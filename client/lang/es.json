@@ -1,0 +1,344 @@
+[
+  {
+    "term": "component.password-input.hide",
+    "definition": "Ocultar constraseña",
+    "context": "",
+    "reference": "components/PasswordInput.tsx#L21-L24"
+  },
+  {
+    "term": "component.password-input.show",
+    "definition": "Mostrar contraseña",
+    "context": "",
+    "reference": "components/PasswordInput.tsx#L25-L28"
+  },
+  {
+    "term": "component.toggle-color-mode-button.toggle-dark",
+    "definition": "Cambiar a modo oscuro",
+    "context": "",
+    "reference": "components/ToggleColorModeButton.tsx#L19-L22"
+  },
+  {
+    "term": "component.toggle-color-mode-button.toggle-light",
+    "definition": "Cambiar a modo claro",
+    "context": "",
+    "reference": "components/ToggleColorModeButton.tsx#L23-L26"
+  },
+  {
+    "term": "generic.forms.email-label",
+    "definition": "Email",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L138-L141"
+  },
+  {
+    "term": "generic.forms.email-placeholder",
+    "definition": "tunombre@ejemplo.com",
+    "context": "",
+    "reference": "components/public/PublicHero.tsx#L66-L69"
+  },
+  {
+    "term": "generic.forms.invalid-email-error",
+    "definition": "Por favor, introduzca un correo eletrónico válido",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L154-L157"
+  },
+  {
+    "term": "generic.forms.invalid-verification-code",
+    "definition": "El código de verificación es inválido",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L266-L269"
+  },
+  {
+    "term": "generic.forms.new-password-label",
+    "definition": "Contraseña nueva",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L245-L248"
+  },
+  {
+    "term": "generic.forms.password-label",
+    "definition": "Contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L269-L272"
+  },
+  {
+    "term": "generic.forms.password-policy-error",
+    "definition": "La contraseña debe contener al menos 8 caracteres",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L260-L263"
+  },
+  {
+    "term": "generic.forms.passwords-must-match",
+    "definition": "Las contraseñas deben coincidir",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L284-L287"
+  },
+  {
+    "term": "generic.forms.required-password-error",
+    "definition": "Por favor, introduzca la contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L175-L178"
+  },
+  {
+    "term": "generic.forms.required-verification-code",
+    "definition": "El código de verificación es obligatorio",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L274-L277"
+  },
+  {
+    "term": "generic.forms.verification-code-label",
+    "definition": "Código de verificación",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L254-L257"
+  },
+  {
+    "term": "header.user-menu-button",
+    "definition": "Menú de usuario",
+    "context": "",
+    "reference": "components/layout/AppLayoutHeader.tsx#L43-L46"
+  },
+  {
+    "term": "navbar.contacts-link",
+    "definition": "Contactos",
+    "context": "",
+    "reference": "components/layout/AppLayoutNavbar.tsx#L42-L45"
+  },
+  {
+    "term": "navbar.new-button",
+    "definition": "Nueva petición",
+    "context": "",
+    "reference": "components/layout/AppLayoutNavbar.tsx#L62-L65"
+  },
+  {
+    "term": "navbar.petitions-link",
+    "definition": "Peticiones",
+    "context": "",
+    "reference": "components/layout/AppLayoutNavbar.tsx#L34-L37"
+  },
+  {
+    "term": "navbar.sendouts-link",
+    "definition": "Envíos",
+    "context": "",
+    "reference": "components/layout/AppLayoutNavbar.tsx#L26-L29"
+  },
+  {
+    "term": "public.cookies.title",
+    "definition": "Política de cookies",
+    "context": "",
+    "reference": "pages/[locale]/legal/[doc].tsx#L28-L31"
+  },
+  {
+    "term": "public.footer.follow-us",
+    "definition": "Síguenos",
+    "context": "",
+    "reference": "components/public/layout/PublicFooter.tsx#L76-L79"
+  },
+  {
+    "term": "public.footer.language-select-label",
+    "definition": "Cambiar idioma",
+    "context": "",
+    "reference": "components/public/layout/PublicFooter.tsx#L59-L62"
+  },
+  {
+    "term": "public.footer.legal-information",
+    "definition": "Información legal",
+    "context": "",
+    "reference": "components/public/layout/PublicFooter.tsx#L115-L118"
+  },
+  {
+    "term": "public.footer.linkedin-profile",
+    "definition": "LinkedIn",
+    "context": "",
+    "reference": "components/public/layout/PublicFooter.tsx#L105-L108"
+  },
+  {
+    "term": "public.footer.twitter-profile",
+    "definition": "Twitter",
+    "context": "",
+    "reference": "components/public/layout/PublicFooter.tsx#L90-L93"
+  },
+  {
+    "term": "public.forgot-password.explanation",
+    "definition": "Le enviaremos un mensaje para restablecer su contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L144-L147"
+  },
+  {
+    "term": "public.forgot-password.header",
+    "definition": "He olvidado mi contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L138-L141"
+  },
+  {
+    "term": "public.forgot-password.login-link",
+    "definition": "Me acordé de mi contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L191-L194"
+  },
+  {
+    "term": "public.forgot-password.reset-button",
+    "definition": "Restablecer contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L336-L339"
+  },
+  {
+    "term": "public.forgot-password.reset-explanation",
+    "definition": "Use el código de verificación que habrá recibido en su correo electrónico.",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L245-L248"
+  },
+  {
+    "term": "public.forgot-password.reset-header",
+    "definition": "Restablecer contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L239-L242"
+  },
+  {
+    "term": "public.forgot-password.reset-success-toast-description",
+    "definition": "Su contraseña ha sido restablecida con éxito.",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L81-L84"
+  },
+  {
+    "term": "public.forgot-password.reset-success-toast-title",
+    "definition": "Contraseña restablecida",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L77-L80"
+  },
+  {
+    "term": "public.forgot-password.send-button",
+    "definition": "Enviar código de verificación",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L183-L186"
+  },
+  {
+    "term": "public.forgot-password.toast-description",
+    "definition": "Le hemos enviado un correo eletrónico. Siga las instrucciones para restablecer su contaseña.",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L52-L56"
+  },
+  {
+    "term": "public.forgot-password.toast-title",
+    "definition": "Restablecer contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L48-L51"
+  },
+  {
+    "term": "public.forgot.title",
+    "definition": "He olvidado mi contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L98-L101"
+  },
+  {
+    "term": "public.hero-invite.toast-description",
+    "definition": "Nos pondremos en contacto contigo muy pronto.",
+    "context": "",
+    "reference": "pages/[locale]/index.tsx#L20-L23"
+  },
+  {
+    "term": "public.hero-invite.toast-title",
+    "definition": "¡Muchas gracias!",
+    "context": "",
+    "reference": "pages/[locale]/index.tsx#L16-L19"
+  },
+  {
+    "term": "public.home.hero-question",
+    "definition": "",
+    "context": "",
+    "reference": "components/public/PublicHero.tsx#L46-L49"
+  },
+  {
+    "term": "public.home.hero-subtitle",
+    "definition": "",
+    "context": "",
+    "reference": "components/public/PublicHero.tsx#L40-L43"
+  },
+  {
+    "term": "public.home.hero-title",
+    "definition": "",
+    "context": "",
+    "reference": "components/public/PublicHero.tsx#L34-L37"
+  },
+  {
+    "term": "public.home.request-invite-button",
+    "definition": "Socitar acceso",
+    "context": "",
+    "reference": "components/public/PublicHero.tsx#L92-L95"
+  },
+  {
+    "term": "public.login-button",
+    "definition": "Acceder",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L189-L192"
+  },
+  {
+    "term": "public.login.back-to-login-link",
+    "definition": "Volver atrás",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L306-L309"
+  },
+  {
+    "term": "public.login.explanation",
+    "definition": "Acceda usando su correo eletrónico y contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L129-L132"
+  },
+  {
+    "term": "public.login.forgot-password-link",
+    "definition": "He olvidado mi contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L197-L200"
+  },
+  {
+    "term": "public.login.header",
+    "definition": "Entrar en Parallel",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L123-L126"
+  },
+  {
+    "term": "public.login.invalid-login.description",
+    "definition": "El correo eletrónico o la contraseña proporcionados no son válidos.",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L49-L52"
+  },
+  {
+    "term": "public.login.invalid-login.title",
+    "definition": "Acceso inválido",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L45-L48"
+  },
+  {
+    "term": "public.login.password-update-button",
+    "definition": "Cambiar contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L298-L301"
+  },
+  {
+    "term": "public.login.password-update-explanation",
+    "definition": "Al acceder por primera vez, se debe cambiar la contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L236-L239"
+  },
+  {
+    "term": "public.login.password-update-header",
+    "definition": "Cambie su contraseña",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L230-L233"
+  },
+  {
+    "term": "public.login.title",
+    "definition": "Entra en Parallel",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L82-L85"
+  },
+  {
+    "term": "public.privacy.title",
+    "definition": "Política de privacidad",
+    "context": "",
+    "reference": "pages/[locale]/legal/[doc].tsx#L24-L27"
+  },
+  {
+    "term": "public.terms.title",
+    "definition": "Términos y condiciones",
+    "context": "",
+    "reference": "pages/[locale]/legal/[doc].tsx#L20-L23"
+  }
+]

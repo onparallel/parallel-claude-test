@@ -1,0 +1,22 @@
+{
+  "name": "@parallel/bin",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "extract-i18n-terms": "ts-node extract-i18n-terms.ts",
+    "generate-i18n-files": "ts-node generate-i18n-files.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@formatjs/cli": "^1.1.20",
+    "@types/node": "^13.7.0",
+    "@types/yargs": "^15.0.3",
+    "chalk": "^3.0.0",
+    "intl-messageformat-parser": "^3.6.4",
+    "prettier": "^1.19.1",
+    "remeda": "^0.0.14",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5",
+    "yargs": "^15.1.0"
+  }
+}

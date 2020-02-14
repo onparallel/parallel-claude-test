@@ -1,0 +1,33 @@
+{
+  "name": "@parallel/emails",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node --files ./server.tsx",
+    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --input '../emails/{components,emails}/**/*.{ts,tsx}' --output '../emails/lang'",
+    "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --input '../emails/lang' --output-compiled '../emails/lang/compiled'"
+  },
+  "dependencies": {
+    "mjml": "^4.5.1",
+    "mjml-react": "^1.0.57",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-intl": "^3.12.0",
+    "remeda": "^0.0.14",
+    "ts-node": "^8.6.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.2",
+    "@types/mjml": "^4.0.3",
+    "@types/mjml-react": "^1.0.1",
+    "@types/node": "^13.7.0",
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "chalk": "^3.0.0",
+    "express": "^4.17.1",
+    "livereload": "^0.9.1",
+    "prettier": "^1.19.1",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.7.5"
+  }
+}

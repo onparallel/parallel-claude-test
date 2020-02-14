@@ -1,0 +1,13 @@
+schema: http://localhost/graphql
+documents: "**/*.tsx"
+generates:
+  ./graphql/__types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+    config:
+      skipTypename: true
+      namingConvention: keep
+      exportFragmentSpreadSubTypes: true
+      scalars:
+        DateTime: string

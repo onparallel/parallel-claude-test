@@ -1,0 +1,10 @@
+{
+  "schemaPath": "server/parallel-schema.graphql",
+  "include": "./client/**/*.tsx",
+  "endpoint": "http://localhost/graphql",
+  "extensions": {
+    "endpoints": {
+      "dev": "http://localhost/graphql"
+    }
+  }
+}

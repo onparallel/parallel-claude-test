@@ -1,0 +1,8 @@
+[
+  {
+    "term": "greeting",
+    "definition": "Hello {name}",
+    "context": "",
+    "reference": "emails/ForgotPassword.tsx#L39-L43"
+  }
+]
