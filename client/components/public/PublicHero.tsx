@@ -100,7 +100,7 @@ export function PublicHero({ onRequestInvite, ...props }: PublicHeroProps) {
         <Box
           flex="2"
           display={{ base: "none", md: "block" }}
-          backgroundImage="url('/images/hero.png')"
+          backgroundImage="url('/static/images/hero.png')"
           backgroundSize="cover"
           backgroundPosition="bottom left"
           marginLeft={12}

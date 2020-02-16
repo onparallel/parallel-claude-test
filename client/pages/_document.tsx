@@ -9,14 +9,16 @@ import Document, {
 import { IntlConfig } from "react-intl";
 import { LangProps } from "./_app";
 
+const LANG_DIR = process.env.ROOT + "/public/static/lang";
+
 export async function loadMessages(
   locale: string
 ): Promise<IntlConfig["messages"]> {
   const [raw, compiled] = await Promise.all([
-    fs.readFile(process.env.ROOT + `/public/lang/${locale}.json`, {
+    fs.readFile(LANG_DIR + `/${locale}.json`, {
       encoding: "utf-8"
     }),
-    fs.readFile(process.env.ROOT + `/public/lang/compiled/${locale}.json`, {
+    fs.readFile(LANG_DIR + `/compiled/${locale}.json`, {
       encoding: "utf-8"
     })
   ]);

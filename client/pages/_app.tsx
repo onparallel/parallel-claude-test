@@ -69,7 +69,7 @@ export function useTranslations(locale: string) {
   });
   useEffect(() => {
     if (!cache[locale]) {
-      fetch(`/lang/${locale}.json`)
+      fetch(`/static/lang/${locale}.json`)
         .then(res => res.json())
         .then(messages => {
           setState({
