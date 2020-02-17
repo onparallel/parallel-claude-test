@@ -20,7 +20,6 @@ import {
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { Title } from "@parallel/components/common/Title";
 
 interface NameChangeFormData {
   firstName: string;
@@ -136,7 +135,6 @@ function Account() {
 Account.fragments = {
   user: gql`
     fragment Account_User on User {
-      id
       firstName
       lastName
       ...AppLayout_User
@@ -159,6 +157,7 @@ const UPDATE_ACCOUNT = gql`
 const GET_ACCOUNT_DATA = gql`
   query Account {
     me {
+      id
       ...Account_User
     }
   }

@@ -125,7 +125,7 @@ export type SendoutsQueryVariables = {};
 export type SendoutsQuery = { me: AppLayout_UserFragment };
 
 export type Account_UserFragment = (
-  Pick<User, 'id' | 'firstName' | 'lastName'>
+  Pick<User, 'firstName' | 'lastName'>
   & AppLayout_UserFragment
 );
 
@@ -141,13 +141,16 @@ export type updateAccountMutation = { updateUser: Pick<User, 'id' | 'firstName' 
 export type AccountQueryVariables = {};
 
 
-export type AccountQuery = { me: Account_UserFragment };
+export type AccountQuery = { me: (
+    Pick<User, 'id'>
+    & Account_UserFragment
+  ) };
 
 export type SecurityQueryVariables = {};
 
 
 export type SecurityQuery = { me: (
-    Pick<User, 'organizationRole' | 'email'>
+    Pick<User, 'id'>
     & AppLayout_UserFragment
   ) };
 
