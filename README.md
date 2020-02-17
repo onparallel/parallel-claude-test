@@ -14,7 +14,7 @@ The client uses the following libraries:
 - `yarn dev`: Runs the client locally with live-reload.
 - `yarn build`: Creates a production build of the next app.
 - `yarn start`: Serves the production build locally.
-- `yarn graphql`: Generates the interfaces for all the queries, mutations and fragments used in the client (`graphql/__types.ts`).
+- `yarn generate-graphql-types`: Generates the interfaces for all the queries, mutations and fragments used in the client (`graphql/__types.ts`).
 - `yarn extract-i18n-terms`: Extracts the translation terms into `lang/[locale].json`.
 - `yarn generate-i18n-files`: Generates the translations files for the app to consume.
 
