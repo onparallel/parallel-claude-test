@@ -1,7 +1,7 @@
 import { enumType, objectType } from "nexus";
 import { toGlobalId } from "../../util/globalId";
 import { Context } from "../../context";
-import { Organization } from "../../db/__types";
+import { Organization as DbOrganization } from "../../db/__types";
 import { authorizeAnd, hasOrgRole } from "../helpers/authorize";
 
 export const OrganizationStatus = enumType({
@@ -45,6 +45,6 @@ export const Organization = objectType({
   }
 });
 
-export function belongsToOrg(root: Organization, _args: any, ctx: Context) {
+export function belongsToOrg(root: DbOrganization, _args: any, ctx: Context) {
   return ctx.user.org_id === root.id;
 }

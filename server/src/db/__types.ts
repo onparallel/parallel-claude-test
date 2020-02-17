@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-export type Nullable<T> = T | null;
+export type Maybe<T> = T | null;
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
 
@@ -15,11 +15,11 @@ export interface Organization {
   identifier: string;
   status: OrganizationStatus;
   created_at: Date;
-  created_by: Nullable<string>;
+  created_by: Maybe<string>;
   updated_at: Date;
-  updated_by: Nullable<string>;
-  deleted_at: Nullable<Date>;
-  deleted_by: Nullable<string>;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
 }
 
 export interface CreateOrganization {
@@ -28,11 +28,11 @@ export interface CreateOrganization {
   identifier: string;
   status: OrganizationStatus;
   created_at?: Date;
-  created_by?: Nullable<string>;
+  created_by?: Maybe<string>;
   updated_at?: Date;
-  updated_by?: Nullable<string>;
-  deleted_at?: Nullable<Date>;
-  deleted_by?: Nullable<string>;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
 }
 
 export interface User {
@@ -41,14 +41,14 @@ export interface User {
   org_id: number;
   organization_role: UserOrganizationRole;
   email: string;
-  first_name: Nullable<string>;
-  last_name: Nullable<string>;
+  first_name: Maybe<string>;
+  last_name: Maybe<string>;
   created_at: Date;
-  created_by: Nullable<string>;
+  created_by: Maybe<string>;
   updated_at: Date;
-  updated_by: Nullable<string>;
-  deleted_at: Nullable<Date>;
-  deleted_by: Nullable<string>;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
 }
 
 export interface CreateUser {
@@ -57,12 +57,12 @@ export interface CreateUser {
   org_id: number;
   organization_role?: UserOrganizationRole;
   email: string;
-  first_name?: Nullable<string>;
-  last_name?: Nullable<string>;
+  first_name?: Maybe<string>;
+  last_name?: Maybe<string>;
   created_at?: Date;
-  created_by?: Nullable<string>;
+  created_by?: Maybe<string>;
   updated_at?: Date;
-  updated_by?: Nullable<string>;
-  deleted_at?: Nullable<Date>;
-  deleted_by?: Nullable<string>;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
 }
