@@ -27,6 +27,7 @@ interface DbColumn {
   type: string;
   nullable: boolean;
   hasDefault: boolean;
+  position: number;
 }
 
 interface DbTable {
@@ -59,6 +60,7 @@ export type ${name} = ${values
       ({ name, columns }) => `
 export interface ${name} {
   ${columns
+    .sort((a, b) => a.position - b.position)
     .map(c => `${c.name}: ${c.nullable ? `Maybe<${c.type}>` : c.type};`)
     .join("\n  ")}
 }
@@ -118,29 +120,25 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
       "column_name ",
       "udt_name",
       "is_nullable",
-      "column_default"
+      "column_default",
+      "ordinal_position"
     )
     .from("information_schema.columns")
     .whereIn("table_name", tables);
   const result = new Map<string, DbTable>();
-  for (const {
-    table_name,
-    column_name,
-    udt_name,
-    is_nullable,
-    column_default
-  } of rows) {
-    if (!result.has(table_name)) {
-      result.set(table_name, {
-        name: camelCase(table_name, { pascalCase: true }),
+  for (const row of rows) {
+    if (!result.has(row.table_name)) {
+      result.set(row.table_name, {
+        name: camelCase(row.table_name, { pascalCase: true }),
         columns: []
       });
     }
-    result.get(table_name)!.columns.push({
-      name: column_name,
-      type: getColumnType(udt_name, enums),
-      nullable: is_nullable === "YES",
-      hasDefault: !!column_default
+    result.get(row.table_name)!.columns.push({
+      name: row.column_name,
+      type: getColumnType(row.udt_name, enums),
+      nullable: row.is_nullable === "YES",
+      hasDefault: !!row.column_default,
+      position: row.ordinal_position
     });
   }
   return result;
