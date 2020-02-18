@@ -1,4 +1,4 @@
-import { enumType, objectType } from "nexus";
+import { enumType, objectType, FieldAuthorizeResolver } from "nexus";
 import { toGlobalId } from "../../util/globalId";
 import { Context } from "../../context";
 import { Organization as DbOrganization } from "../../db/__types";
@@ -37,7 +37,7 @@ export const Organization = objectType({
     t.paginationField("users", {
       type: "User",
       description: "The users in the organization.",
-      authorize: authorizeAnd(belongsToOrg, hasOrgRole("ADMIN")),
+      authorize: authorizeAnd(belongsToOrg(), hasOrgRole("ADMIN")),
       resolve: async (root, { offset, limit }, ctx, info) => {
         return await ctx.organizations.loadOrgUsers(root.id, { offset, limit });
       }
@@ -45,6 +45,11 @@ export const Organization = objectType({
   }
 });
 
-export function belongsToOrg(root: DbOrganization, _args: any, ctx: Context) {
-  return ctx.user.org_id === root.id;
+function belongsToOrg<FieldName extends string>(): FieldAuthorizeResolver<
+  "Organization",
+  FieldName
+> {
+  return (root: DbOrganization, _args: any, ctx: Context) => {
+    return ctx.user.org_id === root.id;
+  };
 }

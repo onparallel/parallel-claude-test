@@ -10,7 +10,7 @@ export const Query = objectType({
       args: {
         id: stringArg({ required: true })
       },
-      authorize: authenticate,
+      authorize: authenticate(),
       nullable: true,
       resolve: async (_, args, ctx) => {
         const { id } = fromGlobalId(args.id, "Organization");
@@ -19,7 +19,7 @@ export const Query = objectType({
     });
     t.field("me", {
       type: "User",
-      authorize: authenticate,
+      authorize: authenticate(),
       resolve: (_, args, ctx, info) => {
         return ctx.user;
       }
