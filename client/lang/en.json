@@ -1,33 +1,57 @@
 [
   {
+    "term": "component.cookie-consent.accept-button",
+    "definition": "Accept",
+    "context": "",
+    "reference": "components/public/layout/CookieConsent.tsx#L76-L79"
+  },
+  {
+    "term": "component.cookie-consent.description",
+    "definition": "We use analytics cookies that allow us to understand how users navigate around our website. These cookies will only be used if you grant consent and you will always be allowed to reject them at any moment. <a>Read more</a>",
+    "context": "",
+    "reference": "components/public/layout/CookieConsent.tsx#L36-L55"
+  },
+  {
+    "term": "component.cookie-consent.header",
+    "definition": "Cookies on Parallel",
+    "context": "",
+    "reference": "components/public/layout/CookieConsent.tsx#L30-L33"
+  },
+  {
+    "term": "component.cookie-consent.reject-button",
+    "definition": "Reject",
+    "context": "",
+    "reference": "components/public/layout/CookieConsent.tsx#L91-L94"
+  },
+  {
     "term": "component.password-input.hide",
     "definition": "Hide",
     "context": "",
-    "reference": "components/PasswordInput.tsx#L21-L24"
+    "reference": "components/common/PasswordInput.tsx#L21-L24"
   },
   {
     "term": "component.password-input.show",
     "definition": "Show",
     "context": "",
-    "reference": "components/PasswordInput.tsx#L25-L28"
+    "reference": "components/common/PasswordInput.tsx#L25-L28"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
     "definition": "Toggle dark mode",
     "context": "",
-    "reference": "components/ToggleColorModeButton.tsx#L19-L22"
+    "reference": "components/common/ToggleColorModeButton.tsx#L19-L22"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-light",
     "definition": "Toggle light mode",
     "context": "",
-    "reference": "components/ToggleColorModeButton.tsx#L23-L26"
+    "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
     "term": "generic.forms.email-label",
     "definition": "Email",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L138-L141"
+    "reference": "pages/[locale]/login.tsx#L210-L213"
   },
   {
     "term": "generic.forms.email-placeholder",
@@ -36,10 +60,16 @@
     "reference": "components/public/PublicHero.tsx#L66-L69"
   },
   {
+    "term": "generic.forms.fist-name-label",
+    "definition": "First name",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L72-L75"
+  },
+  {
     "term": "generic.forms.invalid-email-error",
     "definition": "Please, enter a valid email",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L154-L157"
+    "reference": "pages/[locale]/login.tsx#L226-L229"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -48,34 +78,52 @@
     "reference": "pages/[locale]/forgot.tsx#L266-L269"
   },
   {
+    "term": "generic.forms.last-name-label",
+    "definition": "Last name",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L101-L104"
+  },
+  {
     "term": "generic.forms.new-password-label",
     "definition": "New password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L245-L248"
+    "reference": "pages/[locale]/login.tsx#L317-L320"
   },
   {
     "term": "generic.forms.password-label",
     "definition": "Password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L269-L272"
+    "reference": "pages/[locale]/login.tsx#L341-L344"
   },
   {
     "term": "generic.forms.password-policy-error",
     "definition": "The password must have a least 8 characters",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L260-L263"
+    "reference": "pages/[locale]/login.tsx#L332-L335"
   },
   {
     "term": "generic.forms.passwords-must-match",
     "definition": "Passwords must match",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L284-L287"
+    "reference": "pages/[locale]/login.tsx#L356-L359"
+  },
+  {
+    "term": "generic.forms.required-first-name-error",
+    "definition": "First name is required",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L84-L87"
+  },
+  {
+    "term": "generic.forms.required-last-name-error",
+    "definition": "Last name is required",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L113-L116"
   },
   {
     "term": "generic.forms.required-password-error",
     "definition": "Please, enter a password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L175-L178"
+    "reference": "pages/[locale]/login.tsx#L247-L250"
   },
   {
     "term": "generic.forms.required-verification-code",
@@ -93,31 +141,31 @@
     "term": "header.user-menu-button",
     "definition": "User menu",
     "context": "",
-    "reference": "components/layout/AppLayoutHeader.tsx#L43-L46"
+    "reference": "components/layout/UserMenu.tsx#L36-L39"
   },
   {
     "term": "navbar.contacts-link",
     "definition": "Contacts",
     "context": "",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L42-L45"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L48-L51"
   },
   {
     "term": "navbar.new-button",
     "definition": "Create a new petition",
     "context": "",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L62-L65"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L89-L92"
   },
   {
     "term": "navbar.petitions-link",
     "definition": "Petitions",
     "context": "",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L34-L37"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L40-L43"
   },
   {
     "term": "navbar.sendouts-link",
     "definition": "Sendouts",
     "context": "",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L26-L29"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L32-L35"
   },
   {
     "term": "public.cookies.title",
@@ -267,67 +315,85 @@
     "term": "public.login-button",
     "definition": "Login",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L189-L192"
+    "reference": "pages/[locale]/login.tsx#L261-L264"
+  },
+  {
+    "term": "public.login.already-logged-in.continue-button",
+    "definition": "Continue as {name}",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L161-L165"
+  },
+  {
+    "term": "public.login.already-logged-in.explanation",
+    "definition": "You are already logged in as {name}",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L146-L150"
+  },
+  {
+    "term": "public.login.already-logged-in.relogin",
+    "definition": "Login as someone else",
+    "context": "",
+    "reference": "pages/[locale]/login.tsx#L169-L172"
   },
   {
     "term": "public.login.back-to-login-link",
     "definition": "Go back to login",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L306-L309"
+    "reference": "pages/[locale]/login.tsx#L378-L381"
   },
   {
     "term": "public.login.explanation",
     "definition": "Login using your email and password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L129-L132"
+    "reference": "pages/[locale]/login.tsx#L201-L204"
   },
   {
     "term": "public.login.forgot-password-link",
     "definition": "I forgot my password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L197-L200"
+    "reference": "pages/[locale]/login.tsx#L269-L272"
   },
   {
     "term": "public.login.header",
     "definition": "Enter Parallel",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L123-L126"
+    "reference": "pages/[locale]/login.tsx#L195-L198"
   },
   {
     "term": "public.login.invalid-login.description",
     "definition": "The email or password are invalid.",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L49-L52"
+    "reference": "pages/[locale]/login.tsx#L64-L67"
   },
   {
     "term": "public.login.invalid-login.title",
     "definition": "Invalid login",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L45-L48"
+    "reference": "pages/[locale]/login.tsx#L60-L63"
   },
   {
     "term": "public.login.password-update-button",
     "definition": "Update password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L298-L301"
+    "reference": "pages/[locale]/login.tsx#L370-L373"
   },
   {
     "term": "public.login.password-update-explanation",
     "definition": "First time users need to update their password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L236-L239"
+    "reference": "pages/[locale]/login.tsx#L308-L311"
   },
   {
     "term": "public.login.password-update-header",
     "definition": "Update your password",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L230-L233"
+    "reference": "pages/[locale]/login.tsx#L302-L305"
   },
   {
     "term": "public.login.title",
     "definition": "Login",
     "context": "",
-    "reference": "pages/[locale]/login.tsx#L82-L85"
+    "reference": "pages/[locale]/login.tsx#L97-L100"
   },
   {
     "term": "public.privacy.title",
@@ -340,5 +406,35 @@
     "definition": "Terms & conditions",
     "context": "",
     "reference": "pages/[locale]/legal/[doc].tsx#L20-L23"
+  },
+  {
+    "term": "settings.account",
+    "definition": "Account",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L51"
+  },
+  {
+    "term": "settings.account.name-header",
+    "definition": "Name",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L56-L59"
+  },
+  {
+    "term": "settings.account.update-name-button",
+    "definition": "Update name",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/account.tsx#L123-L126"
+  },
+  {
+    "term": "settings.header",
+    "definition": "Settings",
+    "context": "",
+    "reference": "components/layout/SettingsLayout.tsx#L23"
+  },
+  {
+    "term": "settings.security",
+    "definition": "Security",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L16"
   }
 ]

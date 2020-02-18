@@ -99,7 +99,7 @@ function Account() {
                 <FormControl isInvalid={!!errors.lastName}>
                   <FormLabel htmlFor="last-name">
                     <FormattedMessage
-                      id="generic.forms.fist-name-label"
+                      id="generic.forms.last-name-label"
                       defaultMessage="Last name"
                     ></FormattedMessage>
                   </FormLabel>
