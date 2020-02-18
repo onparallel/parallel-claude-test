@@ -48,14 +48,12 @@ export type Maybe<T> = T | null;
   ${Array.from(enums.values())
     .map(
       ({ name, values }) => `
-export type ${name} = ${values
-        .sort()
-        .map(value => `"${value}"`)
-        .join(" | ")};`
+export type ${name} = ${values.map(value => `"${value}"`).join(" | ")};`
     )
     .join("\n")}
     
   ${Array.from(tables.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map(
       ({ name, columns }) => `
 export interface ${name} {
@@ -95,11 +93,16 @@ async function getTableNames() {
 
 async function getDefinedEnums() {
   const rows = await knex
-    .select("t.typname as name", "e.enumlabel as value")
+    .select(
+      "t.typname as name",
+      "e.enumlabel as value",
+      "e.enumsortorder as order"
+    )
     .from("pg_catalog.pg_type as t")
     .join("pg_catalog.pg_enum as e", "t.oid", "=", "e.enumtypid")
     .join("pg_catalog.pg_namespace as n", "n.oid", "=", "t.typnamespace")
-    .where("n.nspname", "public");
+    .where("n.nspname", "public")
+    .orderBy(["name", "order"]);
   const result = new Map<string, DbEnum>();
   for (const { name, value } of rows) {
     if (!result.has(name)) {

@@ -5,9 +5,9 @@
 
 export type Maybe<T> = T | null;
 
-export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
+export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
-export type UserOrganizationRole = "ADMIN" | "NORMAL";
+export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
 export interface Organization {
   id: number;
