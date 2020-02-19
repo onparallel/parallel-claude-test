@@ -11,3 +11,6 @@ generates:
       exportFragmentSpreadSubTypes: true
       scalars:
         DateTime: string
+hooks:
+  afterAllFileWrite:
+    - prettier --write
