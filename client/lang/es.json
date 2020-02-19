@@ -48,6 +48,12 @@
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
+    "term": "generic.forms.confirm-password-label",
+    "definition": "Confirmar contraseña",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L307-L310"
+  },
+  {
     "term": "generic.forms.email-label",
     "definition": "Email",
     "context": "",
@@ -70,6 +76,12 @@
     "definition": "Por favor, introduzca un correo eletrónico válido",
     "context": "",
     "reference": "pages/[locale]/login.tsx#L226-L229"
+  },
+  {
+    "term": "generic.forms.invalid-old-password-error",
+    "definition": "La contraseña actual es incorrecta",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L119-L122"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -118,6 +130,12 @@
     "definition": "El apellido es un campo requerido",
     "context": "",
     "reference": "pages/[locale]/app/settings/account.tsx#L113-L116"
+  },
+  {
+    "term": "generic.forms.required-old-password-error",
+    "definition": "La contraseña actual es requerida",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L111-L114"
   },
   {
     "term": "generic.forms.required-password-error",
@@ -414,6 +432,12 @@
     "reference": "pages/[locale]/app/settings/account.tsx#L51"
   },
   {
+    "term": "settings.account.change-password-button",
+    "definition": "Cambiar contraseña",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L193-L196"
+  },
+  {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
     "context": "",
@@ -435,6 +459,24 @@
     "term": "settings.security",
     "definition": "Seguridad",
     "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L16"
+    "reference": "pages/[locale]/app/settings/security.tsx#L78"
+  },
+  {
+    "term": "settings.security.password-change-toast-description",
+    "definition": "Tu contraseña ha sido actualizada con éxito.",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L63-L66"
+  },
+  {
+    "term": "settings.security.password-change-toast-title",
+    "definition": "Contraseña actualizada",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L59-L62"
+  },
+  {
+    "term": "settings.security.password-header",
+    "definition": "Contraseña",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L83-L86"
   }
 ]

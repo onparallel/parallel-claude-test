@@ -15,7 +15,14 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 scalar DateTime
 
 type Mutation {
+  """
+  Changes the password for the current logged in user.
+  """
   changePassword(newPassword: String!, password: String!): ChangePasswordResult!
+
+  """
+  Updates the user with the provided data.
+  """
   updateUser(data: UpdateUserInput!, id: ID!): User!
 }
 

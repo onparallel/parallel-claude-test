@@ -146,6 +146,14 @@ export type AccountQuery = { me: (
     & Account_UserFragment
   ) };
 
+export type updatePasswordMutationVariables = {
+  password: Scalars['String'],
+  newPassword: Scalars['String']
+};
+
+
+export type updatePasswordMutation = Pick<Mutation, 'changePassword'>;
+
 export type SecurityQueryVariables = {};
 
 

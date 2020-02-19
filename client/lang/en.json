@@ -48,6 +48,12 @@
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
+    "term": "generic.forms.confirm-password-label",
+    "definition": "Confirm password",
+    "context": "",
+    "reference": "pages/[locale]/forgot.tsx#L307-L310"
+  },
+  {
     "term": "generic.forms.email-label",
     "definition": "Email",
     "context": "",
@@ -70,6 +76,12 @@
     "definition": "Please, enter a valid email",
     "context": "",
     "reference": "pages/[locale]/login.tsx#L226-L229"
+  },
+  {
+    "term": "generic.forms.invalid-old-password-error",
+    "definition": "Old password is incorrect",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L119-L122"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -118,6 +130,12 @@
     "definition": "Last name is required",
     "context": "",
     "reference": "pages/[locale]/app/settings/account.tsx#L113-L116"
+  },
+  {
+    "term": "generic.forms.required-old-password-error",
+    "definition": "Old password is required",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L111-L114"
   },
   {
     "term": "generic.forms.required-password-error",
@@ -414,6 +432,12 @@
     "reference": "pages/[locale]/app/settings/account.tsx#L51"
   },
   {
+    "term": "settings.account.change-password-button",
+    "definition": "Change password",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L193-L196"
+  },
+  {
     "term": "settings.account.name-header",
     "definition": "Name",
     "context": "",
@@ -435,6 +459,24 @@
     "term": "settings.security",
     "definition": "Security",
     "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L16"
+    "reference": "pages/[locale]/app/settings/security.tsx#L78"
+  },
+  {
+    "term": "settings.security.password-change-toast-description",
+    "definition": "Your password has been successfully changed.",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L63-L66"
+  },
+  {
+    "term": "settings.security.password-change-toast-title",
+    "definition": "Password changed",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L59-L62"
+  },
+  {
+    "term": "settings.security.password-header",
+    "definition": "Password",
+    "context": "",
+    "reference": "pages/[locale]/app/settings/security.tsx#L83-L86"
   }
 ]

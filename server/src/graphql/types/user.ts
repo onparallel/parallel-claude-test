@@ -4,15 +4,14 @@ import {
   inputObjectType,
   mutationField,
   objectType,
-  stringArg,
-  FieldAuthorizeResolver
+  stringArg
 } from "nexus";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { removeNotDefined } from "../../util/removeNotDefined";
 import {
+  argIsContextUserId,
   authenticate,
-  authorizeAnd,
-  argIsContextUserId
+  authorizeAnd
 } from "../helpers/authorize";
 
 export const OrganizationRole = enumType({
@@ -69,6 +68,7 @@ export const User = objectType({
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
+  description: "Updates the user with the provided data.",
   authorize: authorizeAnd(authenticate(), argIsContextUserId("id")),
   args: {
     id: idArg({ required: true }),
@@ -94,6 +94,7 @@ export const updateUser = mutationField("updateUser", {
 });
 
 export const changePassword = mutationField("changePassword", {
+  description: "Changes the password for the current logged in user.",
   type: enumType({
     name: "ChangePasswordResult",
     members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD"]

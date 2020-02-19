@@ -305,8 +305,8 @@ function PasswordResetForm({
         <FormControl mt={2} isInvalid={!!errors.password2}>
           <FormLabel htmlFor="password-confirm">
             <FormattedMessage
-              id="generic.forms.password-label"
-              defaultMessage="Password"
+              id="generic.forms.confirm-password-label"
+              defaultMessage="Confirm password"
             ></FormattedMessage>
           </FormLabel>
           <PasswordInput
