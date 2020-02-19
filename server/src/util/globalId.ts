@@ -1,9 +1,11 @@
+import { decode, encode } from "./base58";
+
 export function toGlobalId(type: string, id: number) {
-  return Buffer.from(`${type}:${id}`, "utf8").toString("base64");
+  return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
 
 export function fromGlobalId(globalId: string, verifytype?: string) {
-  const [type, id] = Buffer.from(globalId, "base64")
+  const [type, id] = decode(globalId)
     .toString("utf8")
     .split(":");
   if (verifytype && verifytype !== type) {
