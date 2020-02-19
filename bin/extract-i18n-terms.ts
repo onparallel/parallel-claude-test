@@ -15,6 +15,8 @@ interface Language {
 
 const exec = promisify(cp.exec);
 
+const isWindows = process.platform === "win32";
+
 export interface Term {
   term: string;
   definition: string;
@@ -54,13 +56,13 @@ interface ExtractedTerm {
 async function extractTerms(input: string) {
   try {
     const tmpFileName = "lang_tmp.json";
-    await exec(`
-      ./node_modules/.bin/formatjs extract \
-        --extract-source-location \
-        --extract-from-format-message-call \
-        --out-file ${tmpFileName} \
-        '${input}'
-    `);
+    await exec(
+      `formatjs extract \
+       --extract-source-location \
+       --extract-from-format-message-call \
+       --out-file ${tmpFileName} \
+       ${isWindows ? input.replace("/", "\\") : `'${input}'`}`
+    );
     const terms = await readJson<ExtractedTerm[]>(tmpFileName);
     await fs.unlink(tmpFileName);
     return terms;
@@ -110,7 +112,10 @@ function updateLocaleData(
       term.start.line !== term.end.line
         ? `L${term.start.line}-L${term.end.line}`
         : `L${term.start.line}`;
-    entry!.reference = `${term.file.replace(/^\.\.\/[^/]+\//, "")}#${range}`;
+    const path = isWindows
+      ? term.file.replace(/^\.\.\\[^\\]+\\/, "").replace(/\\/g, "/")
+      : term.file.replace(/^\.\.\/[^/]+\//, "");
+    entry!.reference = `${path}#${range}`;
     updated.set(entry!.term, entry);
   }
   return Array.from(updated.values()).sort((a, b) =>
