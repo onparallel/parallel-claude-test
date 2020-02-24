@@ -107,7 +107,7 @@ function updateLocaleData(
     if (defaultLanguage) {
       entry!.definition = term.defaultMessage;
     }
-    entry!.context = term.description || "";
+    entry!.context = term.description || term.defaultMessage;
     const range =
       term.start.line !== term.end.line
         ? `L${term.start.line}-L${term.end.line}`

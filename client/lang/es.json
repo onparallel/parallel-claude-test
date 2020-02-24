@@ -2,481 +2,481 @@
   {
     "term": "component.cookie-consent.accept-button",
     "definition": "",
-    "context": "",
+    "context": "Accept",
     "reference": "components/public/layout/CookieConsent.tsx#L76-L79"
   },
   {
     "term": "component.cookie-consent.description",
     "definition": "",
-    "context": "",
+    "context": "We use analytics cookies that allow us to understand how users navigate around our website. These cookies will only be used if you grant consent and you will always be allowed to reject them at any moment. <a>Read more</a>",
     "reference": "components/public/layout/CookieConsent.tsx#L36-L55"
   },
   {
     "term": "component.cookie-consent.header",
     "definition": "",
-    "context": "",
+    "context": "Cookies on Parallel",
     "reference": "components/public/layout/CookieConsent.tsx#L30-L33"
   },
   {
     "term": "component.cookie-consent.reject-button",
     "definition": "",
-    "context": "",
+    "context": "Reject",
     "reference": "components/public/layout/CookieConsent.tsx#L91-L94"
   },
   {
     "term": "component.password-input.hide",
     "definition": "Ocultar constraseña",
-    "context": "",
+    "context": "Hide",
     "reference": "components/common/PasswordInput.tsx#L21-L24"
   },
   {
     "term": "component.password-input.show",
     "definition": "Mostrar contraseña",
-    "context": "",
+    "context": "Show",
     "reference": "components/common/PasswordInput.tsx#L25-L28"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
     "definition": "Cambiar a modo oscuro",
-    "context": "",
+    "context": "Toggle dark mode",
     "reference": "components/common/ToggleColorModeButton.tsx#L19-L22"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-light",
     "definition": "Cambiar a modo claro",
-    "context": "",
+    "context": "Toggle light mode",
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
     "term": "generic.forms.confirm-password-label",
     "definition": "Confirmar contraseña",
-    "context": "",
+    "context": "Confirm password",
     "reference": "pages/[locale]/forgot.tsx#L307-L310"
   },
   {
     "term": "generic.forms.email-label",
     "definition": "Email",
-    "context": "",
+    "context": "Email",
     "reference": "pages/[locale]/login.tsx#L210-L213"
   },
   {
     "term": "generic.forms.email-placeholder",
     "definition": "tunombre@ejemplo.com",
-    "context": "",
+    "context": "you@example.com",
     "reference": "components/public/PublicHero.tsx#L66-L69"
   },
   {
     "term": "generic.forms.fist-name-label",
     "definition": "Nombre",
-    "context": "",
+    "context": "First name",
     "reference": "pages/[locale]/app/settings/account.tsx#L72-L75"
   },
   {
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo eletrónico válido",
-    "context": "",
+    "context": "Please, enter a valid email",
     "reference": "pages/[locale]/login.tsx#L226-L229"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
     "definition": "La contraseña actual es incorrecta",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L119-L122"
+    "context": "Old password is incorrect",
+    "reference": "pages/[locale]/app/settings/security.tsx#L118-L121"
   },
   {
     "term": "generic.forms.invalid-verification-code",
     "definition": "El código de verificación es inválido",
-    "context": "",
+    "context": "The verification code is invalid",
     "reference": "pages/[locale]/forgot.tsx#L266-L269"
   },
   {
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
-    "context": "",
+    "context": "Last name",
     "reference": "pages/[locale]/app/settings/account.tsx#L101-L104"
   },
   {
     "term": "generic.forms.new-password-label",
     "definition": "Contraseña nueva",
-    "context": "",
+    "context": "New password",
     "reference": "pages/[locale]/login.tsx#L317-L320"
   },
   {
     "term": "generic.forms.password-label",
     "definition": "Contraseña",
-    "context": "",
+    "context": "Password",
     "reference": "pages/[locale]/login.tsx#L341-L344"
   },
   {
     "term": "generic.forms.password-policy-error",
     "definition": "La contraseña debe contener al menos 8 caracteres",
-    "context": "",
+    "context": "The password must have a least 8 characters",
     "reference": "pages/[locale]/login.tsx#L332-L335"
   },
   {
     "term": "generic.forms.passwords-must-match",
     "definition": "Las contraseñas deben coincidir",
-    "context": "",
+    "context": "Passwords must match",
     "reference": "pages/[locale]/login.tsx#L356-L359"
   },
   {
     "term": "generic.forms.required-first-name-error",
     "definition": "El nombre es un campo requerido",
-    "context": "",
+    "context": "First name is required",
     "reference": "pages/[locale]/app/settings/account.tsx#L84-L87"
   },
   {
     "term": "generic.forms.required-last-name-error",
     "definition": "El apellido es un campo requerido",
-    "context": "",
+    "context": "Last name is required",
     "reference": "pages/[locale]/app/settings/account.tsx#L113-L116"
   },
   {
     "term": "generic.forms.required-old-password-error",
     "definition": "La contraseña actual es requerida",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L111-L114"
+    "context": "Old password is required",
+    "reference": "pages/[locale]/app/settings/security.tsx#L110-L113"
   },
   {
     "term": "generic.forms.required-password-error",
     "definition": "Por favor, introduzca la contraseña",
-    "context": "",
+    "context": "Please, enter a password",
     "reference": "pages/[locale]/login.tsx#L247-L250"
   },
   {
     "term": "generic.forms.required-verification-code",
     "definition": "El código de verificación es obligatorio",
-    "context": "",
+    "context": "The verification code is required",
     "reference": "pages/[locale]/forgot.tsx#L274-L277"
   },
   {
     "term": "generic.forms.verification-code-label",
     "definition": "Código de verificación",
-    "context": "",
+    "context": "Verification code",
     "reference": "pages/[locale]/forgot.tsx#L254-L257"
   },
   {
     "term": "header.user-menu-button",
     "definition": "Menú de usuario",
-    "context": "",
+    "context": "User menu",
     "reference": "components/layout/UserMenu.tsx#L36-L39"
   },
   {
     "term": "navbar.contacts-link",
     "definition": "Contactos",
-    "context": "",
+    "context": "Contacts",
     "reference": "components/layout/AppLayoutNavbar.tsx#L48-L51"
   },
   {
     "term": "navbar.new-button",
     "definition": "Nueva petición",
-    "context": "",
+    "context": "Create a new petition",
     "reference": "components/layout/AppLayoutNavbar.tsx#L89-L92"
   },
   {
     "term": "navbar.petitions-link",
     "definition": "Peticiones",
-    "context": "",
+    "context": "Petitions",
     "reference": "components/layout/AppLayoutNavbar.tsx#L40-L43"
   },
   {
     "term": "navbar.sendouts-link",
     "definition": "Envíos",
-    "context": "",
+    "context": "Sendouts",
     "reference": "components/layout/AppLayoutNavbar.tsx#L32-L35"
   },
   {
     "term": "public.cookies.title",
     "definition": "Política de cookies",
-    "context": "",
+    "context": "Cookie policy",
     "reference": "pages/[locale]/legal/[doc].tsx#L28-L31"
   },
   {
     "term": "public.footer.follow-us",
-    "definition": "Síguenos",
-    "context": "",
+    "definition": "",
+    "context": "Follow us",
     "reference": "components/public/layout/PublicFooter.tsx#L76-L79"
   },
   {
     "term": "public.footer.language-select-label",
     "definition": "Cambiar idioma",
-    "context": "",
+    "context": "Change language",
     "reference": "components/public/layout/PublicFooter.tsx#L59-L62"
   },
   {
     "term": "public.footer.legal-information",
     "definition": "Información legal",
-    "context": "",
+    "context": "Legal information",
     "reference": "components/public/layout/PublicFooter.tsx#L115-L118"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn",
-    "context": "",
+    "context": "LinkedIn profile",
     "reference": "components/public/layout/PublicFooter.tsx#L105-L108"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter",
-    "context": "",
+    "context": "Twitter profile",
     "reference": "components/public/layout/PublicFooter.tsx#L90-L93"
   },
   {
     "term": "public.forgot-password.explanation",
     "definition": "Le enviaremos un mensaje para restablecer su contraseña",
-    "context": "",
+    "context": "We will send you a message to reset your password.",
     "reference": "pages/[locale]/forgot.tsx#L144-L147"
   },
   {
     "term": "public.forgot-password.header",
     "definition": "He olvidado mi contraseña",
-    "context": "",
+    "context": "Forgot password",
     "reference": "pages/[locale]/forgot.tsx#L138-L141"
   },
   {
     "term": "public.forgot-password.login-link",
     "definition": "Me acordé de mi contraseña",
-    "context": "",
+    "context": "I remembered my password",
     "reference": "pages/[locale]/forgot.tsx#L191-L194"
   },
   {
     "term": "public.forgot-password.reset-button",
     "definition": "Restablecer contraseña",
-    "context": "",
+    "context": "Reset password",
     "reference": "pages/[locale]/forgot.tsx#L336-L339"
   },
   {
     "term": "public.forgot-password.reset-explanation",
     "definition": "Use el código de verificación que habrá recibido en su correo electrónico.",
-    "context": "",
+    "context": "Use the verification code in the email you have received.",
     "reference": "pages/[locale]/forgot.tsx#L245-L248"
   },
   {
     "term": "public.forgot-password.reset-header",
     "definition": "Restablecer contraseña",
-    "context": "",
+    "context": "Password reset",
     "reference": "pages/[locale]/forgot.tsx#L239-L242"
   },
   {
     "term": "public.forgot-password.reset-success-toast-description",
     "definition": "Su contraseña ha sido restablecida con éxito.",
-    "context": "",
+    "context": "Your password has been reset successfully.",
     "reference": "pages/[locale]/forgot.tsx#L81-L84"
   },
   {
     "term": "public.forgot-password.reset-success-toast-title",
     "definition": "Contraseña restablecida",
-    "context": "",
+    "context": "Password reset",
     "reference": "pages/[locale]/forgot.tsx#L77-L80"
   },
   {
     "term": "public.forgot-password.send-button",
     "definition": "Enviar código de verificación",
-    "context": "",
+    "context": "Send verification code",
     "reference": "pages/[locale]/forgot.tsx#L183-L186"
   },
   {
     "term": "public.forgot-password.toast-description",
     "definition": "Le hemos enviado un correo eletrónico. Siga las instrucciones para restablecer su contaseña.",
-    "context": "",
+    "context": "An email is on its way to you with a verification code.",
     "reference": "pages/[locale]/forgot.tsx#L52-L56"
   },
   {
     "term": "public.forgot-password.toast-title",
     "definition": "Restablecer contraseña",
-    "context": "",
+    "context": "Reset your password",
     "reference": "pages/[locale]/forgot.tsx#L48-L51"
   },
   {
     "term": "public.forgot.title",
     "definition": "He olvidado mi contraseña",
-    "context": "",
+    "context": "Forgot password",
     "reference": "pages/[locale]/forgot.tsx#L98-L101"
   },
   {
     "term": "public.hero-invite.toast-description",
     "definition": "Nos pondremos en contacto contigo muy pronto.",
-    "context": "",
+    "context": "We will get in touch with you very soon.",
     "reference": "pages/[locale]/index.tsx#L20-L23"
   },
   {
     "term": "public.hero-invite.toast-title",
     "definition": "¡Muchas gracias!",
-    "context": "",
+    "context": "Thank you!",
     "reference": "pages/[locale]/index.tsx#L16-L19"
   },
   {
     "term": "public.home.hero-question",
     "definition": "",
-    "context": "",
+    "context": "Do you want to reduce the time wasted reviewing recurrent emails?",
     "reference": "components/public/PublicHero.tsx#L46-L49"
   },
   {
     "term": "public.home.hero-subtitle",
     "definition": "",
-    "context": "",
+    "context": "A game changer process for daily document workflows.",
     "reference": "components/public/PublicHero.tsx#L40-L43"
   },
   {
     "term": "public.home.hero-title",
     "definition": "",
-    "context": "",
+    "context": "Parallel is the new black",
     "reference": "components/public/PublicHero.tsx#L34-L37"
   },
   {
     "term": "public.home.request-invite-button",
     "definition": "Socitar acceso",
-    "context": "",
+    "context": "Request an invite",
     "reference": "components/public/PublicHero.tsx#L92-L95"
   },
   {
     "term": "public.login-button",
-    "definition": "Acceder",
-    "context": "",
+    "definition": "Acceso",
+    "context": "Login",
     "reference": "pages/[locale]/login.tsx#L261-L264"
   },
   {
     "term": "public.login.already-logged-in.continue-button",
     "definition": "Continuar como {name}",
-    "context": "",
+    "context": "Continue as {name}",
     "reference": "pages/[locale]/login.tsx#L161-L165"
   },
   {
     "term": "public.login.already-logged-in.explanation",
     "definition": "Ya ha iniciado sesión como {name}",
-    "context": "",
+    "context": "You are already logged in as {name}",
     "reference": "pages/[locale]/login.tsx#L146-L150"
   },
   {
     "term": "public.login.already-logged-in.relogin",
     "definition": "Iniciar sesión con otra cuenta",
-    "context": "",
+    "context": "Login as someone else",
     "reference": "pages/[locale]/login.tsx#L169-L172"
   },
   {
     "term": "public.login.back-to-login-link",
     "definition": "Volver atrás",
-    "context": "",
+    "context": "Go back to login",
     "reference": "pages/[locale]/login.tsx#L378-L381"
   },
   {
     "term": "public.login.explanation",
     "definition": "Acceda usando su correo eletrónico y contraseña",
-    "context": "",
+    "context": "Login using your email and password",
     "reference": "pages/[locale]/login.tsx#L201-L204"
   },
   {
     "term": "public.login.forgot-password-link",
     "definition": "He olvidado mi contraseña",
-    "context": "",
+    "context": "I forgot my password",
     "reference": "pages/[locale]/login.tsx#L269-L272"
   },
   {
     "term": "public.login.header",
     "definition": "Entrar en Parallel",
-    "context": "",
+    "context": "Enter Parallel",
     "reference": "pages/[locale]/login.tsx#L195-L198"
   },
   {
     "term": "public.login.invalid-login.description",
     "definition": "El correo eletrónico o la contraseña proporcionados no son válidos.",
-    "context": "",
+    "context": "The email or password are invalid.",
     "reference": "pages/[locale]/login.tsx#L64-L67"
   },
   {
     "term": "public.login.invalid-login.title",
     "definition": "Acceso inválido",
-    "context": "",
+    "context": "Invalid login",
     "reference": "pages/[locale]/login.tsx#L60-L63"
   },
   {
     "term": "public.login.password-update-button",
     "definition": "Cambiar contraseña",
-    "context": "",
+    "context": "Update password",
     "reference": "pages/[locale]/login.tsx#L370-L373"
   },
   {
     "term": "public.login.password-update-explanation",
     "definition": "Al acceder por primera vez, se debe cambiar la contraseña",
-    "context": "",
+    "context": "First time users need to update their password",
     "reference": "pages/[locale]/login.tsx#L308-L311"
   },
   {
     "term": "public.login.password-update-header",
     "definition": "Cambie su contraseña",
-    "context": "",
+    "context": "Update your password",
     "reference": "pages/[locale]/login.tsx#L302-L305"
   },
   {
     "term": "public.login.title",
     "definition": "Entra en Parallel",
-    "context": "",
+    "context": "Login",
     "reference": "pages/[locale]/login.tsx#L97-L100"
   },
   {
     "term": "public.privacy.title",
     "definition": "Política de privacidad",
-    "context": "",
+    "context": "Privacy policy",
     "reference": "pages/[locale]/legal/[doc].tsx#L24-L27"
   },
   {
     "term": "public.terms.title",
     "definition": "Términos y condiciones",
-    "context": "",
+    "context": "Terms & conditions",
     "reference": "pages/[locale]/legal/[doc].tsx#L20-L23"
   },
   {
     "term": "settings.account",
     "definition": "Cuenta",
-    "context": "",
+    "context": "Account",
     "reference": "pages/[locale]/app/settings/account.tsx#L51"
   },
   {
     "term": "settings.account.change-password-button",
     "definition": "Cambiar contraseña",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L193-L196"
+    "context": "Change password",
+    "reference": "pages/[locale]/app/settings/security.tsx#L192-L195"
   },
   {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
-    "context": "",
+    "context": "Name",
     "reference": "pages/[locale]/app/settings/account.tsx#L56-L59"
   },
   {
     "term": "settings.account.update-name-button",
     "definition": "Actualizar nombre",
-    "context": "",
+    "context": "Update name",
     "reference": "pages/[locale]/app/settings/account.tsx#L123-L126"
   },
   {
     "term": "settings.header",
     "definition": "Ajustes",
-    "context": "",
+    "context": "Settings",
     "reference": "components/layout/SettingsLayout.tsx#L23"
   },
   {
     "term": "settings.security",
     "definition": "Seguridad",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L78"
+    "context": "Security",
+    "reference": "pages/[locale]/app/settings/security.tsx#L77"
   },
   {
     "term": "settings.security.password-change-toast-description",
     "definition": "Tu contraseña ha sido actualizada con éxito.",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L63-L66"
+    "context": "Your password has been successfully changed.",
+    "reference": "pages/[locale]/app/settings/security.tsx#L62-L65"
   },
   {
     "term": "settings.security.password-change-toast-title",
     "definition": "Contraseña actualizada",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L59-L62"
+    "context": "Password changed",
+    "reference": "pages/[locale]/app/settings/security.tsx#L58-L61"
   },
   {
     "term": "settings.security.password-header",
     "definition": "Contraseña",
-    "context": "",
-    "reference": "pages/[locale]/app/settings/security.tsx#L83-L86"
+    "context": "Password",
+    "reference": "pages/[locale]/app/settings/security.tsx#L82-L85"
   }
 ]
