@@ -5,16 +5,20 @@ import { Organization } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 
 @injectable()
-export class OrganizationRepository extends BaseRepository<Organization, "id"> {
+export class OrganizationRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
-    super("organization", "id", knex);
+    super(knex);
   }
+
+  readonly loadOneById = this.createLoadOneById("organization", "id");
 
   async loadOrgUsers(orgId: number, opts: PageOpts) {
     return await this.loadPageAndCount(
-      this.users.where({ org_id: orgId, deleted_at: null }).modify(q => {
-        q.orderBy("id");
-      }),
+      this.from("user")
+        .where({ org_id: orgId, deleted_at: null })
+        .modify(q => {
+          q.orderBy("id");
+        }),
       opts
     );
   }

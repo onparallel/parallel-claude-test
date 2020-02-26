@@ -4,6 +4,8 @@ import { promises as fs } from "fs";
 import Knex from "knex";
 import path from "path";
 import { format } from "prettier";
+import { props } from "../src/util/promises";
+import { groupBy, indexBy } from "remeda";
 
 const EXCLUDED_TABLES = ["migrations", "migrations_lock"];
 
@@ -31,7 +33,9 @@ interface DbColumn {
 }
 
 interface DbTable {
+  primaryKey: string;
   name: string;
+  tableName: string;
   columns: DbColumn[];
 }
 
@@ -51,7 +55,28 @@ export type Maybe<T> = T | null;
 export type ${name} = ${values.map(value => `"${value}"`).join(" | ")};`
     )
     .join("\n")}
-    
+
+export interface TableTypes {
+  ${Array.from(tables.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ name, tableName }) => `${tableName}: ${name};`)
+    .join("\n  ")}
+}
+
+export interface TableCreateTypes {
+  ${Array.from(tables.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ name, tableName }) => `${tableName}: Create${name};`)
+    .join("\n  ")}
+}
+
+export interface TablePrimaryKeys {
+  ${Array.from(tables.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ tableName, primaryKey }) => `${tableName}: "${primaryKey}";`)
+    .join("\n  ")}
+}
+
   ${Array.from(tables.values())
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(
@@ -117,34 +142,51 @@ async function getDefinedEnums() {
 }
 
 async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
-  const rows = await knex
-    .select(
-      "table_name",
-      "column_name ",
-      "udt_name",
-      "is_nullable",
-      "column_default",
-      "ordinal_position"
-    )
-    .from("information_schema.columns")
-    .whereIn("table_name", tables);
-  const result = new Map<string, DbTable>();
-  for (const row of rows) {
-    if (!result.has(row.table_name)) {
-      result.set(row.table_name, {
-        name: camelCase(row.table_name, { pascalCase: true }),
-        columns: []
-      });
-    }
-    result.get(row.table_name)!.columns.push({
-      name: row.column_name,
-      type: getColumnType(row.udt_name, enums),
-      nullable: row.is_nullable === "YES",
-      hasDefault: !!row.column_default,
-      position: row.ordinal_position
-    });
-  }
-  return result;
+  const columns = groupBy(
+    await knex
+      .select(
+        "table_name",
+        "column_name ",
+        "udt_name",
+        "is_nullable",
+        "column_default",
+        "ordinal_position"
+      )
+      .from("information_schema.columns")
+      .whereIn("table_name", tables),
+    c => c.table_name
+  );
+  const primaryKeys = indexBy(
+    await knex
+      .select("tc.table_name", "ccu.column_name")
+      .from("information_schema.table_constraints as tc")
+      .join("information_schema.constraint_column_usage as ccu", function() {
+        this.on("tc.constraint_schema", "ccu.constraint_schema").andOn(
+          "tc.constraint_name",
+          "ccu.constraint_name"
+        );
+      })
+      .where("tc.constraint_type", "PRIMARY KEY")
+      .whereIn("tc.table_name", tables),
+    pk => pk.table_name
+  );
+  return new Map<string, DbTable>(
+    Object.entries(columns).map(([tableName, columns]) => [
+      tableName,
+      {
+        name: camelCase(tableName, { pascalCase: true }),
+        tableName: tableName,
+        columns: columns.map(column => ({
+          name: column.column_name,
+          type: getColumnType(column.udt_name, enums),
+          nullable: column.is_nullable === "YES",
+          hasDefault: !!column.column_default,
+          position: column.ordinal_position
+        })),
+        primaryKey: primaryKeys[tableName].column_name
+      }
+    ])
+  );
 }
 
 function getColumnType(type: string, enums: Map<string, DbEnum>): string {

@@ -16,9 +16,9 @@ import { indexBy, sortBy, groupBy } from "remeda";
 import { count } from "../../util/remedaExtensions";
 
 @injectable()
-export class PetitionRepository extends BaseRepository<Petition, "id"> {
+export class PetitionRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
-    super("petition", "id", knex);
+    super(knex);
   }
 
   async loadPetitionsForUser(
@@ -29,7 +29,7 @@ export class PetitionRepository extends BaseRepository<Petition, "id"> {
     } & PageOpts
   ) {
     return await this.loadPageAndCount(
-      this.petitions
+      this.from("petition")
         .where({
           owner_id: userId,
           is_template: false,
@@ -50,7 +50,7 @@ export class PetitionRepository extends BaseRepository<Petition, "id"> {
 
   readonly loadFieldsForPetition = fromDataLoader(
     new DataLoader<number, PetitionField[]>(async ids => {
-      const rows = await this.petitionFields
+      const rows = await this.from("petition_field")
         .whereIn("petition_id", ids as number[])
         .whereNull("deleted_at")
         .select("*");
@@ -63,7 +63,7 @@ export class PetitionRepository extends BaseRepository<Petition, "id"> {
 
   readonly loadFieldCountForPetition = fromDataLoader(
     new DataLoader<number, number>(async ids => {
-      const rows = await this.petitionFields
+      const rows = await this.from("petition_field")
         .whereIn("petition_id", ids as number[])
         .whereNull("deleted_at")
         .groupBy("petition_id")
@@ -129,7 +129,7 @@ export class PetitionRepository extends BaseRepository<Petition, "id"> {
 
   readonly loadAccessesForPetition = fromDataLoader(
     new DataLoader<number, PetitionAccess[]>(async ids => {
-      const rows = await this.petitionAccesses
+      const rows = await this.from("petition_access")
         .whereIn("petition_id", ids as number[])
         .whereNull("deleted_at")
         .select("*");

@@ -8,14 +8,14 @@ import { fromDataLoader } from "../../util/fromDataLoader";
 import { BaseRepository } from "../helpers/BaseRepository";
 
 @injectable()
-export class UserReposistory extends BaseRepository<User, "id"> {
+export class UserReposistory extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
-    super("user", "id", knex);
+    super(knex);
   }
 
   readonly loadOneByCognitoId = fromDataLoader(
     new DataLoader<string, User | null>(async ids => {
-      const rows = await this.users
+      const rows = await this.from("user")
         .whereIn("cognito_id", ids as string[])
         .where("deleted_at", null)
         .select("*");
@@ -28,7 +28,7 @@ export class UserReposistory extends BaseRepository<User, "id"> {
     id: number,
     data: Partial<User> & { updated_by: string }
   ) {
-    const rows = await this.users
+    const rows = await this.from("user")
       .update({
         ...data,
         updated_at: new Date()

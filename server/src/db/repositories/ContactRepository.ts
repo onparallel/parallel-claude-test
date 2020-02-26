@@ -2,11 +2,12 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { Contact } from "../__types";
 
 @injectable()
-export class ContactReposistory extends BaseRepository<Contact, "id"> {
+export class ContactReposistory extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
-    super("contact", "id", knex);
+    super(knex);
   }
+
+  readonly loadOneById = this.createLoadOneById("contact", "id");
 }

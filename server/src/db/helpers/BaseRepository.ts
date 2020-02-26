@@ -8,7 +8,9 @@ import {
   Petition,
   PetitionField,
   PetitionFieldReply,
-  PetitionAccess
+  PetitionAccess,
+  TableTypes,
+  TablePrimaryKeys
 } from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
 
@@ -18,50 +20,34 @@ export interface PageOpts {
 }
 
 @injectable()
-export class BaseRepository<
-  TType extends {},
-  TId extends keyof TType & string
-> {
-  protected get organizations() {
-    return this.knex<Organization>("organization");
+export class BaseRepository {
+  constructor(protected readonly knex: Knex) {}
+
+  protected from<TName extends keyof TableTypes>(tableName: TName) {
+    return this.knex<TableTypes[TName]>(tableName);
   }
 
-  protected get petitions() {
-    return this.knex<Petition>("petition");
+  protected createLoadOneById<TName extends keyof TableTypes>(
+    tableName: TName,
+    idColumn: TablePrimaryKeys[TName]
+  ) {
+    return fromDataLoader(
+      new DataLoader<
+        TableTypes[TName][TablePrimaryKeys[TName]],
+        TableTypes[TName] | null
+      >(async ids => {
+        const rows = <TableTypes[TName][]>await this.knex
+          .from<TableTypes[TName]>(tableName)
+          .select("*")
+          .whereIn(
+            idColumn,
+            ids as TableTypes[TName][TablePrimaryKeys[TName]][]
+          );
+        const byId = indexBy(rows, r => r[idColumn]);
+        return ids.map(id => byId[id]);
+      })
+    );
   }
-
-  protected get petitionAccesses() {
-    return this.knex<PetitionAccess>("petition_access");
-  }
-
-  protected get petitionFields() {
-    return this.knex<PetitionField>("petition_field");
-  }
-
-  protected get petitionFieldReplies() {
-    return this.knex<PetitionFieldReply>("petition_field_reply");
-  }
-
-  protected get users() {
-    return this.knex<User>("user");
-  }
-
-  constructor(
-    @unmanaged() protected readonly tableName: string,
-    @unmanaged() protected readonly idColumn: TId,
-    protected readonly knex: Knex<TType>
-  ) {}
-
-  loadOneById = fromDataLoader(
-    new DataLoader<TType[TId], TType | null>(async ids => {
-      const rows = <TType[]>await this.knex
-        .from<TType>(this.tableName)
-        .select<TType>("*")
-        .whereIn(this.idColumn, <any>ids);
-      const byId = indexBy(rows, r => r[this.idColumn]);
-      return ids.map(id => byId[<any>id]);
-    })
-  );
 
   protected async loadPageAndCount<TRecord, TResult>(
     query: Knex.QueryBuilder<TRecord, TResult>,

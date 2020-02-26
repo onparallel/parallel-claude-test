@@ -13,6 +13,39 @@ export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
 
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
+export interface TableTypes {
+  contact: Contact;
+  organization: Organization;
+  petition: Petition;
+  petition_access: PetitionAccess;
+  petition_event_log: PetitionEventLog;
+  petition_field: PetitionField;
+  petition_field_reply: PetitionFieldReply;
+  user: User;
+}
+
+export interface TableCreateTypes {
+  contact: CreateContact;
+  organization: CreateOrganization;
+  petition: CreatePetition;
+  petition_access: CreatePetitionAccess;
+  petition_event_log: CreatePetitionEventLog;
+  petition_field: CreatePetitionField;
+  petition_field_reply: CreatePetitionFieldReply;
+  user: CreateUser;
+}
+
+export interface TablePrimaryKeys {
+  contact: "id";
+  organization: "id";
+  petition: "id";
+  petition_access: "id";
+  petition_event_log: "id";
+  petition_field: "id";
+  petition_field_reply: "id";
+  user: "id";
+}
+
 export interface Contact {
   id: number;
   email: string;
@@ -207,40 +240,6 @@ export interface CreatePetitionFieldReply {
   petition_field_id: number;
   petition_access_id: number;
   reply: Object;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-}
-
-export interface PetitionTemplate {
-  id: number;
-  name: string;
-  locale: string;
-  org_id: number;
-  owner_id: number;
-  definition: Object;
-  email_subject: Maybe<string>;
-  email_body: Maybe<string>;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-}
-
-export interface CreatePetitionTemplate {
-  id?: number;
-  name: string;
-  locale: string;
-  org_id: number;
-  owner_id: number;
-  definition: Object;
-  email_subject?: Maybe<string>;
-  email_body?: Maybe<string>;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;
