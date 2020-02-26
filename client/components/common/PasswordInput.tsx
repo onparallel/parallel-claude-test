@@ -48,6 +48,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
           aria-label={show ? labels.hide : labels.show}
           icon={show ? "view-off" : "view"}
           size="sm"
+          variant="ghost"
           onClick={handleClick}
         ></IconButton>
       </InputRightElement>

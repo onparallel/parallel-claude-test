@@ -10,7 +10,8 @@ import {
   MaybePromise,
   ResultValue,
   MaybePromiseDeep,
-  printedGenTypingImport
+  printedGenTypingImport,
+  stringArg
 } from "nexus/dist/core";
 
 export interface PaginationPluginConfig {}
@@ -20,6 +21,11 @@ export type PaginationFieldConfig<
   FieldName extends string = any
 > = {
   type: GetGen<"allOutputTypes", string> | AllNexusOutputTypeDefs;
+
+  /**
+   * Additional `search` argument that can be used for searching.
+   */
+  searchable?: boolean;
   /**
    * Additional args to use for just this field
    */
@@ -134,10 +140,18 @@ export function paginationPlugin() {
               ...nonPaginationFieldProps(fieldConfig),
               args: {
                 ...PaginationArgs,
+                ...(fieldConfig.searchable
+                  ? {
+                      search: stringArg({
+                        description:
+                          "Optional text to search in the collection."
+                      })
+                    }
+                  : {}),
                 ...(fieldConfig.additionalArgs ?? {})
               },
               type: paginationName as any,
-              resolve(root, args: PaginationArgs, ctx, info) {
+              resolve(root, args, ctx, info) {
                 validateArgs(args, info);
                 return fieldConfig.resolve(root, args, ctx, info);
               }
@@ -164,11 +178,6 @@ function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig) {
   } = fieldConfig;
   return rest;
 }
-
-export type PaginationArgs = {
-  offset?: number;
-  limit?: string;
-};
 
 const getTypeNames = (
   fieldName: string,

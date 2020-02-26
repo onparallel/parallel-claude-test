@@ -1,4 +1,5 @@
-import { Box, BoxProps, Flex, useColorMode } from "@chakra-ui/core";
+import { Box, BoxProps, Flex } from "@chakra-ui/core";
+import { Card } from "../common/Card";
 
 export type PublicUserFormContainerProps = BoxProps & {
   wrapper?: BoxProps;
@@ -9,9 +10,14 @@ export function PublicUserFormContainer({
   children,
   ...props
 }: PublicUserFormContainerProps) {
-  const { colorMode } = useColorMode();
   return (
-    <Flex flex="1" width="100%" direction="column" align="stretch" {...wrapper}>
+    <Flex
+      flex="1"
+      width="100%"
+      direction="column"
+      alignItems="stretch"
+      {...wrapper}
+    >
       <Box flex="1"></Box>
       <Box
         margin="0 auto"
@@ -19,17 +25,9 @@ export function PublicUserFormContainer({
         paddingX={4}
         maxWidth={{ xs: "containers.xs" }}
       >
-        <Box
-          as="section"
-          borderWidth="1px"
-          backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
-          shadow="md"
-          rounded="lg"
-          padding={4}
-          {...props}
-        >
+        <Card padding={4} {...props}>
           {children}
-        </Box>
+        </Card>
       </Box>
       <Box flex="3"></Box>
     </Flex>

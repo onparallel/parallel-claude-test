@@ -1,5 +1,11 @@
 [
   {
+    "term": "component.confirm-dialog.cancel-button",
+    "definition": "Cancelar",
+    "context": "Cancel",
+    "reference": "components/common/ConfirmDialog.tsx#L51-L54"
+  },
+  {
     "term": "component.cookie-consent.accept-button",
     "definition": "",
     "context": "Accept",
@@ -34,6 +40,114 @@
     "definition": "Mostrar contraseña",
     "context": "Show",
     "reference": "components/common/PasswordInput.tsx#L25-L28"
+  },
+  {
+    "term": "component.petition-progress-bar.all-pending",
+    "definition": "El destinatario no ha rellenado ninguno de los campos.",
+    "context": "The recipient has not filled any fields.",
+    "reference": "components/common/PetitionProgressBar.tsx#L86-L89"
+  },
+  {
+    "term": "component.petition-progress-bar.completed",
+    "definition": "Esta petición se ha completado.",
+    "context": "This petition is completed.",
+    "reference": "components/common/PetitionProgressBar.tsx#L96-L99"
+  },
+  {
+    "term": "component.petition-progress-bar.no-fields",
+    "definition": "Esta petición no tiene campos.",
+    "context": "This petition has no fields.",
+    "reference": "components/common/PetitionProgressBar.tsx#L76-L79"
+  },
+  {
+    "term": "component.petition-progress-bar.not-replied",
+    "definition": "{count, plural, =1{# campo ha sido rellenado} other {# campos han sido rellenados}}.",
+    "context": "{count, plural, =1{# field has} other {# fields have}} not been filled.",
+    "reference": "components/common/PetitionProgressBar.tsx#L139-L143"
+  },
+  {
+    "term": "component.petition-progress-bar.not-sent",
+    "definition": "Esta petición no ha sido enviada todavía.",
+    "context": "This petition has not been sent yet.",
+    "reference": "components/common/PetitionProgressBar.tsx#L66-L69"
+  },
+  {
+    "term": "component.petition-progress-bar.optional",
+    "definition": "{count, plural, =1{# campo no ha sido rellenado pero es opcional} other {# campos no han sido rellenados pero son opcionales}}.",
+    "context": "{count, plural, =1{# field has not been filled but it is optional.} other {# fields have not been filled but they are optional.}}",
+    "reference": "components/common/PetitionProgressBar.tsx#L130-L134"
+  },
+  {
+    "term": "component.petition-progress-bar.pending",
+    "definition": "{count, plural, =1{# campo ha sido rellenado y está pendiente de validación.} other {# campos han sido rellenados y están pendientes de validación.}}",
+    "context": "{count, plural, =1{# field has been filled and is pending validation.} other {# fields have been filled and are pending validation.}}",
+    "reference": "components/common/PetitionProgressBar.tsx#L121-L125"
+  },
+  {
+    "term": "component.petition-progress-bar.validated",
+    "definition": "{count, plural, =1{# campo ha sido rellenado y validado.} other {# campos han sido rellenados y validados.}}",
+    "context": "{count, plural, =1{# field has} other {# fields have}} been filled and validated.",
+    "reference": "components/common/PetitionProgressBar.tsx#L112-L116"
+  },
+  {
+    "term": "component.petition-status-filter.all",
+    "definition": "Todas las peticiones",
+    "context": "All petitions",
+    "reference": "components/common/PetitionStatusFilter.tsx#L25-L28"
+  },
+  {
+    "term": "component.petition-status-filter.completed",
+    "definition": "Completadas",
+    "context": "Completed",
+    "reference": "components/common/PetitionStatusFilter.tsx#L41-L44"
+  },
+  {
+    "term": "component.petition-status-filter.draft",
+    "definition": "Borradores",
+    "context": "Draft",
+    "reference": "components/common/PetitionStatusFilter.tsx#L29-L32"
+  },
+  {
+    "term": "component.petition-status-filter.pending",
+    "definition": "Pendientes",
+    "context": "Pending",
+    "reference": "components/common/PetitionStatusFilter.tsx#L33-L36"
+  },
+  {
+    "term": "component.petition-status-filter.scheduled",
+    "definition": "Programadas",
+    "context": "Scheduled",
+    "reference": "components/common/PetitionStatusFilter.tsx#L37-L40"
+  },
+  {
+    "term": "component.search-input.clear-button",
+    "definition": "Borrar",
+    "context": "Clear",
+    "reference": "components/common/SearchInput.tsx#L47-L50"
+  },
+  {
+    "term": "component.search-input.placeholder",
+    "definition": "Buscar...",
+    "context": "Search...",
+    "reference": "components/common/SearchInput.tsx#L90-L93"
+  },
+  {
+    "term": "component.table.next-page-button",
+    "definition": "Siguiente",
+    "context": "Next",
+    "reference": "components/common/TablePage.tsx#L107-L110"
+  },
+  {
+    "term": "component.table.prev-page-button",
+    "definition": "Anterior",
+    "context": "Previous",
+    "reference": "components/common/TablePage.tsx#L96-L99"
+  },
+  {
+    "term": "component.table.total-results",
+    "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
+    "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}",
+    "reference": "components/common/TablePage.tsx#L79-L87"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
@@ -156,6 +270,30 @@
     "reference": "pages/[locale]/forgot.tsx#L254-L257"
   },
   {
+    "term": "generic.petition-status.completed",
+    "definition": "Completada",
+    "context": "Completed",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L321-L324"
+  },
+  {
+    "term": "generic.petition-status.draft",
+    "definition": "Borrador",
+    "context": "Draft",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L363-L366"
+  },
+  {
+    "term": "generic.petition-status.pending",
+    "definition": "Pendiente",
+    "context": "Pending",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L313-L316"
+  },
+  {
+    "term": "generic.petition-status.scheduled",
+    "definition": "Programada",
+    "context": "Scheduled",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L355-L358"
+  },
+  {
     "term": "header.user-menu-button",
     "definition": "Menú de usuario",
     "context": "User menu",
@@ -165,25 +303,103 @@
     "term": "navbar.contacts-link",
     "definition": "Contactos",
     "context": "Contacts",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L48-L51"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L51-L54"
   },
   {
     "term": "navbar.new-button",
     "definition": "Nueva petición",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L89-L92"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L94-L97"
   },
   {
     "term": "navbar.petitions-link",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L40-L43"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L35-L38"
   },
   {
-    "term": "navbar.sendouts-link",
-    "definition": "Envíos",
-    "context": "Sendouts",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L32-L35"
+    "term": "navbar.templates-link",
+    "definition": "Plantillas",
+    "context": "Templates",
+    "reference": "components/layout/AppLayoutNavbar.tsx#L43-L46"
+  },
+  {
+    "term": "petitions.confirm-delete.body",
+    "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L109-L117"
+  },
+  {
+    "term": "petitions.confirm-delete.confirm-button",
+    "definition": "Si, eliminar",
+    "context": "Yes, delete",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L120-L123"
+  },
+  {
+    "term": "petitions.confirm-delete.header",
+    "definition": "Eliminar peticiones",
+    "context": "Delete petitions",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L103-L106"
+  },
+  {
+    "term": "petitions.create-petition-button",
+    "definition": "Crear petición",
+    "context": "Create petition",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L181-L184"
+  },
+  {
+    "term": "petitions.delete-label",
+    "definition": "Borrar {count, plural, =1 {peticion} other {# peticiones}}",
+    "context": "Delete {count, plural, =1 {petition} other {# petitions}}",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L170-L174"
+  },
+  {
+    "term": "petitions.header.custom-ref",
+    "definition": "Referencia",
+    "context": "Reference",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L219-L222"
+  },
+  {
+    "term": "petitions.header.deadline",
+    "definition": "Vencimiento",
+    "context": "Deadline",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L250-L253"
+  },
+  {
+    "term": "petitions.header.name",
+    "definition": "Nombre de la petición",
+    "context": "Petition name",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L209-L212"
+  },
+  {
+    "term": "petitions.header.progress",
+    "definition": "Progreso",
+    "context": "Progress",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L292-L295"
+  },
+  {
+    "term": "petitions.header.recipient",
+    "definition": "Destinatario",
+    "context": "Recipient",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L229-L232"
+  },
+  {
+    "term": "petitions.header.status",
+    "definition": "Estado",
+    "context": "Status",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L307"
+  },
+  {
+    "term": "petitions.no-deadline",
+    "definition": "Sin vencimiento",
+    "context": "No deadline",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L280-L283"
+  },
+  {
+    "term": "petitions.title",
+    "definition": "Peticiones",
+    "context": "Petitions",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L136-L139"
   },
   {
     "term": "public.cookies.title",
@@ -195,31 +411,31 @@
     "term": "public.footer.follow-us",
     "definition": "",
     "context": "Follow us",
-    "reference": "components/public/layout/PublicFooter.tsx#L76-L79"
+    "reference": "components/public/layout/PublicFooter.tsx#L81-L84"
   },
   {
     "term": "public.footer.language-select-label",
     "definition": "Cambiar idioma",
     "context": "Change language",
-    "reference": "components/public/layout/PublicFooter.tsx#L59-L62"
+    "reference": "components/public/layout/PublicFooter.tsx#L64-L67"
   },
   {
     "term": "public.footer.legal-information",
     "definition": "Información legal",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L115-L118"
+    "reference": "components/public/layout/PublicFooter.tsx#L120-L123"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L105-L108"
+    "reference": "components/public/layout/PublicFooter.tsx#L110-L113"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L90-L93"
+    "reference": "components/public/layout/PublicFooter.tsx#L95-L98"
   },
   {
     "term": "public.forgot-password.explanation",

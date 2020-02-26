@@ -8,11 +8,53 @@ enum ChangePasswordResult {
 }
 
 """
+A contact in the system.
+"""
+type Contact implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The email of the contact.
+  """
+  email: String!
+
+  """
+  The first name of the contact.
+  """
+  firstName: String
+
+  """
+  The full name of the contact.
+  """
+  fullName: String
+
+  """
+  The ID of the contact.
+  """
+  id: ID!
+
+  """
+  The last name of the contact.
+  """
+  lastName: String
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
+
+scalar JSON
 
 type Mutation {
   """
@@ -109,9 +151,219 @@ enum OrganizationStatus {
   DEV
 }
 
+"""
+An petition in the system.
+"""
+type Petition implements Timestamps {
+  """
+  The accesses for this petition
+  """
+  accessess: [PetitionAccess!]!
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The custom ref of the petition.
+  """
+  customRef: String
+
+  """
+  The deadline of the petition.
+  """
+  deadline: DateTime
+
+  """
+  The number of fields in the petition.
+  """
+  fieldCount: Int!
+
+  """
+  The field definition of the petition.
+  """
+  fields: [PetitionField!]!
+
+  """
+  The ID of the petition.
+  """
+  id: ID!
+
+  """
+  The locale of the petition.
+  """
+  locale: String!
+
+  """
+  The name of the petition.
+  """
+  name: String!
+
+  """
+  The progress of the petition.
+  """
+  progress: PetitionProgress!
+
+  """
+  The status of the petition.
+  """
+  status: PetitionStatus!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+An access to a petition
+"""
+type PetitionAccess {
+  """
+  The receiver of the petition through this access.
+  """
+  contact: Contact
+
+  """
+  The ID of the petition field access.
+  """
+  id: ID!
+}
+
+"""
+A field within a petition.
+"""
+type PetitionField {
+  """
+  The description of the petition field.
+  """
+  description: String
+
+  """
+  The ID of the petition field.
+  """
+  id: ID!
+
+  """
+  Determines if this field is optional.
+  """
+  optional: Boolean!
+
+  """
+  The options of the petition.
+  """
+  options: JSON
+
+  """
+  The title of the petition field.
+  """
+  title: String
+
+  """
+  The type of the petition field.
+  """
+  type: PetitionFieldType!
+
+  """
+  Determines if the content of this field has been validated.
+  """
+  validated: Boolean!
+}
+
+"""
+Type of a petition field
+"""
+enum PetitionFieldType {
+  """
+  A file upload field.
+  """
+  FILE_UPLOAD
+}
+
+type PetitionPagination {
+  """
+  The requested slice of items.
+  """
+  items: [Petition!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+"""
+The progress of a petition.
+"""
+type PetitionProgress {
+  """
+  Number of optional fields not replied or validated
+  """
+  optional: Int!
+
+  """
+  Number of fields with a reply and not validated
+  """
+  replied: Int!
+
+  """
+  Total number of fields in the petition
+  """
+  total: Int!
+
+  """
+  Number of fields validated
+  """
+  validated: Int!
+}
+
+enum PetitionStatus {
+  """
+  The petition is completed
+  """
+  COMPLETED
+
+  """
+  The petition has not been sent.
+  """
+  DRAFT
+
+  """
+  The petition has been sent and is awaiting for the contact to complete.
+  """
+  PENDING
+
+  """
+  The petition sendout has been scheduled.
+  """
+  SCHEDULED
+}
+
 type Query {
   me: User!
   organization(id: String!): Organization
+
+  """
+  The petitions of the user
+  """
+  petitions(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+    status: PetitionStatus
+  ): PetitionPagination!
 }
 
 interface Timestamps {

@@ -9,3 +9,9 @@ export function resolveUrl(pathname: string, query: ParsedUrlQuery) {
     return parameter as string;
   });
 }
+
+export function pathParams(pathname: string) {
+  return (pathname.match(/\[(\.{3})?([^\]]*)]/g) ?? []).map(param =>
+    param.replace(/^\[(\.{3})?/, "").replace(/\]$/, "")
+  );
+}

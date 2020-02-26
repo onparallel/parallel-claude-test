@@ -7,7 +7,41 @@ export type Maybe<T> = T | null;
 
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
+export type PetitionFieldType = "FILE_UPLOAD";
+
+export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
+
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
+
+export interface Contact {
+  id: number;
+  email: string;
+  first_name: Maybe<string>;
+  last_name: Maybe<string>;
+  org_id: number;
+  owner_id: number;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreateContact {
+  id?: number;
+  email: string;
+  first_name?: Maybe<string>;
+  last_name?: Maybe<string>;
+  org_id: number;
+  owner_id: number;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
 
 export interface Organization {
   id: number;
@@ -27,6 +61,186 @@ export interface CreateOrganization {
   name: string;
   identifier: string;
   status: OrganizationStatus;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
+
+export interface Petition {
+  id: number;
+  org_id: number;
+  owner_id: number;
+  name: string;
+  custom_ref: Maybe<string>;
+  locale: string;
+  is_template: boolean;
+  status: Maybe<PetitionStatus>;
+  deadline: Maybe<Date>;
+  email_subject: Maybe<string>;
+  email_body: Maybe<string>;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreatePetition {
+  id?: number;
+  org_id: number;
+  owner_id: number;
+  name: string;
+  custom_ref?: Maybe<string>;
+  locale: string;
+  is_template?: boolean;
+  status?: Maybe<PetitionStatus>;
+  deadline?: Maybe<Date>;
+  email_subject?: Maybe<string>;
+  email_body?: Maybe<string>;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
+
+export interface PetitionAccess {
+  id: number;
+  petition_id: number;
+  contact_id: number;
+  keycode: string;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreatePetitionAccess {
+  id?: number;
+  petition_id: number;
+  contact_id: number;
+  keycode: string;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
+
+export interface PetitionEventLog {
+  id: number;
+  petition_id: number;
+  petition_access_id: number;
+  event: Maybe<string>;
+  event_data: Maybe<Object>;
+  event_date: Date;
+}
+
+export interface CreatePetitionEventLog {
+  id?: number;
+  petition_id: number;
+  petition_access_id: number;
+  event?: Maybe<string>;
+  event_data?: Maybe<Object>;
+  event_date?: Date;
+}
+
+export interface PetitionField {
+  id: number;
+  petition_id: number;
+  position: number;
+  type: PetitionFieldType;
+  title: Maybe<string>;
+  description: Maybe<string>;
+  optional: boolean;
+  options: Maybe<Object>;
+  validated: boolean;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreatePetitionField {
+  id?: number;
+  petition_id: number;
+  position: number;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  description?: Maybe<string>;
+  optional?: boolean;
+  options?: Maybe<Object>;
+  validated?: boolean;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
+
+export interface PetitionFieldReply {
+  id: number;
+  petition_field_id: number;
+  petition_access_id: number;
+  reply: Object;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreatePetitionFieldReply {
+  id?: number;
+  petition_field_id: number;
+  petition_access_id: number;
+  reply: Object;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
+
+export interface PetitionTemplate {
+  id: number;
+  name: string;
+  locale: string;
+  org_id: number;
+  owner_id: number;
+  definition: Object;
+  email_subject: Maybe<string>;
+  email_body: Maybe<string>;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreatePetitionTemplate {
+  id?: number;
+  name: string;
+  locale: string;
+  org_id: number;
+  owner_id: number;
+  definition: Object;
+  email_subject?: Maybe<string>;
+  email_body?: Maybe<string>;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;

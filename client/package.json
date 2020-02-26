@@ -16,6 +16,8 @@
     "@chakra-ui/core": "^0.6.0",
     "@emotion/core": "^10.0.27",
     "@emotion/styled": "^10.0.27",
+    "@formatjs/intl-utils": "^2.2.0",
+    "@welldone-software/why-did-you-render": "^4.0.5",
     "apollo-boost": "^0.4.7",
     "apollo-link-context": "^1.0.19",
     "beautiful-react-hooks": "^0.22.2",

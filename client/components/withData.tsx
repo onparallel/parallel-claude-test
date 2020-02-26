@@ -36,6 +36,13 @@ export function withData<P = {}>(
       </ApolloProvider>
     );
   };
+  for (const key of Object.keys(Component)) {
+    if (key === "getInitialProps") {
+      // ignore
+    } else {
+      (withData as any)[key] = (Component as any)[key];
+    }
+  }
   withData.displayName = `WithData(${Component.displayName || Component.name})`;
   withData.getInitialProps = async (context: NextPageContext) => {
     const apollo = createApolloClient(
@@ -77,6 +84,9 @@ export function withData<P = {}>(
             Router.push(`/${context.query.locale}/login`);
           }
         } else {
+          if (error?.networkError?.result?.errors?.[0]) {
+            console.log(error?.networkError?.result?.errors?.[0]);
+          }
           throw error;
         }
       }
@@ -100,96 +110,3 @@ export function withData<P = {}>(
   };
   return withData;
 }
-
-// export default ComposedComponent => {
-//   return class WithData extends React.Component {
-//     static displayName = `WithData(${ComposedComponent.displayName})`;
-//     static propTypes = {
-//       serverState: PropTypes.object.isRequired
-//     };
-
-//     static async getInitialProps(context) {
-//       let serverState = {};
-
-//       // Setup a server-side one-time-use apollo client for initial props and
-//       // rendering (on server)
-//       let apollo = initApollo(
-//         {},
-//         {
-//           getToken: () => getCookie(context)
-//         }
-//       );
-
-//       // Evaluate the composed component's getInitialProps()
-//       let composedInitialProps = {};
-//       if (ComposedComponent.getInitialProps) {
-//         composedInitialProps = await ComposedComponent.getInitialProps(
-//           context,
-//           apollo
-//         );
-//       }
-
-//       // Run all graphql queries in the component tree
-//       // and extract the resulting data
-//       if (!process.browser) {
-//         if (context.res && context.res.finished) {
-//           // When redirecting, the response is finished.
-//           // No point in continuing to render
-//           return;
-//         }
-
-//         // Provide the `url` prop data in case a graphql query uses it
-//         const url = { query: context.query, pathname: context.pathname };
-//         try {
-//           // Run all GraphQL queries
-//           const app = (
-//             <ApolloProvider client={apollo}>
-//               <ComposedComponent url={url} {...composedInitialProps} />
-//             </ApolloProvider>
-//           );
-//           await getDataFromTree(app, {
-//             router: {
-//               query: context.query,
-//               pathname: context.pathname,
-//               asPath: context.asPath
-//             }
-//           });
-//         } catch (error) {
-//           // Prevent Apollo Client GraphQL errors from crashing SSR.
-//           // Handle them in components via the data.error prop:
-//           // http://dev.apollodata.com/react/api-queries.html#graphql-query-data-error
-//         }
-//         // getDataFromTree does not call componentWillUnmount
-//         // head side effect therefore need to be cleared manually
-//         Head.rewind();
-
-//         // Extract query data from the Apollo's store
-//         serverState = apollo.cache.extract();
-//       }
-
-//       return {
-//         serverState,
-//         ...composedInitialProps
-//       };
-//     }
-
-//     constructor(props) {
-//       super(props);
-//       // Note: Apollo should never be used on the server side beyond the initial
-//       // render within `getInitialProps()` above (since the entire prop tree
-//       // will be initialized there), meaning the below will only ever be
-//       // executed on the client.
-//       this.apollo = initApollo(this.props.serverState, {
-//         getToken: () => getCookie()
-//       });
-//     }
-
-//     render() {
-//       return (
-//         <ApolloProvider client={this.apollo}>
-//           <ComposedComponent {...this.props} />
-//         </ApolloProvider>
-//       );
-//     }
-//   };
-// };

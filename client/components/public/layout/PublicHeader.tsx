@@ -13,6 +13,7 @@ import { PublicContainer } from "./PublicContainer";
 import { Logo } from "@parallel/components/common/Logo";
 import { Link } from "@parallel/components/common/Link";
 import { ToggleColorModeButton } from "@parallel/components/common/ToggleColorModeButton";
+import { Spacer } from "@parallel/components/common/Spacer";
 
 function logoColorProps(colorMode: string) {
   const theme: { [colorMode: string]: ChakraLinkProps } = {
@@ -54,13 +55,14 @@ export function PublicHeader(props: BoxProps) {
         height: 20,
         ...props
       }}
+      display="flex"
+      alignItems="center"
     >
-      <Flex align="center">
-        <Link href="/" chakra={{ ...logoColorProps(colorMode) }}>
-          <Logo width={152}></Logo>
-        </Link>
-        <Box flex="1"></Box>
-        {/* <ToggleColorModeButton
+      <Link href="/" chakra={{ ...logoColorProps(colorMode) }}>
+        <Logo width={152}></Logo>
+      </Link>
+      <Spacer />
+      {/* <ToggleColorModeButton
           css={css`
             display: none;
             @media (prefers-color-scheme: dark) {
@@ -69,20 +71,19 @@ export function PublicHeader(props: BoxProps) {
           `}
           marginRight={2}
         ></ToggleColorModeButton> */}
-        <Link
-          href="/login"
-          render={children => (
-            <Button as="a" variantColor="purple">
-              {children}
-            </Button>
-          )}
-        >
-          <FormattedMessage
-            id="public.login-button"
-            defaultMessage="Login"
-          ></FormattedMessage>
-        </Link>
-      </Flex>
+      <Link
+        href="/login"
+        render={children => (
+          <Button as="a" variantColor="purple">
+            {children}
+          </Button>
+        )}
+      >
+        <FormattedMessage
+          id="public.login-button"
+          defaultMessage="Login"
+        ></FormattedMessage>
+      </Link>
     </PublicContainer>
   );
 }

@@ -1,4 +1,4 @@
-import { decode, encode } from "./base58";
+import { decode, encode } from "./token";
 
 export function toGlobalId(type: string, id: number) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));

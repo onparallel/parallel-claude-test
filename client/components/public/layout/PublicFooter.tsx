@@ -38,7 +38,12 @@ export function PublicFooter(props: BoxProps) {
 
   return (
     <PublicContainer wrapper={{ as: "footer", ...props }}>
-      <Flex justify="space-between" align="stretch" height="100%" wrap="wrap">
+      <Flex
+        justify="space-between"
+        alignItems="stretch"
+        height="100%"
+        wrap="wrap"
+      >
         <PublicFooterBox flex="3" minWidth={{ base: "100%", md: 40 }}>
           <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
           <InputGroup size="sm" display="inline-flex">

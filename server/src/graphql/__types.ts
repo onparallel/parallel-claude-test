@@ -16,6 +16,12 @@ declare global {
         core.GetGen3<"inputTypes", TypeName, FieldName>
       >
     ): void; // "DateTime";
+    json<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.ScalarInputFieldConfig<
+        core.GetGen3<"inputTypes", TypeName, FieldName>
+      >
+    ): void; // "JSON";
   }
 }
 declare global {
@@ -24,6 +30,10 @@ declare global {
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "DateTime";
+    json<FieldName extends string>(
+      fieldName: FieldName,
+      ...opts: core.ScalarOutSpread<TypeName, FieldName>
+    ): void; // "JSON";
     paginationField<FieldName extends string>(
       fieldName: FieldName,
       config: PaginationFieldConfig<TypeName, FieldName>
@@ -50,11 +60,29 @@ export interface NexusGenEnums {
     | "SUCCESS";
   OrganizationRole: "ADMIN" | "NORMAL";
   OrganizationStatus: db.OrganizationStatus;
+  PetitionFieldType: db.PetitionFieldType;
+  PetitionStatus: db.PetitionStatus;
 }
 
 export interface NexusGenRootTypes {
+  Contact: db.Contact;
   Mutation: {};
   Organization: db.Organization;
+  Petition: db.Petition;
+  PetitionAccess: db.PetitionAccess;
+  PetitionField: db.PetitionField;
+  PetitionPagination: {
+    // root type
+    items: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    totalCount: number; // Int!
+  };
+  PetitionProgress: {
+    // root type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+    validated: number; // Int!
+  };
   Query: {};
   User: db.User;
   UserPagination: {
@@ -62,13 +90,18 @@ export interface NexusGenRootTypes {
     items: NexusGenRootTypes["User"][]; // [User!]!
     totalCount: number; // Int!
   };
-  Timestamps: NexusGenRootTypes["User"] | NexusGenRootTypes["Organization"];
+  Timestamps:
+    | NexusGenRootTypes["User"]
+    | NexusGenRootTypes["Organization"]
+    | NexusGenRootTypes["Petition"]
+    | NexusGenRootTypes["Contact"];
   String: string;
   Int: number;
   Float: number;
   Boolean: boolean;
   ID: string;
   DateTime: Date;
+  JSON: any;
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -76,9 +109,21 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
   OrganizationStatus: NexusGenEnums["OrganizationStatus"];
+  PetitionFieldType: NexusGenEnums["PetitionFieldType"];
+  PetitionStatus: NexusGenEnums["PetitionStatus"];
 }
 
 export interface NexusGenFieldTypes {
+  Contact: {
+    // field return type
+    createdAt: Date; // DateTime!
+    email: string; // String!
+    firstName: string | null; // String
+    fullName: string | null; // String
+    id: string; // ID!
+    lastName: string | null; // String
+    updatedAt: Date; // DateTime!
+  };
   Mutation: {
     // field return type
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
@@ -94,10 +139,53 @@ export interface NexusGenFieldTypes {
     updatedAt: Date; // DateTime!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
   };
+  Petition: {
+    // field return type
+    accessess: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    createdAt: Date; // DateTime!
+    customRef: string | null; // String
+    deadline: Date | null; // DateTime
+    fieldCount: number; // Int!
+    fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    id: string; // ID!
+    locale: string; // String!
+    name: string; // String!
+    progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
+    status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
+    updatedAt: Date; // DateTime!
+  };
+  PetitionAccess: {
+    // field return type
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
+    id: string; // ID!
+  };
+  PetitionField: {
+    // field return type
+    description: string | null; // String
+    id: string; // ID!
+    optional: boolean; // Boolean!
+    options: any | null; // JSON
+    title: string | null; // String
+    type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    validated: boolean; // Boolean!
+  };
+  PetitionPagination: {
+    // field return type
+    items: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    totalCount: number; // Int!
+  };
+  PetitionProgress: {
+    // field return type
+    optional: number; // Int!
+    replied: number; // Int!
+    total: number; // Int!
+    validated: number; // Int!
+  };
   Query: {
     // field return type
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
+    petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
   };
   User: {
     // field return type
@@ -148,18 +236,31 @@ export interface NexusGenArgTypes {
       // args
       id: string; // String!
     };
+    petitions: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+      status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
+    };
   };
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  Timestamps: "User" | "Organization";
+  Timestamps: "User" | "Organization" | "Petition" | "Contact";
 }
 
 export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames =
+  | "Contact"
   | "Mutation"
   | "Organization"
+  | "Petition"
+  | "PetitionAccess"
+  | "PetitionField"
+  | "PetitionPagination"
+  | "PetitionProgress"
   | "Query"
   | "User"
   | "UserPagination";
@@ -169,7 +270,9 @@ export type NexusGenInputNames = "UpdateUserInput";
 export type NexusGenEnumNames =
   | "ChangePasswordResult"
   | "OrganizationRole"
-  | "OrganizationStatus";
+  | "OrganizationStatus"
+  | "PetitionFieldType"
+  | "PetitionStatus";
 
 export type NexusGenInterfaceNames = "Timestamps";
 
@@ -179,6 +282,7 @@ export type NexusGenScalarNames =
   | "Float"
   | "ID"
   | "Int"
+  | "JSON"
   | "String";
 
 export type NexusGenUnionNames = never;

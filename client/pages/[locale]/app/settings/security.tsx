@@ -40,6 +40,7 @@ function Security() {
   const { handleSubmit, register, errors, getValues, setError } = useForm<
     PasswordChangeFormData
   >();
+
   async function onChangePassword({
     password,
     newPassword

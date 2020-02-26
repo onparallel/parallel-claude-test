@@ -5,8 +5,8 @@ export interface FromDataLoaderOptions {
 }
 
 export interface Loader<K, V> {
-  (id: K, opts?: FromDataLoaderOptions): Promise<V | null>;
-  (ids: K[], opts?: FromDataLoaderOptions): Promise<Array<V | null>>;
+  (id: K, opts?: FromDataLoaderOptions): Promise<V>;
+  (ids: K[], opts?: FromDataLoaderOptions): Promise<Array<V>>;
 }
 
 export function fromDataLoader<K, V, C = K>(

@@ -16,6 +16,8 @@ import { Logo } from "../common/Logo";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
 import { NakedLink } from "../common/Link";
+import { useMemo } from "react";
+import { Spacer } from "../common/Spacer";
 
 export type AppLayoutNavbarProps = BoxProps & {
   user: AppLayoutNavbar_UserFragment;
@@ -25,32 +27,35 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
   const { colorMode } = useColorMode();
   const { pathname } = useRouter();
   const intl = useIntl();
-  const items = [
-    {
-      section: "sendouts",
-      icon: "paper-plane",
-      text: intl.formatMessage({
-        id: "navbar.sendouts-link",
-        defaultMessage: "Sendouts"
-      })
-    },
-    {
-      section: "petitions",
-      icon: "file-alt",
-      text: intl.formatMessage({
-        id: "navbar.petitions-link",
-        defaultMessage: "Petitions"
-      })
-    },
-    {
-      section: "contacts",
-      icon: "address-book",
-      text: intl.formatMessage({
-        id: "navbar.contacts-link",
-        defaultMessage: "Contacts"
-      })
-    }
-  ];
+  const items = useMemo(
+    () => [
+      {
+        section: "petitions",
+        icon: "paper-plane",
+        text: intl.formatMessage({
+          id: "navbar.petitions-link",
+          defaultMessage: "Petitions"
+        })
+      },
+      {
+        section: "templates",
+        icon: "file-alt",
+        text: intl.formatMessage({
+          id: "navbar.templates-link",
+          defaultMessage: "Templates"
+        })
+      },
+      {
+        section: "contacts",
+        icon: "address-book",
+        text: intl.formatMessage({
+          id: "navbar.contacts-link",
+          defaultMessage: "Contacts"
+        })
+      }
+    ],
+    [intl.locale]
+  );
   return (
     <Flex
       flexDirection="column"
@@ -105,7 +110,7 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
           </ListItem>
         ))}
       </List>
-      <Box flex="1"></Box>
+      <Spacer />
       <Flex justifyContent="center" marginY={4}>
         <UserMenu user={user}></UserMenu>
       </Flex>

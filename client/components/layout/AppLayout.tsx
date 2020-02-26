@@ -19,6 +19,8 @@ export function AppLayout({ user, children }: AppLayoutProps) {
         as="main"
         flex="1"
         flexDirection="column"
+        maxHeight="100vh"
+        overflow="auto"
         backgroundColor={{ light: "gray.50", dark: "gray.600" }[colorMode]}
       >
         {children}

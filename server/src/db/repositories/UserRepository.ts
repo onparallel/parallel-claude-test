@@ -5,7 +5,7 @@ import { User } from "../__types";
 import { indexBy } from "remeda";
 import DataLoader from "dataloader";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { BaseRepository } from "./helpers";
+import { BaseRepository } from "../helpers/BaseRepository";
 
 @injectable()
 export class UserReposistory extends BaseRepository<User, "id"> {
@@ -13,14 +13,14 @@ export class UserReposistory extends BaseRepository<User, "id"> {
     super("user", "id", knex);
   }
 
-  loadOneByCognitoId = fromDataLoader(
-    new DataLoader<string, User>(async ids => {
+  readonly loadOneByCognitoId = fromDataLoader(
+    new DataLoader<string, User | null>(async ids => {
       const rows = await this.users
         .whereIn("cognito_id", ids as string[])
         .where("deleted_at", null)
         .select("*");
       const byIds = indexBy(rows, r => r.cognito_id);
-      return ids.map(id => byIds[id]);
+      return ids.map(id => byIds[id] ?? null);
     })
   );
 

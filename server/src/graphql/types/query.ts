@@ -1,4 +1,4 @@
-import { objectType, stringArg } from "nexus";
+import { objectType, stringArg, arg } from "nexus";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate } from "../helpers/authorize";
 
@@ -20,8 +20,28 @@ export const Query = objectType({
     t.field("me", {
       type: "User",
       authorize: authenticate(),
-      resolve: (_, args, ctx, info) => {
+      resolve: (_, args, ctx) => {
         return ctx.user;
+      }
+    });
+    t.paginationField("petitions", {
+      type: "Petition",
+      description: "The petitions of the user",
+      authorize: authenticate(),
+      additionalArgs: {
+        status: arg({
+          type: "PetitionStatus",
+          nullable: true
+        })
+      },
+      searchable: true,
+      resolve: async (_, { offset, limit, search, status }, ctx) => {
+        return await ctx.petitions.loadPetitionsForUser(ctx.user.id, {
+          status,
+          search,
+          offset,
+          limit
+        });
       }
     });
   }

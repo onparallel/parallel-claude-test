@@ -9,6 +9,7 @@ import jwtDecode from "jwt-decode";
 import { fromDataLoader } from "../util/fromDataLoader";
 import DataLoader from "dataloader";
 import async from "async";
+import { random } from "../util/token";
 
 @injectable()
 export class Auth {
@@ -111,8 +112,7 @@ export class Auth {
 
   private async storeSession(session: CognitoUserSession, token?: string) {
     if (!token) {
-      const buffer = await promisify(randomBytes)(48);
-      token = buffer.toString("hex");
+      token = random(48);
     }
     const idToken = session.getIdToken().getJwtToken();
     const refreshToken = session.getRefreshToken().getToken();
@@ -126,7 +126,7 @@ export class Auth {
   }
 
   validateSession = fromDataLoader(
-    new DataLoader<string, string>(async tokens => {
+    new DataLoader<string, string | null>(async tokens => {
       return await async.map(tokens as string[], async token => {
         try {
           const idToken = await this.redis.get(`session:${token}:idToken`);

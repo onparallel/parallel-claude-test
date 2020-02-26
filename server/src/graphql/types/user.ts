@@ -4,10 +4,11 @@ import {
   inputObjectType,
   mutationField,
   objectType,
-  stringArg
+  stringArg,
+  FieldAuthorizeResolver
 } from "nexus";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { removeNotDefined } from "../../util/removeNotDefined";
+import { removeNotDefined } from "../../util/remedaExtensions";
 import {
   argIsContextUserId,
   authenticate,
@@ -119,3 +120,11 @@ export const changePassword = mutationField("changePassword", {
     }
   }
 });
+
+function rootIsContextUserId<
+  FieldName extends string
+>(): FieldAuthorizeResolver<"User", FieldName> {
+  return (root, _, ctx) => {
+    return ctx.user.id === root.id;
+  };
+}

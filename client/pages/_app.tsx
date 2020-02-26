@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
 import { pick } from "remeda";
 import { theme } from "@parallel/utils/theme";
+import { DialogProvider } from "@parallel/components/common/DialogProvider";
 
 const resetConfig = (theme: ITheme) => ({
   light: {
@@ -49,7 +50,9 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         <ColorModeProvider value="light">
           {/* Force light mode until a fix is found for the server vs client discrepancies */}
           <CSSReset config={resetConfig} />
-          <Component {...pageProps} />
+          <DialogProvider>
+            <Component {...pageProps} />
+          </DialogProvider>
         </ColorModeProvider>
       </ThemeProvider>
     </IntlProvider>

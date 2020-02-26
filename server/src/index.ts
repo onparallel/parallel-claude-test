@@ -16,6 +16,7 @@ app.use("/api", bodyParser.json(), cors(), cookieParser(), api(container));
 
 const server = new ApolloServer({
   schema,
+  tracing: process.env.NODE_ENV === "development",
   context: async ({ req }) => {
     const context = container.get<Context>(Context);
     context.req = req;

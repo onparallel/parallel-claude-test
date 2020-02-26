@@ -2,8 +2,10 @@ import { ContainerModule } from "inversify";
 import Knex from "knex";
 import { CONFIG, Config } from "../config";
 import { KNEX } from "./knex";
-import { OrganizationReposistory } from "./repositories/organizations";
-import { UserReposistory } from "./repositories/users";
+import { OrganizationRepository } from "./repositories/OrganizationRepository";
+import { UserReposistory } from "./repositories/UserRepository";
+import { PetitionRepository } from "./repositories/PetitionRepository";
+import { ContactReposistory } from "./repositories/ContactRepository";
 
 export const dbModule = new ContainerModule(bind => {
   bind<Knex>(KNEX)
@@ -26,6 +28,10 @@ export const dbModule = new ContainerModule(bind => {
       return knex;
     })
     .inSingletonScope();
+
+  // Repositories
+  bind<ContactReposistory>(ContactReposistory).toSelf();
+  bind<OrganizationRepository>(OrganizationRepository).toSelf();
+  bind<PetitionRepository>(PetitionRepository).toSelf();
   bind<UserReposistory>(UserReposistory).toSelf();
-  bind<OrganizationReposistory>(OrganizationReposistory).toSelf();
 });
