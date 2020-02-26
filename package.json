@@ -5,5 +5,11 @@
     "client",
     "emails",
     "server"
-  ]
+  ],
+  "scripts": {
+    "update-deps": "ncu -u --packageFile bin/package.json && ncu -u --packageFile client/package.json && ncu -u --packageFile emails/package.json && ncu -u --packageFile client/package.json"
+  },
+  "devDependencies": {
+    "npm-check-updates": "^4.0.1"
+  }
 }

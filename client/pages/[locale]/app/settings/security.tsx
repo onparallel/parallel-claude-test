@@ -40,7 +40,6 @@ function Security() {
   const { handleSubmit, register, errors, getValues, setError } = useForm<
     PasswordChangeFormData
   >();
-  console.log(errors);
   async function onChangePassword({
     password,
     newPassword
@@ -216,7 +215,6 @@ const GET_SECURITY_DATA = gql`
   }
   ${AppLayout.fragments.user}
 `;
-
 
 Security.getInitialProps = async ({ apollo }: WithDataContext) => {
   await apollo.query<SecurityQuery>({ query: GET_SECURITY_DATA });

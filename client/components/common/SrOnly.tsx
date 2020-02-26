@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 import { ReactNode } from "react";
+import { Box } from "@chakra-ui/core";
 
 export interface SrOnlyProps {
   children: ReactNode;
@@ -8,7 +9,8 @@ export interface SrOnlyProps {
 
 export function SrOnly({ children }: SrOnlyProps) {
   return (
-    <span
+    <Box
+      as="span"
       css={{
         position: "absolute",
         width: "1px",
@@ -21,6 +23,6 @@ export function SrOnly({ children }: SrOnlyProps) {
       }}
     >
       {children}
-    </span>
+    </Box>
   );
 }
