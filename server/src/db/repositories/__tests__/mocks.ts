@@ -1,18 +1,17 @@
+import faker from "faker";
 import Knex from "knex";
+import { range } from "remeda";
 import {
   CreateOrganization,
-  Organization,
-  CreateUser,
-  User,
-  CreatePetitionField,
-  Petition,
   CreatePetition,
+  CreatePetitionField,
+  CreateUser,
+  Organization,
+  Petition,
   PetitionField,
-  PetitionFieldType
+  PetitionFieldType,
+  User
 } from "../../__types";
-import { range, last, flatMap } from "remeda";
-import faker from "faker";
-import { createReadStream } from "fs";
 
 export class Mocks {
   constructor(private knex: Knex) {}
@@ -107,7 +106,7 @@ export class Mocks {
 function randomPetitionStatus() {
   return faker.random.arrayElement([
     "DRAFT",
-    "SENDING",
+    "SCHEDULED",
     "PENDING",
     "COMPLETED"
   ] as const);
