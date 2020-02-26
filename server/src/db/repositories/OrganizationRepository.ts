@@ -10,7 +10,7 @@ export class OrganizationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.createLoadOneById("organization", "id");
+  readonly loadOneById = this.buildLoadOneById("organization", "id");
 
   async loadOrgUsers(orgId: number, opts: PageOpts) {
     return await this.loadPageAndCount(

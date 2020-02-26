@@ -1,19 +1,19 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import { groupBy, indexBy, sortBy } from "remeda";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import { count } from "../../util/remedaExtensions";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
-  Petition,
+  PetitionAccess,
   PetitionField,
   PetitionFieldReply,
   PetitionStatus,
-  PetitionAccess
+  User
 } from "../__types";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike } from "../helpers/utils";
-import { fromDataLoader } from "../../util/fromDataLoader";
-import DataLoader from "dataloader";
-import { indexBy, sortBy, groupBy } from "remeda";
-import { count } from "../../util/remedaExtensions";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {

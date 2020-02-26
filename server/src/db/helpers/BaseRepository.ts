@@ -10,24 +10,28 @@ import {
   PetitionFieldReply,
   PetitionAccess,
   TableTypes,
-  TablePrimaryKeys
+  TablePrimaryKeys,
+  TableCreateTypes
 } from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { MaybeArray } from "../../util/types";
 
 export interface PageOpts {
   offset?: number | null;
   limit?: number | null;
 }
 
+type TableNames = keyof TableTypes;
+
 @injectable()
 export class BaseRepository {
   constructor(protected readonly knex: Knex) {}
 
-  protected from<TName extends keyof TableTypes>(tableName: TName) {
+  protected from<TName extends TableNames>(tableName: TName) {
     return this.knex<TableTypes[TName]>(tableName);
   }
 
-  protected createLoadOneById<TName extends keyof TableTypes>(
+  protected buildLoadOneById<TName extends TableNames>(
     tableName: TName,
     idColumn: TablePrimaryKeys[TName]
   ) {
@@ -53,11 +57,10 @@ export class BaseRepository {
     query: Knex.QueryBuilder<TRecord, TResult>,
     { offset, limit }: PageOpts
   ) {
-    const [{ count }] = await query
+    const [{ totalCount }] = await query
       .clone()
       .clearOrder()
-      .count("*");
-    const totalCount = parseInt(count);
+      .select(this.knex.raw(`count(*)::integer as "totalCount"`));
     if (totalCount === 0) {
       return { totalCount, items: [] };
     } else {

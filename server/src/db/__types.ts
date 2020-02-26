@@ -62,7 +62,6 @@ export interface Contact {
 }
 
 export interface CreateContact {
-  id?: number;
   email: string;
   first_name?: Maybe<string>;
   last_name?: Maybe<string>;
@@ -90,7 +89,6 @@ export interface Organization {
 }
 
 export interface CreateOrganization {
-  id?: number;
   name: string;
   identifier: string;
   status: OrganizationStatus;
@@ -123,7 +121,6 @@ export interface Petition {
 }
 
 export interface CreatePetition {
-  id?: number;
   org_id: number;
   owner_id: number;
   name: string;
@@ -156,7 +153,6 @@ export interface PetitionAccess {
 }
 
 export interface CreatePetitionAccess {
-  id?: number;
   petition_id: number;
   contact_id: number;
   keycode: string;
@@ -178,7 +174,6 @@ export interface PetitionEventLog {
 }
 
 export interface CreatePetitionEventLog {
-  id?: number;
   petition_id: number;
   petition_access_id: number;
   event?: Maybe<string>;
@@ -205,7 +200,6 @@ export interface PetitionField {
 }
 
 export interface CreatePetitionField {
-  id?: number;
   petition_id: number;
   position: number;
   type: PetitionFieldType;
@@ -236,7 +230,6 @@ export interface PetitionFieldReply {
 }
 
 export interface CreatePetitionFieldReply {
-  id?: number;
   petition_field_id: number;
   petition_access_id: number;
   reply: Object;
@@ -265,7 +258,6 @@ export interface User {
 }
 
 export interface CreateUser {
-  id?: number;
   cognito_id: string;
   org_id: number;
   organization_role?: UserOrganizationRole;

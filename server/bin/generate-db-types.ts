@@ -80,7 +80,7 @@ export interface TablePrimaryKeys {
   ${Array.from(tables.values())
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(
-      ({ name, columns }) => `
+      ({ name, columns, primaryKey }) => `
 export interface ${name} {
   ${columns
     .sort((a, b) => a.position - b.position)
@@ -90,6 +90,7 @@ export interface ${name} {
 
 export interface Create${name} {
   ${columns
+    .filter(c => c.name !== primaryKey)
     .map(
       c =>
         `${c.name}${c.hasDefault || c.nullable ? "?" : ""}: ${

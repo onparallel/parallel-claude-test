@@ -9,5 +9,5 @@ export class ContactReposistory extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.createLoadOneById("contact", "id");
+  readonly loadOneById = this.buildLoadOneById("contact", "id");
 }
