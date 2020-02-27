@@ -61,7 +61,9 @@ export interface NexusGenEnums {
   OrganizationRole: "ADMIN" | "NORMAL";
   OrganizationStatus: db.OrganizationStatus;
   PetitionFieldType: db.PetitionFieldType;
+  PetitionLocale: "en" | "es";
   PetitionStatus: db.PetitionStatus;
+  Result: "FAILURE" | "SUCCESS";
 }
 
 export interface NexusGenRootTypes {
@@ -110,7 +112,9 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   OrganizationRole: NexusGenEnums["OrganizationRole"];
   OrganizationStatus: NexusGenEnums["OrganizationStatus"];
   PetitionFieldType: NexusGenEnums["PetitionFieldType"];
+  PetitionLocale: NexusGenEnums["PetitionLocale"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
+  Result: NexusGenEnums["Result"];
 }
 
 export interface NexusGenFieldTypes {
@@ -127,6 +131,8 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
+    createPetition: NexusGenRootTypes["Petition"]; // Petition!
+    deletePetitions: NexusGenEnums["Result"]; // Result!
     updateUser: NexusGenRootTypes["User"]; // User!
   };
   Organization: {
@@ -148,7 +154,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: string; // ID!
-    locale: string; // String!
+    locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string; // String!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
@@ -185,6 +191,7 @@ export interface NexusGenFieldTypes {
     // field return type
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
   };
   User: {
@@ -218,6 +225,15 @@ export interface NexusGenArgTypes {
       newPassword: string; // String!
       password: string; // String!
     };
+    createPetition: {
+      // args
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+      name: string; // String!
+    };
+    deletePetitions: {
+      // args
+      ids: string[]; // [ID!]!
+    };
     updateUser: {
       // args
       data: NexusGenInputs["UpdateUserInput"]; // UpdateUserInput!
@@ -235,6 +251,10 @@ export interface NexusGenArgTypes {
     organization: {
       // args
       id: string; // String!
+    };
+    petition: {
+      // args
+      id: string; // ID!
     };
     petitions: {
       // args
@@ -272,7 +292,9 @@ export type NexusGenEnumNames =
   | "OrganizationRole"
   | "OrganizationStatus"
   | "PetitionFieldType"
-  | "PetitionStatus";
+  | "PetitionLocale"
+  | "PetitionStatus"
+  | "Result";
 
 export type NexusGenInterfaceNames = "Timestamps";
 

@@ -13,11 +13,11 @@ export function useFocus<T = any>({
     {
       onFocus: <FocusEventHandler<T>>(e => {
         setFocused(true);
-        onFocus && onFocus(e);
+        onFocus?.(e);
       }),
       onBlur: <FocusEventHandler<T>>(e => {
         setFocused(false);
-        onBlur && onBlur(e);
+        onBlur?.(e);
       })
     }
   ] as const;

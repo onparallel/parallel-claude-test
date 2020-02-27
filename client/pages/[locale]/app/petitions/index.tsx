@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import {
   Box,
   Button,
@@ -8,11 +8,15 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text
+  Text,
+  Input
 } from "@chakra-ui/core";
 import { selectUnit } from "@formatjs/intl-utils";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import { useDialog } from "@parallel/components/common/DialogProvider";
+import {
+  DialogCallbacks,
+  useDialog
+} from "@parallel/components/common/DialogOpenerProvider";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
 import { PetitionStatusFilter } from "@parallel/components/common/PetitionStatusFilter";
 import { SearchInput } from "@parallel/components/common/SearchInput";
@@ -23,11 +27,15 @@ import { Title } from "@parallel/components/common/Title";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
+  createPetitionMutation,
+  createPetitionMutationVariables,
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
-  Petitions_PetitionsListFragment
+  Petitions_PetitionsListFragment,
+  deletePetitionsMutation,
+  deletePetitionsMutationVariables
 } from "@parallel/graphql/__types";
 import {
   enums,
@@ -40,13 +48,15 @@ import { ExtractArrayGeneric } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { ChangeEvent, memo, useState } from "react";
+import { ChangeEvent, memo, useState, useRef, KeyboardEvent } from "react";
 import {
   FormattedDate,
   FormattedMessage,
   FormattedRelativeTime,
   useIntl
 } from "react-intl";
+import { useRouter } from "next/router";
+import { clearCache } from "@parallel/utils/apollo";
 
 const PAGE_SIZE = 10;
 
@@ -58,6 +68,7 @@ const QUERY_STATE = {
 
 function Petitions() {
   const intl = useIntl();
+  const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [search, setSearch] = useState(state.search);
   const setSearchState = useDebouncedCallback(
@@ -66,21 +77,48 @@ function Petitions() {
     []
   );
   const { me } = useQueryData<PetitionsUserQuery>(GET_PETITIONS_USER_DATA);
-  const { data, loading } = useQuery<PetitionsQuery, PetitionsQueryVariables>(
-    GET_PETITIONS_DATA,
-    {
-      variables: {
-        offset: PAGE_SIZE * (state.page - 1),
-        limit: PAGE_SIZE,
-        search: state.search,
-        status: state.status
+  const { data, loading, refetch } = useQuery<
+    PetitionsQuery,
+    PetitionsQueryVariables
+  >(GET_PETITIONS_DATA, {
+    variables: {
+      offset: PAGE_SIZE * (state.page - 1),
+      limit: PAGE_SIZE,
+      search: state.search,
+      status: state.status
+    }
+  });
+  const [createPetition] = useMutation<
+    createPetitionMutation,
+    createPetitionMutationVariables
+  >(CREATE_PETITION, {
+    update(cache) {
+      // clear caches where new item would appear
+      clearCache(
+        cache,
+        /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
+      );
+      if (state.status === null || state.status === "DRAFT") {
+        refetch();
       }
     }
-  );
+  });
+
+  const [deletePetition] = useMutation<
+    deletePetitionsMutation,
+    deletePetitionsMutationVariables
+  >(DELETE_PETITIONS, {
+    update(cache) {
+      clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
+      refetch();
+    }
+  });
+
   const { petitions } = data!;
 
   const [selected, setSelected] = useState<string[]>();
-  const openDialog = useDialog();
+  const confirmDelete = useDialog(ConfirmDelete, [selected, petitions]);
+  const askPetitionName = useDialog(AskPetitionName, [selected, petitions]);
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
@@ -93,41 +131,43 @@ function Petitions() {
   }
 
   async function handleDeleteClick() {
-    const count = selected?.length ?? 0;
-    const name =
-      selected?.length && petitions.items.find(p => p.id === selected[0])?.name;
     try {
-      await openDialog(dialog => (
-        <ConfirmDialog
-          header={
-            <FormattedMessage
-              id="petitions.confirm-delete.header"
-              defaultMessage="Delete petitions"
-            />
-          }
-          body={
-            <FormattedMessage
-              id="petitions.confirm-delete.body"
-              defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
-              values={{
-                count,
-                name,
-                b: (...chunks: any[]) => <b>{chunks}</b>
-              }}
-            />
-          }
-          confirm={
-            <FormattedMessage
-              id="petitions.confirm-delete.confirm-button"
-              defaultMessage="Yes, delete"
-            />
-          }
-          confirmButtonProps={{ variantColor: "red" }}
-          {...dialog}
-        />
-      ));
-      // continue
+      await confirmDelete({
+        selected: petitions.items.filter(p => selected!.includes(p.id))
+      });
+      await deletePetition({
+        variables: { ids: selected! }
+      });
+    } catch {
+      console.log("cancelled");
+    }
+  }
+
+  async function handleCreateClick() {
+    try {
+      const name = await askPetitionName({});
+      const { data, errors } = await createPetition({
+        variables: {
+          name,
+          locale: router.query.locale as any
+        }
+      });
+      if (errors) {
+        throw errors;
+      }
+      goToPetition(data!.createPetition.id);
     } catch {}
+  }
+
+  function handleRowClick(row: PetitionSelection) {
+    goToPetition(row.id);
+  }
+
+  function goToPetition(id: string) {
+    router.push(
+      "/[locale]/app/petitions/[petitionId]",
+      `/${router.query.locale}/app/petitions/${id}`
+    );
   }
 
   return (
@@ -145,6 +185,7 @@ function Petitions() {
           rowKeyProp={"id"}
           selectable
           loading={loading}
+          onRowClick={handleRowClick}
           header={
             <Stack direction="row" padding={4}>
               <Box flex="0 1 400px">
@@ -177,7 +218,7 @@ function Petitions() {
                   </Menu>
                 </Box>
               ) : null}
-              <Button variantColor="purple">
+              <Button variantColor="purple" onClick={handleCreateClick}>
                 <FormattedMessage
                   id="petitions.create-petition-button"
                   defaultMessage="Create petition"
@@ -370,6 +411,108 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
   }
 ];
 
+function ConfirmDelete({
+  selected,
+  ...props
+}: {
+  selected: PetitionSelection[];
+} & DialogCallbacks<void>) {
+  const count = selected.length;
+  const name = selected.length && selected[0].name;
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="petitions.confirm-delete.header"
+          defaultMessage="Delete petitions"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="petitions.confirm-delete.body"
+          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
+          values={{
+            count,
+            name,
+            b: (...chunks: any[]) => <b>{chunks}</b>
+          }}
+        />
+      }
+      confirm={
+        <Button variantColor="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="petitions.confirm-delete.confirm-button"
+            defaultMessage="Yes, delete"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function AskPetitionName(props: DialogCallbacks<string>) {
+  const [name, setName] = useState("");
+  const intl = useIntl();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    setName(event.target.value);
+  }
+
+  function handleInputKeyPress(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter" && name.length > 0) {
+      props.onResolve(name);
+    }
+  }
+
+  return (
+    <ConfirmDialog
+      focusRef={inputRef}
+      header={
+        <FormattedMessage
+          id="petitions.create-new-petition.header"
+          defaultMessage="Create a new petition"
+        />
+      }
+      body={
+        <Box>
+          <Text>
+            <FormattedMessage
+              id="petitions.create-new-petition.body"
+              defaultMessage="Give your new petition a name"
+            />
+          </Text>
+          <Input
+            ref={inputRef}
+            value={name}
+            placeholder={intl.formatMessage({
+              id: "generic.untitled-petition",
+              defaultMessage: "Untitled petition"
+            })}
+            onChange={handleInputChange}
+            onKeyPress={handleInputKeyPress}
+            marginTop={2}
+          />
+        </Box>
+      }
+      confirm={
+        <Button
+          isDisabled={name.length === 0}
+          variantColor="purple"
+          onClick={() => props.onResolve(name)}
+        >
+          <FormattedMessage
+            id="petitions.create-new-petition.continue-button"
+            defaultMessage="Continue"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
 Petitions.fragments = {
   petitions: gql`
     fragment Petitions_PetitionsList on PetitionPagination {
@@ -430,6 +573,20 @@ const GET_PETITIONS_USER_DATA = gql`
     }
   }
   ${Petitions.fragments.user}
+`;
+
+const CREATE_PETITION = gql`
+  mutation createPetition($name: String!, $locale: PetitionLocale!) {
+    createPetition(name: $name, locale: $locale) {
+      id
+    }
+  }
+`;
+
+const DELETE_PETITIONS = gql`
+  mutation deletePetitions($ids: [ID!]!) {
+    deletePetitions(ids: $ids)
+  }
 `;
 
 Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {

@@ -63,6 +63,16 @@ type Mutation {
   changePassword(newPassword: String!, password: String!): ChangePasswordResult!
 
   """
+  Create petition.
+  """
+  createPetition(locale: PetitionLocale!, name: String!): Petition!
+
+  """
+  Delete petitions.
+  """
+  deletePetitions(ids: [ID!]!): Result!
+
+  """
   Updates the user with the provided data.
   """
   updateUser(data: UpdateUserInput!, id: ID!): User!
@@ -193,7 +203,7 @@ type Petition implements Timestamps {
   """
   The locale of the petition.
   """
-  locale: String!
+  locale: PetitionLocale!
 
   """
   The name of the petition.
@@ -281,6 +291,14 @@ enum PetitionFieldType {
   FILE_UPLOAD
 }
 
+"""
+The locale used for rendering the petition to the contact.
+"""
+enum PetitionLocale {
+  en
+  es
+}
+
 type PetitionPagination {
   """
   The requested slice of items.
@@ -318,6 +336,9 @@ type PetitionProgress {
   validated: Int!
 }
 
+"""
+The status of a petition.
+"""
 enum PetitionStatus {
   """
   The petition is completed
@@ -343,6 +364,7 @@ enum PetitionStatus {
 type Query {
   me: User!
   organization(id: String!): Organization
+  petition(id: ID!): Petition
 
   """
   The petitions of the user
@@ -364,6 +386,14 @@ type Query {
     search: String
     status: PetitionStatus
   ): PetitionPagination!
+}
+
+"""
+Represents the result of an operation.
+"""
+enum Result {
+  FAILURE
+  SUCCESS
 }
 
 interface Timestamps {

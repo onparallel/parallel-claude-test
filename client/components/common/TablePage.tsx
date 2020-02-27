@@ -13,11 +13,9 @@ export type TableCardProps<T> = TableProps<T> & {
   loading: boolean;
   header?: ReactNode;
   totalCount: number;
-  selectable: boolean;
   page: number;
   pageSize: number;
   onPageChange?: (page: number) => void;
-  onSelectionChange?: (selected: string[]) => void;
 } & BoxProps;
 
 export function TablePage<T>({
@@ -26,6 +24,7 @@ export function TablePage<T>({
   rowKeyProp,
   selectable,
   onSelectionChange,
+  onRowClick,
   loading,
   header,
   totalCount,
@@ -64,6 +63,7 @@ export function TablePage<T>({
           rowKeyProp={rowKeyProp}
           selectable={selectable}
           onSelectionChange={onSelectionChange}
+          onRowClick={onRowClick}
           borderTop={header ? "1px solid" : "none"}
           borderTopColor={colors.border}
         ></Table>
@@ -92,7 +92,7 @@ export function TablePage<T>({
         <Button
           variant="outline"
           isDisabled={page === 1}
-          onClick={() => onPageChange && onPageChange(page - 1)}
+          onClick={() => onPageChange?.(page - 1)}
         >
           <FormattedMessage
             id="component.table.prev-page-button"
@@ -102,7 +102,7 @@ export function TablePage<T>({
         <Button
           variant="outline"
           isDisabled={page * pageSize >= totalCount}
-          onClick={() => onPageChange && onPageChange(page + 1)}
+          onClick={() => onPageChange?.(page + 1)}
         >
           <FormattedMessage
             id="component.table.next-page-button"

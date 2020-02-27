@@ -1,20 +1,15 @@
 import DataLoader from "dataloader";
-import { injectable, unmanaged } from "inversify";
+import { injectable } from "inversify";
 import Knex from "knex";
 import { indexBy } from "remeda";
-import {
-  User,
-  Organization,
-  Petition,
-  PetitionField,
-  PetitionFieldReply,
-  PetitionAccess,
-  TableTypes,
-  TablePrimaryKeys,
-  TableCreateTypes
-} from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray } from "../../util/types";
+import {
+  TableCreateTypes,
+  TablePrimaryKeys,
+  TableTypes,
+  Maybe
+} from "../__types";
 
 export interface PageOpts {
   offset?: number | null;
@@ -22,6 +17,18 @@ export interface PageOpts {
 }
 
 type TableNames = keyof TableTypes;
+type TableKey<
+  TName extends TableNames
+> = TableTypes[TName][TablePrimaryKeys[TName]] & (string | number);
+
+interface Timestamped {
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
 
 @injectable()
 export class BaseRepository {
@@ -31,22 +38,23 @@ export class BaseRepository {
     return this.knex<TableTypes[TName]>(tableName);
   }
 
+  protected insert<TName extends TableNames>(
+    tableName: TName,
+    data: MaybeArray<TableCreateTypes[TName]>
+  ) {
+    return this.knex<TableTypes[TName]>(tableName).insert(data as any, "*");
+  }
+
   protected buildLoadOneById<TName extends TableNames>(
     tableName: TName,
     idColumn: TablePrimaryKeys[TName]
   ) {
     return fromDataLoader(
-      new DataLoader<
-        TableTypes[TName][TablePrimaryKeys[TName]],
-        TableTypes[TName] | null
-      >(async ids => {
+      new DataLoader<TableKey<TName>, TableTypes[TName] | null>(async ids => {
         const rows = <TableTypes[TName][]>await this.knex
           .from<TableTypes[TName]>(tableName)
           .select("*")
-          .whereIn(
-            idColumn,
-            ids as TableTypes[TName][TablePrimaryKeys[TName]][]
-          );
+          .whereIn(idColumn, ids as TableKey<TName>[]);
         const byId = indexBy(rows, r => r[idColumn]);
         return ids.map(id => byId[id]);
       })

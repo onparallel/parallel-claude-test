@@ -6,38 +6,45 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   Button,
-  ButtonProps
+  ButtonProps,
+  Stack
 } from "@chakra-ui/core";
-import { useRef, ReactNode } from "react";
+import { useRef, ReactNode, RefObject } from "react";
 import { FormattedMessage } from "react-intl";
+import { DialogCallbacks, Dialog } from "./DialogOpenerProvider";
 
-export type ConfirmDialogProps = {
+export type ConfirmDialogProps<T> = {
   header: ReactNode;
   body: ReactNode;
   confirm: ReactNode;
   cancel?: ReactNode;
-  confirmButtonProps?: Omit<ButtonProps, "children">;
-  cancelButtonProps?: Omit<ButtonProps, "children">;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
+  focusRef?: RefObject<HTMLElement>;
+} & DialogCallbacks<T>;
 
-export function ConfirmDialog({
+export function ConfirmDialog<T = void>({
   header,
   body,
   confirm,
   cancel,
-  confirmButtonProps,
-  cancelButtonProps,
-  onConfirm,
-  onCancel
-}: ConfirmDialogProps) {
+  focusRef,
+  onReject
+}: ConfirmDialogProps<T>) {
   const cancelRef = useRef<HTMLElement>(null);
+  cancel = cancel || (
+    <Button ref={cancelRef} onClick={() => onReject()}>
+      {cancel ?? (
+        <FormattedMessage
+          id="component.confirm-dialog.cancel-button"
+          defaultMessage="Cancel"
+        />
+      )}
+    </Button>
+  );
   return (
     <AlertDialog
       isOpen={true}
-      leastDestructiveRef={cancelRef}
-      onClose={onConfirm}
+      leastDestructiveRef={focusRef || cancelRef}
+      onClose={() => onReject()}
     >
       <AlertDialogOverlay />
       <AlertDialogContent>
@@ -46,17 +53,10 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogBody>{body}</AlertDialogBody>
         <AlertDialogFooter>
-          <Button ref={cancelRef} onClick={onCancel} {...cancelButtonProps}>
-            {cancel ?? (
-              <FormattedMessage
-                id="component.confirm-dialog.cancel-button"
-                defaultMessage="Cancel"
-              />
-            )}
-          </Button>
-          <Button onClick={onConfirm} marginLeft={2} {...confirmButtonProps}>
+          <Stack direction="row">
+            {cancel}
             {confirm}
-          </Button>
+          </Stack>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

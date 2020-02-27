@@ -27,7 +27,7 @@ export class Mocks {
             name: faker.company.companyName(),
             identifier: faker.random.alphaNumeric(10),
             status: "DEV",
-            ...(builder && builder(index))
+            ...builder?.(index)
           };
         })
       )
@@ -50,7 +50,7 @@ export class Mocks {
             last_name: lastName,
             email: faker.internet.email(firstName, lastName),
             cognito_id: faker.random.uuid(),
-            ...(builder && builder(index))
+            ...builder?.(index)
           };
         })
       )
@@ -73,7 +73,7 @@ export class Mocks {
             status: randomPetitionStatus(),
             name: faker.random.words(),
             locale: randomSupportedLocale(),
-            ...(builder && builder(index))
+            ...builder?.(index)
           };
         })
       )
@@ -95,7 +95,7 @@ export class Mocks {
             title: faker.random.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
-            ...(builder && builder(index))
+            ...builder?.(index)
           };
         })
       )

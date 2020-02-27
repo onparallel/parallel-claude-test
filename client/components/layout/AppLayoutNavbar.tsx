@@ -102,7 +102,7 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
           <ListItem key={section}>
             <AppLayoutNavbarLink
               href={`/app/${section}`}
-              active={pathname === `/[locale]/app/${section}`}
+              active={pathname.startsWith(`/[locale]/app/${section}`)}
               icon={icon}
             >
               {text}

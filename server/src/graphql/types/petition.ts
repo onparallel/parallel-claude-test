@@ -1,8 +1,24 @@
-import { enumType, objectType } from "nexus";
-import { toGlobalId } from "../../util/globalId";
+import {
+  enumType,
+  objectType,
+  mutationField,
+  stringArg,
+  arg,
+  FieldAuthorizeResolver,
+  idArg
+} from "nexus";
+import { toGlobalId, fromGlobalId } from "../../util/globalId";
+import { authenticate, authorizeAnd } from "../helpers/authorize";
+
+export const PetitionLocale = enumType({
+  name: "PetitionLocale",
+  description: "The locale used for rendering the petition to the contact.",
+  members: ["en", "es"]
+});
 
 export const PetitionStatus = enumType({
   name: "PetitionStatus",
+  description: "The status of a petition.",
   members: [
     { name: "DRAFT", description: "The petition has not been sent." },
     {
@@ -59,7 +75,8 @@ export const Petition = objectType({
       nullable: true,
       resolve: o => o.deadline
     });
-    t.string("locale", {
+    t.field("locale", {
+      type: PetitionLocale,
       description: "The locale of the petition."
     });
     t.field("status", {
@@ -154,3 +171,64 @@ export const PetitionAccess = objectType({
     });
   }
 });
+
+export const createPetition = mutationField("createPetition", {
+  description: "Create petition.",
+  type: "Petition",
+  authorize: authenticate(),
+  args: {
+    name: stringArg({ required: true }),
+    locale: arg({ type: PetitionLocale, required: true })
+  },
+  resolve: async (_, { name, locale }, ctx) => {
+    return await ctx.petitions.createPetition({ name, locale }, ctx.user);
+  }
+});
+
+export const deletePetitions = mutationField("deletePetitions", {
+  description: "Delete petitions.",
+  type: "Result",
+  authorize: authorizeAnd(authenticate(), userHasAccessToPetitions("ids")),
+  args: {
+    ids: idArg({ required: true, list: true })
+  },
+  resolve: async (_, args, ctx) => {
+    const ids = args.ids.map((arg: string) => {
+      const { id } = fromGlobalId(arg, "Petition");
+      return id;
+    });
+    await ctx.petitions.deletePetitionById(ids, ctx.user);
+    return "SUCCESS" as const;
+  }
+});
+
+export function userHasAccessToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  T extends string
+>(argName: T): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id } = fromGlobalId(args[argName], "Petition");
+      return ctx.petitions.userHasAccessToPetitions(ctx.user.id, [id]);
+    } catch {}
+    return false;
+  };
+}
+
+export function userHasAccessToPetitions<
+  TypeName extends string,
+  FieldName extends string,
+  T extends string
+>(argName: T): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const ids = args[argName].map((arg: string) => {
+        const { id } = fromGlobalId(arg, "Petition");
+        return id;
+      });
+      return ctx.petitions.userHasAccessToPetitions(ctx.user.id, ids);
+    } catch {}
+    return false;
+  };
+}

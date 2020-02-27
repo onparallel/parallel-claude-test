@@ -1,7 +1,8 @@
-import { ApolloClient } from "apollo-boost";
+import { ApolloClient, MutationUpdaterFn } from "apollo-boost";
 import { createHttpLink } from "apollo-link-http";
 import { setContext } from "apollo-link-context";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import { clearConfigCache } from "prettier";
 
 if (!process.browser) {
   (<any>global).fetch = require("node-fetch");
@@ -41,4 +42,14 @@ export function createApolloClient(
   });
   _cached = client;
   return client;
+}
+
+type DataProxy = Parameters<MutationUpdaterFn>[0];
+export function clearCache(cache: DataProxy, regex: RegExp) {
+  const data = (cache as any).data;
+  for (const key of Object.keys(data.data)) {
+    if (regex.test(key)) {
+      data.delete(key);
+    }
+  }
 }

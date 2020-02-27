@@ -1,6 +1,7 @@
-import { objectType, stringArg, arg } from "nexus";
+import { arg, idArg, objectType, stringArg } from "nexus";
 import { fromGlobalId } from "../../util/globalId";
-import { authenticate } from "../helpers/authorize";
+import { authenticate, authorizeAnd } from "../helpers/authorize";
+import { userHasAccessToPetition } from "./petition";
 
 export const Query = objectType({
   name: "Query",
@@ -42,6 +43,18 @@ export const Query = objectType({
           offset,
           limit
         });
+      }
+    });
+    t.field("petition", {
+      type: "Petition",
+      args: {
+        id: idArg({ required: true })
+      },
+      authorize: authorizeAnd(authenticate(), userHasAccessToPetition("id")),
+      nullable: true,
+      resolve: async (root, args, ctx) => {
+        const { id } = fromGlobalId(args.id, "Petition");
+        return await ctx.petitions.loadOneById(id);
       }
     });
   }

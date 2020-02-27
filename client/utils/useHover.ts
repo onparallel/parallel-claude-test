@@ -13,11 +13,11 @@ export function useHover<T = any>({
     {
       onMouseEnter: <MouseEventHandler<T>>(e => {
         setHovered(true);
-        onMouseEnter && onMouseEnter(e);
+        onMouseEnter?.(e);
       }),
       onMouseLeave: <MouseEventHandler<T>>(e => {
         setHovered(false);
-        onMouseLeave && onMouseLeave(e);
+        onMouseLeave?.(e);
       })
     }
   ] as const;

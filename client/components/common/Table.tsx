@@ -6,7 +6,7 @@ import {
   PseudoBoxProps,
   useColorMode
 } from "@chakra-ui/core";
-import { ComponentType, useEffect, useMemo, memo } from "react";
+import { ComponentType, useEffect, useMemo, memo, MouseEvent } from "react";
 import { useSelectionState } from "../../utils/useSelectionState";
 
 export type TableProps<T> = BoxProps & {
@@ -15,6 +15,7 @@ export type TableProps<T> = BoxProps & {
   rowKeyProp: keyof T;
   selectable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
+  onRowClick?: (row: T, event: MouseEvent) => void;
 };
 
 export type TableHeaderProps<T> = {
@@ -47,6 +48,7 @@ function _Table<T>({
   rowKeyProp,
   selectable,
   onSelectionChange,
+  onRowClick,
   ...props
 }: TableProps<T>) {
   const {
@@ -59,12 +61,11 @@ function _Table<T>({
   const colors = useTableColors();
 
   useEffect(() => {
-    onSelectionChange &&
-      onSelectionChange(
-        Object.entries(selection)
-          .filter(([_, value]) => value)
-          .map(([key]) => key)
-      );
+    onSelectionChange?.(
+      Object.entries(selection)
+        .filter(([_, value]) => value)
+        .map(([key]) => key)
+    );
   }, [selection]);
 
   columns = useMemo(() => {
@@ -157,6 +158,7 @@ function _Table<T>({
               cursor="pointer"
               borderBottom="1px solid"
               borderBottomColor={colors.border}
+              onClick={event => onRowClick?.(row, event)}
             >
               {columns.map(column => {
                 return (

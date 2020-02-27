@@ -4,6 +4,7 @@ import Knex from "knex";
 import { groupBy, indexBy, sortBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { count } from "../../util/remedaExtensions";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -19,6 +20,20 @@ import {
 export class PetitionRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
     super(knex);
+  }
+
+  readonly loadOneById = this.buildLoadOneById("petition", "id");
+
+  async userHasAccessToPetitions(userId: number, petitionIds: number[]) {
+    const [{ count }] = await this.from("petition")
+      .where({
+        owner_id: userId,
+        is_template: false,
+        deleted_at: null
+      })
+      .whereIn("id", petitionIds)
+      .select(this.knex.raw(`count(*)::integer as "count"`));
+    return count === petitionIds.length;
   }
 
   async loadPetitionsForUser(
@@ -137,4 +152,29 @@ export class PetitionRepository extends BaseRepository {
       return ids.map(id => byPetitionId[<any>id] || []);
     })
   );
+
+  async createPetition(
+    { name, locale }: { name: string; locale: string },
+    user: User
+  ) {
+    const [row] = await this.insert("petition", {
+      org_id: user.org_id,
+      owner_id: user.id,
+      locale,
+      name,
+      status: "DRAFT",
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`
+    });
+    return row;
+  }
+
+  async deletePetitionById(petitionId: MaybeArray<number>, user: User) {
+    return await this.from("petition")
+      .update({
+        deleted_at: this.knex.raw("NOW()") as any,
+        deleted_by: `User:${user.id}`
+      })
+      .whereIn("id", Array.isArray(petitionId) ? petitionId : [petitionId]);
+  }
 }

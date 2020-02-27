@@ -29,12 +29,20 @@ export function AppLayoutNavbarLink({
         },
         ...{
           light: {
+            _active: {
+              backgroundColor: "purple.50",
+              color: "purple.700"
+            },
             _hover: {
               backgroundColor: "purple.50",
               color: "purple.700"
             }
           },
           dark: {
+            _active: {
+              backgroundColor: "purple.900",
+              color: "purple.50"
+            },
             _hover: {
               backgroundColor: "purple.900",
               color: "purple.50"
@@ -46,6 +54,10 @@ export function AppLayoutNavbarLink({
               light: {
                 backgroundColor: "purple.500",
                 color: "white",
+                _active: {
+                  backgroundColor: "purple.600",
+                  color: "white"
+                },
                 _hover: {
                   backgroundColor: "purple.600",
                   color: "white"
@@ -54,6 +66,10 @@ export function AppLayoutNavbarLink({
               dark: {
                 backgroundColor: "purple.200",
                 color: "gray.700",
+                _active: {
+                  backgroundColor: "purple.300",
+                  color: "gray.800"
+                },
                 _hover: {
                   backgroundColor: "purple.300",
                   color: "gray.800"

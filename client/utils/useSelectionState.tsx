@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  MouseEvent,
-  useEffect,
-  useMemo,
-  useState,
-  useRef
-} from "react";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 interface SelectionState {
   selection: {
@@ -59,6 +52,7 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
       let immediate: ReturnType<typeof setImmediate>;
       return {
         toggle: function(key: string, event: MouseEvent) {
+          event.stopPropagation();
           event.persist();
           if (immediate) {
             clearImmediate(immediate);

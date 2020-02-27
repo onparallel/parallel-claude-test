@@ -1,5 +1,6 @@
 export * from "../helpers/date";
 export * from "../helpers/json";
+export * from "../helpers/results";
 export * from "../helpers/timestamps";
 export * from "./contact";
 export * from "./organization";
