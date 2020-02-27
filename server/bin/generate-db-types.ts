@@ -4,7 +4,6 @@ import { promises as fs } from "fs";
 import Knex from "knex";
 import path from "path";
 import { format } from "prettier";
-import { props } from "../src/util/promises";
 import { groupBy, indexBy } from "remeda";
 
 const EXCLUDED_TABLES = ["migrations", "migrations_lock"];
