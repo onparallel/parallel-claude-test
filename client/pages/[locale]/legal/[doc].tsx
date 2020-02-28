@@ -99,7 +99,7 @@ interface LegalDocParams {
   doc: string;
 }
 
-export async function unstable_getStaticProps({
+export async function getStaticProps({
   params: { locale, doc }
 }: {
   params: LegalDocParams;
@@ -108,9 +108,12 @@ export async function unstable_getStaticProps({
   return { props: { content, doc } };
 }
 
-export function unstable_getStaticPaths() {
-  return flatMap(languages, ({ locale }) =>
-    DOCS.map(doc => ({ params: { locale, doc } }))
-  );
+export function getStaticPaths() {
+  return {
+    paths: flatMap(languages, ({ locale }) =>
+      DOCS.map(doc => ({ params: { locale, doc } }))
+    ),
+    fallback: false
+  };
 }
 export default LegalDoc;

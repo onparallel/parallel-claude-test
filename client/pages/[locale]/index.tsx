@@ -1,10 +1,10 @@
 import { useToast } from "@chakra-ui/core";
+import { Title } from "@parallel/components/common/Title";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import {
   PublicHero,
   RequestInviteForm
 } from "@parallel/components/public/PublicHero";
-import { Title } from "@parallel/components/common/Title";
 import languages from "@parallel/lang/languages.json";
 import { useIntl } from "react-intl";
 
@@ -38,12 +38,15 @@ function Home() {
   );
 }
 
-export async function unstable_getStaticProps() {
+export function getStaticProps() {
   return {};
 }
 
-export function unstable_getStaticPaths() {
-  return languages.map(({ locale }) => ({ params: { locale } }));
+export function getStaticPaths() {
+  return {
+    paths: languages.map(({ locale }) => ({ params: { locale } })),
+    fallback: false
+  };
 }
 
 export default Home;

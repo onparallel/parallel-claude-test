@@ -351,12 +351,15 @@ function PasswordResetForm({
   );
 }
 
-export async function unstable_getStaticProps() {
+export async function getStaticProps() {
   return {};
 }
 
-export function unstable_getStaticPaths() {
-  return languages.map(({ locale }) => ({ params: { locale } }));
+export function getStaticPaths() {
+  return {
+    paths: languages.map(({ locale }) => ({ params: { locale } })),
+    fallback: false
+  };
 }
 
 export default Forgot;
