@@ -85,7 +85,7 @@ export function AppLayoutNavbarLink({
             aria-hidden="true"
             focusable={false}
             name={icon as any}
-            size="20px"
+            size="24px"
           ></Icon>
         </Box>
         <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight={600}>

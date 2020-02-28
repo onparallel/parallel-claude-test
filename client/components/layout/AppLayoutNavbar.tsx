@@ -39,7 +39,7 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
       },
       {
         section: "templates",
-        icon: "file-alt",
+        icon: "file-text",
         text: intl.formatMessage({
           id: "navbar.templates-link",
           defaultMessage: "Templates"
@@ -47,7 +47,7 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
       },
       {
         section: "contacts",
-        icon: "address-book",
+        icon: "users",
         text: intl.formatMessage({
           id: "navbar.contacts-link",
           defaultMessage: "Contacts"
