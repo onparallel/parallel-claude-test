@@ -1,0 +1,269 @@
+import { useMutation } from "@apollo/react-hooks";
+import { Box, Flex, FormLabel, Input, Select, Stack } from "@chakra-ui/core";
+import { Card } from "@parallel/components/common/Card";
+import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
+import { HorizontalFormControl } from "@parallel/components/common/HorizontalFormControl";
+import {
+  isEmptyContent,
+  RichTextEditor,
+  RichTextEditorContent
+} from "@parallel/components/common/RichTextEditor";
+import { Title } from "@parallel/components/common/Title";
+import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  PetitionLocale,
+  PetitionSendQuery,
+  PetitionSendQueryVariables,
+  PetitionSendUserQuery,
+  PetitionSend_updatePetitionMutation,
+  PetitionSend_updatePetitionMutationVariables,
+  UpdatePetitionInput
+} from "@parallel/graphql/__types";
+import {
+  usePetitionState,
+  useWrapPetitionUpdater
+} from "@parallel/utils/petitions";
+import { UnwrapPromise } from "@parallel/utils/types";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useQueryData } from "@parallel/utils/useQueryData";
+import { gql } from "apollo-boost";
+import { ChangeEvent, useCallback, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+
+type PetitionProps = UnwrapPromise<
+  ReturnType<typeof PetitionSend.getInitialProps>
+>;
+
+function PetitionSend({ petitionId }: PetitionProps) {
+  const intl = useIntl();
+  const { me } = useQueryData<PetitionSendUserQuery>(
+    GET_PETITION_SEND_USER_DATA
+  );
+  const { petition } = useQueryData<
+    PetitionSendQuery,
+    PetitionSendQueryVariables
+  >(GET_PETITION_SEND_DATA, { variables: { id: petitionId } });
+
+  const [subject, setSubject] = useState(petition!.emailSubject ?? "");
+  const [body, setBody] = useState<RichTextEditorContent>(
+    petition!.emailBody ?? [{ children: [{ text: "" }] }]
+  );
+
+  const [state, setState] = usePetitionState();
+  const wrapper = useWrapPetitionUpdater(setState);
+  const [_updatePetition] = useUpdatePetition();
+
+  const handleUpdatePetition = useCallback(
+    wrapper(async (data: UpdatePetitionInput) => {
+      return await _updatePetition({ variables: { id: petitionId, data } });
+    }),
+    [petitionId]
+  );
+  const updateSubject = useDebouncedCallback(handleUpdatePetition, 500, []);
+  const updateBody = useDebouncedCallback(handleUpdatePetition, 500, []);
+  const updateDeadline = useDebouncedCallback(handleUpdatePetition, 500, []);
+
+  const handleSubjectChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSubject(event.target.value);
+      updateSubject({ emailSubject: event.target.value || null });
+    },
+    []
+  );
+
+  const handleLocaleChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      handleUpdatePetition({
+        locale: event.target.value as PetitionLocale
+      });
+    },
+    []
+  );
+
+  const handleDeadlineChange = useCallback((value: Date | null) => {
+    updateDeadline({ deadline: value ? value.toISOString() : null });
+  }, []);
+
+  const handleBodyChange = useCallback((value: RichTextEditorContent) => {
+    setBody(value);
+    updateBody({ emailBody: isEmptyContent(value) ? null : value });
+  }, []);
+
+  return (
+    <>
+      <Title>
+        {petition!.name ||
+          intl.formatMessage({
+            id: "generic.untitled-petition",
+            defaultMessage: "Untitled petition"
+          })}
+      </Title>
+      <PetitionLayout
+        user={me}
+        petition={petition!}
+        onUpdatePetition={handleUpdatePetition}
+        section="send"
+        state={state}
+      >
+        <Stack direction="row" padding={4} spacing={4}>
+          <Box flex="2">
+            <Card padding={4}>
+              <Stack>
+                <HorizontalFormControl>
+                  <FormLabel htmlFor="petition-locale">
+                    <FormattedMessage
+                      id="petition.locale-label"
+                      defaultMessage="Language:"
+                    />
+                  </FormLabel>
+                  <Select
+                    id="petition-locale"
+                    value={petition!.locale}
+                    onChange={handleLocaleChange}
+                  >
+                    <option value="en">
+                      {intl.formatMessage({
+                        id: "petition.locale.en",
+                        defaultMessage: "English"
+                      })}
+                    </option>
+                    <option value="es">
+                      {intl.formatMessage({
+                        id: "petition.locale.es",
+                        defaultMessage: "Spanish"
+                      })}
+                    </option>
+                  </Select>
+                </HorizontalFormControl>
+                <HorizontalFormControl>
+                  <FormLabel
+                    htmlFor="petition-deadline"
+                    paddingBottom={0}
+                    minWidth="120px"
+                  >
+                    <FormattedMessage
+                      id="petition.deadline-label"
+                      defaultMessage="Deadline:"
+                    />
+                  </FormLabel>
+                  <DateTimeInput
+                    id="petition-deadline"
+                    type="datetime-local"
+                    isFullWidth
+                    value={
+                      petition!.deadline ? new Date(petition!.deadline) : null
+                    }
+                    onChange={handleDeadlineChange}
+                  />
+                </HorizontalFormControl>
+                <HorizontalFormControl>
+                  <FormLabel
+                    htmlFor="petition-subject"
+                    paddingBottom={0}
+                    minWidth="120px"
+                  >
+                    <FormattedMessage
+                      id="petition.subject-label"
+                      defaultMessage="Subject:"
+                    />
+                  </FormLabel>
+                  <Input
+                    id="petition-subject"
+                    type="text"
+                    value={subject ?? ""}
+                    onChange={handleSubjectChange}
+                  ></Input>
+                </HorizontalFormControl>
+                <Box>
+                  <RichTextEditor
+                    placeholder={intl.formatMessage({
+                      id: "petition.body-placeholder",
+                      defaultMessage: "Write a message to include in the email"
+                    })}
+                    value={body}
+                    onChange={handleBodyChange}
+                    style={{ minHeight: "100px" }}
+                  ></RichTextEditor>
+                </Box>
+              </Stack>
+            </Card>
+          </Box>
+          <Box flex="1"></Box>
+        </Stack>
+      </PetitionLayout>
+    </>
+  );
+}
+
+PetitionSend.fragments = {
+  petition: gql`
+    fragment PetitionSend_Petition on Petition {
+      id
+      ...PetitionLayout_Petition
+      locale
+      deadline
+      emailSubject
+      emailBody
+    }
+    ${PetitionLayout.fragments.petition}
+  `,
+  user: gql`
+    fragment PetitionSend_User on User {
+      ...PetitionLayout_User
+    }
+    ${PetitionLayout.fragments.user}
+  `
+};
+
+const GET_PETITION_SEND_DATA = gql`
+  query PetitionSend($id: ID!) {
+    petition(id: $id) {
+      ...PetitionSend_Petition
+    }
+  }
+  ${PetitionSend.fragments.petition}
+`;
+
+const GET_PETITION_SEND_USER_DATA = gql`
+  query PetitionSendUser {
+    me {
+      ...PetitionSend_User
+    }
+  }
+  ${PetitionSend.fragments.user}
+`;
+
+function useUpdatePetition() {
+  return useMutation<
+    PetitionSend_updatePetitionMutation,
+    PetitionSend_updatePetitionMutationVariables
+  >(gql`
+    mutation PetitionSend_updatePetition(
+      $id: ID!
+      $data: UpdatePetitionInput!
+    ) {
+      updatePetition(id: $id, data: $data) {
+        ...PetitionSend_Petition
+      }
+    }
+    ${PetitionSend.fragments.petition}
+  `);
+}
+
+PetitionSend.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+  await Promise.all([
+    apollo.query<PetitionSendQuery, PetitionSendQueryVariables>({
+      query: GET_PETITION_SEND_DATA,
+      variables: { id: query.petitionId as string }
+    }),
+    apollo.query<PetitionSendUserQuery>({
+      query: GET_PETITION_SEND_USER_DATA
+    })
+  ]);
+  return {
+    petitionId: query.petitionId as string
+  };
+};
+
+export default withData(PetitionSend);

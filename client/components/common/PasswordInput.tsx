@@ -1,12 +1,12 @@
 import {
-  InputGroup,
-  Input,
-  InputRightElement,
   IconButton,
-  InputProps
+  Input,
+  InputGroup,
+  InputProps,
+  InputRightElement
 } from "@chakra-ui/core";
-import { useState, useRef, forwardRef, Ref } from "react";
-import { mergeRefs } from "@parallel/utils/mergeRefs";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import { forwardRef, Ref, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
 export const PasswordInput = forwardRef(function PasswordInput(
@@ -15,6 +15,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
 ) {
   const [show, setShow] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();
 
   const labels = {
@@ -36,7 +37,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
   return (
     <InputGroup size="md">
       <Input
-        ref={mergeRefs(ref, inputRef)}
+        ref={mergedRef}
         paddingRight={12}
         type={show ? "text" : "password"}
         {...props}

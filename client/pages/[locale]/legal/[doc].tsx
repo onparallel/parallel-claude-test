@@ -1,13 +1,12 @@
 import { Box, Heading, Text } from "@chakra-ui/core";
 import { NormalLink } from "@parallel/components/common/Link";
+import { Title } from "@parallel/components/common/Title";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { Title } from "@parallel/components/common/Title";
 import languages from "@parallel/lang/languages.json";
 import { loadDoc } from "@parallel/utils/docs";
 import Markdown from "markdown-to-jsx";
 import { useIntl } from "react-intl";
-import { flatMap } from "remeda";
 
 interface LegalDocProps {
   content: string;
@@ -110,7 +109,7 @@ export async function getStaticProps({
 
 export function getStaticPaths() {
   return {
-    paths: flatMap(languages, ({ locale }) =>
+    paths: languages.flatMap(({ locale }) =>
       DOCS.map(doc => ({ params: { locale, doc } }))
     ),
     fallback: false

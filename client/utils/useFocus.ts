@@ -1,4 +1,4 @@
-import { useState, FocusEventHandler } from "react";
+import { FocusEventHandler, useMemo, useState } from "react";
 
 export function useFocus<T = any>({
   onFocus,
@@ -10,15 +10,18 @@ export function useFocus<T = any>({
   const [focused, setFocused] = useState(false);
   return [
     focused,
-    {
-      onFocus: <FocusEventHandler<T>>(e => {
-        setFocused(true);
-        onFocus?.(e);
+    useMemo(
+      () => ({
+        onFocus: <FocusEventHandler<T>>(e => {
+          setFocused(true);
+          onFocus?.(e);
+        }),
+        onBlur: <FocusEventHandler<T>>(e => {
+          setFocused(false);
+          onBlur?.(e);
+        })
       }),
-      onBlur: <FocusEventHandler<T>>(e => {
-        setFocused(false);
-        onBlur?.(e);
-      })
-    }
+      [onFocus, onBlur]
+    )
   ] as const;
 }

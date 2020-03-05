@@ -4,6 +4,7 @@ export * from "../helpers/results";
 export * from "../helpers/timestamps";
 export * from "./contact";
 export * from "./organization";
-export * from "./petition";
+export * from "./petition/types";
+export * from "./petition/mutations";
 export * from "./query";
 export * from "./user";

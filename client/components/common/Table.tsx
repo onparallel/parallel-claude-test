@@ -202,7 +202,7 @@ export function useTableColors() {
           header: "gray.50",
           row: "white",
           rowHover: "gray.50",
-          rowSelected: "yellow.50"
+          rowSelected: "purple.50"
         };
       case "dark":
         return {

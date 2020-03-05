@@ -7,6 +7,10 @@ interface SelectionState {
   lastSelected: string | null;
 }
 
+/**
+ * This hook encapsulates the logic for handling the selection of rows on a
+ * table.
+ */
 export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
   const [{ selection }, setState] = useState<SelectionState>({
     selection: Object.fromEntries(
@@ -49,15 +53,15 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
 
     ...useMemo(() => {
       // click fires twice, once on the label and another one on the input
-      let immediate: ReturnType<typeof setImmediate>;
+      let timeout: any;
       return {
         toggle: function(key: string, event: MouseEvent) {
           event.stopPropagation();
           event.persist();
-          if (immediate) {
-            clearImmediate(immediate);
+          if (timeout) {
+            clearTimeout(timeout);
           }
-          immediate = setImmediate(() => {
+          timeout = setTimeout(() => {
             setState(previous => {
               const keys = [key];
               if (previous.lastSelected && event?.shiftKey) {

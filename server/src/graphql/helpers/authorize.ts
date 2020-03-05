@@ -3,6 +3,7 @@ import { fromGlobalId } from "../../util/globalId";
 import { FieldAuthorizeResolver } from "nexus";
 import { UserOrganizationRole } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
+import { every, everySeries } from "async";
 
 export function authenticate<
   TypeName extends string,
@@ -63,12 +64,24 @@ export function authorizeAnd<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    for (const resolver of resolvers) {
-      if (!(await resolver(root, args, ctx, info))) {
-        return false;
-      }
-    }
-    return true;
+    return ((await everySeries(
+      resolvers,
+      async resolver => await resolver(root, args, ctx, info)
+    )) as unknown) as boolean;
+  };
+}
+
+export function authorizeAndP<
+  TypeName extends string,
+  FieldName extends string
+>(
+  ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    return ((await every(
+      resolvers,
+      async resolver => await resolver(root, args, ctx, info)
+    )) as unknown) as boolean;
   };
 }
 

@@ -14,8 +14,8 @@ import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   AccountQuery,
-  updateAccountMutation,
-  updateAccountMutationVariables
+  Account_updateAccountMutation,
+  Account_updateAccountMutationVariables
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
@@ -35,13 +35,10 @@ function Account() {
       lastName: me.lastName ?? undefined
     }
   });
-  const [updateAccount] = useMutation<
-    updateAccountMutation,
-    updateAccountMutationVariables
-  >(UPDATE_ACCOUNT);
+  const [updateAccount] = useUpdateAccount();
 
   function onSaveName({ firstName, lastName }: NameChangeFormData) {
-    updateAccount({ variables: { id: me.id, firstName, lastName } });
+    updateAccount({ variables: { id: me.id, data: { firstName, lastName } } });
   }
 
   return (
@@ -143,17 +140,6 @@ Account.fragments = {
   `
 };
 
-const UPDATE_ACCOUNT = gql`
-  mutation updateAccount($id: ID!, $firstName: String!, $lastName: String!) {
-    updateUser(id: $id, data: { firstName: $firstName, lastName: $lastName }) {
-      id
-      firstName
-      lastName
-      fullName
-    }
-  }
-`;
-
 const GET_ACCOUNT_DATA = gql`
   query Account {
     me {
@@ -163,6 +149,22 @@ const GET_ACCOUNT_DATA = gql`
   }
   ${Account.fragments.user}
 `;
+
+function useUpdateAccount() {
+  return useMutation<
+    Account_updateAccountMutation,
+    Account_updateAccountMutationVariables
+  >(gql`
+    mutation Account_updateAccount($id: ID!, $data: UpdateUserInput!) {
+      updateUser(id: $id, data: $data) {
+        id
+        firstName
+        lastName
+        fullName
+      }
+    }
+  `);
+}
 
 Account.getInitialProps = async ({ apollo }: WithDataContext) => {
   await apollo.query<AccountQuery>({ query: GET_ACCOUNT_DATA });

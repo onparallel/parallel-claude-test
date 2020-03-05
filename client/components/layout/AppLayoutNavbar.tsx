@@ -61,6 +61,8 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
       flexDirection="column"
       as="nav"
       shadow="md"
+      // borderRight="2px solid"
+      // borderRightColor="gray.200"
       width={24}
       backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
       {...props}
@@ -71,7 +73,7 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
             <PseudoBox
               position="absolute"
               cursor="pointer"
-              transition="transform 200ms ease"
+              transition="transform 150ms"
               _hover={{
                 color: {
                   light: "gray.900",

@@ -16,6 +16,12 @@ declare global {
         core.GetGen3<"inputTypes", TypeName, FieldName>
       >
     ): void; // "DateTime";
+    jsonObject<FieldName extends string>(
+      fieldName: FieldName,
+      opts?: core.ScalarInputFieldConfig<
+        core.GetGen3<"inputTypes", TypeName, FieldName>
+      >
+    ): void; // "JSONObject";
     json<FieldName extends string>(
       fieldName: FieldName,
       opts?: core.ScalarInputFieldConfig<
@@ -30,6 +36,10 @@ declare global {
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "DateTime";
+    jsonObject<FieldName extends string>(
+      fieldName: FieldName,
+      ...opts: core.ScalarOutSpread<TypeName, FieldName>
+    ): void; // "JSONObject";
     json<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
@@ -46,6 +56,21 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  UpdatePetitionFieldInput: {
+    // input type
+    description?: string | null; // String
+    optional?: boolean | null; // Boolean
+    options?: { [key: string]: any } | null; // JSONObject
+    title?: string | null; // String
+  };
+  UpdatePetitionInput: {
+    // input type
+    deadline?: Date | null; // DateTime
+    emailBody?: any | null; // JSON
+    emailSubject?: string | null; // String
+    locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+    name?: string | null; // String
+  };
   UpdateUserInput: {
     // input type
     firstName?: string | null; // String
@@ -72,6 +97,11 @@ export interface NexusGenRootTypes {
   Organization: db.Organization;
   Petition: db.Petition;
   PetitionAccess: db.PetitionAccess;
+  PetitionAndField: {
+    // root type
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+  };
   PetitionField: db.PetitionField;
   PetitionPagination: {
     // root type
@@ -104,9 +134,12 @@ export interface NexusGenRootTypes {
   ID: string;
   DateTime: Date;
   JSON: any;
+  JSONObject: { [key: string]: any };
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
+  UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
+  UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
@@ -132,7 +165,12 @@ export interface NexusGenFieldTypes {
     // field return type
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     createPetition: NexusGenRootTypes["Petition"]; // Petition!
+    createPetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
+    deletePetitionField: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
+    updatePetition: NexusGenRootTypes["Petition"]; // Petition!
+    updatePetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
     updateUser: NexusGenRootTypes["User"]; // User!
   };
   Organization: {
@@ -151,11 +189,13 @@ export interface NexusGenFieldTypes {
     createdAt: Date; // DateTime!
     customRef: string | null; // String
     deadline: Date | null; // DateTime
+    emailBody: any | null; // JSON
+    emailSubject: string | null; // String
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: string; // ID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    name: string; // String!
+    name: string | null; // String
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: Date; // DateTime!
@@ -165,12 +205,17 @@ export interface NexusGenFieldTypes {
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     id: string; // ID!
   };
+  PetitionAndField: {
+    // field return type
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+  };
   PetitionField: {
     // field return type
     description: string | null; // String
     id: string; // ID!
     optional: boolean; // Boolean!
-    options: any | null; // JSON
+    options: { [key: string]: any } | null; // JSONObject
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     validated: boolean; // Boolean!
@@ -230,9 +275,35 @@ export interface NexusGenArgTypes {
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name: string; // String!
     };
+    createPetitionField: {
+      // args
+      id: string; // ID!
+      type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    };
+    deletePetitionField: {
+      // args
+      fieldId: string; // ID!
+      id: string; // ID!
+    };
     deletePetitions: {
       // args
       ids: string[]; // [ID!]!
+    };
+    updateFieldPositions: {
+      // args
+      fieldIds: string[]; // [ID!]!
+      id: string; // ID!
+    };
+    updatePetition: {
+      // args
+      data: NexusGenInputs["UpdatePetitionInput"]; // UpdatePetitionInput!
+      id: string; // ID!
+    };
+    updatePetitionField: {
+      // args
+      data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
+      fieldId: string; // ID!
+      id: string; // ID!
     };
     updateUser: {
       // args
@@ -278,6 +349,7 @@ export type NexusGenObjectNames =
   | "Organization"
   | "Petition"
   | "PetitionAccess"
+  | "PetitionAndField"
   | "PetitionField"
   | "PetitionPagination"
   | "PetitionProgress"
@@ -285,7 +357,10 @@ export type NexusGenObjectNames =
   | "User"
   | "UserPagination";
 
-export type NexusGenInputNames = "UpdateUserInput";
+export type NexusGenInputNames =
+  | "UpdatePetitionFieldInput"
+  | "UpdatePetitionInput"
+  | "UpdateUserInput";
 
 export type NexusGenEnumNames =
   | "ChangePasswordResult"
@@ -305,6 +380,7 @@ export type NexusGenScalarNames =
   | "ID"
   | "Int"
   | "JSON"
+  | "JSONObject"
   | "String";
 
 export type NexusGenUnionNames = never;

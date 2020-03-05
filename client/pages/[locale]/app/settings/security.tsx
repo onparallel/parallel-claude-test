@@ -15,8 +15,8 @@ import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   SecurityQuery,
-  updatePasswordMutation,
-  updatePasswordMutationVariables
+  Security_updatePasswordMutation,
+  Security_updatePasswordMutationVariables
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
@@ -33,10 +33,7 @@ function Security() {
   const intl = useIntl();
   const { data } = useQuery<SecurityQuery>(GET_SECURITY_DATA);
   const { me } = data!;
-  const [updatePassword] = useMutation<
-    updatePasswordMutation,
-    updatePasswordMutationVariables
-  >(UPDATE_PASSWORD);
+  const [updatePassword] = useUpdatePassword();
   const { handleSubmit, register, errors, getValues, setError } = useForm<
     PasswordChangeFormData
   >();
@@ -201,12 +198,6 @@ function Security() {
   );
 }
 
-const UPDATE_PASSWORD = gql`
-  mutation updatePassword($password: String!, $newPassword: String!) {
-    changePassword(password: $password, newPassword: $newPassword)
-  }
-`;
-
 const GET_SECURITY_DATA = gql`
   query Security {
     me {
@@ -216,6 +207,20 @@ const GET_SECURITY_DATA = gql`
   }
   ${AppLayout.fragments.user}
 `;
+
+function useUpdatePassword() {
+  return useMutation<
+    Security_updatePasswordMutation,
+    Security_updatePasswordMutationVariables
+  >(gql`
+    mutation Security_updatePassword(
+      $password: String!
+      $newPassword: String!
+    ) {
+      changePassword(password: $password, newPassword: $newPassword)
+    }
+  `);
+}
 
 Security.getInitialProps = async ({ apollo }: WithDataContext) => {
   await apollo.query<SecurityQuery>({ query: GET_SECURITY_DATA });

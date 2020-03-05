@@ -1,14 +1,5 @@
-import {
-  enumType,
-  objectType,
-  mutationField,
-  stringArg,
-  arg,
-  FieldAuthorizeResolver,
-  idArg
-} from "nexus";
-import { toGlobalId, fromGlobalId } from "../../util/globalId";
-import { authenticate, authorizeAnd } from "../helpers/authorize";
+import { enumType, objectType } from "nexus";
+import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -63,7 +54,8 @@ export const Petition = objectType({
       resolve: o => toGlobalId("Petition", o.id)
     });
     t.string("name", {
-      description: "The name of the petition."
+      description: "The name of the petition.",
+      nullable: true
     });
     t.string("customRef", {
       description: "The custom ref of the petition.",
@@ -76,7 +68,7 @@ export const Petition = objectType({
       resolve: o => o.deadline
     });
     t.field("locale", {
-      type: PetitionLocale,
+      type: "PetitionLocale",
       description: "The locale of the petition."
     });
     t.field("status", {
@@ -89,6 +81,22 @@ export const Petition = objectType({
       description: "The field definition of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
+      }
+    });
+    t.string("emailSubject", {
+      description: "The subject of the petition.",
+      nullable: true,
+      resolve: o => o.email_subject
+    });
+    t.json("emailBody", {
+      description: "The body of the petition.",
+      nullable: true,
+      resolve: o => {
+        try {
+          return o.email_body ? JSON.parse(o.email_body) : null;
+        } catch {
+          return null;
+        }
       }
     });
     t.int("fieldCount", {
@@ -117,7 +125,10 @@ export const Petition = objectType({
 export const PetitionFieldType = enumType({
   name: "PetitionFieldType",
   description: "Type of a petition field",
-  members: [{ name: "FILE_UPLOAD", description: "A file upload field." }]
+  members: [
+    { name: "FILE_UPLOAD", description: "A file upload field." },
+    { name: "TEXT", description: "A text field." }
+  ]
 });
 
 export const PetitionField = objectType({
@@ -140,7 +151,7 @@ export const PetitionField = objectType({
       nullable: true,
       description: "The description of the petition field."
     });
-    t.json("options", {
+    t.jsonObject("options", {
       description: "The options of the petition.",
       nullable: true
     });
@@ -171,64 +182,3 @@ export const PetitionAccess = objectType({
     });
   }
 });
-
-export const createPetition = mutationField("createPetition", {
-  description: "Create petition.",
-  type: "Petition",
-  authorize: authenticate(),
-  args: {
-    name: stringArg({ required: true }),
-    locale: arg({ type: PetitionLocale, required: true })
-  },
-  resolve: async (_, { name, locale }, ctx) => {
-    return await ctx.petitions.createPetition({ name, locale }, ctx.user);
-  }
-});
-
-export const deletePetitions = mutationField("deletePetitions", {
-  description: "Delete petitions.",
-  type: "Result",
-  authorize: authorizeAnd(authenticate(), userHasAccessToPetitions("ids")),
-  args: {
-    ids: idArg({ required: true, list: true })
-  },
-  resolve: async (_, args, ctx) => {
-    const ids = args.ids.map((arg: string) => {
-      const { id } = fromGlobalId(arg, "Petition");
-      return id;
-    });
-    await ctx.petitions.deletePetitionById(ids, ctx.user);
-    return "SUCCESS" as const;
-  }
-});
-
-export function userHasAccessToPetition<
-  TypeName extends string,
-  FieldName extends string,
-  T extends string
->(argName: T): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => {
-    try {
-      const { id } = fromGlobalId(args[argName], "Petition");
-      return ctx.petitions.userHasAccessToPetitions(ctx.user.id, [id]);
-    } catch {}
-    return false;
-  };
-}
-
-export function userHasAccessToPetitions<
-  TypeName extends string,
-  FieldName extends string,
-  T extends string
->(argName: T): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => {
-    try {
-      const ids = args[argName].map((arg: string) => {
-        const { id } = fromGlobalId(arg, "Petition");
-        return id;
-      });
-      return ctx.petitions.userHasAccessToPetitions(ctx.user.id, ids);
-    } catch {}
-    return false;
-  };
-}

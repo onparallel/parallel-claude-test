@@ -8,26 +8,12 @@ import {
   InputRightElement,
   useColorMode
 } from "@chakra-ui/core";
-import { mergeRefs } from "@parallel/utils/mergeRefs";
+import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useFocus } from "@parallel/utils/useFocus";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { ChangeEvent, forwardRef, Ref, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-
-function setNativeValue(element: HTMLInputElement, value: string) {
-  const valueSetter = Object.getOwnPropertyDescriptor(element, "value")!.set!;
-  const prototype = Object.getPrototypeOf(element);
-  const prototypeValueSetter = Object.getOwnPropertyDescriptor(
-    prototype,
-    "value"
-  )!.set!;
-
-  if (valueSetter && valueSetter !== prototypeValueSetter) {
-    prototypeValueSetter.call(element, value);
-  } else {
-    valueSetter.call(element, value);
-  }
-}
 
 export type SearchInputProps = InputProps &
   Required<Pick<InputProps, "value" | "onChange">>;
@@ -38,6 +24,7 @@ export const SearchInput = forwardRef(function SearchInput(
 ) {
   const { colorMode } = useColorMode();
   const inputRef = useRef<HTMLInputElement>(null);
+  const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();
   const [focused, bind] = useFocus<HTMLInputElement>(props);
   const [value, setValue] = useState(_value);
@@ -45,7 +32,7 @@ export const SearchInput = forwardRef(function SearchInput(
   const onChange = useDebouncedCallback(_onChange!, 300, []);
 
   const clearLabel = intl.formatMessage({
-    id: "component.search-input.clear-button",
+    id: "component.input.clear-button",
     defaultMessage: "Clear"
   });
 
@@ -81,7 +68,7 @@ export const SearchInput = forwardRef(function SearchInput(
         />
       </InputLeftElement>
       <Input
-        ref={mergeRefs(ref, inputRef)}
+        ref={mergedRef}
         paddingRight={isActive ? 12 : undefined}
         paddingLeft={12}
         type="search"

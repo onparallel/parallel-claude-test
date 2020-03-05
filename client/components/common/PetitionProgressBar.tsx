@@ -13,9 +13,10 @@ import {
   useTheme,
   Stack
 } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
+import { generateCssStripe } from "../../utils/css";
 
 type PetitionProgressProps = PetitionProgress & { status: PetitionStatus };
 
@@ -28,7 +29,7 @@ export function PetitionProgressBar({
 }: PetitionProgressProps) {
   const theme = useTheme();
   return (
-    <Popover trigger="hover" placement="left" {...{ usePortal: true }}>
+    <Popover trigger="hover" placement="left" usePortal>
       <PopoverTrigger>
         <Box>
           <ProgressTrack size="md">
@@ -49,7 +50,7 @@ export function PetitionProgressBar({
               max={total!}
               value={optional!}
               backgroundColor="yellow.400"
-              css={generateStripe({
+              css={generateCssStripe({
                 color: theme.colors.gray[200],
                 size: "1rem"
               })}
@@ -172,7 +173,7 @@ function ProgressIndicator({
       aria-valuemin={min}
       aria-valuenow={value}
       role="progressbar"
-      transition="all 0.3s"
+      transition="all 300ms"
       width={percent + "%"}
       {...rest}
     ></Box>
@@ -204,21 +205,3 @@ function ProgressTrack({ size, ...rest }: ProgressTrackProps) {
 function valueToPercent(value: number, min: number, max: number) {
   return ((value - min) * 100) / (max - min);
 }
-
-export const generateStripe = ({
-  size = "1rem",
-  color = "rgba(255, 255, 255, 1)"
-}) => css`
-  background-image: linear-gradient(
-    135deg,
-    ${color} 25%,
-    transparent 25%,
-    transparent 50%,
-    ${color} 50%,
-    ${color} 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: ${size} ${size};
-  background-position: left;
-`;

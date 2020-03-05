@@ -21,7 +21,8 @@ export const schema = makeSchema({
     ],
     contextType: "ctx.Context",
     backingTypeMap: {
-      DateTime: "Date"
+      DateTime: "Date",
+      JSONObject: "{[key: string]: any}"
     }
   },
   prettierConfig: path.join(__dirname, "../../.prettierrc")

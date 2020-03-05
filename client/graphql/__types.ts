@@ -7,6 +7,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   DateTime: string;
+  JSONObject: { [key: string]: any };
   JSON: any;
 };
 
@@ -16,6 +17,7 @@ export type ChangePasswordResult =
   | "INVALID_NEW_PASSWORD";
 
 export type Contact = Timestamps & {
+  __typename?: "Contact";
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
   id: Scalars["ID"];
@@ -26,8 +28,14 @@ export type Contact = Timestamps & {
 };
 
 export type Mutation = {
+  __typename?: "Mutation";
   createPetition: Petition;
   deletePetitions: Result;
+  updateFieldPositions: Petition;
+  updatePetition: Petition;
+  createPetitionField: PetitionAndField;
+  deletePetitionField: Petition;
+  updatePetitionField: PetitionAndField;
   updateUser: User;
   changePassword: ChangePasswordResult;
 };
@@ -41,6 +49,32 @@ export type MutationdeletePetitionsArgs = {
   ids: Array<Scalars["ID"]>;
 };
 
+export type MutationupdateFieldPositionsArgs = {
+  id: Scalars["ID"];
+  fieldIds: Array<Scalars["ID"]>;
+};
+
+export type MutationupdatePetitionArgs = {
+  id: Scalars["ID"];
+  data: UpdatePetitionInput;
+};
+
+export type MutationcreatePetitionFieldArgs = {
+  id: Scalars["ID"];
+  type: PetitionFieldType;
+};
+
+export type MutationdeletePetitionFieldArgs = {
+  id: Scalars["ID"];
+  fieldId: Scalars["ID"];
+};
+
+export type MutationupdatePetitionFieldArgs = {
+  id: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  data: UpdatePetitionFieldInput;
+};
+
 export type MutationupdateUserArgs = {
   id: Scalars["ID"];
   data: UpdateUserInput;
@@ -52,6 +86,7 @@ export type MutationchangePasswordArgs = {
 };
 
 export type Organization = Timestamps & {
+  __typename?: "Organization";
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
   id: Scalars["ID"];
@@ -71,45 +106,58 @@ export type OrganizationRole = "NORMAL" | "ADMIN";
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type Petition = Timestamps & {
+  __typename?: "Petition";
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
   id: Scalars["ID"];
-  name: Scalars["String"];
+  name?: Maybe<Scalars["String"]>;
   customRef?: Maybe<Scalars["String"]>;
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   status: PetitionStatus;
   fields: Array<PetitionField>;
+  emailSubject?: Maybe<Scalars["String"]>;
+  emailBody?: Maybe<Scalars["JSON"]>;
   fieldCount: Scalars["Int"];
   progress: PetitionProgress;
   accessess: Array<PetitionAccess>;
 };
 
 export type PetitionAccess = {
+  __typename?: "PetitionAccess";
   id: Scalars["ID"];
   contact?: Maybe<Contact>;
 };
 
+export type PetitionAndField = {
+  __typename?: "PetitionAndField";
+  petition: Petition;
+  field: PetitionField;
+};
+
 export type PetitionField = {
+  __typename?: "PetitionField";
   id: Scalars["ID"];
   type: PetitionFieldType;
   title?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
-  options?: Maybe<Scalars["JSON"]>;
+  options?: Maybe<Scalars["JSONObject"]>;
   optional: Scalars["Boolean"];
   validated: Scalars["Boolean"];
 };
 
-export type PetitionFieldType = "FILE_UPLOAD";
+export type PetitionFieldType = "FILE_UPLOAD" | "TEXT";
 
 export type PetitionLocale = "en" | "es";
 
 export type PetitionPagination = {
+  __typename?: "PetitionPagination";
   items: Array<Petition>;
   totalCount: Scalars["Int"];
 };
 
 export type PetitionProgress = {
+  __typename?: "PetitionProgress";
   validated: Scalars["Int"];
   replied: Scalars["Int"];
   optional: Scalars["Int"];
@@ -119,6 +167,7 @@ export type PetitionProgress = {
 export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
 
 export type Query = {
+  __typename?: "Query";
   organization?: Maybe<Organization>;
   me: User;
   petitions: PetitionPagination;
@@ -147,12 +196,28 @@ export type Timestamps = {
   updatedAt: Scalars["DateTime"];
 };
 
+export type UpdatePetitionFieldInput = {
+  title?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  options?: Maybe<Scalars["JSONObject"]>;
+  optional?: Maybe<Scalars["Boolean"]>;
+};
+
+export type UpdatePetitionInput = {
+  name?: Maybe<Scalars["String"]>;
+  locale?: Maybe<PetitionLocale>;
+  deadline?: Maybe<Scalars["DateTime"]>;
+  emailSubject?: Maybe<Scalars["String"]>;
+  emailBody?: Maybe<Scalars["JSON"]>;
+};
+
 export type UpdateUserInput = {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
 };
 
 export type User = Timestamps & {
+  __typename?: "User";
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
   id: Scalars["ID"];
@@ -165,67 +230,283 @@ export type User = Timestamps & {
 };
 
 export type UserPagination = {
+  __typename?: "UserPagination";
   items: Array<User>;
   totalCount: Scalars["Int"];
 };
 
-export type AppLayout_UserFragment = AppLayoutNavbar_UserFragment;
+export type AppLayout_UserFragment = {
+  __typename?: "User";
+} & AppLayoutNavbar_UserFragment;
 
-export type AppLayoutNavbar_UserFragment = UserMenu_UserFragment;
+export type AppLayoutNavbar_UserFragment = {
+  __typename?: "User";
+} & UserMenu_UserFragment;
 
-export type UserMenu_UserFragment = Pick<User, "fullName">;
+export type PetitionHeader_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name" | "updatedAt">;
+
+export type PetitionLayout_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> &
+  PetitionHeader_PetitionFragment;
+
+export type PetitionLayout_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "fullName"
+>;
+
+export type PetitionComposeField_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "title" | "description" | "optional">;
+
+export type PetitionComposeFieldSettings_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "optional" | "options">;
 
 export type ContactsQueryVariables = {};
 
-export type ContactsQuery = { me: AppLayout_UserFragment };
+export type ContactsQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & AppLayout_UserFragment;
+};
 
 export type AppHomeQueryVariables = {};
 
-export type AppHomeQuery = { me: AppLayout_UserFragment };
-
-export type Petition_PetitionFragment = Pick<
-  Petition,
-  "id" | "customRef" | "name" | "status" | "deadline"
-> & {
-  progress: Pick<
-    PetitionProgress,
-    "validated" | "replied" | "optional" | "total"
-  >;
-  accessess: Array<{
-    contact: Maybe<Pick<Contact, "id" | "fullName" | "email">>;
-  }>;
+export type AppHomeQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & AppLayout_UserFragment;
 };
 
-export type Petitions_UserFragment = AppLayout_UserFragment;
+export type PetitionCompose_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & PetitionComposeField_PetitionFieldFragment &
+  PetitionComposeFieldSettings_PetitionFieldFragment;
 
-export type PetitionQueryVariables = {
+export type PetitionCompose_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
+    >;
+  } & PetitionLayout_PetitionFragment;
+
+export type PetitionCompose_UserFragment = {
+  __typename?: "User";
+} & PetitionLayout_UserFragment;
+
+export type PetitionComposeQueryVariables = {
   id: Scalars["ID"];
 };
 
-export type PetitionQuery = { petition: Maybe<Petition_PetitionFragment> };
-
-export type PetitionUserQueryVariables = {};
-
-export type PetitionUserQuery = { me: Petitions_UserFragment };
-
-export type Petitions_PetitionsListFragment = Pick<
-  PetitionPagination,
-  "totalCount"
-> & {
-  items: Array<
-    Pick<Petition, "id" | "customRef" | "name" | "status" | "deadline"> & {
-      progress: Pick<
-        PetitionProgress,
-        "validated" | "replied" | "optional" | "total"
-      >;
-      accessess: Array<{
-        contact: Maybe<Pick<Contact, "id" | "fullName" | "email">>;
-      }>;
-    }
+export type PetitionComposeQuery = { __typename?: "Query" } & {
+  petition: Maybe<
+    { __typename?: "Petition" } & PetitionCompose_PetitionFragment
   >;
 };
 
-export type Petitions_UserFragment = AppLayout_UserFragment;
+export type PetitionComposeUserQueryVariables = {};
+
+export type PetitionComposeUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & PetitionCompose_UserFragment;
+};
+
+export type PetitionCompose_updatePetitionMutationVariables = {
+  id: Scalars["ID"];
+  data: UpdatePetitionInput;
+};
+
+export type PetitionCompose_updatePetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetition: {
+    __typename?: "Petition";
+  } & PetitionCompose_PetitionFragment;
+};
+
+export type PetitionCompose_updateFieldPositionsMutationVariables = {
+  id: Scalars["ID"];
+  fieldIds: Array<Scalars["ID"]>;
+};
+
+export type PetitionCompose_updateFieldPositionsMutation = {
+  __typename?: "Mutation";
+} & {
+  updateFieldPositions: { __typename?: "Petition" } & Pick<Petition, "id"> &
+    PetitionCompose_PetitionFragment;
+};
+
+export type PetitionCompose_createPetitionFieldMutationVariables = {
+  id: Scalars["ID"];
+  type: PetitionFieldType;
+};
+
+export type PetitionCompose_createPetitionFieldMutation = {
+  __typename?: "Mutation";
+} & {
+  createPetitionField: { __typename?: "PetitionAndField" } & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
+      PetitionComposeField_PetitionFieldFragment &
+      PetitionComposeFieldSettings_PetitionFieldFragment;
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
+  };
+};
+
+export type PetitionCompose_CreatePetitionField_PetitionFragment = {
+  __typename?: "Petition";
+} & {
+  fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
+};
+
+export type PetitionCompose_deletePetitionFieldMutationVariables = {
+  id: Scalars["ID"];
+  fieldId: Scalars["ID"];
+};
+
+export type PetitionCompose_deletePetitionFieldMutation = {
+  __typename?: "Mutation";
+} & {
+  deletePetitionField: { __typename?: "Petition" } & Pick<Petition, "id"> &
+    PetitionCompose_PetitionFragment;
+};
+
+export type PetitionCompose_updatePetitionFieldMutationVariables = {
+  id: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  data: UpdatePetitionFieldInput;
+};
+
+export type PetitionCompose_updatePetitionFieldMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetitionField: { __typename?: "PetitionAndField" } & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
+      PetitionComposeField_PetitionFieldFragment &
+      PetitionComposeFieldSettings_PetitionFieldFragment;
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
+  };
+};
+
+export type PetitionReview_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> &
+  PetitionLayout_PetitionFragment;
+
+export type PetitionReview_UserFragment = {
+  __typename?: "User";
+} & PetitionLayout_UserFragment;
+
+export type PetitionReviewQueryVariables = {
+  id: Scalars["ID"];
+};
+
+export type PetitionReviewQuery = { __typename?: "Query" } & {
+  petition: Maybe<
+    { __typename?: "Petition" } & PetitionReview_PetitionFragment
+  >;
+};
+
+export type PetitionReviewUserQueryVariables = {};
+
+export type PetitionReviewUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & PetitionReview_UserFragment;
+};
+
+export type PetitionReview_updatePetitionMutationVariables = {
+  id: Scalars["ID"];
+  data: UpdatePetitionInput;
+};
+
+export type PetitionReview_updatePetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetition: { __typename?: "Petition" } & PetitionReview_PetitionFragment;
+};
+
+export type PetitionSend_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "locale" | "deadline" | "emailSubject" | "emailBody"
+> &
+  PetitionLayout_PetitionFragment;
+
+export type PetitionSend_UserFragment = {
+  __typename?: "User";
+} & PetitionLayout_UserFragment;
+
+export type PetitionSendQueryVariables = {
+  id: Scalars["ID"];
+};
+
+export type PetitionSendQuery = { __typename?: "Query" } & {
+  petition: Maybe<{ __typename?: "Petition" } & PetitionSend_PetitionFragment>;
+};
+
+export type PetitionSendUserQueryVariables = {};
+
+export type PetitionSendUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & PetitionSend_UserFragment;
+};
+
+export type PetitionSend_updatePetitionMutationVariables = {
+  id: Scalars["ID"];
+  data: UpdatePetitionInput;
+};
+
+export type PetitionSend_updatePetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetition: { __typename?: "Petition" } & PetitionSend_PetitionFragment;
+};
+
+export type Petitions_createPetitionMutationVariables = {
+  name: Scalars["String"];
+  locale: PetitionLocale;
+};
+
+export type Petitions_createPetitionMutation = { __typename?: "Mutation" } & {
+  createPetition: { __typename?: "Petition" } & Pick<Petition, "id">;
+};
+
+export type Petitions_deletePetitionsMutationVariables = {
+  ids: Array<Scalars["ID"]>;
+};
+
+export type Petitions_deletePetitionsMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "deletePetitions">;
+
+export type Petitions_PetitionsListFragment = {
+  __typename?: "PetitionPagination";
+} & Pick<PetitionPagination, "totalCount"> & {
+    items: Array<
+      { __typename?: "Petition" } & Pick<
+        Petition,
+        "id" | "customRef" | "name" | "status" | "deadline"
+      > & {
+          progress: { __typename?: "PetitionProgress" } & Pick<
+            PetitionProgress,
+            "validated" | "replied" | "optional" | "total"
+          >;
+          accessess: Array<
+            { __typename?: "PetitionAccess" } & {
+              contact: Maybe<
+                { __typename?: "Contact" } & Pick<
+                  Contact,
+                  "id" | "fullName" | "email"
+                >
+              >;
+            }
+          >;
+        }
+    >;
+  };
+
+export type Petitions_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
 
 export type PetitionsQueryVariables = {
   offset: Scalars["Int"];
@@ -234,57 +515,65 @@ export type PetitionsQueryVariables = {
   status?: Maybe<PetitionStatus>;
 };
 
-export type PetitionsQuery = { petitions: Petitions_PetitionsListFragment };
+export type PetitionsQuery = { __typename?: "Query" } & {
+  petitions: {
+    __typename?: "PetitionPagination";
+  } & Petitions_PetitionsListFragment;
+};
 
 export type PetitionsUserQueryVariables = {};
 
-export type PetitionsUserQuery = { me: Petitions_UserFragment };
-
-export type createPetitionMutationVariables = {
-  name: Scalars["String"];
-  locale: PetitionLocale;
+export type PetitionsUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Petitions_UserFragment;
 };
 
-export type createPetitionMutation = { createPetition: Pick<Petition, "id"> };
-
-export type deletePetitionsMutationVariables = {
-  ids: Array<Scalars["ID"]>;
-};
-
-export type deletePetitionsMutation = Pick<Mutation, "deletePetitions">;
-
-export type Account_UserFragment = Pick<User, "firstName" | "lastName"> &
+export type Account_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "firstName" | "lastName"
+> &
   AppLayout_UserFragment;
-
-export type updateAccountMutationVariables = {
-  id: Scalars["ID"];
-  firstName: Scalars["String"];
-  lastName: Scalars["String"];
-};
-
-export type updateAccountMutation = {
-  updateUser: Pick<User, "id" | "firstName" | "lastName" | "fullName">;
-};
 
 export type AccountQueryVariables = {};
 
-export type AccountQuery = { me: Pick<User, "id"> & Account_UserFragment };
+export type AccountQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
+};
 
-export type updatePasswordMutationVariables = {
+export type Account_updateAccountMutationVariables = {
+  id: Scalars["ID"];
+  data: UpdateUserInput;
+};
+
+export type Account_updateAccountMutation = { __typename?: "Mutation" } & {
+  updateUser: { __typename?: "User" } & Pick<
+    User,
+    "id" | "firstName" | "lastName" | "fullName"
+  >;
+};
+
+export type SecurityQueryVariables = {};
+
+export type SecurityQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
+};
+
+export type Security_updatePasswordMutationVariables = {
   password: Scalars["String"];
   newPassword: Scalars["String"];
 };
 
-export type updatePasswordMutation = Pick<Mutation, "changePassword">;
-
-export type SecurityQueryVariables = {};
-
-export type SecurityQuery = { me: Pick<User, "id"> & AppLayout_UserFragment };
+export type Security_updatePasswordMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "changePassword">;
 
 export type TemplatesQueryVariables = {};
 
-export type TemplatesQuery = { me: AppLayout_UserFragment };
+export type TemplatesQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & AppLayout_UserFragment;
+};
 
 export type CurrentUserQueryVariables = {};
 
-export type CurrentUserQuery = { me: Pick<User, "fullName" | "email"> };
+export type CurrentUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "fullName" | "email">;
+};

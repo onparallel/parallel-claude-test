@@ -10,6 +10,8 @@ import { IntlConfig, IntlProvider } from "react-intl";
 import { pick } from "remeda";
 import { theme } from "@parallel/utils/theme";
 import { DialogOpenerProvider } from "@parallel/components/common/DialogOpenerProvider";
+import { DndProvider } from "react-dnd";
+import Backend from "react-dnd-html5-backend";
 
 const resetConfig = (theme: ITheme) => ({
   light: {
@@ -50,9 +52,11 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         <ColorModeProvider value="light">
           {/* Force light mode until a fix is found for the server vs client discrepancies */}
           <CSSReset config={resetConfig} />
-          <DialogOpenerProvider>
-            <Component {...pageProps} />
-          </DialogOpenerProvider>
+          <DndProvider backend={Backend}>
+            <DialogOpenerProvider>
+              <Component {...pageProps} />
+            </DialogOpenerProvider>
+          </DndProvider>
         </ColorModeProvider>
       </ThemeProvider>
     </IntlProvider>

@@ -54,7 +54,15 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 """
 scalar DateTime
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
 scalar JSON
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 type Mutation {
   """
@@ -68,9 +76,38 @@ type Mutation {
   createPetition(locale: PetitionLocale!, name: String!): Petition!
 
   """
+  Creates a petition field
+  """
+  createPetitionField(id: ID!, type: PetitionFieldType!): PetitionAndField!
+
+  """
+  Delete petitions fields.
+  """
+  deletePetitionField(fieldId: ID!, id: ID!): Petition!
+
+  """
   Delete petitions.
   """
   deletePetitions(ids: [ID!]!): Result!
+
+  """
+  Updates the positions of the petition fields
+  """
+  updateFieldPositions(fieldIds: [ID!]!, id: ID!): Petition!
+
+  """
+  Updates a petition.
+  """
+  updatePetition(data: UpdatePetitionInput!, id: ID!): Petition!
+
+  """
+  Updates a petition field.
+  """
+  updatePetitionField(
+    data: UpdatePetitionFieldInput!
+    fieldId: ID!
+    id: ID!
+  ): PetitionAndField!
 
   """
   Updates the user with the provided data.
@@ -186,6 +223,16 @@ type Petition implements Timestamps {
   deadline: DateTime
 
   """
+  The body of the petition.
+  """
+  emailBody: JSON
+
+  """
+  The subject of the petition.
+  """
+  emailSubject: String
+
+  """
   The number of fields in the petition.
   """
   fieldCount: Int!
@@ -208,7 +255,7 @@ type Petition implements Timestamps {
   """
   The name of the petition.
   """
-  name: String!
+  name: String
 
   """
   The progress of the petition.
@@ -241,6 +288,11 @@ type PetitionAccess {
   id: ID!
 }
 
+type PetitionAndField {
+  field: PetitionField!
+  petition: Petition!
+}
+
 """
 A field within a petition.
 """
@@ -263,7 +315,7 @@ type PetitionField {
   """
   The options of the petition.
   """
-  options: JSON
+  options: JSONObject
 
   """
   The title of the petition field.
@@ -289,6 +341,11 @@ enum PetitionFieldType {
   A file upload field.
   """
   FILE_UPLOAD
+
+  """
+  A text field.
+  """
+  TEXT
 }
 
 """
@@ -406,6 +463,21 @@ interface Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+input UpdatePetitionFieldInput {
+  description: String
+  optional: Boolean
+  options: JSONObject
+  title: String
+}
+
+input UpdatePetitionInput {
+  deadline: DateTime
+  emailBody: JSON
+  emailSubject: String
+  locale: PetitionLocale
+  name: String
 }
 
 input UpdateUserInput {

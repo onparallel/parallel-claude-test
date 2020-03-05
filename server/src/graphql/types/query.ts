@@ -1,7 +1,7 @@
 import { arg, idArg, objectType, stringArg } from "nexus";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, authorizeAnd } from "../helpers/authorize";
-import { userHasAccessToPetition } from "./petition";
+import { userHasAccessToPetition } from "./petition/authorizers";
 
 export const Query = objectType({
   name: "Query",

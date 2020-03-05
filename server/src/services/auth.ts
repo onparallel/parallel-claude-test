@@ -1,15 +1,13 @@
+import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { map } from "async";
+import DataLoader from "dataloader";
 import { NextFunction, Request, Response } from "express";
 import { injectable } from "inversify";
-import { Cognito } from "./cognito";
-import { Redis } from "./redis";
-import { CognitoUserSession } from "amazon-cognito-identity-js";
-import { randomBytes } from "crypto";
-import { promisify } from "util";
 import jwtDecode from "jwt-decode";
 import { fromDataLoader } from "../util/fromDataLoader";
-import DataLoader from "dataloader";
-import async from "async";
 import { random } from "../util/token";
+import { Cognito } from "./cognito";
+import { Redis } from "./redis";
 
 @injectable()
 export class Auth {
@@ -127,7 +125,7 @@ export class Auth {
 
   validateSession = fromDataLoader(
     new DataLoader<string, string | null>(async tokens => {
-      return await async.map(tokens as string[], async token => {
+      return await map(tokens as string[], async token => {
         try {
           const idToken = await this.redis.get(`session:${token}:idToken`);
           if (idToken === null) {

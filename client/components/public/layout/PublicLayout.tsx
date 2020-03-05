@@ -26,7 +26,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
     <Flex direction="column" minHeight="100vh">
       <PublicHeader
         position="fixed"
-        transition="height 100ms ease"
+        transition="height 150ms"
         zIndex={2}
         {...(headerIsThin ? { shadow: "md", height: 16 } : {})}
       ></PublicHeader>

@@ -6,12 +6,12 @@ generates:
       - typescript
       - typescript-operations
     config:
-      skipTypename: true
       namingConvention: keep
       exportFragmentSpreadSubTypes: true
       enumsAsTypes: true
       scalars:
         DateTime: string
+        JSONObject: "{ [key: string]: any }"
 hooks:
   afterAllFileWrite:
     - prettier --write

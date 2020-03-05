@@ -1,20 +1,28 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { groupBy, indexBy, sortBy } from "remeda";
+import { groupBy, indexBy, sortBy, times } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { count } from "../../util/remedaExtensions";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, Maybe } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
+  CreatePetition,
   PetitionAccess,
   PetitionField,
   PetitionFieldReply,
   PetitionStatus,
-  User
+  User,
+  CreatePetitionField,
+  PetitionFieldType
 } from "../__types";
+import {
+  validateFieldOptions,
+  defaultFieldOptions
+} from "../helpers/fieldOptions";
+import { props } from "../../util/promises";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -22,7 +30,12 @@ export class PetitionRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("petition", "id");
+  readonly loadOneById = this.buildLoadOneById("petition", "id", q =>
+    q.whereNull("deleted_at")
+  );
+  readonly loadOneFieldById = this.buildLoadOneById("petition_field", "id", q =>
+    q.whereNull("deleted_at")
+  );
 
   async userHasAccessToPetitions(userId: number, petitionIds: number[]) {
     const [{ count }] = await this.from("petition")
@@ -32,8 +45,19 @@ export class PetitionRepository extends BaseRepository {
         deleted_at: null
       })
       .whereIn("id", petitionIds)
-      .select(this.knex.raw(`count(*)::integer as "count"`));
-    return count === petitionIds.length;
+      .select(this.count());
+    return count === new Set(petitionIds).size;
+  }
+
+  async fieldsBelongToPetition(petitionId: number, fieldIds: number[]) {
+    const [{ count }] = await this.from("petition_field")
+      .where({
+        petition_id: petitionId,
+        deleted_at: null
+      })
+      .whereIn("id", fieldIds)
+      .select(this.count());
+    return count === new Set(fieldIds).size;
   }
 
   async loadPetitionsForUser(
@@ -82,10 +106,7 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_id", ids as number[])
         .whereNull("deleted_at")
         .groupBy("petition_id")
-        .select(
-          "petition_id",
-          this.knex.raw(`count(*)::integer as "count"`) as any
-        );
+        .select("petition_id", this.count());
       const byPetitionId = indexBy(rows, r => r.petition_id);
       return ids.map(id => byPetitionId[id]?.count ?? 0);
     })
@@ -123,7 +144,7 @@ export class PetitionRepository extends BaseRepository {
           "pf.petition_id",
           "pf.validated",
           "pf.optional",
-          this.knex.raw(`count("pfr"."id")::integer as "replies"`) as any
+          this.knex.raw(`count("pfr"."id")::int as "replies"`) as any
         );
 
       const fieldsById = groupBy(fields, f => f.petition_id);
@@ -172,9 +193,207 @@ export class PetitionRepository extends BaseRepository {
   async deletePetitionById(petitionId: MaybeArray<number>, user: User) {
     return await this.from("petition")
       .update({
-        deleted_at: this.knex.raw("NOW()") as any,
+        deleted_at: this.now(),
         deleted_by: `User:${user.id}`
       })
       .whereIn("id", Array.isArray(petitionId) ? petitionId : [petitionId]);
+  }
+
+  async updatePetition(
+    petitionId: number,
+    data: Partial<CreatePetition>,
+    user: User
+  ) {
+    const [row] = await this.from("petition")
+      .where("id", petitionId)
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`
+        },
+        "*"
+      );
+    return row;
+  }
+
+  async updateFieldPositions(
+    petitionId: number,
+    fieldIds: number[],
+    user: User
+  ) {
+    return await this.knex.transaction(async t => {
+      const _ids = await this.from("petition_field", t)
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .select("id");
+      const ids = new Set(_ids.map(f => f.id));
+
+      if (ids.size !== fieldIds.length || fieldIds.some(id => !ids.has(id))) {
+        throw new Error("Invalid petition field ids");
+      }
+
+      await t.raw(
+        /* sql */ `
+        update "petition_field" as "pf" set
+          "position" = "t"."position",
+          "deleted_at" = NOW() -- temporarily delete to avoid unique index constraint
+        from (
+          values ${fieldIds.map(() => "(?::int, ?::int)").join(", ")}
+        ) as "t" ("id", "position")
+        where "t"."id" = "pf"."id";
+      `,
+        fieldIds.flatMap((id, i) => [id, i])
+      );
+
+      await this.from("petition_field", t)
+        .whereIn("id", fieldIds)
+        .update({
+          deleted_at: null,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`
+        });
+
+      const [petition] = await this.from("petition", t)
+        .where("id", petitionId)
+        .update(
+          {
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        );
+      return petition;
+    });
+  }
+
+  async createPetitionField(
+    petitionId: number,
+    type: PetitionFieldType,
+    user: User
+  ) {
+    return await this.knex.transaction(async t => {
+      const [{ max }] = await this.from("petition_field")
+        .where({
+          petition_id: petitionId,
+          deleted_at: null
+        })
+        .max("position");
+
+      const {
+        fields: [field],
+        petitions: [petition]
+      } = await props({
+        fields: this.insert("petition_field", [
+          {
+            petition_id: petitionId,
+            type,
+            optional: false,
+            options: defaultFieldOptions(type),
+            position: max === null ? 0 : max + 1,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`
+          }
+        ]),
+        petitions: this.from("petition", t)
+          .where("id", petitionId)
+          .update(
+            {
+              updated_at: this.now(),
+              updated_by: `User:${user.id}`
+            },
+            "*"
+          )
+      });
+      return { field, petition };
+    });
+  }
+
+  async deletePetitionField(petitionId: number, fieldId: number, user: User) {
+    return await this.knex.transaction(async t => {
+      const [field] = await this.from("petition_field", t)
+        .update(
+          {
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`
+          },
+          ["id", "position"]
+        )
+        .where({
+          petition_id: petitionId,
+          id: fieldId,
+          deleted_at: null
+        });
+
+      if (!field) {
+        throw new Error("Invalid petition field id");
+      }
+
+      await this.from("petition_field", t)
+        .update({
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+          position: this.knex.raw(`"position" - 1`) as any
+        })
+        .where({
+          petition_id: petitionId,
+          deleted_at: null
+        })
+        .where("position", ">", field.position);
+
+      const [petition] = await this.from("petition", t)
+        .where("id", petitionId)
+        .update(
+          {
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        );
+      return petition;
+    });
+  }
+
+  async updatePetitionField(
+    petitionId: number,
+    fieldId: number,
+    data: Partial<CreatePetitionField>,
+    user: User
+  ) {
+    const [[field], [petition]] = await Promise.all([
+      this.from("petition_field")
+        .where({
+          id: fieldId,
+          petition_id: petitionId
+        })
+        .update(
+          {
+            ...data,
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        ),
+      this.from("petition")
+        .where({
+          id: petitionId
+        })
+        .update(
+          {
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        )
+    ]);
+    return { field, petition };
+  }
+
+  async validateFieldData(fieldId: number, data: { options: Maybe<Object> }) {
+    const field = await this.loadOneFieldById(fieldId);
+    if (!field) {
+      throw new Error("Petition field not found");
+    }
+    validateFieldOptions(field?.type, data.options);
   }
 }

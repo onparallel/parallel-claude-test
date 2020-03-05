@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { injectable } from "inversify";
-import Knex from "knex";
+import Knex, { Transaction, QueryBuilder } from "knex";
 import { indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray } from "../../util/types";
@@ -10,6 +10,7 @@ import {
   TableTypes,
   Maybe
 } from "../__types";
+import { handler } from "../../util/handler";
 
 export interface PageOpts {
   offset?: number | null;
@@ -34,26 +35,47 @@ interface Timestamped {
 export class BaseRepository {
   constructor(protected readonly knex: Knex) {}
 
-  protected from<TName extends TableNames>(tableName: TName) {
-    return this.knex<TableTypes[TName]>(tableName);
+  protected from<TName extends TableNames>(
+    tableName: TName,
+    transaction?: Transaction
+  ) {
+    return transaction
+      ? transaction<TableTypes[TName]>(tableName)
+      : this.knex<TableTypes[TName]>(tableName);
+  }
+
+  protected now() {
+    return this.knex.raw("NOW()") as any;
+  }
+
+  protected count(as?: string) {
+    return this.knex.raw(`count(*)::int as "${as ?? "count"}"`) as any;
   }
 
   protected insert<TName extends TableNames>(
     tableName: TName,
-    data: MaybeArray<TableCreateTypes[TName]>
+    data: MaybeArray<TableCreateTypes[TName]>,
+    transaction?: Transaction
   ) {
-    return this.knex<TableTypes[TName]>(tableName).insert(data as any, "*");
+    return (transaction
+      ? transaction<TableTypes[TName]>(tableName)
+      : this.knex<TableTypes[TName]>(tableName)
+    ).insert(data as any, "*");
   }
 
   protected buildLoadOneById<TName extends TableNames>(
     tableName: TName,
-    idColumn: TablePrimaryKeys[TName]
+    idColumn: TablePrimaryKeys[TName],
+    builder?: (
+      builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
+    ) => void
   ) {
     return fromDataLoader(
       new DataLoader<TableKey<TName>, TableTypes[TName] | null>(async ids => {
         const rows = <TableTypes[TName][]>await this.knex
           .from<TableTypes[TName]>(tableName)
           .select("*")
+          .modify(q => builder?.(q))
           .whereIn(idColumn, ids as TableKey<TName>[]);
         const byId = indexBy(rows, r => r[idColumn]);
         return ids.map(id => byId[id]);
@@ -68,7 +90,7 @@ export class BaseRepository {
     const [{ totalCount }] = await query
       .clone()
       .clearOrder()
-      .select(this.knex.raw(`count(*)::integer as "totalCount"`));
+      .select(this.count("totalCount"));
     if (totalCount === 0) {
       return { totalCount, items: [] };
     } else {

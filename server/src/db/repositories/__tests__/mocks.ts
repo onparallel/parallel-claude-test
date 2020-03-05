@@ -113,7 +113,7 @@ function randomPetitionStatus() {
 }
 
 function randomPetitionFieldType() {
-  return faker.random.arrayElement(["FILE_UPLOAD"] as const);
+  return faker.random.arrayElement(["FILE_UPLOAD", "TEXT"] as const);
 }
 
 function randomSupportedLocale() {
@@ -124,8 +124,13 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
   switch (type) {
     case "FILE_UPLOAD": {
       return {
-        accepts: [faker.random.arrayElement(["PDF", "IMAGE", "VIDEO", "WORD"])],
+        accepts: [faker.random.arrayElement(["PDF", "IMAGE", "VIDEO"])],
         multiple: faker.random.boolean()
+      };
+    }
+    case "TEXT": {
+      return {
+        multiline: faker.random.boolean()
       };
     }
   }

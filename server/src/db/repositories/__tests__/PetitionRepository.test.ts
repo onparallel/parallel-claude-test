@@ -6,7 +6,8 @@ import { KNEX } from "../../knex";
 import { Organization, User, Petition, PetitionField } from "../../__types";
 import { Mocks } from "./mocks";
 import { PetitionRepository } from "../PetitionRepository";
-import { pick, range } from "remeda";
+import { pick, range, sortBy, indexBy } from "remeda";
+import faker from "faker";
 
 describe("repositories/PetitionRepository", () => {
   let container: Container;
@@ -68,7 +69,7 @@ describe("repositories/PetitionRepository", () => {
       expect(result.totalCount).toBe(5);
       expect(result.items).toMatchObject(
         _petitions
-          .filter(p => p.name.toLowerCase().includes("good"))
+          .filter(p => (p.name ?? "").toLowerCase().includes("good"))
           .slice(2, 2 + 5)
       );
     });
@@ -111,6 +112,218 @@ describe("repositories/PetitionRepository", () => {
       ]);
       expect(fieldCount1).toBe(5);
       expect(fieldCount2).toBe(0);
+    });
+  });
+
+  describe("updateFieldPositions", () => {
+    let org: Organization;
+    let user: User;
+    let petition1: Petition, petition2: Petition;
+    let fields: PetitionField[],
+      deleted: PetitionField[],
+      foreignField: PetitionField;
+
+    beforeAll(async () => {
+      await deleteAllData(knex);
+      [org] = await mocks.createRandomOrganizations(1);
+      [user] = await mocks.createRandomUsers(org.id, 2);
+      [petition1, petition2] = await mocks.createRandomPetitions(
+        org.id,
+        user.id,
+        2
+      );
+      fields = await mocks.createRandomPetitionFields(petition1.id, 6);
+      // add some random deleted fields
+      deleted = await mocks.createRandomPetitionFields(
+        petition1.id,
+        10,
+        index => ({
+          position: faker.random.number(10),
+          deleted_at: new Date()
+        })
+      );
+      [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
+    });
+
+    test("fails if the ids passed do not match with the petition field ids", async () => {
+      const [
+        { id: id1 },
+        { id: id2 },
+        { id: id3 },
+        { id: id4 },
+        { id: id5 },
+        { id: id6 }
+      ] = fields;
+      await expect(
+        petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user)
+      ).rejects.toThrow("Invalid petition field ids");
+      await expect(
+        petitions.updateFieldPositions(
+          petition1.id,
+          [id1, id2, id3, id4, id5, id6, id6],
+          user
+        )
+      ).rejects.toThrow("Invalid petition field ids");
+    });
+
+    test("fails if passed deleted field ids", async () => {
+      const [
+        { id: id1 },
+        { id: id2 },
+        { id: id3 },
+        { id: id4 },
+        { id: id5 },
+        { id: id6 }
+      ] = fields;
+      await expect(
+        petitions.updateFieldPositions(
+          petition1.id,
+          [id1, id2, id3, deleted[2].id, id5, id6, id6],
+          user
+        )
+      ).rejects.toThrow("Invalid petition field ids");
+    });
+
+    test("fails if passed fields ids from another petition", async () => {
+      const [
+        { id: id1 },
+        { id: id2 },
+        { id: id3 },
+        { id: id4 },
+        { id: id5 },
+        { id: id6 }
+      ] = fields;
+      await expect(
+        petitions.updateFieldPositions(
+          petition1.id,
+          [id1, id2, id3, foreignField.id, id5, id6, id6],
+          user
+        )
+      ).rejects.toThrow("Invalid petition field ids");
+    });
+
+    test("updates the positions", async () => {
+      const [
+        { id: id1 },
+        { id: id2 },
+        { id: id3 },
+        { id: id4 },
+        { id: id5 },
+        { id: id6 }
+      ] = fields;
+      await petitions.updateFieldPositions(
+        petition1.id,
+        [id2, id5, id6, id3, id1, id4],
+        user
+      );
+      const result1 = await petitions.loadFieldsForPetition(petition1.id, {
+        refresh: true
+      });
+      expect(sortBy(result1, f => f.position)).toMatchObject(
+        [id2, id5, id6, id3, id1, id4].map((id, index) => ({
+          id,
+          position: index,
+          deleted_at: null
+        }))
+      );
+      await petitions.updateFieldPositions(
+        petition1.id,
+        [id6, id5, id4, id3, id2, id1],
+        user
+      );
+      const result2 = await petitions.loadFieldsForPetition(petition1.id, {
+        refresh: true
+      });
+      expect(sortBy(result2, f => f.position)).toMatchObject(
+        [id6, id5, id4, id3, id2, id1].map((id, index) => ({
+          id,
+          position: index,
+          deleted_at: null
+        }))
+      );
+    });
+  });
+
+  describe("deletePetitionField", () => {
+    let org: Organization;
+    let user: User;
+    let petition1: Petition, petition2: Petition;
+    let fields: PetitionField[],
+      deleted: PetitionField[],
+      foreignField: PetitionField;
+
+    beforeAll(async () => {
+      await deleteAllData(knex);
+      [org] = await mocks.createRandomOrganizations(1);
+      [user] = await mocks.createRandomUsers(org.id, 2);
+      [petition1, petition2] = await mocks.createRandomPetitions(
+        org.id,
+        user.id,
+        2
+      );
+      fields = await mocks.createRandomPetitionFields(petition1.id, 6);
+      // add some random deleted fields
+      deleted = await mocks.createRandomPetitionFields(
+        petition1.id,
+        10,
+        index => ({
+          position: faker.random.number(10),
+          deleted_at: new Date()
+        })
+      );
+      [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
+    });
+
+    test("fails if passed a deleted field id", async () => {
+      await expect(
+        petitions.deletePetitionField(petition1.id, deleted[3].id, user)
+      ).rejects.toThrow("Invalid petition field id");
+    });
+
+    test("fails if passed a fields id from another petition", async () => {
+      await expect(
+        petitions.deletePetitionField(petition1.id, foreignField.id, user)
+      ).rejects.toThrow("Invalid petition field id");
+    });
+
+    test("deletes the specified fields", async () => {
+      let current = [...fields];
+      await petitions.deletePetitionField(petition1.id, fields[3].id, user);
+      const result1 = await petitions.loadFieldsForPetition(petition1.id, {
+        refresh: true
+      });
+      current = current.filter(f => f.id !== fields[3].id);
+      expect(result1).toMatchObject(
+        current.map(({ id }, index) => ({
+          id,
+          position: index,
+          deleted_at: null
+        }))
+      );
+      await petitions.deletePetitionField(petition1.id, fields[5].id, user);
+      const result2 = await petitions.loadFieldsForPetition(petition1.id, {
+        refresh: true
+      });
+      current = current.filter(f => f.id !== fields[5].id);
+      expect(result2).toMatchObject(
+        current.map(({ id }, index) => ({
+          id,
+          position: index,
+          deleted_at: null
+        }))
+      );
+      await petitions.deletePetitionField(petition1.id, fields[0].id, user);
+      const result3 = await petitions.loadFieldsForPetition(petition1.id, {
+        refresh: true
+      });
+      current = current.filter(f => f.id !== fields[0].id);
+      expect(result3).toMatchObject(
+        current.map(({ id }, index) => ({
+          id,
+          position: index,
+          deleted_at: null
+        }))
+      );
     });
   });
 });

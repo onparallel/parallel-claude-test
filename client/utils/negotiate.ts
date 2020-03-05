@@ -1,3 +1,12 @@
+/**
+ * Returns the most suitable language from a list of available ones given a
+ * value of the Accept-Language header.
+ * More information on:
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language
+ * @param accepts Value of the Accept-Language header
+ * @param available List of available languages
+ * @param defaults Default language when nothing matches
+ */
 export function negotiate(
   accepts: string,
   available: string[],

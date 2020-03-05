@@ -10,7 +10,9 @@ export class OrganizationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("organization", "id");
+  readonly loadOneById = this.buildLoadOneById("organization", "id", q =>
+    q.whereNull("deleted_at")
+  );
 
   async loadOrgUsers(orgId: number, opts: PageOpts) {
     return await this.loadPageAndCount(

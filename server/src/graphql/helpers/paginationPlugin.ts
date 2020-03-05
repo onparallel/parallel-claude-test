@@ -84,7 +84,7 @@ export function paginationPlugin() {
     ],
     // Defines the field added to the definition block:
     // t.paginationField('users', {
-    //   type: User
+    //   type: "User"
     // })
     onInstall(b) {
       b.addType(

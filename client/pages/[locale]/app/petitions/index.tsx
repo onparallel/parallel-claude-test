@@ -1,15 +1,19 @@
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery,
+  MutationHookOptions
+} from "@apollo/react-hooks";
 import {
   Box,
   Button,
   Icon,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Stack,
-  Text,
-  Input
+  Text
 } from "@chakra-ui/core";
 import { selectUnit } from "@formatjs/intl-utils";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
@@ -27,16 +31,18 @@ import { Title } from "@parallel/components/common/Title";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
-  createPetitionMutation,
-  createPetitionMutationVariables,
+  Petitions_createPetitionMutation,
+  Petitions_createPetitionMutationVariables,
+  Petitions_deletePetitionsMutation,
+  Petitions_deletePetitionsMutationVariables,
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
-  Petitions_PetitionsListFragment,
-  deletePetitionsMutation,
-  deletePetitionsMutationVariables
+  Petitions_PetitionsListFragment
 } from "@parallel/graphql/__types";
+import { clearCache } from "@parallel/utils/apollo";
+import { FORMATS } from "@parallel/utils/dates";
 import {
   enums,
   integer,
@@ -44,19 +50,18 @@ import {
   string,
   useQueryState
 } from "@parallel/utils/queryState";
-import { ExtractArrayGeneric } from "@parallel/utils/types";
+import { UnwrapArray } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { ChangeEvent, memo, useState, useRef, KeyboardEvent } from "react";
+import { useRouter } from "next/router";
+import { ChangeEvent, KeyboardEvent, memo, useRef, useState } from "react";
 import {
   FormattedDate,
   FormattedMessage,
   FormattedRelativeTime,
   useIntl
 } from "react-intl";
-import { useRouter } from "next/router";
-import { clearCache } from "@parallel/utils/apollo";
 
 const PAGE_SIZE = 10;
 
@@ -88,10 +93,7 @@ function Petitions() {
       status: state.status
     }
   });
-  const [createPetition] = useMutation<
-    createPetitionMutation,
-    createPetitionMutationVariables
-  >(CREATE_PETITION, {
+  const [createPetition] = useCreatePetition({
     update(cache) {
       // clear caches where new item would appear
       clearCache(
@@ -104,10 +106,7 @@ function Petitions() {
     }
   });
 
-  const [deletePetition] = useMutation<
-    deletePetitionsMutation,
-    deletePetitionsMutationVariables
-  >(DELETE_PETITIONS, {
+  const [deletePetition] = useDeletePetition({
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
       refetch();
@@ -138,9 +137,7 @@ function Petitions() {
       await deletePetition({
         variables: { ids: selected! }
       });
-    } catch {
-      console.log("cancelled");
-    }
+    } catch {}
   }
 
   async function handleCreateClick() {
@@ -155,18 +152,26 @@ function Petitions() {
       if (errors) {
         throw errors;
       }
-      goToPetition(data!.createPetition.id);
+      goToPetition(data!.createPetition.id, "compose");
     } catch {}
   }
 
   function handleRowClick(row: PetitionSelection) {
-    goToPetition(row.id);
+    goToPetition(
+      row.id,
+      ({
+        DRAFT: "compose",
+        SCHEDULED: "send",
+        PENDING: "review",
+        COMPLETED: "review"
+      } as const)[row.status]
+    );
   }
 
-  function goToPetition(id: string) {
+  function goToPetition(id: string, section: "compose" | "send" | "review") {
     router.push(
-      "/[locale]/app/petitions/[petitionId]",
-      `/${router.query.locale}/app/petitions/${id}`
+      `/[locale]/app/petitions/[petitionId]/${section}`,
+      `/${router.query.locale}/app/petitions/${id}/${section}`
     );
   }
 
@@ -239,9 +244,7 @@ function Petitions() {
   );
 }
 
-type PetitionSelection = ExtractArrayGeneric<
-  Petitions_PetitionsListFragment["items"]
->;
+type PetitionSelection = UnwrapArray<Petitions_PetitionsListFragment["items"]>;
 
 const COLUMNS: TableColumn<PetitionSelection>[] = [
   {
@@ -252,7 +255,18 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
         defaultMessage="Petition name"
       />
     )),
-    Cell: memo(({ row }) => <>{row.name}</>)
+    Cell: memo(({ row }) => (
+      <>
+        {row.name || (
+          <Text as="span" color="gray.400" fontStyle="italic">
+            <FormattedMessage
+              id="generic.untitled-petition"
+              defaultMessage="Untitled petition"
+            />
+          </Text>
+        )}
+      </>
+    ))
   },
   {
     key: "customRef",
@@ -305,13 +319,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
         } else {
           return (
             <time dateTime={deadline!}>
-              <FormattedDate
-                value={deadline}
-                day="numeric"
-                month="long"
-                year="numeric"
-                hour12={false}
-              />
+              <FormattedDate value={deadline} {...FORMATS.LL} />
             </time>
           );
         }
@@ -410,6 +418,49 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
     )
   }
 ];
+
+function useCreatePetition(
+  options?: MutationHookOptions<
+    Petitions_createPetitionMutation,
+    Petitions_createPetitionMutationVariables
+  >
+) {
+  return useMutation<
+    Petitions_createPetitionMutation,
+    Petitions_createPetitionMutationVariables
+  >(
+    gql`
+      mutation Petitions_createPetition(
+        $name: String!
+        $locale: PetitionLocale!
+      ) {
+        createPetition(name: $name, locale: $locale) {
+          id
+        }
+      }
+    `,
+    options
+  );
+}
+
+function useDeletePetition(
+  options?: MutationHookOptions<
+    Petitions_deletePetitionsMutation,
+    Petitions_deletePetitionsMutationVariables
+  >
+) {
+  return useMutation<
+    Petitions_deletePetitionsMutation,
+    Petitions_deletePetitionsMutationVariables
+  >(
+    gql`
+      mutation Petitions_deletePetitions($ids: [ID!]!) {
+        deletePetitions(ids: $ids)
+      }
+    `,
+    options
+  );
+}
 
 function ConfirmDelete({
   selected,
@@ -573,20 +624,6 @@ const GET_PETITIONS_USER_DATA = gql`
     }
   }
   ${Petitions.fragments.user}
-`;
-
-const CREATE_PETITION = gql`
-  mutation createPetition($name: String!, $locale: PetitionLocale!) {
-    createPetition(name: $name, locale: $locale) {
-      id
-    }
-  }
-`;
-
-const DELETE_PETITIONS = gql`
-  mutation deletePetitions($ids: [ID!]!) {
-    deletePetitions(ids: $ids)
-  }
 `;
 
 Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {

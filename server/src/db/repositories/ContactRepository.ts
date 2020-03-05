@@ -9,5 +9,7 @@ export class ContactReposistory extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("contact", "id");
+  readonly loadOneById = this.buildLoadOneById("contact", "id", q =>
+    q.whereNull("deleted_at")
+  );
 }

@@ -7,7 +7,7 @@ export type Maybe<T> = T | null;
 
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
-export type PetitionFieldType = "FILE_UPLOAD";
+export type PetitionFieldType = "FILE_UPLOAD" | "TEXT";
 
 export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
 
@@ -104,7 +104,7 @@ export interface Petition {
   id: number;
   org_id: number;
   owner_id: number;
-  name: string;
+  name: Maybe<string>;
   custom_ref: Maybe<string>;
   locale: string;
   is_template: boolean;
@@ -123,7 +123,7 @@ export interface Petition {
 export interface CreatePetition {
   org_id: number;
   owner_id: number;
-  name: string;
+  name?: Maybe<string>;
   custom_ref?: Maybe<string>;
   locale: string;
   is_template?: boolean;
