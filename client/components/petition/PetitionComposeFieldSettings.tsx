@@ -14,17 +14,11 @@ import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   UpdatePetitionFieldInput
 } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
-import {
-  ReactNode,
-  useCallback,
-  ChangeEvent,
-  useEffect,
-  useState
-} from "react";
-import { FormattedMessage, useIntl } from "react-intl";
 import { FieldOptions } from "@parallel/utils/petitions";
-import { setNumberFormatDigitOptions } from "@formatjs/intl-utils";
+import { gql } from "apollo-boost";
+import { ChangeEvent, ReactNode } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Divider } from "../common/Divider";
 
 export type PetitionComposeFieldSettingsProps = BoxProps & {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
@@ -45,9 +39,10 @@ export function PetitionComposeFieldSettings({
       borderRight="2px solid"
       borderRightColor="gray.200"
       backgroundColor="white"
+      padding={4}
       {...props}
     >
-      <Stack padding={4} spacing={4}>
+      <Stack spacing={4}>
         <Stack direction="row" alignItems="center">
           <Heading size="sm">
             <FormattedMessage
@@ -67,7 +62,7 @@ export function PetitionComposeFieldSettings({
             onClick={onClose}
           />
         </Stack>
-        <SettingsRowSeparator />
+        <Divider />
         <SettingsRow
           label={
             <FormattedMessage
@@ -88,7 +83,7 @@ export function PetitionComposeFieldSettings({
             }
           />
         </SettingsRow>
-        <SettingsRowSeparator />
+        <Divider />
         {field.type === "FILE_UPLOAD" ? (
           <FileUploadSettings field={field} onUpdate={onUpdate} />
         ) : field.type === "TEXT" ? (
@@ -128,7 +123,7 @@ function FileUploadSettings({
           }
         />
       </SettingsRow>
-      <SettingsRowSeparator />
+      <Divider />
     </Stack>
   );
 }
@@ -163,7 +158,7 @@ function TextSettings({
           }
         />
       </SettingsRow>
-      <SettingsRowSeparator />
+      <Divider />
     </Stack>
   );
 }
@@ -185,12 +180,6 @@ function SettingsRow({
       </Box>
       <Flex alignSelf="center">{children}</Flex>
     </Flex>
-  );
-}
-
-function SettingsRowSeparator(props: BoxProps) {
-  return (
-    <Box borderBottom="1px solid" borderBottomColor="gray.200" {...props} />
   );
 }
 

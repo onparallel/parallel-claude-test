@@ -1,14 +1,26 @@
 import { useMutation } from "@apollo/react-hooks";
-import { Box, Flex, FormLabel, Input, Select, Stack } from "@chakra-ui/core";
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Select,
+  Stack,
+  Flex,
+  Button
+} from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
+import { CollapseCard } from "@parallel/components/common/CollapseCard";
 import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
-import { HorizontalFormControl } from "@parallel/components/common/HorizontalFormControl";
+import { Divider } from "@parallel/components/common/Divider";
 import {
   isEmptyContent,
   RichTextEditor,
   RichTextEditorContent
 } from "@parallel/components/common/RichTextEditor";
 import { Title } from "@parallel/components/common/Title";
+import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   PetitionLocale,
@@ -29,7 +41,7 @@ import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { Spacer } from "@parallel/components/common/Spacer";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionSend.getInitialProps>
@@ -106,11 +118,66 @@ function PetitionSend({ petitionId }: PetitionProps) {
         section="send"
         state={state}
       >
-        <Stack direction="row" padding={4} spacing={4}>
-          <Box flex="2">
+        <Flex flexDirection={{ base: "column", md: "row" }} padding={4}>
+          <Box
+            flex={{ base: "auto", md: 2 }}
+            marginRight={{ base: 0, md: 4 }}
+            marginBottom={{ base: 4, md: 0 }}
+          >
             <Card padding={4}>
-              <Stack>
-                <HorizontalFormControl>
+              <Stack spacing={4}>
+                <FormControl>
+                  <FormLabel
+                    htmlFor="petition-subject"
+                    paddingBottom={0}
+                    minWidth="120px"
+                  >
+                    <FormattedMessage
+                      id="petition.subject-label"
+                      defaultMessage="Subject:"
+                    />
+                  </FormLabel>
+                  <Input
+                    id="petition-subject"
+                    type="text"
+                    value={subject ?? ""}
+                    onChange={handleSubjectChange}
+                  ></Input>
+                </FormControl>
+                <Box>
+                  <RichTextEditor
+                    placeholder={intl.formatMessage({
+                      id: "petition.body-placeholder",
+                      defaultMessage: "Write a message to include in the email"
+                    })}
+                    value={body}
+                    onChange={handleBodyChange}
+                    style={{ minHeight: "100px" }}
+                  ></RichTextEditor>
+                </Box>
+                <Flex>
+                  <Spacer />
+                  <Button variantColor="purple" leftIcon={"paper-plane" as any}>
+                    Send
+                  </Button>
+                </Flex>
+              </Stack>
+            </Card>
+          </Box>
+          <Box flex={{ base: "auto", md: 1 }}>
+            <CollapseCard
+              header={
+                <Heading size="sm">
+                  <FormattedMessage
+                    id="petition.advanced-settings"
+                    defaultMessage="Advanced settings"
+                  />
+                </Heading>
+              }
+            >
+              <Stack padding={4} paddingTop={0} spacing={4}>
+                <Divider />
+                <FormControl>
                   <FormLabel htmlFor="petition-locale">
                     <FormattedMessage
                       id="petition.locale-label"
@@ -135,8 +202,8 @@ function PetitionSend({ petitionId }: PetitionProps) {
                       })}
                     </option>
                   </Select>
-                </HorizontalFormControl>
-                <HorizontalFormControl>
+                </FormControl>
+                <FormControl>
                   <FormLabel
                     htmlFor="petition-deadline"
                     paddingBottom={0}
@@ -156,41 +223,11 @@ function PetitionSend({ petitionId }: PetitionProps) {
                     }
                     onChange={handleDeadlineChange}
                   />
-                </HorizontalFormControl>
-                <HorizontalFormControl>
-                  <FormLabel
-                    htmlFor="petition-subject"
-                    paddingBottom={0}
-                    minWidth="120px"
-                  >
-                    <FormattedMessage
-                      id="petition.subject-label"
-                      defaultMessage="Subject:"
-                    />
-                  </FormLabel>
-                  <Input
-                    id="petition-subject"
-                    type="text"
-                    value={subject ?? ""}
-                    onChange={handleSubjectChange}
-                  ></Input>
-                </HorizontalFormControl>
-                <Box>
-                  <RichTextEditor
-                    placeholder={intl.formatMessage({
-                      id: "petition.body-placeholder",
-                      defaultMessage: "Write a message to include in the email"
-                    })}
-                    value={body}
-                    onChange={handleBodyChange}
-                    style={{ minHeight: "100px" }}
-                  ></RichTextEditor>
-                </Box>
+                </FormControl>
               </Stack>
-            </Card>
+            </CollapseCard>
           </Box>
-          <Box flex="1"></Box>
-        </Stack>
+        </Flex>
       </PetitionLayout>
     </>
   );

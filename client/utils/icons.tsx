@@ -118,12 +118,40 @@ export const icons = {
       </g>
     )
   },
+  "chevron-down-big": {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="2 8 12 18 22 8"></polyline>
+      </g>
+    )
+  },
+  "chevron-up-big": {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="2 18 12 8 22 18"></polyline>
+      </g>
+    )
+  },
   bold: {
     viewBox: "0 0 24 24",
     path: (
       <g
         stroke="currentColor"
-        strokeWidth="3"
+        strokeWidth={3}
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
