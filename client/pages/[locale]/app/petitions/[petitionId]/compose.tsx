@@ -433,7 +433,7 @@ function ConfirmDelete({ ...props }: DialogCallbacks<void>) {
       body={
         <FormattedMessage
           id="petition.confirm-delete-field.body"
-          defaultMessage="This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>"
+          defaultMessage="This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>."
           values={{
             b: (...chunks: any[]) => <b>{chunks}</b>
           }}

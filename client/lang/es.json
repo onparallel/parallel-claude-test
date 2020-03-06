@@ -3,7 +3,7 @@
     "term": "component.confirm-dialog.cancel-button",
     "definition": "Cancelar",
     "context": "Cancel",
-    "reference": "components/common/ConfirmDialog.tsx#L51-L54"
+    "reference": "components/common/ConfirmDialog.tsx#L36-L39"
   },
   {
     "term": "component.cookie-consent.accept-button",
@@ -30,64 +30,70 @@
     "reference": "components/public/layout/CookieConsent.tsx#L91-L94"
   },
   {
+    "term": "component.input.clear-button",
+    "definition": "Vaciar",
+    "context": "Clear",
+    "reference": "components/common/SearchInput.tsx#L34-L37"
+  },
+  {
     "term": "component.password-input.hide",
     "definition": "Ocultar constraseña",
     "context": "Hide",
-    "reference": "components/common/PasswordInput.tsx#L21-L24"
+    "reference": "components/common/PasswordInput.tsx#L22-L25"
   },
   {
     "term": "component.password-input.show",
     "definition": "Mostrar contraseña",
     "context": "Show",
-    "reference": "components/common/PasswordInput.tsx#L25-L28"
+    "reference": "components/common/PasswordInput.tsx#L26-L29"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
     "definition": "El destinatario no ha rellenado ninguno de los campos.",
     "context": "The recipient has not filled any fields.",
-    "reference": "components/common/PetitionProgressBar.tsx#L86-L89"
+    "reference": "components/common/PetitionProgressBar.tsx#L87-L90"
   },
   {
     "term": "component.petition-progress-bar.completed",
     "definition": "Esta petición se ha completado.",
     "context": "This petition is completed.",
-    "reference": "components/common/PetitionProgressBar.tsx#L96-L99"
+    "reference": "components/common/PetitionProgressBar.tsx#L97-L100"
   },
   {
     "term": "component.petition-progress-bar.no-fields",
     "definition": "Esta petición no tiene campos.",
     "context": "This petition has no fields.",
-    "reference": "components/common/PetitionProgressBar.tsx#L76-L79"
+    "reference": "components/common/PetitionProgressBar.tsx#L77-L80"
   },
   {
     "term": "component.petition-progress-bar.not-replied",
     "definition": "{count, plural, =1{# campo ha sido rellenado} other {# campos han sido rellenados}}.",
     "context": "{count, plural, =1{# field has} other {# fields have}} not been filled.",
-    "reference": "components/common/PetitionProgressBar.tsx#L139-L143"
+    "reference": "components/common/PetitionProgressBar.tsx#L140-L144"
   },
   {
     "term": "component.petition-progress-bar.not-sent",
     "definition": "Esta petición no ha sido enviada todavía.",
     "context": "This petition has not been sent yet.",
-    "reference": "components/common/PetitionProgressBar.tsx#L66-L69"
+    "reference": "components/common/PetitionProgressBar.tsx#L67-L70"
   },
   {
     "term": "component.petition-progress-bar.optional",
     "definition": "{count, plural, =1{# campo no ha sido rellenado pero es opcional} other {# campos no han sido rellenados pero son opcionales}}.",
     "context": "{count, plural, =1{# field has not been filled but it is optional.} other {# fields have not been filled but they are optional.}}",
-    "reference": "components/common/PetitionProgressBar.tsx#L130-L134"
+    "reference": "components/common/PetitionProgressBar.tsx#L131-L135"
   },
   {
     "term": "component.petition-progress-bar.pending",
     "definition": "{count, plural, =1{# campo ha sido rellenado y está pendiente de validación.} other {# campos han sido rellenados y están pendientes de validación.}}",
     "context": "{count, plural, =1{# field has been filled and is pending validation.} other {# fields have been filled and are pending validation.}}",
-    "reference": "components/common/PetitionProgressBar.tsx#L121-L125"
+    "reference": "components/common/PetitionProgressBar.tsx#L122-L126"
   },
   {
     "term": "component.petition-progress-bar.validated",
     "definition": "{count, plural, =1{# campo ha sido rellenado y validado.} other {# campos han sido rellenados y validados.}}",
     "context": "{count, plural, =1{# field has} other {# fields have}} been filled and validated.",
-    "reference": "components/common/PetitionProgressBar.tsx#L112-L116"
+    "reference": "components/common/PetitionProgressBar.tsx#L113-L117"
   },
   {
     "term": "component.petition-status-filter.all",
@@ -120,16 +126,10 @@
     "reference": "components/common/PetitionStatusFilter.tsx#L37-L40"
   },
   {
-    "term": "component.search-input.clear-button",
-    "definition": "Borrar",
-    "context": "Clear",
-    "reference": "components/common/SearchInput.tsx#L47-L50"
-  },
-  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search...",
-    "reference": "components/common/SearchInput.tsx#L90-L93"
+    "reference": "components/common/SearchInput.tsx#L77-L80"
   },
   {
     "term": "component.table.next-page-button",
@@ -141,13 +141,13 @@
     "term": "component.table.prev-page-button",
     "definition": "Anterior",
     "context": "Previous",
-    "reference": "components/common/TablePage.tsx#L96-L99"
+    "reference": "components/common/TablePage.tsx#L97-L100"
   },
   {
     "term": "component.table.total-results",
     "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}",
-    "reference": "components/common/TablePage.tsx#L79-L87"
+    "reference": "components/common/TablePage.tsx#L81-L89"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
@@ -160,6 +160,42 @@
     "definition": "Cambiar a modo claro",
     "context": "Toggle light mode",
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
+  },
+  {
+    "term": "field-settings.file-multiple-label",
+    "definition": "Permitir múltiples archivos",
+    "context": "Allow multiple file uploads",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L106-L109"
+  },
+  {
+    "term": "field-settings.required-label",
+    "definition": "Requerido",
+    "context": "Required",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L68-L71"
+  },
+  {
+    "term": "field-settings.text-multiline-label",
+    "definition": "Multilínea",
+    "context": "Multiline",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L141-L144"
+  },
+  {
+    "term": "generic.collapse",
+    "definition": "Contraer",
+    "context": "Collapse",
+    "reference": "components/common/CollapseCard.tsx#L31-L34"
+  },
+  {
+    "term": "generic.edit-label",
+    "definition": "Editar",
+    "context": "Edit",
+    "reference": "components/layout/PetitionHeader.tsx#L132-L135"
+  },
+  {
+    "term": "generic.expand",
+    "definition": "Expandir",
+    "context": "Expand",
+    "reference": "components/common/CollapseCard.tsx#L35-L38"
   },
   {
     "term": "generic.forms.confirm-password-label",
@@ -183,7 +219,7 @@
     "term": "generic.forms.fist-name-label",
     "definition": "Nombre",
     "context": "First name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L72-L75"
+    "reference": "pages/[locale]/app/settings/account.tsx#L69-L72"
   },
   {
     "term": "generic.forms.invalid-email-error",
@@ -195,7 +231,7 @@
     "term": "generic.forms.invalid-old-password-error",
     "definition": "La contraseña actual es incorrecta",
     "context": "Old password is incorrect",
-    "reference": "pages/[locale]/app/settings/security.tsx#L118-L121"
+    "reference": "pages/[locale]/app/settings/security.tsx#L115-L118"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -207,7 +243,7 @@
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L101-L104"
+    "reference": "pages/[locale]/app/settings/account.tsx#L98-L101"
   },
   {
     "term": "generic.forms.new-password-label",
@@ -237,19 +273,19 @@
     "term": "generic.forms.required-first-name-error",
     "definition": "El nombre es un campo requerido",
     "context": "First name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L84-L87"
+    "reference": "pages/[locale]/app/settings/account.tsx#L81-L84"
   },
   {
     "term": "generic.forms.required-last-name-error",
     "definition": "El apellido es un campo requerido",
     "context": "Last name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L113-L116"
+    "reference": "pages/[locale]/app/settings/account.tsx#L110-L113"
   },
   {
     "term": "generic.forms.required-old-password-error",
     "definition": "La contraseña actual es requerida",
     "context": "Old password is required",
-    "reference": "pages/[locale]/app/settings/security.tsx#L110-L113"
+    "reference": "pages/[locale]/app/settings/security.tsx#L107-L110"
   },
   {
     "term": "generic.forms.required-password-error",
@@ -273,25 +309,61 @@
     "term": "generic.petition-status.completed",
     "definition": "Completada",
     "context": "Completed",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L321-L324"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L370-L373"
   },
   {
     "term": "generic.petition-status.draft",
     "definition": "Borrador",
     "context": "Draft",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L363-L366"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L412-L415"
   },
   {
     "term": "generic.petition-status.pending",
     "definition": "Pendiente",
     "context": "Pending",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L313-L316"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L362-L365"
   },
   {
     "term": "generic.petition-status.scheduled",
     "definition": "Programada",
     "context": "Scheduled",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L355-L358"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L404-L407"
+  },
+  {
+    "term": "generic.required-field",
+    "definition": "Campo requerido",
+    "context": "Required field",
+    "reference": "components/petition/PetitionComposeField.tsx#L58-L61"
+  },
+  {
+    "term": "generic.richtext.bold",
+    "definition": "Negrita",
+    "context": "Bold",
+    "reference": "components/common/RichTextEditor.tsx#L109-L112"
+  },
+  {
+    "term": "generic.richtext.italic",
+    "definition": "Cursiva",
+    "context": "Italic",
+    "reference": "components/common/RichTextEditor.tsx#L118-L121"
+  },
+  {
+    "term": "generic.richtext.list",
+    "definition": "Lista",
+    "context": "Bullet list",
+    "reference": "components/common/RichTextEditor.tsx#L136-L139"
+  },
+  {
+    "term": "generic.richtext.underline",
+    "definition": "Subrayado",
+    "context": "Underline",
+    "reference": "components/common/RichTextEditor.tsx#L127-L130"
+  },
+  {
+    "term": "generic.untitled-petition",
+    "definition": "Petición sin título",
+    "context": "Untitled petition",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L540-L543"
   },
   {
     "term": "header.user-menu-button",
@@ -309,7 +381,7 @@
     "term": "navbar.new-button",
     "definition": "Nueva petición",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L94-L97"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L96-L99"
   },
   {
     "term": "navbar.petitions-link",
@@ -324,88 +396,310 @@
     "reference": "components/layout/AppLayoutNavbar.tsx#L43-L46"
   },
   {
+    "term": "petition.add-another-field-button",
+    "definition": "Añadir otro campo",
+    "context": "Add another field",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L202-L205"
+  },
+  {
+    "term": "petition.add-field-button",
+    "definition": "Añadir campo",
+    "context": "Add field",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L230-L233"
+  },
+  {
+    "term": "petition.advanced-settings",
+    "definition": "Ajustes avanzados",
+    "context": "Advanced settings",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L204-L207"
+  },
+  {
+    "term": "petition.body-placeholder",
+    "definition": "Escribe un mensaje para incluir en el correo electrónico",
+    "context": "Write a message to include in the email",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L157-L160"
+  },
+  {
+    "term": "petition.close-sidebar-button",
+    "definition": "Cerrar",
+    "context": "Close",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L58-L61"
+  },
+  {
+    "term": "petition.confirm-delete-field.body",
+    "definition": "Este campo puede contener respuestas. Si eliminas este campo perderás <b>de forma definitiva</b> estas respuestas incluido archivos subidos.",
+    "context": "This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L434-L440"
+  },
+  {
+    "term": "petition.confirm-delete-field.header",
+    "definition": "Eliminar campo",
+    "context": "Delete field",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L428-L431"
+  },
+  {
+    "term": "petition.deadline-label",
+    "definition": "Vencimiento",
+    "context": "Deadline",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L245-L248"
+  },
+  {
+    "term": "petition.drag-to-sort-label",
+    "definition": "Arrastrar para ordenar los campos de la petición",
+    "context": "Drag to sort this petition fields",
+    "reference": "components/petition/PetitionComposeField.tsx#L144-L147"
+  },
+  {
+    "term": "petition.empty-header",
+    "definition": "Esta petición esta vacía...",
+    "context": "This petition is empty...",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L212-L215"
+  },
+  {
+    "term": "petition.empty-text",
+    "definition": "Empieza por añadir un campo",
+    "context": "Start by adding a field",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L218-L221"
+  },
+  {
+    "term": "petition.field-delete-button",
+    "definition": "Eliminar campo",
+    "context": "Delete field",
+    "reference": "components/petition/PetitionComposeField.tsx#L258-L261"
+  },
+  {
+    "term": "petition.field-description-label",
+    "definition": "Descripción del campo",
+    "context": "Field description",
+    "reference": "components/petition/PetitionComposeField.tsx#L222-L225"
+  },
+  {
+    "term": "petition.field-description-placeholder",
+    "definition": "Añade una descripción...",
+    "context": "Add a description...",
+    "reference": "components/petition/PetitionComposeField.tsx#L218-L221"
+  },
+  {
+    "term": "petition.field-settings",
+    "definition": "Ajustes de campo",
+    "context": "Field settings",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L48-L51"
+  },
+  {
+    "term": "petition.field-title-label",
+    "definition": "Título del campo",
+    "context": "Field title",
+    "reference": "components/petition/PetitionComposeField.tsx#L198-L201"
+  },
+  {
+    "term": "petition.field-title-placeholder",
+    "definition": "Introduce un título para el campo",
+    "context": "Enter a field title",
+    "reference": "components/petition/PetitionComposeField.tsx#L194-L197"
+  },
+  {
+    "term": "petition.field-type.file-upload",
+    "definition": "Subida de archivo",
+    "context": "File Upload",
+    "reference": "components/petition/PetitionComposeField.tsx#L357-L360"
+  },
+  {
+    "term": "petition.field-type.text",
+    "definition": "Campo de texto",
+    "context": "Text field",
+    "reference": "components/petition/PetitionComposeField.tsx#L361-L364"
+  },
+  {
+    "term": "petition.fields-header",
+    "definition": "Campos de la petición",
+    "context": "Petition fields",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L174-L177"
+  },
+  {
+    "term": "petition.header.compose-tab",
+    "definition": "Componer",
+    "context": "Compose",
+    "reference": "components/layout/PetitionHeader.tsx#L57-L60"
+  },
+  {
+    "term": "petition.header.last-saved-on",
+    "definition": "Guardado por última vez el: {date}",
+    "context": "Last saved on: {date}",
+    "reference": "components/layout/PetitionHeader.tsx#L44-L47"
+  },
+  {
+    "term": "petition.header.review-tab",
+    "definition": "Revisar",
+    "context": "Review",
+    "reference": "components/layout/PetitionHeader.tsx#L71-L74"
+  },
+  {
+    "term": "petition.header.send-tab",
+    "definition": "Enviar",
+    "context": "Send",
+    "reference": "components/layout/PetitionHeader.tsx#L64-L67"
+  },
+  {
+    "term": "petition.locale-label",
+    "definition": "Idioma",
+    "context": "Language",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L215-L218"
+  },
+  {
+    "term": "petition.locale.en",
+    "definition": "Inglés",
+    "context": "English",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L226-L229"
+  },
+  {
+    "term": "petition.locale.es",
+    "definition": "Español",
+    "context": "Spanish",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L232-L235"
+  },
+  {
+    "term": "petition.name-label",
+    "definition": "Nombre de la petición",
+    "context": "Petition name",
+    "reference": "components/layout/PetitionHeader.tsx#L110-L113"
+  },
+  {
+    "term": "petition.schedule-send-button",
+    "definition": "Programar envío",
+    "context": "Schedule send",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L189-L192"
+  },
+  {
+    "term": "petition.send-button",
+    "definition": "Enviar",
+    "context": "Send",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L177-L180"
+  },
+  {
+    "term": "petition.status.error",
+    "definition": "Error",
+    "context": "Error",
+    "reference": "components/layout/PetitionHeader.tsx#L215-L218"
+  },
+  {
+    "term": "petition.status.saved",
+    "definition": "Guardado",
+    "context": "Saved",
+    "reference": "components/layout/PetitionHeader.tsx#L200-L203"
+  },
+  {
+    "term": "petition.status.saving",
+    "definition": "Guardando",
+    "context": "Saving...",
+    "reference": "components/layout/PetitionHeader.tsx#L180-L183"
+  },
+  {
+    "term": "petition.subject-label",
+    "definition": "Asunto",
+    "context": "Subject",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L143-L146"
+  },
+  {
     "term": "petitions.confirm-delete.body",
     "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L109-L117"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L482-L490"
   },
   {
     "term": "petitions.confirm-delete.confirm-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L120-L123"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L494-L497"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Eliminar peticiones",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L103-L106"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L476-L479"
+  },
+  {
+    "term": "petitions.create-new-petition.body",
+    "definition": "Nueva petición",
+    "context": "Give your new petition a name",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L532-L535"
+  },
+  {
+    "term": "petitions.create-new-petition.continue-button",
+    "definition": "Continuar",
+    "context": "Continue",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L556-L559"
+  },
+  {
+    "term": "petitions.create-new-petition.header",
+    "definition": "Crear una petición nueva",
+    "context": "Create a new petition",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L524-L527"
   },
   {
     "term": "petitions.create-petition-button",
     "definition": "Crear petición",
     "context": "Create petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L181-L184"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L227-L230"
   },
   {
     "term": "petitions.delete-label",
     "definition": "Borrar {count, plural, =1 {peticion} other {# peticiones}}",
     "context": "Delete {count, plural, =1 {petition} other {# petitions}}",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L170-L174"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L216-L220"
   },
   {
     "term": "petitions.header.custom-ref",
     "definition": "Referencia",
     "context": "Reference",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L219-L222"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L274-L277"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L250-L253"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L305-L308"
   },
   {
     "term": "petitions.header.name",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L209-L212"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L253-L256"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progreso",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L292-L295"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L341-L344"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L229-L232"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L284-L287"
   },
   {
     "term": "petitions.header.status",
     "definition": "Estado",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L307"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L356"
   },
   {
     "term": "petitions.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L280-L283"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L329-L332"
   },
   {
     "term": "petitions.title",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L136-L139"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L181-L184"
   },
   {
     "term": "public.cookies.title",
     "definition": "Política de cookies",
     "context": "Cookie policy",
-    "reference": "pages/[locale]/legal/[doc].tsx#L28-L31"
+    "reference": "pages/[locale]/legal/[doc].tsx#L27-L30"
   },
   {
     "term": "public.footer.follow-us",
@@ -633,37 +927,37 @@
     "term": "public.privacy.title",
     "definition": "Política de privacidad",
     "context": "Privacy policy",
-    "reference": "pages/[locale]/legal/[doc].tsx#L24-L27"
+    "reference": "pages/[locale]/legal/[doc].tsx#L23-L26"
   },
   {
     "term": "public.terms.title",
     "definition": "Términos y condiciones",
     "context": "Terms & conditions",
-    "reference": "pages/[locale]/legal/[doc].tsx#L20-L23"
+    "reference": "pages/[locale]/legal/[doc].tsx#L19-L22"
   },
   {
     "term": "settings.account",
     "definition": "Cuenta",
     "context": "Account",
-    "reference": "pages/[locale]/app/settings/account.tsx#L51"
+    "reference": "pages/[locale]/app/settings/account.tsx#L48"
   },
   {
     "term": "settings.account.change-password-button",
     "definition": "Cambiar contraseña",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L192-L195"
+    "reference": "pages/[locale]/app/settings/security.tsx#L189-L192"
   },
   {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
     "context": "Name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L56-L59"
+    "reference": "pages/[locale]/app/settings/account.tsx#L53-L56"
   },
   {
     "term": "settings.account.update-name-button",
     "definition": "Actualizar nombre",
     "context": "Update name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L123-L126"
+    "reference": "pages/[locale]/app/settings/account.tsx#L120-L123"
   },
   {
     "term": "settings.header",
@@ -675,24 +969,24 @@
     "term": "settings.security",
     "definition": "Seguridad",
     "context": "Security",
-    "reference": "pages/[locale]/app/settings/security.tsx#L77"
+    "reference": "pages/[locale]/app/settings/security.tsx#L74"
   },
   {
     "term": "settings.security.password-change-toast-description",
     "definition": "Tu contraseña ha sido actualizada con éxito.",
     "context": "Your password has been successfully changed.",
-    "reference": "pages/[locale]/app/settings/security.tsx#L62-L65"
+    "reference": "pages/[locale]/app/settings/security.tsx#L59-L62"
   },
   {
     "term": "settings.security.password-change-toast-title",
     "definition": "Contraseña actualizada",
     "context": "Password changed",
-    "reference": "pages/[locale]/app/settings/security.tsx#L58-L61"
+    "reference": "pages/[locale]/app/settings/security.tsx#L55-L58"
   },
   {
     "term": "settings.security.password-header",
     "definition": "Contraseña",
     "context": "Password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L82-L85"
+    "reference": "pages/[locale]/app/settings/security.tsx#L79-L82"
   }
 ]

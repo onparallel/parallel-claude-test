@@ -142,7 +142,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                   >
                     <FormattedMessage
                       id="petition.subject-label"
-                      defaultMessage="Subject:"
+                      defaultMessage="Subject"
                     />
                   </FormLabel>
                   <Input
@@ -174,7 +174,10 @@ function PetitionSend({ petitionId }: PetitionProps) {
                         borderBottomRightRadius: 0
                       }}
                     >
-                      Send
+                      <FormattedMessage
+                        id="petition.send-button"
+                        defaultMessage="Send"
+                      />
                     </Button>
                     <IconButtonMenu
                       variantColor="purple"
@@ -184,7 +187,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                       <MenuItem>
                         <Icon name="time" marginRight={2} />
                         <FormattedMessage
-                          id="petition.schedule-send"
+                          id="petition.schedule-send-button"
                           defaultMessage="Schedule send"
                         />
                       </MenuItem>
@@ -211,7 +214,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                   <FormLabel htmlFor="petition-locale">
                     <FormattedMessage
                       id="petition.locale-label"
-                      defaultMessage="Language:"
+                      defaultMessage="Language"
                     />
                   </FormLabel>
                   <Select
@@ -241,7 +244,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                   >
                     <FormattedMessage
                       id="petition.deadline-label"
-                      defaultMessage="Deadline:"
+                      defaultMessage="Deadline"
                     />
                   </FormLabel>
                   <DateTimeInput
