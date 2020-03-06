@@ -1,21 +1,19 @@
 import {
-  IconButton,
   PseudoBox,
   PseudoBoxProps,
   Stack,
-  Tooltip,
   useColorMode,
   useTheme
 } from "@chakra-ui/core";
 import { useFocus } from "@parallel/utils/useFocus";
 import isHotkey from "is-hotkey";
-import React, {
+import {
+  CSSProperties,
   KeyboardEvent,
   memo,
   TextareaHTMLAttributes,
   useCallback,
-  useMemo,
-  CSSProperties
+  useMemo
 } from "react";
 import { useIntl } from "react-intl";
 import { createEditor, Editor, Node, Transforms } from "slate";
@@ -52,6 +50,7 @@ export type RichTextEditorContent = Node[];
 export function RichTextEditor({
   value,
   onChange,
+  disabled,
   style: editorStyle,
   ...props
 }: RichTextEditorProps) {
@@ -64,15 +63,15 @@ export function RichTextEditor({
       }
     }
   }, []);
-  const [focused, focusBind] = useFocus(props);
-  const styles = useStyles({ focused, disabled: props.disabled });
+  const styles = useStyles();
 
   return (
-    <PseudoBox {...styles}>
+    <PseudoBox aria-disabled={disabled} {...styles}>
       <Slate editor={editor} value={value} onChange={onChange}>
-        <Toolbar />
+        <Toolbar disabled={disabled} />
         <PseudoBox>
           <MemoEditable
+            readOnly={disabled}
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             onKeyDown={onKeyDown}
@@ -81,7 +80,6 @@ export function RichTextEditor({
               padding: "8px 16px"
             }}
             {...props}
-            {...focusBind}
           />
         </PseudoBox>
       </Slate>
@@ -91,7 +89,10 @@ export function RichTextEditor({
 
 const MemoEditable = memo(Editable);
 
-const Toolbar = memo(function _Toolbar(props: PseudoBoxProps) {
+const Toolbar = memo(function _Toolbar({
+  disabled,
+  ...props
+}: PseudoBoxProps & { disabled?: boolean }) {
   const intl = useIntl();
   return (
     <Stack
@@ -104,6 +105,7 @@ const Toolbar = memo(function _Toolbar(props: PseudoBoxProps) {
       <MarkButton
         format="bold"
         icon={"bold" as any}
+        isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.bold",
           defaultMessage: "Bold"
@@ -112,6 +114,7 @@ const Toolbar = memo(function _Toolbar(props: PseudoBoxProps) {
       <MarkButton
         format="italic"
         icon={"italic" as any}
+        isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.italic",
           defaultMessage: "Italic"
@@ -120,6 +123,7 @@ const Toolbar = memo(function _Toolbar(props: PseudoBoxProps) {
       <MarkButton
         format="underline"
         icon={"underline" as any}
+        isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.underline",
           defaultMessage: "Underline"
@@ -128,6 +132,7 @@ const Toolbar = memo(function _Toolbar(props: PseudoBoxProps) {
       <BlockButton
         format="bulleted-list"
         icon={"list" as any}
+        isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.list",
           defaultMessage: "Bullet list"
@@ -261,13 +266,7 @@ function MarkButton({ format, icon, ...props }: MarkButtonProps) {
   );
 }
 
-function useStyles({
-  focused,
-  disabled
-}: {
-  focused?: boolean;
-  disabled?: boolean;
-}) {
+function useStyles() {
   const theme = useTheme();
   const { colorMode } = useColorMode();
   return useMemo(() => {
@@ -288,6 +287,7 @@ function useStyles({
       focusBorderColor,
       focusBorderColor // If color doesn't exist in theme, use it's raw value
     );
+
     const _errorBorderColor = get(
       theme.colors,
       errorBorderColor,
@@ -302,33 +302,22 @@ function useStyles({
       _hover: {
         borderColor: hoverColor[colorMode]
       },
-      ...(focused
-        ? {
-            borderColor: _focusBorderColor,
-            boxShadow: `0 0 0 1px ${_focusBorderColor}`,
-            _hover: {
-              borderColor: _focusBorderColor
-            }
-          }
-        : {}),
-      ...(disabled
-        ? {
-            borderColor: borderColor[colorMode],
-            bg: bg[colorMode],
-            opacity: 0.4,
-            cursor: "not-allowed",
-            _hover: {
-              borderColor: _focusBorderColor,
-              boxShadow: `0 0 0 1px ${_focusBorderColor}`
-            }
-          }
-        : {})
+      _focusWithin: {
+        borderColor: _focusBorderColor,
+        boxShadow: `0 0 0 1px ${_focusBorderColor}`
+      },
+      _disabled: {
+        borderColor: borderColor[colorMode],
+        bg: bg[colorMode],
+        opacity: 0.4,
+        cursor: "not-allowed"
+      }
       // _invalid: {
       //   borderColor: _errorBorderColor,
       //   boxShadow: `0 0 0 1px ${_errorBorderColor}`
       // }
-    };
-  }, [focused, disabled]);
+    } as PseudoBoxProps;
+  }, []);
 }
 
 export function isEmptyContent(content: RichTextEditorContent) {

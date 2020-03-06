@@ -14,9 +14,12 @@ export function IconButtonWithTooltip({
   label,
   placement,
   showDelay,
+  isDisabled,
   ...props
 }: IconButtonWithTooltipProps) {
-  return (
+  return isDisabled ? (
+    <IconButton isDisabled aria-label={label} {...props} />
+  ) : (
     <Tooltip
       aria-label={label}
       label={label}
