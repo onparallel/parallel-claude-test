@@ -8,7 +8,14 @@ import {
   Select,
   Stack,
   Flex,
-  Button
+  Button,
+  IconButton,
+  IconButtonProps,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Icon
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { CollapseCard } from "@parallel/components/common/CollapseCard";
@@ -39,9 +46,10 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useState, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { SplitButton } from "@parallel/components/common/SplitButton";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionSend.getInitialProps>
@@ -157,9 +165,31 @@ function PetitionSend({ petitionId }: PetitionProps) {
                 </Box>
                 <Flex>
                   <Spacer />
-                  <Button variantColor="purple" leftIcon={"paper-plane" as any}>
-                    Send
-                  </Button>
+                  <SplitButton dividerColor="purple.600">
+                    <Button
+                      variantColor="purple"
+                      leftIcon={"paper-plane" as any}
+                      style={{
+                        borderTopRightRadius: 0,
+                        borderBottomRightRadius: 0
+                      }}
+                    >
+                      Send
+                    </Button>
+                    <IconButtonMenu
+                      variantColor="purple"
+                      icon="chevron-down"
+                      aria-label="Options"
+                    >
+                      <MenuItem>
+                        <Icon name="time" marginRight={2} />
+                        <FormattedMessage
+                          id="petition.schedule-send"
+                          defaultMessage="Schedule send"
+                        />
+                      </MenuItem>
+                    </IconButtonMenu>
+                  </SplitButton>
                 </Flex>
               </Stack>
             </Card>
@@ -230,6 +260,20 @@ function PetitionSend({ petitionId }: PetitionProps) {
         </Flex>
       </PetitionLayout>
     </>
+  );
+}
+
+function IconButtonMenu({
+  children,
+  ...props
+}: IconButtonProps & { children: ReactNode }) {
+  return (
+    <Menu>
+      <MenuButton as={IconButton} {...props}></MenuButton>
+      <MenuList minWidth={0} placement="bottom-end">
+        {children}
+      </MenuList>
+    </Menu>
   );
 }
 
