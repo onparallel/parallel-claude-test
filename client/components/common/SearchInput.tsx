@@ -91,7 +91,7 @@ export const SearchInput = forwardRef(function SearchInput(
             title={clearLabel}
             aria-label={clearLabel}
             icon="close"
-            size="sm"
+            size="xs"
             variant="ghost"
             onClick={handleClearClick}
           ></IconButton>

@@ -27,6 +27,12 @@ export type Contact = Timestamps & {
   fullName?: Maybe<Scalars["String"]>;
 };
 
+export type ContactPagination = {
+  __typename?: "ContactPagination";
+  items: Array<Contact>;
+  totalCount: Scalars["Int"];
+};
+
 export type Mutation = {
   __typename?: "Mutation";
   createPetition: Petition;
@@ -168,10 +174,23 @@ export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
 
 export type Query = {
   __typename?: "Query";
+  contacts: ContactPagination;
+  contact?: Maybe<Contact>;
   organization?: Maybe<Organization>;
-  me: User;
   petitions: PetitionPagination;
   petition?: Maybe<Petition>;
+  me: User;
+};
+
+export type QuerycontactsArgs = {
+  offset?: Maybe<Scalars["Int"]>;
+  limit?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  exclude?: Maybe<Array<Scalars["ID"]>>;
+};
+
+export type QuerycontactArgs = {
+  id: Scalars["ID"];
 };
 
 export type QueryorganizationArgs = {
@@ -235,6 +254,11 @@ export type UserPagination = {
   totalCount: Scalars["Int"];
 };
 
+export type RecipientSelect_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "fullName" | "email"
+>;
+
 export type AppLayout_UserFragment = {
   __typename?: "User";
 } & AppLayoutNavbar_UserFragment;
@@ -281,16 +305,14 @@ export type AppHomeQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & AppLayout_UserFragment;
 };
 
-export type PetitionCompose_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-} & PetitionComposeField_PetitionFieldFragment &
-  PetitionComposeFieldSettings_PetitionFieldFragment;
-
 export type PetitionCompose_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
     fields: Array<
-      { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
+      {
+        __typename?: "PetitionField";
+      } & PetitionComposeField_PetitionFieldFragment &
+        PetitionComposeFieldSettings_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionFragment;
 
@@ -459,6 +481,17 @@ export type PetitionSend_updatePetitionMutation = {
   __typename?: "Mutation";
 } & {
   updatePetition: { __typename?: "Petition" } & PetitionSend_PetitionFragment;
+};
+
+export type PetitionSendSearchContactsQueryVariables = {
+  search?: Maybe<Scalars["String"]>;
+  exclude?: Maybe<Array<Scalars["ID"]>>;
+};
+
+export type PetitionSendSearchContactsQuery = { __typename?: "Query" } & {
+  contacts: { __typename?: "ContactPagination" } & {
+    items: Array<{ __typename?: "Contact" } & RecipientSelect_ContactFragment>;
+  };
 };
 
 export type Petitions_createPetitionMutationVariables = {

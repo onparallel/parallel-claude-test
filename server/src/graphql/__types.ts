@@ -93,6 +93,11 @@ export interface NexusGenEnums {
 
 export interface NexusGenRootTypes {
   Contact: db.Contact;
+  ContactPagination: {
+    // root type
+    items: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    totalCount: number; // Int!
+  };
   Mutation: {};
   Organization: db.Organization;
   Petition: db.Petition;
@@ -123,10 +128,10 @@ export interface NexusGenRootTypes {
     totalCount: number; // Int!
   };
   Timestamps:
+    | NexusGenRootTypes["Contact"]
     | NexusGenRootTypes["User"]
     | NexusGenRootTypes["Organization"]
-    | NexusGenRootTypes["Petition"]
-    | NexusGenRootTypes["Contact"];
+    | NexusGenRootTypes["Petition"];
   String: string;
   Int: number;
   Float: number;
@@ -160,6 +165,11 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     lastName: string | null; // String
     updatedAt: Date; // DateTime!
+  };
+  ContactPagination: {
+    // field return type
+    items: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    totalCount: number; // Int!
   };
   Mutation: {
     // field return type
@@ -234,6 +244,8 @@ export interface NexusGenFieldTypes {
   };
   Query: {
     // field return type
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
+    contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["Petition"] | null; // Petition
@@ -319,6 +331,17 @@ export interface NexusGenArgTypes {
     };
   };
   Query: {
+    contact: {
+      // args
+      id: string; // ID!
+    };
+    contacts: {
+      // args
+      exclude?: string[] | null; // [ID!]
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+    };
     organization: {
       // args
       id: string; // String!
@@ -338,13 +361,14 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  Timestamps: "User" | "Organization" | "Petition" | "Contact";
+  Timestamps: "Contact" | "User" | "Organization" | "Petition";
 }
 
 export interface NexusGenInheritedFields {}
 
 export type NexusGenObjectNames =
   | "Contact"
+  | "ContactPagination"
   | "Mutation"
   | "Organization"
   | "Petition"

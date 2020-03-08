@@ -1,31 +1,38 @@
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useLazyQuery,
+  useMutation,
+  useApolloClient
+} from "@apollo/react-hooks";
 import {
   Box,
+  Button,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
-  Input,
-  Select,
-  Stack,
-  Flex,
-  Button,
+  Icon,
   IconButton,
   IconButtonProps,
+  Input,
   Menu,
   MenuButton,
-  MenuList,
   MenuItem,
-  Icon
+  MenuList,
+  Select,
+  Stack
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { CollapseCard } from "@parallel/components/common/CollapseCard";
 import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
 import { Divider } from "@parallel/components/common/Divider";
+import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 import {
   isEmptyContent,
   RichTextEditor,
   RichTextEditorContent
 } from "@parallel/components/common/RichTextEditor";
+import { Spacer } from "@parallel/components/common/Spacer";
+import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
@@ -33,6 +40,8 @@ import {
   PetitionLocale,
   PetitionSendQuery,
   PetitionSendQueryVariables,
+  PetitionSendSearchContactsQuery,
+  PetitionSendSearchContactsQueryVariables,
   PetitionSendUserQuery,
   PetitionSend_updatePetitionMutation,
   PetitionSend_updatePetitionMutationVariables,
@@ -46,10 +55,9 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { ChangeEvent, useCallback, useState, ReactNode } from "react";
+import { ChangeEvent, ReactNode, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Spacer } from "@parallel/components/common/Spacer";
-import { SplitButton } from "@parallel/components/common/SplitButton";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionSend.getInitialProps>
@@ -110,6 +118,8 @@ function PetitionSend({ petitionId }: PetitionProps) {
     updateBody({ emailBody: isEmptyContent(value) ? null : value });
   }, []);
 
+  const searchContacts = useSearchContacts();
+
   return (
     <>
       <Title>
@@ -133,7 +143,23 @@ function PetitionSend({ petitionId }: PetitionProps) {
             marginBottom={{ base: 4, md: 0 }}
           >
             <Card padding={4}>
-              <Stack spacing={4}>
+              <Stack spacing={2}>
+                <FormControl>
+                  <FormLabel
+                    htmlFor="petition-recipients"
+                    paddingBottom={0}
+                    minWidth="120px"
+                  >
+                    <FormattedMessage
+                      id="petition.recipients-label"
+                      defaultMessage="Recipients"
+                    />
+                  </FormLabel>
+                  <RecipientSelect
+                    inputId="petition-recipients"
+                    searchContacts={searchContacts}
+                  />
+                </FormControl>
                 <FormControl>
                   <FormLabel
                     htmlFor="petition-subject"
@@ -152,7 +178,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                     onChange={handleSubjectChange}
                   ></Input>
                 </FormControl>
-                <Box>
+                <Box marginTop={2}>
                   <RichTextEditor
                     placeholder={intl.formatMessage({
                       id: "petition.body-placeholder",
@@ -333,6 +359,33 @@ function useUpdatePetition() {
     }
     ${PetitionSend.fragments.petition}
   `);
+}
+
+function useSearchContacts() {
+  const apollo = useApolloClient();
+  return useDebouncedAsync(
+    async (search: string, exclude: string[]) => {
+      const { data } = await apollo.query<
+        PetitionSendSearchContactsQuery,
+        PetitionSendSearchContactsQueryVariables
+      >({
+        query: gql`
+          query PetitionSendSearchContacts($search: String, $exclude: [ID!]) {
+            contacts(limit: 10, search: $search, exclude: $exclude) {
+              items {
+                ...RecipientSelect_Contact
+              }
+            }
+          }
+          ${RecipientSelect.fragments.contact}
+        `,
+        variables: { search, exclude }
+      });
+      return data.contacts.items;
+    },
+    300,
+    []
+  );
 }
 
 PetitionSend.getInitialProps = async ({ apollo, query }: WithDataContext) => {

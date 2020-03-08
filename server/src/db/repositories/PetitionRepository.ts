@@ -75,11 +75,12 @@ export class PetitionRepository extends BaseRepository {
           deleted_at: null
         })
         .modify(q => {
-          if (opts.search) {
-            q.whereIlike("name", `%${escapeLike(opts.search, "\\")}%`, "\\");
+          const { search, status } = opts;
+          if (search) {
+            q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
           }
-          if (opts.status) {
-            q.where("status", opts.status);
+          if (status) {
+            q.where("status", status);
           }
           q.orderBy("id");
         }),

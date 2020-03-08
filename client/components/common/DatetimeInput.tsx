@@ -142,7 +142,7 @@ export const DateTimeInput = forwardRef(function DateTimeInput(
             title={clearLabel}
             aria-label={clearLabel}
             icon="close"
-            size="sm"
+            size="xs"
             variant="ghost"
             onClick={handleClearClick}
           ></IconButton>
