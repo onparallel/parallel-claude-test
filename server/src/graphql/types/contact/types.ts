@@ -1,5 +1,5 @@
 import { objectType } from "nexus";
-import { toGlobalId } from "../../util/globalId";
+import { toGlobalId } from "../../../util/globalId";
 
 export const Contact = objectType({
   name: "Contact",
