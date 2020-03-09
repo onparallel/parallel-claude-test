@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
+import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
 import { useMemo } from "react";
-import { resolveUrl, pathParams } from "./next";
-import * as qs from "querystring";
+import { pathParams, resolveUrl } from "./next";
 
 export class QueryItem<T> {
   defaultValue: T | null = null;
@@ -105,17 +105,26 @@ export function useQueryState<T extends {}>(
   const router = useRouter();
   return [
     useMemo(() => {
-      return parseQuery(router.query, shape, { prefix });
-    }, [router.query]),
-    useMemo(
-      () => (state: { [P in keyof T]?: T[P] }) => {
+      const state = parseQuery(router.query, shape, { prefix });
+      return state;
+    }, [router.query, router.pathname]),
+    useMemo(() => {
+      return async function(
+        state:
+          | { [P in keyof T]?: T[P] }
+          | ((current: { [P in keyof T]?: T[P] }) => { [P in keyof T]?: T[P] })
+      ) {
+        const newState =
+          typeof state === "function"
+            ? state(parseQuery(router.query, shape, { prefix }))
+            : state;
         const fromPath = pathParams(router.pathname);
         const fromState = Object.keys(shape).map(key =>
           prefix ? prefix + key : key
         );
         const query = qs.stringify(
           Object.fromEntries([
-            ...Object.entries(state)
+            ...Object.entries(newState)
               .filter(
                 ([key, value]) =>
                   value !== null &&
@@ -133,13 +142,12 @@ export function useQueryState<T extends {}>(
           ])
         );
         const route = resolveUrl(router.pathname, router.query);
-        router.replace(
+        await router.replace(
           `${router.pathname}${query ? "?" + query : ""}`,
           `${route}${query ? "?" + query : ""}`,
           { shallow: true }
         );
-      },
-      []
-    )
+      };
+    }, [router.query, router.pathname])
   ] as const;
 }

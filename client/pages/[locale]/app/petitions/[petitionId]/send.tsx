@@ -175,6 +175,10 @@ function PetitionSend({ petitionId }: PetitionProps) {
                     id="petition-subject"
                     type="text"
                     value={subject ?? ""}
+                    placeholder={intl.formatMessage({
+                      id: "petition.subject-placeholder",
+                      defaultMessage: "Enter the subject of the email"
+                    })}
                     onChange={handleSubjectChange}
                   ></Input>
                 </FormControl>
@@ -195,10 +199,6 @@ function PetitionSend({ petitionId }: PetitionProps) {
                     <Button
                       variantColor="purple"
                       leftIcon={"paper-plane" as any}
-                      style={{
-                        borderTopRightRadius: 0,
-                        borderBottomRightRadius: 0
-                      }}
                     >
                       <FormattedMessage
                         id="petition.send-button"

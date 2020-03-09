@@ -9,17 +9,16 @@ import {
   useColorMode
 } from "@chakra-ui/core";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useFocus } from "@parallel/utils/useFocus";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-import { ChangeEvent, forwardRef, Ref, useRef, useState } from "react";
+import { forwardRef, Ref, useRef } from "react";
 import { useIntl } from "react-intl";
 
 export type SearchInputProps = InputProps &
   Required<Pick<InputProps, "value" | "onChange">>;
 
 export const SearchInput = forwardRef(function SearchInput(
-  { value: _value, onChange: _onChange, ...props }: SearchInputProps,
+  { ...props }: SearchInputProps,
   ref: Ref<HTMLInputElement>
 ) {
   const { colorMode } = useColorMode();
@@ -27,9 +26,7 @@ export const SearchInput = forwardRef(function SearchInput(
   const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();
   const [focused, bind] = useFocus<HTMLInputElement>(props);
-  const [value, setValue] = useState(_value);
-  const isActive = Boolean(value || focused);
-  const onChange = useDebouncedCallback(_onChange!, 300, []);
+  const isActive = Boolean(inputRef.current?.value || focused);
 
   const clearLabel = intl.formatMessage({
     id: "component.input.clear-button",
@@ -40,19 +37,8 @@ export const SearchInput = forwardRef(function SearchInput(
     const input = inputRef.current!;
     setNativeValue(input, "");
     const event = new Event("input", { bubbles: true });
-    (event as any)._fromClearClick = true;
     input.dispatchEvent(event);
     input.focus();
-  }
-
-  function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    setValue(e.target.value);
-    if ((e.nativeEvent as any)._fromClearClick) {
-      _onChange(e);
-    } else {
-      e.persist();
-      onChange(e);
-    }
   }
 
   return (
@@ -79,8 +65,6 @@ export const SearchInput = forwardRef(function SearchInput(
             defaultMessage: "Search..."
           })
         }
-        value={value}
-        onChange={handleChange}
         {...props}
         {...bind}
       />

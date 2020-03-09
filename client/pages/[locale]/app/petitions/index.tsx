@@ -1,20 +1,9 @@
 import {
+  MutationHookOptions,
   useMutation,
-  useQuery,
-  MutationHookOptions
+  useQuery
 } from "@apollo/react-hooks";
-import {
-  Box,
-  Button,
-  Icon,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Stack,
-  Text
-} from "@chakra-ui/core";
+import { Box, Button, Flex, Icon, Input, Text } from "@chakra-ui/core";
 import { selectUnit } from "@formatjs/intl-utils";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -22,23 +11,21 @@ import {
   useDialog
 } from "@parallel/components/common/DialogOpenerProvider";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
-import { PetitionStatusFilter } from "@parallel/components/common/PetitionStatusFilter";
-import { SearchInput } from "@parallel/components/common/SearchInput";
-import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { PetitionListHeader } from "@parallel/components/petitions/PetitionListHeader";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
-  Petitions_createPetitionMutation,
-  Petitions_createPetitionMutationVariables,
-  Petitions_deletePetitionsMutation,
-  Petitions_deletePetitionsMutationVariables,
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
+  Petitions_createPetitionMutation,
+  Petitions_createPetitionMutationVariables,
+  Petitions_deletePetitionsMutation,
+  Petitions_deletePetitionsMutationVariables,
   Petitions_PetitionsListFragment
 } from "@parallel/graphql/__types";
 import { clearCache } from "@parallel/utils/apollo";
@@ -51,7 +38,6 @@ import {
   useQueryState
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
@@ -75,12 +61,6 @@ function Petitions() {
   const intl = useIntl();
   const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const [search, setSearch] = useState(state.search);
-  const setSearchState = useDebouncedCallback(
-    (value: string) => setQueryState({ search: value?.length ? value : null }),
-    300,
-    []
-  );
   const { me } = useQueryData<PetitionsUserQuery>(GET_PETITIONS_USER_DATA);
   const { data, loading, refetch } = useQuery<
     PetitionsQuery,
@@ -119,14 +99,20 @@ function Petitions() {
   const confirmDelete = useDialog(ConfirmDelete, [selected, petitions]);
   const askPetitionName = useDialog(AskPetitionName, [selected, petitions]);
 
-  function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value;
-    setSearch(value);
-    setSearchState(value);
+  function handleSearchChange(value: string | null) {
+    setQueryState(current => ({
+      ...current,
+      search: value,
+      page: 1
+    }));
   }
 
-  function handleFilterStatusChange(value: any) {
-    setQueryState({ ...state, status: value === "ALL" ? null : value }); // go to page 1
+  function handleStatusChange(value: any) {
+    setQueryState(current => ({
+      ...current,
+      status: value === "ALL" ? null : value,
+      page: 1
+    }));
   }
 
   async function handleDeleteClick() {
@@ -168,6 +154,13 @@ function Petitions() {
     );
   }
 
+  function handlePageChange(page: number) {
+    setQueryState(current => ({
+      ...current,
+      page
+    }));
+  }
+
   function goToPetition(id: string, section: "compose" | "send" | "review") {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
@@ -192,51 +185,44 @@ function Petitions() {
           loading={loading}
           onRowClick={handleRowClick}
           header={
-            <Stack direction="row" padding={4}>
-              <Box flex="0 1 400px">
-                <SearchInput
-                  value={search ?? ""}
-                  onChange={handleSearchChange}
-                />
-              </Box>
-              <PetitionStatusFilter
-                value={state.status ?? "ALL"}
-                onChange={handleFilterStatusChange}
-              />
-              <Spacer />
-              {selected?.length ? (
-                <Box>
-                  <Menu>
-                    <MenuButton as={Button} {...{ rightIcon: "chevron-down" }}>
-                      Actions
-                    </MenuButton>
-                    <MenuList minWidth="160px">
-                      <MenuItem onClick={handleDeleteClick}>
-                        <Icon name="delete" marginRight={2} />
-                        <FormattedMessage
-                          id="petitions.delete-label"
-                          defaultMessage="Delete {count, plural, =1 {petition} other {# petitions}}"
-                          values={{ count: selected?.length }}
-                        />
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                </Box>
-              ) : null}
-              <Button variantColor="purple" onClick={handleCreateClick}>
-                <FormattedMessage
-                  id="petitions.create-petition-button"
-                  defaultMessage="Create petition"
-                />
-              </Button>
-            </Stack>
+            <PetitionListHeader
+              search={state.search}
+              status={state.status}
+              showActions={Boolean(selected?.length)}
+              onSearchChange={handleSearchChange}
+              onStatusChange={handleStatusChange}
+              onDeleteClick={handleDeleteClick}
+              onCreateClick={handleCreateClick}
+            />
+          }
+          body={
+            petitions.totalCount === 0 && !loading ? (
+              state.search ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="petitions.no-results"
+                      defaultMessage="There's no petitions matching your search"
+                    />
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="petitions.no-petitions"
+                      defaultMessage="You have no petitions yet. Start by creating one now!"
+                    />
+                  </Text>
+                </Flex>
+              )
+            ) : null
           }
           page={state.page}
           pageSize={PAGE_SIZE}
           totalCount={petitions.totalCount}
           onSelectionChange={setSelected}
-          onPageChange={page => setQueryState({ page, search })}
-          flex="1"
+          onPageChange={handlePageChange}
           margin={6}
         ></TablePage>
       </AppLayout>

@@ -1,28 +1,30 @@
 import { ButtonProps, Flex } from "@chakra-ui/core";
 import { Children, cloneElement, ReactElement } from "react";
 import { Divider, DividerProps } from "./Divider";
+import { MaybeArray } from "@parallel/utils/types";
 
 export type SplitButtonProps = {
   dividerColor: DividerProps["color"];
-  children: ReactElement<ButtonProps>[];
+  children: MaybeArray<ReactElement<ButtonProps>>;
 };
 
 export function SplitButton({ dividerColor, children }: SplitButtonProps) {
+  const length = Array.isArray(children) ? children.length : 1;
   return (
     <Flex>
-      {Children.map(children, (child, index) => [
+      {Children.map(children as any, (child, index) => [
         cloneElement(child, {
           style: {
             ...child.props?.style,
             ...(index !== 0
               ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }
               : {}),
-            ...(index !== children.length - 1
+            ...(index !== length - 1
               ? { borderTopRightRadius: 0, borderBottomRightRadius: 0 }
               : {})
           }
         }),
-        index !== children.length - 1 ? (
+        index !== length - 1 ? (
           <Divider isVertical color={dividerColor} />
         ) : (
           undefined

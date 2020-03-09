@@ -12,6 +12,7 @@ import { FormattedMessage } from "react-intl";
 export type TableCardProps<T> = TableProps<T> & {
   loading: boolean;
   header?: ReactNode;
+  body?: ReactNode;
   totalCount: number;
   page: number;
   pageSize: number;
@@ -27,6 +28,7 @@ export function TablePage<T>({
   onRowClick,
   loading,
   header,
+  body,
   totalCount,
   page,
   pageSize,
@@ -37,8 +39,12 @@ export function TablePage<T>({
 
   return (
     <Card display="flex" flexDirection="column" {...props}>
-      {header ?? null}
-      <Box flex="1" position="relative">
+      {header ? (
+        <Box borderBottom="1px solid" borderBottomColor={colors.border}>
+          {header}
+        </Box>
+      ) : null}
+      <Flex flexDirection="column" minHeight="300px" position="relative">
         {loading ? (
           <Flex
             position="absolute"
@@ -57,18 +63,22 @@ export function TablePage<T>({
             />
           </Flex>
         ) : null}
-        <Table
-          columns={columns}
-          rows={rows}
-          rowKeyProp={rowKeyProp}
-          selectable={selectable}
-          onSelectionChange={onSelectionChange}
-          onRowClick={onRowClick}
-          borderTop={header ? "1px solid" : "none"}
-          borderTopColor={colors.border}
-        ></Table>
-        <Spacer marginTop="-1px" />
-      </Box>
+        {body ? (
+          body
+        ) : (
+          <Table
+            columns={columns}
+            rows={rows}
+            rowKeyProp={rowKeyProp}
+            selectable={selectable}
+            onSelectionChange={onSelectionChange}
+            onRowClick={onRowClick}
+            borderTop="1px solid"
+            borderTopColor={colors.border}
+            marginTop="-1px"
+          ></Table>
+        )}
+      </Flex>
       <Stack
         direction="row"
         spacing={2}

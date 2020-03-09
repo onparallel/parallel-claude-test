@@ -33,7 +33,7 @@
     "term": "component.input.clear-button",
     "definition": "Vaciar",
     "context": "Clear",
-    "reference": "components/common/SearchInput.tsx#L34-L37"
+    "reference": "components/common/SearchInput.tsx#L31-L34"
   },
   {
     "term": "component.password-input.hide",
@@ -99,55 +99,61 @@
     "term": "component.petition-status-filter.all",
     "definition": "Todas las peticiones",
     "context": "All petitions",
-    "reference": "components/common/PetitionStatusFilter.tsx#L25-L28"
+    "reference": "components/common/PetitionStatusFilter.tsx#L26-L29"
   },
   {
     "term": "component.petition-status-filter.completed",
     "definition": "Completadas",
     "context": "Completed",
-    "reference": "components/common/PetitionStatusFilter.tsx#L41-L44"
+    "reference": "components/common/PetitionStatusFilter.tsx#L42-L45"
   },
   {
     "term": "component.petition-status-filter.draft",
     "definition": "Borradores",
     "context": "Draft",
-    "reference": "components/common/PetitionStatusFilter.tsx#L29-L32"
+    "reference": "components/common/PetitionStatusFilter.tsx#L30-L33"
   },
   {
     "term": "component.petition-status-filter.pending",
     "definition": "Pendientes",
     "context": "Pending",
-    "reference": "components/common/PetitionStatusFilter.tsx#L33-L36"
+    "reference": "components/common/PetitionStatusFilter.tsx#L34-L37"
   },
   {
     "term": "component.petition-status-filter.scheduled",
     "definition": "Programadas",
     "context": "Scheduled",
-    "reference": "components/common/PetitionStatusFilter.tsx#L37-L40"
+    "reference": "components/common/PetitionStatusFilter.tsx#L38-L41"
+  },
+  {
+    "term": "component.recipient-select.create-new-contact",
+    "definition": "Crear nuevo contacto para: <em>{email}</em>",
+    "context": "Create new contact for: <em>{email}</em>",
+    "reference": "components/common/RecipientSelect.tsx#L180-L189"
   },
   {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search...",
-    "reference": "components/common/SearchInput.tsx#L77-L80"
+    "reference": "components/common/SearchInput.tsx#L63-L66"
   },
   {
     "term": "component.table.next-page-button",
     "definition": "Siguiente",
     "context": "Next",
-    "reference": "components/common/TablePage.tsx#L107-L110"
+    "reference": "components/common/TablePage.tsx#L117-L120"
   },
   {
     "term": "component.table.prev-page-button",
     "definition": "Anterior",
     "context": "Previous",
-    "reference": "components/common/TablePage.tsx#L97-L100"
+    "reference": "components/common/TablePage.tsx#L107-L110"
   },
   {
     "term": "component.table.total-results",
     "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}",
-    "reference": "components/common/TablePage.tsx#L81-L89"
+    "reference": "components/common/TablePage.tsx#L91-L99"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
@@ -160,6 +166,54 @@
     "definition": "Cambiar a modo claro",
     "context": "Toggle light mode",
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
+  },
+  {
+    "term": "components.petition-list-header.actions-button",
+    "definition": "Acciones",
+    "context": "Actions",
+    "reference": "components/petitions/PetitionListHeader.tsx#L61-L64"
+  },
+  {
+    "term": "components.petition-list-header.create-petition-button",
+    "definition": "Crear petición",
+    "context": "Create petition",
+    "reference": "components/petitions/PetitionListHeader.tsx#L79-L82"
+  },
+  {
+    "term": "components.petition-list-header.delete-label",
+    "definition": "Eliminar seleccionadas",
+    "context": "Delete selected",
+    "reference": "components/petitions/PetitionListHeader.tsx#L69-L72"
+  },
+  {
+    "term": "components.recipient-select.enter-email",
+    "definition": "También puedes introducir un correo eletrónico válido.",
+    "context": "You can also enter a valid email.",
+    "reference": "components/common/RecipientSelect.tsx#L107-L110"
+  },
+  {
+    "term": "components.recipient-select.new-contact",
+    "definition": "Contacto nuevo",
+    "context": "New contact",
+    "reference": "components/common/RecipientSelect.tsx#L139-L142"
+  },
+  {
+    "term": "components.recipient-select.no-options",
+    "definition": "No pudimos encontrar ningún contacto con <em>{search}</em>",
+    "context": "We could not find any exisiting contacts for <em>{search}</em>",
+    "reference": "components/common/RecipientSelect.tsx#L97-L104"
+  },
+  {
+    "term": "components.recipient-select.placeholder",
+    "definition": "Introduce destinatarios...",
+    "context": "Enter recipients...",
+    "reference": "components/common/RecipientSelect.tsx#L46-L49"
+  },
+  {
+    "term": "components.recipient-select.search-hint",
+    "definition": "Busca contactos existentes o introduce un correo electrónico válido",
+    "context": "Search for exisiting contacts or enter a valid email.",
+    "reference": "components/common/RecipientSelect.tsx#L115-L118"
   },
   {
     "term": "field-settings.file-multiple-label",
@@ -309,25 +363,25 @@
     "term": "generic.petition-status.completed",
     "definition": "Completada",
     "context": "Completed",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L370-L373"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L356-L359"
   },
   {
     "term": "generic.petition-status.draft",
     "definition": "Borrador",
     "context": "Draft",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L412-L415"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L398-L401"
   },
   {
     "term": "generic.petition-status.pending",
     "definition": "Pendiente",
     "context": "Pending",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L362-L365"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L348-L351"
   },
   {
     "term": "generic.petition-status.scheduled",
     "definition": "Programada",
     "context": "Scheduled",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L404-L407"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L390-L393"
   },
   {
     "term": "generic.required-field",
@@ -363,7 +417,7 @@
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L540-L543"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L526-L529"
   },
   {
     "term": "header.user-menu-button",
@@ -411,13 +465,13 @@
     "term": "petition.advanced-settings",
     "definition": "Ajustes avanzados",
     "context": "Advanced settings",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L204-L207"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L230-L233"
   },
   {
     "term": "petition.body-placeholder",
     "definition": "Escribe un mensaje para incluir en el correo electrónico",
     "context": "Write a message to include in the email",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L157-L160"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L187-L190"
   },
   {
     "term": "petition.close-sidebar-button",
@@ -441,7 +495,7 @@
     "term": "petition.deadline-label",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L245-L248"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L271-L274"
   },
   {
     "term": "petition.drag-to-sort-label",
@@ -543,19 +597,19 @@
     "term": "petition.locale-label",
     "definition": "Idioma",
     "context": "Language",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L215-L218"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L241-L244"
   },
   {
     "term": "petition.locale.en",
     "definition": "Inglés",
     "context": "English",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L226-L229"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L252-L255"
   },
   {
     "term": "petition.locale.es",
     "definition": "Español",
     "context": "Spanish",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L232-L235"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L258-L261"
   },
   {
     "term": "petition.name-label",
@@ -564,16 +618,22 @@
     "reference": "components/layout/PetitionHeader.tsx#L110-L113"
   },
   {
+    "term": "petition.recipients-label",
+    "definition": "Destinatarios",
+    "context": "Recipients",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L153-L156"
+  },
+  {
     "term": "petition.schedule-send-button",
     "definition": "Programar envío",
     "context": "Schedule send",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L189-L192"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L215-L218"
   },
   {
     "term": "petition.send-button",
     "definition": "Enviar",
     "context": "Send",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L177-L180"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L203-L206"
   },
   {
     "term": "petition.status.error",
@@ -597,103 +657,109 @@
     "term": "petition.subject-label",
     "definition": "Asunto",
     "context": "Subject",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L143-L146"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L169-L172"
+  },
+  {
+    "term": "petition.subject-placeholder",
+    "definition": "Introduce el asunto del correo electrónico",
+    "context": "Enter the subject of the email",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L178-L181"
   },
   {
     "term": "petitions.confirm-delete.body",
     "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L482-L490"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L468-L476"
   },
   {
     "term": "petitions.confirm-delete.confirm-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L494-L497"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L480-L483"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Eliminar peticiones",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L476-L479"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L462-L465"
   },
   {
     "term": "petitions.create-new-petition.body",
     "definition": "Nueva petición",
     "context": "Give your new petition a name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L532-L535"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L518-L521"
   },
   {
     "term": "petitions.create-new-petition.continue-button",
     "definition": "Continuar",
     "context": "Continue",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L556-L559"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L542-L545"
   },
   {
     "term": "petitions.create-new-petition.header",
     "definition": "Crear una petición nueva",
     "context": "Create a new petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L524-L527"
-  },
-  {
-    "term": "petitions.create-petition-button",
-    "definition": "Crear petición",
-    "context": "Create petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L227-L230"
-  },
-  {
-    "term": "petitions.delete-label",
-    "definition": "Borrar {count, plural, =1 {peticion} other {# peticiones}}",
-    "context": "Delete {count, plural, =1 {petition} other {# petitions}}",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L216-L220"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L510-L513"
   },
   {
     "term": "petitions.header.custom-ref",
     "definition": "Referencia",
     "context": "Reference",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L274-L277"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L260-L263"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L305-L308"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L291-L294"
   },
   {
     "term": "petitions.header.name",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L253-L256"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L239-L242"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progreso",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L341-L344"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L327-L330"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L284-L287"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L270-L273"
   },
   {
     "term": "petitions.header.status",
     "definition": "Estado",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L356"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L342"
   },
   {
     "term": "petitions.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L329-L332"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L315-L318"
+  },
+  {
+    "term": "petitions.no-petitions",
+    "definition": "No tienes ninguna petición todavía. ¡Empieza creando una nueva!",
+    "context": "You have no petitions yet. Start by creating one now!",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L212-L215"
+  },
+  {
+    "term": "petitions.no-results",
+    "definition": "No encontramos peticiones con esta búsqueda",
+    "context": "There's no petitions matching your search",
+    "reference": "pages/[locale]/app/petitions/index.tsx#L203-L206"
   },
   {
     "term": "petitions.title",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L181-L184"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L174-L177"
   },
   {
     "term": "public.cookies.title",
@@ -703,7 +769,7 @@
   },
   {
     "term": "public.footer.follow-us",
-    "definition": "",
+    "definition": "Síguenos",
     "context": "Follow us",
     "reference": "components/public/layout/PublicFooter.tsx#L81-L84"
   },

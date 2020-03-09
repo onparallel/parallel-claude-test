@@ -1,19 +1,20 @@
 import {
+  Button,
   Menu,
   MenuButton,
-  Button,
+  MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  MenuItemOption,
-  MenuProps,
-  MenuOptionGroupProps,
-  Icon
+  MenuProps
 } from "@chakra-ui/core";
+import { PetitionStatus } from "@parallel/graphql/__types";
+import { useCallback } from "react";
+import { useIntl } from "react-intl";
 
-import { FormattedMessage, useIntl } from "react-intl";
-
-export type PetitionStatusFilterProps = Omit<MenuProps, "children"> &
-  Pick<MenuOptionGroupProps, "value" | "onChange">;
+export type PetitionStatusFilterProps = Omit<MenuProps, "children"> & {
+  value: PetitionStatus | null;
+  onChange: (value: PetitionStatus | null) => void;
+};
 
 export function PetitionStatusFilter({
   value,
@@ -43,20 +44,31 @@ export function PetitionStatusFilter({
       defaultMessage: "Completed"
     })
   };
+  const handleChange = useCallback(
+    value => {
+      onChange(value === "ALL" ? null : (value as PetitionStatus));
+    },
+    [onChange]
+  );
+
   return (
     <Menu {...props}>
       <MenuButton
         as={Button}
         {...{
           variant: "outline",
-          leftIcon: value === "ALL" ? null : "filter",
+          leftIcon: value === null ? null : "filter",
           rightIcon: "chevron-down"
         }}
       >
-        {filters[value as keyof typeof filters]}
+        {filters[value ?? "ALL"]}
       </MenuButton>
       <MenuList minWidth="200px">
-        <MenuOptionGroup value={value} onChange={onChange} type="radio">
+        <MenuOptionGroup
+          value={value ?? "ALL"}
+          onChange={handleChange}
+          type="radio"
+        >
           <MenuItemOption value="ALL">{filters.ALL}</MenuItemOption>
           <MenuItemOption value="DRAFT">{filters.DRAFT}</MenuItemOption>
           <MenuItemOption value="PENDING">{filters.PENDING}</MenuItemOption>
