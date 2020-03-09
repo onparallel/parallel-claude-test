@@ -215,11 +215,6 @@ An petition in the system.
 """
 type Petition implements Timestamps {
   """
-  The accesses for this petition
-  """
-  accessess: [PetitionAccess!]!
-
-  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -275,6 +270,11 @@ type Petition implements Timestamps {
   progress: PetitionProgress!
 
   """
+  The sendouts for this petition
+  """
+  sendouts: [PetitionSendout!]!
+
+  """
   The status of the petition.
   """
   status: PetitionStatus!
@@ -283,21 +283,6 @@ type Petition implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-}
-
-"""
-An access to a petition
-"""
-type PetitionAccess {
-  """
-  The receiver of the petition through this access.
-  """
-  contact: Contact
-
-  """
-  The ID of the petition field access.
-  """
-  id: ID!
 }
 
 type PetitionAndField {
@@ -403,6 +388,21 @@ type PetitionProgress {
   Number of fields validated
   """
   validated: Int!
+}
+
+"""
+A sendout of a petition
+"""
+type PetitionSendout {
+  """
+  The receiver of the petition through this sendout.
+  """
+  contact: Contact
+
+  """
+  The ID of the petition field access.
+  """
+  id: ID!
 }
 
 """

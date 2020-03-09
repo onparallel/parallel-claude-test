@@ -4,13 +4,13 @@ import {
   CreateContact,
   CreateOrganization,
   CreatePetition,
-  CreatePetitionAccess,
+  CreatePetitionSendout,
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreateUser,
   Organization,
   Petition,
-  PetitionAccess,
+  PetitionSendout,
   PetitionField,
   PetitionFieldReply,
   User
@@ -204,8 +204,8 @@ export async function seed(knex: Knex): Promise<any> {
     "id"
   );
 
-  const accessIds = await knex<PetitionAccess>("petition_access").insert(
-    <CreatePetitionAccess[]>[
+  const sendoutIds = await knex<PetitionSendout>("petition_sendout").insert(
+    <CreatePetitionSendout[]>[
       {
         petition_id: petitionIds[0],
         contact_id: contactIds[0],
@@ -236,21 +236,21 @@ export async function seed(knex: Knex): Promise<any> {
   ).insert(<CreatePetitionFieldReply[]>[
     {
       petition_field_id: fieldIds[0],
-      petition_access_id: accessIds[0],
+      petition_sendout_id: sendoutIds[0],
       reply: {},
       created_by: `Contact:${contactIds[0]}`,
       updated_by: `Contact:${contactIds[0]}`
     },
     {
       petition_field_id: fieldIds[2],
-      petition_access_id: accessIds[0],
+      petition_sendout_id: sendoutIds[0],
       reply: {},
       created_by: `Contact:${contactIds[0]}`,
       updated_by: `Contact:${contactIds[0]}`
     },
     {
       petition_field_id: fieldIds[6],
-      petition_access_id: accessIds[0],
+      petition_sendout_id: sendoutIds[0],
       reply: {},
       created_by: `Contact:${contactIds[1]}`,
       updated_by: `Contact:${contactIds[1]}`

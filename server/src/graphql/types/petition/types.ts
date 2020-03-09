@@ -112,11 +112,11 @@ export const Petition = objectType({
         return await ctx.petitions.loadStatusForPetition(root.id);
       }
     });
-    t.list.field("accessess", {
-      type: "PetitionAccess",
-      description: "The accesses for this petition",
+    t.list.field("sendouts", {
+      type: "PetitionSendout",
+      description: "The sendouts for this petition",
       resolve: async (root, _, ctx) => {
-        return ctx.petitions.loadAccessesForPetition(root.id);
+        return ctx.petitions.loadSendoutsForPetition(root.id);
       }
     });
   }
@@ -164,17 +164,17 @@ export const PetitionField = objectType({
   }
 });
 
-export const PetitionAccess = objectType({
-  name: "PetitionAccess",
-  description: "An access to a petition",
+export const PetitionSendout = objectType({
+  name: "PetitionSendout",
+  description: "A sendout of a petition",
   definition(t) {
     t.id("id", {
       description: "The ID of the petition field access.",
-      resolve: o => toGlobalId("PetitionAccess", o.id)
+      resolve: o => toGlobalId("PetitionSendout", o.id)
     });
     t.field("contact", {
       type: "Contact",
-      description: "The receiver of the petition through this access.",
+      description: "The receiver of the petition through this sendout.",
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadOneById(root.contact_id);

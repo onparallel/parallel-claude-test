@@ -273,10 +273,10 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
       />
     )),
     Cell: memo(({ row }) => {
-      if (row.accessess.length === 0) {
+      if (row.sendouts.length === 0) {
         return null;
       }
-      const [{ contact }, ...rest] = row.accessess;
+      const [{ contact }, ...rest] = row.sendouts;
       if (contact) {
         const { email, fullName } = contact;
         return <Text>{fullName ? `${fullName} (${email})` : email}</Text>;
@@ -565,7 +565,7 @@ Petitions.fragments = {
           optional
           total
         }
-        accessess {
+        sendouts {
           contact {
             id
             fullName

@@ -126,13 +126,7 @@ export type Petition = Timestamps & {
   emailBody?: Maybe<Scalars["JSON"]>;
   fieldCount: Scalars["Int"];
   progress: PetitionProgress;
-  accessess: Array<PetitionAccess>;
-};
-
-export type PetitionAccess = {
-  __typename?: "PetitionAccess";
-  id: Scalars["ID"];
-  contact?: Maybe<Contact>;
+  sendouts: Array<PetitionSendout>;
 };
 
 export type PetitionAndField = {
@@ -168,6 +162,12 @@ export type PetitionProgress = {
   replied: Scalars["Int"];
   optional: Scalars["Int"];
   total: Scalars["Int"];
+};
+
+export type PetitionSendout = {
+  __typename?: "PetitionSendout";
+  id: Scalars["ID"];
+  contact?: Maybe<Contact>;
 };
 
 export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
@@ -523,8 +523,8 @@ export type Petitions_PetitionsListFragment = {
             PetitionProgress,
             "validated" | "replied" | "optional" | "total"
           >;
-          accessess: Array<
-            { __typename?: "PetitionAccess" } & {
+          sendouts: Array<
+            { __typename?: "PetitionSendout" } & {
               contact: Maybe<
                 { __typename?: "Contact" } & Pick<
                   Contact,

@@ -101,7 +101,6 @@ export interface NexusGenRootTypes {
   Mutation: {};
   Organization: db.Organization;
   Petition: db.Petition;
-  PetitionAccess: db.PetitionAccess;
   PetitionAndField: {
     // root type
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -120,6 +119,7 @@ export interface NexusGenRootTypes {
     total: number; // Int!
     validated: number; // Int!
   };
+  PetitionSendout: db.PetitionSendout;
   Query: {};
   User: db.User;
   UserPagination: {
@@ -195,7 +195,6 @@ export interface NexusGenFieldTypes {
   };
   Petition: {
     // field return type
-    accessess: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     createdAt: Date; // DateTime!
     customRef: string | null; // String
     deadline: Date | null; // DateTime
@@ -207,13 +206,9 @@ export interface NexusGenFieldTypes {
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
+    sendouts: NexusGenRootTypes["PetitionSendout"][]; // [PetitionSendout!]!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: Date; // DateTime!
-  };
-  PetitionAccess: {
-    // field return type
-    contact: NexusGenRootTypes["Contact"] | null; // Contact
-    id: string; // ID!
   };
   PetitionAndField: {
     // field return type
@@ -241,6 +236,11 @@ export interface NexusGenFieldTypes {
     replied: number; // Int!
     total: number; // Int!
     validated: number; // Int!
+  };
+  PetitionSendout: {
+    // field return type
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
+    id: string; // ID!
   };
   Query: {
     // field return type
@@ -372,11 +372,11 @@ export type NexusGenObjectNames =
   | "Mutation"
   | "Organization"
   | "Petition"
-  | "PetitionAccess"
   | "PetitionAndField"
   | "PetitionField"
   | "PetitionPagination"
   | "PetitionProgress"
+  | "PetitionSendout"
   | "Query"
   | "User"
   | "UserPagination";

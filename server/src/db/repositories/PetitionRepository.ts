@@ -10,7 +10,7 @@ import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   CreatePetition,
-  PetitionAccess,
+  PetitionSendout,
   PetitionField,
   PetitionFieldReply,
   PetitionStatus,
@@ -164,9 +164,9 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  readonly loadAccessesForPetition = fromDataLoader(
-    new DataLoader<number, PetitionAccess[]>(async ids => {
-      const rows = await this.from("petition_access")
+  readonly loadSendoutsForPetition = fromDataLoader(
+    new DataLoader<number, PetitionSendout[]>(async ids => {
+      const rows = await this.from("petition_sendout")
         .whereIn("petition_id", ids as number[])
         .whereNull("deleted_at")
         .select("*");
