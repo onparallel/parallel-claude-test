@@ -24,6 +24,7 @@ export function TablePage<T>({
   rows,
   rowKeyProp,
   selectable,
+  highlightable,
   onSelectionChange,
   onRowClick,
   loading,
@@ -71,6 +72,7 @@ export function TablePage<T>({
             rows={rows}
             rowKeyProp={rowKeyProp}
             selectable={selectable}
+            highlightable={highlightable}
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}
             borderTop="1px solid"

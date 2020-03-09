@@ -14,6 +14,7 @@ export type TableProps<T> = BoxProps & {
   rows: T[];
   rowKeyProp: keyof T;
   selectable?: boolean;
+  highlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: T, event: MouseEvent) => void;
 };
@@ -47,6 +48,7 @@ function _Table<T>({
   rows,
   rowKeyProp,
   selectable,
+  highlightable,
   onSelectionChange,
   onRowClick,
   ...props
@@ -153,7 +155,9 @@ function _Table<T>({
               _hover={{
                 backgroundColor: isSelected
                   ? colors.rowSelected
-                  : colors.rowHover
+                  : highlightable
+                  ? colors.rowHover
+                  : colors.row
               }}
               cursor="pointer"
               borderBottom="1px solid"

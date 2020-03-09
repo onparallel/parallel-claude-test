@@ -43,6 +43,7 @@ import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick } from "remeda";
 import { PetitionComposeFieldSettings } from "../../../../../components/petition/PetitionComposeFieldSettings";
+import { Spacer } from "@parallel/components/common/Spacer";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -166,8 +167,11 @@ function PetitionCompose({ petitionId }: PetitionProps) {
         section="compose"
         state={state}
       >
-        <Stack direction="row" padding={4} spacing={4}>
-          <Box flex="2">
+        <Flex flexDirection="row" padding={4}>
+          <Box
+            flex="2"
+            display={{ base: active ? "none" : "block", md: "block" }}
+          >
             <Card>
               <Box padding={4}>
                 <Heading as="h2" size="sm">
@@ -236,16 +240,19 @@ function PetitionCompose({ petitionId }: PetitionProps) {
               )}
             </Card>
           </Box>
-          <Box flex="1">
-            {active ? (
+          {active ? null : (
+            <Spacer flex="1" display={{ base: "none", md: "block" }} />
+          )}
+          {active ? (
+            <Box flex="1" marginLeft={{ base: 0, md: 4 }}>
               <PetitionComposeFieldSettings
                 field={fieldsById[active]}
                 onUpdate={data => handleFieldUpdate(fieldsById[active], data)}
                 onClose={() => setActive(null)}
               />
-            ) : null}
-          </Box>
-        </Stack>
+            </Box>
+          ) : null}
+        </Flex>
       </PetitionLayout>
     </>
   );

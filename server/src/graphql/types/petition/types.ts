@@ -168,6 +168,7 @@ export const PetitionSendout = objectType({
   name: "PetitionSendout",
   description: "A sendout of a petition",
   definition(t) {
+    t.implements("Timestamps");
     t.id("id", {
       description: "The ID of the petition field access.",
       resolve: o => toGlobalId("PetitionSendout", o.id)

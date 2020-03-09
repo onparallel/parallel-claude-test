@@ -1,8 +1,4 @@
-import {
-  useLazyQuery,
-  useMutation,
-  useApolloClient
-} from "@apollo/react-hooks";
+import { useApolloClient, useMutation } from "@apollo/react-hooks";
 import {
   Box,
   Button,
@@ -19,7 +15,8 @@ import {
   MenuItem,
   MenuList,
   Select,
-  Stack
+  Stack,
+  Text
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { CollapseCard } from "@parallel/components/common/CollapseCard";
@@ -33,6 +30,11 @@ import {
 } from "@parallel/components/common/RichTextEditor";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
+import {
+  TableColumn,
+  Table,
+  useTableColors
+} from "@parallel/components/common/Table";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
@@ -43,6 +45,7 @@ import {
   PetitionSendSearchContactsQuery,
   PetitionSendSearchContactsQueryVariables,
   PetitionSendUserQuery,
+  PetitionSend_PetitionFragment,
   PetitionSend_updatePetitionMutation,
   PetitionSend_updatePetitionMutationVariables,
   UpdatePetitionInput
@@ -51,13 +54,14 @@ import {
   usePetitionState,
   useWrapPetitionUpdater
 } from "@parallel/utils/petitions";
-import { UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { ChangeEvent, ReactNode, useCallback, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { ChangeEvent, memo, ReactNode, useCallback, useState } from "react";
+import { FormattedMessage, useIntl, FormattedDate } from "react-intl";
+import { FORMATS } from "@parallel/utils/dates";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionSend.getInitialProps>
@@ -119,6 +123,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
   }, []);
 
   const searchContacts = useSearchContacts();
+  const { border } = useTableColors();
 
   return (
     <>
@@ -287,10 +292,76 @@ function PetitionSend({ petitionId }: PetitionProps) {
             </CollapseCard>
           </Box>
         </Flex>
+        <Flex padding={4} paddingTop={0}>
+          <Box flex="2">
+            <Card>
+              <Heading size="sm" padding={4}>
+                <FormattedMessage
+                  id="petition.sendouts-header"
+                  defaultMessage="Sendouts"
+                />
+              </Heading>
+              <Table
+                columns={SENDOUT_COLUMNS}
+                rows={petition?.sendouts ?? []}
+                rowKeyProp="id"
+                borderTop="1px solid"
+                borderTopColor={border}
+                marginBottom={1}
+              />
+            </Card>
+          </Box>
+          <Spacer
+            flex="1"
+            marginLeft={4}
+            display={{ base: "none", md: "block" }}
+          />
+        </Flex>
       </PetitionLayout>
     </>
   );
 }
+
+type SendoutSelection = UnwrapArray<PetitionSend_PetitionFragment["sendouts"]>;
+
+const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
+  {
+    key: "recipient",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.sendouts-header.recipient"
+        defaultMessage="Recipient"
+      />
+    )),
+    Cell: memo(({ row: { contact } }) => (
+      <>
+        {contact ? (
+          <Text>
+            {contact.fullName
+              ? `${contact.fullName} (${contact.email})`
+              : contact.email}
+          </Text>
+        ) : null}
+      </>
+    ))
+  },
+  {
+    key: "sent",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.sendouts-header.sent-on"
+        defaultMessage="Sent on"
+      />
+    )),
+    Cell: memo(({ row: { createdAt } }) => (
+      <Text>
+        <time dateTime={createdAt}>
+          <FormattedDate value={createdAt} {...FORMATS.LLL} />
+        </time>
+      </Text>
+    ))
+  }
+];
 
 function IconButtonMenu({
   children,
@@ -315,6 +386,15 @@ PetitionSend.fragments = {
       deadline
       emailSubject
       emailBody
+      sendouts {
+        id
+        contact {
+          id
+          fullName
+          email
+        }
+        createdAt
+      }
     }
     ${PetitionLayout.fragments.petition}
   `,

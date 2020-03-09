@@ -182,6 +182,7 @@ function Petitions() {
           rows={petitions.items}
           rowKeyProp={"id"}
           selectable
+          highlightable
           loading={loading}
           onRowClick={handleRowClick}
           header={
@@ -223,7 +224,7 @@ function Petitions() {
           totalCount={petitions.totalCount}
           onSelectionChange={setSelected}
           onPageChange={handlePageChange}
-          margin={6}
+          margin={4}
         ></TablePage>
       </AppLayout>
     </>

@@ -164,8 +164,10 @@ export type PetitionProgress = {
   total: Scalars["Int"];
 };
 
-export type PetitionSendout = {
+export type PetitionSendout = Timestamps & {
   __typename?: "PetitionSendout";
+  createdAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"];
   id: Scalars["ID"];
   contact?: Maybe<Contact>;
 };
@@ -451,8 +453,21 @@ export type PetitionReview_updatePetitionMutation = {
 export type PetitionSend_PetitionFragment = { __typename?: "Petition" } & Pick<
   Petition,
   "id" | "locale" | "deadline" | "emailSubject" | "emailBody"
-> &
-  PetitionLayout_PetitionFragment;
+> & {
+    sendouts: Array<
+      { __typename?: "PetitionSendout" } & Pick<
+        PetitionSendout,
+        "id" | "createdAt"
+      > & {
+          contact: Maybe<
+            { __typename?: "Contact" } & Pick<
+              Contact,
+              "id" | "fullName" | "email"
+            >
+          >;
+        }
+    >;
+  } & PetitionLayout_PetitionFragment;
 
 export type PetitionSend_UserFragment = {
   __typename?: "User";

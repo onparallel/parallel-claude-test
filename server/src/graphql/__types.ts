@@ -131,7 +131,8 @@ export interface NexusGenRootTypes {
     | NexusGenRootTypes["Contact"]
     | NexusGenRootTypes["User"]
     | NexusGenRootTypes["Organization"]
-    | NexusGenRootTypes["Petition"];
+    | NexusGenRootTypes["Petition"]
+    | NexusGenRootTypes["PetitionSendout"];
   String: string;
   Int: number;
   Float: number;
@@ -240,7 +241,9 @@ export interface NexusGenFieldTypes {
   PetitionSendout: {
     // field return type
     contact: NexusGenRootTypes["Contact"] | null; // Contact
+    createdAt: Date; // DateTime!
     id: string; // ID!
+    updatedAt: Date; // DateTime!
   };
   Query: {
     // field return type
@@ -361,7 +364,12 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  Timestamps: "Contact" | "User" | "Organization" | "Petition";
+  Timestamps:
+    | "Contact"
+    | "User"
+    | "Organization"
+    | "Petition"
+    | "PetitionSendout";
 }
 
 export interface NexusGenInheritedFields {}

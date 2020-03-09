@@ -393,16 +393,26 @@ type PetitionProgress {
 """
 A sendout of a petition
 """
-type PetitionSendout {
+type PetitionSendout implements Timestamps {
   """
   The receiver of the petition through this sendout.
   """
   contact: Contact
 
   """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
   The ID of the petition field access.
   """
   id: ID!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
 }
 
 """
