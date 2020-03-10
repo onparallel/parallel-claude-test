@@ -9,8 +9,7 @@ export async function up(knex: Knex): Promise<any> {
       t.text("email_body")
         .nullable()
         .alter();
-    })
-    .raw(`alter type "petition_field_type" add value 'TEXT'`);
+    });
 }
 
 export async function down(knex: Knex): Promise<any> {

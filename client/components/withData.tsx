@@ -81,7 +81,7 @@ export function withData<P = {}>(
             });
             context.res!.end();
           } else {
-            Router.push(`/${context.query.locale}/login`);
+            Router.push("/[locale]/login", `/${context.query.locale}/login`);
           }
         } else {
           if (error?.networkError?.result?.errors?.[0]) {
