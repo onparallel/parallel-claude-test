@@ -1,11 +1,11 @@
-import { Box, BoxProps, useColorMode } from "@chakra-ui/core";
+import { PseudoBox, PseudoBoxProps, useColorMode } from "@chakra-ui/core";
 
-export type CardProps = BoxProps;
+export type CardProps = PseudoBoxProps;
 
 export function Card({ children, ...props }: CardProps) {
   const { colorMode } = useColorMode();
   return (
-    <Box
+    <PseudoBox
       as="section"
       borderWidth="1px"
       backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
@@ -14,6 +14,6 @@ export function Card({ children, ...props }: CardProps) {
       {...props}
     >
       {children}
-    </Box>
+    </PseudoBox>
   );
 }

@@ -1,7 +1,7 @@
 import { queryField, arg, idArg } from "nexus";
 import { authenticate, authorizeAnd } from "../../helpers/authorize";
 import { userHasAccessToContact } from "./authorizers";
-import { fromGlobalId } from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 
 export const contactQueries = queryField(t => {
   t.paginationField("contacts", {
@@ -16,7 +16,7 @@ export const contactQueries = queryField(t => {
       })
     },
     resolve: async (_, { offset, limit, search, exclude }, ctx) => {
-      const excludeIds = exclude?.map(id => fromGlobalId(id, "Contact").id);
+      const { ids: excludeIds } = fromGlobalIds(exclude ?? [], "Contact");
       return await ctx.contacts.loadContactsForUser(ctx.user.id, {
         search,
         excludeIds,

@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus";
-import { fromGlobalId } from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 
 export function userHasAccessToPetition<
   TypeName extends string,
@@ -49,6 +49,29 @@ export function fieldBelongsToPetition<
         "PetitionField"
       );
       return ctx.petitions.fieldsBelongToPetition(petitionId, [fieldId]);
+    } catch {}
+    return false;
+  };
+}
+
+export function fieldsBelongsToPetition<
+  TypeName extends string,
+  FieldName extends string
+>(
+  argNamePetitionId: string,
+  argNameFieldIds: string
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id: petitionId } = fromGlobalId(
+        args[argNamePetitionId],
+        "Petition"
+      );
+      const { ids: fieldIds } = fromGlobalIds(
+        args[argNameFieldIds],
+        "PetitionField"
+      );
+      return ctx.petitions.fieldsBelongToPetition(petitionId, fieldIds);
     } catch {}
     return false;
   };

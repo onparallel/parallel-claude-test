@@ -1,15 +1,17 @@
 import { useMutation } from "@apollo/react-hooks";
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/core";
+import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
   useDialog
 } from "@parallel/components/common/DialogOpenerProvider";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { AddFieldPopover } from "@parallel/components/petition/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
+import { PetitionComposeFieldSettings } from "@parallel/components/petition/PetitionComposeFieldSettings";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   PetitionComposeQuery,
@@ -42,8 +44,6 @@ import { defaultDataIdFromObject, gql } from "apollo-boost";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick } from "remeda";
-import { PetitionComposeFieldSettings } from "../../../../../components/petition/PetitionComposeFieldSettings";
-import { Spacer } from "@parallel/components/common/Spacer";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -120,6 +120,8 @@ function PetitionCompose({ petitionId }: PetitionProps) {
             petition: {
               __typename: "Petition",
               id: petitionId,
+              name: petition!.name,
+              status: petition!.status,
               updatedAt: new Date().toISOString()
             },
             field: {
@@ -165,6 +167,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
         petition={petition!}
         onUpdatePetition={handleOnUpdatePetition}
         section="compose"
+        scrollBody
         state={state}
       >
         <Flex flexDirection="row" padding={4}>
@@ -347,11 +350,11 @@ function useCreatePetitionField() {
             ...PetitionComposeFieldSettings_PetitionField
           }
           petition {
-            id
-            updatedAt
+            ...PetitionLayout_Petition
           }
         }
       }
+      ${PetitionLayout.fragments.petition}
       ${PetitionComposeField.fragments.petitionField}
       ${PetitionComposeFieldSettings.fragments.petitionField}
     `,
@@ -417,11 +420,11 @@ function useUpdatePetitionField() {
             ...PetitionComposeFieldSettings_PetitionField
           }
           petition {
-            id
-            updatedAt
+            ...PetitionLayout_Petition
           }
         }
       }
+      ${PetitionLayout.fragments.petition}
       ${PetitionComposeField.fragments.petitionField}
       ${PetitionComposeFieldSettings.fragments.petitionField}
     `

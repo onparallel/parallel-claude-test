@@ -42,6 +42,7 @@ export type Mutation = {
   createPetitionField: PetitionAndField;
   deletePetitionField: Petition;
   updatePetitionField: PetitionAndField;
+  validatePetitionFields: PetitionAndFields;
   updateUser: User;
   changePassword: ChangePasswordResult;
 };
@@ -79,6 +80,12 @@ export type MutationupdatePetitionFieldArgs = {
   id: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: UpdatePetitionFieldInput;
+};
+
+export type MutationvalidatePetitionFieldsArgs = {
+  id: Scalars["ID"];
+  fieldIds: Array<Scalars["ID"]>;
+  value: Scalars["Boolean"];
 };
 
 export type MutationupdateUserArgs = {
@@ -135,6 +142,12 @@ export type PetitionAndField = {
   field: PetitionField;
 };
 
+export type PetitionAndFields = {
+  __typename?: "PetitionAndFields";
+  petition: Petition;
+  fields: Array<PetitionField>;
+};
+
 export type PetitionField = {
   __typename?: "PetitionField";
   id: Scalars["ID"];
@@ -144,6 +157,16 @@ export type PetitionField = {
   options?: Maybe<Scalars["JSONObject"]>;
   optional: Scalars["Boolean"];
   validated: Scalars["Boolean"];
+  replies: Array<PetitionFieldReply>;
+};
+
+export type PetitionFieldReply = Timestamps & {
+  __typename?: "PetitionFieldReply";
+  createdAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  content: Scalars["JSONObject"];
+  sendout?: Maybe<PetitionSendout>;
 };
 
 export type PetitionFieldType = "FILE_UPLOAD" | "TEXT";
@@ -172,7 +195,12 @@ export type PetitionSendout = Timestamps & {
   contact?: Maybe<Contact>;
 };
 
-export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
+export type PetitionStatus =
+  | "DRAFT"
+  | "SCHEDULED"
+  | "PENDING"
+  | "READY"
+  | "COMPLETED";
 
 export type Query = {
   __typename?: "Query";
@@ -271,7 +299,7 @@ export type AppLayoutNavbar_UserFragment = {
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name" | "updatedAt">;
+} & Pick<Petition, "id" | "name" | "status" | "updatedAt">;
 
 export type PetitionLayout_PetitionFragment = {
   __typename?: "Petition";
@@ -294,6 +322,28 @@ export type PetitionComposeField_PetitionFieldFragment = {
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "type" | "optional" | "options">;
+
+export type PetitionReviewField_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "title" | "validated"> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
+        "id" | "content" | "createdAt"
+      > & {
+          sendout: Maybe<
+            { __typename?: "PetitionSendout" } & {
+              contact: Maybe<
+                { __typename?: "Contact" } & Pick<
+                  Contact,
+                  "id" | "fullName" | "email"
+                >
+              >;
+            }
+          >;
+        }
+    >;
+  };
 
 export type ContactsQueryVariables = {};
 
@@ -375,7 +425,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
       PetitionComposeField_PetitionFieldFragment &
       PetitionComposeFieldSettings_PetitionFieldFragment;
-    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
+    petition: { __typename?: "Petition" } & PetitionLayout_PetitionFragment;
   };
 };
 
@@ -410,14 +460,19 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
       PetitionComposeField_PetitionFieldFragment &
       PetitionComposeFieldSettings_PetitionFieldFragment;
-    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
+    petition: { __typename?: "Petition" } & PetitionLayout_PetitionFragment;
   };
 };
 
 export type PetitionReview_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> &
-  PetitionLayout_PetitionFragment;
+} & Pick<Petition, "id"> & {
+    fields: Array<
+      {
+        __typename?: "PetitionField";
+      } & PetitionReviewField_PetitionFieldFragment
+    >;
+  } & PetitionLayout_PetitionFragment;
 
 export type PetitionReview_UserFragment = {
   __typename?: "User";
@@ -448,6 +503,23 @@ export type PetitionReview_updatePetitionMutation = {
   __typename?: "Mutation";
 } & {
   updatePetition: { __typename?: "Petition" } & PetitionReview_PetitionFragment;
+};
+
+export type PetitionReview_validatePetitionFieldsMutationVariables = {
+  id: Scalars["ID"];
+  fieldIds: Array<Scalars["ID"]>;
+  value: Scalars["Boolean"];
+};
+
+export type PetitionReview_validatePetitionFieldsMutation = {
+  __typename?: "Mutation";
+} & {
+  validatePetitionFields: { __typename?: "PetitionAndFields" } & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "validated">
+    >;
+    petition: { __typename?: "Petition" } & PetitionLayout_PetitionFragment;
+  };
 };
 
 export type PetitionSend_PetitionFragment = { __typename?: "Petition" } & Pick<

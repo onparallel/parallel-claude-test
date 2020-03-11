@@ -1,5 +1,5 @@
 import { FieldAuthorizeResolver } from "nexus";
-import { fromGlobalId } from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 
 export function userHasAccessToContact<
   TypeName extends string,
@@ -21,10 +21,7 @@ export function userHasAccessToContacts<
 >(argName: string): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const ids = args[argName].map((arg: string) => {
-        const { id } = fromGlobalId(arg, "Contact");
-        return id;
-      });
+      const { ids } = fromGlobalIds(args[argName], "Contact");
       return ctx.contacts.userHasAccessToContacts(ctx.user.id, ids);
     } catch {}
     return false;

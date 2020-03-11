@@ -6,9 +6,10 @@ import {
 import { PetitionLayout_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { ReactNode } from "react";
-import { Box } from "@chakra-ui/core";
+import { Box, Flex } from "@chakra-ui/core";
 
 export type PetitionLayoutProps = PetitionHeaderProps & {
+  scrollBody: boolean;
   user: PetitionLayout_UserFragment;
   children: ReactNode;
 };
@@ -16,6 +17,7 @@ export type PetitionLayoutProps = PetitionHeaderProps & {
 export function PetitionLayout({
   user,
   petition,
+  scrollBody,
   state,
   section,
   onUpdatePetition,
@@ -29,9 +31,14 @@ export function PetitionLayout({
         section={section}
         state={state}
       />
-      <Box flex="1" overflow="auto">
+      <Flex
+        flexDirection="column"
+        flex="1"
+        minHeight={0}
+        overflow={scrollBody ? "auto" : "visible"}
+      >
         {children}
-      </Box>
+      </Flex>
     </AppLayout>
   );
 }

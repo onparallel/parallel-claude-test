@@ -164,6 +164,8 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  readonly loadSendoutById = this.buildLoadOneById("petition_sendout", "id");
+
   readonly loadSendoutsForPetition = fromDataLoader(
     new DataLoader<number, PetitionSendout[]>(async ids => {
       const rows = await this.from("petition_sendout")
@@ -326,6 +328,8 @@ export class PetitionRepository extends BaseRepository {
           deleted_at: null
         });
 
+      // TODO: delete replies
+
       if (!field) {
         throw new Error("Invalid petition field id");
       }
@@ -342,16 +346,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .where("position", ">", field.position);
 
-      const [petition] = await this.from("petition", t)
-        .where("id", petitionId)
-        .update(
-          {
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`
-          },
-          "*"
-        );
-      return petition;
+      return await this.checkPetitionStatus(petitionId, user, true);
     });
   }
 
@@ -396,5 +391,89 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field not found");
     }
     validateFieldOptions(field?.type, data.options);
+  }
+
+  readonly loadRepliesForField = fromDataLoader(
+    new DataLoader<number, PetitionFieldReply[]>(async ids => {
+      const rows = await this.from("petition_field_reply")
+        .whereIn("petition_field_id", ids as number[])
+        .whereNull("deleted_at")
+        .select("*");
+      const byPetitionId = groupBy(rows, r => r.petition_field_id);
+      return ids.map(id => {
+        return sortBy(byPetitionId[<any>id] || [], r => r.created_at);
+      });
+    })
+  );
+
+  async checkPetitionStatus(
+    petitionId: number,
+    user: User,
+    updateAnyways: boolean
+  ) {
+    const [fields, petition] = await Promise.all([
+      this.loadFieldsForPetition(petitionId),
+      this.loadOneById(petitionId)
+    ]);
+    const allValidated = fields!.every(f => f.validated);
+    if (petition?.status === "READY" && allValidated) {
+      const [updated] = await this.from("petition")
+        .where("id", petitionId)
+        .update(
+          {
+            status: "COMPLETED",
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        );
+      return updated;
+    } else if (petition?.status === "COMPLETED" && !allValidated) {
+      const [updated] = await this.from("petition")
+        .where("id", petitionId)
+        .update(
+          {
+            status: "READY",
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        );
+      return updated;
+    } else if (updateAnyways) {
+      const [updated] = await this.from("petition")
+        .where("id", petitionId)
+        .update(
+          {
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`
+          },
+          "*"
+        );
+      return updated;
+    } else {
+      return petition;
+    }
+  }
+
+  async validatePetitionFields(
+    petitionId: number,
+    fieldIds: number[],
+    value: boolean,
+    user: User
+  ) {
+    const fields = await this.from("petition_field")
+      .whereIn("id", fieldIds)
+      .where("petition_id", petitionId)
+      .update(
+        {
+          validated: value,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`
+        },
+        "*"
+      );
+    const petition = await this.checkPetitionStatus(petitionId, user, true);
+    return { fields, petition };
   }
 }

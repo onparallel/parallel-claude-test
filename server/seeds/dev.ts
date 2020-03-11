@@ -237,21 +237,21 @@ export async function seed(knex: Knex): Promise<any> {
     {
       petition_field_id: fieldIds[0],
       petition_sendout_id: sendoutIds[0],
-      reply: {},
+      content: {},
       created_by: `Contact:${contactIds[0]}`,
       updated_by: `Contact:${contactIds[0]}`
     },
     {
       petition_field_id: fieldIds[2],
       petition_sendout_id: sendoutIds[0],
-      reply: {},
+      content: {},
       created_by: `Contact:${contactIds[0]}`,
       updated_by: `Contact:${contactIds[0]}`
     },
     {
       petition_field_id: fieldIds[6],
       petition_sendout_id: sendoutIds[0],
-      reply: {},
+      content: {},
       created_by: `Contact:${contactIds[1]}`,
       updated_by: `Contact:${contactIds[1]}`
     }

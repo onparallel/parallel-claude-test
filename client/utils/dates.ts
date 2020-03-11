@@ -1,4 +1,4 @@
-type DateTimeFormatOptions = Exclude<
+export type DateTimeFormatOptions = Exclude<
   Intl.DateTimeFormatOptions,
   "localeMatcher"
 >;

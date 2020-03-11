@@ -21,6 +21,11 @@ export const PetitionStatus = enumType({
       description:
         "The petition has been sent and is awaiting for the contact to complete."
     },
+    {
+      name: "READY",
+      description:
+        "The petition has been completed by the contact and is awaiting validation."
+    },
     { name: "COMPLETED", description: "The petition is completed" }
   ]
 });
@@ -161,6 +166,14 @@ export const PetitionField = objectType({
     t.boolean("validated", {
       description: "Determines if the content of this field has been validated."
     });
+
+    t.list.field("replies", {
+      type: "PetitionFieldReply",
+      description: "The replies to the petition field",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadRepliesForField(root.id);
+      }
+    });
   }
 });
 
@@ -179,6 +192,29 @@ export const PetitionSendout = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadOneById(root.contact_id);
+      }
+    });
+  }
+});
+
+export const PetitionFieldReply = objectType({
+  name: "PetitionFieldReply",
+  description: "A reply to a petition field",
+  definition(t) {
+    t.implements("Timestamps");
+    t.id("id", {
+      description: "The ID of the petition field access.",
+      resolve: o => toGlobalId("PetitionSendout", o.id)
+    });
+    t.jsonObject("content", {
+      description: "The content of the reply"
+    });
+    t.field("sendout", {
+      type: "PetitionSendout",
+      description: "The sendout from where this reply was made.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadSendoutById(root.petition_sendout_id);
       }
     });
   }

@@ -3,14 +3,15 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import { Box, Button, Flex, Icon, Input, Text } from "@chakra-ui/core";
-import { selectUnit } from "@formatjs/intl-utils";
+import { Box, Button, Flex, Input, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { DateTime } from "@parallel/components/common/DateTime";
 import {
   DialogCallbacks,
   useDialog
 } from "@parallel/components/common/DialogOpenerProvider";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
+import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
@@ -42,12 +43,7 @@ import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { ChangeEvent, KeyboardEvent, memo, useRef, useState } from "react";
-import {
-  FormattedDate,
-  FormattedMessage,
-  FormattedRelativeTime,
-  useIntl
-} from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const PAGE_SIZE = 10;
 
@@ -149,6 +145,7 @@ function Petitions() {
         DRAFT: "compose",
         SCHEDULED: "send",
         PENDING: "review",
+        READY: "review",
         COMPLETED: "review"
       } as const)[row.status]
     );
@@ -296,20 +293,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
     )),
     Cell: memo(({ row: { deadline } }) => {
       if (deadline) {
-        const { value, unit } = selectUnit(new Date(deadline));
-        if (["second", "minute", "hour"].includes(unit)) {
-          return (
-            <time dateTime={deadline!}>
-              <FormattedRelativeTime value={value} unit={unit} />
-            </time>
-          );
-        } else {
-          return (
-            <time dateTime={deadline!}>
-              <FormattedDate value={deadline} {...FORMATS.LL} />
-            </time>
-          );
-        }
+        return <DateTime value={deadline} format={FORMATS.LL} />;
       } else {
         return (
           <Text as="span" color="gray.400" fontStyle="italic">
@@ -342,67 +326,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
     Header: memo(() => (
       <FormattedMessage id="petitions.header.status" defaultMessage="Status" />
     )),
-    Cell: memo(({ row }) =>
-      row.status === "PENDING" ? (
-        <Text as="span" color="yellow.600" whiteSpace="nowrap">
-          <Icon name="time" size="18px" marginBottom="2px" marginRight={3} />
-          <FormattedMessage
-            id="generic.petition-status.pending"
-            defaultMessage="Pending"
-          />
-        </Text>
-      ) : row.status === "COMPLETED" ? (
-        <Text color="green.500" whiteSpace="nowrap">
-          <Icon name="check" size="18px" marginBottom="2px" marginRight={3} />
-          <FormattedMessage
-            id="generic.petition-status.completed"
-            defaultMessage="Completed"
-          />
-        </Text>
-      ) : row.status === "SCHEDULED" ? (
-        <Text as="span" color="blue.500" whiteSpace="nowrap">
-          <Box
-            display="inline-block"
-            position="relative"
-            width="26px"
-            height="18px"
-            marginRight={1}
-            marginBottom="-2px"
-          >
-            <Icon
-              name={"paper-plane" as any}
-              size="16px"
-              position="absolute"
-              left="0"
-              top="0"
-            />
-            <Box
-              position="absolute"
-              right={0}
-              bottom={0}
-              borderRadius="100%"
-              width="14px"
-              height="14px"
-              backgroundColor="white"
-            >
-              <Icon name="time" size="14px" position="absolute" />
-            </Box>
-          </Box>
-          <FormattedMessage
-            id="generic.petition-status.scheduled"
-            defaultMessage="Scheduled"
-          />
-        </Text>
-      ) : row.status === "DRAFT" ? (
-        <Text as="span" color="gray.500" whiteSpace="nowrap">
-          <Icon name="edit" size="18px" marginBottom="2px" marginRight={3} />
-          <FormattedMessage
-            id="generic.petition-status.draft"
-            defaultMessage="Draft"
-          />
-        </Text>
-      ) : null
-    )
+    Cell: memo(({ row }) => <PetitionStatusText status={row.status} />)
   }
 ];
 

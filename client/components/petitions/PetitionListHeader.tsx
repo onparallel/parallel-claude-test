@@ -15,6 +15,7 @@ import { FormattedMessage } from "react-intl";
 import { PetitionStatusFilter } from "../common/PetitionStatusFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { ButtonDropdown } from "../common/ButtonDropdown";
 
 export interface PetitionListHeaderProps {
   search: string | null;
@@ -56,23 +57,26 @@ export function PetitionListHeader({
       <Spacer />
       {showActions ? (
         <Box>
-          <Menu>
-            <MenuButton as={Button} {...{ rightIcon: "chevron-down" }}>
+          <ButtonDropdown
+            rightIcon="chevron-down"
+            children={
               <FormattedMessage
                 id="components.petition-list-header.actions-button"
                 defaultMessage="Actions"
               ></FormattedMessage>
-            </MenuButton>
-            <MenuList minWidth="160px">
-              <MenuItem onClick={onDeleteClick}>
-                <Icon name="delete" marginRight={2} />
-                <FormattedMessage
-                  id="components.petition-list-header.delete-label"
-                  defaultMessage="Delete selected"
-                />
-              </MenuItem>
-            </MenuList>
-          </Menu>
+            }
+            dropdown={
+              <MenuList minWidth="160px">
+                <MenuItem onClick={onDeleteClick}>
+                  <Icon name="delete" marginRight={2} />
+                  <FormattedMessage
+                    id="components.petition-list-header.delete-label"
+                    defaultMessage="Delete selected"
+                  />
+                </MenuItem>
+              </MenuList>
+            }
+          ></ButtonDropdown>
         </Box>
       ) : null}
       <Button variantColor="purple" onClick={onCreateClick}>

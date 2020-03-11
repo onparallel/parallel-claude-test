@@ -4,9 +4,10 @@ import {
   arg,
   idArg,
   inputObjectType,
-  objectType
+  objectType,
+  booleanArg
 } from "nexus";
-import { fromGlobalId } from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import {
   authenticate,
   authorizeAnd,
@@ -16,7 +17,8 @@ import { CreatePetition, CreatePetitionField } from "../../../db/__types";
 import {
   userHasAccessToPetitions,
   userHasAccessToPetition,
-  fieldBelongsToPetition
+  fieldBelongsToPetition,
+  fieldsBelongsToPetition
 } from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
@@ -37,13 +39,10 @@ export const deletePetitions = mutationField("deletePetitions", {
   type: "Result",
   authorize: authorizeAnd(authenticate(), userHasAccessToPetitions("ids")),
   args: {
-    ids: idArg({ required: true, list: true })
+    ids: idArg({ required: true, list: [true] })
   },
   resolve: async (_, args, ctx) => {
-    const ids = args.ids.map((arg: string) => {
-      const { id } = fromGlobalId(arg, "Petition");
-      return id;
-    });
+    const { ids } = fromGlobalIds(args.ids, "Petition");
     await ctx.petitions.deletePetitionById(ids, ctx.user);
     return "SUCCESS" as const;
   }
@@ -62,10 +61,7 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   },
   resolve: async (_, args, ctx) => {
     const { id } = fromGlobalId(args.id, "Petition");
-    const fieldIds = args.fieldIds.map((arg: string) => {
-      const { id } = fromGlobalId(arg, "PetitionField");
-      return id;
-    });
+    const { ids: fieldIds } = fromGlobalIds(args.fieldIds, "PetitionField");
     return await ctx.petitions.updateFieldPositions(id, fieldIds, ctx.user);
   }
 });
@@ -200,6 +196,40 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       petitionId,
       fieldId,
       data,
+      ctx.user
+    );
+  }
+});
+
+export const validatePetitionFields = mutationField("validatePetitionFields", {
+  description: "Updates the validation of a petition field.",
+  type: objectType({
+    name: "PetitionAndFields",
+    definition(t) {
+      t.field("petition", { type: "Petition" });
+      t.field("fields", { type: "PetitionField", list: [true] });
+    }
+  }),
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(
+      userHasAccessToPetition("id"),
+      fieldsBelongsToPetition("id", "fieldIds")
+    )
+  ),
+  args: {
+    id: idArg({ required: true }),
+    fieldIds: idArg({ required: true, list: [true] }),
+    value: booleanArg({ required: true })
+  },
+  resolve: async (_, args, ctx) => {
+    const { id: petitionId } = fromGlobalId(args.id, "Petition");
+    const { ids: fieldIds } = fromGlobalIds(args.fieldIds, "PetitionField");
+    const { value } = args;
+    return await ctx.petitions.validatePetitionFields(
+      petitionId,
+      fieldIds,
+      value,
       ctx.user
     );
   }

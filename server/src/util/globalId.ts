@@ -19,3 +19,10 @@ export function fromGlobalId(globalId: string, verifytype?: string) {
     id: parseInt(id, 10)
   };
 }
+
+export function fromGlobalIds(globalIds: string[], verifytype: string) {
+  return {
+    type: verifytype,
+    ids: globalIds.map(globalId => fromGlobalId(globalId, verifytype).id)
+  };
+}

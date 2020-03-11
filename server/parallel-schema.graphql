@@ -125,6 +125,15 @@ type Mutation {
   Updates the user with the provided data.
   """
   updateUser(data: UpdateUserInput!, id: ID!): User!
+
+  """
+  Updates the validation of a petition field.
+  """
+  validatePetitionFields(
+    fieldIds: [ID!]!
+    id: ID!
+    value: Boolean!
+  ): PetitionAndFields!
 }
 
 """
@@ -290,6 +299,11 @@ type PetitionAndField {
   petition: Petition!
 }
 
+type PetitionAndFields {
+  fields: [PetitionField!]!
+  petition: Petition!
+}
+
 """
 A field within a petition.
 """
@@ -315,6 +329,11 @@ type PetitionField {
   options: JSONObject
 
   """
+  The replies to the petition field
+  """
+  replies: [PetitionFieldReply!]!
+
+  """
   The title of the petition field.
   """
   title: String
@@ -328,6 +347,36 @@ type PetitionField {
   Determines if the content of this field has been validated.
   """
   validated: Boolean!
+}
+
+"""
+A reply to a petition field
+"""
+type PetitionFieldReply implements Timestamps {
+  """
+  The content of the reply
+  """
+  content: JSONObject!
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The ID of the petition field access.
+  """
+  id: ID!
+
+  """
+  The sendout from where this reply was made.
+  """
+  sendout: PetitionSendout
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
 }
 
 """
@@ -433,6 +482,11 @@ enum PetitionStatus {
   The petition has been sent and is awaiting for the contact to complete.
   """
   PENDING
+
+  """
+  The petition has been completed by the contact and is awaiting validation.
+  """
+  READY
 
   """
   The petition sendout has been scheduled.

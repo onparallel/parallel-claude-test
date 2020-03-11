@@ -236,6 +236,7 @@ function BlockButton({ format, icon, ...props }: BlockButtonProps) {
       showDelay={300}
       icon={icon as any}
       variant={isBlockActive(editor, format) ? "solid" : "ghost"}
+      tabIndex={-1}
       onMouseDown={event => {
         event.preventDefault();
         toggleBlock(editor, format);
@@ -257,6 +258,7 @@ function MarkButton({ format, icon, ...props }: MarkButtonProps) {
       showDelay={300}
       icon={icon as any}
       variant={isMarkActive(editor, format) ? "solid" : "ghost"}
+      tabIndex={-1}
       onMouseDown={event => {
         event.preventDefault();
         toggleMark(editor, format);

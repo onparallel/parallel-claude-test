@@ -8,25 +8,26 @@ import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { gql } from "apollo-boost";
 import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
 
-type Recipient =
+export type Recipient =
   | RecipientSelect_ContactFragment
   | {
       value: string;
       __isNew__: true;
     };
+
 type RecipientSelectProps = Pick<Props<Recipient>, "inputId"> & {
+  value: Recipient[];
+  onChange: (recipients: Recipient[]) => void;
   searchContacts: (search: string, exclude: string[]) => Promise<Recipient[]>;
 };
 
 export function RecipientSelect({
+  value,
   searchContacts,
+  onChange,
   ...props
 }: RecipientSelectProps) {
   const intl = useIntl();
-  const [value, setValue] = useState<Recipient[]>([]);
-  const handleChange = useCallback((value: Recipient[]) => {
-    setValue(value ?? []);
-  }, []);
   const reactSelectProps = useReactSelectProps();
   const loadOptions = useCallback(
     async search => {
@@ -47,7 +48,7 @@ export function RecipientSelect({
         id: "components.recipient-select.placeholder",
         defaultMessage: "Enter recipients..."
       })}
-      onChange={handleChange as any}
+      onChange={value => onChange((value as any) ?? [])}
       isMulti
       loadOptions={loadOptions}
       {...reactSelectProps}
@@ -160,7 +161,7 @@ function useReactSelectProps() {
         },
         getOptionLabel: option => {
           if ("__isNew__" in option) {
-            return option.value;
+            return (option as any).label;
           } else {
             return option.email;
           }

@@ -9,7 +9,12 @@ export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type PetitionFieldType = "FILE_UPLOAD" | "TEXT";
 
-export type PetitionStatus = "DRAFT" | "SCHEDULED" | "PENDING" | "COMPLETED";
+export type PetitionStatus =
+  | "DRAFT"
+  | "SCHEDULED"
+  | "PENDING"
+  | "READY"
+  | "COMPLETED";
 
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
@@ -195,7 +200,7 @@ export interface PetitionFieldReply {
   id: number;
   petition_field_id: number;
   petition_sendout_id: number;
-  reply: Object;
+  content: Object;
   created_at: Date;
   created_by: Maybe<string>;
   updated_at: Date;
@@ -207,7 +212,7 @@ export interface PetitionFieldReply {
 export interface CreatePetitionFieldReply {
   petition_field_id: number;
   petition_sendout_id: number;
-  reply: Object;
+  content: Object;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;

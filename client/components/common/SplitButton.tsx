@@ -4,7 +4,7 @@ import { Divider, DividerProps } from "./Divider";
 import { MaybeArray } from "@parallel/utils/types";
 
 export type SplitButtonProps = {
-  dividerColor: DividerProps["color"];
+  dividerColor?: DividerProps["color"];
   children: MaybeArray<ReactElement<ButtonProps>>;
 };
 
@@ -17,10 +17,18 @@ export function SplitButton({ dividerColor, children }: SplitButtonProps) {
           style: {
             ...child.props?.style,
             ...(index !== 0
-              ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }
+              ? {
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                  borderLeftWidth: 0
+                }
               : {}),
             ...(index !== length - 1
-              ? { borderTopRightRadius: 0, borderBottomRightRadius: 0 }
+              ? {
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                  borderRightWidth: 0
+                }
               : {})
           }
         }),

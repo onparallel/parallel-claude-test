@@ -1,5 +1,7 @@
 import { useApolloClient, useMutation } from "@apollo/react-hooks";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Flex,
@@ -8,10 +10,7 @@ import {
   Heading,
   Icon,
   IconButton,
-  IconButtonProps,
   Input,
-  Menu,
-  MenuButton,
   MenuItem,
   MenuList,
   Select,
@@ -20,9 +19,13 @@ import {
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { CollapseCard } from "@parallel/components/common/CollapseCard";
+import { DateTime } from "@parallel/components/common/DateTime";
 import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
 import { Divider } from "@parallel/components/common/Divider";
-import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
+import {
+  Recipient,
+  RecipientSelect
+} from "@parallel/components/common/RecipientSelect";
 import {
   isEmptyContent,
   RichTextEditor,
@@ -31,8 +34,8 @@ import {
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import {
-  TableColumn,
   Table,
+  TableColumn,
   useTableColors
 } from "@parallel/components/common/Table";
 import { Title } from "@parallel/components/common/Title";
@@ -50,6 +53,7 @@ import {
   PetitionSend_updatePetitionMutationVariables,
   UpdatePetitionInput
 } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import {
   usePetitionState,
   useWrapPetitionUpdater
@@ -59,9 +63,9 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { ChangeEvent, memo, ReactNode, useCallback, useState } from "react";
-import { FormattedMessage, useIntl, FormattedDate } from "react-intl";
-import { FORMATS } from "@parallel/utils/dates";
+import { ChangeEvent, memo, useCallback, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { ButtonDropdown } from "../../../../../components/common/ButtonDropdown";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionSend.getInitialProps>
@@ -77,6 +81,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
     PetitionSendQueryVariables
   >(GET_PETITION_SEND_DATA, { variables: { id: petitionId } });
 
+  const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [subject, setSubject] = useState(petition!.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorContent>(
     petition!.emailBody ?? [{ children: [{ text: "" }] }]
@@ -104,6 +109,11 @@ function PetitionSend({ petitionId }: PetitionProps) {
     []
   );
 
+  const handleBodyChange = useCallback((value: RichTextEditorContent) => {
+    setBody(value);
+    updateBody({ emailBody: isEmptyContent(value) ? null : value });
+  }, []);
+
   const handleLocaleChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
       handleUpdatePetition({
@@ -115,11 +125,6 @@ function PetitionSend({ petitionId }: PetitionProps) {
 
   const handleDeadlineChange = useCallback((value: Date | null) => {
     updateDeadline({ deadline: value ? value.toISOString() : null });
-  }, []);
-
-  const handleBodyChange = useCallback((value: RichTextEditorContent) => {
-    setBody(value);
-    updateBody({ emailBody: isEmptyContent(value) ? null : value });
   }, []);
 
   const searchContacts = useSearchContacts();
@@ -139,6 +144,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
         petition={petition!}
         onUpdatePetition={handleUpdatePetition}
         section="send"
+        scrollBody
         state={state}
       >
         <Flex flexDirection={{ base: "column", md: "row" }} padding={4}>
@@ -163,8 +169,21 @@ function PetitionSend({ petitionId }: PetitionProps) {
                   <RecipientSelect
                     inputId="petition-recipients"
                     searchContacts={searchContacts}
+                    value={recipients}
+                    onChange={setRecipients}
                   />
                 </FormControl>
+                {recipients.length >= 2 ? (
+                  <Alert status="info">
+                    <AlertIcon />
+                    <FormattedMessage
+                      id="petition.same-petition-warning"
+                      defaultMessage="All {recipients} recipients will receive a link to the same petition so they can fill it out collaboratively."
+                      values={{ recipients: recipients.length }}
+                    />
+                  </Alert>
+                ) : null}
+
                 <FormControl>
                   <FormLabel
                     htmlFor="petition-subject"
@@ -210,19 +229,24 @@ function PetitionSend({ petitionId }: PetitionProps) {
                         defaultMessage="Send"
                       />
                     </Button>
-                    <IconButtonMenu
+                    <ButtonDropdown
+                      as={IconButton}
                       variantColor="purple"
                       icon="chevron-down"
                       aria-label="Options"
-                    >
-                      <MenuItem>
-                        <Icon name="time" marginRight={2} />
-                        <FormattedMessage
-                          id="petition.schedule-send-button"
-                          defaultMessage="Schedule send"
-                        />
-                      </MenuItem>
-                    </IconButtonMenu>
+                      minWidth={8}
+                      dropdown={
+                        <MenuList minWidth={0} placement="bottom-end">
+                          <MenuItem>
+                            <Icon name="time" marginRight={2} />
+                            <FormattedMessage
+                              id="petition.schedule-send-button"
+                              defaultMessage="Schedule send"
+                            />
+                          </MenuItem>
+                        </MenuList>
+                      }
+                    ></ButtonDropdown>
                   </SplitButton>
                 </Flex>
               </Stack>
@@ -295,20 +319,39 @@ function PetitionSend({ petitionId }: PetitionProps) {
         <Flex padding={4} paddingTop={0}>
           <Box flex="2">
             <Card>
-              <Heading size="sm" padding={4}>
-                <FormattedMessage
-                  id="petition.sendouts-header"
-                  defaultMessage="Sendouts"
+              <Box
+                padding={4}
+                borderBottom="1px solid"
+                borderBottomColor={border}
+              >
+                <Heading size="sm">
+                  <FormattedMessage
+                    id="petition.sendouts-header"
+                    defaultMessage="Sendouts"
+                  />
+                </Heading>
+              </Box>
+              {petition?.sendouts?.length ? (
+                <Table
+                  columns={SENDOUT_COLUMNS}
+                  rows={petition?.sendouts ?? []}
+                  rowKeyProp="id"
+                  marginBottom={2}
                 />
-              </Heading>
-              <Table
-                columns={SENDOUT_COLUMNS}
-                rows={petition?.sendouts ?? []}
-                rowKeyProp="id"
-                borderTop="1px solid"
-                borderTopColor={border}
-                marginBottom={1}
-              />
+              ) : (
+                <Flex
+                  height="100px"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="petition.no-sendouts"
+                      defaultMessage="This petition has not been sent yet"
+                    />
+                  </Text>
+                </Flex>
+              )}
             </Card>
           </Box>
           <Spacer
@@ -354,28 +397,27 @@ const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
       />
     )),
     Cell: memo(({ row: { createdAt } }) => (
-      <Text>
-        <time dateTime={createdAt}>
-          <FormattedDate value={createdAt} {...FORMATS.LLL} />
-        </time>
+      <DateTime value={createdAt} format={FORMATS.LLL} />
+    ))
+  },
+  {
+    key: "status",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.sendouts-header.status"
+        defaultMessage="Status"
+      />
+    )),
+    Cell: memo(({ row: { createdAt } }) => (
+      <Text color="green.500">
+        <FormattedMessage
+          id="petitions.sendout-status.active"
+          defaultMessage="Active"
+        />
       </Text>
     ))
   }
 ];
-
-function IconButtonMenu({
-  children,
-  ...props
-}: IconButtonProps & { children: ReactNode }) {
-  return (
-    <Menu>
-      <MenuButton as={IconButton} {...props}></MenuButton>
-      <MenuList minWidth={0} placement="bottom-end">
-        {children}
-      </MenuList>
-    </Menu>
-  );
-}
 
 PetitionSend.fragments = {
   petition: gql`

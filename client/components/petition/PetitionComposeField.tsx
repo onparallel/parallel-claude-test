@@ -7,26 +7,22 @@ import {
   Icon,
   PseudoBox,
   Stack,
-  useTheme,
-  Flex,
-  Text,
   Tooltip,
-  BoxProps,
+  useTheme,
   VisuallyHidden
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
   PetitionComposeField_PetitionFieldFragment,
-  UpdatePetitionFieldInput,
-  PetitionFieldType
+  UpdatePetitionFieldInput
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { gql } from "apollo-boost";
-import { MouseEvent, useRef, useCallback, useMemo } from "react";
+import { MouseEvent, useCallback, useRef } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
-import { useIntl, FormattedNumber } from "react-intl";
+import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { fileURLToPath } from "url";
+import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
@@ -175,11 +171,12 @@ export function PetitionComposeField({
           </Box>
         )}
         <Box marginLeft={3}>
-          <FieldTypeIndicator
+          <PetitionFieldTypeIndicator
             type={field.type}
             index={index}
             onClick={onSettingsClick}
             marginTop="10px"
+            alignSelf="flex-start"
           />
         </Box>
         <Box
@@ -341,60 +338,6 @@ function useDragAndDrop(
 
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
-}
-
-function FieldTypeIndicator({
-  type,
-  index,
-  ...props
-}: BoxProps & {
-  type: PetitionFieldType;
-  index: number;
-}) {
-  const intl = useIntl();
-  const label = useMemo(() => {
-    return {
-      FILE_UPLOAD: intl.formatMessage({
-        id: "petition.field-type.file-upload",
-        defaultMessage: "File Upload"
-      }),
-      TEXT: intl.formatMessage({
-        id: "petition.field-type.text",
-        defaultMessage: "Text field"
-      })
-    }[type];
-  }, [type]);
-  return (
-    <Tooltip
-      label={label}
-      aria-label={label}
-      showDelay={300}
-      placement="bottom"
-    >
-      <Flex
-        alignSelf="flex-start"
-        as="button"
-        aria-label={label}
-        backgroundColor={`field.${type}`}
-        color="white"
-        paddingX={1}
-        paddingY="1px"
-        rounded="sm"
-        alignItems="center"
-        {...props}
-      >
-        <Icon
-          size="16px"
-          name={`field.${type}` as any}
-          focusable={false}
-          role="presentation"
-        />
-        <Text as="span" fontSize="xs" marginLeft={2}>
-          <FormattedNumber value={index + 1} />
-        </Text>
-      </Flex>
-    </Tooltip>
-  );
 }
 
 PetitionComposeField.fragments = {

@@ -45,6 +45,7 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
     selection,
     ...useMemo(
       () => ({
+        selected: rows.filter(r => selection[r[rowKeyProp] as any]),
         allSelected: rows.every(r => selection[r[rowKeyProp] as any]),
         anySelected: rows.some(r => selection[r[rowKeyProp] as any])
       }),
@@ -105,6 +106,14 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
                 rows.map(r => [r[rowKeyProp], !_allSelected])
               )
             };
+          });
+        },
+        toggleBy: function(predicate: (row: T) => boolean) {
+          setState({
+            lastSelected: null,
+            selection: Object.fromEntries(
+              rows.map(r => [r[rowKeyProp], predicate(r)])
+            )
           });
         }
       };
