@@ -105,7 +105,7 @@
     "term": "component.petition-status-filter.completed",
     "definition": "Completadas",
     "context": "Completed",
-    "reference": "components/common/PetitionStatusFilter.tsx#L42-L45"
+    "reference": "components/common/PetitionStatusFilter.tsx#L46-L49"
   },
   {
     "term": "component.petition-status-filter.draft",
@@ -120,6 +120,12 @@
     "reference": "components/common/PetitionStatusFilter.tsx#L34-L37"
   },
   {
+    "term": "component.petition-status-filter.ready",
+    "definition": "Contestadas",
+    "context": "Ready",
+    "reference": "components/common/PetitionStatusFilter.tsx#L42-L45"
+  },
+  {
     "term": "component.petition-status-filter.scheduled",
     "definition": "Programadas",
     "context": "Scheduled",
@@ -129,7 +135,7 @@
     "term": "component.recipient-select.create-new-contact",
     "definition": "Crear nuevo contacto para: <em>{email}</em>",
     "context": "Create new contact for: <em>{email}</em>",
-    "reference": "components/common/RecipientSelect.tsx#L180-L189"
+    "reference": "components/common/RecipientSelect.tsx#L181-L190"
   },
   {
     "term": "component.search-input.placeholder",
@@ -141,19 +147,19 @@
     "term": "component.table.next-page-button",
     "definition": "Siguiente",
     "context": "Next",
-    "reference": "components/common/TablePage.tsx#L117-L120"
+    "reference": "components/common/TablePage.tsx#L119-L122"
   },
   {
     "term": "component.table.prev-page-button",
     "definition": "Anterior",
     "context": "Previous",
-    "reference": "components/common/TablePage.tsx#L107-L110"
+    "reference": "components/common/TablePage.tsx#L109-L112"
   },
   {
     "term": "component.table.total-results",
     "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}",
-    "reference": "components/common/TablePage.tsx#L91-L99"
+    "reference": "components/common/TablePage.tsx#L93-L101"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
@@ -168,52 +174,64 @@
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
+    "term": "components.copy-to-clipboard-button.copied-label",
+    "definition": "",
+    "context": "Copied to clipboard!",
+    "reference": "components/common/CopyToClipboardButton.tsx#L29-L32"
+  },
+  {
+    "term": "components.copy-to-clipboard-button.copy-label",
+    "definition": "",
+    "context": "Copy to clipboard",
+    "reference": "components/common/CopyToClipboardButton.tsx#L25-L28"
+  },
+  {
     "term": "components.petition-list-header.actions-button",
     "definition": "Acciones",
     "context": "Actions",
-    "reference": "components/petitions/PetitionListHeader.tsx#L61-L64"
+    "reference": "components/petitions/PetitionListHeader.tsx#L63-L66"
   },
   {
     "term": "components.petition-list-header.create-petition-button",
     "definition": "Crear petición",
     "context": "Create petition",
-    "reference": "components/petitions/PetitionListHeader.tsx#L79-L82"
+    "reference": "components/petitions/PetitionListHeader.tsx#L83-L86"
   },
   {
     "term": "components.petition-list-header.delete-label",
     "definition": "Eliminar seleccionadas",
     "context": "Delete selected",
-    "reference": "components/petitions/PetitionListHeader.tsx#L69-L72"
+    "reference": "components/petitions/PetitionListHeader.tsx#L72-L75"
   },
   {
     "term": "components.recipient-select.enter-email",
     "definition": "También puedes introducir un correo eletrónico válido.",
     "context": "You can also enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L107-L110"
+    "reference": "components/common/RecipientSelect.tsx#L108-L111"
   },
   {
     "term": "components.recipient-select.new-contact",
     "definition": "Contacto nuevo",
     "context": "New contact",
-    "reference": "components/common/RecipientSelect.tsx#L139-L142"
+    "reference": "components/common/RecipientSelect.tsx#L140-L143"
   },
   {
     "term": "components.recipient-select.no-options",
     "definition": "No pudimos encontrar ningún contacto con <em>{search}</em>",
     "context": "We could not find any exisiting contacts for <em>{search}</em>",
-    "reference": "components/common/RecipientSelect.tsx#L97-L104"
+    "reference": "components/common/RecipientSelect.tsx#L98-L105"
   },
   {
     "term": "components.recipient-select.placeholder",
     "definition": "Introduce destinatarios...",
     "context": "Enter recipients...",
-    "reference": "components/common/RecipientSelect.tsx#L46-L49"
+    "reference": "components/common/RecipientSelect.tsx#L47-L50"
   },
   {
     "term": "components.recipient-select.search-hint",
     "definition": "Busca contactos existentes o introduce un correo electrónico válido",
     "context": "Search for exisiting contacts or enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L115-L118"
+    "reference": "components/common/RecipientSelect.tsx#L116-L119"
   },
   {
     "term": "field-settings.file-multiple-label",
@@ -243,7 +261,7 @@
     "term": "generic.edit-label",
     "definition": "Editar",
     "context": "Edit",
-    "reference": "components/layout/PetitionHeader.tsx#L132-L135"
+    "reference": "components/layout/PetitionHeader.tsx#L127-L130"
   },
   {
     "term": "generic.expand",
@@ -363,31 +381,37 @@
     "term": "generic.petition-status.completed",
     "definition": "Completada",
     "context": "Completed",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L356-L359"
+    "reference": "components/common/PetitionStatusText.tsx#L55-L58"
   },
   {
     "term": "generic.petition-status.draft",
     "definition": "Borrador",
     "context": "Draft",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L398-L401"
+    "reference": "components/common/PetitionStatusText.tsx#L26-L29"
   },
   {
     "term": "generic.petition-status.pending",
     "definition": "Pendiente",
     "context": "Pending",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L348-L351"
+    "reference": "components/common/PetitionStatusText.tsx#L34-L37"
+  },
+  {
+    "term": "generic.petition-status.ready",
+    "definition": "Contestada",
+    "context": "Ready",
+    "reference": "components/common/PetitionStatusText.tsx#L47-L50"
   },
   {
     "term": "generic.petition-status.scheduled",
     "definition": "Programada",
     "context": "Scheduled",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L390-L393"
+    "reference": "components/common/PetitionStatusText.tsx#L89-L92"
   },
   {
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field",
-    "reference": "components/petition/PetitionComposeField.tsx#L58-L61"
+    "reference": "components/petition/PetitionComposeField.tsx#L54-L57"
   },
   {
     "term": "generic.richtext.bold",
@@ -417,7 +441,7 @@
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L526-L529"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L451-L454"
   },
   {
     "term": "header.user-menu-button",
@@ -453,25 +477,25 @@
     "term": "petition.add-another-field-button",
     "definition": "Añadir otro campo",
     "context": "Add another field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L202-L205"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L209-L212"
   },
   {
     "term": "petition.add-field-button",
     "definition": "Añadir campo",
     "context": "Add field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L230-L233"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L237-L240"
   },
   {
     "term": "petition.advanced-settings",
     "definition": "Ajustes avanzados",
     "context": "Advanced settings",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L230-L233"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L259-L262"
   },
   {
     "term": "petition.body-placeholder",
     "definition": "Escribe un mensaje para incluir en el correo electrónico",
     "context": "Write a message to include in the email",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L187-L190"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L211-L214"
   },
   {
     "term": "petition.close-sidebar-button",
@@ -483,55 +507,55 @@
     "term": "petition.confirm-delete-field.body",
     "definition": "Este campo puede contener respuestas. Si eliminas este campo perderás <b>de forma definitiva</b> estas respuestas incluido archivos subidos.",
     "context": "This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L434-L440"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L444-L450"
   },
   {
     "term": "petition.confirm-delete-field.header",
     "definition": "Eliminar campo",
     "context": "Delete field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L428-L431"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L438-L441"
   },
   {
     "term": "petition.deadline-label",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L271-L274"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L300-L303"
   },
   {
     "term": "petition.drag-to-sort-label",
     "definition": "Arrastrar para ordenar los campos de la petición",
     "context": "Drag to sort this petition fields",
-    "reference": "components/petition/PetitionComposeField.tsx#L144-L147"
+    "reference": "components/petition/PetitionComposeField.tsx#L140-L143"
   },
   {
     "term": "petition.empty-header",
     "definition": "Esta petición esta vacía...",
     "context": "This petition is empty...",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L212-L215"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L219-L222"
   },
   {
     "term": "petition.empty-text",
     "definition": "Empieza por añadir un campo",
     "context": "Start by adding a field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L218-L221"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L225-L228"
   },
   {
     "term": "petition.field-delete-button",
     "definition": "Eliminar campo",
     "context": "Delete field",
-    "reference": "components/petition/PetitionComposeField.tsx#L258-L261"
+    "reference": "components/petition/PetitionComposeField.tsx#L255-L258"
   },
   {
     "term": "petition.field-description-label",
     "definition": "Descripción del campo",
     "context": "Field description",
-    "reference": "components/petition/PetitionComposeField.tsx#L222-L225"
+    "reference": "components/petition/PetitionComposeField.tsx#L219-L222"
   },
   {
     "term": "petition.field-description-placeholder",
     "definition": "Añade una descripción...",
     "context": "Add a description...",
-    "reference": "components/petition/PetitionComposeField.tsx#L218-L221"
+    "reference": "components/petition/PetitionComposeField.tsx#L215-L218"
   },
   {
     "term": "petition.field-settings",
@@ -543,223 +567,385 @@
     "term": "petition.field-title-label",
     "definition": "Título del campo",
     "context": "Field title",
-    "reference": "components/petition/PetitionComposeField.tsx#L198-L201"
+    "reference": "components/petition/PetitionComposeField.tsx#L195-L198"
   },
   {
     "term": "petition.field-title-placeholder",
     "definition": "Introduce un título para el campo",
     "context": "Enter a field title",
-    "reference": "components/petition/PetitionComposeField.tsx#L194-L197"
+    "reference": "components/petition/PetitionComposeField.tsx#L191-L194"
   },
   {
     "term": "petition.field-type.file-upload",
     "definition": "Subida de archivo",
     "context": "File Upload",
-    "reference": "components/petition/PetitionComposeField.tsx#L357-L360"
+    "reference": "components/petition/PetitionFieldTypeIndicator.tsx#L19-L22"
   },
   {
     "term": "petition.field-type.text",
     "definition": "Campo de texto",
     "context": "Text field",
-    "reference": "components/petition/PetitionComposeField.tsx#L361-L364"
+    "reference": "components/petition/PetitionFieldTypeIndicator.tsx#L23-L26"
   },
   {
     "term": "petition.fields-header",
     "definition": "Campos de la petición",
     "context": "Petition fields",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L174-L177"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L181-L184"
   },
   {
     "term": "petition.header.compose-tab",
     "definition": "Componer",
     "context": "Compose",
-    "reference": "components/layout/PetitionHeader.tsx#L57-L60"
+    "reference": "components/layout/PetitionHeader.tsx#L59-L62"
   },
   {
     "term": "petition.header.last-saved-on",
     "definition": "Guardado por última vez el: {date}",
     "context": "Last saved on: {date}",
-    "reference": "components/layout/PetitionHeader.tsx#L44-L47"
+    "reference": "components/layout/PetitionHeader.tsx#L46-L49"
   },
   {
     "term": "petition.header.review-tab",
     "definition": "Revisar",
     "context": "Review",
-    "reference": "components/layout/PetitionHeader.tsx#L71-L74"
+    "reference": "components/layout/PetitionHeader.tsx#L73-L76"
   },
   {
     "term": "petition.header.send-tab",
     "definition": "Enviar",
     "context": "Send",
-    "reference": "components/layout/PetitionHeader.tsx#L64-L67"
+    "reference": "components/layout/PetitionHeader.tsx#L66-L69"
   },
   {
     "term": "petition.locale-label",
     "definition": "Idioma",
     "context": "Language",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L241-L244"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L270-L273"
   },
   {
     "term": "petition.locale.en",
     "definition": "Inglés",
     "context": "English",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L252-L255"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L281-L284"
   },
   {
     "term": "petition.locale.es",
     "definition": "Español",
     "context": "Spanish",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L258-L261"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L287-L290"
   },
   {
     "term": "petition.name-label",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "components/layout/PetitionHeader.tsx#L110-L113"
+    "reference": "components/layout/PetitionHeader.tsx#L105-L108"
+  },
+  {
+    "term": "petition.no-sendouts",
+    "definition": "Esta petición no ha sido enviada todavía",
+    "context": "This petition has not been sent yet",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L348-L351"
+  },
+  {
+    "term": "petition.petition-field.no-replies",
+    "definition": "No hay respuestas a este campo todavía",
+    "context": "There are no replies to this field yet",
+    "reference": "components/petition/PetitionReviewField.tsx#L177-L180"
+  },
+  {
+    "term": "petition.petition-field.replies-label",
+    "definition": "Hay {replies, plural, =1 {una respuesta} other {# respuestas}} a este campo.",
+    "context": "{replies, plural, =1 {There is one reply to this field.} other {There are # replies to this field.}}",
+    "reference": "components/petition/PetitionReviewField.tsx#L108-L112"
+  },
+  {
+    "term": "petition.petition-field.reply-file-download",
+    "definition": "Descargar archivo",
+    "context": "Download file",
+    "reference": "components/petition/PetitionReviewField.tsx#L54-L57"
+  },
+  {
+    "term": "petition.petition-field.reply-file-name",
+    "definition": "Nombre de archivo",
+    "context": "File name",
+    "reference": "components/petition/PetitionReviewField.tsx#L50-L53"
+  },
+  {
+    "term": "petition.petition-field.reply-file-size",
+    "definition": "Tamaño de archivo",
+    "context": "File size",
+    "reference": "components/petition/PetitionReviewField.tsx#L46-L49"
+  },
+  {
+    "term": "petition.petition-field.validate-button",
+    "definition": "Aprobar",
+    "context": "Approve",
+    "reference": "components/petition/PetitionReviewField.tsx#L96-L99"
+  },
+  {
+    "term": "petition.petition-field.validated-button",
+    "definition": "Aprobado",
+    "context": "Approved",
+    "reference": "components/petition/PetitionReviewField.tsx#L91-L94"
   },
   {
     "term": "petition.recipients-label",
     "definition": "Destinatarios",
     "context": "Recipients",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L153-L156"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L164-L167"
+  },
+  {
+    "term": "petition.review.select-all",
+    "definition": "Todos",
+    "context": "All",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L146-L149"
+  },
+  {
+    "term": "petition.review.select-none",
+    "definition": "Ninguno",
+    "context": "None",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L152-L155"
+  },
+  {
+    "term": "petition.review.validate-selected",
+    "definition": "Aprobar",
+    "context": "Approve",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L173-L176"
+  },
+  {
+    "term": "petition.same-petition-warning",
+    "definition": "Los {recipients} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
+    "context": "All {recipients} recipients will receive a link to the same petition so they can fill it out collaboratively.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L179-L183"
   },
   {
     "term": "petition.schedule-send-button",
     "definition": "Programar envío",
     "context": "Schedule send",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L215-L218"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L242-L245"
   },
   {
     "term": "petition.send-button",
     "definition": "Enviar",
     "context": "Send",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L203-L206"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L227-L230"
+  },
+  {
+    "term": "petition.sendouts-header",
+    "definition": "Envíos",
+    "context": "Sendouts",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L328-L331"
   },
   {
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/layout/PetitionHeader.tsx#L215-L218"
-  },
-  {
-    "term": "petition.status.saved",
-    "definition": "Guardado",
-    "context": "Saved",
-    "reference": "components/layout/PetitionHeader.tsx#L200-L203"
+    "reference": "components/layout/PetitionHeader.tsx#L171-L174"
   },
   {
     "term": "petition.status.saving",
     "definition": "Guardando",
     "context": "Saving...",
-    "reference": "components/layout/PetitionHeader.tsx#L180-L183"
+    "reference": "components/layout/PetitionHeader.tsx#L148-L151"
   },
   {
     "term": "petition.subject-label",
     "definition": "Asunto",
     "context": "Subject",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L169-L172"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L193-L196"
   },
   {
     "term": "petition.subject-placeholder",
     "definition": "Introduce el asunto del correo electrónico",
     "context": "Enter the subject of the email",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L178-L181"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L202-L205"
   },
   {
     "term": "petitions.confirm-delete.body",
     "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L468-L476"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L393-L401"
   },
   {
     "term": "petitions.confirm-delete.confirm-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L480-L483"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L405-L408"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Eliminar peticiones",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L462-L465"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L387-L390"
   },
   {
     "term": "petitions.create-new-petition.body",
     "definition": "Nueva petición",
     "context": "Give your new petition a name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L518-L521"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L443-L446"
   },
   {
     "term": "petitions.create-new-petition.continue-button",
     "definition": "Continuar",
     "context": "Continue",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L542-L545"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L467-L470"
   },
   {
     "term": "petitions.create-new-petition.header",
     "definition": "Crear una petición nueva",
     "context": "Create a new petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L510-L513"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L435-L438"
   },
   {
     "term": "petitions.header.custom-ref",
     "definition": "Referencia",
     "context": "Reference",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L260-L263"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L258-L261"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L291-L294"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L289-L292"
   },
   {
     "term": "petitions.header.name",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L239-L242"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L237-L240"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progreso",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L327-L330"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L312-L315"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L270-L273"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L268-L271"
   },
   {
     "term": "petitions.header.status",
     "definition": "Estado",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L342"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L327"
   },
   {
     "term": "petitions.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L315-L318"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L300-L303"
   },
   {
     "term": "petitions.no-petitions",
     "definition": "No tienes ninguna petición todavía. ¡Empieza creando una nueva!",
     "context": "You have no petitions yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L212-L215"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L210-L213"
   },
   {
     "term": "petitions.no-results",
     "definition": "No encontramos peticiones con esta búsqueda",
     "context": "There's no petitions matching your search",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L203-L206"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L201-L204"
+  },
+  {
+    "term": "petitions.sendout-status.active",
+    "definition": "Activo",
+    "context": "Active",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L413-L416"
+  },
+  {
+    "term": "petitions.sendouts-header.recipient",
+    "definition": "Destinatario",
+    "context": "Recipient",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L374-L377"
+  },
+  {
+    "term": "petitions.sendouts-header.sent-on",
+    "definition": "Fecha de envío",
+    "context": "Sent on",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L394-L397"
+  },
+  {
+    "term": "petitions.sendouts-header.status",
+    "definition": "Estado",
+    "context": "Status",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L406-L409"
   },
   {
     "term": "petitions.title",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L174-L177"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L171-L174"
+  },
+  {
+    "term": "public.about.mission",
+    "definition": "Nuestra misión es hacer que el trabajo de los profesionales valga la pena",
+    "context": "Our mission is to make professionals work worthwhile",
+    "reference": "pages/[locale]/about.tsx#L25-L28"
+  },
+  {
+    "term": "public.about.our-story",
+    "definition": "Nuestra historia",
+    "context": "Our story",
+    "reference": "pages/[locale]/about.tsx#L45-L48"
+  },
+  {
+    "term": "public.about.story-1",
+    "definition": "Cuando estábamos en nuestros anteriores trabajos nos dimos cuenta de que en casi todos los temas que llevábamos era habitual pedir información, siendo habitual que los clientes tardaran mucho en enviar la información que necesitábamos para trabajar.",
+    "context": "When we were in our previous jobs, we realized that in almost all the topics we were carrying, it was usual to ask for information, it being usual for customers to take a long time to send the information we needed to work.",
+    "reference": "pages/[locale]/about.tsx#L58-L61"
+  },
+  {
+    "term": "public.about.story-2",
+    "definition": "Esa información que pedíamos era imprescindible para poder empezar a trabajar.",
+    "context": "That information we requested was essential to start working.",
+    "reference": "pages/[locale]/about.tsx#L64-L67"
+  },
+  {
+    "term": "public.about.story-3",
+    "definition": "Al preguntar a otros profesionales muchos coincidían en que esa misma situación les ocurría a menudo. No importaba si en el momento de solicitar la información lo dejáramos bonito y fácilmente entendible, los clientes pocas veces respondían al email con toda la información.",
+    "context": "When asking other professionals, many agreed that this same situation often happened to them. It did not matter if at the time of requesting the information we left it beautiful and easily understood, customers rarely responded to the email with all the information.",
+    "reference": "pages/[locale]/about.tsx#L70-L73"
+  },
+  {
+    "term": "public.about.story-4",
+    "definition": "Era habitual que los clientes mandaran la información con cuentagotas o se olvidaran de enviar ciertos documentos. Esto nos obligaba a perseguir constantemente a los clientes para que pudiéramos disponer de toda la información.",
+    "context": "It was common for customers to send the information with an eyedropper or forget to send certain documents. This forced us to constantly chase customers so that we could have all the information.",
+    "reference": "pages/[locale]/about.tsx#L76-L79"
+  },
+  {
+    "term": "public.about.story-5",
+    "definition": "Empezamos a investigar qué herramientas en el mercado podían solucionar esa situación y al no ver ninguna herramienta que lo resolviera bien y de una manera sencilla decidimos resolverlo nosotros mismos.",
+    "context": "We began to investigate what tools in the market could solve that situation and not seeing any tool that solved it well and in a simple way we decided to solve it ourselves.",
+    "reference": "pages/[locale]/about.tsx#L82-L85"
+  },
+  {
+    "term": "public.about.story-6",
+    "definition": "En ese momento nació Parallel.",
+    "context": "At that time Parallel was born.",
+    "reference": "pages/[locale]/about.tsx#L88-L91"
+  },
+  {
+    "term": "public.about.tech-company",
+    "definition": "Parallel es una compañía tecnológica que construye la siguiente generación de herramientas para las tareas diarias de los profesionales",
+    "context": "Parallel is a technology company that builds the next generation tools for professionals daily tasks.",
+    "reference": "pages/[locale]/about.tsx#L31-L34"
+  },
+  {
+    "term": "public.about.title",
+    "definition": "Nosotros",
+    "context": "About",
+    "reference": "pages/[locale]/about.tsx#L13-L16"
+  },
+  {
+    "term": "public.bookdemo-button",
+    "definition": "Pide una demo",
+    "context": "Book a demo",
+    "reference": "components/public/PublicHeroPc.tsx#L48-L51"
   },
   {
     "term": "public.cookies.title",
@@ -768,34 +954,34 @@
     "reference": "pages/[locale]/legal/[doc].tsx#L27-L30"
   },
   {
-    "term": "public.footer.follow-us",
-    "definition": "Síguenos",
-    "context": "Follow us",
-    "reference": "components/public/layout/PublicFooter.tsx#L81-L84"
+    "term": "public.footer.company",
+    "definition": "Compañía",
+    "context": "Company",
+    "reference": "components/public/layout/PublicFooter.tsx#L56-L59"
   },
   {
     "term": "public.footer.language-select-label",
     "definition": "Cambiar idioma",
     "context": "Change language",
-    "reference": "components/public/layout/PublicFooter.tsx#L64-L67"
+    "reference": "components/common/LanguageSelector.tsx#L42-L45"
   },
   {
     "term": "public.footer.legal-information",
     "definition": "Información legal",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L120-L123"
+    "reference": "components/public/layout/PublicFooter.tsx#L77-L80"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L110-L113"
+    "reference": "components/public/layout/PublicFooter.tsx#L158-L161"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L95-L98"
+    "reference": "components/public/layout/PublicFooter.tsx#L143-L146"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -870,22 +1056,70 @@
     "reference": "pages/[locale]/forgot.tsx#L98-L101"
   },
   {
+    "term": "public.header.about",
+    "definition": "Acerca de",
+    "context": "About",
+    "reference": "components/public/layout/PublicHeader.tsx#L104-L107"
+  },
+  {
     "term": "public.hero-invite.toast-description",
     "definition": "Nos pondremos en contacto contigo muy pronto.",
     "context": "We will get in touch with you very soon.",
-    "reference": "pages/[locale]/index.tsx#L20-L23"
+    "reference": "pages/[locale]/index.tsx#L21-L24"
   },
   {
     "term": "public.hero-invite.toast-title",
     "definition": "¡Muchas gracias!",
     "context": "Thank you!",
-    "reference": "pages/[locale]/index.tsx#L16-L19"
+    "reference": "pages/[locale]/index.tsx#L17-L20"
+  },
+  {
+    "term": "public.home.hero-collect",
+    "definition": "Recopila información de una manera simple y eficiente",
+    "context": "Collect information in a simple and efficient way",
+    "reference": "components/public/PublicHeroPc.tsx#L29-L32"
+  },
+  {
+    "term": "public.home.hero-discover-use",
+    "definition": "Descubre qué puedes hacer con Parallel",
+    "context": "Discover what you can do with Parallel",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L24-L27"
+  },
+  {
+    "term": "public.home.hero-how-it-works",
+    "definition": "Cómo funciona",
+    "context": "How it works",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L35-L38"
+  },
+  {
+    "term": "public.home.hero-leading-digital-transformation",
+    "definition": "Liderando la transformación digital en sus compañías",
+    "context": "Leading digital transformation in their companies",
+    "reference": "components/public/PublicHeroWhoTrustUs.tsx#L25-L28"
+  },
+  {
+    "term": "public.home.hero-platform",
+    "definition": "Nuestra plataforma recopila la información de tus clientes y te permite dedicarte a aquellas tareas de valor añadido",
+    "context": "Our platform collects the information from your clients and allows you to focus on value adding tasks.",
+    "reference": "components/public/PublicHeroPc.tsx#L35-L38"
+  },
+  {
+    "term": "public.home.hero-popular-use-cases",
+    "definition": "Casos de uso populares",
+    "context": "Popular use cases",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L18-L21"
   },
   {
     "term": "public.home.hero-question",
     "definition": "",
     "context": "Do you want to reduce the time wasted reviewing recurrent emails?",
     "reference": "components/public/PublicHero.tsx#L46-L49"
+  },
+  {
+    "term": "public.home.hero-scale-services",
+    "definition": "¿Quién dijo que los servicios profesionales solo escalan con más capital humano?",
+    "context": "Who said professional services only scale with more human capital?",
+    "reference": "components/public/PublicHeroBlackBanner.tsx#L18-L21"
   },
   {
     "term": "public.home.hero-subtitle",
@@ -898,6 +1132,12 @@
     "definition": "",
     "context": "Parallel is the new black",
     "reference": "components/public/PublicHero.tsx#L34-L37"
+  },
+  {
+    "term": "public.home.hero-who-trust-us",
+    "definition": "Confían en nosotros",
+    "context": "Who trust us",
+    "reference": "components/public/PublicHeroWhoTrustUs.tsx#L19-L22"
   },
   {
     "term": "public.home.request-invite-button",
@@ -988,6 +1228,114 @@
     "definition": "Entra en Parallel",
     "context": "Login",
     "reference": "pages/[locale]/login.tsx#L97-L100"
+  },
+  {
+    "term": "public.popular.accounting",
+    "definition": "Contabilidad",
+    "context": "Accounting",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L97-L100"
+  },
+  {
+    "term": "public.popular.claims",
+    "definition": "Demandas",
+    "context": "Claims",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L111-L114"
+  },
+  {
+    "term": "public.popular.client-timings",
+    "definition": "Porque la vida real es asíncrona, deja que tus clientes trabajen a su ritmo. Déjanos que se lo recordemos si lo necesitan.",
+    "context": "Because real life is asynchronous, allow your clients to work at their own timings. Let us remind them if needed.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L83-L86"
+  },
+  {
+    "term": "public.popular.clients-upload",
+    "definition": "Deja a tus clientes a su ritmo",
+    "context": "Let clients upload at their pace",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L77-L80"
+  },
+  {
+    "term": "public.popular.collect-schedules",
+    "definition": "Recopila todos los anexos sin límite de espacios y accede a ellos en un único lugar",
+    "context": "Collect all the schedules without space limitation and access them in a single place",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L117-L120"
+  },
+  {
+    "term": "public.popular.contract-addenda",
+    "definition": "Anexos contractuales",
+    "context": "Contract addenda",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L83-L86"
+  },
+  {
+    "term": "public.popular.create-request",
+    "definition": "Crea tu petición",
+    "context": "Create your request",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L60-L63"
+  },
+  {
+    "term": "public.popular.easily-collect",
+    "definition": "Recopila de manera sencilla toda la información de potenciales clientes antes de empezar a trabajar",
+    "context": "Easily collect all the information from potential clients before starting to work",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L47-L50"
+  },
+  {
+    "term": "public.popular.focus",
+    "definition": "Céntrate en lo realmente importante",
+    "context": "Focus on what really matters",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L94-L97"
+  },
+  {
+    "term": "public.popular.focus-on-contract",
+    "definition": "Céntrate en el contrato mientras tus clientes te envían los anexos a su ritmo",
+    "context": "Focus on the contract while your clients send you the addenda at their pace",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L89-L92"
+  },
+  {
+    "term": "public.popular.focus-on-work",
+    "definition": "Céntrate en tu trabajo y deja de enviar correos arriba y abajo. Te lo haremos saber cuando la información esté lista.",
+    "context": "Focus on your work and stop sending emails back and forth. We will let you know when the information is ready.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L100-L103"
+  },
+  {
+    "term": "public.popular.information-ready",
+    "definition": "Ten tu información lista cada mes en tu espacio y reduce los correos en tu bandeja de entrada",
+    "context": "Have your information ready every month in your space and reduce the emails received in your inbox",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L103-L106"
+  },
+  {
+    "term": "public.popular.investor-relations",
+    "definition": "Relaciones con inversores",
+    "context": "Investor relations",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L69-L72"
+  },
+  {
+    "term": "public.popular.kyc",
+    "definition": "Verifica tus clientes (KYC)",
+    "context": "Know your customer (KYC)",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L41-L44"
+  },
+  {
+    "term": "public.popular.multiple-recipients",
+    "definition": "Envía una sola petición a múltiples partes para recopilar la información y mantén todo organizado",
+    "context": "Send a single request to multiple parties to gather the information and keep everything organized",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L75-L78"
+  },
+  {
+    "term": "public.popular.periodical-reporting",
+    "definition": "Reportes periódicos",
+    "context": "Periodical reporting",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L55-L58"
+  },
+  {
+    "term": "public.popular.periodical-requests",
+    "definition": "Configura peticiones periódicas que recopilan automáticamente la información para ti",
+    "context": "Set up periodical requests that automatically collects the information for you",
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L61-L64"
+  },
+  {
+    "term": "public.popular.user-friendly",
+    "definition": "Utiliza nuestra interfaz amigable para programar tus peticiones de información. Nosotros nos encargamos del resto.",
+    "context": "Use our user-friendly interface to program your information request. We will handle the rest.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L66-L69"
   },
   {
     "term": "public.privacy.title",

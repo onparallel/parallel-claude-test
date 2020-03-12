@@ -26,15 +26,19 @@ export function PublicLayout({ children }: PublicLayoutProps) {
     <Flex direction="column" minHeight="100vh">
       <PublicHeader
         position="fixed"
-        transition="height 150ms"
         zIndex={2}
-        {...(headerIsThin ? { shadow: "md", height: 16 } : {})}
+        isThin={headerIsThin}
       ></PublicHeader>
-      <Flex as="main" marginTop={24} flex="1" direction="column" zIndex={1}>
+      <Flex
+        as="main"
+        marginTop={headerIsThin ? 16 : 20}
+        flex="1"
+        direction="column"
+        zIndex={1}
+      >
         {children}
       </Flex>
-      <PublicFooter marginTop={8} marginBottom={4}></PublicFooter>
-      {/* <CookieConsent /> */}
+      <PublicFooter marginTop={8}></PublicFooter>
     </Flex>
   );
 }

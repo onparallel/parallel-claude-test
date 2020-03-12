@@ -16,7 +16,7 @@ import Backend from "react-dnd-html5-backend";
 const resetConfig = (theme: ITheme) => ({
   light: {
     color: theme.colors.gray[700],
-    bg: theme.colors.gray[50],
+    bg: theme.colors.white,
     borderColor: theme.colors.gray[200],
     placeholderColor: theme.colors.gray[400]
   },
@@ -90,7 +90,7 @@ export function useTranslations(locale: string) {
     } else if (current !== locale) {
       setState({ current: locale, cache });
     }
-  }, [locale]);
+  }, [cache, locale]);
   return { locale: current, messages: cache[current] };
 }
 

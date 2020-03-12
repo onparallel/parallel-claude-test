@@ -1,19 +1,19 @@
-/** @jsx jsx */
 import {
-  Box,
   BoxProps,
   Button,
+  Collapse,
   Flex,
-  useColorMode,
-  LinkProps as ChakraLinkProps
+  LinkProps as ChakraLinkProps,
+  Stack,
+  StackProps,
+  useDisclosure
 } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
+import { BurgerButton } from "@parallel/components/common/BurgerButton";
+import { Link, NakedLink } from "@parallel/components/common/Link";
+import { Logo } from "@parallel/components/common/Logo";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
-import { Logo } from "@parallel/components/common/Logo";
-import { Link } from "@parallel/components/common/Link";
-import { ToggleColorModeButton } from "@parallel/components/common/ToggleColorModeButton";
-import { Spacer } from "@parallel/components/common/Spacer";
 
 function logoColorProps(colorMode: string) {
   const theme: { [colorMode: string]: ChakraLinkProps } = {
@@ -45,45 +45,87 @@ function logoColorProps(colorMode: string) {
   return theme[colorMode];
 }
 
-export function PublicHeader(props: BoxProps) {
-  const { colorMode, toggleColorMode } = useColorMode();
+export type PublicHeaderProps = BoxProps & {
+  isThin?: boolean;
+};
+
+export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
+  const { isOpen, onToggle } = useDisclosure();
+  const breakpoint = "md" as const;
+
   return (
     <PublicContainer
       wrapper={{
         as: "header",
-        backgroundColor: colorMode === "light" ? "gray.50" : "gray.800",
-        height: 20,
+        backgroundColor: "white",
+        shadow: isThin || isOpen ? "md" : "none",
         ...props
       }}
-      display="flex"
-      alignItems="center"
     >
-      <Link href="/" chakra={{ ...logoColorProps(colorMode) }}>
-        <Logo width={152}></Logo>
-      </Link>
-      <Spacer />
-      {/* <ToggleColorModeButton
-          css={css`
-            display: none;
-            @media (prefers-color-scheme: dark) {
-              display: inline-flex;
-            }
-          `}
-          marginRight={2}
-        ></ToggleColorModeButton> */}
-      <Link
-        href="/login"
-        render={children => (
-          <Button as="a" variantColor="purple">
-            {children}
+      <Flex
+        alignItems="center"
+        minHeight={isThin ? 16 : 20}
+        transition="min-height 300ms"
+      >
+        <Link href="/" chakra={{ ...logoColorProps("light") }}>
+          <Logo width={152}></Logo>
+        </Link>
+        <Spacer />
+        <PublicHeaderMenu
+          direction="row"
+          alignItems="center"
+          spacing={4}
+          display={{ base: "none", [breakpoint]: "flex" }}
+        />
+        <BurgerButton
+          isOpen={isOpen}
+          display={{ base: "block", [breakpoint]: "none" }}
+          onClick={onToggle}
+        />
+      </Flex>
+      <Collapse
+        isOpen={isOpen}
+        display={{ base: "block", [breakpoint]: "none" }}
+      >
+        <PublicHeaderMenu direction="column" spacing={2} paddingBottom={4} />
+      </Collapse>
+    </PublicContainer>
+  );
+}
+
+function PublicHeaderMenu(props: StackProps) {
+  return (
+    <Stack {...props}>
+      <Flex>
+        <NakedLink href="/about">
+          <Button flex="1" as="a" variant="ghost">
+            <FormattedMessage
+              id="public.header.about"
+              defaultMessage="About"
+            ></FormattedMessage>
           </Button>
-        )}
+        </NakedLink>
+      </Flex>
+      <Button
+        as="a"
+        {...{ href: "https://api.parallel.so/auth/login" }}
+        variant="outline"
       >
         <FormattedMessage
           id="public.login-button"
           defaultMessage="Login"
         ></FormattedMessage>
-      </Link>
-    </PublicContainer>
+      </Button>
+      <Button
+        as="a"
+        {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
+        variantColor="purple"
+      >
+        <FormattedMessage
+          id="public.bookdemo-button"
+          defaultMessage="Book a demo"
+        ></FormattedMessage>
+      </Button>
+    </Stack>
   );
 }

@@ -15,7 +15,7 @@ export function PublicContainer({
         margin="0 auto"
         paddingX={4}
         width="100%"
-        maxWidth={{ lg: "containers.lg" }}
+        maxWidth={{ lg: "containers.xl" }}
         {...props}
       >
         {children}

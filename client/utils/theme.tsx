@@ -5,8 +5,8 @@ export const theme = {
   ...base,
   fonts: {
     ...base.fonts,
-    body: "'IBM Plex Sans', sans-serif",
-    heading: "'IBM Plex Sans', sans-serif",
+    body: "'Montserrat', sans-serif",
+    heading: "'Montserrat', sans-serif",
     hero: "'Playfair Display', serif"
   },
   fontSizes: {

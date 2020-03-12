@@ -33,7 +33,7 @@ function LegalDoc({ content, doc }: LegalDocProps) {
     <>
       <Title>{titles[doc]}</Title>
       <PublicLayout>
-        <PublicContainer>
+        <PublicContainer marginTop={8}>
           <Markdown
             options={{
               overrides: {
@@ -43,12 +43,14 @@ function LegalDoc({ content, doc }: LegalDocProps) {
                 h1: {
                   component: Heading,
                   props: {
+                    as: "h2",
                     fontSize: "3xl"
                   }
                 },
                 h2: {
                   component: Heading,
                   props: {
+                    as: "h3",
                     fontSize: "lg",
                     marginTop: 4
                   }
@@ -77,6 +79,7 @@ function LegalDoc({ content, doc }: LegalDocProps) {
                 p: {
                   component: Text,
                   props: {
+                    as: "div",
                     marginTop: 2
                   }
                 }

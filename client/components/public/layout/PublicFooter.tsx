@@ -1,27 +1,24 @@
 import {
+  BoxProps,
+  Divider,
   Flex,
   IconButton,
   List,
   ListItem,
   Text,
-  BoxProps,
-  Select,
-  InputLeftElement,
-  InputGroup,
-  Icon,
-  useColorMode
+  useColorMode,
+  Box
 } from "@chakra-ui/core";
-import { FormattedMessage, useIntl } from "react-intl";
-import { PublicContainer } from "./PublicContainer";
-import { PublicFooterBox } from "./PublicFooterBox";
+import { Link } from "@parallel/components/common/Link";
+import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
-import languages from "@parallel/lang/languages.json";
-import { resolveUrl } from "@parallel/utils/next";
-import { Link } from "@parallel/components/common/Link";
+import { FormattedMessage, useIntl } from "react-intl";
+import { LanguageSelector } from "../../common/LanguageSelector";
+import { PublicContainer } from "./PublicContainer";
+import { PublicFooterBox } from "./PublicFooterBox";
 
 export function PublicFooter(props: BoxProps) {
-  const { colorMode } = useColorMode();
   const router = useRouter();
   const intl = useIntl();
 
@@ -37,84 +34,45 @@ export function PublicFooter(props: BoxProps) {
   }
 
   return (
-    <PublicContainer wrapper={{ as: "footer", ...props }}>
+    <PublicContainer
+      wrapper={{
+        as: "footer",
+        backgroundColor: "gray.50",
+        paddingTop: 12,
+        paddingBottom: 8,
+        ...props
+      }}
+    >
       <Flex
         justify="space-between"
-        alignItems="stretch"
+        align="stretch"
         height="100%"
         wrap="wrap"
+        marginBottom={10}
       >
-        <PublicFooterBox flex="3" minWidth={{ base: "100%", md: 40 }}>
-          <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
-          <InputGroup size="sm" display="inline-flex">
-            <InputLeftElement
-              children={
-                <Icon
-                  name={"language" as any}
-                  color={colorMode === "light" ? "purple.600" : "purple.200"}
-                  aria-hidden="true"
-                />
-              }
-            />
-            <Select
-              variant="flushed"
-              paddingLeft={6}
-              onChange={handleLangChange}
-              value={router.query.locale}
-              aria-label={intl.formatMessage({
-                id: "public.footer.language-select-label",
-                defaultMessage: "Change language"
-              })}
-            >
-              {languages.map(({ locale, text }) => (
-                <option key={locale} value={locale}>
-                  {text}
-                </option>
-              ))}
-            </Select>
-          </InputGroup>
-        </PublicFooterBox>
         <PublicFooterBox
           flex="1"
           minWidth={{ base: "100%", md: 40 }}
           marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
-            id: "public.footer.follow-us",
-            defaultMessage: "Follow us"
+            id: "public.footer.company",
+            defaultMessage: "Company"
           })}
         >
-          <IconButton
-            as={"a" as any}
-            {...{
-              href: "https://twitter.com/Parallel_SO",
-              target: "_blank"
-            }}
-            icon={"twitter" as any}
-            isRound
-            variantColor="purple"
-            aria-label={intl.formatMessage({
-              id: "public.footer.twitter-profile",
-              defaultMessage: "Twitter profile"
-            })}
-          ></IconButton>
-          <IconButton
-            as={"a" as any}
-            {...{
-              href: "https://www.linkedin.com/company/parallel-so/",
-              target: "_blank"
-            }}
-            icon={"linkedin" as any}
-            isRound
-            variantColor="purple"
-            marginLeft={2}
-            aria-label={intl.formatMessage({
-              id: "public.footer.linkedin-profile",
-              defaultMessage: "LinkedIn profile"
-            })}
-          ></IconButton>
+          <List>
+            <ListItem>
+              <Link href="/about" as="/about">
+                <FormattedMessage
+                  id="public.about.title"
+                  defaultMessage="About"
+                ></FormattedMessage>
+              </Link>
+            </ListItem>
+          </List>
         </PublicFooterBox>
         <PublicFooterBox
           flex="1"
+          flexGrow={8}
           minWidth={{ base: "100%", md: 40 }}
           marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
@@ -149,6 +107,48 @@ export function PublicFooter(props: BoxProps) {
             </ListItem>
           </List>
         </PublicFooterBox>
+      </Flex>
+      <Divider />
+      <Flex marginTop={5} wrap="wrap" marginBottom={["30px", "0"]}>
+        <Box flex="1" flexGrow={8} minWidth={{ base: "100%", md: 40 }}>
+          <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
+          <LanguageSelector
+            value={router.query.locale}
+            onChange={handleLangChange}
+            marginTop={4}
+          />
+        </Box>
+        <Box>
+          <IconButton
+            as={"a" as any}
+            {...{
+              href: "https://twitter.com/Parallel_SO",
+              target: "_blank"
+            }}
+            icon={"twitter" as any}
+            isRound
+            variantColor="purple"
+            aria-label={intl.formatMessage({
+              id: "public.footer.twitter-profile",
+              defaultMessage: "Twitter profile"
+            })}
+          ></IconButton>
+          <IconButton
+            as={"a" as any}
+            {...{
+              href: "https://www.linkedin.com/company/parallel-so/",
+              target: "_blank"
+            }}
+            icon={"linkedin" as any}
+            isRound
+            variantColor="purple"
+            marginLeft={2}
+            aria-label={intl.formatMessage({
+              id: "public.footer.linkedin-profile",
+              defaultMessage: "LinkedIn profile"
+            })}
+          ></IconButton>
+        </Box>
       </Flex>
     </PublicContainer>
   );
