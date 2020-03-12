@@ -88,6 +88,7 @@ export function TablePage<T>({
         borderTop="1px solid"
         alignItems="center"
         borderTopColor={colors.border}
+        marginTop="-1px"
       >
         <Box>
           <FormattedMessage

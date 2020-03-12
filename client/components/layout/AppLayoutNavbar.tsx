@@ -37,6 +37,7 @@ export function AppLayoutNavbar({
       {
         section: "petitions",
         icon: "paper-plane",
+        available: true,
         text: intl.formatMessage({
           id: "navbar.petitions-link",
           defaultMessage: "Petitions"
@@ -45,6 +46,7 @@ export function AppLayoutNavbar({
       {
         section: "templates",
         icon: "file-text",
+        available: false,
         text: intl.formatMessage({
           id: "navbar.templates-link",
           defaultMessage: "Templates"
@@ -53,6 +55,7 @@ export function AppLayoutNavbar({
       {
         section: "contacts",
         icon: "users",
+        available: false,
         text: intl.formatMessage({
           id: "navbar.contacts-link",
           defaultMessage: "Contacts"
@@ -104,10 +107,11 @@ export function AppLayoutNavbar({
         ></IconButton>
       </Flex>
       <List>
-        {items.map(({ section, icon, text }) => (
+        {items.map(({ section, available, icon, text }) => (
           <ListItem key={section}>
             <AppLayoutNavbarLink
               href={`/app/${section}`}
+              available={available}
               active={pathname.startsWith(`/[locale]/app/${section}`)}
               icon={icon}
             >
