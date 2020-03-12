@@ -346,7 +346,8 @@ export class PetitionRepository extends BaseRepository {
         })
         .where("position", ">", field.position);
 
-      return await this.checkPetitionStatus(petitionId, user, true);
+      const petition = await this.checkPetitionStatus(petitionId, user, true);
+      return petition!;
     });
   }
 
@@ -474,6 +475,6 @@ export class PetitionRepository extends BaseRepository {
         "*"
       );
     const petition = await this.checkPetitionStatus(petitionId, user, true);
-    return { fields, petition };
+    return { fields, petition: petition! };
   }
 }

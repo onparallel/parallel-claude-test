@@ -352,7 +352,7 @@ function PasswordResetForm({
 }
 
 export async function getStaticProps() {
-  return {};
+  return { props: {} };
 }
 
 export function getStaticPaths() {

@@ -98,7 +98,7 @@ function About() {
 }
 
 export function getStaticProps() {
-  return {};
+  return { props: {} };
 }
 
 export function getStaticPaths() {

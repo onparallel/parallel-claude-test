@@ -45,7 +45,7 @@ function Home() {
 }
 
 export function getStaticProps() {
-  return {};
+  return { props: {} };
 }
 
 export function getStaticPaths() {
