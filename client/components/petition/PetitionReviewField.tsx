@@ -113,20 +113,19 @@ export function PetitionReviewField({
               </Text>
             </Box>
             {field.type === "TEXT" ? (
-              <Stack spacing={4}>
+              <Stack
+                spacing={4}
+                css={css`
+                  .copy-to-clipboard {
+                    display: none;
+                  }
+                  &:hover .copy-to-clipboard {
+                    display: inline-flex;
+                  }
+                `}
+              >
                 {field.replies.map(reply => (
-                  <PetitionReviewFieldReply
-                    key={reply.id}
-                    reply={reply}
-                    css={css`
-                      .copy-to-clipboard {
-                        display: none;
-                      }
-                      &:hover .copy-to-clipboard {
-                        display: inline-flex;
-                      }
-                    `}
-                  >
+                  <PetitionReviewFieldReply key={reply.id} reply={reply}>
                     <Text>{reply.content.text}</Text>
                     <CopyToClipboardButton
                       className="copy-to-clipboard"
