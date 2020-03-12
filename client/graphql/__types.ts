@@ -581,15 +581,6 @@ export type PetitionSendSearchContactsQuery = { __typename?: "Query" } & {
   };
 };
 
-export type Petitions_createPetitionMutationVariables = {
-  name: Scalars["String"];
-  locale: PetitionLocale;
-};
-
-export type Petitions_createPetitionMutation = { __typename?: "Mutation" } & {
-  createPetition: { __typename?: "Petition" } & Pick<Petition, "id">;
-};
-
 export type Petitions_deletePetitionsMutationVariables = {
   ids: Array<Scalars["ID"]>;
 };
@@ -697,3 +688,12 @@ export type CurrentUserQueryVariables = {};
 export type CurrentUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "fullName" | "email">;
 };
+
+export type useCreatePetition_createPetitionMutationVariables = {
+  name: Scalars["String"];
+  locale: PetitionLocale;
+};
+
+export type useCreatePetition_createPetitionMutation = {
+  __typename?: "Mutation";
+} & { createPetition: { __typename?: "Petition" } & Pick<Petition, "id"> };

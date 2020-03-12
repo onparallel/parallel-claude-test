@@ -20,10 +20,15 @@ import { useMemo } from "react";
 import { Spacer } from "../common/Spacer";
 
 export type AppLayoutNavbarProps = BoxProps & {
+  onCreate: () => void;
   user: AppLayoutNavbar_UserFragment;
 };
 
-export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
+export function AppLayoutNavbar({
+  user,
+  onCreate,
+  ...props
+}: AppLayoutNavbarProps) {
   const { colorMode } = useColorMode();
   const { pathname } = useRouter();
   const intl = useIntl();
@@ -61,8 +66,6 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
       flexDirection="column"
       as="nav"
       shadow="md"
-      // borderRight="2px solid"
-      // borderRightColor="gray.200"
       width={24}
       backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
       {...props}
@@ -93,6 +96,7 @@ export function AppLayoutNavbar({ user, ...props }: AppLayoutNavbarProps) {
           icon="add"
           size="lg"
           isRound
+          onClick={onCreate}
           aria-label={intl.formatMessage({
             id: "navbar.new-button",
             defaultMessage: "Create a new petition"

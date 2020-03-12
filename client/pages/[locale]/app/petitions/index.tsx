@@ -3,7 +3,7 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import { Box, Button, Flex, Input, Text } from "@chakra-ui/core";
+import { Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
@@ -23,8 +23,6 @@ import {
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
-  Petitions_createPetitionMutation,
-  Petitions_createPetitionMutationVariables,
   Petitions_deletePetitionsMutation,
   Petitions_deletePetitionsMutationVariables,
   Petitions_PetitionsListFragment
@@ -39,10 +37,11 @@ import {
   useQueryState
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
+import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { ChangeEvent, KeyboardEvent, memo, useRef, useState } from "react";
+import { memo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const PAGE_SIZE = 10;
@@ -69,18 +68,7 @@ function Petitions() {
       status: state.status
     }
   });
-  const [createPetition] = useCreatePetition({
-    update(cache) {
-      // clear caches where new item would appear
-      clearCache(
-        cache,
-        /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
-      );
-      if (state.status === null || state.status === "DRAFT") {
-        refetch();
-      }
-    }
-  });
+  const createPetition = useCreatePetition();
 
   const [deletePetition] = useDeletePetition({
     update(cache) {
@@ -92,8 +80,10 @@ function Petitions() {
   const { petitions } = data!;
 
   const [selected, setSelected] = useState<string[]>();
-  const confirmDelete = useDialog(ConfirmDelete, [selected, petitions]);
-  const askPetitionName = useDialog(AskPetitionName, [selected, petitions]);
+  const confirmDelete = useDialog(ConfirmDeletePetitions, [
+    selected,
+    petitions
+  ]);
 
   function handleSearchChange(value: string | null) {
     setQueryState(current => ({
@@ -124,17 +114,11 @@ function Petitions() {
 
   async function handleCreateClick() {
     try {
-      const name = await askPetitionName({});
-      const { data, errors } = await createPetition({
-        variables: {
-          name,
-          locale: router.query.locale as any
-        }
-      });
-      if (errors) {
-        throw errors;
+      const id = await createPetition();
+      if (state.status === null || state.status === "DRAFT") {
+        refetch();
       }
-      goToPetition(data!.createPetition.id, "compose");
+      goToPetition(id, "compose");
     } catch {}
   }
 
@@ -173,7 +157,7 @@ function Petitions() {
           defaultMessage: "Petitions"
         })}
       </Title>
-      <AppLayout user={me}>
+      <AppLayout user={me} onCreate={handleCreateClick}>
         <TablePage
           columns={COLUMNS}
           rows={petitions.items}
@@ -330,30 +314,6 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
   }
 ];
 
-function useCreatePetition(
-  options?: MutationHookOptions<
-    Petitions_createPetitionMutation,
-    Petitions_createPetitionMutationVariables
-  >
-) {
-  return useMutation<
-    Petitions_createPetitionMutation,
-    Petitions_createPetitionMutationVariables
-  >(
-    gql`
-      mutation Petitions_createPetition(
-        $name: String!
-        $locale: PetitionLocale!
-      ) {
-        createPetition(name: $name, locale: $locale) {
-          id
-        }
-      }
-    `,
-    options
-  );
-}
-
 function useDeletePetition(
   options?: MutationHookOptions<
     Petitions_deletePetitionsMutation,
@@ -373,7 +333,7 @@ function useDeletePetition(
   );
 }
 
-function ConfirmDelete({
+function ConfirmDeletePetitions({
   selected,
   ...props
 }: {
@@ -405,68 +365,6 @@ function ConfirmDelete({
           <FormattedMessage
             id="petitions.confirm-delete.confirm-button"
             defaultMessage="Yes, delete"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
-function AskPetitionName(props: DialogCallbacks<string>) {
-  const [name, setName] = useState("");
-  const intl = useIntl();
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-    setName(event.target.value);
-  }
-
-  function handleInputKeyPress(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Enter" && name.length > 0) {
-      props.onResolve(name);
-    }
-  }
-
-  return (
-    <ConfirmDialog
-      focusRef={inputRef}
-      header={
-        <FormattedMessage
-          id="petitions.create-new-petition.header"
-          defaultMessage="Create a new petition"
-        />
-      }
-      body={
-        <Box>
-          <Text>
-            <FormattedMessage
-              id="petitions.create-new-petition.body"
-              defaultMessage="Give your new petition a name"
-            />
-          </Text>
-          <Input
-            ref={inputRef}
-            value={name}
-            placeholder={intl.formatMessage({
-              id: "generic.untitled-petition",
-              defaultMessage: "Untitled petition"
-            })}
-            onChange={handleInputChange}
-            onKeyPress={handleInputKeyPress}
-            marginTop={2}
-          />
-        </Box>
-      }
-      confirm={
-        <Button
-          isDisabled={name.length === 0}
-          variantColor="purple"
-          onClick={() => props.onResolve(name)}
-        >
-          <FormattedMessage
-            id="petitions.create-new-petition.continue-button"
-            defaultMessage="Continue"
           />
         </Button>
       }

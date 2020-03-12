@@ -1,26 +1,42 @@
-import { Box, Flex, useColorMode } from "@chakra-ui/core";
-import { ReactNode } from "react";
-import { ToggleColorModeButton } from "../common/ToggleColorModeButton";
-import { AppLayoutNavbar } from "./AppLayoutNavbar";
-import { gql } from "apollo-boost";
+import { Flex, useColorMode } from "@chakra-ui/core";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
+import { gql } from "apollo-boost";
+import { ReactNode } from "react";
+import { AppLayoutNavbar } from "./AppLayoutNavbar";
+import { useCreatePetition } from "@parallel/utils/useCreatePetition";
+import { useRouter } from "next/router";
 
 export interface AppLayoutProps {
+  onCreate?: () => void;
   user: AppLayoutNavbar_UserFragment;
   children: ReactNode;
 }
 
-export function AppLayout({ user, children }: AppLayoutProps) {
-  const { colorMode } = useColorMode();
+export function AppLayout({ user, onCreate, children }: AppLayoutProps) {
+  const router = useRouter();
+  const createPetition = useCreatePetition();
+  async function defaultOnCreate() {
+    try {
+      const id = await createPetition();
+      router.push(
+        `/[locale]/app/petitions/[petitionId]/compose`,
+        `/${router.query.locale}/app/petitions/${id}/compose`
+      );
+    } catch {}
+  }
   return (
     <Flex alignItems="stretch" minHeight="100vh">
-      <AppLayoutNavbar user={user} zIndex={2} />
+      <AppLayoutNavbar
+        user={user}
+        zIndex={2}
+        onCreate={onCreate ?? defaultOnCreate}
+      />
       <Flex
         as="main"
         flex="1"
         flexDirection="column"
         maxHeight="100vh"
-        backgroundColor={{ light: "gray.50", dark: "gray.600" }[colorMode]}
+        backgroundColor="gray.50"
       >
         {children}
       </Flex>
