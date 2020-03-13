@@ -80,6 +80,7 @@ export function withData<P = {}>(
               Location: `/${context.query.locale}/login`
             });
             context.res!.end();
+            return;
           } else {
             Router.push("/[locale]/login", `/${context.query.locale}/login`);
           }
