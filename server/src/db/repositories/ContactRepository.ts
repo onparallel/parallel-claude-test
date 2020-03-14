@@ -1,8 +1,10 @@
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
 import { escapeLike } from "../helpers/utils";
+import { KNEX } from "../knex";
+import { User, CreateContact } from "../__types";
 
 @injectable()
 export class ContactReposistory extends BaseRepository {
@@ -56,5 +58,28 @@ export class ContactReposistory extends BaseRepository {
         }),
       opts
     );
+  }
+
+  async createContact(
+    data: Omit<CreateContact, "owner_id" | "org_id">,
+    user: User
+  ) {
+    const [row] = await this.insert("contact", {
+      ...data,
+      org_id: user.org_id,
+      owner_id: user.id,
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`
+    });
+    return row;
+  }
+
+  async deleteContactById(contactId: MaybeArray<number>, user: User) {
+    return await this.from("contact")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: `User:${user.id}`
+      })
+      .whereIn("id", Array.isArray(contactId) ? contactId : [contactId]);
   }
 }

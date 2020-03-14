@@ -55,7 +55,7 @@ export function AppLayoutNavbar({
       {
         section: "contacts",
         icon: "users",
-        available: false,
+        available: true,
         text: intl.formatMessage({
           id: "navbar.contacts-link",
           defaultMessage: "Contacts"

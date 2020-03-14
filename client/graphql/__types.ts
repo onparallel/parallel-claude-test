@@ -33,8 +33,16 @@ export type ContactPagination = {
   totalCount: Scalars["Int"];
 };
 
+export type CreateContactInput = {
+  email: Scalars["String"];
+  firstName?: Maybe<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
+};
+
 export type Mutation = {
   __typename?: "Mutation";
+  createContact: Contact;
+  deleteContacts: Result;
   createPetition: Petition;
   deletePetitions: Result;
   updateFieldPositions: Petition;
@@ -45,6 +53,14 @@ export type Mutation = {
   validatePetitionFields: PetitionAndFields;
   updateUser: User;
   changePassword: ChangePasswordResult;
+};
+
+export type MutationcreateContactArgs = {
+  data: CreateContactInput;
+};
+
+export type MutationdeleteContactsArgs = {
+  ids: Array<Scalars["ID"]>;
 };
 
 export type MutationcreatePetitionArgs = {
@@ -345,10 +361,45 @@ export type PetitionReviewField_PetitionFieldFragment = {
     >;
   };
 
-export type ContactsQueryVariables = {};
+export type Contacts_deleteContactsMutationVariables = {
+  ids: Array<Scalars["ID"]>;
+};
+
+export type Contacts_deleteContactsMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "deleteContacts">;
+
+export type Contacts_ContactsListFragment = {
+  __typename?: "ContactPagination";
+} & Pick<ContactPagination, "totalCount"> & {
+    items: Array<
+      { __typename?: "Contact" } & Pick<
+        Contact,
+        "id" | "fullName" | "firstName" | "lastName" | "email"
+      >
+    >;
+  };
+
+export type Contacts_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type ContactsQueryVariables = {
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+};
 
 export type ContactsQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & AppLayout_UserFragment;
+  contacts: {
+    __typename?: "ContactPagination";
+  } & Contacts_ContactsListFragment;
+};
+
+export type ContactsUserQueryVariables = {};
+
+export type ContactsUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Contacts_UserFragment;
 };
 
 export type AppHomeQueryVariables = {};
@@ -688,6 +739,14 @@ export type CurrentUserQueryVariables = {};
 export type CurrentUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "fullName" | "email">;
 };
+
+export type useCreateContact_createContactMutationVariables = {
+  data: CreateContactInput;
+};
+
+export type useCreateContact_createContactMutation = {
+  __typename?: "Mutation";
+} & { createContact: { __typename?: "Contact" } & Pick<Contact, "id"> };
 
 export type useCreatePetition_createPetitionMutationVariables = {
   name: Scalars["String"];

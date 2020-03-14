@@ -199,6 +199,69 @@ export async function seed(knex: Knex): Promise<any> {
         email: "alex@parallel.so",
         created_by: `User:${userIds[2]}`,
         updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "santi@parallel.so",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "dereklou00@gmail.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "santialbo@gmail.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "feelmyglock@gmail.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "one@example.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "two@example.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "three@example.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "four@example.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
+      },
+      {
+        org_id: orgIds[0],
+        owner_id: userIds[2],
+        email: "five@example.com",
+        created_by: `User:${userIds[2]}`,
+        updated_by: `User:${userIds[2]}`
       }
     ],
     "id"

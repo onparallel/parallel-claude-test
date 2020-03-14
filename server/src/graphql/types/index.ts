@@ -5,6 +5,7 @@ export * from "../helpers/timestamps";
 
 export * from "./contact/types";
 export * from "./contact/queries";
+export * from "./contact/mutations";
 
 export * from "./organization/types";
 export * from "./organization/queries";

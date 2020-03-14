@@ -1,26 +1,22 @@
-import { Box, Button, Input, Text } from "@chakra-ui/core";
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  useRef,
-  useState,
-  useCallback
-} from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useMutation } from "@apollo/react-hooks";
+import { Button, FormControl, FormLabel, Input } from "@chakra-ui/core";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
   useDialog
 } from "@parallel/components/common/DialogOpenerProvider";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import { useMutation } from "@apollo/react-hooks";
 import {
+  PetitionLocale,
   useCreatePetition_createPetitionMutation,
-  useCreatePetition_createPetitionMutationVariables,
-  PetitionLocale
+  useCreatePetition_createPetitionMutationVariables
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
-import { clearCache } from "./apollo";
 import { useRouter } from "next/router";
+import { useCallback, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import { clearCache } from "./apollo";
+import { useMergeRefs } from "./useMergeRefs";
 
 export function useCreatePetition() {
   const { query } = useRouter();
@@ -70,24 +66,33 @@ export function useCreatePetition() {
   );
 }
 
+type CreatePetitionFormData = {
+  name: string;
+};
+
 function AskPetitionName(props: DialogCallbacks<string>) {
-  const [name, setName] = useState("");
   const intl = useIntl();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    handleSubmit,
+    register,
+    errors,
+    formState: { isValid }
+  } = useForm<CreatePetitionFormData>({
+    mode: "onChange",
+    defaultValues: { name: "" }
+  });
+  const focusRef = useRef<HTMLInputElement>(null);
+  const inputRef = useMergeRefs(focusRef, register({ required: true }));
 
-  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-    setName(event.target.value);
-  }
-
-  function handleInputKeyPress(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Enter" && name.length > 0) {
-      props.onResolve(name);
-    }
+  function onContinue({ name }: CreatePetitionFormData) {
+    props.onResolve(name);
   }
 
   return (
     <ConfirmDialog
-      focusRef={inputRef}
+      as="form"
+      onSubmit={handleSubmit(onContinue)}
+      focusRef={focusRef}
       header={
         <FormattedMessage
           id="petitions.create-new-petition.header"
@@ -95,32 +100,26 @@ function AskPetitionName(props: DialogCallbacks<string>) {
         />
       }
       body={
-        <Box>
-          <Text>
+        <FormControl isInvalid={!!errors.name}>
+          <FormLabel htmlFor="petition-name">
             <FormattedMessage
               id="petitions.create-new-petition.body"
               defaultMessage="Give your new petition a name"
             />
-          </Text>
+          </FormLabel>
           <Input
+            id="petition-name"
+            name="name"
             ref={inputRef}
-            value={name}
             placeholder={intl.formatMessage({
               id: "generic.untitled-petition",
               defaultMessage: "Untitled petition"
             })}
-            onChange={handleInputChange}
-            onKeyPress={handleInputKeyPress}
-            marginTop={2}
           />
-        </Box>
+        </FormControl>
       }
       confirm={
-        <Button
-          isDisabled={name.length === 0}
-          variantColor="purple"
-          onClick={() => props.onResolve(name)}
-        >
+        <Button type="submit" variantColor="purple" isDisabled={!isValid}>
           <FormattedMessage
             id="petitions.create-new-petition.continue-button"
             defaultMessage="Continue"

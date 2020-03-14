@@ -56,6 +56,12 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  CreateContactInput: {
+    // input type
+    email: string; // String!
+    firstName?: string | null; // String
+    lastName?: string | null; // String
+  };
   UpdatePetitionFieldInput: {
     // input type
     description?: string | null; // String
@@ -151,6 +157,7 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
+  CreateContactInput: NexusGenInputs["CreateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
@@ -182,8 +189,10 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
+    createContact: NexusGenRootTypes["Contact"]; // Contact!
     createPetition: NexusGenRootTypes["Petition"]; // Petition!
     createPetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
+    deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetitionField: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitions: NexusGenEnums["Result"]; // Result!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
@@ -307,6 +316,10 @@ export interface NexusGenArgTypes {
       newPassword: string; // String!
       password: string; // String!
     };
+    createContact: {
+      // args
+      data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
+    };
     createPetition: {
       // args
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
@@ -316,6 +329,10 @@ export interface NexusGenArgTypes {
       // args
       id: string; // ID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    };
+    deleteContacts: {
+      // args
+      ids: string[]; // [ID!]!
     };
     deletePetitionField: {
       // args
@@ -421,6 +438,7 @@ export type NexusGenObjectNames =
   | "UserPagination";
 
 export type NexusGenInputNames =
+  | "CreateContactInput"
   | "UpdatePetitionFieldInput"
   | "UpdatePetitionInput"
   | "UpdateUserInput";

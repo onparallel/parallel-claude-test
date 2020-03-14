@@ -3,7 +3,7 @@
     "term": "component.confirm-dialog.cancel-button",
     "definition": "Cancelar",
     "context": "Cancel",
-    "reference": "components/common/ConfirmDialog.tsx#L36-L39"
+    "reference": "components/common/ConfirmDialog.tsx#L40-L43"
   },
   {
     "term": "component.cookie-consent.accept-button",
@@ -33,7 +33,7 @@
     "term": "component.input.clear-button",
     "definition": "Vaciar",
     "context": "Clear",
-    "reference": "components/common/SearchInput.tsx#L31-L34"
+    "reference": "utils/useReactSelectStyle.tsx#L60-L63"
   },
   {
     "term": "component.password-input.hide",
@@ -147,19 +147,19 @@
     "term": "component.table.next-page-button",
     "definition": "Siguiente",
     "context": "Next",
-    "reference": "components/common/TablePage.tsx#L119-L122"
+    "reference": "components/common/TablePage.tsx#L120-L123"
   },
   {
     "term": "component.table.prev-page-button",
     "definition": "Anterior",
     "context": "Previous",
-    "reference": "components/common/TablePage.tsx#L109-L112"
+    "reference": "components/common/TablePage.tsx#L110-L113"
   },
   {
     "term": "component.table.total-results",
     "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}",
-    "reference": "components/common/TablePage.tsx#L93-L101"
+    "reference": "components/common/TablePage.tsx#L94-L102"
   },
   {
     "term": "component.toggle-color-mode-button.toggle-dark",
@@ -174,14 +174,32 @@
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
+    "term": "components.contact-list-header.actions-button",
+    "definition": "Acciones",
+    "context": "Actions",
+    "reference": "components/contacts/ContactListHeader.tsx#L49-L52"
+  },
+  {
+    "term": "components.contact-list-header.create-contact-button",
+    "definition": "Crear contacto",
+    "context": "Create contact",
+    "reference": "components/contacts/ContactListHeader.tsx#L69-L72"
+  },
+  {
+    "term": "components.contact-list-header.delete-label",
+    "definition": "Eliminar seleccionados",
+    "context": "Delete selected",
+    "reference": "components/contacts/ContactListHeader.tsx#L58-L61"
+  },
+  {
     "term": "components.copy-to-clipboard-button.copied-label",
-    "definition": "",
+    "definition": "¡Copiado al portapapeles!",
     "context": "Copied to clipboard!",
     "reference": "components/common/CopyToClipboardButton.tsx#L29-L32"
   },
   {
     "term": "components.copy-to-clipboard-button.copy-label",
-    "definition": "",
+    "definition": "Copiar al portapapeles",
     "context": "Copy to clipboard",
     "reference": "components/common/CopyToClipboardButton.tsx#L25-L28"
   },
@@ -202,6 +220,18 @@
     "definition": "Eliminar seleccionadas",
     "context": "Delete selected",
     "reference": "components/petitions/PetitionListHeader.tsx#L72-L75"
+  },
+  {
+    "term": "components.react-select.loading",
+    "definition": "Cargando...",
+    "context": "Loading...",
+    "reference": "utils/useReactSelectStyle.tsx#L135-L138"
+  },
+  {
+    "term": "components.react-select.no-options",
+    "definition": "Sin resultados",
+    "context": "No options",
+    "reference": "utils/useReactSelectStyle.tsx#L122-L125"
   },
   {
     "term": "components.recipient-select.enter-email",
@@ -232,6 +262,72 @@
     "definition": "Busca contactos existentes o introduce un correo electrónico válido",
     "context": "Search for exisiting contacts or enter a valid email.",
     "reference": "components/common/RecipientSelect.tsx#L116-L119"
+  },
+  {
+    "term": "contacts.confirm-delete.body",
+    "definition": "¿Está seguro de que desea eliminar {count, plural, =1 {<b>{email}</b>} other {los <b>#</b> contactos seleccionados}}?",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L246-L254"
+  },
+  {
+    "term": "contacts.confirm-delete.confirm-button",
+    "definition": "Si, eliminar",
+    "context": "Yes, delete",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L258-L261"
+  },
+  {
+    "term": "contacts.confirm-delete.header",
+    "definition": "Eliminar contactos",
+    "context": "Delete contacts",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L240-L243"
+  },
+  {
+    "term": "contacts.create-new-contact.continue-button",
+    "definition": "Continuar",
+    "context": "Continue",
+    "reference": "utils/useCreateContact.tsx#L136-L139"
+  },
+  {
+    "term": "contacts.create-new-contact.header",
+    "definition": "Introduce los datos del contacto",
+    "context": "Enter the contact details",
+    "reference": "utils/useCreateContact.tsx#L82-L85"
+  },
+  {
+    "term": "contacts.header.email",
+    "definition": "Correo electrónico",
+    "context": "Email",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L204"
+  },
+  {
+    "term": "contacts.header.first-name",
+    "definition": "Nombre",
+    "context": "First name",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L184-L187"
+  },
+  {
+    "term": "contacts.header.last-name",
+    "definition": "Apellidos",
+    "context": "Last name",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L194-L197"
+  },
+  {
+    "term": "contacts.no-contacts",
+    "definition": "No tienes contactos todavía. ¡Empieza por añadir uno!",
+    "context": "You have no contacts yet. Start by creating one now!",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L157-L160"
+  },
+  {
+    "term": "contacts.no-results",
+    "definition": "No hemos encontrado contactos con esta búsqueda",
+    "context": "There's no contacts matching your search",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L148-L151"
+  },
+  {
+    "term": "contacts.title",
+    "definition": "Contactos",
+    "context": "Contacts",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L120-L123"
   },
   {
     "term": "field-settings.file-multiple-label",
@@ -277,27 +373,27 @@
   },
   {
     "term": "generic.forms.email-label",
-    "definition": "Email",
+    "definition": "Correo electrónico",
     "context": "Email",
-    "reference": "pages/[locale]/login.tsx#L210-L213"
+    "reference": "utils/useCreateContact.tsx#L91-L94"
   },
   {
     "term": "generic.forms.email-placeholder",
-    "definition": "tunombre@ejemplo.com",
-    "context": "you@example.com",
-    "reference": "components/public/PublicHero.tsx#L66-L69"
+    "definition": "nombre@ejemplo.com",
+    "context": "name@example.com",
+    "reference": "utils/useCreateContact.tsx#L100-L103"
   },
   {
-    "term": "generic.forms.fist-name-label",
+    "term": "generic.forms.first-name-label",
     "definition": "Nombre",
     "context": "First name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L69-L72"
+    "reference": "utils/useCreateContact.tsx#L116-L119"
   },
   {
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo eletrónico válido",
     "context": "Please, enter a valid email",
-    "reference": "pages/[locale]/login.tsx#L226-L229"
+    "reference": "utils/useCreateContact.tsx#L107-L110"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
@@ -315,7 +411,7 @@
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L98-L101"
+    "reference": "utils/useCreateContact.tsx#L125-L128"
   },
   {
     "term": "generic.forms.new-password-label",
@@ -441,7 +537,7 @@
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L451-L454"
+    "reference": "utils/useCreatePetition.tsx#L114-L117"
   },
   {
     "term": "header.user-menu-button",
@@ -450,28 +546,34 @@
     "reference": "components/layout/UserMenu.tsx#L36-L39"
   },
   {
+    "term": "navbar.coming-soon",
+    "definition": "Próximamente",
+    "context": "Coming soon",
+    "reference": "components/layout/AppLayoutNavbarLink.tsx#L22-L25"
+  },
+  {
     "term": "navbar.contacts-link",
     "definition": "Contactos",
     "context": "Contacts",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L51-L54"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L59-L62"
   },
   {
     "term": "navbar.new-button",
     "definition": "Nueva petición",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L96-L99"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L103-L106"
   },
   {
     "term": "navbar.petitions-link",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L35-L38"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L41-L44"
   },
   {
     "term": "navbar.templates-link",
     "definition": "Plantillas",
     "context": "Templates",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L43-L46"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L50-L53"
   },
   {
     "term": "petition.add-another-field-button",
@@ -651,7 +753,7 @@
     "term": "petition.petition-field.no-replies",
     "definition": "No hay respuestas a este campo todavía",
     "context": "There are no replies to this field yet",
-    "reference": "components/petition/PetitionReviewField.tsx#L177-L180"
+    "reference": "components/petition/PetitionReviewField.tsx#L176-L179"
   },
   {
     "term": "petition.petition-field.replies-label",
@@ -765,91 +867,91 @@
     "term": "petitions.confirm-delete.body",
     "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L393-L401"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L353-L361"
   },
   {
     "term": "petitions.confirm-delete.confirm-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L405-L408"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L365-L368"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Eliminar peticiones",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L387-L390"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L347-L350"
   },
   {
     "term": "petitions.create-new-petition.body",
     "definition": "Nueva petición",
     "context": "Give your new petition a name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L443-L446"
+    "reference": "utils/useCreatePetition.tsx#L105-L108"
   },
   {
     "term": "petitions.create-new-petition.continue-button",
     "definition": "Continuar",
     "context": "Continue",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L467-L470"
+    "reference": "utils/useCreatePetition.tsx#L123-L126"
   },
   {
     "term": "petitions.create-new-petition.header",
     "definition": "Crear una petición nueva",
     "context": "Create a new petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L435-L438"
+    "reference": "utils/useCreatePetition.tsx#L97-L100"
   },
   {
     "term": "petitions.header.custom-ref",
     "definition": "Referencia",
     "context": "Reference",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L258-L261"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L242-L245"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L289-L292"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L273-L276"
   },
   {
     "term": "petitions.header.name",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L237-L240"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L221-L224"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progreso",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L312-L315"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L296-L299"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L268-L271"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L252-L255"
   },
   {
     "term": "petitions.header.status",
     "definition": "Estado",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L327"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L311"
   },
   {
     "term": "petitions.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L300-L303"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L284-L287"
   },
   {
     "term": "petitions.no-petitions",
     "definition": "No tienes ninguna petición todavía. ¡Empieza creando una nueva!",
     "context": "You have no petitions yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L210-L213"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L194-L197"
   },
   {
     "term": "petitions.no-results",
     "definition": "No encontramos peticiones con esta búsqueda",
     "context": "There's no petitions matching your search",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L201-L204"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L185-L188"
   },
   {
     "term": "petitions.sendout-status.active",
@@ -879,7 +981,7 @@
     "term": "petitions.title",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L171-L174"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L155-L158"
   },
   {
     "term": "public.about.mission",
@@ -945,7 +1047,7 @@
     "term": "public.bookdemo-button",
     "definition": "Pide una demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicHeroPc.tsx#L48-L51"
+    "reference": "components/public/PublicHeroPc.tsx#L45-L48"
   },
   {
     "term": "public.cookies.title",
@@ -957,7 +1059,7 @@
     "term": "public.footer.company",
     "definition": "Compañía",
     "context": "Company",
-    "reference": "components/public/layout/PublicFooter.tsx#L56-L59"
+    "reference": "components/public/layout/PublicFooter.tsx#L57-L60"
   },
   {
     "term": "public.footer.language-select-label",
@@ -969,19 +1071,19 @@
     "term": "public.footer.legal-information",
     "definition": "Información legal",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L77-L80"
+    "reference": "components/public/layout/PublicFooter.tsx#L78-L81"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L158-L161"
+    "reference": "components/public/layout/PublicFooter.tsx#L146-L149"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L143-L146"
+    "reference": "components/public/layout/PublicFooter.tsx#L131-L134"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -1059,7 +1161,7 @@
     "term": "public.header.about",
     "definition": "Acerca de",
     "context": "About",
-    "reference": "components/public/layout/PublicHeader.tsx#L104-L107"
+    "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
   },
   {
     "term": "public.hero-invite.toast-description",
@@ -1077,7 +1179,7 @@
     "term": "public.home.hero-collect",
     "definition": "Recopila información de una manera simple y eficiente",
     "context": "Collect information in a simple and efficient way",
-    "reference": "components/public/PublicHeroPc.tsx#L29-L32"
+    "reference": "components/public/PublicHeroPc.tsx#L27-L30"
   },
   {
     "term": "public.home.hero-discover-use",
@@ -1101,7 +1203,7 @@
     "term": "public.home.hero-platform",
     "definition": "Nuestra plataforma recopila la información de tus clientes y te permite dedicarte a aquellas tareas de valor añadido",
     "context": "Our platform collects the information from your clients and allows you to focus on value adding tasks.",
-    "reference": "components/public/PublicHeroPc.tsx#L35-L38"
+    "reference": "components/public/PublicHeroPc.tsx#L33-L36"
   },
   {
     "term": "public.home.hero-popular-use-cases",

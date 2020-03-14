@@ -20,7 +20,7 @@ export function AppLayoutNavbarLink({
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
   const label = intl.formatMessage({
-    id: "navbar.comin-soon",
+    id: "navbar.coming-soon",
     defaultMessage: "Coming soon"
   });
   return available ? (

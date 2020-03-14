@@ -65,7 +65,7 @@ export function PublicHero({ onRequestInvite, ...props }: PublicHeroProps) {
                   })}
                   placeholder={intl.formatMessage({
                     id: "generic.forms.email-placeholder",
-                    defaultMessage: "you@example.com"
+                    defaultMessage: "name@example.com"
                   })}
                   ref={register({
                     required: true,

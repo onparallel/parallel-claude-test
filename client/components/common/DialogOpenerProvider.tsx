@@ -32,7 +32,7 @@ export function useDialog<TProps, TResult>(
       opener((callbacks: DialogCallbacks<TResult>) => (
         <Dialog {...({ ...callbacks, ...props } as any)} />
       )),
-    deps
+    [Dialog, ...deps]
   );
 }
 

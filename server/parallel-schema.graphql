@@ -59,6 +59,12 @@ type ContactPagination {
   totalCount: Int!
 }
 
+input CreateContactInput {
+  email: String!
+  firstName: String
+  lastName: String
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
@@ -83,6 +89,11 @@ type Mutation {
   changePassword(newPassword: String!, password: String!): ChangePasswordResult!
 
   """
+  Create contact.
+  """
+  createContact(data: CreateContactInput!): Contact!
+
+  """
   Create petition.
   """
   createPetition(locale: PetitionLocale!, name: String!): Petition!
@@ -91,6 +102,11 @@ type Mutation {
   Creates a petition field
   """
   createPetitionField(id: ID!, type: PetitionFieldType!): PetitionAndField!
+
+  """
+  Delete contacts.
+  """
+  deleteContacts(ids: [ID!]!): Result!
 
   """
   Delete petitions fields.
