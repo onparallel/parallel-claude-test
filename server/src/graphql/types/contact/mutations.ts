@@ -1,8 +1,8 @@
-import { authenticate, authorizeAnd } from "../../helpers/authorize";
-import { stringArg, mutationField, idArg, inputObjectType } from "nexus";
-import { userHasAccessToContacts } from "./authorizers";
+import { idArg, inputObjectType, mutationField } from "nexus";
 import { fromGlobalIds } from "../../../util/globalId";
-import { CreateContact } from "../../../db/__types";
+import { authenticate, authorizeAnd } from "../../helpers/authorize";
+import { userHasAccessToContacts } from "./authorizers";
+
 export const createContact = mutationField("createContact", {
   description: "Create contact.",
   type: "Contact",

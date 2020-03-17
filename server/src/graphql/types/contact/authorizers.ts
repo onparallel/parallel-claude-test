@@ -1,11 +1,11 @@
-import { FieldAuthorizeResolver } from "nexus";
+import { FieldAuthorizeResolver, core } from "nexus";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 
 export function userHasAccessToContact<
   TypeName extends string,
   FieldName extends string,
-  T extends string
->(argName: T): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends keyof core.ArgsValue<TypeName, FieldName>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       const { id } = fromGlobalId(args[argName], "Contact");
@@ -17,8 +17,9 @@ export function userHasAccessToContact<
 
 export function userHasAccessToContacts<
   TypeName extends string,
-  FieldName extends string
->(argName: string): FieldAuthorizeResolver<TypeName, FieldName> {
+  FieldName extends string,
+  TArg extends keyof core.ArgsValue<TypeName, FieldName>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       const { ids } = fromGlobalIds(args[argName], "Contact");
@@ -30,10 +31,12 @@ export function userHasAccessToContacts<
 
 export function fieldBelongsToPetition<
   TypeName extends string,
-  FieldName extends string
+  FieldName extends string,
+  TArg1 extends keyof core.ArgsValue<TypeName, FieldName>,
+  TArg2 extends keyof core.ArgsValue<TypeName, FieldName>
 >(
-  argNamePetitionId: string,
-  argNameFieldId: string
+  argNamePetitionId: TArg1,
+  argNameFieldId: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {

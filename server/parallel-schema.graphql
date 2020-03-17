@@ -535,7 +535,7 @@ type Query {
     search: String
   ): ContactPagination!
   me: User!
-  organization(id: String!): Organization
+  organization(id: ID!): Organization
   petition(id: ID!): Petition
 
   """

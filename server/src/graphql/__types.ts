@@ -392,7 +392,7 @@ export interface NexusGenArgTypes {
     };
     organization: {
       // args
-      id: string; // String!
+      id: string; // ID!
     };
     petition: {
       // args

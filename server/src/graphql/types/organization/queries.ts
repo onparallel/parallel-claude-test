@@ -1,4 +1,4 @@
-import { queryField, stringArg } from "nexus";
+import { idArg, queryField } from "nexus";
 import { fromGlobalId } from "../../../util/globalId";
 import { authenticate } from "../../helpers/authorize";
 
@@ -6,7 +6,7 @@ export const organizationQueries = queryField(t => {
   t.field("organization", {
     type: "Organization",
     args: {
-      id: stringArg({ required: true })
+      id: idArg({ required: true })
     },
     authorize: authenticate(),
     nullable: true,
