@@ -1,10 +1,21 @@
 import { FieldAuthorizeResolver, core } from "nexus";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
+import { KeysOfType } from "../../../util/types";
+
+type StringArg<TypeName extends string, FieldName extends string> = KeysOfType<
+  core.ArgsValue<TypeName, FieldName>,
+  string
+>;
+
+type StringArrayArg<
+  TypeName extends string,
+  FieldName extends string
+> = KeysOfType<core.ArgsValue<TypeName, FieldName>, string[]>;
 
 export function userHasAccessToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg extends keyof core.ArgsValue<TypeName, FieldName>
+  TArg extends StringArg<TypeName, FieldName>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -18,7 +29,7 @@ export function userHasAccessToPetition<
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends keyof core.ArgsValue<TypeName, FieldName>
+  TArg extends StringArrayArg<TypeName, FieldName>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -35,8 +46,8 @@ export function userHasAccessToPetitions<
 export function fieldBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends keyof core.ArgsValue<TypeName, FieldName>,
-  TArg2 extends keyof core.ArgsValue<TypeName, FieldName>
+  TArg1 extends StringArg<TypeName, FieldName>,
+  TArg2 extends StringArg<TypeName, FieldName>
 >(
   argNamePetitionId: TArg1,
   argNameFieldId: TArg2
@@ -60,8 +71,8 @@ export function fieldBelongsToPetition<
 export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends keyof core.ArgsValue<TypeName, FieldName>,
-  TArg2 extends keyof core.ArgsValue<TypeName, FieldName>
+  TArg1 extends StringArg<TypeName, FieldName>,
+  TArg2 extends StringArrayArg<TypeName, FieldName>
 >(
   argNamePetitionId: TArg1,
   argNameFieldIds: TArg2
