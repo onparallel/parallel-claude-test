@@ -1,18 +1,12 @@
 import { GraphQLResolveInfo } from "graphql";
-import { intArg, plugin, dynamicOutputMethod, objectType } from "nexus";
 import {
-  GetGen,
-  AllNexusOutputTypeDefs,
-  ArgsRecord,
-  ObjectDefinitionBlock,
-  RootValue,
-  ArgsValue,
-  MaybePromise,
-  ResultValue,
-  MaybePromiseDeep,
-  printedGenTypingImport,
-  stringArg
-} from "nexus/dist/core";
+  core,
+  intArg,
+  stringArg,
+  plugin,
+  dynamicOutputMethod,
+  objectType
+} from "nexus";
 
 export interface PaginationPluginConfig {}
 
@@ -20,7 +14,7 @@ export type PaginationFieldConfig<
   TypeName extends string = any,
   FieldName extends string = any
 > = {
-  type: GetGen<"allOutputTypes", string> | AllNexusOutputTypeDefs;
+  type: core.GetGen<"allOutputTypes", string> | core.AllNexusOutputTypeDefs;
 
   /**
    * Additional `search` argument that can be used for searching.
@@ -29,7 +23,7 @@ export type PaginationFieldConfig<
   /**
    * Additional args to use for just this field
    */
-  additionalArgs?: ArgsRecord;
+  additionalArgs?: core.ArgsRecord;
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -43,18 +37,18 @@ export type PaginationFieldConfig<
    * This will cause the resulting type to be prefix'ed with the name of the type/field it is branched off of,
    * so as not to conflict with any non-extended paginations.
    */
-  extendPagination?: (def: ObjectDefinitionBlock<any>) => void;
+  extendPagination?: (def: core.ObjectDefinitionBlock<any>) => void;
   /**
    * Implement the full resolve, including `items` and `totalCount`.
    */
   resolve: (
-    root: RootValue<TypeName>,
-    args: ArgsValue<TypeName, FieldName>,
-    ctx: GetGen<"context">,
+    root: core.RootValue<TypeName>,
+    args: core.ArgsValue<TypeName, FieldName>,
+    ctx: core.GetGen<"context">,
     info: GraphQLResolveInfo
   ) =>
-    | MaybePromise<ResultValue<TypeName, FieldName>>
-    | MaybePromiseDeep<ResultValue<TypeName, FieldName>>;
+    | core.MaybePromise<core.ResultValue<TypeName, FieldName>>
+    | core.MaybePromiseDeep<core.ResultValue<TypeName, FieldName>>;
 } & NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 const PaginationArgs = {
@@ -73,11 +67,11 @@ export function paginationPlugin() {
   return plugin({
     name: "PaginationPlugin",
     fieldDefTypes: [
-      printedGenTypingImport({
+      core.printedGenTypingImport({
         module: "nexus",
         bindings: ["core"]
       }),
-      printedGenTypingImport({
+      core.printedGenTypingImport({
         module: "./helpers/paginationPlugin",
         bindings: ["PaginationFieldConfig"]
       })
