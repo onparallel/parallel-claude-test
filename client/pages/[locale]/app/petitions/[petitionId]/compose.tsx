@@ -40,7 +40,7 @@ import {
 } from "@parallel/utils/petitions";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
-import { defaultDataIdFromObject, gql } from "apollo-boost";
+import { gql } from "apollo-boost";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick } from "remeda";
@@ -361,7 +361,6 @@ function useCreatePetitionField() {
     {
       update(client, { data }) {
         const { field, petition } = data!.createPetitionField;
-        const petitionId = defaultDataIdFromObject(petition)!;
         const fragment = gql`
           fragment PetitionCompose_CreatePetitionField_Petition on Petition {
             fields {
@@ -371,11 +370,11 @@ function useCreatePetitionField() {
         `;
         const cached = client.readFragment<
           PetitionCompose_CreatePetitionField_PetitionFragment
-        >({ id: petitionId, fragment });
+        >({ id: petition.id, fragment });
         client.writeFragment<
           PetitionCompose_CreatePetitionField_PetitionFragment
         >({
-          id: petitionId,
+          id: petition.id,
           fragment,
           data: {
             __typename: "Petition",

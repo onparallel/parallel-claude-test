@@ -37,7 +37,10 @@ export function createApolloClient(
   const client = new ApolloClient({
     link: authLink.concat(httpLink),
     ssrMode: !process.browser,
-    cache: new InMemoryCache().restore(initialState ?? {}),
+    cache: new InMemoryCache({
+      // graphql returns unique ids
+      dataIdFromObject: o => o.id
+    }).restore(initialState ?? {}),
     connectToDevTools: process.browser && process.env.NODE_ENV === "development"
   });
   _cached = client;
