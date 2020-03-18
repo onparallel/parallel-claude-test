@@ -42,6 +42,7 @@ export type CreateContactInput = {
 export type Mutation = {
   __typename?: "Mutation";
   createContact: Contact;
+  updateContact: Contact;
   deleteContacts: Result;
   createPetition: Petition;
   deletePetitions: Result;
@@ -57,6 +58,11 @@ export type Mutation = {
 
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
+};
+
+export type MutationupdateContactArgs = {
+  id: Scalars["ID"];
+  data: UpdateContactInput;
 };
 
 export type MutationdeleteContactsArgs = {
@@ -261,6 +267,11 @@ export type Timestamps = {
   updatedAt: Scalars["DateTime"];
 };
 
+export type UpdateContactInput = {
+  firstName?: Maybe<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
+};
+
 export type UpdatePetitionFieldInput = {
   title?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
@@ -313,6 +324,21 @@ export type AppLayoutNavbar_UserFragment = {
   __typename?: "User";
 } & UserMenu_UserFragment;
 
+export type ContactHeader_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "email" | "fullName" | "updatedAt"
+>;
+
+export type ContactLayout_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id"
+> &
+  ContactHeader_ContactFragment;
+
+export type ContactLayout_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name" | "status" | "updatedAt">;
@@ -360,6 +386,42 @@ export type PetitionReviewField_PetitionFieldFragment = {
         }
     >;
   };
+
+export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "email" | "firstName" | "lastName"
+>;
+
+export type Contact_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type ContactQueryVariables = {
+  id: Scalars["ID"];
+};
+
+export type ContactQuery = { __typename?: "Query" } & {
+  contact: Maybe<
+    { __typename?: "Contact" } & Pick<Contact, "fullName"> &
+      Contact_ContactFragment
+  >;
+};
+
+export type ContactUserQueryVariables = {};
+
+export type ContactUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Contact_UserFragment;
+};
+
+export type Contact_updateContactMutationVariables = {
+  id: Scalars["ID"];
+  data: UpdateContactInput;
+};
+
+export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
+  updateContact: { __typename?: "Contact" } & Pick<Contact, "fullName"> &
+    Contact_ContactFragment;
+};
 
 export type Contacts_deleteContactsMutationVariables = {
   ids: Array<Scalars["ID"]>;

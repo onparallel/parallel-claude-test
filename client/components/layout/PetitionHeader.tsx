@@ -146,7 +146,7 @@ export function PetitionHeader({
               bottom="-1px"
             />
             <FormattedMessage
-              id="petition.status.saving"
+              id="generic.saving-changes"
               defaultMessage="Saving..."
             />
           </Box>

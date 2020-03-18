@@ -1,7 +1,8 @@
 import { idArg, inputObjectType, mutationField } from "nexus";
-import { fromGlobalIds } from "../../../util/globalId";
+import { CreateContact } from "../../../db/__types";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { authenticate, authorizeAnd } from "../../helpers/authorize";
-import { userHasAccessToContacts } from "./authorizers";
+import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
 
 export const createContact = mutationField("createContact", {
   description: "Create contact.",
@@ -27,6 +28,34 @@ export const createContact = mutationField("createContact", {
       },
       ctx.user
     );
+  }
+});
+
+export const updateContact = mutationField("updateContact", {
+  description: "Updates a contact.",
+  type: "Contact",
+  authorize: authorizeAnd(authenticate(), userHasAccessToContact("id")),
+  args: {
+    id: idArg({ required: true }),
+    data: inputObjectType({
+      name: "UpdateContactInput",
+      definition(t) {
+        t.string("firstName", { nullable: true });
+        t.string("lastName", { nullable: true });
+      }
+    }).asArg({ required: true })
+  },
+  resolve: async (_, args, ctx) => {
+    const { id } = fromGlobalId(args.id, "Contact");
+    const { firstName, lastName } = args.data;
+    const data: Partial<CreateContact> = {};
+    if (firstName !== undefined) {
+      data.first_name = firstName;
+    }
+    if (lastName !== undefined) {
+      data.last_name = lastName;
+    }
+    return await ctx.contacts.updateContact(id, data, ctx.user);
   }
 });
 

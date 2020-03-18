@@ -119,6 +119,11 @@ type Mutation {
   deletePetitions(ids: [ID!]!): Result!
 
   """
+  Updates a contact.
+  """
+  updateContact(data: UpdateContactInput!, id: ID!): Contact!
+
+  """
   Updates the positions of the petition fields
   """
   updateFieldPositions(fieldIds: [ID!]!, id: ID!): Petition!
@@ -578,6 +583,11 @@ interface Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+input UpdateContactInput {
+  firstName: String
+  lastName: String
 }
 
 input UpdatePetitionFieldInput {

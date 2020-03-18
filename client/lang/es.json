@@ -264,22 +264,28 @@
     "reference": "components/common/RecipientSelect.tsx#L116-L119"
   },
   {
+    "term": "contact.edit-details-button",
+    "definition": "Editar",
+    "context": "Edit",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L161-L164"
+  },
+  {
     "term": "contacts.confirm-delete.body",
     "definition": "¿Está seguro de que desea eliminar {count, plural, =1 {<b>{email}</b>} other {los <b>#</b> contactos seleccionados}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L246-L254"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L247-L255"
   },
   {
     "term": "contacts.confirm-delete.confirm-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L258-L261"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L259-L262"
   },
   {
     "term": "contacts.confirm-delete.header",
     "definition": "Eliminar contactos",
     "context": "Delete contacts",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L240-L243"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L241-L244"
   },
   {
     "term": "contacts.create-new-contact.continue-button",
@@ -297,37 +303,37 @@
     "term": "contacts.header.email",
     "definition": "Correo electrónico",
     "context": "Email",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L204"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L205"
   },
   {
     "term": "contacts.header.first-name",
     "definition": "Nombre",
     "context": "First name",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L184-L187"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L185-L188"
   },
   {
     "term": "contacts.header.last-name",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L194-L197"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L195-L198"
   },
   {
     "term": "contacts.no-contacts",
     "definition": "No tienes contactos todavía. ¡Empieza por añadir uno!",
     "context": "You have no contacts yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L157-L160"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L158-L161"
   },
   {
     "term": "contacts.no-results",
     "definition": "No hemos encontrado contactos con esta búsqueda",
     "context": "There's no contacts matching your search",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L148-L151"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L149-L152"
   },
   {
     "term": "contacts.title",
     "definition": "Contactos",
     "context": "Contacts",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L120-L123"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L121-L124"
   },
   {
     "term": "field-settings.file-multiple-label",
@@ -346,6 +352,12 @@
     "definition": "Multilínea",
     "context": "Multiline",
     "reference": "components/petition/PetitionComposeFieldSettings.tsx#L141-L144"
+  },
+  {
+    "term": "generic.cancel-save-changes",
+    "definition": "Cancelar",
+    "context": "Cancel",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L135-L138"
   },
   {
     "term": "generic.collapse",
@@ -534,6 +546,18 @@
     "reference": "components/common/RichTextEditor.tsx#L127-L130"
   },
   {
+    "term": "generic.save-changes",
+    "definition": "Guardar",
+    "context": "Save",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L149-L152"
+  },
+  {
+    "term": "generic.saving-changes",
+    "definition": "Guardando...",
+    "context": "Saving...",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L144-L147"
+  },
+  {
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition",
@@ -609,13 +633,13 @@
     "term": "petition.confirm-delete-field.body",
     "definition": "Este campo puede contener respuestas. Si eliminas este campo perderás <b>de forma definitiva</b> estas respuestas incluido archivos subidos.",
     "context": "This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L444-L450"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L443-L449"
   },
   {
     "term": "petition.confirm-delete-field.header",
     "definition": "Eliminar campo",
     "context": "Delete field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L438-L441"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L437-L440"
   },
   {
     "term": "petition.deadline-label",
@@ -844,12 +868,6 @@
     "definition": "Error",
     "context": "Error",
     "reference": "components/layout/PetitionHeader.tsx#L171-L174"
-  },
-  {
-    "term": "petition.status.saving",
-    "definition": "Guardando",
-    "context": "Saving...",
-    "reference": "components/layout/PetitionHeader.tsx#L148-L151"
   },
   {
     "term": "petition.subject-label",

@@ -62,6 +62,11 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
+  UpdateContactInput: {
+    // input type
+    firstName?: string | null; // String
+    lastName?: string | null; // String
+  };
   UpdatePetitionFieldInput: {
     // input type
     description?: string | null; // String
@@ -158,6 +163,7 @@ export interface NexusGenRootTypes {
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreateContactInput: NexusGenInputs["CreateContactInput"];
+  UpdateContactInput: NexusGenInputs["UpdateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
@@ -195,6 +201,7 @@ export interface NexusGenFieldTypes {
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetitionField: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updatePetition: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
@@ -343,6 +350,11 @@ export interface NexusGenArgTypes {
       // args
       ids: string[]; // [ID!]!
     };
+    updateContact: {
+      // args
+      data: NexusGenInputs["UpdateContactInput"]; // UpdateContactInput!
+      id: string; // ID!
+    };
     updateFieldPositions: {
       // args
       fieldIds: string[]; // [ID!]!
@@ -439,6 +451,7 @@ export type NexusGenObjectNames =
 
 export type NexusGenInputNames =
   | "CreateContactInput"
+  | "UpdateContactInput"
   | "UpdatePetitionFieldInput"
   | "UpdatePetitionInput"
   | "UpdateUserInput";

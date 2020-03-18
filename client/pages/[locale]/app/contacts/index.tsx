@@ -84,7 +84,10 @@ function Contacts() {
   }
 
   function handleRowClick(row: ContactSelection) {
-    console.log(row);
+    router.push(
+      `/[locale]/app/contacts/[contactId]`,
+      `/${router.query.locale}/app/contacts/${row.id}`
+    );
   }
 
   function handlePageChange(page: number) {
@@ -97,9 +100,7 @@ function Contacts() {
   async function handleCreateClick() {
     try {
       const id = await createContact();
-      // if (state.status === null || state.status === "DRAFT") {
       refetch();
-      // }
     } catch {}
   }
 

@@ -74,6 +74,24 @@ export class ContactReposistory extends BaseRepository {
     return row;
   }
 
+  async updateContact(
+    contactId: number,
+    data: Partial<CreateContact>,
+    user: User
+  ) {
+    const [row] = await this.from("contact")
+      .where("id", contactId)
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`
+        },
+        "*"
+      );
+    return row;
+  }
+
   async deleteContactById(contactId: MaybeArray<number>, user: User) {
     return await this.from("contact")
       .update({
