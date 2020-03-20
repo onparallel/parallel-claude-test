@@ -41,13 +41,68 @@ import {
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { indexBy, pick } from "remeda";
+import { indexBy, omit, pick } from "remeda";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
 >;
+
+type FieldSelection = UnwrapArray<
+  Exclude<PetitionComposeQuery["petition"], null>["fields"]
+>;
+
+type FieldsReducerState = {
+  active: string | null;
+  fieldsById: { [id: string]: FieldSelection };
+  fieldIds: string[];
+};
+
+function fieldsReducer(
+  state: FieldsReducerState,
+  action:
+    | { type: "RESET"; fields: FieldSelection[] }
+    | { type: "SORT"; fieldIds: string[] }
+    | { type: "REMOVE"; fieldId: string }
+    | { type: "ADD"; field: FieldSelection }
+    | { type: "SET_ACTIVE"; fieldId: string | null }
+): FieldsReducerState {
+  switch (action.type) {
+    case "RESET":
+      return reset(action.fields);
+    case "SORT":
+      return {
+        ...state,
+        fieldIds: action.fieldIds
+      };
+    case "REMOVE":
+      return {
+        active: state.active === action.fieldId ? null : state.active,
+        fieldsById: omit(state.fieldsById, [action.fieldId]),
+        fieldIds: state.fieldIds.filter(id => id !== action.fieldId)
+      };
+    case "ADD":
+      return {
+        ...state,
+        fieldsById: { ...state.fieldsById, [action.field.id]: action.field },
+        fieldIds: [...state.fieldIds, action.field.id]
+      };
+    case "SET_ACTIVE":
+      return {
+        ...state,
+        active: action.fieldId
+      };
+  }
+}
+
+function reset(fields: FieldSelection[]): FieldsReducerState {
+  return {
+    active: null,
+    fieldsById: indexBy(fields, f => f.id),
+    fieldIds: fields.map(f => f.id)
+  };
+}
 
 function PetitionCompose({ petitionId }: PetitionProps) {
   const intl = useIntl();
@@ -58,13 +113,20 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     PetitionComposeQuery,
     PetitionComposeQueryVariables
   >(GET_PETITION_COMPOSE_DATA, { variables: { id: petitionId } });
-  const { fields } = petition!;
-  const fieldsById = useMemo(() => indexBy(fields, f => f.id), [fields]);
-  const [fieldIds, setFieldIds] = useState(fields.map(f => f.id));
-  const [active, setActive] = useState<string | null>(null);
-  const confirmDelete = useDialog(ConfirmDelete, []);
+
   const [state, setState] = usePetitionState();
+  const [{ active, fieldsById, fieldIds }, dispatch] = useReducer(
+    fieldsReducer,
+    petition!.fields,
+    reset
+  );
+  useEffect(() => dispatch({ type: "RESET", fields: petition!.fields }), [
+    petition!.id
+  ]);
+
+  const confirmDelete = useDialog(ConfirmDelete, []);
   const wrapper = useWrapPetitionUpdater(setState);
+
   const [updatePetition] = useUpdatePetition();
   const [updateFieldPositions] = useUpdateFieldPositions();
   const [createPetitionField] = useCreatePetitionField();
@@ -83,7 +145,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       const newFieldIds = [...fieldIds];
       const [field] = newFieldIds.splice(dragIndex, 1);
       newFieldIds.splice(hoverIndex, 0, field);
-      setFieldIds(newFieldIds);
+      dispatch({ type: "SORT", fieldIds: newFieldIds });
       if (dropped) {
         await wrapper(updateFieldPositions)({
           variables: { id: petitionId, fieldIds: newFieldIds }
@@ -97,8 +159,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     async function(fieldId: string) {
       try {
         await confirmDelete({});
-        setFieldIds(fieldIds => fieldIds.filter(id => id !== fieldId));
-        setActive(active => (active === fieldId ? null : active));
+        dispatch({ type: "REMOVE", fieldId });
         await wrapper(deletePetitionField)({
           variables: { id: petitionId, fieldId }
         });
@@ -141,11 +202,11 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       const { data } = await createPetitionField({
         variables: { id: petitionId, type }
       });
-      const fieldId = data!.createPetitionField.field.id;
-      setFieldIds(fieldIds => [...fieldIds, fieldId]);
+      const field = data!.createPetitionField.field;
+      dispatch({ type: "ADD", field });
       setTimeout(() => {
         const title = document.querySelector<HTMLElement>(
-          `#field-title-${fieldId}`
+          `#field-title-${field.id}`
         );
         title?.click();
       }, 0);
@@ -193,7 +254,9 @@ function PetitionCompose({ petitionId }: PetitionProps) {
                       field={fieldsById[fieldId]}
                       index={index}
                       active={active === fieldId}
-                      onSettingsClick={() => setActive(fieldId)}
+                      onSettingsClick={() =>
+                        dispatch({ type: "SET_ACTIVE", fieldId })
+                      }
                       onDeleteClick={() => handleFieldDelete(fieldId)}
                       onFieldEdit={data =>
                         handleFieldUpdate(fieldsById[fieldId], data)
@@ -251,7 +314,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
               <PetitionComposeFieldSettings
                 field={fieldsById[active]}
                 onUpdate={data => handleFieldUpdate(fieldsById[active], data)}
-                onClose={() => setActive(null)}
+                onClose={() => dispatch({ type: "SET_ACTIVE", fieldId: null })}
               />
             </Box>
           ) : null}
