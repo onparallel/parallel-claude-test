@@ -15,7 +15,7 @@ import {
   ButtonProps
 } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, Ref, forwardRef } from "react";
 import { useIntl } from "react-intl";
 
 export type AddFieldPopoverProps = ButtonProps & {
@@ -24,10 +24,10 @@ export type AddFieldPopoverProps = ButtonProps & {
 
 export const FIELD_TYPES: PetitionFieldType[] = ["TEXT", "FILE_UPLOAD"];
 
-export function AddFieldPopover({
-  onSelectFieldType,
-  ...props
-}: AddFieldPopoverProps) {
+export const AddFieldPopover = forwardRef(function AddFieldPopover(
+  { onSelectFieldType, ...props }: AddFieldPopoverProps,
+  ref: Ref<HTMLButtonElement>
+) {
   const intl = useIntl();
   const labels = useMemo(() => {
     return {
@@ -43,7 +43,7 @@ export function AddFieldPopover({
   }, []);
   return (
     <Menu>
-      <MenuButton as={Button} {...props}></MenuButton>
+      <MenuButton as={Button} ref={ref} {...props}></MenuButton>
       <MenuList>
         {FIELD_TYPES.map(type => (
           <MenuItem
@@ -75,4 +75,4 @@ export function AddFieldPopover({
       </MenuList>
     </Menu>
   );
-}
+});

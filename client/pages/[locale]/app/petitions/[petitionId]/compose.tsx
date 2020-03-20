@@ -41,7 +41,13 @@ import {
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { useCallback, useEffect, useReducer } from "react";
+import {
+  useCallback,
+  useEffect,
+  useReducer,
+  KeyboardEvent,
+  useRef
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, omit, pick } from "remeda";
 
@@ -124,6 +130,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     petition!.id
   ]);
 
+  const addFieldRef = useRef<HTMLButtonElement>(null);
   const confirmDelete = useDialog(ConfirmDelete, []);
   const wrapper = useWrapPetitionUpdater(setState);
 
@@ -197,6 +204,13 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     [petitionId]
   );
 
+  const focusTitle = useCallback((fieldId: string) => {
+    const title = document.querySelector<HTMLElement>(
+      `#field-title-${fieldId}`
+    );
+    title?.click();
+  }, []);
+
   const handleAddField = useCallback(
     wrapper(async function(type: PetitionFieldType) {
       const { data } = await createPetitionField({
@@ -204,14 +218,31 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       });
       const field = data!.createPetitionField.field;
       dispatch({ type: "ADD", field });
-      setTimeout(() => {
-        const title = document.querySelector<HTMLElement>(
-          `#field-title-${field.id}`
-        );
-        title?.click();
-      }, 0);
+      setTimeout(() => focusTitle(field.id));
     }),
     [petitionId]
+  );
+
+  const handleTitleKeyDown = useCallback(
+    function(fieldId: string, event: KeyboardEvent<any>) {
+      const index = fieldIds.indexOf(fieldId);
+      switch (event.key) {
+        case "ArrowDown":
+          if (index < fieldIds.length - 1) {
+            focusTitle(fieldIds[index + 1]);
+          }
+          break;
+        case "ArrowUp":
+          if (index > 0) {
+            focusTitle(fieldIds[index - 1]);
+          }
+          break;
+        case "Enter":
+          addFieldRef.current!.click();
+          break;
+      }
+    },
+    [fieldIds]
   );
 
   return (
@@ -261,10 +292,14 @@ function PetitionCompose({ petitionId }: PetitionProps) {
                       onFieldEdit={data =>
                         handleFieldUpdate(fieldsById[fieldId], data)
                       }
+                      onTitleKeyDown={event =>
+                        handleTitleKeyDown(fieldId, event)
+                      }
                     />
                   ))}
                   <Flex padding={2} justifyContent="center">
                     <AddFieldPopover
+                      ref={addFieldRef}
                       variant="ghost"
                       leftIcon="add"
                       onSelectFieldType={handleAddField}

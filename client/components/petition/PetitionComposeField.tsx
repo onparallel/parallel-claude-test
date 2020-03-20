@@ -18,7 +18,7 @@ import {
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { gql } from "apollo-boost";
-import { MouseEvent, useCallback, useRef } from "react";
+import { MouseEvent, useCallback, useRef, KeyboardEvent } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -32,6 +32,7 @@ export type PetitionComposeFieldProps = {
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
 };
 
 interface DragItem {
@@ -46,8 +47,9 @@ export function PetitionComposeField({
   active,
   onMove,
   onSettingsClick,
-  onFieldEdit: onPetitionEdit,
-  onDeleteClick
+  onFieldEdit,
+  onDeleteClick,
+  onTitleKeyDown
 }: PetitionComposeFieldProps) {
   const intl = useIntl();
   const labels = {
@@ -66,19 +68,19 @@ export function PetitionComposeField({
   const handleTitleSubmit = useCallback(
     function(value) {
       if (value !== field.title) {
-        onPetitionEdit({ title: value || null });
+        onFieldEdit({ title: value || null });
       }
     },
-    [field, onPetitionEdit]
+    [field, onFieldEdit]
   );
 
   const handleDescriptionSubmit = useCallback(
     function(value) {
       if (value !== field.description) {
-        onPetitionEdit({ description: value || null });
+        onFieldEdit({ description: value || null });
       }
     },
-    [field, onPetitionEdit]
+    [field, onFieldEdit]
   );
 
   return (
@@ -201,7 +203,10 @@ export function PetitionComposeField({
             {({ onRequestEdit }: { onRequestEdit: () => void }) => (
               <>
                 <EditablePreview width="100%" />
-                <EditableInput _focus={{ outline: "none" }} />
+                <EditableInput
+                  _focus={{ outline: "none" }}
+                  onKeyDown={onTitleKeyDown}
+                />
                 <VisuallyHidden
                   id={`field-title-${field.id}`}
                   onClick={onRequestEdit}
