@@ -10,23 +10,23 @@
   "dependencies": {
     "mjml": "^4.6.2",
     "mjml-react": "^1.0.57",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0",
-    "react-intl": "^4.1.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-intl": "^4.2.2",
     "remeda": "^0.0.15",
-    "ts-node": "^8.6.2"
+    "ts-node": "^8.8.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.3",
     "@types/mjml": "^4.0.3",
     "@types/mjml-react": "^1.0.3",
-    "@types/node": "^13.9.1",
-    "@types/react": "^16.9.23",
+    "@types/node": "^13.9.3",
+    "@types/react": "^16.9.25",
     "@types/react-dom": "^16.9.5",
     "chalk": "^3.0.0",
     "express": "^4.17.1",
     "livereload": "^0.9.1",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.1",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.8.3"
   }

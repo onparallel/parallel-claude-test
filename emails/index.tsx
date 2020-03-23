@@ -15,13 +15,14 @@ async function buildEmail(locale: string, component: ReactElement) {
   const { html } = render(
     <IntlProvider locale={locale} messages={messages}>
       {component}
-    </IntlProvider>
-  {
-    keepComments: false,
-    beautify: false,
-    minify: true,
-    validationLevel: 'skip'
-  });
+    </IntlProvider>,
+    {
+      keepComments: false,
+      beautify: false,
+      minify: true,
+      validationLevel: "skip"
+    }
+  );
   return html;
 }
 
