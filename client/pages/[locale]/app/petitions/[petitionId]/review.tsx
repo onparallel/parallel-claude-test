@@ -7,7 +7,7 @@ import {
   IconButton,
   MenuItem,
   MenuList,
-  Stack
+  Stack,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
 import { Divider } from "@parallel/components/common/Divider";
@@ -26,11 +26,11 @@ import {
   PetitionsUserQuery,
   UpdatePetitionInput,
   PetitionReview_validatePetitionFieldsMutation,
-  PetitionReview_validatePetitionFieldsMutationVariables
+  PetitionReview_validatePetitionFieldsMutationVariables,
 } from "@parallel/graphql/__types";
 import {
   usePetitionState,
-  useWrapPetitionUpdater
+  useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
@@ -70,15 +70,15 @@ function PetitionReview({ petitionId }: PetitionProps) {
               id: petition!.id,
               name: petition!.name,
               status: petition!.status,
-              updatedAt: new Date().toISOString()
+              updatedAt: new Date().toISOString(),
             },
-            fields: fieldIds.map(id => ({
+            fields: fieldIds.map((id) => ({
               __typename: "PetitionField",
               id,
-              validated: value
-            }))
-          }
-        }
+              validated: value,
+            })),
+          },
+        },
       });
     }),
     []
@@ -98,7 +98,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
     allSelected,
     toggle,
     toggleAll,
-    toggleBy
+    toggleBy,
   } = useSelectionState(petition!.fields, "id");
 
   return (
@@ -107,7 +107,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
         {petition!.name ||
           intl.formatMessage({
             id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition"
+            defaultMessage: "Untitled petition",
           })}
       </Title>
       <PetitionLayout
@@ -123,7 +123,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
             <Button variant="outline" onClick={toggleAll} padding={0}>
               <Checkbox
                 isReadOnly
-                onClick={event => event.preventDefault()}
+                onClick={(event) => event.preventDefault()}
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
                 size="md"
@@ -165,7 +165,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
               variantColor="green"
               onClick={() =>
                 handleOnValidate(
-                  selected.map(r => r.id),
+                  selected.map((r) => r.id),
                   true
                 )
               }
@@ -190,7 +190,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
                   onValidateToggle={() =>
                     handleOnValidate([field.id], !field.validated)
                   }
-                  onToggle={event => toggle(field.id, event)}
+                  onToggle={(event) => toggle(field.id, event)}
                 />
               ))}
             </Stack>
@@ -219,7 +219,7 @@ PetitionReview.fragments = {
       ...PetitionLayout_User
     }
     ${PetitionLayout.fragments.user}
-  `
+  `,
 };
 
 const GET_PETITION_REVIEW_DATA = gql`
@@ -285,14 +285,14 @@ PetitionReview.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   await Promise.all([
     apollo.query<PetitionReviewQuery, PetitionReviewQueryVariables>({
       query: GET_PETITION_REVIEW_DATA,
-      variables: { id: query.petitionId as string }
+      variables: { id: query.petitionId as string },
     }),
     apollo.query<PetitionReviewUserQuery>({
-      query: GET_PETITION_REVIEW_USER_DATA
-    })
+      query: GET_PETITION_REVIEW_USER_DATA,
+    }),
   ]);
   return {
-    petitionId: query.petitionId as string
+    petitionId: query.petitionId as string,
   };
 };
 

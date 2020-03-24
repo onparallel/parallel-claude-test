@@ -21,7 +21,7 @@ const server = new ApolloServer({
     const context = container.get<Context>(Context);
     context.req = req;
     return context;
-  }
+  },
 });
 
 server.applyMiddleware({ app });

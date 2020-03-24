@@ -16,7 +16,7 @@ export function resolveUrl(pathname: string, query: ParsedUrlQuery) {
  * @returns The parameters used in the pathname, e.g. ['locale', 'petitionId']
  */
 export function pathParams(pathname: string) {
-  return (pathname.match(/\[(\.{3})?([^\]]*)]/g) ?? []).map(param =>
+  return (pathname.match(/\[(\.{3})?([^\]]*)]/g) ?? []).map((param) =>
     param.replace(/^\[(\.{3})?/, "").replace(/\]$/, "")
   );
 }

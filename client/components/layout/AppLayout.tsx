@@ -50,5 +50,5 @@ AppLayout.fragments = {
       ...AppLayoutNavbar_User
     }
     ${AppLayoutNavbar.fragments.user}
-  `
+  `,
 };

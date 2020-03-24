@@ -5,7 +5,7 @@ import { css } from "@emotion/core";
  */
 export function generateCssStripe({
   size = "1rem",
-  color = "rgba(255, 255, 255, 1)"
+  color = "rgba(255, 255, 255, 1)",
 }) {
   return css`
     background-image: linear-gradient(

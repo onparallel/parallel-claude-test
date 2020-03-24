@@ -8,31 +8,31 @@ export const Contact = objectType({
     t.implements("Timestamps");
     t.id("id", {
       description: "The ID of the contact.",
-      resolve: o => toGlobalId("Contact", o.id)
+      resolve: (o) => toGlobalId("Contact", o.id),
     });
     t.string("email", {
-      description: "The email of the contact."
+      description: "The email of the contact.",
     });
     t.string("firstName", {
       description: "The first name of the contact.",
       nullable: true,
-      resolve: o => o.first_name
+      resolve: (o) => o.first_name,
     });
     t.string("lastName", {
       description: "The last name of the contact.",
       nullable: true,
-      resolve: o => o.last_name
+      resolve: (o) => o.last_name,
     });
     t.string("fullName", {
       description: "The full name of the contact.",
       nullable: true,
-      resolve: o => {
+      resolve: (o) => {
         if (o.first_name) {
           return o.last_name ? `${o.first_name} ${o.last_name}` : o.first_name;
         } else {
           return null;
         }
-      }
+      },
     });
-  }
+  },
 });

@@ -7,7 +7,7 @@ import {
   Heading,
   Input,
   Text,
-  useToast
+  useToast,
 } from "@chakra-ui/core";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -41,21 +41,21 @@ function Forgot() {
     setIsSubmitting(true);
     try {
       await postJson("/api/auth/forgot-password", {
-        email
+        email,
       });
       setVerification({ sent: true, email });
       toast({
         title: intl.formatMessage({
           id: "public.forgot-password.toast-title",
-          defaultMessage: "Reset your password"
+          defaultMessage: "Reset your password",
         }),
         description: intl.formatMessage({
           id: "public.forgot-password.toast-description",
           defaultMessage:
-            "An email is on its way to you with a verification code."
+            "An email is on its way to you with a verification code.",
         }),
         status: "success",
-        isClosable: true
+        isClosable: true,
       });
     } catch (error) {}
     setIsSubmitting(false);
@@ -63,7 +63,7 @@ function Forgot() {
 
   async function onPasswordResetSubmit({
     verificationCode,
-    password1: newPassword
+    password1: newPassword,
   }: PasswordResetFormData) {
     setIsSubmitting(true);
     setVerification({ ...verification, verificationCodeError: false });
@@ -71,19 +71,19 @@ function Forgot() {
       await postJson("/api/auth/confirm-forgot-password", {
         email: verification.email,
         verificationCode,
-        newPassword
+        newPassword,
       });
       toast({
         title: intl.formatMessage({
           id: "public.forgot-password.reset-success-toast-title",
-          defaultMessage: "Password reset"
+          defaultMessage: "Password reset",
         }),
         description: intl.formatMessage({
           id: "public.forgot-password.reset-success-toast-description",
-          defaultMessage: "Your password has been reset successfully."
+          defaultMessage: "Your password has been reset successfully.",
         }),
         status: "success",
-        isClosable: true
+        isClosable: true,
       });
       router.push("/[locale]/login", `/${router.query.locale}/login`);
     } catch (error) {
@@ -97,7 +97,7 @@ function Forgot() {
       <Title>
         {intl.formatMessage({
           id: "public.forgot.title",
-          defaultMessage: "Forgot password"
+          defaultMessage: "Forgot password",
         })}
       </Title>
       <PublicLayout>
@@ -128,7 +128,7 @@ interface ForgotPasswordFormProps {
 
 function ForgotPasswordForm({
   onSubmit,
-  isSubmitting
+  isSubmitting,
 }: ForgotPasswordFormProps) {
   const { handleSubmit, register, errors } = useForm<ForgotPasswordFormData>();
   return (
@@ -161,7 +161,7 @@ function ForgotPasswordForm({
             type="email"
             ref={register({
               required: true,
-              pattern: EMAIL_REGEX
+              pattern: EMAIL_REGEX,
             })}
           />
           {errors.email && (
@@ -215,7 +215,7 @@ function PasswordResetForm({
   onSubmit,
   onBackToForgotPassword,
   verificationCodeError,
-  isSubmitting
+  isSubmitting,
 }: PasswordResetFormProps) {
   const {
     handleSubmit,
@@ -223,7 +223,7 @@ function PasswordResetForm({
     errors,
     getValues,
     setError,
-    clearError
+    clearError,
   } = useForm<PasswordResetFormData>({ mode: "onBlur" });
   useEffect(() => {
     if (verificationCodeError) {
@@ -290,7 +290,7 @@ function PasswordResetForm({
             name="password1"
             ref={register({
               required: true,
-              validate: value => value.length >= 8
+              validate: (value) => value.length >= 8,
             })}
           />
           {errors.password1 && (
@@ -314,7 +314,7 @@ function PasswordResetForm({
             name="password2"
             ref={register({
               required: true,
-              validate: value => value === getValues().password1
+              validate: (value) => value === getValues().password1,
             })}
           />
           {errors.password2 && (
@@ -358,7 +358,7 @@ export async function getStaticProps() {
 export function getStaticPaths() {
   return {
     paths: languages.map(({ locale }) => ({ params: { locale } })),
-    fallback: false
+    fallback: false,
   };
 }
 

@@ -2,7 +2,7 @@ import { FocusEventHandler, useMemo, useState } from "react";
 
 export function useFocus<T = any>({
   onFocus,
-  onBlur
+  onBlur,
 }: {
   onFocus?: FocusEventHandler<T>;
   onBlur?: FocusEventHandler<T>;
@@ -12,16 +12,16 @@ export function useFocus<T = any>({
     focused,
     useMemo(
       () => ({
-        onFocus: <FocusEventHandler<T>>(e => {
+        onFocus: <FocusEventHandler<T>>((e) => {
           setFocused(true);
           onFocus?.(e);
         }),
-        onBlur: <FocusEventHandler<T>>(e => {
+        onBlur: <FocusEventHandler<T>>((e) => {
           setFocused(false);
           onBlur?.(e);
-        })
+        }),
       }),
       [onFocus, onBlur]
-    )
+    ),
   ] as const;
 }

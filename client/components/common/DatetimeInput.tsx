@@ -7,7 +7,7 @@ import {
   InputLeftElement,
   InputProps,
   InputRightElement,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -28,7 +28,7 @@ function serializeDate(value: Date | null) {
       month: value.getMonth() + 1,
       day: value.getDate(),
       hours: value.getHours(),
-      minutes: value.getMinutes()
+      minutes: value.getMinutes(),
     };
     return `${year}-${p(month)}-${p(day)}T${p(hours)}:${p(minutes)}`;
   }
@@ -65,10 +65,10 @@ export const DateTimeInput = forwardRef(function DateTimeInput(
     if (!supportsDatetimeLocal) {
       const mask = maskInput({
         inputElement: input,
-        mask: "0000-00-00 00:00".split("").map(c => (c === "0" ? /\d/ : c)),
+        mask: "0000-00-00 00:00".split("").map((c) => (c === "0" ? /\d/ : c)),
         showMask: true,
         keepCharPositions: true,
-        placeholderChar: "\u2000"
+        placeholderChar: "\u2000",
       });
       input.addEventListener("input", handleChangeNative);
       return () => {
@@ -92,7 +92,7 @@ export const DateTimeInput = forwardRef(function DateTimeInput(
 
   const clearLabel = intl.formatMessage({
     id: "component.input.clear-button",
-    defaultMessage: "Clear"
+    defaultMessage: "Clear",
   });
 
   function handleClearClick() {

@@ -4,7 +4,7 @@ import Document, {
   Head,
   Html,
   Main,
-  NextScript
+  NextScript,
 } from "next/document";
 import { IntlConfig } from "react-intl";
 import { LangProps } from "./_app";
@@ -16,11 +16,11 @@ export async function loadMessages(
 ): Promise<IntlConfig["messages"]> {
   const [raw, compiled] = await Promise.all([
     fs.readFile(LANG_DIR + `/${locale}.json`, {
-      encoding: "utf-8"
+      encoding: "utf-8",
     }),
     fs.readFile(LANG_DIR + `/compiled/${locale}.json`, {
-      encoding: "utf-8"
-    })
+      encoding: "utf-8",
+    }),
   ]);
   return { raw: JSON.parse(raw), compiled: JSON.parse(compiled) };
 }
@@ -35,9 +35,9 @@ class MyDocument extends Document<MyDocumentProps> {
     const { raw, compiled } = await loadMessages(locale as string);
     ctx.renderPage = () =>
       renderPage({
-        enhanceApp: App => props => (
+        enhanceApp: (App) => (props) => (
           <App {...props} {...{ locale, messages: compiled }}></App>
-        )
+        ),
       });
     const initialProps = await Document.getInitialProps(ctx);
     return { ...initialProps, locale, messages: raw };
@@ -59,7 +59,7 @@ class MyDocument extends Document<MyDocumentProps> {
             id="__LANG_DATA__"
             type="application/json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify({ locale, messages })
+              __html: JSON.stringify({ locale, messages }),
             }}
           />
           <NextScript />

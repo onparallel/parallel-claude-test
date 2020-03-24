@@ -3,7 +3,7 @@ export async function postJson(url: string, content?: {}) {
     credentials: "include",
     method: "POST",
     body: content && JSON.stringify(content),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   });
   if (res.status === 204) {
     return null;

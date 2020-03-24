@@ -4,7 +4,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useState
+  useState,
 } from "react";
 
 export type DialogCallbacks<T> = {
@@ -51,7 +51,7 @@ export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
           onReject: (reason?: any) => {
             setDialog(null);
             reject(reason);
-          }
+          },
         })
       );
     });

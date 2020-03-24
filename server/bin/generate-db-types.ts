@@ -14,8 +14,8 @@ const knex = Knex({
     host: process.env.DB_HOST!,
     database: process.env.DB_DATABASE!,
     user: process.env.DB_USER!,
-    password: process.env.DB_PASSWORD!
-  }
+    password: process.env.DB_PASSWORD!,
+  },
 });
 
 interface DbEnum {
@@ -51,7 +51,7 @@ export type Maybe<T> = T | null;
   ${Array.from(enums.values())
     .map(
       ({ name, values }) => `
-export type ${name} = ${values.map(value => `"${value}"`).join(" | ")};`
+export type ${name} = ${values.map((value) => `"${value}"`).join(" | ")};`
     )
     .join("\n")}
 
@@ -83,15 +83,15 @@ export interface TablePrimaryKeys {
 export interface ${name} {
   ${columns
     .sort((a, b) => a.position - b.position)
-    .map(c => `${c.name}: ${c.nullable ? `Maybe<${c.type}>` : c.type};`)
+    .map((c) => `${c.name}: ${c.nullable ? `Maybe<${c.type}>` : c.type};`)
     .join("\n  ")}
 }
 
 export interface Create${name} {
   ${columns
-    .filter(c => c.name !== primaryKey)
+    .filter((c) => c.name !== primaryKey)
     .map(
-      c =>
+      (c) =>
         `${c.name}${c.hasDefault || c.nullable ? "?" : ""}: ${
           c.nullable ? `Maybe<${c.type}>` : c.type
         };`
@@ -110,8 +110,8 @@ async function getTableNames() {
     .from("information_schema.tables")
     .where("table_schema", "public");
   const tableNames = rows
-    .map(t => <string>t.table_name)
-    .filter(t => !EXCLUDED_TABLES.includes(t))
+    .map((t) => <string>t.table_name)
+    .filter((t) => !EXCLUDED_TABLES.includes(t))
     .sort();
   return tableNames;
 }
@@ -133,7 +133,7 @@ async function getDefinedEnums() {
     if (!result.has(name)) {
       result.set(name, {
         name: camelCase(name, { pascalCase: true }),
-        values: []
+        values: [],
       });
     }
     result.get(name)!.values.push(value);
@@ -154,13 +154,13 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
       )
       .from("information_schema.columns")
       .whereIn("table_name", tables),
-    c => c.table_name
+    (c) => c.table_name
   );
   const primaryKeys = indexBy(
     await knex
       .select("tc.table_name", "ccu.column_name")
       .from("information_schema.table_constraints as tc")
-      .join("information_schema.constraint_column_usage as ccu", function() {
+      .join("information_schema.constraint_column_usage as ccu", function () {
         this.on("tc.constraint_schema", "ccu.constraint_schema").andOn(
           "tc.constraint_name",
           "ccu.constraint_name"
@@ -168,7 +168,7 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
       })
       .where("tc.constraint_type", "PRIMARY KEY")
       .whereIn("tc.table_name", tables),
-    pk => pk.table_name
+    (pk) => pk.table_name
   );
   return new Map<string, DbTable>(
     Object.entries(columns).map(([tableName, columns]) => [
@@ -176,15 +176,15 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
       {
         name: camelCase(tableName, { pascalCase: true }),
         tableName: tableName,
-        columns: columns.map(column => ({
+        columns: columns.map((column) => ({
           name: column.column_name,
           type: getColumnType(column.udt_name, enums),
           nullable: column.is_nullable === "YES",
           hasDefault: !!column.column_default,
-          position: column.ordinal_position
+          position: column.ordinal_position,
         })),
-        primaryKey: primaryKeys[tableName].column_name
-      }
+        primaryKey: primaryKeys[tableName].column_name,
+      },
     ])
   );
 }

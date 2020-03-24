@@ -33,7 +33,7 @@ async function extract(input: string, output: string) {
     }
     const updated = updateLocaleData(language, data, terms);
     await writeJson(path.join(output, `${language.locale}.json`), updated, {
-      pretty: true
+      pretty: true,
     });
   }
 }
@@ -102,7 +102,7 @@ function updateLocaleData(
           term: term.id,
           definition: "",
           context: "",
-          reference: ""
+          reference: "",
         };
     if (defaultLanguage) {
       entry!.definition = term.defaultMessage;
@@ -124,9 +124,9 @@ function updateLocaleData(
 }
 
 function logStats(terms: ExtractedTerm[], data: Map<string, Term>) {
-  const set = new Set(terms.map(t => t.id));
-  const added = terms.filter(t => !data.has(t.id));
-  const removed = Array.from(data.values()).filter(t => !set.has(t.term));
+  const set = new Set(terms.map((t) => t.id));
+  const added = terms.filter((t) => !data.has(t.id));
+  const removed = Array.from(data.values()).filter((t) => !set.has(t.term));
   console.log(chalk.green.bold(`Terms added (${added.length}):`));
   for (const term of added) {
     console.log(`- ${term.id}`);
@@ -142,12 +142,12 @@ async function main() {
     .option("input", {
       required: true,
       type: "string",
-      description: "Files to extract terms from"
+      description: "Files to extract terms from",
     })
     .option("output", {
       required: true,
       type: "string",
-      description: "Directory to place the extracted terms"
+      description: "Directory to place the extracted terms",
     }).argv;
 
   await extract(input, output);

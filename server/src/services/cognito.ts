@@ -3,7 +3,7 @@ import {
   CognitoRefreshToken,
   CognitoUser,
   CognitoUserPool,
-  CognitoUserSession
+  CognitoUserSession,
 } from "amazon-cognito-identity-js";
 import { inject, injectable } from "inversify";
 import { promisify } from "util";
@@ -16,14 +16,14 @@ export class Cognito {
   private getPool() {
     return new CognitoUserPool({
       ClientId: this.config.cognito.clientId,
-      UserPoolId: this.config.cognito.defaultPoolId
+      UserPoolId: this.config.cognito.defaultPoolId,
     });
   }
 
   private getUser(email: string) {
     return new CognitoUser({
       Username: email,
-      Pool: this.getPool()
+      Pool: this.getPool(),
     });
   }
 
@@ -33,12 +33,12 @@ export class Cognito {
       user.authenticateUser(
         new AuthenticationDetails({
           Username: email,
-          Password: password
+          Password: password,
         }),
         {
           onSuccess: resolve,
           onFailure: reject,
-          newPasswordRequired: () => reject({ code: "NewPasswordRequired" })
+          newPasswordRequired: () => reject({ code: "NewPasswordRequired" }),
         }
       )
     );
@@ -49,7 +49,7 @@ export class Cognito {
       this.getUser(email).forgotPassword({
         onSuccess: reject, // it should always go through inputVerificationCode
         onFailure: reject,
-        inputVerificationCode: resolve
+        inputVerificationCode: resolve,
       })
     );
   }
@@ -62,7 +62,7 @@ export class Cognito {
     return await new Promise<any>((resolve, reject) =>
       this.getUser(email).confirmPassword(verificationCode, newPasword, {
         onSuccess: resolve,
-        onFailure: reject
+        onFailure: reject,
       })
     );
   }
@@ -77,7 +77,7 @@ export class Cognito {
       user.authenticateUser(
         new AuthenticationDetails({
           Username: email,
-          Password: password
+          Password: password,
         }),
         {
           onSuccess: resolve,
@@ -85,8 +85,8 @@ export class Cognito {
           newPasswordRequired: () =>
             user.completeNewPasswordChallenge(newPassword, [], {
               onSuccess: resolve,
-              onFailure: reject
-            })
+              onFailure: reject,
+            }),
         }
       )
     );
@@ -98,11 +98,11 @@ export class Cognito {
       user.authenticateUser(
         new AuthenticationDetails({
           Username: email,
-          Password: password
+          Password: password,
         }),
         {
           onSuccess: resolve,
-          onFailure: reject
+          onFailure: reject,
         }
       )
     );
@@ -116,7 +116,7 @@ export class Cognito {
     const user = this.getUser(email);
     return (await promisify(user.refreshSession.bind(user))(
       new CognitoRefreshToken({
-        RefreshToken: refreshToken
+        RefreshToken: refreshToken,
       })
     )) as CognitoUserSession;
   }

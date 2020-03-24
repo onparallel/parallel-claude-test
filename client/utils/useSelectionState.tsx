@@ -14,12 +14,12 @@ interface SelectionState {
 export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
   const [{ selection }, setState] = useState<SelectionState>({
     selection: Object.fromEntries(
-      rows.map(r => {
+      rows.map((r) => {
         const key = r[rowKeyProp] as any;
         return [key, false];
       })
     ),
-    lastSelected: null
+    lastSelected: null,
   });
 
   const initial = useRef(true);
@@ -33,11 +33,11 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
     setState({
       lastSelected: null,
       selection: Object.fromEntries(
-        rows.map(r => {
+        rows.map((r) => {
           const key = r[rowKeyProp] as any;
           return [key, selection[key] ?? false];
         })
-      )
+      ),
     });
   }, [rows, rowKeyProp]);
 
@@ -45,9 +45,9 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
     selection,
     ...useMemo(
       () => ({
-        selected: rows.filter(r => selection[r[rowKeyProp] as any]),
-        allSelected: rows.every(r => selection[r[rowKeyProp] as any]),
-        anySelected: rows.some(r => selection[r[rowKeyProp] as any])
+        selected: rows.filter((r) => selection[r[rowKeyProp] as any]),
+        allSelected: rows.every((r) => selection[r[rowKeyProp] as any]),
+        anySelected: rows.some((r) => selection[r[rowKeyProp] as any]),
       }),
       [selection, rowKeyProp]
     ),
@@ -56,22 +56,22 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
       // click fires twice, once on the label and another one on the input
       let timeout: any;
       return {
-        toggle: function(key: string, event: MouseEvent) {
+        toggle: function (key: string, event: MouseEvent) {
           event.stopPropagation();
           event.persist();
           if (timeout) {
             clearTimeout(timeout);
           }
           timeout = setTimeout(() => {
-            setState(previous => {
+            setState((previous) => {
               const keys = [key];
               if (previous.lastSelected && event?.shiftKey) {
                 // range selection
                 const lastIndex = rows.findIndex(
-                  r => (r[rowKeyProp] as any) === previous.lastSelected
+                  (r) => (r[rowKeyProp] as any) === previous.lastSelected
                 );
                 const index = rows.findIndex(
-                  r => (r[rowKeyProp] as any) === key
+                  (r) => (r[rowKeyProp] as any) === key
                 );
                 if (lastIndex >= 0 && index >= 0) {
                   for (
@@ -88,35 +88,35 @@ export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
                 selection: {
                   ...previous.selection,
                   ...Object.fromEntries(
-                    keys.map(k => [k, !previous.selection[key]])
-                  )
-                }
+                    keys.map((k) => [k, !previous.selection[key]])
+                  ),
+                },
               };
             });
           });
         },
-        toggleAll: function() {
+        toggleAll: function () {
           setState(({ selection }) => {
             const _allSelected = rows.every(
-              r => selection[r[rowKeyProp] as any]
+              (r) => selection[r[rowKeyProp] as any]
             );
             return {
               lastSelected: null,
               selection: Object.fromEntries(
-                rows.map(r => [r[rowKeyProp], !_allSelected])
-              )
+                rows.map((r) => [r[rowKeyProp], !_allSelected])
+              ),
             };
           });
         },
-        toggleBy: function(predicate: (row: T) => boolean) {
+        toggleBy: function (predicate: (row: T) => boolean) {
           setState({
             lastSelected: null,
             selection: Object.fromEntries(
-              rows.map(r => [r[rowKeyProp], predicate(r)])
-            )
+              rows.map((r) => [r[rowKeyProp], predicate(r)])
+            ),
           });
-        }
+        },
       };
-    }, [rows, rowKeyProp])
+    }, [rows, rowKeyProp]),
   };
 }

@@ -6,7 +6,7 @@ import {
   PseudoBoxProps,
   Select,
   SelectProps,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import languages from "@parallel/lang/languages.json";
 import { useIntl } from "react-intl";
@@ -41,7 +41,7 @@ export function LanguageSelector({
           value={value}
           aria-label={intl.formatMessage({
             id: "public.footer.language-select-label",
-            defaultMessage: "Change language"
+            defaultMessage: "Change language",
           })}
         >
           {languages.map(({ locale, text }) => (

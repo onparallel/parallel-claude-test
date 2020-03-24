@@ -8,7 +8,7 @@ import {
   PseudoBox,
   PseudoBoxProps,
   Stack,
-  Text
+  Text,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
@@ -45,16 +45,16 @@ export function PetitionReviewField({
   const labels = {
     filesize: intl.formatMessage({
       id: "petition.petition-field.reply-file-size",
-      defaultMessage: "File size"
+      defaultMessage: "File size",
     }),
     filename: intl.formatMessage({
       id: "petition.petition-field.reply-file-name",
-      defaultMessage: "File name"
+      defaultMessage: "File name",
     }),
     download: intl.formatMessage({
       id: "petition.petition-field.reply-file-download",
-      defaultMessage: "Download file"
-    })
+      defaultMessage: "Download file",
+    }),
   };
   return (
     <Card
@@ -124,7 +124,7 @@ export function PetitionReviewField({
                   }
                 `}
               >
-                {field.replies.map(reply => (
+                {field.replies.map((reply) => (
                   <PetitionReviewFieldReply key={reply.id} reply={reply}>
                     <Text>{reply.content.text}</Text>
                     <CopyToClipboardButton
@@ -141,7 +141,7 @@ export function PetitionReviewField({
               </Stack>
             ) : field.type === "FILE_UPLOAD" ? (
               <Stack spacing={4}>
-                {field.replies.map(reply => (
+                {field.replies.map((reply) => (
                   <PetitionReviewFieldReply key={reply.id} reply={reply}>
                     <Box display="inling-flex">
                       <Text as="span" aria-label={labels.filename}>
@@ -200,7 +200,7 @@ function PetitionReviewFieldReply({
       borderLeft="2px solid"
       borderColor="gray.200"
       _hover={{
-        borderColor: "gray.300"
+        borderColor: "gray.300",
       }}
       position="relative"
       {...props}
@@ -244,5 +244,5 @@ PetitionReviewField.fragments = {
         }
       }
     }
-  `
+  `,
 };

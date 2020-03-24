@@ -9,17 +9,17 @@ import { Card } from "../common/Card";
 const IMAGES = [
   { id: 0, url: "/static/images/newrequest.png" },
   { id: 1, url: "/static/images/uploadview.png" },
-  { id: 2, url: "/static/images/downloadview.png" }
+  { id: 2, url: "/static/images/downloadview.png" },
 ];
 
 export function PublicHeroHowItWorks({ ...props }: BoxProps) {
   const intl = useIntl();
   const [index, setIndex] = useState(0);
-  const onClick = useCallback(() => setIndex(state => (state + 1) % 3), []);
-  const transitions = useTransition(IMAGES[index], i => i.id, {
+  const onClick = useCallback(() => setIndex((state) => (state + 1) % 3), []);
+  const transitions = useTransition(IMAGES[index], (i) => i.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
-    leave: { opacity: 0 }
+    leave: { opacity: 0 },
   });
 
   return (
@@ -28,7 +28,7 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
       wrapper={{
         paddingY: 16,
         textAlign: "center",
-        backgroundColor: "white"
+        backgroundColor: "white",
       }}
     >
       <Heading as="h2" fontSize="3xl" fontWeight="light" color="purple.500">
@@ -136,7 +136,7 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
                       backgroundRepeat: "no-repeat",
                       backgroundPosition: "center",
                       willChange: "opacity",
-                      backgroundImage: `url(${item.url})`
+                      backgroundImage: `url(${item.url})`,
                     }}
                   ></animated.div>
                 );

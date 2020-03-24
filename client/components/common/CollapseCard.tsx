@@ -30,11 +30,11 @@ export function CollapseCard({
             open
               ? intl.formatMessage({
                   id: "generic.collapse",
-                  defaultMessage: "Collapse"
+                  defaultMessage: "Collapse",
                 })
               : intl.formatMessage({
                   id: "generic.expand",
-                  defaultMessage: "Expand"
+                  defaultMessage: "Expand",
                 })
           }
           onClick={() => setOpen(!open)}

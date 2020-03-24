@@ -8,7 +8,7 @@ import {
   Button,
   ButtonProps,
   Stack,
-  BoxProps
+  BoxProps,
 } from "@chakra-ui/core";
 import { useRef, ReactNode, RefObject } from "react";
 import { FormattedMessage } from "react-intl";

@@ -20,23 +20,21 @@ export function SplitButton({ dividerColor, children }: SplitButtonProps) {
               ? {
                   borderTopLeftRadius: 0,
                   borderBottomLeftRadius: 0,
-                  borderLeftWidth: 0
+                  borderLeftWidth: 0,
                 }
               : {}),
             ...(index !== length - 1
               ? {
                   borderTopRightRadius: 0,
                   borderBottomRightRadius: 0,
-                  borderRightWidth: 0
+                  borderRightWidth: 0,
                 }
-              : {})
-          }
+              : {}),
+          },
         }),
         index !== length - 1 ? (
           <Divider isVertical color={dividerColor} />
-        ) : (
-          undefined
-        )
+        ) : undefined,
       ])}
     </Flex>
   );

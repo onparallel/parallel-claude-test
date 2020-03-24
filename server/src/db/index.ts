@@ -7,7 +7,7 @@ import { UserReposistory } from "./repositories/UserRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ContactReposistory } from "./repositories/ContactRepository";
 
-export const dbModule = new ContainerModule(bind => {
+export const dbModule = new ContainerModule((bind) => {
   bind<Knex>(KNEX)
     .toDynamicValue(({ container }) => {
       const config = container.get<Config>(CONFIG);
@@ -17,8 +17,8 @@ export const dbModule = new ContainerModule(bind => {
         asyncStackTraces: process.env.NODE_ENV !== "production",
         pool: {
           min: 5,
-          max: config.db.maxConnections
-        }
+          max: config.db.maxConnections,
+        },
       });
       if (process.env.NODE_ENV === "development") {
         knex.on("query", ({ sql, bindings }) => {

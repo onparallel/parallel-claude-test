@@ -11,7 +11,7 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
       paddingY={20}
       wrapper={{
         textAlign: "center",
-        backgroundColor: "gray.50"
+        backgroundColor: "gray.50",
       }}
     >
       <Heading as="h2" fontSize="3xl" fontWeight="light" color="purple.600">
@@ -33,7 +33,7 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
         templateColumns={{
           base: "minmax(auto, 320px)",
           md: "repeat(2, minmax(auto, 320px))",
-          lg: "repeat(3, minmax(auto, 320px))"
+          lg: "repeat(3, minmax(auto, 320px))",
         }}
       >
         <Feature

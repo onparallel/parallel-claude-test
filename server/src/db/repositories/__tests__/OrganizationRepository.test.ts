@@ -33,9 +33,9 @@ describe("repositories/OrganizationRepository", () => {
       await deleteAllData(knex);
       [org1, org2, org3] = await mocks.createRandomOrganizations(3);
       org1Users = await mocks.createRandomUsers(org1.id, 42);
-      org2Users = await mocks.createRandomUsers(org2.id, 10, i => ({
+      org2Users = await mocks.createRandomUsers(org2.id, 10, (i) => ({
         // delete even i
-        deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null
+        deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
       }));
     });
 
@@ -57,7 +57,7 @@ describe("repositories/OrganizationRepository", () => {
     test("returns the second page of users", async () => {
       const result = await organizations.loadOrgUsers(org1.id, {
         limit: 10,
-        offset: 10
+        offset: 10,
       });
       expect(result.totalCount).toBe(42);
       expect(result.items).toMatchObject(

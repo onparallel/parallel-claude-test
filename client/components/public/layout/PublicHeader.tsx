@@ -6,7 +6,7 @@ import {
   LinkProps as ChakraLinkProps,
   Stack,
   StackProps,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/core";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { Link, NakedLink } from "@parallel/components/common/Link";
@@ -20,27 +20,27 @@ function logoColorProps(colorMode: string) {
     light: {
       color: "gray.700",
       _hover: {
-        color: "gray.800"
+        color: "gray.800",
       },
       _focus: {
-        color: "gray.800"
+        color: "gray.800",
       },
       _active: {
-        color: "gray.900"
-      }
+        color: "gray.900",
+      },
     },
     dark: {
       color: "purple.50",
       _hover: {
-        color: "purple.100"
+        color: "purple.100",
       },
       _focus: {
-        color: "purple.100"
+        color: "purple.100",
       },
       _active: {
-        color: "purple.200"
-      }
-    }
+        color: "purple.200",
+      },
+    },
   };
   return theme[colorMode];
 }
@@ -59,7 +59,7 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         as: "header",
         backgroundColor: "white",
         shadow: isThin || isOpen ? "md" : "none",
-        ...props
+        ...props,
       }}
     >
       <Flex

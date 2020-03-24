@@ -12,7 +12,7 @@ export class ContactReposistory extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("contact", "id", q =>
+  readonly loadOneById = this.buildLoadOneById("contact", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
@@ -20,7 +20,7 @@ export class ContactReposistory extends BaseRepository {
     const [{ count }] = await this.from("contact")
       .where({
         owner_id: userId,
-        deleted_at: null
+        deleted_at: null,
       })
       .whereIn("id", contactIds)
       .select(this.count());
@@ -38,12 +38,12 @@ export class ContactReposistory extends BaseRepository {
       this.from("contact")
         .where({
           owner_id: userId,
-          deleted_at: null
+          deleted_at: null,
         })
-        .modify(q => {
+        .modify((q) => {
           const { search, excludeIds } = opts;
           if (search) {
-            q.andWhere(q2 => {
+            q.andWhere((q2) => {
               q2.whereIlike(
                 this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
                 `%${escapeLike(search, "\\")}%`,
@@ -69,7 +69,7 @@ export class ContactReposistory extends BaseRepository {
       org_id: user.org_id,
       owner_id: user.id,
       created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`
+      updated_by: `User:${user.id}`,
     });
     return row;
   }
@@ -85,7 +85,7 @@ export class ContactReposistory extends BaseRepository {
         {
           ...data,
           updated_at: this.now(),
-          updated_by: `User:${user.id}`
+          updated_by: `User:${user.id}`,
         },
         "*"
       );
@@ -96,7 +96,7 @@ export class ContactReposistory extends BaseRepository {
     return await this.from("contact")
       .update({
         deleted_at: this.now(),
-        deleted_by: `User:${user.id}`
+        deleted_by: `User:${user.id}`,
       })
       .whereIn("id", Array.isArray(contactId) ? contactId : [contactId]);
   }

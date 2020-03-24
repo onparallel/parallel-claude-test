@@ -50,17 +50,17 @@ async function main() {
     .option("input", {
       required: true,
       type: "string",
-      description: "Directory with the translated term files"
+      description: "Directory with the translated term files",
     })
     .option("output-raw", {
       required: false,
       type: "string",
-      description: "Directory to place generated raw json files"
+      description: "Directory to place generated raw json files",
     })
     .option("output-compiled", {
       required: false,
       type: "string",
-      description: "Directory to place generated compiled json files"
+      description: "Directory to place generated compiled json files",
     }).argv;
   await generate(input, outputRaw as string, outputCompiled as string);
 }

@@ -16,12 +16,12 @@ export function AppLayoutNavbarLink({
   active,
   icon,
   available,
-  children
+  children,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
   const label = intl.formatMessage({
     id: "navbar.coming-soon",
-    defaultMessage: "Coming soon"
+    defaultMessage: "Coming soon",
   });
   return available ? (
     <Link
@@ -31,7 +31,7 @@ export function AppLayoutNavbarLink({
         userSelect: "none",
         _focus: {
           boxShadow: "none",
-          textDecoration: "underline"
+          textDecoration: "underline",
         },
         ...(active
           ? {
@@ -39,25 +39,25 @@ export function AppLayoutNavbarLink({
               color: "white",
               _active: {
                 backgroundColor: "purple.600",
-                color: "white"
+                color: "white",
               },
               _hover: {
                 backgroundColor: "purple.600",
-                color: "white"
-              }
+                color: "white",
+              },
             }
           : {
               backgroundColor: "white",
               color: "purple.600",
               _active: {
                 backgroundColor: "purple.50",
-                color: "purple.700"
+                color: "purple.700",
               },
               _hover: {
                 backgroundColor: "purple.50",
-                color: "purple.700"
-              }
-            })
+                color: "purple.700",
+              },
+            }),
       }}
     >
       <Content icon={icon}>{children}</Content>
@@ -73,7 +73,7 @@ export function AppLayoutNavbarLink({
 
 function Content({
   icon,
-  children
+  children,
 }: Pick<AppLayoutNavbarLinkProps, "icon" | "children">) {
   return (
     <Box textAlign="center" paddingY={3}>

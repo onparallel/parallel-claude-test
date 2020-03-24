@@ -4,7 +4,7 @@ import { toGlobalId } from "../../../util/globalId";
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
   description: "The locale used for rendering the petition to the contact.",
-  members: ["en", "es"]
+  members: ["en", "es"],
 });
 
 export const PetitionStatus = enumType({
@@ -14,20 +14,20 @@ export const PetitionStatus = enumType({
     { name: "DRAFT", description: "The petition has not been sent." },
     {
       name: "SCHEDULED",
-      description: "The petition sendout has been scheduled."
+      description: "The petition sendout has been scheduled.",
     },
     {
       name: "PENDING",
       description:
-        "The petition has been sent and is awaiting for the contact to complete."
+        "The petition has been sent and is awaiting for the contact to complete.",
     },
     {
       name: "READY",
       description:
-        "The petition has been completed by the contact and is awaiting validation."
+        "The petition has been completed by the contact and is awaiting validation.",
     },
-    { name: "COMPLETED", description: "The petition is completed" }
-  ]
+    { name: "COMPLETED", description: "The petition is completed" },
+  ],
 });
 
 export const PetitionProgress = objectType({
@@ -35,18 +35,18 @@ export const PetitionProgress = objectType({
   description: "The progress of a petition.",
   definition(t) {
     t.int("validated", {
-      description: "Number of fields validated"
+      description: "Number of fields validated",
     });
     t.int("replied", {
-      description: "Number of fields with a reply and not validated"
+      description: "Number of fields with a reply and not validated",
     });
     t.int("optional", {
-      description: "Number of optional fields not replied or validated"
+      description: "Number of optional fields not replied or validated",
     });
     t.int("total", {
-      description: "Total number of fields in the petition"
+      description: "Total number of fields in the petition",
     });
-  }
+  },
 });
 
 export const Petition = objectType({
@@ -56,75 +56,75 @@ export const Petition = objectType({
     t.implements("Timestamps");
     t.id("id", {
       description: "The ID of the petition.",
-      resolve: o => toGlobalId("Petition", o.id)
+      resolve: (o) => toGlobalId("Petition", o.id),
     });
     t.string("name", {
       description: "The name of the petition.",
-      nullable: true
+      nullable: true,
     });
     t.string("customRef", {
       description: "The custom ref of the petition.",
       nullable: true,
-      resolve: o => o.custom_ref
+      resolve: (o) => o.custom_ref,
     });
     t.datetime("deadline", {
       description: "The deadline of the petition.",
       nullable: true,
-      resolve: o => o.deadline
+      resolve: (o) => o.deadline,
     });
     t.field("locale", {
       type: "PetitionLocale",
-      description: "The locale of the petition."
+      description: "The locale of the petition.",
     });
     t.field("status", {
       type: "PetitionStatus",
       description: "The status of the petition.",
-      resolve: o => o.status!
+      resolve: (o) => o.status!,
     });
     t.list.field("fields", {
       type: "PetitionField",
       description: "The field definition of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
-      }
+      },
     });
     t.string("emailSubject", {
       description: "The subject of the petition.",
       nullable: true,
-      resolve: o => o.email_subject
+      resolve: (o) => o.email_subject,
     });
     t.json("emailBody", {
       description: "The body of the petition.",
       nullable: true,
-      resolve: o => {
+      resolve: (o) => {
         try {
           return o.email_body ? JSON.parse(o.email_body) : null;
         } catch {
           return null;
         }
-      }
+      },
     });
     t.int("fieldCount", {
       description: "The number of fields in the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldCountForPetition(root.id);
-      }
+      },
     });
     t.field("progress", {
       type: "PetitionProgress",
       description: "The progress of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadStatusForPetition(root.id);
-      }
+      },
     });
     t.list.field("sendouts", {
       type: "PetitionSendout",
       description: "The sendouts for this petition",
       resolve: async (root, _, ctx) => {
         return ctx.petitions.loadSendoutsForPetition(root.id);
-      }
+      },
     });
-  }
+  },
 });
 
 export const PetitionFieldType = enumType({
@@ -132,8 +132,8 @@ export const PetitionFieldType = enumType({
   description: "Type of a petition field",
   members: [
     { name: "FILE_UPLOAD", description: "A file upload field." },
-    { name: "TEXT", description: "A text field." }
-  ]
+    { name: "TEXT", description: "A text field." },
+  ],
 });
 
 export const PetitionField = objectType({
@@ -142,29 +142,30 @@ export const PetitionField = objectType({
   definition(t) {
     t.id("id", {
       description: "The ID of the petition field.",
-      resolve: o => toGlobalId("PetitionField", o.id)
+      resolve: (o) => toGlobalId("PetitionField", o.id),
     });
     t.field("type", {
       type: "PetitionFieldType",
-      description: "The type of the petition field."
+      description: "The type of the petition field.",
     });
     t.string("title", {
       nullable: true,
-      description: "The title of the petition field."
+      description: "The title of the petition field.",
     });
     t.string("description", {
       nullable: true,
-      description: "The description of the petition field."
+      description: "The description of the petition field.",
     });
     t.jsonObject("options", {
       description: "The options of the petition.",
-      nullable: true
+      nullable: true,
     });
     t.boolean("optional", {
-      description: "Determines if this field is optional."
+      description: "Determines if this field is optional.",
     });
     t.boolean("validated", {
-      description: "Determines if the content of this field has been validated."
+      description:
+        "Determines if the content of this field has been validated.",
     });
 
     t.list.field("replies", {
@@ -172,9 +173,9 @@ export const PetitionField = objectType({
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadRepliesForField(root.id);
-      }
+      },
     });
-  }
+  },
 });
 
 export const PetitionSendout = objectType({
@@ -184,7 +185,7 @@ export const PetitionSendout = objectType({
     t.implements("Timestamps");
     t.id("id", {
       description: "The ID of the petition field access.",
-      resolve: o => toGlobalId("PetitionSendout", o.id)
+      resolve: (o) => toGlobalId("PetitionSendout", o.id),
     });
     t.field("contact", {
       type: "Contact",
@@ -192,9 +193,9 @@ export const PetitionSendout = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadOneById(root.contact_id);
-      }
+      },
     });
-  }
+  },
 });
 
 export const PetitionFieldReply = objectType({
@@ -204,10 +205,10 @@ export const PetitionFieldReply = objectType({
     t.implements("Timestamps");
     t.id("id", {
       description: "The ID of the petition field access.",
-      resolve: o => toGlobalId("PetitionSendout", o.id)
+      resolve: (o) => toGlobalId("PetitionSendout", o.id),
     });
     t.jsonObject("content", {
-      description: "The content of the reply"
+      description: "The content of the reply",
     });
     t.field("sendout", {
       type: "PetitionSendout",
@@ -215,7 +216,7 @@ export const PetitionFieldReply = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadSendoutById(root.petition_sendout_id);
-      }
+      },
     });
-  }
+  },
 });

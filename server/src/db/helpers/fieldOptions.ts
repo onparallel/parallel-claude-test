@@ -7,26 +7,26 @@ const SCHEMAS = {
     required: ["multiline"],
     properties: {
       multiline: {
-        type: "boolean"
-      }
-    }
+        type: "boolean",
+      },
+    },
   },
   FILE_UPLOAD: {
     type: "object",
     required: ["multiple", "accepts"],
     properties: {
       multiple: {
-        type: "boolean"
+        type: "boolean",
       },
       accepts: {
         type: ["array", "null"],
         items: {
           type: "string",
-          enum: ["PDF", "IMAGE", "VIDEO", "DOCUMENT"]
-        }
-      }
-    }
-  }
+          enum: ["PDF", "IMAGE", "VIDEO", "DOCUMENT"],
+        },
+      },
+    },
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -41,12 +41,12 @@ export function defaultFieldOptions(type: PetitionFieldType) {
   switch (type) {
     case "TEXT":
       return {
-        multiline: true
+        multiline: true,
       };
     case "FILE_UPLOAD":
       return {
         multiple: true,
-        accepts: null
+        accepts: null,
       };
   }
 }

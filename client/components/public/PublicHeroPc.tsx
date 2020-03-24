@@ -5,7 +5,7 @@ import {
   Flex,
   Heading,
   Image,
-  Text
+  Text,
 } from "@chakra-ui/core";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
@@ -18,7 +18,7 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
       {...props}
       wrapper={{
         marginY: 24,
-        minHeight: { md: "500px" }
+        minHeight: { md: "500px" },
       }}
     >
       <Flex>

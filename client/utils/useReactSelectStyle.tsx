@@ -5,7 +5,7 @@ import {
   OptionTypeBase,
   Props as SelectProps,
   Theme,
-  components
+  components,
 } from "react-select";
 
 export const SIZES = {
@@ -13,38 +13,38 @@ export const SIZES = {
     spacing: {
       controlHeight: 48,
       menuGutter: 8,
-      baseUnit: 4
+      baseUnit: 4,
     },
     paddingX: 4,
     rounded: "md" as const,
     multiValue: {
-      rounded: "sm" as const
-    }
+      rounded: "sm" as const,
+    },
   },
   md: {
     spacing: {
       controlHeight: 40,
       menuGutter: 8,
-      baseUnit: 4
+      baseUnit: 4,
     },
     paddingX: 4,
     rounded: "md" as const,
     multiValue: {
-      rounded: "sm" as const
-    }
+      rounded: "sm" as const,
+    },
   },
   sm: {
     spacing: {
       controlHeight: 32,
       menuGutter: 8,
-      baseUnit: 4
+      baseUnit: 4,
     },
     paddingX: 3,
     rounded: "sm" as const,
     multiValue: {
-      rounded: "sm" as const
-    }
-  }
+      rounded: "sm" as const,
+    },
+  },
 };
 
 /**
@@ -59,8 +59,8 @@ export function useReactSelectStyle<
     () => ({
       clear: intl.formatMessage({
         id: "component.input.clear-button",
-        defaultMessage: "Clear"
-      })
+        defaultMessage: "Clear",
+      }),
     }),
     []
   );
@@ -83,9 +83,9 @@ export function useReactSelectStyle<
             neutral60: colors.gray[600],
             neutral70: colors.gray[700],
             neutral80: colors.gray[800],
-            neutral90: colors.gray[900]
+            neutral90: colors.gray[900],
           },
-          borderRadius: radii[SIZES[size].rounded] as any
+          borderRadius: radii[SIZES[size].rounded] as any,
         } as Theme),
       components: {
         IndicatorSeparator: memo(() => <></>),
@@ -105,7 +105,7 @@ export function useReactSelectStyle<
             paddingX={2}
             color={isFocused ? "gray.600" : "gray.300"}
             _hover={{
-              color: "gray.600"
+              color: "gray.600",
             }}
           >
             <Icon display="block" name="chevron-down" />
@@ -137,7 +137,7 @@ export function useReactSelectStyle<
               defaultMessage="Loading..."
             />
           </Text>
-        ))
+        )),
       },
       styles: {
         control: (styles, { isDisabled, isFocused, theme }) => {
@@ -149,33 +149,33 @@ export function useReactSelectStyle<
               ? colors.blue[500]
               : "inherit",
             "&:hover": {
-              borderColor: isFocused ? theme.colors.primary : colors.gray[300]
-            }
+              borderColor: isFocused ? theme.colors.primary : colors.gray[300],
+            },
           };
         },
-        placeholder: styles => ({
+        placeholder: (styles) => ({
           ...styles,
-          color: colors.gray[300]
+          color: colors.gray[300],
         }),
-        valueContainer: styles => ({
+        valueContainer: (styles) => ({
           ...styles,
-          paddingLeft: (sizes as any)[SIZES[size].paddingX]
+          paddingLeft: (sizes as any)[SIZES[size].paddingX],
         }),
-        option: styles => ({
+        option: (styles) => ({
           ...styles,
           padding: "0 1rem",
           minHeight: "32px",
           display: "flex",
-          alignItems: "center"
+          alignItems: "center",
         }),
-        menuList: styles => ({
+        menuList: (styles) => ({
           ...styles,
-          padding: "0.5rem 0"
+          padding: "0.5rem 0",
         }),
-        multiValue: styles => ({
+        multiValue: (styles) => ({
           ...styles,
           backgroundColor: colors.gray[200],
-          borderRadius: radii[SIZES[size].multiValue.rounded]
+          borderRadius: radii[SIZES[size].multiValue.rounded],
         }),
         multiValueRemove: (styles, { theme }) => {
           const radius = radii[SIZES[size].multiValue.rounded];
@@ -184,11 +184,11 @@ export function useReactSelectStyle<
             borderRadius: `0 ${radius} ${radius} 0`,
             ":hover": {
               backgroundColor: colors.gray[300],
-              color: colors.gray[900]
-            }
+              color: colors.gray[900],
+            },
           };
-        }
-      }
+        },
+      },
     }),
     []
   );

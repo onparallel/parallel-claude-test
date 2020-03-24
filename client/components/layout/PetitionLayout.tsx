@@ -1,7 +1,7 @@
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
-  PetitionHeaderProps
+  PetitionHeaderProps,
 } from "@parallel/components/layout/PetitionHeader";
 import { PetitionLayout_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
@@ -21,7 +21,7 @@ export function PetitionLayout({
   state,
   section,
   onUpdatePetition,
-  children
+  children,
 }: PetitionLayoutProps) {
   return (
     <AppLayout user={user}>
@@ -56,5 +56,5 @@ PetitionLayout.fragments = {
       ...AppLayout_User
     }
     ${AppLayout.fragments.user}
-  `
+  `,
 };

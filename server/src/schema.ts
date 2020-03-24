@@ -11,19 +11,19 @@ export const schema = makeSchema({
   types: allTypes,
   outputs: {
     schema: path.join(__dirname, "../parallel-schema.graphql"),
-    typegen: resolve("./graphql/__types.ts")
+    typegen: resolve("./graphql/__types.ts"),
   },
   plugins: [fieldAuthorizePlugin(), paginationPlugin()],
   typegenAutoConfig: {
     sources: [
       { source: resolve("./db/__types.ts"), alias: "db" },
-      { source: resolve("./context.ts"), alias: "ctx" }
+      { source: resolve("./context.ts"), alias: "ctx" },
     ],
     contextType: "ctx.Context",
     backingTypeMap: {
       DateTime: "Date",
-      JSONObject: "{[key: string]: any}"
-    }
+      JSONObject: "{[key: string]: any}",
+    },
   },
-  prettierConfig: path.join(__dirname, "../../.prettierrc")
+  prettierConfig: path.join(__dirname, "../../.prettierrc"),
 });

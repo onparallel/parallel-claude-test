@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
   Text,
   useTheme,
-  Stack
+  Stack,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
@@ -25,7 +25,7 @@ export function PetitionProgressBar({
   validated,
   replied,
   optional,
-  total
+  total,
 }: PetitionProgressProps) {
   const theme = useTheme();
   return (
@@ -52,7 +52,7 @@ export function PetitionProgressBar({
               backgroundColor="yellow.400"
               css={generateCssStripe({
                 color: theme.colors.gray[200],
-                size: "1rem"
+                size: "1rem",
               })}
             ></ProgressIndicator>
           </ProgressTrack>
@@ -183,7 +183,7 @@ function ProgressIndicator({
 const progressbarSizes = {
   lg: "1rem",
   md: "0.75rem",
-  sm: "0.5rem"
+  sm: "0.5rem",
 };
 
 type ProgressTrackProps = Omit<BoxProps, "size"> & {

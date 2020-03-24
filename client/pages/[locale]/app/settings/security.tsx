@@ -7,7 +7,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
-  useToast
+  useToast,
 } from "@chakra-ui/core";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -16,7 +16,7 @@ import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   SecurityQuery,
   Security_updatePasswordMutation,
-  Security_updatePasswordMutationVariables
+  Security_updatePasswordMutationVariables,
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
@@ -40,10 +40,10 @@ function Security() {
 
   async function onChangePassword({
     password,
-    newPassword
+    newPassword,
   }: PasswordChangeFormData) {
     const { data } = await updatePassword({
-      variables: { password, newPassword }
+      variables: { password, newPassword },
     });
     if (data) {
       switch (data.changePassword) {
@@ -54,14 +54,14 @@ function Security() {
           toast({
             title: intl.formatMessage({
               id: "settings.security.password-change-toast-title",
-              defaultMessage: "Password changed"
+              defaultMessage: "Password changed",
             }),
             description: intl.formatMessage({
               id: "settings.security.password-change-toast-description",
-              defaultMessage: "Your password has been successfully changed."
+              defaultMessage: "Your password has been successfully changed.",
             }),
             status: "success",
-            isClosable: true
+            isClosable: true,
           });
       }
     }
@@ -139,7 +139,7 @@ function Security() {
                     name="newPassword"
                     ref={register({
                       required: true,
-                      validate: value => value.length >= 8
+                      validate: (value) => value.length >= 8,
                     })}
                   />
                   {errors.newPassword && (
@@ -171,7 +171,7 @@ function Security() {
                     name="newPassword2"
                     ref={register({
                       required: true,
-                      validate: value => value === getValues().newPassword
+                      validate: (value) => value === getValues().newPassword,
                     })}
                   />
                   {errors.newPassword2 && (

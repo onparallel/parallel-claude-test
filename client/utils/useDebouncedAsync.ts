@@ -15,7 +15,7 @@ export function useDebouncedAsync<
     }
   }, [...(deps ?? []), ms]);
   return useCallback(
-    function(...args: any[]) {
+    function (...args: any[]) {
       return new Promise<TReturn>((resolve, reject) => {
         if (timeout.current) {
           clearTimeout(timeout.current);

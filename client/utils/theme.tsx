@@ -7,18 +7,18 @@ export const theme = {
     ...base.fonts,
     body: "'IBM Plex Sans', sans-serif",
     heading: "'IBM Plex Sans', sans-serif",
-    hero: "'Playfair Display', serif"
+    hero: "'Playfair Display', serif",
   },
   fontSizes: {
     ...base.fontSizes,
-    hero: "5rem"
+    hero: "5rem",
   },
   sizes: {
     ...base.sizes,
     containers: {
       ...base.sizes.containers,
-      xs: "480px"
-    }
+      xs: "480px",
+    },
   },
   colors: {
     ...base.colors,
@@ -32,17 +32,17 @@ export const theme = {
       600: "#5650de",
       700: "#433ead",
       800: "#332f80",
-      900: "#282666"
+      900: "#282666",
     },
     field: {
       FILE_UPLOAD: base.colors.teal[400],
-      TEXT: base.colors.yellow[400]
-    }
+      TEXT: base.colors.yellow[400],
+    },
   },
   icons: {
     ...base.icons,
-    ...icons
-  }
+    ...icons,
+  },
 };
 
 if (process.browser) {

@@ -16,14 +16,14 @@ function Home() {
     toast({
       title: intl.formatMessage({
         id: "public.hero-invite.toast-title",
-        defaultMessage: "Thank you!"
+        defaultMessage: "Thank you!",
       }),
       description: intl.formatMessage({
         id: "public.hero-invite.toast-description",
-        defaultMessage: "We will get in touch with you very soon."
+        defaultMessage: "We will get in touch with you very soon.",
       }),
       status: "success",
-      isClosable: true
+      isClosable: true,
     });
   }
   return (
@@ -51,7 +51,7 @@ export function getStaticProps() {
 export function getStaticPaths() {
   return {
     paths: languages.map(({ locale }) => ({ params: { locale } })),
-    fallback: false
+    fallback: false,
   };
 }
 

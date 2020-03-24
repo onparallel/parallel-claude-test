@@ -5,26 +5,26 @@ export async function up(knex: Knex) {
   return knex.schema
     .createSchemaIfNotExists("public")
 
-    .createTable("organization", t => {
+    .createTable("organization", (t) => {
       t.increments("id");
       t.string("name").notNullable();
       t.string("identifier").notNullable();
       t.enum("status", ["DEV", "DEMO", "ACTIVE", "CHURNED"], {
         useNative: true,
-        enumName: "organization_status"
+        enumName: "organization_status",
       }).notNullable();
       timestamps(t);
 
       t.unique(["identifier"]);
     })
 
-    .createTable("user", t => {
+    .createTable("user", (t) => {
       t.increments("id");
       t.string("cognito_id").notNullable();
       t.integer("org_id").notNullable();
       t.enum("organization_role", ["NORMAL", "ADMIN"], {
         useNative: true,
-        enumName: "user_organization_role"
+        enumName: "user_organization_role",
       })
         .notNullable()
         .defaultTo("NORMAL");

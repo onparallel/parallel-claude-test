@@ -9,9 +9,9 @@ export const OrganizationStatus = enumType({
     { name: "DEV", description: "Used for development or testing purposes" },
     { name: "DEMO", description: "Used for demoing the product" },
     { name: "ACTIVE", description: "Used for regular clients" },
-    { name: "CHURNED", description: "Used on churned clients" }
+    { name: "CHURNED", description: "Used on churned clients" },
   ],
-  description: "The status of the organization."
+  description: "The status of the organization.",
 });
 
 export const Organization = objectType({
@@ -21,17 +21,17 @@ export const Organization = objectType({
     t.implements("Timestamps");
     t.id("id", {
       description: "The ID of the organization.",
-      resolve: o => toGlobalId("Organization", o.id)
+      resolve: (o) => toGlobalId("Organization", o.id),
     });
     t.string("name", {
-      description: "The name of the organization."
+      description: "The name of the organization.",
     });
     t.string("identifier", {
-      description: "The unique text identifier of the organization."
+      description: "The unique text identifier of the organization.",
     });
     t.field("status", {
       type: "OrganizationStatus",
-      description: "The status of the organization."
+      description: "The status of the organization.",
     });
     t.paginationField("users", {
       type: "User",
@@ -39,7 +39,7 @@ export const Organization = objectType({
       authorize: authorizeAnd(belongsToOrg(), hasOrgRole("ADMIN")),
       resolve: async (root, { offset, limit }, ctx, info) => {
         return await ctx.organizations.loadOrgUsers(root.id, { offset, limit });
-      }
+      },
     });
-  }
+  },
 });

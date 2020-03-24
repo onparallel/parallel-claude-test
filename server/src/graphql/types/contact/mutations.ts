@@ -15,8 +15,8 @@ export const createContact = mutationField("createContact", {
         t.string("email", { required: true });
         t.string("firstName", { nullable: true });
         t.string("lastName", { nullable: true });
-      }
-    }).asArg({ required: true })
+      },
+    }).asArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
@@ -24,11 +24,11 @@ export const createContact = mutationField("createContact", {
       {
         email,
         first_name: firstName || null,
-        last_name: lastName || null
+        last_name: lastName || null,
       },
       ctx.user
     );
-  }
+  },
 });
 
 export const updateContact = mutationField("updateContact", {
@@ -42,8 +42,8 @@ export const updateContact = mutationField("updateContact", {
       definition(t) {
         t.string("firstName", { nullable: true });
         t.string("lastName", { nullable: true });
-      }
-    }).asArg({ required: true })
+      },
+    }).asArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id } = fromGlobalId(args.id, "Contact");
@@ -56,7 +56,7 @@ export const updateContact = mutationField("updateContact", {
       data.last_name = lastName;
     }
     return await ctx.contacts.updateContact(id, data, ctx.user);
-  }
+  },
 });
 
 export const deleteContacts = mutationField("deleteContacts", {
@@ -64,11 +64,11 @@ export const deleteContacts = mutationField("deleteContacts", {
   type: "Result",
   authorize: authorizeAnd(authenticate(), userHasAccessToContacts("ids")),
   args: {
-    ids: idArg({ required: true, list: [true] })
+    ids: idArg({ required: true, list: [true] }),
   },
   resolve: async (_, args, ctx) => {
     const { ids } = fromGlobalIds(args.ids, "Contact");
     await ctx.contacts.deleteContactById(ids, ctx.user);
     return "SUCCESS" as const;
-  }
+  },
 });

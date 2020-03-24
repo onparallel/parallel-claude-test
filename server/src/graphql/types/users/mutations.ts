@@ -4,14 +4,14 @@ import {
   idArg,
   inputObjectType,
   mutationField,
-  stringArg
+  stringArg,
 } from "nexus";
 import { fromGlobalId } from "../../../util/globalId";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import {
   argIsContextUserId,
   authenticate,
-  authorizeAnd
+  authorizeAnd,
 } from "../../helpers/authorize";
 
 export const updateUser = mutationField("updateUser", {
@@ -25,8 +25,8 @@ export const updateUser = mutationField("updateUser", {
       definition(t) {
         t.string("firstName");
         t.string("lastName");
-      }
-    }).asArg({ required: true })
+      },
+    }).asArg({ required: true }),
   },
   resolve: async (o, args, ctx) => {
     const { id } = fromGlobalId(args.id, "User");
@@ -34,23 +34,23 @@ export const updateUser = mutationField("updateUser", {
     return await ctx.users.updateUserById(id, {
       ...removeNotDefined({
         first_name: firstName,
-        last_name: lastName
+        last_name: lastName,
       }),
-      updated_by: `User:${ctx.user.id}`
+      updated_by: `User:${ctx.user.id}`,
     });
-  }
+  },
 });
 
 export const changePassword = mutationField("changePassword", {
   description: "Changes the password for the current logged in user.",
   type: enumType({
     name: "ChangePasswordResult",
-    members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD"]
+    members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD"],
   }),
   authorize: authenticate(),
   args: {
     password: stringArg({ required: true }),
-    newPassword: stringArg({ required: true })
+    newPassword: stringArg({ required: true }),
   },
   resolve: async (o, { password, newPassword }, ctx) => {
     try {
@@ -65,7 +65,7 @@ export const changePassword = mutationField("changePassword", {
       }
       throw error;
     }
-  }
+  },
 });
 
 function rootIsContextUserId<

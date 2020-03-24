@@ -18,12 +18,12 @@ export function PetitionFieldTypeIndicator({
     return {
       FILE_UPLOAD: intl.formatMessage({
         id: "petition.field-type.file-upload",
-        defaultMessage: "File Upload"
+        defaultMessage: "File Upload",
       }),
       TEXT: intl.formatMessage({
         id: "petition.field-type.text",
-        defaultMessage: "Text field"
-      })
+        defaultMessage: "Text field",
+      }),
     }[type];
   }, [type]);
   return (

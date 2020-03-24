@@ -5,7 +5,7 @@ import {
   stringArg,
   plugin,
   dynamicOutputMethod,
-  objectType
+  objectType,
 } from "nexus";
 
 export interface PaginationPluginConfig {}
@@ -54,12 +54,12 @@ export type PaginationFieldConfig<
 const PaginationArgs = {
   offset: intArg({
     nullable: true,
-    description: "Number of elements to skip from the list."
+    description: "Number of elements to skip from the list.",
   }),
   limit: intArg({
     nullable: true,
-    description: "Number of elements to take from the list."
-  })
+    description: "Number of elements to take from the list.",
+  }),
 };
 
 export function paginationPlugin() {
@@ -69,12 +69,12 @@ export function paginationPlugin() {
     fieldDefTypes: [
       core.printedGenTypingImport({
         module: "nexus",
-        bindings: ["core"]
+        bindings: ["core"],
       }),
       core.printedGenTypingImport({
         module: "./helpers/paginationPlugin",
-        bindings: ["PaginationFieldConfig"]
-      })
+        bindings: ["PaginationFieldConfig"],
+      }),
     ],
     // Defines the field added to the definition block:
     // t.paginationField('users', {
@@ -92,7 +92,7 @@ export function paginationPlugin() {
             typeName: parentTypeName,
             typeDef: t,
             args: factoryArgs,
-            stage
+            stage,
           }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
@@ -115,16 +115,16 @@ export function paginationPlugin() {
                     t2.field("items", {
                       type: targetType,
                       description: "The requested slice of items.",
-                      list: [true]
+                      list: [true],
                     });
                     t2.int("totalCount", {
                       nullable: false,
-                      description: "The total count of items in the list."
+                      description: "The total count of items in the list.",
                     });
                     if (fieldConfig.extendPagination instanceof Function) {
                       fieldConfig.extendPagination(t2);
                     }
-                  }
+                  },
                 })
               );
             }
@@ -138,25 +138,25 @@ export function paginationPlugin() {
                   ? {
                       search: stringArg({
                         description:
-                          "Optional text to search in the collection."
-                      })
+                          "Optional text to search in the collection.",
+                      }),
                     }
                   : {}),
-                ...(fieldConfig.additionalArgs ?? {})
+                ...(fieldConfig.additionalArgs ?? {}),
               },
               type: paginationName as any,
               resolve(root, args, ctx, info) {
                 validateArgs(args, info);
                 return fieldConfig.resolve(root, args, ctx, info);
-              }
+              },
             });
-          }
+          },
         })
       );
 
       // TODO: Deprecate this syntax
       return { types: [] };
-    }
+    },
   });
 }
 
@@ -191,7 +191,7 @@ const getTypeNames = (
 
   return {
     targetTypeName,
-    paginationName
+    paginationName,
   };
 };
 
@@ -200,10 +200,7 @@ function isPaginationFieldExtended(fieldConfig: PaginationFieldConfig) {
 }
 
 const upperFirst = (fieldName: string) => {
-  return fieldName
-    .slice(0, 1)
-    .toUpperCase()
-    .concat(fieldName.slice(1));
+  return fieldName.slice(0, 1).toUpperCase().concat(fieldName.slice(1));
 };
 
 function validateArgs(

@@ -16,7 +16,7 @@ export function HorizontalFormControl({
     <FormControl display="flex" alignItems="center" {...props}>
       {cloneElement(label, {
         paddingBottom: 0,
-        minWidth: labelMinWidth ?? "120px"
+        minWidth: labelMinWidth ?? "120px",
       })}
       {control}
     </FormControl>

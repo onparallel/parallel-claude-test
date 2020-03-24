@@ -19,8 +19,8 @@ app.get("/", async (req, res, next) => {
   res.send(`
     <ul>
       ${files
-        .filter(f => f.endsWith(".tsx"))
-        .map(f => `<li><a href="/${f.replace(/\.tsx$/, "")}">${f}</a></li>`)}
+        .filter((f) => f.endsWith(".tsx"))
+        .map((f) => `<li><a href="/${f.replace(/\.tsx$/, "")}">${f}</a></li>`)}
     </ul>
   `);
 });
@@ -44,7 +44,7 @@ app.get("/:email", async (req, res, next) => {
         keepComments: true,
         beautify: true,
         minify: false,
-        validationLevel: "soft"
+        validationLevel: "soft",
       }
     );
     res.send(html.replace(/<\/body>/, LR_SCRIPT + "\n</body>"));
@@ -60,11 +60,11 @@ app.listen(port, () => {
 });
 
 const lr = createServer({
-  exts: ["tsx", "ts", "jsx", "js", "json"]
+  exts: ["tsx", "ts", "jsx", "js", "json"],
 });
 
 lr.watch([
   __dirname + "/components",
   __dirname + "/emails",
-  __dirname + "/lang"
+  __dirname + "/lang",
 ]);

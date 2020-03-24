@@ -7,7 +7,7 @@ import {
   MjmlImage,
   MjmlPreview,
   MjmlSection,
-  MjmlTitle
+  MjmlTitle,
 } from "mjml-react";
 import { FormattedMessage } from "react-intl";
 import React from "react";
@@ -50,5 +50,5 @@ export default function ForgotPassword({ name }: ForgotPasswordProps) {
 }
 
 export const props: ForgotPasswordProps = {
-  name: "Michelle"
+  name: "Michelle",
 };

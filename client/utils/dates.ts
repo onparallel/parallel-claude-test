@@ -13,7 +13,7 @@ export const FORMATS = {
   LL: {
     day: "numeric",
     month: "long",
-    year: "numeric"
+    year: "numeric",
   } as DateTimeFormatOptions,
   /**
    * E.g. March 5, 2020, 2:16 PM
@@ -23,7 +23,7 @@ export const FORMATS = {
     month: "long",
     year: "numeric",
     hour: "numeric",
-    minute: "numeric"
+    minute: "numeric",
   } as DateTimeFormatOptions,
   /**
    * E.g. March 5, 2020, 2:16:39 PM
@@ -34,6 +34,6 @@ export const FORMATS = {
     year: "numeric",
     hour: "numeric",
     minute: "numeric",
-    second: "numeric"
-  } as DateTimeFormatOptions
+    second: "numeric",
+  } as DateTimeFormatOptions,
 };

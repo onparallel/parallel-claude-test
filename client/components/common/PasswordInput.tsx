@@ -3,7 +3,7 @@ import {
   Input,
   InputGroup,
   InputProps,
-  InputRightElement
+  InputRightElement,
 } from "@chakra-ui/core";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, Ref, useRef, useState } from "react";
@@ -21,12 +21,12 @@ export const PasswordInput = forwardRef(function PasswordInput(
   const labels = {
     hide: intl.formatMessage({
       id: "component.password-input.hide",
-      defaultMessage: "Hide"
+      defaultMessage: "Hide",
     }),
     show: intl.formatMessage({
       id: "component.password-input.show",
-      defaultMessage: "Show"
-    })
+      defaultMessage: "Show",
+    }),
   };
 
   function handleClick() {

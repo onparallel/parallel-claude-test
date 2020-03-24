@@ -9,12 +9,12 @@ import {
   Stack,
   Tooltip,
   useTheme,
-  VisuallyHidden
+  VisuallyHidden,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
   PetitionComposeField_PetitionFieldFragment,
-  UpdatePetitionFieldInput
+  UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { gql } from "apollo-boost";
@@ -49,14 +49,14 @@ export function PetitionComposeField({
   onSettingsClick,
   onFieldEdit,
   onDeleteClick,
-  onTitleKeyDown
+  onTitleKeyDown,
 }: PetitionComposeFieldProps) {
   const intl = useIntl();
   const labels = {
     required: intl.formatMessage({
       id: "generic.required-field",
-      defaultMessage: "Required field"
-    })
+      defaultMessage: "Required field",
+    }),
   };
   const { colors } = useTheme();
   const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
@@ -66,7 +66,7 @@ export function PetitionComposeField({
   );
 
   const handleTitleSubmit = useCallback(
-    function(value) {
+    function (value) {
       if (value !== field.title) {
         onFieldEdit({ title: value || null });
       }
@@ -75,7 +75,7 @@ export function PetitionComposeField({
   );
 
   const handleDescriptionSubmit = useCallback(
-    function(value) {
+    function (value) {
       if (value !== field.description) {
         onFieldEdit({ description: value || null });
       }
@@ -137,11 +137,11 @@ export function PetitionComposeField({
           cursor="grab"
           color="gray.400"
           _hover={{
-            color: "gray.700"
+            color: "gray.700",
           }}
           aria-label={intl.formatMessage({
             id: "petition.drag-to-sort-label",
-            defaultMessage: "Drag to sort this petition fields"
+            defaultMessage: "Drag to sort this petition fields",
           })}
         >
           <Icon name="drag-handle" focusable={false} role="presentation" />
@@ -192,11 +192,11 @@ export function PetitionComposeField({
             defaultValue={field.title ?? ""}
             placeholder={intl.formatMessage({
               id: "petition.field-title-placeholder",
-              defaultMessage: "Enter a field title"
+              defaultMessage: "Enter a field title",
             })}
             aria-label={intl.formatMessage({
               id: "petition.field-title-label",
-              defaultMessage: "Field title"
+              defaultMessage: "Field title",
             })}
             onSubmit={handleTitleSubmit}
           >
@@ -219,11 +219,11 @@ export function PetitionComposeField({
             defaultValue={field.description ?? ""}
             placeholder={intl.formatMessage({
               id: "petition.field-description-placeholder",
-              defaultMessage: "Add a description..."
+              defaultMessage: "Add a description...",
             })}
             aria-label={intl.formatMessage({
               id: "petition.field-description-label",
-              defaultMessage: "Field description"
+              defaultMessage: "Field description",
             })}
             onSubmit={handleDescriptionSubmit}
           >
@@ -247,7 +247,7 @@ export function PetitionComposeField({
             color="gray.600"
             label={intl.formatMessage({
               id: "petition.field-settings",
-              defaultMessage: "Field settings"
+              defaultMessage: "Field settings",
             })}
             onClick={onSettingsClick}
           />
@@ -259,7 +259,7 @@ export function PetitionComposeField({
             color="gray.600"
             label={intl.formatMessage({
               id: "petition.field-delete-button",
-              defaultMessage: "Delete field"
+              defaultMessage: "Delete field",
             })}
             onClick={onDeleteClick}
           />
@@ -325,20 +325,20 @@ function useDragAndDrop(
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.index = hoverIndex;
-    }
+    },
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
     item: { type: "FIELD", id, index },
     collect: (monitor: any) => {
       return {
-        isDragging: monitor.isDragging()
+        isDragging: monitor.isDragging(),
       };
     },
     end: (dropResult, monitor) => {
       const { index: hoverIndex } = monitor.getItem();
       onMove?.(index, hoverIndex, true);
-    }
+    },
   });
 
   drop(elementRef);
@@ -354,5 +354,5 @@ PetitionComposeField.fragments = {
       description
       optional
     }
-  `
+  `,
 };

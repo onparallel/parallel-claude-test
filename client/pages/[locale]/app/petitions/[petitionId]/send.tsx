@@ -15,7 +15,7 @@ import {
   MenuList,
   Select,
   Stack,
-  Text
+  Text,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { CollapseCard } from "@parallel/components/common/CollapseCard";
@@ -24,19 +24,19 @@ import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
 import { Divider } from "@parallel/components/common/Divider";
 import {
   Recipient,
-  RecipientSelect
+  RecipientSelect,
 } from "@parallel/components/common/RecipientSelect";
 import {
   isEmptyContent,
   RichTextEditor,
-  RichTextEditorContent
+  RichTextEditorContent,
 } from "@parallel/components/common/RichTextEditor";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import {
   Table,
   TableColumn,
-  useTableColors
+  useTableColors,
 } from "@parallel/components/common/Table";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
@@ -51,12 +51,12 @@ import {
   PetitionSend_PetitionFragment,
   PetitionSend_updatePetitionMutation,
   PetitionSend_updatePetitionMutationVariables,
-  UpdatePetitionInput
+  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   usePetitionState,
-  useWrapPetitionUpdater
+  useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
@@ -117,7 +117,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
   const handleLocaleChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
       handleUpdatePetition({
-        locale: event.target.value as PetitionLocale
+        locale: event.target.value as PetitionLocale,
       });
     },
     []
@@ -136,7 +136,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
         {petition!.name ||
           intl.formatMessage({
             id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition"
+            defaultMessage: "Untitled petition",
           })}
       </Title>
       <PetitionLayout
@@ -201,7 +201,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                     value={subject ?? ""}
                     placeholder={intl.formatMessage({
                       id: "petition.subject-placeholder",
-                      defaultMessage: "Enter the subject of the email"
+                      defaultMessage: "Enter the subject of the email",
                     })}
                     onChange={handleSubjectChange}
                   ></Input>
@@ -210,7 +210,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                   <RichTextEditor
                     placeholder={intl.formatMessage({
                       id: "petition.body-placeholder",
-                      defaultMessage: "Write a message to include in the email"
+                      defaultMessage: "Write a message to include in the email",
                     })}
                     value={body}
                     onChange={handleBodyChange}
@@ -280,13 +280,13 @@ function PetitionSend({ petitionId }: PetitionProps) {
                     <option value="en">
                       {intl.formatMessage({
                         id: "petition.locale.en",
-                        defaultMessage: "English"
+                        defaultMessage: "English",
                       })}
                     </option>
                     <option value="es">
                       {intl.formatMessage({
                         id: "petition.locale.es",
-                        defaultMessage: "Spanish"
+                        defaultMessage: "Spanish",
                       })}
                     </option>
                   </Select>
@@ -386,7 +386,7 @@ const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
           </Text>
         ) : null}
       </>
-    ))
+    )),
   },
   {
     key: "sent",
@@ -398,7 +398,7 @@ const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
     )),
     Cell: memo(({ row: { createdAt } }) => (
       <DateTime value={createdAt} format={FORMATS.LLL} />
-    ))
+    )),
   },
   {
     key: "status",
@@ -415,8 +415,8 @@ const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
           defaultMessage="Active"
         />
       </Text>
-    ))
-  }
+    )),
+  },
 ];
 
 PetitionSend.fragments = {
@@ -445,7 +445,7 @@ PetitionSend.fragments = {
       ...PetitionLayout_User
     }
     ${PetitionLayout.fragments.user}
-  `
+  `,
 };
 
 const GET_PETITION_SEND_DATA = gql`
@@ -501,7 +501,7 @@ function useSearchContacts() {
           }
           ${RecipientSelect.fragments.contact}
         `,
-        variables: { search, exclude }
+        variables: { search, exclude },
       });
       return data.contacts.items;
     },
@@ -514,14 +514,14 @@ PetitionSend.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   await Promise.all([
     apollo.query<PetitionSendQuery, PetitionSendQueryVariables>({
       query: GET_PETITION_SEND_DATA,
-      variables: { id: query.petitionId as string }
+      variables: { id: query.petitionId as string },
     }),
     apollo.query<PetitionSendUserQuery>({
-      query: GET_PETITION_SEND_USER_DATA
-    })
+      query: GET_PETITION_SEND_USER_DATA,
+    }),
   ]);
   return {
-    petitionId: query.petitionId as string
+    petitionId: query.petitionId as string,
   };
 };
 

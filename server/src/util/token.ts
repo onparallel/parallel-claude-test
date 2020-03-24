@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
   .split("")
-  .filter(c => !"il10O".includes(c)); // avoid ambiguous characters
+  .filter((c) => !"il10O".includes(c)); // avoid ambiguous characters
 const ALPHABET_MAP = Object.fromEntries(ALPHABET.map((c, i) => [c, i]));
 
 export function encode(buffer: Buffer) {
@@ -39,7 +39,7 @@ export function encode(buffer: Buffer) {
   }
   return digits
     .reverse()
-    .map(d => ALPHABET[d])
+    .map((d) => ALPHABET[d])
     .join("");
 }
 

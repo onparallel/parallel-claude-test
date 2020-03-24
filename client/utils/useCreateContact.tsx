@@ -5,16 +5,16 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Stack
+  Stack,
 } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
-  useDialog
+  useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import {
   useCreateContact_createContactMutation,
-  useCreateContact_createContactMutationVariables
+  useCreateContact_createContactMutationVariables,
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useCallback, useRef } from "react";
@@ -38,11 +38,11 @@ export function useCreateContact() {
 
   const askContactDetails = useDialog(AskContactDetails, []);
 
-  return useCallback(async function() {
+  return useCallback(async function () {
     const details = await askContactDetails({});
 
     const { data, errors } = await createContact({
-      variables: { data: details }
+      variables: { data: details },
     });
     if (errors) {
       throw errors;
@@ -60,7 +60,7 @@ type ContactDetailsFormData = {
 function AskContactDetails(props: DialogCallbacks<ContactDetailsFormData>) {
   const intl = useIntl();
   const { handleSubmit, register, errors } = useForm<ContactDetailsFormData>({
-    defaultValues: { email: "", firstName: "", lastName: "" }
+    defaultValues: { email: "", firstName: "", lastName: "" },
   });
   const focusRef = useRef<HTMLInputElement>(null);
   const emailRef = register({ required: true, pattern: EMAIL_REGEX });
@@ -69,7 +69,7 @@ function AskContactDetails(props: DialogCallbacks<ContactDetailsFormData>) {
     props.onResolve({
       email: data.email,
       firstName: data.firstName || null,
-      lastName: data.lastName || null
+      lastName: data.lastName || null,
     });
   }
 
@@ -99,7 +99,7 @@ function AskContactDetails(props: DialogCallbacks<ContactDetailsFormData>) {
               name="email"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",
-                defaultMessage: "name@example.com"
+                defaultMessage: "name@example.com",
               })}
             />
             {errors.email && (

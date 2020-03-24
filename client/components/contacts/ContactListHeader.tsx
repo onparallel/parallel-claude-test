@@ -20,12 +20,12 @@ export function ContactListHeader({
   showActions,
   onSearchChange,
   onCreateClick,
-  onDeleteClick
+  onDeleteClick,
 }: // onStatusChange,
 ContactListHeaderProps) {
   const [search, setSearch] = useState(_search ?? "");
   const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [
-    onSearchChange
+    onSearchChange,
   ]);
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {

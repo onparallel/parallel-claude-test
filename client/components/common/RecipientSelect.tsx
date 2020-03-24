@@ -30,7 +30,7 @@ export function RecipientSelect({
   const intl = useIntl();
   const reactSelectProps = useReactSelectProps();
   const loadOptions = useCallback(
-    async search => {
+    async (search) => {
       const exclude = [];
       for (const recipient of value) {
         if (!("__isNew__" in recipient)) {
@@ -46,9 +46,9 @@ export function RecipientSelect({
     <AsyncCreatableSelect<Recipient>
       placeholder={intl.formatMessage({
         id: "components.recipient-select.placeholder",
-        defaultMessage: "Enter recipients..."
+        defaultMessage: "Enter recipients...",
       })}
-      onChange={value => onChange((value as any) ?? [])}
+      onChange={(value) => onChange((value as any) ?? [])}
       isMulti
       loadOptions={loadOptions}
       {...reactSelectProps}
@@ -64,7 +64,7 @@ RecipientSelect.fragments = {
       fullName
       email
     }
-  `
+  `,
 };
 
 function useReactSelectProps() {
@@ -74,11 +74,11 @@ function useReactSelectProps() {
       ({
         styles: {
           ...styleProps.styles,
-          multiValueLabel: styles => ({
+          multiValueLabel: (styles) => ({
             ...styles,
             display: "inline-flex",
-            alignItems: "center"
-          })
+            alignItems: "center",
+          }),
         },
         components: {
           ...styleProps.components,
@@ -100,7 +100,7 @@ function useReactSelectProps() {
                         defaultMessage="We could not find any exisiting contacts for <em>{search}</em>"
                         values={{
                           search,
-                          em: (...chunks: any[]) => <em>{chunks}</em>
+                          em: (...chunks: any[]) => <em>{chunks}</em>,
                         }}
                       />
                     </Text>
@@ -139,7 +139,7 @@ function useReactSelectProps() {
                       name={"user-plus" as any}
                       aria-label={intl.formatMessage({
                         id: "components.recipient-select.new-contact",
-                        defaultMessage: "New contact"
+                        defaultMessage: "New contact",
                       })}
                     />
                     <Text as="span" marginLeft={2}>
@@ -157,16 +157,16 @@ function useReactSelectProps() {
                 </components.MultiValueLabel>
               );
             }
-          )
+          ),
         },
-        getOptionLabel: option => {
+        getOptionLabel: (option) => {
           if ("__isNew__" in option) {
             return (option as any).label;
           } else {
             return option.email;
           }
         },
-        getOptionValue: option => {
+        getOptionValue: (option) => {
           if ("__isNew__" in option) {
             return option.value;
           } else {
@@ -185,11 +185,11 @@ function useReactSelectProps() {
                 email: label,
                 em: (...chunks: any[]) => (
                   <em style={{ marginLeft: "4px" }}>{chunks}</em>
-                )
+                ),
               }}
             ></FormattedMessage>
           );
-        }
+        },
       } as Partial<Props<Recipient>>),
     [styleProps]
   );

@@ -5,7 +5,7 @@ import {
   MenuButton,
   MenuDivider,
   MenuItem,
-  MenuList
+  MenuList,
 } from "@chakra-ui/core";
 import { useIntl } from "react-intl";
 import { gql } from "apollo-boost";
@@ -35,12 +35,12 @@ export function UserMenu({ user }: UserMenuProps) {
         {...{
           "aria-label": intl.formatMessage({
             id: "header.user-menu-button",
-            defaultMessage: "User menu"
+            defaultMessage: "User menu",
           }),
           rounded: "100%",
           height: 12,
           paddingLeft: 0,
-          paddingRight: 0
+          paddingRight: 0,
         }}
       >
         <Avatar name={user.fullName!} size="md"></Avatar>
@@ -61,5 +61,5 @@ UserMenu.fragments = {
     fragment UserMenu_User on User {
       fullName
     }
-  `
+  `,
 };

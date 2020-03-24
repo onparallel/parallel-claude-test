@@ -13,7 +13,7 @@ export function negotiate(
   defaults: string
 ) {
   try {
-    const preferred = accepts.split(/\s*,\s*/).map(lang => {
+    const preferred = accepts.split(/\s*,\s*/).map((lang) => {
       const match = lang.match(/^(\*|[a-z-]+)(?:;q=(.*))?$/i);
       if (!match) {
         throw new Error();

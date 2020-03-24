@@ -13,7 +13,7 @@ import {
   PetitionSendout,
   PetitionField,
   PetitionFieldReply,
-  User
+  User,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 import { random } from "../src/util/token";
@@ -22,7 +22,7 @@ export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
   const orgIds = await knex<Organization>("organization").insert(
     <CreateOrganization[]>[
-      { name: "Parallel", identifier: "parallel", status: "DEV" }
+      { name: "Parallel", identifier: "parallel", status: "DEV" },
     ],
     "id"
   );
@@ -34,7 +34,7 @@ export async function seed(knex: Knex): Promise<any> {
         email: "harvey@parallel.so",
         organization_role: "ADMIN",
         first_name: "Harvey",
-        last_name: "Specter"
+        last_name: "Specter",
       },
       {
         org_id: orgIds[0],
@@ -42,7 +42,7 @@ export async function seed(knex: Knex): Promise<any> {
         email: "mike@parallel.so",
         organization_role: "NORMAL",
         first_name: "Mike",
-        last_name: "Ross"
+        last_name: "Ross",
       },
       {
         org_id: orgIds[0],
@@ -50,8 +50,8 @@ export async function seed(knex: Knex): Promise<any> {
         email: "santialbo@gmail.com",
         organization_role: "ADMIN",
         first_name: "Santi",
-        last_name: "Albo"
-      }
+        last_name: "Albo",
+      },
     ],
     "id"
   );
@@ -59,7 +59,7 @@ export async function seed(knex: Knex): Promise<any> {
     .where("id", orgIds[0])
     .update({
       created_by: `User:${userIds[0]}`,
-      updated_by: `User:${userIds[0]}`
+      updated_by: `User:${userIds[0]}`,
     });
   const petitionIds = await knex<Petition>("petition").insert(
     <CreatePetition[]>[
@@ -70,7 +70,7 @@ export async function seed(knex: Knex): Promise<any> {
         locale: "es",
         status: "PENDING",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
@@ -79,7 +79,7 @@ export async function seed(knex: Knex): Promise<any> {
         locale: "es",
         status: "PENDING",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
@@ -88,7 +88,7 @@ export async function seed(knex: Knex): Promise<any> {
         locale: "es",
         status: "DRAFT",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
@@ -97,8 +97,8 @@ export async function seed(knex: Knex): Promise<any> {
         locale: "es",
         status: "COMPLETED",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
-      }
+        updated_by: `User:${userIds[2]}`,
+      },
     ],
     "id"
   );
@@ -111,9 +111,9 @@ export async function seed(knex: Knex): Promise<any> {
         title: "Nóminas",
         options: {
           accepts: ["PDF", "IMAGE"],
-          multiple: true
+          multiple: true,
         },
-        validated: true
+        validated: true,
       },
       {
         petition_id: petitionIds[0],
@@ -123,8 +123,8 @@ export async function seed(knex: Knex): Promise<any> {
         optional: true,
         options: {
           accepts: ["PDF", "IMAGE"],
-          multiple: false
-        }
+          multiple: false,
+        },
       },
       {
         petition_id: petitionIds[0],
@@ -134,8 +134,8 @@ export async function seed(knex: Knex): Promise<any> {
         optional: true,
         options: {
           accepts: ["PDF", "IMAGE"],
-          multiple: true
-        }
+          multiple: true,
+        },
       },
       {
         petition_id: petitionIds[0],
@@ -144,8 +144,8 @@ export async function seed(knex: Knex): Promise<any> {
         title: "DNI",
         options: {
           accepts: ["PDF", "IMAGE"],
-          multiple: false
-        }
+          multiple: false,
+        },
       },
       {
         petition_id: petitionIds[1],
@@ -154,8 +154,8 @@ export async function seed(knex: Knex): Promise<any> {
         title: "Certificado de retenciones",
         options: {
           accepts: ["PDF"],
-          multiple: false
-        }
+          multiple: false,
+        },
       },
       {
         petition_id: petitionIds[2],
@@ -164,8 +164,8 @@ export async function seed(knex: Knex): Promise<any> {
         title: "Certificado de retenciones",
         options: {
           accepts: ["PDF"],
-          multiple: false
-        }
+          multiple: false,
+        },
       },
       {
         petition_id: petitionIds[3],
@@ -174,10 +174,10 @@ export async function seed(knex: Knex): Promise<any> {
         title: "Certificado de retenciones",
         options: {
           accepts: ["PDF"],
-          multiple: false
+          multiple: false,
         },
-        validated: true
-      }
+        validated: true,
+      },
     ],
     "id"
   );
@@ -191,78 +191,78 @@ export async function seed(knex: Knex): Promise<any> {
         first_name: "Derek",
         last_name: "Lou",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "alex@parallel.so",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "santi@parallel.so",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "dereklou00@gmail.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "santialbo@gmail.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "feelmyglock@gmail.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "one@example.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "two@example.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "three@example.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "four@example.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         org_id: orgIds[0],
         owner_id: userIds[2],
         email: "five@example.com",
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
-      }
+        updated_by: `User:${userIds[2]}`,
+      },
     ],
     "id"
   );
@@ -274,22 +274,22 @@ export async function seed(knex: Knex): Promise<any> {
         contact_id: contactIds[0],
         keycode: random(16),
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         petition_id: petitionIds[1],
         contact_id: contactIds[1],
         keycode: random(16),
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
+        updated_by: `User:${userIds[2]}`,
       },
       {
         petition_id: petitionIds[3],
         contact_id: contactIds[1],
         keycode: random(16),
         created_by: `User:${userIds[2]}`,
-        updated_by: `User:${userIds[2]}`
-      }
+        updated_by: `User:${userIds[2]}`,
+      },
     ],
     "id"
   );
@@ -302,21 +302,21 @@ export async function seed(knex: Knex): Promise<any> {
       petition_sendout_id: sendoutIds[0],
       content: {},
       created_by: `Contact:${contactIds[0]}`,
-      updated_by: `Contact:${contactIds[0]}`
+      updated_by: `Contact:${contactIds[0]}`,
     },
     {
       petition_field_id: fieldIds[2],
       petition_sendout_id: sendoutIds[0],
       content: {},
       created_by: `Contact:${contactIds[0]}`,
-      updated_by: `Contact:${contactIds[0]}`
+      updated_by: `Contact:${contactIds[0]}`,
     },
     {
       petition_field_id: fieldIds[6],
       petition_sendout_id: sendoutIds[0],
       content: {},
       created_by: `Contact:${contactIds[1]}`,
-      updated_by: `Contact:${contactIds[1]}`
-    }
+      updated_by: `Contact:${contactIds[1]}`,
+    },
   ]);
 }

@@ -14,13 +14,13 @@ export class UserReposistory extends BaseRepository {
   }
 
   readonly loadOneByCognitoId = fromDataLoader(
-    new DataLoader<string, User | null>(async ids => {
+    new DataLoader<string, User | null>(async (ids) => {
       const rows = await this.from("user")
         .whereIn("cognito_id", ids as string[])
         .where("deleted_at", null)
         .select("*");
-      const byIds = indexBy(rows, r => r.cognito_id);
-      return ids.map(id => byIds[id] ?? null);
+      const byIds = indexBy(rows, (r) => r.cognito_id);
+      return ids.map((id) => byIds[id] ?? null);
     })
   );
 
@@ -31,7 +31,7 @@ export class UserReposistory extends BaseRepository {
     const rows = await this.from("user")
       .update({
         ...data,
-        updated_at: new Date()
+        updated_at: new Date(),
       })
       .where({ id })
       .returning("*");

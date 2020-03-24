@@ -16,7 +16,7 @@ export const PetitionStatusText = forwardRef(function PetitionStatusText(
     PENDING: "yellow.600",
     SCHEDULED: "blue.500",
     READY: "blue.500",
-    COMPLETED: "green.500"
+    COMPLETED: "green.500",
   } as const)[status];
   return (
     <Text ref={ref} color={color} whiteSpace="nowrap" {...props}>

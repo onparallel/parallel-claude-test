@@ -2,7 +2,7 @@ import {
   IconButton,
   IconButtonProps,
   Tooltip,
-  TooltipProps
+  TooltipProps,
 } from "@chakra-ui/core";
 import copy from "clipboard-copy";
 import { memo, MouseEvent, useState } from "react";
@@ -24,12 +24,12 @@ export const CopyToClipboardButton = memo(function CopyToClipboardButton({
   const labels = {
     copy: intl.formatMessage({
       id: "components.copy-to-clipboard-button.copy-label",
-      defaultMessage: "Copy to clipboard"
+      defaultMessage: "Copy to clipboard",
     }),
     copied: intl.formatMessage({
       id: "components.copy-to-clipboard-button.copied-label",
-      defaultMessage: "Copied to clipboard!"
-    })
+      defaultMessage: "Copied to clipboard!",
+    }),
   };
   const [copied, setState] = useState(false);
 

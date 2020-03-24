@@ -39,7 +39,7 @@ describe("repositories/PetitionRepository", () => {
         org.id,
         user.id,
         15,
-        i => ({ name: i % 3 === 0 ? "good petition" : "bad petition" })
+        (i) => ({ name: i % 3 === 0 ? "good petition" : "bad petition" })
       );
     });
 
@@ -52,7 +52,7 @@ describe("repositories/PetitionRepository", () => {
     test("returns a slice of petitions", async () => {
       const result = await petitions.loadPetitionsForUser(user.id, {
         offset: 5,
-        limit: 5
+        limit: 5,
       });
       expect(result.totalCount).toBe(15);
       expect(result.items).toMatchObject(
@@ -64,12 +64,12 @@ describe("repositories/PetitionRepository", () => {
       const result = await petitions.loadPetitionsForUser(user.id, {
         offset: 2,
         limit: 5,
-        search: "good" // there's only 5 good petitions
+        search: "good", // there's only 5 good petitions
       });
       expect(result.totalCount).toBe(5);
       expect(result.items).toMatchObject(
         _petitions
-          .filter(p => (p.name ?? "").toLowerCase().includes("good"))
+          .filter((p) => (p.name ?? "").toLowerCase().includes("good"))
           .slice(2, 2 + 5)
       );
     });
@@ -90,25 +90,25 @@ describe("repositories/PetitionRepository", () => {
         user.id,
         2
       );
-      fields = await mocks.createRandomPetitionFields(petition1.id, 6, i => ({
-        deleted_at: i === 5 ? new Date() : null
+      fields = await mocks.createRandomPetitionFields(petition1.id, 6, (i) => ({
+        deleted_at: i === 5 ? new Date() : null,
       }));
     });
 
     test("returns the fields in each petition", async () => {
       const [fields1, fields2] = await Promise.all([
         petitions.loadFieldsForPetition(petition1.id),
-        petitions.loadFieldsForPetition(petition2.id)
+        petitions.loadFieldsForPetition(petition2.id),
       ]);
       expect(fields1).toHaveLength(5);
       expect(fields2).toHaveLength(0);
-      expect(fields1).toMatchObject(range(0, 5).map(i => ({ position: i })));
+      expect(fields1).toMatchObject(range(0, 5).map((i) => ({ position: i })));
     });
 
     test("returns the right amount of fields in each petition", async () => {
       const [fieldCount1, fieldCount2] = await Promise.all([
         petitions.loadFieldCountForPetition(petition1.id),
-        petitions.loadFieldCountForPetition(petition2.id)
+        petitions.loadFieldCountForPetition(petition2.id),
       ]);
       expect(fieldCount1).toBe(5);
       expect(fieldCount2).toBe(0);
@@ -137,9 +137,9 @@ describe("repositories/PetitionRepository", () => {
       deleted = await mocks.createRandomPetitionFields(
         petition1.id,
         10,
-        index => ({
+        (index) => ({
           position: faker.random.number(10),
-          deleted_at: new Date()
+          deleted_at: new Date(),
         })
       );
       [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
@@ -152,7 +152,7 @@ describe("repositories/PetitionRepository", () => {
         { id: id3 },
         { id: id4 },
         { id: id5 },
-        { id: id6 }
+        { id: id6 },
       ] = fields;
       await expect(
         petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user)
@@ -173,7 +173,7 @@ describe("repositories/PetitionRepository", () => {
         { id: id3 },
         { id: id4 },
         { id: id5 },
-        { id: id6 }
+        { id: id6 },
       ] = fields;
       await expect(
         petitions.updateFieldPositions(
@@ -191,7 +191,7 @@ describe("repositories/PetitionRepository", () => {
         { id: id3 },
         { id: id4 },
         { id: id5 },
-        { id: id6 }
+        { id: id6 },
       ] = fields;
       await expect(
         petitions.updateFieldPositions(
@@ -209,7 +209,7 @@ describe("repositories/PetitionRepository", () => {
         { id: id3 },
         { id: id4 },
         { id: id5 },
-        { id: id6 }
+        { id: id6 },
       ] = fields;
       await petitions.updateFieldPositions(
         petition1.id,
@@ -217,13 +217,13 @@ describe("repositories/PetitionRepository", () => {
         user
       );
       const result1 = await petitions.loadFieldsForPetition(petition1.id, {
-        refresh: true
+        refresh: true,
       });
-      expect(sortBy(result1, f => f.position)).toMatchObject(
+      expect(sortBy(result1, (f) => f.position)).toMatchObject(
         [id2, id5, id6, id3, id1, id4].map((id, index) => ({
           id,
           position: index,
-          deleted_at: null
+          deleted_at: null,
         }))
       );
       await petitions.updateFieldPositions(
@@ -232,13 +232,13 @@ describe("repositories/PetitionRepository", () => {
         user
       );
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
-        refresh: true
+        refresh: true,
       });
-      expect(sortBy(result2, f => f.position)).toMatchObject(
+      expect(sortBy(result2, (f) => f.position)).toMatchObject(
         [id6, id5, id4, id3, id2, id1].map((id, index) => ({
           id,
           position: index,
-          deleted_at: null
+          deleted_at: null,
         }))
       );
     });
@@ -266,9 +266,9 @@ describe("repositories/PetitionRepository", () => {
       deleted = await mocks.createRandomPetitionFields(
         petition1.id,
         10,
-        index => ({
+        (index) => ({
           position: faker.random.number(10),
-          deleted_at: new Date()
+          deleted_at: new Date(),
         })
       );
       [foreignField] = await mocks.createRandomPetitionFields(petition2.id, 1);
@@ -290,38 +290,38 @@ describe("repositories/PetitionRepository", () => {
       let current = [...fields];
       await petitions.deletePetitionField(petition1.id, fields[3].id, user);
       const result1 = await petitions.loadFieldsForPetition(petition1.id, {
-        refresh: true
+        refresh: true,
       });
-      current = current.filter(f => f.id !== fields[3].id);
+      current = current.filter((f) => f.id !== fields[3].id);
       expect(result1).toMatchObject(
         current.map(({ id }, index) => ({
           id,
           position: index,
-          deleted_at: null
+          deleted_at: null,
         }))
       );
       await petitions.deletePetitionField(petition1.id, fields[5].id, user);
       const result2 = await petitions.loadFieldsForPetition(petition1.id, {
-        refresh: true
+        refresh: true,
       });
-      current = current.filter(f => f.id !== fields[5].id);
+      current = current.filter((f) => f.id !== fields[5].id);
       expect(result2).toMatchObject(
         current.map(({ id }, index) => ({
           id,
           position: index,
-          deleted_at: null
+          deleted_at: null,
         }))
       );
       await petitions.deletePetitionField(petition1.id, fields[0].id, user);
       const result3 = await petitions.loadFieldsForPetition(petition1.id, {
-        refresh: true
+        refresh: true,
       });
-      current = current.filter(f => f.id !== fields[0].id);
+      current = current.filter((f) => f.id !== fields[0].id);
       expect(result3).toMatchObject(
         current.map(({ id }, index) => ({
           id,
           position: index,
-          deleted_at: null
+          deleted_at: null,
         }))
       );
     });

@@ -6,7 +6,7 @@ import {
   List,
   ListItem,
   PseudoBox,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
@@ -40,8 +40,8 @@ export function AppLayoutNavbar({
         available: true,
         text: intl.formatMessage({
           id: "navbar.petitions-link",
-          defaultMessage: "Petitions"
-        })
+          defaultMessage: "Petitions",
+        }),
       },
       {
         section: "templates",
@@ -49,8 +49,8 @@ export function AppLayoutNavbar({
         available: false,
         text: intl.formatMessage({
           id: "navbar.templates-link",
-          defaultMessage: "Templates"
-        })
+          defaultMessage: "Templates",
+        }),
       },
       {
         section: "contacts",
@@ -58,9 +58,9 @@ export function AppLayoutNavbar({
         available: true,
         text: intl.formatMessage({
           id: "navbar.contacts-link",
-          defaultMessage: "Contacts"
-        })
-      }
+          defaultMessage: "Contacts",
+        }),
+      },
     ],
     [intl.locale]
   );
@@ -83,9 +83,9 @@ export function AppLayoutNavbar({
               _hover={{
                 color: {
                   light: "gray.900",
-                  dark: "purple.200"
+                  dark: "purple.200",
                 }[colorMode],
-                transform: "scale(1.1)"
+                transform: "scale(1.1)",
               }}
             >
               <Logo width={40} hideText={true}></Logo>
@@ -102,7 +102,7 @@ export function AppLayoutNavbar({
           onClick={onCreate}
           aria-label={intl.formatMessage({
             id: "navbar.new-button",
-            defaultMessage: "Create a new petition"
+            defaultMessage: "Create a new petition",
           })}
         ></IconButton>
       </Flex>
@@ -134,5 +134,5 @@ AppLayoutNavbar.fragments = {
       ...UserMenu_User
     }
     ${UserMenu.fragments.user}
-  `
+  `,
 };

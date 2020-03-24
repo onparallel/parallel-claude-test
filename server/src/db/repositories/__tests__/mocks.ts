@@ -10,7 +10,7 @@ import {
   Petition,
   PetitionField,
   PetitionFieldType,
-  User
+  User,
 } from "../../__types";
 
 export class Mocks {
@@ -22,12 +22,12 @@ export class Mocks {
   ) {
     return await this.knex<Organization>("organization")
       .insert(
-        range(0, amount).map<CreateOrganization>(index => {
+        range(0, amount).map<CreateOrganization>((index) => {
           return {
             name: faker.company.companyName(),
             identifier: faker.random.alphaNumeric(10),
             status: "DEV",
-            ...builder?.(index)
+            ...builder?.(index),
           };
         })
       )
@@ -41,7 +41,7 @@ export class Mocks {
   ) {
     return await this.knex<User>("user")
       .insert(
-        range(0, amount).map<CreateUser>(index => {
+        range(0, amount).map<CreateUser>((index) => {
           const firstName = faker.name.firstName();
           const lastName = faker.name.lastName();
           return {
@@ -50,7 +50,7 @@ export class Mocks {
             last_name: lastName,
             email: faker.internet.email(firstName, lastName),
             cognito_id: faker.random.uuid(),
-            ...builder?.(index)
+            ...builder?.(index),
           };
         })
       )
@@ -65,7 +65,7 @@ export class Mocks {
   ) {
     return await this.knex<Petition>("petition")
       .insert(
-        range(0, amount).map<CreatePetition>(index => {
+        range(0, amount).map<CreatePetition>((index) => {
           return {
             org_id: orgId,
             owner_id: ownerId,
@@ -73,7 +73,7 @@ export class Mocks {
             status: randomPetitionStatus(),
             name: faker.random.words(),
             locale: randomSupportedLocale(),
-            ...builder?.(index)
+            ...builder?.(index),
           };
         })
       )
@@ -87,7 +87,7 @@ export class Mocks {
   ) {
     return await this.knex<PetitionField>("petition_field")
       .insert(
-        range(0, amount).map<CreatePetitionField>(index => {
+        range(0, amount).map<CreatePetitionField>((index) => {
           const type = randomPetitionFieldType();
           return {
             petition_id: petitionId,
@@ -95,7 +95,7 @@ export class Mocks {
             title: faker.random.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
-            ...builder?.(index)
+            ...builder?.(index),
           };
         })
       )
@@ -108,7 +108,7 @@ function randomPetitionStatus() {
     "DRAFT",
     "SCHEDULED",
     "PENDING",
-    "COMPLETED"
+    "COMPLETED",
   ] as const);
 }
 
@@ -125,12 +125,12 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
     case "FILE_UPLOAD": {
       return {
         accepts: [faker.random.arrayElement(["PDF", "IMAGE", "VIDEO"])],
-        multiple: faker.random.boolean()
+        multiple: faker.random.boolean(),
       };
     }
     case "TEXT": {
       return {
-        multiline: faker.random.boolean()
+        multiline: faker.random.boolean(),
       };
     }
   }

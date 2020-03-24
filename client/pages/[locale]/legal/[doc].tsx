@@ -18,16 +18,16 @@ function LegalDoc({ content, doc }: LegalDocProps) {
   const titles: Record<string, string> = {
     terms: intl.formatMessage({
       id: "public.terms.title",
-      defaultMessage: "Terms & conditions"
+      defaultMessage: "Terms & conditions",
     }),
     privacy: intl.formatMessage({
       id: "public.privacy.title",
-      defaultMessage: "Privacy policy"
+      defaultMessage: "Privacy policy",
     }),
     cookies: intl.formatMessage({
       id: "public.cookies.title",
-      defaultMessage: "Cookie policy"
-    })
+      defaultMessage: "Cookie policy",
+    }),
   };
   return (
     <>
@@ -38,52 +38,52 @@ function LegalDoc({ content, doc }: LegalDocProps) {
             options={{
               overrides: {
                 a: {
-                  component: NormalLink
+                  component: NormalLink,
                 },
                 h1: {
                   component: Heading,
                   props: {
                     as: "h2",
-                    fontSize: "3xl"
-                  }
+                    fontSize: "3xl",
+                  },
                 },
                 h2: {
                   component: Heading,
                   props: {
                     as: "h3",
                     fontSize: "lg",
-                    marginTop: 4
-                  }
+                    marginTop: 4,
+                  },
                 },
                 ul: {
                   component: Box,
                   props: {
                     as: "ul",
-                    paddingLeft: 8
-                  }
+                    paddingLeft: 8,
+                  },
                 },
                 ol: {
                   component: Box,
                   props: {
                     as: "ol",
-                    paddingLeft: 8
-                  }
+                    paddingLeft: 8,
+                  },
                 },
                 li: {
                   component: Text,
                   props: {
                     as: "li",
-                    marginTop: 2
-                  }
+                    marginTop: 2,
+                  },
                 },
                 p: {
                   component: Text,
                   props: {
                     as: "div",
-                    marginTop: 2
-                  }
-                }
-              }
+                    marginTop: 2,
+                  },
+                },
+              },
             }}
           >
             {content}
@@ -102,7 +102,7 @@ interface LegalDocParams {
 }
 
 export async function getStaticProps({
-  params: { locale, doc }
+  params: { locale, doc },
 }: {
   params: LegalDocParams;
 }) {
@@ -113,9 +113,9 @@ export async function getStaticProps({
 export function getStaticPaths() {
   return {
     paths: languages.flatMap(({ locale }) =>
-      DOCS.map(doc => ({ params: { locale, doc } }))
+      DOCS.map((doc) => ({ params: { locale, doc } }))
     ),
-    fallback: false
+    fallback: false,
   };
 }
 export default LegalDoc;

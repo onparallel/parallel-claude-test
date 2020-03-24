@@ -15,7 +15,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
     }
   }, [...(deps ?? []), ms]);
   return useCallback(
-    function(...args: any[]) {
+    function (...args: any[]) {
       if (timeout.current) {
         clearTimeout(timeout.current);
       }

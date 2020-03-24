@@ -2,10 +2,10 @@ import * as Knex from "knex";
 
 export async function up(knex: Knex) {
   return knex.schema
-    .alterTable("organization", t => {
+    .alterTable("organization", (t) => {
       t.dropUnique(["identifier"]);
     })
-    .alterTable("user", t => {
+    .alterTable("user", (t) => {
       t.dropUnique(["email"]);
     })
     .raw(
@@ -20,10 +20,10 @@ export async function down(knex: Knex) {
   return knex.schema
     .raw(`drop index "user_email_unique"`)
     .raw(`drop index "organization_identifier_unique"`)
-    .alterTable("user", t => {
+    .alterTable("user", (t) => {
       t.unique(["email"]);
     })
-    .alterTable("organization", t => {
+    .alterTable("organization", (t) => {
       t.unique(["identifier"]);
     });
 }

@@ -12,7 +12,7 @@ function About() {
       <Title>
         {intl.formatMessage({
           id: "public.about.title",
-          defaultMessage: "About"
+          defaultMessage: "About",
         })}
       </Title>
       <PublicLayout>
@@ -38,7 +38,7 @@ function About() {
         <PublicContainer
           paddingY={16}
           wrapper={{
-            textAlign: "center"
+            textAlign: "center",
           }}
         >
           <Heading fontSize="3xl" fontWeight="light" color="purple.600">
@@ -104,7 +104,7 @@ export function getStaticProps() {
 export function getStaticPaths() {
   return {
     paths: languages.map(({ locale }) => ({ params: { locale } })),
-    fallback: false
+    fallback: false,
   };
 }
 

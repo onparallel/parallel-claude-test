@@ -6,7 +6,7 @@ module.exports = function cleanReactIntl({ types: t }) {
   if (process.env.NODE_ENV !== "production") {
     return {
       name: "clean-react-intl",
-      visitor: {}
+      visitor: {},
     };
   }
   return {
@@ -16,10 +16,10 @@ module.exports = function cleanReactIntl({ types: t }) {
         enter({ node }) {
           if (JSX_ELEMENTS.includes(node.openingElement.name.name)) {
             node.openingElement.attributes = node.openingElement.attributes.filter(
-              attr => !BLACKLISTED.includes(attr.name.name)
+              (attr) => !BLACKLISTED.includes(attr.name.name)
             );
           }
-        }
+        },
       },
       CallExpression: {
         enter({ node }) {
@@ -33,7 +33,7 @@ module.exports = function cleanReactIntl({ types: t }) {
             node.arguments[0].type === "ObjectExpression"
           ) {
             node.arguments[0].properties = node.arguments[0].properties.filter(
-              prop => {
+              (prop) => {
                 if (
                   prop.key.type === "Identifier" &&
                   BLACKLISTED.includes(prop.key.name)
@@ -44,8 +44,8 @@ module.exports = function cleanReactIntl({ types: t }) {
               }
             );
           }
-        }
-      }
-    }
+        },
+      },
+    },
   };
 };

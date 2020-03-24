@@ -41,7 +41,7 @@ export class QueryItem<T> {
 
 export function integer({ max, min }: { max?: number; min?: number } = {}) {
   return new QueryItem<number | null>(
-    value => {
+    (value) => {
       if (typeof value === "string") {
         const parsed = parseInt(value);
         if (
@@ -54,21 +54,21 @@ export function integer({ max, min }: { max?: number; min?: number } = {}) {
       }
       return null;
     },
-    value => value.toString()
+    (value) => value.toString()
   );
 }
 
 export function string() {
   return new QueryItem<string | null>(
-    value => {
+    (value) => {
       return typeof value === "string" ? value : null;
     },
-    value => value
+    (value) => value
   );
 }
 
 export function enums<T extends string>(values: T[]) {
-  return new QueryItem<T | null>(value => {
+  return new QueryItem<T | null>((value) => {
     return values.includes(value as any) ? (value as T) : null;
   });
 }
@@ -88,7 +88,7 @@ export function parseQuery<T extends {}>(
         key,
         (component as QueryItem<any>).parseValue(
           query[prefix ? prefix + key : key]
-        )
+        ),
       ];
     })
   ) as any;
@@ -109,7 +109,7 @@ export function useQueryState<T extends {}>(
       return state;
     }, [router.query, router.pathname]),
     useMemo(() => {
-      return async function(
+      return async function (
         state:
           | { [P in keyof T]?: T[P] }
           | ((current: { [P in keyof T]?: T[P] }) => { [P in keyof T]?: T[P] })
@@ -119,7 +119,7 @@ export function useQueryState<T extends {}>(
             ? state(parseQuery(router.query, shape, { prefix }))
             : state;
         const fromPath = pathParams(router.pathname);
-        const fromState = Object.keys(shape).map(key =>
+        const fromState = Object.keys(shape).map((key) =>
           prefix ? prefix + key : key
         );
         const query = qs.stringify(
@@ -133,12 +133,12 @@ export function useQueryState<T extends {}>(
               )
               .map(([key, value]) => [
                 prefix ? prefix + key : key,
-                shape[key as keyof T].serialize(value as any)
+                shape[key as keyof T].serialize(value as any),
               ]),
             // keep other params
             ...Object.entries(router.query).filter(
               ([key]) => !fromState.includes(key) && !fromPath.includes(key)
-            )
+            ),
           ])
         );
         const route = resolveUrl(router.pathname, router.query);
@@ -148,6 +148,6 @@ export function useQueryState<T extends {}>(
           { shallow: true }
         );
       };
-    }, [router.query, router.pathname])
+    }, [router.query, router.pathname]),
   ] as const;
 }

@@ -5,7 +5,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  MenuProps
+  MenuProps,
 } from "@chakra-ui/core";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useCallback } from "react";
@@ -25,31 +25,31 @@ export function PetitionStatusFilter({
   const filters = {
     ALL: intl.formatMessage({
       id: "component.petition-status-filter.all",
-      defaultMessage: "All petitions"
+      defaultMessage: "All petitions",
     }),
     DRAFT: intl.formatMessage({
       id: "component.petition-status-filter.draft",
-      defaultMessage: "Draft"
+      defaultMessage: "Draft",
     }),
     PENDING: intl.formatMessage({
       id: "component.petition-status-filter.pending",
-      defaultMessage: "Pending"
+      defaultMessage: "Pending",
     }),
     SCHEDULED: intl.formatMessage({
       id: "component.petition-status-filter.scheduled",
-      defaultMessage: "Scheduled"
+      defaultMessage: "Scheduled",
     }),
     READY: intl.formatMessage({
       id: "component.petition-status-filter.ready",
-      defaultMessage: "Ready"
+      defaultMessage: "Ready",
     }),
     COMPLETED: intl.formatMessage({
       id: "component.petition-status-filter.completed",
-      defaultMessage: "Completed"
-    })
+      defaultMessage: "Completed",
+    }),
   };
   const handleChange = useCallback(
-    value => {
+    (value) => {
       onChange(value === "ALL" ? null : (value as PetitionStatus));
     },
     [onChange]
@@ -62,7 +62,7 @@ export function PetitionStatusFilter({
         {...{
           variant: "outline",
           leftIcon: value === null ? null : "filter",
-          rightIcon: "chevron-down"
+          rightIcon: "chevron-down",
         }}
       >
         {filters[value ?? "ALL"]}

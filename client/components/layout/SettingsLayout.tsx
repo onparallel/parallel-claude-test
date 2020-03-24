@@ -49,7 +49,7 @@ interface SettingsLayoutMenuItemProps {
 
 function SettingsLayoutMenuItem({
   section,
-  children
+  children,
 }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
   const active = pathname === `/[locale]/app/settings/${section}`;
@@ -62,7 +62,7 @@ function SettingsLayoutMenuItem({
         borderBottomColor="gray.100"
         backgroundColor={active ? "gray.50" : "white"}
         _hover={{
-          backgroundColor: "gray.50"
+          backgroundColor: "gray.50",
         }}
       >
         <Flex

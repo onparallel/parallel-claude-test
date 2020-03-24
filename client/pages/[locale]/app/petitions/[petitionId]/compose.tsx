@@ -4,7 +4,7 @@ import { Card } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
-  useDialog
+  useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
@@ -32,11 +32,11 @@ import {
   PetitionFieldType,
   PetitionsUserQuery,
   UpdatePetitionFieldInput,
-  UpdatePetitionInput
+  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import {
   usePetitionState,
-  useWrapPetitionUpdater
+  useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
@@ -46,7 +46,7 @@ import {
   useEffect,
   useReducer,
   KeyboardEvent,
-  useRef
+  useRef,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, omit, pick } from "remeda";
@@ -80,24 +80,24 @@ function fieldsReducer(
     case "SORT":
       return {
         ...state,
-        fieldIds: action.fieldIds
+        fieldIds: action.fieldIds,
       };
     case "REMOVE":
       return {
         active: state.active === action.fieldId ? null : state.active,
         fieldsById: omit(state.fieldsById, [action.fieldId]),
-        fieldIds: state.fieldIds.filter(id => id !== action.fieldId)
+        fieldIds: state.fieldIds.filter((id) => id !== action.fieldId),
       };
     case "ADD":
       return {
         ...state,
         fieldsById: { ...state.fieldsById, [action.field.id]: action.field },
-        fieldIds: [...state.fieldIds, action.field.id]
+        fieldIds: [...state.fieldIds, action.field.id],
       };
     case "SET_ACTIVE":
       return {
         ...state,
-        active: action.fieldId
+        active: action.fieldId,
       };
   }
 }
@@ -105,8 +105,8 @@ function fieldsReducer(
 function reset(fields: FieldSelection[]): FieldsReducerState {
   return {
     active: null,
-    fieldsById: indexBy(fields, f => f.id),
-    fieldIds: fields.map(f => f.id)
+    fieldsById: indexBy(fields, (f) => f.id),
+    fieldIds: fields.map((f) => f.id),
   };
 }
 
@@ -127,7 +127,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     reset
   );
   useEffect(() => dispatch({ type: "RESET", fields: petition!.fields }), [
-    petition!.id
+    petition!.id,
   ]);
 
   const addFieldRef = useRef<HTMLButtonElement>(null);
@@ -148,14 +148,14 @@ function PetitionCompose({ petitionId }: PetitionProps) {
   );
 
   const handleFieldMove = useCallback(
-    async function(dragIndex: number, hoverIndex: number, dropped?: boolean) {
+    async function (dragIndex: number, hoverIndex: number, dropped?: boolean) {
       const newFieldIds = [...fieldIds];
       const [field] = newFieldIds.splice(dragIndex, 1);
       newFieldIds.splice(hoverIndex, 0, field);
       dispatch({ type: "SORT", fieldIds: newFieldIds });
       if (dropped) {
         await wrapper(updateFieldPositions)({
-          variables: { id: petitionId, fieldIds: newFieldIds }
+          variables: { id: petitionId, fieldIds: newFieldIds },
         });
       }
     },
@@ -163,12 +163,12 @@ function PetitionCompose({ petitionId }: PetitionProps) {
   );
 
   const handleFieldDelete = useCallback(
-    async function(fieldId: string) {
+    async function (fieldId: string) {
       try {
         await confirmDelete({});
         dispatch({ type: "REMOVE", fieldId });
         await wrapper(deletePetitionField)({
-          variables: { id: petitionId, fieldId }
+          variables: { id: petitionId, fieldId },
         });
       } catch {}
     },
@@ -176,7 +176,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
   );
 
   const handleFieldUpdate = useCallback(
-    wrapper(async function(
+    wrapper(async function (
       field: UnwrapArray<PetitionCompose_PetitionFragment["fields"]>,
       data: UpdatePetitionFieldInput
     ) {
@@ -190,15 +190,15 @@ function PetitionCompose({ petitionId }: PetitionProps) {
               id: petitionId,
               name: petition!.name,
               status: petition!.status,
-              updatedAt: new Date().toISOString()
+              updatedAt: new Date().toISOString(),
             },
             field: {
               __typename: "PetitionField",
               ...field,
-              ...(data as any)
-            }
-          }
-        }
+              ...(data as any),
+            },
+          },
+        },
       });
     }),
     [petitionId]
@@ -212,9 +212,9 @@ function PetitionCompose({ petitionId }: PetitionProps) {
   }, []);
 
   const handleAddField = useCallback(
-    wrapper(async function(type: PetitionFieldType) {
+    wrapper(async function (type: PetitionFieldType) {
       const { data } = await createPetitionField({
-        variables: { id: petitionId, type }
+        variables: { id: petitionId, type },
       });
       const field = data!.createPetitionField.field;
       dispatch({ type: "ADD", field });
@@ -224,7 +224,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
   );
 
   const handleTitleKeyDown = useCallback(
-    function(fieldId: string, event: KeyboardEvent<any>) {
+    function (fieldId: string, event: KeyboardEvent<any>) {
       const index = fieldIds.indexOf(fieldId);
       switch (event.key) {
         case "ArrowDown":
@@ -251,7 +251,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
         {petition!.name ||
           intl.formatMessage({
             id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition"
+            defaultMessage: "Untitled petition",
           })}
       </Title>
       <PetitionLayout
@@ -289,10 +289,10 @@ function PetitionCompose({ petitionId }: PetitionProps) {
                         dispatch({ type: "SET_ACTIVE", fieldId })
                       }
                       onDeleteClick={() => handleFieldDelete(fieldId)}
-                      onFieldEdit={data =>
+                      onFieldEdit={(data) =>
                         handleFieldUpdate(fieldsById[fieldId], data)
                       }
-                      onTitleKeyDown={event =>
+                      onTitleKeyDown={(event) =>
                         handleTitleKeyDown(fieldId, event)
                       }
                     />
@@ -348,7 +348,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
             <Box flex="1" marginLeft={{ base: 0, md: 4 }}>
               <PetitionComposeFieldSettings
                 field={fieldsById[active]}
-                onUpdate={data => handleFieldUpdate(fieldsById[active], data)}
+                onUpdate={(data) => handleFieldUpdate(fieldsById[active], data)}
                 onClose={() => dispatch({ type: "SET_ACTIVE", fieldId: null })}
               />
             </Box>
@@ -378,7 +378,7 @@ PetitionCompose.fragments = {
       ...PetitionLayout_User
     }
     ${PetitionLayout.fragments.user}
-  `
+  `,
 };
 
 const GET_PETITION_COMPOSE_DATA = gql`
@@ -476,10 +476,10 @@ function useCreatePetitionField() {
           fragment,
           data: {
             __typename: "Petition",
-            fields: [...cached!.fields, pick(field, ["id", "__typename"])]
-          }
+            fields: [...cached!.fields, pick(field, ["id", "__typename"])],
+          },
         });
-      }
+      },
     }
   );
 }
@@ -542,7 +542,7 @@ function ConfirmDelete({ ...props }: DialogCallbacks<void>) {
           id="petition.confirm-delete-field.body"
           defaultMessage="This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>."
           values={{
-            b: (...chunks: any[]) => <b>{chunks}</b>
+            b: (...chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }
@@ -561,19 +561,19 @@ function ConfirmDelete({ ...props }: DialogCallbacks<void>) {
 
 PetitionCompose.getInitialProps = async ({
   apollo,
-  query
+  query,
 }: WithDataContext) => {
   await Promise.all([
     apollo.query<PetitionComposeQuery, PetitionComposeQueryVariables>({
       query: GET_PETITION_COMPOSE_DATA,
-      variables: { id: query.petitionId as string }
+      variables: { id: query.petitionId as string },
     }),
     apollo.query<PetitionComposeUserQuery>({
-      query: GET_PETITION_COMPOSE_USER_DATA
-    })
+      query: GET_PETITION_COMPOSE_USER_DATA,
+    }),
   ]);
   return {
-    petitionId: query.petitionId as string
+    petitionId: query.petitionId as string,
   };
 };
 

@@ -4,7 +4,7 @@ import {
   IconButton,
   IconButtonProps,
   Menu,
-  MenuButton
+  MenuButton,
 } from "@chakra-ui/core";
 import { ReactNode } from "react";
 

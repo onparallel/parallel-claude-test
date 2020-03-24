@@ -11,11 +11,11 @@ import {
   PseudoBoxProps,
   Spinner,
   Stack,
-  Tooltip
+  Tooltip,
 } from "@chakra-ui/core";
 import {
   PetitionHeader_PetitionFragment,
-  UpdatePetitionInput
+  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
@@ -45,10 +45,10 @@ export function PetitionHeader({
   const lastSavedTooltip = intl.formatMessage(
     {
       id: "petition.header.last-saved-on",
-      defaultMessage: "Last saved on: {date}"
+      defaultMessage: "Last saved on: {date}",
     },
     {
-      date: intl.formatDate(petition.updatedAt, FORMATS.FULL)
+      date: intl.formatDate(petition.updatedAt, FORMATS.FULL),
     }
   );
 
@@ -58,23 +58,23 @@ export function PetitionHeader({
         section: "compose",
         text: intl.formatMessage({
           id: "petition.header.compose-tab",
-          defaultMessage: "Compose"
-        })
+          defaultMessage: "Compose",
+        }),
       },
       {
         section: "send",
         text: intl.formatMessage({
           id: "petition.header.send-tab",
-          defaultMessage: "Send"
-        })
+          defaultMessage: "Send",
+        }),
       },
       {
         section: "review",
         text: intl.formatMessage({
           id: "petition.header.review-tab",
-          defaultMessage: "Review"
-        })
-      }
+          defaultMessage: "Review",
+        }),
+      },
     ],
     []
   );
@@ -100,16 +100,16 @@ export function PetitionHeader({
           onSubmit={handleOnSubmit}
           placeholder={intl.formatMessage({
             id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition"
+            defaultMessage: "Untitled petition",
           })}
           aria-label={intl.formatMessage({
             id: "petition.name-label",
-            defaultMessage: "Petition name"
+            defaultMessage: "Petition name",
           })}
         >
           {({
             isEditing,
-            onRequestEdit
+            onRequestEdit,
           }: {
             isEditing: boolean;
             onRequestEdit: () => void;
@@ -126,7 +126,7 @@ export function PetitionHeader({
                   onClick={() => onRequestEdit()}
                   aria-label={intl.formatMessage({
                     id: "generic.edit-label",
-                    defaultMessage: "Edit"
+                    defaultMessage: "Edit",
                   })}
                 ></IconButton>
               )}
@@ -205,7 +205,7 @@ type PetitionHeaderTabProps = PseudoBoxProps & {
   children: ReactNode;
 };
 
-const PetitionHeaderTab = forwardRef(function(
+const PetitionHeaderTab = forwardRef(function (
   { active, children, ...props }: PetitionHeaderTabProps,
   ref: Ref<any>
 ) {
@@ -224,7 +224,7 @@ const PetitionHeaderTab = forwardRef(function(
       cursor="pointer"
       color={active ? "gray.900" : "gray.500"}
       _hover={{
-        color: "purple.700"
+        color: "purple.700",
       }}
       {...(active ? { "aria-current": "page" } : {})}
       {...props}
@@ -242,5 +242,5 @@ PetitionHeader.fragments = {
       status
       updatedAt
     }
-  `
+  `,
 };

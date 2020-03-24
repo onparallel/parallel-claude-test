@@ -66,7 +66,7 @@ export function authorizeAnd<TypeName extends string, FieldName extends string>(
   return async (root, args, ctx, info) => {
     return ((await everySeries(
       resolvers,
-      async resolver => await resolver(root, args, ctx, info)
+      async (resolver) => await resolver(root, args, ctx, info)
     )) as unknown) as boolean;
   };
 }
@@ -80,7 +80,7 @@ export function authorizeAndP<
   return async (root, args, ctx, info) => {
     return ((await every(
       resolvers,
-      async resolver => await resolver(root, args, ctx, info)
+      async (resolver) => await resolver(root, args, ctx, info)
     )) as unknown) as boolean;
   };
 }

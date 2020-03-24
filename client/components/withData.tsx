@@ -24,11 +24,11 @@ export function withData<P = {}>(
     NextPageContext,
     WithDataProps<P>,
     WithDataProps<P>
-  > = function({ componentProps, serverState }) {
+  > = function ({ componentProps, serverState }) {
     const client = createApolloClient(serverState, {
       getToken() {
         return localStorage.getItem("token")!;
-      }
+      },
     });
     return (
       <ApolloProvider client={client}>
@@ -55,7 +55,7 @@ export function withData<P = {}>(
             const cookies = parseCookie(context.req!.headers.cookie ?? "");
             return cookies["parallel_session"];
           }
-        }
+        },
       }
     );
     let componentProps: P = {} as P;
@@ -64,7 +64,7 @@ export function withData<P = {}>(
       try {
         componentProps = await getInitialProps({
           ...context,
-          apollo
+          apollo,
         });
       } catch (error) {
         // Check for NotAuthenticated errors and redirect to Login
@@ -77,7 +77,7 @@ export function withData<P = {}>(
         if (notAuthenticated) {
           if (!process.browser) {
             context.res!.writeHead(302, {
-              Location: `/${context.query.locale}/login`
+              Location: `/${context.query.locale}/login`,
             });
             context.res!.end();
             return;
@@ -106,7 +106,7 @@ export function withData<P = {}>(
 
     return {
       serverState,
-      componentProps
+      componentProps,
     };
   };
   return withData;

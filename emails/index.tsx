@@ -3,7 +3,7 @@ import { ReactElement } from "react";
 import { IntlProvider } from "react-intl";
 import {
   default as ForgotPassword,
-  ForgotPasswordProps
+  ForgotPasswordProps,
 } from "./emails/ForgotPassword";
 
 export interface EmailOptions {
@@ -20,7 +20,7 @@ async function buildEmail(locale: string, component: ReactElement) {
       keepComments: false,
       beautify: false,
       minify: true,
-      validationLevel: "skip"
+      validationLevel: "skip",
     }
   );
   return html;

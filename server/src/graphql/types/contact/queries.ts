@@ -3,7 +3,7 @@ import { authenticate, authorizeAnd } from "../../helpers/authorize";
 import { userHasAccessToContact } from "./authorizers";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 
-export const contactQueries = queryField(t => {
+export const contactQueries = queryField((t) => {
   t.paginationField("contacts", {
     type: "Contact",
     description: "The contacts of the user",
@@ -12,8 +12,8 @@ export const contactQueries = queryField(t => {
     additionalArgs: {
       exclude: idArg({
         list: [true],
-        required: false
-      })
+        required: false,
+      }),
     },
     resolve: async (_, { offset, limit, search, exclude }, ctx) => {
       const { ids: excludeIds } = fromGlobalIds(exclude ?? [], "Contact");
@@ -21,21 +21,21 @@ export const contactQueries = queryField(t => {
         search,
         excludeIds,
         offset,
-        limit
+        limit,
       });
-    }
+    },
   });
 
   t.field("contact", {
     type: "Contact",
     args: {
-      id: idArg({ required: true })
+      id: idArg({ required: true }),
     },
     authorize: authorizeAnd(authenticate(), userHasAccessToContact("id")),
     nullable: true,
     resolve: async (root, args, ctx) => {
       const { id } = fromGlobalId(args.id, "Contact");
       return await ctx.contacts.loadOneById(id);
-    }
+    },
   });
 });

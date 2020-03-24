@@ -6,13 +6,13 @@ import {
   IconButton,
   Stack,
   Switch,
-  Text
+  Text,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
-  UpdatePetitionFieldInput
+  UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitions";
 import { gql } from "apollo-boost";
@@ -57,7 +57,7 @@ export function PetitionComposeFieldSettings({
             icon="close"
             aria-label={intl.formatMessage({
               id: "petition.close-sidebar-button",
-              defaultMessage: "Close"
+              defaultMessage: "Close",
             })}
             onClick={onClose}
           />
@@ -96,7 +96,7 @@ export function PetitionComposeFieldSettings({
 
 function FileUploadSettings({
   field,
-  onUpdate
+  onUpdate,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdate">) {
   const options: FieldOptions["FILE_UPLOAD"] = field.options as any;
   return (
@@ -118,7 +118,7 @@ function FileUploadSettings({
           isChecked={options.multiple}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onUpdate({
-              options: { ...field.options, multiple: event.target.checked }
+              options: { ...field.options, multiple: event.target.checked },
             })
           }
         />
@@ -130,7 +130,7 @@ function FileUploadSettings({
 
 function TextSettings({
   field,
-  onUpdate
+  onUpdate,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdate">) {
   const options: FieldOptions["TEXT"] = field.options as any;
 
@@ -153,7 +153,7 @@ function TextSettings({
           isChecked={options.multiline}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onUpdate({
-              options: { ...field.options, multiline: event.target.checked }
+              options: { ...field.options, multiline: event.target.checked },
             })
           }
         />
@@ -191,5 +191,5 @@ PetitionComposeFieldSettings.fragments = {
       optional
       options
     }
-  `
+  `,
 };

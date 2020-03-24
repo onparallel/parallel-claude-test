@@ -2,7 +2,7 @@ import {
   ColorModeProvider,
   CSSReset,
   ITheme,
-  ThemeProvider
+  ThemeProvider,
 } from "@chakra-ui/core";
 import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
@@ -18,14 +18,14 @@ const resetConfig = (theme: ITheme) => ({
     color: theme.colors.gray[700],
     bg: theme.colors.white,
     borderColor: theme.colors.gray[200],
-    placeholderColor: theme.colors.gray[400]
+    placeholderColor: theme.colors.gray[400],
   },
   dark: {
     color: theme.colors.whiteAlpha[900],
     bg: theme.colors.gray[800],
     borderColor: theme.colors.whiteAlpha[300],
-    placeholderColor: theme.colors.whiteAlpha[400]
-  }
+    placeholderColor: theme.colors.whiteAlpha[400],
+  },
 });
 
 export interface LangProps {
@@ -70,21 +70,21 @@ export function useTranslations(locale: string) {
     return {
       current: locale,
       cache: {
-        [locale]: messages
-      }
+        [locale]: messages,
+      },
     };
   });
   useEffect(() => {
     if (!cache[locale]) {
       fetch(`/static/lang/${locale}.json`)
-        .then(res => res.json())
-        .then(messages => {
+        .then((res) => res.json())
+        .then((messages) => {
           setState({
             current: locale,
             cache: {
               ...cache,
-              [locale]: messages
-            }
+              [locale]: messages,
+            },
           });
         });
     } else if (current !== locale) {

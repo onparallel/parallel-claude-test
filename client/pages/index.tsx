@@ -14,8 +14,8 @@ Redirect.getInitialProps = async ({ req, res }: NextPageContext) => {
     const accepts = req!.headers["accept-language"]!;
     const language = negotiate(
       accepts,
-      languages.map(l => l.locale),
-      languages.find(l => l.default)!.locale
+      languages.map((l) => l.locale),
+      languages.find((l) => l.default)!.locale
     );
     res!.writeHead(302, { Location: `/${language}` });
     res!.end();

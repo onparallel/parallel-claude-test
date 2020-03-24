@@ -9,7 +9,7 @@ import {
   Input,
   InputProps,
   Stack,
-  Divider
+  Divider,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -21,7 +21,7 @@ import {
   ContactsUserQuery,
   ContactUserQuery,
   Contact_updateContactMutation,
-  Contact_updateContactMutationVariables
+  Contact_updateContactMutationVariables,
 } from "@parallel/graphql/__types";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
@@ -49,8 +49,8 @@ function Contact({ contactId }: ContactProps) {
   const { register, handleSubmit, reset } = useForm<ContactDetailsFormData>({
     defaultValues: {
       firstName: contact!.firstName ?? "",
-      lastName: contact!.lastName ?? ""
-    }
+      lastName: contact!.lastName ?? "",
+    },
   });
 
   const handleContactSaveSubmit = useCallback(
@@ -60,9 +60,9 @@ function Contact({ contactId }: ContactProps) {
           id: contact!.id,
           data: {
             firstName: firstName || null,
-            lastName: lastName || null
-          }
-        }
+            lastName: lastName || null,
+          },
+        },
       });
       reset({ firstName, lastName });
       setIsEditing(false);
@@ -143,7 +143,7 @@ function Contact({ contactId }: ContactProps) {
                       isLoading={loading}
                       loadingText={intl.formatMessage({
                         id: "generic.saving-changes",
-                        defaultMessage: "Saving..."
+                        defaultMessage: "Saving...",
                       })}
                     >
                       <FormattedMessage
@@ -192,7 +192,7 @@ Contact.fragments = {
       ...AppLayout_User
     }
     ${AppLayout.fragments.user}
-  `
+  `,
 };
 
 const ToggleInput = forwardRef(function ToggleInput(
@@ -254,14 +254,14 @@ Contact.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   await Promise.all([
     apollo.query<ContactQuery, ContactQueryVariables>({
       query: GET_CONTACT_DATA,
-      variables: { id: query.contactId as string }
+      variables: { id: query.contactId as string },
     }),
     apollo.query<ContactUserQuery>({
-      query: GET_CONTACT_USER_DATA
-    })
+      query: GET_CONTACT_USER_DATA,
+    }),
   ]);
   return {
-    contactId: query.contactId as string
+    contactId: query.contactId as string,
   };
 };
 export default withData(Contact);

@@ -5,20 +5,20 @@ import {
   idArg,
   inputObjectType,
   objectType,
-  booleanArg
+  booleanArg,
 } from "nexus";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import {
   authenticate,
   authorizeAnd,
-  authorizeAndP
+  authorizeAndP,
 } from "../../helpers/authorize";
 import { CreatePetition, CreatePetitionField } from "../../../db/__types";
 import {
   userHasAccessToPetitions,
   userHasAccessToPetition,
   fieldBelongsToPetition,
-  fieldsBelongsToPetition
+  fieldsBelongsToPetition,
 } from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
@@ -27,11 +27,11 @@ export const createPetition = mutationField("createPetition", {
   authorize: authenticate(),
   args: {
     name: stringArg({ required: true }),
-    locale: arg({ type: "PetitionLocale", required: true })
+    locale: arg({ type: "PetitionLocale", required: true }),
   },
   resolve: async (_, { name, locale }, ctx) => {
     return await ctx.petitions.createPetition({ name, locale }, ctx.user);
-  }
+  },
 });
 
 export const deletePetitions = mutationField("deletePetitions", {
@@ -39,13 +39,13 @@ export const deletePetitions = mutationField("deletePetitions", {
   type: "Result",
   authorize: authorizeAnd(authenticate(), userHasAccessToPetitions("ids")),
   args: {
-    ids: idArg({ required: true, list: [true] })
+    ids: idArg({ required: true, list: [true] }),
   },
   resolve: async (_, args, ctx) => {
     const { ids } = fromGlobalIds(args.ids, "Petition");
     await ctx.petitions.deletePetitionById(ids, ctx.user);
     return "SUCCESS" as const;
-  }
+  },
 });
 
 export const updateFieldPositions = mutationField("updateFieldPositions", {
@@ -56,14 +56,14 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
     id: idArg({ required: true }),
     fieldIds: idArg({
       required: true,
-      list: [true]
-    })
+      list: [true],
+    }),
   },
   resolve: async (_, args, ctx) => {
     const { id } = fromGlobalId(args.id, "Petition");
     const { ids: fieldIds } = fromGlobalIds(args.fieldIds, "PetitionField");
     return await ctx.petitions.updateFieldPositions(id, fieldIds, ctx.user);
-  }
+  },
 });
 
 export const updatePetition = mutationField("updatePetition", {
@@ -80,8 +80,8 @@ export const updatePetition = mutationField("updatePetition", {
         t.datetime("deadline", { nullable: true });
         t.string("emailSubject", { nullable: true });
         t.json("emailBody", { nullable: true });
-      }
-    }).asArg({ required: true })
+      },
+    }).asArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id } = fromGlobalId(args.id, "Petition");
@@ -103,7 +103,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.email_body = emailBody === null ? null : JSON.stringify(emailBody);
     }
     return await ctx.petitions.updatePetition(id, data, ctx.user);
-  }
+  },
 });
 
 export const createPetitionField = mutationField("createPetitionField", {
@@ -112,12 +112,12 @@ export const createPetitionField = mutationField("createPetitionField", {
   authorize: authorizeAnd(authenticate(), userHasAccessToPetition("id")),
   args: {
     id: idArg({ required: true }),
-    type: arg({ type: "PetitionFieldType", required: true })
+    type: arg({ type: "PetitionFieldType", required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id } = fromGlobalId(args.id, "Petition");
     return await ctx.petitions.createPetitionField(id, args.type, ctx.user);
-  }
+  },
 });
 
 export const deletePetitionField = mutationField("deletePetitionField", {
@@ -132,7 +132,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
   ),
   args: {
     id: idArg({ required: true }),
-    fieldId: idArg({ required: true })
+    fieldId: idArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.id, "Petition");
@@ -142,7 +142,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
       fieldId,
       ctx.user
     );
-  }
+  },
 });
 
 export const updatePetitionField = mutationField("updatePetitionField", {
@@ -152,7 +152,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     definition(t) {
       t.field("petition", { type: "Petition" });
       t.field("field", { type: "PetitionField" });
-    }
+    },
   }),
   authorize: authorizeAnd(
     authenticate(),
@@ -171,8 +171,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         t.string("description", { nullable: true });
         t.field("options", { type: "JSONObject", nullable: true });
         t.boolean("optional", { nullable: true });
-      }
-    }).asArg({ required: true })
+      },
+    }).asArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.id, "Petition");
@@ -198,7 +198,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       data,
       ctx.user
     );
-  }
+  },
 });
 
 export const validatePetitionFields = mutationField("validatePetitionFields", {
@@ -208,7 +208,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     definition(t) {
       t.field("petition", { type: "Petition" });
       t.field("fields", { type: "PetitionField", list: [true] });
-    }
+    },
   }),
   authorize: authorizeAnd(
     authenticate(),
@@ -220,7 +220,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
   args: {
     id: idArg({ required: true }),
     fieldIds: idArg({ required: true, list: [true] }),
-    value: booleanArg({ required: true })
+    value: booleanArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.id, "Petition");
@@ -232,5 +232,5 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       value,
       ctx.user
     );
-  }
+  },
 });

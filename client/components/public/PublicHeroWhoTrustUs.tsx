@@ -12,7 +12,7 @@ export function PublicHeroWhoTrustUs({ ...props }: PublicHeroProps) {
       paddingY={16}
       wrapper={{
         // minHeight: ["0", "0", "540px"],
-        textAlign: "center"
+        textAlign: "center",
       }}
     >
       <Heading fontSize="3xl" fontWeight="light" color="purple.500">

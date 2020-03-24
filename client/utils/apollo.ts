@@ -24,14 +24,14 @@ export function createApolloClient(
   }
 
   const httpLink = createHttpLink({
-    uri: "http://localhost/graphql"
+    uri: "http://localhost/graphql",
   });
 
   const authLink = setContext((_, { headers }) => ({
     headers: {
       ...headers,
-      Authorization: `Bearer ${getToken()}`
-    }
+      Authorization: `Bearer ${getToken()}`,
+    },
   }));
 
   const client = new ApolloClient({
@@ -39,9 +39,10 @@ export function createApolloClient(
     ssrMode: !process.browser,
     cache: new InMemoryCache({
       // graphql returns unique ids
-      dataIdFromObject: o => o.id
+      dataIdFromObject: (o) => o.id,
     }).restore(initialState ?? {}),
-    connectToDevTools: process.browser && process.env.NODE_ENV === "development"
+    connectToDevTools:
+      process.browser && process.env.NODE_ENV === "development",
   });
   _cached = client;
   return client;

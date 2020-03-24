@@ -3,12 +3,12 @@ import { Button, FormControl, FormLabel, Input } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
-  useDialog
+  useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import {
   PetitionLocale,
   useCreatePetition_createPetitionMutation,
-  useCreatePetition_createPetitionMutationVariables
+  useCreatePetition_createPetitionMutationVariables,
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
@@ -42,20 +42,20 @@ export function useCreatePetition() {
           cache,
           /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
         );
-      }
+      },
     }
   );
 
   const askPetitionName = useDialog(AskPetitionName, []);
 
   return useCallback(
-    async function() {
+    async function () {
       const name = await askPetitionName({});
       const { data, errors } = await createPetition({
         variables: {
           name,
-          locale: query.locale as PetitionLocale
-        }
+          locale: query.locale as PetitionLocale,
+        },
       });
       if (errors) {
         throw errors;
@@ -76,10 +76,10 @@ function AskPetitionName(props: DialogCallbacks<string>) {
     handleSubmit,
     register,
     errors,
-    formState: { isValid }
+    formState: { isValid },
   } = useForm<CreatePetitionFormData>({
     mode: "onChange",
-    defaultValues: { name: "" }
+    defaultValues: { name: "" },
   });
   const focusRef = useRef<HTMLInputElement>(null);
   const inputRef = useMergeRefs(focusRef, register({ required: true }));
@@ -113,7 +113,7 @@ function AskPetitionName(props: DialogCallbacks<string>) {
             ref={inputRef}
             placeholder={intl.formatMessage({
               id: "generic.untitled-petition",
-              defaultMessage: "Untitled petition"
+              defaultMessage: "Untitled petition",
             })}
           />
         </FormControl>

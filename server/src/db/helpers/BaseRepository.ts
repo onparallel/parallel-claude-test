@@ -8,7 +8,7 @@ import {
   TableCreateTypes,
   TablePrimaryKeys,
   TableTypes,
-  Maybe
+  Maybe,
 } from "../__types";
 import { handler } from "../../util/handler";
 
@@ -71,14 +71,14 @@ export class BaseRepository {
     ) => void
   ) {
     return fromDataLoader(
-      new DataLoader<TableKey<TName>, TableTypes[TName] | null>(async ids => {
+      new DataLoader<TableKey<TName>, TableTypes[TName] | null>(async (ids) => {
         const rows = <TableTypes[TName][]>await this.knex
           .from<TableTypes[TName]>(tableName)
           .select("*")
-          .modify(q => builder?.(q))
+          .modify((q) => builder?.(q))
           .whereIn(idColumn, ids as TableKey<TName>[]);
-        const byId = indexBy(rows, r => r[idColumn]);
-        return ids.map(id => byId[id]);
+        const byId = indexBy(rows, (r) => r[idColumn]);
+        return ids.map((id) => byId[id]);
       })
     );
   }
@@ -100,7 +100,7 @@ export class BaseRepository {
           .clone()
           .select("*")
           .offset(offset ?? 0)
-          .limit(limit ?? 0)
+          .limit(limit ?? 0),
       };
     }
   }

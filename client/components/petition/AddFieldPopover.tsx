@@ -12,7 +12,7 @@ import {
   Button,
   MenuList,
   MenuItem,
-  ButtonProps
+  ButtonProps,
 } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { ReactNode, useMemo, Ref, forwardRef } from "react";
@@ -33,19 +33,19 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
     return {
       FILE_UPLOAD: intl.formatMessage({
         id: "petition.field-type.file-upload",
-        defaultMessage: "File Upload"
+        defaultMessage: "File Upload",
       }),
       TEXT: intl.formatMessage({
         id: "petition.field-type.text",
-        defaultMessage: "Text field"
-      })
+        defaultMessage: "Text field",
+      }),
     };
   }, []);
   return (
     <Menu>
       <MenuButton as={Button} ref={ref} {...props}></MenuButton>
       <MenuList>
-        {FIELD_TYPES.map(type => (
+        {FIELD_TYPES.map((type) => (
           <MenuItem
             key={type}
             paddingY={2}

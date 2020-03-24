@@ -3,7 +3,7 @@ import {
   PseudoBoxProps,
   Stack,
   useColorMode,
-  useTheme
+  useTheme,
 } from "@chakra-ui/core";
 import { useFocus } from "@parallel/utils/useFocus";
 import isHotkey from "is-hotkey";
@@ -13,7 +13,7 @@ import {
   memo,
   TextareaHTMLAttributes,
   useCallback,
-  useMemo
+  useMemo,
 } from "react";
 import { useIntl } from "react-intl";
 import { createEditor, Editor, Node, Transforms } from "slate";
@@ -24,18 +24,18 @@ import {
   RenderLeafProps,
   Slate,
   useSlate,
-  withReact
+  withReact,
 } from "slate-react";
 import { get } from "styled-system";
 import {
   IconButtonWithTooltip,
-  IconButtonWithTooltipProps
+  IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
 
 const HOTKEYS = {
   "mod+b": "bold",
   "mod+i": "italic",
-  "mod+u": "underline"
+  "mod+u": "underline",
 } as const;
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
@@ -77,7 +77,7 @@ export function RichTextEditor({
             onKeyDown={onKeyDown}
             style={{
               ...editorStyle,
-              padding: "8px 16px"
+              padding: "8px 16px",
             }}
             {...props}
           />
@@ -108,7 +108,7 @@ const Toolbar = memo(function _Toolbar({
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.bold",
-          defaultMessage: "Bold"
+          defaultMessage: "Bold",
         })}
       />
       <MarkButton
@@ -117,7 +117,7 @@ const Toolbar = memo(function _Toolbar({
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.italic",
-          defaultMessage: "Italic"
+          defaultMessage: "Italic",
         })}
       />
       <MarkButton
@@ -126,7 +126,7 @@ const Toolbar = memo(function _Toolbar({
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.underline",
-          defaultMessage: "Underline"
+          defaultMessage: "Underline",
         })}
       />
       <BlockButton
@@ -135,7 +135,7 @@ const Toolbar = memo(function _Toolbar({
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.list",
-          defaultMessage: "Bullet list"
+          defaultMessage: "Bullet list",
         })}
       />
     </Stack>
@@ -147,12 +147,12 @@ function toggleBlock(editor: Editor, format: string) {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(n.type),
-    split: true
+    match: (n) => LIST_TYPES.includes(n.type),
+    split: true,
   });
 
   Transforms.setNodes(editor, {
-    type: isActive ? "paragraph" : isList ? "list-item" : format
+    type: isActive ? "paragraph" : isList ? "list-item" : format,
   });
 
   if (!isActive && isList) {
@@ -173,7 +173,7 @@ function toggleMark(editor: Editor, format: string) {
 
 function isBlockActive(editor: Editor, format: string) {
   const matches = Editor.nodes(editor, {
-    match: n => n.type === format
+    match: (n) => n.type === format,
   });
   return Array.from(matches).length > 0;
 }
@@ -237,7 +237,7 @@ function BlockButton({ format, icon, ...props }: BlockButtonProps) {
       icon={icon as any}
       variant={isBlockActive(editor, format) ? "solid" : "ghost"}
       tabIndex={-1}
-      onMouseDown={event => {
+      onMouseDown={(event) => {
         event.preventDefault();
         toggleBlock(editor, format);
       }}
@@ -259,7 +259,7 @@ function MarkButton({ format, icon, ...props }: MarkButtonProps) {
       icon={icon as any}
       variant={isMarkActive(editor, format) ? "solid" : "ghost"}
       tabIndex={-1}
-      onMouseDown={event => {
+      onMouseDown={(event) => {
         event.preventDefault();
         toggleMark(editor, format);
       }}
@@ -302,18 +302,18 @@ function useStyles() {
       borderColor: borderColor[colorMode],
       bg: bg[colorMode],
       _hover: {
-        borderColor: hoverColor[colorMode]
+        borderColor: hoverColor[colorMode],
       },
       _focusWithin: {
         borderColor: _focusBorderColor,
-        boxShadow: `0 0 0 1px ${_focusBorderColor}`
+        boxShadow: `0 0 0 1px ${_focusBorderColor}`,
       },
       _disabled: {
         borderColor: borderColor[colorMode],
         bg: bg[colorMode],
         opacity: 0.4,
-        cursor: "not-allowed"
-      }
+        cursor: "not-allowed",
+      },
       // _invalid: {
       //   borderColor: _errorBorderColor,
       //   boxShadow: `0 0 0 1px ${_errorBorderColor}`

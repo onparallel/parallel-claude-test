@@ -1,14 +1,14 @@
 import {
   MutationHookOptions,
   useMutation,
-  useQuery
+  useQuery,
 } from "@apollo/react-hooks";
 import { Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
   DialogCallbacks,
-  useDialog
+  useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
 import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
@@ -25,7 +25,7 @@ import {
   PetitionsUserQuery,
   Petitions_deletePetitionsMutation,
   Petitions_deletePetitionsMutationVariables,
-  Petitions_PetitionsListFragment
+  Petitions_PetitionsListFragment,
 } from "@parallel/graphql/__types";
 import { clearCache } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
@@ -34,7 +34,7 @@ import {
   integer,
   parseQuery,
   string,
-  useQueryState
+  useQueryState,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
@@ -49,7 +49,7 @@ const PAGE_SIZE = 10;
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   status: enums<PetitionStatus>(["DRAFT", "SCHEDULED", "PENDING", "COMPLETED"]),
-  search: string()
+  search: string(),
 };
 
 function Petitions() {
@@ -65,8 +65,8 @@ function Petitions() {
       offset: PAGE_SIZE * (state.page - 1),
       limit: PAGE_SIZE,
       search: state.search,
-      status: state.status
-    }
+      status: state.status,
+    },
   });
   const createPetition = useCreatePetition();
 
@@ -74,7 +74,7 @@ function Petitions() {
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
       refetch();
-    }
+    },
   });
 
   const { petitions } = data!;
@@ -82,32 +82,32 @@ function Petitions() {
   const [selected, setSelected] = useState<string[]>();
   const confirmDelete = useDialog(ConfirmDeletePetitions, [
     selected,
-    petitions
+    petitions,
   ]);
 
   function handleSearchChange(value: string | null) {
-    setQueryState(current => ({
+    setQueryState((current) => ({
       ...current,
       search: value,
-      page: 1
+      page: 1,
     }));
   }
 
   function handleStatusChange(value: any) {
-    setQueryState(current => ({
+    setQueryState((current) => ({
       ...current,
       status: value === "ALL" ? null : value,
-      page: 1
+      page: 1,
     }));
   }
 
   async function handleDeleteClick() {
     try {
       await confirmDelete({
-        selected: petitions.items.filter(p => selected!.includes(p.id))
+        selected: petitions.items.filter((p) => selected!.includes(p.id)),
       });
       await deletePetition({
-        variables: { ids: selected! }
+        variables: { ids: selected! },
       });
     } catch {}
   }
@@ -130,15 +130,15 @@ function Petitions() {
         SCHEDULED: "send",
         PENDING: "review",
         READY: "review",
-        COMPLETED: "review"
+        COMPLETED: "review",
       } as const)[row.status]
     );
   }
 
   function handlePageChange(page: number) {
-    setQueryState(current => ({
+    setQueryState((current) => ({
       ...current,
-      page
+      page,
     }));
   }
 
@@ -154,7 +154,7 @@ function Petitions() {
       <Title>
         {intl.formatMessage({
           id: "petitions.title",
-          defaultMessage: "Petitions"
+          defaultMessage: "Petitions",
         })}
       </Title>
       <AppLayout user={me} onCreate={handleCreateClick}>
@@ -234,7 +234,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
           </Text>
         )}
       </>
-    ))
+    )),
   },
   {
     key: "customRef",
@@ -244,7 +244,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
         defaultMessage="Reference"
       />
     )),
-    Cell: memo(({ row }) => <>{row.customRef}</>)
+    Cell: memo(({ row }) => <>{row.customRef}</>),
   },
   {
     key: "recipient",
@@ -265,7 +265,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
       } else {
         return null;
       }
-    })
+    }),
   },
   {
     key: "deadline",
@@ -288,7 +288,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
           </Text>
         );
       }
-    })
+    }),
   },
   {
     key: "progress",
@@ -303,15 +303,15 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
         status={row.status}
         {...row.progress}
       ></PetitionProgressBar>
-    ))
+    )),
   },
   {
     key: "status",
     Header: memo(() => (
       <FormattedMessage id="petitions.header.status" defaultMessage="Status" />
     )),
-    Cell: memo(({ row }) => <PetitionStatusText status={row.status} />)
-  }
+    Cell: memo(({ row }) => <PetitionStatusText status={row.status} />),
+  },
 ];
 
 function useDeletePetition(
@@ -356,7 +356,7 @@ function ConfirmDeletePetitions({
           values={{
             count,
             name,
-            b: (...chunks: any[]) => <b>{chunks}</b>
+            b: (...chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }
@@ -404,7 +404,7 @@ Petitions.fragments = {
       ...AppLayout_User
     }
     ${AppLayout.fragments.user}
-  `
+  `,
 };
 
 const GET_PETITIONS_DATA = gql`
@@ -444,10 +444,10 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
         offset: PAGE_SIZE * (page - 1),
         limit: PAGE_SIZE,
         search,
-        status
-      }
+        status,
+      },
     }),
-    apollo.query<PetitionsUserQuery>({ query: GET_PETITIONS_USER_DATA })
+    apollo.query<PetitionsUserQuery>({ query: GET_PETITIONS_USER_DATA }),
   ]);
 };
 

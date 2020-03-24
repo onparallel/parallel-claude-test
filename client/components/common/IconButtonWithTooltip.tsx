@@ -2,7 +2,7 @@ import {
   IconButtonProps,
   Tooltip,
   IconButton,
-  TooltipProps
+  TooltipProps,
 } from "@chakra-ui/core";
 
 export type IconButtonWithTooltipProps = Omit<IconButtonProps, "aria-label"> &

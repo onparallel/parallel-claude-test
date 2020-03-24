@@ -2,7 +2,7 @@ import { useState, MouseEventHandler, useMemo } from "react";
 
 export function useHover<T = any>({
   onMouseEnter,
-  onMouseLeave
+  onMouseLeave,
 }: {
   onMouseEnter?: MouseEventHandler<T>;
   onMouseLeave?: MouseEventHandler<T>;
@@ -12,16 +12,16 @@ export function useHover<T = any>({
     hovered,
     useMemo(
       () => ({
-        onMouseEnter: <MouseEventHandler<T>>(e => {
+        onMouseEnter: <MouseEventHandler<T>>((e) => {
           setHovered(true);
           onMouseEnter?.(e);
         }),
-        onMouseLeave: <MouseEventHandler<T>>(e => {
+        onMouseLeave: <MouseEventHandler<T>>((e) => {
           setHovered(false);
           onMouseLeave?.(e);
-        })
+        }),
       }),
       [onMouseEnter, onMouseLeave]
-    )
+    ),
   ] as const;
 }

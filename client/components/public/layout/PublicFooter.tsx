@@ -7,7 +7,7 @@ import {
   ListItem,
   Text,
   useColorMode,
-  Box
+  Box,
 } from "@chakra-ui/core";
 import { Link } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";
@@ -28,7 +28,7 @@ export function PublicFooter(props: BoxProps) {
       router.pathname,
       resolveUrl(router.pathname, {
         ...router.query,
-        locale: value
+        locale: value,
       })
     );
   }
@@ -40,7 +40,7 @@ export function PublicFooter(props: BoxProps) {
         backgroundColor: "gray.50",
         paddingTop: 12,
         paddingBottom: 8,
-        ...props
+        ...props,
       }}
     >
       <Flex
@@ -56,7 +56,7 @@ export function PublicFooter(props: BoxProps) {
           marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
             id: "public.footer.company",
-            defaultMessage: "Company"
+            defaultMessage: "Company",
           })}
         >
           <List>
@@ -77,7 +77,7 @@ export function PublicFooter(props: BoxProps) {
           marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
             id: "public.footer.legal-information",
-            defaultMessage: "Legal information"
+            defaultMessage: "Legal information",
           })}
         >
           <List>
@@ -123,21 +123,21 @@ export function PublicFooter(props: BoxProps) {
             as={"a" as any}
             {...{
               href: "https://twitter.com/Parallel_SO",
-              target: "_blank"
+              target: "_blank",
             }}
             icon={"twitter" as any}
             isRound
             variantColor="purple"
             aria-label={intl.formatMessage({
               id: "public.footer.twitter-profile",
-              defaultMessage: "Twitter profile"
+              defaultMessage: "Twitter profile",
             })}
           ></IconButton>
           <IconButton
             as={"a" as any}
             {...{
               href: "https://www.linkedin.com/company/parallel-so/",
-              target: "_blank"
+              target: "_blank",
             }}
             icon={"linkedin" as any}
             isRound
@@ -145,7 +145,7 @@ export function PublicFooter(props: BoxProps) {
             marginLeft={2}
             aria-label={intl.formatMessage({
               id: "public.footer.linkedin-profile",
-              defaultMessage: "LinkedIn profile"
+              defaultMessage: "LinkedIn profile",
             })}
           ></IconButton>
         </Box>

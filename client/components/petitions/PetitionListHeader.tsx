@@ -6,7 +6,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Stack
+  Stack,
 } from "@chakra-ui/core";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -34,11 +34,11 @@ export function PetitionListHeader({
   onSearchChange,
   onStatusChange,
   onDeleteClick,
-  onCreateClick
+  onCreateClick,
 }: PetitionListHeaderProps) {
   const [search, setSearch] = useState(_search ?? "");
   const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [
-    onSearchChange
+    onSearchChange,
   ]);
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {

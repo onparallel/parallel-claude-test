@@ -4,7 +4,7 @@ import { timestamps } from "./helpers/timestamps";
 export async function up(knex: Knex) {
   return knex.schema
 
-    .createTable("contact", t => {
+    .createTable("contact", (t) => {
       t.increments("id");
       t.string("email").notNullable();
       t.string("first_name");
@@ -20,19 +20,17 @@ export async function up(knex: Knex) {
       `create unique index "contact_owner_id_email_unique" on "contact" ("owner_id", "email") where "deleted_at" is null`
     )
 
-    .createTable("petition", t => {
+    .createTable("petition", (t) => {
       t.increments("id");
       t.integer("org_id").notNullable();
       t.integer("owner_id").notNullable();
       t.string("name", 255).notNullable();
       t.string("custom_ref", 255);
       t.string("locale", 10).notNullable();
-      t.boolean("is_template")
-        .notNullable()
-        .defaultTo(false);
+      t.boolean("is_template").notNullable().defaultTo(false);
       t.enum("status", ["DRAFT", "SCHEDULED", "PENDING", "COMPLETED"], {
         useNative: true,
-        enumName: "petition_status"
+        enumName: "petition_status",
       });
       t.timestamp("deadline");
       t.string("email_subject");
@@ -48,23 +46,19 @@ export async function up(knex: Knex) {
       )`
     )
 
-    .createTable("petition_field", t => {
+    .createTable("petition_field", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable();
       t.integer("position").notNullable();
       t.enum("type", ["FILE_UPLOAD"], {
         useNative: true,
-        enumName: "petition_field_type"
+        enumName: "petition_field_type",
       }).notNullable();
       t.string("title");
       t.string("description");
-      t.boolean("optional")
-        .defaultTo(false)
-        .notNullable();
+      t.boolean("optional").defaultTo(false).notNullable();
       t.json("options");
-      t.boolean("validated")
-        .defaultTo(false)
-        .notNullable();
+      t.boolean("validated").defaultTo(false).notNullable();
       timestamps(t);
 
       t.foreign("petition_id").references("petition.id");
@@ -73,7 +67,7 @@ export async function up(knex: Knex) {
       `create unique index "petition_field_petition_id_position" on "petition_field" ("petition_id", "position") where "deleted_at" is null`
     )
 
-    .createTable("petition_access", t => {
+    .createTable("petition_access", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable();
       t.integer("contact_id").notNullable();
@@ -84,7 +78,7 @@ export async function up(knex: Knex) {
       t.foreign("petition_id").references("petition.id");
     })
 
-    .createTable("petition_field_reply", t => {
+    .createTable("petition_field_reply", (t) => {
       t.increments("id");
       t.integer("petition_field_id").notNullable();
       t.integer("petition_access_id").notNullable();
@@ -95,7 +89,7 @@ export async function up(knex: Knex) {
       t.foreign("petition_access_id").references("petition_access.id");
     })
 
-    .createTable("petition_event_log", t => {
+    .createTable("petition_event_log", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable();
       t.integer("petition_access_id").notNullable();

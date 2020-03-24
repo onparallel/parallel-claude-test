@@ -8,7 +8,7 @@ import {
   Heading,
   Input,
   Text,
-  useToast
+  useToast,
 } from "@chakra-ui/core";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -61,15 +61,15 @@ export function PublicHero({ onRequestInvite, ...props }: PublicHeroProps) {
                   type="email"
                   aria-label={intl.formatMessage({
                     id: "generic.forms.email-label",
-                    defaultMessage: "Email"
+                    defaultMessage: "Email",
                   })}
                   placeholder={intl.formatMessage({
                     id: "generic.forms.email-placeholder",
-                    defaultMessage: "name@example.com"
+                    defaultMessage: "name@example.com",
                   })}
                   ref={register({
                     required: true,
-                    pattern: EMAIL_REGEX
+                    pattern: EMAIL_REGEX,
                   })}
                 />
                 {errors.email && (

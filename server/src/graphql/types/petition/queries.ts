@@ -3,7 +3,7 @@ import { authenticate, authorizeAnd } from "../../helpers/authorize";
 import { userHasAccessToPetition } from "./authorizers";
 import { fromGlobalId } from "../../../util/globalId";
 
-export const petitionQueries = queryField(t => {
+export const petitionQueries = queryField((t) => {
   t.paginationField("petitions", {
     type: "Petition",
     description: "The petitions of the user",
@@ -11,8 +11,8 @@ export const petitionQueries = queryField(t => {
     additionalArgs: {
       status: arg({
         type: "PetitionStatus",
-        nullable: true
-      })
+        nullable: true,
+      }),
     },
     searchable: true,
     resolve: async (_, { offset, limit, search, status }, ctx) => {
@@ -20,21 +20,21 @@ export const petitionQueries = queryField(t => {
         status,
         search,
         offset,
-        limit
+        limit,
       });
-    }
+    },
   });
 
   t.field("petition", {
     type: "Petition",
     args: {
-      id: idArg({ required: true })
+      id: idArg({ required: true }),
     },
     authorize: authorizeAnd(authenticate(), userHasAccessToPetition("id")),
     nullable: true,
     resolve: async (root, args, ctx) => {
       const { id } = fromGlobalId(args.id, "Petition");
       return await ctx.petitions.loadOneById(id);
-    }
+    },
   });
 });

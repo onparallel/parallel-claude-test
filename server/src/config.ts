@@ -27,15 +27,15 @@ export const config = Object.freeze({
     user: process.env.DB_USER!,
     password: process.env.DB_PASSWORD!,
     port: parseInt(process.env.DB_PORT!),
-    maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS!)
+    maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS!),
   }),
   cognito: Object.freeze({
     clientId: process.env.COGNITO_CLIENT_ID!,
-    defaultPoolId: process.env.COGNITO_DEFAULT_POOL_ID!
+    defaultPoolId: process.env.COGNITO_DEFAULT_POOL_ID!,
   }),
   redis: Object.freeze({
     host: process.env.REDIS_HOST!,
     password: process.env.REDIS_PASSWORD!,
-    port: parseInt(process.env.REDIS_PORT!)
-  })
+    port: parseInt(process.env.REDIS_PORT!),
+  }),
 });

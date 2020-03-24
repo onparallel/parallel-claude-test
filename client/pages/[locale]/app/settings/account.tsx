@@ -7,7 +7,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
-  Input
+  Input,
 } from "@chakra-ui/core";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -15,7 +15,7 @@ import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   AccountQuery,
   Account_updateAccountMutation,
-  Account_updateAccountMutationVariables
+  Account_updateAccountMutationVariables,
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
@@ -32,8 +32,8 @@ function Account() {
   const { handleSubmit, register, errors } = useForm<NameChangeFormData>({
     defaultValues: {
       firstName: me.firstName ?? undefined,
-      lastName: me.lastName ?? undefined
-    }
+      lastName: me.lastName ?? undefined,
+    },
   });
   const [updateAccount] = useUpdateAccount();
 
@@ -137,7 +137,7 @@ Account.fragments = {
       ...AppLayout_User
     }
     ${AppLayout.fragments.user}
-  `
+  `,
 };
 
 const GET_ACCOUNT_DATA = gql`

@@ -11,10 +11,10 @@ export type PetitionUpdaterWrapper = ReturnType<typeof useWrapPetitionUpdater>;
 export function useWrapPetitionUpdater(
   setState: Dispatch<SetStateAction<PetitionState>>
 ) {
-  return useCallback(function<T extends (...args: any[]) => Promise<any>>(
+  return useCallback(function <T extends (...args: any[]) => Promise<any>>(
     updater: T
   ) {
-    return async function(...args: any[]) {
+    return async function (...args: any[]) {
       setState("SAVING");
       try {
         const result = await updater(...args);

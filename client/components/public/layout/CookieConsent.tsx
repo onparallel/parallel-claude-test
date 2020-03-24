@@ -14,7 +14,7 @@ export function CookieConsent({}: CookieConsentProps) {
         width: "100%",
         bottom: 0,
         backgroundColor: "green.500",
-        zIndex: 10
+        zIndex: 10,
       }}
       paddingY={6}
       color="white"
@@ -45,12 +45,12 @@ export function CookieConsent({}: CookieConsentProps) {
                     color: "white",
                     textDecoration: "underline",
                     _hover: { color: "white" },
-                    _active: { color: "white" }
+                    _active: { color: "white" },
                   }}
                 >
                   {chunks}
                 </Link>
-              )
+              ),
             }}
           ></FormattedMessage>
         </Text>
@@ -69,7 +69,7 @@ export function CookieConsent({}: CookieConsentProps) {
           color="white"
           _hover={{
             backgroundColor: "green.600",
-            color: "white"
+            color: "white",
           }}
           rightIcon="check"
         >
@@ -85,7 +85,7 @@ export function CookieConsent({}: CookieConsentProps) {
           backgroundColor="transparent"
           color="white"
           _hover={{
-            backgroundColor: "green.600"
+            backgroundColor: "green.600",
           }}
         >
           <FormattedMessage

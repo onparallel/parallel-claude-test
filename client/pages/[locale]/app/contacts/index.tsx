@@ -1,13 +1,13 @@
 import {
   MutationHookOptions,
   useMutation,
-  useQuery
+  useQuery,
 } from "@apollo/react-hooks";
 import { Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
-  useDialog
+  useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
@@ -21,14 +21,14 @@ import {
   ContactsUserQuery,
   Contacts_ContactsListFragment,
   Contacts_deleteContactsMutation,
-  Contacts_deleteContactsMutationVariables
+  Contacts_deleteContactsMutationVariables,
 } from "@parallel/graphql/__types";
 import { clearCache } from "@parallel/utils/apollo";
 import {
   integer,
   parseQuery,
   string,
-  useQueryState
+  useQueryState,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
@@ -42,7 +42,7 @@ const PAGE_SIZE = 10;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
-  search: string()
+  search: string(),
 };
 
 function Contacts() {
@@ -57,8 +57,8 @@ function Contacts() {
     variables: {
       offset: PAGE_SIZE * (state.page - 1),
       limit: PAGE_SIZE,
-      search: state.search
-    }
+      search: state.search,
+    },
   });
 
   const createContact = useCreateContact();
@@ -67,7 +67,7 @@ function Contacts() {
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.contacts\(/);
       refetch();
-    }
+    },
   });
 
   const { contacts } = data!;
@@ -76,10 +76,10 @@ function Contacts() {
   const confirmDelete = useDialog(ConfirmDeleteContacts, [selected, contacts]);
 
   function handleSearchChange(value: string | null) {
-    setQueryState(current => ({
+    setQueryState((current) => ({
       ...current,
       search: value,
-      page: 1
+      page: 1,
     }));
   }
 
@@ -91,9 +91,9 @@ function Contacts() {
   }
 
   function handlePageChange(page: number) {
-    setQueryState(current => ({
+    setQueryState((current) => ({
       ...current,
-      page
+      page,
     }));
   }
 
@@ -107,10 +107,10 @@ function Contacts() {
   async function handleDeleteClick() {
     try {
       await confirmDelete({
-        selected: contacts.items.filter(p => selected!.includes(p.id))
+        selected: contacts.items.filter((p) => selected!.includes(p.id)),
       });
       await deleteContact({
-        variables: { ids: selected! }
+        variables: { ids: selected! },
       });
     } catch {}
   }
@@ -120,7 +120,7 @@ function Contacts() {
       <Title>
         {intl.formatMessage({
           id: "contacts.title",
-          defaultMessage: "Contacts"
+          defaultMessage: "Contacts",
         })}
       </Title>
       <AppLayout user={me}>
@@ -187,7 +187,7 @@ const COLUMNS: TableColumn<ContactSelection>[] = [
         defaultMessage="First name"
       />
     )),
-    Cell: memo(({ row }) => <>{row.firstName}</>)
+    Cell: memo(({ row }) => <>{row.firstName}</>),
   },
   {
     key: "lastName",
@@ -197,15 +197,15 @@ const COLUMNS: TableColumn<ContactSelection>[] = [
         defaultMessage="Last name"
       />
     )),
-    Cell: memo(({ row }) => <>{row.lastName}</>)
+    Cell: memo(({ row }) => <>{row.lastName}</>),
   },
   {
     key: "email",
     Header: memo(() => (
       <FormattedMessage id="contacts.header.email" defaultMessage="Email" />
     )),
-    Cell: memo(({ row }) => <>{row.email}</>)
-  }
+    Cell: memo(({ row }) => <>{row.email}</>),
+  },
 ];
 
 function useDeleteContact(
@@ -250,7 +250,7 @@ function ConfirmDeleteContacts({
           values={{
             count,
             email,
-            b: (...chunks: any[]) => <b>{chunks}</b>
+            b: (...chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }
@@ -285,7 +285,7 @@ Contacts.fragments = {
       ...AppLayout_User
     }
     ${AppLayout.fragments.user}
-  `
+  `,
 };
 
 const GET_CONTACTS_DATA = gql`
@@ -314,10 +314,10 @@ Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
       variables: {
         offset: PAGE_SIZE * (page - 1),
         limit: PAGE_SIZE,
-        search
-      }
+        search,
+      },
     }),
-    apollo.query<ContactsUserQuery>({ query: GET_CONTACTS_USER_DATA })
+    apollo.query<ContactsUserQuery>({ query: GET_CONTACTS_USER_DATA }),
   ]);
 };
 

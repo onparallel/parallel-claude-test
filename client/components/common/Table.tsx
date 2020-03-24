@@ -4,7 +4,7 @@ import {
   Checkbox,
   PseudoBox,
   PseudoBoxProps,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import { ComponentType, useEffect, useMemo, memo, MouseEvent } from "react";
 import { useSelectionState } from "../../utils/useSelectionState";
@@ -58,7 +58,7 @@ function _Table<T>({
     allSelected,
     anySelected,
     toggle,
-    toggleAll
+    toggleAll,
   } = useSelectionState(rows, rowKeyProp);
   const colors = useTableColors();
 
@@ -97,13 +97,13 @@ function _Table<T>({
                   size="md"
                   variantColor="purple"
                   onClick={toggle}
-                  onChange={function() {}}
+                  onChange={function () {}}
                 />
               </Box>
             );
-          }
+          },
         },
-        ...columns
+        ...columns,
       ];
     }
   }, [selectable]);
@@ -117,7 +117,7 @@ function _Table<T>({
           borderBottom="1px solid"
           borderBottomColor={colors.border}
         >
-          {columns.map(column => {
+          {columns.map((column) => {
             return (
               <PseudoBox
                 key={column.key}
@@ -144,7 +144,7 @@ function _Table<T>({
         </PseudoBox>
       </Box>
       <Box as="tbody">
-        {rows.map(row => {
+        {rows.map((row) => {
           const key = row[rowKeyProp] as any;
           const isSelected = selection[key] ?? false;
           return (
@@ -157,14 +157,14 @@ function _Table<T>({
                   ? colors.rowSelected
                   : highlightable
                   ? colors.rowHover
-                  : colors.row
+                  : colors.row,
               }}
               cursor="pointer"
               borderBottom="1px solid"
               borderBottomColor={colors.border}
-              onClick={event => onRowClick?.(row, event)}
+              onClick={(event) => onRowClick?.(row, event)}
             >
-              {columns.map(column => {
+              {columns.map((column) => {
                 return (
                   <PseudoBox
                     key={column.key}
@@ -181,7 +181,7 @@ function _Table<T>({
                       row={row}
                       column={column}
                       isSelected={isSelected}
-                      toggle={event => toggle(key, event)}
+                      toggle={(event) => toggle(key, event)}
                     ></column.Cell>
                   </PseudoBox>
                 );
@@ -206,7 +206,7 @@ export function useTableColors() {
           header: "gray.50",
           row: "white",
           rowHover: "gray.50",
-          rowSelected: "purple.50"
+          rowSelected: "purple.50",
         };
       case "dark":
         return {
@@ -214,7 +214,7 @@ export function useTableColors() {
           header: "gray.700",
           row: "gray.900",
           rowHover: "gray.800",
-          rowSelected: "blue.900"
+          rowSelected: "blue.900",
         };
     }
   }, [colorMode]);

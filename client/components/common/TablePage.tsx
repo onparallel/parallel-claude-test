@@ -4,7 +4,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import {
   Table,
   TableProps,
-  useTableColors
+  useTableColors,
 } from "@parallel/components/common/Table";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
@@ -97,7 +97,7 @@ export function TablePage<T>({
             values={{
               total: totalCount,
               start: pageSize * (page - 1) + 1,
-              end: pageSize * (page - 1) + rows.length
+              end: pageSize * (page - 1) + rows.length,
             }}
           />
         </Box>

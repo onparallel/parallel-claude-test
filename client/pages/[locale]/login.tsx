@@ -8,7 +8,7 @@ import {
   useToast,
   Box,
   Heading,
-  Avatar
+  Avatar,
 } from "@chakra-ui/core";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
@@ -48,7 +48,7 @@ function Login({ me }: LoginProps) {
     try {
       const { token } = await postJson("/api/auth/login", {
         email,
-        password
+        password,
       });
       localStorage.setItem("token", token);
       router.push("/[locale]/app", `/${router.query.locale}/app`);
@@ -59,15 +59,15 @@ function Login({ me }: LoginProps) {
         toast({
           title: intl.formatMessage({
             id: "public.login.invalid-login.title",
-            defaultMessage: "Invalid login"
+            defaultMessage: "Invalid login",
           }),
           description: intl.formatMessage({
             id: "public.login.invalid-login.description",
-            defaultMessage: "The email or password are invalid."
+            defaultMessage: "The email or password are invalid.",
           }),
           status: "error",
           duration: 3000,
-          isClosable: true
+          isClosable: true,
         });
       }
     }
@@ -75,7 +75,7 @@ function Login({ me }: LoginProps) {
   }
 
   async function onPasswordChangeSubmit({
-    password1: newPassword
+    password1: newPassword,
   }: PasswordChangeData) {
     setIsSubmitting(true);
     try {
@@ -83,7 +83,7 @@ function Login({ me }: LoginProps) {
       const { token } = await postJson("/api/auth/new-password", {
         email,
         password,
-        newPassword
+        newPassword,
       });
       localStorage.setItem("token", token);
       router.push("/[locale]/app", `/${router.query.locale}/app`);
@@ -96,7 +96,7 @@ function Login({ me }: LoginProps) {
       <Title>
         {intl.formatMessage({
           id: "public.login.title",
-          defaultMessage: "Login"
+          defaultMessage: "Login",
         })}
       </Title>
       <PublicLayout>
@@ -136,7 +136,7 @@ interface AlreadyLoggedInProps {
 function AlreadyLoggedIn({
   me,
   onRelogin,
-  onContinueAs
+  onContinueAs,
 }: AlreadyLoggedInProps) {
   return (
     <>
@@ -218,7 +218,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             type="email"
             ref={register({
               required: true,
-              pattern: EMAIL_REGEX
+              pattern: EMAIL_REGEX,
             })}
           />
           {errors.email && (
@@ -290,7 +290,7 @@ interface PasswordChangeFormProps {
 function PasswordChangeForm({
   onSubmit,
   onBackToLogin,
-  isSubmitting
+  isSubmitting,
 }: PasswordChangeFormProps) {
   const { handleSubmit, register, errors, getValues } = useForm<
     PasswordChangeData
@@ -324,7 +324,7 @@ function PasswordChangeForm({
             name="password1"
             ref={register({
               required: true,
-              validate: value => value.length >= 8
+              validate: (value) => value.length >= 8,
             })}
           />
           {errors.password1 && (
@@ -348,7 +348,7 @@ function PasswordChangeForm({
             name="password2"
             ref={register({
               required: true,
-              validate: value => value === getValues().password1
+              validate: (value) => value === getValues().password1,
             })}
           />
           {errors.password2 && (
@@ -395,7 +395,7 @@ Login.getInitialProps = async ({ res, apollo }: WithDataContext) => {
             email
           }
         }
-      `
+      `,
     });
     return result.data;
   } catch (error) {

@@ -1,7 +1,7 @@
 const isProd = process.env.NODE_ENV === "production";
 module.exports = {
   env: {
-    ROOT: __dirname
+    ROOT: __dirname,
   },
   // assetPrefix: isProd ? "https://static.parallel.so" : "",
   poweredByHeader: false,
@@ -21,5 +21,5 @@ module.exports = {
       return entries;
     };
     return config;
-  }
+  },
 };

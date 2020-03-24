@@ -11,7 +11,7 @@ export function PublicHeroBlackBanner({ ...props }: PublicHeroProps) {
       paddingY={16}
       wrapper={{
         backgroundColor: "gray.900",
-        textAlign: "center"
+        textAlign: "center",
       }}
     >
       <Heading fontWeight="light" fontSize="3xl" color="white">

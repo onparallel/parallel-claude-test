@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import { spawn, execSync, ChildProcessWithoutNullStreams } from "child_process";
 
-export default async function() {
+export default async function () {
   // Setting up the stack
   const dc = spawn("docker-compose", [
     "--file",
     "../ops/test/docker-compose.yml",
-    "up"
+    "up",
   ]);
 
   await waitUntilReady(dc);
@@ -16,7 +16,7 @@ export default async function() {
 }
 
 function waitUntilReady(process: ChildProcessWithoutNullStreams) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     process.stdout.on("data", (data: Buffer) => {
       const text = data.toString();
       if (text.includes("database system is ready to accept connections")) {

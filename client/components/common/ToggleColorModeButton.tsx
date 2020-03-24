@@ -18,11 +18,11 @@ export const ToggleColorModeButton = forwardRef(
           colorMode === "dark"
             ? intl.formatMessage({
                 id: "component.toggle-color-mode-button.toggle-dark",
-                defaultMessage: "Toggle dark mode"
+                defaultMessage: "Toggle dark mode",
               })
             : intl.formatMessage({
                 id: "component.toggle-color-mode-button.toggle-light",
-                defaultMessage: "Toggle light mode"
+                defaultMessage: "Toggle light mode",
               })
         }
         icon={colorMode === "dark" ? "sun" : "moon"}

@@ -96,7 +96,7 @@ export class Auth {
       sameSite: true,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
     res.status(201).send({ token });
   }
@@ -124,8 +124,8 @@ export class Auth {
   }
 
   validateSession = fromDataLoader(
-    new DataLoader<string, string | null>(async tokens => {
-      return await map(tokens as string[], async token => {
+    new DataLoader<string, string | null>(async (tokens) => {
+      return await map(tokens as string[], async (token) => {
         try {
           const idToken = await this.redis.get(`session:${token}:idToken`);
           if (idToken === null) {
@@ -134,7 +134,7 @@ export class Auth {
           const {
             exp: expiresAt,
             "cognito:username": cognitoId,
-            email
+            email,
           } = jwtDecode(idToken);
           if (Date.now() > expiresAt * 1000) {
             const refreshToken = await this.redis.get(

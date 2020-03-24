@@ -6,7 +6,7 @@ import {
   InputLeftElement,
   InputProps,
   InputRightElement,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
@@ -30,7 +30,7 @@ export const SearchInput = forwardRef(function SearchInput(
 
   const clearLabel = intl.formatMessage({
     id: "component.input.clear-button",
-    defaultMessage: "Clear"
+    defaultMessage: "Clear",
   });
 
   function handleClearClick() {
@@ -62,7 +62,7 @@ export const SearchInput = forwardRef(function SearchInput(
           props.placeholder ||
           intl.formatMessage({
             id: "component.search-input.placeholder",
-            defaultMessage: "Search..."
+            defaultMessage: "Search...",
           })
         }
         {...props}

@@ -12,10 +12,10 @@ export interface Loader<K, V> {
 export function fromDataLoader<K, V, C = K>(
   dataloader: DataLoader<K, V, C>
 ): Loader<K, V> {
-  return <any>async function(ids: K | K[], opts: FromDataLoaderOptions = {}) {
+  return <any>async function (ids: K | K[], opts: FromDataLoaderOptions = {}) {
     const { refresh } = {
       refresh: false,
-      ...opts
+      ...opts,
     };
     if (refresh) {
       for (const id of Array.isArray(ids) ? ids : [ids]) {

@@ -13,7 +13,5 @@
       "@parallel/*": ["./*"]
     }
   },
-  "include": [
-    "definitions.d.ts"
-  ]
+  "include": ["definitions.d.ts"]
 }

@@ -6,7 +6,7 @@ QueryBuilder.extend("whereNotLike", likeClause("not like"));
 QueryBuilder.extend("whereNotIlike", likeClause("not ilike"));
 
 function likeClause<TRecord = any, TResult = unknown>(operator: string) {
-  return function(
+  return function (
     this: QueryBuilder<TRecord, TResult>,
     columnName: string,
     pattern: string,
@@ -16,7 +16,7 @@ function likeClause<TRecord = any, TResult = unknown>(operator: string) {
       return this.whereRaw(`?? ${operator} ? escape ?`, [
         columnName,
         pattern,
-        escape
+        escape,
       ]);
     } else {
       return this.whereRaw(`?? ${operator} ?`, [columnName, pattern]);

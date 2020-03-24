@@ -18,7 +18,7 @@ export class Redis {
     if (this.client.connected) {
       return;
     } else {
-      await new Promise(r => this.client.on("ready", r));
+      await new Promise((r) => this.client.on("ready", r));
     }
   }
 

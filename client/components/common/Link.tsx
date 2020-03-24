@@ -1,7 +1,7 @@
 import {
   Link as ChakraLink,
   LinkProps as ChakraLinkProps,
-  useColorMode
+  useColorMode,
 } from "@chakra-ui/core";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
@@ -12,21 +12,21 @@ export function linkColorProps(colorMode: string) {
     light: {
       color: "purple.600",
       _hover: {
-        color: "purple.700"
+        color: "purple.700",
       },
       _active: {
-        color: "purple.800"
-      }
+        color: "purple.800",
+      },
     },
     dark: {
       color: "purple.200",
       _hover: {
-        color: "purple.300"
+        color: "purple.300",
       },
       _active: {
-        color: "purple.400"
-      }
-    }
+        color: "purple.400",
+      },
+    },
   };
   return theme[colorMode];
 }

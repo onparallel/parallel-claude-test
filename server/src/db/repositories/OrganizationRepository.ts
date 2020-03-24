@@ -10,7 +10,7 @@ export class OrganizationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("organization", "id", q =>
+  readonly loadOneById = this.buildLoadOneById("organization", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
@@ -18,7 +18,7 @@ export class OrganizationRepository extends BaseRepository {
     return await this.loadPageAndCount(
       this.from("user")
         .where({ org_id: orgId, deleted_at: null })
-        .modify(q => {
+        .modify((q) => {
           q.orderBy("id");
         }),
       opts
