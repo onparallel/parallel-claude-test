@@ -10,6 +10,7 @@ import {
   Tooltip,
   useTheme,
   VisuallyHidden,
+  BoxProps,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
@@ -33,7 +34,7 @@ export type PetitionComposeFieldProps = {
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
-};
+} & BoxProps;
 
 interface DragItem {
   index: number;
@@ -50,6 +51,7 @@ export function PetitionComposeField({
   onFieldEdit,
   onDeleteClick,
   onTitleKeyDown,
+  ...props
 }: PetitionComposeFieldProps) {
   const intl = useIntl();
   const labels = {
@@ -95,6 +97,7 @@ export function PetitionComposeField({
           ? generateCssStripe({ size: "1rem", color: colors.gray[50] })
           : null
       }
+      {...props}
     >
       <PseudoBox
         ref={previewRef}

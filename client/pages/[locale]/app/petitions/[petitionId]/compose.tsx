@@ -39,7 +39,12 @@ import {
   usePetitionState,
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
-import { UnwrapArray, UnwrapPromise, Assert } from "@parallel/utils/types";
+import {
+  UnwrapArray,
+  UnwrapPromise,
+  Assert,
+  Maybe,
+} from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import {
@@ -62,7 +67,7 @@ type FieldSelection = UnwrapArray<
 >;
 
 type FieldsReducerState = {
-  active: string | null;
+  active: Maybe<string>;
   fieldsById: { [id: string]: FieldSelection };
   fieldIds: string[];
 };
@@ -281,6 +286,11 @@ function PetitionCompose({ petitionId }: PetitionProps) {
                 <>
                   {fieldIds.map((fieldId, index) => (
                     <PetitionComposeField
+                      onFocus={() => {
+                        if (active) {
+                          dispatch({ type: "SET_ACTIVE", fieldId });
+                        }
+                      }}
                       onMove={handleFieldMove}
                       key={fieldId}
                       field={fieldsById[fieldId]}
