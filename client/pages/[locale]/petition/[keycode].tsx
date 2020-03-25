@@ -584,16 +584,16 @@ function useCreateFileUploadReply() {
             },
           });
           const petitionFragment = gql`
-            fragment PublicPetition_createTextReply_PublicPetition on PublicPetition {
+            fragment PublicPetition_createFileUploadReply_PublicPetition on PublicPetition {
               status
             }
           `;
           const cachedPetition = client.readFragment<
-            PublicPetition_createTextReply_PublicPetitionFragment
+            PublicPetition_createFileUploadReply_PublicPetitionFragment
           >({ id: petitionId, fragment: petitionFragment });
           if (cachedPetition?.status === "COMPLETED") {
             client.writeFragment<
-              PublicPetition_createTextReply_PublicPetitionFragment
+              PublicPetition_createFileUploadReply_PublicPetitionFragment
             >({
               id: petitionId,
               fragment: petitionFragment,

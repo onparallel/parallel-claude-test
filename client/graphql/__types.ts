@@ -1062,7 +1062,7 @@ export type PublicPetition_createFileUploadReply_FieldFragment = {
   >;
 };
 
-export type PublicPetition_createTextReply_PublicPetitionFragment = {
+export type PublicPetition_createFileUploadReply_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status">;
 
