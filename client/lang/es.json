@@ -1603,7 +1603,7 @@
   },
   {
     "term": "sendout.sender-message",
-    "definition": "<b>{name}</b> te envío la siguiente petición:",
+    "definition": "<b>{name}</b> te envió la siguiente petición:",
     "context": "<b>{name}</b> sent you this petition:",
     "reference": "pages/[locale]/petition/[keycode].tsx#L233-L240"
   },
@@ -1615,8 +1615,8 @@
   },
   {
     "term": "sendout.text-reply",
-    "definition": "Respuesta enviada el {date}",
-    "context": "Reply sent on {date}",
+    "definition": "Respuesta añadida el {date}",
+    "context": "Reply added on {date}",
     "reference": "components/petition/PublicPetitionField.tsx#L142-L153"
   },
   {

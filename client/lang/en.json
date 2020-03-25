@@ -1615,8 +1615,8 @@
   },
   {
     "term": "sendout.text-reply",
-    "definition": "Reply sent on {date}",
-    "context": "Reply sent on {date}",
+    "definition": "Reply added on {date}",
+    "context": "Reply added on {date}",
     "reference": "components/petition/PublicPetitionField.tsx#L142-L153"
   },
   {

@@ -141,7 +141,7 @@ export function PublicPetitionField({
                 {field.type === "TEXT" ? (
                   <FormattedMessage
                     id="sendout.text-reply"
-                    defaultMessage="Reply sent on {date}"
+                    defaultMessage="Reply added on {date}"
                     values={{
                       date: (
                         <DateTime
