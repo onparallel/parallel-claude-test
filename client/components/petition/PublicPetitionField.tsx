@@ -14,6 +14,7 @@ import {
   Text,
   Textarea,
   useTheme,
+  Tooltip,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
@@ -62,6 +63,10 @@ export function PublicPetitionField({
       id: "generic.file-name",
       defaultMessage: "File name",
     }),
+    required: intl.formatMessage({
+      id: "generic.required-field",
+      defaultMessage: "Required field",
+    }),
   };
 
   return (
@@ -75,15 +80,42 @@ export function PublicPetitionField({
         : {})}
       {...props}
     >
-      <Heading as="h2" fontSize="md">
-        {field.title}
-      </Heading>
+      <Flex>
+        <Heading as="h2" fontSize="md">
+          {field.title}
+        </Heading>
+        {field.optional ? (
+          <Text marginLeft={2} color="gray.400" fontSize="sm">
+            <FormattedMessage
+              id="generic.optional-field"
+              defaultMessage="Optional"
+            />
+          </Text>
+        ) : (
+          <Tooltip
+            placement="right"
+            zIndex={1000}
+            showDelay={300}
+            aria-label={labels.required}
+            label={labels.required}
+          >
+            <Box
+              fontSize="xl"
+              userSelect="none"
+              position="relative"
+              bottom="4px"
+            >
+              *
+            </Box>
+          </Tooltip>
+        )}
+      </Flex>
       {field.description ? (
         <Text fontSize="sm" color="gray.600">
           {field.description}
         </Text>
       ) : null}
-      <Text fontSize="sm" color="gray.400">
+      <Text fontSize="sm" color="gray.500">
         {field.type === "TEXT" ? (
           <FormattedMessage
             id="sendout.replies-submitted"
@@ -325,6 +357,7 @@ function FileUploadReplyForm({
       borderColor={
         isDragActive ? (isDragAccept ? "gray.400" : "red.500") : "gray.300"
       }
+      cursor="pointer"
       rounded="md"
       flexDirection="column"
       justifyContent="center"

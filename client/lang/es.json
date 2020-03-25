@@ -369,13 +369,13 @@
     "term": "generic.dropzone-allowed-types",
     "definition": "Solo los siguientes tipos están permitidos:",
     "context": "Only the following file types are allowed:",
-    "reference": "components/petition/PublicPetitionField.tsx#L354-L357"
+    "reference": "components/petition/PublicPetitionField.tsx#L387-L390"
   },
   {
     "term": "generic.dropzone-default",
     "definition": "Arrastra archivos aquí o haz click para seleccionarlos",
     "context": "Drag files here, or click to select them",
-    "reference": "components/petition/PublicPetitionField.tsx#L387-L390"
+    "reference": "components/petition/PublicPetitionField.tsx#L420-L423"
   },
   {
     "term": "generic.edit-label",
@@ -393,37 +393,37 @@
     "term": "generic.file-name",
     "definition": "Nombre de archivo",
     "context": "File name",
-    "reference": "components/petition/PublicPetitionField.tsx#L61-L64"
+    "reference": "components/petition/PublicPetitionField.tsx#L62-L65"
   },
   {
     "term": "generic.file-size",
     "definition": "Tamaño de archivo",
     "context": "File size",
-    "reference": "components/petition/PublicPetitionField.tsx#L57-L60"
+    "reference": "components/petition/PublicPetitionField.tsx#L58-L61"
   },
   {
     "term": "generic.file-types.document",
     "definition": "Documentos (.pdf, .doc, .docx)",
     "context": "Documents (.pdf, .doc, .docx)",
-    "reference": "components/petition/PublicPetitionField.tsx#L362-L365"
+    "reference": "components/petition/PublicPetitionField.tsx#L395-L398"
   },
   {
     "term": "generic.file-types.image",
     "definition": "Imágenes (.jpeg, .png, etc.)",
     "context": "Images (.jpeg, .png, etc.)",
-    "reference": "components/petition/PublicPetitionField.tsx#L367-L370"
+    "reference": "components/petition/PublicPetitionField.tsx#L400-L403"
   },
   {
     "term": "generic.file-types.pdf",
     "definition": "Documentos PDF",
     "context": "PDF Documents",
-    "reference": "components/petition/PublicPetitionField.tsx#L377-L380"
+    "reference": "components/petition/PublicPetitionField.tsx#L410-L413"
   },
   {
     "term": "generic.file-types.video",
     "definition": "Vídeos (.mp4, .avi, etc.)",
     "context": "Videos (.mp4, .avi, etc.)",
-    "reference": "components/petition/PublicPetitionField.tsx#L372-L375"
+    "reference": "components/petition/PublicPetitionField.tsx#L405-L408"
   },
   {
     "term": "generic.forms.confirm-password-label",
@@ -501,7 +501,7 @@
     "term": "generic.forms.required-field-error",
     "definition": "Se requiere un valor",
     "context": "A value is required",
-    "reference": "components/petition/PublicPetitionField.tsx#L256-L259"
+    "reference": "components/petition/PublicPetitionField.tsx#L288-L291"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -546,6 +546,12 @@
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L673-L676"
   },
   {
+    "term": "generic.optional-field",
+    "definition": "Opcional",
+    "context": "Optional",
+    "reference": "components/petition/PublicPetitionField.tsx#L89-L92"
+  },
+  {
     "term": "generic.petition-status.completed",
     "definition": "Completada",
     "context": "Completed",
@@ -567,7 +573,7 @@
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field",
-    "reference": "components/petition/PetitionComposeField.tsx#L56-L59"
+    "reference": "components/petition/PublicPetitionField.tsx#L66-L69"
   },
   {
     "term": "generic.richtext.bold",
@@ -1545,13 +1551,13 @@
     "term": "sendout.field-reply-submit",
     "definition": "Enviar",
     "context": "Submit",
-    "reference": "components/petition/PublicPetitionField.tsx#L270-L273"
+    "reference": "components/petition/PublicPetitionField.tsx#L302-L305"
   },
   {
     "term": "sendout.files-uploaded",
     "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
-    "reference": "components/petition/PublicPetitionField.tsx#L94-L98"
+    "reference": "components/petition/PublicPetitionField.tsx#L126-L130"
   },
   {
     "term": "sendout.first-time-header",
@@ -1587,13 +1593,13 @@
     "term": "sendout.remove-reply-label",
     "definition": "Eliminar respuesta",
     "context": "Remove reply",
-    "reference": "components/petition/PublicPetitionField.tsx#L207-L210"
+    "reference": "components/petition/PublicPetitionField.tsx#L239-L242"
   },
   {
     "term": "sendout.replies-submitted",
     "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviad} other {# respuestas enviadas}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "reference": "components/petition/PublicPetitionField.tsx#L88-L92"
+    "reference": "components/petition/PublicPetitionField.tsx#L120-L124"
   },
   {
     "term": "sendout.sender-message",
@@ -1611,7 +1617,7 @@
     "term": "sendout.text-reply",
     "definition": "Respuesta enviada el {date}",
     "context": "Reply sent on {date}",
-    "reference": "components/petition/PublicPetitionField.tsx#L110-L121"
+    "reference": "components/petition/PublicPetitionField.tsx#L142-L153"
   },
   {
     "term": "settings.account",
