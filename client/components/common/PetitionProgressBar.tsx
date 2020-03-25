@@ -66,7 +66,7 @@ export function PetitionProgressBar({
               <Text fontStyle="italic">
                 <FormattedMessage
                   id="component.petition-progress-bar.not-sent"
-                  defaultMessage="This petition has not been sent yet."
+                  defaultMessage="You haven't send this petition to anyone yet."
                 />
               </Text>
             </Box>

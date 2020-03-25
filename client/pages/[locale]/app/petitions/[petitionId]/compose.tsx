@@ -273,7 +273,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
                 <Heading as="h2" size="sm">
                   <FormattedMessage
                     id="petition.fields-header"
-                    defaultMessage="Petition fields"
+                    defaultMessage="This is the information that you need"
                   />
                 </Heading>
               </Box>
@@ -317,13 +317,13 @@ function PetitionCompose({ petitionId }: PetitionProps) {
                   <Heading as="h2" size="md" marginTop={8} marginBottom={2}>
                     <FormattedMessage
                       id="petition.empty-header"
-                      defaultMessage="This petition is empty..."
+                      defaultMessage="What information do you want us to collect?"
                     />
                   </Heading>
                   <Text fontSize="md">
                     <FormattedMessage
                       id="petition.empty-text"
-                      defaultMessage="Start by adding a field"
+                      defaultMessage="Let's add our first field"
                     />
                   </Text>
                   <AddFieldPopover

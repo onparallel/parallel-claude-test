@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/react-hooks";
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/core";
+import { Button, FormControl, FormLabel, Input, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
@@ -96,19 +96,15 @@ function AskPetitionName(props: DialogCallbacks<string>) {
       }}
       focusRef={focusRef}
       header={
-        <FormattedMessage
-          id="petitions.create-new-petition.header"
-          defaultMessage="Create a new petition"
-        />
+        <Text as="label" {...{ htmlFor: "petition-name" }}>
+          <FormattedMessage
+            id="petitions.create-new-petition.header"
+            defaultMessage="Give your new petition a name"
+          />
+        </Text>
       }
       body={
         <FormControl isInvalid={!!errors.name}>
-          <FormLabel htmlFor="petition-name">
-            <FormattedMessage
-              id="petitions.create-new-petition.body"
-              defaultMessage="Give your new petition a name"
-            />
-          </FormLabel>
           <Input
             id="petition-name"
             name="name"
@@ -124,7 +120,7 @@ function AskPetitionName(props: DialogCallbacks<string>) {
         <Button type="submit" variantColor="purple" isDisabled={!isValid}>
           <FormattedMessage
             id="petitions.create-new-petition.continue-button"
-            defaultMessage="Continue"
+            defaultMessage="Let's continue"
           />
         </Button>
       }

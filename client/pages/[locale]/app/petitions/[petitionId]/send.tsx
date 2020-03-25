@@ -347,7 +347,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="petition.no-sendouts"
-                      defaultMessage="This petition has not been sent yet"
+                      defaultMessage="You haven't send this petition to anyone yet"
                     />
                   </Text>
                 </Flex>

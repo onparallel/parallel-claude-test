@@ -3,7 +3,7 @@
     "term": "component.confirm-dialog.cancel-button",
     "definition": "Cancelar",
     "context": "Cancel",
-    "reference": "components/common/ConfirmDialog.tsx#L40-L43"
+    "reference": "components/common/ConfirmDialog.tsx#L42-L45"
   },
   {
     "term": "component.cookie-consent.accept-button",
@@ -73,8 +73,8 @@
   },
   {
     "term": "component.petition-progress-bar.not-sent",
-    "definition": "Esta petición no ha sido enviada todavía.",
-    "context": "This petition has not been sent yet.",
+    "definition": "No has enviado esta petición a nadie todavía",
+    "context": "You haven't send this petition to anyone yet.",
     "reference": "components/common/PetitionProgressBar.tsx#L67-L70"
   },
   {
@@ -273,13 +273,13 @@
     "term": "contacts.create-new-contact.continue-button",
     "definition": "Continuar",
     "context": "Continue",
-    "reference": "utils/useCreateContact.tsx#L136-L139"
+    "reference": "utils/useCreateContact.tsx#L138-L141"
   },
   {
     "term": "contacts.create-new-contact.header",
     "definition": "Introduce los datos del contacto",
     "context": "Enter the contact details",
-    "reference": "utils/useCreateContact.tsx#L82-L85"
+    "reference": "utils/useCreateContact.tsx#L84-L87"
   },
   {
     "term": "contacts.header.email",
@@ -435,25 +435,25 @@
     "term": "generic.forms.email-label",
     "definition": "Correo electrónico",
     "context": "Email",
-    "reference": "utils/useCreateContact.tsx#L91-L94"
+    "reference": "utils/useCreateContact.tsx#L93-L96"
   },
   {
     "term": "generic.forms.email-placeholder",
     "definition": "nombre@ejemplo.com",
     "context": "name@example.com",
-    "reference": "utils/useCreateContact.tsx#L100-L103"
+    "reference": "utils/useCreateContact.tsx#L102-L105"
   },
   {
     "term": "generic.forms.first-name-label",
     "definition": "Nombre",
     "context": "First name",
-    "reference": "utils/useCreateContact.tsx#L116-L119"
+    "reference": "utils/useCreateContact.tsx#L118-L121"
   },
   {
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo eletrónico válido",
     "context": "Please, enter a valid email",
-    "reference": "utils/useCreateContact.tsx#L107-L110"
+    "reference": "utils/useCreateContact.tsx#L109-L112"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
@@ -471,7 +471,7 @@
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "utils/useCreateContact.tsx#L125-L128"
+    "reference": "utils/useCreateContact.tsx#L127-L130"
   },
   {
     "term": "generic.forms.new-password-label",
@@ -543,7 +543,7 @@
     "term": "generic.go-back-button",
     "definition": "Volver atrás",
     "context": "Go back",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L673-L676"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L675-L678"
   },
   {
     "term": "generic.optional-field",
@@ -621,7 +621,7 @@
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition",
-    "reference": "utils/useCreatePetition.tsx#L114-L117"
+    "reference": "utils/useCreatePetition.tsx#L112-L115"
   },
   {
     "term": "header.user-menu-button",
@@ -693,19 +693,19 @@
     "term": "petition.completed-petition-dialog.body",
     "definition": "Esta petición ya fue completada por el destinatario. Si realiza cualquier cambio a los campos, el destinatario deberá finalizar la petición de nuevo.",
     "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L652-L655"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L654-L657"
   },
   {
     "term": "petition.completed-petition-dialog.confirm-button",
     "definition": "Ok, entiendo",
     "context": "I understand",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L659-L662"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L661-L664"
   },
   {
     "term": "petition.completed-petition-dialog.header",
     "definition": "Esta petición esta completada",
     "context": "This petition is completed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L646-L649"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L648-L651"
   },
   {
     "term": "petition.confirm-delete-field.body",
@@ -733,14 +733,14 @@
   },
   {
     "term": "petition.empty-header",
-    "definition": "Esta petición esta vacía...",
-    "context": "This petition is empty...",
+    "definition": "¿Que información necesitas que pidamos?",
+    "context": "What information do you want us to collect?",
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L318-L321"
   },
   {
     "term": "petition.empty-text",
-    "definition": "Empieza por añadir un campo",
-    "context": "Start by adding a field",
+    "definition": "Añadamos nuestro primer campo",
+    "context": "Let's add our first field",
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L324-L327"
   },
   {
@@ -793,8 +793,8 @@
   },
   {
     "term": "petition.fields-header",
-    "definition": "Campos de la petición",
-    "context": "Petition fields",
+    "definition": "Esta es la información que necesitas",
+    "context": "This is the information that you need",
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L274-L277"
   },
   {
@@ -847,8 +847,8 @@
   },
   {
     "term": "petition.no-sendouts",
-    "definition": "Esta petición no ha sido enviada todavía",
-    "context": "This petition has not been sent yet",
+    "definition": "No has enviado esta petición a nadie todavía",
+    "context": "You haven't send this petition to anyone yet",
     "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L348-L351"
   },
   {
@@ -966,22 +966,16 @@
     "reference": "pages/[locale]/app/petitions/index.tsx#L345-L348"
   },
   {
-    "term": "petitions.create-new-petition.body",
-    "definition": "Nueva petición",
-    "context": "Give your new petition a name",
-    "reference": "utils/useCreatePetition.tsx#L105-L108"
-  },
-  {
     "term": "petitions.create-new-petition.continue-button",
-    "definition": "Continuar",
-    "context": "Continue",
-    "reference": "utils/useCreatePetition.tsx#L123-L126"
+    "definition": "Sigamos",
+    "context": "Let's continue",
+    "reference": "utils/useCreatePetition.tsx#L121-L124"
   },
   {
     "term": "petitions.create-new-petition.header",
-    "definition": "Crear una petición nueva",
-    "context": "Create a new petition",
-    "reference": "utils/useCreatePetition.tsx#L97-L100"
+    "definition": "Dale un nombre a tu nueva petición",
+    "context": "Give your new petition a name",
+    "reference": "utils/useCreatePetition.tsx#L100-L103"
   },
   {
     "term": "petitions.header.custom-ref",
@@ -1539,13 +1533,13 @@
     "term": "sendout.completed-petition.toast-description",
     "definition": "Has completado esta petición y {name} será notificado",
     "context": "You have completed this petition and {name} will be notified",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L166-L170"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L167-L171"
   },
   {
     "term": "sendout.completed-petition.toast-title",
     "definition": "¡Petición completada!",
     "context": "Petition completed!",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L161-L164"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L162-L165"
   },
   {
     "term": "sendout.field-reply-submit",
@@ -1563,31 +1557,31 @@
     "term": "sendout.first-time-header",
     "definition": "¿Es la primera vez que usas Parallel?",
     "context": "Is this your first time using Parallel?",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L289-L292"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L296-L299"
   },
   {
     "term": "sendout.first-time-p1",
     "definition": "No te preocupes, es sencillo. Para completar la petición solamente necesitas rellenar cada uno de los campos de la izquierda.",
     "context": "Don't worry, it's very simple. To complete this petition you need to fill each of the fields on the left.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L297-L300"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L304-L307"
   },
   {
     "term": "sendout.first-time-p2",
     "definition": "Asegurate de que hayas subido todos los archivos antes de finalizar",
     "context": "Make sure you have upload all the requested files before submitting.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L303-L306"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L310-L313"
   },
   {
     "term": "sendout.first-time-p3",
     "definition": "Si te equivocases, puedes volver y hacer los cambios que creas pertinentes.",
     "context": "If you accidentally make any mistakes, you will be able to come back and make any amends necessary.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L309-L312"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L316-L319"
   },
   {
     "term": "sendout.petition-completed-alert",
     "definition": "Esta petición ha sido completada. Si deseas realizar cambios, no te olvides de hacer click de nuevo en el botón de finalizar.",
     "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L201-L204"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L207-L210"
   },
   {
     "term": "sendout.remove-reply-label",
@@ -1605,13 +1599,13 @@
     "term": "sendout.sender-message",
     "definition": "<b>{name}</b> te envió la siguiente petición:",
     "context": "<b>{name}</b> sent you this petition:",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L233-L240"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L240-L247"
   },
   {
     "term": "sendout.submit-button",
     "definition": "Finalizar y notificar a {name}",
     "context": "Submit and notify {name}",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L319-L323"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L326-L330"
   },
   {
     "term": "sendout.text-reply",
