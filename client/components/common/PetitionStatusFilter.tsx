@@ -35,14 +35,6 @@ export function PetitionStatusFilter({
       id: "component.petition-status-filter.pending",
       defaultMessage: "Pending",
     }),
-    SCHEDULED: intl.formatMessage({
-      id: "component.petition-status-filter.scheduled",
-      defaultMessage: "Scheduled",
-    }),
-    READY: intl.formatMessage({
-      id: "component.petition-status-filter.ready",
-      defaultMessage: "Ready",
-    }),
     COMPLETED: intl.formatMessage({
       id: "component.petition-status-filter.completed",
       defaultMessage: "Completed",
@@ -76,8 +68,6 @@ export function PetitionStatusFilter({
           <MenuItemOption value="ALL">{filters.ALL}</MenuItemOption>
           <MenuItemOption value="DRAFT">{filters.DRAFT}</MenuItemOption>
           <MenuItemOption value="PENDING">{filters.PENDING}</MenuItemOption>
-          <MenuItemOption value="SCHEDULED">{filters.SCHEDULED}</MenuItemOption>
-          <MenuItemOption value="READY">{filters.READY}</MenuItemOption>
           <MenuItemOption value="COMPLETED">{filters.COMPLETED}</MenuItemOption>
         </MenuOptionGroup>
       </MenuList>

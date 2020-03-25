@@ -62,6 +62,16 @@ export interface NexusGenInputs {
     firstName?: string | null; // String
     lastName?: string | null; // String
   };
+  CreateFileUploadReplyInput: {
+    // input type
+    contentType: string; // String!
+    filename: string; // String!
+    size: number; // Int!
+  };
+  CreateTextReplyInput: {
+    // input type
+    text: string; // String!
+  };
   UpdateContactInput: {
     // input type
     firstName?: string | null; // String
@@ -70,6 +80,7 @@ export interface NexusGenInputs {
   UpdatePetitionFieldInput: {
     // input type
     description?: string | null; // String
+    multiple?: boolean | null; // Boolean
     optional?: boolean | null; // Boolean
     options?: { [key: string]: any } | null; // JSONObject
     title?: string | null; // String
@@ -109,6 +120,16 @@ export interface NexusGenRootTypes {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  CreateFileUploadReply: {
+    // root type
+    endpoint: string; // String!
+    reply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+  };
+  FileUploadReplyDownloadLinkResult: {
+    // root type
+    result: NexusGenEnums["Result"]; // Result!
+    url?: string | null; // String
+  };
   Mutation: {};
   Organization: db.Organization;
   Petition: db.Petition;
@@ -137,6 +158,11 @@ export interface NexusGenRootTypes {
     validated: number; // Int!
   };
   PetitionSendout: db.PetitionSendout;
+  PublicPetition: db.Petition;
+  PublicPetitionField: db.PetitionField;
+  PublicPetitionFieldReply: db.PetitionFieldReply;
+  PublicPetitionSendout: db.PetitionSendout;
+  PublicUser: db.User;
   Query: {};
   User: db.User;
   UserPagination: {
@@ -150,7 +176,9 @@ export interface NexusGenRootTypes {
     | NexusGenRootTypes["Organization"]
     | NexusGenRootTypes["Petition"]
     | NexusGenRootTypes["PetitionFieldReply"]
-    | NexusGenRootTypes["PetitionSendout"];
+    | NexusGenRootTypes["PetitionSendout"]
+    | NexusGenRootTypes["PublicPetition"]
+    | NexusGenRootTypes["PublicPetitionFieldReply"];
   String: string;
   Int: number;
   Float: number;
@@ -163,6 +191,8 @@ export interface NexusGenRootTypes {
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreateContactInput: NexusGenInputs["CreateContactInput"];
+  CreateFileUploadReplyInput: NexusGenInputs["CreateFileUploadReplyInput"];
+  CreateTextReplyInput: NexusGenInputs["CreateTextReplyInput"];
   UpdateContactInput: NexusGenInputs["UpdateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
@@ -192,6 +222,16 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  CreateFileUploadReply: {
+    // field return type
+    endpoint: string; // String!
+    reply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+  };
+  FileUploadReplyDownloadLinkResult: {
+    // field return type
+    result: NexusGenEnums["Result"]; // Result!
+    url: string | null; // String
+  };
   Mutation: {
     // field return type
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
@@ -201,6 +241,12 @@ export interface NexusGenFieldTypes {
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetitionField: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
+    publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
+    publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
+    publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
+    publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updatePetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -249,6 +295,7 @@ export interface NexusGenFieldTypes {
     // field return type
     description: string | null; // String
     id: string; // ID!
+    multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: { [key: string]: any } | null; // JSONObject
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
@@ -283,6 +330,49 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     updatedAt: Date; // DateTime!
   };
+  PublicPetition: {
+    // field return type
+    createdAt: Date; // DateTime!
+    deadline: Date | null; // DateTime
+    emailBody: any | null; // JSON
+    emailSubject: string | null; // String
+    fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
+    id: string; // ID!
+    locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
+    updatedAt: Date; // DateTime!
+  };
+  PublicPetitionField: {
+    // field return type
+    description: string | null; // String
+    id: string; // ID!
+    multiple: boolean; // Boolean!
+    optional: boolean; // Boolean!
+    options: { [key: string]: any } | null; // JSONObject
+    replies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
+    title: string | null; // String
+    type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    validated: boolean; // Boolean!
+  };
+  PublicPetitionFieldReply: {
+    // field return type
+    createdAt: Date; // DateTime!
+    id: string; // ID!
+    publicContent: { [key: string]: any }; // JSONObject!
+    updatedAt: Date; // DateTime!
+  };
+  PublicPetitionSendout: {
+    // field return type
+    petition: NexusGenRootTypes["PublicPetition"] | null; // PublicPetition
+    sender: NexusGenRootTypes["PublicUser"] | null; // PublicUser
+  };
+  PublicUser: {
+    // field return type
+    firstName: string | null; // String
+    fullName: string | null; // String
+    id: string; // ID!
+    lastName: string | null; // String
+  };
   Query: {
     // field return type
     contact: NexusGenRootTypes["Contact"] | null; // Contact
@@ -291,6 +381,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
+    sendout: NexusGenRootTypes["PublicPetitionSendout"] | null; // PublicPetitionSendout
   };
   User: {
     // field return type
@@ -334,7 +425,7 @@ export interface NexusGenArgTypes {
     };
     createPetitionField: {
       // args
-      id: string; // ID!
+      petitionId: string; // ID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
     deleteContacts: {
@@ -344,11 +435,42 @@ export interface NexusGenArgTypes {
     deletePetitionField: {
       // args
       fieldId: string; // ID!
-      id: string; // ID!
+      petitionId: string; // ID!
     };
     deletePetitions: {
       // args
       ids: string[]; // [ID!]!
+    };
+    fileUploadReplyDownloadLink: {
+      // args
+      petitionId: string; // ID!
+      replyId: string; // ID!
+    };
+    publicCompletePetition: {
+      // args
+      keycode: string; // ID!
+    };
+    publicCreateFileUploadReply: {
+      // args
+      data: NexusGenInputs["CreateFileUploadReplyInput"]; // CreateFileUploadReplyInput!
+      fieldId: string; // ID!
+      keycode: string; // ID!
+    };
+    publicCreateTextReply: {
+      // args
+      data: NexusGenInputs["CreateTextReplyInput"]; // CreateTextReplyInput!
+      fieldId: string; // ID!
+      keycode: string; // ID!
+    };
+    publicDeletePetitionReply: {
+      // args
+      keycode: string; // ID!
+      replyId: string; // ID!
+    };
+    publicFileUploadReplyComplete: {
+      // args
+      keycode: string; // ID!
+      replyId: string; // ID!
     };
     updateContact: {
       // args
@@ -358,18 +480,18 @@ export interface NexusGenArgTypes {
     updateFieldPositions: {
       // args
       fieldIds: string[]; // [ID!]!
-      id: string; // ID!
+      petitionId: string; // ID!
     };
     updatePetition: {
       // args
       data: NexusGenInputs["UpdatePetitionInput"]; // UpdatePetitionInput!
-      id: string; // ID!
+      petitionId: string; // ID!
     };
     updatePetitionField: {
       // args
       data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
       fieldId: string; // ID!
-      id: string; // ID!
+      petitionId: string; // ID!
     };
     updateUser: {
       // args
@@ -379,7 +501,7 @@ export interface NexusGenArgTypes {
     validatePetitionFields: {
       // args
       fieldIds: string[]; // [ID!]!
-      id: string; // ID!
+      petitionId: string; // ID!
       value: boolean; // Boolean!
     };
   };
@@ -417,6 +539,10 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
     };
+    sendout: {
+      // args
+      keycode: string; // ID!
+    };
   };
 }
 
@@ -427,7 +553,9 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "Organization"
     | "Petition"
     | "PetitionFieldReply"
-    | "PetitionSendout";
+    | "PetitionSendout"
+    | "PublicPetition"
+    | "PublicPetitionFieldReply";
 }
 
 export interface NexusGenInheritedFields {}
@@ -435,6 +563,8 @@ export interface NexusGenInheritedFields {}
 export type NexusGenObjectNames =
   | "Contact"
   | "ContactPagination"
+  | "CreateFileUploadReply"
+  | "FileUploadReplyDownloadLinkResult"
   | "Mutation"
   | "Organization"
   | "Petition"
@@ -445,12 +575,19 @@ export type NexusGenObjectNames =
   | "PetitionPagination"
   | "PetitionProgress"
   | "PetitionSendout"
+  | "PublicPetition"
+  | "PublicPetitionField"
+  | "PublicPetitionFieldReply"
+  | "PublicPetitionSendout"
+  | "PublicUser"
   | "Query"
   | "User"
   | "UserPagination";
 
 export type NexusGenInputNames =
   | "CreateContactInput"
+  | "CreateFileUploadReplyInput"
+  | "CreateTextReplyInput"
   | "UpdateContactInput"
   | "UpdatePetitionFieldInput"
   | "UpdatePetitionInput"

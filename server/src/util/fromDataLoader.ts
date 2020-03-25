@@ -1,6 +1,7 @@
 import DataLoader from "dataloader";
 
 export interface FromDataLoaderOptions {
+  cache?: boolean;
   refresh?: boolean;
 }
 

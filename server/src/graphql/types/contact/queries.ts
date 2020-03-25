@@ -17,7 +17,7 @@ export const contactQueries = queryField((t) => {
     },
     resolve: async (_, { offset, limit, search, exclude }, ctx) => {
       const { ids: excludeIds } = fromGlobalIds(exclude ?? [], "Contact");
-      return await ctx.contacts.loadContactsForUser(ctx.user.id, {
+      return await ctx.contacts.loadContactsForUser(ctx.user!.id, {
         search,
         excludeIds,
         offset,

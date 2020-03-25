@@ -93,7 +93,7 @@ function PetitionSend({ petitionId }: PetitionProps) {
 
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
-      return await _updatePetition({ variables: { id: petitionId, data } });
+      return await _updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
   );
@@ -472,10 +472,10 @@ function useUpdatePetition() {
     PetitionSend_updatePetitionMutationVariables
   >(gql`
     mutation PetitionSend_updatePetition(
-      $id: ID!
+      $petitionId: ID!
       $data: UpdatePetitionInput!
     ) {
-      updatePetition(id: $id, data: $data) {
+      updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionSend_Petition
       }
     }

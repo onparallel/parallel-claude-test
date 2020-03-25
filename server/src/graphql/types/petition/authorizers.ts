@@ -20,7 +20,7 @@ export function userHasAccessToPetition<
   return (_, args, ctx) => {
     try {
       const { id } = fromGlobalId(args[argName], "Petition");
-      return ctx.petitions.userHasAccessToPetitions(ctx.user.id, [id]);
+      return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, [id]);
     } catch {}
     return false;
   };
@@ -37,7 +37,7 @@ export function userHasAccessToPetitions<
         const { id } = fromGlobalId(arg, "Petition");
         return id;
       });
-      return ctx.petitions.userHasAccessToPetitions(ctx.user.id, ids);
+      return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, ids);
     } catch {}
     return false;
   };
@@ -88,6 +88,31 @@ export function fieldsBelongsToPetition<
         "PetitionField"
       );
       return ctx.petitions.fieldsBelongToPetition(petitionId, fieldIds);
+    } catch {}
+    return false;
+  };
+}
+
+export function replyBelongsToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends StringArg<TypeName, FieldName>,
+  TArg2 extends StringArg<TypeName, FieldName>
+>(
+  argNamePetitionId: TArg1,
+  argNameReplyId: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id: petitionId } = fromGlobalId(
+        args[argNamePetitionId],
+        "Petition"
+      );
+      const { id: replyId } = fromGlobalId(
+        args[argNameReplyId],
+        "PetitionFieldReply"
+      );
+      return ctx.petitions.replyBelongsToPetition(replyId, petitionId);
     } catch {}
     return false;
   };

@@ -85,7 +85,7 @@ function useReactSelectProps() {
           NoOptionsMessage: memo(({ selectProps }) => {
             const search = selectProps.inputValue;
             return (
-              <Box textAlign="center" color="gray.400" marginY={4}>
+              <Box textAlign="center" color="gray.400" padding={4}>
                 <Icon
                   name={"user-plus" as any}
                   role="presentation"

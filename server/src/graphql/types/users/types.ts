@@ -1,19 +1,5 @@
-import {
-  enumType,
-  idArg,
-  inputObjectType,
-  mutationField,
-  objectType,
-  stringArg,
-  FieldAuthorizeResolver,
-} from "nexus";
-import { fromGlobalId, toGlobalId } from "../../../util/globalId";
-import { removeNotDefined } from "../../../util/remedaExtensions";
-import {
-  argIsContextUserId,
-  authenticate,
-  authorizeAnd,
-} from "../../helpers/authorize";
+import { enumType, objectType } from "nexus";
+import { toGlobalId } from "../../../util/globalId";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",

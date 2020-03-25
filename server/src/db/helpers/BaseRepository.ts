@@ -70,16 +70,31 @@ export class BaseRepository {
       builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
     ) => void
   ) {
+    return this.buildLoadOneBy(tableName, idColumn, builder);
+  }
+
+  protected buildLoadOneBy<
+    TName extends TableNames,
+    TColumn extends keyof TableTypes[TName]
+  >(
+    tableName: TName,
+    column: TColumn,
+    builder?: (
+      builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
+    ) => void
+  ) {
     return fromDataLoader(
-      new DataLoader<TableKey<TName>, TableTypes[TName] | null>(async (ids) => {
-        const rows = <TableTypes[TName][]>await this.knex
-          .from<TableTypes[TName]>(tableName)
-          .select("*")
-          .modify((q) => builder?.(q))
-          .whereIn(idColumn, ids as TableKey<TName>[]);
-        const byId = indexBy(rows, (r) => r[idColumn]);
-        return ids.map((id) => byId[id]);
-      })
+      new DataLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(
+        async (values) => {
+          const rows = <TableTypes[TName][]>await this.knex
+            .from<TableTypes[TName]>(tableName)
+            .select("*")
+            .modify((q) => builder?.(q))
+            .whereIn(column, values as TableKey<TName>[]);
+          const byValue = indexBy(rows, (r) => r[column]);
+          return values.map((value) => byValue[value as any]);
+        }
+      )
     );
   }
 

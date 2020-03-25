@@ -257,7 +257,7 @@ function ConfirmDeleteContacts({
       confirm={
         <Button variantColor="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="contacts.confirm-delete.confirm-button"
+            id="generic.confirm-delete-button"
             defaultMessage="Yes, delete"
           />
         </Button>

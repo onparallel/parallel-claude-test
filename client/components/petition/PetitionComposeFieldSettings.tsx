@@ -4,6 +4,7 @@ import {
   Flex,
   Heading,
   IconButton,
+  Input,
   Stack,
   Switch,
   Text,
@@ -15,8 +16,9 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitions";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
-import { ChangeEvent, ReactNode } from "react";
+import { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 
@@ -84,6 +86,27 @@ export function PetitionComposeFieldSettings({
           />
         </SettingsRow>
         <Divider />
+        <SettingsRow
+          label={
+            <FormattedMessage
+              id="field-settings.multiple-replies"
+              defaultMessage="Allow multiple replies"
+            />
+          }
+          controlId="field-multiple"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="field-multiple"
+            color="green"
+            isChecked={field.multiple}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              onUpdate({ multiple: event.target.checked })
+            }
+          />
+        </SettingsRow>
+        <Divider />
         {field.type === "FILE_UPLOAD" ? (
           <FileUploadSettings field={field} onUpdate={onUpdate} />
         ) : field.type === "TEXT" ? (
@@ -99,33 +122,7 @@ function FileUploadSettings({
   onUpdate,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdate">) {
   const options: FieldOptions["FILE_UPLOAD"] = field.options as any;
-  return (
-    <Stack spacing={4}>
-      <SettingsRow
-        label={
-          <FormattedMessage
-            id="field-settings.file-multiple-label"
-            defaultMessage="Allow multiple file uploads"
-          />
-        }
-        controlId="field-file-multiple"
-      >
-        <Switch
-          height="20px"
-          display="block"
-          id="field-file-multiple"
-          color="green"
-          isChecked={options.multiple}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onUpdate({
-              options: { ...field.options, multiple: event.target.checked },
-            })
-          }
-        />
-      </SettingsRow>
-      <Divider />
-    </Stack>
-  );
+  return <></>;
 }
 
 function TextSettings({
@@ -133,6 +130,21 @@ function TextSettings({
   onUpdate,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdate">) {
   const options: FieldOptions["TEXT"] = field.options as any;
+  const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
+  useEffect(() => setPlaceholder(options.placeholder ?? ""), [field.id]);
+  const debouncedOnUpdate = useDebouncedCallback(onUpdate, 300, [field.id]);
+  const handlePlaceholderChange = function (
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const value = event.target.value;
+    setPlaceholder(value);
+    debouncedOnUpdate({
+      options: {
+        ...field.options,
+        placeholder: value || null,
+      },
+    });
+  };
 
   return (
     <Stack spacing={4}>
@@ -159,6 +171,23 @@ function TextSettings({
         />
       </SettingsRow>
       <Divider />
+      <SettingsRow
+        label={
+          <FormattedMessage
+            id="field-settings.text-placeholder-label"
+            defaultMessage="Placeholder"
+          />
+        }
+        controlId="text-placeholder"
+      >
+        <Input
+          id="text-placeholder"
+          value={placeholder}
+          marginLeft={2}
+          onChange={handlePlaceholderChange}
+        />
+      </SettingsRow>
+      <Divider />
     </Stack>
   );
 }
@@ -174,7 +203,7 @@ function SettingsRow({
   children: ReactNode;
 }) {
   return (
-    <Flex {...props}>
+    <Flex alignItems="center" {...props}>
       <Box flex="1" as="label" cursor="pointer" {...{ htmlFor: controlId }}>
         <Text as="div">{label}</Text>
       </Box>
@@ -189,6 +218,7 @@ PetitionComposeFieldSettings.fragments = {
       id
       type
       optional
+      multiple
       options
     }
   `,

@@ -1,5 +1,4 @@
-const isProd = process.env.NODE_ENV === "production";
-module.exports = {
+const config = {
   env: {
     ROOT: __dirname,
   },
@@ -23,3 +22,11 @@ module.exports = {
     return config;
   },
 };
+
+const plugins = [
+  require("@next/bundle-analyzer")({
+    enabled: process.env.ANALYZE === "true",
+  }),
+];
+
+module.exports = plugins.reduce((acc, curr) => curr(acc), config);

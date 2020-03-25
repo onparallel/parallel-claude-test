@@ -1,4 +1,4 @@
-import { css } from "@emotion/core";
+import { css, keyframes } from "@emotion/core";
 
 /**
  * Generates a background image of diagonal lines
@@ -20,5 +20,14 @@ export function generateCssStripe({
     );
     background-size: ${size} ${size};
     background-position: left;
+  `;
+}
+
+export function animatedStripe({ size = "1rem" }) {
+  return css`
+    animation: ${keyframes`
+      from { background-position: 0 0}
+      to { background-position: ${size} 0 }
+    `} 1s linear infinite;
   `;
 }

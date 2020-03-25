@@ -1,11 +1,8 @@
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { KNEX } from "../knex";
-import { User } from "../__types";
-import { indexBy } from "remeda";
-import DataLoader from "dataloader";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { BaseRepository } from "../helpers/BaseRepository";
+import { KNEX } from "../knex";
+import { CreateUser, User } from "../__types";
 
 @injectable()
 export class UserReposistory extends BaseRepository {
@@ -13,25 +10,20 @@ export class UserReposistory extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneByCognitoId = fromDataLoader(
-    new DataLoader<string, User | null>(async (ids) => {
-      const rows = await this.from("user")
-        .whereIn("cognito_id", ids as string[])
-        .where("deleted_at", null)
-        .select("*");
-      const byIds = indexBy(rows, (r) => r.cognito_id);
-      return ids.map((id) => byIds[id] ?? null);
-    })
+  readonly loadOneByCognitoId = this.buildLoadOneBy("user", "cognito_id", (q) =>
+    q.whereNull("deleted_at")
   );
 
-  async updateUserById(
-    id: number,
-    data: Partial<User> & { updated_by: string }
-  ) {
+  readonly loadOneById = this.buildLoadOneById("user", "id", (q) =>
+    q.whereNull("deleted_at")
+  );
+
+  async updateUserById(id: number, data: Partial<CreateUser>, user: User) {
     const rows = await this.from("user")
       .update({
         ...data,
-        updated_at: new Date(),
+        updated_at: this.now(),
+        updated_by: `User:${user.id}`,
       })
       .where({ id })
       .returning("*");

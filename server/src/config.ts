@@ -1,24 +1,6 @@
 export const CONFIG = Symbol.for("CONFIG");
 
-export type Config = {
-  readonly db: Readonly<{
-    host: string;
-    database: string;
-    user: string;
-    password: string;
-    port: number;
-    maxConnections: number;
-  }>;
-  readonly cognito: Readonly<{
-    clientId: string;
-    defaultPoolId: string;
-  }>;
-  readonly redis: Readonly<{
-    host: string;
-    password: string;
-    port: number;
-  }>;
-};
+export type Config = typeof config;
 
 export const config = Object.freeze({
   db: Object.freeze({
@@ -37,5 +19,13 @@ export const config = Object.freeze({
     host: process.env.REDIS_HOST!,
     password: process.env.REDIS_PASSWORD!,
     port: parseInt(process.env.REDIS_PORT!),
+  }),
+  aws: Object.freeze({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    region: process.env.AWS_REGION!,
+  }),
+  s3: Object.freeze({
+    uplodsBucketName: process.env.S3_UPLOADS_BUCKET_NAME!,
   }),
 });

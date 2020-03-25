@@ -20,7 +20,9 @@
     "amazon-cognito-identity-js": "^3.2.5",
     "apollo-server-express": "^2.11.0",
     "async": "^3.2.0",
+    "aws-sdk": "^2.642.0",
     "body-parser": "^1.19.0",
+    "content-disposition": "^0.5.3",
     "cookie": "^0.4.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -47,6 +49,7 @@
   "devDependencies": {
     "@types/async": "^3.0.8",
     "@types/body-parser": "^1.19.0",
+    "@types/content-disposition": "^0.5.2",
     "@types/cookie": "^0.3.3",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.6",

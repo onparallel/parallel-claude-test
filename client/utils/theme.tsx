@@ -22,6 +22,10 @@ export const theme = {
   },
   colors: {
     ...base.colors,
+    gray: {
+      ...base.colors.gray,
+      50: "#fbfcfd",
+    },
     purple: {
       50: "#f0efff",
       100: "#d1cfff",

@@ -13,18 +13,8 @@ export const PetitionStatus = enumType({
   members: [
     { name: "DRAFT", description: "The petition has not been sent." },
     {
-      name: "SCHEDULED",
-      description: "The petition sendout has been scheduled.",
-    },
-    {
       name: "PENDING",
-      description:
-        "The petition has been sent and is awaiting for the contact to complete.",
-    },
-    {
-      name: "READY",
-      description:
-        "The petition has been completed by the contact and is awaiting validation.",
+      description: "The petition has been sent and is awaiting completion.",
     },
     { name: "COMPLETED", description: "The petition is completed" },
   ],
@@ -163,6 +153,9 @@ export const PetitionField = objectType({
     t.boolean("optional", {
       description: "Determines if this field is optional.",
     });
+    t.boolean("multiple", {
+      description: "Determines if this field allows multiple replies.",
+    });
     t.boolean("validated", {
       description:
         "Determines if the content of this field has been validated.",
@@ -204,11 +197,30 @@ export const PetitionFieldReply = objectType({
   definition(t) {
     t.implements("Timestamps");
     t.id("id", {
-      description: "The ID of the petition field access.",
-      resolve: (o) => toGlobalId("PetitionSendout", o.id),
+      description: "The ID of the petition field reply.",
+      resolve: (o) => toGlobalId("PetitionFieldReply", o.id),
     });
     t.jsonObject("content", {
       description: "The content of the reply",
+      resolve: async (root, _, ctx) => {
+        switch (root.type) {
+          case "TEXT": {
+            return root.content;
+          }
+          case "FILE_UPLOAD": {
+            const file = await ctx.files.loadOneById(
+              root.content["file_upload_id"]
+            );
+            return file
+              ? {
+                  filename: file.filename,
+                  size: file.size,
+                  contentType: file.content_type,
+                }
+              : {};
+          }
+        }
+      },
     });
     t.field("sendout", {
       type: "PetitionSendout",

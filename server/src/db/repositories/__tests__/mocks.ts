@@ -104,12 +104,7 @@ export class Mocks {
 }
 
 function randomPetitionStatus() {
-  return faker.random.arrayElement([
-    "DRAFT",
-    "SCHEDULED",
-    "PENDING",
-    "COMPLETED",
-  ] as const);
+  return faker.random.arrayElement(["DRAFT", "PENDING", "COMPLETED"] as const);
 }
 
 function randomPetitionFieldType() {
@@ -131,6 +126,7 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
     case "TEXT": {
       return {
         multiline: faker.random.boolean(),
+        placeholder: faker.random.words(3),
       };
     }
   }

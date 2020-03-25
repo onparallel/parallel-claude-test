@@ -2,10 +2,11 @@ import { ContainerModule } from "inversify";
 import Knex from "knex";
 import { CONFIG, Config } from "../config";
 import { KNEX } from "./knex";
-import { OrganizationRepository } from "./repositories/OrganizationRepository";
-import { UserReposistory } from "./repositories/UserRepository";
-import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ContactReposistory } from "./repositories/ContactRepository";
+import { FileUploadRepository } from "./repositories/FileUploadRepository";
+import { OrganizationRepository } from "./repositories/OrganizationRepository";
+import { PetitionRepository } from "./repositories/PetitionRepository";
+import { UserReposistory } from "./repositories/UserRepository";
 
 export const dbModule = new ContainerModule((bind) => {
   bind<Knex>(KNEX)
@@ -31,6 +32,7 @@ export const dbModule = new ContainerModule((bind) => {
 
   // Repositories
   bind<ContactReposistory>(ContactReposistory).toSelf();
+  bind<FileUploadRepository>(FileUploadRepository).toSelf();
   bind<OrganizationRepository>(OrganizationRepository).toSelf();
   bind<PetitionRepository>(PetitionRepository).toSelf();
   bind<UserReposistory>(UserReposistory).toSelf();

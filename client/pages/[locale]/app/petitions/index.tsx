@@ -48,7 +48,7 @@ const PAGE_SIZE = 10;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
-  status: enums<PetitionStatus>(["DRAFT", "SCHEDULED", "PENDING", "COMPLETED"]),
+  status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]),
   search: string(),
 };
 
@@ -127,9 +127,7 @@ function Petitions() {
       row.id,
       ({
         DRAFT: "compose",
-        SCHEDULED: "send",
-        PENDING: "review",
-        READY: "review",
+        PENDING: "send",
         COMPLETED: "review",
       } as const)[row.status]
     );
@@ -363,7 +361,7 @@ function ConfirmDeletePetitions({
       confirm={
         <Button variantColor="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petitions.confirm-delete.confirm-button"
+            id="generic.confirm-delete-button"
             defaultMessage="Yes, delete"
           />
         </Button>

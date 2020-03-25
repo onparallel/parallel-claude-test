@@ -15,7 +15,7 @@ import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition/PetitionFieldTypeIndicator";
 import { PetitionReviewField_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { UnwrapArray } from "@parallel/utils/types";
+import { UnwrapArray, Assert } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -25,11 +25,17 @@ import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 
+export type PetitionReviewFieldAction = {
+  type: "DOWNLOAD_FILE";
+  reply: UnwrapArray<PetitionReviewField_PetitionFieldFragment["replies"]>;
+};
+
 export type PetitionReviewFieldProps = BoxProps & {
   field: PetitionReviewField_PetitionFieldFragment;
   index: number;
   selected: boolean;
   onToggle: (event: MouseEvent) => void;
+  onAction: (action: PetitionReviewFieldAction) => void;
   onValidateToggle: () => void;
 };
 
@@ -38,17 +44,18 @@ export function PetitionReviewField({
   index,
   selected,
   onToggle,
+  onAction,
   onValidateToggle,
   ...props
 }: PetitionReviewFieldProps) {
   const intl = useIntl();
   const labels = {
     filesize: intl.formatMessage({
-      id: "petition.petition-field.reply-file-size",
+      id: "generic.file-size",
       defaultMessage: "File size",
     }),
     filename: intl.formatMessage({
-      id: "petition.petition-field.reply-file-name",
+      id: "generic.file-name",
       defaultMessage: "File name",
     }),
     download: intl.formatMessage({
@@ -78,26 +85,36 @@ export function PetitionReviewField({
             index={index}
             as="div"
           />
-          <Text marginLeft={4}>{field.title}</Text>
+          <Box marginLeft={4}>
+            {field.title ? (
+              <Text>{field.title}</Text>
+            ) : (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.untitled-field"
+                  defaultMessage="Untitled field"
+                />
+              </Text>
+            )}
+          </Box>
           <Spacer />
           <Box>
             <Button
               size="sm"
-              leftIcon="check"
-              variantColor={field.validated ? "green" : "gray"}
+              variant={field.validated ? "solid" : "ghost"}
               onClick={onValidateToggle}
             >
-              {field.validated ? (
-                <FormattedMessage
-                  id="petition.petition-field.validated-button"
-                  defaultMessage="Approved"
-                ></FormattedMessage>
-              ) : (
-                <FormattedMessage
-                  id="petition.petition-field.validate-button"
-                  defaultMessage="Approve"
-                ></FormattedMessage>
-              )}
+              <Checkbox
+                isChecked={field.validated}
+                isReadOnly
+                size="md"
+                pointerEvents="none"
+                marginRight={2}
+              />
+              <FormattedMessage
+                id="petition.petition-field.validate-button"
+                defaultMessage="Reviewed"
+              ></FormattedMessage>
             </Button>
           </Box>
         </Flex>
@@ -126,7 +143,11 @@ export function PetitionReviewField({
               >
                 {field.replies.map((reply) => (
                   <PetitionReviewFieldReply key={reply.id} reply={reply}>
-                    <Text>{reply.content.text}</Text>
+                    {(reply.content.text as string)
+                      .split(/\n/)
+                      .map((line, index) => (
+                        <Text key={index}>{line}</Text>
+                      ))}
                     <CopyToClipboardButton
                       className="copy-to-clipboard"
                       placement="left"
@@ -147,7 +168,9 @@ export function PetitionReviewField({
                       <Text as="span" aria-label={labels.filename}>
                         {reply.content.filename}
                       </Text>
-                      <Text marginX={2}>-</Text>
+                      <Text as="span" marginX={2}>
+                        -
+                      </Text>
                       <Text
                         as="span"
                         aria-label={labels.filesize}
@@ -163,6 +186,9 @@ export function PetitionReviewField({
                         icon="download"
                         placement="right"
                         label={labels.download}
+                        onClick={() =>
+                          onAction({ type: "DOWNLOAD_FILE", reply })
+                        }
                       ></IconButtonWithTooltip>
                     </Box>
                   </PetitionReviewFieldReply>

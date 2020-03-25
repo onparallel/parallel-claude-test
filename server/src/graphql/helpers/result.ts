@@ -5,3 +5,8 @@ export const Result = enumType({
   description: "Represents the result of an operation.",
   members: ["SUCCESS", "FAILURE"],
 });
+
+export const RESULT = Object.freeze({
+  SUCCESS: "SUCCESS" as const,
+  FAILURE: "FAILURE" as const,
+});

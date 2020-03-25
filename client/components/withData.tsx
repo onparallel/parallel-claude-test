@@ -69,10 +69,7 @@ export function withData<P = {}>(
       } catch (error) {
         // Check for NotAuthenticated errors and redirect to Login
         const notAuthenticated = error?.graphQLErrors?.some((e: any) => {
-          return (
-            e?.message === "Not authorized" &&
-            e?.extensions?.exception?.originalError?.name === "NotAuthenticated"
-          );
+          return e?.message === "Not authorized";
         });
         if (notAuthenticated) {
           if (!process.browser) {

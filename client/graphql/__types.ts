@@ -39,6 +39,28 @@ export type CreateContactInput = {
   lastName?: Maybe<Scalars["String"]>;
 };
 
+export type CreateFileUploadReply = {
+  __typename?: "CreateFileUploadReply";
+  endpoint: Scalars["String"];
+  reply: PublicPetitionFieldReply;
+};
+
+export type CreateFileUploadReplyInput = {
+  filename: Scalars["String"];
+  size: Scalars["Int"];
+  contentType: Scalars["String"];
+};
+
+export type CreateTextReplyInput = {
+  text: Scalars["String"];
+};
+
+export type FileUploadReplyDownloadLinkResult = {
+  __typename?: "FileUploadReplyDownloadLinkResult";
+  result: Result;
+  url?: Maybe<Scalars["String"]>;
+};
+
 export type Mutation = {
   __typename?: "Mutation";
   createContact: Contact;
@@ -52,8 +74,14 @@ export type Mutation = {
   deletePetitionField: Petition;
   updatePetitionField: PetitionAndField;
   validatePetitionFields: PetitionAndFields;
+  fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   updateUser: User;
   changePassword: ChangePasswordResult;
+  publicDeletePetitionReply: Result;
+  publicFileUploadReplyComplete: PublicPetitionFieldReply;
+  publicCreateFileUploadReply: CreateFileUploadReply;
+  publicCreateTextReply: PublicPetitionFieldReply;
+  publicCompletePetition: PublicPetition;
 };
 
 export type MutationcreateContactArgs = {
@@ -79,35 +107,40 @@ export type MutationdeletePetitionsArgs = {
 };
 
 export type MutationupdateFieldPositionsArgs = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldIds: Array<Scalars["ID"]>;
 };
 
 export type MutationupdatePetitionArgs = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
 };
 
 export type MutationcreatePetitionFieldArgs = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   type: PetitionFieldType;
 };
 
 export type MutationdeletePetitionFieldArgs = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
 };
 
 export type MutationupdatePetitionFieldArgs = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: UpdatePetitionFieldInput;
 };
 
 export type MutationvalidatePetitionFieldsArgs = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldIds: Array<Scalars["ID"]>;
   value: Scalars["Boolean"];
+};
+
+export type MutationfileUploadReplyDownloadLinkArgs = {
+  petitionId: Scalars["ID"];
+  replyId: Scalars["ID"];
 };
 
 export type MutationupdateUserArgs = {
@@ -118,6 +151,32 @@ export type MutationupdateUserArgs = {
 export type MutationchangePasswordArgs = {
   password: Scalars["String"];
   newPassword: Scalars["String"];
+};
+
+export type MutationpublicDeletePetitionReplyArgs = {
+  replyId: Scalars["ID"];
+  keycode: Scalars["ID"];
+};
+
+export type MutationpublicFileUploadReplyCompleteArgs = {
+  keycode: Scalars["ID"];
+  replyId: Scalars["ID"];
+};
+
+export type MutationpublicCreateFileUploadReplyArgs = {
+  keycode: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  data: CreateFileUploadReplyInput;
+};
+
+export type MutationpublicCreateTextReplyArgs = {
+  keycode: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  data: CreateTextReplyInput;
+};
+
+export type MutationpublicCompletePetitionArgs = {
+  keycode: Scalars["ID"];
 };
 
 export type Organization = Timestamps & {
@@ -178,6 +237,7 @@ export type PetitionField = {
   description?: Maybe<Scalars["String"]>;
   options?: Maybe<Scalars["JSONObject"]>;
   optional: Scalars["Boolean"];
+  multiple: Scalars["Boolean"];
   validated: Scalars["Boolean"];
   replies: Array<PetitionFieldReply>;
 };
@@ -217,12 +277,55 @@ export type PetitionSendout = Timestamps & {
   contact?: Maybe<Contact>;
 };
 
-export type PetitionStatus =
-  | "DRAFT"
-  | "SCHEDULED"
-  | "PENDING"
-  | "READY"
-  | "COMPLETED";
+export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
+
+export type PublicPetition = Timestamps & {
+  __typename?: "PublicPetition";
+  createdAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  deadline?: Maybe<Scalars["DateTime"]>;
+  locale: PetitionLocale;
+  status: PetitionStatus;
+  fields: Array<PublicPetitionField>;
+  emailSubject?: Maybe<Scalars["String"]>;
+  emailBody?: Maybe<Scalars["JSON"]>;
+};
+
+export type PublicPetitionField = {
+  __typename?: "PublicPetitionField";
+  id: Scalars["ID"];
+  type: PetitionFieldType;
+  title?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  options?: Maybe<Scalars["JSONObject"]>;
+  optional: Scalars["Boolean"];
+  multiple: Scalars["Boolean"];
+  validated: Scalars["Boolean"];
+  replies: Array<PublicPetitionFieldReply>;
+};
+
+export type PublicPetitionFieldReply = Timestamps & {
+  __typename?: "PublicPetitionFieldReply";
+  createdAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  publicContent: Scalars["JSONObject"];
+};
+
+export type PublicPetitionSendout = {
+  __typename?: "PublicPetitionSendout";
+  petition?: Maybe<PublicPetition>;
+  sender?: Maybe<PublicUser>;
+};
+
+export type PublicUser = {
+  __typename?: "PublicUser";
+  id: Scalars["ID"];
+  firstName?: Maybe<Scalars["String"]>;
+  lastName?: Maybe<Scalars["String"]>;
+  fullName?: Maybe<Scalars["String"]>;
+};
 
 export type Query = {
   __typename?: "Query";
@@ -232,6 +335,7 @@ export type Query = {
   petitions: PetitionPagination;
   petition?: Maybe<Petition>;
   me: User;
+  sendout?: Maybe<PublicPetitionSendout>;
 };
 
 export type QuerycontactsArgs = {
@@ -246,7 +350,7 @@ export type QuerycontactArgs = {
 };
 
 export type QueryorganizationArgs = {
-  id: Scalars["String"];
+  id: Scalars["ID"];
 };
 
 export type QuerypetitionsArgs = {
@@ -258,6 +362,10 @@ export type QuerypetitionsArgs = {
 
 export type QuerypetitionArgs = {
   id: Scalars["ID"];
+};
+
+export type QuerysendoutArgs = {
+  keycode: Scalars["ID"];
 };
 
 export type Result = "SUCCESS" | "FAILURE";
@@ -277,6 +385,7 @@ export type UpdatePetitionFieldInput = {
   description?: Maybe<Scalars["String"]>;
   options?: Maybe<Scalars["JSONObject"]>;
   optional?: Maybe<Scalars["Boolean"]>;
+  multiple?: Maybe<Scalars["Boolean"]>;
 };
 
 export type UpdatePetitionInput = {
@@ -324,21 +433,6 @@ export type AppLayoutNavbar_UserFragment = {
   __typename?: "User";
 } & UserMenu_UserFragment;
 
-export type ContactHeader_ContactFragment = { __typename?: "Contact" } & Pick<
-  Contact,
-  "id" | "email" | "fullName" | "updatedAt"
->;
-
-export type ContactLayout_ContactFragment = { __typename?: "Contact" } & Pick<
-  Contact,
-  "id"
-> &
-  ContactHeader_ContactFragment;
-
-export type ContactLayout_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
-
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name" | "status" | "updatedAt">;
@@ -359,11 +453,14 @@ export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
 
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "title" | "description" | "optional">;
+} & Pick<
+  PetitionField,
+  "id" | "type" | "title" | "description" | "optional" | "multiple"
+>;
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "optional" | "options">;
+} & Pick<PetitionField, "id" | "type" | "optional" | "multiple" | "options">;
 
 export type PetitionReviewField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -373,9 +470,9 @@ export type PetitionReviewField_PetitionFieldFragment = {
         PetitionFieldReply,
         "id" | "content" | "createdAt"
       > & {
-          sendout: Maybe<
+          sendout?: Maybe<
             { __typename?: "PetitionSendout" } & {
-              contact: Maybe<
+              contact?: Maybe<
                 { __typename?: "Contact" } & Pick<
                   Contact,
                   "id" | "fullName" | "email"
@@ -387,9 +484,30 @@ export type PetitionReviewField_PetitionFieldFragment = {
     >;
   };
 
+export type PublicPetitionField_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<
+  PublicPetitionField,
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "options"
+  | "optional"
+  | "multiple"
+  | "validated"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "publicContent" | "createdAt"
+      >
+    >;
+  };
+
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
-  "id" | "email" | "firstName" | "lastName"
+  "id" | "email" | "fullName" | "firstName" | "lastName"
 >;
 
 export type Contact_UserFragment = {
@@ -401,10 +519,7 @@ export type ContactQueryVariables = {
 };
 
 export type ContactQuery = { __typename?: "Query" } & {
-  contact: Maybe<
-    { __typename?: "Contact" } & Pick<Contact, "fullName"> &
-      Contact_ContactFragment
-  >;
+  contact?: Maybe<{ __typename?: "Contact" } & Contact_ContactFragment>;
 };
 
 export type ContactUserQueryVariables = {};
@@ -419,8 +534,7 @@ export type Contact_updateContactMutationVariables = {
 };
 
 export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
-  updateContact: { __typename?: "Contact" } & Pick<Contact, "fullName"> &
-    Contact_ContactFragment;
+  updateContact: { __typename?: "Contact" } & Contact_ContactFragment;
 };
 
 export type Contacts_deleteContactsMutationVariables = {
@@ -490,7 +604,7 @@ export type PetitionComposeQueryVariables = {
 };
 
 export type PetitionComposeQuery = { __typename?: "Query" } & {
-  petition: Maybe<
+  petition?: Maybe<
     { __typename?: "Petition" } & PetitionCompose_PetitionFragment
   >;
 };
@@ -502,7 +616,7 @@ export type PetitionComposeUserQuery = { __typename?: "Query" } & {
 };
 
 export type PetitionCompose_updatePetitionMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
 };
 
@@ -515,7 +629,7 @@ export type PetitionCompose_updatePetitionMutation = {
 };
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldIds: Array<Scalars["ID"]>;
 };
 
@@ -523,11 +637,17 @@ export type PetitionCompose_updateFieldPositionsMutation = {
   __typename?: "Mutation";
 } & {
   updateFieldPositions: { __typename?: "Petition" } & Pick<Petition, "id"> &
-    PetitionCompose_PetitionFragment;
+    PetitionLayout_PetitionFragment;
+};
+
+export type PetitionCompose_updateFieldPositions_PetitionFragment = {
+  __typename?: "Petition";
+} & {
+  fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
 };
 
 export type PetitionCompose_createPetitionFieldMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   type: PetitionFieldType;
 };
 
@@ -542,14 +662,14 @@ export type PetitionCompose_createPetitionFieldMutation = {
   };
 };
 
-export type PetitionCompose_CreatePetitionField_PetitionFragment = {
+export type PetitionCompose_createPetitionField_PetitionFragment = {
   __typename?: "Petition";
 } & {
   fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
 };
 
 export type PetitionCompose_deletePetitionFieldMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
 };
 
@@ -557,11 +677,17 @@ export type PetitionCompose_deletePetitionFieldMutation = {
   __typename?: "Mutation";
 } & {
   deletePetitionField: { __typename?: "Petition" } & Pick<Petition, "id"> &
-    PetitionCompose_PetitionFragment;
+    PetitionLayout_PetitionFragment;
+};
+
+export type PetitionCompose_deletePetitionField_PetitionFragment = {
+  __typename?: "Petition";
+} & {
+  fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
 };
 
 export type PetitionCompose_updatePetitionFieldMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: UpdatePetitionFieldInput;
 };
@@ -596,7 +722,7 @@ export type PetitionReviewQueryVariables = {
 };
 
 export type PetitionReviewQuery = { __typename?: "Query" } & {
-  petition: Maybe<
+  petition?: Maybe<
     { __typename?: "Petition" } & PetitionReview_PetitionFragment
   >;
 };
@@ -608,7 +734,7 @@ export type PetitionReviewUserQuery = { __typename?: "Query" } & {
 };
 
 export type PetitionReview_updatePetitionMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
 };
 
@@ -619,7 +745,7 @@ export type PetitionReview_updatePetitionMutation = {
 };
 
 export type PetitionReview_validatePetitionFieldsMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   fieldIds: Array<Scalars["ID"]>;
   value: Scalars["Boolean"];
 };
@@ -635,6 +761,19 @@ export type PetitionReview_validatePetitionFieldsMutation = {
   };
 };
 
+export type PetitionReview_fileUploadReplyDownloadLinkMutationVariables = {
+  petitionId: Scalars["ID"];
+  replyId: Scalars["ID"];
+};
+
+export type PetitionReview_fileUploadReplyDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  fileUploadReplyDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
+
 export type PetitionSend_PetitionFragment = { __typename?: "Petition" } & Pick<
   Petition,
   "id" | "locale" | "deadline" | "emailSubject" | "emailBody"
@@ -644,7 +783,7 @@ export type PetitionSend_PetitionFragment = { __typename?: "Petition" } & Pick<
         PetitionSendout,
         "id" | "createdAt"
       > & {
-          contact: Maybe<
+          contact?: Maybe<
             { __typename?: "Contact" } & Pick<
               Contact,
               "id" | "fullName" | "email"
@@ -663,7 +802,7 @@ export type PetitionSendQueryVariables = {
 };
 
 export type PetitionSendQuery = { __typename?: "Query" } & {
-  petition: Maybe<{ __typename?: "Petition" } & PetitionSend_PetitionFragment>;
+  petition?: Maybe<{ __typename?: "Petition" } & PetitionSend_PetitionFragment>;
 };
 
 export type PetitionSendUserQueryVariables = {};
@@ -673,7 +812,7 @@ export type PetitionSendUserQuery = { __typename?: "Query" } & {
 };
 
 export type PetitionSend_updatePetitionMutationVariables = {
-  id: Scalars["ID"];
+  petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
 };
 
@@ -716,7 +855,7 @@ export type Petitions_PetitionsListFragment = {
           >;
           sendouts: Array<
             { __typename?: "PetitionSendout" } & {
-              contact: Maybe<
+              contact?: Maybe<
                 { __typename?: "Contact" } & Pick<
                   Contact,
                   "id" | "fullName" | "email"
@@ -800,6 +939,157 @@ export type CurrentUserQueryVariables = {};
 
 export type CurrentUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "fullName" | "email">;
+};
+
+export type PublicPetition_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<
+  PublicPetition,
+  "id" | "status" | "deadline" | "emailSubject" | "emailBody"
+>;
+
+export type PublicPetition_PublicUserFragment = {
+  __typename?: "PublicUser";
+} & Pick<PublicUser, "id" | "firstName" | "fullName">;
+
+export type PublicPetitionQueryVariables = {
+  keycode: Scalars["ID"];
+};
+
+export type PublicPetitionQuery = { __typename?: "Query" } & {
+  sendout?: Maybe<
+    { __typename?: "PublicPetitionSendout" } & {
+      petition?: Maybe<
+        { __typename?: "PublicPetition" } & {
+          fields: Array<
+            { __typename?: "PublicPetitionField" } & Pick<
+              PublicPetitionField,
+              "id"
+            > &
+              PublicPetitionField_PublicPetitionFieldFragment
+          >;
+        } & PublicPetition_PublicPetitionFragment
+      >;
+      sender?: Maybe<
+        { __typename?: "PublicUser" } & PublicPetition_PublicUserFragment
+      >;
+    }
+  >;
+};
+
+export type PublicPetition_publicDeletePetitionReplyMutationVariables = {
+  replyId: Scalars["ID"];
+  keycode: Scalars["ID"];
+};
+
+export type PublicPetition_publicDeletePetitionReplyMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "publicDeletePetitionReply">;
+
+export type PublicPetition_deletePetitionReply_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type PublicPetition_deletePetitionReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type PublicPetition_publicCreateTextReplyMutationVariables = {
+  keycode: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  data: CreateTextReplyInput;
+};
+
+export type PublicPetition_publicCreateTextReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateTextReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "publicContent" | "createdAt"
+  >;
+};
+
+export type PublicPetition_createTextReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type PublicPetition_createTextReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type PublicPetition_publicCreateFileUploadReplyMutationVariables = {
+  keycode: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  data: CreateFileUploadReplyInput;
+};
+
+export type PublicPetition_publicCreateFileUploadReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateFileUploadReply: { __typename?: "CreateFileUploadReply" } & Pick<
+    CreateFileUploadReply,
+    "endpoint"
+  > & {
+      reply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "publicContent" | "createdAt"
+      >;
+    };
+};
+
+export type PublicPetition_createFileUploadReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type PublicPetition_createTextReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type PublicPetition_publicFileUploadReplyCompleteMutationVariables = {
+  keycode: Scalars["ID"];
+  replyId: Scalars["ID"];
+};
+
+export type PublicPetition_publicFileUploadReplyCompleteMutation = {
+  __typename?: "Mutation";
+} & {
+  publicFileUploadReplyComplete: {
+    __typename?: "PublicPetitionFieldReply";
+  } & Pick<PublicPetitionFieldReply, "id" | "publicContent">;
+};
+
+export type PublicPetition_publicCompletePetitionMutationVariables = {
+  keycode: Scalars["ID"];
+};
+
+export type PublicPetition_publicCompletePetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCompletePetition: { __typename?: "PublicPetition" } & Pick<
+    PublicPetition,
+    "id" | "status"
+  >;
 };
 
 export type useCreateContact_createContactMutationVariables = {

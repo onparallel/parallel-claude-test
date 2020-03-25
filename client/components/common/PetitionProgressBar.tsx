@@ -61,7 +61,7 @@ export function PetitionProgressBar({
       <PopoverContent zIndex={4}>
         <PopoverArrow />
         <PopoverBody>
-          {["DRAFT", "SCHEDULED"].includes(status) ? (
+          {status === "DRAFT" ? (
             <Box textAlign="center" margin={2} fontSize="sm">
               <Text fontStyle="italic">
                 <FormattedMessage
@@ -86,7 +86,7 @@ export function PetitionProgressBar({
               <Text marginTop={2}>
                 <FormattedMessage
                   id="component.petition-progress-bar.all-pending"
-                  defaultMessage="The recipient has not filled any fields."
+                  defaultMessage="The recipient has not replied to any of the fields."
                 />
               </Text>
             </Box>
@@ -112,7 +112,7 @@ export function PetitionProgressBar({
                 <Text as="li">
                   <FormattedMessage
                     id="component.petition-progress-bar.validated"
-                    defaultMessage="{count, plural, =1{# field has} other {# fields have}} been filled and validated."
+                    defaultMessage="{count, plural, =1{# field has} other {# fields have}} been filled and reviewed."
                     values={{ count: validated }}
                   />
                 </Text>
@@ -121,7 +121,7 @@ export function PetitionProgressBar({
                 <Text as="li">
                   <FormattedMessage
                     id="component.petition-progress-bar.pending"
-                    defaultMessage="{count, plural, =1{# field has been filled and is pending validation.} other {# fields have been filled and are pending validation.}}"
+                    defaultMessage="{count, plural, =1{# field has been replied.} other {# fields have been replied.}}"
                     values={{ count: replied }}
                   />
                 </Text>
@@ -130,7 +130,7 @@ export function PetitionProgressBar({
                 <Text as="li">
                   <FormattedMessage
                     id="component.petition-progress-bar.optional"
-                    defaultMessage="{count, plural, =1{# field has not been filled but it is optional.} other {# fields have not been filled but they are optional.}}"
+                    defaultMessage="{count, plural, =1{# field has not been replied but it is optional.} other {# fields have not been replied but they are optional.}}"
                     values={{ count: optional }}
                   />
                 </Text>
@@ -139,7 +139,7 @@ export function PetitionProgressBar({
                 <Text as="li">
                   <FormattedMessage
                     id="component.petition-progress-bar.not-replied"
-                    defaultMessage="{count, plural, =1{# field has} other {# fields have}} not been filled."
+                    defaultMessage="{count, plural, =1{# field has} other {# fields have}} not been replied."
                     values={{ count: total - (validated + replied + optional) }}
                   />
                 </Text>

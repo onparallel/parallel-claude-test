@@ -6,7 +6,7 @@ export const userQueries = queryField((t) => {
     type: "User",
     authorize: authenticate(),
     resolve: (_, args, ctx) => {
-      return ctx.user;
+      return ctx.user!;
     },
   });
 });

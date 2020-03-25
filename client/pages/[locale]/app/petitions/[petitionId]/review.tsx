@@ -8,6 +8,7 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Text,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
 import { Divider } from "@parallel/components/common/Divider";
@@ -15,18 +16,25 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { PetitionReviewField } from "@parallel/components/petition/PetitionReviewField";
+import {
+  PetitionReviewField,
+  PetitionReviewFieldAction,
+} from "@parallel/components/petition/PetitionReviewField";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   PetitionReviewQuery,
   PetitionReviewQueryVariables,
   PetitionReviewUserQuery,
+  PetitionReview_fileUploadReplyDownloadLinkMutation,
+  PetitionReview_fileUploadReplyDownloadLinkMutationVariables,
   PetitionReview_updatePetitionMutation,
   PetitionReview_updatePetitionMutationVariables,
-  PetitionsUserQuery,
-  UpdatePetitionInput,
   PetitionReview_validatePetitionFieldsMutation,
   PetitionReview_validatePetitionFieldsMutationVariables,
+  PetitionsUserQuery,
+  UpdatePetitionInput,
+  FileUploadReplyDownloadLinkResult,
+  PetitionFieldReply,
 } from "@parallel/graphql/__types";
 import {
   usePetitionState,
@@ -36,8 +44,13 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { gql } from "apollo-boost";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import {
+  DialogCallbacks,
+  useDialog,
+} from "@parallel/components/common/DialogOpenerProvider";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReview.getInitialProps>
@@ -57,11 +70,12 @@ function PetitionReview({ petitionId }: PetitionProps) {
   const wrapper = useWrapPetitionUpdater(setState);
   const [updatePetition] = useUpdatePetition();
   const [validatePetitionFields] = useValidatePetitionFields();
+  const downloadReplyFile = useDownloadReplyFile();
 
-  const handleOnValidate = useCallback(
+  const handleValidateToggle = useCallback(
     wrapper(async (fieldIds: string[], value: boolean) => {
       validatePetitionFields({
-        variables: { id: petition!.id, fieldIds, value },
+        variables: { petitionId: petition!.id, fieldIds, value },
         optimisticResponse: {
           validatePetitionFields: {
             __typename: "PetitionAndFields",
@@ -86,10 +100,21 @@ function PetitionReview({ petitionId }: PetitionProps) {
 
   const handleOnUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
-      return await updatePetition({ variables: { id: petitionId, data } });
+      return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
   );
+
+  const handleAction = async function (action: PetitionReviewFieldAction) {
+    switch (action.type) {
+      case "DOWNLOAD_FILE":
+        try {
+          const url = await downloadReplyFile(petitionId, action.reply);
+          window.open(url, "_blank");
+        } catch {}
+        break;
+    }
+  };
 
   const {
     selection,
@@ -164,7 +189,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
               leftIcon="check"
               variantColor="green"
               onClick={() =>
-                handleOnValidate(
+                handleValidateToggle(
                   selected.map((r) => r.id),
                   true
                 )
@@ -188,8 +213,9 @@ function PetitionReview({ petitionId }: PetitionProps) {
                   index={index}
                   selected={selection[field.id]}
                   onValidateToggle={() =>
-                    handleOnValidate([field.id], !field.validated)
+                    handleValidateToggle([field.id], !field.validated)
                   }
+                  onAction={handleAction}
                   onToggle={(event) => toggle(field.id, event)}
                 />
               ))}
@@ -246,10 +272,10 @@ function useUpdatePetition() {
     PetitionReview_updatePetitionMutationVariables
   >(gql`
     mutation PetitionReview_updatePetition(
-      $id: ID!
+      $petitionId: ID!
       $data: UpdatePetitionInput!
     ) {
-      updatePetition(id: $id, data: $data) {
+      updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionReview_Petition
       }
     }
@@ -263,11 +289,15 @@ function useValidatePetitionFields() {
     PetitionReview_validatePetitionFieldsMutationVariables
   >(gql`
     mutation PetitionReview_validatePetitionFields(
-      $id: ID!
+      $petitionId: ID!
       $fieldIds: [ID!]!
       $value: Boolean!
     ) {
-      validatePetitionFields(id: $id, fieldIds: $fieldIds, value: $value) {
+      validatePetitionFields(
+        petitionId: $petitionId
+        fieldIds: $fieldIds
+        value: $value
+      ) {
         fields {
           id
           validated
@@ -279,6 +309,125 @@ function useValidatePetitionFields() {
     }
     ${PetitionLayout.fragments.petition}
   `);
+}
+
+function useDownloadReplyFile() {
+  const [generateLink] = useMutation<
+    PetitionReview_fileUploadReplyDownloadLinkMutation,
+    PetitionReview_fileUploadReplyDownloadLinkMutationVariables
+  >(gql`
+    mutation PetitionReview_fileUploadReplyDownloadLink(
+      $petitionId: ID!
+      $replyId: ID!
+    ) {
+      fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+        result
+        url
+      }
+    }
+  `);
+  const openDialog = useDialog(WaitForDowloadLinkDialog, []);
+  return useCallback(
+    async function downloadReplyFile(
+      petitionId: string,
+      reply: Pick<PetitionFieldReply, "id" | "content">
+    ) {
+      return await openDialog({
+        filename: reply.content.filename,
+        generateLink: async () => {
+          const { data } = await generateLink({
+            variables: { petitionId, replyId: reply.id },
+          });
+          return data!.fileUploadReplyDownloadLink;
+        },
+      });
+    },
+    [generateLink]
+  );
+}
+
+function WaitForDowloadLinkDialog({
+  filename,
+  generateLink,
+  ...props
+}: {
+  filename: string;
+  generateLink: () => Promise<FileUploadReplyDownloadLinkResult>;
+} & DialogCallbacks<string>) {
+  const intl = useIntl();
+  const downloadRef = useRef<HTMLButtonElement>();
+  const [{ loading, data }, setState] = useState<{
+    loading: boolean;
+    data?: FileUploadReplyDownloadLinkResult;
+  }>({ loading: true });
+  useEffect(() => {
+    (async () => {
+      const data = await generateLink();
+      setState({ loading: false, data });
+      downloadRef.current!.focus();
+    })();
+  }, []);
+
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="petition.review.download-file-dialog.header"
+          defaultMessage="Download {filename}"
+          values={{
+            filename,
+          }}
+        />
+      }
+      body={
+        loading ? (
+          <Text>
+            <FormattedMessage
+              id="petition.review.download-file-dialog.generating-link"
+              defaultMessage="Generating download link for {filename}..."
+              values={{
+                filename,
+              }}
+            />
+          </Text>
+        ) : data?.result === "SUCCESS" ? (
+          <Text>
+            <FormattedMessage
+              id="petition.review.download-file-dialog.link-generated"
+              defaultMessage="Click the button below to start the download."
+              values={{
+                filename,
+              }}
+            />
+          </Text>
+        ) : (
+          <Text>
+            <FormattedMessage
+              id="petition.review.download-file-dialog.link-generation-failure"
+              defaultMessage="There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
+              values={{
+                filename,
+              }}
+            />
+          </Text>
+        )
+      }
+      confirm={
+        <Button
+          ref={downloadRef}
+          variantColor="purple"
+          isDisabled={!data || data.result !== "SUCCESS"}
+          onClick={() => props.onResolve(data!.url!)}
+        >
+          <FormattedMessage
+            id="petition.review.download-file-dialog.download-button"
+            defaultMessage="Download file"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
 }
 
 PetitionReview.getInitialProps = async ({ apollo, query }: WithDataContext) => {

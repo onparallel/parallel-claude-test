@@ -20,7 +20,7 @@ export function userHasAccessToContact<
   return (_, args, ctx) => {
     try {
       const { id } = fromGlobalId(args[argName], "Contact");
-      return ctx.contacts.userHasAccessToContacts(ctx.user.id, [id]);
+      return ctx.contacts.userHasAccessToContacts(ctx.user!.id, [id]);
     } catch {}
     return false;
   };
@@ -34,7 +34,7 @@ export function userHasAccessToContacts<
   return (_, args, ctx) => {
     try {
       const { ids } = fromGlobalIds(args[argName], "Contact");
-      return ctx.contacts.userHasAccessToContacts(ctx.user.id, ids);
+      return ctx.contacts.userHasAccessToContacts(ctx.user!.id, ids);
     } catch {}
     return false;
   };

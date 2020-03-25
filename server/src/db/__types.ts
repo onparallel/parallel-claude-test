@@ -9,17 +9,13 @@ export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type PetitionFieldType = "FILE_UPLOAD" | "TEXT";
 
-export type PetitionStatus =
-  | "DRAFT"
-  | "SCHEDULED"
-  | "PENDING"
-  | "READY"
-  | "COMPLETED";
+export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
 
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
 export interface TableTypes {
   contact: Contact;
+  file_upload: FileUpload;
   organization: Organization;
   petition: Petition;
   petition_event_log: PetitionEventLog;
@@ -31,6 +27,7 @@ export interface TableTypes {
 
 export interface TableCreateTypes {
   contact: CreateContact;
+  file_upload: CreateFileUpload;
   organization: CreateOrganization;
   petition: CreatePetition;
   petition_event_log: CreatePetitionEventLog;
@@ -42,6 +39,7 @@ export interface TableCreateTypes {
 
 export interface TablePrimaryKeys {
   contact: "id";
+  file_upload: "id";
   organization: "id";
   petition: "id";
   petition_event_log: "id";
@@ -72,6 +70,35 @@ export interface CreateContact {
   last_name?: Maybe<string>;
   org_id: number;
   owner_id: number;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
+}
+
+export interface FileUpload {
+  id: number;
+  path: string;
+  filename: string;
+  size: number;
+  content_type: string;
+  upload_complete: boolean;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreateFileUpload {
+  path: string;
+  filename: string;
+  size: number;
+  content_type: string;
+  upload_complete?: boolean;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;
@@ -149,7 +176,7 @@ export interface PetitionEventLog {
   petition_id: number;
   petition_sendout_id: number;
   event: Maybe<string>;
-  event_data: Maybe<Object>;
+  event_data: Maybe<any>;
   event_date: Date;
 }
 
@@ -157,7 +184,7 @@ export interface CreatePetitionEventLog {
   petition_id: number;
   petition_sendout_id: number;
   event?: Maybe<string>;
-  event_data?: Maybe<Object>;
+  event_data?: Maybe<any>;
   event_date?: Date;
 }
 
@@ -169,7 +196,8 @@ export interface PetitionField {
   title: Maybe<string>;
   description: Maybe<string>;
   optional: boolean;
-  options: Maybe<Object>;
+  multiple: boolean;
+  options: Maybe<any>;
   validated: boolean;
   created_at: Date;
   created_by: Maybe<string>;
@@ -186,7 +214,8 @@ export interface CreatePetitionField {
   title?: Maybe<string>;
   description?: Maybe<string>;
   optional?: boolean;
-  options?: Maybe<Object>;
+  multiple?: boolean;
+  options?: Maybe<any>;
   validated?: boolean;
   created_at?: Date;
   created_by?: Maybe<string>;
@@ -200,7 +229,8 @@ export interface PetitionFieldReply {
   id: number;
   petition_field_id: number;
   petition_sendout_id: number;
-  content: Object;
+  type: PetitionFieldType;
+  content: any;
   created_at: Date;
   created_by: Maybe<string>;
   updated_at: Date;
@@ -212,7 +242,8 @@ export interface PetitionFieldReply {
 export interface CreatePetitionFieldReply {
   petition_field_id: number;
   petition_sendout_id: number;
-  content: Object;
+  type: PetitionFieldType;
+  content: any;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;
@@ -225,6 +256,7 @@ export interface PetitionSendout {
   id: number;
   petition_id: number;
   contact_id: number;
+  sender_id: number;
   keycode: string;
   created_at: Date;
   created_by: Maybe<string>;
@@ -237,6 +269,7 @@ export interface PetitionSendout {
 export interface CreatePetitionSendout {
   petition_id: number;
   contact_id: number;
+  sender_id: number;
   keycode: string;
   created_at?: Date;
   created_by?: Maybe<string>;

@@ -44,7 +44,7 @@ export function argIsContextUserId<
   return (_, args, ctx) => {
     try {
       const { id } = fromGlobalId(args[argName], "User");
-      return ctx.user.id === id;
+      return ctx.user!.id === id;
     } catch {}
     return false;
   };
@@ -55,8 +55,8 @@ export function hasOrgRole<TypeName extends string, FieldName extends string>(
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_root, _, ctx: Context) => {
     return Array.isArray(role)
-      ? role.includes(ctx.user.organization_role)
-      : role === ctx.user.organization_role;
+      ? role.includes(ctx.user!.organization_role)
+      : role === ctx.user!.organization_role;
   };
 }
 

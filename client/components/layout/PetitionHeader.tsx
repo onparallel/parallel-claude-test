@@ -89,11 +89,21 @@ export function PetitionHeader({
       borderBottomColor="gray.200"
       zIndex={1}
       position="relative"
-      height={{ base: 24, md: 16 }}
+      minHeight={{ base: 24, md: 16 }}
       {...props}
     >
-      <Flex height={16} padding={4} alignItems="center">
+      <Flex
+        height={16}
+        padding={4}
+        alignItems="center"
+        maxWidth={{
+          base: "calc(100vw - 92px - 100px)",
+          md: "calc((100% - 300px)/2)",
+        }}
+      >
         <Editable
+          display="flex"
+          maxWidth="100%"
           value={name}
           onChange={setName}
           fontSize="xl"
@@ -115,20 +125,38 @@ export function PetitionHeader({
             onRequestEdit: () => void;
           }) => (
             <>
-              <Box display="inline-block" padding={1}>
-                <EditablePreview paddingY={1} paddingX={2} />
+              <Box flex="1 1 auto" minWidth={0} padding={1}>
+                <EditablePreview
+                  paddingY={1}
+                  paddingX={2}
+                  display="block"
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                />
                 <EditableInput paddingY={1} paddingX={2} />
               </Box>
               {!isEditing && (
-                <IconButton
-                  variant="ghost"
-                  icon={"pencil" as any}
-                  onClick={() => onRequestEdit()}
-                  aria-label={intl.formatMessage({
-                    id: "generic.edit-label",
-                    defaultMessage: "Edit",
-                  })}
-                ></IconButton>
+                <Flex display="inline-flex" alignItems="center">
+                  <IconButton
+                    variant="ghost"
+                    icon={"pencil" as any}
+                    onClick={() => onRequestEdit()}
+                    aria-label={intl.formatMessage({
+                      id: "generic.edit-label",
+                      defaultMessage: "Edit",
+                    })}
+                  />
+                  <PetitionStatusText
+                    display={{ base: "none", lg: "block" }}
+                    marginLeft={4}
+                    status={petition.status}
+                    iconSize="14px"
+                    fontSize="sm"
+                  />
+                </Flex>
               )}
             </>
           )}
@@ -137,7 +165,7 @@ export function PetitionHeader({
       <Spacer />
       <Flex height={16} padding={4} alignItems="center">
         {state === "SAVING" ? (
-          <Box color="gray.500">
+          <Flex color="gray.500" alignItems="center">
             <Spinner
               size="sm"
               marginRight={2}
@@ -149,7 +177,7 @@ export function PetitionHeader({
               id="generic.saving-changes"
               defaultMessage="Saving..."
             />
-          </Box>
+          </Flex>
         ) : state === "SAVED" ? (
           <Tooltip
             zIndex={1000}
@@ -157,22 +185,34 @@ export function PetitionHeader({
             aria-label={lastSavedTooltip}
             label={lastSavedTooltip}
           >
-            <PetitionStatusText status={petition.status} />
+            <Flex color="green.500" alignItems="center">
+              <Icon
+                name="check"
+                size="16px"
+                role="presentation"
+                focusable={false}
+                marginRight={2}
+              />
+              <FormattedMessage
+                id="generic.changes-saved"
+                defaultMessage="Saved"
+              />
+            </Flex>
           </Tooltip>
         ) : state === "ERROR" ? (
-          <Box color="red.500">
+          <Flex color="red.500" alignItems="center">
             <Icon
               name="warning"
               size="16px"
+              role="presentation"
+              focusable={false}
               marginRight={2}
-              position="relative"
-              bottom="3px"
             />
             <FormattedMessage
               id="petition.status.error"
               defaultMessage="Error"
             />
-          </Box>
+          </Flex>
         ) : null}
       </Flex>
       <Flex

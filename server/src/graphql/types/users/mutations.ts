@@ -31,13 +31,14 @@ export const updateUser = mutationField("updateUser", {
   resolve: async (o, args, ctx) => {
     const { id } = fromGlobalId(args.id, "User");
     const { firstName, lastName } = args.data;
-    return await ctx.users.updateUserById(id, {
-      ...removeNotDefined({
+    return await ctx.users.updateUserById(
+      id,
+      removeNotDefined({
         first_name: firstName,
         last_name: lastName,
       }),
-      updated_by: `User:${ctx.user.id}`,
-    });
+      ctx.user!
+    );
   },
 });
 
@@ -54,7 +55,7 @@ export const changePassword = mutationField("changePassword", {
   },
   resolve: async (o, { password, newPassword }, ctx) => {
     try {
-      await ctx.cognito.changePassword(ctx.user.email, password, newPassword);
+      await ctx.cognito.changePassword(ctx.user!.email, password, newPassword);
       return "SUCCESS";
     } catch (error) {
       switch (error.code) {
@@ -72,6 +73,6 @@ function rootIsContextUserId<
   FieldName extends string
 >(): FieldAuthorizeResolver<"User", FieldName> {
   return (root, _, ctx) => {
-    return ctx.user.id === root.id;
+    return ctx.user!.id === root.id;
   };
 }

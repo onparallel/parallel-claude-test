@@ -5,10 +5,15 @@ import { MaybeArray } from "@parallel/utils/types";
 
 export type SplitButtonProps = {
   dividerColor?: DividerProps["color"];
+  withoutDivider?: boolean;
   children: MaybeArray<ReactElement<ButtonProps>>;
 };
 
-export function SplitButton({ dividerColor, children }: SplitButtonProps) {
+export function SplitButton({
+  dividerColor,
+  withoutDivider,
+  children,
+}: SplitButtonProps) {
   const length = Array.isArray(children) ? children.length : 1;
   return (
     <Flex>
@@ -32,7 +37,7 @@ export function SplitButton({ dividerColor, children }: SplitButtonProps) {
               : {}),
           },
         }),
-        index !== length - 1 ? (
+        index !== length - 1 && !withoutDivider ? (
           <Divider isVertical color={dividerColor} />
         ) : undefined,
       ])}

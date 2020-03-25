@@ -220,7 +220,7 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
       return "boolean";
     case "json":
     case "jsonb":
-      return "Object";
+      return "any";
     case "date":
     case "timestamp":
     case "timestamptz":

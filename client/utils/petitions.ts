@@ -34,9 +34,9 @@ export type FileUploadAccepts = "PDF" | "IMAGE" | "VIDEO" | "DOCUMENT";
 export type FieldOptions = {
   FILE_UPLOAD: {
     accepts: FileUploadAccepts[] | null;
-    multiple: boolean;
   };
   TEXT: {
     multiline: boolean;
+    placeholder: string | null;
   };
 };

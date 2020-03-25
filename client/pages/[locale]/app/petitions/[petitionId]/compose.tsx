@@ -19,7 +19,7 @@ import {
   PetitionComposeUserQuery,
   PetitionCompose_createPetitionFieldMutation,
   PetitionCompose_createPetitionFieldMutationVariables,
-  PetitionCompose_CreatePetitionField_PetitionFragment,
+  PetitionCompose_createPetitionField_PetitionFragment,
   PetitionCompose_deletePetitionFieldMutation,
   PetitionCompose_deletePetitionFieldMutationVariables,
   PetitionCompose_PetitionFragment,
@@ -33,12 +33,13 @@ import {
   PetitionsUserQuery,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
+  PetitionCompose_updateFieldPositions_PetitionFragment,
 } from "@parallel/graphql/__types";
 import {
   usePetitionState,
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
-import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapArray, UnwrapPromise, Assert } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import {
@@ -50,13 +51,14 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, omit, pick } from "remeda";
+import { useRouter } from "next/router";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
 >;
 
 type FieldSelection = UnwrapArray<
-  Exclude<PetitionComposeQuery["petition"], null>["fields"]
+  Assert<PetitionComposeQuery["petition"]>["fields"]
 >;
 
 type FieldsReducerState = {
@@ -71,12 +73,11 @@ function fieldsReducer(
     | { type: "RESET"; fields: FieldSelection[] }
     | { type: "SORT"; fieldIds: string[] }
     | { type: "REMOVE"; fieldId: string }
-    | { type: "ADD"; field: FieldSelection }
     | { type: "SET_ACTIVE"; fieldId: string | null }
 ): FieldsReducerState {
   switch (action.type) {
     case "RESET":
-      return reset(action.fields);
+      return reset(action.fields, state);
     case "SORT":
       return {
         ...state,
@@ -88,12 +89,6 @@ function fieldsReducer(
         fieldsById: omit(state.fieldsById, [action.fieldId]),
         fieldIds: state.fieldIds.filter((id) => id !== action.fieldId),
       };
-    case "ADD":
-      return {
-        ...state,
-        fieldsById: { ...state.fieldsById, [action.field.id]: action.field },
-        fieldIds: [...state.fieldIds, action.field.id],
-      };
     case "SET_ACTIVE":
       return {
         ...state,
@@ -102,9 +97,15 @@ function fieldsReducer(
   }
 }
 
-function reset(fields: FieldSelection[]): FieldsReducerState {
+function reset(
+  fields: FieldSelection[],
+  prev?: FieldsReducerState
+): FieldsReducerState {
   return {
-    active: null,
+    active:
+      prev?.active && fields.some((f) => f.id == prev?.active)
+        ? prev!.active
+        : null,
     fieldsById: indexBy(fields, (f) => f.id),
     fieldIds: fields.map((f) => f.id),
   };
@@ -127,22 +128,29 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     reset
   );
   useEffect(() => dispatch({ type: "RESET", fields: petition!.fields }), [
-    petition!.id,
+    petition!.fields,
   ]);
+
+  const completedDialog = useDialog(CompletedPetitionDialog, []);
+  useEffect(() => {
+    if (petition?.status === "COMPLETED") {
+      completedDialog({});
+    }
+  }, []);
 
   const addFieldRef = useRef<HTMLButtonElement>(null);
   const confirmDelete = useDialog(ConfirmDelete, []);
   const wrapper = useWrapPetitionUpdater(setState);
 
   const [updatePetition] = useUpdatePetition();
-  const [updateFieldPositions] = useUpdateFieldPositions();
-  const [createPetitionField] = useCreatePetitionField();
-  const [deletePetitionField] = useDeletePetitionField();
+  const updateFieldPositions = useUpdateFieldPositions();
+  const createPetitionField = useCreatePetitionField();
+  const deletePetitionField = useDeletePetitionField();
   const [updatePetitionField] = useUpdatePetitionField();
 
   const handleOnUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
-      return await updatePetition({ variables: { id: petitionId, data } });
+      return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
   );
@@ -154,9 +162,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       newFieldIds.splice(hoverIndex, 0, field);
       dispatch({ type: "SORT", fieldIds: newFieldIds });
       if (dropped) {
-        await wrapper(updateFieldPositions)({
-          variables: { id: petitionId, fieldIds: newFieldIds },
-        });
+        await wrapper(updateFieldPositions)(petitionId, newFieldIds);
       }
     },
     [petitionId, fieldIds]
@@ -167,9 +173,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       try {
         await confirmDelete({});
         dispatch({ type: "REMOVE", fieldId });
-        await wrapper(deletePetitionField)({
-          variables: { id: petitionId, fieldId },
-        });
+        await wrapper(deletePetitionField)(petitionId, fieldId);
       } catch {}
     },
     [petitionId]
@@ -181,7 +185,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       data: UpdatePetitionFieldInput
     ) {
       await updatePetitionField({
-        variables: { id: petitionId, fieldId: field.id, data },
+        variables: { petitionId, fieldId: field.id, data },
         optimisticResponse: {
           updatePetitionField: {
             __typename: "PetitionAndField",
@@ -213,11 +217,8 @@ function PetitionCompose({ petitionId }: PetitionProps) {
 
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType) {
-      const { data } = await createPetitionField({
-        variables: { id: petitionId, type },
-      });
+      const { data } = await createPetitionField(petitionId, type);
       const field = data!.createPetitionField.field;
-      dispatch({ type: "ADD", field });
       setTimeout(() => focusTitle(field.id));
     }),
     [petitionId]
@@ -405,10 +406,10 @@ function useUpdatePetition() {
     PetitionCompose_updatePetitionMutationVariables
   >(gql`
     mutation PetitionCompose_updatePetition(
-      $id: ID!
+      $petitionId: ID!
       $data: UpdatePetitionInput!
     ) {
-      updatePetition(id: $id, data: $data) {
+      updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionCompose_Petition
       }
     }
@@ -417,31 +418,64 @@ function useUpdatePetition() {
 }
 
 function useUpdateFieldPositions() {
-  return useMutation<
+  const [mutate] = useMutation<
     PetitionCompose_updateFieldPositionsMutation,
     PetitionCompose_updateFieldPositionsMutationVariables
   >(gql`
-    mutation PetitionCompose_updateFieldPositions($id: ID!, $fieldIds: [ID!]!) {
-      updateFieldPositions(id: $id, fieldIds: $fieldIds) {
+    mutation PetitionCompose_updateFieldPositions(
+      $petitionId: ID!
+      $fieldIds: [ID!]!
+    ) {
+      updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
         id
-        ...PetitionCompose_Petition
+        ...PetitionLayout_Petition
       }
     }
-    ${PetitionCompose.fragments.petition}
+    ${PetitionLayout.fragments.petition}
   `);
+  return useCallback(
+    async function (petitionId: string, fieldIds: string[]) {
+      return await mutate({
+        variables: { petitionId, fieldIds },
+        update(client) {
+          const fragment = gql`
+            fragment PetitionCompose_updateFieldPositions_Petition on Petition {
+              fields {
+                id
+              }
+            }
+          `;
+          client.writeFragment<
+            PetitionCompose_updateFieldPositions_PetitionFragment
+          >({
+            id: petitionId,
+            fragment,
+            data: {
+              __typename: "Petition",
+              fields: fieldIds.map((id) => ({
+                __typename: "PetitionField",
+                id,
+              })),
+            },
+          });
+        },
+      });
+    },
+    [mutate]
+  );
 }
 
 function useCreatePetitionField() {
-  return useMutation<
+  const [mutate] = useMutation<
     PetitionCompose_createPetitionFieldMutation,
     PetitionCompose_createPetitionFieldMutationVariables
   >(
     gql`
       mutation PetitionCompose_createPetitionField(
-        $id: ID!
+        $petitionId: ID!
         $type: PetitionFieldType!
       ) {
-        createPetitionField(id: $id, type: $type) {
+        createPetitionField(petitionId: $petitionId, type: $type) {
           field {
             id
             ...PetitionComposeField_PetitionField
@@ -455,48 +489,87 @@ function useCreatePetitionField() {
       ${PetitionLayout.fragments.petition}
       ${PetitionComposeField.fragments.petitionField}
       ${PetitionComposeFieldSettings.fragments.petitionField}
-    `,
-    {
-      update(client, { data }) {
-        const { field, petition } = data!.createPetitionField;
-        const fragment = gql`
-          fragment PetitionCompose_CreatePetitionField_Petition on Petition {
-            fields {
-              id
+    `
+  );
+  return useCallback(
+    async function (petitionId: string, type: PetitionFieldType) {
+      return mutate({
+        variables: { petitionId, type },
+        update(client, { data }) {
+          const { field, petition } = data!.createPetitionField;
+          const fragment = gql`
+            fragment PetitionCompose_createPetitionField_Petition on Petition {
+              fields {
+                id
+              }
             }
-          }
-        `;
-        const cached = client.readFragment<
-          PetitionCompose_CreatePetitionField_PetitionFragment
-        >({ id: petition.id, fragment });
-        client.writeFragment<
-          PetitionCompose_CreatePetitionField_PetitionFragment
-        >({
-          id: petition.id,
-          fragment,
-          data: {
-            __typename: "Petition",
-            fields: [...cached!.fields, pick(field, ["id", "__typename"])],
-          },
-        });
-      },
-    }
+          `;
+          const cached = client.readFragment<
+            PetitionCompose_createPetitionField_PetitionFragment
+          >({ id: petition.id, fragment });
+          client.writeFragment<
+            PetitionCompose_createPetitionField_PetitionFragment
+          >({
+            id: petition.id,
+            fragment,
+            data: {
+              __typename: "Petition",
+              fields: [...cached!.fields, pick(field, ["id", "__typename"])],
+            },
+          });
+        },
+      });
+    },
+    [mutate]
   );
 }
 
 function useDeletePetitionField() {
-  return useMutation<
+  const [mutate] = useMutation<
     PetitionCompose_deletePetitionFieldMutation,
     PetitionCompose_deletePetitionFieldMutationVariables
   >(gql`
-    mutation PetitionCompose_deletePetitionField($id: ID!, $fieldId: ID!) {
-      deletePetitionField(id: $id, fieldId: $fieldId) {
+    mutation PetitionCompose_deletePetitionField(
+      $petitionId: ID!
+      $fieldId: ID!
+    ) {
+      deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
         id
-        ...PetitionCompose_Petition
+        ...PetitionLayout_Petition
       }
     }
-    ${PetitionCompose.fragments.petition}
+    ${PetitionLayout.fragments.petition}
   `);
+  return useCallback(
+    async function (petitionId: string, fieldId: string) {
+      return await mutate({
+        variables: { petitionId, fieldId },
+        update(client) {
+          const fragment = gql`
+            fragment PetitionCompose_deletePetitionField_Petition on Petition {
+              fields {
+                id
+              }
+            }
+          `;
+          const cached = client.readFragment<
+            PetitionCompose_createPetitionField_PetitionFragment
+          >({ id: petitionId, fragment });
+          client.writeFragment<
+            PetitionCompose_createPetitionField_PetitionFragment
+          >({
+            id: petitionId,
+            fragment,
+            data: {
+              __typename: "Petition",
+              fields: cached!.fields.filter(({ id }) => id !== fieldId),
+            },
+          });
+        },
+      });
+    },
+    [mutate]
+  );
 }
 
 function useUpdatePetitionField() {
@@ -506,11 +579,15 @@ function useUpdatePetitionField() {
   >(
     gql`
       mutation PetitionCompose_updatePetitionField(
-        $id: ID!
+        $petitionId: ID!
         $fieldId: ID!
         $data: UpdatePetitionFieldInput!
       ) {
-        updatePetitionField(id: $id, fieldId: $fieldId, data: $data) {
+        updatePetitionField(
+          petitionId: $petitionId
+          fieldId: $fieldId
+          data: $data
+        ) {
           field {
             id
             ...PetitionComposeField_PetitionField
@@ -549,8 +626,53 @@ function ConfirmDelete({ ...props }: DialogCallbacks<void>) {
       confirm={
         <Button variantColor="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petitions.confirm-delete.confirm-button"
+            id="generic.confirm-delete-button"
             defaultMessage="Yes, delete"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function CompletedPetitionDialog({ ...props }: DialogCallbacks<void>) {
+  const focusRef = useRef(null);
+  const router = useRouter();
+  return (
+    <ConfirmDialog
+      focusRef={focusRef}
+      header={
+        <FormattedMessage
+          id="petition.completed-petition-dialog.header"
+          defaultMessage="This petition is completed"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="petition.completed-petition-dialog.body"
+          defaultMessage="This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
+        />
+      }
+      confirm={
+        <Button variantColor="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="petition.completed-petition-dialog.confirm-button"
+            defaultMessage="I understand"
+          />
+        </Button>
+      }
+      cancel={
+        <Button
+          ref={focusRef}
+          onClick={() => {
+            props.onResolve();
+            router.back();
+          }}
+        >
+          <FormattedMessage
+            id="generic.go-back-button"
+            defaultMessage="Go back"
           />
         </Button>
       }

@@ -5,7 +5,6 @@ import {
   useColorMode,
   useTheme,
 } from "@chakra-ui/core";
-import { useFocus } from "@parallel/utils/useFocus";
 import isHotkey from "is-hotkey";
 import {
   CSSProperties,
@@ -16,7 +15,7 @@ import {
   useMemo,
 } from "react";
 import { useIntl } from "react-intl";
-import { createEditor, Editor, Node, Transforms } from "slate";
+import { createEditor, Editor, Element, Text, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import {
   Editable,
@@ -45,7 +44,17 @@ export type RichTextEditorProps = {
   onChange: (value: RichTextEditorContent) => void;
 } & Omit<TextareaHTMLAttributes<HTMLDivElement>, "value" | "onChange">;
 
-export type RichTextEditorContent = Node[];
+export type RichTextBlock = {
+  children: (RichTextBlock | RichTextLeaf)[];
+  [key: string]: any;
+};
+
+export type RichTextLeaf = {
+  text: string;
+  [key: string]: any;
+};
+
+export type RichTextEditorContent = RichTextBlock[];
 
 export function RichTextEditor({
   value,
@@ -67,7 +76,7 @@ export function RichTextEditor({
 
   return (
     <PseudoBox aria-disabled={disabled} {...styles}>
-      <Slate editor={editor} value={value} onChange={onChange}>
+      <Slate editor={editor} value={value} onChange={onChange as any}>
         <Toolbar disabled={disabled} />
         <PseudoBox>
           <MemoEditable

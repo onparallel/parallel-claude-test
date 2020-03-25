@@ -1,23 +1,23 @@
-import { PetitionFieldType } from "../__types";
+import { PetitionFieldType, CreatePetitionField } from "../__types";
 import Ajv from "ajv";
 
 const SCHEMAS = {
   TEXT: {
     type: "object",
-    required: ["multiline"],
+    required: ["multiline", "placeholder"],
     properties: {
       multiline: {
         type: "boolean",
+      },
+      placeholder: {
+        type: ["string", "null"],
       },
     },
   },
   FILE_UPLOAD: {
     type: "object",
-    required: ["multiple", "accepts"],
+    required: ["accepts"],
     properties: {
-      multiple: {
-        type: "boolean",
-      },
       accepts: {
         type: ["array", "null"],
         items: {
@@ -37,16 +37,26 @@ export function validateFieldOptions(type: PetitionFieldType, options: any) {
   }
 }
 
-export function defaultFieldOptions(type: PetitionFieldType) {
+export function defaultFieldOptions(
+  type: PetitionFieldType
+): Partial<CreatePetitionField> {
   switch (type) {
     case "TEXT":
       return {
-        multiline: true,
+        optional: false,
+        multiple: false,
+        options: {
+          multiline: true,
+          placeholder: null,
+        },
       };
     case "FILE_UPLOAD":
       return {
+        optional: false,
         multiple: true,
-        accepts: null,
+        options: {
+          accepts: null,
+        },
       };
   }
 }

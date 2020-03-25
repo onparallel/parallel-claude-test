@@ -65,12 +65,35 @@ input CreateContactInput {
   lastName: String
 }
 
+type CreateFileUploadReply {
+  """
+  Endpoint where to upload the file.
+  """
+  endpoint: String!
+  reply: PublicPetitionFieldReply!
+}
+
+input CreateFileUploadReplyInput {
+  contentType: String!
+  filename: String!
+  size: Int!
+}
+
+input CreateTextReplyInput {
+  text: String!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
 `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
+
+type FileUploadReplyDownloadLinkResult {
+  result: Result!
+  url: String
+}
 
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
@@ -101,7 +124,10 @@ type Mutation {
   """
   Creates a petition field
   """
-  createPetitionField(id: ID!, type: PetitionFieldType!): PetitionAndField!
+  createPetitionField(
+    petitionId: ID!
+    type: PetitionFieldType!
+  ): PetitionAndField!
 
   """
   Delete contacts.
@@ -111,12 +137,56 @@ type Mutation {
   """
   Delete petitions fields.
   """
-  deletePetitionField(fieldId: ID!, id: ID!): Petition!
+  deletePetitionField(fieldId: ID!, petitionId: ID!): Petition!
 
   """
   Delete petitions.
   """
   deletePetitions(ids: [ID!]!): Result!
+
+  """
+  Generates a download link for a file reply.
+  """
+  fileUploadReplyDownloadLink(
+    petitionId: ID!
+    replyId: ID!
+  ): FileUploadReplyDownloadLinkResult!
+
+  """
+  Marks a filled petition as ready for review.
+  """
+  publicCompletePetition(keycode: ID!): PublicPetition!
+
+  """
+  Creates a reply to a file upload field.
+  """
+  publicCreateFileUploadReply(
+    data: CreateFileUploadReplyInput!
+    fieldId: ID!
+    keycode: ID!
+  ): CreateFileUploadReply!
+
+  """
+  Creates a reply to a text field.
+  """
+  publicCreateTextReply(
+    data: CreateTextReplyInput!
+    fieldId: ID!
+    keycode: ID!
+  ): PublicPetitionFieldReply!
+
+  """
+  Deletes a reply to a petition field.
+  """
+  publicDeletePetitionReply(keycode: ID!, replyId: ID!): Result!
+
+  """
+  Notifies the backend that the upload is complete.
+  """
+  publicFileUploadReplyComplete(
+    keycode: ID!
+    replyId: ID!
+  ): PublicPetitionFieldReply!
 
   """
   Updates a contact.
@@ -126,12 +196,12 @@ type Mutation {
   """
   Updates the positions of the petition fields
   """
-  updateFieldPositions(fieldIds: [ID!]!, id: ID!): Petition!
+  updateFieldPositions(fieldIds: [ID!]!, petitionId: ID!): Petition!
 
   """
   Updates a petition.
   """
-  updatePetition(data: UpdatePetitionInput!, id: ID!): Petition!
+  updatePetition(data: UpdatePetitionInput!, petitionId: ID!): Petition!
 
   """
   Updates a petition field.
@@ -139,7 +209,7 @@ type Mutation {
   updatePetitionField(
     data: UpdatePetitionFieldInput!
     fieldId: ID!
-    id: ID!
+    petitionId: ID!
   ): PetitionAndField!
 
   """
@@ -152,7 +222,7 @@ type Mutation {
   """
   validatePetitionFields(
     fieldIds: [ID!]!
-    id: ID!
+    petitionId: ID!
     value: Boolean!
   ): PetitionAndFields!
 }
@@ -340,6 +410,11 @@ type PetitionField {
   id: ID!
 
   """
+  Determines if this field allows multiple replies.
+  """
+  multiple: Boolean!
+
+  """
   Determines if this field is optional.
   """
   optional: Boolean!
@@ -385,7 +460,7 @@ type PetitionFieldReply implements Timestamps {
   createdAt: DateTime!
 
   """
-  The ID of the petition field access.
+  The ID of the petition field reply.
   """
   id: ID!
 
@@ -500,19 +575,167 @@ enum PetitionStatus {
   DRAFT
 
   """
-  The petition has been sent and is awaiting for the contact to complete.
+  The petition has been sent and is awaiting completion.
   """
   PENDING
+}
+
+"""
+A public view of the petition
+"""
+type PublicPetition implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
 
   """
-  The petition has been completed by the contact and is awaiting validation.
+  The deadline of the petition.
   """
-  READY
+  deadline: DateTime
 
   """
-  The petition sendout has been scheduled.
+  The body of the petition.
   """
-  SCHEDULED
+  emailBody: JSON
+
+  """
+  The subject of the petition.
+  """
+  emailSubject: String
+
+  """
+  The field definition of the petition.
+  """
+  fields: [PublicPetitionField!]!
+
+  """
+  The ID of the petition.
+  """
+  id: ID!
+
+  """
+  The locale of the petition.
+  """
+  locale: PetitionLocale!
+
+  """
+  The status of the petition.
+  """
+  status: PetitionStatus!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A field within a petition.
+"""
+type PublicPetitionField {
+  """
+  The description of the petition field.
+  """
+  description: String
+
+  """
+  The ID of the petition field.
+  """
+  id: ID!
+
+  """
+  Determines if this field allows multiple replies.
+  """
+  multiple: Boolean!
+
+  """
+  Determines if this field is optional.
+  """
+  optional: Boolean!
+
+  """
+  The options of the petition.
+  """
+  options: JSONObject
+
+  """
+  The replies to the petition field
+  """
+  replies: [PublicPetitionFieldReply!]!
+
+  """
+  The title of the petition field.
+  """
+  title: String
+
+  """
+  The type of the petition field.
+  """
+  type: PetitionFieldType!
+
+  """
+  Determines if the content of this field has been validated.
+  """
+  validated: Boolean!
+}
+
+"""
+A reply to a petition field
+"""
+type PublicPetitionFieldReply implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The ID of the petition field reply.
+  """
+  id: ID!
+
+  """
+  The public content of the reply
+  """
+  publicContent: JSONObject!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+A public view of a petition sendout
+"""
+type PublicPetitionSendout {
+  petition: PublicPetition
+  sender: PublicUser
+}
+
+"""
+A public view of a user
+"""
+type PublicUser {
+  """
+  The first name of the user.
+  """
+  firstName: String
+
+  """
+  The full name of the user.
+  """
+  fullName: String
+
+  """
+  The ID of the user.
+  """
+  id: ID!
+
+  """
+  The last name of the user.
+  """
+  lastName: String
 }
 
 type Query {
@@ -563,6 +786,7 @@ type Query {
     search: String
     status: PetitionStatus
   ): PetitionPagination!
+  sendout(keycode: ID!): PublicPetitionSendout
 }
 
 """
@@ -592,6 +816,7 @@ input UpdateContactInput {
 
 input UpdatePetitionFieldInput {
   description: String
+  multiple: Boolean
   optional: Boolean
   options: JSONObject
   title: String

@@ -3,6 +3,7 @@ import { CreateContact } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { authenticate, authorizeAnd } from "../../helpers/authorize";
 import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
+import { RESULT } from "../../helpers/result";
 
 export const createContact = mutationField("createContact", {
   description: "Create contact.",
@@ -26,7 +27,7 @@ export const createContact = mutationField("createContact", {
         first_name: firstName || null,
         last_name: lastName || null,
       },
-      ctx.user
+      ctx.user!
     );
   },
 });
@@ -55,7 +56,7 @@ export const updateContact = mutationField("updateContact", {
     if (lastName !== undefined) {
       data.last_name = lastName;
     }
-    return await ctx.contacts.updateContact(id, data, ctx.user);
+    return await ctx.contacts.updateContact(id, data, ctx.user!);
   },
 });
 
@@ -68,7 +69,7 @@ export const deleteContacts = mutationField("deleteContacts", {
   },
   resolve: async (_, args, ctx) => {
     const { ids } = fromGlobalIds(args.ids, "Contact");
-    await ctx.contacts.deleteContactById(ids, ctx.user);
-    return "SUCCESS" as const;
+    await ctx.contacts.deleteContactById(ids, ctx.user!);
+    return RESULT.SUCCESS;
   },
 });

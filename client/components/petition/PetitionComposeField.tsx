@@ -67,7 +67,7 @@ export function PetitionComposeField({
 
   const handleTitleSubmit = useCallback(
     function (value) {
-      if (value !== field.title) {
+      if (value && value !== field.title) {
         onFieldEdit({ title: value || null });
       }
     },
@@ -76,7 +76,7 @@ export function PetitionComposeField({
 
   const handleDescriptionSubmit = useCallback(
     function (value) {
-      if (value !== field.description) {
+      if (value && value !== field.description) {
         onFieldEdit({ description: value || null });
       }
     },
@@ -353,6 +353,7 @@ PetitionComposeField.fragments = {
       title
       description
       optional
+      multiple
     }
   `,
 };
