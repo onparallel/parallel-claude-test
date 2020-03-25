@@ -186,7 +186,6 @@ function PetitionReview({ petitionId }: PetitionProps) {
           {anySelected ? (
             <Button
               leftIcon="check"
-              variantColor="green"
               onClick={() =>
                 handleValidateToggle(
                   selected.map((r) => r.id),
@@ -196,7 +195,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
             >
               <FormattedMessage
                 id="petition.review.validate-selected"
-                defaultMessage="Approve"
+                defaultMessage="Mark as reviewed"
               />
             </Button>
           ) : null}

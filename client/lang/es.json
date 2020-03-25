@@ -543,7 +543,7 @@
     "term": "generic.go-back-button",
     "definition": "Volver atrás",
     "context": "Go back",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L675-L678"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L685-L688"
   },
   {
     "term": "generic.optional-field",
@@ -663,13 +663,13 @@
     "term": "petition.add-another-field-button",
     "definition": "Añadir otro campo",
     "context": "Add another field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L308-L311"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L318-L321"
   },
   {
     "term": "petition.add-field-button",
     "definition": "Añadir campo",
     "context": "Add field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L336-L339"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L346-L349"
   },
   {
     "term": "petition.advanced-settings",
@@ -693,31 +693,31 @@
     "term": "petition.completed-petition-dialog.body",
     "definition": "Esta petición ya fue completada por el destinatario. Si realiza cualquier cambio a los campos, el destinatario deberá finalizar la petición de nuevo.",
     "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L654-L657"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L664-L667"
   },
   {
     "term": "petition.completed-petition-dialog.confirm-button",
     "definition": "Ok, entiendo",
     "context": "I understand",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L661-L664"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L671-L674"
   },
   {
     "term": "petition.completed-petition-dialog.header",
     "definition": "Esta petición esta completada",
     "context": "This petition is completed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L648-L651"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L658-L661"
   },
   {
     "term": "petition.confirm-delete-field.body",
     "definition": "Este campo puede contener respuestas. Si eliminas este campo perderás <b>de forma definitiva</b> estas respuestas incluido archivos subidos.",
     "context": "This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L618-L624"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L628-L634"
   },
   {
     "term": "petition.confirm-delete-field.header",
     "definition": "Eliminar campo",
     "context": "Delete field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L612-L615"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L622-L625"
   },
   {
     "term": "petition.deadline-label",
@@ -729,37 +729,37 @@
     "term": "petition.drag-to-sort-label",
     "definition": "Arrastrar para ordenar los campos de la petición",
     "context": "Drag to sort this petition fields",
-    "reference": "components/petition/PetitionComposeField.tsx#L142-L145"
+    "reference": "components/petition/PetitionComposeField.tsx#L145-L148"
   },
   {
     "term": "petition.empty-header",
     "definition": "¿Que información necesitas que pidamos?",
     "context": "What information do you want us to collect?",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L318-L321"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L328-L331"
   },
   {
     "term": "petition.empty-text",
     "definition": "Añadamos nuestro primer campo",
     "context": "Let's add our first field",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L324-L327"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L334-L337"
   },
   {
     "term": "petition.field-delete-button",
     "definition": "Eliminar campo",
     "context": "Delete field",
-    "reference": "components/petition/PetitionComposeField.tsx#L260-L263"
+    "reference": "components/petition/PetitionComposeField.tsx#L263-L266"
   },
   {
     "term": "petition.field-description-label",
     "definition": "Descripción del campo",
     "context": "Field description",
-    "reference": "components/petition/PetitionComposeField.tsx#L224-L227"
+    "reference": "components/petition/PetitionComposeField.tsx#L227-L230"
   },
   {
     "term": "petition.field-description-placeholder",
     "definition": "Añade una descripción...",
     "context": "Add a description...",
-    "reference": "components/petition/PetitionComposeField.tsx#L220-L223"
+    "reference": "components/petition/PetitionComposeField.tsx#L223-L226"
   },
   {
     "term": "petition.field-settings",
@@ -771,13 +771,13 @@
     "term": "petition.field-title-label",
     "definition": "Título del campo",
     "context": "Field title",
-    "reference": "components/petition/PetitionComposeField.tsx#L197-L200"
+    "reference": "components/petition/PetitionComposeField.tsx#L200-L203"
   },
   {
     "term": "petition.field-title-placeholder",
     "definition": "Introduce un título para el campo",
     "context": "Enter a field title",
-    "reference": "components/petition/PetitionComposeField.tsx#L193-L196"
+    "reference": "components/petition/PetitionComposeField.tsx#L196-L199"
   },
   {
     "term": "petition.field-type.file-upload",
@@ -795,7 +795,7 @@
     "term": "petition.fields-header",
     "definition": "Esta es la información que necesitas",
     "context": "This is the information that you need",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L274-L277"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L279-L282"
   },
   {
     "term": "petition.header.compose-tab",
@@ -907,8 +907,8 @@
   },
   {
     "term": "petition.review.validate-selected",
-    "definition": "Aprobar",
-    "context": "Approve",
+    "definition": "Marcar como revisado",
+    "context": "Mark as reviewed",
     "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L197-L200"
   },
   {
