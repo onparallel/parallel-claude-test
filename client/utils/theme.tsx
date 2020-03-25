@@ -49,6 +49,6 @@ export const theme = {
   },
 };
 
-if (process.browser) {
-  console.log(theme);
-}
+// if (process.browser) {
+//   console.log(theme);
+// }
