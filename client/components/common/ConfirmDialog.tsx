@@ -1,18 +1,18 @@
 import {
   AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
   AlertDialogBody,
+  AlertDialogContent,
   AlertDialogFooter,
-  Button,
-  ButtonProps,
-  Stack,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   BoxProps,
+  Button,
+  Stack,
+  IAlertDialog,
 } from "@chakra-ui/core";
-import { useRef, ReactNode, RefObject } from "react";
+import { ReactNode, RefObject, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { DialogCallbacks, Dialog } from "./DialogOpenerProvider";
+import { DialogCallbacks } from "./DialogOpenerProvider";
 
 export type ConfirmDialogProps<T> = {
   header: ReactNode;
@@ -20,8 +20,9 @@ export type ConfirmDialogProps<T> = {
   confirm: ReactNode;
   cancel?: ReactNode;
   focusRef?: RefObject<HTMLElement>;
+  content?: BoxProps;
 } & DialogCallbacks<T> &
-  BoxProps;
+  Omit<IAlertDialog, "children" | "isOpen" | "leastDestructiveRef" | "onClose">;
 
 export function ConfirmDialog<T = void>({
   header,
@@ -31,6 +32,7 @@ export function ConfirmDialog<T = void>({
   focusRef,
   onResolve,
   onReject,
+  content,
   ...props
 }: ConfirmDialogProps<T>) {
   const cancelRef = useRef<HTMLElement>(null);
@@ -49,9 +51,10 @@ export function ConfirmDialog<T = void>({
       isOpen={true}
       leastDestructiveRef={focusRef || cancelRef}
       onClose={() => onReject()}
+      {...props}
     >
       <AlertDialogOverlay />
-      <AlertDialogContent {...props}>
+      <AlertDialogContent {...content}>
         <AlertDialogHeader fontSize="lg" fontWeight="bold">
           {header}
         </AlertDialogHeader>

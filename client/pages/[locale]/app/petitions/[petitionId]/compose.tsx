@@ -642,6 +642,8 @@ function CompletedPetitionDialog({ ...props }: DialogCallbacks<void>) {
   return (
     <ConfirmDialog
       focusRef={focusRef}
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
       header={
         <FormattedMessage
           id="petition.completed-petition-dialog.header"

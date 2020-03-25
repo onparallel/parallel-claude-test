@@ -76,8 +76,10 @@ function AskContactDetails(props: DialogCallbacks<ContactDetailsFormData>) {
   return (
     <ConfirmDialog
       focusRef={focusRef}
-      as="form"
-      onSubmit={handleSubmit(onCreateContact)}
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(onCreateContact),
+      }}
       header={
         <FormattedMessage
           id="contacts.create-new-contact.header"

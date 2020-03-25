@@ -90,8 +90,10 @@ function AskPetitionName(props: DialogCallbacks<string>) {
 
   return (
     <ConfirmDialog
-      as="form"
-      onSubmit={handleSubmit(onContinue)}
+      content={{
+        as: "form",
+        onSubmit: handleSubmit(onContinue),
+      }}
       focusRef={focusRef}
       header={
         <FormattedMessage
