@@ -22,6 +22,7 @@ import {
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
   PublicPetition_createFileUploadReply_FieldFragment,
+  PublicPetition_createFileUploadReply_PublicPetitionFragment,
   PublicPetition_createTextReply_FieldFragment,
   PublicPetition_createTextReply_PublicPetitionFragment,
   PublicPetition_deletePetitionReply_PublicPetitionFieldFragment,
@@ -185,33 +186,39 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
   return (
     <>
       <Title>{petition.emailSubject}</Title>
-      <Box backgroundColor="gray.50">
-        {showCompletedAlert && petition.status === "COMPLETED" ? (
-          <Alert status="success" variant="subtle">
-            <Flex
-              maxWidth="containers.lg"
-              alignItems="center"
-              marginX="auto"
-              width="100%"
-              paddingLeft={4}
-              paddingRight={12}
-            >
-              <AlertIcon />
-              <AlertDescription>
-                <FormattedMessage
-                  id="sendout.petition-completed-alert"
-                  defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
-                />
-              </AlertDescription>
-            </Flex>
-            <CloseButton
-              position="absolute"
-              right="8px"
-              top="8px"
-              onClick={() => setShowCompletedAlert(false)}
-            />
-          </Alert>
-        ) : null}
+      {showCompletedAlert && petition.status === "COMPLETED" ? (
+        <Alert
+          status="success"
+          variant="subtle"
+          position="sticky"
+          top="0"
+          zIndex={2}
+        >
+          <Flex
+            maxWidth="containers.lg"
+            alignItems="center"
+            marginX="auto"
+            width="100%"
+            paddingLeft={4}
+            paddingRight={12}
+          >
+            <AlertIcon />
+            <AlertDescription>
+              <FormattedMessage
+                id="sendout.petition-completed-alert"
+                defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
+              />
+            </AlertDescription>
+          </Flex>
+          <CloseButton
+            position="absolute"
+            right="8px"
+            top="8px"
+            onClick={() => setShowCompletedAlert(false)}
+          />
+        </Alert>
+      ) : null}
+      <Box backgroundColor="gray.50" zIndex={1}>
         <Flex
           flexDirection="row"
           maxWidth="containers.lg"
