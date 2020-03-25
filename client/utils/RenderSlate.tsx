@@ -24,7 +24,15 @@ function render(node: RichTextBlock | RichTextLeaf, index: number) {
         props.listStylePosition = "outside";
         break;
     }
-    return <Box {...props}>{node.children.map(render)}</Box>;
+    return (
+      <Box {...props}>
+        {paragraphIsEmpty(node as RichTextBlock) ? (
+          <br />
+        ) : (
+          node.children.map(render)
+        )}
+      </Box>
+    );
   } else if (typeof node.text === "string") {
     const props: BoxProps = { key: index };
     if (node.bold) {
@@ -43,6 +51,10 @@ function render(node: RichTextBlock | RichTextLeaf, index: number) {
     );
   }
   return null;
+}
+
+function paragraphIsEmpty(node: RichTextBlock) {
+  return node.children.length === 1 && node.children[0]?.text === "";
 }
 
 export const RenderSlate = memo(function RenderSlate({
