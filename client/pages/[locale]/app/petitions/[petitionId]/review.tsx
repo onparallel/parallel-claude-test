@@ -109,8 +109,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
     switch (action.type) {
       case "DOWNLOAD_FILE":
         try {
-          const url = await downloadReplyFile(petitionId, action.reply);
-          window.open(url, "_blank");
+          await downloadReplyFile(petitionId, action.reply);
         } catch {}
         break;
     }
@@ -312,7 +311,7 @@ function useValidatePetitionFields() {
 }
 
 function useDownloadReplyFile() {
-  const [generateLink] = useMutation<
+  const [mutate] = useMutation<
     PetitionReview_fileUploadReplyDownloadLinkMutation,
     PetitionReview_fileUploadReplyDownloadLinkMutationVariables
   >(gql`
@@ -326,105 +325,59 @@ function useDownloadReplyFile() {
       }
     }
   `);
-  const openDialog = useDialog(WaitForDowloadLinkDialog, []);
+  const openDialog = useDialog(FailureGeneratingLink, []);
   return useCallback(
     async function downloadReplyFile(
       petitionId: string,
       reply: Pick<PetitionFieldReply, "id" | "content">
     ) {
-      return await openDialog({
-        filename: reply.content.filename,
-        generateLink: async () => {
-          const { data } = await generateLink({
-            variables: { petitionId, replyId: reply.id },
-          });
-          return data!.fileUploadReplyDownloadLink;
-        },
+      const _window = window.open(undefined, "_blank")!;
+      const { data } = await mutate({
+        variables: { petitionId, replyId: reply.id },
       });
+      const { url, result } = data!.fileUploadReplyDownloadLink;
+      if (result === "SUCCESS") {
+        _window.location.href = url!;
+      } else {
+        _window.close();
+        try {
+          await openDialog({ filename: reply.content.filename });
+        } catch {}
+      }
     },
-    [generateLink]
+    [mutate]
   );
 }
 
-function WaitForDowloadLinkDialog({
+function FailureGeneratingLink({
   filename,
-  generateLink,
   ...props
 }: {
   filename: string;
-  generateLink: () => Promise<FileUploadReplyDownloadLinkResult>;
 } & DialogCallbacks<string>) {
-  const intl = useIntl();
-  const downloadRef = useRef<HTMLButtonElement>();
-  const [{ loading, data }, setState] = useState<{
-    loading: boolean;
-    data?: FileUploadReplyDownloadLinkResult;
-  }>({ loading: true });
-  useEffect(() => {
-    (async () => {
-      const data = await generateLink();
-      setState({ loading: false, data });
-      downloadRef.current!.focus();
-    })();
-  }, []);
-
   return (
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="petition.review.download-file-dialog.header"
-          defaultMessage="Download {filename}"
+          id="petition.review.download-file-error-dialog.header"
+          defaultMessage="Error downloading {filename}"
           values={{
             filename,
           }}
         />
       }
       body={
-        loading ? (
-          <Text>
-            <FormattedMessage
-              id="petition.review.download-file-dialog.generating-link"
-              defaultMessage="Generating download link for {filename}..."
-              values={{
-                filename,
-              }}
-            />
-          </Text>
-        ) : data?.result === "SUCCESS" ? (
-          <Text>
-            <FormattedMessage
-              id="petition.review.download-file-dialog.link-generated"
-              defaultMessage="Click the button below to start the download."
-              values={{
-                filename,
-              }}
-            />
-          </Text>
-        ) : (
-          <Text>
-            <FormattedMessage
-              id="petition.review.download-file-dialog.link-generation-failure"
-              defaultMessage="There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
-              values={{
-                filename,
-              }}
-            />
-          </Text>
-        )
-      }
-      confirm={
-        <Button
-          ref={downloadRef}
-          variantColor="purple"
-          isDisabled={!data || data.result !== "SUCCESS"}
-          onClick={() => props.onResolve(data!.url!)}
-        >
+        <Text>
           <FormattedMessage
-            id="petition.review.download-file-dialog.download-button"
-            defaultMessage="Download file"
+            id="petition.review.download-file-error-dialog.body"
+            defaultMessage="There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
+            values={{
+              filename,
+            }}
           />
-        </Button>
+        </Text>
       }
+      confirm={<></>}
       {...props}
     />
   );

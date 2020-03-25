@@ -865,7 +865,7 @@
   },
   {
     "term": "petition.petition-field.validate-button",
-    "definition": "Aprobar",
+    "definition": "Revisado",
     "context": "Reviewed",
     "reference": "components/petition/PetitionReviewField.tsx#L114-L117"
   },
@@ -876,52 +876,34 @@
     "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L164-L167"
   },
   {
-    "term": "petition.review.download-file-dialog.download-button",
-    "definition": "Descargar archivo",
-    "context": "Download file",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L422-L425"
-  },
-  {
-    "term": "petition.review.download-file-dialog.generating-link",
-    "definition": "Generando enlace de descarga para {filename}...",
-    "context": "Generating download link for {filename}...",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L385-L391"
-  },
-  {
-    "term": "petition.review.download-file-dialog.header",
-    "definition": "Descargar {filename}",
-    "context": "Download {filename}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L374-L380"
-  },
-  {
-    "term": "petition.review.download-file-dialog.link-generated",
-    "definition": "Haga click en el botón siguiente para empezar la descarga.",
-    "context": "Click the button below to start the download.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L395-L401"
-  },
-  {
-    "term": "petition.review.download-file-dialog.link-generation-failure",
+    "term": "petition.review.download-file-error-dialog.body",
     "definition": "Ocurrió un problema generando el enlace de descarga de {filename}. Esto, normalmente, significa que la subida del archivo por parte del usuario falló.",
     "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L405-L411"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L371-L377"
+  },
+  {
+    "term": "petition.review.download-file-error-dialog.header",
+    "definition": "Error descargando {filename}",
+    "context": "Error downloading {filename}",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L361-L367"
   },
   {
     "term": "petition.review.select-all",
     "definition": "Todos",
     "context": "All",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L171-L174"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L170-L173"
   },
   {
     "term": "petition.review.select-none",
     "definition": "Ninguno",
     "context": "None",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L177-L180"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L176-L179"
   },
   {
     "term": "petition.review.validate-selected",
     "definition": "Aprobar",
     "context": "Approve",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L198-L201"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L197-L200"
   },
   {
     "term": "petition.same-petition-warning",
