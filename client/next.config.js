@@ -1,8 +1,9 @@
+const PROD = process.env.NODE_ENV === "production";
 const config = {
   env: {
     ROOT: __dirname,
   },
-  // assetPrefix: isProd ? "https://static.parallel.so" : "",
+  assetPrefix: PROD ? "https://static.parallel.so" : "",
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
