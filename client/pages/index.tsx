@@ -9,7 +9,12 @@ function Redirect() {
 
 Redirect.getInitialProps = async ({ req, res }: NextPageContext) => {
   if (process.browser) {
-    Router.push("/");
+    const language = negotiate(
+      navigator.languages,
+      languages.map((l) => l.locale),
+      languages.find((l) => l.default)!.locale
+    );
+    Router.push("/[locale]", `/${language}`);
   } else {
     const accepts = req!.headers["accept-language"]!;
     const language = negotiate(
