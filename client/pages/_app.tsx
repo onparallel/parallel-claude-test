@@ -75,7 +75,9 @@ export function useTranslations(locale: string) {
     };
   });
   useEffect(() => {
-    if (!cache[locale]) {
+    if (!locale) {
+      return;
+    } else if (!cache[locale]) {
       fetch(`/static/lang/${locale}.json`)
         .then((res) => res.json())
         .then((messages) => {
