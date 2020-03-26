@@ -46,12 +46,12 @@ class MyDocument extends Document<MyDocumentProps> {
   render() {
     const { locale, messages } = this.props;
     return (
-      <Html>
+      <Html lang={locale}>
         <Head>
           <link
-            href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,600|Playfair+Display&display=swap"
             rel="stylesheet"
-          ></link>
+            href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,600|Playfair+Display&display=swap"
+          />
         </Head>
         <body>
           <Main />

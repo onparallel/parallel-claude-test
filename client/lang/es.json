@@ -885,13 +885,13 @@
     "term": "petition.review.download-file-error-dialog.body",
     "definition": "Ocurrió un problema generando el enlace de descarga de {filename}. Esto, normalmente, significa que la subida del archivo por parte del usuario falló.",
     "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L371-L377"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L370-L376"
   },
   {
     "term": "petition.review.download-file-error-dialog.header",
     "definition": "Error descargando {filename}",
     "context": "Error downloading {filename}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L361-L367"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L360-L366"
   },
   {
     "term": "petition.review.select-all",
@@ -909,7 +909,7 @@
     "term": "petition.review.validate-selected",
     "definition": "Marcar como revisado",
     "context": "Mark as reviewed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L197-L200"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L196-L199"
   },
   {
     "term": "petition.same-petition-warning",
@@ -1242,18 +1242,6 @@
     "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
   },
   {
-    "term": "public.hero-invite.toast-description",
-    "definition": "Nos pondremos en contacto contigo muy pronto.",
-    "context": "We will get in touch with you very soon.",
-    "reference": "pages/[locale]/index.tsx#L21-L24"
-  },
-  {
-    "term": "public.hero-invite.toast-title",
-    "definition": "¡Muchas gracias!",
-    "context": "Thank you!",
-    "reference": "pages/[locale]/index.tsx#L17-L20"
-  },
-  {
     "term": "public.home.hero-collect",
     "definition": "Recopila información de una manera simple y eficiente",
     "context": "Collect information in a simple and efficient way",
@@ -1324,6 +1312,12 @@
     "definition": "Socitar acceso",
     "context": "Request an invite",
     "reference": "components/public/PublicHero.tsx#L92-L95"
+  },
+  {
+    "term": "public.home.title",
+    "definition": "Recopila información eficientemente",
+    "context": "Collect information efficiently",
+    "reference": "pages/[locale]/index.tsx#L15-L18"
   },
   {
     "term": "public.login-button",
@@ -1408,6 +1402,12 @@
     "definition": "Entra en Parallel",
     "context": "Login",
     "reference": "pages/[locale]/login.tsx#L97-L100"
+  },
+  {
+    "term": "public.meta-description",
+    "definition": "Parallel ayuda a profesionales a recopilar y organizar información de sus clientes mediante la automatización de emails y un portal de cliente similar a formularios.",
+    "context": "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
+    "reference": "components/public/layout/PublicLayout.tsx#L37-L41"
   },
   {
     "term": "public.popular.accounting",

@@ -4,14 +4,14 @@ import {
   ITheme,
   ThemeProvider,
 } from "@chakra-ui/core";
+import { DialogOpenerProvider } from "@parallel/components/common/DialogOpenerProvider";
+import { theme } from "@parallel/utils/theme";
 import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
-import { IntlConfig, IntlProvider } from "react-intl";
-import { pick } from "remeda";
-import { theme } from "@parallel/utils/theme";
-import { DialogOpenerProvider } from "@parallel/components/common/DialogOpenerProvider";
 import { DndProvider } from "react-dnd";
 import Backend from "react-dnd-html5-backend";
+import { IntlConfig, IntlProvider } from "react-intl";
+import { pick } from "remeda";
 
 const resetConfig = (theme: ITheme) => ({
   light: {
