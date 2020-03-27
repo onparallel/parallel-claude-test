@@ -40,16 +40,14 @@ export function PublicLayout({ children }: PublicLayoutProps) {
               "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
           })}
         />
-        {languages
-          .filter(({ locale }) => locale !== query.locale)
-          .map(({ locale }) => (
-            <link
-              key={locale}
-              rel="alternate"
-              hrefLang={locale}
-              href={resolveUrl(pathname, { ...query, locale })}
-            />
-          ))}
+        {languages.map(({ locale }) => (
+          <link
+            key={locale}
+            rel="alternate"
+            hrefLang={locale}
+            href={resolveUrl(pathname, { ...query, locale })}
+          />
+        ))}
       </Head>
       <Flex direction="column" minHeight="100vh">
         <PublicHeader
