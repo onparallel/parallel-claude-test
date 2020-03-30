@@ -1125,7 +1125,7 @@
     "term": "public.bookdemo-button",
     "definition": "Pide una demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicHeroPc.tsx#L45-L48"
+    "reference": "components/public/PublicHeroPc.tsx#L44-L47"
   },
   {
     "term": "public.cookies.title",
@@ -1239,7 +1239,13 @@
     "term": "public.header.about",
     "definition": "Acerca de",
     "context": "About",
-    "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
+    "reference": "components/public/layout/PublicHeader.tsx#L108-L111"
+  },
+  {
+    "term": "public.header.blog",
+    "definition": "Blog",
+    "context": "Blog",
+    "reference": "components/public/layout/PublicHeader.tsx#L100-L103"
   },
   {
     "term": "public.home.hero-collect",
