@@ -39,7 +39,6 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
             <Button
               as="a"
               {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
-              fontWeight="normal"
               variantColor="purple"
             >
               <FormattedMessage

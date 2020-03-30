@@ -96,6 +96,12 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
 function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
+      <Button as="a" variant="ghost" {...{ href: "/blog" }}>
+        <FormattedMessage
+          id="public.header.blog"
+          defaultMessage="Blog"
+        ></FormattedMessage>
+      </Button>
       <Flex>
         <NakedLink href="/about">
           <Button flex="1" as="a" variant="ghost">
