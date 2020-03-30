@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
+    "clean": "rimraf '{out,.next}'",
     "dev": "next",
     "build": "next build",
     "start": "next start",
     "generate-graphql-types": "graphql-codegen",
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --input '../client/{components,pages,utils}/**/*.tsx' --output '../client/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
-    "build-static-prod": "NODE_ENV=production next build && next export",
-    "deploy-static-landing-prod": "aws s3 sync out s3://parallel-static-landing-prod --profile parallel-deploy-prod"
+    "build-static-prod": "yarn clean && ENV=production next build && ENV=production next export",
+    "deploy-static-landing-prod": "aws s3 sync out s3://parallel-static-landing-prod --profile parallel-deploy && aws cloudfront create-invalidation --distribution-id E200FE05XP92NJ --paths \"/*\" --profile parallel-deploy",
+    "build-static-staging": "yarn clean && ENV=staging next build && ENV=staging next export && echo 'Disallow: /' >> out/robots.txt",
+    "deploy-static-landing-staging": "aws s3 sync out s3://parallel-static-landing-staging --profile parallel-deploy && aws cloudfront create-invalidation --distribution-id E2JVYY22XTRJ1B --paths \"/*\" --profile parallel-deploy"
   },
   "dependencies": {
     "@apollo/react-hooks": "^3.1.3",
@@ -62,6 +65,7 @@
     "chalk": "^3.0.0",
     "intl-messageformat-parser": "^4.1.1",
     "prettier": "^2.0.2",
+    "rimraf": "^3.0.2",
     "ts-node": "^8.8.1",
     "typescript": "^3.8.3"
   }

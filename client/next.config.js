@@ -3,7 +3,12 @@ const config = {
   env: {
     ROOT: __dirname,
   },
-  assetPrefix: PROD ? "https://static.parallel.so" : "",
+  assetPrefix: PROD
+    ? {
+        staging: "https://static-staging.parallel.so",
+        production: "https://static.parallel.so",
+      }[process.env.ENV]
+    : "",
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;

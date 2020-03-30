@@ -1,0 +1,36 @@
+{
+  "url": "http://staging.parallel.so/blog",
+  "server": {
+    "port": 2368,
+    "host": "127.0.0.1"
+  },
+  "database": {
+    "client": "mysql",
+    "connection": {
+      "host": "localhost",
+      "user": "bn_ghost",
+      "password": "<DB_PASSWORD>",
+      "database": "bitnami_ghost"
+    }
+  },
+  "mail": {
+    "from": "'Parallel' <no-reply@parallel.so>",
+    "transport": "SMTP",
+    "options": {
+      "host": "email-smtp.eu-west-1.amazonaws.com",
+      "port": 465,
+      "service": "SES",
+      "auth": {
+        "user": "<ACCESS_KEY_ID>",
+        "pass": "<SECRET_KEY_ID>"
+      }
+    }
+  },
+  "logging": {
+    "transports": ["file"]
+  },
+  "process": "local",
+  "paths": {
+    "contentPath": "/opt/bitnami/apps/ghost/htdocs/content"
+  }
+}
