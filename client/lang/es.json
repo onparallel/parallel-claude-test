@@ -255,19 +255,31 @@
     "term": "contact.edit-details-button",
     "definition": "Editar",
     "context": "Edit",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L161-L164"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L195-L198"
+  },
+  {
+    "term": "contact.no-sendouts",
+    "definition": "No has enviado peticiones a {name, select, null {este contacto} other {{name}}} todavía",
+    "context": "You haven't send any petitions to {name, select, null {this contact} other {{name}}} yet",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L232-L236"
+  },
+  {
+    "term": "contact.petitions-header",
+    "definition": "Peticiones enviadas{name, select, null {} other { a {name}}",
+    "context": "Petitions sent{name, select, null {} other { to {name}}}",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L210-L214"
   },
   {
     "term": "contacts.confirm-delete.body",
     "definition": "¿Está seguro de que desea eliminar {count, plural, =1 {<b>{email}</b>} other {los <b>#</b> contactos seleccionados}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L247-L255"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L269-L277"
   },
   {
     "term": "contacts.confirm-delete.header",
     "definition": "Eliminar contactos",
     "context": "Delete contacts",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L241-L244"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L263-L266"
   },
   {
     "term": "contacts.create-new-contact.continue-button",
@@ -285,7 +297,7 @@
     "term": "contacts.header.email",
     "definition": "Correo electrónico",
     "context": "Email",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L205"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L227"
   },
   {
     "term": "contacts.header.first-name",
@@ -297,7 +309,7 @@
     "term": "contacts.header.last-name",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L195-L198"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L206-L209"
   },
   {
     "term": "contacts.no-contacts",
@@ -345,7 +357,7 @@
     "term": "generic.cancel-save-changes",
     "definition": "Cancelar",
     "context": "Cancel",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L135-L138"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L169-L172"
   },
   {
     "term": "generic.changes-saved",
@@ -546,6 +558,12 @@
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L685-L688"
   },
   {
+    "term": "generic.not-specified",
+    "definition": "Sin especificar",
+    "context": "Not specified",
+    "reference": "pages/[locale]/app/contacts/index.tsx#L215-L218"
+  },
+  {
     "term": "generic.optional-field",
     "definition": "Opcional",
     "context": "Optional",
@@ -603,13 +621,13 @@
     "term": "generic.save-changes",
     "definition": "Guardar",
     "context": "Save",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L149-L152"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L183-L186"
   },
   {
     "term": "generic.saving-changes",
     "definition": "Guardando...",
     "context": "Saving...",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L144-L147"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L178-L181"
   },
   {
     "term": "generic.untitled-field",
@@ -1036,6 +1054,18 @@
     "definition": "Activo",
     "context": "Active",
     "reference": "pages/[locale]/app/petitions/[petitionId]/send.tsx#L413-L416"
+  },
+  {
+    "term": "petitions.sendouts-header.deadline",
+    "definition": "Vencimiento",
+    "context": "Deadline",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L309-L312"
+  },
+  {
+    "term": "petitions.sendouts-header.progress",
+    "definition": "Progreso",
+    "context": "Progress",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L290-L293"
   },
   {
     "term": "petitions.sendouts-header.recipient",

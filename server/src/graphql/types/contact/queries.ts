@@ -1,7 +1,7 @@
-import { queryField, arg, idArg } from "nexus";
+import { idArg, queryField } from "nexus";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { authenticate, authorizeAnd } from "../../helpers/authorize";
 import { userHasAccessToContact } from "./authorizers";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 
 export const contactQueries = queryField((t) => {
   t.paginationField("contacts", {

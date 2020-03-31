@@ -188,6 +188,14 @@ export const PetitionSendout = objectType({
         return await ctx.contacts.loadOneById(root.contact_id);
       },
     });
+    t.field("petition", {
+      type: "Petition",
+      description: "The petition for this sendout.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetition(root.petition_id);
+      },
+    });
   },
 });
 

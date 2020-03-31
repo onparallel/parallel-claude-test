@@ -142,7 +142,7 @@ export class PetitionRepository extends BaseRepository {
           is_template: false,
           deleted_at: null,
         })
-        .modify((q) => {
+        .mmodify((q) => {
           const { search, status } = opts;
           if (search) {
             q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
@@ -151,7 +151,8 @@ export class PetitionRepository extends BaseRepository {
             q.where("status", status);
           }
           q.orderBy("id");
-        }),
+        })
+        .select("*"),
       opts
     );
   }

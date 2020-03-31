@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 import {
   Box,
   Button,
+  Divider,
   Flex,
   FormControl,
   FormLabel,
@@ -9,10 +10,18 @@ import {
   Input,
   InputProps,
   Stack,
-  Divider,
+  Text,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
+import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
 import { Spacer } from "@parallel/components/common/Spacer";
+import {
+  Table,
+  TableColumn,
+  useTableColors,
+} from "@parallel/components/common/Table";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
@@ -20,13 +29,16 @@ import {
   ContactQueryVariables,
   ContactsUserQuery,
   ContactUserQuery,
+  Contact_ContactFragment,
   Contact_updateContactMutation,
   Contact_updateContactMutationVariables,
 } from "@parallel/graphql/__types";
-import { UnwrapPromise } from "@parallel/utils/types";
+import { FORMATS } from "@parallel/utils/dates";
+import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
-import { forwardRef, ReactNode, Ref, useCallback, useState } from "react";
+import { useRouter } from "next/router";
+import { forwardRef, memo, ReactNode, Ref, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -39,6 +51,7 @@ type ContactDetailsFormData = {
 
 function Contact({ contactId }: ContactProps) {
   const intl = useIntl();
+  const router = useRouter();
   const { me } = useQueryData<ContactsUserQuery>(GET_CONTACT_USER_DATA);
   const { contact } = useQueryData<ContactQuery, ContactQueryVariables>(
     GET_CONTACT_DATA,
@@ -52,6 +65,24 @@ function Contact({ contactId }: ContactProps) {
       lastName: contact!.lastName ?? "",
     },
   });
+
+  function goToPetition(id: string, section: "compose" | "send" | "review") {
+    router.push(
+      `/[locale]/app/petitions/[petitionId]/${section}`,
+      `/${router.query.locale}/app/petitions/${id}/${section}`
+    );
+  }
+
+  function handleRowClick(row: SendoutSelection) {
+    goToPetition(
+      row.petition!.id,
+      ({
+        DRAFT: "compose",
+        PENDING: "review",
+        COMPLETED: "review",
+      } as const)[row.petition!.status]
+    );
+  }
 
   const handleContactSaveSubmit = useCallback(
     handleSubmit(async ({ firstName, lastName }) => {
@@ -69,6 +100,9 @@ function Contact({ contactId }: ContactProps) {
     }),
     []
   );
+
+  const { border } = useTableColors();
+
   return (
     <>
       <AppLayout user={me}>
@@ -166,8 +200,43 @@ function Contact({ contactId }: ContactProps) {
                 )}
               </Flex>
             </Card>
-            <Card backgroundColor="white" marginTop={4} padding={4}>
-              Contact petitions goes here in a new component
+            <Card backgroundColor="white" marginTop={4}>
+              <Box
+                padding={4}
+                borderBottom="1px solid"
+                borderBottomColor={border}
+              >
+                <Heading size="sm">
+                  <FormattedMessage
+                    id="contact.petitions-header"
+                    defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
+                    values={{ name: contact?.firstName }}
+                  />
+                </Heading>
+              </Box>
+              {contact?.sendouts.items.length ? (
+                <Table
+                  columns={SENDOUT_COLUMNS}
+                  rows={contact?.sendouts.items ?? []}
+                  rowKeyProp="id"
+                  onRowClick={handleRowClick}
+                  marginBottom={2}
+                />
+              ) : (
+                <Flex
+                  height="100px"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="contact.no-sendouts"
+                      defaultMessage="You haven't send any petitions to {name, select, null {this contact} other {{name}}} yet"
+                      values={{ name: contact?.firstName }}
+                    />
+                  </Text>
+                </Flex>
+              )}
             </Card>
           </Box>
           <Spacer flex="1" display={{ base: "none", md: "block" }} />
@@ -177,6 +246,93 @@ function Contact({ contactId }: ContactProps) {
   );
 }
 
+type SendoutSelection = UnwrapArray<
+  Contact_ContactFragment["sendouts"]["items"]
+>;
+
+const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
+  {
+    key: "name",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.header.name"
+        defaultMessage="Petition name"
+      />
+    )),
+    Cell: memo(({ row }) => (
+      <>
+        {row.petition?.name || (
+          <Text as="span" color="gray.400" fontStyle="italic">
+            <FormattedMessage
+              id="generic.untitled-petition"
+              defaultMessage="Untitled petition"
+            />
+          </Text>
+        )}
+      </>
+    )),
+  },
+  // {
+  //   key: "subject",
+  //   Header: memo(() => (
+  //     <FormattedMessage
+  //       id="petitions.sendouts-header.subject"
+  //       defaultMessage="Subject"
+  //     />
+  //   )),
+  //   Cell: memo(({ row: { petition } }) => (
+  //     <>{petition ? <Text>{petition.emailSubject}</Text> : null}</>
+  //   )),
+  // },
+  {
+    key: "progress",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.sendouts-header.progress"
+        defaultMessage="Progress"
+      />
+    )),
+    Cell: memo(({ row: { petition } }) => (
+      <>
+        {petition ? (
+          <PetitionProgressBar
+            status={petition.status}
+            {...petition.progress}
+          ></PetitionProgressBar>
+        ) : null}
+      </>
+    )),
+  },
+  {
+    key: "deadline",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.sendouts-header.deadline"
+        defaultMessage="Deadline"
+      />
+    )),
+    Cell: memo(({ row: { petition } }) => (
+      <>
+        {petition?.deadline ? (
+          <DateTime value={petition.deadline} format={FORMATS.LLL} />
+        ) : null}
+      </>
+    )),
+  },
+  {
+    key: "status",
+    Header: memo(() => (
+      <FormattedMessage
+        id="petitions.sendouts-header.status"
+        defaultMessage="Status"
+      />
+    )),
+    Cell: memo(({ row: { petition } }) => (
+      <>{petition ? <PetitionStatusText status={petition.status} /> : null}</>
+    )),
+  },
+];
+
 Contact.fragments = {
   contact: gql`
     fragment Contact_Contact on Contact {
@@ -185,6 +341,24 @@ Contact.fragments = {
       fullName
       firstName
       lastName
+      sendouts(limit: 100) {
+        items {
+          id
+          petition {
+            id
+            name
+            emailSubject
+            status
+            deadline
+            progress {
+              validated
+              replied
+              optional
+              total
+            }
+          }
+        }
+      }
     }
   `,
   user: gql`
@@ -205,6 +379,19 @@ const ToggleInput = forwardRef(function ToggleInput(
 ) {
   return isEditing ? (
     <Input ref={ref} {...props} />
+  ) : children === null ? (
+    <Text
+      paddingLeft={4}
+      height="40px"
+      lineHeight="40px"
+      color="gray.400"
+      fontStyle="italic"
+    >
+      <FormattedMessage
+        id="generic.not-specified"
+        defaultMessage="Not specified"
+      />
+    </Text>
   ) : (
     <Box
       height="40px"

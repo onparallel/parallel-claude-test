@@ -187,7 +187,18 @@ const COLUMNS: TableColumn<ContactSelection>[] = [
         defaultMessage="First name"
       />
     )),
-    Cell: memo(({ row }) => <>{row.firstName}</>),
+    Cell: memo(({ row }) => (
+      <>
+        {row.firstName || (
+          <Text as="span" color="gray.400" fontStyle="italic">
+            <FormattedMessage
+              id="generic.not-specified"
+              defaultMessage="Not specified"
+            />
+          </Text>
+        )}
+      </>
+    )),
   },
   {
     key: "lastName",
@@ -197,7 +208,18 @@ const COLUMNS: TableColumn<ContactSelection>[] = [
         defaultMessage="Last name"
       />
     )),
-    Cell: memo(({ row }) => <>{row.lastName}</>),
+    Cell: memo(({ row }) => (
+      <>
+        {row.lastName || (
+          <Text as="span" color="gray.400" fontStyle="italic">
+            <FormattedMessage
+              id="generic.not-specified"
+              defaultMessage="Not specified"
+            />
+          </Text>
+        )}
+      </>
+    )),
   },
   {
     key: "email",

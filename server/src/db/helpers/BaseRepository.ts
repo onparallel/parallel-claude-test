@@ -3,14 +3,13 @@ import { injectable } from "inversify";
 import Knex, { Transaction, QueryBuilder } from "knex";
 import { indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, UnwrapPromise } from "../../util/types";
 import {
   TableCreateTypes,
   TablePrimaryKeys,
   TableTypes,
   Maybe,
 } from "../__types";
-import { handler } from "../../util/handler";
 
 export interface PageOpts {
   offset?: number | null;
@@ -102,20 +101,23 @@ export class BaseRepository {
     query: Knex.QueryBuilder<TRecord, TResult>,
     { offset, limit }: PageOpts
   ) {
-    const [{ totalCount }] = await query
+    const [{ count }] = await query
       .clone()
       .clearOrder()
-      .select(this.count("totalCount"));
-    if (totalCount === 0) {
-      return { totalCount, items: [] };
+      .clearSelect()
+      .select(this.count());
+    if (count === 0) {
+      return {
+        totalCount: 0,
+        items: ([] as unknown) as UnwrapPromise<typeof query>,
+      };
     } else {
       return {
-        totalCount,
-        items: await query
+        totalCount: count as number,
+        items: (await query
           .clone()
-          .select("*")
           .offset(offset ?? 0)
-          .limit(limit ?? 0),
+          .limit(limit ?? 0)) as UnwrapPromise<typeof query>,
       };
     }
   }

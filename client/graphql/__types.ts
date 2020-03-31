@@ -25,6 +25,12 @@ export type Contact = Timestamps & {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
   fullName?: Maybe<Scalars["String"]>;
+  sendouts: PetitionSendoutPagination;
+};
+
+export type ContactsendoutsArgs = {
+  offset?: Maybe<Scalars["Int"]>;
+  limit?: Maybe<Scalars["Int"]>;
 };
 
 export type ContactPagination = {
@@ -275,6 +281,13 @@ export type PetitionSendout = Timestamps & {
   updatedAt: Scalars["DateTime"];
   id: Scalars["ID"];
   contact?: Maybe<Contact>;
+  petition?: Maybe<Petition>;
+};
+
+export type PetitionSendoutPagination = {
+  __typename?: "PetitionSendoutPagination";
+  items: Array<PetitionSendout>;
+  totalCount: Scalars["Int"];
 };
 
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
@@ -508,7 +521,25 @@ export type PublicPetitionField_PublicPetitionFieldFragment = {
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
   "id" | "email" | "fullName" | "firstName" | "lastName"
->;
+> & {
+    sendouts: { __typename?: "PetitionSendoutPagination" } & {
+      items: Array<
+        { __typename?: "PetitionSendout" } & Pick<PetitionSendout, "id"> & {
+            petition?: Maybe<
+              { __typename?: "Petition" } & Pick<
+                Petition,
+                "id" | "name" | "emailSubject" | "status" | "deadline"
+              > & {
+                  progress: { __typename?: "PetitionProgress" } & Pick<
+                    PetitionProgress,
+                    "validated" | "replied" | "optional" | "total"
+                  >;
+                }
+            >;
+          }
+      >;
+    };
+  };
 
 export type Contact_UserFragment = {
   __typename?: "User";

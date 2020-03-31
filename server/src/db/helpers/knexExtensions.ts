@@ -23,3 +23,10 @@ function likeClause<TRecord = any, TResult = unknown>(operator: string) {
     }
   };
 }
+
+QueryBuilder.extend("mmodify", function mmodify<TRecord, TResult>(
+  this: QueryBuilder<TRecord, TResult>,
+  ...args: Parameters<QueryBuilder["modify"]>
+) {
+  return this.modify<TRecord, TResult>(...args);
+});

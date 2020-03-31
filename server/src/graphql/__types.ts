@@ -158,6 +158,11 @@ export interface NexusGenRootTypes {
     validated: number; // Int!
   };
   PetitionSendout: db.PetitionSendout;
+  PetitionSendoutPagination: {
+    // root type
+    items: NexusGenRootTypes["PetitionSendout"][]; // [PetitionSendout!]!
+    totalCount: number; // Int!
+  };
   PublicPetition: db.Petition;
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldReply: db.PetitionFieldReply;
@@ -172,11 +177,11 @@ export interface NexusGenRootTypes {
   };
   Timestamps:
     | NexusGenRootTypes["Contact"]
-    | NexusGenRootTypes["User"]
-    | NexusGenRootTypes["Organization"]
+    | NexusGenRootTypes["PetitionSendout"]
     | NexusGenRootTypes["Petition"]
     | NexusGenRootTypes["PetitionFieldReply"]
-    | NexusGenRootTypes["PetitionSendout"]
+    | NexusGenRootTypes["User"]
+    | NexusGenRootTypes["Organization"]
     | NexusGenRootTypes["PublicPetition"]
     | NexusGenRootTypes["PublicPetitionFieldReply"];
   String: string;
@@ -215,6 +220,7 @@ export interface NexusGenFieldTypes {
     fullName: string | null; // String
     id: string; // ID!
     lastName: string | null; // String
+    sendouts: NexusGenRootTypes["PetitionSendoutPagination"]; // PetitionSendoutPagination!
     updatedAt: Date; // DateTime!
   };
   ContactPagination: {
@@ -328,7 +334,13 @@ export interface NexusGenFieldTypes {
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: Date; // DateTime!
     id: string; // ID!
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
     updatedAt: Date; // DateTime!
+  };
+  PetitionSendoutPagination: {
+    // field return type
+    items: NexusGenRootTypes["PetitionSendout"][]; // [PetitionSendout!]!
+    totalCount: number; // Int!
   };
   PublicPetition: {
     // field return type
@@ -408,6 +420,13 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenArgTypes {
+  Contact: {
+    sendouts: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
+  };
   Mutation: {
     changePassword: {
       // args
@@ -549,11 +568,11 @@ export interface NexusGenArgTypes {
 export interface NexusGenAbstractResolveReturnTypes {
   Timestamps:
     | "Contact"
-    | "User"
-    | "Organization"
+    | "PetitionSendout"
     | "Petition"
     | "PetitionFieldReply"
-    | "PetitionSendout"
+    | "User"
+    | "Organization"
     | "PublicPetition"
     | "PublicPetitionFieldReply";
 }
@@ -575,6 +594,7 @@ export type NexusGenObjectNames =
   | "PetitionPagination"
   | "PetitionProgress"
   | "PetitionSendout"
+  | "PetitionSendoutPagination"
   | "PublicPetition"
   | "PublicPetitionField"
   | "PublicPetitionFieldReply"

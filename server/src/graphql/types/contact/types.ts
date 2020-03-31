@@ -34,5 +34,12 @@ export const Contact = objectType({
         }
       },
     });
+    t.paginationField("sendouts", {
+      type: "PetitionSendout",
+      description: "The sendouts for this contact",
+      resolve: async (root, { offset, limit }, ctx) => {
+        return ctx.contacts.loadSendoutsForContact(root.id, { offset, limit });
+      },
+    });
   },
 });

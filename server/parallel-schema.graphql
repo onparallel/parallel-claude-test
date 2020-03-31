@@ -42,6 +42,21 @@ type Contact implements Timestamps {
   lastName: String
 
   """
+  The sendouts for this contact
+  """
+  sendouts(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PetitionSendoutPagination!
+
+  """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
@@ -555,9 +570,26 @@ type PetitionSendout implements Timestamps {
   id: ID!
 
   """
+  The petition for this sendout.
+  """
+  petition: Petition
+
+  """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type PetitionSendoutPagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionSendout!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 """

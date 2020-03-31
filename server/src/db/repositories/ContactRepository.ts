@@ -1,10 +1,19 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import { groupBy } from "remeda";
+import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { User, CreateContact } from "../__types";
+import {
+  CreateContact,
+  PetitionSendout,
+  PetitionStatus,
+  User,
+  Contact,
+} from "../__types";
 
 @injectable()
 export class ContactReposistory extends BaseRepository {
@@ -40,7 +49,7 @@ export class ContactReposistory extends BaseRepository {
           owner_id: userId,
           deleted_at: null,
         })
-        .modify((q) => {
+        .mmodify((q) => {
           const { search, excludeIds } = opts;
           if (search) {
             q.andWhere((q2) => {
@@ -55,7 +64,19 @@ export class ContactReposistory extends BaseRepository {
             q.whereNotIn("id", excludeIds);
           }
           q.orderBy("id");
-        }),
+        })
+        .select("*"),
+      opts
+    );
+  }
+
+  async loadSendoutsForContact(contactId: number, opts: PageOpts) {
+    return await this.loadPageAndCount(
+      this.from("petition_sendout")
+        .where({ contact_id: contactId })
+        .whereNull("deleted_at")
+        .orderBy("created_at", "desc")
+        .select("*"),
       opts
     );
   }

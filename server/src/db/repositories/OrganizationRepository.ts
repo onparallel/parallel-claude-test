@@ -18,9 +18,10 @@ export class OrganizationRepository extends BaseRepository {
     return await this.loadPageAndCount(
       this.from("user")
         .where({ org_id: orgId, deleted_at: null })
-        .modify((q) => {
+        .mmodify((q) => {
           q.orderBy("id");
-        }),
+        })
+        .select("*"),
       opts
     );
   }
