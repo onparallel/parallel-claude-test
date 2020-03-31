@@ -65,4 +65,4 @@ async function main() {
   await generate(input, outputRaw as string, outputCompiled as string);
 }
 
-main().then();
+main().then().catch(console.log);

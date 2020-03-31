@@ -265,7 +265,7 @@
   },
   {
     "term": "contact.petitions-header",
-    "definition": "Peticiones enviadas{name, select, null {} other { a {name}}",
+    "definition": "Peticiones enviadas{name, select, null {} other { a {name}}}",
     "context": "Petitions sent{name, select, null {} other { to {name}}}",
     "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L210-L214"
   },
