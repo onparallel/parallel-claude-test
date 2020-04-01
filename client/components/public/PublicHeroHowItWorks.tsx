@@ -1,10 +1,10 @@
-import { Box, BoxProps, Flex, Heading, Stack, Text } from "@chakra-ui/core";
+import { Box, BoxProps, Button, Flex, Heading, Text } from "@chakra-ui/core";
 import { ReactNode, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { animated, useTransition } from "react-spring";
-import { PublicContainer } from "./layout/PublicContainer";
-import { Spacer } from "../common/Spacer";
 import { Card } from "../common/Card";
+import { Spacer } from "../common/Spacer";
+import { PublicContainer } from "./layout/PublicContainer";
 
 const IMAGES = [
   { id: 0, url: "/static/images/newrequest.png" },
@@ -31,7 +31,7 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
         backgroundColor: "white",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="light" color="purple.500">
+      <Heading as="h2" fontSize="3xl" fontWeight="bold" color="purple.500">
         <FormattedMessage
           id="public.home.hero-how-it-works"
           defaultMessage="How it works"
@@ -39,8 +39,8 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
       </Heading>
       <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
-          id="public.home.hero-discover-use"
-          defaultMessage="Discover what you can do with Parallel"
+          id="public.home.hero-steps"
+          defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you. Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
         ></FormattedMessage>
       </Heading>
       <Flex
@@ -58,14 +58,14 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.popular.create-request"
+                id="public.steps.create-request"
                 defaultMessage="Create your request"
               ></FormattedMessage>
             }
             description={
               <FormattedMessage
-                id="public.popular.user-friendly"
-                defaultMessage="Use our user-friendly interface to program your information request. We will handle the rest."
+                id="public.steps.user-friendly"
+                defaultMessage="Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you."
               ></FormattedMessage>
             }
             isActive={index === 0}
@@ -75,14 +75,14 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.popular.clients-upload"
-                defaultMessage="Let clients upload at their pace"
+                id="public.steps.set-date"
+                defaultMessage="Set a delivery deadline"
               ></FormattedMessage>
             }
             description={
               <FormattedMessage
-                id="public.popular.client-timings"
-                defaultMessage="Because real life is asynchronous, allow your clients to work at their own timings. Let us remind them if needed."
+                id="public.steps.client-timings"
+                defaultMessage="We automate the information request process. Your client will not know that it is not you who sends the emails."
               ></FormattedMessage>
             }
             isActive={index === 1}
@@ -92,14 +92,14 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.popular.focus"
-                defaultMessage="Focus on what really matters"
+                id="public.steps.receive-inbox"
+                defaultMessage="Receive it on time in your inbox"
               ></FormattedMessage>
             }
             description={
               <FormattedMessage
-                id="public.popular.focus-on-work"
-                defaultMessage="Focus on your work and stop sending emails back and forth. We will let you know when the information is ready."
+                id="public.steps.focus-on-work"
+                defaultMessage="We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification."
               ></FormattedMessage>
             }
             isActive={index === 2}
@@ -145,6 +145,18 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
           </Box>
         </Flex>
       </Flex>
+      <Flex marginTop={16} justifyContent="center">
+        <Button
+          as="a"
+          {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
+          variantColor="purple"
+        >
+          <FormattedMessage
+            id="public.invite-button"
+            defaultMessage="Request an invite"
+          ></FormattedMessage>
+        </Button>
+      </Flex>
     </PublicContainer>
   );
 }
@@ -171,7 +183,7 @@ function Step({
       <Heading as="h4" fontSize="md" color="purple.500">
         {header}
       </Heading>
-      <Text marginTop={2} fontSize="sm">
+      <Text marginTop={4} fontSize="sm">
         {description}
       </Text>
     </Card>

@@ -96,22 +96,22 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
 function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
-      <Button as="a" variant="ghost" {...{ href: "/blog" }}>
-        <FormattedMessage
-          id="public.header.blog"
-          defaultMessage="Blog"
-        ></FormattedMessage>
-      </Button>
       <Flex>
         <NakedLink href="/about">
           <Button flex="1" as="a" variant="ghost">
             <FormattedMessage
-              id="public.header.about"
+              id="public.about-link"
               defaultMessage="About"
             ></FormattedMessage>
           </Button>
         </NakedLink>
       </Flex>
+      <Button as="a" variant="ghost" {...{ href: "/blog" }}>
+        <FormattedMessage
+          id="public.blog-link"
+          defaultMessage="Blog"
+        ></FormattedMessage>
+      </Button>
       <Button
         as="a"
         {...{ href: "https://api.parallel.so/auth/login" }}
@@ -128,8 +128,8 @@ function PublicHeaderMenu(props: StackProps) {
         variantColor="purple"
       >
         <FormattedMessage
-          id="public.bookdemo-button"
-          defaultMessage="Book a demo"
+          id="public.invite-button"
+          defaultMessage="Request an invite"
         ></FormattedMessage>
       </Button>
     </Stack>

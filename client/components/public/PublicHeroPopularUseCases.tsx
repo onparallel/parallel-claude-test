@@ -1,4 +1,4 @@
-import { BoxProps, Flex, Heading, Text, Grid } from "@chakra-ui/core";
+import { BoxProps, Flex, Heading, Text, Grid, Button } from "@chakra-ui/core";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "../common/Card";
@@ -14,7 +14,7 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
         backgroundColor: "gray.50",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="light" color="purple.600">
+      <Heading as="h2" fontSize="3xl" fontWeight="bold" color="purple.600">
         <FormattedMessage
           id="public.home.hero-popular-use-cases"
           defaultMessage="Popular use cases"
@@ -23,7 +23,7 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
       <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.home.hero-discover-use"
-          defaultMessage="Discover what you can do with Parallel"
+          defaultMessage="You can use Parallel if you work in a law firm, accounting firm or startup. Discover everything you can do with our platform."
         ></FormattedMessage>
       </Heading>
       <Grid
@@ -121,6 +121,18 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
           }
         />
       </Grid>
+      <Flex marginTop={16} justifyContent="center">
+        <Button
+          as="a"
+          {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
+          variantColor="purple"
+        >
+          <FormattedMessage
+            id="public.bookdemo-button"
+            defaultMessage="Book a demo"
+          ></FormattedMessage>
+        </Button>
+      </Flex>
     </PublicContainer>
   );
 }
@@ -135,7 +147,7 @@ function Feature({
 }) {
   return (
     <Card padding={5} textAlign="left" {...props}>
-      <Heading as="h4" fontSize="md">
+      <Heading as="h4" fontSize="md" color="purple.500">
         {header}
       </Heading>
       <Text marginTop={4} fontSize="sm">

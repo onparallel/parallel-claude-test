@@ -9,7 +9,7 @@ import {
   useColorMode,
   Box,
 } from "@chakra-ui/core";
-import { Link } from "@parallel/components/common/Link";
+import { Link, NormalLink } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
@@ -63,10 +63,18 @@ export function PublicFooter(props: BoxProps) {
             <ListItem>
               <Link href="/about" as="/about">
                 <FormattedMessage
-                  id="public.about.title"
+                  id="public.about-link"
                   defaultMessage="About"
                 ></FormattedMessage>
               </Link>
+            </ListItem>
+            <ListItem>
+              <NormalLink href="/blog">
+                <FormattedMessage
+                  id="public.blog-link"
+                  defaultMessage="Blog"
+                ></FormattedMessage>
+              </NormalLink>
             </ListItem>
           </List>
         </PublicFooterBox>

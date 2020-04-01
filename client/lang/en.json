@@ -1092,6 +1092,12 @@
     "reference": "pages/[locale]/app/petitions/index.tsx#L153-L156"
   },
   {
+    "term": "public.about-link",
+    "definition": "About",
+    "context": "About",
+    "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
+  },
+  {
     "term": "public.about.mission",
     "definition": "Our mission is to make professionals work worthwhile",
     "context": "Our mission is to make professionals work worthwhile",
@@ -1152,10 +1158,16 @@
     "reference": "pages/[locale]/about.tsx#L13-L16"
   },
   {
+    "term": "public.blog-link",
+    "definition": "Blog",
+    "context": "Blog",
+    "reference": "components/public/layout/PublicHeader.tsx#L110-L113"
+  },
+  {
     "term": "public.bookdemo-button",
     "definition": "Book a demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicHeroPc.tsx#L44-L47"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L130-L133"
   },
   {
     "term": "public.cookies.title",
@@ -1179,19 +1191,19 @@
     "term": "public.footer.legal-information",
     "definition": "Legal information",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L78-L81"
+    "reference": "components/public/layout/PublicFooter.tsx#L86-L89"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn profile",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L146-L149"
+    "reference": "components/public/layout/PublicFooter.tsx#L154-L157"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter profile",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L131-L134"
+    "reference": "components/public/layout/PublicFooter.tsx#L139-L142"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -1266,27 +1278,15 @@
     "reference": "pages/[locale]/forgot.tsx#L98-L101"
   },
   {
-    "term": "public.header.about",
-    "definition": "About",
-    "context": "About",
-    "reference": "components/public/layout/PublicHeader.tsx#L108-L111"
-  },
-  {
-    "term": "public.header.blog",
-    "definition": "Blog",
-    "context": "Blog",
-    "reference": "components/public/layout/PublicHeader.tsx#L100-L103"
-  },
-  {
     "term": "public.home.hero-collect",
-    "definition": "Collect information in a simple and efficient way",
-    "context": "Collect information in a simple and efficient way",
-    "reference": "components/public/PublicHeroPc.tsx#L27-L30"
+    "definition": "Automate your information collection processes and save time",
+    "context": "Automate your information collection processes and save time",
+    "reference": "components/public/PublicHeroPc.tsx#L28-L31"
   },
   {
     "term": "public.home.hero-discover-use",
-    "definition": "Discover what you can do with Parallel",
-    "context": "Discover what you can do with Parallel",
+    "definition": "You can use Parallel if you work in a law firm, accounting firm or startup. Discover everything you can do with our platform.",
+    "context": "You can use Parallel if you work in a law firm, accounting firm or startup. Discover everything you can do with our platform.",
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L24-L27"
   },
   {
@@ -1303,9 +1303,9 @@
   },
   {
     "term": "public.home.hero-platform",
-    "definition": "Our platform collects the information from your clients and allows you to focus on value adding tasks.",
-    "context": "Our platform collects the information from your clients and allows you to focus on value adding tasks.",
-    "reference": "components/public/PublicHeroPc.tsx#L33-L36"
+    "definition": "Parallel is a platform for medium and small companies. We collect all the documentation from your client for you safely and quickly. Begin your digital transformation!",
+    "context": "Parallel is a platform for medium and small companies. We collect all the documentation from your client for you safely and quickly. Begin your digital transformation!",
+    "reference": "components/public/PublicHeroPc.tsx#L34-L37"
   },
   {
     "term": "public.home.hero-popular-use-cases",
@@ -1324,6 +1324,18 @@
     "definition": "Who said professional services only scale with more human capital?",
     "context": "Who said professional services only scale with more human capital?",
     "reference": "components/public/PublicHeroBlackBanner.tsx#L18-L21"
+  },
+  {
+    "term": "public.home.hero-start-free",
+    "definition": "Get started for free and spend your time on tasks that really matter.",
+    "context": "Get started for free and spend your time on tasks that really matter.",
+    "reference": "components/public/PublicHeroPc.tsx#L40-L43"
+  },
+  {
+    "term": "public.home.hero-steps",
+    "definition": "In 3 easy steps you can create a request with the documentation you need your client to send you. Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
+    "context": "In 3 easy steps you can create a request with the documentation you need your client to send you. Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L41-L44"
   },
   {
     "term": "public.home.hero-subtitle",
@@ -1354,6 +1366,12 @@
     "definition": "Collect information efficiently",
     "context": "Collect information efficiently",
     "reference": "pages/[locale]/index.tsx#L15-L18"
+  },
+  {
+    "term": "public.invite-button",
+    "definition": "Request an invite",
+    "context": "Request an invite",
+    "reference": "components/public/PublicHeroPc.tsx#L51-L54"
   },
   {
     "term": "public.login-button",
@@ -1458,18 +1476,6 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L111-L114"
   },
   {
-    "term": "public.popular.client-timings",
-    "definition": "Because real life is asynchronous, allow your clients to work at their own timings. Let us remind them if needed.",
-    "context": "Because real life is asynchronous, allow your clients to work at their own timings. Let us remind them if needed.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L83-L86"
-  },
-  {
-    "term": "public.popular.clients-upload",
-    "definition": "Let clients upload at their pace",
-    "context": "Let clients upload at their pace",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L77-L80"
-  },
-  {
     "term": "public.popular.collect-schedules",
     "definition": "Collect all the schedules without space limitation and access them in a single place",
     "context": "Collect all the schedules without space limitation and access them in a single place",
@@ -1482,34 +1488,16 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L83-L86"
   },
   {
-    "term": "public.popular.create-request",
-    "definition": "Create your request",
-    "context": "Create your request",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L60-L63"
-  },
-  {
     "term": "public.popular.easily-collect",
     "definition": "Easily collect all the information from potential clients before starting to work",
     "context": "Easily collect all the information from potential clients before starting to work",
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L47-L50"
   },
   {
-    "term": "public.popular.focus",
-    "definition": "Focus on what really matters",
-    "context": "Focus on what really matters",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L94-L97"
-  },
-  {
     "term": "public.popular.focus-on-contract",
     "definition": "Focus on the contract while your clients send you the addenda at their pace",
     "context": "Focus on the contract while your clients send you the addenda at their pace",
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L89-L92"
-  },
-  {
-    "term": "public.popular.focus-on-work",
-    "definition": "Focus on your work and stop sending emails back and forth. We will let you know when the information is ready.",
-    "context": "Focus on your work and stop sending emails back and forth. We will let you know when the information is ready.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L100-L103"
   },
   {
     "term": "public.popular.information-ready",
@@ -1548,16 +1536,46 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L61-L64"
   },
   {
-    "term": "public.popular.user-friendly",
-    "definition": "Use our user-friendly interface to program your information request. We will handle the rest.",
-    "context": "Use our user-friendly interface to program your information request. We will handle the rest.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L66-L69"
-  },
-  {
     "term": "public.privacy.title",
     "definition": "Privacy policy",
     "context": "Privacy policy",
     "reference": "pages/[locale]/legal/[doc].tsx#L23-L26"
+  },
+  {
+    "term": "public.steps.client-timings",
+    "definition": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
+    "context": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L83-L86"
+  },
+  {
+    "term": "public.steps.create-request",
+    "definition": "Create your request",
+    "context": "Create your request",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L60-L63"
+  },
+  {
+    "term": "public.steps.focus-on-work",
+    "definition": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
+    "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L100-L103"
+  },
+  {
+    "term": "public.steps.receive-inbox",
+    "definition": "Receive it on time in your inbox",
+    "context": "Receive it on time in your inbox",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L94-L97"
+  },
+  {
+    "term": "public.steps.set-date",
+    "definition": "Set a delivery deadline",
+    "context": "Set a delivery deadline",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L77-L80"
+  },
+  {
+    "term": "public.steps.user-friendly",
+    "definition": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
+    "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L66-L69"
   },
   {
     "term": "public.terms.title",
