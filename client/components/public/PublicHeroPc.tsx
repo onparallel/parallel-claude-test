@@ -27,30 +27,31 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
           <Heading fontFamily="hero" fontSize="5xl" fontWeight="light">
             <FormattedMessage
               id="public.home.hero-collect"
-              defaultMessage="Automate your information collection processes and save time"
+              defaultMessage="Automate your information collection processes and save time."
             ></FormattedMessage>
           </Heading>
           <Text marginTop={8}>
             <FormattedMessage
               id="public.home.hero-platform"
-              defaultMessage="Parallel is a platform for medium and small companies. We collect all the documentation from your client for you safely and quickly. Begin your digital transformation!"
+              defaultMessage="Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly."
             ></FormattedMessage>
           </Text>
-          <Text marginTop={8}>
+          <Text>
             <FormattedMessage
-              id="public.home.hero-start-free"
-              defaultMessage="Get started for free and spend your time on tasks that really matter."
+              id="public.home.hero-digital-transformation"
+              defaultMessage="Begin your digital transformation!"
             ></FormattedMessage>
           </Text>
+
           <Stack spacing={4} direction="row" marginTop={10}>
             <Button
               as="a"
-              {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
+              {...{ href: "https://parallelso.typeform.com/to/XxE7IY" }}
               variantColor="purple"
             >
               <FormattedMessage
                 id="public.invite-button"
-                defaultMessage="Request an invite"
+                defaultMessage="Try Parallel free"
               ></FormattedMessage>
             </Button>
             <Button
@@ -64,6 +65,12 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
               ></FormattedMessage>
             </Button>
           </Stack>
+          <Text marginTop={8}>
+            <FormattedMessage
+              id="public.home.hero-try-now"
+              defaultMessage="Try it now and let Parallel work for you!"
+            ></FormattedMessage>
+          </Text>
         </Box>
         <Box flex="2" marginLeft={12} display={{ base: "none", md: "block" }}>
           <Image

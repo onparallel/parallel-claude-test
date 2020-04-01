@@ -23,7 +23,12 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
       <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.home.hero-discover-use"
-          defaultMessage="You can use Parallel if you work in a law firm, accounting firm or startup. Discover everything you can do with our platform."
+          defaultMessage="You can use Parallel if you work in a law firm, accounting firm or startup."
+        ></FormattedMessage>
+        <br />
+        <FormattedMessage
+          id="public.home.hero-discover-use-2"
+          defaultMessage="Discover everything you can do with our platform."
         ></FormattedMessage>
       </Heading>
       <Grid

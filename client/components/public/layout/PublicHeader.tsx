@@ -112,6 +112,12 @@ function PublicHeaderMenu(props: StackProps) {
           defaultMessage="Blog"
         ></FormattedMessage>
       </Button>
+      <Button as="a" variant="ghost" {...{ href: "mailto:hello@parallel.so" }}>
+        <FormattedMessage
+          id="public.contact-link"
+          defaultMessage="Contact"
+        ></FormattedMessage>
+      </Button>
       <Button
         as="a"
         {...{ href: "https://api.parallel.so/auth/login" }}
@@ -124,12 +130,12 @@ function PublicHeaderMenu(props: StackProps) {
       </Button>
       <Button
         as="a"
-        {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
+        {...{ href: "https://parallelso.typeform.com/to/XxE7IY" }}
         variantColor="purple"
       >
         <FormattedMessage
           id="public.invite-button"
-          defaultMessage="Request an invite"
+          defaultMessage="Try Parallel free"
         ></FormattedMessage>
       </Button>
     </Stack>

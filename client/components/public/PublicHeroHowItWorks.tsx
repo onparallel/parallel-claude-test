@@ -40,7 +40,12 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
       <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.home.hero-steps"
-          defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you. Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
+          defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you."
+        ></FormattedMessage>
+        <br />
+        <FormattedMessage
+          id="public.home.hero-steps-1"
+          defaultMessage="Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
         ></FormattedMessage>
       </Heading>
       <Flex
@@ -148,7 +153,9 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
       <Flex marginTop={16} justifyContent="center">
         <Button
           as="a"
-          {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
+          {...{
+            href: "https://parallelso.typeform.com/to/XxE7IY",
+          }}
           variantColor="purple"
         >
           <FormattedMessage

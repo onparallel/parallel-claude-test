@@ -76,6 +76,14 @@ export function PublicFooter(props: BoxProps) {
                 ></FormattedMessage>
               </NormalLink>
             </ListItem>
+            <ListItem>
+              <NormalLink href="mailto:hello@parallel.so">
+                <FormattedMessage
+                  id="public.contact-link"
+                  defaultMessage="Contact"
+                ></FormattedMessage>
+              </NormalLink>
+            </ListItem>
           </List>
         </PublicFooterBox>
         <PublicFooterBox
