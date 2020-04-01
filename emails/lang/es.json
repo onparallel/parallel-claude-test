@@ -1,8 +1,152 @@
 [
   {
+    "term": "closing.sender",
+    "definition": "El equipo de Parallel",
+    "context": "The Parallel team",
+    "reference": "components/Closing.tsx#L12-L15"
+  },
+  {
+    "term": "closing.text",
+    "definition": "Saludos",
+    "context": "Cheers,",
+    "reference": "components/Closing.tsx#L9"
+  },
+  {
+    "term": "email.upload.button",
+    "definition": "Completa aquí la información",
+    "context": "Complete the information here",
+    "reference": "emails/NewPetition.tsx#L101-L104"
+  },
+  {
+    "term": "footer.slogan",
+    "definition": "Trabaja mejor con",
+    "context": "Work better with",
+    "reference": "components/Layout.tsx#L80-L83"
+  },
+  {
+    "term": "forgot-password.click-to-reset",
+    "definition": "Accede a este enlace para resetear tu contraseña:",
+    "context": "Click on this link to reset your password:",
+    "reference": "emails/ForgotPassword.tsx#L26-L29"
+  },
+  {
+    "term": "forgot-password.ignore-text",
+    "definition": "Si no has solicitado el cambio de tu contraseña ignora por favor este email.",
+    "context": "If you didn't request to change your password please ignore this email.",
+    "reference": "emails/ForgotPassword.tsx#L38-L41"
+  },
+  {
+    "term": "forgot-password.reset-button",
+    "definition": "Restablecer mi contraseña",
+    "context": "Reset my password",
+    "reference": "emails/ForgotPassword.tsx#L32-L35"
+  },
+  {
+    "term": "generic.complete-information-button",
+    "definition": "Completa aquí la información",
+    "context": "Complete the information here",
+    "reference": "emails/PetitionReminder.tsx#L101-L104"
+  },
+  {
+    "term": "generic.submit-text.with-deadline",
+    "definition": "Por favor, rellene la siguiente información antes del {deadline}:",
+    "context": "Please submit the following information before {deadline}:",
+    "reference": "emails/PetitionReminder.tsx#L63-L73"
+  },
+  {
+    "term": "generic.submit-text.without-deadline",
+    "definition": "Por favor, rellene la siguiente información:",
+    "context": "Please submit the following information:",
+    "reference": "emails/PetitionReminder.tsx#L75-L78"
+  },
+  {
+    "term": "generic.untitled-field",
+    "definition": "Campo sin nombre",
+    "context": "Untitled field",
+    "reference": "emails/PetitionReminder.tsx#L89-L92"
+  },
+  {
+    "term": "generic.untitled-petition",
+    "definition": "Petición sin nombre",
+    "context": "Untitled petition",
+    "reference": "emails/PetitionCompleted.tsx#L46-L49"
+  },
+  {
     "term": "greeting",
-    "definition": "Hola {name}",
-    "context": "",
-    "reference": "emails/ForgotPassword.tsx#L39-L43"
+    "definition": "Hola{name, select, null {} other { {name}}}",
+    "context": "Hi{name, select, null {} other { {name}}},",
+    "reference": "components/Greeting.tsx#L8-L12"
+  },
+  {
+    "term": "invitation.details",
+    "definition": "Tu usuario es {email} y tu contraseña temporal es:",
+    "context": "Your username is {email} and your temporary password is:",
+    "reference": "emails/Invitation.tsx#L27-L31"
+  },
+  {
+    "term": "invitation.login-button",
+    "definition": "Acceder",
+    "context": "Log in",
+    "reference": "emails/Invitation.tsx#L43-L46"
+  },
+  {
+    "term": "invitation.website",
+    "definition": "Puedes acceder a través de nuestra página.",
+    "context": "You can login through our website.",
+    "reference": "emails/Invitation.tsx#L37-L40"
+  },
+  {
+    "term": "layout.privacy-link",
+    "definition": "Privacidad",
+    "context": "Privacy",
+    "reference": "components/Layout.tsx#L123-L126"
+  },
+  {
+    "term": "layout.terms-and-conditions-link",
+    "definition": "Términos y condiciones",
+    "context": "Terms and conditions",
+    "reference": "components/Layout.tsx#L113-L116"
+  },
+  {
+    "term": "new-petition.text",
+    "definition": "{senderName} ({senderEmail}) te envió una petición:",
+    "context": "{senderName} ({senderEmail}) sent you a petition:",
+    "reference": "emails/NewPetition.tsx#L41-L48"
+  },
+  {
+    "term": "petition-completed",
+    "definition": "{recipient} ha completado la petición que le enviaste.",
+    "context": "{recipient} completed the petition you sent to him.",
+    "reference": "emails/PetitionCompleted.tsx#L33-L39"
+  },
+  {
+    "term": "petition-completed.access-button",
+    "definition": "Accede a la información aquí",
+    "context": "Access the information here",
+    "reference": "emails/PetitionCompleted.tsx#L72-L75"
+  },
+  {
+    "term": "reminder.text",
+    "definition": "Recuerda que {senderName} ({senderEmail}) te envió una petición.",
+    "context": "Remember that {senderName} ({senderEmail}) sent you a petition.",
+    "reference": "emails/PetitionReminder.tsx#L41-L48"
+  },
+  {
+    "term": "welcome.click-to-verify",
+    "definition": "Por favor, haz click en el siguiente enlace para verificar tu dirección de correo.",
+    "context": "Please click the link below to verify your email address.",
+    "reference": "emails/Welcome.tsx#L26-L29"
+  },
+  {
+    "term": "welcome.greeting",
+    "definition": "¡Bienvenido a Parallel!",
+    "context": "Welcome to Parallel!",
+    "reference": "emails/Welcome.tsx#L20-L23"
+  },
+  {
+    "term": "welcome.verify-button",
+    "definition": "Verificar mi correo electrónico",
+    "context": "Verify my email",
+    "reference": "emails/Welcome.tsx#L32-L35"
   }
 ]

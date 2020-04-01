@@ -1,54 +1,57 @@
-import {
-  Mjml,
-  MjmlBody,
-  MjmlButton,
-  MjmlColumn,
-  MjmlHead,
-  MjmlImage,
-  MjmlPreview,
-  MjmlSection,
-  MjmlTitle,
-} from "mjml-react";
-import { FormattedMessage } from "react-intl";
+import { MjmlText, MjmlSection, MjmlColumn } from "mjml-react";
 import React from "react";
+import { FormattedMessage } from "react-intl";
+import { Closing } from "../components/Closing";
+import { Button } from "../components/common/Button";
+import { Greeting } from "../components/Greeting";
+import { Layout } from "../components/Layout";
 
 export interface ForgotPasswordProps {
-  name: string;
+  name: string | null;
+  assetsUrl: string;
+  parallelUrl: string;
+  resetUrl: string;
 }
 
-export default function ForgotPassword({ name }: ForgotPasswordProps) {
+export default function ForgotPassword({
+  name,
+  assetsUrl,
+  parallelUrl,
+  resetUrl,
+}: ForgotPasswordProps) {
   return (
-    <Mjml>
-      <MjmlHead>
-        <MjmlTitle>Last Minute Offer</MjmlTitle>
-        <MjmlPreview>Last Minute Offer...</MjmlPreview>
-      </MjmlHead>
-      <MjmlBody width={500}>
-        <MjmlSection fullWidth backgroundColor="#efefef">
-          <MjmlColumn>
-            <MjmlImage src="https://static.wixstatic.com/media/5cb24728abef45dabebe7edc1d97ddd2.jpg" />
-          </MjmlColumn>
-        </MjmlSection>
-        <MjmlSection>
-          <MjmlColumn>
-            <MjmlButton
-              padding="20px"
-              backgroundColor="#346DB7"
-              href="https://www.wix.com/"
-            >
-              <FormattedMessage
-                id="greeting"
-                defaultMessage="Hello {name}"
-                values={{ name }}
-              ></FormattedMessage>
-            </MjmlButton>
-          </MjmlColumn>
-        </MjmlSection>
-      </MjmlBody>
-    </Mjml>
+    <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <MjmlSection>
+        <MjmlColumn>
+          <Greeting name={name} />
+          <MjmlText>
+            <FormattedMessage
+              id="forgot-password.click-to-reset"
+              defaultMessage="Click on this link to reset your password:"
+            />
+          </MjmlText>
+          <Button href={`${parallelUrl}${resetUrl}`}>
+            <FormattedMessage
+              id="forgot-password.reset-button"
+              defaultMessage="Reset my password"
+            />
+          </Button>
+          <MjmlText>
+            <FormattedMessage
+              id="forgot-password.ignore-text"
+              defaultMessage="If you didn't request to change your password please ignore this email."
+            />
+          </MjmlText>
+          <Closing />
+        </MjmlColumn>
+      </MjmlSection>
+    </Layout>
   );
 }
 
 export const props: ForgotPasswordProps = {
-  name: "Michelle",
+  name: "Derek",
+  assetsUrl: "http://localhost",
+  parallelUrl: "http://localhost",
+  resetUrl: "/en/login",
 };

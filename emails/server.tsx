@@ -20,7 +20,8 @@ app.get("/", async (req, res, next) => {
     <ul>
       ${files
         .filter((f) => f.endsWith(".tsx"))
-        .map((f) => `<li><a href="/${f.replace(/\.tsx$/, "")}">${f}</a></li>`)}
+        .map((f) => `<li><a href="/${f.replace(/\.tsx$/, "")}">${f}</a></li>`)
+        .join("")}
     </ul>
   `);
 });
@@ -31,11 +32,17 @@ app.get("/:email", async (req, res, next) => {
     const locale = req.query.lang ?? "en";
     const componentFile = path.join(__dirname, `emails/${email}.tsx`);
     const messagesFile = path.join(__dirname, `lang/compiled/${locale}.json`);
-    delete require.cache[componentFile];
-    delete require.cache[messagesFile];
+    for (const entry of Object.keys(require.cache)) {
+      if (
+        ["components", "emails", "lang", "utils"].some((path) =>
+          entry.startsWith(`${__dirname}/${path}`)
+        )
+      ) {
+        delete require.cache[entry];
+      }
+    }
     const { default: Component, props } = await import(componentFile);
     const messages = await import(messagesFile);
-    console.log(`loading ${email}`);
     const { html } = render(
       <IntlProvider locale={locale} messages={messages}>
         <Component {...props} />
@@ -49,6 +56,7 @@ app.get("/:email", async (req, res, next) => {
     );
     res.send(html.replace(/<\/body>/, LR_SCRIPT + "\n</body>"));
   } catch (error) {
+    console.log(">>>>", error);
     res.status(500).send(error);
   }
 });
@@ -67,4 +75,5 @@ lr.watch([
   __dirname + "/components",
   __dirname + "/emails",
   __dirname + "/lang",
+  __dirname + "/utils",
 ]);
