@@ -13,7 +13,7 @@ export function PublicContainer({
     <Flex width="100%" alignItems="center" {...wrapper}>
       <Box
         margin="0 auto"
-        paddingX={4}
+        paddingX={{ base: 4, sm: 8, md: 12 }}
         width="100%"
         maxWidth={{ lg: "containers.xl" }}
         {...props}

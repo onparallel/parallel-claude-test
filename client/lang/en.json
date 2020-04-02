@@ -1369,8 +1369,8 @@
   },
   {
     "term": "public.home.hero-try-now",
-    "definition": "Try it now and let Parallel work for you!",
-    "context": "Try it now and let Parallel work for you!",
+    "definition": "Try it now and let Parallel work for you",
+    "context": "Try it now and let Parallel work for you",
     "reference": "components/public/PublicHeroPc.tsx#L69-L72"
   },
   {

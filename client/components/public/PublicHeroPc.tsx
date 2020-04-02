@@ -43,7 +43,7 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
             ></FormattedMessage>
           </Text>
 
-          <Stack spacing={4} direction="row" marginTop={10}>
+          <Stack spacing={4} direction="row" marginTop={8}>
             <Button
               as="a"
               {...{ href: "https://parallelso.typeform.com/to/XxE7IY" }}
@@ -68,11 +68,11 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
           <Text marginTop={8}>
             <FormattedMessage
               id="public.home.hero-try-now"
-              defaultMessage="Try it now and let Parallel work for you!"
+              defaultMessage="Try it now and let Parallel work for you"
             ></FormattedMessage>
           </Text>
         </Box>
-        <Box flex="2" marginLeft={12} display={{ base: "none", md: "block" }}>
+        <Box flex="2" marginLeft={12} display={{ base: "none", md: "flex" }}>
           <Image
             margin="auto"
             src="/static/images/demo-on-pc.svg"
