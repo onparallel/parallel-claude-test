@@ -8,6 +8,7 @@ import { PublicFooter } from "./PublicFooter";
 import { PublicHeader } from "./PublicHeader";
 import { useRouter } from "next/router";
 import { useIntl } from "react-intl";
+import { CookieConsent } from "./CookieConsent";
 
 export interface PublicLayoutProps {
   children?: ReactNode;
@@ -65,6 +66,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
           {children}
         </Flex>
         <PublicFooter marginTop={8}></PublicFooter>
+        <CookieConsent />
       </Flex>
     </>
   );

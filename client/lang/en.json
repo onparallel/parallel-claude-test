@@ -9,25 +9,13 @@
     "term": "component.cookie-consent.accept-button",
     "definition": "Accept",
     "context": "Accept",
-    "reference": "components/public/layout/CookieConsent.tsx#L76-L79"
+    "reference": "components/public/layout/CookieConsent.tsx#L77-L80"
   },
   {
-    "term": "component.cookie-consent.description",
-    "definition": "We use analytics cookies that allow us to understand how users navigate around our website. These cookies will only be used if you grant consent and you will always be allowed to reject them at any moment. <a>Read more</a>",
-    "context": "We use analytics cookies that allow us to understand how users navigate around our website. These cookies will only be used if you grant consent and you will always be allowed to reject them at any moment. <a>Read more</a>",
-    "reference": "components/public/layout/CookieConsent.tsx#L36-L55"
-  },
-  {
-    "term": "component.cookie-consent.header",
-    "definition": "Cookies on Parallel",
-    "context": "Cookies on Parallel",
-    "reference": "components/public/layout/CookieConsent.tsx#L30-L33"
-  },
-  {
-    "term": "component.cookie-consent.reject-button",
-    "definition": "Reject",
-    "context": "Reject",
-    "reference": "components/public/layout/CookieConsent.tsx#L91-L94"
+    "term": "component.cookie-consent.text",
+    "definition": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>.",
+    "context": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>.",
+    "reference": "components/public/layout/CookieConsent.tsx#L41-L60"
   },
   {
     "term": "component.input.clear-button",
@@ -1485,7 +1473,7 @@
     "term": "public.meta-description",
     "definition": "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
     "context": "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
-    "reference": "components/public/layout/PublicLayout.tsx#L37-L41"
+    "reference": "components/public/layout/PublicLayout.tsx#L38-L42"
   },
   {
     "term": "public.popular.accounting",
