@@ -28,7 +28,7 @@ import { PetitionStatusText } from "../common/PetitionStatusText";
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "send" | "review";
+  section: "compose" | "review";
   state: "SAVED" | "SAVING" | "ERROR";
 };
 
@@ -59,13 +59,6 @@ export function PetitionHeader({
         text: intl.formatMessage({
           id: "petition.header.compose-tab",
           defaultMessage: "Compose",
-        }),
-      },
-      {
-        section: "send",
-        text: intl.formatMessage({
-          id: "petition.header.send-tab",
-          defaultMessage: "Send",
         }),
       },
       {

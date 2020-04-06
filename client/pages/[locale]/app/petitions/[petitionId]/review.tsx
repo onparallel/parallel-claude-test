@@ -1,4 +1,3 @@
-import { useMutation } from "@apollo/react-hooks";
 import {
   Box,
   Button,
@@ -11,6 +10,12 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
+import { Card } from "@parallel/components/common/Card";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import {
+  DialogCallbacks,
+  useDialog,
+} from "@parallel/components/common/DialogOpenerProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
@@ -20,37 +25,30 @@ import {
   PetitionReviewField,
   PetitionReviewFieldAction,
 } from "@parallel/components/petition/PetitionReviewField";
+import { PetitionSendouts } from "@parallel/components/petition/PetitionSendouts";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
+  PetitionFieldReply,
   PetitionReviewQuery,
   PetitionReviewQueryVariables,
   PetitionReviewUserQuery,
-  PetitionReview_fileUploadReplyDownloadLinkMutation,
-  PetitionReview_fileUploadReplyDownloadLinkMutationVariables,
-  PetitionReview_updatePetitionMutation,
-  PetitionReview_updatePetitionMutationVariables,
-  PetitionReview_validatePetitionFieldsMutation,
-  PetitionReview_validatePetitionFieldsMutationVariables,
-  PetitionsUserQuery,
   UpdatePetitionInput,
-  FileUploadReplyDownloadLinkResult,
-  PetitionFieldReply,
+  usePetitionReviewQuery,
+  usePetitionReview_fileUploadReplyDownloadLinkMutation,
+  usePetitionReview_updatePetitionMutation,
+  usePetitionReview_validatePetitionFieldsMutation,
+  usePetitionsUserQuery,
 } from "@parallel/graphql/__types";
+import { assertQuery } from "@parallel/utils/apollo";
 import {
   usePetitionState,
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useQueryData } from "@parallel/utils/useQueryData";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { gql } from "apollo-boost";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import {
-  DialogCallbacks,
-  useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReview.getInitialProps>
@@ -58,18 +56,19 @@ type PetitionProps = UnwrapPromise<
 
 function PetitionReview({ petitionId }: PetitionProps) {
   const intl = useIntl();
-  const { me } = useQueryData<PetitionsUserQuery>(
-    GET_PETITION_REVIEW_USER_DATA
-  );
-  const { petition } = useQueryData<
-    PetitionReviewQuery,
-    PetitionReviewQueryVariables
-  >(GET_PETITION_REVIEW_DATA, { variables: { id: petitionId } });
+  const {
+    data: { me },
+  } = assertQuery(usePetitionsUserQuery());
+  const {
+    data: { petition },
+  } = assertQuery(usePetitionReviewQuery({ variables: { id: petitionId } }));
 
   const [state, setState] = usePetitionState();
   const wrapper = useWrapPetitionUpdater(setState);
-  const [updatePetition] = useUpdatePetition();
-  const [validatePetitionFields] = useValidatePetitionFields();
+  const [updatePetition] = usePetitionReview_updatePetitionMutation();
+  const [
+    validatePetitionFields,
+  ] = usePetitionReview_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
   const handleValidateToggle = useCallback(
@@ -201,9 +200,9 @@ function PetitionReview({ petitionId }: PetitionProps) {
           ) : null}
         </Stack>
         <Divider />
-        <Flex flex="1" overflow="auto">
-          <Box flex="2">
-            <Stack flex="2" padding={4} spacing={4}>
+        <Box flex="1" overflow="auto">
+          <Flex margin={4}>
+            <Stack flex="2" spacing={4}>
               {petition!.fields.map((field, index) => (
                 <PetitionReviewField
                   key={field.id}
@@ -218,9 +217,14 @@ function PetitionReview({ petitionId }: PetitionProps) {
                 />
               ))}
             </Stack>
-          </Box>
-          <Spacer flex="1" display={{ base: "none", md: "block" }} />
-        </Flex>
+            <Spacer flex="1" display={{ base: "none", md: "block" }} />
+          </Flex>
+          <PetitionSendouts
+            sendouts={petition!.sendouts}
+            margin={4}
+            marginTop={12}
+          />
+        </Box>
       </PetitionLayout>
     </>
   );
@@ -234,9 +238,11 @@ PetitionReview.fragments = {
       fields {
         ...PetitionReviewField_PetitionField
       }
+      ...PetitionSendouts_Petition
     }
     ${PetitionLayout.fragments.petition}
     ${PetitionReviewField.fragments.petitionField}
+    ${PetitionSendouts.fragments.petition}
   `,
   user: gql`
     fragment PetitionReview_User on User {
@@ -246,29 +252,8 @@ PetitionReview.fragments = {
   `,
 };
 
-const GET_PETITION_REVIEW_DATA = gql`
-  query PetitionReview($id: ID!) {
-    petition(id: $id) {
-      ...PetitionReview_Petition
-    }
-  }
-  ${PetitionReview.fragments.petition}
-`;
-
-const GET_PETITION_REVIEW_USER_DATA = gql`
-  query PetitionReviewUser {
-    me {
-      ...PetitionReview_User
-    }
-  }
-  ${PetitionReview.fragments.user}
-`;
-
-function useUpdatePetition() {
-  return useMutation<
-    PetitionReview_updatePetitionMutation,
-    PetitionReview_updatePetitionMutationVariables
-  >(gql`
+PetitionReview.mutations = [
+  gql`
     mutation PetitionReview_updatePetition(
       $petitionId: ID!
       $data: UpdatePetitionInput!
@@ -278,14 +263,8 @@ function useUpdatePetition() {
       }
     }
     ${PetitionReview.fragments.petition}
-  `);
-}
-
-function useValidatePetitionFields() {
-  return useMutation<
-    PetitionReview_validatePetitionFieldsMutation,
-    PetitionReview_validatePetitionFieldsMutationVariables
-  >(gql`
+  `,
+  gql`
     mutation PetitionReview_validatePetitionFields(
       $petitionId: ID!
       $fieldIds: [ID!]!
@@ -306,14 +285,8 @@ function useValidatePetitionFields() {
       }
     }
     ${PetitionLayout.fragments.petition}
-  `);
-}
-
-function useDownloadReplyFile() {
-  const [mutate] = useMutation<
-    PetitionReview_fileUploadReplyDownloadLinkMutation,
-    PetitionReview_fileUploadReplyDownloadLinkMutationVariables
-  >(gql`
+  `,
+  gql`
     mutation PetitionReview_fileUploadReplyDownloadLink(
       $petitionId: ID!
       $replyId: ID!
@@ -323,7 +296,29 @@ function useDownloadReplyFile() {
         url
       }
     }
-  `);
+  `,
+];
+
+const GET_PETITION_REVIEW_DATA = gql`
+  query PetitionReview($id: ID!) {
+    petition(id: $id) {
+      ...PetitionReview_Petition
+    }
+  }
+  ${PetitionReview.fragments.petition}
+`;
+
+const GET_PETITION_REVIEW_USER_DATA = gql`
+  query PetitionReviewUser {
+    me {
+      ...PetitionReview_User
+    }
+  }
+  ${PetitionReview.fragments.user}
+`;
+
+function useDownloadReplyFile() {
+  const [mutate] = usePetitionReview_fileUploadReplyDownloadLinkMutation();
   const openDialog = useDialog(FailureGeneratingLink, []);
   return useCallback(
     async function downloadReplyFile(

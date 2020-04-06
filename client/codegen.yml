@@ -1,10 +1,11 @@
-schema: http://localhost/graphql
+schema: ../server/parallel-schema.graphql
 documents: "**/*.tsx"
 generates:
   ./graphql/__types.ts:
     plugins:
       - typescript
       - typescript-operations
+      - typescript-react-apollo
     config:
       namingConvention: keep
       exportFragmentSpreadSubTypes: true
@@ -12,6 +13,14 @@ generates:
       scalars:
         DateTime: string
         JSONObject: "{ [key: string]: any }"
+      apolloReactHooksImportFrom: "@apollo/react-hooks"
+      apolloReactCommonImportFrom: "@apollo/react-common"
+      withComponent: false
+      withHOC: false
+      withHooks: true
+      withMutationFn: true
+      reactApolloVersion: 3
+
 hooks:
   afterAllFileWrite:
     - prettier --write

@@ -24,13 +24,13 @@ import { Divider } from "../common/Divider";
 
 export type PetitionComposeFieldSettingsProps = BoxProps & {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
-  onUpdate: (data: UpdatePetitionFieldInput) => void;
+  onUpdateField: (data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
 };
 
 export function PetitionComposeFieldSettings({
   field,
-  onUpdate,
+  onUpdateField,
   onClose,
   ...props
 }: PetitionComposeFieldSettingsProps) {
@@ -81,7 +81,7 @@ export function PetitionComposeFieldSettings({
             color="green"
             isChecked={!field.optional}
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              onUpdate({ optional: !event.target.checked })
+              onUpdateField({ optional: !event.target.checked })
             }
           />
         </SettingsRow>
@@ -102,15 +102,15 @@ export function PetitionComposeFieldSettings({
             color="green"
             isChecked={field.multiple}
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              onUpdate({ multiple: event.target.checked })
+              onUpdateField({ multiple: event.target.checked })
             }
           />
         </SettingsRow>
         <Divider />
         {field.type === "FILE_UPLOAD" ? (
-          <FileUploadSettings field={field} onUpdate={onUpdate} />
+          <FileUploadSettings field={field} onUpdateField={onUpdateField} />
         ) : field.type === "TEXT" ? (
-          <TextSettings field={field} onUpdate={onUpdate} />
+          <TextSettings field={field} onUpdateField={onUpdateField} />
         ) : null}
       </Stack>
     </Card>
@@ -119,20 +119,22 @@ export function PetitionComposeFieldSettings({
 
 function FileUploadSettings({
   field,
-  onUpdate,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdate">) {
+  onUpdateField,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdateField">) {
   const options: FieldOptions["FILE_UPLOAD"] = field.options as any;
   return <></>;
 }
 
 function TextSettings({
   field,
-  onUpdate,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdate">) {
+  onUpdateField,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdateField">) {
   const options: FieldOptions["TEXT"] = field.options as any;
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   useEffect(() => setPlaceholder(options.placeholder ?? ""), [field.id]);
-  const debouncedOnUpdate = useDebouncedCallback(onUpdate, 300, [field.id]);
+  const debouncedOnUpdate = useDebouncedCallback(onUpdateField, 300, [
+    field.id,
+  ]);
   const handlePlaceholderChange = function (
     event: ChangeEvent<HTMLInputElement>
   ) {
@@ -164,7 +166,7 @@ function TextSettings({
           color="green"
           isChecked={options.multiline}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onUpdate({
+            onUpdateField({
               options: { ...field.options, multiline: event.target.checked },
             })
           }

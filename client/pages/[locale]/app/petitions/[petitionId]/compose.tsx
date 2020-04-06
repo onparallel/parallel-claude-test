@@ -1,6 +1,4 @@
-import { useMutation } from "@apollo/react-hooks";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
-import { Card } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
@@ -11,131 +9,85 @@ import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { AddFieldPopover } from "@parallel/components/petition/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
+import { PetitionComposeFields } from "@parallel/components/petition/PetitionComposeFields";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition/PetitionComposeFieldSettings";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
   PetitionComposeUserQuery,
-  PetitionCompose_createPetitionFieldMutation,
-  PetitionCompose_createPetitionFieldMutationVariables,
   PetitionCompose_createPetitionField_PetitionFragment,
-  PetitionCompose_deletePetitionFieldMutation,
-  PetitionCompose_deletePetitionFieldMutationVariables,
-  PetitionCompose_PetitionFragment,
-  PetitionCompose_updateFieldPositionsMutation,
-  PetitionCompose_updateFieldPositionsMutationVariables,
-  PetitionCompose_updatePetitionFieldMutation,
-  PetitionCompose_updatePetitionFieldMutationVariables,
-  PetitionCompose_updatePetitionMutation,
-  PetitionCompose_updatePetitionMutationVariables,
+  PetitionCompose_updateFieldPositions_PetitionFragment,
   PetitionFieldType,
-  PetitionsUserQuery,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
-  PetitionCompose_updateFieldPositions_PetitionFragment,
+  usePetitionComposeQuery,
+  usePetitionComposeUserQuery,
+  usePetitionCompose_createPetitionFieldMutation,
+  usePetitionCompose_deletePetitionFieldMutation,
+  usePetitionCompose_updateFieldPositionsMutation,
+  usePetitionCompose_updatePetitionFieldMutation,
+  usePetitionCompose_updatePetitionMutation,
+  PetitionCompose_PetitionFieldFragment,
+  PetitionComposeSearchContactsQuery,
+  PetitionComposeSearchContactsQueryVariables,
 } from "@parallel/graphql/__types";
+import { assertQuery } from "@parallel/utils/apollo";
 import {
   usePetitionState,
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
-import {
-  UnwrapArray,
-  UnwrapPromise,
-  Assert,
-  Maybe,
-} from "@parallel/utils/types";
-import { useQueryData } from "@parallel/utils/useQueryData";
+import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
-import {
-  useCallback,
-  useEffect,
-  useReducer,
-  KeyboardEvent,
-  useRef,
-} from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { indexBy, omit, pick } from "remeda";
 import { useRouter } from "next/router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { pick } from "remeda";
+import { PetitionComposeSettings } from "@parallel/components/petition/PetitionComposeSettings";
+import { useApolloClient } from "@apollo/react-hooks";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 
-type PetitionProps = UnwrapPromise<
+type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
 >;
 
-type FieldSelection = UnwrapArray<
-  Assert<PetitionComposeQuery["petition"]>["fields"]
->;
+type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
-type FieldsReducerState = {
-  active: Maybe<string>;
-  fieldsById: { [id: string]: FieldSelection };
-  fieldIds: string[];
-};
-
-function fieldsReducer(
-  state: FieldsReducerState,
-  action:
-    | { type: "RESET"; fields: FieldSelection[] }
-    | { type: "SORT"; fieldIds: string[] }
-    | { type: "REMOVE"; fieldId: string }
-    | { type: "SET_ACTIVE"; fieldId: string | null }
-): FieldsReducerState {
-  switch (action.type) {
-    case "RESET":
-      return reset(action.fields, state);
-    case "SORT":
-      return {
-        ...state,
-        fieldIds: action.fieldIds,
-      };
-    case "REMOVE":
-      return {
-        active: state.active === action.fieldId ? null : state.active,
-        fieldsById: omit(state.fieldsById, [action.fieldId]),
-        fieldIds: state.fieldIds.filter((id) => id !== action.fieldId),
-      };
-    case "SET_ACTIVE":
-      return {
-        ...state,
-        active: action.fieldId,
-      };
-  }
-}
-
-function reset(
-  fields: FieldSelection[],
-  prev?: FieldsReducerState
-): FieldsReducerState {
-  return {
-    active:
-      prev?.active && fields.some((f) => f.id == prev?.active)
-        ? prev!.active
-        : null,
-    fieldsById: indexBy(fields, (f) => f.id),
-    fieldIds: fields.map((f) => f.id),
-  };
-}
-
-function PetitionCompose({ petitionId }: PetitionProps) {
+function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const intl = useIntl();
-  const { me } = useQueryData<PetitionsUserQuery>(
-    GET_PETITION_COMPOSE_USER_DATA
-  );
-  const { petition } = useQueryData<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >(GET_PETITION_COMPOSE_DATA, { variables: { id: petitionId } });
+  const {
+    data: { me },
+  } = assertQuery(usePetitionComposeUserQuery());
+  const {
+    data: { petition },
+  } = assertQuery(usePetitionComposeQuery({ variables: { id: petitionId } }));
 
   const [state, setState] = usePetitionState();
-  const [{ active, fieldsById, fieldIds }, dispatch] = useReducer(
-    fieldsReducer,
-    petition!.fields,
-    reset
-  );
-  useEffect(() => dispatch({ type: "RESET", fields: petition!.fields }), [
-    petition!.fields,
-  ]);
+  const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
+  const activeField: Maybe<FieldSelection> = useMemo(() => {
+    if (activeFieldId) {
+      return petition!.fields.find((f) => f.id === activeFieldId) ?? null;
+    }
+    return null;
+  }, [activeFieldId, petition!.fields]);
 
+  // This handles the position of the settings card
+  const [offset, setSettingsOffset] = useState(0);
+  useEffect(() => {
+    if (!activeFieldId) {
+      return;
+    }
+    const element = document.querySelector<HTMLElement>(
+      `#field-${activeFieldId}`
+    );
+    if (element) {
+      const offset = element.offsetTop - element.parentElement!.offsetTop;
+      setSettingsOffset(offset);
+    }
+  }, [activeFieldId]);
+
+  // When the petition is completed show a dialog to avoid unintended changes
   const completedDialog = useDialog(CompletedPetitionDialog, []);
   useEffect(() => {
     if (petition?.status === "COMPLETED") {
@@ -143,54 +95,49 @@ function PetitionCompose({ petitionId }: PetitionProps) {
     }
   }, []);
 
-  const addFieldRef = useRef<HTMLButtonElement>(null);
   const confirmDelete = useDialog(ConfirmDelete, []);
   const wrapper = useWrapPetitionUpdater(setState);
 
-  const [updatePetition] = useUpdatePetition();
+  const [updatePetition] = usePetitionCompose_updatePetitionMutation();
   const updateFieldPositions = useUpdateFieldPositions();
   const createPetitionField = useCreatePetitionField();
   const deletePetitionField = useDeletePetitionField();
-  const [updatePetitionField] = useUpdatePetitionField();
+  const [
+    updatePetitionField,
+  ] = usePetitionCompose_updatePetitionFieldMutation();
 
-  const handleOnUpdatePetition = useCallback(
+  const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
     [petitionId]
   );
 
-  const handleFieldMove = useCallback(
-    async function (dragIndex: number, hoverIndex: number, dropped?: boolean) {
-      const newFieldIds = [...fieldIds];
-      const [field] = newFieldIds.splice(dragIndex, 1);
-      newFieldIds.splice(hoverIndex, 0, field);
-      dispatch({ type: "SORT", fieldIds: newFieldIds });
-      if (dropped) {
-        await wrapper(updateFieldPositions)(petitionId, newFieldIds);
-      }
-    },
-    [petitionId, fieldIds]
+  const handleUpdateFieldPositions = useCallback(
+    wrapper(async function (fieldIds: string[]) {
+      await updateFieldPositions(petitionId, fieldIds);
+    }),
+    [petitionId]
   );
 
-  const handleFieldDelete = useCallback(
+  const handleDeleteField = useCallback(
     async function (fieldId: string) {
       try {
         await confirmDelete({});
-        dispatch({ type: "REMOVE", fieldId });
+        if (activeFieldId === fieldId) {
+          setActiveFieldId(null);
+        }
         await wrapper(deletePetitionField)(petitionId, fieldId);
       } catch {}
     },
     [petitionId]
   );
 
-  const handleFieldUpdate = useCallback(
-    wrapper(async function (
-      field: UnwrapArray<PetitionCompose_PetitionFragment["fields"]>,
-      data: UpdatePetitionFieldInput
-    ) {
+  const handleUpdateField = useCallback(
+    wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
+      const field = petition!.fields.find((f) => f.id === fieldId);
       await updatePetitionField({
-        variables: { petitionId, fieldId: field.id, data },
+        variables: { petitionId, fieldId, data },
         optimisticResponse: {
           updatePetitionField: {
             __typename: "PetitionAndField",
@@ -210,46 +157,29 @@ function PetitionCompose({ petitionId }: PetitionProps) {
         },
       });
     }),
-    [petitionId]
+    [petitionId, petition!.fields]
   );
-
-  const focusTitle = useCallback((fieldId: string) => {
-    const title = document.querySelector<HTMLElement>(
-      `#field-title-${fieldId}`
-    );
-    title?.click();
-  }, []);
 
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType) {
       const { data } = await createPetitionField(petitionId, type);
       const field = data!.createPetitionField.field;
-      setTimeout(() => focusTitle(field.id));
+      setTimeout(() => {
+        const title = document.querySelector<HTMLElement>(
+          `#field-title-${field.id}`
+        );
+        title?.click();
+      });
     }),
     [petitionId]
   );
 
-  const handleTitleKeyDown = useCallback(
-    function (fieldId: string, event: KeyboardEvent<any>) {
-      const index = fieldIds.indexOf(fieldId);
-      switch (event.key) {
-        case "ArrowDown":
-          if (index < fieldIds.length - 1) {
-            focusTitle(fieldIds[index + 1]);
-          }
-          break;
-        case "ArrowUp":
-          if (index > 0) {
-            focusTitle(fieldIds[index - 1]);
-          }
-          break;
-        case "Enter":
-          addFieldRef.current!.click();
-          break;
-      }
-    },
-    [fieldIds]
-  );
+  const handleFieldFocus = useCallback((fieldId) => {
+    //Set field as active only if settings were already showing for another field
+    setActiveFieldId((active) => active && fieldId);
+  }, []);
+
+  const searchContacts = useSearchContacts();
 
   return (
     <>
@@ -263,7 +193,7 @@ function PetitionCompose({ petitionId }: PetitionProps) {
       <PetitionLayout
         user={me}
         petition={petition!}
-        onUpdatePetition={handleOnUpdatePetition}
+        onUpdatePetition={handleUpdatePetition}
         section="compose"
         scrollBody
         state={state}
@@ -271,96 +201,44 @@ function PetitionCompose({ petitionId }: PetitionProps) {
         <Flex flexDirection="row" padding={4}>
           <Box
             flex="2"
-            display={{ base: active ? "none" : "block", md: "block" }}
+            display={{ base: activeFieldId ? "none" : "block", md: "block" }}
           >
-            <Card>
-              <Box padding={4}>
-                <Heading as="h2" size="sm">
-                  <FormattedMessage
-                    id="petition.fields-header"
-                    defaultMessage="This is the information that you need"
-                  />
-                </Heading>
-              </Box>
-              {fieldIds.length ? (
-                <>
-                  {fieldIds.map((fieldId, index) => (
-                    <PetitionComposeField
-                      onFocus={() => {
-                        if (active) {
-                          dispatch({ type: "SET_ACTIVE", fieldId });
-                        }
-                      }}
-                      onMove={handleFieldMove}
-                      key={fieldId}
-                      field={fieldsById[fieldId]}
-                      index={index}
-                      active={active === fieldId}
-                      onSettingsClick={() =>
-                        dispatch({ type: "SET_ACTIVE", fieldId })
-                      }
-                      onDeleteClick={() => handleFieldDelete(fieldId)}
-                      onFieldEdit={(data) =>
-                        handleFieldUpdate(fieldsById[fieldId], data)
-                      }
-                      onTitleKeyDown={(event) =>
-                        handleTitleKeyDown(fieldId, event)
-                      }
-                    />
-                  ))}
-                  <Flex padding={2} justifyContent="center">
-                    <AddFieldPopover
-                      ref={addFieldRef}
-                      variant="ghost"
-                      leftIcon="add"
-                      onSelectFieldType={handleAddField}
-                    >
-                      <FormattedMessage
-                        id="petition.add-another-field-button"
-                        defaultMessage="Add another field"
-                      />
-                    </AddFieldPopover>
-                  </Flex>
-                </>
-              ) : (
-                <Flex flexDirection="column" alignItems="center">
-                  <Heading as="h2" size="md" marginTop={8} marginBottom={2}>
-                    <FormattedMessage
-                      id="petition.empty-header"
-                      defaultMessage="What information do you want us to collect?"
-                    />
-                  </Heading>
-                  <Text fontSize="md">
-                    <FormattedMessage
-                      id="petition.empty-text"
-                      defaultMessage="Let's add our first field"
-                    />
-                  </Text>
-                  <AddFieldPopover
-                    marginTop={8}
-                    marginBottom={6}
-                    variantColor="purple"
-                    leftIcon="add"
-                    onSelectFieldType={handleAddField}
-                  >
-                    <FormattedMessage
-                      id="petition.add-field-button"
-                      defaultMessage="Add field"
-                    />
-                  </AddFieldPopover>
-                </Flex>
-              )}
-            </Card>
+            <PetitionComposeFields
+              fields={petition!.fields}
+              active={activeFieldId}
+              onAddField={handleAddField}
+              onDeleteField={handleDeleteField}
+              onFieldFocus={handleFieldFocus}
+              onUpdateFieldPositions={handleUpdateFieldPositions}
+              onUpdateField={handleUpdateField}
+              onSettingsClick={setActiveFieldId}
+            />
+            <PetitionComposeSettings
+              marginTop={4}
+              petition={petition!}
+              searchContacts={searchContacts}
+              onUpdatePetition={handleUpdatePetition}
+            />
           </Box>
-          {active ? null : (
-            <Spacer flex="1" display={{ base: "none", md: "block" }} />
+          {activeField ? null : (
+            <Spacer
+              flex="1"
+              display={{ base: "none", md: "block" }}
+              marginLeft={{ base: 0, md: 4 }}
+            />
           )}
-          {active ? (
+          {activeField ? (
             <Box flex="1" marginLeft={{ base: 0, md: 4 }}>
               <PetitionComposeFieldSettings
-                field={fieldsById[active]}
-                onUpdate={(data) => handleFieldUpdate(fieldsById[active], data)}
-                onClose={() => dispatch({ type: "SET_ACTIVE", fieldId: null })}
+                marginTop={{ base: 0, md: `${offset - 52}px` }}
+                transition="margin-top 200ms ease"
+                position={{ base: "relative", md: "sticky" }}
+                top={{ base: 0, md: 4 }}
+                field={activeField!}
+                onUpdateField={(data) =>
+                  handleUpdateField(activeField.id, data)
+                }
+                onClose={() => setActiveFieldId(null)}
               />
             </Box>
           ) : null}
@@ -376,13 +254,18 @@ PetitionCompose.fragments = {
       id
       ...PetitionLayout_Petition
       fields {
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionCompose_PetitionField
       }
+      ...PetitionComposeSettings_Petition
+    }
+    fragment PetitionCompose_PetitionField on PetitionField {
+      ...PetitionComposeField_PetitionField
+      ...PetitionComposeFieldSettings_PetitionField
     }
     ${PetitionLayout.fragments.petition}
     ${PetitionComposeField.fragments.petitionField}
     ${PetitionComposeFieldSettings.fragments.petitionField}
+    ${PetitionComposeSettings.fragments.petition}
   `,
   user: gql`
     fragment PetitionCompose_User on User {
@@ -391,6 +274,91 @@ PetitionCompose.fragments = {
     ${PetitionLayout.fragments.user}
   `,
 };
+
+PetitionCompose.mutations = [
+  gql`
+    mutation PetitionCompose_updatePetition(
+      $petitionId: ID!
+      $data: UpdatePetitionInput!
+    ) {
+      updatePetition(petitionId: $petitionId, data: $data) {
+        ...PetitionLayout_Petition
+        ...PetitionComposeSettings_Petition
+      }
+    }
+    ${PetitionLayout.fragments.petition}
+    ${PetitionComposeSettings.fragments.petition}
+  `,
+  gql`
+    mutation PetitionCompose_updateFieldPositions(
+      $petitionId: ID!
+      $fieldIds: [ID!]!
+    ) {
+      updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
+        id
+        ...PetitionLayout_Petition
+      }
+    }
+    ${PetitionLayout.fragments.petition}
+  `,
+  gql`
+    mutation PetitionCompose_createPetitionField(
+      $petitionId: ID!
+      $type: PetitionFieldType!
+    ) {
+      createPetitionField(petitionId: $petitionId, type: $type) {
+        field {
+          id
+          ...PetitionComposeField_PetitionField
+          ...PetitionComposeFieldSettings_PetitionField
+        }
+        petition {
+          ...PetitionLayout_Petition
+        }
+      }
+    }
+    ${PetitionLayout.fragments.petition}
+    ${PetitionComposeField.fragments.petitionField}
+    ${PetitionComposeFieldSettings.fragments.petitionField}
+  `,
+  gql`
+    mutation PetitionCompose_deletePetitionField(
+      $petitionId: ID!
+      $fieldId: ID!
+    ) {
+      deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+        id
+        ...PetitionLayout_Petition
+      }
+    }
+    ${PetitionLayout.fragments.petition}
+  `,
+  gql`
+    mutation PetitionCompose_updatePetitionField(
+      $petitionId: ID!
+      $fieldId: ID!
+      $data: UpdatePetitionFieldInput!
+    ) {
+      updatePetitionField(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        data: $data
+      ) {
+        field {
+          id
+          ...PetitionComposeField_PetitionField
+          ...PetitionComposeFieldSettings_PetitionField
+        }
+        petition {
+          ...PetitionLayout_Petition
+        }
+      }
+    }
+    ${PetitionLayout.fragments.petition}
+    ${PetitionComposeField.fragments.petitionField}
+    ${PetitionComposeFieldSettings.fragments.petitionField}
+  `,
+];
 
 const GET_PETITION_COMPOSE_DATA = gql`
   query PetitionCompose($id: ID!) {
@@ -410,39 +378,8 @@ const GET_PETITION_COMPOSE_USER_DATA = gql`
   ${PetitionCompose.fragments.user}
 `;
 
-function useUpdatePetition() {
-  return useMutation<
-    PetitionCompose_updatePetitionMutation,
-    PetitionCompose_updatePetitionMutationVariables
-  >(gql`
-    mutation PetitionCompose_updatePetition(
-      $petitionId: ID!
-      $data: UpdatePetitionInput!
-    ) {
-      updatePetition(petitionId: $petitionId, data: $data) {
-        ...PetitionCompose_Petition
-      }
-    }
-    ${PetitionCompose.fragments.petition}
-  `);
-}
-
 function useUpdateFieldPositions() {
-  const [mutate] = useMutation<
-    PetitionCompose_updateFieldPositionsMutation,
-    PetitionCompose_updateFieldPositionsMutationVariables
-  >(gql`
-    mutation PetitionCompose_updateFieldPositions(
-      $petitionId: ID!
-      $fieldIds: [ID!]!
-    ) {
-      updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
-        id
-        ...PetitionLayout_Petition
-      }
-    }
-    ${PetitionLayout.fragments.petition}
-  `);
+  const [mutate] = usePetitionCompose_updateFieldPositionsMutation();
   return useCallback(
     async function (petitionId: string, fieldIds: string[]) {
       return await mutate({
@@ -476,31 +413,7 @@ function useUpdateFieldPositions() {
 }
 
 function useCreatePetitionField() {
-  const [mutate] = useMutation<
-    PetitionCompose_createPetitionFieldMutation,
-    PetitionCompose_createPetitionFieldMutationVariables
-  >(
-    gql`
-      mutation PetitionCompose_createPetitionField(
-        $petitionId: ID!
-        $type: PetitionFieldType!
-      ) {
-        createPetitionField(petitionId: $petitionId, type: $type) {
-          field {
-            id
-            ...PetitionComposeField_PetitionField
-            ...PetitionComposeFieldSettings_PetitionField
-          }
-          petition {
-            ...PetitionLayout_Petition
-          }
-        }
-      }
-      ${PetitionLayout.fragments.petition}
-      ${PetitionComposeField.fragments.petitionField}
-      ${PetitionComposeFieldSettings.fragments.petitionField}
-    `
-  );
+  const [mutate] = usePetitionCompose_createPetitionFieldMutation();
   return useCallback(
     async function (petitionId: string, type: PetitionFieldType) {
       return mutate({
@@ -535,21 +448,7 @@ function useCreatePetitionField() {
 }
 
 function useDeletePetitionField() {
-  const [mutate] = useMutation<
-    PetitionCompose_deletePetitionFieldMutation,
-    PetitionCompose_deletePetitionFieldMutationVariables
-  >(gql`
-    mutation PetitionCompose_deletePetitionField(
-      $petitionId: ID!
-      $fieldId: ID!
-    ) {
-      deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
-        id
-        ...PetitionLayout_Petition
-      }
-    }
-    ${PetitionLayout.fragments.petition}
-  `);
+  const [mutate] = usePetitionCompose_deletePetitionFieldMutation();
   return useCallback(
     async function (petitionId: string, fieldId: string) {
       return await mutate({
@@ -579,39 +478,6 @@ function useDeletePetitionField() {
       });
     },
     [mutate]
-  );
-}
-
-function useUpdatePetitionField() {
-  return useMutation<
-    PetitionCompose_updatePetitionFieldMutation,
-    PetitionCompose_updatePetitionFieldMutationVariables
-  >(
-    gql`
-      mutation PetitionCompose_updatePetitionField(
-        $petitionId: ID!
-        $fieldId: ID!
-        $data: UpdatePetitionFieldInput!
-      ) {
-        updatePetitionField(
-          petitionId: $petitionId
-          fieldId: $fieldId
-          data: $data
-        ) {
-          field {
-            id
-            ...PetitionComposeField_PetitionField
-            ...PetitionComposeFieldSettings_PetitionField
-          }
-          petition {
-            ...PetitionLayout_Petition
-          }
-        }
-      }
-      ${PetitionLayout.fragments.petition}
-      ${PetitionComposeField.fragments.petitionField}
-      ${PetitionComposeFieldSettings.fragments.petitionField}
-    `
   );
 }
 
@@ -690,6 +556,36 @@ function CompletedPetitionDialog({ ...props }: DialogCallbacks<void>) {
       }
       {...props}
     />
+  );
+}
+
+function useSearchContacts() {
+  const apollo = useApolloClient();
+  return useDebouncedAsync(
+    async (search: string, exclude: string[]) => {
+      const { data } = await apollo.query<
+        PetitionComposeSearchContactsQuery,
+        PetitionComposeSearchContactsQueryVariables
+      >({
+        query: gql`
+          query PetitionComposeSearchContacts(
+            $search: String
+            $exclude: [ID!]
+          ) {
+            contacts(limit: 10, search: $search, exclude: $exclude) {
+              items {
+                ...RecipientSelect_Contact
+              }
+            }
+          }
+          ${RecipientSelect.fragments.contact}
+        `,
+        variables: { search, exclude },
+      });
+      return data.contacts.items;
+    },
+    300,
+    []
   );
 }
 

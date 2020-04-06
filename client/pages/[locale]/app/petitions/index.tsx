@@ -127,7 +127,7 @@ function Petitions() {
       row.id,
       ({
         DRAFT: "compose",
-        PENDING: "send",
+        PENDING: "review",
         COMPLETED: "review",
       } as const)[row.status]
     );
@@ -140,7 +140,7 @@ function Petitions() {
     }));
   }
 
-  function goToPetition(id: string, section: "compose" | "send" | "review") {
+  function goToPetition(id: string, section: "compose" | "review") {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
       `/${router.query.locale}/app/petitions/${id}/${section}`

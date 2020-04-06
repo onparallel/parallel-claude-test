@@ -1,27 +1,24 @@
-import { BoxProps, Collapse, IconButton, Stack } from "@chakra-ui/core";
-import { Children, ReactNode, useState } from "react";
-import { Card } from "./Card";
-import { Spacer } from "./Spacer";
+import { Box, BoxProps, Collapse, IconButton, Stack } from "@chakra-ui/core";
+import { ReactNode, useState } from "react";
 import { useIntl } from "react-intl";
 
-export type CollapseCardProps = BoxProps & {
+export type CollapseContentProps = BoxProps & {
   defaultIsOpen?: boolean;
   header: ReactNode;
 };
 
-export function CollapseCard({
+export function CollapseContent({
   defaultIsOpen,
   header,
   children,
   ...props
-}: CollapseCardProps) {
+}: CollapseContentProps) {
   const intl = useIntl();
   const [open, setOpen] = useState(defaultIsOpen ?? false);
   return (
-    <Card aria-expanded={open} {...props}>
-      <Stack direction="row" alignItems="center" padding={4}>
+    <Box aria-expanded={open} {...props}>
+      <Stack direction="row" alignItems="center">
         {header}
-        <Spacer />
         <IconButton
           variant="ghost"
           size="sm"
@@ -41,6 +38,6 @@ export function CollapseCard({
         />
       </Stack>
       <Collapse isOpen={open}>{children}</Collapse>
-    </Card>
+    </Box>
   );
 }

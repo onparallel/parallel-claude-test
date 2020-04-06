@@ -31,11 +31,12 @@ import {
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
 
-const HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-} as const;
+const HOTKEYS =
+  {
+    "mod+b": "bold",
+    "mod+i": "italic",
+    "mod+u": "underline",
+  } as const;
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
@@ -86,7 +87,7 @@ export function RichTextEditor({
             onKeyDown={onKeyDown}
             style={{
               ...editorStyle,
-              padding: "8px 16px",
+              padding: "12px 16px",
             }}
             {...props}
           />
@@ -305,29 +306,31 @@ function useStyles() {
       errorBorderColor
     );
 
-    return {
-      rounded: "md",
-      border: "1px",
-      borderColor: borderColor[colorMode],
-      bg: bg[colorMode],
-      _hover: {
-        borderColor: hoverColor[colorMode],
-      },
-      _focusWithin: {
-        borderColor: _focusBorderColor,
-        boxShadow: `0 0 0 1px ${_focusBorderColor}`,
-      },
-      _disabled: {
+    return (
+      {
+        rounded: "md",
+        border: "1px",
         borderColor: borderColor[colorMode],
         bg: bg[colorMode],
-        opacity: 0.4,
-        cursor: "not-allowed",
-      },
-      // _invalid: {
-      //   borderColor: _errorBorderColor,
-      //   boxShadow: `0 0 0 1px ${_errorBorderColor}`
-      // }
-    } as PseudoBoxProps;
+        _hover: {
+          borderColor: hoverColor[colorMode],
+        },
+        _focusWithin: {
+          borderColor: _focusBorderColor,
+          boxShadow: `0 0 0 1px ${_focusBorderColor}`,
+        },
+        _disabled: {
+          borderColor: borderColor[colorMode],
+          bg: bg[colorMode],
+          opacity: 0.4,
+          cursor: "not-allowed",
+        },
+        // _invalid: {
+        //   borderColor: _errorBorderColor,
+        //   boxShadow: `0 0 0 1px ${_errorBorderColor}`
+        // }
+      } as PseudoBoxProps
+    );
   }, []);
 }
 

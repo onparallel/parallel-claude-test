@@ -2,6 +2,8 @@ import { ApolloClient, MutationUpdaterFn } from "apollo-boost";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
+import { QueryResult } from "@apollo/react-common";
+import { Assert } from "./types";
 
 if (!process.browser) {
   (<any>global).fetch = require("node-fetch");
@@ -58,4 +60,19 @@ export function clearCache(cache: DataProxy, regex: RegExp) {
       data.delete(key);
     }
   }
+}
+
+export function assertQuery<TData, TVariables>(
+  result: QueryResult<TData, TVariables>
+): Omit<QueryResult<TData, TVariables>, "data"> & {
+  data: Assert<QueryResult<TData, TVariables>["data"]>;
+} {
+  const { data, ...rest } = result;
+  if (!data) {
+    throw new Error("Expected data to be present on the Apollo cache");
+  }
+  return {
+    data: data!,
+    ...rest,
+  };
 }
