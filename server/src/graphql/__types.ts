@@ -177,13 +177,13 @@ export interface NexusGenRootTypes {
   };
   Timestamps:
     | NexusGenRootTypes["Contact"]
-    | NexusGenRootTypes["PetitionSendout"]
+    | NexusGenRootTypes["Organization"]
     | NexusGenRootTypes["Petition"]
     | NexusGenRootTypes["PetitionFieldReply"]
-    | NexusGenRootTypes["User"]
-    | NexusGenRootTypes["Organization"]
+    | NexusGenRootTypes["PetitionSendout"]
     | NexusGenRootTypes["PublicPetition"]
-    | NexusGenRootTypes["PublicPetitionFieldReply"];
+    | NexusGenRootTypes["PublicPetitionFieldReply"]
+    | NexusGenRootTypes["User"];
   String: string;
   Int: number;
   Float: number;
@@ -568,13 +568,13 @@ export interface NexusGenArgTypes {
 export interface NexusGenAbstractResolveReturnTypes {
   Timestamps:
     | "Contact"
-    | "PetitionSendout"
+    | "Organization"
     | "Petition"
     | "PetitionFieldReply"
-    | "User"
-    | "Organization"
+    | "PetitionSendout"
     | "PublicPetition"
-    | "PublicPetitionFieldReply";
+    | "PublicPetitionFieldReply"
+    | "User";
 }
 
 export interface NexusGenInheritedFields {}

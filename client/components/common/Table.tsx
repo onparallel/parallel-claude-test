@@ -162,7 +162,7 @@ function _Table<T>({
               cursor="pointer"
               borderBottom="1px solid"
               borderBottomColor={colors.border}
-              onClick={(event) => onRowClick?.(row, event)}
+              onClick={(event) => onRowClick?.(row, event as any)}
             >
               {columns.map((column) => {
                 return (
