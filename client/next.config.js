@@ -2,6 +2,7 @@ const PROD = process.env.NODE_ENV === "production";
 const config = {
   env: {
     ROOT: __dirname,
+    GA_TRACKING_ID: process.env.ENV === "production" ? "UA-153451031-3" : null,
   },
   assetPrefix: PROD
     ? {
