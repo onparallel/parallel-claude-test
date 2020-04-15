@@ -67,7 +67,7 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         minHeight={isThin ? 16 : 20}
         transition="min-height 300ms"
       >
-        <Link href="/" chakra={{ ...logoColorProps("light") }}>
+        <Link href="/" {...logoColorProps("light")}>
           <Logo width={152}></Logo>
         </Link>
         <Spacer />

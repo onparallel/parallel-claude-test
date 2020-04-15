@@ -9,41 +9,43 @@ import {
 import { ComponentType, useEffect, useMemo, memo, MouseEvent } from "react";
 import { useSelectionState } from "../../utils/useSelectionState";
 
-export type TableProps<T> = BoxProps & {
-  columns: TableColumn<T>[];
-  rows: T[];
-  rowKeyProp: keyof T;
+export type TableProps<TRow, TAction extends string = string> = BoxProps & {
+  columns: TableColumn<TRow, TAction>[];
+  rows: TRow[];
+  rowKeyProp: keyof TRow;
   selectable?: boolean;
   highlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
-  onRowClick?: (row: T, event: MouseEvent) => void;
+  onRowClick?: (row: TRow, event: MouseEvent) => void;
+  onAction?: (action: TAction, row: TRow, data?: any) => void;
 };
 
-export type TableHeaderProps<T> = {
-  column: TableColumn<T>;
+export type TableHeaderProps<TRow, TAction extends string = string> = {
+  column: TableColumn<TRow, TAction>;
   allSelected: boolean;
   anySelected: boolean;
   onToggleAll: (event?: any) => void;
 };
 
-export type TableCellProps<T> = {
+export type TableCellProps<TRow, TAction extends string = string> = {
   key: string;
-  row: T;
-  column: TableColumn<T>;
+  row: TRow;
+  column: TableColumn<TRow, TAction>;
   isSelected?: boolean;
   toggle?: (event: any) => void;
+  onAction: (action: TAction, data?: any) => void;
 };
 
-export type TableColumn<T> = {
+export type TableColumn<TRow, TAction extends string = string> = {
   key: string;
   align?: BoxProps["textAlign"];
-  Header: ComponentType<TableHeaderProps<T>>;
+  Header: ComponentType<TableHeaderProps<TRow, TAction>>;
   headerProps?: PseudoBoxProps;
-  Cell: ComponentType<TableCellProps<T>>;
+  Cell: ComponentType<TableCellProps<TRow, TAction>>;
   cellProps?: PseudoBoxProps;
 };
 
-function _Table<T>({
+function _Table<TRow, TAction extends string = string>({
   columns,
   rows,
   rowKeyProp,
@@ -51,8 +53,9 @@ function _Table<T>({
   highlightable,
   onSelectionChange,
   onRowClick,
+  onAction,
   ...props
-}: TableProps<T>) {
+}: TableProps<TRow, TAction>) {
   const {
     selection,
     allSelected,
@@ -147,6 +150,10 @@ function _Table<T>({
         {rows.map((row) => {
           const key = row[rowKeyProp] as any;
           const isSelected = selection[key] ?? false;
+
+          function handleAction(action: TAction, data: any) {
+            onAction?.(action, row, data);
+          }
           return (
             <PseudoBox
               key={key}
@@ -159,7 +166,9 @@ function _Table<T>({
                   ? colors.rowHover
                   : colors.row,
               }}
-              cursor="pointer"
+              cursor={onRowClick ? "pointer" : "default"}
+              borderTop="1px solid"
+              borderTopColor={colors.border}
               borderBottom="1px solid"
               borderBottomColor={colors.border}
               onClick={(event) => onRowClick?.(row, event as any)}
@@ -182,6 +191,7 @@ function _Table<T>({
                       column={column}
                       isSelected={isSelected}
                       toggle={(event) => toggle(key, event)}
+                      onAction={handleAction}
                     ></column.Cell>
                   </PseudoBox>
                 );

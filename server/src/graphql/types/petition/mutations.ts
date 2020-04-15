@@ -1,27 +1,33 @@
 import {
-  mutationField,
-  stringArg,
   arg,
+  booleanArg,
   idArg,
   inputObjectType,
+  mutationField,
   objectType,
-  booleanArg,
+  stringArg,
 } from "nexus";
+import { pick } from "remeda";
+import { CreatePetition, CreatePetitionField } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
+import { random } from "../../../util/token";
 import {
   authenticate,
   authorizeAnd,
   authorizeAndP,
 } from "../../helpers/authorize";
-import { CreatePetition, CreatePetitionField } from "../../../db/__types";
+import { dateTimeArg } from "../../helpers/date";
+import { RESULT } from "../../helpers/result";
 import {
-  userHasAccessToPetitions,
-  userHasAccessToPetition,
   fieldBelongsToPetition,
   fieldsBelongsToPetition,
   replyBelongsToPetition,
+  sendoutsBelongToPetition,
+  userHasAccessToPetition,
+  userHasAccessToPetitions,
 } from "./authorizers";
-import { RESULT } from "../../helpers/result";
+import { findTimeZone } from "timezone-support";
+import { calculateNextReminder } from "../../../util/calculateNextReminder";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -32,7 +38,10 @@ export const createPetition = mutationField("createPetition", {
     locale: arg({ type: "PetitionLocale", required: true }),
   },
   resolve: async (_, { name, locale }, ctx) => {
-    return await ctx.petitions.createPetition({ name, locale }, ctx.user!);
+    return await ctx.petitions.createPetition(
+      { name, locale, email_subject: name },
+      ctx.user!
+    );
   },
 });
 
@@ -75,6 +84,29 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   },
 });
 
+export const ReminderSettingsInput = inputObjectType({
+  name: "ReminderSettingsInput",
+  description: "The reminder settings of a petition",
+  definition(t) {
+    t.int("offset", {
+      description: "The amount of days between reminders.",
+      required: true,
+    });
+    t.string("time", {
+      description: "The time at which the reminder should be sent.",
+      required: true,
+    });
+    t.string("timezone", {
+      description: "The timezone the time is referring to.",
+      required: true,
+    });
+    t.boolean("weekdaysOnly", {
+      description: "Whether to send reminders only from monday to friday.",
+      required: true,
+    });
+  },
+});
+
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "Petition",
@@ -92,12 +124,23 @@ export const updatePetition = mutationField("updatePetition", {
         t.datetime("deadline", { nullable: true });
         t.string("emailSubject", { nullable: true });
         t.json("emailBody", { nullable: true });
+        t.field("reminderSettings", {
+          type: "ReminderSettingsInput",
+          nullable: true,
+        });
       },
     }).asArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { name, locale, deadline, emailSubject, emailBody } = args.data;
+    const {
+      name,
+      locale,
+      deadline,
+      emailSubject,
+      emailBody,
+      reminderSettings,
+    } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
       data.name = name;
@@ -113,6 +156,37 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (emailBody !== undefined) {
       data.email_body = emailBody === null ? null : JSON.stringify(emailBody);
+    }
+    if (reminderSettings !== undefined) {
+      if (reminderSettings === null) {
+        data.reminders_active = false;
+        data.reminders_offset = null;
+        data.reminders_time = null;
+        data.reminders_timezone = null;
+        data.reminders_weekdays_only = null;
+      } else {
+        if (!/(2[0-3]|[01][0-9]):([0-5][0-9])/.test(reminderSettings.time)) {
+          throw new Error(
+            `Invalid reminderSettings.time ${JSON.stringify(
+              reminderSettings.time
+            )}`
+          );
+        }
+        try {
+          findTimeZone(reminderSettings.timezone);
+        } catch {
+          throw new Error(
+            `Invalid reminderSettings.timezone ${JSON.stringify(
+              reminderSettings.timezone
+            )}`
+          );
+        }
+        data.reminders_active = true;
+        data.reminders_offset = reminderSettings.offset;
+        data.reminders_time = reminderSettings.time;
+        data.reminders_timezone = reminderSettings.timezone;
+        data.reminders_weekdays_only = reminderSettings.weekdaysOnly;
+      }
     }
     return await ctx.petitions.updatePetition(petitionId, data, ctx.user!);
   },
@@ -290,7 +364,7 @@ export const fileUploadReplyDownloadLink = mutationField(
         if (reply!.type !== "FILE_UPLOAD") {
           throw new Error("Invalid field type");
         }
-        const file = await ctx.files.loadOneById(
+        const file = await ctx.files.loadFileUpload(
           reply!.content["file_upload_id"]
         );
         if (file && !file.upload_complete) {
@@ -312,3 +386,186 @@ export const fileUploadReplyDownloadLink = mutationField(
     },
   }
 );
+
+export const sendPetition = mutationField("sendPetition", {
+  description: "Sends the petition and creates the corresponding sendouts.",
+  type: objectType({
+    name: "SendPetitionResult",
+    definition(t) {
+      t.field("result", { type: "Result" });
+      t.field("petition", { type: "Petition", nullable: true });
+      t.field("sendouts", {
+        type: "PetitionSendout",
+        list: [true],
+        nullable: true,
+      });
+    },
+  }),
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(userHasAccessToPetition("petitionId"))
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    recipients: arg({
+      type: inputObjectType({
+        name: "Recipient",
+        definition(t) {
+          t.id("id");
+          t.id("email");
+        },
+      }),
+      list: [true],
+      required: true,
+    }),
+    scheduledAt: dateTimeArg({}),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      // Create necessary contacts
+      if (args.recipients.length === 0) {
+        throw new Error("Empty recipients");
+      }
+      const { ids: contactIds } = fromGlobalIds(
+        args.recipients.filter((r) => r.id).map((r) => r.id!),
+        "Contact"
+      );
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+      const emails = args.recipients
+        .filter((r) => r.email)
+        .map((r) => r.email!);
+      const [hasAccess, petition] = await Promise.all([
+        ctx.contacts.userHasAccessToContacts(ctx.user!.id, contactIds),
+        ctx.petitions.loadPetition(petitionId),
+      ]);
+      if (!hasAccess) {
+        throw new Error("No access to contacts");
+      }
+      if (!petition) {
+        throw new Error("Petition not available");
+      }
+      let allIds = [...contactIds];
+      if (emails.length) {
+        const created = await ctx.contacts.getOrCreateContacts(
+          emails,
+          ctx.user!
+        );
+        allIds = [...contactIds, ...created.map((c) => c.id)];
+      }
+      const [sendouts] = await Promise.all([
+        ctx.petitions.createSendouts(
+          allIds.map((id) => ({
+            petition_id: petitionId,
+            keycode: random(16),
+            status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
+            scheduled_at: args.scheduledAt ?? null,
+            contact_id: id,
+            sender_id: ctx.user!.id,
+            next_reminder_at: petition.reminders_active
+              ? calculateNextReminder(
+                  args.scheduledAt ?? new Date(),
+                  petition.reminders_offset!,
+                  petition.reminders_time!,
+                  petition.reminders_timezone!,
+                  petition.reminders_weekdays_only!
+                )
+              : null,
+            ...pick(petition, [
+              "email_body",
+              "email_subject",
+              "locale",
+              "deadline",
+              "reminders_active",
+              "reminders_offset",
+              "reminders_time",
+              "reminders_timezone",
+              "reminders_weekdays_only",
+            ]),
+          })),
+          ctx.user!
+        ),
+        petition.status === "DRAFT"
+          ? ctx.petitions.updatePetition(
+              petitionId,
+              { status: "PENDING" },
+              ctx.user!
+            )
+          : null,
+      ]);
+      if (!args.scheduledAt) {
+        await ctx.aws.enqueueSendouts(sendouts.map((s) => s.id));
+      }
+      return {
+        petition: await ctx.petitions.loadPetition(petitionId, {
+          refresh: true,
+        }),
+        sendouts,
+        result: RESULT.SUCCESS,
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+      };
+    }
+  },
+});
+
+export const sendReminder = mutationField("sendReminders", {
+  description: "Sends a reminder for the corresponding sendouts.",
+  type: objectType({
+    name: "SendReminderResult",
+    definition(t) {
+      t.field("result", { type: "Result" });
+      t.field("sendouts", {
+        type: "PetitionSendout",
+        list: [false],
+        nullable: true,
+      });
+    },
+  }),
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(
+      userHasAccessToPetition("petitionId"),
+      sendoutsBelongToPetition("petitionId", "sendoutIds")
+    )
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    sendoutIds: idArg({ list: [true], required: true }),
+  },
+  resolve: async (_, args, ctx) => {
+    const { ids: sendoutIds } = fromGlobalIds(
+      args.sendoutIds,
+      "PetitionSendout"
+    );
+    try {
+      const sendouts = await ctx.petitions.loadSendout(sendoutIds);
+      for (const sendout of sendouts) {
+        if (!sendout || sendout.status !== "ACTIVE") {
+          throw new Error("Invalid sendout");
+        }
+      }
+      const reminders = await ctx.reminders.createReminders(
+        sendoutIds.map((id) => ({
+          type: "MANUAL",
+          status: "PROCESSING",
+          petition_sendout_id: id,
+          created_by: `User:${ctx.user!.id}`,
+        }))
+      );
+      await ctx.aws.enqueueReminders(reminders.map((r) => r.id));
+      return {
+        sendouts,
+        result: RESULT.SUCCESS,
+      };
+    } catch (error) {
+      return {
+        sendouts: await ctx.petitions.loadSendout(sendoutIds, {
+          refresh: true,
+        }),
+        result: RESULT.FAILURE,
+      };
+    }
+  },
+});

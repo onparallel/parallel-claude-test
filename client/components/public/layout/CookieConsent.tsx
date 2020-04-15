@@ -46,7 +46,7 @@ export function CookieConsent({}: CookieConsentProps) {
               <Link
                 href="/legal/[doc]"
                 as="/legal/cookies"
-                chakra={{
+                {...{
                   color: "white",
                   textDecoration: "underline",
                   _hover: { color: "white" },

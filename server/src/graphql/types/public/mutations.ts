@@ -28,7 +28,7 @@ export const publicDeletePetitionReply = mutationField(
       const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
       const reply = await ctx.petitions.loadFieldReply(replyId);
       if (reply!.type === "FILE_UPLOAD") {
-        const file = await ctx.files.loadOneById(
+        const file = await ctx.files.loadFileUpload(
           reply!.content["file_upload_id"]
         );
         await Promise.all([
@@ -61,7 +61,9 @@ export const publicFileUploadReplyComplete = mutationField(
       if (reply?.type !== "FILE_UPLOAD") {
         throw new Error("Invalid");
       }
-      const file = await ctx.files.loadOneById(reply.content["file_upload_id"]);
+      const file = await ctx.files.loadFileUpload(
+        reply.content["file_upload_id"]
+      );
       const metadata = await ctx.aws.getFileMetadata(file!.path);
       await ctx.files.markFileUploadComplete(file!.id);
       return reply;
@@ -173,9 +175,11 @@ export const completePetition = mutationField("publicCompletePetition", {
   },
   authorize: fetchSendout("keycode"),
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.completePetition(
+    const petition = await ctx.petitions.completePetition(
       ctx.sendout!.petition_id,
       ctx.contact!
     );
+    await ctx.aws.enqueuePetitionCompleted(ctx.sendout!.id);
+    return petition;
   },
 });

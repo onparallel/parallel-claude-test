@@ -1,13 +1,18 @@
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import { gql } from "apollo-boost";
-import { AppHomeQuery } from "@parallel/graphql/__types";
-import { useQuery } from "@apollo/react-hooks";
+import Router from "next/router";
 
 function AppHome() {
-  const { data } = useQuery<AppHomeQuery>(GET_APP_HOME_DATA);
-  const { me } = data!;
-  return <AppLayout user={me}>home</AppLayout>;
+  // const {
+  //   data: { me },
+  // } = assertQuery(useAppHomeQuery());
+  return (
+    <></>
+    // <AppLayout user={me}>
+    //   <></>
+    // </AppLayout>
+  );
 }
 
 const GET_APP_HOME_DATA = gql`
@@ -19,8 +24,15 @@ const GET_APP_HOME_DATA = gql`
   ${AppLayout.fragments.user}
 `;
 
-AppHome.getInitialProps = async ({ apollo }: WithDataContext) => {
-  await apollo.query<AppHomeQuery>({ query: GET_APP_HOME_DATA });
+AppHome.getInitialProps = async ({ apollo, query, res }: WithDataContext) => {
+  // await apollo.query<AppHomeQuery>({ query: GET_APP_HOME_DATA });
+  if (process.browser) {
+    Router.push("/[locale]/app/petitions", `/${query.locale}/app/petitions`);
+  } else if (res?.writeHead) {
+    res!.writeHead(302, { Location: `/${query.locale}/app/petitions` });
+    res!.end();
+  }
+  return {};
 };
 
 export default withData(AppHome);

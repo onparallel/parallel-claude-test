@@ -166,6 +166,21 @@ export const icons = {
       </g>
     ),
   },
+  forbidden: {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        fill="none"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+      </g>
+    ),
+  },
   "chevron-down-big": {
     viewBox: "0 0 24 24",
     path: (
@@ -219,6 +234,19 @@ export const icons = {
         strokeLinejoin="round"
       >
         <polyline points="4 17 12 9 20 17"></polyline>
+      </g>
+    ),
+  },
+  "check-short": {
+    viewBox: "0 0 14 14",
+    path: (
+      <g
+        stroke=""
+        fill="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polygon points="5.5 12 14 3.5 12.5 2 5.5 9 3.5 7 2 8.5"></polygon>
       </g>
     ),
   },

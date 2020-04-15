@@ -66,8 +66,22 @@ export function fetchSendout<
   return async (_, args, ctx) => {
     try {
       const keycode = args[argKeycode] as string;
-      ctx.sendout = await ctx.petitions.loadSendoutByKeycode(keycode);
-      ctx.contact = await ctx.contacts.loadOneById(ctx.sendout!.contact_id);
+      const sendout = await ctx.petitions.loadSendoutByKeycode(keycode);
+      if (!sendout) {
+        throw new Error(`Petition sendout with keycode ${keycode} not found`);
+      } else if (sendout.status !== "ACTIVE") {
+        throw new Error(`Petition sendout with keycode ${keycode} not active`);
+      } else {
+        ctx.sendout = sendout;
+        const contact = await ctx.contacts.loadContact(ctx.sendout!.contact_id);
+        if (!contact) {
+          throw new Error(
+            `Contact for petition sendout with keycode ${keycode} not found`
+          );
+        } else {
+          ctx.contact = contact;
+        }
+      }
       return true;
     } catch {
       return false;

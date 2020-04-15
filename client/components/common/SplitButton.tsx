@@ -1,4 +1,4 @@
-import { ButtonProps, Flex } from "@chakra-ui/core";
+import { ButtonProps, Flex, BoxProps } from "@chakra-ui/core";
 import { Children, cloneElement, ReactElement } from "react";
 import { Divider, DividerProps } from "./Divider";
 import { MaybeArray } from "@parallel/utils/types";
@@ -6,19 +6,23 @@ import { MaybeArray } from "@parallel/utils/types";
 export type SplitButtonProps = {
   dividerColor?: DividerProps["color"];
   withoutDivider?: boolean;
+  isDisabled?: boolean;
   children: MaybeArray<ReactElement<ButtonProps>>;
-};
+} & BoxProps;
 
 export function SplitButton({
   dividerColor,
   withoutDivider,
+  isDisabled,
   children,
+  ...props
 }: SplitButtonProps) {
   const length = Array.isArray(children) ? children.length : 1;
   return (
-    <Flex>
+    <Flex {...props}>
       {Children.map(children as any, (child, index) => [
         cloneElement(child, {
+          isDisabled,
           style: {
             ...child.props?.style,
             ...(index !== 0
@@ -38,7 +42,11 @@ export function SplitButton({
           },
         }),
         index !== length - 1 && !withoutDivider ? (
-          <Divider isVertical color={dividerColor} />
+          <Divider
+            isVertical
+            color={dividerColor}
+            opacity={isDisabled ? 0.4 : 1}
+          />
         ) : undefined,
       ])}
     </Flex>

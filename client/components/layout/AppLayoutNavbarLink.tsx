@@ -26,7 +26,7 @@ export function AppLayoutNavbarLink({
   return available ? (
     <Link
       href={href}
-      chakra={{
+      {...{
         display: "block",
         userSelect: "none",
         _focus: {

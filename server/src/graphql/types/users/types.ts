@@ -47,7 +47,7 @@ export const User = objectType({
     t.field("organization", {
       type: "Organization",
       resolve: async (o, _, ctx) => {
-        return (await ctx.organizations.loadOneById(o.org_id))!;
+        return (await ctx.organizations.loadOrg(o.org_id))!;
       },
     });
   },

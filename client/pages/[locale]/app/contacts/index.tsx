@@ -1,8 +1,3 @@
-import {
-  MutationHookOptions,
-  useMutation,
-  useQuery,
-} from "@apollo/react-hooks";
 import { Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -20,10 +15,11 @@ import {
   ContactsQueryVariables,
   ContactsUserQuery,
   Contacts_ContactsListFragment,
-  Contacts_deleteContactsMutation,
-  Contacts_deleteContactsMutationVariables,
+  useContactsQuery,
+  useContactsUserQuery,
+  useContacts_deleteContactsMutation,
 } from "@parallel/graphql/__types";
-import { clearCache } from "@parallel/utils/apollo";
+import { assertQuery, clearCache } from "@parallel/utils/apollo";
 import {
   integer,
   parseQuery,
@@ -32,7 +28,6 @@ import {
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
-import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { memo, useState } from "react";
@@ -49,11 +44,10 @@ function Contacts() {
   const intl = useIntl();
   const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const { me } = useQueryData<ContactsUserQuery>(GET_CONTACTS_USER_DATA);
-  const { data, loading, refetch } = useQuery<
-    ContactsQuery,
-    ContactsQueryVariables
-  >(GET_CONTACTS_DATA, {
+  const {
+    data: { me },
+  } = assertQuery(useContactsUserQuery());
+  const { data, loading, refetch } = useContactsQuery({
     variables: {
       offset: PAGE_SIZE * (state.page - 1),
       limit: PAGE_SIZE,
@@ -63,7 +57,7 @@ function Contacts() {
 
   const createContact = useCreateContact();
 
-  const [deleteContact] = useDeleteContact({
+  const [deleteContact] = useContacts_deleteContactsMutation({
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.contacts\(/);
       refetch();
@@ -73,7 +67,7 @@ function Contacts() {
   const { contacts } = data!;
 
   const [selected, setSelected] = useState<string[]>();
-  const confirmDelete = useDialog(ConfirmDeleteContacts, [selected, contacts]);
+  const confirmDelete = useDialog(ConfirmDeleteContacts);
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -230,25 +224,6 @@ const COLUMNS: TableColumn<ContactSelection>[] = [
   },
 ];
 
-function useDeleteContact(
-  options?: MutationHookOptions<
-    Contacts_deleteContactsMutation,
-    Contacts_deleteContactsMutationVariables
-  >
-) {
-  return useMutation<
-    Contacts_deleteContactsMutation,
-    Contacts_deleteContactsMutationVariables
-  >(
-    gql`
-      mutation Contacts_deleteContacts($ids: [ID!]!) {
-        deleteContacts(ids: $ids)
-      }
-    `,
-    options
-  );
-}
-
 function ConfirmDeleteContacts({
   selected,
   ...props
@@ -309,6 +284,14 @@ Contacts.fragments = {
     ${AppLayout.fragments.user}
   `,
 };
+
+Contacts.mutations = [
+  gql`
+    mutation Contacts_deleteContacts($ids: [ID!]!) {
+      deleteContacts(ids: $ids)
+    }
+  `,
+];
 
 const GET_CONTACTS_DATA = gql`
   query Contacts($offset: Int!, $limit: Int!, $search: String) {

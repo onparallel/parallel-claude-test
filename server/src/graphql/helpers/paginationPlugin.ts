@@ -154,7 +154,6 @@ export function paginationPlugin() {
         })
       );
 
-      // TODO: Deprecate this syntax
       return { types: [] };
     },
   });

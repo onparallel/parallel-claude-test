@@ -3,19 +3,67 @@ import { Config, CONFIG } from "../config";
 import AWS from "aws-sdk";
 import { promisify } from "util";
 import contentDisposition from "content-disposition";
+import { chunk } from "remeda";
 
 @injectable()
 export class Aws {
-  readonly s3: AWS.S3;
+  private _s3?: AWS.S3;
+  public get s3() {
+    if (!this._s3) {
+      this._s3 = new AWS.S3({
+        signatureVersion: "v4",
+        region: this.config.aws.region,
+        useAccelerateEndpoint: true,
+      });
+    }
+    return this._s3;
+  }
+
+  private _sqs?: AWS.SQS;
+  public get sqs() {
+    if (!this._sqs) {
+      this._sqs = new AWS.SQS();
+    }
+    return this._sqs;
+  }
 
   constructor(@inject(CONFIG) private config: Config) {
-    AWS.config.update({ ...config.aws, signatureVersion: "v4" });
-
-    this.s3 = new AWS.S3({
+    AWS.config.update({
+      ...config.aws,
       signatureVersion: "v4",
-      region: this.config.aws.region,
-      useAccelerateEndpoint: true,
+      logger: process.env.NODE_ENV === "production" ? undefined : console,
     });
+  }
+
+  private async enqueueMessages(
+    queue: keyof Config["queueWorkers"],
+    messages:
+      | { id: string; body: any; groupId: string }[]
+      | { body: any; groupId: string }
+  ) {
+    const queueUrl = this.config.queueWorkers[queue].endpoint;
+    if (Array.isArray(messages)) {
+      for (const batch of chunk(messages, 10)) {
+        await this.sqs
+          .sendMessageBatch({
+            QueueUrl: queueUrl,
+            Entries: batch.map(({ id, body, groupId }) => ({
+              Id: id,
+              MessageBody: JSON.stringify(body),
+              MessageGroupId: groupId,
+            })),
+          })
+          .promise();
+      }
+    } else {
+      await this.sqs
+        .sendMessage({
+          QueueUrl: queueUrl,
+          MessageBody: JSON.stringify(messages.body),
+          MessageGroupId: messages.groupId,
+        })
+        .promise();
+    }
   }
 
   async getSignedUploadEndpoint(key: string, contentType: string) {
@@ -53,6 +101,42 @@ export class Aws {
       ResponseContentDisposition: contentDisposition(filename, {
         type: "inline",
       }),
+    });
+  }
+
+  async enqueueSendouts(sendoutIds: number[]) {
+    return await this.enqueueMessages(
+      "sendout-email",
+      sendoutIds.map((id) => ({
+        id: `PetitionSendout:${id}`,
+        body: { petition_sendout_id: id },
+        groupId: `PetitionSendout:${id}`,
+      }))
+    );
+  }
+
+  async enqueueReminders(ids: number[]) {
+    return await this.enqueueMessages(
+      "reminder-email",
+      ids.map((id) => ({
+        id: `PetitionReminder:${id}`,
+        body: { petition_reminder_id: id },
+        groupId: `PetitionReminder:${id}`,
+      }))
+    );
+  }
+
+  async enqueueEmail(id: number) {
+    await this.enqueueMessages("email-sender", {
+      body: { email_log_id: id },
+      groupId: `EmailLog:${id}`,
+    });
+  }
+
+  async enqueuePetitionCompleted(id: number) {
+    await this.enqueueMessages("completed-email", {
+      body: { petition_sendout_id: id },
+      groupId: `PetitionSendout:${id}`,
     });
   }
 }

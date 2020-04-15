@@ -62,17 +62,17 @@ export class BaseRepository {
     ).insert(data as any, "*");
   }
 
-  protected buildLoadOneById<TName extends TableNames>(
+  protected buildLoadById<TName extends TableNames>(
     tableName: TName,
     idColumn: TablePrimaryKeys[TName],
     builder?: (
       builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
     ) => void
   ) {
-    return this.buildLoadOneBy(tableName, idColumn, builder);
+    return this.buildLoadBy(tableName, idColumn, builder);
   }
 
-  protected buildLoadOneBy<
+  protected buildLoadBy<
     TName extends TableNames,
     TColumn extends keyof TableTypes[TName]
   >(

@@ -14,17 +14,24 @@ export function fromDataLoader<K, V, C = K>(
   dataloader: DataLoader<K, V, C>
 ): Loader<K, V> {
   return <any>async function (ids: K | K[], opts: FromDataLoaderOptions = {}) {
-    const { refresh } = {
+    const { refresh, cache } = {
       refresh: false,
+      cache: true,
       ...opts,
     };
-    if (refresh) {
+    if (refresh && !cache) {
       for (const id of Array.isArray(ids) ? ids : [ids]) {
         dataloader.clear(id);
       }
     }
-    return Array.isArray(ids)
+    const result = Array.isArray(ids)
       ? await dataloader.loadMany(ids)
       : await dataloader.load(ids);
+    if (!cache) {
+      for (const id of Array.isArray(ids) ? ids : [ids]) {
+        dataloader.clear(id);
+      }
+    }
+    return result;
   };
 }

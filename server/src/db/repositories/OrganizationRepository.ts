@@ -10,7 +10,7 @@ export class OrganizationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("organization", "id", (q) =>
+  readonly loadOrg = this.buildLoadById("organization", "id", (q) =>
     q.whereNull("deleted_at")
   );
 

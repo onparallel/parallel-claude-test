@@ -117,3 +117,28 @@ export function replyBelongsToPetition<
     return false;
   };
 }
+
+export function sendoutsBelongToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends StringArg<TypeName, FieldName>,
+  TArg2 extends StringArrayArg<TypeName, FieldName>
+>(
+  argNamePetitionId: TArg1,
+  argNameSendoutIds: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id: petitionId } = fromGlobalId(
+        args[argNamePetitionId],
+        "Petition"
+      );
+      const { ids: sendoutIds } = fromGlobalIds(
+        args[argNameSendoutIds],
+        "PetitionSendout"
+      );
+      return ctx.petitions.sendoutsBelongToPetition(petitionId, sendoutIds);
+    } catch {}
+    return false;
+  };
+}

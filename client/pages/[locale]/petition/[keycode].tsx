@@ -1,4 +1,3 @@
-import { useMutation } from "@apollo/react-hooks";
 import {
   Alert,
   AlertDescription,
@@ -27,20 +26,16 @@ import {
   PublicPetition_createTextReply_PublicPetitionFragment,
   PublicPetition_deletePetitionReply_PublicPetitionFieldFragment,
   PublicPetition_deletePetitionReply_PublicPetitionFragment,
-  PublicPetition_publicCompletePetitionMutation,
-  PublicPetition_publicCompletePetitionMutationVariables,
-  PublicPetition_publicCreateFileUploadReplyMutation,
-  PublicPetition_publicCreateFileUploadReplyMutationVariables,
-  PublicPetition_publicCreateTextReplyMutation,
-  PublicPetition_publicCreateTextReplyMutationVariables,
-  PublicPetition_publicDeletePetitionReplyMutation,
-  PublicPetition_publicDeletePetitionReplyMutationVariables,
-  PublicPetition_publicFileUploadReplyCompleteMutation,
-  PublicPetition_publicFileUploadReplyCompleteMutationVariables,
+  usePublicPetitionQuery,
+  usePublicPetition_publicCompletePetitionMutation,
+  usePublicPetition_publicCreateFileUploadReplyMutation,
+  usePublicPetition_publicCreateTextReplyMutation,
+  usePublicPetition_publicDeletePetitionReplyMutation,
+  usePublicPetition_publicFileUploadReplyCompleteMutation,
 } from "@parallel/graphql/__types";
+import { assertQuery } from "@parallel/utils/apollo";
 import { RenderSlate } from "@parallel/utils/RenderSlate";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import axios, { CancelTokenSource } from "axios";
 import { useCallback, useMemo, useState } from "react";
@@ -58,18 +53,19 @@ type PublicPetitionProps = UnwrapPromise<
 
 function PublicPetition({ keycode }: PublicPetitionProps) {
   const intl = useIntl();
-  const { sendout } = useQueryData<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >(GET_PUBLIC_PETITION_DATA, { variables: { keycode } });
+  const {
+    data: { sendout },
+  } = assertQuery(usePublicPetitionQuery({ variables: { keycode } }));
   const petition = sendout!.petition!;
   const sender = sendout!.sender!;
   const [showCompletedAlert, setShowCompletedAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
   const createTextReply = useCreateTextReply();
   const createFileUploadReply = useCreateFileUploadReply();
-  const [fileUploadReplyComplete] = useFileUploadReplyComplete();
-  const [completePetition] = useCompletePetition();
+  const [
+    fileUploadReplyComplete,
+  ] = usePublicPetition_publicFileUploadReplyCompleteMutation();
+  const [completePetition] = usePublicPetition_publicCompletePetitionMutation();
   const toast = useToast();
   const [uploadTokens, setUploadTokens] = useState<{
     [replyId: string]: CancelTokenSource;
@@ -358,6 +354,69 @@ PublicPetition.fragments = {
   `,
 };
 
+PublicPetition.mutations = [
+  gql`
+    mutation PublicPetition_publicDeletePetitionReply(
+      $replyId: ID!
+      $keycode: ID!
+    ) {
+      publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
+    }
+  `,
+  gql`
+    mutation PublicPetition_publicCreateTextReply(
+      $keycode: ID!
+      $fieldId: ID!
+      $data: CreateTextReplyInput!
+    ) {
+      publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
+        id
+        publicContent
+        createdAt
+      }
+    }
+  `,
+  gql`
+    mutation PublicPetition_publicCreateFileUploadReply(
+      $keycode: ID!
+      $fieldId: ID!
+      $data: CreateFileUploadReplyInput!
+    ) {
+      publicCreateFileUploadReply(
+        keycode: $keycode
+        fieldId: $fieldId
+        data: $data
+      ) {
+        endpoint
+        reply {
+          id
+          publicContent
+          createdAt
+        }
+      }
+    }
+  `,
+  gql`
+    mutation PublicPetition_publicFileUploadReplyComplete(
+      $keycode: ID!
+      $replyId: ID!
+    ) {
+      publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
+        id
+        publicContent
+      }
+    }
+  `,
+  gql`
+    mutation PublicPetition_publicCompletePetition($keycode: ID!) {
+      publicCompletePetition(keycode: $keycode) {
+        id
+        status
+      }
+    }
+  `,
+];
+
 const GET_PUBLIC_PETITION_DATA = gql`
   query PublicPetition($keycode: ID!) {
     sendout(keycode: $keycode) {
@@ -379,22 +438,9 @@ const GET_PUBLIC_PETITION_DATA = gql`
 `;
 
 function useDeletePetitionReply() {
-  const [mutate] = useMutation<
-    PublicPetition_publicDeletePetitionReplyMutation,
-    PublicPetition_publicDeletePetitionReplyMutationVariables
-  >(
-    gql`
-      mutation PublicPetition_publicDeletePetitionReply(
-        $replyId: ID!
-        $keycode: ID!
-      ) {
-        publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
-      }
-    `,
-    {
-      optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
-    }
-  );
+  const [mutate] = usePublicPetition_publicDeletePetitionReplyMutation({
+    optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
+  });
   return useCallback(
     async function (
       keycode: string,
@@ -452,28 +498,7 @@ function useDeletePetitionReply() {
 }
 
 function useCreateTextReply() {
-  const [mutate] = useMutation<
-    PublicPetition_publicCreateTextReplyMutation,
-    PublicPetition_publicCreateTextReplyMutationVariables
-  >(
-    gql`
-      mutation PublicPetition_publicCreateTextReply(
-        $keycode: ID!
-        $fieldId: ID!
-        $data: CreateTextReplyInput!
-      ) {
-        publicCreateTextReply(
-          keycode: $keycode
-          fieldId: $fieldId
-          data: $data
-        ) {
-          id
-          publicContent
-          createdAt
-        }
-      }
-    `
-  );
+  const [mutate] = usePublicPetition_publicCreateTextReplyMutation();
   return useCallback(async function (
     keycode: string,
     petitionId: string,
@@ -531,31 +556,7 @@ function useCreateTextReply() {
 }
 
 function useCreateFileUploadReply() {
-  const [mutate] = useMutation<
-    PublicPetition_publicCreateFileUploadReplyMutation,
-    PublicPetition_publicCreateFileUploadReplyMutationVariables
-  >(
-    gql`
-      mutation PublicPetition_publicCreateFileUploadReply(
-        $keycode: ID!
-        $fieldId: ID!
-        $data: CreateFileUploadReplyInput!
-      ) {
-        publicCreateFileUploadReply(
-          keycode: $keycode
-          fieldId: $fieldId
-          data: $data
-        ) {
-          endpoint
-          reply {
-            id
-            publicContent
-            createdAt
-          }
-        }
-      }
-    `
-  );
+  const [mutate] = usePublicPetition_publicCreateFileUploadReplyMutation();
   return useCallback(
     async function (
       keycode: string,
@@ -613,41 +614,6 @@ function useCreateFileUploadReply() {
       });
     },
     [mutate]
-  );
-}
-
-function useFileUploadReplyComplete() {
-  return useMutation<
-    PublicPetition_publicFileUploadReplyCompleteMutation,
-    PublicPetition_publicFileUploadReplyCompleteMutationVariables
-  >(
-    gql`
-      mutation PublicPetition_publicFileUploadReplyComplete(
-        $keycode: ID!
-        $replyId: ID!
-      ) {
-        publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
-          id
-          publicContent
-        }
-      }
-    `
-  );
-}
-
-function useCompletePetition() {
-  return useMutation<
-    PublicPetition_publicCompletePetitionMutation,
-    PublicPetition_publicCompletePetitionMutationVariables
-  >(
-    gql`
-      mutation PublicPetition_publicCompletePetition($keycode: ID!) {
-        publicCompletePetition(keycode: $keycode) {
-          id
-          status
-        }
-      }
-    `
   );
 }
 

@@ -11,11 +11,12 @@ import {
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionStatusFilter } from "../common/PetitionStatusFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { ButtonDropdown } from "../common/ButtonDropdown";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface PetitionListHeaderProps {
   search: string | null;
@@ -25,6 +26,7 @@ export interface PetitionListHeaderProps {
   onStatusChange: (value: PetitionStatus | null) => void;
   onDeleteClick: () => void;
   onCreateClick: () => void;
+  onReload: () => void;
 }
 
 export function PetitionListHeader({
@@ -35,7 +37,9 @@ export function PetitionListHeader({
   onStatusChange,
   onDeleteClick,
   onCreateClick,
+  onReload,
 }: PetitionListHeaderProps) {
+  const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
   const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [
     onSearchChange,
@@ -53,6 +57,16 @@ export function PetitionListHeader({
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
+      <IconButtonWithTooltip
+        onClick={() => onReload()}
+        icon="repeat"
+        placement="bottom"
+        variant="outline"
+        label={intl.formatMessage({
+          id: "generic.reload-data",
+          defaultMessage: "Reload",
+        })}
+      />
       <PetitionStatusFilter value={status} onChange={onStatusChange} />
       <Spacer />
       {showActions ? (

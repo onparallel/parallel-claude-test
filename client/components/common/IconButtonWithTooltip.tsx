@@ -25,6 +25,7 @@ export function IconButtonWithTooltip({
       label={label}
       showDelay={showDelay}
       placement={placement}
+      zIndex={1000}
     >
       <IconButton aria-label={label} {...props} />
     </Tooltip>

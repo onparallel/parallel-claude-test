@@ -48,7 +48,3 @@ export const theme = {
     ...icons,
   },
 };
-
-// if (process.browser) {
-//   console.log(theme);
-// }

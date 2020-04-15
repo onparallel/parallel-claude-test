@@ -12,7 +12,7 @@ export const organizationQueries = queryField((t) => {
     nullable: true,
     resolve: async (_, args, ctx) => {
       const { id } = fromGlobalId(args.id, "Organization");
-      return await ctx.organizations.loadOneById(id);
+      return await ctx.organizations.loadOrg(id);
     },
   });
 });

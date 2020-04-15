@@ -21,11 +21,53 @@ export const config = Object.freeze({
     port: parseInt(process.env.REDIS_PORT!),
   }),
   aws: Object.freeze({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    region: process.env.AWS_REGION!,
+    accessKeyId: process.env._AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env._AWS_SECRET_ACCESS_KEY!,
+    region: process.env._AWS_REGION!,
   }),
   s3: Object.freeze({
     uplodsBucketName: process.env.S3_UPLOADS_BUCKET_NAME!,
+  }),
+  smtp: Object.freeze({
+    host: process.env.SMTP_HOST!,
+    port: parseInt(process.env.SMTP_PORT!),
+    user: process.env.SMTP_USER!,
+    password: process.env.SMTP_PASSWORD!,
+  }),
+  ses: Object.freeze({
+    configurationSet: Object.freeze({
+      tracking: process.env.SES_CONFIGURATION_SET_TRACKING!,
+      noTracking: process.env.SES_CONFIGURATION_SET_NO_TRACKING!,
+    }),
+  }),
+  queueWorkers: Object.freeze({
+    "email-sender": Object.freeze({
+      endpoint: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
+    }),
+    "sendout-email": Object.freeze({
+      endpoint: process.env.WORKERS_SENDOUT_EMAIL_ENDPOINT!,
+    }),
+    "reminder-email": Object.freeze({
+      endpoint: process.env.WORKERS_REMINDER_EMAIL_ENDPOINT!,
+    }),
+    "completed-email": Object.freeze({
+      endpoint: process.env.WORKERS_COMPLETED_EMAIL_ENDPOINT!,
+    }),
+    "email-events": Object.freeze({
+      endpoint: process.env.WORKERS_EMAIL_EVENTS_ENDPOINT!,
+    }),
+  }),
+  cronWorkers: Object.freeze({
+    "scheduled-trigger": Object.freeze({
+      rule: process.env.WORKERS_SCHEDULED_TRIGGER_RULE!,
+    }),
+    "reminder-trigger": Object.freeze({
+      rule: process.env.WORKERS_REMINDER_TRIGGER_RULE!,
+    }),
+  }),
+  misc: Object.freeze({
+    assetsUrl: process.env.ASSETS_URL!,
+    parallelUrl: process.env.PARALLEL_URL!,
+    emailFrom: process.env.EMAIL_FROM!,
   }),
 });

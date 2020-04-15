@@ -1,6 +1,5 @@
 import { objectType } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
-import { pick } from "remeda";
 
 export const PublicPetitionSendout = objectType({
   name: "PublicPetitionSendout",
@@ -18,7 +17,7 @@ export const PublicPetitionSendout = objectType({
       type: "PublicUser",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.users.loadOneById(root.sender_id);
+        return await ctx.users.loadUser(root.sender_id);
       },
     });
   },
@@ -169,7 +168,7 @@ export const PublicPetitionFieldReply = objectType({
             return {};
           }
           case "FILE_UPLOAD": {
-            const file = await ctx.files.loadOneById(
+            const file = await ctx.files.loadFileUpload(
               root.content["file_upload_id"]
             );
             return file

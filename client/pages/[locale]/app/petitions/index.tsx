@@ -1,8 +1,3 @@
-import {
-  MutationHookOptions,
-  useMutation,
-  useQuery,
-} from "@apollo/react-hooks";
 import { Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -23,11 +18,12 @@ import {
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
-  Petitions_deletePetitionsMutation,
-  Petitions_deletePetitionsMutationVariables,
   Petitions_PetitionsListFragment,
+  usePetitionsQuery,
+  usePetitionsUserQuery,
+  usePetitions_deletePetitionsMutation,
 } from "@parallel/graphql/__types";
-import { clearCache } from "@parallel/utils/apollo";
+import { assertQuery, clearCache } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   enums,
@@ -38,11 +34,12 @@ import {
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
-import { useQueryData } from "@parallel/utils/useQueryData";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { memo, useState } from "react";
+import { memo, useState, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Link } from "@parallel/components/common/Link";
+import { ContactLink } from "@parallel/components/common/ContactLink";
 
 const PAGE_SIZE = 10;
 
@@ -56,11 +53,10 @@ function Petitions() {
   const intl = useIntl();
   const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
-  const { me } = useQueryData<PetitionsUserQuery>(GET_PETITIONS_USER_DATA);
-  const { data, loading, refetch } = useQuery<
-    PetitionsQuery,
-    PetitionsQueryVariables
-  >(GET_PETITIONS_DATA, {
+  const {
+    data: { me },
+  } = assertQuery(usePetitionsUserQuery());
+  const { data, loading, refetch } = usePetitionsQuery({
     variables: {
       offset: PAGE_SIZE * (state.page - 1),
       limit: PAGE_SIZE,
@@ -70,7 +66,7 @@ function Petitions() {
   });
   const createPetition = useCreatePetition();
 
-  const [deletePetition] = useDeletePetition({
+  const [deletePetition] = usePetitions_deletePetitionsMutation({
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
       refetch();
@@ -80,10 +76,7 @@ function Petitions() {
   const { petitions } = data!;
 
   const [selected, setSelected] = useState<string[]>();
-  const confirmDelete = useDialog(ConfirmDeletePetitions, [
-    selected,
-    petitions,
-  ]);
+  const confirmDelete = useDialog(ConfirmDeletePetitions);
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -173,6 +166,7 @@ function Petitions() {
               onStatusChange={handleStatusChange}
               onDeleteClick={handleDeleteClick}
               onCreateClick={handleCreateClick}
+              onReload={() => refetch()}
             />
           }
           body={
@@ -253,15 +247,49 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
       />
     )),
     Cell: memo(({ row }) => {
-      if (row.sendouts.length === 0) {
+      if (row.recipients.length === 0) {
         return null;
       }
-      const [{ contact }, ...rest] = row.sendouts;
+      const [contact, ...rest] = row.recipients;
       if (contact) {
-        const { email, fullName } = contact;
-        return <Text>{fullName ? `${fullName} (${email})` : email}</Text>;
+        return rest.length ? (
+          <FormattedMessage
+            id="petitions.recipients"
+            defaultMessage="{contact} and <a>{more} more</a>"
+            values={{
+              contact: (
+                <ContactLink
+                  contact={contact}
+                  onClick={(e: MouseEvent) => e.stopPropagation()}
+                />
+              ),
+              more: rest.length,
+              a: (...chunks: any[]) => (
+                <Link
+                  href="/app/petitions/[petitionId]/review#sendouts"
+                  as={`/app/petitions/${row.id}/review/#sendouts`}
+                  onClick={(e: MouseEvent) => e.stopPropagation()}
+                >
+                  {chunks}
+                </Link>
+              ),
+            }}
+          />
+        ) : (
+          <ContactLink
+            contact={contact}
+            onClick={(e: MouseEvent) => e.stopPropagation()}
+          />
+        );
       } else {
-        return null;
+        return (
+          <Text as="span" color="gray.400" fontStyle="italic">
+            <FormattedMessage
+              id="generic.deleted-contact"
+              defaultMessage="Deleted contact"
+            />
+          </Text>
+        );
       }
     }),
   },
@@ -275,12 +303,12 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
     )),
     Cell: memo(({ row: { deadline } }) => {
       if (deadline) {
-        return <DateTime value={deadline} format={FORMATS.LL} />;
+        return <DateTime value={deadline} format={FORMATS.LLL} />;
       } else {
         return (
           <Text as="span" color="gray.400" fontStyle="italic">
             <FormattedMessage
-              id="petitions.no-deadline"
+              id="generic.no-deadline"
               defaultMessage="No deadline"
             />
           </Text>
@@ -311,25 +339,6 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
     Cell: memo(({ row }) => <PetitionStatusText status={row.status} />),
   },
 ];
-
-function useDeletePetition(
-  options?: MutationHookOptions<
-    Petitions_deletePetitionsMutation,
-    Petitions_deletePetitionsMutationVariables
-  >
-) {
-  return useMutation<
-    Petitions_deletePetitionsMutation,
-    Petitions_deletePetitionsMutationVariables
-  >(
-    gql`
-      mutation Petitions_deletePetitions($ids: [ID!]!) {
-        deletePetitions(ids: $ids)
-      }
-    `,
-    options
-  );
-}
 
 function ConfirmDeletePetitions({
   selected,
@@ -386,16 +395,13 @@ Petitions.fragments = {
           optional
           total
         }
-        sendouts {
-          contact {
-            id
-            fullName
-            email
-          }
+        recipients {
+          ...ContactLink_Contact
         }
       }
       totalCount
     }
+    ${ContactLink.fragments.contact}
   `,
   user: gql`
     fragment Petitions_User on User {
@@ -404,6 +410,14 @@ Petitions.fragments = {
     ${AppLayout.fragments.user}
   `,
 };
+
+Petitions.mutations = [
+  gql`
+    mutation Petitions_deletePetitions($ids: [ID!]!) {
+      deletePetitions(ids: $ids)
+    }
+  `,
+];
 
 const GET_PETITIONS_DATA = gql`
   query Petitions(

@@ -24,3 +24,9 @@ services:
     ports:
       - 80:80
       - 443:443
+  queue:
+    image: softwaremill/elasticmq
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf
+    ports:
+      - "9324:9324"

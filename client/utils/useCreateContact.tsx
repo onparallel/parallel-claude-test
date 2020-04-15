@@ -36,7 +36,7 @@ export function useCreateContact() {
     `
   );
 
-  const askContactDetails = useDialog(AskContactDetails, []);
+  const askContactDetails = useDialog(AskContactDetails);
 
   return useCallback(async function () {
     const details = await askContactDetails({});

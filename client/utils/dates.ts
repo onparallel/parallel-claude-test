@@ -16,7 +16,7 @@ export const FORMATS = {
     year: "numeric",
   } as DateTimeFormatOptions,
   /**
-   * E.g. March 5, 2020, 2:16 PM
+   * E.g. March 5, 2020, 14:16
    */
   LLL: {
     day: "numeric",
@@ -24,9 +24,10 @@ export const FORMATS = {
     year: "numeric",
     hour: "numeric",
     minute: "numeric",
+    hour12: false,
   } as DateTimeFormatOptions,
   /**
-   * E.g. March 5, 2020, 2:16:39 PM
+   * E.g. March 5, 2020, 14:16:39
    */
   FULL: {
     day: "numeric",
@@ -35,5 +36,6 @@ export const FORMATS = {
     hour: "numeric",
     minute: "numeric",
     second: "numeric",
+    hour12: false,
   } as DateTimeFormatOptions,
 };

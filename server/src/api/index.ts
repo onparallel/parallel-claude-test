@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { Container } from "inversify";
-import { Context } from "../context";
+import { ApiContext } from "../context";
 
 export function api(container: Container) {
   return Router()
     .use((req, res, next) => {
-      req.context = container.get<Context>(Context);
+      req.context = container.get<ApiContext>(ApiContext);
       next();
     })
     .use(

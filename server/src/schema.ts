@@ -19,7 +19,7 @@ export const schema = makeSchema({
       { source: resolve("./db/__types.ts"), alias: "db" },
       { source: resolve("./context.ts"), alias: "ctx" },
     ],
-    contextType: "ctx.Context",
+    contextType: "ctx.ApiContext",
     backingTypeMap: {
       DateTime: "Date",
       JSONObject: "{[key: string]: any}",

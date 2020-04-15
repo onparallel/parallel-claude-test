@@ -114,6 +114,10 @@ export type Mutation = {
   publicDeletePetitionReply: Result;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
+  /** Sends the petition and creates the corresponding sendouts. */
+  sendPetition: SendPetitionResult;
+  /** Sends a reminder for the corresponding sendouts. */
+  sendReminders: SendReminderResult;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -189,6 +193,17 @@ export type MutationpublicDeletePetitionReplyArgs = {
 export type MutationpublicFileUploadReplyCompleteArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["ID"];
+};
+
+export type MutationsendPetitionArgs = {
+  petitionId: Scalars["ID"];
+  recipients: Array<Recipient>;
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+};
+
+export type MutationsendRemindersArgs = {
+  petitionId: Scalars["ID"];
+  sendoutIds: Array<Scalars["ID"]>;
 };
 
 export type MutationupdateContactArgs = {
@@ -287,6 +302,10 @@ export type Petition = Timestamps & {
   name?: Maybe<Scalars["String"]>;
   /** The progress of the petition. */
   progress: PetitionProgress;
+  /** The recipients for this petition */
+  recipients: Array<Maybe<Contact>>;
+  /** The reminder settings of the petition. */
+  reminderSettings?: Maybe<ReminderSettings>;
   /** The sendouts for this petition */
   sendouts: Array<PetitionSendout>;
   /** The status of the petition. */
@@ -379,14 +398,34 @@ export type PetitionProgress = {
 /** A sendout of a petition */
 export type PetitionSendout = Timestamps & {
   __typename?: "PetitionSendout";
+  /** Tells when the email bounced. */
+  bouncedAt?: Maybe<Scalars["DateTime"]>;
   /** The receiver of the petition through this sendout. */
   contact?: Maybe<Contact>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Tells when the email was delivered. */
+  deliveredAt?: Maybe<Scalars["DateTime"]>;
+  /** The body of the petition. */
+  emailBody?: Maybe<Scalars["JSON"]>;
+  /** The subject of the petition. */
+  emailSubject?: Maybe<Scalars["String"]>;
   /** The ID of the petition field access. */
   id: Scalars["ID"];
+  /** When the next reminder will be sent. */
+  nextReminderAt?: Maybe<Scalars["DateTime"]>;
+  /** Tells when the email was opened for the first time. */
+  openedAt?: Maybe<Scalars["DateTime"]>;
   /** The petition for this sendout. */
   petition?: Maybe<Petition>;
+  /** The reminder settings of the petition. */
+  reminderSettings?: Maybe<ReminderSettings>;
+  /** Time at which the sendout is scheduled. */
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+  /** If already sent, the date at which the email was delivered. */
+  sentAt?: Maybe<Scalars["DateTime"]>;
+  /** The status of the sendout */
+  status: PetitionSendoutStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -399,11 +438,24 @@ export type PetitionSendoutPagination = {
   totalCount: Scalars["Int"];
 };
 
+/** The status of a sendout. */
+export type PetitionSendoutStatus =
+  /** The sendout is active and accessible. */
+  | "ACTIVE"
+  /** The scheduled sendout was cancelled. */
+  | "CANCELLED"
+  /** The sendout is not active. */
+  | "INACTIVE"
+  /** The sendout is being processed. */
+  | "PROCESSING"
+  /** The sendout has been scheduled. */
+  | "SCHEDULED";
+
 /** The status of a petition. */
 export type PetitionStatus =
-  /** The petition is completed */
+  /** The petition has been completed. */
   | "COMPLETED"
-  /** The petition has not been sent. */
+  /** The petition has not been sent yet. */
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
@@ -530,8 +582,51 @@ export type QuerysendoutArgs = {
   keycode: Scalars["ID"];
 };
 
+export type Recipient = {
+  email?: Maybe<Scalars["ID"]>;
+  id?: Maybe<Scalars["ID"]>;
+};
+
+/** The reminder settings of a petition */
+export type ReminderSettings = {
+  __typename?: "ReminderSettings";
+  /** The amount of days between reminders. */
+  offset: Scalars["Int"];
+  /** The time at which the reminder should be sent. */
+  time: Scalars["String"];
+  /** The timezone the time is referring to. */
+  timezone: Scalars["String"];
+  /** Wether to send reminders only from monday to friday. */
+  weekdaysOnly: Scalars["Boolean"];
+};
+
+/** The reminder settings of a petition */
+export type ReminderSettingsInput = {
+  /** The amount of days between reminders. */
+  offset: Scalars["Int"];
+  /** The time at which the reminder should be sent. */
+  time: Scalars["String"];
+  /** The timezone the time is referring to. */
+  timezone: Scalars["String"];
+  /** Whether to send reminders only from monday to friday. */
+  weekdaysOnly: Scalars["Boolean"];
+};
+
 /** Represents the result of an operation. */
 export type Result = "FAILURE" | "SUCCESS";
+
+export type SendPetitionResult = {
+  __typename?: "SendPetitionResult";
+  petition?: Maybe<Petition>;
+  result: Result;
+  sendouts?: Maybe<Array<PetitionSendout>>;
+};
+
+export type SendReminderResult = {
+  __typename?: "SendReminderResult";
+  result: Result;
+  sendouts?: Maybe<Array<Maybe<PetitionSendout>>>;
+};
 
 export type Timestamps = {
   /** Time when the resource was created. */
@@ -559,6 +654,7 @@ export type UpdatePetitionInput = {
   emailSubject?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
+  reminderSettings?: Maybe<ReminderSettingsInput>;
 };
 
 export type UpdateUserInput = {
@@ -594,6 +690,11 @@ export type UserPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
+
+export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "fullName" | "email"
+>;
 
 export type RecipientSelect_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
@@ -653,7 +754,14 @@ export type PetitionComposeSettings_ContactFragment = {
 
 export type PetitionComposeSettings_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "locale" | "deadline" | "emailSubject" | "emailBody">;
+} & Pick<Petition, "locale" | "deadline" | "emailSubject" | "emailBody"> & {
+    reminderSettings?: Maybe<
+      { __typename?: "ReminderSettings" } & Pick<
+        ReminderSettings,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
+  };
 
 export type PetitionReviewField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -677,6 +785,10 @@ export type PetitionReviewField_PetitionFieldFragment = {
     >;
   };
 
+export type PetitionScheduledDialog_ContactFragment = {
+  __typename?: "Contact";
+} & ContactLink_ContactFragment;
+
 export type PetitionSendouts_PetitionFragment = { __typename?: "Petition" } & {
   sendouts: Array<
     {
@@ -687,11 +799,24 @@ export type PetitionSendouts_PetitionFragment = { __typename?: "Petition" } & {
 
 export type PetitionSendouts_PetitionSendoutFragment = {
   __typename?: "PetitionSendout";
-} & Pick<PetitionSendout, "id" | "createdAt"> & {
-    contact?: Maybe<
-      { __typename?: "Contact" } & Pick<Contact, "id" | "fullName" | "email">
-    >;
+} & Pick<
+  PetitionSendout,
+  | "id"
+  | "emailSubject"
+  | "status"
+  | "scheduledAt"
+  | "nextReminderAt"
+  | "deliveredAt"
+  | "bouncedAt"
+  | "openedAt"
+  | "sentAt"
+> & {
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+
+export type PetitionSentDialog_ContactFragment = {
+  __typename?: "Contact";
+} & ContactLink_ContactFragment;
 
 export type PublicPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
@@ -741,6 +866,15 @@ export type Contact_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
 
+export type Contact_updateContactMutationVariables = {
+  id: Scalars["ID"];
+  data: UpdateContactInput;
+};
+
+export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
+  updateContact: { __typename?: "Contact" } & Contact_ContactFragment;
+};
+
 export type ContactQueryVariables = {
   id: Scalars["ID"];
 };
@@ -754,23 +888,6 @@ export type ContactUserQueryVariables = {};
 export type ContactUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contact_UserFragment;
 };
-
-export type Contact_updateContactMutationVariables = {
-  id: Scalars["ID"];
-  data: UpdateContactInput;
-};
-
-export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
-  updateContact: { __typename?: "Contact" } & Contact_ContactFragment;
-};
-
-export type Contacts_deleteContactsMutationVariables = {
-  ids: Array<Scalars["ID"]>;
-};
-
-export type Contacts_deleteContactsMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deleteContacts">;
 
 export type Contacts_ContactsListFragment = {
   __typename?: "ContactPagination";
@@ -786,6 +903,14 @@ export type Contacts_ContactsListFragment = {
 export type Contacts_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
+
+export type Contacts_deleteContactsMutationVariables = {
+  ids: Array<Scalars["ID"]>;
+};
+
+export type Contacts_deleteContactsMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "deleteContacts">;
 
 export type ContactsQueryVariables = {
   offset: Scalars["Int"];
@@ -900,20 +1025,32 @@ export type PetitionCompose_updatePetitionFieldMutation = {
   };
 };
 
-export type PetitionComposeQueryVariables = {
-  id: Scalars["ID"];
+export type PetitionCompose_sendPetitionMutationVariables = {
+  petitionId: Scalars["ID"];
+  recipients: Array<Recipient>;
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
 };
 
-export type PetitionComposeQuery = { __typename?: "Query" } & {
-  petition?: Maybe<
-    { __typename?: "Petition" } & PetitionCompose_PetitionFragment
-  >;
-};
-
-export type PetitionComposeUserQueryVariables = {};
-
-export type PetitionComposeUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & PetitionCompose_UserFragment;
+export type PetitionCompose_sendPetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  sendPetition: { __typename?: "SendPetitionResult" } & Pick<
+    SendPetitionResult,
+    "result"
+  > & {
+      petition?: Maybe<
+        { __typename?: "Petition" } & Pick<Petition, "id" | "status">
+      >;
+      sendouts?: Maybe<
+        Array<
+          { __typename?: "PetitionSendout" } & Pick<PetitionSendout, "id"> & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & PetitionSentDialog_ContactFragment
+              >;
+            }
+        >
+      >;
+    };
 };
 
 export type PetitionCompose_updateFieldPositions_PetitionFragment = {
@@ -943,6 +1080,30 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   contacts: { __typename?: "ContactPagination" } & {
     items: Array<{ __typename?: "Contact" } & RecipientSelect_ContactFragment>;
   };
+};
+
+export type PetitionCompose_sendPetition_PetitionFragment = {
+  __typename?: "Petition";
+} & {
+  sendouts: Array<
+    { __typename?: "PetitionSendout" } & Pick<PetitionSendout, "id">
+  >;
+};
+
+export type PetitionComposeQueryVariables = {
+  id: Scalars["ID"];
+};
+
+export type PetitionComposeQuery = { __typename?: "Query" } & {
+  petition?: Maybe<
+    { __typename?: "Petition" } & PetitionCompose_PetitionFragment
+  >;
+};
+
+export type PetitionComposeUserQueryVariables = {};
+
+export type PetitionComposeUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & PetitionCompose_UserFragment;
 };
 
 export type PetitionReview_PetitionFragment = {
@@ -1001,6 +1162,31 @@ export type PetitionReview_fileUploadReplyDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
+export type PetitionReview_sendRemindersMutationVariables = {
+  petitionId: Scalars["ID"];
+  sendoutIds: Array<Scalars["ID"]>;
+};
+
+export type PetitionReview_sendRemindersMutation = {
+  __typename?: "Mutation";
+} & {
+  sendReminders: { __typename?: "SendReminderResult" } & Pick<
+    SendReminderResult,
+    "result"
+  > & {
+      sendouts?: Maybe<
+        Array<
+          Maybe<
+            { __typename?: "PetitionSendout" } & Pick<
+              PetitionSendout,
+              "id" | "status"
+            >
+          >
+        >
+      >;
+    };
+};
+
 export type PetitionReviewQueryVariables = {
   id: Scalars["ID"];
 };
@@ -1017,60 +1203,6 @@ export type PetitionReviewUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionReview_UserFragment;
 };
 
-export type PetitionSend_PetitionFragment = { __typename?: "Petition" } & Pick<
-  Petition,
-  "id" | "locale" | "deadline" | "emailSubject" | "emailBody"
-> &
-  PetitionLayout_PetitionFragment;
-
-export type PetitionSend_UserFragment = {
-  __typename?: "User";
-} & PetitionLayout_UserFragment;
-
-export type PetitionSendQueryVariables = {
-  id: Scalars["ID"];
-};
-
-export type PetitionSendQuery = { __typename?: "Query" } & {
-  petition?: Maybe<{ __typename?: "Petition" } & PetitionSend_PetitionFragment>;
-};
-
-export type PetitionSendUserQueryVariables = {};
-
-export type PetitionSendUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & PetitionSend_UserFragment;
-};
-
-export type PetitionSend_updatePetitionMutationVariables = {
-  petitionId: Scalars["ID"];
-  data: UpdatePetitionInput;
-};
-
-export type PetitionSend_updatePetitionMutation = {
-  __typename?: "Mutation";
-} & {
-  updatePetition: { __typename?: "Petition" } & PetitionSend_PetitionFragment;
-};
-
-export type PetitionSendSearchContactsQueryVariables = {
-  search?: Maybe<Scalars["String"]>;
-  exclude?: Maybe<Array<Scalars["ID"]>>;
-};
-
-export type PetitionSendSearchContactsQuery = { __typename?: "Query" } & {
-  contacts: { __typename?: "ContactPagination" } & {
-    items: Array<{ __typename?: "Contact" } & RecipientSelect_ContactFragment>;
-  };
-};
-
-export type Petitions_deletePetitionsMutationVariables = {
-  ids: Array<Scalars["ID"]>;
-};
-
-export type Petitions_deletePetitionsMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deletePetitions">;
-
 export type Petitions_PetitionsListFragment = {
   __typename?: "PetitionPagination";
 } & Pick<PetitionPagination, "totalCount"> & {
@@ -1083,15 +1215,8 @@ export type Petitions_PetitionsListFragment = {
             PetitionProgress,
             "validated" | "replied" | "optional" | "total"
           >;
-          sendouts: Array<
-            { __typename?: "PetitionSendout" } & {
-              contact?: Maybe<
-                { __typename?: "Contact" } & Pick<
-                  Contact,
-                  "id" | "fullName" | "email"
-                >
-              >;
-            }
+          recipients: Array<
+            Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
           >;
         }
     >;
@@ -1100,6 +1225,14 @@ export type Petitions_PetitionsListFragment = {
 export type Petitions_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
+
+export type Petitions_deletePetitionsMutationVariables = {
+  ids: Array<Scalars["ID"]>;
+};
+
+export type Petitions_deletePetitionsMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "deletePetitions">;
 
 export type PetitionsQueryVariables = {
   offset: Scalars["Int"];
@@ -1182,31 +1315,6 @@ export type PublicPetition_PublicUserFragment = {
   __typename?: "PublicUser";
 } & Pick<PublicUser, "id" | "firstName" | "fullName">;
 
-export type PublicPetitionQueryVariables = {
-  keycode: Scalars["ID"];
-};
-
-export type PublicPetitionQuery = { __typename?: "Query" } & {
-  sendout?: Maybe<
-    { __typename?: "PublicPetitionSendout" } & {
-      petition?: Maybe<
-        { __typename?: "PublicPetition" } & {
-          fields: Array<
-            { __typename?: "PublicPetitionField" } & Pick<
-              PublicPetitionField,
-              "id"
-            > &
-              PublicPetitionField_PublicPetitionFieldFragment
-          >;
-        } & PublicPetition_PublicPetitionFragment
-      >;
-      sender?: Maybe<
-        { __typename?: "PublicUser" } & PublicPetition_PublicUserFragment
-      >;
-    }
-  >;
-};
-
 export type PublicPetition_publicDeletePetitionReplyMutationVariables = {
   replyId: Scalars["ID"];
   keycode: Scalars["ID"];
@@ -1215,21 +1323,6 @@ export type PublicPetition_publicDeletePetitionReplyMutationVariables = {
 export type PublicPetition_publicDeletePetitionReplyMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "publicDeletePetitionReply">;
-
-export type PublicPetition_deletePetitionReply_PublicPetitionFieldFragment = {
-  __typename?: "PublicPetitionField";
-} & {
-  replies: Array<
-    { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id"
-    >
-  >;
-};
-
-export type PublicPetition_deletePetitionReply_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status">;
 
 export type PublicPetition_publicCreateTextReplyMutationVariables = {
   keycode: Scalars["ID"];
@@ -1245,21 +1338,6 @@ export type PublicPetition_publicCreateTextReplyMutation = {
     "id" | "publicContent" | "createdAt"
   >;
 };
-
-export type PublicPetition_createTextReply_FieldFragment = {
-  __typename?: "PublicPetitionField";
-} & {
-  replies: Array<
-    { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id"
-    >
-  >;
-};
-
-export type PublicPetition_createTextReply_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status">;
 
 export type PublicPetition_publicCreateFileUploadReplyMutationVariables = {
   keycode: Scalars["ID"];
@@ -1280,21 +1358,6 @@ export type PublicPetition_publicCreateFileUploadReplyMutation = {
       >;
     };
 };
-
-export type PublicPetition_createFileUploadReply_FieldFragment = {
-  __typename?: "PublicPetitionField";
-} & {
-  replies: Array<
-    { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id"
-    >
-  >;
-};
-
-export type PublicPetition_createFileUploadReply_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status">;
 
 export type PublicPetition_publicFileUploadReplyCompleteMutationVariables = {
   keycode: Scalars["ID"];
@@ -1321,6 +1384,76 @@ export type PublicPetition_publicCompletePetitionMutation = {
     "id" | "status"
   >;
 };
+
+export type PublicPetitionQueryVariables = {
+  keycode: Scalars["ID"];
+};
+
+export type PublicPetitionQuery = { __typename?: "Query" } & {
+  sendout?: Maybe<
+    { __typename?: "PublicPetitionSendout" } & {
+      petition?: Maybe<
+        { __typename?: "PublicPetition" } & {
+          fields: Array<
+            { __typename?: "PublicPetitionField" } & Pick<
+              PublicPetitionField,
+              "id"
+            > &
+              PublicPetitionField_PublicPetitionFieldFragment
+          >;
+        } & PublicPetition_PublicPetitionFragment
+      >;
+      sender?: Maybe<
+        { __typename?: "PublicUser" } & PublicPetition_PublicUserFragment
+      >;
+    }
+  >;
+};
+
+export type PublicPetition_deletePetitionReply_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type PublicPetition_deletePetitionReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type PublicPetition_createTextReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type PublicPetition_createTextReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type PublicPetition_createFileUploadReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type PublicPetition_createFileUploadReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
 
 export type useCreateContact_createContactMutationVariables = {
   data: CreateContactInput;
@@ -1370,6 +1503,25 @@ export const PetitionComposeSettings_ContactFragmentDoc = gql`
     fullName
     email
   }
+`;
+export const ContactLink_ContactFragmentDoc = gql`
+  fragment ContactLink_Contact on Contact {
+    id
+    fullName
+    email
+  }
+`;
+export const PetitionScheduledDialog_ContactFragmentDoc = gql`
+  fragment PetitionScheduledDialog_Contact on Contact {
+    ...ContactLink_Contact
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const PetitionSentDialog_ContactFragmentDoc = gql`
+  fragment PetitionSentDialog_Contact on Contact {
+    ...ContactLink_Contact
+  }
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const PublicPetitionField_PublicPetitionFieldFragmentDoc = gql`
   fragment PublicPetitionField_PublicPetitionField on PublicPetitionField {
@@ -1494,6 +1646,12 @@ export const PetitionComposeSettings_PetitionFragmentDoc = gql`
     deadline
     emailSubject
     emailBody
+    reminderSettings {
+      offset
+      time
+      timezone
+      weekdaysOnly
+    }
   }
 `;
 export const PetitionCompose_PetitionFragmentDoc = gql`
@@ -1542,6 +1700,13 @@ export const PetitionCompose_deletePetitionField_PetitionFragmentDoc = gql`
     }
   }
 `;
+export const PetitionCompose_sendPetition_PetitionFragmentDoc = gql`
+  fragment PetitionCompose_sendPetition_Petition on Petition {
+    sendouts {
+      id
+    }
+  }
+`;
 export const PetitionReviewField_PetitionFieldFragmentDoc = gql`
   fragment PetitionReviewField_PetitionField on PetitionField {
     id
@@ -1566,12 +1731,18 @@ export const PetitionSendouts_PetitionSendoutFragmentDoc = gql`
   fragment PetitionSendouts_PetitionSendout on PetitionSendout {
     id
     contact {
-      id
-      fullName
-      email
+      ...ContactLink_Contact
     }
-    createdAt
+    emailSubject
+    status
+    scheduledAt
+    nextReminderAt
+    deliveredAt
+    bouncedAt
+    openedAt
+    sentAt
   }
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const PetitionSendouts_PetitionFragmentDoc = gql`
   fragment PetitionSendouts_Petition on Petition {
@@ -1584,35 +1755,18 @@ export const PetitionSendouts_PetitionFragmentDoc = gql`
 export const PetitionReview_PetitionFragmentDoc = gql`
   fragment PetitionReview_Petition on Petition {
     id
-    ...PetitionLayout_Petition
     fields {
       ...PetitionReviewField_PetitionField
     }
+    ...PetitionLayout_Petition
     ...PetitionSendouts_Petition
   }
-  ${PetitionLayout_PetitionFragmentDoc}
   ${PetitionReviewField_PetitionFieldFragmentDoc}
+  ${PetitionLayout_PetitionFragmentDoc}
   ${PetitionSendouts_PetitionFragmentDoc}
 `;
 export const PetitionReview_UserFragmentDoc = gql`
   fragment PetitionReview_User on User {
-    ...PetitionLayout_User
-  }
-  ${PetitionLayout_UserFragmentDoc}
-`;
-export const PetitionSend_PetitionFragmentDoc = gql`
-  fragment PetitionSend_Petition on Petition {
-    id
-    ...PetitionLayout_Petition
-    locale
-    deadline
-    emailSubject
-    emailBody
-  }
-  ${PetitionLayout_PetitionFragmentDoc}
-`;
-export const PetitionSend_UserFragmentDoc = gql`
-  fragment PetitionSend_User on User {
     ...PetitionLayout_User
   }
   ${PetitionLayout_UserFragmentDoc}
@@ -1631,16 +1785,13 @@ export const Petitions_PetitionsListFragmentDoc = gql`
         optional
         total
       }
-      sendouts {
-        contact {
-          id
-          fullName
-          email
-        }
+      recipients {
+        ...ContactLink_Contact
       }
     }
     totalCount
   }
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
@@ -1708,6 +1859,58 @@ export const PublicPetition_createFileUploadReply_PublicPetitionFragmentDoc = gq
     status
   }
 `;
+export const Contact_updateContactDocument = gql`
+  mutation Contact_updateContact($id: ID!, $data: UpdateContactInput!) {
+    updateContact(id: $id, data: $data) {
+      ...Contact_Contact
+    }
+  }
+  ${Contact_ContactFragmentDoc}
+`;
+export type Contact_updateContactMutationFn = ApolloReactCommon.MutationFunction<
+  Contact_updateContactMutation,
+  Contact_updateContactMutationVariables
+>;
+
+/**
+ * __useContact_updateContactMutation__
+ *
+ * To run a mutation, you first call `useContact_updateContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useContact_updateContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [contactUpdateContactMutation, { data, loading, error }] = useContact_updateContactMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useContact_updateContactMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    Contact_updateContactMutation,
+    Contact_updateContactMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    Contact_updateContactMutation,
+    Contact_updateContactMutationVariables
+  >(Contact_updateContactDocument, baseOptions);
+}
+export type Contact_updateContactMutationHookResult = ReturnType<
+  typeof useContact_updateContactMutation
+>;
+export type Contact_updateContactMutationResult = ApolloReactCommon.MutationResult<
+  Contact_updateContactMutation
+>;
+export type Contact_updateContactMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  Contact_updateContactMutation,
+  Contact_updateContactMutationVariables
+>;
 export const ContactDocument = gql`
   query Contact($id: ID!) {
     contact(id: $id) {
@@ -1814,58 +2017,6 @@ export type ContactUserLazyQueryHookResult = ReturnType<
 export type ContactUserQueryResult = ApolloReactCommon.QueryResult<
   ContactUserQuery,
   ContactUserQueryVariables
->;
-export const Contact_updateContactDocument = gql`
-  mutation Contact_updateContact($id: ID!, $data: UpdateContactInput!) {
-    updateContact(id: $id, data: $data) {
-      ...Contact_Contact
-    }
-  }
-  ${Contact_ContactFragmentDoc}
-`;
-export type Contact_updateContactMutationFn = ApolloReactCommon.MutationFunction<
-  Contact_updateContactMutation,
-  Contact_updateContactMutationVariables
->;
-
-/**
- * __useContact_updateContactMutation__
- *
- * To run a mutation, you first call `useContact_updateContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useContact_updateContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [contactUpdateContactMutation, { data, loading, error }] = useContact_updateContactMutation({
- *   variables: {
- *      id: // value for 'id'
- *      data: // value for 'data'
- *   },
- * });
- */
-export function useContact_updateContactMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
-    Contact_updateContactMutation,
-    Contact_updateContactMutationVariables
-  >
-) {
-  return ApolloReactHooks.useMutation<
-    Contact_updateContactMutation,
-    Contact_updateContactMutationVariables
-  >(Contact_updateContactDocument, baseOptions);
-}
-export type Contact_updateContactMutationHookResult = ReturnType<
-  typeof useContact_updateContactMutation
->;
-export type Contact_updateContactMutationResult = ApolloReactCommon.MutationResult<
-  Contact_updateContactMutation
->;
-export type Contact_updateContactMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  Contact_updateContactMutation,
-  Contact_updateContactMutationVariables
 >;
 export const Contacts_deleteContactsDocument = gql`
   mutation Contacts_deleteContacts($ids: [ID!]!) {
@@ -2383,6 +2534,137 @@ export type PetitionCompose_updatePetitionFieldMutationOptions = ApolloReactComm
   PetitionCompose_updatePetitionFieldMutation,
   PetitionCompose_updatePetitionFieldMutationVariables
 >;
+export const PetitionCompose_sendPetitionDocument = gql`
+  mutation PetitionCompose_sendPetition(
+    $petitionId: ID!
+    $recipients: [Recipient!]!
+    $scheduledAt: DateTime
+  ) {
+    sendPetition(
+      petitionId: $petitionId
+      recipients: $recipients
+      scheduledAt: $scheduledAt
+    ) {
+      result
+      petition {
+        id
+        status
+      }
+      sendouts {
+        id
+        contact {
+          ...PetitionSentDialog_Contact
+        }
+      }
+    }
+  }
+  ${PetitionSentDialog_ContactFragmentDoc}
+`;
+export type PetitionCompose_sendPetitionMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionCompose_sendPetitionMutation,
+  PetitionCompose_sendPetitionMutationVariables
+>;
+
+/**
+ * __usePetitionCompose_sendPetitionMutation__
+ *
+ * To run a mutation, you first call `usePetitionCompose_sendPetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionCompose_sendPetitionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionComposeSendPetitionMutation, { data, loading, error }] = usePetitionCompose_sendPetitionMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      recipients: // value for 'recipients'
+ *      scheduledAt: // value for 'scheduledAt'
+ *   },
+ * });
+ */
+export function usePetitionCompose_sendPetitionMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionCompose_sendPetitionMutation,
+    PetitionCompose_sendPetitionMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionCompose_sendPetitionMutation,
+    PetitionCompose_sendPetitionMutationVariables
+  >(PetitionCompose_sendPetitionDocument, baseOptions);
+}
+export type PetitionCompose_sendPetitionMutationHookResult = ReturnType<
+  typeof usePetitionCompose_sendPetitionMutation
+>;
+export type PetitionCompose_sendPetitionMutationResult = ApolloReactCommon.MutationResult<
+  PetitionCompose_sendPetitionMutation
+>;
+export type PetitionCompose_sendPetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionCompose_sendPetitionMutation,
+  PetitionCompose_sendPetitionMutationVariables
+>;
+export const PetitionComposeSearchContactsDocument = gql`
+  query PetitionComposeSearchContacts($search: String, $exclude: [ID!]) {
+    contacts(limit: 10, search: $search, exclude: $exclude) {
+      items {
+        ...RecipientSelect_Contact
+      }
+    }
+  }
+  ${RecipientSelect_ContactFragmentDoc}
+`;
+
+/**
+ * __usePetitionComposeSearchContactsQuery__
+ *
+ * To run a query within a React component, call `usePetitionComposeSearchContactsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionComposeSearchContactsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionComposeSearchContactsQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      exclude: // value for 'exclude'
+ *   },
+ * });
+ */
+export function usePetitionComposeSearchContactsQuery(
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
+    PetitionComposeSearchContactsQuery,
+    PetitionComposeSearchContactsQueryVariables
+  >
+) {
+  return ApolloReactHooks.useQuery<
+    PetitionComposeSearchContactsQuery,
+    PetitionComposeSearchContactsQueryVariables
+  >(PetitionComposeSearchContactsDocument, baseOptions);
+}
+export function usePetitionComposeSearchContactsLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    PetitionComposeSearchContactsQuery,
+    PetitionComposeSearchContactsQueryVariables
+  >
+) {
+  return ApolloReactHooks.useLazyQuery<
+    PetitionComposeSearchContactsQuery,
+    PetitionComposeSearchContactsQueryVariables
+  >(PetitionComposeSearchContactsDocument, baseOptions);
+}
+export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
+  typeof usePetitionComposeSearchContactsQuery
+>;
+export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
+  typeof usePetitionComposeSearchContactsLazyQuery
+>;
+export type PetitionComposeSearchContactsQueryResult = ApolloReactCommon.QueryResult<
+  PetitionComposeSearchContactsQuery,
+  PetitionComposeSearchContactsQueryVariables
+>;
 export const PetitionComposeDocument = gql`
   query PetitionCompose($id: ID!) {
     petition(id: $id) {
@@ -2495,66 +2777,6 @@ export type PetitionComposeUserLazyQueryHookResult = ReturnType<
 export type PetitionComposeUserQueryResult = ApolloReactCommon.QueryResult<
   PetitionComposeUserQuery,
   PetitionComposeUserQueryVariables
->;
-export const PetitionComposeSearchContactsDocument = gql`
-  query PetitionComposeSearchContacts($search: String, $exclude: [ID!]) {
-    contacts(limit: 10, search: $search, exclude: $exclude) {
-      items {
-        ...RecipientSelect_Contact
-      }
-    }
-  }
-  ${RecipientSelect_ContactFragmentDoc}
-`;
-
-/**
- * __usePetitionComposeSearchContactsQuery__
- *
- * To run a query within a React component, call `usePetitionComposeSearchContactsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionComposeSearchContactsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionComposeSearchContactsQuery({
- *   variables: {
- *      search: // value for 'search'
- *      exclude: // value for 'exclude'
- *   },
- * });
- */
-export function usePetitionComposeSearchContactsQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    PetitionComposeSearchContactsQuery,
-    PetitionComposeSearchContactsQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<
-    PetitionComposeSearchContactsQuery,
-    PetitionComposeSearchContactsQueryVariables
-  >(PetitionComposeSearchContactsDocument, baseOptions);
-}
-export function usePetitionComposeSearchContactsLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    PetitionComposeSearchContactsQuery,
-    PetitionComposeSearchContactsQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<
-    PetitionComposeSearchContactsQuery,
-    PetitionComposeSearchContactsQueryVariables
-  >(PetitionComposeSearchContactsDocument, baseOptions);
-}
-export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
-  typeof usePetitionComposeSearchContactsQuery
->;
-export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
-  typeof usePetitionComposeSearchContactsLazyQuery
->;
-export type PetitionComposeSearchContactsQueryResult = ApolloReactCommon.QueryResult<
-  PetitionComposeSearchContactsQuery,
-  PetitionComposeSearchContactsQueryVariables
 >;
 export const PetitionReview_updatePetitionDocument = gql`
   mutation PetitionReview_updatePetition(
@@ -2733,6 +2955,61 @@ export type PetitionReview_fileUploadReplyDownloadLinkMutationOptions = ApolloRe
   PetitionReview_fileUploadReplyDownloadLinkMutation,
   PetitionReview_fileUploadReplyDownloadLinkMutationVariables
 >;
+export const PetitionReview_sendRemindersDocument = gql`
+  mutation PetitionReview_sendReminders($petitionId: ID!, $sendoutIds: [ID!]!) {
+    sendReminders(petitionId: $petitionId, sendoutIds: $sendoutIds) {
+      result
+      sendouts {
+        id
+        status
+      }
+    }
+  }
+`;
+export type PetitionReview_sendRemindersMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReview_sendRemindersMutation,
+  PetitionReview_sendRemindersMutationVariables
+>;
+
+/**
+ * __usePetitionReview_sendRemindersMutation__
+ *
+ * To run a mutation, you first call `usePetitionReview_sendRemindersMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReview_sendRemindersMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionReviewSendRemindersMutation, { data, loading, error }] = usePetitionReview_sendRemindersMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      sendoutIds: // value for 'sendoutIds'
+ *   },
+ * });
+ */
+export function usePetitionReview_sendRemindersMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReview_sendRemindersMutation,
+    PetitionReview_sendRemindersMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReview_sendRemindersMutation,
+    PetitionReview_sendRemindersMutationVariables
+  >(PetitionReview_sendRemindersDocument, baseOptions);
+}
+export type PetitionReview_sendRemindersMutationHookResult = ReturnType<
+  typeof usePetitionReview_sendRemindersMutation
+>;
+export type PetitionReview_sendRemindersMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReview_sendRemindersMutation
+>;
+export type PetitionReview_sendRemindersMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReview_sendRemindersMutation,
+  PetitionReview_sendRemindersMutationVariables
+>;
 export const PetitionReviewDocument = gql`
   query PetitionReview($id: ID!) {
     petition(id: $id) {
@@ -2845,234 +3122,6 @@ export type PetitionReviewUserLazyQueryHookResult = ReturnType<
 export type PetitionReviewUserQueryResult = ApolloReactCommon.QueryResult<
   PetitionReviewUserQuery,
   PetitionReviewUserQueryVariables
->;
-export const PetitionSendDocument = gql`
-  query PetitionSend($id: ID!) {
-    petition(id: $id) {
-      ...PetitionSend_Petition
-    }
-  }
-  ${PetitionSend_PetitionFragmentDoc}
-`;
-
-/**
- * __usePetitionSendQuery__
- *
- * To run a query within a React component, call `usePetitionSendQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionSendQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionSendQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function usePetitionSendQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    PetitionSendQuery,
-    PetitionSendQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<
-    PetitionSendQuery,
-    PetitionSendQueryVariables
-  >(PetitionSendDocument, baseOptions);
-}
-export function usePetitionSendLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    PetitionSendQuery,
-    PetitionSendQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<
-    PetitionSendQuery,
-    PetitionSendQueryVariables
-  >(PetitionSendDocument, baseOptions);
-}
-export type PetitionSendQueryHookResult = ReturnType<
-  typeof usePetitionSendQuery
->;
-export type PetitionSendLazyQueryHookResult = ReturnType<
-  typeof usePetitionSendLazyQuery
->;
-export type PetitionSendQueryResult = ApolloReactCommon.QueryResult<
-  PetitionSendQuery,
-  PetitionSendQueryVariables
->;
-export const PetitionSendUserDocument = gql`
-  query PetitionSendUser {
-    me {
-      ...PetitionSend_User
-    }
-  }
-  ${PetitionSend_UserFragmentDoc}
-`;
-
-/**
- * __usePetitionSendUserQuery__
- *
- * To run a query within a React component, call `usePetitionSendUserQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionSendUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionSendUserQuery({
- *   variables: {
- *   },
- * });
- */
-export function usePetitionSendUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    PetitionSendUserQuery,
-    PetitionSendUserQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<
-    PetitionSendUserQuery,
-    PetitionSendUserQueryVariables
-  >(PetitionSendUserDocument, baseOptions);
-}
-export function usePetitionSendUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    PetitionSendUserQuery,
-    PetitionSendUserQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<
-    PetitionSendUserQuery,
-    PetitionSendUserQueryVariables
-  >(PetitionSendUserDocument, baseOptions);
-}
-export type PetitionSendUserQueryHookResult = ReturnType<
-  typeof usePetitionSendUserQuery
->;
-export type PetitionSendUserLazyQueryHookResult = ReturnType<
-  typeof usePetitionSendUserLazyQuery
->;
-export type PetitionSendUserQueryResult = ApolloReactCommon.QueryResult<
-  PetitionSendUserQuery,
-  PetitionSendUserQueryVariables
->;
-export const PetitionSend_updatePetitionDocument = gql`
-  mutation PetitionSend_updatePetition(
-    $petitionId: ID!
-    $data: UpdatePetitionInput!
-  ) {
-    updatePetition(petitionId: $petitionId, data: $data) {
-      ...PetitionSend_Petition
-    }
-  }
-  ${PetitionSend_PetitionFragmentDoc}
-`;
-export type PetitionSend_updatePetitionMutationFn = ApolloReactCommon.MutationFunction<
-  PetitionSend_updatePetitionMutation,
-  PetitionSend_updatePetitionMutationVariables
->;
-
-/**
- * __usePetitionSend_updatePetitionMutation__
- *
- * To run a mutation, you first call `usePetitionSend_updatePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSend_updatePetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSendUpdatePetitionMutation, { data, loading, error }] = usePetitionSend_updatePetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      data: // value for 'data'
- *   },
- * });
- */
-export function usePetitionSend_updatePetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PetitionSend_updatePetitionMutation,
-    PetitionSend_updatePetitionMutationVariables
-  >
-) {
-  return ApolloReactHooks.useMutation<
-    PetitionSend_updatePetitionMutation,
-    PetitionSend_updatePetitionMutationVariables
-  >(PetitionSend_updatePetitionDocument, baseOptions);
-}
-export type PetitionSend_updatePetitionMutationHookResult = ReturnType<
-  typeof usePetitionSend_updatePetitionMutation
->;
-export type PetitionSend_updatePetitionMutationResult = ApolloReactCommon.MutationResult<
-  PetitionSend_updatePetitionMutation
->;
-export type PetitionSend_updatePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PetitionSend_updatePetitionMutation,
-  PetitionSend_updatePetitionMutationVariables
->;
-export const PetitionSendSearchContactsDocument = gql`
-  query PetitionSendSearchContacts($search: String, $exclude: [ID!]) {
-    contacts(limit: 10, search: $search, exclude: $exclude) {
-      items {
-        ...RecipientSelect_Contact
-      }
-    }
-  }
-  ${RecipientSelect_ContactFragmentDoc}
-`;
-
-/**
- * __usePetitionSendSearchContactsQuery__
- *
- * To run a query within a React component, call `usePetitionSendSearchContactsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionSendSearchContactsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionSendSearchContactsQuery({
- *   variables: {
- *      search: // value for 'search'
- *      exclude: // value for 'exclude'
- *   },
- * });
- */
-export function usePetitionSendSearchContactsQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    PetitionSendSearchContactsQuery,
-    PetitionSendSearchContactsQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<
-    PetitionSendSearchContactsQuery,
-    PetitionSendSearchContactsQueryVariables
-  >(PetitionSendSearchContactsDocument, baseOptions);
-}
-export function usePetitionSendSearchContactsLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    PetitionSendSearchContactsQuery,
-    PetitionSendSearchContactsQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<
-    PetitionSendSearchContactsQuery,
-    PetitionSendSearchContactsQueryVariables
-  >(PetitionSendSearchContactsDocument, baseOptions);
-}
-export type PetitionSendSearchContactsQueryHookResult = ReturnType<
-  typeof usePetitionSendSearchContactsQuery
->;
-export type PetitionSendSearchContactsLazyQueryHookResult = ReturnType<
-  typeof usePetitionSendSearchContactsLazyQuery
->;
-export type PetitionSendSearchContactsQueryResult = ApolloReactCommon.QueryResult<
-  PetitionSendSearchContactsQuery,
-  PetitionSendSearchContactsQueryVariables
 >;
 export const Petitions_deletePetitionsDocument = gql`
   mutation Petitions_deletePetitions($ids: [ID!]!) {
@@ -3565,74 +3614,6 @@ export type CurrentUserQueryResult = ApolloReactCommon.QueryResult<
   CurrentUserQuery,
   CurrentUserQueryVariables
 >;
-export const PublicPetitionDocument = gql`
-  query PublicPetition($keycode: ID!) {
-    sendout(keycode: $keycode) {
-      petition {
-        ...PublicPetition_PublicPetition
-        fields {
-          id
-          ...PublicPetitionField_PublicPetitionField
-        }
-      }
-      sender {
-        ...PublicPetition_PublicUser
-      }
-    }
-  }
-  ${PublicPetition_PublicPetitionFragmentDoc}
-  ${PublicPetitionField_PublicPetitionFieldFragmentDoc}
-  ${PublicPetition_PublicUserFragmentDoc}
-`;
-
-/**
- * __usePublicPetitionQuery__
- *
- * To run a query within a React component, call `usePublicPetitionQuery` and pass it any options that fit your needs.
- * When your component renders, `usePublicPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePublicPetitionQuery({
- *   variables: {
- *      keycode: // value for 'keycode'
- *   },
- * });
- */
-export function usePublicPetitionQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >(PublicPetitionDocument, baseOptions);
-}
-export function usePublicPetitionLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >(PublicPetitionDocument, baseOptions);
-}
-export type PublicPetitionQueryHookResult = ReturnType<
-  typeof usePublicPetitionQuery
->;
-export type PublicPetitionLazyQueryHookResult = ReturnType<
-  typeof usePublicPetitionLazyQuery
->;
-export type PublicPetitionQueryResult = ApolloReactCommon.QueryResult<
-  PublicPetitionQuery,
-  PublicPetitionQueryVariables
->;
 export const PublicPetition_publicDeletePetitionReplyDocument = gql`
   mutation PublicPetition_publicDeletePetitionReply(
     $replyId: ID!
@@ -3913,6 +3894,74 @@ export type PublicPetition_publicCompletePetitionMutationResult = ApolloReactCom
 export type PublicPetition_publicCompletePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PublicPetition_publicCompletePetitionMutation,
   PublicPetition_publicCompletePetitionMutationVariables
+>;
+export const PublicPetitionDocument = gql`
+  query PublicPetition($keycode: ID!) {
+    sendout(keycode: $keycode) {
+      petition {
+        ...PublicPetition_PublicPetition
+        fields {
+          id
+          ...PublicPetitionField_PublicPetitionField
+        }
+      }
+      sender {
+        ...PublicPetition_PublicUser
+      }
+    }
+  }
+  ${PublicPetition_PublicPetitionFragmentDoc}
+  ${PublicPetitionField_PublicPetitionFieldFragmentDoc}
+  ${PublicPetition_PublicUserFragmentDoc}
+`;
+
+/**
+ * __usePublicPetitionQuery__
+ *
+ * To run a query within a React component, call `usePublicPetitionQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePublicPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePublicPetitionQuery({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *   },
+ * });
+ */
+export function usePublicPetitionQuery(
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
+    PublicPetitionQuery,
+    PublicPetitionQueryVariables
+  >
+) {
+  return ApolloReactHooks.useQuery<
+    PublicPetitionQuery,
+    PublicPetitionQueryVariables
+  >(PublicPetitionDocument, baseOptions);
+}
+export function usePublicPetitionLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    PublicPetitionQuery,
+    PublicPetitionQueryVariables
+  >
+) {
+  return ApolloReactHooks.useLazyQuery<
+    PublicPetitionQuery,
+    PublicPetitionQueryVariables
+  >(PublicPetitionDocument, baseOptions);
+}
+export type PublicPetitionQueryHookResult = ReturnType<
+  typeof usePublicPetitionQuery
+>;
+export type PublicPetitionLazyQueryHookResult = ReturnType<
+  typeof usePublicPetitionLazyQuery
+>;
+export type PublicPetitionQueryResult = ApolloReactCommon.QueryResult<
+  PublicPetitionQuery,
+  PublicPetitionQueryVariables
 >;
 export const useCreateContact_createContactDocument = gql`
   mutation useCreateContact_createContact($data: CreateContactInput!) {

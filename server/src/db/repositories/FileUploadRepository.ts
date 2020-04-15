@@ -10,7 +10,7 @@ export class FileUploadRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("file_upload", "id", (q) =>
+  readonly loadFileUpload = this.buildLoadById("file_upload", "id", (q) =>
     q.whereNull("deleted_at")
   );
 

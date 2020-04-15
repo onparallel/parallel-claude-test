@@ -59,7 +59,7 @@ export class Auth {
     } catch (error) {
       switch (error.code) {
         case "UserNotFoundException":
-          // don't leak wether users exist or not
+          // don't leak whether users exist or not
           res.status(204);
           return;
       }

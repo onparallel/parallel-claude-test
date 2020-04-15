@@ -1,22 +1,28 @@
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogCallbacks,
-  useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+import { useApolloClient } from "@apollo/react-hooks";
+import { Box, Flex } from "@chakra-ui/core";
+import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { AddFieldPopover } from "@parallel/components/petition/AddFieldPopover";
+import { useCompletedPetitionDialog } from "@parallel/components/petition/CompletedPetitionDialog";
+import { useConfirmDeleteFieldDialog } from "@parallel/components/petition/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
 import { PetitionComposeFields } from "@parallel/components/petition/PetitionComposeFields";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition/PetitionComposeFieldSettings";
+import {
+  PetitionComposeSettings,
+  PetitionComposeSettingsProps,
+} from "@parallel/components/petition/PetitionComposeSettings";
 import { withData, WithDataContext } from "@parallel/components/withData";
 import {
+  Recipient,
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
+  PetitionComposeSearchContactsQuery,
+  PetitionComposeSearchContactsQueryVariables,
   PetitionComposeUserQuery,
   PetitionCompose_createPetitionField_PetitionFragment,
+  PetitionCompose_PetitionFieldFragment,
   PetitionCompose_updateFieldPositions_PetitionFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
@@ -25,12 +31,12 @@ import {
   usePetitionComposeUserQuery,
   usePetitionCompose_createPetitionFieldMutation,
   usePetitionCompose_deletePetitionFieldMutation,
+  usePetitionCompose_sendPetitionMutation,
   usePetitionCompose_updateFieldPositionsMutation,
   usePetitionCompose_updatePetitionFieldMutation,
   usePetitionCompose_updatePetitionMutation,
-  PetitionCompose_PetitionFieldFragment,
-  PetitionComposeSearchContactsQuery,
-  PetitionComposeSearchContactsQueryVariables,
+  PetitionCompose_sendPetition_PetitionFragment,
+  PetitionCompose_sendPetitionMutationResult,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import {
@@ -38,15 +44,18 @@ import {
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { gql } from "apollo-boost";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
-import { PetitionComposeSettings } from "@parallel/components/petition/PetitionComposeSettings";
-import { useApolloClient } from "@apollo/react-hooks";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
+import { gql } from "apollo-boost";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useIntl } from "react-intl";
+import { pick } from "remeda";
+import {
+  PetitionSentDialog,
+  usePetitionSentDialog,
+} from "@parallel/components/petition/PetitionSentDialog";
+import { useRouter } from "next/router";
+import { resolveUrl } from "@parallel/utils/next";
+import { usePetitionScheduledDialog } from "@parallel/components/petition/PetitionScheduledDialog";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -88,14 +97,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, [activeFieldId]);
 
   // When the petition is completed show a dialog to avoid unintended changes
-  const completedDialog = useDialog(CompletedPetitionDialog, []);
+  const completedDialog = useCompletedPetitionDialog();
   useEffect(() => {
     if (petition?.status === "COMPLETED") {
       completedDialog({});
     }
   }, []);
 
-  const confirmDelete = useDialog(ConfirmDelete, []);
+  const confirmDelete = useConfirmDeleteFieldDialog();
   const wrapper = useWrapPetitionUpdater(setState);
 
   const [updatePetition] = usePetitionCompose_updatePetitionMutation();
@@ -180,6 +189,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, []);
 
   const searchContacts = useSearchContacts();
+  const sendPetition = useSendPetition();
 
   return (
     <>
@@ -218,6 +228,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               petition={petition!}
               searchContacts={searchContacts}
               onUpdatePetition={handleUpdatePetition}
+              onSend={({ recipients, scheduledAt }) =>
+                sendPetition(petitionId, recipients, scheduledAt)
+              }
             />
           </Box>
           {activeField ? null : (
@@ -358,25 +371,33 @@ PetitionCompose.mutations = [
     ${PetitionComposeField.fragments.petitionField}
     ${PetitionComposeFieldSettings.fragments.petitionField}
   `,
+  gql`
+    mutation PetitionCompose_sendPetition(
+      $petitionId: ID!
+      $recipients: [Recipient!]!
+      $scheduledAt: DateTime
+    ) {
+      sendPetition(
+        petitionId: $petitionId
+        recipients: $recipients
+        scheduledAt: $scheduledAt
+      ) {
+        result
+        petition {
+          id
+          status
+        }
+        sendouts {
+          id
+          contact {
+            ...PetitionSentDialog_Contact
+          }
+        }
+      }
+    }
+    ${PetitionSentDialog.fragments.contact}
+  `,
 ];
-
-const GET_PETITION_COMPOSE_DATA = gql`
-  query PetitionCompose($id: ID!) {
-    petition(id: $id) {
-      ...PetitionCompose_Petition
-    }
-  }
-  ${PetitionCompose.fragments.petition}
-`;
-
-const GET_PETITION_COMPOSE_USER_DATA = gql`
-  query PetitionComposeUser {
-    me {
-      ...PetitionCompose_User
-    }
-  }
-  ${PetitionCompose.fragments.user}
-`;
 
 function useUpdateFieldPositions() {
   const [mutate] = usePetitionCompose_updateFieldPositionsMutation();
@@ -481,84 +502,6 @@ function useDeletePetitionField() {
   );
 }
 
-function ConfirmDelete({ ...props }: DialogCallbacks<void>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="petition.confirm-delete-field.header"
-          defaultMessage="Delete field"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="petition.confirm-delete-field.body"
-          defaultMessage="This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>."
-          values={{
-            b: (...chunks: any[]) => <b>{chunks}</b>,
-          }}
-        />
-      }
-      confirm={
-        <Button variantColor="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="generic.confirm-delete-button"
-            defaultMessage="Yes, delete"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
-function CompletedPetitionDialog({ ...props }: DialogCallbacks<void>) {
-  const focusRef = useRef(null);
-  const router = useRouter();
-  return (
-    <ConfirmDialog
-      focusRef={focusRef}
-      closeOnEsc={false}
-      closeOnOverlayClick={false}
-      header={
-        <FormattedMessage
-          id="petition.completed-petition-dialog.header"
-          defaultMessage="This petition is completed"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="petition.completed-petition-dialog.body"
-          defaultMessage="This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
-        />
-      }
-      confirm={
-        <Button variantColor="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="petition.completed-petition-dialog.confirm-button"
-            defaultMessage="I understand"
-          />
-        </Button>
-      }
-      cancel={
-        <Button
-          ref={focusRef}
-          onClick={() => {
-            props.onResolve();
-            router.back();
-          }}
-        >
-          <FormattedMessage
-            id="generic.go-back-button"
-            defaultMessage="Go back"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
 function useSearchContacts() {
   const apollo = useApolloClient();
   return useDebouncedAsync(
@@ -589,17 +532,95 @@ function useSearchContacts() {
   );
 }
 
+function useSendPetition() {
+  const showPetitionSentDialog = usePetitionSentDialog();
+  const showPetitionScheduledDialog = usePetitionScheduledDialog();
+  const router = useRouter();
+  const [doSendPetition] = usePetitionCompose_sendPetitionMutation();
+  return useCallback(async function (
+    petitionId: string,
+    recipients: Recipient[],
+    scheduledAt?: Date
+  ) {
+    const { data } = await doSendPetition({
+      variables: {
+        petitionId,
+        recipients,
+        scheduledAt: scheduledAt?.toISOString() ?? null,
+      },
+      update(client, { data }: PetitionCompose_sendPetitionMutationResult) {
+        const sendouts = data!.sendPetition.sendouts;
+        if (!sendouts) {
+          return;
+        }
+        const fragment = gql`
+          fragment PetitionCompose_sendPetition_Petition on Petition {
+            sendouts {
+              id
+            }
+          }
+        `;
+        const cached = client.readFragment<
+          PetitionCompose_sendPetition_PetitionFragment
+        >({ id: petitionId, fragment: fragment });
+        client.writeFragment<PetitionCompose_sendPetition_PetitionFragment>({
+          id: petitionId,
+          fragment: fragment,
+          data: {
+            __typename: "Petition",
+            sendouts: [
+              ...cached!.sendouts,
+              ...sendouts.map(pick(["id", "__typename"])),
+            ],
+          },
+        });
+      },
+    });
+    if (data?.sendPetition.sendouts) {
+      try {
+        if (scheduledAt) {
+          await showPetitionScheduledDialog({
+            scheduledAt,
+            contacts: data.sendPetition.sendouts.map((s) => s.contact!),
+          });
+        } else {
+          await showPetitionSentDialog({
+            contacts: data.sendPetition.sendouts.map((s) => s.contact!),
+          });
+        }
+        const pathname = "/[locale]/app/petitions/[petitionId]/review";
+        router.push(pathname, resolveUrl(pathname, router.query));
+      } catch {}
+    }
+  },
+  []);
+}
+
 PetitionCompose.getInitialProps = async ({
   apollo,
   query,
 }: WithDataContext) => {
   await Promise.all([
     apollo.query<PetitionComposeQuery, PetitionComposeQueryVariables>({
-      query: GET_PETITION_COMPOSE_DATA,
+      query: gql`
+        query PetitionCompose($id: ID!) {
+          petition(id: $id) {
+            ...PetitionCompose_Petition
+          }
+        }
+        ${PetitionCompose.fragments.petition}
+      `,
       variables: { id: query.petitionId as string },
     }),
     apollo.query<PetitionComposeUserQuery>({
-      query: GET_PETITION_COMPOSE_USER_DATA,
+      query: gql`
+        query PetitionComposeUser {
+          me {
+            ...PetitionCompose_User
+          }
+        }
+        ${PetitionCompose.fragments.user}
+      `,
     }),
   ]);
   return {

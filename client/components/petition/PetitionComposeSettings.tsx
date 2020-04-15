@@ -14,6 +14,9 @@ import {
   Select,
   Stack,
   Heading,
+  Text,
+  PseudoBox,
+  Checkbox,
 } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
@@ -34,13 +37,26 @@ import {
   PetitionComposeSettings_PetitionFragment,
   PetitionLocale,
   UpdatePetitionInput,
+  ReminderSettings,
 } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
-import { ChangeEvent, useCallback, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { ChangeEvent, useCallback, useState, useEffect } from "react";
+import {
+  FormattedMessage,
+  useIntl,
+  FormattedTime,
+  FormattedDate,
+} from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { CollapseContent } from "../common/CollapseContent";
+import { useScheduleSendoutDialog } from "./ScheduleSendoutDialog";
+import { FORMATS } from "@parallel/utils/dates";
+import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { DateTime } from "../common/DateTime";
+import { PetitionReminderSettings } from "./PetitionReminderSettings";
+import { omit } from "remeda";
 
 export type PetitionComposeSettingsProps = {
   petition: PetitionComposeSettings_PetitionFragment;
@@ -49,23 +65,36 @@ export type PetitionComposeSettingsProps = {
     exclude: string[]
   ) => Promise<PetitionComposeSettings_ContactFragment[]>;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
+  onSend: (data: {
+    recipients: ({ id: string } | { email: string })[];
+    scheduledAt?: Date;
+  }) => void;
 } & CardProps;
 
 export function PetitionComposeSettings({
   petition,
   searchContacts,
   onUpdatePetition,
+  onSend,
   ...props
 }: PetitionComposeSettingsProps) {
   const intl = useIntl();
   const [recipients, setRecipients] = useState<Recipient[]>([]);
-  const [subject, setSubject] = useState(petition!.emailSubject ?? "");
+  const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorContent>(
-    petition!.emailBody ?? [{ children: [{ text: "" }] }]
+    petition.emailBody ?? [{ children: [{ text: "" }] }]
   );
+  const [
+    reminderSettings,
+    setReminderSettings,
+  ] = useState<ReminderSettings | null>(petition.reminderSettings ?? null);
   const updateSubject = useDebouncedCallback(onUpdatePetition, 500, []);
   const updateBody = useDebouncedCallback(onUpdatePetition, 500, []);
-  const updateDeadline = useDebouncedCallback(onUpdatePetition, 500, []);
+  const updateReminderSettings = useDebouncedCallback(
+    onUpdatePetition,
+    500,
+    []
+  );
 
   const handleSubjectChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -80,18 +109,49 @@ export function PetitionComposeSettings({
     updateBody({ emailBody: isEmptyContent(value) ? null : value });
   }, []);
 
-  const handleLocaleChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      onUpdatePetition({
-        locale: event.target.value as PetitionLocale,
-      });
-    },
-    []
-  );
+  function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
+    const value = event.target.checked
+      ? {
+          offset: 2,
+          time: "09:00",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          weekdaysOnly: false,
+        }
+      : null;
+    setReminderSettings(value);
+    updateReminderSettings({ reminderSettings: value });
+  }
 
-  const handleDeadlineChange = useCallback((value: Date | null) => {
-    updateDeadline({ deadline: value ? value.toISOString() : null });
-  }, []);
+  function handleRemindersChange(value: ReminderSettings) {
+    setReminderSettings(value);
+    updateReminderSettings({ reminderSettings: omit(value, ["__typename"]) });
+  }
+
+  const showScheduleSendoutDialog = useScheduleSendoutDialog();
+  async function handleSendClick({ schedule = false } = {}) {
+    let scheduleAt: Date | undefined;
+    if (schedule) {
+      try {
+        scheduleAt = await showScheduleSendoutDialog({});
+      } catch {
+        return;
+      }
+    }
+    onSend({
+      scheduledAt: scheduleAt,
+      recipients: recipients.map((r) =>
+        "__isNew__" in r ? { email: r.value } : { id: r.id }
+      ),
+    });
+  }
+
+  const showPetitionDeadlineDialog = usePetitionDeadlineDialog();
+  async function handleSetDeadlineClick() {
+    try {
+      const deadline = await showPetitionDeadlineDialog({});
+      onUpdatePetition({ deadline: deadline.toISOString() });
+    } catch {}
+  }
 
   return (
     <Card {...props}>
@@ -165,6 +225,28 @@ export function PetitionComposeSettings({
             style={{ minHeight: "100px" }}
           ></RichTextEditor>
         </Box>
+        <Flex alignItems="center" marginTop={2}>
+          <Checkbox
+            id="petition-reminders"
+            variantColor="purple"
+            size="lg"
+            marginRight={2}
+            isChecked={Boolean(reminderSettings)}
+            onChange={handleEnableRemindersChange}
+          />
+          <Text as="label" {...{ htmlFor: "petition-reminders" }}>
+            <FormattedMessage
+              id="petition.reminders-label"
+              defaultMessage="Enable automatic reminders"
+            />
+          </Text>
+        </Flex>
+        {reminderSettings ? (
+          <PetitionReminderSettings
+            value={reminderSettings}
+            onChange={handleRemindersChange}
+          />
+        ) : null}
         <CollapseContent
           marginTop={2}
           header={
@@ -176,7 +258,7 @@ export function PetitionComposeSettings({
             </Heading>
           }
         >
-          <Stack paddingTop={0} spacing={4}>
+          <Stack paddingTop={0} spacing={2}>
             <FormControl>
               <FormLabel htmlFor="petition-locale">
                 <FormattedMessage
@@ -187,7 +269,11 @@ export function PetitionComposeSettings({
               <Select
                 id="petition-locale"
                 value={petition!.locale}
-                onChange={handleLocaleChange}
+                onChange={(event) =>
+                  onUpdatePetition({
+                    locale: event.target.value as PetitionLocale,
+                  })
+                }
               >
                 <option value="en">
                   {intl.formatMessage({
@@ -203,31 +289,88 @@ export function PetitionComposeSettings({
                 </option>
               </Select>
             </FormControl>
-            <FormControl>
-              <FormLabel
-                htmlFor="petition-deadline"
-                paddingBottom={0}
-                minWidth="120px"
-              >
+            <Box>
+              <Text paddingBottom={1} margin={0}>
                 <FormattedMessage
                   id="petition.deadline-label"
                   defaultMessage="Deadline"
                 />
-              </FormLabel>
-              <DateTimeInput
-                id="petition-deadline"
-                type="datetime-local"
-                isFullWidth
-                value={petition!.deadline ? new Date(petition!.deadline) : null}
-                onChange={handleDeadlineChange}
-              />
-            </FormControl>
+              </Text>
+              <PseudoBox
+                display="flex"
+                alignItems="center"
+                paddingLeft={4}
+                paddingRight={2}
+                rounded="md"
+                border="1px solid"
+                borderColor="gray.200"
+                _hover={{
+                  borderColor: "gray.300",
+                }}
+                height={10}
+              >
+                {petition!.deadline ? (
+                  <>
+                    <DateTime
+                      value={petition!.deadline}
+                      format={{ ...FORMATS.LLL, weekday: "long" }}
+                    />
+                    {petition!.deadline ? (
+                      <IconButtonWithTooltip
+                        marginLeft={2}
+                        variant="ghost"
+                        size="xs"
+                        icon="close"
+                        label={intl.formatMessage({
+                          id: "petition.remove-deadline",
+                          defaultMessage: "Remove deadline",
+                        })}
+                        onClick={() => onUpdatePetition({ deadline: null })}
+                      />
+                    ) : null}
+                  </>
+                ) : (
+                  <Text color="gray.400" fontStyle="italic">
+                    <FormattedMessage
+                      id="generic.no-deadline"
+                      defaultMessage="No deadline"
+                    />
+                  </Text>
+                )}
+                <Spacer />
+                <Button
+                  marginLeft={2}
+                  leftIcon="time"
+                  size="xs"
+                  onClick={handleSetDeadlineClick}
+                >
+                  {petition!.deadline ? (
+                    <FormattedMessage
+                      id="petition.change-deadline"
+                      defaultMessage="Change deadline"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="petition.set-a-deadline"
+                      defaultMessage="Set a deadline"
+                    />
+                  )}
+                </Button>
+              </PseudoBox>
+            </Box>
           </Stack>
         </CollapseContent>
         <Flex marginTop={2}>
           <Spacer />
-          <SplitButton dividerColor="purple.600">
-            <Button variantColor="purple" leftIcon={"paper-plane" as any}>
+          <SplitButton
+            dividerColor="purple.600"
+            isDisabled={recipients.length === 0}
+          >
+            <Button
+              variantColor="purple"
+              leftIcon={"paper-plane" as any}
+              onClick={() => handleSendClick()}
+            >
               <FormattedMessage
                 id="petition.send-button"
                 defaultMessage="Send"
@@ -240,8 +383,8 @@ export function PetitionComposeSettings({
               aria-label="Options"
               minWidth={8}
               dropdown={
-                <MenuList minWidth={0} placement="bottom-end">
-                  <MenuItem>
+                <MenuList minWidth={0} placement="top-end">
+                  <MenuItem onClick={() => handleSendClick({ schedule: true })}>
                     <Icon name="time" marginRight={2} />
                     <FormattedMessage
                       id="petition.schedule-send-button"
@@ -272,6 +415,12 @@ PetitionComposeSettings.fragments = {
       deadline
       emailSubject
       emailBody
+      reminderSettings {
+        offset
+        time
+        timezone
+        weekdaysOnly
+      }
     }
   `,
 };

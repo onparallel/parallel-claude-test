@@ -35,7 +35,7 @@ export const contactQueries = queryField((t) => {
     nullable: true,
     resolve: async (root, args, ctx) => {
       const { id } = fromGlobalId(args.id, "Contact");
-      return await ctx.contacts.loadOneById(id);
+      return await ctx.contacts.loadContact(id);
     },
   });
 });

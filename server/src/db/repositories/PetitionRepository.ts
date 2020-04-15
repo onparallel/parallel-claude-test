@@ -20,6 +20,8 @@ import {
   Petition,
   Contact,
   CreatePetitionFieldReply,
+  CreatePetitionSendout,
+  CreatePetitionReminder,
 } from "../__types";
 import {
   validateFieldOptions,
@@ -33,15 +35,15 @@ export class PetitionRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadPetition = this.buildLoadOneById("petition", "id", (q) =>
+  readonly loadPetition = this.buildLoadById("petition", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
-  readonly loadField = this.buildLoadOneById("petition_field", "id", (q) =>
+  readonly loadField = this.buildLoadById("petition_field", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
-  readonly loadFieldReply = this.buildLoadOneById(
+  readonly loadFieldReply = this.buildLoadById(
     "petition_field_reply",
     "id",
     (q) => q.whereNull("deleted_at")
@@ -68,6 +70,17 @@ export class PetitionRepository extends BaseRepository {
       .whereIn("id", fieldIds)
       .select(this.count());
     return count === new Set(fieldIds).size;
+  }
+
+  async sendoutsBelongToPetition(petitionId: number, sendoutIds: number[]) {
+    const [{ count }] = await this.from("petition_sendout")
+      .where({
+        petition_id: petitionId,
+        deleted_at: null,
+      })
+      .whereIn("id", sendoutIds)
+      .select(this.count());
+    return count === new Set(sendoutIds).size;
   }
 
   async replyBelongsToSendout(replyId: number, keycode: string) {
@@ -233,9 +246,9 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  readonly loadSendoutById = this.buildLoadOneById("petition_sendout", "id");
+  readonly loadSendout = this.buildLoadById("petition_sendout", "id");
 
-  readonly loadSendoutByKeycode = this.buildLoadOneBy(
+  readonly loadSendoutByKeycode = this.buildLoadBy(
     "petition_sendout",
     "keycode",
     (q) => q.whereNull("deleted_at")
@@ -246,22 +259,55 @@ export class PetitionRepository extends BaseRepository {
       const rows = await this.from("petition_sendout")
         .whereIn("petition_id", ids as number[])
         .whereNull("deleted_at")
-        .select("*");
+        .select("*")
+        .orderBy("id", "asc");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
       return ids.map((id) => byPetitionId[<any>id] || []);
     })
   );
 
+  async createSendouts(data: CreatePetitionSendout[], user: User) {
+    return await this.insert(
+      "petition_sendout",
+      data.map((item) => ({
+        ...item,
+        created_by: `User:${user.id}`,
+        updated_by: `User:${user.id}`,
+      }))
+    );
+  }
+
+  async updatePetitionSendout(
+    petitionSendoutId: number,
+    data: Partial<CreatePetitionSendout>,
+    user?: User
+  ) {
+    const [row] = await this.from("petition_sendout")
+      .where("id", petitionSendoutId)
+      .update(
+        {
+          ...data,
+          ...(user
+            ? {
+                updated_at: this.now(),
+                updated_by: `User:${user.id}`,
+              }
+            : {}),
+        },
+        "*"
+      );
+    return row;
+  }
+
   async createPetition(
-    { name, locale }: { name: string; locale: string },
+    data: Omit<CreatePetition, "org_id" | "owner_id" | "status">,
     user: User
   ) {
     const [row] = await this.insert("petition", {
       org_id: user.org_id,
       owner_id: user.id,
-      locale,
-      name,
       status: "DRAFT",
+      ...data,
       created_by: `User:${user.id}`,
       updated_by: `User:${user.id}`,
     });
@@ -589,19 +635,45 @@ export class PetitionRepository extends BaseRepository {
       (f) => f.optional || repliesByFieldId[f.id].length > 0
     );
     if (canComplete) {
-      const [updated] = await this.from("petition")
-        .where("id", petitionId)
-        .update(
-          {
-            status: "COMPLETED",
-            updated_at: this.now(),
-            updated_by: `Contact:${contact.id}`,
-          },
-          "*"
-        );
-      return updated;
+      return await this.knex.transaction(async (t) => {
+        await this.from("petition_sendout", t)
+          .where("petition_id", petitionId)
+          .update(
+            {
+              next_reminder_at: null,
+            },
+            "*"
+          );
+        const [updated] = await this.from("petition", t)
+          .where("id", petitionId)
+          .update(
+            {
+              status: "COMPLETED",
+              updated_at: this.now(),
+              updated_by: `Contact:${contact.id}`,
+            },
+            "*"
+          );
+        return updated;
+      });
     } else {
       throw new Error("Can't transition status to COMPLETED");
     }
+  }
+
+  async processScheduledSendouts() {
+    return await this.from("petition_sendout")
+      .where("status", "SCHEDULED")
+      .whereNotNull("scheduled_at")
+      .where("scheduled_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"))
+      .update({ status: "PROCESSING" }, "id");
+  }
+
+  async processSendoutReminders() {
+    return await this.from("petition_sendout")
+      .where("status", "ACTIVE")
+      .where("reminders_active", true)
+      .whereNotNull("next_reminder_at")
+      .where("next_reminder_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"));
   }
 }

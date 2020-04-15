@@ -46,7 +46,7 @@ export function useCreatePetition() {
     }
   );
 
-  const askPetitionName = useDialog(AskPetitionName, []);
+  const askPetitionName = useDialog(AskPetitionName);
 
   return useCallback(
     async function () {

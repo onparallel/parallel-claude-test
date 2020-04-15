@@ -38,12 +38,10 @@ export function ConfirmDialog<T = void>({
   const cancelRef = useRef<HTMLElement>(null);
   cancel = cancel || (
     <Button ref={cancelRef} onClick={() => onReject()}>
-      {cancel ?? (
-        <FormattedMessage
-          id="component.confirm-dialog.cancel-button"
-          defaultMessage="Cancel"
-        />
-      )}
+      <FormattedMessage
+        id="component.confirm-dialog.cancel-button"
+        defaultMessage="Cancel"
+      />
     </Button>
   );
   return (

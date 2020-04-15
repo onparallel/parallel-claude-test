@@ -6,7 +6,7 @@ import cors from "cors";
 import express from "express";
 import { api } from "./api";
 import { createContainer } from "./container";
-import { Context } from "./context";
+import { ApiContext } from "./context";
 import { schema } from "./schema";
 
 const app = express();
@@ -18,7 +18,7 @@ const server = new ApolloServer({
   schema,
   tracing: process.env.NODE_ENV === "development",
   context: async ({ req }) => {
-    const context = container.get<Context>(Context);
+    const context = container.get<ApiContext>(ApiContext);
     context.req = req;
     return context;
   },

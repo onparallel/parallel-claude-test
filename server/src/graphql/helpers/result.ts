@@ -1,4 +1,4 @@
-import { enumType } from "nexus";
+import { enumType, objectType } from "nexus";
 
 export const Result = enumType({
   name: "Result",

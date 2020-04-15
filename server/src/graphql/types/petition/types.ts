@@ -1,5 +1,6 @@
 import { enumType, objectType } from "nexus";
 import { toGlobalId } from "../../../util/globalId";
+import { uniq } from "remeda";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -11,12 +12,24 @@ export const PetitionStatus = enumType({
   name: "PetitionStatus",
   description: "The status of a petition.",
   members: [
-    { name: "DRAFT", description: "The petition has not been sent." },
+    { name: "DRAFT", description: "The petition has not been sent yet." },
     {
       name: "PENDING",
       description: "The petition has been sent and is awaiting completion.",
     },
-    { name: "COMPLETED", description: "The petition is completed" },
+    { name: "COMPLETED", description: "The petition has been completed." },
+  ],
+});
+
+export const PetitionSendoutStatus = enumType({
+  name: "PetitionSendoutStatus",
+  description: "The status of a sendout.",
+  members: [
+    { name: "SCHEDULED", description: "The sendout has been scheduled." },
+    { name: "CANCELLED", description: "The scheduled sendout was cancelled." },
+    { name: "PROCESSING", description: "The sendout is being processed." },
+    { name: "ACTIVE", description: "The sendout is active and accessible." },
+    { name: "INACTIVE", description: "The sendout is not active." },
   ],
 });
 
@@ -114,6 +127,33 @@ export const Petition = objectType({
         return ctx.petitions.loadSendoutsForPetition(root.id);
       },
     });
+    t.list.field("recipients", {
+      type: "Contact",
+      list: [false],
+      description: "The recipients for this petition",
+      resolve: async (root, _, ctx) => {
+        const sendouts = await ctx.petitions.loadSendoutsForPetition(root.id);
+        const contactIds = uniq(sendouts.map((s) => s.contact_id));
+        return contactIds.length
+          ? await ctx.contacts.loadContact(contactIds)
+          : [];
+      },
+    });
+    t.field("reminderSettings", {
+      type: "ReminderSettings",
+      description: "The reminder settings of the petition.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return root.reminders_active
+          ? {
+              offset: root.reminders_offset!,
+              time: root.reminders_time!,
+              timezone: root.reminders_timezone!,
+              weekdaysOnly: root.reminders_weekdays_only!,
+            }
+          : null;
+      },
+    });
   },
 });
 
@@ -171,6 +211,25 @@ export const PetitionField = objectType({
   },
 });
 
+export const ReminderSettings = objectType({
+  name: "ReminderSettings",
+  description: "The reminder settings of a petition",
+  definition(t) {
+    t.int("offset", {
+      description: "The amount of days between reminders.",
+    });
+    t.string("time", {
+      description: "The time at which the reminder should be sent.",
+    });
+    t.string("timezone", {
+      description: "The timezone the time is referring to.",
+    });
+    t.boolean("weekdaysOnly", {
+      description: "Wether to send reminders only from monday to friday.",
+    });
+  },
+});
+
 export const PetitionSendout = objectType({
   name: "PetitionSendout",
   description: "A sendout of a petition",
@@ -185,7 +244,98 @@ export const PetitionSendout = objectType({
       description: "The receiver of the petition through this sendout.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.contacts.loadOneById(root.contact_id);
+        return await ctx.contacts.loadContact(root.contact_id);
+      },
+    });
+    t.string("emailSubject", {
+      description: "The subject of the petition.",
+      nullable: true,
+      resolve: (o) => o.email_subject,
+    });
+    t.json("emailBody", {
+      description: "The body of the petition.",
+      nullable: true,
+      resolve: (o) => {
+        try {
+          return o.email_body ? JSON.parse(o.email_body) : null;
+        } catch {
+          return null;
+        }
+      },
+    });
+    t.field("status", {
+      type: "PetitionSendoutStatus",
+      description: "The status of the sendout",
+    });
+    t.datetime("scheduledAt", {
+      description: "Time at which the sendout is scheduled.",
+      nullable: true,
+      resolve: (o) => o.scheduled_at,
+    });
+    t.datetime("nextReminderAt", {
+      description: "When the next reminder will be sent.",
+      nullable: true,
+      resolve: (o) => o.next_reminder_at,
+    });
+    t.field("reminderSettings", {
+      type: "ReminderSettings",
+      description: "The reminder settings of the petition.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return root.reminders_active
+          ? {
+              offset: root.reminders_offset!,
+              time: root.reminders_time!,
+              timezone: root.reminders_timezone!,
+              weekdaysOnly: root.reminders_weekdays_only!,
+            }
+          : null;
+      },
+    });
+    t.datetime("sentAt", {
+      description:
+        "If already sent, the date at which the email was delivered.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        if (root.email_log_id) {
+          const email = await ctx.emails.loadEmailLog(root.email_log_id);
+          return email!.sent_at;
+        } else {
+          return null;
+        }
+      },
+    });
+    t.datetime("deliveredAt", {
+      description: "Tells when the email was delivered.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        if (!root.email_log_id) {
+          return null;
+        }
+        const events = await ctx.emails.loadEmailEvents(root.email_log_id);
+        return events.find((e) => e.event === "delivery")?.created_at ?? null;
+      },
+    });
+    t.datetime("bouncedAt", {
+      description: "Tells when the email bounced.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        if (!root.email_log_id) {
+          return null;
+        }
+        const events = await ctx.emails.loadEmailEvents(root.email_log_id);
+        return events.find((e) => e.event === "bounce")?.created_at ?? null;
+      },
+    });
+    t.datetime("openedAt", {
+      description: "Tells when the email was opened for the first time.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        if (!root.email_log_id) {
+          return null;
+        }
+        const events = await ctx.emails.loadEmailEvents(root.email_log_id);
+        return events.find((e) => e.event === "open")?.created_at ?? null;
       },
     });
     t.field("petition", {
@@ -216,7 +366,7 @@ export const PetitionFieldReply = objectType({
             return root.content;
           }
           case "FILE_UPLOAD": {
-            const file = await ctx.files.loadOneById(
+            const file = await ctx.files.loadFileUpload(
               root.content["file_upload_id"]
             );
             return file
@@ -235,7 +385,7 @@ export const PetitionFieldReply = objectType({
       description: "The sendout from where this reply was made.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadSendoutById(root.petition_sendout_id);
+        return await ctx.petitions.loadSendout(root.petition_sendout_id);
       },
     });
   },

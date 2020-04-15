@@ -3,6 +3,8 @@ import { arg, asNexusMethod, core } from "nexus";
 
 export const DateTime = asNexusMethod(GraphQLDateTime, "datetime");
 
-export function dateTimeArg(opts: core.NexusArgConfig<"DateTime">) {
+export function dateTimeArg(
+  opts: Omit<core.NexusArgConfig<"DateTime">, "type">
+) {
   return arg({ ...opts, type: "DateTime" });
 }

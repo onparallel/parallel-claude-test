@@ -22,17 +22,14 @@ export type DialogOpener = <TResult>(
 
 export const DialogOpenerContext = createContext<DialogOpener>(null as any);
 
-export function useDialog<TProps, TResult>(
-  Dialog: Dialog<TProps, TResult>,
-  deps: any[]
-) {
+export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
   const opener = useContext(DialogOpenerContext);
   return useCallback(
     (props: Omit<TProps, keyof DialogCallbacks<TResult>>) =>
       opener((callbacks: DialogCallbacks<TResult>) => (
         <Dialog {...({ ...callbacks, ...props } as any)} />
       )),
-    [Dialog, ...deps]
+    [Dialog]
   );
 }
 

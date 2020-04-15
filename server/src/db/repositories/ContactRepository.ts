@@ -1,19 +1,10 @@
-import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { groupBy } from "remeda";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import {
-  CreateContact,
-  PetitionSendout,
-  PetitionStatus,
-  User,
-  Contact,
-} from "../__types";
+import { CreateContact, User } from "../__types";
 
 @injectable()
 export class ContactReposistory extends BaseRepository {
@@ -21,7 +12,7 @@ export class ContactReposistory extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneById = this.buildLoadOneById("contact", "id", (q) =>
+  readonly loadContact = this.buildLoadById("contact", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
@@ -120,5 +111,26 @@ export class ContactReposistory extends BaseRepository {
         deleted_by: `User:${user.id}`,
       })
       .whereIn("id", Array.isArray(contactId) ? contactId : [contactId]);
+  }
+
+  async getOrCreateContacts(emails: string[], user: User) {
+    await this.knex.raw(
+      /* sql */ `
+      insert into contact (email, org_id, owner_id, created_by)
+        values ${emails.map(() => `(?, ?, ?, ?)`).join(", ")}
+        on conflict do nothing;
+    `,
+      emails.flatMap((email) => [
+        email,
+        user.org_id,
+        user.id,
+        `User:${user.id}`,
+      ])
+    );
+    return await this.from("contact")
+      .where("owner_id", user.id)
+      .whereIn("email", emails)
+      .whereNull("deleted_at")
+      .select("*");
   }
 }

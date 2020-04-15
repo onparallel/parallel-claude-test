@@ -5,7 +5,7 @@ import {
 } from "@chakra-ui/core";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, forwardRef } from "react";
+import { ReactNode, forwardRef, Ref } from "react";
 
 export function linkColorProps(colorMode: string) {
   const theme: { [colorMode: string]: ChakraLinkProps } = {
@@ -31,14 +31,18 @@ export function linkColorProps(colorMode: string) {
   return theme[colorMode];
 }
 
-export type LinkProps = Omit<NextLinkProps, "href"> & {
-  href: NextLinkProps["href"];
-  render?: (children?: ReactNode) => ReactNode;
-  chakra?: ChakraLinkProps;
-  children?: ReactNode;
-};
+export type LinkProps = Pick<NextLinkProps, "href" | "as"> &
+  Omit<ChakraLinkProps, "href" | "as"> & {
+    chakraAs?: ChakraLinkProps["as"];
+    render?: (children?: ReactNode) => ReactNode;
+    next?: Omit<NextLinkProps, "href" | "as">;
+    children?: ReactNode;
+  };
 
-export function Link({ children, chakra, render, ...props }: LinkProps) {
+export const Link = forwardRef(function Link(
+  { chakraAs, next, render, children, ...props }: LinkProps,
+  ref: Ref<HTMLAnchorElement>
+) {
   const { colorMode } = useColorMode();
   const { query } = useRouter();
   let { href, as, ...rest } = props;
@@ -46,17 +50,17 @@ export function Link({ children, chakra, render, ...props }: LinkProps) {
   as = `/${query.locale}${as ?? href}`;
   href = `/[locale]${href}`;
   return (
-    <NextLink href={href} as={as} {...rest} passHref>
+    <NextLink href={href} as={as} {...next} passHref>
       {render ? (
         render(children)
       ) : (
-        <ChakraLink {...linkColorProps(colorMode)} {...chakra}>
+        <ChakraLink {...linkColorProps(colorMode)} {...rest} ref={ref}>
           {children}
         </ChakraLink>
       )}
     </NextLink>
   );
-}
+});
 
 export type NakedLinkProps = NextLinkProps & {
   children?: ReactNode;

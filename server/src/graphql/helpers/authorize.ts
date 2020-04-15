@@ -1,4 +1,4 @@
-import { Context } from "../../context";
+import { ApiContext } from "../../context";
 import { fromGlobalId } from "../../util/globalId";
 import { FieldAuthorizeResolver } from "nexus";
 import { UserOrganizationRole } from "../../db/__types";
@@ -20,7 +20,7 @@ export function authenticate<
       if (!cognitoId) {
         throw new Error();
       }
-      const user = await ctx.users.loadOneByCognitoId(cognitoId);
+      const user = await ctx.users.loadUserByCognitoId(cognitoId);
       if (!user) {
         throw new Error();
       }
@@ -53,7 +53,7 @@ export function argIsContextUserId<
 export function hasOrgRole<TypeName extends string, FieldName extends string>(
   role: MaybeArray<UserOrganizationRole>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_root, _, ctx: Context) => {
+  return (_root, _, ctx: ApiContext) => {
     return Array.isArray(role)
       ? role.includes(ctx.user!.organization_role)
       : role === ctx.user!.organization_role;

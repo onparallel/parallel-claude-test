@@ -202,6 +202,20 @@ type Mutation {
   ): PublicPetitionFieldReply!
 
   """
+  Sends the petition and creates the corresponding sendouts.
+  """
+  sendPetition(
+    petitionId: ID!
+    recipients: [Recipient!]!
+    scheduledAt: DateTime
+  ): SendPetitionResult!
+
+  """
+  Sends a reminder for the corresponding sendouts.
+  """
+  sendReminders(petitionId: ID!, sendoutIds: [ID!]!): SendReminderResult!
+
+  """
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: ID!): Contact!
@@ -383,6 +397,16 @@ type Petition implements Timestamps {
   progress: PetitionProgress!
 
   """
+  The recipients for this petition
+  """
+  recipients: [Contact]!
+
+  """
+  The reminder settings of the petition.
+  """
+  reminderSettings: ReminderSettings
+
+  """
   The sendouts for this petition
   """
   sendouts: [PetitionSendout!]!
@@ -553,6 +577,11 @@ A sendout of a petition
 """
 type PetitionSendout implements Timestamps {
   """
+  Tells when the email bounced.
+  """
+  bouncedAt: DateTime
+
+  """
   The receiver of the petition through this sendout.
   """
   contact: Contact
@@ -563,14 +592,59 @@ type PetitionSendout implements Timestamps {
   createdAt: DateTime!
 
   """
+  Tells when the email was delivered.
+  """
+  deliveredAt: DateTime
+
+  """
+  The body of the petition.
+  """
+  emailBody: JSON
+
+  """
+  The subject of the petition.
+  """
+  emailSubject: String
+
+  """
   The ID of the petition field access.
   """
   id: ID!
 
   """
+  When the next reminder will be sent.
+  """
+  nextReminderAt: DateTime
+
+  """
+  Tells when the email was opened for the first time.
+  """
+  openedAt: DateTime
+
+  """
   The petition for this sendout.
   """
   petition: Petition
+
+  """
+  The reminder settings of the petition.
+  """
+  reminderSettings: ReminderSettings
+
+  """
+  Time at which the sendout is scheduled.
+  """
+  scheduledAt: DateTime
+
+  """
+  If already sent, the date at which the email was delivered.
+  """
+  sentAt: DateTime
+
+  """
+  The status of the sendout
+  """
+  status: PetitionSendoutStatus!
 
   """
   Time when the resource was last updated.
@@ -591,16 +665,46 @@ type PetitionSendoutPagination {
 }
 
 """
+The status of a sendout.
+"""
+enum PetitionSendoutStatus {
+  """
+  The sendout is active and accessible.
+  """
+  ACTIVE
+
+  """
+  The scheduled sendout was cancelled.
+  """
+  CANCELLED
+
+  """
+  The sendout is not active.
+  """
+  INACTIVE
+
+  """
+  The sendout is being processed.
+  """
+  PROCESSING
+
+  """
+  The sendout has been scheduled.
+  """
+  SCHEDULED
+}
+
+"""
 The status of a petition.
 """
 enum PetitionStatus {
   """
-  The petition is completed
+  The petition has been completed.
   """
   COMPLETED
 
   """
-  The petition has not been sent.
+  The petition has not been sent yet.
   """
   DRAFT
 
@@ -819,12 +923,78 @@ type Query {
   sendout(keycode: ID!): PublicPetitionSendout
 }
 
+input Recipient {
+  email: ID
+  id: ID
+}
+
+"""
+The reminder settings of a petition
+"""
+type ReminderSettings {
+  """
+  The amount of days between reminders.
+  """
+  offset: Int!
+
+  """
+  The time at which the reminder should be sent.
+  """
+  time: String!
+
+  """
+  The timezone the time is referring to.
+  """
+  timezone: String!
+
+  """
+  Wether to send reminders only from monday to friday.
+  """
+  weekdaysOnly: Boolean!
+}
+
+"""
+The reminder settings of a petition
+"""
+input ReminderSettingsInput {
+  """
+  The amount of days between reminders.
+  """
+  offset: Int!
+
+  """
+  The time at which the reminder should be sent.
+  """
+  time: String!
+
+  """
+  The timezone the time is referring to.
+  """
+  timezone: String!
+
+  """
+  Whether to send reminders only from monday to friday.
+  """
+  weekdaysOnly: Boolean!
+}
+
 """
 Represents the result of an operation.
 """
 enum Result {
   FAILURE
   SUCCESS
+}
+
+type SendPetitionResult {
+  petition: Petition
+  result: Result!
+  sendouts: [PetitionSendout!]
+}
+
+type SendReminderResult {
+  result: Result!
+  sendouts: [PetitionSendout]
 }
 
 interface Timestamps {
@@ -858,6 +1028,7 @@ input UpdatePetitionInput {
   emailSubject: String
   locale: PetitionLocale
   name: String
+  reminderSettings: ReminderSettingsInput
 }
 
 input UpdateUserInput {

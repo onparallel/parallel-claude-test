@@ -7,20 +7,16 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
+  useToast,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
-import { Card } from "@parallel/components/common/Card";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogCallbacks,
-  useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
 import { Divider } from "@parallel/components/common/Divider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { useFailureGeneratingLinkDialog } from "@parallel/components/petition/FailureGeneratingLinkDialog";
 import {
   PetitionReviewField,
   PetitionReviewFieldAction,
@@ -34,10 +30,11 @@ import {
   PetitionReviewUserQuery,
   UpdatePetitionInput,
   usePetitionReviewQuery,
+  usePetitionReviewUserQuery,
   usePetitionReview_fileUploadReplyDownloadLinkMutation,
+  usePetitionReview_sendRemindersMutation,
   usePetitionReview_updatePetitionMutation,
   usePetitionReview_validatePetitionFieldsMutation,
-  usePetitionsUserQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import {
@@ -58,9 +55,10 @@ function PetitionReview({ petitionId }: PetitionProps) {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(usePetitionsUserQuery());
+  } = assertQuery(usePetitionReviewUserQuery());
   const {
     data: { petition },
+    refetch,
   } = assertQuery(usePetitionReviewQuery({ variables: { id: petitionId } }));
 
   const [state, setState] = usePetitionState();
@@ -124,6 +122,8 @@ function PetitionReview({ petitionId }: PetitionProps) {
     toggleBy,
   } = useSelectionState(petition!.fields, "id");
 
+  const sendReminder = useSendReminder();
+
   return (
     <>
       <Title>
@@ -181,6 +181,16 @@ function PetitionReview({ petitionId }: PetitionProps) {
               }
             ></ButtonDropdown>
           </SplitButton>
+          <IconButtonWithTooltip
+            onClick={() => refetch()}
+            icon="repeat"
+            placement="bottom"
+            variant="outline"
+            label={intl.formatMessage({
+              id: "generic.reload-data",
+              defaultMessage: "Reload",
+            })}
+          />
           <Spacer />
           {anySelected ? (
             <Button
@@ -223,6 +233,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
             sendouts={petition!.sendouts}
             margin={4}
             marginTop={12}
+            onSendReminder={(sendoutId) => sendReminder(petitionId, sendoutId)}
           />
         </Box>
       </PetitionLayout>
@@ -234,10 +245,10 @@ PetitionReview.fragments = {
   petition: gql`
     fragment PetitionReview_Petition on Petition {
       id
-      ...PetitionLayout_Petition
       fields {
         ...PetitionReviewField_PetitionField
       }
+      ...PetitionLayout_Petition
       ...PetitionSendouts_Petition
     }
     ${PetitionLayout.fragments.petition}
@@ -297,6 +308,20 @@ PetitionReview.mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionReview_sendReminders(
+      $petitionId: ID!
+      $sendoutIds: [ID!]!
+    ) {
+      sendReminders(petitionId: $petitionId, sendoutIds: $sendoutIds) {
+        result
+        sendouts {
+          id
+          status
+        }
+      }
+    }
+  `,
 ];
 
 const GET_PETITION_REVIEW_DATA = gql`
@@ -319,7 +344,7 @@ const GET_PETITION_REVIEW_USER_DATA = gql`
 
 function useDownloadReplyFile() {
   const [mutate] = usePetitionReview_fileUploadReplyDownloadLinkMutation();
-  const openDialog = useDialog(FailureGeneratingLink, []);
+  const showFailure = useFailureGeneratingLinkDialog();
   return useCallback(
     async function downloadReplyFile(
       petitionId: string,
@@ -335,7 +360,7 @@ function useDownloadReplyFile() {
       } else {
         _window.close();
         try {
-          await openDialog({ filename: reply.content.filename });
+          await showFailure({ filename: reply.content.filename });
         } catch {}
       }
     },
@@ -343,38 +368,28 @@ function useDownloadReplyFile() {
   );
 }
 
-function FailureGeneratingLink({
-  filename,
-  ...props
-}: {
-  filename: string;
-} & DialogCallbacks<string>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="petition.review.download-file-error-dialog.header"
-          defaultMessage="Error downloading {filename}"
-          values={{
-            filename,
-          }}
-        />
-      }
-      body={
-        <Text>
-          <FormattedMessage
-            id="petition.review.download-file-error-dialog.body"
-            defaultMessage="There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
-            values={{
-              filename,
-            }}
-          />
-        </Text>
-      }
-      confirm={<></>}
-      {...props}
-    />
-  );
+function useSendReminder() {
+  const intl = useIntl();
+  const toast = useToast();
+  const [sendReminders] = usePetitionReview_sendRemindersMutation();
+  return useCallback(async (petitionId: string, sendoutId: string) => {
+    await sendReminders({
+      variables: { petitionId, sendoutIds: [sendoutId] },
+    });
+    toast({
+      title: intl.formatMessage({
+        id: "petition.reminder-sent.toast-header",
+        defaultMessage: "Reminder sent",
+      }),
+      description: intl.formatMessage({
+        id: "petition.reminder-sent.toast-description",
+        defaultMessage: "The reminder is on it's way",
+      }),
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  }, []);
 }
 
 PetitionReview.getInitialProps = async ({ apollo, query }: WithDataContext) => {

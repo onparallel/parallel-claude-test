@@ -72,6 +72,18 @@ export interface NexusGenInputs {
     // input type
     text: string; // String!
   };
+  Recipient: {
+    // input type
+    email?: string | null; // ID
+    id?: string | null; // ID
+  };
+  ReminderSettingsInput: {
+    // input type
+    offset: number; // Int!
+    time: string; // String!
+    timezone: string; // String!
+    weekdaysOnly: boolean; // Boolean!
+  };
   UpdateContactInput: {
     // input type
     firstName?: string | null; // String
@@ -92,6 +104,7 @@ export interface NexusGenInputs {
     emailSubject?: string | null; // String
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
+    reminderSettings?: NexusGenInputs["ReminderSettingsInput"] | null; // ReminderSettingsInput
   };
   UpdateUserInput: {
     // input type
@@ -109,6 +122,7 @@ export interface NexusGenEnums {
   OrganizationStatus: db.OrganizationStatus;
   PetitionFieldType: db.PetitionFieldType;
   PetitionLocale: "en" | "es";
+  PetitionSendoutStatus: db.PetitionSendoutStatus;
   PetitionStatus: db.PetitionStatus;
   Result: "FAILURE" | "SUCCESS";
 }
@@ -169,6 +183,24 @@ export interface NexusGenRootTypes {
   PublicPetitionSendout: db.PetitionSendout;
   PublicUser: db.User;
   Query: {};
+  ReminderSettings: {
+    // root type
+    offset: number; // Int!
+    time: string; // String!
+    timezone: string; // String!
+    weekdaysOnly: boolean; // Boolean!
+  };
+  SendPetitionResult: {
+    // root type
+    petition?: NexusGenRootTypes["Petition"] | null; // Petition
+    result: NexusGenEnums["Result"]; // Result!
+    sendouts?: NexusGenRootTypes["PetitionSendout"][] | null; // [PetitionSendout!]
+  };
+  SendReminderResult: {
+    // root type
+    result: NexusGenEnums["Result"]; // Result!
+    sendouts?: Array<NexusGenRootTypes["PetitionSendout"] | null> | null; // [PetitionSendout]
+  };
   User: db.User;
   UserPagination: {
     // root type
@@ -198,6 +230,8 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreateContactInput: NexusGenInputs["CreateContactInput"];
   CreateFileUploadReplyInput: NexusGenInputs["CreateFileUploadReplyInput"];
   CreateTextReplyInput: NexusGenInputs["CreateTextReplyInput"];
+  Recipient: NexusGenInputs["Recipient"];
+  ReminderSettingsInput: NexusGenInputs["ReminderSettingsInput"];
   UpdateContactInput: NexusGenInputs["UpdateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
@@ -207,6 +241,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   OrganizationStatus: NexusGenEnums["OrganizationStatus"];
   PetitionFieldType: NexusGenEnums["PetitionFieldType"];
   PetitionLocale: NexusGenEnums["PetitionLocale"];
+  PetitionSendoutStatus: NexusGenEnums["PetitionSendoutStatus"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
   Result: NexusGenEnums["Result"];
 }
@@ -253,6 +288,8 @@ export interface NexusGenFieldTypes {
     publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
+    sendReminders: NexusGenRootTypes["SendReminderResult"]; // SendReminderResult!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updatePetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -283,6 +320,8 @@ export interface NexusGenFieldTypes {
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
+    recipients: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
+    reminderSettings: NexusGenRootTypes["ReminderSettings"] | null; // ReminderSettings
     sendouts: NexusGenRootTypes["PetitionSendout"][]; // [PetitionSendout!]!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: Date; // DateTime!
@@ -331,10 +370,20 @@ export interface NexusGenFieldTypes {
   };
   PetitionSendout: {
     // field return type
+    bouncedAt: Date | null; // DateTime
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: Date; // DateTime!
+    deliveredAt: Date | null; // DateTime
+    emailBody: any | null; // JSON
+    emailSubject: string | null; // String
     id: string; // ID!
+    nextReminderAt: Date | null; // DateTime
+    openedAt: Date | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    reminderSettings: NexusGenRootTypes["ReminderSettings"] | null; // ReminderSettings
+    scheduledAt: Date | null; // DateTime
+    sentAt: Date | null; // DateTime
+    status: NexusGenEnums["PetitionSendoutStatus"]; // PetitionSendoutStatus!
     updatedAt: Date; // DateTime!
   };
   PetitionSendoutPagination: {
@@ -394,6 +443,24 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
     sendout: NexusGenRootTypes["PublicPetitionSendout"] | null; // PublicPetitionSendout
+  };
+  ReminderSettings: {
+    // field return type
+    offset: number; // Int!
+    time: string; // String!
+    timezone: string; // String!
+    weekdaysOnly: boolean; // Boolean!
+  };
+  SendPetitionResult: {
+    // field return type
+    petition: NexusGenRootTypes["Petition"] | null; // Petition
+    result: NexusGenEnums["Result"]; // Result!
+    sendouts: NexusGenRootTypes["PetitionSendout"][] | null; // [PetitionSendout!]
+  };
+  SendReminderResult: {
+    // field return type
+    result: NexusGenEnums["Result"]; // Result!
+    sendouts: Array<NexusGenRootTypes["PetitionSendout"] | null> | null; // [PetitionSendout]
   };
   User: {
     // field return type
@@ -490,6 +557,17 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       replyId: string; // ID!
+    };
+    sendPetition: {
+      // args
+      petitionId: string; // ID!
+      recipients: NexusGenInputs["Recipient"][]; // [Recipient!]!
+      scheduledAt?: Date | null; // DateTime
+    };
+    sendReminders: {
+      // args
+      petitionId: string; // ID!
+      sendoutIds: string[]; // [ID!]!
     };
     updateContact: {
       // args
@@ -601,6 +679,9 @@ export type NexusGenObjectNames =
   | "PublicPetitionSendout"
   | "PublicUser"
   | "Query"
+  | "ReminderSettings"
+  | "SendPetitionResult"
+  | "SendReminderResult"
   | "User"
   | "UserPagination";
 
@@ -608,6 +689,8 @@ export type NexusGenInputNames =
   | "CreateContactInput"
   | "CreateFileUploadReplyInput"
   | "CreateTextReplyInput"
+  | "Recipient"
+  | "ReminderSettingsInput"
   | "UpdateContactInput"
   | "UpdatePetitionFieldInput"
   | "UpdatePetitionInput"
@@ -619,6 +702,7 @@ export type NexusGenEnumNames =
   | "OrganizationStatus"
   | "PetitionFieldType"
   | "PetitionLocale"
+  | "PetitionSendoutStatus"
   | "PetitionStatus"
   | "Result";
 
@@ -637,7 +721,7 @@ export type NexusGenScalarNames =
 export type NexusGenUnionNames = never;
 
 export interface NexusGenTypes {
-  context: ctx.Context;
+  context: ctx.ApiContext;
   inputTypes: NexusGenInputs;
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;

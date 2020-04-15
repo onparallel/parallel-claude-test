@@ -10,11 +10,11 @@ export class UserReposistory extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOneByCognitoId = this.buildLoadOneBy("user", "cognito_id", (q) =>
+  readonly loadUserByCognitoId = this.buildLoadBy("user", "cognito_id", (q) =>
     q.whereNull("deleted_at")
   );
 
-  readonly loadOneById = this.buildLoadOneById("user", "id", (q) =>
+  readonly loadUser = this.buildLoadById("user", "id", (q) =>
     q.whereNull("deleted_at")
   );
 

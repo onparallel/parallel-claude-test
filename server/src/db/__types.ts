@@ -7,7 +7,18 @@ export type Maybe<T> = T | null;
 
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
-export type PetitionFieldType = "FILE_UPLOAD" | "TEXT";
+export type PetitionFieldType = "TEXT" | "FILE_UPLOAD";
+
+export type PetitionReminderStatus = "PROCESSING" | "PROCESSED";
+
+export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
+
+export type PetitionSendoutStatus =
+  | "SCHEDULED"
+  | "CANCELLED"
+  | "PROCESSING"
+  | "ACTIVE"
+  | "INACTIVE";
 
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
 
@@ -15,36 +26,42 @@ export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
 export interface TableTypes {
   contact: Contact;
+  email_event: EmailEvent;
+  email_log: EmailLog;
   file_upload: FileUpload;
   organization: Organization;
   petition: Petition;
-  petition_event_log: PetitionEventLog;
   petition_field: PetitionField;
   petition_field_reply: PetitionFieldReply;
+  petition_reminder: PetitionReminder;
   petition_sendout: PetitionSendout;
   user: User;
 }
 
 export interface TableCreateTypes {
   contact: CreateContact;
+  email_event: CreateEmailEvent;
+  email_log: CreateEmailLog;
   file_upload: CreateFileUpload;
   organization: CreateOrganization;
   petition: CreatePetition;
-  petition_event_log: CreatePetitionEventLog;
   petition_field: CreatePetitionField;
   petition_field_reply: CreatePetitionFieldReply;
+  petition_reminder: CreatePetitionReminder;
   petition_sendout: CreatePetitionSendout;
   user: CreateUser;
 }
 
 export interface TablePrimaryKeys {
   contact: "id";
+  email_event: "id";
+  email_log: "id";
   file_upload: "id";
   organization: "id";
   petition: "id";
-  petition_event_log: "id";
   petition_field: "id";
   petition_field_reply: "id";
+  petition_reminder: "id";
   petition_sendout: "id";
   user: "id";
 }
@@ -76,6 +93,50 @@ export interface CreateContact {
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
+}
+
+export interface EmailEvent {
+  id: number;
+  email_log_id: number;
+  event: string;
+  payload: string;
+  created_at: Date;
+}
+
+export interface CreateEmailEvent {
+  email_log_id: number;
+  event: string;
+  payload: string;
+  created_at?: Date;
+}
+
+export interface EmailLog {
+  id: number;
+  to: string;
+  from: string;
+  subject: string;
+  text: string;
+  html: string;
+  track_opens: boolean;
+  created_at: Date;
+  created_from: string;
+  sent_at: Maybe<Date>;
+  response: Maybe<string>;
+  external_id: Maybe<string>;
+}
+
+export interface CreateEmailLog {
+  to: string;
+  from: string;
+  subject: string;
+  text: string;
+  html: string;
+  track_opens?: boolean;
+  created_at?: Date;
+  created_from: string;
+  sent_at?: Maybe<Date>;
+  response?: Maybe<string>;
+  external_id?: Maybe<string>;
 }
 
 export interface FileUpload {
@@ -144,6 +205,11 @@ export interface Petition {
   deadline: Maybe<Date>;
   email_subject: Maybe<string>;
   email_body: Maybe<string>;
+  reminders_active: boolean;
+  reminders_offset: Maybe<number>;
+  reminders_time: Maybe<string>;
+  reminders_timezone: Maybe<string>;
+  reminders_weekdays_only: Maybe<boolean>;
   created_at: Date;
   created_by: Maybe<string>;
   updated_at: Date;
@@ -163,29 +229,17 @@ export interface CreatePetition {
   deadline?: Maybe<Date>;
   email_subject?: Maybe<string>;
   email_body?: Maybe<string>;
+  reminders_active?: boolean;
+  reminders_offset?: Maybe<number>;
+  reminders_time?: Maybe<string>;
+  reminders_timezone?: Maybe<string>;
+  reminders_weekdays_only?: Maybe<boolean>;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
-}
-
-export interface PetitionEventLog {
-  id: number;
-  petition_id: number;
-  petition_sendout_id: number;
-  event: Maybe<string>;
-  event_data: Maybe<any>;
-  event_date: Date;
-}
-
-export interface CreatePetitionEventLog {
-  petition_id: number;
-  petition_sendout_id: number;
-  event?: Maybe<string>;
-  event_data?: Maybe<any>;
-  event_date?: Date;
 }
 
 export interface PetitionField {
@@ -252,12 +306,45 @@ export interface CreatePetitionFieldReply {
   deleted_by?: Maybe<string>;
 }
 
+export interface PetitionReminder {
+  id: number;
+  petition_sendout_id: number;
+  email_log_id: Maybe<number>;
+  type: PetitionReminderType;
+  status: PetitionReminderStatus;
+  created_at: Date;
+  created_by: Maybe<string>;
+}
+
+export interface CreatePetitionReminder {
+  petition_sendout_id: number;
+  email_log_id?: Maybe<number>;
+  type: PetitionReminderType;
+  status: PetitionReminderStatus;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+}
+
 export interface PetitionSendout {
   id: number;
   petition_id: number;
   contact_id: number;
   sender_id: number;
   keycode: string;
+  email_subject: Maybe<string>;
+  email_body: Maybe<string>;
+  locale: string;
+  deadline: Maybe<Date>;
+  status: PetitionSendoutStatus;
+  scheduled_at: Maybe<Date>;
+  email_log_id: Maybe<number>;
+  next_reminder_at: Maybe<Date>;
+  reminders_active: boolean;
+  reminders_offset: Maybe<number>;
+  reminders_time: Maybe<string>;
+  reminders_timezone: Maybe<string>;
+  reminders_weekdays_only: Maybe<boolean>;
+  reminders_left: number;
   created_at: Date;
   created_by: Maybe<string>;
   updated_at: Date;
@@ -271,6 +358,20 @@ export interface CreatePetitionSendout {
   contact_id: number;
   sender_id: number;
   keycode: string;
+  email_subject?: Maybe<string>;
+  email_body?: Maybe<string>;
+  locale: string;
+  deadline?: Maybe<Date>;
+  status: PetitionSendoutStatus;
+  scheduled_at?: Maybe<Date>;
+  email_log_id?: Maybe<number>;
+  next_reminder_at?: Maybe<Date>;
+  reminders_active?: boolean;
+  reminders_offset?: Maybe<number>;
+  reminders_time?: Maybe<string>;
+  reminders_timezone?: Maybe<string>;
+  reminders_weekdays_only?: Maybe<boolean>;
+  reminders_left?: number;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;
