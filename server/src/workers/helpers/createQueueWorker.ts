@@ -6,10 +6,7 @@ import { createContainer } from "../../container";
 import { CONFIG, Config } from "../../config";
 import { WorkerContext } from "../../context";
 import { Aws } from "../../services/aws";
-
-function prefix(name: string) {
-  return `Queue worker ${name}:`;
-}
+import { LOGGER, Logger } from "../../services/logger";
 
 export function createQueueWorker<T>(
   name: keyof Config["queueWorkers"],
@@ -17,34 +14,39 @@ export function createQueueWorker<T>(
 ) {
   const container = createContainer();
   const config = container.get<Config>(CONFIG);
+  const logger = container.get<Logger>(LOGGER);
   const aws = container.get<Aws>(Aws);
   const consumer = Consumer.create({
     queueUrl: config.queueWorkers[name].endpoint,
     batchSize: 10,
     handleMessage: async (message) => {
       const payload = JSON.parse(message.Body!);
-      await handler(payload, container.get<WorkerContext>(WorkerContext));
-      console.log(
-        `${prefix(name)} Successfully executed message with payload ${
-          message.Body
-        }`
-      );
+      const context = container.get<WorkerContext>(WorkerContext);
+      const time = process.hrtime();
+      logger.info("Start processing message", {
+        queue: name,
+        payload: message.Body,
+      });
+      await handler(payload, context);
+      const [seconds, nanoseconds] = process.hrtime(time);
+      const millis = seconds * 1000 + Math.round(nanoseconds / 1e6);
+      logger.info(`Successfully processed message in ${millis}ms`, {
+        queue: name,
+        payload: message.Body,
+      });
     },
     sqs: aws.sqs,
   });
   consumer.on("error", (error) => {
-    console.error(error);
+    logger.error(error, { queue: name });
   });
   consumer.on("processing_error", (error, message) => {
-    console.log(
-      `${prefix(name)} Error during execution with payload ${message.Body}`
-    );
-    console.error(error);
+    logger.error(error, { queue: name, payload: message.Body });
   });
   process.on("SIGINT", function () {
-    console.log(`${prefix(name)} Shutting down`);
+    logger.info(`Shutting down queue worker`, { queue: name });
     consumer.on("stopped", () => {
-      console.log(`${prefix(name)} Worker stopped`);
+      logger.info(`Queue worker stopped`, { queue: name });
       process.exit(0);
     });
     consumer.stop();
@@ -52,7 +54,7 @@ export function createQueueWorker<T>(
   return {
     start() {
       consumer.start();
-      console.log(`${prefix(name)} Running`);
+      logger.info(`Queue worker running`, { queue: name });
     },
     stop: consumer.stop.bind(consumer),
   };

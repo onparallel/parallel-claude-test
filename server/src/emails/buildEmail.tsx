@@ -8,7 +8,7 @@ export interface EmailOptions {
 }
 
 export interface Email<T> {
-  subject: (props: T, intl: IntlShape) => string;
+  subject?: (props: T, intl: IntlShape) => string;
   text: (props: T, intl: IntlShape) => string;
   html: ComponentType<T>;
 }

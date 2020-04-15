@@ -13,6 +13,7 @@ import { Auth } from "./services/auth";
 import { Aws } from "./services/aws";
 import { Cognito } from "./services/cognito";
 import { Smtp } from "./services/smtp";
+import { LOGGER, Logger } from "./services/logger";
 
 @injectable()
 export class ApiContext {
@@ -21,6 +22,7 @@ export class ApiContext {
   sendout: PetitionSendout | null = null;
   req!: express.Request;
   constructor(
+    @inject(LOGGER) public logger: Logger,
     // Services
     public readonly auth: Auth,
     public readonly aws: Aws,
@@ -40,6 +42,7 @@ export class ApiContext {
 export class WorkerContext {
   constructor(
     @inject(CONFIG) public config: Config,
+    @inject(LOGGER) public logger: Logger,
     // Services
     public readonly aws: Aws,
     public readonly smtp: Smtp,

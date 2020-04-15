@@ -179,6 +179,7 @@ export const props: PetitionReminderProps = {
   name: "Santi",
   senderName: "Derek",
   senderEmail: "derek@parallel.so",
+  subject: null,
   body: [
     {
       children: [
