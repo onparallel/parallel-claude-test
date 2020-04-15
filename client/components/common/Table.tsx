@@ -5,6 +5,7 @@ import {
   PseudoBox,
   PseudoBoxProps,
   useColorMode,
+  Flex,
 } from "@chakra-ui/core";
 import { ComponentType, useEffect, useMemo, memo, MouseEvent } from "react";
 import { useSelectionState } from "../../utils/useSelectionState";
@@ -92,17 +93,27 @@ function _Table<TRow, TAction extends string = string>({
             </Box>
           ),
           headerProps: { width: 0 },
+          cellProps: {
+            paddingY: 0,
+            paddingRight: 0,
+            _first: { paddingLeft: 3 },
+          },
           Cell: ({ isSelected, toggle }) => {
             return (
-              <Box height="16px">
+              <Flex
+                height="32px"
+                alignItems="center"
+                justifyContent="center"
+                borderRadius="32px"
+                onClick={toggle}
+              >
                 <Checkbox
                   isChecked={isSelected}
                   size="md"
                   variantColor="purple"
-                  onClick={toggle}
                   onChange={function () {}}
                 />
-              </Box>
+              </Flex>
             );
           },
         },
