@@ -92,7 +92,7 @@ function _Table<TRow, TAction extends string = string>({
               />
             </Box>
           ),
-          headerProps: { width: 0 },
+          headerProps: { width: "1px" },
           cellProps: {
             paddingY: 0,
             paddingRight: 0,
@@ -101,6 +101,7 @@ function _Table<TRow, TAction extends string = string>({
           Cell: ({ isSelected, toggle }) => {
             return (
               <Flex
+                as="label"
                 height="32px"
                 alignItems="center"
                 justifyContent="center"
