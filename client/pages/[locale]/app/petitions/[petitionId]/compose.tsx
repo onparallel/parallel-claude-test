@@ -13,7 +13,10 @@ import {
   PetitionComposeSettings,
   PetitionComposeSettingsProps,
 } from "@parallel/components/petition/PetitionComposeSettings";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   Recipient,
   PetitionComposeQuery,

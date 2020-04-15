@@ -12,7 +12,10 @@ import {
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   SecurityQuery,
   Security_updatePasswordMutation,

@@ -21,7 +21,10 @@ import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { postJson } from "@parallel/utils/rest";
 import { Title } from "@parallel/components/common/Title";
 import { useRouter } from "next/router";
-import { WithDataContext, withData } from "@parallel/components/withData";
+import {
+  WithDataContext,
+  withData,
+} from "@parallel/components/common/withData";
 import { gql } from "apollo-boost";
 
 interface LoginProps {

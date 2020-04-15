@@ -14,7 +14,10 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { Title } from "@parallel/components/common/Title";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   CreateFileUploadReplyInput,
   CreateTextReplyInput,

@@ -11,7 +11,10 @@ import {
 } from "@chakra-ui/core";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   AccountQuery,
   Account_updateAccountMutation,

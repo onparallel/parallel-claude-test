@@ -22,7 +22,10 @@ import {
   PetitionReviewFieldAction,
 } from "@parallel/components/petition/PetitionReviewField";
 import { PetitionSendouts } from "@parallel/components/petition/PetitionSendouts";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   PetitionFieldReply,
   PetitionReviewQuery,

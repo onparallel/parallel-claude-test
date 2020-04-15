@@ -1,5 +1,8 @@
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import { gql } from "apollo-boost";
 import Router from "next/router";
 

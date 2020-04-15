@@ -9,7 +9,10 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import { ContactListHeader } from "@parallel/components/contacts/ContactListHeader";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   ContactsQuery,
   ContactsQueryVariables,

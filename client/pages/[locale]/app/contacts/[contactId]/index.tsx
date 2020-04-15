@@ -22,7 +22,10 @@ import {
   useTableColors,
 } from "@parallel/components/common/Table";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   ContactQuery,
   ContactQueryVariables,

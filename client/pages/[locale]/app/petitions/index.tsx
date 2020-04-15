@@ -12,7 +12,10 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { PetitionListHeader } from "@parallel/components/petitions/PetitionListHeader";
-import { withData, WithDataContext } from "@parallel/components/withData";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import {
   PetitionsQuery,
   PetitionsQueryVariables,

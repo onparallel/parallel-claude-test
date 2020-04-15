@@ -2,7 +2,10 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { TemplatesQuery } from "@parallel/graphql/__types";
-import { WithDataContext, withData } from "@parallel/components/withData";
+import {
+  WithDataContext,
+  withData,
+} from "@parallel/components/common/withData";
 
 function Templates() {
   const { data } = useQuery<TemplatesQuery>(GET_SENDOUTS_DATA);
