@@ -127,7 +127,7 @@ export const Petition = objectType({
         return ctx.petitions.loadSendoutsForPetition(root.id);
       },
     });
-    t.list.field("recipients", {
+    t.field("recipients", {
       type: "Contact",
       list: [false],
       description: "The recipients for this petition",

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "noEmit": false,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "sourceMap": false
   },
   "include": ["src/env.d.ts", "src/**/*"],
   "exclude": ["**/__tests__/**/*"]
