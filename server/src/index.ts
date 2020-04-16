@@ -9,6 +9,7 @@ import { createContainer } from "./container";
 import { ApiContext } from "./context";
 import { schema } from "./schema";
 import { LOGGER, Logger } from "./services/logger";
+import { stopwatchEnd } from "./util/stopwatch";
 
 const app = express();
 const container = createContainer();
@@ -22,17 +23,16 @@ const server = new ApolloServer({
     () => ({
       requestDidStart({ operationName, variables, context }) {
         const time = process.hrtime();
-        (context as ApiContext).logger.info(
-          `GraphQL operation "${operationName}" start`,
-          { variables }
-        );
         return () => {
-          const [seconds, nanoseconds] = process.hrtime(time);
-          const milis = seconds * 1000 + Math.round(nanoseconds / 1e6);
+          const duration = stopwatchEnd(time);
           (context as ApiContext).logger.info(
-            `GraphQL operation "${operationName}" finished in ${milis}ms`,
+            `GraphQL operation "${operationName}" - ${duration}ms`,
             {
-              variables,
+              operation: {
+                name: operationName,
+                variables,
+              },
+              duration,
             }
           );
         };

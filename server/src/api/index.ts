@@ -1,13 +1,23 @@
 import { Router } from "express";
 import { Container } from "inversify";
 import { ApiContext } from "../context";
+import morgan from "morgan";
+import { LOGGER, Logger } from "../services/logger";
 
 export function api(container: Container) {
+  const logger = container.get<Logger>(LOGGER);
   return Router()
     .use((req, res, next) => {
       req.context = container.get<ApiContext>(ApiContext);
       next();
     })
+    .use(
+      morgan("short", {
+        stream: {
+          write: (message: string) => logger.info(message),
+        },
+      })
+    )
     .use(
       "/auth",
       Router()

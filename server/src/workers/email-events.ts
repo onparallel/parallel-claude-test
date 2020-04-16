@@ -1,18 +1,18 @@
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type EmailEventsWorkerPayload = {
-  Message: string;
+  eventType: string;
+  mail: any;
 };
 
 const worker = createQueueWorker(
   "email-events",
   async (payload: EmailEventsWorkerPayload, context) => {
-    const message = JSON.parse(payload.Message);
-    if (!message?.mail?.messageId) {
+    if (!payload?.mail?.messageId) {
       return;
     }
     const emailLogId = await context.emails.findInternalId(
-      message.mail.messageId
+      payload.mail.messageId
     );
     if (!emailLogId) {
       return;
@@ -21,12 +21,18 @@ const worker = createQueueWorker(
       Delivery: "delivery",
       Bounce: "bounce",
       Open: "open",
-    } as any)[message.eventType];
+    } as any)[payload.eventType];
     await context.emails.createEvent({
       email_log_id: emailLogId,
       event,
-      payload: JSON.stringify(message[event]),
+      payload: JSON.stringify((payload as any)[event]),
     });
+  },
+  {
+    parser: (message) => {
+      const m = JSON.parse(message);
+      return JSON.parse(m.Message);
+    },
   }
 );
 

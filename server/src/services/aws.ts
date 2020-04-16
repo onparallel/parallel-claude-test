@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
 import AWS from "aws-sdk";
-import { promisify } from "util";
 import contentDisposition from "content-disposition";
 import { chunk } from "remeda";
+import { LOGGER, Logger } from "./logger";
 
 @injectable()
 export class Aws {
@@ -27,11 +27,29 @@ export class Aws {
     return this._sqs;
   }
 
-  constructor(@inject(CONFIG) private config: Config) {
+  private _logs?: AWS.CloudWatchLogs;
+  public get logs() {
+    if (!this._logs) {
+      this._logs = new AWS.CloudWatchLogs();
+    }
+    return this._logs;
+  }
+
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(LOGGER) private logger: Logger
+  ) {
     AWS.config.update({
       ...config.aws,
       signatureVersion: "v4",
-      logger: process.env.NODE_ENV === "production" ? undefined : console,
+      logger:
+        process.env.NODE_ENV === "production"
+          ? undefined
+          : {
+              log(message) {
+                logger.debug(message);
+              },
+            },
     });
   }
 

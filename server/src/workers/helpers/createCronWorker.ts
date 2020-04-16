@@ -1,42 +1,58 @@
 import "reflect-metadata";
-require("dotenv").config();
-
 import { CronJob } from "cron";
-import { createContainer } from "../../container";
+import { EventEmitter } from "events";
+import path from "path";
 import { Config, CONFIG } from "../../config";
+import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
 import { LOGGER, Logger } from "../../services/logger";
-
-function prefix(name: string) {
-  return `Cron worker ${name}:`;
-}
+import { stopwatch } from "../../util/stopwatch";
 
 export function createCronWorker(
   name: keyof Config["cronWorkers"],
   handler: (context: WorkerContext) => Promise<void>
 ) {
+  require("dotenv").config({
+    path: path.resolve(process.cwd(), `.${name}.env`),
+  });
+  require("dotenv").config();
   const container = createContainer();
   const config = container.get<Config>(CONFIG);
   const logger = container.get<Logger>(LOGGER);
-
+  let running = false;
+  const events = new EventEmitter();
   const job = new CronJob(config.cronWorkers[name].rule, async function () {
     try {
-      const time = process.hrtime();
-      await handler(container.get<WorkerContext>(WorkerContext));
-      const [seconds, nanoseconds] = process.hrtime(time);
-      const millis = seconds * 1000 + Math.round(nanoseconds / 1e6);
+      running = true;
+      logger.info(`Execution start`);
+      const duration = await stopwatch(async () => {
+        await handler(container.get<WorkerContext>(WorkerContext));
+      });
       const nextExecution = job.nextDate().toDate().toISOString();
       logger.info(
-        `Successful execution in ${millis}ms. Next execution on ${nextExecution}`,
-        { queue: name }
+        `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
+        { duration }
       );
     } catch (error) {
-      logger.error(error, { queue: name });
+      logger.error(error.stack);
+    } finally {
+      running = false;
+      events.emit("finish");
     }
   });
   process.on("SIGINT", function () {
-    logger.info(`Shutting down worker`, { queue: name });
+    logger.info(`Shutting down cron worker`);
     job.stop();
+    if (running) {
+      logger.info(`Waiting for cron job to finish`);
+      events.once("finish", () => {
+        logger.info(`Cron worker stopped`);
+        process.exit(0);
+      });
+    } else {
+      logger.info(`Cron worker stopped`);
+      process.exit(0);
+    }
   });
   return {
     start() {

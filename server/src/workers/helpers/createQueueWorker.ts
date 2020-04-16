@@ -1,17 +1,30 @@
 import "reflect-metadata";
-require("dotenv").config();
-
+import path from "path";
 import { Consumer } from "sqs-consumer";
-import { createContainer } from "../../container";
 import { CONFIG, Config } from "../../config";
+import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
 import { Aws } from "../../services/aws";
 import { LOGGER, Logger } from "../../services/logger";
+import { stopwatch } from "../../util/stopwatch";
+
+export type QueueWorkerOptions<T> = {
+  parser?: (message: string) => T;
+};
 
 export function createQueueWorker<T>(
   name: keyof Config["queueWorkers"],
-  handler: (payload: T, context: WorkerContext) => Promise<void>
+  handler: (payload: T, context: WorkerContext) => Promise<void>,
+  options?: QueueWorkerOptions<T>
 ) {
+  require("dotenv").config({
+    path: path.resolve(process.cwd(), `.${name}.env`),
+  });
+  require("dotenv").config();
+  const { parser } = {
+    parser: (message: string) => JSON.parse(message) as T,
+    ...options,
+  };
   const container = createContainer();
   const config = container.get<Config>(CONFIG);
   const logger = container.get<Logger>(LOGGER);
@@ -20,33 +33,29 @@ export function createQueueWorker<T>(
     queueUrl: config.queueWorkers[name].endpoint,
     batchSize: 10,
     handleMessage: async (message) => {
-      const payload = JSON.parse(message.Body!);
+      const payload = parser(message.Body!);
       const context = container.get<WorkerContext>(WorkerContext);
-      const time = process.hrtime();
-      logger.info("Start processing message", {
-        queue: name,
-        payload: message.Body,
+      logger.info("Start processing message", { payload });
+      const duration = await stopwatch(async () => {
+        await handler(payload, context);
       });
-      await handler(payload, context);
-      const [seconds, nanoseconds] = process.hrtime(time);
-      const millis = seconds * 1000 + Math.round(nanoseconds / 1e6);
-      logger.info(`Successfully processed message in ${millis}ms`, {
-        queue: name,
-        payload: message.Body,
+      logger.info(`Successfully processed message in ${duration}ms`, {
+        payload,
+        duration,
       });
     },
     sqs: aws.sqs,
   });
   consumer.on("error", (error) => {
-    logger.error(error, { queue: name });
+    logger.error(error.stack);
   });
   consumer.on("processing_error", (error, message) => {
-    logger.error(error, { queue: name, payload: message.Body });
+    logger.error(error.stack, { payload: message.Body });
   });
   process.on("SIGINT", function () {
-    logger.info(`Shutting down queue worker`, { queue: name });
+    logger.info(`Shutting down queue worker`);
     consumer.on("stopped", () => {
-      logger.info(`Queue worker stopped`, { queue: name });
+      logger.info(`Queue worker stopped`);
       process.exit(0);
     });
     consumer.stop();
@@ -54,7 +63,7 @@ export function createQueueWorker<T>(
   return {
     start() {
       consumer.start();
-      logger.info(`Queue worker running`, { queue: name });
+      logger.info(`Queue worker running`);
     },
     stop: consumer.stop.bind(consumer),
   };
