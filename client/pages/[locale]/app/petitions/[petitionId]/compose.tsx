@@ -551,7 +551,7 @@ function useSendPetition() {
         recipients,
         scheduledAt: scheduledAt?.toISOString() ?? null,
       },
-      update(client, { data }: PetitionCompose_sendPetitionMutationResult) {
+      update(client, { data }) {
         const sendouts = data!.sendPetition.sendouts;
         if (!sendouts) {
           return;
