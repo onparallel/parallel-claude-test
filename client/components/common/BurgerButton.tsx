@@ -1,10 +1,12 @@
 import { Box, BoxProps, Button, ButtonProps } from "@chakra-ui/core";
+import { useIntl } from "react-intl";
 
 export type BurgerButtonProps = Omit<ButtonProps, "children"> & {
   isOpen: boolean;
 };
 
 export function BurgerButton({ isOpen, ...props }: BurgerButtonProps) {
+  const intl = useIntl();
   const common: BoxProps = {
     width: "30px",
     height: "3px",
@@ -22,6 +24,17 @@ export function BurgerButton({ isOpen, ...props }: BurgerButtonProps) {
       width="40px"
       height="40px"
       variant="ghost"
+      aria-label={
+        isOpen
+          ? intl.formatMessage({
+              id: "component.burger-button.label-close",
+              defaultMessage: "Close menu",
+            })
+          : intl.formatMessage({
+              id: "component.burger-button.label-open",
+              defaultMessage: "Open menu",
+            })
+      }
       {...props}
     >
       <Box
