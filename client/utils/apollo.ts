@@ -25,7 +25,7 @@ export function createApolloClient(
   }
 
   const httpLink = createHttpLink({
-    uri: "http://localhost/graphql",
+    uri: process.browser ? "/graphql" : "http://localhost:4000/graphql",
   });
 
   const authLink = setContext((_, { headers }) => {

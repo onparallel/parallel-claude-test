@@ -78,7 +78,7 @@ export function useTranslations(locale: string) {
     if (!locale) {
       return;
     } else if (!cache[locale]) {
-      fetch(`/static/lang/${locale}.json`)
+      fetch(`${process.env.ASSETS_URL}/static/lang/${locale}.json`)
         .then((res) => res.json())
         .then((messages) => {
           setState({

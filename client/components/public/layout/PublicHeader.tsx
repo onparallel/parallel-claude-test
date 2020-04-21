@@ -118,16 +118,16 @@ function PublicHeaderMenu(props: StackProps) {
           defaultMessage="Contact"
         ></FormattedMessage>
       </Button>
-      <Button
-        as="a"
-        {...{ href: "https://api.parallel.so/auth/login" }}
-        variant="outline"
-      >
-        <FormattedMessage
-          id="public.login-button"
-          defaultMessage="Login"
-        ></FormattedMessage>
-      </Button>
+      <Flex>
+        <NakedLink href="/login">
+          <Button as="a" variant="outline">
+            <FormattedMessage
+              id="public.login-button"
+              defaultMessage="Login"
+            ></FormattedMessage>
+          </Button>
+        </NakedLink>
+      </Flex>
       <Button
         as="a"
         {...{ href: "https://parallelso.typeform.com/to/XxE7IY" }}

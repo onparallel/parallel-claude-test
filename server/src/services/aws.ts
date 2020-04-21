@@ -126,9 +126,9 @@ export class Aws {
     return await this.enqueueMessages(
       "sendout-email",
       sendoutIds.map((id) => ({
-        id: `PetitionSendout:${id}`,
+        id: `PetitionSendout-${id}`,
         body: { petition_sendout_id: id },
-        groupId: `PetitionSendout:${id}`,
+        groupId: `PetitionSendout-${id}`,
       }))
     );
   }
@@ -137,9 +137,9 @@ export class Aws {
     return await this.enqueueMessages(
       "reminder-email",
       ids.map((id) => ({
-        id: `PetitionReminder:${id}`,
+        id: `PetitionReminder-${id}`,
         body: { petition_reminder_id: id },
-        groupId: `PetitionReminder:${id}`,
+        groupId: `PetitionReminder-${id}`,
       }))
     );
   }
@@ -147,14 +147,14 @@ export class Aws {
   async enqueueEmail(id: number) {
     await this.enqueueMessages("email-sender", {
       body: { email_log_id: id },
-      groupId: `EmailLog:${id}`,
+      groupId: `EmailLog-${id}`,
     });
   }
 
   async enqueuePetitionCompleted(id: number) {
     await this.enqueueMessages("completed-email", {
       body: { petition_sendout_id: id },
-      groupId: `PetitionSendout:${id}`,
+      groupId: `PetitionSendout-${id}`,
     });
   }
 }

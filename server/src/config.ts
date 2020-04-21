@@ -18,7 +18,6 @@ export function buildConfig() {
     }),
     redis: Object.freeze({
       host: process.env.REDIS_HOST!,
-      password: process.env.REDIS_PASSWORD!,
       port: parseInt(process.env.REDIS_PORT!),
     }),
     aws: Object.freeze({

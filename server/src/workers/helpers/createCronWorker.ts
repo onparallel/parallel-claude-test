@@ -1,21 +1,18 @@
 import "reflect-metadata";
 import { CronJob } from "cron";
 import { EventEmitter } from "events";
-import path from "path";
 import { Config, CONFIG } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
 import { LOGGER, Logger } from "../../services/logger";
+import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
 export function createCronWorker(
   name: keyof Config["cronWorkers"],
   handler: (context: WorkerContext) => Promise<void>
 ) {
-  require("dotenv").config({
-    path: path.resolve(process.cwd(), `.${name}.env`),
-  });
-  require("dotenv").config();
+  loadEnv(`.${name}.env`);
   const container = createContainer();
   const config = container.get<Config>(CONFIG);
   const logger = container.get<Logger>(LOGGER);

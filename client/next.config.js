@@ -1,15 +1,18 @@
 const PROD = process.env.NODE_ENV === "production";
+const assetsUrl = PROD
+  ? {
+      dev: "",
+      staging: "https://static-staging.parallel.so",
+      production: "https://static.parallel.so",
+    }[process.env.ENV]
+  : "";
 const config = {
   env: {
     ROOT: __dirname,
     GA_TRACKING_ID: process.env.ENV === "production" ? "UA-153451031-3" : null,
+    ASSETS_URL: assetsUrl,
   },
-  assetPrefix: PROD
-    ? {
-        staging: "https://static-staging.parallel.so",
-        production: "https://static.parallel.so",
-      }[process.env.ENV]
-    : "",
+  assetPrefix: assetsUrl,
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
@@ -27,6 +30,14 @@ const config = {
       return entries;
     };
     return config;
+  },
+  exportPathMap: async function (
+    defaultPathMap,
+    { dev, dir, outDir, distDir, buildId }
+  ) {
+    return {
+      "/": { page: "/" },
+    };
   },
 };
 

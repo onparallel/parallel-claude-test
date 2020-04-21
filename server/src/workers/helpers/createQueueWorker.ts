@@ -1,11 +1,11 @@
 import "reflect-metadata";
-import path from "path";
 import { Consumer } from "sqs-consumer";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
 import { Aws } from "../../services/aws";
 import { LOGGER, Logger } from "../../services/logger";
+import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 
 export type QueueWorkerOptions<T> = {
@@ -17,10 +17,7 @@ export function createQueueWorker<T>(
   handler: (payload: T, context: WorkerContext) => Promise<void>,
   options?: QueueWorkerOptions<T>
 ) {
-  require("dotenv").config({
-    path: path.resolve(process.cwd(), `.${name}.env`),
-  });
-  require("dotenv").config();
+  loadEnv(`.${name}.env`);
   const { parser } = {
     parser: (message: string) => JSON.parse(message) as T,
     ...options,

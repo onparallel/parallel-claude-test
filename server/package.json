@@ -15,8 +15,8 @@
     "generate-db-types": "ts-node ./bin/generate-db-types.ts",
     "test": "jest --runInBand",
     "emails": "ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx",
-    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --input '../server/src/emails/{components,common}/**/*.{ts,tsx}' --output '../server/src/emails/lang'",
-    "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --input '../server/src/emails/lang' --output-compiled '../server/src/emails/lang/compiled'"
+    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --input '../server/src/emails/{components,common}/**/*.{ts,tsx}' --output '../server/lang'",
+    "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --input '../server/lang' --output-compiled '../server/lang/compiled'"
   },
   "dependencies": {
     "amazon-cognito-identity-js": "^4.2.1",

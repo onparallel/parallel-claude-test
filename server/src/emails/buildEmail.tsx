@@ -18,7 +18,7 @@ export async function buildEmail<T>(
   props: T,
   { locale }: EmailOptions
 ) {
-  const messages = await import(`./lang/compiled/${locale}.json`);
+  const messages = await import(`../../lang/compiled/${locale}.json`);
   const { html } = render(
     <IntlProvider locale={locale} messages={messages}>
       {createElement(email.html, props)}

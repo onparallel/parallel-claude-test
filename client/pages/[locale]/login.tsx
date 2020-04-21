@@ -54,9 +54,12 @@ function Login({ me }: LoginProps) {
         password,
       });
       localStorage.setItem("token", token);
-      router.push("/[locale]/app", `/${router.query.locale}/app`);
+      router.push(
+        "/[locale]/app/petitions",
+        `/${router.query.locale}/app/petitions`
+      );
     } catch (error) {
-      if (error.code === "NewPasswordRequired") {
+      if (error.error === "NewPasswordRequired") {
         setPasswordChange({ required: true, email, password });
       } else {
         toast({
@@ -89,7 +92,10 @@ function Login({ me }: LoginProps) {
         newPassword,
       });
       localStorage.setItem("token", token);
-      router.push("/[locale]/app", `/${router.query.locale}/app`);
+      router.push(
+        "/[locale]/app/petitions",
+        `/${router.query.locale}/app/petitions`
+      );
     } catch (error) {}
     setIsSubmitting(false);
   }
@@ -109,7 +115,10 @@ function Login({ me }: LoginProps) {
               me={me!}
               onRelogin={() => setShowContinueAs(false)}
               onContinueAs={() =>
-                router.push("/[locale]/app", `/${router.query.locale}/app`)
+                router.push(
+                  "/[locale]/app/petitions",
+                  `/${router.query.locale}/app/petitions`
+                )
               }
             />
           ) : passwordChange.required ? (

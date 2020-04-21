@@ -24,6 +24,7 @@ export class Auth {
     } catch (error) {
       switch (error.code) {
         case "NewPasswordRequired":
+        case "PasswordResetRequiredException":
           res.status(401).send({ error: "NewPasswordRequired" });
           return;
         case "UserNotFoundException":

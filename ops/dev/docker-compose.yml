@@ -16,7 +16,7 @@ services:
       - "6379:6379"
     volumes:
       - $HOME/docker/volumes/parallel/redis:/var/lib/redis
-    command: redis-server --requirepass lellarap
+    command: redis-server
   nginx:
     image: nginx:latest
     volumes:

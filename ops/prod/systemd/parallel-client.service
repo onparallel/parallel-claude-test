@@ -1,0 +1,16 @@
+[Unit]
+Description=parallel client
+After=network.target
+
+[Service]
+Environment=PORT=3000
+Environment=NODE_ENV=production
+Environment=ENV=#ENV#
+WorkingDirectory=/home/ec2-user/main/client
+Type=simple
+User=ec2-user
+ExecStart=/home/ec2-user/main/node_modules/.bin/next start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
