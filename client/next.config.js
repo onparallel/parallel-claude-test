@@ -9,7 +9,8 @@ const assetsUrl = PROD
 const config = {
   env: {
     ROOT: __dirname,
-    GA_TRACKING_ID: process.env.ENV === "production" ? "UA-153451031-3" : null,
+    GA_TRACKING_ID:
+      process.env.ENV === "production" ? "UA-153451031-1" : "UA-153451031-3",
     ASSETS_URL: assetsUrl,
   },
   assetPrefix: assetsUrl,
