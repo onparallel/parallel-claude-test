@@ -38,8 +38,6 @@ import {
   usePetitionCompose_updateFieldPositionsMutation,
   usePetitionCompose_updatePetitionFieldMutation,
   usePetitionCompose_updatePetitionMutation,
-  PetitionCompose_sendPetition_PetitionFragment,
-  PetitionCompose_sendPetitionMutationResult,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import {
@@ -551,32 +549,10 @@ function useSendPetition() {
         recipients,
         scheduledAt: scheduledAt?.toISOString() ?? null,
       },
-      update(client, { data }) {
-        const sendouts = data!.sendPetition.sendouts;
-        if (!sendouts) {
-          return;
-        }
-        const fragment = gql`
-          fragment PetitionCompose_sendPetition_Petition on Petition {
-            sendouts {
-              id
-            }
-          }
-        `;
-        const cached = client.readFragment<
-          PetitionCompose_sendPetition_PetitionFragment
-        >({ id: petitionId, fragment: fragment });
-        client.writeFragment<PetitionCompose_sendPetition_PetitionFragment>({
-          id: petitionId,
-          fragment: fragment,
-          data: {
-            __typename: "Petition",
-            sendouts: [
-              ...cached!.sendouts,
-              ...sendouts.map(pick(["id", "__typename"])),
-            ],
-          },
-        });
+      update(client) {
+        // clear stale data
+        delete (client as any).data.data[petitionId].sendouts;
+        delete (client as any).data.data[petitionId].recipients;
       },
     });
     if (data?.sendPetition.sendouts) {

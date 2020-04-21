@@ -19,7 +19,7 @@ export function fromDataLoader<K, V, C = K>(
       cache: true,
       ...opts,
     };
-    if (refresh && !cache) {
+    if (refresh || !cache) {
       for (const id of Array.isArray(ids) ? ids : [ids]) {
         dataloader.clear(id);
       }

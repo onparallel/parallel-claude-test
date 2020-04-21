@@ -1082,14 +1082,6 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   };
 };
 
-export type PetitionCompose_sendPetition_PetitionFragment = {
-  __typename?: "Petition";
-} & {
-  sendouts: Array<
-    { __typename?: "PetitionSendout" } & Pick<PetitionSendout, "id">
-  >;
-};
-
 export type PetitionComposeQueryVariables = {
   id: Scalars["ID"];
 };
@@ -1696,13 +1688,6 @@ export const PetitionCompose_createPetitionField_PetitionFragmentDoc = gql`
 export const PetitionCompose_deletePetitionField_PetitionFragmentDoc = gql`
   fragment PetitionCompose_deletePetitionField_Petition on Petition {
     fields {
-      id
-    }
-  }
-`;
-export const PetitionCompose_sendPetition_PetitionFragmentDoc = gql`
-  fragment PetitionCompose_sendPetition_Petition on Petition {
-    sendouts {
       id
     }
   }

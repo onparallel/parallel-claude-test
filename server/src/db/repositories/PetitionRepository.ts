@@ -27,7 +27,6 @@ import {
   validateFieldOptions,
   defaultFieldOptions,
 } from "../helpers/fieldOptions";
-import { props } from "../../util/promises";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
