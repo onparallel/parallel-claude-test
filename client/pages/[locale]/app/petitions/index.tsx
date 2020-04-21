@@ -231,16 +231,16 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
       </>
     )),
   },
-  {
-    key: "customRef",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.header.custom-ref"
-        defaultMessage="Reference"
-      />
-    )),
-    Cell: memo(({ row }) => <>{row.customRef}</>),
-  },
+  // {
+  //   key: "customRef",
+  //   Header: memo(() => (
+  //     <FormattedMessage
+  //       id="petitions.header.custom-ref"
+  //       defaultMessage="Reference"
+  //     />
+  //   )),
+  //   Cell: memo(({ row }) => <>{row.customRef}</>),
+  // },
   {
     key: "recipient",
     Header: memo(() => (
