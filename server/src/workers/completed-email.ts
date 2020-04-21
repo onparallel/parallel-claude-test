@@ -59,14 +59,6 @@ const worker = createQueueWorker(
       html,
       created_from: `PetitionSendout:${petition_sendout_id}`,
     });
-    await context.petitions.updatePetitionSendout(
-      petition_sendout_id,
-      {
-        status: "ACTIVE",
-        email_log_id: email.id,
-      },
-      sender
-    );
     await context.aws.enqueueEmail(email.id);
   }
 );
