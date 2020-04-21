@@ -43,3 +43,23 @@ export const staging = {
     extension: "ts",
   },
 };
+
+export const production = {
+  client: "pg",
+  connection: {
+    host: "parallel-production.cawlvk8lltxr.eu-central-1.rds.amazonaws.com",
+    database: "parallel",
+    user: "parallel_ops",
+    password: process.env.DB_PASSWORD,
+    port: 5432,
+  },
+  migrations: {
+    directory: "migrations",
+    tableName: "migrations",
+    extension: "ts",
+  },
+  seeds: {
+    directory: "seeds",
+    extension: "ts",
+  },
+};
