@@ -2,6 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Layout } from "../common/Layout";
@@ -13,11 +14,17 @@ export type WelcomeProps = {
   assetsUrl: string;
 };
 
-export default {
-  text: function Welcome(
-    { verificationUrl, parallelUrl }: WelcomeProps,
-    intl: IntlShape
-  ) {
+const email: Email<WelcomeProps> = {
+  from({}, intl) {
+    return intl.formatMessage({
+      id: "from.parallel-team",
+      defaultMessage: "Parallel team",
+    });
+  },
+  subject({}, intl) {
+    return "";
+  },
+  text({ verificationUrl, parallelUrl }: WelcomeProps, intl: IntlShape) {
     return outdent`
       ${intl.formatMessage({
         id: "welcome.greeting",
@@ -33,11 +40,7 @@ export default {
       ${closing({}, intl)}
     `;
   },
-  html: function Welcome({
-    verificationUrl,
-    parallelUrl,
-    assetsUrl,
-  }: WelcomeProps) {
+  html({ verificationUrl, parallelUrl, assetsUrl }: WelcomeProps) {
     const { locale } = useIntl();
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
@@ -68,6 +71,8 @@ export default {
     );
   },
 };
+
+export default email;
 
 export const props: WelcomeProps = {
   assetsUrl: "http://localhost",

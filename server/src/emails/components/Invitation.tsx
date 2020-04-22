@@ -1,11 +1,12 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import outdent from "outdent";
 import React from "react";
-import { FormattedMessage, useIntl, IntlShape } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import outdent from "outdent";
 
 export interface InvitationProps {
   email: string;
@@ -14,19 +15,23 @@ export interface InvitationProps {
   parallelUrl: string;
 }
 
-export default {
-  text: function Invitation(
+const email: Email<InvitationProps> = {
+  from({}, intl) {
+    return intl.formatMessage({
+      id: "from.parallel-team",
+      defaultMessage: "Parallel team",
+    });
+  },
+  subject({}, intl) {
+    return "";
+  },
+  text(
     { email, password, assetsUrl, parallelUrl }: InvitationProps,
     intl: IntlShape
   ) {
     return outdent``;
   },
-  html: function Invitation({
-    email,
-    password,
-    assetsUrl,
-    parallelUrl,
-  }: InvitationProps) {
+  html({ email, password, assetsUrl, parallelUrl }: InvitationProps) {
     const { locale } = useIntl();
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
@@ -62,6 +67,8 @@ export default {
     );
   },
 };
+
+export default email;
 
 export const props: InvitationProps = {
   email: "derek@parallel.so",

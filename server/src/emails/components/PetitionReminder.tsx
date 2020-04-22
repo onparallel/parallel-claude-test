@@ -1,21 +1,22 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import outdent from "outdent";
 import React from "react";
-import { FormattedMessage, useIntl, IntlShape } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { DateTime } from "../common/DateTime";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import { RenderSlate } from "../common/RenderSlate";
-import { FORMATS } from "../utils/dates";
-import outdent from "outdent";
-import {
-  greeting,
-  closing,
-  renderSlateText,
-  petitionFieldList,
-} from "../common/texts";
 import { PetitionFieldList } from "../common/PetitionFieldList";
+import { RenderSlate } from "../common/RenderSlate";
+import {
+  closing,
+  greeting,
+  petitionFieldList,
+  renderSlateText,
+} from "../common/texts";
+import { FORMATS } from "../utils/dates";
 
 export interface PetitionReminderProps {
   name: string | null;
@@ -30,17 +31,27 @@ export interface PetitionReminderProps {
   assetsUrl: string;
 }
 
-export default {
-  subject: function ({ subject }: PetitionReminderProps, intl: IntlShape) {
+const email: Email<PetitionReminderProps> = {
+  from({ senderName }, intl) {
+    return intl.formatMessage(
+      {
+        id: "from.via-parallel",
+        defaultMessage: "{senderName} (via Parallel)",
+      },
+      { senderName }
+    );
+  },
+  subject({ subject }: PetitionReminderProps, intl: IntlShape) {
     return intl.formatMessage(
       {
         id: "petition-reminder.subject",
-        defaultMessage: "Reminder! {subject}",
+        defaultMessage:
+          "Reminder!{subject, select, null {} other { {subject}}}",
       },
       { subject }
     );
   },
-  text: function PetitionReminder(
+  text(
     {
       name,
       senderName,
@@ -93,7 +104,7 @@ export default {
       ${closing({}, intl)}
     `;
   },
-  html: function PetitionReminder({
+  html({
     name,
     senderName,
     senderEmail,
@@ -174,6 +185,8 @@ export default {
     );
   },
 };
+
+export default email;
 
 export const props: PetitionReminderProps = {
   name: "Santi",

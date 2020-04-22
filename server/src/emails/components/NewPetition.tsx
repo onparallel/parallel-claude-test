@@ -1,36 +1,50 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
+import outdent from "outdent";
 import React from "react";
-import { FormattedMessage, useIntl, IntlShape } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { DateTime } from "../common/DateTime";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import { RenderSlate } from "../common/RenderSlate";
-import { FORMATS } from "../utils/dates";
-import outdent from "outdent";
-import {
-  greeting,
-  closing,
-  renderSlateText,
-  petitionFieldList,
-} from "../common/texts";
 import { PetitionFieldList } from "../common/PetitionFieldList";
+import { RenderSlate } from "../common/RenderSlate";
+import {
+  closing,
+  greeting,
+  petitionFieldList,
+  renderSlateText,
+} from "../common/texts";
+import { FORMATS } from "../utils/dates";
 
 export interface NewPetitionProps {
   name: string | null;
   senderName: string;
   senderEmail: string;
   fields: { id: number; title: string | null }[];
-  body: any;
+  subject: string | null;
+  body: any | null;
   deadline: Date | null;
   keycode: string;
   parallelUrl: string;
   assetsUrl: string;
 }
 
-export default {
-  text: function NewPetition(
+const email: Email<NewPetitionProps> = {
+  from({ senderName }, intl) {
+    return intl.formatMessage(
+      {
+        id: "from.via-parallel",
+        defaultMessage: "{senderName} (via Parallel)",
+      },
+      { senderName }
+    );
+  },
+  subject({ subject }, intl) {
+    return subject || "";
+  },
+  text(
     {
       name,
       senderName,
@@ -40,8 +54,8 @@ export default {
       deadline,
       keycode,
       parallelUrl,
-    }: NewPetitionProps,
-    intl: IntlShape
+    },
+    intl
   ) {
     return outdent`
       ${greeting({ name }, intl)}
@@ -82,7 +96,7 @@ export default {
       ${closing({}, intl)}
     `;
   },
-  html: function NewPetition({
+  html({
     name,
     senderName,
     senderEmail,
@@ -164,11 +178,13 @@ export default {
     );
   },
 };
+export default email;
 
 export const props: NewPetitionProps = {
   name: "Derek",
   senderName: "santi",
   senderEmail: "santi@parallel.so",
+  subject: null,
   body: [
     {
       children: [

@@ -1,7 +1,8 @@
-import { createQueueWorker } from "./helpers/createQueueWorker";
 import { buildEmail } from "../emails/buildEmail";
 import PetitionCompleted from "../emails/components/PetitionCompleted";
+import { buildFrom } from "../emails/utils/buildFrom";
 import { toGlobalId } from "../util/globalId";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type SendoutWorkerPayload = { petition_sendout_id: number };
 
@@ -37,7 +38,7 @@ const worker = createQueueWorker(
       (contact.first_name && contact.last_name
         ? `${contact.first_name} ${contact.last_name}`
         : contact.first_name!) || contact.email;
-    const { html, text, subject } = await buildEmail(
+    const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
         name: sender.first_name,
@@ -50,11 +51,10 @@ const worker = createQueueWorker(
       },
       { locale: sendout.locale }
     );
-    const from = context.config.misc.emailFrom;
     const email = await context.emails.createEmail({
-      from: `Parallel <${from}>`,
+      from: buildFrom(from, context.config.misc.emailFrom),
       to: sender.email,
-      subject: subject!,
+      subject,
       text,
       html,
       created_from: `PetitionSendout:${petition_sendout_id}`,

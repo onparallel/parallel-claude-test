@@ -2,6 +2,7 @@ import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
@@ -19,11 +20,14 @@ export interface PetitionCompletedProps {
   assetsUrl: string;
 }
 
-export default {
-  subject: function (
-    { petitionName }: PetitionCompletedProps,
-    intl: IntlShape
-  ) {
+const email: Email<PetitionCompletedProps> = {
+  from({}, intl) {
+    return intl.formatMessage({
+      id: "from.parallel-team",
+      defaultMessage: "Parallel team",
+    });
+  },
+  subject({ petitionName }: PetitionCompletedProps, intl: IntlShape) {
     return intl.formatMessage(
       {
         id: "petition-completed.subject",
@@ -32,7 +36,7 @@ export default {
       { petitionName }
     );
   },
-  text: function PetitionCompleted(
+  text(
     {
       name,
       petitionId,
@@ -72,7 +76,7 @@ export default {
       ${closing({}, intl)}
     `;
   },
-  html: function PetitionCompleted({
+  html({
     name,
     petitionId,
     petitionName,
@@ -126,6 +130,8 @@ export default {
     );
   },
 };
+
+export default email;
 
 export const props: PetitionCompletedProps = {
   name: "Derek",

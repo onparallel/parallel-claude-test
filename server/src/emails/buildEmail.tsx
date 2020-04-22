@@ -8,7 +8,8 @@ export interface EmailOptions {
 }
 
 export interface Email<T> {
-  subject?: (props: T, intl: IntlShape) => string;
+  from: (props: T, intl: IntlShape) => string;
+  subject: (props: T, intl: IntlShape) => string;
   text: (props: T, intl: IntlShape) => string;
   html: ComponentType<T>;
 }
@@ -32,6 +33,7 @@ export async function buildEmail<T>(
   );
   const intl = createIntl({ locale, messages });
   const text = email.text(props, intl);
-  const subject = email.subject ? email.subject(props, intl) : null;
-  return { html, text, subject };
+  const subject = email.subject(props, intl);
+  const from = email.from(props, intl);
+  return { html, text, subject, from };
 }

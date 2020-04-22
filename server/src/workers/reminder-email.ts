@@ -1,6 +1,7 @@
-import { createQueueWorker } from "./helpers/createQueueWorker";
 import { buildEmail } from "../emails/buildEmail";
 import PetitionReminder from "../emails/components/PetitionReminder";
+import { buildFrom } from "../emails/utils/buildFrom";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type ReminderEmailWorkerPayload = {
   petition_reminder_id: number;
@@ -59,7 +60,7 @@ const worker = createQueueWorker(
     const senderName = sender.last_name
       ? `${sender.first_name} ${sender.last_name}`
       : sender.first_name!;
-    const { html, text, subject } = await buildEmail(
+    const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
         name: contact.first_name,
@@ -75,11 +76,10 @@ const worker = createQueueWorker(
       },
       { locale: sendout.locale }
     );
-    const from = context.config.misc.emailFrom;
     const email = await context.emails.createEmail({
-      from: `"${senderName.replace(/"/g, '"')}" <${from}>`,
+      from: buildFrom(from, context.config.misc.emailFrom),
       to: contact.email,
-      subject: subject!,
+      subject,
       text,
       html,
       created_from: `PetitionReminder:${reminder.id}`,

@@ -1,6 +1,7 @@
-import { createQueueWorker } from "./helpers/createQueueWorker";
 import { buildEmail } from "../emails/buildEmail";
 import NewPetition from "../emails/components/NewPetition";
+import { buildFrom } from "../emails/utils/buildFrom";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type SendoutEmailWorkerPayload = { petition_sendout_id: number };
 
@@ -34,12 +35,13 @@ const worker = createQueueWorker(
     const senderName = sender.last_name
       ? `${sender.first_name} ${sender.last_name}`
       : sender.first_name!;
-    const { html, text } = await buildEmail(
+    const { html, text, subject, from } = await buildEmail(
       NewPetition,
       {
         name: contact.first_name,
         senderName,
         senderEmail: sender.email,
+        subject: sendout.email_subject,
         body: sendout.email_body ? JSON.parse(sendout.email_body) : [],
         fields: fields.map((f) => ({ id: f.id, title: f.title })),
         deadline: sendout.deadline,
@@ -49,11 +51,10 @@ const worker = createQueueWorker(
       },
       { locale: sendout.locale }
     );
-    const from = context.config.misc.emailFrom;
     const email = await context.emails.createEmail({
-      from: `"${senderName.replace(/"/g, '"')}" <${from}>`,
+      from: buildFrom(from, context.config.misc.emailFrom),
       to: contact.email,
-      subject: sendout.email_subject ?? "",
+      subject,
       text,
       html,
       track_opens: true,

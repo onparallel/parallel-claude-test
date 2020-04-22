@@ -1,11 +1,12 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape } from "react-intl";
+import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import outdent from "outdent";
 
 export interface ForgotPasswordProps {
   name: string | null;
@@ -14,19 +15,20 @@ export interface ForgotPasswordProps {
   resetUrl: string;
 }
 
-export default {
-  text: function ForgotPassword(
-    { name, assetsUrl, parallelUrl, resetUrl }: ForgotPasswordProps,
-    intl: IntlShape
-  ) {
+const email: Email<ForgotPasswordProps> = {
+  from({}, intl) {
+    return intl.formatMessage({
+      id: "from.parallel-team",
+      defaultMessage: "Parallel team",
+    });
+  },
+  subject({}, intl) {
+    return "";
+  },
+  text({ name, parallelUrl, resetUrl }: ForgotPasswordProps, intl: IntlShape) {
     return outdent``;
   },
-  html: function ForgotPassword({
-    name,
-    assetsUrl,
-    parallelUrl,
-    resetUrl,
-  }: ForgotPasswordProps) {
+  html({ name, assetsUrl, parallelUrl, resetUrl }: ForgotPasswordProps) {
     return (
       <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
         <MjmlSection>
@@ -57,6 +59,7 @@ export default {
     );
   },
 };
+export default email;
 
 export const props: ForgotPasswordProps = {
   name: "Derek",
