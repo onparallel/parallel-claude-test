@@ -27,6 +27,7 @@ yarn build-${ENV}
 
 # upload next.js static assets to s3 and invalidate the distribution corresponding to the environment
 aws s3 sync ${BUILD_DIR}/client/out s3://parallel-static-${ENV} --profile parallel-deploy
+sleep 5
 ORIGIN_ID="S3-parallel-static-${ENV}"
 DISTRIBUTION_LIST=$(aws cloudfront list-distributions --profile parallel-deploy)
 DISTRIBUTION_ID=$(echo $DISTRIBUTION_LIST | jq -r ".DistributionList.Items[] | select(.Origins.Items[0].Id == \"${ORIGIN_ID}\") | .Id")
