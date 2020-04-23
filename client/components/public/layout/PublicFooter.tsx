@@ -21,6 +21,12 @@ import { PublicFooterBox } from "./PublicFooterBox";
 export function PublicFooter(props: BoxProps) {
   const router = useRouter();
   const intl = useIntl();
+  const supportUrl =
+    ({
+      en: "https://support.parallel.so/hc/en-us",
+      es: "https://support.parallel.so/hc/es",
+    } as any)[router.query.locale as string] ??
+    "https://support.parallel.so/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value;
@@ -81,7 +87,7 @@ export function PublicFooter(props: BoxProps) {
         >
           <List>
             <ListItem>
-              <NormalLink href="https://support.parallel.so">
+              <NormalLink href={supportUrl}>
                 <FormattedMessage
                   id="public.support.support-center"
                   defaultMessage="Support center"
@@ -90,7 +96,7 @@ export function PublicFooter(props: BoxProps) {
             </ListItem>
             <ListItem>
               <NormalLink
-                href={`https://support.parallel.so/hc/categories/360001331677-FAQ-Frequently-asked-questions`}
+                href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
               >
                 <FormattedMessage
                   id="public.support.faq"
