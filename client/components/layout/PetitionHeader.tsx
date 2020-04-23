@@ -91,7 +91,7 @@ export function PetitionHeader({
         alignItems="center"
         maxWidth={{
           base: "calc(100vw - 92px - 100px)",
-          md: "calc((100% - 300px)/2)",
+          md: "calc((100vw - 300px)/2)",
         }}
       >
         <Editable
@@ -142,13 +142,64 @@ export function PetitionHeader({
                       defaultMessage: "Edit",
                     })}
                   />
-                  <PetitionStatusText
-                    display={{ base: "none", lg: "block" }}
-                    marginLeft={4}
-                    status={petition.status}
-                    iconSize="14px"
+
+                  <Flex
+                    alignItems="center"
                     fontSize="sm"
-                  />
+                    marginLeft={4}
+                    display={{ base: "none", sm: "flex" }}
+                  >
+                    {state === "SAVING" ? (
+                      <Flex color="gray.500" alignItems="center">
+                        <Spinner
+                          size="sm"
+                          marginRight={2}
+                          position="relative"
+                          speed="0.8s"
+                          bottom="-1px"
+                        />
+                        <FormattedMessage
+                          id="generic.saving-changes"
+                          defaultMessage="Saving..."
+                        />
+                      </Flex>
+                    ) : state === "SAVED" ? (
+                      <Tooltip
+                        zIndex={1000}
+                        showDelay={300}
+                        aria-label={lastSavedTooltip}
+                        label={lastSavedTooltip}
+                      >
+                        <Flex color="green.500" alignItems="center">
+                          <Icon
+                            name="check"
+                            size="16px"
+                            role="presentation"
+                            focusable={false}
+                            marginRight={2}
+                          />
+                          <FormattedMessage
+                            id="generic.changes-saved"
+                            defaultMessage="Saved"
+                          />
+                        </Flex>
+                      </Tooltip>
+                    ) : state === "ERROR" ? (
+                      <Flex color="red.500" alignItems="center">
+                        <Icon
+                          name="warning"
+                          size="16px"
+                          role="presentation"
+                          focusable={false}
+                          marginRight={2}
+                        />
+                        <FormattedMessage
+                          id="petition.status.error"
+                          defaultMessage="Error"
+                        />
+                      </Flex>
+                    ) : null}
+                  </Flex>
                 </Flex>
               )}
             </>
@@ -157,56 +208,12 @@ export function PetitionHeader({
       </Flex>
       <Spacer />
       <Flex height={16} padding={4} alignItems="center">
-        {state === "SAVING" ? (
-          <Flex color="gray.500" alignItems="center">
-            <Spinner
-              size="sm"
-              marginRight={2}
-              position="relative"
-              speed="0.8s"
-              bottom="-1px"
-            />
-            <FormattedMessage
-              id="generic.saving-changes"
-              defaultMessage="Saving..."
-            />
-          </Flex>
-        ) : state === "SAVED" ? (
-          <Tooltip
-            zIndex={1000}
-            showDelay={300}
-            aria-label={lastSavedTooltip}
-            label={lastSavedTooltip}
-          >
-            <Flex color="green.500" alignItems="center">
-              <Icon
-                name="check"
-                size="16px"
-                role="presentation"
-                focusable={false}
-                marginRight={2}
-              />
-              <FormattedMessage
-                id="generic.changes-saved"
-                defaultMessage="Saved"
-              />
-            </Flex>
-          </Tooltip>
-        ) : state === "ERROR" ? (
-          <Flex color="red.500" alignItems="center">
-            <Icon
-              name="warning"
-              size="16px"
-              role="presentation"
-              focusable={false}
-              marginRight={2}
-            />
-            <FormattedMessage
-              id="petition.status.error"
-              defaultMessage="Error"
-            />
-          </Flex>
-        ) : null}
+        <PetitionStatusText
+          display="block"
+          status={petition.status}
+          iconSize="14px"
+          fontSize="sm"
+        />
       </Flex>
       <Flex
         position="absolute"
