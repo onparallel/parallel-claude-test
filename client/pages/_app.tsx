@@ -12,6 +12,9 @@ import { DndProvider } from "react-dnd";
 import Backend from "react-dnd-html5-backend";
 import { IntlConfig, IntlProvider } from "react-intl";
 import { pick } from "remeda";
+import { Hubspot } from "@parallel/components/scripts/Hubspot";
+import { GoogleAnalytics } from "@parallel/components/scripts/GoogleAnalytics";
+import { Hotjar } from "@parallel/components/scripts/Hotjar";
 
 const resetConfig = (theme: ITheme) => ({
   light: {
@@ -47,19 +50,24 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     ? useTranslations(router.query.locale as string)
     : pick(props, ["locale", "messages"]);
   return (
-    <IntlProvider {...intlConfig}>
-      <ThemeProvider theme={theme}>
-        <ColorModeProvider value="light">
-          {/* Force light mode until a fix is found for the server vs client discrepancies */}
-          <CSSReset config={resetConfig} />
-          <DndProvider backend={Backend}>
-            <DialogOpenerProvider>
-              <Component {...pageProps} />
-            </DialogOpenerProvider>
-          </DndProvider>
-        </ColorModeProvider>
-      </ThemeProvider>
-    </IntlProvider>
+    <>
+      <GoogleAnalytics trackingId={process.env.GA_TRACKING_ID!} />
+      <Hubspot />
+      <Hotjar />
+      <IntlProvider {...intlConfig}>
+        <ThemeProvider theme={theme}>
+          <ColorModeProvider value="light">
+            {/* Force light mode until a fix is found for the server vs client discrepancies */}
+            <CSSReset config={resetConfig} />
+            <DndProvider backend={Backend}>
+              <DialogOpenerProvider>
+                <Component {...pageProps} />
+              </DialogOpenerProvider>
+            </DndProvider>
+          </ColorModeProvider>
+        </ThemeProvider>
+      </IntlProvider>
+    </>
   );
 }
 

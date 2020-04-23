@@ -1158,12 +1158,6 @@
     "reference": "utils/useCreatePetition.tsx#L100-L103"
   },
   {
-    "term": "petitions.header.custom-ref",
-    "definition": "Reference",
-    "context": "Reference",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L237-L240"
-  },
-  {
     "term": "petitions.header.deadline",
     "definition": "Deadline",
     "context": "Deadline",
@@ -1353,61 +1347,61 @@
     "term": "public.about-link",
     "definition": "About",
     "context": "About",
-    "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
+    "reference": "components/public/layout/PublicHeader.tsx#L122-L125"
   },
   {
     "term": "public.about.mission",
     "definition": "Our mission is to make professionals work worthwhile",
     "context": "Our mission is to make professionals work worthwhile",
-    "reference": "pages/[locale]/about.tsx#L25-L28"
+    "reference": "pages/[locale]/about.tsx#L30-L33"
   },
   {
     "term": "public.about.our-story",
     "definition": "Our story",
     "context": "Our story",
-    "reference": "pages/[locale]/about.tsx#L45-L48"
+    "reference": "pages/[locale]/about.tsx#L50-L53"
   },
   {
     "term": "public.about.story-1",
     "definition": "When we were in our previous jobs, we realized that in almost all the topics we were carrying, it was usual to ask for information, it being usual for customers to take a long time to send the information we needed to work.",
     "context": "When we were in our previous jobs, we realized that in almost all the topics we were carrying, it was usual to ask for information, it being usual for customers to take a long time to send the information we needed to work.",
-    "reference": "pages/[locale]/about.tsx#L58-L61"
+    "reference": "pages/[locale]/about.tsx#L63-L66"
   },
   {
     "term": "public.about.story-2",
     "definition": "That information we requested was essential to start working.",
     "context": "That information we requested was essential to start working.",
-    "reference": "pages/[locale]/about.tsx#L64-L67"
+    "reference": "pages/[locale]/about.tsx#L69-L72"
   },
   {
     "term": "public.about.story-3",
     "definition": "When asking other professionals, many agreed that this same situation often happened to them. It did not matter if at the time of requesting the information we left it beautiful and easily understood, customers rarely responded to the email with all the information.",
     "context": "When asking other professionals, many agreed that this same situation often happened to them. It did not matter if at the time of requesting the information we left it beautiful and easily understood, customers rarely responded to the email with all the information.",
-    "reference": "pages/[locale]/about.tsx#L70-L73"
+    "reference": "pages/[locale]/about.tsx#L75-L78"
   },
   {
     "term": "public.about.story-4",
     "definition": "It was common for customers to send the information with an eyedropper or forget to send certain documents. This forced us to constantly chase customers so that we could have all the information.",
     "context": "It was common for customers to send the information with an eyedropper or forget to send certain documents. This forced us to constantly chase customers so that we could have all the information.",
-    "reference": "pages/[locale]/about.tsx#L76-L79"
+    "reference": "pages/[locale]/about.tsx#L81-L84"
   },
   {
     "term": "public.about.story-5",
     "definition": "We began to investigate what tools in the market could solve that situation and not seeing any tool that solved it well and in a simple way we decided to solve it ourselves.",
     "context": "We began to investigate what tools in the market could solve that situation and not seeing any tool that solved it well and in a simple way we decided to solve it ourselves.",
-    "reference": "pages/[locale]/about.tsx#L82-L85"
+    "reference": "pages/[locale]/about.tsx#L87-L90"
   },
   {
     "term": "public.about.story-6",
     "definition": "At that time Parallel was born.",
     "context": "At that time Parallel was born.",
-    "reference": "pages/[locale]/about.tsx#L88-L91"
+    "reference": "pages/[locale]/about.tsx#L93-L96"
   },
   {
     "term": "public.about.tech-company",
     "definition": "Parallel is a technology company that builds the next generation tools for professionals daily tasks.",
     "context": "Parallel is a technology company that builds the next generation tools for professionals daily tasks.",
-    "reference": "pages/[locale]/about.tsx#L31-L34"
+    "reference": "pages/[locale]/about.tsx#L36-L39"
   },
   {
     "term": "public.about.title",
@@ -1419,19 +1413,151 @@
     "term": "public.blog-link",
     "definition": "Blog",
     "context": "Blog",
-    "reference": "components/public/layout/PublicHeader.tsx#L110-L113"
+    "reference": "components/public/layout/PublicHeader.tsx#L130-L133"
   },
   {
-    "term": "public.bookdemo-button",
+    "term": "public.book-demo-button",
     "definition": "Book a demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L135-L138"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L133-L136"
+  },
+  {
+    "term": "public.book-demo.basic-functions",
+    "definition": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
+    "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
+    "reference": "pages/[locale]/book-demo.tsx#L77-L87"
+  },
+  {
+    "term": "public.book-demo.checklist",
+    "definition": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
+    "context": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
+    "reference": "pages/[locale]/book-demo.tsx#L90-L100"
+  },
+  {
+    "term": "public.book-demo.follow",
+    "definition": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
+    "context": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
+    "reference": "pages/[locale]/book-demo.tsx#L103-L113"
+  },
+  {
+    "term": "public.book-demo.other-functionalities",
+    "definition": "<b>Other functionalities:</b> additional security layers, reminders.",
+    "context": "<b>Other functionalities:</b> additional security layers, reminders.",
+    "reference": "pages/[locale]/book-demo.tsx#L129-L139"
+  },
+  {
+    "term": "public.book-demo.request-invite",
+    "definition": "Book a demo today!",
+    "context": "Book a demo today!",
+    "reference": "pages/[locale]/book-demo.tsx#L57-L60"
+  },
+  {
+    "term": "public.book-demo.review-and-download",
+    "definition": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
+    "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
+    "reference": "pages/[locale]/book-demo.tsx#L116-L126"
+  },
+  {
+    "term": "public.book-demo.title",
+    "definition": "Book a demo",
+    "context": "Book a demo",
+    "reference": "pages/[locale]/book-demo.tsx#L35-L38"
+  },
+  {
+    "term": "public.book-demo.what-we-explain",
+    "definition": "In this demo we will explain:",
+    "context": "In this demo we will explain:",
+    "reference": "pages/[locale]/book-demo.tsx#L63-L66"
+  },
+  {
+    "term": "public.case.laura.centralized-information",
+    "definition": "All information centralized in a single space per case.",
+    "context": "All information centralized in a single space per case.",
+    "reference": "pages/[locale]/people.tsx#L203-L206"
+  },
+  {
+    "term": "public.case.laura.client-anywhere",
+    "definition": "The security of her clients, who can upload the files, either from the computer, mobile or tablet, without having to download any app.",
+    "context": "The security of her clients, who can upload the files, either from the computer, mobile or tablet, without having to download any app.",
+    "reference": "pages/[locale]/people.tsx#L239-L242"
+  },
+  {
+    "term": "public.case.laura.cloud",
+    "definition": "Information always available in the cloud.",
+    "context": "Information always available in the cloud.",
+    "reference": "pages/[locale]/people.tsx#L227-L230"
+  },
+  {
+    "term": "public.case.laura.increased-billing",
+    "definition": "In just one month, Laura has managed to increase the hours billed and an <a>additional net income of € 1,500 per month</a>.",
+    "context": "In just one month, Laura has managed to increase the hours billed and an <a>additional net income of € 1,500 per month</a>.",
+    "reference": "pages/[locale]/people.tsx#L170-L180"
+  },
+  {
+    "term": "public.case.laura.non-billable",
+    "definition": "All this tasks that she has to do involves <a>20 hours of work</a> that Laura cannot bill the client.",
+    "context": "All this tasks that she has to do involves <a>20 hours of work</a> that Laura cannot bill the client.",
+    "reference": "pages/[locale]/people.tsx#L116-L126"
+  },
+  {
+    "term": "public.case.laura.now-has",
+    "definition": "Laura now has:",
+    "context": "Laura now has:",
+    "reference": "pages/[locale]/people.tsx#L186-L189"
+  },
+  {
+    "term": "public.case.laura.recently-discovered",
+    "definition": "Laura has recently discovered the Parallel platform and is <a>saving more than half an hour a day</a>.",
+    "context": "Laura has recently discovered the Parallel platform and is <a>saving more than half an hour a day</a>.",
+    "reference": "pages/[locale]/people.tsx#L146-L156"
+  },
+  {
+    "term": "public.case.laura.register",
+    "definition": "If you want to start using Parallel, <a>register for free here</a>.",
+    "context": "If you want to start using Parallel, <a>register for free here</a>.",
+    "reference": "pages/[locale]/people.tsx#L247-L257"
+  },
+  {
+    "term": "public.case.laura.reminders",
+    "definition": "She forgets to send reminders, because Parallel does it for her.",
+    "context": "She forgets to send reminders, because Parallel does it for her.",
+    "reference": "pages/[locale]/people.tsx#L215-L218"
+  },
+  {
+    "term": "public.case.laura.requests-information",
+    "definition": "Requests for information",
+    "context": "Requests for information",
+    "reference": "pages/[locale]/people.tsx#L90-L93"
+  },
+  {
+    "term": "public.case.laura.reviews-emails",
+    "definition": "Reviews emails",
+    "context": "Reviews emails",
+    "reference": "pages/[locale]/people.tsx#L96-L99"
+  },
+  {
+    "term": "public.case.laura.time-spent",
+    "definition": "Laura spends <a>1 hour each day</a> reviewing the emails and the information attached to it to make sure she has all the information:",
+    "context": "Laura spends <a>1 hour each day</a> reviewing the emails and the information attached to it to make sure she has all the information:",
+    "reference": "pages/[locale]/people.tsx#L69-L79"
+  },
+  {
+    "term": "public.case.laura.with-parallel",
+    "definition": "With Parallel",
+    "context": "With Parallel",
+    "reference": "pages/[locale]/people.tsx#L137-L140"
+  },
+  {
+    "term": "public.case.laura.without-parallel",
+    "definition": "Without Parallel",
+    "context": "Without Parallel",
+    "reference": "pages/[locale]/people.tsx#L59-L62"
   },
   {
     "term": "public.contact-link",
     "definition": "Contact",
     "context": "Contact",
-    "reference": "components/public/layout/PublicHeader.tsx#L116-L119"
+    "reference": "components/public/layout/PublicFooter.tsx#L131-L134"
   },
   {
     "term": "public.cookies.title",
@@ -1443,7 +1569,7 @@
     "term": "public.footer.company",
     "definition": "Company",
     "context": "Company",
-    "reference": "components/public/layout/PublicFooter.tsx#L57-L60"
+    "reference": "components/public/layout/PublicFooter.tsx#L107-L110"
   },
   {
     "term": "public.footer.language-select-label",
@@ -1455,19 +1581,31 @@
     "term": "public.footer.legal-information",
     "definition": "Legal information",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L94-L97"
+    "reference": "components/public/layout/PublicFooter.tsx#L143-L146"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn profile",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L162-L165"
+    "reference": "components/public/layout/PublicFooter.tsx#L211-L214"
+  },
+  {
+    "term": "public.footer.product",
+    "definition": "Product",
+    "context": "Product",
+    "reference": "components/public/layout/PublicFooter.tsx#L57-L60"
+  },
+  {
+    "term": "public.footer.support",
+    "definition": "Support",
+    "context": "Support",
+    "reference": "components/public/layout/PublicFooter.tsx#L77-L80"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter profile",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L147-L150"
+    "reference": "components/public/layout/PublicFooter.tsx#L196-L199"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -1545,31 +1683,31 @@
     "term": "public.home.hero-collect",
     "definition": "Automate your information collection processes and save time.",
     "context": "Automate your information collection processes and save time.",
-    "reference": "components/public/PublicHeroPc.tsx#L28-L31"
+    "reference": "components/public/PublicHeroPc.tsx#L29-L32"
   },
   {
     "term": "public.home.hero-digital-transformation",
     "definition": "Begin your digital transformation!",
     "context": "Begin your digital transformation!",
-    "reference": "components/public/PublicHeroPc.tsx#L40-L43"
+    "reference": "components/public/PublicHeroPc.tsx#L41-L44"
   },
   {
     "term": "public.home.hero-discover-use",
     "definition": "You can use Parallel if you work in a law firm, accounting firm or startup.",
     "context": "You can use Parallel if you work in a law firm, accounting firm or startup.",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L24-L27"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L25-L28"
   },
   {
     "term": "public.home.hero-discover-use-2",
     "definition": "Discover everything you can do with our platform.",
     "context": "Discover everything you can do with our platform.",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L29-L32"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L30-L33"
   },
   {
     "term": "public.home.hero-how-it-works",
     "definition": "How it works",
     "context": "How it works",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L35-L38"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L36-L39"
   },
   {
     "term": "public.home.hero-leading-digital-transformation",
@@ -1581,13 +1719,13 @@
     "term": "public.home.hero-platform",
     "definition": "Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly.",
     "context": "Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly.",
-    "reference": "components/public/PublicHeroPc.tsx#L34-L37"
+    "reference": "components/public/PublicHeroPc.tsx#L35-L38"
   },
   {
     "term": "public.home.hero-popular-use-cases",
     "definition": "Popular use cases",
     "context": "Popular use cases",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L18-L21"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L19-L22"
   },
   {
     "term": "public.home.hero-question",
@@ -1605,13 +1743,13 @@
     "term": "public.home.hero-steps",
     "definition": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
     "context": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L41-L44"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L42-L45"
   },
   {
     "term": "public.home.hero-steps-1",
     "definition": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
     "context": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L46-L49"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L47-L50"
   },
   {
     "term": "public.home.hero-subtitle",
@@ -1629,7 +1767,7 @@
     "term": "public.home.hero-try-now",
     "definition": "Try it now and let Parallel work for you",
     "context": "Try it now and let Parallel work for you",
-    "reference": "components/public/PublicHeroPc.tsx#L69-L72"
+    "reference": "components/public/PublicHeroPc.tsx#L65-L68"
   },
   {
     "term": "public.home.hero-who-trust-us",
@@ -1653,7 +1791,37 @@
     "term": "public.invite-button",
     "definition": "Try Parallel free",
     "context": "Try Parallel free",
-    "reference": "components/public/PublicHeroPc.tsx#L52-L55"
+    "reference": "components/public/PublicHeroPc.tsx#L49-L52"
+  },
+  {
+    "term": "public.invite.consent",
+    "definition": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
+    "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
+    "reference": "pages/[locale]/invite.tsx#L81-L84"
+  },
+  {
+    "term": "public.invite.request-invite",
+    "definition": "Request your invite today!",
+    "context": "Request your invite today!",
+    "reference": "pages/[locale]/invite.tsx#L57-L60"
+  },
+  {
+    "term": "public.invite.review-privacy",
+    "definition": "For more information, please review our <a>Privacy Policy</a>.",
+    "context": "For more information, please review our <a>Privacy Policy</a>.",
+    "reference": "pages/[locale]/invite.tsx#L87-L97"
+  },
+  {
+    "term": "public.invite.tell-us-about-yourself",
+    "definition": "Tell us a bit about yourself, and we will send you a <a>free access</a>.",
+    "context": "Tell us a bit about yourself, and we will send you a <a>free access</a>.",
+    "reference": "pages/[locale]/invite.tsx#L63-L78"
+  },
+  {
+    "term": "public.invite.title",
+    "definition": "Request an invite",
+    "context": "Request an invite",
+    "reference": "pages/[locale]/invite.tsx#L35-L38"
   },
   {
     "term": "public.login-button",
@@ -1743,79 +1911,103 @@
     "term": "public.meta-description",
     "definition": "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
     "context": "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
-    "reference": "components/public/layout/PublicLayout.tsx#L39-L43"
+    "reference": "components/public/layout/PublicLayout.tsx#L38-L42"
+  },
+  {
+    "term": "public.people.hero-title",
+    "definition": "Laura now has much more time available",
+    "context": "Laura now has much more time available",
+    "reference": "pages/[locale]/people.tsx#L37-L40"
+  },
+  {
+    "term": "public.people.routine-change",
+    "definition": "Let us tell you how his routine has changed since he discovered Parallel.",
+    "context": "Let us tell you how his routine has changed since he discovered Parallel.",
+    "reference": "pages/[locale]/people.tsx#L43-L46"
+  },
+  {
+    "term": "public.people.title",
+    "definition": "For whom",
+    "context": "For whom",
+    "reference": "pages/[locale]/people.tsx#L26-L29"
+  },
+  {
+    "term": "public.persons-link",
+    "definition": "For whom",
+    "context": "For whom",
+    "reference": "components/public/layout/PublicHeader.tsx#L112-L115"
   },
   {
     "term": "public.popular.accounting",
     "definition": "Accounting",
     "context": "Accounting",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L102-L105"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L103-L106"
   },
   {
     "term": "public.popular.claims",
     "definition": "Claims",
     "context": "Claims",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L116-L119"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L117-L120"
   },
   {
     "term": "public.popular.collect-schedules",
     "definition": "Collect all the schedules without space limitation and access them in a single place",
     "context": "Collect all the schedules without space limitation and access them in a single place",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L122-L125"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L123-L126"
   },
   {
     "term": "public.popular.contract-addenda",
     "definition": "Contract addenda",
     "context": "Contract addenda",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L88-L91"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L89-L92"
   },
   {
     "term": "public.popular.easily-collect",
     "definition": "Easily collect all the information from potential clients before starting to work",
     "context": "Easily collect all the information from potential clients before starting to work",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L52-L55"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L53-L56"
   },
   {
     "term": "public.popular.focus-on-contract",
     "definition": "Focus on the contract while your clients send you the addenda at their pace",
     "context": "Focus on the contract while your clients send you the addenda at their pace",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L94-L97"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L95-L98"
   },
   {
     "term": "public.popular.information-ready",
     "definition": "Have your information ready every month in your space and reduce the emails received in your inbox",
     "context": "Have your information ready every month in your space and reduce the emails received in your inbox",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L108-L111"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L109-L112"
   },
   {
     "term": "public.popular.investor-relations",
     "definition": "Investor relations",
     "context": "Investor relations",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L74-L77"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L75-L78"
   },
   {
     "term": "public.popular.kyc",
     "definition": "Know your customer (KYC)",
     "context": "Know your customer (KYC)",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L46-L49"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L47-L50"
   },
   {
     "term": "public.popular.multiple-recipients",
     "definition": "Send a single request to multiple parties to gather the information and keep everything organized",
     "context": "Send a single request to multiple parties to gather the information and keep everything organized",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L80-L83"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L81-L84"
   },
   {
     "term": "public.popular.periodical-reporting",
     "definition": "Periodical reporting",
     "context": "Periodical reporting",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L60-L63"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L61-L64"
   },
   {
     "term": "public.popular.periodical-requests",
     "definition": "Set up periodical requests that automatically collects the information for you",
     "context": "Set up periodical requests that automatically collects the information for you",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L66-L69"
+    "reference": "components/public/PublicHeroPopularUseCases.tsx#L67-L70"
   },
   {
     "term": "public.privacy.title",
@@ -1824,40 +2016,136 @@
     "reference": "pages/[locale]/legal/[doc].tsx#L23-L26"
   },
   {
+    "term": "public.security-link",
+    "definition": "Security",
+    "context": "Security",
+    "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
+  },
+  {
+    "term": "public.security.data-at-rest",
+    "definition": "Your data at rest is encrypted using the 256-bit AES-256 (Advanced Encryption Standard).",
+    "context": "Your data at rest is encrypted using the 256-bit AES-256 (Advanced Encryption Standard).",
+    "reference": "pages/[locale]/security.tsx#L72-L75"
+  },
+  {
+    "term": "public.security.hero-title",
+    "definition": "Your information is safe with Parallel",
+    "context": "Your information is safe with Parallel",
+    "reference": "pages/[locale]/security.tsx#L33-L36"
+  },
+  {
+    "term": "public.security.how-we-protect",
+    "definition": "How do we protect your data and information?",
+    "context": "How do we protect your data and information?",
+    "reference": "pages/[locale]/security.tsx#L60-L63"
+  },
+  {
+    "term": "public.security.pass-storage",
+    "definition": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials.",
+    "context": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials.",
+    "reference": "pages/[locale]/security.tsx#L110-L113"
+  },
+  {
+    "term": "public.security.pillar",
+    "definition": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact.",
+    "context": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact.",
+    "reference": "pages/[locale]/security.tsx#L125-L128"
+  },
+  {
+    "term": "public.security.protect-your-customer",
+    "definition": "How do we protect your clients' information?",
+    "context": "How do we protect your clients' information?",
+    "reference": "pages/[locale]/security.tsx#L104-L107"
+  },
+  {
+    "term": "public.security.secure-access",
+    "definition": "You can safely access your files from any computer, and all communications and requests for information will be kept safe from third parties.",
+    "context": "You can safely access your files from any computer, and all communications and requests for information will be kept safe from third parties.",
+    "reference": "pages/[locale]/security.tsx#L66-L69"
+  },
+  {
+    "term": "public.security.ssl-connection",
+    "definition": "We use SSL (Secure Sockets Layer) to protect data in transit between the Parallel application in your browser and our servers.",
+    "context": "We use SSL (Secure Sockets Layer) to protect data in transit between the Parallel application in your browser and our servers.",
+    "reference": "pages/[locale]/security.tsx#L91-L94"
+  },
+  {
+    "term": "public.security.system-security-layers",
+    "definition": "For this, our system has multiple layers of protection and is secure by design.",
+    "context": "For this, our system has multiple layers of protection and is secure by design.",
+    "reference": "pages/[locale]/security.tsx#L45-L48"
+  },
+  {
+    "term": "public.security.title",
+    "definition": "Security",
+    "context": "Security",
+    "reference": "pages/[locale]/security.tsx#L22-L25"
+  },
+  {
+    "term": "public.security.trust-our-security",
+    "definition": "Trust Parallel to keep all your information safe and confidential.",
+    "context": "Trust Parallel to keep all your information safe and confidential.",
+    "reference": "pages/[locale]/security.tsx#L39-L42"
+  },
+  {
+    "term": "public.security.verify-identity",
+    "definition": "In addition, no one will be able to access upload pages to download or view information without first identifying themselves.",
+    "context": "In addition, no one will be able to access upload pages to download or view information without first identifying themselves.",
+    "reference": "pages/[locale]/security.tsx#L116-L119"
+  },
+  {
+    "term": "public.security.your-connection",
+    "definition": "How do we protect your connection?",
+    "context": "How do we protect your connection?",
+    "reference": "pages/[locale]/security.tsx#L85-L88"
+  },
+  {
     "term": "public.steps.client-timings",
     "definition": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
     "context": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L88-L91"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L89-L92"
   },
   {
     "term": "public.steps.create-request",
     "definition": "Create your request",
     "context": "Create your request",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L65-L68"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L66-L69"
   },
   {
     "term": "public.steps.focus-on-work",
     "definition": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
     "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L105-L108"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L106-L109"
   },
   {
     "term": "public.steps.receive-inbox",
     "definition": "Receive it on time in your inbox",
     "context": "Receive it on time in your inbox",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L99-L102"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L100-L103"
   },
   {
     "term": "public.steps.set-date",
     "definition": "Set a delivery deadline",
     "context": "Set a delivery deadline",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L82-L85"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L83-L86"
   },
   {
     "term": "public.steps.user-friendly",
     "definition": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
     "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L71-L74"
+    "reference": "components/public/PublicHeroHowItWorks.tsx#L72-L75"
+  },
+  {
+    "term": "public.support.faq",
+    "definition": "FAQ",
+    "context": "FAQ",
+    "reference": "components/public/layout/PublicFooter.tsx#L95-L98"
+  },
+  {
+    "term": "public.support.support-center",
+    "definition": "Support center",
+    "context": "Support center",
+    "reference": "components/public/layout/PublicFooter.tsx#L85-L88"
   },
   {
     "term": "public.terms.title",

@@ -13,6 +13,7 @@ const config = {
       process.env.ENV === "production" ? "UA-153451031-1" : "UA-153451031-3",
     ASSETS_URL: assetsUrl,
   },
+  crossOrigin: "anonymous",
   assetPrefix: assetsUrl,
   poweredByHeader: false,
   webpack(config, options) {

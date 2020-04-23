@@ -1,0 +1,30 @@
+import { useEffect } from "react";
+
+declare const hbspt: any;
+
+export type HubspotFormProps = {
+  target: string;
+  portalId: string;
+  formId: string;
+};
+
+export function useHubspotForm(data: HubspotFormProps | null) {
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    const element = document.querySelector(data.target);
+    while (element && element.lastChild) {
+      element.removeChild(element.lastChild);
+    }
+    if (typeof hbspt !== "undefined") {
+      hbspt.forms.create(data);
+    } else {
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://js.hsforms.net/forms/shell.js";
+      script.onload = () => hbspt!.forms.create(data);
+      document.head.appendChild(script);
+    }
+  }, [data?.target, data?.portalId, data?.formId]);
+}

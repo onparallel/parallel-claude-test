@@ -51,7 +51,7 @@ export type PublicHeaderProps = BoxProps & {
 
 export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
   const { isOpen, onToggle } = useDisclosure();
-  const breakpoint = "md" as const;
+  const breakpoint = "lg" as const;
 
   return (
     <PublicContainer
@@ -97,6 +97,26 @@ function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
       <Flex>
+        <NakedLink href="/security">
+          <Button flex="1" as="a" variant="ghost">
+            <FormattedMessage
+              id="public.security-link"
+              defaultMessage="Security"
+            ></FormattedMessage>
+          </Button>
+        </NakedLink>
+      </Flex>
+      <Flex>
+        <NakedLink href="/people">
+          <Button flex="1" as="a" variant="ghost">
+            <FormattedMessage
+              id="public.persons-link"
+              defaultMessage="For whom"
+            ></FormattedMessage>
+          </Button>
+        </NakedLink>
+      </Flex>
+      <Flex>
         <NakedLink href="/about">
           <Button flex="1" as="a" variant="ghost">
             <FormattedMessage
@@ -112,15 +132,9 @@ function PublicHeaderMenu(props: StackProps) {
           defaultMessage="Blog"
         ></FormattedMessage>
       </Button>
-      <Button as="a" variant="ghost" {...{ href: "mailto:hello@parallel.so" }}>
-        <FormattedMessage
-          id="public.contact-link"
-          defaultMessage="Contact"
-        ></FormattedMessage>
-      </Button>
       <Flex>
         <NakedLink href="/login">
-          <Button as="a" variant="outline">
+          <Button as="a" flex="1" variant="outline">
             <FormattedMessage
               id="public.login-button"
               defaultMessage="Login"
@@ -128,16 +142,16 @@ function PublicHeaderMenu(props: StackProps) {
           </Button>
         </NakedLink>
       </Flex>
-      <Button
-        as="a"
-        {...{ href: "https://parallelso.typeform.com/to/XxE7IY" }}
-        variantColor="purple"
-      >
-        <FormattedMessage
-          id="public.invite-button"
-          defaultMessage="Try Parallel free"
-        ></FormattedMessage>
-      </Button>
+      <Flex>
+        <NakedLink href="/invite">
+          <Button flex="1" as="a" variantColor="purple">
+            <FormattedMessage
+              id="public.invite-button"
+              defaultMessage="Try Parallel free"
+            ></FormattedMessage>
+          </Button>
+        </NakedLink>
+      </Flex>
     </Stack>
   );
 }

@@ -5,6 +5,7 @@ import { animated, useTransition } from "react-spring";
 import { Card } from "../common/Card";
 import { Spacer } from "../common/Spacer";
 import { PublicContainer } from "./layout/PublicContainer";
+import { NakedLink } from "../common/Link";
 
 const IMAGES = [
   { id: 0, url: "/static/images/newrequest.png" },
@@ -151,18 +152,14 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
         </Flex>
       </Flex>
       <Flex marginTop={16} justifyContent="center">
-        <Button
-          as="a"
-          {...{
-            href: "https://parallelso.typeform.com/to/XxE7IY",
-          }}
-          variantColor="purple"
-        >
-          <FormattedMessage
-            id="public.invite-button"
-            defaultMessage="Request an invite"
-          ></FormattedMessage>
-        </Button>
+        <NakedLink href="/invite">
+          <Button as="a" variantColor="purple">
+            <FormattedMessage
+              id="public.invite-button"
+              defaultMessage="Request an invite"
+            ></FormattedMessage>
+          </Button>
+        </NakedLink>
       </Flex>
     </PublicContainer>
   );

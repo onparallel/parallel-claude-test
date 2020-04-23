@@ -47,7 +47,7 @@ class MyDocument extends Document<MyDocumentProps> {
     const { locale, messages } = this.props;
     return (
       <Html lang={locale}>
-        <Head crossOrigin="">
+        <Head>
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,600|Playfair+Display&display=swap"

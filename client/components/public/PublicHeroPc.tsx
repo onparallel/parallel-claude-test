@@ -5,9 +5,10 @@ import {
   Flex,
   Heading,
   Image,
-  Text,
   Stack,
+  Text,
 } from "@chakra-ui/core";
+import { NakedLink } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 
@@ -24,7 +25,7 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
     >
       <Flex>
         <Box flex="2">
-          <Heading fontFamily="hero" fontSize="5xl" fontWeight="light">
+          <Heading as="h1" fontFamily="hero" fontSize="5xl" fontWeight="light">
             <FormattedMessage
               id="public.home.hero-collect"
               defaultMessage="Automate your information collection processes and save time."
@@ -42,29 +43,24 @@ export function PublicHeroPC({ ...props }: PublicHeroProps) {
               defaultMessage="Begin your digital transformation!"
             ></FormattedMessage>
           </Text>
-
-          <Stack spacing={4} direction="row" marginTop={8}>
-            <Button
-              as="a"
-              {...{ href: "https://parallelso.typeform.com/to/XxE7IY" }}
-              variantColor="purple"
-            >
-              <FormattedMessage
-                id="public.invite-button"
-                defaultMessage="Try Parallel free"
-              ></FormattedMessage>
-            </Button>
-            <Button
-              as="a"
-              {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
-              variant="outline"
-            >
-              <FormattedMessage
-                id="public.bookdemo-button"
-                defaultMessage="Book a demo"
-              ></FormattedMessage>
-            </Button>
-          </Stack>
+          <Box marginTop={8}>
+            <NakedLink href="/invite">
+              <Button as="a" variantColor="purple" marginRight={4}>
+                <FormattedMessage
+                  id="public.invite-button"
+                  defaultMessage="Try Parallel free"
+                ></FormattedMessage>
+              </Button>
+            </NakedLink>
+            <NakedLink href="/book-demo">
+              <Button as="a" variant="outline">
+                <FormattedMessage
+                  id="public.book-demo-button"
+                  defaultMessage="Book a demo"
+                ></FormattedMessage>
+              </Button>
+            </NakedLink>
+          </Box>
           <Text marginTop={8}>
             <FormattedMessage
               id="public.home.hero-try-now"

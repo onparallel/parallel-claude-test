@@ -1,3 +1,4 @@
+import { NakedLink } from "@parallel/components/common/Link";
 import { BoxProps, Flex, Heading, Text, Grid, Button } from "@chakra-ui/core";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -127,16 +128,14 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
         />
       </Grid>
       <Flex marginTop={16} justifyContent="center">
-        <Button
-          as="a"
-          {...{ href: "https://parallelso.typeform.com/to/Rd29bQ" }}
-          variantColor="purple"
-        >
-          <FormattedMessage
-            id="public.bookdemo-button"
-            defaultMessage="Book a demo"
-          ></FormattedMessage>
-        </Button>
+        <NakedLink href="/book-demo">
+          <Button as="a" variantColor="purple">
+            <FormattedMessage
+              id="public.book-demo-button"
+              defaultMessage="Book a demo"
+            ></FormattedMessage>
+          </Button>
+        </NakedLink>
       </Flex>
     </PublicContainer>
   );

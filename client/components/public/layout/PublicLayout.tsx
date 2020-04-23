@@ -6,7 +6,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode, useState } from "react";
 import { useIntl } from "react-intl";
-import { GoogleAnalytics } from "../GoogleAnalytics";
 import { CookieConsent } from "./CookieConsent";
 import { PublicFooter } from "./PublicFooter";
 import { PublicHeader } from "./PublicHeader";
@@ -51,9 +50,6 @@ export function PublicLayout({ children }: PublicLayoutProps) {
           />
         ))}
       </Head>
-      {process.env.GA_TRACKING_ID ? (
-        <GoogleAnalytics trackingId={process.env.GA_TRACKING_ID} />
-      ) : null}
       <Flex direction="column" minHeight="100vh">
         <PublicHeader
           position="fixed"

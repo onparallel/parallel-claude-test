@@ -39,7 +39,7 @@ export function PublicFooter(props: BoxProps) {
         as: "footer",
         backgroundColor: "gray.50",
         paddingTop: 12,
-        paddingBottom: 8,
+        paddingBottom: 16,
         ...props,
       }}
     >
@@ -50,6 +50,56 @@ export function PublicFooter(props: BoxProps) {
         wrap="wrap"
         marginBottom={10}
       >
+        <PublicFooterBox
+          flex="1"
+          minWidth={{ base: "100%", md: 40 }}
+          marginTop={{ base: 4, md: 0 }}
+          heading={intl.formatMessage({
+            id: "public.footer.product",
+            defaultMessage: "Product",
+          })}
+        >
+          <List>
+            <ListItem>
+              <Link href="/security" as="/security">
+                <FormattedMessage
+                  id="public.security-link"
+                  defaultMessage="Security"
+                ></FormattedMessage>
+              </Link>
+            </ListItem>
+          </List>
+        </PublicFooterBox>
+        <PublicFooterBox
+          flex="1"
+          minWidth={{ base: "100%", md: 40 }}
+          marginTop={{ base: 4, md: 0 }}
+          heading={intl.formatMessage({
+            id: "public.footer.support",
+            defaultMessage: "Support",
+          })}
+        >
+          <List>
+            <ListItem>
+              <NormalLink href="https://support.parallel.so">
+                <FormattedMessage
+                  id="public.support.support-center"
+                  defaultMessage="Support center"
+                ></FormattedMessage>
+              </NormalLink>
+            </ListItem>
+            <ListItem>
+              <NormalLink
+                href={`https://support.parallel.so/hc/categories/360001331677-FAQ-Frequently-asked-questions`}
+              >
+                <FormattedMessage
+                  id="public.support.faq"
+                  defaultMessage="FAQ"
+                ></FormattedMessage>
+              </NormalLink>
+            </ListItem>
+          </List>
+        </PublicFooterBox>
         <PublicFooterBox
           flex="1"
           minWidth={{ base: "100%", md: 40 }}
@@ -88,7 +138,6 @@ export function PublicFooter(props: BoxProps) {
         </PublicFooterBox>
         <PublicFooterBox
           flex="1"
-          flexGrow={8}
           minWidth={{ base: "100%", md: 40 }}
           marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
@@ -126,7 +175,7 @@ export function PublicFooter(props: BoxProps) {
       </Flex>
       <Divider />
       <Flex marginTop={5} wrap="wrap" marginBottom={["30px", "0"]}>
-        <Box flex="1" flexGrow={8} minWidth={{ base: "100%", md: 40 }}>
+        <Box flex="1">
           <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
           <LanguageSelector
             value={router.query.locale}

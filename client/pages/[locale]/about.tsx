@@ -21,7 +21,12 @@ function About() {
           wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
         >
           <Box maxWidth="700px" marginX="auto">
-            <Heading fontFamily="hero" fontSize="5xl" fontWeight="light">
+            <Heading
+              as="h1"
+              fontFamily="hero"
+              fontSize="5xl"
+              fontWeight="light"
+            >
               <FormattedMessage
                 id="public.about.mission"
                 defaultMessage="Our mission is to make professionals work worthwhile"
