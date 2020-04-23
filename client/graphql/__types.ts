@@ -90,6 +90,8 @@ export type Mutation = {
   __typename?: "Mutation";
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
+  /** Clone petition. */
+  clonePetition: Petition;
   /** Create contact. */
   createContact: Contact;
   /** Create petition. */
@@ -135,6 +137,11 @@ export type Mutation = {
 export type MutationchangePasswordArgs = {
   newPassword: Scalars["String"];
   password: Scalars["String"];
+};
+
+export type MutationclonePetitionArgs = {
+  name?: Maybe<Scalars["String"]>;
+  petitionId: Scalars["ID"];
 };
 
 export type MutationcreateContactArgs = {
@@ -1225,6 +1232,15 @@ export type Petitions_deletePetitionsMutationVariables = {
 export type Petitions_deletePetitionsMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deletePetitions">;
+
+export type Petitions_clonePetitionMutationVariables = {
+  petitionId: Scalars["ID"];
+  name?: Maybe<Scalars["String"]>;
+};
+
+export type Petitions_clonePetitionMutation = { __typename?: "Mutation" } & {
+  clonePetition: { __typename?: "Petition" } & Pick<Petition, "id">;
+};
 
 export type PetitionsQueryVariables = {
   offset: Scalars["Int"];
@@ -3155,6 +3171,57 @@ export type Petitions_deletePetitionsMutationResult = ApolloReactCommon.Mutation
 export type Petitions_deletePetitionsMutationOptions = ApolloReactCommon.BaseMutationOptions<
   Petitions_deletePetitionsMutation,
   Petitions_deletePetitionsMutationVariables
+>;
+export const Petitions_clonePetitionDocument = gql`
+  mutation Petitions_clonePetition($petitionId: ID!, $name: String) {
+    clonePetition(petitionId: $petitionId, name: $name) {
+      id
+    }
+  }
+`;
+export type Petitions_clonePetitionMutationFn = ApolloReactCommon.MutationFunction<
+  Petitions_clonePetitionMutation,
+  Petitions_clonePetitionMutationVariables
+>;
+
+/**
+ * __usePetitions_clonePetitionMutation__
+ *
+ * To run a mutation, you first call `usePetitions_clonePetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitions_clonePetitionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionsClonePetitionMutation, { data, loading, error }] = usePetitions_clonePetitionMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function usePetitions_clonePetitionMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    Petitions_clonePetitionMutation,
+    Petitions_clonePetitionMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    Petitions_clonePetitionMutation,
+    Petitions_clonePetitionMutationVariables
+  >(Petitions_clonePetitionDocument, baseOptions);
+}
+export type Petitions_clonePetitionMutationHookResult = ReturnType<
+  typeof usePetitions_clonePetitionMutation
+>;
+export type Petitions_clonePetitionMutationResult = ApolloReactCommon.MutationResult<
+  Petitions_clonePetitionMutation
+>;
+export type Petitions_clonePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  Petitions_clonePetitionMutation,
+  Petitions_clonePetitionMutationVariables
 >;
 export const PetitionsDocument = gql`
   query Petitions(

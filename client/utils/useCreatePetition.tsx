@@ -1,10 +1,5 @@
 import { useMutation } from "@apollo/react-hooks";
-import { Button, FormControl, FormLabel, Input, Text } from "@chakra-ui/core";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogCallbacks,
-  useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
 import {
   PetitionLocale,
   useCreatePetition_createPetitionMutation,
@@ -12,11 +7,8 @@ import {
 } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { useCallback, useRef } from "react";
-import { useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useCallback } from "react";
 import { clearCache } from "./apollo";
-import { useMergeRefs } from "./useMergeRefs";
 
 export function useCreatePetition() {
   const { query } = useRouter();
@@ -46,7 +38,7 @@ export function useCreatePetition() {
     }
   );
 
-  const askPetitionName = useDialog(AskPetitionName);
+  const askPetitionName = useAskPetitionNameDialog();
 
   return useCallback(
     async function () {
@@ -63,68 +55,5 @@ export function useCreatePetition() {
       return data!.createPetition.id;
     },
     [query.locale]
-  );
-}
-
-type CreatePetitionFormData = {
-  name: string;
-};
-
-function AskPetitionName(props: DialogCallbacks<string>) {
-  const intl = useIntl();
-  const {
-    handleSubmit,
-    register,
-    errors,
-    formState: { isValid },
-  } = useForm<CreatePetitionFormData>({
-    mode: "onChange",
-    defaultValues: { name: "" },
-  });
-  const focusRef = useRef<HTMLInputElement>(null);
-  const inputRef = useMergeRefs(focusRef, register({ required: true }));
-
-  function onContinue({ name }: CreatePetitionFormData) {
-    props.onResolve(name);
-  }
-
-  return (
-    <ConfirmDialog
-      content={{
-        as: "form",
-        onSubmit: handleSubmit(onContinue),
-      }}
-      focusRef={focusRef}
-      header={
-        <Text as="label" {...{ htmlFor: "petition-name" }}>
-          <FormattedMessage
-            id="petitions.create-new-petition.header"
-            defaultMessage="Give your new petition a name"
-          />
-        </Text>
-      }
-      body={
-        <FormControl isInvalid={!!errors.name}>
-          <Input
-            id="petition-name"
-            name="name"
-            ref={inputRef}
-            placeholder={intl.formatMessage({
-              id: "generic.untitled-petition",
-              defaultMessage: "Untitled petition",
-            })}
-          />
-        </FormControl>
-      }
-      confirm={
-        <Button type="submit" variantColor="purple" isDisabled={!isValid}>
-          <FormattedMessage
-            id="petitions.create-new-petition.continue-button"
-            defaultMessage="Let's continue"
-          />
-        </Button>
-      }
-      {...props}
-    />
   );
 }

@@ -225,19 +225,25 @@
     "term": "components.petition-list-header.actions-button",
     "definition": "Actions",
     "context": "Actions",
-    "reference": "components/petitions/PetitionListHeader.tsx#L77-L80"
+    "reference": "components/petitions/PetitionListHeader.tsx#L85-L88"
+  },
+  {
+    "term": "components.petition-list-header.clone-label",
+    "definition": "Clone petition",
+    "context": "Clone petition",
+    "reference": "components/petitions/PetitionListHeader.tsx#L94-L97"
   },
   {
     "term": "components.petition-list-header.create-petition-button",
     "definition": "Create petition",
     "context": "Create petition",
-    "reference": "components/petitions/PetitionListHeader.tsx#L97-L100"
+    "reference": "components/petitions/PetitionListHeader.tsx#L113-L116"
   },
   {
     "term": "components.petition-list-header.delete-label",
     "definition": "Delete selected",
     "context": "Delete selected",
-    "reference": "components/petitions/PetitionListHeader.tsx#L86-L89"
+    "reference": "components/petitions/PetitionListHeader.tsx#L102-L105"
   },
   {
     "term": "components.react-select.loading",
@@ -405,13 +411,13 @@
     "term": "generic.confirm-delete-button",
     "definition": "Yes, delete",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L375-L378"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L414-L417"
   },
   {
     "term": "generic.deleted-contact",
     "definition": "Deleted contact",
     "context": "Deleted contact",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L290-L293"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L329-L332"
   },
   {
     "term": "generic.dismiss-button",
@@ -609,7 +615,7 @@
     "term": "generic.no-deadline",
     "definition": "No deadline",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L313-L316"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L352-L355"
   },
   {
     "term": "generic.not-specified",
@@ -711,7 +717,7 @@
     "term": "generic.untitled-petition",
     "definition": "Untitled petition",
     "context": "Untitled petition",
-    "reference": "utils/useCreatePetition.tsx#L112-L115"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L264-L267"
   },
   {
     "term": "header.user-menu-button",
@@ -1137,73 +1143,73 @@
     "term": "petitions.confirm-delete.body",
     "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L363-L371"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L402-L410"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Delete petitions",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L357-L360"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L396-L399"
   },
   {
     "term": "petitions.create-new-petition.continue-button",
     "definition": "Let's continue",
     "context": "Let's continue",
-    "reference": "utils/useCreatePetition.tsx#L121-L124"
+    "reference": "components/petitions/AskPetitionNameDialog.tsx#L65-L68"
   },
   {
     "term": "petitions.create-new-petition.header",
     "definition": "Give your new petition a name",
     "context": "Give your new petition a name",
-    "reference": "utils/useCreatePetition.tsx#L100-L103"
+    "reference": "components/petitions/AskPetitionNameDialog.tsx#L44-L47"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Deadline",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L302-L305"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L341-L344"
   },
   {
     "term": "petitions.header.name",
     "definition": "Petition name",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L216-L219"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L255-L258"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L325-L328"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L364-L367"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Recipient",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L247-L250"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L286-L289"
   },
   {
     "term": "petitions.header.status",
     "definition": "Status",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L340"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L379"
   },
   {
     "term": "petitions.no-petitions",
     "definition": "You have no petitions yet. Start by creating one now!",
     "context": "You have no petitions yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L189-L192"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L228-L231"
   },
   {
     "term": "petitions.no-results",
     "definition": "There's no petitions matching your search",
     "context": "There's no petitions matching your search",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L180-L183"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L219-L222"
   },
   {
     "term": "petitions.recipients",
     "definition": "{contact} and <a>{more} more</a>",
     "context": "{contact} and <a>{more} more</a>",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L259-L280"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L298-L319"
   },
   {
     "term": "petitions.reminders-not-set",
@@ -1341,7 +1347,7 @@
     "term": "petitions.title",
     "definition": "Petitions",
     "context": "Petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L149-L152"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L186-L189"
   },
   {
     "term": "public.about-link",
@@ -1425,49 +1431,49 @@
     "term": "public.book-demo.basic-functions",
     "definition": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
     "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
-    "reference": "pages/[locale]/book-demo.tsx#L77-L87"
+    "reference": "pages/[locale]/book-demo.tsx#L85-L91"
   },
   {
     "term": "public.book-demo.checklist",
     "definition": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
     "context": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
-    "reference": "pages/[locale]/book-demo.tsx#L90-L100"
+    "reference": "pages/[locale]/book-demo.tsx#L94-L100"
   },
   {
     "term": "public.book-demo.follow",
     "definition": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
     "context": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
-    "reference": "pages/[locale]/book-demo.tsx#L103-L113"
+    "reference": "pages/[locale]/book-demo.tsx#L103-L109"
   },
   {
     "term": "public.book-demo.other-functionalities",
     "definition": "<b>Other functionalities:</b> additional security layers, reminders.",
     "context": "<b>Other functionalities:</b> additional security layers, reminders.",
-    "reference": "pages/[locale]/book-demo.tsx#L129-L139"
+    "reference": "pages/[locale]/book-demo.tsx#L121-L127"
   },
   {
     "term": "public.book-demo.request-invite",
     "definition": "Book a demo today!",
     "context": "Book a demo today!",
-    "reference": "pages/[locale]/book-demo.tsx#L57-L60"
+    "reference": "pages/[locale]/book-demo.tsx#L65-L68"
   },
   {
     "term": "public.book-demo.review-and-download",
     "definition": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
     "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
-    "reference": "pages/[locale]/book-demo.tsx#L116-L126"
+    "reference": "pages/[locale]/book-demo.tsx#L112-L118"
   },
   {
     "term": "public.book-demo.title",
     "definition": "Book a demo",
     "context": "Book a demo",
-    "reference": "pages/[locale]/book-demo.tsx#L35-L38"
+    "reference": "pages/[locale]/book-demo.tsx#L43-L46"
   },
   {
     "term": "public.book-demo.what-we-explain",
     "definition": "In this demo we will explain:",
     "context": "In this demo we will explain:",
-    "reference": "pages/[locale]/book-demo.tsx#L63-L66"
+    "reference": "pages/[locale]/book-demo.tsx#L71-L74"
   },
   {
     "term": "public.case.laura.centralized-information",
@@ -1797,7 +1803,7 @@
     "term": "public.invite.consent",
     "definition": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
-    "reference": "pages/[locale]/invite.tsx#L81-L84"
+    "reference": "pages/[locale]/invite.tsx#L88-L91"
   },
   {
     "term": "public.invite.request-invite",
@@ -1809,7 +1815,7 @@
     "term": "public.invite.review-privacy",
     "definition": "For more information, please review our <a>Privacy Policy</a>.",
     "context": "For more information, please review our <a>Privacy Policy</a>.",
-    "reference": "pages/[locale]/invite.tsx#L87-L97"
+    "reference": "pages/[locale]/invite.tsx#L94-L104"
   },
   {
     "term": "public.invite.tell-us-about-yourself",
@@ -2043,19 +2049,19 @@
     "term": "public.security.pass-storage",
     "definition": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials.",
     "context": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials.",
-    "reference": "pages/[locale]/security.tsx#L110-L113"
+    "reference": "pages/[locale]/security.tsx#L113-L116"
   },
   {
     "term": "public.security.pillar",
     "definition": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact.",
     "context": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact.",
-    "reference": "pages/[locale]/security.tsx#L125-L128"
+    "reference": "pages/[locale]/security.tsx#L128-L131"
   },
   {
     "term": "public.security.protect-your-customer",
     "definition": "How do we protect your clients' information?",
     "context": "How do we protect your clients' information?",
-    "reference": "pages/[locale]/security.tsx#L104-L107"
+    "reference": "pages/[locale]/security.tsx#L107-L110"
   },
   {
     "term": "public.security.secure-access",
@@ -2067,7 +2073,7 @@
     "term": "public.security.ssl-connection",
     "definition": "We use SSL (Secure Sockets Layer) to protect data in transit between the Parallel application in your browser and our servers.",
     "context": "We use SSL (Secure Sockets Layer) to protect data in transit between the Parallel application in your browser and our servers.",
-    "reference": "pages/[locale]/security.tsx#L91-L94"
+    "reference": "pages/[locale]/security.tsx#L94-L97"
   },
   {
     "term": "public.security.system-security-layers",
@@ -2091,13 +2097,13 @@
     "term": "public.security.verify-identity",
     "definition": "In addition, no one will be able to access upload pages to download or view information without first identifying themselves.",
     "context": "In addition, no one will be able to access upload pages to download or view information without first identifying themselves.",
-    "reference": "pages/[locale]/security.tsx#L116-L119"
+    "reference": "pages/[locale]/security.tsx#L119-L122"
   },
   {
     "term": "public.security.your-connection",
     "definition": "How do we protect your connection?",
     "context": "How do we protect your connection?",
-    "reference": "pages/[locale]/security.tsx#L85-L88"
+    "reference": "pages/[locale]/security.tsx#L88-L91"
   },
   {
     "term": "public.steps.client-timings",

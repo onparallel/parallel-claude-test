@@ -45,6 +45,32 @@ export const createPetition = mutationField("createPetition", {
   },
 });
 
+export const clonePetition = mutationField("clonePetition", {
+  description: "Clone petition.",
+  type: "Petition",
+  authorize: authorizeAnd(
+    authenticate(),
+    userHasAccessToPetition("petitionId")
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    name: stringArg({ required: false }),
+  },
+  resolve: async (_, args, ctx) => {
+    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+    const petition = await ctx.petitions.clonePetition(petitionId, ctx.user!);
+    if (args.name !== undefined && args.name !== petition.name) {
+      return await ctx.petitions.updatePetition(
+        petition.id,
+        { name: args.name ?? null },
+        ctx.user!
+      );
+    } else {
+      return petition;
+    }
+  },
+});
+
 export const deletePetitions = mutationField("deletePetitions", {
   description: "Delete petitions.",
   type: "Result",

@@ -675,4 +675,35 @@ export class PetitionRepository extends BaseRepository {
       .whereNotNull("next_reminder_at")
       .where("next_reminder_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"));
   }
+
+  async clonePetition(petitionId: number, user: User) {
+    const petition = await this.loadPetition(petitionId);
+
+    const [cloned] = await this.insert("petition", {
+      ...omit(petition!, ["id", "created_at", "updated_at"]),
+      org_id: user.org_id,
+      owner_id: user.id,
+      status: "DRAFT",
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`,
+    });
+
+    const fields = await this.loadFieldsForPetition(petitionId);
+    await this.insert(
+      "petition_field",
+      fields.map((field) => ({
+        ...omit(field, [
+          "id",
+          "petition_id",
+          "created_at",
+          "updated_at",
+          "validated",
+        ]),
+        petition_id: cloned.id,
+        created_by: `User:${user.id}`,
+        updated_by: `User:${user.id}`,
+      }))
+    );
+    return cloned;
+  }
 }

@@ -25,6 +25,7 @@ import {
   usePetitionsQuery,
   usePetitionsUserQuery,
   usePetitions_deletePetitionsMutation,
+  usePetitions_clonePetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery, clearCache } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
@@ -43,6 +44,7 @@ import { memo, useState, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "@parallel/components/common/Link";
 import { ContactLink } from "@parallel/components/common/ContactLink";
+import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
 
 const PAGE_SIZE = 10;
 
@@ -59,14 +61,21 @@ function Petitions() {
   const {
     data: { me },
   } = assertQuery(usePetitionsUserQuery());
-  const { data, loading, refetch } = usePetitionsQuery({
-    variables: {
-      offset: PAGE_SIZE * (state.page - 1),
-      limit: PAGE_SIZE,
-      search: state.search,
-      status: state.status,
-    },
-  });
+  const {
+    data: { petitions },
+    loading,
+    refetch,
+  } = assertQuery(
+    usePetitionsQuery({
+      variables: {
+        offset: PAGE_SIZE * (state.page - 1),
+        limit: PAGE_SIZE,
+        search: state.search,
+        status: state.status,
+      },
+    })
+  );
+
   const createPetition = useCreatePetition();
 
   const [deletePetition] = usePetitions_deletePetitionsMutation({
@@ -76,10 +85,20 @@ function Petitions() {
     },
   });
 
-  const { petitions } = data!;
+  const askPetitionName = useAskPetitionNameDialog();
+  const [clonePetition] = usePetitions_clonePetitionMutation({
+    update(cache) {
+      // clear caches where new item would appear
+      clearCache(
+        cache,
+        /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
+      );
+      refetch();
+    },
+  });
 
-  const [selected, setSelected] = useState<string[]>();
-  const confirmDelete = useDialog(ConfirmDeletePetitions);
+  const [selected, setSelected] = useState<string[]>([]);
+  const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -105,6 +124,24 @@ function Petitions() {
       await deletePetition({
         variables: { ids: selected! },
       });
+    } catch {}
+  }
+
+  async function handleCloneClick() {
+    try {
+      const petition = petitions.items.find((p) => selected[0] === p.id);
+      const name = await askPetitionName({
+        defaultName: petition?.name ?? undefined,
+      });
+      const { data } = await clonePetition({
+        variables: { petitionId: selected![0], name },
+      });
+      router.push(
+        `/[locale]/app/petitions/[petitionId]/compose`,
+        `/${router.query.locale}/app/petitions/${
+          data!.clonePetition.id
+        }/compose`
+      );
     } catch {}
   }
 
@@ -164,12 +201,14 @@ function Petitions() {
             <PetitionListHeader
               search={state.search}
               status={state.status}
-              showActions={Boolean(selected?.length)}
+              showDelete={selected.length > 0}
+              showClone={selected.length === 1}
               onSearchChange={handleSearchChange}
               onStatusChange={handleStatusChange}
               onDeleteClick={handleDeleteClick}
               onCreateClick={handleCreateClick}
               onReload={() => refetch()}
+              onCloneClick={handleCloneClick}
             />
           }
           body={
@@ -343,7 +382,7 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
   },
 ];
 
-function ConfirmDeletePetitions({
+function ConfirmDeletePetitionsDialog({
   selected,
   ...props
 }: {
@@ -418,6 +457,13 @@ Petitions.mutations = [
   gql`
     mutation Petitions_deletePetitions($ids: [ID!]!) {
       deletePetitions(ids: $ids)
+    }
+  `,
+  gql`
+    mutation Petitions_clonePetition($petitionId: ID!, $name: String) {
+      clonePetition(petitionId: $petitionId, name: $name) {
+        id
+      }
     }
   `,
 ];

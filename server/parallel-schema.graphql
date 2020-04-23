@@ -125,6 +125,11 @@ type Mutation {
   changePassword(newPassword: String!, password: String!): ChangePasswordResult!
 
   """
+  Clone petition.
+  """
+  clonePetition(name: String, petitionId: ID!): Petition!
+
+  """
   Create contact.
   """
   createContact(data: CreateContactInput!): Contact!

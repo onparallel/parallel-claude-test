@@ -276,6 +276,7 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
+    clonePetition: NexusGenRootTypes["Petition"]; // Petition!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createPetition: NexusGenRootTypes["Petition"]; // Petition!
     createPetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
@@ -499,6 +500,11 @@ export interface NexusGenArgTypes {
       // args
       newPassword: string; // String!
       password: string; // String!
+    };
+    clonePetition: {
+      // args
+      name?: string | null; // String
+      petitionId: string; // ID!
     };
     createContact: {
       // args
