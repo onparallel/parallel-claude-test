@@ -29,16 +29,13 @@ app.get("/", async (req, res, next) => {
 app.get("/:email", async (req, res, next) => {
   try {
     const email = req.params.email;
-    const locale = req.query.lang ?? "en";
+    const locale = (req.query.lang as string) ?? "en";
     const type = req.query.text ? "text" : "html";
     const componentFile = path.join(
       __dirname,
       `src/emails/components/${email}.tsx`
     );
-    const messagesFile = path.join(
-      __dirname,
-      `src/emails/lang/compiled/${locale}.json`
-    );
+    const messagesFile = path.join(__dirname, `lang/compiled/${locale}.json`);
     for (const entry of Object.keys(require.cache)) {
       if (entry.startsWith(`${__dirname}/src`)) {
         delete require.cache[entry];
