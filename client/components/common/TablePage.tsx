@@ -91,15 +91,22 @@ export function TablePage<T>({
         marginTop="-1px"
       >
         <Box>
-          <FormattedMessage
-            id="component.table.total-results"
-            defaultMessage="Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
-            values={{
-              total: totalCount,
-              start: pageSize * (page - 1) + 1,
-              end: pageSize * (page - 1) + rows.length,
-            }}
-          />
+          {totalCount ? (
+            <FormattedMessage
+              id="component.table.total-results"
+              defaultMessage="Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
+              values={{
+                total: totalCount,
+                start: pageSize * (page - 1) + 1,
+                end: Math.min(pageSize * page, totalCount),
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              id="component.table.no-results"
+              defaultMessage="No results"
+            />
+          )}
         </Box>
         <Spacer />
         <Button
