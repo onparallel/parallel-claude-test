@@ -1,18 +1,8 @@
-import {
-  Box,
-  Heading,
-  Icon,
-  Popover,
-  PopoverArrow,
-  PopoverContent,
-  PopoverTrigger,
-  Text,
-} from "@chakra-ui/core";
+import { Box, Heading, Icon, Text } from "@chakra-ui/core";
 import { FORMATS } from "@parallel/utils/dates";
-import { cloneElement, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
-import { useId } from "@reach/auto-id";
+import { SmallPopover } from "../common/SmallPopover";
 
 export type DoubleCheckProps = {
   sent: boolean;
@@ -115,36 +105,4 @@ export function DoubleCheck({
     );
   }
   return null;
-}
-
-function SmallPopover({
-  children,
-  content,
-}: {
-  children: ReactNode;
-  content: ReactNode;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const popoverId = `popover-${useId()}`;
-  return (
-    <Popover
-      trigger="hover"
-      usePortal
-      id={popoverId}
-      onOpen={() => setIsOpen(true)}
-      onClose={() => setIsOpen(false)}
-    >
-      <PopoverTrigger>
-        {cloneElement(children as any, {
-          ...(isOpen ? { "aria-describedby": popoverId } : {}),
-        })}
-      </PopoverTrigger>
-      <PopoverContent zIndex={1000} maxWidth={240}>
-        <PopoverArrow />
-        <Box padding={2} id={popoverId}>
-          {content}
-        </Box>
-      </PopoverContent>
-    </Popover>
-  );
 }

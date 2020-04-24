@@ -390,28 +390,58 @@
     "reference": "pages/[locale]/app/contacts/index.tsx#L118-L121"
   },
   {
-    "term": "field-settings.multiple-replies",
+    "term": "field-settings.file-multiple-description",
+    "definition": "Activar esta opción permitirá al destinatario subir más de un archivo a este campo.",
+    "context": "Enabling this allows the recipient to upload multiple files to this field.",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L109-L112"
+  },
+  {
+    "term": "field-settings.multiple-description",
+    "definition": "Activar esta opción permitirá al destinatario responder más de una vez a este campo.",
+    "context": "Enabling this allows the recipient to submit multiple answers to this field.",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L114-L117"
+  },
+  {
+    "term": "field-settings.multiple-label",
     "definition": "Permitir múltiples respuestas",
     "context": "Allow multiple replies",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L91-L94"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L101-L104"
+  },
+  {
+    "term": "field-settings.required-description",
+    "definition": "Al marcar el campo como obligatorio, el destinatario no podrá finalizar la petición hasta que haya respondido al campo.",
+    "context": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L79-L82"
   },
   {
     "term": "field-settings.required-label",
-    "definition": "Requerido",
+    "definition": "Obligatorio",
     "context": "Required",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L70-L73"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L72-L75"
+  },
+  {
+    "term": "field-settings.text-multiline-description",
+    "definition": "Activar esta opción hara que el campo de texto para responder sea de múltiples lineas en lugar de una sola.",
+    "context": "Enabling this will display a multi-line input field instead of a single line.",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L187-L190"
   },
   {
     "term": "field-settings.text-multiline-label",
     "definition": "Multilínea",
-    "context": "Multiline",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L155-L158"
+    "context": "Multi-line",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L180-L183"
+  },
+  {
+    "term": "field-settings.text-placeholder-description",
+    "definition": "El placeholder es sutil texto descriptivo que aparece cuando el campo de texto está vacío.",
+    "context": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L219-L222"
   },
   {
     "term": "field-settings.text-placeholder-label",
     "definition": "Placeholder",
     "context": "Placeholder",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L178-L181"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L211-L214"
   },
   {
     "term": "generic.cancel-save-changes",
@@ -813,7 +843,7 @@
     "term": "petition.close-sidebar-button",
     "definition": "Cerrar",
     "context": "Close",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L60-L63"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L62-L65"
   },
   {
     "term": "petition.completed-petition-dialog.body",
@@ -891,7 +921,7 @@
     "term": "petition.field-settings",
     "definition": "Ajustes de campo",
     "context": "Field settings",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L50-L53"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L52-L55"
   },
   {
     "term": "petition.field-title-label",
@@ -1245,25 +1275,25 @@
     "term": "petitions.sendout-bounced",
     "definition": "El correo rebotó.",
     "context": "The email bounced.",
-    "reference": "components/petition/DoubleCheck.tsx#L37-L40"
+    "reference": "components/petition/DoubleCheck.tsx#L27-L30"
   },
   {
     "term": "petitions.sendout-bounced-explanation",
     "definition": "No pudimos enviar el correo a este destinatario. Por favor, asegurese de que la dirección es válida.",
     "context": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
-    "reference": "components/petition/DoubleCheck.tsx#L43-L46"
+    "reference": "components/petition/DoubleCheck.tsx#L33-L36"
   },
   {
     "term": "petitions.sendout-delivery-explanation-confirmed",
     "definition": "Se confirmó la recepcción del correo el {date}",
     "context": "The email is confirmed to have been delivered on {date}",
-    "reference": "components/petition/DoubleCheck.tsx#L64-L72"
+    "reference": "components/petition/DoubleCheck.tsx#L54-L62"
   },
   {
     "term": "petitions.sendout-delivery-explanation-not-confirmed",
     "definition": "No hemos recibido confirmación de la recepción del correo todavía.",
     "context": "We haven't received confirmation of the delivery of the email yet.",
-    "reference": "components/petition/DoubleCheck.tsx#L76-L79"
+    "reference": "components/petition/DoubleCheck.tsx#L66-L69"
   },
   {
     "term": "petitions.sendout-no-subject",
@@ -1281,13 +1311,13 @@
     "term": "petitions.sendout-opened-explanation-confirmed",
     "definition": "El correo electrónico se abrió el {date}",
     "context": "The email was opened on {date}",
-    "reference": "components/petition/DoubleCheck.tsx#L90-L96"
+    "reference": "components/petition/DoubleCheck.tsx#L80-L86"
   },
   {
     "term": "petitions.sendout-opened-explanation-not-confirmed",
     "definition": "No hemos podido confirmar que el correo se haya abierto todavía.",
     "context": "We haven't received confirmation of the email being opened yet.",
-    "reference": "components/petition/DoubleCheck.tsx#L100-L103"
+    "reference": "components/petition/DoubleCheck.tsx#L90-L93"
   },
   {
     "term": "petitions.sendout-status.active",

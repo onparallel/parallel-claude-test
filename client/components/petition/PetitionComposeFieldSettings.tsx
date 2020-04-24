@@ -1,9 +1,10 @@
 import {
-  Box,
   BoxProps,
   Flex,
   Heading,
+  Icon,
   IconButton,
+  Image,
   Input,
   Stack,
   Switch,
@@ -21,6 +22,7 @@ import { gql } from "apollo-boost";
 import { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
+import { SmallPopover } from "../common/SmallPopover";
 
 export type PetitionComposeFieldSettingsProps = BoxProps & {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
@@ -72,6 +74,14 @@ export function PetitionComposeFieldSettings({
               defaultMessage="Required"
             />
           }
+          help={
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="field-settings.required-description"
+                defaultMessage="If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field."
+              />
+            </Text>
+          }
           controlId="field-required"
         >
           <Switch
@@ -89,9 +99,24 @@ export function PetitionComposeFieldSettings({
         <SettingsRow
           label={
             <FormattedMessage
-              id="field-settings.multiple-replies"
+              id="field-settings.multiple-label"
               defaultMessage="Allow multiple replies"
             />
+          }
+          help={
+            <Text fontSize="sm">
+              {field.type === "FILE_UPLOAD" ? (
+                <FormattedMessage
+                  id="field-settings.file-multiple-description"
+                  defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
+                />
+              ) : (
+                <FormattedMessage
+                  id="field-settings.multiple-description"
+                  defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
+                />
+              )}
+            </Text>
           }
           controlId="field-multiple"
         >
@@ -154,8 +179,16 @@ function TextSettings({
         label={
           <FormattedMessage
             id="field-settings.text-multiline-label"
-            defaultMessage="Multiline"
+            defaultMessage="Multi-line"
           />
+        }
+        help={
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="field-settings.text-multiline-description"
+              defaultMessage="Enabling this will display a multi-line input field instead of a single line."
+            />
+          </Text>
         }
         controlId="text-multiline"
       >
@@ -180,6 +213,22 @@ function TextSettings({
             defaultMessage="Placeholder"
           />
         }
+        help={
+          <>
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="field-settings.text-placeholder-description"
+                defaultMessage="The placeholder is the subtle descriptive text that shows when the input field is empty."
+              />
+            </Text>
+            <Image
+              height="55px"
+              marginTop={2}
+              src="/static/images/placeholder.gif"
+              role="presentation"
+            />
+          </>
+        }
         controlId="text-placeholder"
       >
         <Input
@@ -197,18 +246,24 @@ function TextSettings({
 function SettingsRow({
   label,
   controlId,
+  help,
   children,
   ...props
 }: BoxProps & {
   label: ReactNode;
   controlId: string;
   children: ReactNode;
+  help: ReactNode;
 }) {
   return (
     <Flex alignItems="center" {...props}>
-      <Box flex="1" as="label" cursor="pointer" {...{ htmlFor: controlId }}>
-        <Text as="div">{label}</Text>
-      </Box>
+      <SmallPopover content={help}>
+        <Flex as="label" alignItems="center" {...{ htmlFor: controlId }}>
+          <Text as="div">{label}</Text>
+          <Icon marginLeft={2} name="question" color="gray.200" />
+        </Flex>
+      </SmallPopover>
+      <Spacer />
       <Flex alignSelf="center">{children}</Flex>
     </Flex>
   );
