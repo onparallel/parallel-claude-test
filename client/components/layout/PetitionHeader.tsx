@@ -101,10 +101,14 @@ export function PetitionHeader({
           onChange={setName}
           fontSize="xl"
           onSubmit={handleOnSubmit}
-          placeholder={intl.formatMessage({
-            id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition",
-          })}
+          placeholder={
+            name
+              ? ""
+              : intl.formatMessage({
+                  id: "generic.untitled-petition",
+                  defaultMessage: "Untitled petition",
+                })
+          }
           aria-label={intl.formatMessage({
             id: "petition.name-label",
             defaultMessage: "Petition name",
