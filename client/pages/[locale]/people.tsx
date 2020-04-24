@@ -10,7 +10,7 @@ import {
   Text,
   useTheme,
 } from "@chakra-ui/core";
-import { NormalLink } from "@parallel/components/common/Link";
+import { NormalLink, Link } from "@parallel/components/common/Link";
 import { Title } from "@parallel/components/common/Title";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -248,11 +248,7 @@ function People() {
               id="public.case.laura.register"
               defaultMessage="If you want to start using Parallel, <a>register for free here</a>."
               values={{
-                a: (...chunks: any[]) => (
-                  <NormalLink href="https://parallelso.typeform.com/to/XxE7IY">
-                    {chunks}
-                  </NormalLink>
-                ),
+                a: (...chunks: any[]) => <Link href="/invite">{chunks}</Link>,
               }}
             ></FormattedMessage>
           </Text>
