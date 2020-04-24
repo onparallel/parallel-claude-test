@@ -6,8 +6,9 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Icon,
 } from "@chakra-ui/core";
-import { useIntl } from "react-intl";
+import { useIntl, FormattedMessage } from "react-intl";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { postJson } from "@parallel/utils/rest";
@@ -47,10 +48,22 @@ export function UserMenu({ user }: UserMenuProps) {
       </MenuButton>
       <MenuList placement="right-end">
         <NakedLink href="/app/settings/account">
-          <MenuItem as="a">My Account</MenuItem>
+          <MenuItem as="a">
+            <Icon name="user" marginRight={2} />
+            <FormattedMessage
+              id="component.user-menu.my-account"
+              defaultMessage="My Account"
+            />
+          </MenuItem>
         </NakedLink>
         <MenuDivider />
-        <MenuItem onClick={handleLogoutClick}>Log out</MenuItem>
+        <MenuItem onClick={handleLogoutClick}>
+          <Icon name="log-out" marginRight={2} />
+          <FormattedMessage
+            id="component.user-menu.log-out"
+            defaultMessage="Log out"
+          />
+        </MenuItem>
       </MenuList>
     </Menu>
   );

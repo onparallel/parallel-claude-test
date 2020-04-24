@@ -294,6 +294,18 @@
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
   },
   {
+    "term": "component.user-menu.log-out",
+    "definition": "Log out",
+    "context": "Log out",
+    "reference": "components/layout/UserMenu.tsx#L62-L65"
+  },
+  {
+    "term": "component.user-menu.my-account",
+    "definition": "My Account",
+    "context": "My Account",
+    "reference": "components/layout/UserMenu.tsx#L53-L56"
+  },
+  {
     "term": "contact.edit-details-button",
     "definition": "Edit",
     "context": "Edit",
@@ -729,7 +741,7 @@
     "term": "header.user-menu-button",
     "definition": "User menu",
     "context": "User menu",
-    "reference": "components/layout/UserMenu.tsx#L36-L39"
+    "reference": "components/layout/UserMenu.tsx#L37-L40"
   },
   {
     "term": "navbar.coming-soon",
