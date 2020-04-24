@@ -18,6 +18,24 @@
     "reference": "components/common/ConfirmDialog.tsx#L41-L44"
   },
   {
+    "term": "component.contact-list-header.actions-button",
+    "definition": "Actions",
+    "context": "Actions",
+    "reference": "components/contacts/ContactListHeader.tsx#L49-L52"
+  },
+  {
+    "term": "component.contact-list-header.create-contact-button",
+    "definition": "Create contact",
+    "context": "Create contact",
+    "reference": "components/contacts/ContactListHeader.tsx#L69-L72"
+  },
+  {
+    "term": "component.contact-list-header.delete-label",
+    "definition": "Delete selected",
+    "context": "Delete selected",
+    "reference": "components/contacts/ContactListHeader.tsx#L58-L61"
+  },
+  {
     "term": "component.cookie-consent.accept-button",
     "definition": "Accept",
     "context": "Accept",
@@ -28,6 +46,18 @@
     "definition": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>.",
     "context": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>.",
     "reference": "components/public/layout/CookieConsent.tsx#L41-L60"
+  },
+  {
+    "term": "component.copy-to-clipboard-button.copied-label",
+    "definition": "Copied to clipboard!",
+    "context": "Copied to clipboard!",
+    "reference": "components/common/CopyToClipboardButton.tsx#L29-L32"
+  },
+  {
+    "term": "component.copy-to-clipboard-button.copy-label",
+    "definition": "Copy to clipboard",
+    "context": "Copy to clipboard",
+    "reference": "components/common/CopyToClipboardButton.tsx#L25-L28"
   },
   {
     "term": "component.date-picker.next-month",
@@ -58,6 +88,30 @@
     "definition": "Show",
     "context": "Show",
     "reference": "components/common/PasswordInput.tsx#L26-L29"
+  },
+  {
+    "term": "component.petition-list-header.actions-button",
+    "definition": "Actions",
+    "context": "Actions",
+    "reference": "components/petitions/PetitionListHeader.tsx#L85-L88"
+  },
+  {
+    "term": "component.petition-list-header.clone-label",
+    "definition": "Clone petition",
+    "context": "Clone petition",
+    "reference": "components/petitions/PetitionListHeader.tsx#L94-L97"
+  },
+  {
+    "term": "component.petition-list-header.create-petition-button",
+    "definition": "Create petition",
+    "context": "Create petition",
+    "reference": "components/petitions/PetitionListHeader.tsx#L113-L116"
+  },
+  {
+    "term": "component.petition-list-header.delete-label",
+    "definition": "Delete selected",
+    "context": "Delete selected",
+    "reference": "components/petitions/PetitionListHeader.tsx#L102-L105"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -150,10 +204,28 @@
     "reference": "components/common/PetitionStatusFilter.tsx#L34-L37"
   },
   {
+    "term": "component.react-select.loading",
+    "definition": "Loading...",
+    "context": "Loading...",
+    "reference": "utils/useReactSelectStyle.tsx#L135-L138"
+  },
+  {
+    "term": "component.react-select.no-options",
+    "definition": "No options",
+    "context": "No options",
+    "reference": "utils/useReactSelectStyle.tsx#L122-L125"
+  },
+  {
     "term": "component.recipient-select.create-new-contact",
     "definition": "Create new contact for: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>",
     "reference": "components/common/RecipientSelect.tsx#L214-L223"
+  },
+  {
+    "term": "component.recipient-select.enter-email",
+    "definition": "You can also enter a valid email.",
+    "context": "You can also enter a valid email.",
+    "reference": "components/common/RecipientSelect.tsx#L135-L138"
   },
   {
     "term": "component.recipient-select.existing-contact.description",
@@ -166,6 +238,24 @@
     "definition": "Existing contact",
     "context": "Existing contact",
     "reference": "components/common/RecipientSelect.tsx#L52-L55"
+  },
+  {
+    "term": "component.recipient-select.no-options",
+    "definition": "We could not find any exisiting contacts for <em>{search}</em>",
+    "context": "We could not find any exisiting contacts for <em>{search}</em>",
+    "reference": "components/common/RecipientSelect.tsx#L125-L132"
+  },
+  {
+    "term": "component.recipient-select.placeholder",
+    "definition": "Enter recipients...",
+    "context": "Enter recipients...",
+    "reference": "components/common/RecipientSelect.tsx#L71-L74"
+  },
+  {
+    "term": "component.recipient-select.search-hint",
+    "definition": "Search for exisiting contacts or enter a valid email.",
+    "context": "Search for exisiting contacts or enter a valid email.",
+    "reference": "components/common/RecipientSelect.tsx#L143-L146"
   },
   {
     "term": "component.search-input.placeholder",
@@ -202,96 +292,6 @@
     "definition": "Toggle light mode",
     "context": "Toggle light mode",
     "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
-  },
-  {
-    "term": "components.contact-list-header.actions-button",
-    "definition": "Actions",
-    "context": "Actions",
-    "reference": "components/contacts/ContactListHeader.tsx#L49-L52"
-  },
-  {
-    "term": "components.contact-list-header.create-contact-button",
-    "definition": "Create contact",
-    "context": "Create contact",
-    "reference": "components/contacts/ContactListHeader.tsx#L69-L72"
-  },
-  {
-    "term": "components.contact-list-header.delete-label",
-    "definition": "Delete selected",
-    "context": "Delete selected",
-    "reference": "components/contacts/ContactListHeader.tsx#L58-L61"
-  },
-  {
-    "term": "components.copy-to-clipboard-button.copied-label",
-    "definition": "Copied to clipboard!",
-    "context": "Copied to clipboard!",
-    "reference": "components/common/CopyToClipboardButton.tsx#L29-L32"
-  },
-  {
-    "term": "components.copy-to-clipboard-button.copy-label",
-    "definition": "Copy to clipboard",
-    "context": "Copy to clipboard",
-    "reference": "components/common/CopyToClipboardButton.tsx#L25-L28"
-  },
-  {
-    "term": "components.petition-list-header.actions-button",
-    "definition": "Actions",
-    "context": "Actions",
-    "reference": "components/petitions/PetitionListHeader.tsx#L85-L88"
-  },
-  {
-    "term": "components.petition-list-header.clone-label",
-    "definition": "Clone petition",
-    "context": "Clone petition",
-    "reference": "components/petitions/PetitionListHeader.tsx#L94-L97"
-  },
-  {
-    "term": "components.petition-list-header.create-petition-button",
-    "definition": "Create petition",
-    "context": "Create petition",
-    "reference": "components/petitions/PetitionListHeader.tsx#L113-L116"
-  },
-  {
-    "term": "components.petition-list-header.delete-label",
-    "definition": "Delete selected",
-    "context": "Delete selected",
-    "reference": "components/petitions/PetitionListHeader.tsx#L102-L105"
-  },
-  {
-    "term": "components.react-select.loading",
-    "definition": "Loading...",
-    "context": "Loading...",
-    "reference": "utils/useReactSelectStyle.tsx#L135-L138"
-  },
-  {
-    "term": "components.react-select.no-options",
-    "definition": "No options",
-    "context": "No options",
-    "reference": "utils/useReactSelectStyle.tsx#L122-L125"
-  },
-  {
-    "term": "components.recipient-select.enter-email",
-    "definition": "You can also enter a valid email.",
-    "context": "You can also enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L135-L138"
-  },
-  {
-    "term": "components.recipient-select.no-options",
-    "definition": "We could not find any exisiting contacts for <em>{search}</em>",
-    "context": "We could not find any exisiting contacts for <em>{search}</em>",
-    "reference": "components/common/RecipientSelect.tsx#L125-L132"
-  },
-  {
-    "term": "components.recipient-select.placeholder",
-    "definition": "Enter recipients...",
-    "context": "Enter recipients...",
-    "reference": "components/common/RecipientSelect.tsx#L71-L74"
-  },
-  {
-    "term": "components.recipient-select.search-hint",
-    "definition": "Search for exisiting contacts or enter a valid email.",
-    "context": "Search for exisiting contacts or enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L143-L146"
   },
   {
     "term": "contact.edit-details-button",

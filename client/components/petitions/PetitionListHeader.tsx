@@ -83,7 +83,7 @@ export function PetitionListHeader({
             rightIcon="chevron-down"
             children={
               <FormattedMessage
-                id="components.petition-list-header.actions-button"
+                id="component.petition-list-header.actions-button"
                 defaultMessage="Actions"
               ></FormattedMessage>
             }
@@ -92,7 +92,7 @@ export function PetitionListHeader({
                 <MenuItem onClick={onCloneClick} isDisabled={!showClone}>
                   <Icon name="copy" marginRight={2} />
                   <FormattedMessage
-                    id="components.petition-list-header.clone-label"
+                    id="component.petition-list-header.clone-label"
                     defaultMessage="Clone petition"
                   />
                 </MenuItem>
@@ -100,7 +100,7 @@ export function PetitionListHeader({
                 <MenuItem onClick={onDeleteClick} isDisabled={!showDelete}>
                   <Icon name="delete" marginRight={2} />
                   <FormattedMessage
-                    id="components.petition-list-header.delete-label"
+                    id="component.petition-list-header.delete-label"
                     defaultMessage="Delete selected"
                   />
                 </MenuItem>
@@ -111,7 +111,7 @@ export function PetitionListHeader({
       ) : null}
       <Button variantColor="purple" onClick={onCreateClick}>
         <FormattedMessage
-          id="components.petition-list-header.create-petition-button"
+          id="component.petition-list-header.create-petition-button"
           defaultMessage="Create petition"
         />
       </Button>

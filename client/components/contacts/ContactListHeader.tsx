@@ -47,7 +47,7 @@ ContactListHeaderProps) {
             rightIcon="chevron-down"
             children={
               <FormattedMessage
-                id="components.contact-list-header.actions-button"
+                id="component.contact-list-header.actions-button"
                 defaultMessage="Actions"
               ></FormattedMessage>
             }
@@ -56,7 +56,7 @@ ContactListHeaderProps) {
                 <MenuItem onClick={onDeleteClick}>
                   <Icon name="delete" marginRight={2} />
                   <FormattedMessage
-                    id="components.contact-list-header.delete-label"
+                    id="component.contact-list-header.delete-label"
                     defaultMessage="Delete selected"
                   />
                 </MenuItem>
@@ -67,7 +67,7 @@ ContactListHeaderProps) {
       ) : null}
       <Button variantColor="purple" onClick={onCreateClick}>
         <FormattedMessage
-          id="components.contact-list-header.create-contact-button"
+          id="component.contact-list-header.create-contact-button"
           defaultMessage="Create contact"
         />
       </Button>

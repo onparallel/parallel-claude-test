@@ -120,7 +120,7 @@ export function useReactSelectStyle<
             paddingY={2}
           >
             <FormattedMessage
-              id="components.react-select.no-options"
+              id="component.react-select.no-options"
               defaultMessage="No options"
             />
           </Text>
@@ -133,7 +133,7 @@ export function useReactSelectStyle<
         LoadingMessage: memo(() => (
           <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
             <FormattedMessage
-              id="components.react-select.loading"
+              id="component.react-select.loading"
               defaultMessage="Loading..."
             />
           </Text>

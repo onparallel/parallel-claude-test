@@ -23,11 +23,11 @@ export const CopyToClipboardButton = memo(function CopyToClipboardButton({
   const intl = useIntl();
   const labels = {
     copy: intl.formatMessage({
-      id: "components.copy-to-clipboard-button.copy-label",
+      id: "component.copy-to-clipboard-button.copy-label",
       defaultMessage: "Copy to clipboard",
     }),
     copied: intl.formatMessage({
-      id: "components.copy-to-clipboard-button.copied-label",
+      id: "component.copy-to-clipboard-button.copied-label",
       defaultMessage: "Copied to clipboard!",
     }),
   };

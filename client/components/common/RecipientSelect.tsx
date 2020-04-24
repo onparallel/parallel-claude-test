@@ -69,7 +69,7 @@ export function RecipientSelect({
   return (
     <AsyncCreatableSelect<Recipient>
       placeholder={intl.formatMessage({
-        id: "components.recipient-select.placeholder",
+        id: "component.recipient-select.placeholder",
         defaultMessage: "Enter recipients...",
       })}
       value={value}
@@ -123,7 +123,7 @@ function useReactSelectProps() {
                   <>
                     <Text as="div" marginTop={2}>
                       <FormattedMessage
-                        id="components.recipient-select.no-options"
+                        id="component.recipient-select.no-options"
                         defaultMessage="We could not find any exisiting contacts for <em>{search}</em>"
                         values={{
                           search,
@@ -133,7 +133,7 @@ function useReactSelectProps() {
                     </Text>
                     <Text as="div" marginTop={2}>
                       <FormattedMessage
-                        id="components.recipient-select.enter-email"
+                        id="component.recipient-select.enter-email"
                         defaultMessage="You can also enter a valid email."
                       />
                     </Text>
@@ -141,7 +141,7 @@ function useReactSelectProps() {
                 ) : (
                   <Text as="div" marginTop={2}>
                     <FormattedMessage
-                      id="components.recipient-select.search-hint"
+                      id="component.recipient-select.search-hint"
                       defaultMessage="Search for exisiting contacts or enter a valid email."
                     />
                   </Text>

@@ -60,6 +60,7 @@ async function extractTerms(input: string) {
       `formatjs extract \
        --extract-source-location \
        --extract-from-format-message-call \
+       --throws \
        --out-file ${tmpFileName} \
        ${isWindows ? input.replace("/", "\\") : `'${input}'`}`
     );
