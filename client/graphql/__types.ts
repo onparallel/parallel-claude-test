@@ -92,7 +92,7 @@ export type Mutation = {
   changePassword: ChangePasswordResult;
   /** Clone petition. */
   clonePetition: Petition;
-  /** Create contact. */
+  /** Create a contact. */
   createContact: Contact;
   /** Create petition. */
   createPetition: Petition;
@@ -204,7 +204,7 @@ export type MutationpublicFileUploadReplyCompleteArgs = {
 
 export type MutationsendPetitionArgs = {
   petitionId: Scalars["ID"];
-  recipients: Array<Recipient>;
+  recipients: Array<Scalars["ID"]>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -587,11 +587,6 @@ export type QuerypetitionsArgs = {
 
 export type QuerysendoutArgs = {
   keycode: Scalars["ID"];
-};
-
-export type Recipient = {
-  email?: Maybe<Scalars["ID"]>;
-  id?: Maybe<Scalars["ID"]>;
 };
 
 /** The reminder settings of a petition */
@@ -1034,7 +1029,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
 
 export type PetitionCompose_sendPetitionMutationVariables = {
   petitionId: Scalars["ID"];
-  recipients: Array<Recipient>;
+  recipients: Array<Scalars["ID"]>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -1469,7 +1464,12 @@ export type useCreateContact_createContactMutationVariables = {
 
 export type useCreateContact_createContactMutation = {
   __typename?: "Mutation";
-} & { createContact: { __typename?: "Contact" } & Pick<Contact, "id"> };
+} & {
+  createContact: { __typename?: "Contact" } & Pick<
+    Contact,
+    "id" | "email" | "firstName" | "lastName" | "fullName"
+  >;
+};
 
 export type useCreatePetition_createPetitionMutationVariables = {
   name: Scalars["String"];
@@ -2538,7 +2538,7 @@ export type PetitionCompose_updatePetitionFieldMutationOptions = ApolloReactComm
 export const PetitionCompose_sendPetitionDocument = gql`
   mutation PetitionCompose_sendPetition(
     $petitionId: ID!
-    $recipients: [Recipient!]!
+    $recipients: [ID!]!
     $scheduledAt: DateTime
   ) {
     sendPetition(
@@ -4019,6 +4019,10 @@ export const useCreateContact_createContactDocument = gql`
   mutation useCreateContact_createContact($data: CreateContactInput!) {
     createContact(data: $data) {
       id
+      email
+      firstName
+      lastName
+      fullName
     }
   }
 `;

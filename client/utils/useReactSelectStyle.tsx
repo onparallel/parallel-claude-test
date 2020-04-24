@@ -163,6 +163,7 @@ export function useReactSelectStyle<
         }),
         option: (styles) => ({
           ...styles,
+          cursor: "pointer",
           padding: "0 1rem",
           minHeight: "32px",
           display: "flex",

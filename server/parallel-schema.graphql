@@ -130,7 +130,7 @@ type Mutation {
   clonePetition(name: String, petitionId: ID!): Petition!
 
   """
-  Create contact.
+  Create a contact.
   """
   createContact(data: CreateContactInput!): Contact!
 
@@ -211,7 +211,7 @@ type Mutation {
   """
   sendPetition(
     petitionId: ID!
-    recipients: [Recipient!]!
+    recipients: [ID!]!
     scheduledAt: DateTime
   ): SendPetitionResult!
 
@@ -926,11 +926,6 @@ type Query {
     status: PetitionStatus
   ): PetitionPagination!
   sendout(keycode: ID!): PublicPetitionSendout
-}
-
-input Recipient {
-  email: ID
-  id: ID
 }
 
 """

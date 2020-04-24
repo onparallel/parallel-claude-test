@@ -72,11 +72,6 @@ export interface NexusGenInputs {
     // input type
     text: string; // String!
   };
-  Recipient: {
-    // input type
-    email?: string | null; // ID
-    id?: string | null; // ID
-  };
   ReminderSettingsInput: {
     // input type
     offset: number; // Int!
@@ -230,7 +225,6 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreateContactInput: NexusGenInputs["CreateContactInput"];
   CreateFileUploadReplyInput: NexusGenInputs["CreateFileUploadReplyInput"];
   CreateTextReplyInput: NexusGenInputs["CreateTextReplyInput"];
-  Recipient: NexusGenInputs["Recipient"];
   ReminderSettingsInput: NexusGenInputs["ReminderSettingsInput"];
   UpdateContactInput: NexusGenInputs["UpdateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
@@ -567,7 +561,7 @@ export interface NexusGenArgTypes {
     sendPetition: {
       // args
       petitionId: string; // ID!
-      recipients: NexusGenInputs["Recipient"][]; // [Recipient!]!
+      recipients: string[]; // [ID!]!
       scheduledAt?: Date | null; // DateTime
     };
     sendReminders: {
@@ -695,7 +689,6 @@ export type NexusGenInputNames =
   | "CreateContactInput"
   | "CreateFileUploadReplyInput"
   | "CreateTextReplyInput"
-  | "Recipient"
   | "ReminderSettingsInput"
   | "UpdateContactInput"
   | "UpdatePetitionFieldInput"

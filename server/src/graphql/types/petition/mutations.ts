@@ -433,14 +433,7 @@ export const sendPetition = mutationField("sendPetition", {
   ),
   args: {
     petitionId: idArg({ required: true }),
-    recipients: arg({
-      type: inputObjectType({
-        name: "Recipient",
-        definition(t) {
-          t.id("id");
-          t.id("email");
-        },
-      }),
+    recipients: idArg({
       list: [true],
       required: true,
     }),
@@ -452,16 +445,10 @@ export const sendPetition = mutationField("sendPetition", {
       if (args.recipients.length === 0) {
         throw new Error("Empty recipients");
       }
-      const { ids: contactIds } = fromGlobalIds(
-        args.recipients.filter((r) => r.id).map((r) => r.id!),
-        "Contact"
-      );
+      const { ids: recipientIds } = fromGlobalIds(args.recipients, "Contact");
       const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-      const emails = args.recipients
-        .filter((r) => r.email)
-        .map((r) => r.email!);
       const [hasAccess, petition] = await Promise.all([
-        ctx.contacts.userHasAccessToContacts(ctx.user!.id, contactIds),
+        ctx.contacts.userHasAccessToContacts(ctx.user!.id, recipientIds),
         ctx.petitions.loadPetition(petitionId),
       ]);
       if (!hasAccess) {
@@ -470,17 +457,9 @@ export const sendPetition = mutationField("sendPetition", {
       if (!petition) {
         throw new Error("Petition not available");
       }
-      let allIds = [...contactIds];
-      if (emails.length) {
-        const created = await ctx.contacts.getOrCreateContacts(
-          emails,
-          ctx.user!
-        );
-        allIds = [...contactIds, ...created.map((c) => c.id)];
-      }
       const [sendouts] = await Promise.all([
         ctx.petitions.createSendouts(
-          allIds.map((id) => ({
+          recipientIds.map((id) => ({
             petition_id: petitionId,
             keycode: random(16),
             status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",

@@ -96,7 +96,7 @@ function Contacts() {
 
   async function handleCreateClick() {
     try {
-      const id = await createContact();
+      await createContact({});
       refetch();
     } catch {}
   }

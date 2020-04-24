@@ -1,19 +1,16 @@
-import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
-import { useReactSelectStyle } from "../../utils/useReactSelectStyle";
-import { components } from "react-select";
-import { Text, Box, Icon } from "@chakra-ui/core";
-import { useMemo, memo, useCallback, useState, ReactNode } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { Box, Icon, Text, useToast } from "@chakra-ui/core";
+import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
+import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { gql } from "apollo-boost";
-import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
+import { memo, ReactNode, useCallback, useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { components, OptionProps } from "react-select";
+import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
+import { pick } from "remeda";
+import { useReactSelectStyle } from "../../utils/useReactSelectStyle";
 
-export type Recipient =
-  | RecipientSelect_ContactFragment
-  | {
-      value: string;
-      __isNew__: true;
-    };
+export type Recipient = RecipientSelect_ContactFragment;
 
 type RecipientSelectProps = Pick<Props<Recipient>, "inputId"> & {
   value: Recipient[];
@@ -28,19 +25,46 @@ export function RecipientSelect({
   ...props
 }: RecipientSelectProps) {
   const intl = useIntl();
+  const [isCreating, setIsCreating] = useState(false);
   const reactSelectProps = useReactSelectProps();
+  const createContact = useCreateContact();
+  const toast = useToast();
+
   const loadOptions = useCallback(
     async (search) => {
       const exclude = [];
       for (const recipient of value) {
-        if (!("__isNew__" in recipient)) {
-          exclude.push(recipient.id);
-        }
+        exclude.push(recipient.id);
       }
       return await searchContacts(search, exclude);
     },
     [searchContacts, value]
   );
+
+  async function handleCreate(email: string) {
+    setIsCreating(true);
+    try {
+      const contact = await createContact({ defaultEmail: email });
+      onChange([...value, pick(contact, ["id", "email", "fullName"])]);
+    } catch (error) {
+      if (error?.graphQLErrors?.[0]?.message === "EXISTING_CONTACT") {
+        toast({
+          title: intl.formatMessage({
+            id: "component.recipient-select.existing-contact.title",
+            defaultMessage: "Existing contact",
+          }),
+          description: intl.formatMessage({
+            id: "component.recipient-select.existing-contact.description",
+            defaultMessage: "This contact already exists.",
+          }),
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    }
+    setIsCreating(false);
+  }
 
   return (
     <AsyncCreatableSelect<Recipient>
@@ -48,7 +72,10 @@ export function RecipientSelect({
         id: "components.recipient-select.placeholder",
         defaultMessage: "Enter recipients...",
       })}
+      value={value}
+      isDisabled={isCreating}
       onChange={(value) => onChange((value as any) ?? [])}
+      onCreateOption={handleCreate}
       isMulti
       loadOptions={loadOptions}
       {...reactSelectProps}
@@ -131,23 +158,6 @@ function useReactSelectProps() {
               data: Recipient;
               children: ReactNode;
             }) => {
-              const intl = useIntl();
-              if ("__isNew__" in data) {
-                return (
-                  <components.MultiValueLabel {...props}>
-                    <Icon
-                      name={"user-plus" as any}
-                      aria-label={intl.formatMessage({
-                        id: "components.recipient-select.new-contact",
-                        defaultMessage: "New contact",
-                      })}
-                    />
-                    <Text as="span" marginLeft={2}>
-                      {children}
-                    </Text>
-                  </components.MultiValueLabel>
-                );
-              }
               const { fullName, email } = data;
               return (
                 <components.MultiValueLabel {...props}>
@@ -158,21 +168,44 @@ function useReactSelectProps() {
               );
             }
           ),
+          Option: ({
+            children,
+            data,
+            ...props
+          }: Omit<OptionProps<Recipient>, "data"> & { data: Recipient }) => {
+            if ((data as any).__isNew__) {
+              return (
+                <components.Option data={data} {...props}>
+                  {children} {/* from formatCreateLabel */}
+                </components.Option>
+              );
+            } else {
+              return (
+                <components.Option data={data} {...props}>
+                  {data.fullName ? (
+                    <Text as="span" verticalAlign="baseline">
+                      <Text as="span">{data.fullName}</Text>
+                      <Text as="span" display="inline-block" width={2}></Text>
+                      <Text as="span" fontSize="sm" color="gray.500">
+                        {data.email}
+                      </Text>
+                    </Text>
+                  ) : (
+                    <Text as="span">{data.email}</Text>
+                  )}
+                </components.Option>
+              );
+            }
+          },
         },
         getOptionLabel: (option) => {
-          if ("__isNew__" in option) {
+          if ((option as any).__isNew__) {
             return (option as any).label;
           } else {
             return option.email;
           }
         },
-        getOptionValue: (option) => {
-          if ("__isNew__" in option) {
-            return option.value;
-          } else {
-            return option.email;
-          }
-        },
+        getOptionValue: (option) => option.id,
         isValidNewOption: (value: string) => {
           return EMAIL_REGEX.test(value);
         },
@@ -180,11 +213,11 @@ function useReactSelectProps() {
           return (
             <FormattedMessage
               id="component.recipient-select.create-new-contact"
-              defaultMessage="Create new contact for: <em>{email}</em>"
+              defaultMessage="Create new contact for: <b>{email}</b>"
               values={{
                 email: label,
-                em: (...chunks: any[]) => (
-                  <em style={{ marginLeft: "4px" }}>{chunks}</em>
+                b: (...chunks: any[]) => (
+                  <strong style={{ marginLeft: "4px" }}>{chunks}</strong>
                 ),
               }}
             ></FormattedMessage>

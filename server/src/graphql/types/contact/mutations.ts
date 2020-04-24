@@ -6,7 +6,7 @@ import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
 import { RESULT } from "../../helpers/result";
 
 export const createContact = mutationField("createContact", {
-  description: "Create contact.",
+  description: "Create a contact.",
   type: "Contact",
   authorize: authenticate(),
   args: {
@@ -21,14 +21,22 @@ export const createContact = mutationField("createContact", {
   },
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
-    return await ctx.contacts.createContact(
-      {
-        email,
-        first_name: firstName || null,
-        last_name: lastName || null,
-      },
-      ctx.user!
-    );
+    try {
+      return await ctx.contacts.createContact(
+        {
+          email,
+          first_name: firstName || null,
+          last_name: lastName || null,
+        },
+        ctx.user!
+      );
+    } catch (error) {
+      if (error?.constraint === "contact__owner_id__email") {
+        throw new Error("EXISTING_CONTACT");
+      } else {
+        throw new Error("INTERNAL_ERROR");
+      }
+    }
   },
 });
 

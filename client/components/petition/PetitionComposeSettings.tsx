@@ -56,7 +56,7 @@ import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { DateTime } from "../common/DateTime";
 import { PetitionReminderSettings } from "./PetitionReminderSettings";
-import { omit } from "remeda";
+import { omit, pick } from "remeda";
 
 export type PetitionComposeSettingsProps = {
   petition: PetitionComposeSettings_PetitionFragment;
@@ -65,10 +65,7 @@ export type PetitionComposeSettingsProps = {
     exclude: string[]
   ) => Promise<PetitionComposeSettings_ContactFragment[]>;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
-  onSend: (data: {
-    recipients: ({ id: string } | { email: string })[];
-    scheduledAt?: Date;
-  }) => void;
+  onSend: (data: { recipients: string[]; scheduledAt?: Date }) => void;
 } & CardProps;
 
 export function PetitionComposeSettings({
@@ -139,9 +136,7 @@ export function PetitionComposeSettings({
     }
     onSend({
       scheduledAt: scheduleAt,
-      recipients: recipients.map((r) =>
-        "__isNew__" in r ? { email: r.value } : { id: r.id }
-      ),
+      recipients: recipients.map((r) => r.id),
     });
   }
 

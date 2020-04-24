@@ -152,8 +152,20 @@
   {
     "term": "component.recipient-select.create-new-contact",
     "definition": "Crear nuevo contacto para: <em>{email}</em>",
-    "context": "Create new contact for: <em>{email}</em>",
-    "reference": "components/common/RecipientSelect.tsx#L181-L190"
+    "context": "Create new contact for: <b>{email}</b>",
+    "reference": "components/common/RecipientSelect.tsx#L214-L223"
+  },
+  {
+    "term": "component.recipient-select.existing-contact.description",
+    "definition": "Este contacto ya existe.",
+    "context": "This contact already exists.",
+    "reference": "components/common/RecipientSelect.tsx#L56-L59"
+  },
+  {
+    "term": "component.recipient-select.existing-contact.title",
+    "definition": "Contacto existente",
+    "context": "Existing contact",
+    "reference": "components/common/RecipientSelect.tsx#L52-L55"
   },
   {
     "term": "component.search-input.placeholder",
@@ -261,31 +273,25 @@
     "term": "components.recipient-select.enter-email",
     "definition": "También puedes introducir un correo eletrónico válido.",
     "context": "You can also enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L108-L111"
-  },
-  {
-    "term": "components.recipient-select.new-contact",
-    "definition": "Contacto nuevo",
-    "context": "New contact",
-    "reference": "components/common/RecipientSelect.tsx#L140-L143"
+    "reference": "components/common/RecipientSelect.tsx#L135-L138"
   },
   {
     "term": "components.recipient-select.no-options",
     "definition": "No pudimos encontrar ningún contacto con <em>{search}</em>",
     "context": "We could not find any exisiting contacts for <em>{search}</em>",
-    "reference": "components/common/RecipientSelect.tsx#L98-L105"
+    "reference": "components/common/RecipientSelect.tsx#L125-L132"
   },
   {
     "term": "components.recipient-select.placeholder",
     "definition": "Introduce destinatarios...",
     "context": "Enter recipients...",
-    "reference": "components/common/RecipientSelect.tsx#L47-L50"
+    "reference": "components/common/RecipientSelect.tsx#L71-L74"
   },
   {
     "term": "components.recipient-select.search-hint",
     "definition": "Busca contactos existentes o introduce un correo electrónico válido",
     "context": "Search for exisiting contacts or enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L116-L119"
+    "reference": "components/common/RecipientSelect.tsx#L143-L146"
   },
   {
     "term": "contact.edit-details-button",
@@ -321,13 +327,13 @@
     "term": "contacts.create-new-contact.continue-button",
     "definition": "Continuar",
     "context": "Continue",
-    "reference": "utils/useCreateContact.tsx#L138-L141"
+    "reference": "utils/AskContactDetailsDialog.tsx#L114-L117"
   },
   {
     "term": "contacts.create-new-contact.header",
     "definition": "Introduce los datos del contacto",
     "context": "Enter the contact details",
-    "reference": "utils/useCreateContact.tsx#L84-L87"
+    "reference": "utils/AskContactDetailsDialog.tsx#L53-L56"
   },
   {
     "term": "contacts.header.email",
@@ -399,7 +405,7 @@
     "term": "generic.changes-saved",
     "definition": "Guardado",
     "context": "Saved",
-    "reference": "components/layout/PetitionHeader.tsx#L189-L192"
+    "reference": "components/layout/PetitionHeader.tsx#L181-L184"
   },
   {
     "term": "generic.collapse",
@@ -495,25 +501,25 @@
     "term": "generic.forms.email-label",
     "definition": "Correo electrónico",
     "context": "Email",
-    "reference": "utils/useCreateContact.tsx#L93-L96"
+    "reference": "utils/AskContactDetailsDialog.tsx#L62-L65"
   },
   {
     "term": "generic.forms.email-placeholder",
     "definition": "nombre@ejemplo.com",
     "context": "name@example.com",
-    "reference": "utils/useCreateContact.tsx#L102-L105"
+    "reference": "utils/AskContactDetailsDialog.tsx#L74-L77"
   },
   {
     "term": "generic.forms.first-name-label",
     "definition": "Nombre",
     "context": "First name",
-    "reference": "utils/useCreateContact.tsx#L118-L121"
+    "reference": "utils/AskContactDetailsDialog.tsx#L90-L93"
   },
   {
     "term": "generic.forms.invalid-email-error",
     "definition": "Por favor, introduzca un correo eletrónico válido",
     "context": "Please, enter a valid email",
-    "reference": "utils/useCreateContact.tsx#L109-L112"
+    "reference": "utils/AskContactDetailsDialog.tsx#L81-L84"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
@@ -531,7 +537,7 @@
     "term": "generic.forms.last-name-label",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "utils/useCreateContact.tsx#L127-L130"
+    "reference": "utils/AskContactDetailsDialog.tsx#L103-L106"
   },
   {
     "term": "generic.forms.new-password-label",
@@ -771,19 +777,19 @@
     "term": "petition.advanced-settings",
     "definition": "Ajustes avanzados",
     "context": "Advanced settings",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L254-L257"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L249-L252"
   },
   {
     "term": "petition.body-placeholder",
     "definition": "Escribe un mensaje para incluir en el correo electrónico",
     "context": "Write a message to include in the email",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L219-L222"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L214-L217"
   },
   {
     "term": "petition.change-deadline",
     "definition": "Cambiar vencimiento",
     "context": "Change deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L348-L351"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L343-L346"
   },
   {
     "term": "petition.close-sidebar-button",
@@ -825,7 +831,7 @@
     "term": "petition.deadline-label",
     "definition": "Vencimiento:",
     "context": "Deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L294-L297"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L289-L292"
   },
   {
     "term": "petition.drag-to-sort-label",
@@ -921,19 +927,19 @@
     "term": "petition.locale-label",
     "definition": "Idioma",
     "context": "Language",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L264-L267"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L259-L262"
   },
   {
     "term": "petition.locale.en",
     "definition": "Inglés",
     "context": "English",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L279-L282"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L274-L277"
   },
   {
     "term": "petition.locale.es",
     "definition": "Español",
     "context": "Spanish",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L285-L288"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L280-L283"
   },
   {
     "term": "petition.name-label",
@@ -1011,7 +1017,7 @@
     "term": "petition.recipients-label",
     "definition": "Destinatarios",
     "context": "Recipients",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L173-L176"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L168-L171"
   },
   {
     "term": "petition.reminder-sent.toast-description",
@@ -1029,13 +1035,13 @@
     "term": "petition.reminders-label",
     "definition": "Activar recordatorios automáticos",
     "context": "Enable automatic reminders",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L238-L241"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L233-L236"
   },
   {
     "term": "petition.remove-deadline",
     "definition": "Quitar vencimiento",
     "context": "Remove deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L324-L327"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L319-L322"
   },
   {
     "term": "petition.review.download-file-error-dialog.body",
@@ -1071,7 +1077,7 @@
     "term": "petition.same-petition-warning",
     "definition": "Los {recipients} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
     "context": "All {recipients} recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L188-L192"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L183-L187"
   },
   {
     "term": "petition.schedule-send-button",
@@ -1089,7 +1095,7 @@
     "term": "petition.send-button",
     "definition": "Enviar",
     "context": "Send",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L374-L377"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L369-L372"
   },
   {
     "term": "petition.sendout-send-reminder",
@@ -1107,7 +1113,7 @@
     "term": "petition.set-a-deadline",
     "definition": "Establecer vencimiento",
     "context": "Set a deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L353-L356"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L348-L351"
   },
   {
     "term": "petition.set-deadline",
@@ -1119,25 +1125,25 @@
     "term": "petition.settings-header",
     "definition": "¿A quién se la quieres enviar?",
     "context": "Who do you want to send it to?",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L160-L163"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L155-L158"
   },
   {
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/layout/PetitionHeader.tsx#L204-L207"
+    "reference": "components/layout/PetitionHeader.tsx#L196-L199"
   },
   {
     "term": "petition.subject-label",
     "definition": "Asunto",
     "context": "Subject",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L201-L204"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L196-L199"
   },
   {
     "term": "petition.subject-placeholder",
     "definition": "Introduce el asunto del correo electrónico",
     "context": "Enter the subject of the email",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L210-L213"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L205-L208"
   },
   {
     "term": "petitions.confirm-delete.body",
@@ -1521,7 +1527,7 @@
     "term": "public.case.laura.register",
     "definition": "Si quieres empezar a usar Parallel, <a>regístrate gratis aquí</a>",
     "context": "If you want to start using Parallel, <a>register for free here</a>.",
-    "reference": "pages/[locale]/people.tsx#L247-L257"
+    "reference": "pages/[locale]/people.tsx#L247-L253"
   },
   {
     "term": "public.case.laura.reminders",
@@ -1563,7 +1569,7 @@
     "term": "public.contact-link",
     "definition": "Contacta",
     "context": "Contact",
-    "reference": "components/public/layout/PublicFooter.tsx#L131-L134"
+    "reference": "components/public/layout/PublicFooter.tsx#L137-L140"
   },
   {
     "term": "public.cookies.title",
@@ -1575,7 +1581,7 @@
     "term": "public.footer.company",
     "definition": "Compañía",
     "context": "Company",
-    "reference": "components/public/layout/PublicFooter.tsx#L107-L110"
+    "reference": "components/public/layout/PublicFooter.tsx#L113-L116"
   },
   {
     "term": "public.footer.language-select-label",
@@ -1587,31 +1593,31 @@
     "term": "public.footer.legal-information",
     "definition": "Información legal",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L143-L146"
+    "reference": "components/public/layout/PublicFooter.tsx#L149-L152"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L211-L214"
+    "reference": "components/public/layout/PublicFooter.tsx#L217-L220"
   },
   {
     "term": "public.footer.product",
     "definition": "Producto",
     "context": "Product",
-    "reference": "components/public/layout/PublicFooter.tsx#L57-L60"
+    "reference": "components/public/layout/PublicFooter.tsx#L63-L66"
   },
   {
     "term": "public.footer.support",
     "definition": "Soporte",
     "context": "Support",
-    "reference": "components/public/layout/PublicFooter.tsx#L77-L80"
+    "reference": "components/public/layout/PublicFooter.tsx#L83-L86"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L196-L199"
+    "reference": "components/public/layout/PublicFooter.tsx#L202-L205"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -2145,13 +2151,13 @@
     "term": "public.support.faq",
     "definition": "FAQ - Preguntas más frecuentes",
     "context": "FAQ",
-    "reference": "components/public/layout/PublicFooter.tsx#L95-L98"
+    "reference": "components/public/layout/PublicFooter.tsx#L101-L104"
   },
   {
     "term": "public.support.support-center",
     "definition": "Centro de soporte",
     "context": "Support center",
-    "reference": "components/public/layout/PublicFooter.tsx#L85-L88"
+    "reference": "components/public/layout/PublicFooter.tsx#L91-L94"
   },
   {
     "term": "public.terms.title",

@@ -3,22 +3,23 @@ import { Box, Flex } from "@chakra-ui/core";
 import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition/CompletedPetitionDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
 import { PetitionComposeFields } from "@parallel/components/petition/PetitionComposeFields";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition/PetitionComposeFieldSettings";
+import { PetitionComposeSettings } from "@parallel/components/petition/PetitionComposeSettings";
+import { usePetitionScheduledDialog } from "@parallel/components/petition/PetitionScheduledDialog";
 import {
-  PetitionComposeSettings,
-  PetitionComposeSettingsProps,
-} from "@parallel/components/petition/PetitionComposeSettings";
+  PetitionSentDialog,
+  usePetitionSentDialog,
+} from "@parallel/components/petition/PetitionSentDialog";
 import {
-  withData,
-  WithDataContext,
-} from "@parallel/components/common/withData";
-import {
-  Recipient,
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
   PetitionComposeSearchContactsQuery,
@@ -40,6 +41,7 @@ import {
   usePetitionCompose_updatePetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
+import { resolveUrl } from "@parallel/utils/next";
 import {
   usePetitionState,
   useWrapPetitionUpdater,
@@ -47,16 +49,10 @@ import {
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { gql } from "apollo-boost";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
-import {
-  PetitionSentDialog,
-  usePetitionSentDialog,
-} from "@parallel/components/petition/PetitionSentDialog";
-import { useRouter } from "next/router";
-import { resolveUrl } from "@parallel/utils/next";
-import { usePetitionScheduledDialog } from "@parallel/components/petition/PetitionScheduledDialog";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -375,7 +371,7 @@ PetitionCompose.mutations = [
   gql`
     mutation PetitionCompose_sendPetition(
       $petitionId: ID!
-      $recipients: [Recipient!]!
+      $recipients: [ID!]!
       $scheduledAt: DateTime
     ) {
       sendPetition(
@@ -540,7 +536,7 @@ function useSendPetition() {
   const [doSendPetition] = usePetitionCompose_sendPetitionMutation();
   return useCallback(async function (
     petitionId: string,
-    recipients: Recipient[],
+    recipients: string[],
     scheduledAt?: Date
   ) {
     const { data } = await doSendPetition({
