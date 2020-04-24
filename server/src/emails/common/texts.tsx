@@ -6,7 +6,7 @@ export function closing({}, intl: IntlShape) {
   return outdent`
     ${intl.formatMessage({
       id: "closing.text",
-      defaultMessage: "Cheers,",
+      defaultMessage: "Regards,",
     })}
     ${intl.formatMessage({
       id: "closing.sender",
@@ -69,4 +69,15 @@ export function renderSlateText(node: any) {
 
 export function dateTime({ value, format }: DateTimeProps, intl: IntlShape) {
   return intl.formatDate(value, format);
+}
+
+export function disclaimer({ email }: { email: string }, intl: IntlShape) {
+  return intl.formatMessage(
+    {
+      id: "disclaimer",
+      defaultMessage:
+        "This is an email sent via Parallel from the verified account {email}",
+    },
+    { email }
+  );
 }

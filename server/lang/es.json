@@ -8,8 +8,14 @@
   {
     "term": "closing.text",
     "definition": "Saludos",
-    "context": "Cheers,",
+    "context": "Regards,",
     "reference": "src/emails/common/texts.tsx#L7-L10"
+  },
+  {
+    "term": "disclaimer",
+    "definition": "Este es un correo enviado mediante Parallel de la cuenta verificada {email}",
+    "context": "This is an email sent via Parallel from the verified account {email}",
+    "reference": "src/emails/common/texts.tsx#L76-L80"
   },
   {
     "term": "footer.slogan",

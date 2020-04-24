@@ -6,7 +6,7 @@ export function Closing() {
   return (
     <>
       <MjmlText>
-        <FormattedMessage id="closing.text" defaultMessage="Cheers," />
+        <FormattedMessage id="closing.text" defaultMessage="Regards," />
       </MjmlText>
       <MjmlText paddingTop="0">
         <FormattedMessage

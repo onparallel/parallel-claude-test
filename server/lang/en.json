@@ -7,9 +7,15 @@
   },
   {
     "term": "closing.text",
-    "definition": "Cheers,",
-    "context": "Cheers,",
+    "definition": "Regards,",
+    "context": "Regards,",
     "reference": "src/emails/common/texts.tsx#L7-L10"
+  },
+  {
+    "term": "disclaimer",
+    "definition": "This is an email sent via Parallel from the verified account {email}",
+    "context": "This is an email sent via Parallel from the verified account {email}",
+    "reference": "src/emails/common/texts.tsx#L76-L80"
   },
   {
     "term": "footer.slogan",

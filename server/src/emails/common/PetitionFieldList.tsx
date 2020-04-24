@@ -16,7 +16,7 @@ export function PetitionFieldList({ fields }: PetitionFieldListProps) {
         {fields.map(({ id, title }) => (
           <li key={id} style={{ margin: 0, padding: 0 }}>
             {title ? (
-              <span style={{ fontWeight: "bold" }}>{title}</span>
+              <span>{title}</span>
             ) : (
               <span style={{ fontStyle: "italic" }}>
                 <FormattedMessage

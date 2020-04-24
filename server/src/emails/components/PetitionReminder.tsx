@@ -4,14 +4,14 @@ import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
 import { DateTime } from "../common/DateTime";
+import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
 import { PetitionFieldList } from "../common/PetitionFieldList";
 import { RenderSlate } from "../common/RenderSlate";
 import {
-  closing,
+  disclaimer,
   greeting,
   petitionFieldList,
   renderSlateText,
@@ -101,7 +101,7 @@ const email: Email<PetitionReminderProps> = {
       })}
       ${parallelUrl}/${intl.locale}/petition/${keycode}
 
-      ${closing({}, intl)}
+      ${disclaimer({ email: senderEmail }, intl)}
     `;
   },
   html({
@@ -151,9 +151,7 @@ const email: Email<PetitionReminderProps> = {
                   defaultMessage="Please submit the following information before {deadline}:"
                   values={{
                     deadline: (
-                      <span
-                        style={{ fontWeight: 600, textDecoration: "underline" }}
-                      >
+                      <span style={{ textDecoration: "underline" }}>
                         <DateTime
                           value={deadline}
                           format={FORMATS.LLL}
@@ -175,10 +173,10 @@ const email: Email<PetitionReminderProps> = {
               <FormattedMessage
                 id="generic.complete-information-button"
                 defaultMessage="Complete the information here"
-              ></FormattedMessage>
+              />
             </Button>
             <MjmlSpacer height="10px" />
-            <Closing />
+            <Disclaimer email={senderEmail} />
           </MjmlColumn>
         </MjmlSection>
       </Layout>
