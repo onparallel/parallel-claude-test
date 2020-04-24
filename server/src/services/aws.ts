@@ -117,7 +117,7 @@ export class Aws {
       Key: key,
       Expires: 60 * 30,
       ResponseContentDisposition: contentDisposition(filename, {
-        type: "inline",
+        type: "attachment",
       }),
     });
   }
