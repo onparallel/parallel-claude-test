@@ -109,8 +109,8 @@ function Contact({ contactId }: ContactProps) {
   return (
     <>
       <AppLayout user={me}>
-        <Flex flex="1" overflow="auto">
-          <Box padding={4} flex="2">
+        <Flex flex="1" padding={4}>
+          <Box flex="2">
             <Card
               as={isEditing ? "form" : "div"}
               onSubmit={isEditing ? handleContactSaveSubmit : undefined}

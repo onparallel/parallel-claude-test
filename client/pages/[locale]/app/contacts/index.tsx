@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "@chakra-ui/core";
+import { Button, Flex, Text, Box } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogCallbacks,
@@ -121,53 +121,54 @@ function Contacts() {
         })}
       </Title>
       <AppLayout user={me}>
-        <TablePage
-          columns={COLUMNS}
-          rows={contacts.items}
-          rowKeyProp={"id"}
-          selectable
-          highlightable
-          loading={loading}
-          onRowClick={handleRowClick}
-          header={
-            <ContactListHeader
-              search={state.search}
-              showActions={Boolean(selected?.length)}
-              onSearchChange={handleSearchChange}
-              onCreateClick={handleCreateClick}
-              onDeleteClick={handleDeleteClick}
-            />
-          }
-          body={
-            contacts.totalCount === 0 && !loading ? (
-              state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
-                    <FormattedMessage
-                      id="contacts.no-results"
-                      defaultMessage="There's no contacts matching your search"
-                    />
-                  </Text>
-                </Flex>
-              ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text fontSize="lg">
-                    <FormattedMessage
-                      id="contacts.no-contacts"
-                      defaultMessage="You have no contacts yet. Start by creating one now!"
-                    />
-                  </Text>
-                </Flex>
-              )
-            ) : null
-          }
-          page={state.page}
-          pageSize={PAGE_SIZE}
-          totalCount={contacts.totalCount}
-          onSelectionChange={setSelected}
-          onPageChange={handlePageChange}
-          margin={4}
-        ></TablePage>
+        <Box padding={4} paddingBottom={24}>
+          <TablePage
+            columns={COLUMNS}
+            rows={contacts.items}
+            rowKeyProp={"id"}
+            selectable
+            highlightable
+            loading={loading}
+            onRowClick={handleRowClick}
+            page={state.page}
+            pageSize={PAGE_SIZE}
+            totalCount={contacts.totalCount}
+            onSelectionChange={setSelected}
+            onPageChange={handlePageChange}
+            header={
+              <ContactListHeader
+                search={state.search}
+                showActions={Boolean(selected?.length)}
+                onSearchChange={handleSearchChange}
+                onCreateClick={handleCreateClick}
+                onDeleteClick={handleDeleteClick}
+              />
+            }
+            body={
+              contacts.totalCount === 0 && !loading ? (
+                state.search ? (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text color="gray.300" fontSize="lg">
+                      <FormattedMessage
+                        id="contacts.no-results"
+                        defaultMessage="There's no contacts matching your search"
+                      />
+                    </Text>
+                  </Flex>
+                ) : (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="contacts.no-contacts"
+                        defaultMessage="You have no contacts yet. Start by creating one now!"
+                      />
+                    </Text>
+                  </Flex>
+                )
+              ) : null
+            }
+          ></TablePage>
+        </Box>
       </AppLayout>
     </>
   );

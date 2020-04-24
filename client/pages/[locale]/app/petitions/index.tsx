@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "@chakra-ui/core";
+import { Button, Flex, Text, Box } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
@@ -189,58 +189,59 @@ function Petitions() {
         })}
       </Title>
       <AppLayout user={me} onCreate={handleCreateClick}>
-        <TablePage
-          columns={COLUMNS}
-          rows={petitions.items}
-          rowKeyProp={"id"}
-          selectable
-          highlightable
-          loading={loading}
-          onRowClick={handleRowClick}
-          header={
-            <PetitionListHeader
-              search={state.search}
-              status={state.status}
-              showDelete={selected.length > 0}
-              showClone={selected.length === 1}
-              onSearchChange={handleSearchChange}
-              onStatusChange={handleStatusChange}
-              onDeleteClick={handleDeleteClick}
-              onCreateClick={handleCreateClick}
-              onReload={() => refetch()}
-              onCloneClick={handleCloneClick}
-            />
-          }
-          body={
-            petitions.totalCount === 0 && !loading ? (
-              state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text color="gray.300" fontSize="lg">
-                    <FormattedMessage
-                      id="petitions.no-results"
-                      defaultMessage="There's no petitions matching your search"
-                    />
-                  </Text>
-                </Flex>
-              ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
-                  <Text fontSize="lg">
-                    <FormattedMessage
-                      id="petitions.no-petitions"
-                      defaultMessage="You have no petitions yet. Start by creating one now!"
-                    />
-                  </Text>
-                </Flex>
-              )
-            ) : null
-          }
-          page={state.page}
-          pageSize={PAGE_SIZE}
-          totalCount={petitions.totalCount}
-          onSelectionChange={setSelected}
-          onPageChange={handlePageChange}
-          margin={4}
-        ></TablePage>
+        <Box padding={4} paddingBottom={24}>
+          <TablePage
+            columns={COLUMNS}
+            rows={petitions.items}
+            rowKeyProp={"id"}
+            selectable
+            highlightable
+            loading={loading}
+            onRowClick={handleRowClick}
+            page={state.page}
+            pageSize={PAGE_SIZE}
+            totalCount={petitions.totalCount}
+            onSelectionChange={setSelected}
+            onPageChange={handlePageChange}
+            header={
+              <PetitionListHeader
+                search={state.search}
+                status={state.status}
+                showDelete={selected.length > 0}
+                showClone={selected.length === 1}
+                onSearchChange={handleSearchChange}
+                onStatusChange={handleStatusChange}
+                onDeleteClick={handleDeleteClick}
+                onCreateClick={handleCreateClick}
+                onReload={() => refetch()}
+                onCloneClick={handleCloneClick}
+              />
+            }
+            body={
+              petitions.totalCount === 0 && !loading ? (
+                state.search ? (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text color="gray.300" fontSize="lg">
+                      <FormattedMessage
+                        id="petitions.no-results"
+                        defaultMessage="There's no petitions matching your search"
+                      />
+                    </Text>
+                  </Flex>
+                ) : (
+                  <Flex flex="1" alignItems="center" justifyContent="center">
+                    <Text fontSize="lg">
+                      <FormattedMessage
+                        id="petitions.no-petitions"
+                        defaultMessage="You have no petitions yet. Start by creating one now!"
+                      />
+                    </Text>
+                  </Flex>
+                )
+              ) : null
+            }
+          ></TablePage>
+        </Box>
       </AppLayout>
     </>
   );

@@ -234,8 +234,9 @@ function PetitionReview({ petitionId }: PetitionProps) {
           </Flex>
           <PetitionSendouts
             sendouts={petition!.sendouts}
-            margin={4}
+            marginX={4}
             marginTop={12}
+            marginBottom={24}
             onSendReminder={(sendoutId) => sendReminder(petitionId, sendoutId)}
           />
         </Box>
