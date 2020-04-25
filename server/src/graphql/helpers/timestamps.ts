@@ -1,4 +1,4 @@
-import { interfaceType } from "nexus";
+import { interfaceType } from "@nexus/schema";
 
 export const Timestamps = interfaceType({
   name: "Timestamps",

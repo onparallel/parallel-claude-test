@@ -1,4 +1,4 @@
-import { idArg, queryField } from "nexus";
+import { idArg, queryField } from "@nexus/schema";
 import { fetchSendout } from "./authorizers";
 
 export const sendoutsQuery = queryField("sendout", {

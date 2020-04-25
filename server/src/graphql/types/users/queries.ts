@@ -1,4 +1,4 @@
-import { queryField } from "nexus";
+import { queryField } from "@nexus/schema";
 import { authenticate } from "../../helpers/authorize";
 
 export const userQueries = queryField((t) => {

@@ -6,7 +6,7 @@ import {
   plugin,
   dynamicOutputMethod,
   objectType,
-} from "nexus";
+} from "@nexus/schema";
 
 export interface PaginationPluginConfig {}
 
@@ -68,7 +68,7 @@ export function paginationPlugin() {
     name: "PaginationPlugin",
     fieldDefTypes: [
       core.printedGenTypingImport({
-        module: "nexus",
+        module: "@nexus/schema",
         bindings: ["core"],
       }),
       core.printedGenTypingImport({

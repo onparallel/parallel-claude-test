@@ -1,6 +1,6 @@
 import { ApiContext } from "../../context";
 import { fromGlobalId } from "../../util/globalId";
-import { FieldAuthorizeResolver } from "nexus";
+import { FieldAuthorizeResolver } from "@nexus/schema";
 import { UserOrganizationRole } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
 import { every, everySeries } from "async";

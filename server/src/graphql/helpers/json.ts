@@ -1,5 +1,5 @@
 import GraphQLJSON, { GraphQLJSONObject } from "graphql-type-json";
-import { arg, asNexusMethod, core } from "nexus";
+import { arg, asNexusMethod, core } from "@nexus/schema";
 
 export const JSONObject = asNexusMethod(GraphQLJSONObject, "jsonObject");
 export const JSON = asNexusMethod(GraphQLJSON, "json");

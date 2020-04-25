@@ -1,4 +1,4 @@
-import { enumType, objectType } from "nexus";
+import { enumType, objectType } from "@nexus/schema";
 import { toGlobalId } from "../../../util/globalId";
 
 export const OrganizationRole = enumType({

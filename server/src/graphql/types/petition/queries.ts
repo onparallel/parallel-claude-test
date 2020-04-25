@@ -1,4 +1,4 @@
-import { queryField, arg, idArg } from "nexus";
+import { queryField, arg, idArg } from "@nexus/schema";
 import { authenticate, authorizeAnd } from "../../helpers/authorize";
 import { userHasAccessToPetition } from "./authorizers";
 import { fromGlobalId } from "../../../util/globalId";

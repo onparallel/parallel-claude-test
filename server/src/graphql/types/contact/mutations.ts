@@ -1,4 +1,4 @@
-import { idArg, inputObjectType, mutationField } from "nexus";
+import { idArg, inputObjectType, mutationField } from "@nexus/schema";
 import { CreateContact } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { authenticate, authorizeAnd } from "../../helpers/authorize";

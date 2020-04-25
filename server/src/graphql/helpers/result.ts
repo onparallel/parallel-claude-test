@@ -1,4 +1,4 @@
-import { enumType, objectType } from "nexus";
+import { enumType, objectType } from "@nexus/schema";
 
 export const Result = enumType({
   name: "Result",

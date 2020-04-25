@@ -1,4 +1,4 @@
-import { fieldAuthorizePlugin, makeSchema } from "nexus";
+import { fieldAuthorizePlugin, makeSchema } from "@nexus/schema";
 import path from "path";
 import * as allTypes from "./graphql/types";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";

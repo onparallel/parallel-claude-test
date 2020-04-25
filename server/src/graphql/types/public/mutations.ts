@@ -1,4 +1,9 @@
-import { idArg, mutationField, objectType, inputObjectType } from "nexus";
+import {
+  idArg,
+  mutationField,
+  objectType,
+  inputObjectType,
+} from "@nexus/schema";
 import {
   replyBelongsToSendout,
   fieldBelongsToSendout,

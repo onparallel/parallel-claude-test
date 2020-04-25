@@ -1,4 +1,4 @@
-import { FieldAuthorizeResolver } from "nexus";
+import { FieldAuthorizeResolver } from "@nexus/schema";
 
 export function belongsToOrg<
   FieldName extends string

@@ -1,5 +1,5 @@
 import { GraphQLDateTime } from "graphql-iso-date";
-import { arg, asNexusMethod, core } from "nexus";
+import { arg, asNexusMethod, core } from "@nexus/schema";
 
 export const DateTime = asNexusMethod(GraphQLDateTime, "datetime");
 

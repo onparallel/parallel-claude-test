@@ -6,7 +6,7 @@ import {
   mutationField,
   objectType,
   stringArg,
-} from "nexus";
+} from "@nexus/schema";
 import { pick } from "remeda";
 import { CreatePetition, CreatePetitionField } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";

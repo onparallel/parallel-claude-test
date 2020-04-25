@@ -5,7 +5,7 @@ import {
   inputObjectType,
   mutationField,
   stringArg,
-} from "nexus";
+} from "@nexus/schema";
 import { fromGlobalId } from "../../../util/globalId";
 import { removeNotDefined } from "../../../util/remedaExtensions";
 import {

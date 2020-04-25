@@ -8,7 +8,7 @@ export class QueryItem<T> {
   defaultValue: T | null = null;
 
   constructor(
-    private _parseValue: (value: string | string[]) => T | null,
+    private _parseValue: (value: string | string[] | undefined) => T | null,
     private _serialize?: (value: NonNullable<T>) => string,
     private _isDefault?: (value: NonNullable<T>) => boolean
   ) {}
@@ -26,7 +26,7 @@ export class QueryItem<T> {
     }
   }
 
-  parseValue(value: string | string[]) {
+  parseValue(value: string | string[] | undefined) {
     return this._parseValue(value) ?? this.defaultValue;
   }
 

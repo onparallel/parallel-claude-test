@@ -1,4 +1,4 @@
-import { FieldAuthorizeResolver, core } from "nexus";
+import { FieldAuthorizeResolver, core } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { KeysOfType } from "../../../util/types";
 
