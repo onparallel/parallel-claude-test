@@ -30,11 +30,4 @@ sudo systemctl enable parallel-sendout-email-queue.service
 
 sudo systemctl start parallel-server
 sudo systemctl start parallel-client
-sudo systemctl start parallel-completed-email-queue.service
-sudo systemctl start parallel-email-events-queue.service
-sudo systemctl start parallel-email-sender-queue.service
-sudo systemctl start parallel-reminder-email-queue.service
-sudo systemctl start parallel-reminder-trigger-cron.service
-sudo systemctl start parallel-scheduled-trigger-cron.service
-sudo systemctl start parallel-sendout-email-queue.service
 sudo systemctl restart nginx

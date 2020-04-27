@@ -38,7 +38,14 @@ export function createCronWorker(
     }
   });
   process.on("SIGINT", function () {
-    logger.info(`Shutting down cron worker`);
+    logger.info(`Received SIGINT. Shutting down cron worker`);
+    shutdown();
+  });
+  process.on("SIGTERM", function () {
+    logger.info(`Received SIGTERM. Shutting down cron worker`);
+    shutdown();
+  });
+  function shutdown() {
     job.stop();
     if (running) {
       logger.info(`Waiting for cron job to finish`);
@@ -50,7 +57,7 @@ export function createCronWorker(
       logger.info(`Cron worker stopped`);
       process.exit(0);
     }
-  });
+  }
   return {
     start() {
       job.start();

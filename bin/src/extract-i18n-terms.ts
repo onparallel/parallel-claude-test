@@ -1,19 +1,10 @@
 import chalk from "chalk";
+import { execSync } from "child_process";
 import { promises as fs } from "fs";
-import { promisify } from "util";
-import cp from "child_process";
-import { readJson, writeJson } from "./utils";
-import languages from "../client/lang/languages.json";
 import path from "path";
 import yargs from "yargs";
-
-interface Language {
-  locale: string;
-  text: string;
-  default?: boolean;
-}
-
-const exec = promisify(cp.exec);
+import { readJson, writeJson } from "./utils/json";
+import { run } from "./utils/run";
 
 const isWindows = process.platform === "win32";
 
@@ -24,17 +15,19 @@ export interface Term {
   reference: string;
 }
 
-async function extract(input: string, output: string) {
+async function extract(locales: string[], input: string, output: string) {
   const terms = await extractTerms(input);
-  for (const language of languages) {
-    const data = await loadLocaleData(output, language.locale);
-    if (language.default) {
+  let first = true;
+  for (const locale of locales) {
+    const data = await loadLocaleData(output, locale);
+    if (first) {
       logStats(terms, data);
     }
-    const updated = updateLocaleData(language, data, terms);
-    await writeJson(path.join(output, `${language.locale}.json`), updated, {
+    const updated = updateLocaleData(first, data, terms);
+    await writeJson(path.join(output, `${locale}.json`), updated, {
       pretty: true,
     });
+    first = false;
   }
 }
 
@@ -56,13 +49,14 @@ interface ExtractedTerm {
 async function extractTerms(input: string) {
   try {
     const tmpFileName = "lang_tmp.json";
-    await exec(
+    execSync(
       `formatjs extract \
        --extract-source-location \
        --extract-from-format-message-call \
        --throws \
        --out-file ${tmpFileName} \
-       ${isWindows ? input.replace("/", "\\") : `'${input}'`}`
+       ${isWindows ? input.replace("/", "\\") : `'${input}'`}`,
+      { encoding: "utf-8" }
     );
     const terms = await readJson<ExtractedTerm[]>(tmpFileName);
     await fs.unlink(tmpFileName);
@@ -91,7 +85,7 @@ async function loadLocaleData(dir: string, locale: string) {
 }
 
 function updateLocaleData(
-  { locale, default: defaultLanguage }: Language,
+  isDefault: boolean,
   data: Map<string, Term>,
   terms: ExtractedTerm[]
 ) {
@@ -105,7 +99,7 @@ function updateLocaleData(
           context: "",
           reference: "",
         };
-    if (defaultLanguage) {
+    if (isDefault) {
       entry!.definition = term.defaultMessage;
     }
     entry!.context = term.description || term.defaultMessage;
@@ -139,7 +133,14 @@ function logStats(terms: ExtractedTerm[], data: Map<string, Term>) {
 }
 
 async function main() {
-  const { input, output } = yargs
+  const { locales, input, output } = yargs
+    .option("locales", {
+      required: true,
+      array: true,
+      type: "string",
+      description:
+        "The locales to extract. First option will be considered the default one",
+    })
     .option("input", {
       required: true,
       type: "string",
@@ -151,6 +152,7 @@ async function main() {
       description: "Directory to place the extracted terms",
     }).argv;
 
-  await extract(input, output);
+  await extract(locales, input, output);
 }
-main().then();
+
+run(main);

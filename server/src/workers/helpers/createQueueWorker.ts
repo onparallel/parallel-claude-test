@@ -50,13 +50,20 @@ export function createQueueWorker<T>(
     logger.error(error.stack, { payload: message.Body });
   });
   process.on("SIGINT", function () {
-    logger.info(`Shutting down queue worker`);
+    logger.info(`Received SIGINT. Shutting down queue worker`);
+    shutdown();
+  });
+  process.on("SIGTERM", function () {
+    logger.info(`Received SIGTERM. Shutting down queue worker`);
+    shutdown();
+  });
+  function shutdown() {
     consumer.on("stopped", () => {
       logger.info(`Queue worker stopped`);
       process.exit(0);
     });
     consumer.stop();
-  });
+  }
   return {
     start() {
       consumer.start();

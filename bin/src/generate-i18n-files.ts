@@ -1,17 +1,18 @@
 import chalk from "chalk";
 import { MessageFormatElement, parse } from "intl-messageformat-parser";
-import languages from "../client/lang/languages.json";
-import { Term } from "./extract-i18n-terms";
-import { readJson, writeJson } from "./utils";
 import path from "path";
 import yargs from "yargs";
+import { Term } from "./extract-i18n-terms";
+import { readJson, writeJson } from "./utils/json";
+import { run } from "./utils/run";
 
 async function generate(
+  locales: string[],
   input: string,
   rawOutput: string | null,
   compiledOutput: string | null
 ) {
-  for (const { locale } of languages) {
+  for (const locale of locales) {
     const terms = await readJson<Term[]>(path.join(input, `${locale}.json`));
     const raw: { [term: string]: string } = {};
     const compiled: { [term: string]: MessageFormatElement[] } = {};
@@ -46,7 +47,14 @@ async function generate(
 }
 
 async function main() {
-  const { input, outputRaw, outputCompiled, ...rest } = yargs
+  const { locales, input, outputRaw, outputCompiled } = yargs
+    .option("locales", {
+      required: true,
+      array: true,
+      type: "string",
+      description:
+        "The locales to extract. First option will be considered the default one",
+    })
     .option("input", {
       required: true,
       type: "string",
@@ -62,7 +70,7 @@ async function main() {
       type: "string",
       description: "Directory to place generated compiled json files",
     }).argv;
-  await generate(input, outputRaw as string, outputCompiled as string);
+  await generate(locales, input, outputRaw as string, outputCompiled as string);
 }
 
-main().then().catch(console.log);
+run(main);

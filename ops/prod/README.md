@@ -1,27 +1,26 @@
-A single nginx instance manages both production and staging. The `nginx.conf` file manages the traffic according to the hostname of the requests.
+## Summary
 
-# Nginx instance
+The backend runs on the parallel-server AMI ami-0e66d197dc8662d25. This instace has the following installed:
 
-Bare Amazon Linux with:
+- Node.js v13.13.0 (latest when installed)
+- Yarn
+- Nginx 1.16.1 (latest when installed) with nginx_accept_language_module
 
-- `nginx`: installed from source so I could use `nginx_accept_language_module`
-  Followed this guide: https://www.augustkleimo.com/build-and-install-nginx-from-source-on-amazon-ec2-linux - https://www.nginx.com/resources/wiki/modules/accept_language/
+The different processes run on the systemd services defined on `ops/prod/systemd`.
 
-```
-./configure --prefix=/usr/share/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib64/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --http-client-body-temp-path=/var/lib/nginx/tmp/client_body --http-proxy-temp-path=/var/lib/nginx/tmp/proxy --http-fastcgi-temp-path=/var/lib/nginx/tmp/fastcgi --http-uwsgi-temp-path=/var/lib/nginx/tmp/uwsgi --http-scgi-temp-path=/var/lib/nginx/tmp/scgi --pid-path=/var/run/nginx.pid --lock-path=/var/lock/subsys/nginx --user=nginx --group=nginx --with-file-aio --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-stream_ssl_preread_module --with-http_addition_module --with-http_sub_module --with-http_dav_module --with-http_flv_module --with-http_mp4_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_random_index_module --with-http_secure_link_module --with-http_degradation_module --with-http_slice_module --with-http_stub_status_module --with-http_perl_module=dynamic --with-http_auth_request_module --with-mail=dynamic --with-mail_ssl_module --with-pcre --with-pcre-jit --with-stream=dynamic --with-stream_ssl_module --with-debug --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic' --with-ld-opt=' -Wl,-E' --add-module=../nginx_accept_language_module
-make
-sudo make install
+## Release
 
-sudo vim /etc/init.d/nginx # see file on ops/prod/nginx/init.d
-sudo chmod +x /etc/init.d/nginx
-sudo /sbin/chkconfig nginx on
-```
+The release process has the following steps defined in different scripts on `bin`
 
-- `s3fs-fuse` to mount the s3 buckets as volumes
-  Followed this guide: https://github.com/s3fs-fuse/s3fs-fuse/wiki/Installation-Notes
-  Unix users `ec2-user` and `nginx` belong to `s3fs` group which is allowed access to the mounted volumes.
-  The instance also has the `nginx-s3` role which is allowed access to the buckets on their policies.
+- `build-release`: Checks out the code at the specified commit hash and builds both the client and the server. It also uploads the statics to the corresponding statics s3 bucket (and creates the corresponding invalidation on Cloudfront). Finally it tars everything and uploads the build to the builds bucket `parallel-builds`.
+- `launch-instance`: It launches a new instance using the parallel-server AMI. It then uploads the `install.sh` and `workers.sh` scripts to it and runs the first one in order to pull out the build artifact from s3 and start the server.
+- `switch-release`:
+  - Stops the workers on the current release.
+  - Switches the target group of the specified load balancer.
+  - Starts the workers on the new release.
+- Optional `prune-instances`: Stops/terminates the instances that are not used by the load balancer and deleted any stale target groups.
 
-```
-sudo s3fs -o iam_role="nginx-s3" -o url="https://s3-eu-central-1.amazonaws.com" -o endpoint=eu-central-1 -o dbglevel=info -o curldbg -o allow_other -o use_cache=/tmp -ogid=501 parallel-static-landing-prod /mnt/parallel-static-landing-prod
-```
+### Additional scripts
+
+- `full-release`: Runs `build-release`, `launch-instance`, `switch-release` and `prune-instances` in sequence.
+- `list-instancesa`: Shows the relevant instances with information: ID, IP, name, release, State, Attached LB and Health
