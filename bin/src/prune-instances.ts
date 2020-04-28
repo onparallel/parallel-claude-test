@@ -60,7 +60,7 @@ async function main() {
       const state = instance.State!.Name;
       if (state === "running") {
         console.log(
-          chalk`Stopping instance {bold ${id}} {blue {bold ${name}}}`
+          chalk`Stopping instance {bold ${id}} {yellow {bold ${name}}}`
         );
         if (!dryRun) {
           await ec2.stopInstances({ InstanceIds: [id] }).promise();

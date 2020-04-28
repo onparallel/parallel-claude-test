@@ -60,7 +60,7 @@ async function main() {
             const name = (_b = instance.Tags.find((t) => t.Key === "Name")) === null || _b === void 0 ? void 0 : _b.Value;
             const state = instance.State.Name;
             if (state === "running") {
-                console.log(chalk_1.default `Stopping instance {bold ${id}} {blue {bold ${name}}}`);
+                console.log(chalk_1.default `Stopping instance {bold ${id}} {yellow {bold ${name}}}`);
                 if (!dryRun) {
                     await ec2.stopInstances({ InstanceIds: [id] }).promise();
                 }
