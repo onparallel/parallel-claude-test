@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import {
   Box,
+  BoxProps,
   Editable,
   EditableInput,
   EditablePreview,
@@ -10,7 +11,6 @@ import {
   Tooltip,
   useTheme,
   VisuallyHidden,
-  BoxProps,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
@@ -19,7 +19,13 @@ import {
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { gql } from "apollo-boost";
-import { MouseEvent, useCallback, useRef, KeyboardEvent } from "react";
+import {
+  KeyboardEvent,
+  MouseEvent,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -29,6 +35,7 @@ export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
   index: number;
   active: boolean;
+  showError: boolean;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -46,6 +53,7 @@ export function PetitionComposeField({
   field,
   index,
   active,
+  showError,
   onMove,
   onSettingsClick,
   onFieldEdit,
@@ -66,10 +74,12 @@ export function PetitionComposeField({
     index,
     onMove
   );
+  const [title, setTitle] = useState(field.title);
 
   const handleTitleSubmit = useCallback(
     function (value) {
-      if (value && value !== field.title) {
+      setTitle(value || null);
+      if (value !== field.title) {
         onFieldEdit({ title: value || null });
       }
     },
@@ -205,7 +215,10 @@ export function PetitionComposeField({
           >
             {({ onRequestEdit }: { onRequestEdit: () => void }) => (
               <>
-                <EditablePreview width="100%" />
+                <EditablePreview
+                  width="100%"
+                  color={showError && !title ? "red.500" : undefined}
+                />
                 <EditableInput
                   _focus={{ outline: "none" }}
                   onKeyDown={onTitleKeyDown}

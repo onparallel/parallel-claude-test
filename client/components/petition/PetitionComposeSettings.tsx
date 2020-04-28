@@ -3,24 +3,22 @@ import {
   AlertIcon,
   Box,
   Button,
+  Checkbox,
   Flex,
   FormControl,
   FormLabel,
+  Heading,
   Icon,
   IconButton,
   Input,
   MenuItem,
   MenuList,
+  PseudoBox,
   Select,
   Stack,
-  Heading,
   Text,
-  PseudoBox,
-  Checkbox,
 } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
-import { DateTimeInput } from "@parallel/components/common/DatetimeInput";
-import { Divider } from "@parallel/components/common/Divider";
 import {
   Recipient,
   RecipientSelect,
@@ -36,27 +34,21 @@ import {
   PetitionComposeSettings_ContactFragment,
   PetitionComposeSettings_PetitionFragment,
   PetitionLocale,
-  UpdatePetitionInput,
   ReminderSettings,
+  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
-import { ChangeEvent, useCallback, useState, useEffect } from "react";
-import {
-  FormattedMessage,
-  useIntl,
-  FormattedTime,
-  FormattedDate,
-} from "react-intl";
+import { ChangeEvent, useCallback, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { omit } from "remeda";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { CollapseContent } from "../common/CollapseContent";
-import { useScheduleSendoutDialog } from "./ScheduleSendoutDialog";
-import { FORMATS } from "@parallel/utils/dates";
-import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { DateTime } from "../common/DateTime";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
 import { PetitionReminderSettings } from "./PetitionReminderSettings";
-import { omit, pick } from "remeda";
 
 export type PetitionComposeSettingsProps = {
   petition: PetitionComposeSettings_PetitionFragment;
@@ -65,7 +57,8 @@ export type PetitionComposeSettingsProps = {
     exclude: string[]
   ) => Promise<PetitionComposeSettings_ContactFragment[]>;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
-  onSend: (data: { recipients: string[]; scheduledAt?: Date }) => void;
+  onValidate?: () => Promise<void>;
+  onSend: (data: { recipients: string[]; schedule: boolean }) => void;
 } & CardProps;
 
 export function PetitionComposeSettings({
@@ -124,18 +117,9 @@ export function PetitionComposeSettings({
     updateReminderSettings({ reminderSettings: omit(value, ["__typename"]) });
   }
 
-  const showScheduleSendoutDialog = useScheduleSendoutDialog();
   async function handleSendClick({ schedule = false } = {}) {
-    let scheduleAt: Date | undefined;
-    if (schedule) {
-      try {
-        scheduleAt = await showScheduleSendoutDialog({});
-      } catch {
-        return;
-      }
-    }
     onSend({
-      scheduledAt: scheduleAt,
+      schedule,
       recipients: recipients.map((r) => r.id),
     });
   }
@@ -357,10 +341,7 @@ export function PetitionComposeSettings({
         </CollapseContent>
         <Flex marginTop={2}>
           <Spacer />
-          <SplitButton
-            dividerColor="purple.600"
-            isDisabled={recipients.length === 0}
-          >
+          <SplitButton dividerColor="purple.600">
             <Button
               variantColor="purple"
               leftIcon={"paper-plane" as any}

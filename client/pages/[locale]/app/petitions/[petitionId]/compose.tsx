@@ -1,5 +1,6 @@
 import { useApolloClient } from "@apollo/react-hooks";
 import { Box, Flex } from "@chakra-ui/core";
+import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
@@ -11,14 +12,21 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition/CompletedPetitionDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
-import { PetitionComposeFields } from "@parallel/components/petition/PetitionComposeFields";
+import {
+  PetitionComposeFields,
+  PetitionComposeFieldsProps,
+} from "@parallel/components/petition/PetitionComposeFields";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition/PetitionComposeFieldSettings";
-import { PetitionComposeSettings } from "@parallel/components/petition/PetitionComposeSettings";
+import {
+  PetitionComposeSettings,
+  PetitionComposeSettingsProps,
+} from "@parallel/components/petition/PetitionComposeSettings";
 import { usePetitionScheduledDialog } from "@parallel/components/petition/PetitionScheduledDialog";
 import {
   PetitionSentDialog,
   usePetitionSentDialog,
 } from "@parallel/components/petition/PetitionSentDialog";
+import { useScheduleSendoutDialog } from "@parallel/components/petition/ScheduleSendoutDialog";
 import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
@@ -51,8 +59,9 @@ import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -71,6 +80,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [state, setState] = usePetitionState();
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
+  const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
     if (activeFieldId) {
       return petition!.fields.find((f) => f.id === activeFieldId) ?? null;
@@ -180,13 +190,79 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const handleFieldFocus = useCallback((fieldId) => {
+  const handleFieldFocus: PetitionComposeFieldsProps["onFieldFocus"] = (
+    fieldId
+  ) => {
     //Set field as active only if settings were already showing for another field
     setActiveFieldId((active) => active && fieldId);
-  }, []);
+  };
 
   const searchContacts = useSearchContacts();
+
   const sendPetition = useSendPetition();
+  const showErrorDialog = useErrorDialog();
+  const showScheduleSendoutDialog = useScheduleSendoutDialog();
+  const handleSend: PetitionComposeSettingsProps["onSend"] = useCallback(
+    async ({ recipients, schedule }) => {
+      if (petition!.fields.length === 0) {
+        try {
+          await showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="petition.no-fields-error"
+                defaultMessage="Please add at least one field to the petition."
+              />
+            ),
+          });
+        } finally {
+          return;
+        }
+      }
+      const fieldWithoutTitle = petition!.fields.find((f) => !f.title);
+      if (fieldWithoutTitle) {
+        try {
+          setShowErrors(true);
+          const node = document.querySelector(`#field-${fieldWithoutTitle.id}`);
+          scrollIntoView(node!, { block: "center", behavior: "smooth" });
+          await showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="petition.no-fields-without-title-error"
+                defaultMessage="Please add a title to every field."
+              />
+            ),
+          });
+        } finally {
+          return;
+        }
+      }
+      if (recipients.length === 0) {
+        try {
+          await showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="petition.no-recipients-error"
+                defaultMessage="Please specify at least one recipient."
+              />
+            ),
+          });
+        } finally {
+          return;
+        }
+      }
+      if (schedule) {
+        try {
+          const scheduledAt = await showScheduleSendoutDialog({});
+          await sendPetition(petition!.id, recipients, scheduledAt);
+        } catch {
+          return;
+        }
+      } else {
+        await sendPetition(petition!.id, recipients, null);
+      }
+    },
+    [petition!.id, petition!.fields]
+  );
 
   return (
     <>
@@ -211,6 +287,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             display={{ base: activeFieldId ? "none" : "block", md: "block" }}
           >
             <PetitionComposeFields
+              showErrors={showErrors}
               fields={petition!.fields}
               active={activeFieldId}
               onAddField={handleAddField}
@@ -225,9 +302,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               petition={petition!}
               searchContacts={searchContacts}
               onUpdatePetition={handleUpdatePetition}
-              onSend={({ recipients, scheduledAt }) =>
-                sendPetition(petitionId, recipients, scheduledAt)
-              }
+              onSend={handleSend}
             />
           </Box>
           {activeField ? null : (
@@ -537,7 +612,7 @@ function useSendPetition() {
   return useCallback(async function (
     petitionId: string,
     recipients: string[],
-    scheduledAt?: Date
+    scheduledAt: Date | null
   ) {
     const { data } = await doSendPetition({
       variables: {

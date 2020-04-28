@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/core";
 import { ReactNode, RefObject, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { DialogCallbacks } from "./DialogOpenerProvider";
+import { DialogCallbacks, useDialog } from "./DialogOpenerProvider";
 
 export type ConfirmDialogProps<T> = {
   header: ReactNode;
@@ -36,14 +36,17 @@ export function ConfirmDialog<T = void>({
   ...props
 }: ConfirmDialogProps<T>) {
   const cancelRef = useRef<HTMLElement>(null);
-  cancel = cancel || (
-    <Button ref={cancelRef} onClick={() => onReject()}>
-      <FormattedMessage
-        id="component.confirm-dialog.cancel-button"
-        defaultMessage="Cancel"
-      />
-    </Button>
-  );
+  cancel =
+    cancel === undefined ? (
+      <Button ref={cancelRef} onClick={() => onReject()}>
+        <FormattedMessage
+          id="component.confirm-dialog.cancel-button"
+          defaultMessage="Cancel"
+        />
+      </Button>
+    ) : (
+      cancel
+    );
   return (
     <AlertDialog
       isOpen={true}

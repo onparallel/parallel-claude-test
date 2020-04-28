@@ -53,9 +53,10 @@ function reset(
   };
 }
 
-export type PetitionComposeFields = {
+export type PetitionComposeFieldsProps = {
   active: Maybe<string>;
   fields: any;
+  showErrors: boolean;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
   onSettingsClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => void;
@@ -67,6 +68,7 @@ export type PetitionComposeFields = {
 export function PetitionComposeFields({
   active,
   fields,
+  showErrors,
   onUpdateFieldPositions,
   onSettingsClick,
   onDeleteField,
@@ -74,7 +76,7 @@ export function PetitionComposeFields({
   onAddField,
   onUpdateField,
   ...props
-}: PetitionComposeFields) {
+}: PetitionComposeFieldsProps) {
   const [{ fieldsById, fieldIds }, dispatch] = useReducer(
     fieldsReducer,
     fields,
@@ -147,6 +149,7 @@ export function PetitionComposeFields({
               field={fieldsById[fieldId]}
               index={index}
               active={active === fieldId}
+              showError={showErrors}
               onSettingsClick={() => onSettingsClick(fieldId)}
               onDeleteClick={() => onDeleteField(fieldId)}
               onFieldEdit={(data) => onUpdateField(fieldId, data)}

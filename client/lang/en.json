@@ -15,7 +15,7 @@
     "term": "component.confirm-dialog.cancel-button",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "components/common/ConfirmDialog.tsx#L41-L44"
+    "reference": "components/common/ConfirmDialog.tsx#L42-L45"
   },
   {
     "term": "component.contact-list-header.actions-button",
@@ -70,6 +70,18 @@
     "definition": "Previous month",
     "context": "Previous month",
     "reference": "components/common/DatePicker.tsx#L54-L57"
+  },
+  {
+    "term": "component.error-dialog.header",
+    "definition": "Error",
+    "context": "Error",
+    "reference": "components/common/ErrorDialog.tsx#L21-L24"
+  },
+  {
+    "term": "component.error-dialog.ok-button",
+    "definition": "OK",
+    "context": "OK",
+    "reference": "components/common/ErrorDialog.tsx#L34-L37"
   },
   {
     "term": "component.input.clear-button",
@@ -813,31 +825,31 @@
     "term": "petition.add-another-field-button",
     "definition": "Add another field",
     "context": "Add another field",
-    "reference": "components/petition/PetitionComposeFields.tsx#L163-L166"
+    "reference": "components/petition/PetitionComposeFields.tsx#L166-L169"
   },
   {
     "term": "petition.add-field-button",
     "definition": "Add field",
     "context": "Add field",
-    "reference": "components/petition/PetitionComposeFields.tsx#L191-L194"
+    "reference": "components/petition/PetitionComposeFields.tsx#L194-L197"
   },
   {
     "term": "petition.advanced-settings",
     "definition": "Advanced settings",
     "context": "Advanced settings",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L249-L252"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L234-L237"
   },
   {
     "term": "petition.body-placeholder",
     "definition": "Write a message to include in the email",
     "context": "Write a message to include in the email",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L214-L217"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L199-L202"
   },
   {
     "term": "petition.change-deadline",
     "definition": "Change deadline",
     "context": "Change deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L343-L346"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L328-L331"
   },
   {
     "term": "petition.close-sidebar-button",
@@ -879,43 +891,43 @@
     "term": "petition.deadline-label",
     "definition": "Deadline",
     "context": "Deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L289-L292"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L274-L277"
   },
   {
     "term": "petition.drag-to-sort-label",
     "definition": "Drag to sort this petition fields",
     "context": "Drag to sort this petition fields",
-    "reference": "components/petition/PetitionComposeField.tsx#L145-L148"
+    "reference": "components/petition/PetitionComposeField.tsx#L155-L158"
   },
   {
     "term": "petition.empty-header",
     "definition": "What information do you want us to collect?",
     "context": "What information do you want us to collect?",
-    "reference": "components/petition/PetitionComposeFields.tsx#L173-L176"
+    "reference": "components/petition/PetitionComposeFields.tsx#L176-L179"
   },
   {
     "term": "petition.empty-text",
     "definition": "Let's add our first field",
     "context": "Let's add our first field",
-    "reference": "components/petition/PetitionComposeFields.tsx#L179-L182"
+    "reference": "components/petition/PetitionComposeFields.tsx#L182-L185"
   },
   {
     "term": "petition.field-delete-button",
     "definition": "Delete field",
     "context": "Delete field",
-    "reference": "components/petition/PetitionComposeField.tsx#L263-L266"
+    "reference": "components/petition/PetitionComposeField.tsx#L276-L279"
   },
   {
     "term": "petition.field-description-label",
     "definition": "Field description",
     "context": "Field description",
-    "reference": "components/petition/PetitionComposeField.tsx#L227-L230"
+    "reference": "components/petition/PetitionComposeField.tsx#L240-L243"
   },
   {
     "term": "petition.field-description-placeholder",
     "definition": "Add a description...",
     "context": "Add a description...",
-    "reference": "components/petition/PetitionComposeField.tsx#L223-L226"
+    "reference": "components/petition/PetitionComposeField.tsx#L236-L239"
   },
   {
     "term": "petition.field-settings",
@@ -927,13 +939,13 @@
     "term": "petition.field-title-label",
     "definition": "Field title",
     "context": "Field title",
-    "reference": "components/petition/PetitionComposeField.tsx#L200-L203"
+    "reference": "components/petition/PetitionComposeField.tsx#L210-L213"
   },
   {
     "term": "petition.field-title-placeholder",
     "definition": "Enter a field title",
     "context": "Enter a field title",
-    "reference": "components/petition/PetitionComposeField.tsx#L196-L199"
+    "reference": "components/petition/PetitionComposeField.tsx#L206-L209"
   },
   {
     "term": "petition.field-type.file-upload",
@@ -951,7 +963,7 @@
     "term": "petition.fields-header",
     "definition": "This is the information that you need",
     "context": "This is the information that you need",
-    "reference": "components/petition/PetitionComposeFields.tsx#L135-L138"
+    "reference": "components/petition/PetitionComposeFields.tsx#L137-L140"
   },
   {
     "term": "petition.header.compose-tab",
@@ -975,25 +987,43 @@
     "term": "petition.locale-label",
     "definition": "Language",
     "context": "Language",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L259-L262"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L244-L247"
   },
   {
     "term": "petition.locale.en",
     "definition": "English",
     "context": "English",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L274-L277"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L259-L262"
   },
   {
     "term": "petition.locale.es",
     "definition": "Spanish",
     "context": "Spanish",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L280-L283"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L265-L268"
   },
   {
     "term": "petition.name-label",
     "definition": "Petition name",
     "context": "Petition name",
     "reference": "components/layout/PetitionHeader.tsx#L92-L95"
+  },
+  {
+    "term": "petition.no-fields-error",
+    "definition": "Please add at least one field to the petition.",
+    "context": "Please add at least one field to the petition.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L226-L229"
+  },
+  {
+    "term": "petition.no-fields-without-title-error",
+    "definition": "Please add a title to every field.",
+    "context": "Please add a title to every field.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L244-L247"
+  },
+  {
+    "term": "petition.no-recipients-error",
+    "definition": "Please specify at least one recipient.",
+    "context": "Please specify at least one recipient.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L212-L215"
   },
   {
     "term": "petition.no-sendouts",
@@ -1065,7 +1095,7 @@
     "term": "petition.recipients-label",
     "definition": "Recipients",
     "context": "Recipients",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L168-L171"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L153-L156"
   },
   {
     "term": "petition.reminder-sent.toast-description",
@@ -1083,13 +1113,13 @@
     "term": "petition.reminders-label",
     "definition": "Enable automatic reminders",
     "context": "Enable automatic reminders",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L233-L236"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L218-L221"
   },
   {
     "term": "petition.remove-deadline",
     "definition": "Remove deadline",
     "context": "Remove deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L319-L322"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L304-L307"
   },
   {
     "term": "petition.replies-not-available",
@@ -1131,7 +1161,7 @@
     "term": "petition.same-petition-warning",
     "definition": "All {recipients} recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "All {recipients} recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L183-L187"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L168-L172"
   },
   {
     "term": "petition.schedule-send-button",
@@ -1149,7 +1179,7 @@
     "term": "petition.send-button",
     "definition": "Send",
     "context": "Send",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L369-L372"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L351-L354"
   },
   {
     "term": "petition.sendout-send-reminder",
@@ -1167,7 +1197,7 @@
     "term": "petition.set-a-deadline",
     "definition": "Set a deadline",
     "context": "Set a deadline",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L348-L351"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L333-L336"
   },
   {
     "term": "petition.set-deadline",
@@ -1179,7 +1209,7 @@
     "term": "petition.settings-header",
     "definition": "Who do you want to send it to?",
     "context": "Who do you want to send it to?",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L155-L158"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L140-L143"
   },
   {
     "term": "petition.status.error",
@@ -1191,13 +1221,13 @@
     "term": "petition.subject-label",
     "definition": "Subject",
     "context": "Subject",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L196-L199"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L181-L184"
   },
   {
     "term": "petition.subject-placeholder",
     "definition": "Enter the subject of the email",
     "context": "Enter the subject of the email",
-    "reference": "components/petition/PetitionComposeSettings.tsx#L205-L208"
+    "reference": "components/petition/PetitionComposeSettings.tsx#L190-L193"
   },
   {
     "term": "petitions.confirm-delete.body",
