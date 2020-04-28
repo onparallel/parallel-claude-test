@@ -24,7 +24,7 @@ export const createContact = mutationField("createContact", {
     try {
       return await ctx.contacts.createContact(
         {
-          email,
+          email: email.toLowerCase(),
           first_name: firstName || null,
           last_name: lastName || null,
         },
