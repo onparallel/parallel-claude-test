@@ -26,39 +26,21 @@ export function AppLayoutNavbarLink({
   return available ? (
     <Link
       href={href}
-      {...{
-        display: "block",
-        userSelect: "none",
-        _focus: {
-          boxShadow: "none",
-          textDecoration: "underline",
-        },
-        ...(active
-          ? {
-              backgroundColor: "purple.500",
-              color: "white",
-              _active: {
-                backgroundColor: "purple.600",
-                color: "white",
-              },
-              _hover: {
-                backgroundColor: "purple.600",
-                color: "white",
-              },
-            }
-          : {
-              backgroundColor: "white",
-              color: "purple.600",
-              _active: {
-                backgroundColor: "purple.50",
-                color: "purple.700",
-              },
-              _hover: {
-                backgroundColor: "purple.50",
-                color: "purple.700",
-              },
-            }),
+      borderX="4px solid"
+      borderColor="transparent"
+      display="block"
+      userSelect="none"
+      _focus={{
+        boxShadow: "none",
+        textDecoration: "underline",
       }}
+      _hover={{
+        color: "purple.700",
+      }}
+      _active={{
+        textDecoration: "none",
+      }}
+      borderRightColor={active ? "purple.600" : "transparent"}
     >
       <Content icon={icon}>{children}</Content>
     </Link>

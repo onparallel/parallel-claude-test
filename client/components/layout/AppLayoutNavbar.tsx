@@ -2,7 +2,6 @@ import {
   Box,
   BoxProps,
   Flex,
-  IconButton,
   List,
   ListItem,
   PseudoBox,
@@ -11,13 +10,14 @@ import {
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
+import { Spacer } from "../common/Spacer";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
-import { NakedLink } from "../common/Link";
-import { useMemo } from "react";
-import { Spacer } from "../common/Spacer";
 
 export type AppLayoutNavbarProps = BoxProps & {
   onCreate: () => void;
@@ -94,17 +94,18 @@ export function AppLayoutNavbar({
         </NakedLink>
       </Flex>
       <Flex justifyContent="center" marginBottom={4}>
-        <IconButton
+        <IconButtonWithTooltip
           variantColor="purple"
           icon="add"
           size="lg"
           isRound
           onClick={onCreate}
-          aria-label={intl.formatMessage({
+          showDelay={300}
+          label={intl.formatMessage({
             id: "navbar.new-button",
             defaultMessage: "Create a new petition",
           })}
-        ></IconButton>
+        />
       </Flex>
       <List>
         {items.map(({ section, available, icon, text }) => (

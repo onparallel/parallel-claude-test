@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@apollo/react-hooks";
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -10,12 +9,12 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/core";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   AccountQuery,
   Account_updateAccountMutation,
