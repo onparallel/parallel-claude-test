@@ -13,7 +13,7 @@ import {
 import { css, jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition/PetitionFieldTypeIndicator";
-import { PetitionReviewField_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PetitionRepliesField_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapArray, Assert } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
@@ -25,21 +25,21 @@ import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 
-export type PetitionReviewFieldAction = {
+export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE";
-  reply: UnwrapArray<PetitionReviewField_PetitionFieldFragment["replies"]>;
+  reply: UnwrapArray<PetitionRepliesField_PetitionFieldFragment["replies"]>;
 };
 
-export type PetitionReviewFieldProps = BoxProps & {
-  field: PetitionReviewField_PetitionFieldFragment;
+export type PetitionRepliesFieldProps = BoxProps & {
+  field: PetitionRepliesField_PetitionFieldFragment;
   index: number;
   selected: boolean;
   onToggle: (event: MouseEvent) => void;
-  onAction: (action: PetitionReviewFieldAction) => void;
+  onAction: (action: PetitionRepliesFieldAction) => void;
   onValidateToggle: () => void;
 };
 
-export function PetitionReviewField({
+export function PetitionRepliesField({
   field,
   index,
   selected,
@@ -47,7 +47,7 @@ export function PetitionReviewField({
   onAction,
   onValidateToggle,
   ...props
-}: PetitionReviewFieldProps) {
+}: PetitionRepliesFieldProps) {
   const intl = useIntl();
   const labels = {
     filesize: intl.formatMessage({
@@ -142,7 +142,7 @@ export function PetitionReviewField({
                 `}
               >
                 {field.replies.map((reply) => (
-                  <PetitionReviewFieldReply key={reply.id} reply={reply}>
+                  <PetitionRepliesFieldReply key={reply.id} reply={reply}>
                     {(reply.content.text as string)
                       .split(/\n/)
                       .map((line, index) => (
@@ -157,13 +157,13 @@ export function PetitionReviewField({
                       size="sm"
                       text={reply.content.text}
                     />
-                  </PetitionReviewFieldReply>
+                  </PetitionRepliesFieldReply>
                 ))}
               </Stack>
             ) : field.type === "FILE_UPLOAD" ? (
               <Stack spacing={4}>
                 {field.replies.map((reply) => (
-                  <PetitionReviewFieldReply key={reply.id} reply={reply}>
+                  <PetitionRepliesFieldReply key={reply.id} reply={reply}>
                     <Box display="inling-flex">
                       <Text as="span" aria-label={labels.filename}>
                         {reply.content.filename}
@@ -191,7 +191,7 @@ export function PetitionReviewField({
                         }
                       ></IconButtonWithTooltip>
                     </Box>
-                  </PetitionReviewFieldReply>
+                  </PetitionRepliesFieldReply>
                 ))}
               </Stack>
             ) : null}
@@ -211,12 +211,12 @@ export function PetitionReviewField({
   );
 }
 
-function PetitionReviewFieldReply({
+function PetitionRepliesFieldReply({
   children,
   reply,
   ...props
 }: {
-  reply: UnwrapArray<PetitionReviewField_PetitionFieldFragment["replies"]>;
+  reply: UnwrapArray<PetitionRepliesField_PetitionFieldFragment["replies"]>;
 } & PseudoBoxProps) {
   return (
     <PseudoBox
@@ -250,9 +250,9 @@ function PetitionReviewFieldReply({
   );
 }
 
-PetitionReviewField.fragments = {
+PetitionRepliesField.fragments = {
   petitionField: gql`
-    fragment PetitionReviewField_PetitionField on PetitionField {
+    fragment PetitionRepliesField_PetitionField on PetitionField {
       id
       type
       title

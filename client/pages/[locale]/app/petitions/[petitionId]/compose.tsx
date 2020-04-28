@@ -563,7 +563,7 @@ function useSendPetition() {
             contacts: data.sendPetition.sendouts.map((s) => s.contact!),
           });
         }
-        const pathname = "/[locale]/app/petitions/[petitionId]/review";
+        const pathname = "/[locale]/app/petitions/[petitionId]/replies";
         router.push(pathname, resolveUrl(pathname, router.query));
       } catch {}
     }

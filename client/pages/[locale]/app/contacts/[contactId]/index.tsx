@@ -69,7 +69,7 @@ function Contact({ contactId }: ContactProps) {
     },
   });
 
-  function goToPetition(id: string, section: "compose" | "review") {
+  function goToPetition(id: string, section: "compose" | "replies") {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
       `/${router.query.locale}/app/petitions/${id}/${section}`
@@ -81,8 +81,8 @@ function Contact({ contactId }: ContactProps) {
       row.petition!.id,
       ({
         DRAFT: "compose",
-        PENDING: "review",
-        COMPLETED: "review",
+        PENDING: "replies",
+        COMPLETED: "replies",
       } as const)[row.petition!.status]
     );
   }

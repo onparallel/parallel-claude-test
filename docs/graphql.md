@@ -22,15 +22,15 @@ Order:
 ```
 function useUpdatePetition() {
   return useMutation(gql`
-    mutation PetitionReview_updatePetition(
+    mutation PetitionReplies_updatePetition(
       $id: ID!
       $data: UpdatePetitionInput!
     ) {
       updatePetition(id: $id, data: $data) {
-        ...PetitionReview_Petition
+        ...PetitionReplies_Petition
       }
     }
-    ${PetitionReview.fragments.petition}
+    ${PetitionReplies.fragments.petition}
   `);
 }
 ```
@@ -42,18 +42,18 @@ function useUpdatePetition() {
 ```
 function useUpdatePetition() {
   return useMutation<
-    PetitionReview_updatePetitionMutation,
-    PetitionReview_updatePetitionMutationVariables
+    PetitionReplies_updatePetitionMutation,
+    PetitionReplies_updatePetitionMutationVariables
   >(gql`
-    mutation PetitionReview_updatePetition(
+    mutation PetitionReplies_updatePetition(
       $id: ID!
       $data: UpdatePetitionInput!
     ) {
       updatePetition(id: $id, data: $data) {
-        ...PetitionReview_Petition
+        ...PetitionReplies_Petition
       }
     }
-    ${PetitionReview.fragments.petition}
+    ${PetitionReplies.fragments.petition}
   `);
 }
 ```

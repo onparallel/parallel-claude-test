@@ -4,16 +4,19 @@ import {
   PopoverArrow,
   PopoverContent,
   PopoverTrigger,
+  PopoverProps,
 } from "@chakra-ui/core";
 import { cloneElement, ReactNode, useState } from "react";
 import { useId } from "@reach/auto-id";
 
 export function SmallPopover({
   children,
+  placement,
   content,
 }: {
-  children: ReactNode;
   content: ReactNode;
+  placement?: PopoverProps["placement"];
+  children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverId = `popover-${useId()}`;
@@ -22,6 +25,7 @@ export function SmallPopover({
       trigger="hover"
       usePortal
       id={popoverId}
+      placement={placement}
       onOpen={() => setIsOpen(true)}
       onClose={() => setIsOpen(false)}
     >

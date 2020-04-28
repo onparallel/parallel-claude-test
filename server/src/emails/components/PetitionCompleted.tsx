@@ -71,7 +71,7 @@ const email: Email<PetitionCompletedProps> = {
         defaultMessage:
           "You can click the link below to access the information.",
       })}
-      ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/review
+      ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies
 
       ${closing({}, intl)}
     `;
@@ -116,7 +116,7 @@ const email: Email<PetitionCompletedProps> = {
             </MjmlText>
             <PetitionFieldList fields={fields} />
             <Button
-              href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/review`}
+              href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
             >
               <FormattedMessage
                 id="petition-completed.access-button"

@@ -453,7 +453,7 @@
     "term": "generic.changes-saved",
     "definition": "Guardado",
     "context": "Saved",
-    "reference": "components/layout/PetitionHeader.tsx#L185-L188"
+    "reference": "components/layout/PetitionHeader.tsx#L165-L168"
   },
   {
     "term": "generic.collapse",
@@ -495,7 +495,7 @@
     "term": "generic.edit-label",
     "definition": "Editar",
     "context": "Edit",
-    "reference": "components/layout/PetitionHeader.tsx#L144-L147"
+    "reference": "components/layout/PetitionHeader.tsx#L124-L127"
   },
   {
     "term": "generic.expand",
@@ -573,7 +573,7 @@
     "term": "generic.forms.invalid-old-password-error",
     "definition": "La contraseña actual es incorrecta",
     "context": "Old password is incorrect",
-    "reference": "pages/[locale]/app/settings/security.tsx#L115-L118"
+    "reference": "pages/[locale]/app/settings/security.tsx#L114-L117"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -621,19 +621,19 @@
     "term": "generic.forms.required-first-name-error",
     "definition": "El nombre es un campo requerido",
     "context": "First name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L81-L84"
+    "reference": "pages/[locale]/app/settings/account.tsx#L80-L83"
   },
   {
     "term": "generic.forms.required-last-name-error",
     "definition": "El apellido es un campo requerido",
     "context": "Last name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L102-L105"
+    "reference": "pages/[locale]/app/settings/account.tsx#L101-L104"
   },
   {
     "term": "generic.forms.required-old-password-error",
     "definition": "La contraseña actual es requerida",
     "context": "Old password is required",
-    "reference": "pages/[locale]/app/settings/security.tsx#L107-L110"
+    "reference": "pages/[locale]/app/settings/security.tsx#L106-L109"
   },
   {
     "term": "generic.forms.required-password-error",
@@ -660,9 +660,9 @@
     "reference": "components/petition/CompletedPetitionDialog.tsx#L47-L50"
   },
   {
-    "term": "generic.go-to-review",
-    "definition": "Ir a revisar",
-    "context": "Go to review",
+    "term": "generic.go-to-replies",
+    "definition": "Ir a respuestas",
+    "context": "Go to replies",
     "reference": "components/petition/PetitionSentDialog.tsx#L64-L67"
   },
   {
@@ -705,7 +705,7 @@
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L192-L195"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L192-L195"
   },
   {
     "term": "generic.required-field",
@@ -765,7 +765,7 @@
     "term": "generic.untitled-field",
     "definition": "Campo sin título",
     "context": "Untitled field",
-    "reference": "components/petition/PetitionReviewField.tsx#L93-L96"
+    "reference": "components/petition/PetitionRepliesField.tsx#L93-L96"
   },
   {
     "term": "generic.untitled-petition",
@@ -795,7 +795,7 @@
     "term": "navbar.new-button",
     "definition": "Nueva petición",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L103-L106"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L104-L107"
   },
   {
     "term": "navbar.petitions-link",
@@ -955,21 +955,21 @@
   },
   {
     "term": "petition.header.compose-tab",
-    "definition": "Componer",
+    "definition": "Editar",
     "context": "Compose",
-    "reference": "components/layout/PetitionHeader.tsx#L59-L62"
+    "reference": "components/layout/PetitionHeader.tsx#L215-L218"
   },
   {
     "term": "petition.header.last-saved-on",
     "definition": "Guardado por última vez el: {date}",
     "context": "Last saved on: {date}",
-    "reference": "components/layout/PetitionHeader.tsx#L46-L49"
+    "reference": "components/layout/PetitionHeader.tsx#L47-L50"
   },
   {
-    "term": "petition.header.review-tab",
-    "definition": "Revisar",
-    "context": "Review",
-    "reference": "components/layout/PetitionHeader.tsx#L66-L69"
+    "term": "petition.header.replies-tab",
+    "definition": "Respuestas",
+    "context": "Replies",
+    "reference": "components/layout/PetitionHeader.tsx#L234-L237"
   },
   {
     "term": "petition.locale-label",
@@ -993,7 +993,7 @@
     "term": "petition.name-label",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "components/layout/PetitionHeader.tsx#L112-L115"
+    "reference": "components/layout/PetitionHeader.tsx#L92-L95"
   },
   {
     "term": "petition.no-sendouts",
@@ -1005,25 +1005,25 @@
     "term": "petition.petition-field.no-replies",
     "definition": "No hay respuestas a este campo todavía",
     "context": "There are no replies to this field yet",
-    "reference": "components/petition/PetitionReviewField.tsx#L202-L205"
+    "reference": "components/petition/PetitionRepliesField.tsx#L202-L205"
   },
   {
     "term": "petition.petition-field.replies-label",
     "definition": "Hay {replies, plural, =1 {una respuesta} other {# respuestas}} a este campo.",
     "context": "{replies, plural, =1 {There is one reply to this field.} other {There are # replies to this field.}}",
-    "reference": "components/petition/PetitionReviewField.tsx#L125-L129"
+    "reference": "components/petition/PetitionRepliesField.tsx#L125-L129"
   },
   {
     "term": "petition.petition-field.reply-file-download",
     "definition": "Descargar archivo",
     "context": "Download file",
-    "reference": "components/petition/PetitionReviewField.tsx#L61-L64"
+    "reference": "components/petition/PetitionRepliesField.tsx#L61-L64"
   },
   {
     "term": "petition.petition-field.validate-button",
     "definition": "Revisado",
     "context": "Reviewed",
-    "reference": "components/petition/PetitionReviewField.tsx#L114-L117"
+    "reference": "components/petition/PetitionRepliesField.tsx#L114-L117"
   },
   {
     "term": "petition.petition-scheduled-dialog.header",
@@ -1071,13 +1071,13 @@
     "term": "petition.reminder-sent.toast-description",
     "definition": "El recordatorio está en camino",
     "context": "The reminder is on it's way",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L388-L391"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L388-L391"
   },
   {
     "term": "petition.reminder-sent.toast-header",
     "definition": "Recordatorio enviado",
     "context": "Reminder sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L384-L387"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L384-L387"
   },
   {
     "term": "petition.reminders-label",
@@ -1092,34 +1092,40 @@
     "reference": "components/petition/PetitionComposeSettings.tsx#L319-L322"
   },
   {
-    "term": "petition.review.download-file-error-dialog.body",
+    "term": "petition.replies-not-available",
+    "definition": "Cuando envíes esta petición, encontrarás todas las respuestas aquí. ",
+    "context": "Once you send this petition, you will be able to see all the replies here.",
+    "reference": "components/layout/PetitionHeader.tsx#L290-L293"
+  },
+  {
+    "term": "petition.replies.download-file-error-dialog.body",
     "definition": "Ocurrió un problema generando el enlace de descarga de {filename}. Esto, normalmente, significa que la subida del archivo por parte del usuario falló.",
     "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
     "reference": "components/petition/FailureGeneratingLinkDialog.tsx#L28-L34"
   },
   {
-    "term": "petition.review.download-file-error-dialog.header",
+    "term": "petition.replies.download-file-error-dialog.header",
     "definition": "Error descargando {filename}",
     "context": "Error downloading {filename}",
     "reference": "components/petition/FailureGeneratingLinkDialog.tsx#L18-L24"
   },
   {
-    "term": "petition.review.select-all",
+    "term": "petition.replies.select-all",
     "definition": "Todos",
     "context": "All",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L172-L175"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L172-L175"
   },
   {
-    "term": "petition.review.select-none",
+    "term": "petition.replies.select-none",
     "definition": "Ninguno",
     "context": "None",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L178-L181"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L178-L181"
   },
   {
-    "term": "petition.review.validate-selected",
+    "term": "petition.replies.validate-selected",
     "definition": "Marcar como revisado",
     "context": "Mark as reviewed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/review.tsx#L208-L211"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L208-L211"
   },
   {
     "term": "petition.same-petition-warning",
@@ -1179,7 +1185,7 @@
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/layout/PetitionHeader.tsx#L200-L203"
+    "reference": "components/layout/PetitionHeader.tsx#L180-L183"
   },
   {
     "term": "petition.subject-label",
@@ -2301,25 +2307,25 @@
     "term": "settings.account",
     "definition": "Cuenta",
     "context": "Account",
-    "reference": "pages/[locale]/app/settings/account.tsx#L52"
+    "reference": "pages/[locale]/app/settings/account.tsx#L51"
   },
   {
     "term": "settings.account.change-password-button",
     "definition": "Cambiar contraseña",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L172-L175"
+    "reference": "pages/[locale]/app/settings/security.tsx#L171-L174"
   },
   {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
     "context": "Name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L57-L60"
+    "reference": "pages/[locale]/app/settings/account.tsx#L56-L59"
   },
   {
     "term": "settings.account.update-name-button",
     "definition": "Guardar cambios",
     "context": "Save changes",
-    "reference": "pages/[locale]/app/settings/account.tsx#L111-L114"
+    "reference": "pages/[locale]/app/settings/account.tsx#L110-L113"
   },
   {
     "term": "settings.header",
@@ -2331,24 +2337,24 @@
     "term": "settings.security",
     "definition": "Seguridad",
     "context": "Security",
-    "reference": "pages/[locale]/app/settings/security.tsx#L78"
+    "reference": "pages/[locale]/app/settings/security.tsx#L77"
   },
   {
     "term": "settings.security.password-change-toast-description",
     "definition": "Tu contraseña ha sido actualizada con éxito.",
     "context": "Your password has been successfully changed.",
-    "reference": "pages/[locale]/app/settings/security.tsx#L63-L66"
+    "reference": "pages/[locale]/app/settings/security.tsx#L62-L65"
   },
   {
     "term": "settings.security.password-change-toast-title",
     "definition": "Contraseña actualizada",
     "context": "Password changed",
-    "reference": "pages/[locale]/app/settings/security.tsx#L59-L62"
+    "reference": "pages/[locale]/app/settings/security.tsx#L58-L61"
   },
   {
     "term": "settings.security.password-header",
     "definition": "Cambiar contraseña",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L83-L86"
+    "reference": "pages/[locale]/app/settings/security.tsx#L82-L85"
   }
 ]

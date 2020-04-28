@@ -62,8 +62,8 @@ export function PetitionSentDialog({
           onClick={() => props.onResolve()}
         >
           <FormattedMessage
-            id="generic.go-to-review"
-            defaultMessage="Go to review"
+            id="generic.go-to-replies"
+            defaultMessage="Go to replies"
           />
         </Button>
       }

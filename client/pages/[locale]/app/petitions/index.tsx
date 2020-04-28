@@ -160,8 +160,8 @@ function Petitions() {
       row.id,
       ({
         DRAFT: "compose",
-        PENDING: "review",
-        COMPLETED: "review",
+        PENDING: "replies",
+        COMPLETED: "replies",
       } as const)[row.status]
     );
   }
@@ -173,7 +173,7 @@ function Petitions() {
     }));
   }
 
-  function goToPetition(id: string, section: "compose" | "review") {
+  function goToPetition(id: string, section: "compose" | "replies") {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
       `/${router.query.locale}/app/petitions/${id}/${section}`
@@ -309,8 +309,8 @@ const COLUMNS: TableColumn<PetitionSelection>[] = [
               more: rest.length,
               a: (...chunks: any[]) => (
                 <Link
-                  href="/app/petitions/[petitionId]/review#sendouts"
-                  as={`/app/petitions/${row.id}/review/#sendouts`}
+                  href="/app/petitions/[petitionId]/replies#sendouts"
+                  as={`/app/petitions/${row.id}/replies/#sendouts`}
                   onClick={(e: MouseEvent) => e.stopPropagation()}
                 >
                   {chunks}

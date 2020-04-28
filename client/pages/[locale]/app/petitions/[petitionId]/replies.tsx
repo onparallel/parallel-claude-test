@@ -18,9 +18,9 @@ import { Title } from "@parallel/components/common/Title";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition/FailureGeneratingLinkDialog";
 import {
-  PetitionReviewField,
-  PetitionReviewFieldAction,
-} from "@parallel/components/petition/PetitionReviewField";
+  PetitionRepliesField,
+  PetitionRepliesFieldAction,
+} from "@parallel/components/petition/PetitionRepliesField";
 import { PetitionSendouts } from "@parallel/components/petition/PetitionSendouts";
 import {
   withData,
@@ -28,16 +28,16 @@ import {
 } from "@parallel/components/common/withData";
 import {
   PetitionFieldReply,
-  PetitionReviewQuery,
-  PetitionReviewQueryVariables,
-  PetitionReviewUserQuery,
+  PetitionRepliesQuery,
+  PetitionRepliesQueryVariables,
+  PetitionRepliesUserQuery,
   UpdatePetitionInput,
-  usePetitionReviewQuery,
-  usePetitionReviewUserQuery,
-  usePetitionReview_fileUploadReplyDownloadLinkMutation,
-  usePetitionReview_sendRemindersMutation,
-  usePetitionReview_updatePetitionMutation,
-  usePetitionReview_validatePetitionFieldsMutation,
+  usePetitionRepliesQuery,
+  usePetitionRepliesUserQuery,
+  usePetitionReplies_fileUploadReplyDownloadLinkMutation,
+  usePetitionReplies_sendRemindersMutation,
+  usePetitionReplies_updatePetitionMutation,
+  usePetitionReplies_validatePetitionFieldsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import {
@@ -51,25 +51,25 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 type PetitionProps = UnwrapPromise<
-  ReturnType<typeof PetitionReview.getInitialProps>
+  ReturnType<typeof PetitionReplies.getInitialProps>
 >;
 
-function PetitionReview({ petitionId }: PetitionProps) {
+function PetitionReplies({ petitionId }: PetitionProps) {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(usePetitionReviewUserQuery());
+  } = assertQuery(usePetitionRepliesUserQuery());
   const {
     data: { petition },
     refetch,
-  } = assertQuery(usePetitionReviewQuery({ variables: { id: petitionId } }));
+  } = assertQuery(usePetitionRepliesQuery({ variables: { id: petitionId } }));
 
   const [state, setState] = usePetitionState();
   const wrapper = useWrapPetitionUpdater(setState);
-  const [updatePetition] = usePetitionReview_updatePetitionMutation();
+  const [updatePetition] = usePetitionReplies_updatePetitionMutation();
   const [
     validatePetitionFields,
-  ] = usePetitionReview_validatePetitionFieldsMutation();
+  ] = usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
   const handleValidateToggle = useCallback(
@@ -105,7 +105,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
     [petitionId]
   );
 
-  const handleAction = async function (action: PetitionReviewFieldAction) {
+  const handleAction = async function (action: PetitionRepliesFieldAction) {
     switch (action.type) {
       case "DOWNLOAD_FILE":
         try {
@@ -140,7 +140,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
         user={me}
         petition={petition!}
         onUpdatePetition={handleOnUpdatePetition}
-        section="review"
+        section="replies"
         scrollBody={false}
         state={state}
       >
@@ -170,13 +170,13 @@ function PetitionReview({ petitionId }: PetitionProps) {
                 >
                   <MenuItem onClick={() => toggleBy(() => true)}>
                     <FormattedMessage
-                      id="petition.review.select-all"
+                      id="petition.replies.select-all"
                       defaultMessage="All"
                     />
                   </MenuItem>
                   <MenuItem onClick={() => toggleBy(() => false)}>
                     <FormattedMessage
-                      id="petition.review.select-none"
+                      id="petition.replies.select-none"
                       defaultMessage="None"
                     />
                   </MenuItem>
@@ -206,7 +206,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
               }
             >
               <FormattedMessage
-                id="petition.review.validate-selected"
+                id="petition.replies.validate-selected"
                 defaultMessage="Mark as reviewed"
               />
             </Button>
@@ -217,7 +217,7 @@ function PetitionReview({ petitionId }: PetitionProps) {
           <Flex margin={4}>
             <Stack flex="2" spacing={4}>
               {petition!.fields.map((field, index) => (
-                <PetitionReviewField
+                <PetitionRepliesField
                   key={field.id}
                   field={field}
                   index={index}
@@ -245,42 +245,42 @@ function PetitionReview({ petitionId }: PetitionProps) {
   );
 }
 
-PetitionReview.fragments = {
+PetitionReplies.fragments = {
   petition: gql`
-    fragment PetitionReview_Petition on Petition {
+    fragment PetitionReplies_Petition on Petition {
       id
       fields {
-        ...PetitionReviewField_PetitionField
+        ...PetitionRepliesField_PetitionField
       }
       ...PetitionLayout_Petition
       ...PetitionSendouts_Petition
     }
     ${PetitionLayout.fragments.petition}
-    ${PetitionReviewField.fragments.petitionField}
+    ${PetitionRepliesField.fragments.petitionField}
     ${PetitionSendouts.fragments.petition}
   `,
   user: gql`
-    fragment PetitionReview_User on User {
+    fragment PetitionReplies_User on User {
       ...PetitionLayout_User
     }
     ${PetitionLayout.fragments.user}
   `,
 };
 
-PetitionReview.mutations = [
+PetitionReplies.mutations = [
   gql`
-    mutation PetitionReview_updatePetition(
+    mutation PetitionReplies_updatePetition(
       $petitionId: ID!
       $data: UpdatePetitionInput!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
-        ...PetitionReview_Petition
+        ...PetitionReplies_Petition
       }
     }
-    ${PetitionReview.fragments.petition}
+    ${PetitionReplies.fragments.petition}
   `,
   gql`
-    mutation PetitionReview_validatePetitionFields(
+    mutation PetitionReplies_validatePetitionFields(
       $petitionId: ID!
       $fieldIds: [ID!]!
       $value: Boolean!
@@ -302,7 +302,7 @@ PetitionReview.mutations = [
     ${PetitionLayout.fragments.petition}
   `,
   gql`
-    mutation PetitionReview_fileUploadReplyDownloadLink(
+    mutation PetitionReplies_fileUploadReplyDownloadLink(
       $petitionId: ID!
       $replyId: ID!
     ) {
@@ -313,7 +313,7 @@ PetitionReview.mutations = [
     }
   `,
   gql`
-    mutation PetitionReview_sendReminders(
+    mutation PetitionReplies_sendReminders(
       $petitionId: ID!
       $sendoutIds: [ID!]!
     ) {
@@ -328,26 +328,26 @@ PetitionReview.mutations = [
   `,
 ];
 
-const GET_PETITION_REVIEW_DATA = gql`
-  query PetitionReview($id: ID!) {
+const GET_PETITION_REPLIES_DATA = gql`
+  query PetitionReplies($id: ID!) {
     petition(id: $id) {
-      ...PetitionReview_Petition
+      ...PetitionReplies_Petition
     }
   }
-  ${PetitionReview.fragments.petition}
+  ${PetitionReplies.fragments.petition}
 `;
 
-const GET_PETITION_REVIEW_USER_DATA = gql`
-  query PetitionReviewUser {
+const GET_PETITION_REPLIES_USER_DATA = gql`
+  query PetitionRepliesUser {
     me {
-      ...PetitionReview_User
+      ...PetitionReplies_User
     }
   }
-  ${PetitionReview.fragments.user}
+  ${PetitionReplies.fragments.user}
 `;
 
 function useDownloadReplyFile() {
-  const [mutate] = usePetitionReview_fileUploadReplyDownloadLinkMutation();
+  const [mutate] = usePetitionReplies_fileUploadReplyDownloadLinkMutation();
   const showFailure = useFailureGeneratingLinkDialog();
   return useCallback(
     async function downloadReplyFile(
@@ -375,7 +375,7 @@ function useDownloadReplyFile() {
 function useSendReminder() {
   const intl = useIntl();
   const toast = useToast();
-  const [sendReminders] = usePetitionReview_sendRemindersMutation();
+  const [sendReminders] = usePetitionReplies_sendRemindersMutation();
   return useCallback(async (petitionId: string, sendoutId: string) => {
     await sendReminders({
       variables: { petitionId, sendoutIds: [sendoutId] },
@@ -396,14 +396,17 @@ function useSendReminder() {
   }, []);
 }
 
-PetitionReview.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+PetitionReplies.getInitialProps = async ({
+  apollo,
+  query,
+}: WithDataContext) => {
   await Promise.all([
-    apollo.query<PetitionReviewQuery, PetitionReviewQueryVariables>({
-      query: GET_PETITION_REVIEW_DATA,
+    apollo.query<PetitionRepliesQuery, PetitionRepliesQueryVariables>({
+      query: GET_PETITION_REPLIES_DATA,
       variables: { id: query.petitionId as string },
     }),
-    apollo.query<PetitionReviewUserQuery>({
-      query: GET_PETITION_REVIEW_USER_DATA,
+    apollo.query<PetitionRepliesUserQuery>({
+      query: GET_PETITION_REPLIES_USER_DATA,
     }),
   ]);
   return {
@@ -411,4 +414,4 @@ PetitionReview.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   };
 };
 
-export default withData(PetitionReview);
+export default withData(PetitionReplies);

@@ -10,7 +10,7 @@ import {
   PseudoBox,
   PseudoBoxProps,
   Spinner,
-  Stack,
+  Text,
   Tooltip,
 } from "@chakra-ui/core";
 import {
@@ -24,11 +24,12 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 import { PetitionStatusText } from "../common/PetitionStatusText";
+import { SmallPopover } from "../common/SmallPopover";
 
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "review";
+  section: "compose" | "replies";
   state: "SAVED" | "SAVING" | "ERROR";
 };
 
@@ -51,27 +52,6 @@ export function PetitionHeader({
       date: intl.formatDate(petition.updatedAt, FORMATS.FULL),
     }
   );
-
-  const tabs = useMemo(
-    () => [
-      {
-        section: "compose",
-        text: intl.formatMessage({
-          id: "petition.header.compose-tab",
-          defaultMessage: "Compose",
-        }),
-      },
-      {
-        section: "review",
-        text: intl.formatMessage({
-          id: "petition.header.review-tab",
-          defaultMessage: "Review",
-        }),
-      },
-    ],
-    []
-  );
-
   function handleOnSubmit() {
     onUpdatePetition({ name: name || null });
   }
@@ -227,18 +207,37 @@ export function PetitionHeader({
         direction="row"
         marginBottom="-2px"
       >
-        {tabs.map(({ section, text }) => (
-          <Box key={section}>
-            <NakedLink
-              href={`/app/petitions/[petitionId]/${section}`}
-              as={`/app/petitions/${petition.id}/${section}`}
-            >
-              <PetitionHeaderTab active={section === current}>
-                {text}
-              </PetitionHeaderTab>
-            </NakedLink>
-          </Box>
-        ))}
+        <NakedLink
+          href={`/app/petitions/[petitionId]/compose`}
+          as={`/app/petitions/${petition.id}/compose`}
+        >
+          <PetitionHeaderTab active={current === "compose"}>
+            <FormattedMessage
+              id="petition.header.compose-tab"
+              defaultMessage="Compose"
+            />
+          </PetitionHeaderTab>
+        </NakedLink>
+        {petition.status === "DRAFT" ? (
+          <PetitionHeaderTab disabled={true}>
+            <FormattedMessage
+              id="petition.header.replies-tab"
+              defaultMessage="Replies"
+            />
+          </PetitionHeaderTab>
+        ) : (
+          <NakedLink
+            href={`/app/petitions/[petitionId]/replies`}
+            as={`/app/petitions/${petition.id}/replies`}
+          >
+            <PetitionHeaderTab active={current === "replies"}>
+              <FormattedMessage
+                id="petition.header.replies-tab"
+                defaultMessage="Replies"
+              />
+            </PetitionHeaderTab>
+          </NakedLink>
+        )}
       </Flex>
     </Flex>
   );
@@ -246,14 +245,15 @@ export function PetitionHeader({
 
 type PetitionHeaderTabProps = PseudoBoxProps & {
   active?: boolean;
+  disabled?: boolean;
   children: ReactNode;
 };
 
 const PetitionHeaderTab = forwardRef(function (
-  { active, children, ...props }: PetitionHeaderTabProps,
+  { active, disabled, children, ...props }: PetitionHeaderTabProps,
   ref: Ref<any>
 ) {
-  return (
+  const link = (
     <PseudoBox
       as="a"
       ref={ref}
@@ -265,17 +265,41 @@ const PetitionHeaderTab = forwardRef(function (
       borderBottom="2px solid"
       borderBottomColor={active ? "purple.500" : "transparent"}
       fontWeight="bold"
-      cursor="pointer"
+      cursor={disabled ? "not-allowed" : "pointer"}
+      opacity={disabled ? 0.4 : 1}
       color={active ? "gray.900" : "gray.500"}
-      _hover={{
-        color: "purple.700",
-      }}
+      _hover={
+        disabled
+          ? {}
+          : {
+              color: "purple.700",
+            }
+      }
       {...(active ? { "aria-current": "page" } : {})}
       {...props}
     >
       {children}
     </PseudoBox>
   );
+  if (disabled) {
+    return (
+      <SmallPopover
+        placement="right"
+        content={
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="petition.replies-not-available"
+              defaultMessage="Once you send this petition, you will be able to see all the replies here."
+            />
+          </Text>
+        }
+      >
+        {link}
+      </SmallPopover>
+    );
+  } else {
+    return link;
+  }
 });
 
 PetitionHeader.fragments = {

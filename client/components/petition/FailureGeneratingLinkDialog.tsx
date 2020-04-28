@@ -16,7 +16,7 @@ export function FailureGeneratingLinkDialog({
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="petition.review.download-file-error-dialog.header"
+          id="petition.replies.download-file-error-dialog.header"
           defaultMessage="Error downloading {filename}"
           values={{
             filename,
@@ -26,7 +26,7 @@ export function FailureGeneratingLinkDialog({
       body={
         <Text>
           <FormattedMessage
-            id="petition.review.download-file-error-dialog.body"
+            id="petition.replies.download-file-error-dialog.body"
             defaultMessage="There was a problem generating the link for {filename}. This usually means that the upload from the user failed."
             values={{
               filename,
