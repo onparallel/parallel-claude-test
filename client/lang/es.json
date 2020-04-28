@@ -573,7 +573,7 @@
     "term": "generic.forms.invalid-old-password-error",
     "definition": "La contraseña actual es incorrecta",
     "context": "Old password is incorrect",
-    "reference": "pages/[locale]/app/settings/security.tsx#L118-L121"
+    "reference": "pages/[locale]/app/settings/security.tsx#L115-L118"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -621,19 +621,19 @@
     "term": "generic.forms.required-first-name-error",
     "definition": "El nombre es un campo requerido",
     "context": "First name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L84-L87"
+    "reference": "pages/[locale]/app/settings/account.tsx#L81-L84"
   },
   {
     "term": "generic.forms.required-last-name-error",
     "definition": "El apellido es un campo requerido",
     "context": "Last name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L113-L116"
+    "reference": "pages/[locale]/app/settings/account.tsx#L102-L105"
   },
   {
     "term": "generic.forms.required-old-password-error",
     "definition": "La contraseña actual es requerida",
     "context": "Old password is required",
-    "reference": "pages/[locale]/app/settings/security.tsx#L110-L113"
+    "reference": "pages/[locale]/app/settings/security.tsx#L107-L110"
   },
   {
     "term": "generic.forms.required-password-error",
@@ -2301,25 +2301,25 @@
     "term": "settings.account",
     "definition": "Cuenta",
     "context": "Account",
-    "reference": "pages/[locale]/app/settings/account.tsx#L51"
+    "reference": "pages/[locale]/app/settings/account.tsx#L52"
   },
   {
     "term": "settings.account.change-password-button",
     "definition": "Cambiar contraseña",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L192-L195"
+    "reference": "pages/[locale]/app/settings/security.tsx#L172-L175"
   },
   {
     "term": "settings.account.name-header",
     "definition": "Nombre y apellidos",
     "context": "Name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L56-L59"
+    "reference": "pages/[locale]/app/settings/account.tsx#L57-L60"
   },
   {
     "term": "settings.account.update-name-button",
-    "definition": "Actualizar nombre",
-    "context": "Update name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L123-L126"
+    "definition": "Guardar cambios",
+    "context": "Save changes",
+    "reference": "pages/[locale]/app/settings/account.tsx#L111-L114"
   },
   {
     "term": "settings.header",
@@ -2331,24 +2331,24 @@
     "term": "settings.security",
     "definition": "Seguridad",
     "context": "Security",
-    "reference": "pages/[locale]/app/settings/security.tsx#L77"
+    "reference": "pages/[locale]/app/settings/security.tsx#L78"
   },
   {
     "term": "settings.security.password-change-toast-description",
     "definition": "Tu contraseña ha sido actualizada con éxito.",
     "context": "Your password has been successfully changed.",
-    "reference": "pages/[locale]/app/settings/security.tsx#L62-L65"
+    "reference": "pages/[locale]/app/settings/security.tsx#L63-L66"
   },
   {
     "term": "settings.security.password-change-toast-title",
     "definition": "Contraseña actualizada",
     "context": "Password changed",
-    "reference": "pages/[locale]/app/settings/security.tsx#L58-L61"
+    "reference": "pages/[locale]/app/settings/security.tsx#L59-L62"
   },
   {
     "term": "settings.security.password-header",
-    "definition": "Contraseña",
-    "context": "Password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L82-L85"
+    "definition": "Cambiar contraseña",
+    "context": "Change password",
+    "reference": "pages/[locale]/app/settings/security.tsx#L83-L86"
   }
 ]

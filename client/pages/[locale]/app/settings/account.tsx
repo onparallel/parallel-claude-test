@@ -8,6 +8,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  Stack,
 } from "@chakra-ui/core";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -52,80 +53,68 @@ function Account() {
         }
       >
         <Box padding={4}>
-          <Heading as="h4" size="sm" marginBottom={2}>
+          <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
             <FormattedMessage
               id="settings.account.name-header"
               defaultMessage="Name"
             />
           </Heading>
-          <form onSubmit={handleSubmit(onSaveName)}>
-            <Flex flexWrap="wrap" marginX={-2}>
-              <Box
-                flex="1"
-                maxWidth="300px"
-                minWidth="200px"
-                paddingX={2}
-                marginBottom={2}
-              >
-                <FormControl isInvalid={!!errors.firstName}>
-                  <FormLabel htmlFor="first-name">
-                    <FormattedMessage
-                      id="generic.forms.first-name-label"
-                      defaultMessage="First name"
-                    ></FormattedMessage>
-                  </FormLabel>
-                  <Input
-                    id="first-name"
-                    name="firstName"
-                    ref={register({ required: true })}
-                  />
-                  {errors.firstName && (
-                    <FormErrorMessage>
-                      <FormattedMessage
-                        id="generic.forms.required-first-name-error"
-                        defaultMessage="First name is required"
-                      ></FormattedMessage>
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
-              </Box>
-              <Box
-                flex="1"
-                maxWidth="300px"
-                minWidth="200px"
-                paddingX={2}
-                marginBottom={2}
-              >
-                <FormControl isInvalid={!!errors.lastName}>
-                  <FormLabel htmlFor="last-name">
-                    <FormattedMessage
-                      id="generic.forms.last-name-label"
-                      defaultMessage="Last name"
-                    ></FormattedMessage>
-                  </FormLabel>
-                  <Input
-                    id="last-name"
-                    name="lastName"
-                    ref={register({ required: true })}
-                  />
-                  {errors.lastName && (
-                    <FormErrorMessage>
-                      <FormattedMessage
-                        id="generic.forms.required-last-name-error"
-                        defaultMessage="Last name is required"
-                      ></FormattedMessage>
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
-              </Box>
-            </Flex>
-            <Button type="submit" variantColor="purple">
-              <FormattedMessage
-                id="settings.account.update-name-button"
-                defaultMessage="Update name"
+          <Stack
+            maxWidth="containers.xs"
+            as="form"
+            onSubmit={handleSubmit(onSaveName)}
+          >
+            <FormControl isInvalid={!!errors.firstName}>
+              <FormLabel htmlFor="first-name">
+                <FormattedMessage
+                  id="generic.forms.first-name-label"
+                  defaultMessage="First name"
+                ></FormattedMessage>
+              </FormLabel>
+              <Input
+                id="first-name"
+                name="firstName"
+                ref={register({ required: true })}
               />
-            </Button>
-          </form>
+              {errors.firstName && (
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.forms.required-first-name-error"
+                    defaultMessage="First name is required"
+                  ></FormattedMessage>
+                </FormErrorMessage>
+              )}
+            </FormControl>
+            <FormControl isInvalid={!!errors.lastName}>
+              <FormLabel htmlFor="last-name">
+                <FormattedMessage
+                  id="generic.forms.last-name-label"
+                  defaultMessage="Last name"
+                ></FormattedMessage>
+              </FormLabel>
+              <Input
+                id="last-name"
+                name="lastName"
+                ref={register({ required: true })}
+              />
+              {errors.lastName && (
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.forms.required-last-name-error"
+                    defaultMessage="Last name is required"
+                  ></FormattedMessage>
+                </FormErrorMessage>
+              )}
+            </FormControl>
+            <Box>
+              <Button type="submit" variantColor="purple">
+                <FormattedMessage
+                  id="settings.account.update-name-button"
+                  defaultMessage="Save changes"
+                />
+              </Button>
+            </Box>
+          </Stack>
         </Box>
       </SettingsLayout>
     </AppLayout>
