@@ -2293,8 +2293,8 @@
   },
   {
     "term": "sendout.submit-button",
-    "definition": "Submit and notify {name}",
-    "context": "Submit and notify {name}",
+    "definition": "Finalize and notify {name}",
+    "context": "Finalize and notify {name}",
     "reference": "pages/[locale]/petition/[keycode].tsx#L325-L329"
   },
   {

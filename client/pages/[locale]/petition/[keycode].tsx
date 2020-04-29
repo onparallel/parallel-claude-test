@@ -277,7 +277,7 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
             >
               <FormattedMessage
                 id="sendout.submit-button"
-                defaultMessage="Submit and notify {name}"
+                defaultMessage="Finalize and notify {name}"
                 values={{ name: sender.firstName }}
               />
             </Button>
@@ -324,7 +324,7 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
                   >
                     <FormattedMessage
                       id="sendout.submit-button"
-                      defaultMessage="Submit and notify {name}"
+                      defaultMessage="Finalize and notify {name}"
                       values={{ name: sender.firstName }}
                     />
                   </Button>

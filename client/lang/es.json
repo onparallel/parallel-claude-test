@@ -2294,7 +2294,7 @@
   {
     "term": "sendout.submit-button",
     "definition": "Finalizar y notificar a {name}",
-    "context": "Submit and notify {name}",
+    "context": "Finalize and notify {name}",
     "reference": "pages/[locale]/petition/[keycode].tsx#L325-L329"
   },
   {
