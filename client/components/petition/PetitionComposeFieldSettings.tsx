@@ -9,6 +9,7 @@ import {
   Stack,
   Switch,
   Text,
+  Box,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -74,7 +75,7 @@ export function PetitionComposeFieldSettings({
               defaultMessage="Required"
             />
           }
-          help={
+          description={
             <Text fontSize="sm">
               <FormattedMessage
                 id="field-settings.required-description"
@@ -103,7 +104,7 @@ export function PetitionComposeFieldSettings({
               defaultMessage="Allow multiple replies"
             />
           }
-          help={
+          description={
             <Text fontSize="sm">
               {field.type === "FILE_UPLOAD" ? (
                 <FormattedMessage
@@ -182,7 +183,7 @@ function TextSettings({
             defaultMessage="Multi-line"
           />
         }
-        help={
+        description={
           <Text fontSize="sm">
             <FormattedMessage
               id="field-settings.text-multiline-description"
@@ -213,7 +214,7 @@ function TextSettings({
             defaultMessage="Placeholder"
           />
         }
-        help={
+        description={
           <>
             <Text fontSize="sm">
               <FormattedMessage
@@ -246,26 +247,29 @@ function TextSettings({
 function SettingsRow({
   label,
   controlId,
-  help,
+  description,
   children,
   ...props
 }: BoxProps & {
   label: ReactNode;
   controlId: string;
   children: ReactNode;
-  help: ReactNode;
+  description: ReactNode;
 }) {
   return (
-    <Flex alignItems="center" {...props}>
-      <SmallPopover content={help}>
-        <Flex as="label" alignItems="center" {...{ htmlFor: controlId }}>
-          <Text as="div">{label}</Text>
-          <Icon marginLeft={2} name="question" color="gray.200" />
-        </Flex>
-      </SmallPopover>
-      <Spacer />
-      <Flex alignSelf="center">{children}</Flex>
-    </Flex>
+    <SmallPopover content={description} placement="left">
+      <Flex
+        as="label"
+        alignItems="center"
+        {...{ htmlFor: controlId }}
+        {...props}
+      >
+        <Text as="div">{label}</Text>
+        <Icon marginLeft={2} name="question" color="gray.200" />
+        <Spacer minWidth={4} />
+        <Flex alignSelf="center">{children}</Flex>
+      </Flex>
+    </SmallPopover>
   );
 }
 

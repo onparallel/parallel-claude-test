@@ -54,7 +54,13 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useLayoutEffect,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -87,19 +93,23 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, [activeFieldId, petition!.fields]);
 
   // This handles the position of the settings card
-  const [offset, setSettingsOffset] = useState(0);
-  useEffect(() => {
+  const [settingsOffset, setSettingsOffset] = useState(0);
+  useLayoutEffect(() => {
     if (!activeFieldId) {
       return;
     }
-    const element = document.querySelector<HTMLElement>(
+    const field = document.querySelector<HTMLElement>(
       `#field-${activeFieldId}`
-    );
-    if (element) {
-      const offset = element.offsetTop - element.parentElement!.offsetTop;
-      setSettingsOffset(offset);
-    }
-  }, [activeFieldId]);
+    )!;
+    const {
+      top: fieldTop,
+      height: fieldHeight,
+    } = field.getBoundingClientRect();
+    const fieldOffset = fieldTop - field.parentElement!.offsetTop;
+    const settings = document.querySelector<HTMLElement>("#field-settings")!;
+    const { height: settingsHeight } = settings.getBoundingClientRect();
+    setSettingsOffset(fieldOffset + fieldHeight / 2 - settingsHeight / 2);
+  }, [activeFieldId, petition!.fields]);
 
   // When the petition is completed show a dialog to avoid unintended changes
   const completedDialog = useCompletedPetitionDialog();
@@ -366,7 +376,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           {activeField ? (
             <Box flex="1" marginLeft={{ base: 0, md: 4 }}>
               <PetitionComposeFieldSettings
-                marginTop={{ base: 0, md: `${offset - 52}px` }}
+                id="field-settings"
+                marginTop={{ base: 0, md: `${settingsOffset}px` }}
                 transition="margin-top 200ms ease"
                 position={{ base: "relative", md: "sticky" }}
                 top={{ base: 0, md: 4 }}
