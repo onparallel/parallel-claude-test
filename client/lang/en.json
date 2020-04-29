@@ -405,55 +405,55 @@
     "term": "field-settings.file-multiple-description",
     "definition": "Enabling this allows the recipient to upload multiple files to this field.",
     "context": "Enabling this allows the recipient to upload multiple files to this field.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L109-L112"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L110-L113"
   },
   {
     "term": "field-settings.multiple-description",
     "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L114-L117"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L115-L118"
   },
   {
     "term": "field-settings.multiple-label",
     "definition": "Allow multiple replies",
     "context": "Allow multiple replies",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L101-L104"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L102-L105"
   },
   {
     "term": "field-settings.required-description",
     "definition": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
     "context": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L79-L82"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L80-L83"
   },
   {
     "term": "field-settings.required-label",
     "definition": "Required",
     "context": "Required",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L72-L75"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L73-L76"
   },
   {
     "term": "field-settings.text-multiline-description",
     "definition": "Enabling this will display a multi-line input field instead of a single line.",
     "context": "Enabling this will display a multi-line input field instead of a single line.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L187-L190"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L188-L191"
   },
   {
     "term": "field-settings.text-multiline-label",
     "definition": "Multi-line",
     "context": "Multi-line",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L180-L183"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L181-L184"
   },
   {
     "term": "field-settings.text-placeholder-description",
     "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L219-L222"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L220-L223"
   },
   {
     "term": "field-settings.text-placeholder-label",
     "definition": "Placeholder",
     "context": "Placeholder",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L211-L214"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L212-L215"
   },
   {
     "term": "generic.cancel-save-changes",
@@ -843,7 +843,7 @@
     "term": "petition.close-sidebar-button",
     "definition": "Close",
     "context": "Close",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L62-L65"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L63-L66"
   },
   {
     "term": "petition.completed-petition-dialog.body",
@@ -921,7 +921,7 @@
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L52-L55"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L53-L56"
   },
   {
     "term": "petition.field-title-label",
@@ -999,19 +999,19 @@
     "term": "petition.no-fields-error",
     "definition": "Please add at least one field to the petition.",
     "context": "Please add at least one field to the petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L209-L212"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L219-L222"
   },
   {
     "term": "petition.no-fields-without-title-error",
     "definition": "Please add a title to every field.",
     "context": "Please add a title to every field.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L227-L230"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L237-L240"
   },
   {
     "term": "petition.no-recipients-error",
     "definition": "Please specify at least one recipient.",
     "context": "Please specify at least one recipient.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L241-L244"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L251-L254"
   },
   {
     "term": "petition.no-sendouts",
@@ -1047,37 +1047,37 @@
     "term": "petition.petition-scheduled-toast.description",
     "definition": "Your petition will be sent on {date}.",
     "context": "Your petition will be sent on {date}.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L301-L304"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L311-L314"
   },
   {
     "term": "petition.petition-scheduled-toast.title",
     "definition": "Petition scheduled",
     "context": "Petition scheduled",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L291-L294"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L301-L304"
   },
   {
     "term": "petition.petition-send-error.description",
     "definition": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
     "context": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L279-L283"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L289-L293"
   },
   {
     "term": "petition.petition-send-error.title",
     "definition": "Error",
     "context": "Error",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L275-L278"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L285-L288"
   },
   {
     "term": "petition.petition-sent-toast.description",
     "definition": "Your petition is on it's way.",
     "context": "Your petition is on it's way.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L307-L310"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L317-L320"
   },
   {
     "term": "petition.petition-sent-toast.title",
     "definition": "Petition sent",
     "context": "Petition sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L295-L298"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L305-L308"
   },
   {
     "term": "petition.recipients-label",
@@ -1299,25 +1299,25 @@
     "term": "petitions.sendout-bounced",
     "definition": "The email bounced.",
     "context": "The email bounced.",
-    "reference": "components/petition/DoubleCheck.tsx#L27-L30"
+    "reference": "components/petition/DoubleCheck.tsx#L34-L37"
   },
   {
     "term": "petitions.sendout-bounced-explanation",
     "definition": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
     "context": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
-    "reference": "components/petition/DoubleCheck.tsx#L33-L36"
+    "reference": "components/petition/DoubleCheck.tsx#L50-L54"
   },
   {
     "term": "petitions.sendout-delivery-explanation-confirmed",
     "definition": "The email is confirmed to have been delivered on {date}",
     "context": "The email is confirmed to have been delivered on {date}",
-    "reference": "components/petition/DoubleCheck.tsx#L54-L62"
+    "reference": "components/petition/DoubleCheck.tsx#L97-L101"
   },
   {
     "term": "petitions.sendout-delivery-explanation-not-confirmed",
     "definition": "We haven't received confirmation of the delivery of the email yet.",
     "context": "We haven't received confirmation of the delivery of the email yet.",
-    "reference": "components/petition/DoubleCheck.tsx#L66-L69"
+    "reference": "components/petition/DoubleCheck.tsx#L109-L113"
   },
   {
     "term": "petitions.sendout-no-subject",
@@ -1335,13 +1335,13 @@
     "term": "petitions.sendout-opened-explanation-confirmed",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}",
-    "reference": "components/petition/DoubleCheck.tsx#L80-L86"
+    "reference": "components/petition/DoubleCheck.tsx#L151-L154"
   },
   {
     "term": "petitions.sendout-opened-explanation-not-confirmed",
     "definition": "We haven't received confirmation of the email being opened yet.",
     "context": "We haven't received confirmation of the email being opened yet.",
-    "reference": "components/petition/DoubleCheck.tsx#L90-L93"
+    "reference": "components/petition/DoubleCheck.tsx#L162-L166"
   },
   {
     "term": "petitions.sendout-status.active",
