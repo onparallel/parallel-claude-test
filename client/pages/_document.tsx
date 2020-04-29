@@ -52,6 +52,15 @@ class MyDocument extends Document<MyDocumentProps> {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,600|Playfair+Display&display=swap"
           />
+          <script
+            src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
+              [
+                "Intl.PluralRules",
+                "Intl.PluralRules.~locale.es",
+                "Intl.PluralRules.~locale.en",
+              ].join(",")
+            )}`}
+          />
         </Head>
         <body>
           <Main />

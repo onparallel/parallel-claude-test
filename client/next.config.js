@@ -18,12 +18,17 @@ const config = {
     const originalEntry = config.entry;
     config.entry = async () => {
       const entries = await originalEntry();
-      if (options.dev && !options.isServer) {
+      const main = entries["main.js"];
+      for (const { src, dev, isServer } of [
+        { src: "./build/why-did-you-render.js", dev: true, isServer: false },
+      ]) {
         if (
-          entries["main.js"] &&
-          !entries["main.js"].includes("./build/why-did-you-render.js")
+          (dev === undefined || dev === options.dev) &&
+          (isServer === undefined || isServer === options.isServer)
         ) {
-          entries["main.js"].unshift("./build/why-did-you-render.js");
+          if (main && !main.includes(src)) {
+            main.unshift(src);
+          }
         }
       }
       return entries;
