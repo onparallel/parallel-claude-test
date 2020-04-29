@@ -3,7 +3,7 @@ const assetsUrl = PROD
   ? {
       staging: "https://static-staging.parallel.so",
       production: "https://static.parallel.so",
-    }[process.env.ENV] ?? ""
+    }[process.env.ENV] || ""
   : "";
 const config = {
   env: {
