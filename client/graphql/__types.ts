@@ -787,10 +787,6 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     >;
   };
 
-export type PetitionScheduledDialog_ContactFragment = {
-  __typename?: "Contact";
-} & ContactLink_ContactFragment;
-
 export type PetitionSendouts_PetitionFragment = { __typename?: "Petition" } & {
   sendouts: Array<
     {
@@ -815,10 +811,6 @@ export type PetitionSendouts_PetitionSendoutFragment = {
 > & {
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
-
-export type PetitionSentDialog_ContactFragment = {
-  __typename?: "Contact";
-} & ContactLink_ContactFragment;
 
 export type PublicPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
@@ -1044,13 +1036,7 @@ export type PetitionCompose_sendPetitionMutation = {
         { __typename?: "Petition" } & Pick<Petition, "id" | "status">
       >;
       sendouts?: Maybe<
-        Array<
-          { __typename?: "PetitionSendout" } & Pick<PetitionSendout, "id"> & {
-              contact?: Maybe<
-                { __typename?: "Contact" } & PetitionSentDialog_ContactFragment
-              >;
-            }
-        >
+        Array<{ __typename?: "PetitionSendout" } & Pick<PetitionSendout, "id">>
       >;
     };
 };
@@ -1514,25 +1500,6 @@ export const PetitionComposeSettings_ContactFragmentDoc = gql`
     email
   }
 `;
-export const ContactLink_ContactFragmentDoc = gql`
-  fragment ContactLink_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
-export const PetitionScheduledDialog_ContactFragmentDoc = gql`
-  fragment PetitionScheduledDialog_Contact on Contact {
-    ...ContactLink_Contact
-  }
-  ${ContactLink_ContactFragmentDoc}
-`;
-export const PetitionSentDialog_ContactFragmentDoc = gql`
-  fragment PetitionSentDialog_Contact on Contact {
-    ...ContactLink_Contact
-  }
-  ${ContactLink_ContactFragmentDoc}
-`;
 export const PublicPetitionField_PublicPetitionFieldFragmentDoc = gql`
   fragment PublicPetitionField_PublicPetitionField on PublicPetitionField {
     id
@@ -1728,6 +1695,13 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
         }
       }
     }
+  }
+`;
+export const ContactLink_ContactFragmentDoc = gql`
+  fragment ContactLink_Contact on Contact {
+    id
+    fullName
+    email
   }
 `;
 export const PetitionSendouts_PetitionSendoutFragmentDoc = gql`
@@ -2555,13 +2529,9 @@ export const PetitionCompose_sendPetitionDocument = gql`
       }
       sendouts {
         id
-        contact {
-          ...PetitionSentDialog_Contact
-        }
       }
     }
   }
-  ${PetitionSentDialog_ContactFragmentDoc}
 `;
 export type PetitionCompose_sendPetitionMutationFn = ApolloReactCommon.MutationFunction<
   PetitionCompose_sendPetitionMutation,

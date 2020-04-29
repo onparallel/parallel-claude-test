@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/react-hooks";
-import { Box, Flex } from "@chakra-ui/core";
+import { Box, Flex, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -21,11 +21,6 @@ import {
   PetitionComposeSettings,
   PetitionComposeSettingsProps,
 } from "@parallel/components/petition/PetitionComposeSettings";
-import { usePetitionScheduledDialog } from "@parallel/components/petition/PetitionScheduledDialog";
-import {
-  PetitionSentDialog,
-  usePetitionSentDialog,
-} from "@parallel/components/petition/PetitionSentDialog";
 import { useScheduleSendoutDialog } from "@parallel/components/petition/ScheduleSendoutDialog";
 import {
   PetitionComposeQuery,
@@ -49,6 +44,7 @@ import {
   usePetitionCompose_updatePetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
+import { FORMATS } from "@parallel/utils/dates";
 import { resolveUrl } from "@parallel/utils/next";
 import {
   usePetitionState,
@@ -70,7 +66,9 @@ type PetitionComposeProps = UnwrapPromise<
 type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
+  const router = useRouter();
   const intl = useIntl();
+  const toast = useToast();
   const {
     data: { me },
   } = assertQuery(usePetitionComposeUserQuery());
@@ -199,9 +197,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const searchContacts = useSearchContacts();
 
-  const sendPetition = useSendPetition();
   const showErrorDialog = useErrorDialog();
   const showScheduleSendoutDialog = useScheduleSendoutDialog();
+  const [sendPetition] = usePetitionCompose_sendPetitionMutation();
   const handleSend: PetitionComposeSettingsProps["onSend"] = useCallback(
     async ({ recipients, schedule }) => {
       if (petition!.fields.length === 0) {
@@ -250,16 +248,69 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           return;
         }
       }
+      let scheduledAt: Date | null = null;
       if (schedule) {
         try {
-          const scheduledAt = await showScheduleSendoutDialog({});
-          await sendPetition(petition!.id, recipients, scheduledAt);
+          scheduledAt = await showScheduleSendoutDialog({});
         } catch {
           return;
         }
-      } else {
-        await sendPetition(petition!.id, recipients, null);
       }
+      const { data } = await sendPetition({
+        variables: {
+          petitionId: petition!.id,
+          recipients,
+          scheduledAt: scheduledAt?.toISOString() ?? null,
+        },
+        update(client) {
+          // clear stale data
+          delete (client as any).data.data[petitionId].sendouts;
+          delete (client as any).data.data[petitionId].recipients;
+        },
+      });
+      if (data?.sendPetition.result !== "SUCCESS") {
+        toast({
+          isClosable: true,
+          status: "error",
+          title: intl.formatMessage({
+            id: "petition.petition-send-error.title",
+            defaultMessage: "Error",
+          }),
+          description: intl.formatMessage({
+            id: "petition.petition-send-error.description",
+            defaultMessage:
+              "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
+          }),
+        });
+        return;
+      }
+      toast({
+        isClosable: true,
+        status: schedule ? "info" : "success",
+        title: schedule
+          ? intl.formatMessage({
+              id: "petition.petition-scheduled-toast.title",
+              defaultMessage: "Petition scheduled",
+            })
+          : intl.formatMessage({
+              id: "petition.petition-sent-toast.title",
+              defaultMessage: "Petition sent",
+            }),
+        description: schedule
+          ? intl.formatMessage(
+              {
+                id: "petition.petition-scheduled-toast.description",
+                defaultMessage: "Your petition will be sent on {date}.",
+              },
+              { date: intl.formatTime(scheduledAt!, FORMATS.LLL) }
+            )
+          : intl.formatMessage({
+              id: "petition.petition-sent-toast.description",
+              defaultMessage: "Your petition is on it's way.",
+            }),
+      });
+      const pathname = "/[locale]/app/petitions";
+      router.push(pathname, resolveUrl(pathname, router.query));
     },
     [petition!.id, petition!.fields]
   );
@@ -461,13 +512,9 @@ PetitionCompose.mutations = [
         }
         sendouts {
           id
-          contact {
-            ...PetitionSentDialog_Contact
-          }
         }
       }
     }
-    ${PetitionSentDialog.fragments.contact}
   `,
 ];
 
@@ -602,48 +649,6 @@ function useSearchContacts() {
     300,
     []
   );
-}
-
-function useSendPetition() {
-  const showPetitionSentDialog = usePetitionSentDialog();
-  const showPetitionScheduledDialog = usePetitionScheduledDialog();
-  const router = useRouter();
-  const [doSendPetition] = usePetitionCompose_sendPetitionMutation();
-  return useCallback(async function (
-    petitionId: string,
-    recipients: string[],
-    scheduledAt: Date | null
-  ) {
-    const { data } = await doSendPetition({
-      variables: {
-        petitionId,
-        recipients,
-        scheduledAt: scheduledAt?.toISOString() ?? null,
-      },
-      update(client) {
-        // clear stale data
-        delete (client as any).data.data[petitionId].sendouts;
-        delete (client as any).data.data[petitionId].recipients;
-      },
-    });
-    if (data?.sendPetition.sendouts) {
-      try {
-        if (scheduledAt) {
-          await showPetitionScheduledDialog({
-            scheduledAt,
-            contacts: data.sendPetition.sendouts.map((s) => s.contact!),
-          });
-        } else {
-          await showPetitionSentDialog({
-            contacts: data.sendPetition.sendouts.map((s) => s.contact!),
-          });
-        }
-        const pathname = "/[locale]/app/petitions/[petitionId]/replies";
-        router.push(pathname, resolveUrl(pathname, router.query));
-      } catch {}
-    }
-  },
-  []);
 }
 
 PetitionCompose.getInitialProps = async ({
