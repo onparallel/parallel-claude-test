@@ -1,6 +1,6 @@
 import { Box, Heading, Icon, Text } from "@chakra-ui/core";
 import { FORMATS } from "@parallel/utils/dates";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { DateTime } from "../common/DateTime";
 import { SmallPopover } from "../common/SmallPopover";
 
@@ -11,12 +11,19 @@ export type DoubleCheckProps = {
   openedAt: string | null;
 };
 
+function rountToNearestSecond(value: Date | string | number) {
+  const date = new Date(value);
+  date.setMilliseconds(0);
+  return date;
+}
+
 export function DoubleCheck({
   sent,
   bounced,
   deliveredAt,
   openedAt,
 }: DoubleCheckProps) {
+  const intl = useIntl();
   if (sent) {
     if (bounced) {
       return (
@@ -38,7 +45,14 @@ export function DoubleCheck({
             </>
           }
         >
-          <Box display="flex">
+          <Box
+            display="flex"
+            aria-label={intl.formatMessage({
+              id: "petitions.sendout-bounced-explanation",
+              defaultMessage:
+                "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
+            })}
+          >
             <Icon name="check" color="red.500" />
             <Icon marginLeft="-7px" name="check-short" color="gray.300" />
           </Box>
@@ -56,7 +70,10 @@ export function DoubleCheck({
                   defaultMessage="The email is confirmed to have been delivered on {date}"
                   values={{
                     date: (
-                      <DateTime value={deliveredAt} format={FORMATS.FULL} />
+                      <DateTime
+                        value={rountToNearestSecond(deliveredAt)}
+                        format={FORMATS.FULL}
+                      />
                     ),
                   }}
                 />
@@ -71,7 +88,31 @@ export function DoubleCheck({
             )
           }
         >
-          <Icon name="check" color={deliveredAt ? "green.500" : "gray.300"} />
+          <Icon
+            name="check"
+            color={deliveredAt ? "green.500" : "gray.300"}
+            aria-label={
+              deliveredAt
+                ? intl.formatMessage(
+                    {
+                      id: "petitions.sendout-delivery-explanation-confirmed",
+                      defaultMessage:
+                        "The email is confirmed to have been delivered on {date}",
+                    },
+                    {
+                      date: intl.formatDate(
+                        rountToNearestSecond(deliveredAt),
+                        FORMATS.FULL
+                      ),
+                    }
+                  )
+                : intl.formatMessage({
+                    id: "petitions.sendout-delivery-explanation-not-confirmed",
+                    defaultMessage:
+                      "We haven't received confirmation of the delivery of the email yet.",
+                  })
+            }
+          />
         </SmallPopover>
         <SmallPopover
           content={
@@ -81,7 +122,12 @@ export function DoubleCheck({
                   id="petitions.sendout-opened-explanation-confirmed"
                   defaultMessage="The email was opened on {date}"
                   values={{
-                    date: <DateTime value={openedAt} format={FORMATS.FULL} />,
+                    date: (
+                      <DateTime
+                        value={rountToNearestSecond(openedAt)}
+                        format={FORMATS.FULL}
+                      />
+                    ),
                   }}
                 />
               </Text>
@@ -99,6 +145,26 @@ export function DoubleCheck({
             marginLeft="-7px"
             name="check-short"
             color={openedAt ? "green.500" : "gray.300"}
+            aria-label={
+              openedAt
+                ? intl.formatMessage(
+                    {
+                      id: "petitions.sendout-opened-explanation-confirmed",
+                      defaultMessage: "The email was opened on {date}",
+                    },
+                    {
+                      date: intl.formatDate(
+                        rountToNearestSecond(openedAt),
+                        FORMATS.FULL
+                      ),
+                    }
+                  )
+                : intl.formatMessage({
+                    id: "petitions.sendout-opened-explanation-not-confirmed",
+                    defaultMessage:
+                      "We haven't received confirmation of the email being opened yet.",
+                  })
+            }
           />
         </SmallPopover>
       </Box>
