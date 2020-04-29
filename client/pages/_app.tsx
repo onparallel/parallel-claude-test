@@ -51,9 +51,13 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     : pick(props, ["locale", "messages"]);
   return (
     <>
-      <GoogleAnalytics trackingId={process.env.GA_TRACKING_ID!} />
-      <Hubspot />
-      <Hotjar />
+      {process.env.NODE_ENV === "development" ? null : (
+        <>
+          <GoogleAnalytics />
+          <Hubspot />
+          <Hotjar />
+        </>
+      )}
       <IntlProvider {...intlConfig}>
         <ThemeProvider theme={theme}>
           <ColorModeProvider value="light">

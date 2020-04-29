@@ -1,16 +1,13 @@
 const PROD = process.env.NODE_ENV === "production";
 const assetsUrl = PROD
   ? {
-      dev: "",
       staging: "https://static-staging.parallel.so",
       production: "https://static.parallel.so",
-    }[process.env.ENV]
+    }[process.env.ENV] ?? ""
   : "";
 const config = {
   env: {
     ROOT: __dirname,
-    GA_TRACKING_ID:
-      process.env.ENV === "production" ? "UA-153451031-1" : "UA-153451031-3",
     ASSETS_URL: assetsUrl,
   },
   crossOrigin: "anonymous",
