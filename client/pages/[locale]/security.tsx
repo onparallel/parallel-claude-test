@@ -44,7 +44,7 @@ function Security() {
           <Text fontSize="lg">
             <FormattedMessage
               id="public.security.system-security-layers"
-              defaultMessage="For this, our system has multiple layers of protection and is secure by design."
+              defaultMessage="To achieve this, our system has multiple layers of protection and is secure by design."
             ></FormattedMessage>
           </Text>
         </PublicContainer>
@@ -127,7 +127,7 @@ function Security() {
             <Text>
               <FormattedMessage
                 id="public.security.pillar"
-                defaultMessage="At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact."
+                defaultMessage="At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. For this reason, we protect you and the people with whom you interact."
               ></FormattedMessage>
             </Text>
           </Box>

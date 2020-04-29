@@ -1555,87 +1555,69 @@
   },
   {
     "term": "public.case.laura.centralized-information",
-    "definition": "All information centralized in a single space per case.",
-    "context": "All information centralized in a single space per case.",
-    "reference": "pages/[locale]/people.tsx#L203-L206"
+    "definition": "All the information always available in a single place on the cloud.",
+    "context": "All the information always available in a single place on the cloud.",
+    "reference": "pages/[locale]/people.tsx#L183-L186"
   },
   {
     "term": "public.case.laura.client-anywhere",
-    "definition": "The security of her clients, who can upload the files, either from the computer, mobile or tablet, without having to download any app.",
-    "context": "The security of her clients, who can upload the files, either from the computer, mobile or tablet, without having to download any app.",
-    "reference": "pages/[locale]/people.tsx#L239-L242"
-  },
-  {
-    "term": "public.case.laura.cloud",
-    "definition": "Information always available in the cloud.",
-    "context": "Information always available in the cloud.",
-    "reference": "pages/[locale]/people.tsx#L227-L230"
+    "definition": "The convenience for her clients, who now can upload their files at any time and from any device.",
+    "context": "The convenience for her clients, who now can upload their files at any time and from any device.",
+    "reference": "pages/[locale]/people.tsx#L207-L210"
   },
   {
     "term": "public.case.laura.increased-billing",
-    "definition": "In just one month, Laura has managed to increase the hours billed and an <a>additional net income of € 1,500 per month</a>.",
-    "context": "In just one month, Laura has managed to increase the hours billed and an <a>additional net income of € 1,500 per month</a>.",
-    "reference": "pages/[locale]/people.tsx#L170-L180"
+    "definition": "In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>.",
+    "context": "In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>.",
+    "reference": "pages/[locale]/people.tsx#L150-L160"
   },
   {
     "term": "public.case.laura.non-billable",
-    "definition": "All this tasks that she has to do involves <a>20 hours of work</a> that Laura cannot bill the client.",
-    "context": "All this tasks that she has to do involves <a>20 hours of work</a> that Laura cannot bill the client.",
-    "reference": "pages/[locale]/people.tsx#L116-L126"
+    "definition": "All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients.",
+    "context": "All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients.",
+    "reference": "pages/[locale]/people.tsx#L96-L106"
   },
   {
     "term": "public.case.laura.now-has",
     "definition": "Laura now has:",
     "context": "Laura now has:",
-    "reference": "pages/[locale]/people.tsx#L186-L189"
+    "reference": "pages/[locale]/people.tsx#L166-L169"
   },
   {
     "term": "public.case.laura.recently-discovered",
-    "definition": "Laura has recently discovered the Parallel platform and is <a>saving more than half an hour a day</a>.",
-    "context": "Laura has recently discovered the Parallel platform and is <a>saving more than half an hour a day</a>.",
-    "reference": "pages/[locale]/people.tsx#L146-L156"
+    "definition": "Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>.",
+    "context": "Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>.",
+    "reference": "pages/[locale]/people.tsx#L126-L136"
   },
   {
     "term": "public.case.laura.register",
-    "definition": "If you want to start using Parallel, <a>register for free here</a>.",
-    "context": "If you want to start using Parallel, <a>register for free here</a>.",
-    "reference": "pages/[locale]/people.tsx#L247-L253"
+    "definition": "If you want to start using Parallel for free, register here.",
+    "context": "If you want to start using Parallel for free, register here.",
+    "reference": "pages/[locale]/people.tsx#L216-L219"
   },
   {
     "term": "public.case.laura.reminders",
-    "definition": "She forgets to send reminders, because Parallel does it for her.",
-    "context": "She forgets to send reminders, because Parallel does it for her.",
-    "reference": "pages/[locale]/people.tsx#L215-L218"
-  },
-  {
-    "term": "public.case.laura.requests-information",
-    "definition": "Requests for information",
-    "context": "Requests for information",
-    "reference": "pages/[locale]/people.tsx#L90-L93"
-  },
-  {
-    "term": "public.case.laura.reviews-emails",
-    "definition": "Reviews emails",
-    "context": "Reviews emails",
-    "reference": "pages/[locale]/people.tsx#L96-L99"
+    "definition": "The peace of mind about not having to chase clients, because Parallel does it for her.",
+    "context": "The peace of mind about not having to chase clients, because Parallel does it for her.",
+    "reference": "pages/[locale]/people.tsx#L195-L198"
   },
   {
     "term": "public.case.laura.time-spent",
-    "definition": "Laura spends <a>1 hour each day</a> reviewing the emails and the information attached to it to make sure she has all the information:",
-    "context": "Laura spends <a>1 hour each day</a> reviewing the emails and the information attached to it to make sure she has all the information:",
-    "reference": "pages/[locale]/people.tsx#L69-L79"
+    "definition": "Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work.",
+    "context": "Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work.",
+    "reference": "pages/[locale]/people.tsx#L70-L80"
   },
   {
     "term": "public.case.laura.with-parallel",
     "definition": "With Parallel",
     "context": "With Parallel",
-    "reference": "pages/[locale]/people.tsx#L137-L140"
+    "reference": "pages/[locale]/people.tsx#L117-L120"
   },
   {
     "term": "public.case.laura.without-parallel",
     "definition": "Without Parallel",
     "context": "Without Parallel",
-    "reference": "pages/[locale]/people.tsx#L59-L62"
+    "reference": "pages/[locale]/people.tsx#L60-L63"
   },
   {
     "term": "public.contact-link",
@@ -1875,7 +1857,7 @@
     "term": "public.invite-button",
     "definition": "Try Parallel free",
     "context": "Try Parallel free",
-    "reference": "components/public/PublicHeroPc.tsx#L49-L52"
+    "reference": "pages/[locale]/people.tsx#L223-L226"
   },
   {
     "term": "public.invite.consent",
@@ -1999,21 +1981,21 @@
   },
   {
     "term": "public.people.hero-title",
-    "definition": "Laura now has much more time available",
-    "context": "Laura now has much more time available",
-    "reference": "pages/[locale]/people.tsx#L37-L40"
+    "definition": "Laura now has more time to focus on the important work",
+    "context": "Laura now has more time to focus on the important work",
+    "reference": "pages/[locale]/people.tsx#L38-L41"
   },
   {
     "term": "public.people.routine-change",
-    "definition": "Let us tell you how his routine has changed since he discovered Parallel.",
-    "context": "Let us tell you how his routine has changed since he discovered Parallel.",
-    "reference": "pages/[locale]/people.tsx#L43-L46"
+    "definition": "Let us tell you how her routine has changed since she discovered Parallel.",
+    "context": "Let us tell you how her routine has changed since she discovered Parallel.",
+    "reference": "pages/[locale]/people.tsx#L44-L47"
   },
   {
     "term": "public.people.title",
     "definition": "For whom",
     "context": "For whom",
-    "reference": "pages/[locale]/people.tsx#L26-L29"
+    "reference": "pages/[locale]/people.tsx#L27-L30"
   },
   {
     "term": "public.persons-link",
@@ -2131,8 +2113,8 @@
   },
   {
     "term": "public.security.pillar",
-    "definition": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact.",
-    "context": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. So we protect you and the people with whom you interact.",
+    "definition": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. For this reason, we protect you and the people with whom you interact.",
+    "context": "At Parallel we maintain security as one of our fundamental pillars. We know that trust is the foundation of any relationship. For this reason, we protect you and the people with whom you interact.",
     "reference": "pages/[locale]/security.tsx#L128-L131"
   },
   {
@@ -2155,8 +2137,8 @@
   },
   {
     "term": "public.security.system-security-layers",
-    "definition": "For this, our system has multiple layers of protection and is secure by design.",
-    "context": "For this, our system has multiple layers of protection and is secure by design.",
+    "definition": "To achieve this, our system has multiple layers of protection and is secure by design.",
+    "context": "To achieve this, our system has multiple layers of protection and is secure by design.",
     "reference": "pages/[locale]/security.tsx#L45-L48"
   },
   {

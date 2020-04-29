@@ -9,8 +9,9 @@ import {
   ListItem,
   Text,
   useTheme,
+  Button,
 } from "@chakra-ui/core";
-import { NormalLink, Link } from "@parallel/components/common/Link";
+import { NormalLink, Link, NakedLink } from "@parallel/components/common/Link";
 import { Title } from "@parallel/components/common/Title";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -36,13 +37,13 @@ function People() {
           <Heading as="h1" fontSize="3xl" fontWeight="bold" color="purple.600">
             <FormattedMessage
               id="public.people.hero-title"
-              defaultMessage="Laura now has much more time available"
+              defaultMessage="Laura now has more time to focus on the important work"
             ></FormattedMessage>
           </Heading>
-          <Text marginTop={12} fontSize="lg">
+          <Text marginTop={8} fontSize="lg">
             <FormattedMessage
               id="public.people.routine-change"
-              defaultMessage="Let us tell you how his routine has changed since he discovered Parallel."
+              defaultMessage="Let us tell you how her routine has changed since she discovered Parallel."
             ></FormattedMessage>
           </Text>
         </PublicContainer>
@@ -68,7 +69,7 @@ function People() {
                   <Text>
                     <FormattedMessage
                       id="public.case.laura.time-spent"
-                      defaultMessage="Laura spends <a>1 hour each day</a> reviewing the emails and the information attached to it to make sure she has all the information:"
+                      defaultMessage="Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work."
                       values={{
                         a: (...chunks: any[]) => (
                           <Text as="em" fontStyle="normal" color="purple.500">
@@ -78,27 +79,6 @@ function People() {
                       }}
                     ></FormattedMessage>
                   </Text>
-                  <List
-                    listStylePosition="inside"
-                    listStyleType="-"
-                    marginTop={2}
-                    spacing={2}
-                    textAlign="left"
-                    alignSelf={{ base: "center", sm: "stretch" }}
-                  >
-                    <ListItem>
-                      <FormattedMessage
-                        id="public.case.laura.requests-information"
-                        defaultMessage="Requests for information"
-                      ></FormattedMessage>
-                    </ListItem>
-                    <ListItem>
-                      <FormattedMessage
-                        id="public.case.laura.reviews-emails"
-                        defaultMessage="Reviews emails"
-                      ></FormattedMessage>
-                    </ListItem>
-                  </List>
                 </Flex>
               }
               right={
@@ -115,7 +95,7 @@ function People() {
                 <Text>
                   <FormattedMessage
                     id="public.case.laura.non-billable"
-                    defaultMessage="All this tasks that she has to do involves <a>20 hours of work</a> that Laura cannot bill the client."
+                    defaultMessage="All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients."
                     values={{
                       a: (chunks: any[]) => (
                         <Text as="em" fontStyle="normal" color="purple.500">
@@ -145,7 +125,7 @@ function People() {
               <Text>
                 <FormattedMessage
                   id="public.case.laura.recently-discovered"
-                  defaultMessage="Laura has recently discovered the Parallel platform and is <a>saving more than half an hour a day</a>."
+                  defaultMessage="Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>."
                   values={{
                     a: (chunks: any[]) => (
                       <Text as="em" fontStyle="normal" color="purple.500">
@@ -169,7 +149,7 @@ function People() {
                 <Text>
                   <FormattedMessage
                     id="public.case.laura.increased-billing"
-                    defaultMessage="In just one month, Laura has managed to increase the hours billed and an <a>additional net income of € 1,500 per month</a>."
+                    defaultMessage="In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>."
                     values={{
                       a: (chunks: any[]) => (
                         <Text as="em" fontStyle="normal" color="purple.500">
@@ -191,7 +171,7 @@ function People() {
             </OneColumnTimeline>
             <Separator flex="1" minHeight="20px" />
           </Flex>
-          <Box textAlign="left" maxWidth="500px" margin="auto" marginTop={4}>
+          <Box textAlign="left" maxWidth="520px" margin="auto" marginTop={4}>
             <List stylePos="outside" spacing={4}>
               <ListItem display="flex">
                 <ListIcon
@@ -202,7 +182,7 @@ function People() {
                 />
                 <FormattedMessage
                   id="public.case.laura.centralized-information"
-                  defaultMessage="All information centralized in a single space per case."
+                  defaultMessage="All the information always available in a single place on the cloud."
                 ></FormattedMessage>
               </ListItem>
               <ListItem display="flex">
@@ -214,19 +194,7 @@ function People() {
                 />
                 <FormattedMessage
                   id="public.case.laura.reminders"
-                  defaultMessage="She forgets to send reminders, because Parallel does it for her."
-                ></FormattedMessage>
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  icon="check"
-                  color="purple.500"
-                  marginTop={1}
-                  marginRight={2}
-                />
-                <FormattedMessage
-                  id="public.case.laura.cloud"
-                  defaultMessage="Information always available in the cloud."
+                  defaultMessage="The peace of mind about not having to chase clients, because Parallel does it for her."
                 ></FormattedMessage>
               </ListItem>
               <ListItem display="flex">
@@ -238,20 +206,27 @@ function People() {
                 />
                 <FormattedMessage
                   id="public.case.laura.client-anywhere"
-                  defaultMessage="The security of her clients, who can upload the files, either from the computer, mobile or tablet, without having to download any app."
+                  defaultMessage="The convenience for her clients, who now can upload their files at any time and from any device."
                 ></FormattedMessage>
               </ListItem>
             </List>
           </Box>
-          <Text paddingY={20} textAlign="center">
-            <FormattedMessage
-              id="public.case.laura.register"
-              defaultMessage="If you want to start using Parallel, <a>register for free here</a>."
-              values={{
-                a: (...chunks: any[]) => <Link href="/invite">{chunks}</Link>,
-              }}
-            ></FormattedMessage>
-          </Text>
+          <Box textAlign="center" paddingY={20}>
+            <Text>
+              <FormattedMessage
+                id="public.case.laura.register"
+                defaultMessage="If you want to start using Parallel for free, register here."
+              ></FormattedMessage>
+            </Text>
+            <NakedLink href="/invite">
+              <Button as="a" variantColor="purple" marginTop={8}>
+                <FormattedMessage
+                  id="public.invite-button"
+                  defaultMessage="Try Parallel free"
+                ></FormattedMessage>
+              </Button>
+            </NakedLink>
+          </Box>
         </PublicContainer>
       </PublicLayout>
     </>
