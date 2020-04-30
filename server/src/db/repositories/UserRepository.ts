@@ -3,15 +3,26 @@ import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateUser, User } from "../__types";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import DataLoader from "dataloader";
+import { indexBy } from "remeda";
 
 @injectable()
-export class UserReposistory extends BaseRepository {
+export class UserRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
     super(knex);
   }
 
-  readonly loadUserByCognitoId = this.buildLoadBy("user", "cognito_id", (q) =>
-    q.whereNull("deleted_at")
+  readonly loadSessionUser = fromDataLoader(
+    new DataLoader<string, User>(async (cognitoIds) => {
+      const rows = await this.from("user")
+        .update({ last_active_at: this.now() })
+        .whereIn("cognito_id", cognitoIds)
+        .whereNull("deleted_at")
+        .returning("*");
+      const byCognitoId = indexBy(rows, (r) => r.cognito_id);
+      return cognitoIds.map((cognitoId) => byCognitoId[cognitoId]);
+    })
   );
 
   readonly loadUser = this.buildLoadById("user", "id", (q) =>

@@ -394,6 +394,7 @@ export interface User {
   updated_by: Maybe<string>;
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
+  last_active_at: Maybe<Date>;
 }
 
 export interface CreateUser {
@@ -409,4 +410,5 @@ export interface CreateUser {
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
+  last_active_at?: Maybe<Date>;
 }

@@ -20,7 +20,7 @@ export function authenticate<
       if (!cognitoId) {
         throw new Error();
       }
-      const user = await ctx.users.loadUserByCognitoId(cognitoId);
+      const user = await ctx.users.loadSessionUser(cognitoId);
       if (!user) {
         throw new Error();
       }

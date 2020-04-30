@@ -7,7 +7,7 @@ import { KNEX } from "../knex";
 import { CreateContact, User } from "../__types";
 
 @injectable()
-export class ContactReposistory extends BaseRepository {
+export class ContactRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
     super(knex);
   }
