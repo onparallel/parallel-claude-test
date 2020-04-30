@@ -1,6 +1,5 @@
 import { format, utcToZonedTime } from "date-fns-tz";
 import Excel from "exceljs";
-import faker from "faker";
 import { outdent } from "outdent";
 import { createCronWorker } from "./helpers/createCronWorker";
 
