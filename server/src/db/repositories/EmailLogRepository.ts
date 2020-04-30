@@ -50,10 +50,7 @@ export class EmailLogRepository extends BaseRepository {
 
   readonly loadEmailEvents = fromDataLoader(
     new DataLoader<number, EmailEvent[]>(async (ids) => {
-      const rows = await this.from("email_event").whereIn(
-        "email_log_id",
-        ids as number[]
-      );
+      const rows = await this.from("email_event").whereIn("email_log_id", ids);
       const byEmailId = groupBy(rows, (r) => r.email_log_id);
       return ids.map((id) =>
         byEmailId[id] ? sortBy(byEmailId[id], (event) => event.created_at) : []

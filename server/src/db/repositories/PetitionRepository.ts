@@ -172,7 +172,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadFieldsForPetition = fromDataLoader(
     new DataLoader<number, PetitionField[]>(async (ids) => {
       const rows = await this.from("petition_field")
-        .whereIn("petition_id", ids as number[])
+        .whereIn("petition_id", ids)
         .whereNull("deleted_at")
         .select("*");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
@@ -185,7 +185,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadFieldCountForPetition = fromDataLoader(
     new DataLoader<number, number>(async (ids) => {
       const rows = await this.from("petition_field")
-        .whereIn("petition_id", ids as number[])
+        .whereIn("petition_id", ids)
         .whereNull("deleted_at")
         .groupBy("petition_id")
         .select("petition_id", this.count());
@@ -218,7 +218,7 @@ export class PetitionRepository extends BaseRepository {
             );
           }
         )
-        .whereIn("pf.petition_id", ids as number[])
+        .whereIn("pf.petition_id", ids)
         .whereNull("pf.deleted_at")
         .groupBy("pf.id", "pf.petition_id", "pf.validated", "pf.optional")
         .select(
@@ -256,7 +256,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadSendoutsForPetition = fromDataLoader(
     new DataLoader<number, PetitionSendout[]>(async (ids) => {
       const rows = await this.from("petition_sendout")
-        .whereIn("petition_id", ids as number[])
+        .whereIn("petition_id", ids)
         .whereNull("deleted_at")
         .select("*")
         .orderBy("id", "asc");
@@ -530,7 +530,7 @@ export class PetitionRepository extends BaseRepository {
   readonly loadRepliesForField = fromDataLoader(
     new DataLoader<number, PetitionFieldReply[]>(async (ids) => {
       const rows = await this.from("petition_field_reply")
-        .whereIn("petition_field_id", ids as number[])
+        .whereIn("petition_field_id", ids)
         .whereNull("deleted_at")
         .select("*");
       const byPetitionId = groupBy(rows, (r) => r.petition_field_id);
