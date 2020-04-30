@@ -32,7 +32,7 @@ export class ReportingRepository extends BaseRepository {
       await this.from("petition").whereNull("deleted_at").select("id")
     ).map((r) => r.id);
     const petitions = await ((async.concatSeries(
-      chunk(petitionIds, 5),
+      chunk(petitionIds, 100),
       async (batch) => {
         const [petitions, fields, sendouts] = await Promise.all([
           this.from("petition")
