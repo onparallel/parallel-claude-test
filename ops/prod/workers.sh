@@ -1,4 +1,5 @@
 COMMAND=$1
+ENV=
 
 if [[ "$COMMAND" == "start" ]]; then
   sudo systemctl ${COMMAND} parallel-completed-email-queue.service
@@ -8,7 +9,9 @@ if [[ "$COMMAND" == "start" ]]; then
   sudo systemctl ${COMMAND} parallel-reminder-trigger-cron.service
   sudo systemctl ${COMMAND} parallel-scheduled-trigger-cron.service
   sudo systemctl ${COMMAND} parallel-sendout-email-queue.service
-  sudo systemctl ${COMMAND} parallel-reporting-cron.service
+  if [[ "$ENV" == "production" ]]; then
+    sudo systemctl ${COMMAND} parallel-reporting-cron.service
+  fi
 else
   sudo systemctl ${COMMAND} parallel-*-{cron,queue}.service
 fi
