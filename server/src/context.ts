@@ -7,6 +7,7 @@ import { FileUploadRepository } from "./db/repositories/FileUploadRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReminderRepository } from "./db/repositories/ReminderRepository";
+import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, PetitionSendout, User } from "./db/__types";
 import { Auth } from "./services/auth";
@@ -54,5 +55,6 @@ export class WorkerContext {
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
     public readonly reminders: ReminderRepository,
+    public readonly reporting: ReportingRepository
   ) {}
 }

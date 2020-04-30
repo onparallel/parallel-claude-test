@@ -7,7 +7,7 @@ type ReminderEmailWorkerPayload = {
   petition_reminder_id: number;
 };
 
-const worker = createQueueWorker(
+createQueueWorker(
   "reminder-email",
   async (payload: ReminderEmailWorkerPayload, context) => {
     const reminderId = payload.petition_reminder_id;
@@ -90,5 +90,3 @@ const worker = createQueueWorker(
     await context.aws.enqueueEmail(email.id);
   }
 );
-
-worker.start();

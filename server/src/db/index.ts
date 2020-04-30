@@ -8,6 +8,7 @@ import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ReminderRepository } from "./repositories/ReminderRepository";
 import { UserRepository } from "./repositories/UserRepository";
+import { ReportingRepository } from "./repositories/ReportingRepository";
 
 export const dbModule = new ContainerModule((bind) => {
   bind<Knex>(KNEX).toDynamicValue(createKnex).inSingletonScope();
@@ -20,4 +21,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<PetitionRepository>(PetitionRepository).toSelf();
   bind<ReminderRepository>(ReminderRepository).toSelf();
   bind<UserRepository>(UserRepository).toSelf();
+  bind<ReportingRepository>(ReportingRepository).toSelf();
 });

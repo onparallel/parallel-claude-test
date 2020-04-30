@@ -3,7 +3,7 @@ import { chunk } from "remeda";
 import { eachOf } from "async";
 import { calculateNextReminder } from "../util/calculateNextReminder";
 
-const worker = createCronWorker("reminder-trigger", async (context) => {
+createCronWorker("reminder-trigger", async (context) => {
   const sendouts = await context.petitions.processSendoutReminders();
   for (const batch of chunk(sendouts, 10)) {
     await eachOf(batch, async (sendout) => {
@@ -32,5 +32,3 @@ const worker = createCronWorker("reminder-trigger", async (context) => {
     await context.aws.enqueueReminders(reminders.map((r) => r.id));
   }
 });
-
-worker.start();

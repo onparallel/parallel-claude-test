@@ -8,7 +8,7 @@ Environment=NODE_ENV=production
 WorkingDirectory=/home/ec2-user/main/server
 Type=simple
 User=ec2-user
-ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/reminder-trigger.js
+ExecStart=/usr/bin/node /home/ec2-user/main/server/dist/workers/reminder-trigger.js start
 Restart=always
 
 [Install]

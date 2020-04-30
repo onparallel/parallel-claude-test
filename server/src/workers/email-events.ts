@@ -5,7 +5,7 @@ type EmailEventsWorkerPayload = {
   mail: any;
 };
 
-const worker = createQueueWorker(
+createQueueWorker(
   "email-events",
   async (payload: EmailEventsWorkerPayload, context) => {
     if (!payload?.mail?.messageId) {
@@ -35,5 +35,3 @@ const worker = createQueueWorker(
     },
   }
 );
-
-worker.start();

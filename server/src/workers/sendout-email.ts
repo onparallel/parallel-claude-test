@@ -5,7 +5,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type SendoutEmailWorkerPayload = { petition_sendout_id: number };
 
-const worker = createQueueWorker(
+createQueueWorker(
   "sendout-email",
   async ({ petition_sendout_id }: SendoutEmailWorkerPayload, context) => {
     const sendout = await context.petitions.loadSendout(petition_sendout_id);
@@ -71,5 +71,3 @@ const worker = createQueueWorker(
     await context.aws.enqueueEmail(email.id);
   }
 );
-
-worker.start();

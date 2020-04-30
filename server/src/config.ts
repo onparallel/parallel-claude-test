@@ -64,6 +64,9 @@ export function buildConfig() {
       "reminder-trigger": Object.freeze({
         rule: process.env.WORKERS_REMINDER_TRIGGER_RULE!,
       }),
+      reporting: Object.freeze({
+        rule: process.env.WORKERS_REPORTING_RULE!,
+      }),
     }),
     logs: Object.freeze({
       groupName: process.env.LOGS_GROUP_NAME!,

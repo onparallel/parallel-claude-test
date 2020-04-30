@@ -2,7 +2,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type EmailSenderWorkerPayload = { email_log_id: number };
 
-const worker = createQueueWorker(
+createQueueWorker(
   "email-sender",
   async ({ email_log_id }: EmailSenderWorkerPayload, context) => {
     const email = await context.emails.loadEmailLog(email_log_id);
@@ -29,5 +29,3 @@ const worker = createQueueWorker(
     }
   }
 );
-
-worker.start();
