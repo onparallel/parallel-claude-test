@@ -4,7 +4,7 @@ import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CreateContact, User } from "../__types";
+import { CreateContact, User, PetitionSendout } from "../__types";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
@@ -63,11 +63,13 @@ export class ContactRepository extends BaseRepository {
 
   async loadSendoutsForContact(contactId: number, opts: PageOpts) {
     return await this.loadPageAndCount(
-      this.from("petition_sendout")
-        .where({ contact_id: contactId })
-        .whereNull("deleted_at")
-        .orderBy("created_at", "desc")
-        .select("*"),
+      this.knex<PetitionSendout>("petition_sendout as ps")
+        .join("petition as p", "p.id", "ps.petition_id")
+        .where("ps.contact_id", contactId)
+        .whereNull("ps.deleted_at")
+        .whereNull("p.deleted_at")
+        .orderBy("p.created_at", "desc")
+        .select<any, PetitionSendout[]>(this.knex.raw("ps.*")),
       opts
     );
   }
