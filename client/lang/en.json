@@ -405,19 +405,25 @@
     "term": "field-settings.file-multiple-description",
     "definition": "Enabling this allows the recipient to upload multiple files to this field.",
     "context": "Enabling this allows the recipient to upload multiple files to this field.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L110-L113"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L117-L120"
+  },
+  {
+    "term": "field-settings.file-multiple-label",
+    "definition": "Allow multiple file uploads",
+    "context": "Allow multiple file uploads",
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L103-L106"
   },
   {
     "term": "field-settings.multiple-description",
     "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L115-L118"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L122-L125"
   },
   {
     "term": "field-settings.multiple-label",
     "definition": "Allow multiple replies",
     "context": "Allow multiple replies",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L102-L105"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L108-L111"
   },
   {
     "term": "field-settings.required-description",
@@ -435,25 +441,25 @@
     "term": "field-settings.text-multiline-description",
     "definition": "Enabling this will display a multi-line input field instead of a single line.",
     "context": "Enabling this will display a multi-line input field instead of a single line.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L188-L191"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L195-L198"
   },
   {
     "term": "field-settings.text-multiline-label",
     "definition": "Multi-line",
     "context": "Multi-line",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L181-L184"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L188-L191"
   },
   {
     "term": "field-settings.text-placeholder-description",
     "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L220-L223"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L227-L230"
   },
   {
     "term": "field-settings.text-placeholder-label",
     "definition": "Placeholder",
     "context": "Placeholder",
-    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L212-L215"
+    "reference": "components/petition/PetitionComposeFieldSettings.tsx#L219-L222"
   },
   {
     "term": "generic.cancel-save-changes",
@@ -999,19 +1005,19 @@
     "term": "petition.no-fields-error",
     "definition": "Please add at least one field to the petition.",
     "context": "Please add at least one field to the petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L219-L222"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L213-L216"
   },
   {
     "term": "petition.no-fields-without-title-error",
     "definition": "Please add a title to every field.",
     "context": "Please add a title to every field.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L237-L240"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L231-L234"
   },
   {
     "term": "petition.no-recipients-error",
     "definition": "Please specify at least one recipient.",
     "context": "Please specify at least one recipient.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L251-L254"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L245-L248"
   },
   {
     "term": "petition.no-sendouts",
@@ -1047,37 +1053,37 @@
     "term": "petition.petition-scheduled-toast.description",
     "definition": "Your petition will be sent on {date}.",
     "context": "Your petition will be sent on {date}.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L311-L314"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L305-L308"
   },
   {
     "term": "petition.petition-scheduled-toast.title",
     "definition": "Petition scheduled",
     "context": "Petition scheduled",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L301-L304"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L295-L298"
   },
   {
     "term": "petition.petition-send-error.description",
     "definition": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
     "context": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L289-L293"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L283-L287"
   },
   {
     "term": "petition.petition-send-error.title",
     "definition": "Error",
     "context": "Error",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L285-L288"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L279-L282"
   },
   {
     "term": "petition.petition-sent-toast.description",
     "definition": "Your petition is on it's way.",
     "context": "Your petition is on it's way.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L317-L320"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L311-L314"
   },
   {
     "term": "petition.petition-sent-toast.title",
     "definition": "Petition sent",
     "context": "Petition sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L305-L308"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L299-L302"
   },
   {
     "term": "petition.recipients-label",
