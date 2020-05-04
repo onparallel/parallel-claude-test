@@ -54,13 +54,7 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useLayoutEffect,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -94,7 +88,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   // This handles the position of the settings card
   const [settingsOffset, setSettingsOffset] = useState(0);
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!activeFieldId) {
       return;
     }
@@ -106,7 +100,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       height: fieldHeight,
     } = field.getBoundingClientRect();
     const fieldOffset = fieldTop - field.parentElement!.offsetTop;
-    const settings = document.querySelector<HTMLElement>("#field-settings")!;
+    const settings = document.querySelector<HTMLElement>("#field-settings");
+    if (!settings) {
+      return;
+    }
     const { height: settingsHeight } = settings.getBoundingClientRect();
     setSettingsOffset(fieldOffset + fieldHeight / 2 - settingsHeight / 2);
   }, [activeFieldId, petition!.fields]);
@@ -154,7 +151,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         await wrapper(deletePetitionField)(petitionId, fieldId);
       } catch {}
     },
-    [petitionId]
+    [petitionId, activeFieldId]
   );
 
   const handleUpdateField = useCallback(
