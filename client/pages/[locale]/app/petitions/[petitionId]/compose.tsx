@@ -95,11 +95,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const field = document.querySelector<HTMLElement>(
       `#field-${activeFieldId}`
     )!;
-    const {
-      top: fieldTop,
-      height: fieldHeight,
-    } = field.getBoundingClientRect();
-    const fieldOffset = fieldTop - field.parentElement!.offsetTop;
+    const { height: fieldHeight } = field.getBoundingClientRect();
+    const fieldOffset = field.offsetTop - field.parentElement!.offsetTop;
     const settings = document.querySelector<HTMLElement>("#field-settings");
     if (!settings) {
       return;
