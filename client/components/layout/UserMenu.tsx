@@ -1,18 +1,19 @@
+import { useApolloClient } from "@apollo/react-hooks";
 import {
   Avatar,
   Button,
+  Icon,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
-  Icon,
 } from "@chakra-ui/core";
-import { useIntl, FormattedMessage } from "react-intl";
+import { UserMenu_UserFragment } from "@parallel/graphql/__types";
+import { postJson } from "@parallel/utils/rest";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { postJson } from "@parallel/utils/rest";
-import { UserMenu_UserFragment } from "@parallel/graphql/__types";
+import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 
 export interface UserMenuProps {
@@ -22,10 +23,12 @@ export interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
+  const apollo = useApolloClient();
 
   async function handleLogoutClick() {
     await postJson("/api/auth/logout");
     localStorage.removeItem("token");
+    await apollo.clearStore();
     router.push("/[locale]/login", `/${router.query.locale}/login`);
   }
 

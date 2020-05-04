@@ -1,31 +1,32 @@
+import { useApolloClient } from "@apollo/react-hooks";
 import {
-  Text,
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  Button,
-  useToast,
-  Box,
-  Heading,
   Avatar,
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  Text,
+  useToast,
 } from "@chakra-ui/core";
-import { FormattedMessage, useIntl } from "react-intl";
-import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { Link, NormalLink } from "@parallel/components/common/Link";
-import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { postJson } from "@parallel/utils/rest";
+import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { Title } from "@parallel/components/common/Title";
-import { useRouter } from "next/router";
 import {
-  WithDataContext,
   withData,
+  WithDataContext,
 } from "@parallel/components/common/withData";
+import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
+import { postJson } from "@parallel/utils/rest";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { gql } from "apollo-boost";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
 
 interface LoginProps {
   me?: {
@@ -36,6 +37,7 @@ interface LoginProps {
 
 function Login({ me }: LoginProps) {
   const router = useRouter();
+  const client = useApolloClient();
   const [showContinueAs, setShowContinueAs] = useState(!!me);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordChange, setPasswordChange] = useState<{
@@ -53,6 +55,7 @@ function Login({ me }: LoginProps) {
         email,
         password,
       });
+      await client.clearStore();
       localStorage.setItem("token", token);
       router.push(
         "/[locale]/app/petitions",
