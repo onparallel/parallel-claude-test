@@ -36,7 +36,7 @@ export function SmallPopover({
       </PopoverTrigger>
       <PopoverContent zIndex={1000} maxWidth={240}>
         <PopoverArrow />
-        <Box padding={2} id={popoverId}>
+        <Box paddingY={2} paddingX={3} id={popoverId}>
           {content}
         </Box>
       </PopoverContent>
