@@ -58,6 +58,9 @@ class MyDocument extends Document<MyDocumentProps> {
                 "Intl.PluralRules",
                 "Intl.PluralRules.~locale.es",
                 "Intl.PluralRules.~locale.en",
+                "Intl.RelativeTimeFormat",
+                "Intl.RelativeTimeFormat.~locale.es",
+                "Intl.RelativeTimeFormat.~locale.en",
               ].join(",")
             )}`}
           />
