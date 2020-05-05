@@ -88,7 +88,7 @@ export function PetitionComposeField({
 
   const handleDescriptionSubmit = useCallback(
     function (value) {
-      if (value && value !== field.description) {
+      if (value !== field.description) {
         onFieldEdit({ description: value || null });
       }
     },
