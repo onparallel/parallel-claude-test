@@ -1,21 +1,11 @@
-import { FieldAuthorizeResolver, core } from "@nexus/schema";
+import { FieldAuthorizeResolver } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
-import { KeysOfType } from "../../../util/types";
-
-type StringArg<TypeName extends string, FieldName extends string> = KeysOfType<
-  core.ArgsValue<TypeName, FieldName>,
-  string
->;
-
-type StringArrayArg<
-  TypeName extends string,
-  FieldName extends string
-> = KeysOfType<core.ArgsValue<TypeName, FieldName>, string[]>;
+import { Arg } from "../../helpers/authorize";
 
 export function userHasAccessToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg extends StringArg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName, string>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -29,7 +19,7 @@ export function userHasAccessToPetition<
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends StringArrayArg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName, string[]>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -46,8 +36,8 @@ export function userHasAccessToPetitions<
 export function fieldBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends StringArg<TypeName, FieldName>,
-  TArg2 extends StringArg<TypeName, FieldName>
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
 >(
   argNamePetitionId: TArg1,
   argNameFieldId: TArg2
@@ -71,8 +61,8 @@ export function fieldBelongsToPetition<
 export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends StringArg<TypeName, FieldName>,
-  TArg2 extends StringArrayArg<TypeName, FieldName>
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string[]>
 >(
   argNamePetitionId: TArg1,
   argNameFieldIds: TArg2
@@ -96,8 +86,8 @@ export function fieldsBelongsToPetition<
 export function replyBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends StringArg<TypeName, FieldName>,
-  TArg2 extends StringArg<TypeName, FieldName>
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
 >(
   argNamePetitionId: TArg1,
   argNameReplyId: TArg2
@@ -121,8 +111,8 @@ export function replyBelongsToPetition<
 export function sendoutsBelongToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends StringArg<TypeName, FieldName>,
-  TArg2 extends StringArrayArg<TypeName, FieldName>
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string[]>
 >(
   argNamePetitionId: TArg1,
   argNameSendoutIds: TArg2

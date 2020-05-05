@@ -1,23 +1,14 @@
-import { core, FieldAuthorizeResolver } from "@nexus/schema";
-import { fromGlobalId } from "../../../util/globalId";
-import { KeysOfType, MaybeArray } from "../../../util/types";
+import { FieldAuthorizeResolver } from "@nexus/schema";
 import { PetitionFieldType } from "../../../db/__types";
-
-type StringArg<TypeName extends string, FieldName extends string> = KeysOfType<
-  core.ArgsValue<TypeName, FieldName>,
-  string
->;
-
-type StringArrayArg<
-  TypeName extends string,
-  FieldName extends string
-> = KeysOfType<core.ArgsValue<TypeName, FieldName>, string[]>;
+import { fromGlobalId } from "../../../util/globalId";
+import { MaybeArray } from "../../../util/types";
+import { Arg } from "../../helpers/authorize";
 
 export function replyBelongsToSendout<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends StringArg<TypeName, FieldName>,
-  TArg2 extends StringArg<TypeName, FieldName>
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
 >(
   argReplyId: TArg1,
   argKeycode: TArg2
@@ -40,8 +31,8 @@ export function replyBelongsToSendout<
 export function fieldBelongsToSendout<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends StringArg<TypeName, FieldName>,
-  TArg2 extends StringArg<TypeName, FieldName>
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
 >(
   argFieldId: TArg1,
   argKeycode: TArg2
@@ -61,7 +52,7 @@ export function fieldBelongsToSendout<
 export function fetchSendout<
   TypeName extends string,
   FieldName extends string,
-  TArg extends StringArg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName, string>
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -92,7 +83,7 @@ export function fetchSendout<
 export function fieldHastype<
   TypeName extends string,
   FieldName extends string,
-  TArg extends StringArg<TypeName, FieldName>
+  TArg extends Arg<TypeName, FieldName, string>
 >(
   argFieldId: TArg,
   fieldType: MaybeArray<PetitionFieldType>

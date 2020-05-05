@@ -1,8 +1,8 @@
 import { ApiContext } from "../../context";
 import { fromGlobalId } from "../../util/globalId";
-import { FieldAuthorizeResolver } from "@nexus/schema";
+import { FieldAuthorizeResolver, core } from "@nexus/schema";
 import { UserOrganizationRole } from "../../db/__types";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, KeysOfType } from "../../util/types";
 import { every, everySeries } from "async";
 
 export function authenticate<
@@ -35,6 +35,12 @@ export function authenticate<
 export class NotAuthenticated extends Error {
   readonly name = "NotAuthenticated";
 }
+
+export type Arg<
+  TypeName extends string,
+  FieldName extends string,
+  Type = any
+> = KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
 
 export function argIsContextUserId<
   TypeName extends string,
