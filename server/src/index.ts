@@ -10,6 +10,8 @@ import { ApiContext } from "./context";
 import { schema } from "./schema";
 import { LOGGER, Logger } from "./services/logger";
 import { stopwatchEnd } from "./util/stopwatch";
+import { FormatErrorWithContextExtension } from "graphql-format-error-context-extension";
+import { UnknownError } from "./graphql/helpers/errors";
 
 const app = express();
 const container = createContainer();
@@ -20,6 +22,16 @@ const server = new ApolloServer({
   schema,
   tracing: process.env.NODE_ENV === "development",
   extensions: [
+    () =>
+      new FormatErrorWithContextExtension<ApiContext>((error, context) => {
+        // Mask internal server errors and log them
+        if (error.extensions?.code === "INTERNAL_SERVER_ERROR") {
+          context.logger.error(error.message, error.extensions?.exception);
+          return new UnknownError("Internal server error");
+        } else {
+          return error;
+        }
+      }),
     () => ({
       requestDidStart({ operationName, variables, context }) {
         const time = process.hrtime();
