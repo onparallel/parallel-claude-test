@@ -1,3 +1,5 @@
+import { I18nProps } from "@parallel/components/common/I18nProvider";
+import languages from "@parallel/lang/languages.json";
 import { promises as fs } from "fs";
 import Document, {
   DocumentContext,
@@ -7,7 +9,6 @@ import Document, {
   NextScript,
 } from "next/document";
 import { IntlConfig } from "react-intl";
-import { LangProps } from "./_app";
 
 const LANG_DIR = process.env.ROOT + "/public/static/lang";
 
@@ -25,14 +26,13 @@ export async function loadMessages(
   return { raw: JSON.parse(raw), compiled: JSON.parse(compiled) };
 }
 
-type MyDocumentProps = LangProps;
+type MyDocumentProps = I18nProps;
 
 class MyDocument extends Document<MyDocumentProps> {
   static async getInitialProps(ctx: DocumentContext) {
-    const { req, res, ...rest } = ctx;
-    const { query, renderPage } = ctx;
-    const locale = query.locale ?? "en";
-    const { raw, compiled } = await loadMessages(locale as string);
+    const { renderPage } = ctx;
+    const locale = getLocale(ctx);
+    const { raw, compiled } = await loadMessages(locale);
     ctx.renderPage = () =>
       renderPage({
         enhanceApp: (App) => (props) => (
@@ -79,6 +79,21 @@ class MyDocument extends Document<MyDocumentProps> {
       </Html>
     );
   }
+}
+
+function getLocale(context: DocumentContext) {
+  if (context.query.locale) {
+    return context.query.locale as string;
+  } else {
+    if (context.req?.url) {
+      const match = context.req?.url.match(/^\/([a-z-]*)\//i);
+      const locale = match?.[1]?.toLowerCase();
+      if (locale && languages.some((l) => l.locale === locale)) {
+        return locale;
+      }
+    }
+  }
+  return "en";
 }
 
 export default MyDocument;

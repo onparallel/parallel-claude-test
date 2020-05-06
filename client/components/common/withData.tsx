@@ -16,17 +16,27 @@ export type WithDataProps<P> = {
   componentProps: P;
 };
 
+function redirect(context: NextPageContext, pathname: string, asHref: string) {
+  if (process.browser) {
+    Router.push(pathname, asHref);
+  } else {
+    context.res!.writeHead(302, { Location: asHref });
+    context.res!.end();
+  }
+}
+
 export function withData<P = {}>(
   Component: NextComponentType<WithDataContext, P, P>
 ) {
-  const getInitialProps = Component.getInitialProps;
-  const withData: NextComponentType<
+  const WithData: NextComponentType<
     NextPageContext,
     WithDataProps<P>,
     WithDataProps<P>
   > = function ({ componentProps, serverState }) {
     const client = createApolloClient(serverState, {
       getToken() {
+        // On the server won't be necessary because all necessary queries were
+        // run already on getInitialProps. Everything else should be cached.
         return localStorage.getItem("token")!;
       },
     });
@@ -36,75 +46,58 @@ export function withData<P = {}>(
       </ApolloProvider>
     );
   };
-  for (const key of Object.keys(Component)) {
-    if (key === "getInitialProps") {
-      // ignore
-    } else {
-      (withData as any)[key] = (Component as any)[key];
-    }
-  }
-  withData.displayName = `WithData(${Component.displayName || Component.name})`;
-  withData.getInitialProps = async (context: NextPageContext) => {
-    const apollo = createApolloClient(
-      {},
-      {
-        getToken() {
-          if (process.browser) {
-            return localStorage.getItem("token")!;
-          } else {
-            const cookies = parseCookie(context.req!.headers.cookie ?? "");
-            return cookies["parallel_session"];
-          }
-        },
-      }
-    );
-    let componentProps: P = {} as P;
-    let serverState: any = {};
-    if (getInitialProps) {
+  const { getInitialProps, displayName, ...rest } = Component;
+  return Object.assign(WithData, rest, {
+    displayName: `WithData(${displayName ?? Component.name})`,
+    getInitialProps: async (context: NextPageContext) => {
+      const apollo = createApolloClient(
+        {},
+        {
+          getToken() {
+            if (process.browser) {
+              return localStorage.getItem("token")!;
+            } else {
+              const cookies = parseCookie(context.req!.headers.cookie ?? "");
+              return cookies["parallel_session"];
+            }
+          },
+        }
+      );
       try {
-        componentProps = await getInitialProps({
-          ...context,
-          apollo,
-        });
-      } catch (error) {
-        // Check for NotAuthenticated errors and redirect to Login
-        const notAuthenticated = error?.graphQLErrors?.some((e: any) => {
-          return e?.message === "Not authorized";
-        });
-        if (notAuthenticated) {
-          if (!process.browser) {
-            context.res!.writeHead(302, {
-              Location: `/${context.query.locale}/login`,
-            });
-            context.res!.end();
-            return;
-          } else {
-            Router.push("/[locale]/login", `/${context.query.locale}/login`);
-          }
+        const componentProps: P =
+          (await getInitialProps?.({ ...context, apollo })) ?? ({} as P);
+
+        if (process.browser) {
+          return {
+            componentProps,
+            serverState: {},
+          };
         } else {
-          if (error?.networkError?.result?.errors?.[0]) {
-            console.log(error?.networkError?.result?.errors?.[0]);
+          // if getInitialProps made a redirect, the response is finished.
+          if (context.res?.finished) {
+            return null as any;
           }
+          return {
+            // get the cache from the Apollo store
+            serverState: apollo.cache.extract(),
+            componentProps,
+          };
+        }
+      } catch (error) {
+        if (error?.graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED") {
+          redirect(
+            context,
+            "/[locale]/login",
+            `/${context.query.locale}/login`
+          );
+        } else if (
+          error?.graphQLErrors?.[0]?.extensions?.code === "FORBIDDEN"
+        ) {
+          redirect(context, "/[locale]/app", `/${context.query.locale}/app`);
+        } else {
           throw error;
         }
       }
-    }
-
-    // Run all graphql queries in the component tree
-    // and extract the resulting data
-    if (!process.browser) {
-      if (context.res?.finished) {
-        // When redirecting, the response is finished.
-        return null as any;
-      }
-      // Extract query data from the Apollo's store
-      serverState = apollo.cache.extract();
-    }
-
-    return {
-      serverState,
-      componentProps,
-    };
-  };
-  return withData;
+    },
+  });
 }

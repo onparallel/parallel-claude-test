@@ -1,7 +1,8 @@
 import { fieldAuthorizePlugin, makeSchema } from "@nexus/schema";
+import { ForbiddenError } from "apollo-server-express";
 import path from "path";
-import * as allTypes from "./graphql/types";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";
+import * as allTypes from "./graphql/types";
 
 function resolve(...paths: string[]) {
   return path.join(__dirname.replace(/\/dist$/, "/src"), ...paths);
@@ -13,7 +14,17 @@ export const schema = makeSchema({
     schema: path.join(__dirname, "../parallel-schema.graphql"),
     typegen: resolve("./graphql/__types.ts"),
   },
-  plugins: [fieldAuthorizePlugin(), paginationPlugin()],
+  plugins: [
+    fieldAuthorizePlugin({
+      formatError: ({ error }) => {
+        if (error.message === "Not authorized") {
+          return new ForbiddenError(error.message);
+        }
+        return error;
+      },
+    }),
+    paginationPlugin(),
+  ],
   typegenAutoConfig: {
     sources: [
       { source: resolve("./db/__types.ts"), alias: "db" },

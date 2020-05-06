@@ -9,6 +9,6 @@ export const sendoutsQuery = queryField("sendout", {
   nullable: true,
   authorize: fetchSendout("keycode"),
   resolve: async (root, args, ctx) => {
-    return await ctx.sendout!;
+    return ctx.sendout!;
   },
 });

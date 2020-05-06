@@ -315,13 +315,13 @@
     "term": "component.user-menu.log-out",
     "definition": "Cerrar sesión",
     "context": "Log out",
-    "reference": "components/layout/UserMenu.tsx#L62-L65"
+    "reference": "components/layout/UserMenu.tsx#L65-L68"
   },
   {
     "term": "component.user-menu.my-account",
     "definition": "Mi cuenta",
     "context": "My Account",
-    "reference": "components/layout/UserMenu.tsx#L53-L56"
+    "reference": "components/layout/UserMenu.tsx#L56-L59"
   },
   {
     "term": "contact.edit-details-button",
@@ -400,6 +400,48 @@
     "definition": "Contactos",
     "context": "Contacts",
     "reference": "pages/[locale]/app/contacts/index.tsx#L118-L121"
+  },
+  {
+    "term": "error.404.header",
+    "definition": "No hemos podido encontrar la página que buscas.",
+    "context": "We can't seem to find the page you're looking for.",
+    "reference": "pages/404.tsx#L12-L15"
+  },
+  {
+    "term": "error.404.helpful-links",
+    "definition": "Aquí tienes algunos enlaces que pueden servirte de ayuda:",
+    "context": "Here are some helpful links instead:",
+    "reference": "pages/404.tsx#L20-L23"
+  },
+  {
+    "term": "error.main-header",
+    "definition": "Vaya",
+    "context": "Oops!",
+    "reference": "components/public/ErrorPage.tsx#L45"
+  },
+  {
+    "term": "error.petition-not-available.header",
+    "definition": "Parece que esta petición ya no está disponible.",
+    "context": "It seems that this petition is no longer available.",
+    "reference": "pages/_error.tsx#L13-L16"
+  },
+  {
+    "term": "error.petition-not-available.text",
+    "definition": "Si necesitas acceder, por favor, ponte en contacto con la persona que te la envió.",
+    "context": "If you need to access it, please reach out to the person that sent it to you.",
+    "reference": "pages/_error.tsx#L21-L24"
+  },
+  {
+    "term": "error.unknown-error.header",
+    "definition": "Ocurrió un error y ya hemos notificado a nuestros desarrolladores.",
+    "context": "An error happened and our developers have already been notified.",
+    "reference": "pages/_error.tsx#L30-L33"
+  },
+  {
+    "term": "error.unknown-error.text",
+    "definition": "Por favor inténtalo más tarde y, si el error persiste, contacta con soporte para que podamos ayudarte.",
+    "context": "Please try again later and if the error persists reach out to support for help.",
+    "reference": "pages/_error.tsx#L38-L41"
   },
   {
     "term": "field-settings.file-multiple-description",
@@ -603,25 +645,25 @@
     "term": "generic.forms.new-password-label",
     "definition": "Contraseña nueva",
     "context": "New password",
-    "reference": "pages/[locale]/login.tsx#L329-L332"
+    "reference": "pages/[locale]/login.tsx#L332-L335"
   },
   {
     "term": "generic.forms.password-label",
     "definition": "Contraseña",
     "context": "Password",
-    "reference": "pages/[locale]/login.tsx#L353-L356"
+    "reference": "pages/[locale]/login.tsx#L356-L359"
   },
   {
     "term": "generic.forms.password-policy-error",
     "definition": "La contraseña debe contener al menos 8 caracteres",
     "context": "The password must have a least 8 characters",
-    "reference": "pages/[locale]/login.tsx#L344-L347"
+    "reference": "pages/[locale]/login.tsx#L347-L350"
   },
   {
     "term": "generic.forms.passwords-must-match",
     "definition": "Las contraseñas deben coincidir",
     "context": "Passwords must match",
-    "reference": "pages/[locale]/login.tsx#L368-L371"
+    "reference": "pages/[locale]/login.tsx#L371-L374"
   },
   {
     "term": "generic.forms.required-field-error",
@@ -651,7 +693,7 @@
     "term": "generic.forms.required-password-error",
     "definition": "Por favor, introduzca la contraseña",
     "context": "Please, enter a password",
-    "reference": "pages/[locale]/login.tsx#L259-L262"
+    "reference": "pages/[locale]/login.tsx#L262-L265"
   },
   {
     "term": "generic.forms.required-verification-code",
@@ -783,7 +825,7 @@
     "term": "header.user-menu-button",
     "definition": "Menú de usuario",
     "context": "User menu",
-    "reference": "components/layout/UserMenu.tsx#L37-L40"
+    "reference": "components/layout/UserMenu.tsx#L40-L43"
   },
   {
     "term": "navbar.coming-soon",
@@ -1752,6 +1794,12 @@
     "reference": "pages/[locale]/forgot.tsx#L98-L101"
   },
   {
+    "term": "public.home-link",
+    "definition": "Inicio",
+    "context": "Home",
+    "reference": "pages/404.tsx#L29"
+  },
+  {
     "term": "public.home.hero-collect",
     "definition": "Automatiza tus procesos de recogida  de información y ahorra tiempo.",
     "context": "Automate your information collection processes and save time.",
@@ -1785,7 +1833,7 @@
     "term": "public.home.hero-leading-digital-transformation",
     "definition": "Liderando la transformación digital en sus compañías",
     "context": "Leading digital transformation in their companies",
-    "reference": "components/public/PublicHeroWhoTrustUs.tsx#L25-L28"
+    "reference": "components/public/PublicHeroWhoTrustUs.tsx#L23-L26"
   },
   {
     "term": "public.home.hero-platform",
@@ -1845,7 +1893,7 @@
     "term": "public.home.hero-who-trust-us",
     "definition": "Confían en nosotros",
     "context": "Who trust us",
-    "reference": "components/public/PublicHeroWhoTrustUs.tsx#L19-L22"
+    "reference": "components/public/PublicHeroWhoTrustUs.tsx#L17-L20"
   },
   {
     "term": "public.home.request-invite-button",
@@ -1899,85 +1947,85 @@
     "term": "public.login-button",
     "definition": "Acceso",
     "context": "Login",
-    "reference": "pages/[locale]/login.tsx#L273-L276"
+    "reference": "pages/[locale]/login.tsx#L276-L279"
   },
   {
     "term": "public.login.already-logged-in.continue-button",
     "definition": "Continuar como {name}",
     "context": "Continue as {name}",
-    "reference": "pages/[locale]/login.tsx#L173-L177"
+    "reference": "pages/[locale]/login.tsx#L176-L180"
   },
   {
     "term": "public.login.already-logged-in.explanation",
     "definition": "Ya has iniciado sesión como {name}",
     "context": "You are already logged in as {name}",
-    "reference": "pages/[locale]/login.tsx#L158-L162"
+    "reference": "pages/[locale]/login.tsx#L161-L165"
   },
   {
     "term": "public.login.already-logged-in.relogin",
     "definition": "Iniciar sesión con otra cuenta",
     "context": "Login as someone else",
-    "reference": "pages/[locale]/login.tsx#L181-L184"
+    "reference": "pages/[locale]/login.tsx#L184-L187"
   },
   {
     "term": "public.login.back-to-login-link",
     "definition": "Volver atrás",
     "context": "Go back to login",
-    "reference": "pages/[locale]/login.tsx#L390-L393"
+    "reference": "pages/[locale]/login.tsx#L393-L396"
   },
   {
     "term": "public.login.explanation",
     "definition": "Accede usando tu correo eletrónico y contraseña",
     "context": "Login using your email and password",
-    "reference": "pages/[locale]/login.tsx#L213-L216"
+    "reference": "pages/[locale]/login.tsx#L216-L219"
   },
   {
     "term": "public.login.forgot-password-link",
     "definition": "He olvidado mi contraseña",
     "context": "I forgot my password",
-    "reference": "pages/[locale]/login.tsx#L281-L284"
+    "reference": "pages/[locale]/login.tsx#L284-L287"
   },
   {
     "term": "public.login.header",
     "definition": "Entrar en Parallel",
     "context": "Enter Parallel",
-    "reference": "pages/[locale]/login.tsx#L207-L210"
+    "reference": "pages/[locale]/login.tsx#L210-L213"
   },
   {
     "term": "public.login.invalid-login.description",
     "definition": "El correo electrónico o la contraseña proporcionados no son válidos.",
     "context": "The email or password are invalid.",
-    "reference": "pages/[locale]/login.tsx#L70-L73"
+    "reference": "pages/[locale]/login.tsx#L73-L76"
   },
   {
     "term": "public.login.invalid-login.title",
     "definition": "Acceso inválido",
     "context": "Invalid login",
-    "reference": "pages/[locale]/login.tsx#L66-L69"
+    "reference": "pages/[locale]/login.tsx#L69-L72"
   },
   {
     "term": "public.login.password-update-button",
     "definition": "Cambiar contraseña",
     "context": "Update password",
-    "reference": "pages/[locale]/login.tsx#L382-L385"
+    "reference": "pages/[locale]/login.tsx#L385-L388"
   },
   {
     "term": "public.login.password-update-explanation",
     "definition": "Al acceder por primera vez, se debe cambiar la contraseña",
     "context": "First time users need to update their password",
-    "reference": "pages/[locale]/login.tsx#L320-L323"
+    "reference": "pages/[locale]/login.tsx#L323-L326"
   },
   {
     "term": "public.login.password-update-header",
     "definition": "Cambie su contraseña",
     "context": "Update your password",
-    "reference": "pages/[locale]/login.tsx#L314-L317"
+    "reference": "pages/[locale]/login.tsx#L317-L320"
   },
   {
     "term": "public.login.title",
     "definition": "Entra en Parallel",
     "context": "Login",
-    "reference": "pages/[locale]/login.tsx#L106-L109"
+    "reference": "pages/[locale]/login.tsx#L109-L112"
   },
   {
     "term": "public.meta-description",
@@ -2211,13 +2259,13 @@
     "term": "public.support.faq",
     "definition": "FAQ - Preguntas más frecuentes",
     "context": "FAQ",
-    "reference": "components/public/layout/PublicFooter.tsx#L101-L104"
+    "reference": "pages/404.tsx#L45"
   },
   {
     "term": "public.support.support-center",
     "definition": "Centro de soporte",
     "context": "Support center",
-    "reference": "components/public/layout/PublicFooter.tsx#L91-L94"
+    "reference": "pages/404.tsx#L35-L38"
   },
   {
     "term": "public.terms.title",

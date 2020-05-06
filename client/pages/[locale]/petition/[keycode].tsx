@@ -622,7 +622,9 @@ function useCreateFileUploadReply() {
 
 PublicPetition.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   const keycode = query.keycode as string;
-  await apollo.query<PublicPetitionQuery, PublicPetitionQueryVariables>({
+  const {
+    data: { sendout },
+  } = await apollo.query<PublicPetitionQuery, PublicPetitionQueryVariables>({
     query: GET_PUBLIC_PETITION_DATA,
     variables: { keycode },
   });

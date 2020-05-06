@@ -10,12 +10,7 @@ export function PublicContainer({
   ...props
 }: PublicContainerProps) {
   return (
-    <Flex
-      width="100%"
-      alignItems="center"
-      paddingX={{ base: 4, sm: 8, md: 12 }}
-      {...wrapper}
-    >
+    <Flex width="100%" paddingX={{ base: 4, sm: 8, md: 12 }} {...wrapper}>
       <Box margin="0 auto" flex="1" maxWidth="containers.xl" {...props}>
         {children}
       </Box>

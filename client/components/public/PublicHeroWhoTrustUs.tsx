@@ -5,13 +5,11 @@ import { PublicContainer } from "./layout/PublicContainer";
 export type PublicHeroProps = BoxProps;
 
 export function PublicHeroWhoTrustUs({ ...props }: PublicHeroProps) {
-  const intl = useIntl();
   return (
     <PublicContainer
       {...props}
       paddingY={16}
       wrapper={{
-        // minHeight: ["0", "0", "540px"],
         textAlign: "center",
       }}
     >

@@ -1,39 +1,32 @@
-import { ApiContext } from "../../context";
-import { fromGlobalId } from "../../util/globalId";
-import { FieldAuthorizeResolver, core } from "@nexus/schema";
-import { UserOrganizationRole } from "../../db/__types";
-import { MaybeArray, KeysOfType } from "../../util/types";
+import { core, FieldAuthorizeResolver } from "@nexus/schema";
+import { AuthenticationError } from "apollo-server-express";
 import { every, everySeries } from "async";
+import { ApiContext } from "../../context";
+import { UserOrganizationRole } from "../../db/__types";
+import { fromGlobalId } from "../../util/globalId";
+import { KeysOfType, MaybeArray } from "../../util/types";
 
 export function authenticate<
   TypeName extends string,
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
-    try {
-      const authorization = ctx.req.header("Authorization");
-      if (!authorization || !authorization.startsWith("Bearer ")) {
-        throw new Error();
-      }
-      const token = authorization.replace("Bearer ", "");
-      const cognitoId = await ctx.auth.validateSession(token);
-      if (!cognitoId) {
-        throw new Error();
-      }
-      const user = await ctx.users.loadSessionUser(cognitoId);
-      if (!user) {
-        throw new Error();
-      }
-      ctx.user = user;
-      return true;
-    } catch {
-      throw new NotAuthenticated();
+    const authorization = ctx.req.header("Authorization");
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      throw new AuthenticationError("Invalid Authorization header");
     }
+    const token = authorization.replace("Bearer ", "");
+    const cognitoId = await ctx.auth.validateSession(token);
+    if (!cognitoId) {
+      throw new AuthenticationError("Invalid session");
+    }
+    const user = await ctx.users.loadSessionUser(cognitoId);
+    if (!user) {
+      throw new AuthenticationError("User not found");
+    }
+    ctx.user = user;
+    return true;
   };
-}
-
-export class NotAuthenticated extends Error {
-  readonly name = "NotAuthenticated";
 }
 
 export type Arg<
