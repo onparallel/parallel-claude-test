@@ -9,7 +9,12 @@ const path_1 = __importDefault(require("path"));
 const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
 const run_1 = require("./utils/run");
+const remeda_1 = require("remeda");
+const log_1 = require("./utils/log");
 async function generate(locales, input, rawOutput, compiledOutput) {
+    // store the values used in the default (first) locale to make sure they
+    // are used in all the other locales
+    const values = {};
     for (const locale of locales) {
         const terms = await json_1.readJson(path_1.default.join(input, `${locale}.json`));
         const raw = {};
@@ -25,6 +30,25 @@ async function generate(locales, input, rawOutput, compiledOutput) {
             if (compiledOutput) {
                 compiled[term] = intl_messageformat_parser_1.parse(definition);
             }
+            if (locale === locales[0]) {
+                values[term] = getValues(compiled[term]);
+            }
+            else {
+                const reference = values[term];
+                const termValues = getValues(compiled[term]);
+                const missing = remeda_1.difference(reference, termValues);
+                if (missing.length) {
+                    log_1.warn(`Term "${term}" (${locale}) is missing the following values: ${missing
+                        .map((v) => `"${v}"`)
+                        .join(", ")}`);
+                }
+                const extra = remeda_1.difference(termValues, reference);
+                if (extra.length) {
+                    log_1.warn(`Term "${term}" (${locale}) has some extra values: ${extra
+                        .map((v) => `"${v}"`)
+                        .join(", ")}`);
+                }
+            }
         }
         if (rawOutput) {
             await json_1.writeJson(path_1.default.join(rawOutput, `${locale}.json`), raw);
@@ -33,9 +57,32 @@ async function generate(locales, input, rawOutput, compiledOutput) {
             await json_1.writeJson(path_1.default.join(compiledOutput, `${locale}.json`), compiled);
         }
         if (missing > 0) {
-            console.log(chalk_1.default.yellow(`Warning: Locale ${chalk_1.default.bold(locale)} is missing ${missing} translations.`));
+            log_1.warn(`Locale ${chalk_1.default.bold(locale)} is missing ${missing} translations.`);
         }
     }
+}
+function getValues(elements) {
+    return remeda_1.uniq(elements.flatMap((element) => {
+        switch (element.type) {
+            case intl_messageformat_parser_1.TYPE.literal:
+                return [];
+            case intl_messageformat_parser_1.TYPE.argument:
+            case intl_messageformat_parser_1.TYPE.number:
+            case intl_messageformat_parser_1.TYPE.date:
+            case intl_messageformat_parser_1.TYPE.time:
+                return [element.value];
+            case intl_messageformat_parser_1.TYPE.select:
+            case intl_messageformat_parser_1.TYPE.plural:
+                return [
+                    element.value,
+                    ...Object.values(element.options).flatMap((option) => getValues(option.value)),
+                ];
+            case intl_messageformat_parser_1.TYPE.pound:
+                return [];
+            case intl_messageformat_parser_1.TYPE.tag:
+                return [element.value, ...getValues(element.children)];
+        }
+    }));
 }
 async function main() {
     const { locales, input, outputRaw, outputCompiled } = yargs_1.default

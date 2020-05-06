@@ -1,10 +1,12 @@
 import chalk from "chalk";
-import { MessageFormatElement, parse } from "intl-messageformat-parser";
+import { MessageFormatElement, parse, TYPE } from "intl-messageformat-parser";
 import path from "path";
 import yargs from "yargs";
 import { Term } from "./extract-i18n-terms";
 import { readJson, writeJson } from "./utils/json";
 import { run } from "./utils/run";
+import { uniq, difference } from "remeda";
+import { warn } from "./utils/log";
 
 async function generate(
   locales: string[],
@@ -12,6 +14,9 @@ async function generate(
   rawOutput: string | null,
   compiledOutput: string | null
 ) {
+  // store the values used in the default (first) locale to make sure they
+  // are used in all the other locales
+  const values: { [term: string]: string[] } = {};
   for (const locale of locales) {
     const terms = await readJson<Term[]>(path.join(input, `${locale}.json`));
     const raw: { [term: string]: string } = {};
@@ -27,6 +32,28 @@ async function generate(
       if (compiledOutput) {
         compiled[term] = parse(definition);
       }
+      if (locale === locales[0]) {
+        values[term] = getValues(compiled[term]);
+      } else {
+        const reference = values[term];
+        const termValues = getValues(compiled[term]);
+        const missing = difference(reference, termValues);
+        if (missing.length) {
+          warn(
+            `Term "${term}" (${locale}) is missing the following values: ${missing
+              .map((v) => `"${v}"`)
+              .join(", ")}`
+          );
+        }
+        const extra = difference(termValues, reference);
+        if (extra.length) {
+          warn(
+            `Term "${term}" (${locale}) has some extra values: ${extra
+              .map((v) => `"${v}"`)
+              .join(", ")}`
+          );
+        }
+      }
     }
     if (rawOutput) {
       await writeJson(path.join(rawOutput, `${locale}.json`), raw);
@@ -35,15 +62,37 @@ async function generate(
       await writeJson(path.join(compiledOutput, `${locale}.json`), compiled);
     }
     if (missing > 0) {
-      console.log(
-        chalk.yellow(
-          `Warning: Locale ${chalk.bold(
-            locale
-          )} is missing ${missing} translations.`
-        )
-      );
+      warn(`Locale ${chalk.bold(locale)} is missing ${missing} translations.`);
     }
   }
+}
+
+function getValues(elements: MessageFormatElement[]): string[] {
+  return uniq(
+    elements.flatMap((element) => {
+      switch (element.type) {
+        case TYPE.literal:
+          return [];
+        case TYPE.argument:
+        case TYPE.number:
+        case TYPE.date:
+        case TYPE.time:
+          return [element.value];
+        case TYPE.select:
+        case TYPE.plural:
+          return [
+            element.value,
+            ...Object.values(element.options).flatMap((option) =>
+              getValues(option.value)
+            ),
+          ];
+        case TYPE.pound:
+          return [];
+        case TYPE.tag:
+          return [element.value, ...getValues(element.children)];
+      }
+    })
+  );
 }
 
 async function main() {
