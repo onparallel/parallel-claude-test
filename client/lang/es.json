@@ -229,7 +229,7 @@
   },
   {
     "term": "component.recipient-select.create-new-contact",
-    "definition": "Crear nuevo contacto para: <em>{email}</em>",
+    "definition": "Crear nuevo contacto para: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>",
     "reference": "components/common/RecipientSelect.tsx#L214-L223"
   },
