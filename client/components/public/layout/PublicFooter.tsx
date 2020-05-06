@@ -44,22 +44,14 @@ export function PublicFooter(props: BoxProps) {
       wrapper={{
         as: "footer",
         backgroundColor: "gray.50",
-        paddingTop: 12,
-        paddingBottom: 16,
+        paddingY: 12,
         ...props,
       }}
     >
-      <Flex
-        justify="space-between"
-        align="stretch"
-        height="100%"
-        wrap="wrap"
-        marginBottom={10}
-      >
+      <Flex justify="space-between" align="stretch" wrap="wrap">
         <PublicFooterBox
           flex="1"
           minWidth={{ base: "100%", md: 40 }}
-          marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
             id: "public.footer.product",
             defaultMessage: "Product",
@@ -179,8 +171,8 @@ export function PublicFooter(props: BoxProps) {
           </List>
         </PublicFooterBox>
       </Flex>
-      <Divider />
-      <Flex marginTop={5} wrap="wrap" marginBottom={["30px", "0"]}>
+      <Divider marginY={8} />
+      <Flex wrap="wrap">
         <Box flex="1">
           <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
           <LanguageSelector

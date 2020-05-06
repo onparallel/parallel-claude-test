@@ -15,7 +15,7 @@ export function PublicFooterBox({
     <Flex as="section" flexDirection="column" {...rest}>
       {heading && (
         <Box as="header" marginBottom={2}>
-          <Heading fontSize="sm">{heading}</Heading>
+          <Heading fontSize="md">{heading}</Heading>
         </Box>
       )}
       <Box flex="1">{children}</Box>
