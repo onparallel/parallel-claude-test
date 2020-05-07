@@ -113,7 +113,11 @@ export function PetitionHeader({
                     textOverflow: "ellipsis",
                   }}
                 />
-                <EditableInput paddingY={1} paddingX={2} />
+                <EditableInput
+                  paddingY={1}
+                  paddingX={2}
+                  {...{ maxLength: 255 }}
+                />
               </Box>
               {!isEditing && (
                 <Flex display="inline-flex" alignItems="center">
