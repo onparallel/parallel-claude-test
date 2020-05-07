@@ -155,7 +155,7 @@ export function useReactSelectStyle<
         },
         placeholder: (styles) => ({
           ...styles,
-          color: colors.gray[300],
+          color: colors.gray[400],
         }),
         valueContainer: (styles) => ({
           ...styles,

@@ -2,15 +2,12 @@
 import {
   Box,
   BoxProps,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Icon,
+  Input,
   PseudoBox,
   Stack,
   Tooltip,
   useTheme,
-  VisuallyHidden,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
@@ -20,14 +17,16 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { gql } from "apollo-boost";
 import {
+  ChangeEvent,
+  FocusEvent,
   KeyboardEvent,
   MouseEvent,
-  useCallback,
   useRef,
   useState,
 } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
+import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 
@@ -40,7 +39,8 @@ export type PetitionComposeFieldProps = {
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onTitleKeyUp: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onDescriptionKeyUp: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 } & BoxProps;
 
 interface DragItem {
@@ -58,7 +58,8 @@ export function PetitionComposeField({
   onSettingsClick,
   onFieldEdit,
   onDeleteClick,
-  onTitleKeyDown,
+  onTitleKeyUp,
+  onDescriptionKeyUp,
   ...props
 }: PetitionComposeFieldProps) {
   const intl = useIntl();
@@ -75,25 +76,7 @@ export function PetitionComposeField({
     onMove
   );
   const [title, setTitle] = useState(field.title);
-
-  const handleTitleSubmit = useCallback(
-    function (value) {
-      setTitle(value || null);
-      if (value !== field.title) {
-        onFieldEdit({ title: value || null });
-      }
-    },
-    [field, onFieldEdit]
-  );
-
-  const handleDescriptionSubmit = useCallback(
-    function (value) {
-      if (value !== field.description) {
-        onFieldEdit({ description: value || null });
-      }
-    },
-    [field, onFieldEdit]
-  );
+  const [description, setDescription] = useState(field.description);
 
   return (
     <Box
@@ -196,43 +179,46 @@ export function PetitionComposeField({
         </Box>
         <Box
           flex="1"
-          paddingLeft={4}
+          paddingLeft={2}
           paddingTop={2}
           paddingBottom={10}
           paddingRight={2}
         >
-          <Editable
-            defaultValue={field.title ?? ""}
-            placeholder={intl.formatMessage({
-              id: "petition.field-title-placeholder",
-              defaultMessage: "Enter a field title",
-            })}
+          <Input
+            id={`field-title-${field.id}`}
             aria-label={intl.formatMessage({
               id: "petition.field-title-label",
               defaultMessage: "Field title",
             })}
-            onSubmit={handleTitleSubmit}
-          >
-            {({ onRequestEdit }: { onRequestEdit: () => void }) => (
-              <>
-                <EditablePreview
-                  width="100%"
-                  color={showError && !title ? "red.500" : undefined}
-                />
-                <EditableInput
-                  _focus={{ outline: "none" }}
-                  onKeyDown={onTitleKeyDown}
-                />
-                <VisuallyHidden
-                  id={`field-title-${field.id}`}
-                  onClick={onRequestEdit}
-                />
-              </>
-            )}
-          </Editable>
-          <Editable
-            fontSize="sm"
-            defaultValue={field.description ?? ""}
+            placeholder={intl.formatMessage({
+              id: "petition.field-title-placeholder",
+              defaultMessage: "Enter a field title",
+            })}
+            value={title ?? ""}
+            width="100%"
+            maxLength={255}
+            border="none"
+            paddingX={2}
+            height={6}
+            backgroundColor={showError && !title ? "red.100" : "transparent"}
+            _focus={{
+              boxShadow: "none",
+            }}
+            onFocus={(event: FocusEvent<HTMLInputElement>) =>
+              event.target.select()
+            }
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setTitle(event.target.value ?? null)
+            }
+            onKeyUp={onTitleKeyUp}
+            onBlur={() => {
+              if (title !== field.title) {
+                onFieldEdit({ title });
+              }
+            }}
+          />
+          <GrowingTextarea
+            id={`field-description-${field.id}`}
             placeholder={intl.formatMessage({
               id: "petition.field-description-placeholder",
               defaultMessage: "Add a description...",
@@ -241,11 +227,30 @@ export function PetitionComposeField({
               id: "petition.field-description-label",
               defaultMessage: "Field description",
             })}
-            onSubmit={handleDescriptionSubmit}
-          >
-            <EditablePreview width="100%" />
-            <EditableInput _focus={{ outline: "none" }} />
-          </Editable>
+            marginTop={1}
+            fontSize="sm"
+            background="transparent"
+            value={description ?? ""}
+            border="none"
+            height="20px"
+            paddingX={2}
+            paddingY={0}
+            minHeight={0}
+            {...{ rows: 1 }}
+            _focus={{
+              boxShadow: "none",
+            }}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setDescription(event.target.value ?? null)
+            }
+            onBlur={() => {
+              if (description !== field.description) {
+                onFieldEdit({ description });
+              }
+            }}
+            // chakra typings are wrong
+            onKeyUp={onDescriptionKeyUp as any}
+          />
         </Box>
         <Stack
           className="field-actions"

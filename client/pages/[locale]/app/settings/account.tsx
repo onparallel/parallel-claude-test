@@ -73,6 +73,7 @@ function Account() {
               <Input
                 id="first-name"
                 name="firstName"
+                maxLength={255}
                 ref={register({ required: true })}
               />
               {errors.firstName && (
@@ -94,6 +95,7 @@ function Account() {
               <Input
                 id="last-name"
                 name="lastName"
+                maxLength={255}
                 ref={register({ required: true })}
               />
               {errors.lastName && (

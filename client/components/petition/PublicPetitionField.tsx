@@ -23,7 +23,7 @@ import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitions";
 import { gql } from "apollo-boost";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -80,7 +80,7 @@ export function PublicPetitionField({
         : {})}
       {...props}
     >
-      <Flex>
+      <Flex height="24px">
         <Heading as="h2" fontSize="md">
           {field.title}
         </Heading>
@@ -112,7 +112,12 @@ export function PublicPetitionField({
       </Flex>
       {field.description ? (
         <Text fontSize="sm" color="gray.600">
-          {field.description}
+          {field.description?.split("\n").map((line, index) => (
+            <Fragment key={index}>
+              {line}
+              <br />
+            </Fragment>
+          ))}
         </Text>
       ) : null}
       <Text fontSize="sm" color="gray.500">

@@ -22,7 +22,7 @@ const resetConfig = (theme: ITheme) => ({
     color: theme.colors.gray[700],
     bg: theme.colors.white,
     borderColor: theme.colors.gray[200],
-    placeholderColor: theme.colors.gray[400],
+    placeholderColor: theme.colors.gray[500],
   },
   dark: {
     color: theme.colors.whiteAlpha[900],

@@ -103,25 +103,53 @@ export function PetitionComposeFields({
     const title = document.querySelector<HTMLElement>(
       `#field-title-${fieldId}`
     );
-    title?.click();
+    title?.focus();
   }, []);
 
-  const handleTitleKeyDown = useCallback(
+  const focusDescription = useCallback((fieldId: string) => {
+    const title = document.querySelector<HTMLElement>(
+      `#field-description-${fieldId}`
+    );
+    title?.focus();
+  }, []);
+
+  const handleTitleKeyUp = useCallback(
     function (fieldId: string, event: KeyboardEvent<any>) {
       const index = fieldIds.indexOf(fieldId);
       switch (event.key) {
         case "ArrowDown":
-          if (index < fieldIds.length - 1) {
-            focusTitle(fieldIds[index + 1]);
-          }
+          focusDescription(fieldId);
           break;
         case "ArrowUp":
           if (index > 0) {
-            focusTitle(fieldIds[index - 1]);
+            focusDescription(fieldIds[index - 1]);
           }
           break;
         case "Enter":
           addFieldRef.current!.click();
+          break;
+      }
+    },
+    [fieldIds]
+  );
+
+  const handleDescriptionKeyUp = useCallback(
+    function (fieldId: string, event: KeyboardEvent<HTMLTextAreaElement>) {
+      const textarea = event.target as HTMLTextAreaElement;
+      const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+      const beforeCursor = textarea.value.substr(0, textarea.selectionStart);
+      const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+      const index = fieldIds.indexOf(fieldId);
+      switch (event.key) {
+        case "ArrowDown":
+          if (index < fieldIds.length - 1 && currentLine === totalLines - 1) {
+            focusTitle(fieldIds[index + 1]);
+          }
+          break;
+        case "ArrowUp":
+          if (currentLine === 0) {
+            focusTitle(fieldId);
+          }
           break;
       }
     },
@@ -153,7 +181,10 @@ export function PetitionComposeFields({
               onSettingsClick={() => onSettingsClick(fieldId)}
               onDeleteClick={() => onDeleteField(fieldId)}
               onFieldEdit={(data) => onUpdateField(fieldId, data)}
-              onTitleKeyDown={(event) => handleTitleKeyDown(fieldId, event)}
+              onTitleKeyUp={(event) => handleTitleKeyUp(fieldId, event)}
+              onDescriptionKeyUp={(event) =>
+                handleDescriptionKeyUp(fieldId, event)
+              }
             />
           ))}
           <Flex padding={2} justifyContent="center">
