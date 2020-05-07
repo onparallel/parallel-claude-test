@@ -3,6 +3,7 @@ import { ForbiddenError } from "apollo-server-express";
 import path from "path";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";
 import * as allTypes from "./graphql";
+import { validateArgsPlugin } from "./graphql/helpers/validateArgsPlugin";
 
 function resolve(...paths: string[]) {
   return path.join(__dirname.replace(/\/dist$/, "/src"), ...paths);
@@ -23,6 +24,7 @@ export const schema = makeSchema({
         return error;
       },
     }),
+    validateArgsPlugin(),
     paginationPlugin(),
   ],
   typegenAutoConfig: {

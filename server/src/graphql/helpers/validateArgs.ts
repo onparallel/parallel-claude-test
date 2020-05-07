@@ -1,0 +1,32 @@
+import { core } from "@nexus/schema";
+import { FieldValidateArgsResolver } from "./validateArgsPlugin";
+import { ArgValidationError } from "./errors";
+
+export function maxLength<TypeName extends string, FieldName extends string>(
+  prop: (
+    args: core.ArgsValue<TypeName, FieldName>
+  ) => string | null | undefined,
+  argName: string,
+  limit: number
+) {
+  return ((_, args, ctx, info) => {
+    const value = prop(args);
+    if (value && value!.length > limit) {
+      throw new ArgValidationError(
+        info,
+        argName,
+        `Value can't be longer than ${limit} characters.`
+      );
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateAnd<TypeName extends string, FieldName extends string>(
+  ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]
+) {
+  return (async (root, args, ctx, info) => {
+    for (const validator of validators) {
+      await validator(root, args, ctx, info);
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}

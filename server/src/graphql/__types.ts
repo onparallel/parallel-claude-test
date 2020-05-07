@@ -6,6 +6,7 @@
 import * as ctx from "../context";
 import * as db from "../db/__types";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { FieldValidateArgsResolver } from "./helpers/validateArgsPlugin";
 import { core } from "@nexus/schema";
 import { PaginationFieldConfig } from "./helpers/paginationPlugin";
 declare global {
@@ -765,6 +766,11 @@ declare global {
      * resolver from executing.
      */
     authorize?: FieldAuthorizeResolver<TypeName, FieldName>;
+    /**
+     * Run validation for the args of this type. Any errors thrown here will
+     * prevent the resolve method from executing.
+     */
+    validateArgs?: FieldValidateArgsResolver<TypeName, FieldName>;
   }
   interface NexusGenPluginSchemaConfig {}
 }

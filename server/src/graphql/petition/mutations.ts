@@ -8,7 +8,9 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { pick } from "remeda";
+import { findTimeZone } from "timezone-support";
 import { CreatePetition, CreatePetitionField } from "../../db/__types";
+import { calculateNextReminder } from "../../util/calculateNextReminder";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { random } from "../../util/token";
 import {
@@ -18,6 +20,7 @@ import {
 } from "../helpers/authorize";
 import { dateTimeArg } from "../helpers/date";
 import { RESULT } from "../helpers/result";
+import { maxLength, validateAnd } from "../helpers/validateArgs";
 import {
   fieldBelongsToPetition,
   fieldsBelongsToPetition,
@@ -26,8 +29,6 @@ import {
   userHasAccessToPetition,
   userHasAccessToPetitions,
 } from "./authorizers";
-import { findTimeZone } from "timezone-support";
-import { calculateNextReminder } from "../../util/calculateNextReminder";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -157,6 +158,10 @@ export const updatePetition = mutationField("updatePetition", {
       },
     }).asArg({ required: true }),
   },
+  validateArgs: validateAnd(
+    maxLength((args) => args.data.name, "data.name", 255),
+    maxLength((args) => args.data.emailSubject, "data.emailSubject", 255)
+  ),
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     const {
@@ -294,6 +299,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       },
     }).asArg({ required: true }),
   },
+  validateArgs: maxLength((args) => args.data.title, "data.title", 255),
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");

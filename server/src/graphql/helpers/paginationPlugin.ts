@@ -8,6 +8,7 @@ import {
 } from "@nexus/schema";
 import { GraphQLResolveInfo } from "graphql";
 import { omit } from "remeda";
+import { ArgValidationError } from "./errors";
 
 export type PaginationPluginConfig = {};
 
@@ -207,14 +208,10 @@ function validateArgs(
   info: GraphQLResolveInfo
 ) {
   if (args.offset < 0) {
-    throw new Error(
-      `The ${info.parentType}.${info.fieldName} pagination field does not allow a negative "offset"`
-    );
+    throw new ArgValidationError(info, "offset", "Value can't be negative.");
   }
   if (args.limit < 0) {
-    throw new Error(
-      `The ${info.parentType}.${info.fieldName} pagination field does not allow a negative "limit"`
-    );
+    throw new ArgValidationError(info, "limit", "Value can't be negative.");
   }
 }
 

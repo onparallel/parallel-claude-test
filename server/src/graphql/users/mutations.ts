@@ -12,6 +12,7 @@ import {
   authenticate,
   authorizeAnd,
 } from "../helpers/authorize";
+import { maxLength, validateAnd } from "../helpers/validateArgs";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -27,6 +28,10 @@ export const updateUser = mutationField("updateUser", {
       },
     }).asArg({ required: true }),
   },
+  validateArgs: validateAnd(
+    maxLength((args) => args.data.firstName, "data.firstName", 255),
+    maxLength((args) => args.data.lastName, "data.lastName", 255)
+  ),
   resolve: async (o, args, ctx) => {
     const { id } = fromGlobalId(args.id, "User");
     const { firstName, lastName } = args.data;
