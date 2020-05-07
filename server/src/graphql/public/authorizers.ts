@@ -1,9 +1,9 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
-import { PetitionFieldType } from "../../../db/__types";
-import { fromGlobalId } from "../../../util/globalId";
-import { MaybeArray } from "../../../util/types";
-import { Arg } from "../../helpers/authorize";
-import { PublicPetitionNotAvailableError } from "../../helpers/errors";
+import { PetitionFieldType } from "../../db/__types";
+import { fromGlobalId } from "../../util/globalId";
+import { MaybeArray } from "../../util/types";
+import { Arg } from "../helpers/authorize";
+import { PublicPetitionNotAvailableError } from "../helpers/errors";
 
 export function replyBelongsToSendout<
   TypeName extends string,

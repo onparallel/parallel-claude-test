@@ -5,13 +5,13 @@ import {
   mutationField,
   stringArg,
 } from "@nexus/schema";
-import { fromGlobalId } from "../../../util/globalId";
-import { removeNotDefined } from "../../../util/remedaExtensions";
+import { fromGlobalId } from "../../util/globalId";
+import { removeNotDefined } from "../../util/remedaExtensions";
 import {
   argIsContextUserId,
   authenticate,
   authorizeAnd,
-} from "../../helpers/authorize";
+} from "../helpers/authorize";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",

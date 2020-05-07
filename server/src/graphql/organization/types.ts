@@ -1,6 +1,6 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
-import { authorizeAnd, hasOrgRole } from "../../helpers/authorize";
+import { toGlobalId } from "../../util/globalId";
+import { authorizeAnd, hasOrgRole } from "../helpers/authorize";
 import { belongsToOrg } from "./authorizers";
 
 export const OrganizationStatus = enumType({

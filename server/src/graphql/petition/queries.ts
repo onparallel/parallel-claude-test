@@ -1,7 +1,7 @@
 import { queryField, arg, idArg } from "@nexus/schema";
-import { authenticate, authorizeAnd } from "../../helpers/authorize";
+import { authenticate, authorizeAnd } from "../helpers/authorize";
 import { userHasAccessToPetition } from "./authorizers";
-import { fromGlobalId } from "../../../util/globalId";
+import { fromGlobalId } from "../../util/globalId";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {

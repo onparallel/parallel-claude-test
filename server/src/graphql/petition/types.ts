@@ -1,5 +1,5 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
+import { toGlobalId } from "../../util/globalId";
 import { uniq } from "remeda";
 
 export const PetitionLocale = enumType({

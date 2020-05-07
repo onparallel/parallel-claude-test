@@ -10,11 +10,11 @@ import {
   fetchSendout,
   fieldHastype,
 } from "./authorizers";
-import { fromGlobalId } from "../../../util/globalId";
-import { random } from "../../../util/token";
-import { props } from "../../../util/promises";
-import { authorizeAndP, authorizeAnd } from "../../helpers/authorize";
-import { RESULT } from "../../helpers/result";
+import { fromGlobalId } from "../../util/globalId";
+import { random } from "../../util/token";
+import { props } from "../../util/promises";
+import { authorizeAndP, authorizeAnd } from "../helpers/authorize";
+import { RESULT } from "../helpers/result";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",

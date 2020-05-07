@@ -1,9 +1,9 @@
 import { idArg, inputObjectType, mutationField } from "@nexus/schema";
-import { CreateContact } from "../../../db/__types";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
-import { authenticate, authorizeAnd } from "../../helpers/authorize";
+import { CreateContact } from "../../db/__types";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { authenticate, authorizeAnd } from "../helpers/authorize";
 import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
-import { RESULT } from "../../helpers/result";
+import { RESULT } from "../helpers/result";
 
 export const createContact = mutationField("createContact", {
   description: "Create a contact.",

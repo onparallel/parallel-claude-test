@@ -2,7 +2,7 @@ import { fieldAuthorizePlugin, makeSchema } from "@nexus/schema";
 import { ForbiddenError } from "apollo-server-express";
 import path from "path";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";
-import * as allTypes from "./graphql/types";
+import * as allTypes from "./graphql";
 
 function resolve(...paths: string[]) {
   return path.join(__dirname.replace(/\/dist$/, "/src"), ...paths);

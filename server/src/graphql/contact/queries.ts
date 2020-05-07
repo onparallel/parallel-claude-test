@@ -1,6 +1,6 @@
 import { idArg, queryField } from "@nexus/schema";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
-import { authenticate, authorizeAnd } from "../../helpers/authorize";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { authenticate, authorizeAnd } from "../helpers/authorize";
 import { userHasAccessToContact } from "./authorizers";
 
 export const contactQueries = queryField((t) => {

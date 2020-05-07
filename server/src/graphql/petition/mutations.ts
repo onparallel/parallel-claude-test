@@ -8,16 +8,16 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { pick } from "remeda";
-import { CreatePetition, CreatePetitionField } from "../../../db/__types";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
-import { random } from "../../../util/token";
+import { CreatePetition, CreatePetitionField } from "../../db/__types";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { random } from "../../util/token";
 import {
   authenticate,
   authorizeAnd,
   authorizeAndP,
-} from "../../helpers/authorize";
-import { dateTimeArg } from "../../helpers/date";
-import { RESULT } from "../../helpers/result";
+} from "../helpers/authorize";
+import { dateTimeArg } from "../helpers/date";
+import { RESULT } from "../helpers/result";
 import {
   fieldBelongsToPetition,
   fieldsBelongsToPetition,
@@ -27,7 +27,7 @@ import {
   userHasAccessToPetitions,
 } from "./authorizers";
 import { findTimeZone } from "timezone-support";
-import { calculateNextReminder } from "../../../util/calculateNextReminder";
+import { calculateNextReminder } from "../../util/calculateNextReminder";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",

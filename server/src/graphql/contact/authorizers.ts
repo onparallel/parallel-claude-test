@@ -1,6 +1,6 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
-import { Arg } from "../../helpers/authorize";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToContact<
   TypeName extends string,
