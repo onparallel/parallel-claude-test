@@ -6,6 +6,7 @@ import {
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, forwardRef, Ref } from "react";
+import { omit } from "remeda";
 
 export function linkColorProps(colorMode: string) {
   const theme: { [colorMode: string]: ChakraLinkProps } = {
@@ -45,7 +46,7 @@ export const Link = forwardRef(function Link(
 ) {
   const { colorMode } = useColorMode();
   const { query } = useRouter();
-  let { href, as, ...rest } = props;
+  let { href, as } = props;
   href = href === "/" ? "" : href;
   as = `/${query.locale}${as ?? href}`;
   href = `/[locale]${href}`;
@@ -54,7 +55,11 @@ export const Link = forwardRef(function Link(
       {render ? (
         render(children)
       ) : (
-        <ChakraLink {...linkColorProps(colorMode)} {...rest} ref={ref}>
+        <ChakraLink
+          {...linkColorProps(colorMode)}
+          {...omit(props, ["href", "as"])}
+          ref={ref}
+        >
           {children}
         </ChakraLink>
       )}

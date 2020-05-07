@@ -1,8 +1,7 @@
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { KNEX } from "../knex";
-import { Organization } from "../__types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { KNEX } from "../knex";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {

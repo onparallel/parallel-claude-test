@@ -19,12 +19,12 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
-import { forwardRef, ReactNode, Ref, useMemo, useState } from "react";
+import { forwardRef, ReactNode, Ref, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
-import { Spacer } from "../common/Spacer";
 import { PetitionStatusText } from "../common/PetitionStatusText";
 import { SmallPopover } from "../common/SmallPopover";
+import { Spacer } from "../common/Spacer";
 
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;

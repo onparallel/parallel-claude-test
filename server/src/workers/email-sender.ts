@@ -2,10 +2,10 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type EmailSenderWorkerPayload = { email_log_id: number };
 
-createQueueWorker(
+createQueueWorker<EmailSenderWorkerPayload>(
   "email-sender",
-  async ({ email_log_id }: EmailSenderWorkerPayload, context) => {
-    const email = await context.emails.loadEmailLog(email_log_id);
+  async (payload, context) => {
+    const email = await context.emails.loadEmailLog(payload.email_log_id);
     if (email) {
       const result = await context.smtp.sendEmail({
         from: email.from,

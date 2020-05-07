@@ -24,16 +24,14 @@ export function LanguageSelector({
   return (
     <PseudoBox {...props}>
       <InputGroup size="sm" display="inline-flex">
-        <InputLeftElement
-          children={
-            <Icon
-              name={"language" as any}
-              color={colorMode === "light" ? "purple.600" : "purple.200"}
-              marginRight={3}
-              aria-hidden="true"
-            />
-          }
-        />
+        <InputLeftElement>
+          <Icon
+            name={"language" as any}
+            color={colorMode === "light" ? "purple.600" : "purple.200"}
+            marginRight={3}
+            aria-hidden="true"
+          />
+        </InputLeftElement>
         <Select
           variant="flushed"
           paddingLeft={6}

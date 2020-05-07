@@ -1,5 +1,4 @@
-import { Heading, Text } from "@chakra-ui/core";
-import { Spacer } from "@parallel/components/common/Spacer";
+import { Text } from "@chakra-ui/core";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { NextPageContext } from "next";
 import { FormattedMessage } from "react-intl";

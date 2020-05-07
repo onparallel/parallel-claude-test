@@ -1,3 +1,4 @@
+import { Flex } from "@chakra-ui/core";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
@@ -6,7 +7,6 @@ import {
 import { PetitionLayout_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { ReactNode } from "react";
-import { Box, Flex } from "@chakra-ui/core";
 
 export type PetitionLayoutProps = PetitionHeaderProps & {
   scrollBody: boolean;

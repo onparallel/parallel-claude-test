@@ -8,12 +8,11 @@ import {
   Heading,
   Input,
   Text,
-  useToast,
 } from "@chakra-ui/core";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
 
 export interface RequestInviteForm {
   email: string;

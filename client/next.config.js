@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const PROD = process.env.NODE_ENV === "production";
 const assetsUrl = PROD
   ? {

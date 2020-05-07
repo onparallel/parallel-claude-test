@@ -45,12 +45,6 @@ ContactListHeaderProps) {
         <Box>
           <ButtonDropdown
             rightIcon="chevron-down"
-            children={
-              <FormattedMessage
-                id="component.contact-list-header.actions-button"
-                defaultMessage="Actions"
-              ></FormattedMessage>
-            }
             dropdown={
               <MenuList minWidth="160px">
                 <MenuItem onClick={onDeleteClick}>
@@ -62,7 +56,12 @@ ContactListHeaderProps) {
                 </MenuItem>
               </MenuList>
             }
-          ></ButtonDropdown>
+          >
+            <FormattedMessage
+              id="component.contact-list-header.actions-button"
+              defaultMessage="Actions"
+            ></FormattedMessage>
+          </ButtonDropdown>
         </Box>
       ) : null}
       <Button variantColor="purple" onClick={onCreateClick}>

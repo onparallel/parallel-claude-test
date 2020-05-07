@@ -5,12 +5,16 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type SendoutEmailWorkerPayload = { petition_sendout_id: number };
 
-createQueueWorker(
+createQueueWorker<SendoutEmailWorkerPayload>(
   "sendout-email",
-  async ({ petition_sendout_id }: SendoutEmailWorkerPayload, context) => {
-    const sendout = await context.petitions.loadSendout(petition_sendout_id);
+  async (payload, context) => {
+    const sendout = await context.petitions.loadSendout(
+      payload.petition_sendout_id
+    );
     if (!sendout) {
-      throw new Error(`Sendout not found for id ${petition_sendout_id}`);
+      throw new Error(
+        `Sendout not found for id ${payload.petition_sendout_id}`
+      );
     }
     const [sender, contact, fields] = await Promise.all([
       context.users.loadUser(sendout.sender_id),
@@ -58,10 +62,10 @@ createQueueWorker(
       text,
       html,
       track_opens: true,
-      created_from: `PetitionSendout:${petition_sendout_id}`,
+      created_from: `PetitionSendout:${payload.petition_sendout_id}`,
     });
     await context.petitions.updatePetitionSendout(
-      petition_sendout_id,
+      payload.petition_sendout_id,
       {
         status: "ACTIVE",
         email_log_id: email.id,

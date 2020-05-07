@@ -15,7 +15,7 @@ import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition/PetitionFieldTypeIndicator";
 import { PetitionRepliesField_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { UnwrapArray, Assert } from "@parallel/utils/types";
+import { UnwrapArray } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

@@ -9,7 +9,7 @@ export function encode(buffer: Buffer) {
   if (buffer.length === 0) {
     return "";
   }
-  let digits = [0];
+  const digits = [0];
   let i = 0;
   while (i < buffer.length) {
     let j = 0;
@@ -47,10 +47,10 @@ export function decode(value: string) {
   if (value.length === 0) {
     return new Buffer(0);
   }
-  let bytes = [0];
+  const bytes = [0];
   let i = 0;
   while (i < value.length) {
-    let c = value[i];
+    const c = value[i];
     if (!(c in ALPHABET_MAP)) {
       throw `decode received unacceptable input. Character '${c}' is not in the alphabet.`;
     }

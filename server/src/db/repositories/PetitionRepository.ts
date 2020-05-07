@@ -1,32 +1,30 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { groupBy, indexBy, sortBy, times, omit } from "remeda";
+import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { count } from "../../util/remedaExtensions";
-import { MaybeArray, Maybe } from "../../util/types";
+import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import {
+  defaultFieldOptions,
+  validateFieldOptions,
+} from "../helpers/fieldOptions";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
-  CreatePetition,
-  PetitionSendout,
-  PetitionField,
-  PetitionFieldReply,
-  PetitionStatus,
-  User,
-  CreatePetitionField,
-  PetitionFieldType,
-  Petition,
   Contact,
+  CreatePetition,
+  CreatePetitionField,
   CreatePetitionFieldReply,
   CreatePetitionSendout,
-  CreatePetitionReminder,
+  PetitionField,
+  PetitionFieldReply,
+  PetitionFieldType,
+  PetitionSendout,
+  PetitionStatus,
+  User,
 } from "../__types";
-import {
-  validateFieldOptions,
-  defaultFieldOptions,
-} from "../helpers/fieldOptions";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -177,7 +175,7 @@ export class PetitionRepository extends BaseRepository {
         .select("*");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
       return ids.map((id) => {
-        return sortBy(byPetitionId[<any>id] || [], (p) => p.position);
+        return sortBy(byPetitionId[id as any] || [], (p) => p.position);
       });
     })
   );
@@ -261,7 +259,7 @@ export class PetitionRepository extends BaseRepository {
         .select("*")
         .orderBy("id", "asc");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
-      return ids.map((id) => byPetitionId[<any>id] || []);
+      return ids.map((id) => byPetitionId[id as any] || []);
     })
   );
 
@@ -519,7 +517,10 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async validateFieldData(fieldId: number, data: { options: Maybe<Object> }) {
+  async validateFieldData(
+    fieldId: number,
+    data: { options: Maybe<Record<string, any>> }
+  ) {
     const field = await this.loadField(fieldId);
     if (!field) {
       throw new Error("Petition field not found");
@@ -535,7 +536,7 @@ export class PetitionRepository extends BaseRepository {
         .select("*");
       const byPetitionId = groupBy(rows, (r) => r.petition_field_id);
       return ids.map((id) => {
-        return sortBy(byPetitionId[<any>id] || [], (r) => r.created_at);
+        return sortBy(byPetitionId[id as any] || [], (r) => r.created_at);
       });
     })
   );

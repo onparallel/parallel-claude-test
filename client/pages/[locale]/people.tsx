@@ -1,6 +1,7 @@
 import {
   Box,
   BoxProps,
+  Button,
   Flex,
   Heading,
   Image,
@@ -9,9 +10,8 @@ import {
   ListItem,
   Text,
   useTheme,
-  Button,
 } from "@chakra-ui/core";
-import { NormalLink, Link, NakedLink } from "@parallel/components/common/Link";
+import { NakedLink } from "@parallel/components/common/Link";
 import { Title } from "@parallel/components/common/Title";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";

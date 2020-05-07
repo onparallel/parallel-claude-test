@@ -2,23 +2,21 @@ import {
   Box,
   Button,
   Icon,
-  Menu,
-  MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Stack,
-  MenuDivider,
 } from "@chakra-ui/core";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { identity } from "remeda";
+import { ButtonDropdown } from "../common/ButtonDropdown";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionStatusFilter } from "../common/PetitionStatusFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
-import { ButtonDropdown } from "../common/ButtonDropdown";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { identity } from "remeda";
 
 export interface PetitionListHeaderProps {
   search: string | null;
@@ -81,12 +79,6 @@ export function PetitionListHeader({
         <Box>
           <ButtonDropdown
             rightIcon="chevron-down"
-            children={
-              <FormattedMessage
-                id="component.petition-list-header.actions-button"
-                defaultMessage="Actions"
-              ></FormattedMessage>
-            }
             dropdown={
               <MenuList minWidth="160px">
                 <MenuItem onClick={onCloneClick} isDisabled={!showClone}>
@@ -106,7 +98,12 @@ export function PetitionListHeader({
                 </MenuItem>
               </MenuList>
             }
-          ></ButtonDropdown>
+          >
+            <FormattedMessage
+              id="component.petition-list-header.actions-button"
+              defaultMessage="Actions"
+            ></FormattedMessage>
+          </ButtonDropdown>
         </Box>
       ) : null}
       <Button variantColor="purple" onClick={onCreateClick}>

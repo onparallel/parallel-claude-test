@@ -12,14 +12,14 @@ export function useHover<T = any>({
     hovered,
     useMemo(
       () => ({
-        onMouseEnter: <MouseEventHandler<T>>((e) => {
+        onMouseEnter: ((e) => {
           setHovered(true);
           onMouseEnter?.(e);
-        }),
-        onMouseLeave: <MouseEventHandler<T>>((e) => {
+        }) as MouseEventHandler<T>,
+        onMouseLeave: ((e) => {
           setHovered(false);
           onMouseLeave?.(e);
-        }),
+        }) as MouseEventHandler<T>,
       }),
       [onMouseEnter, onMouseLeave]
     ),

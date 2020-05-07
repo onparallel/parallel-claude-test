@@ -1,7 +1,7 @@
+import { BoxProps, Icon, IconProps, Text } from "@chakra-ui/core";
 import { PetitionStatus } from "@parallel/graphql/__types";
-import { Text, Icon, Box, BoxProps, IconProps } from "@chakra-ui/core";
-import { FormattedMessage } from "react-intl";
 import { forwardRef } from "react";
+import { FormattedMessage } from "react-intl";
 
 export type PetitionStatusTextProps = {
   status: PetitionStatus;

@@ -20,7 +20,7 @@ export function negotiate(
         if (!match) {
           throw new Error();
         }
-        const [_, locale, quality] = match;
+        const [, locale, quality] = match;
         return { locale, quality: quality ? parseFloat(quality) : 1 };
       });
       // do a very basic negotiation based just on language and ignoring region

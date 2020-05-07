@@ -1,4 +1,4 @@
-import { MjmlButton, MjmlButtonProps } from "mjml-react";
+import { MjmlButton } from "mjml-react";
 import React, { ReactNode } from "react";
 export type ButtonType = "primary";
 

@@ -1,5 +1,5 @@
 import { BoxProps, Heading } from "@chakra-ui/core";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export type PublicHeroProps = BoxProps;

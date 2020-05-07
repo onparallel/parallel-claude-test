@@ -1,6 +1,5 @@
 import AWS from "aws-sdk";
 import chalk from "chalk";
-import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
@@ -13,7 +12,7 @@ const ec2 = new AWS.EC2();
 const elbv2 = new AWS.ELBv2();
 
 async function main() {
-  const { commit: _commit, env, "dry-run": dryRun } = yargs
+  const { env, "dry-run": dryRun } = yargs
     .usage("Usage: $0 --env [env]")
     .option("dry-run", {
       type: "boolean",

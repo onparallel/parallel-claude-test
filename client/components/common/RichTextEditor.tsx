@@ -15,7 +15,7 @@ import {
   useMemo,
 } from "react";
 import { useIntl } from "react-intl";
-import { createEditor, Editor, Element, Text, Transforms } from "slate";
+import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import {
   Editable,
@@ -31,12 +31,11 @@ import {
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
 
-const HOTKEYS =
-  {
-    "mod+b": "bold",
-    "mod+i": "italic",
-    "mod+u": "underline",
-  } as const;
+const HOTKEYS = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+u": "underline",
+} as const;
 
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
@@ -300,37 +299,36 @@ function useStyles() {
       focusBorderColor // If color doesn't exist in theme, use it's raw value
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const _errorBorderColor = get(
       theme.colors,
       errorBorderColor,
       errorBorderColor
     );
 
-    return (
-      {
-        rounded: "md",
-        border: "1px",
+    return {
+      rounded: "md",
+      border: "1px",
+      borderColor: borderColor[colorMode],
+      bg: bg[colorMode],
+      _hover: {
+        borderColor: hoverColor[colorMode],
+      },
+      _focusWithin: {
+        borderColor: _focusBorderColor,
+        boxShadow: `0 0 0 1px ${_focusBorderColor}`,
+      },
+      _disabled: {
         borderColor: borderColor[colorMode],
         bg: bg[colorMode],
-        _hover: {
-          borderColor: hoverColor[colorMode],
-        },
-        _focusWithin: {
-          borderColor: _focusBorderColor,
-          boxShadow: `0 0 0 1px ${_focusBorderColor}`,
-        },
-        _disabled: {
-          borderColor: borderColor[colorMode],
-          bg: bg[colorMode],
-          opacity: 0.4,
-          cursor: "not-allowed",
-        },
-        // _invalid: {
-        //   borderColor: _errorBorderColor,
-        //   boxShadow: `0 0 0 1px ${_errorBorderColor}`
-        // }
-      } as PseudoBoxProps
-    );
+        opacity: 0.4,
+        cursor: "not-allowed",
+      },
+      // _invalid: {
+      //   borderColor: _errorBorderColor,
+      //   boxShadow: `0 0 0 1px ${_errorBorderColor}`
+      // }
+    } as PseudoBoxProps;
   }, []);
 }
 

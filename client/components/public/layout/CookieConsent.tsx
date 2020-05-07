@@ -1,13 +1,13 @@
 import { Button, Text } from "@chakra-ui/core";
 import { Link } from "@parallel/components/common/Link";
+import Cookie from "js-cookie";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
-import Cookie from "js-cookie";
-import { useState, useEffect } from "react";
 
 const COOKIE_NAME = "cookie-consent";
 
-export interface CookieConsentProps {}
+export type CookieConsentProps = {};
 
 export function CookieConsent({}: CookieConsentProps) {
   const [showConsentBanner, setShowConsentBanner] = useState(false);

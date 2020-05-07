@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 import chalk from "chalk";
-import { execSync, exec } from "child_process";
+import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
 

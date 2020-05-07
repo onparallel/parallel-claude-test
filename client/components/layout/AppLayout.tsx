@@ -1,10 +1,9 @@
-import { Flex, useColorMode, BoxProps } from "@chakra-ui/core";
+import { BoxProps, Flex } from "@chakra-ui/core";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
-import { ReactNode } from "react";
-import { AppLayoutNavbar } from "./AppLayoutNavbar";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
+import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
+import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export type AppLayoutProps = BoxProps & {
   onCreate?: () => void;

@@ -34,6 +34,7 @@ const resetConfig = (theme: ITheme) => ({
 
 type MyAppProps = AppProps & I18nProps;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
   return (
     <>

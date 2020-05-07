@@ -1,5 +1,5 @@
-import { FormControlProps, FormControl } from "@chakra-ui/core";
-import { ReactElement, ReactNode, cloneElement } from "react";
+import { FormControl, FormControlProps } from "@chakra-ui/core";
+import { cloneElement, ReactElement } from "react";
 
 export type HorizontalFormControl = Omit<FormControlProps, "children"> & {
   labelMinWidth?: number;

@@ -30,6 +30,7 @@ export function removeKeys<
   R = Record<K, V>
 >(predicate: ObjectPredicate<K, V>): (object: Record<K, V>) => Record<K, V>;
 export function removeKeys() {
+  // eslint-disable-next-line prefer-rest-params
   return purry(_removeKeys, arguments);
 }
 
@@ -55,5 +56,6 @@ function _count<T>(array: T[], predicate: ArrayPredicate<T>) {
 export function count<T>(array: T[], predicate: ArrayPredicate<T>): number;
 export function count<T>(predicate: ArrayPredicate<T>): (array: T[]) => number;
 export function count() {
+  // eslint-disable-next-line prefer-rest-params
   return purry(_count, arguments);
 }

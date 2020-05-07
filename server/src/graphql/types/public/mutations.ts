@@ -69,7 +69,8 @@ export const publicFileUploadReplyComplete = mutationField(
       const file = await ctx.files.loadFileUpload(
         reply.content["file_upload_id"]
       );
-      const metadata = await ctx.aws.getFileMetadata(file!.path);
+      // Try to get metadata
+      await ctx.aws.getFileMetadata(file!.path);
       await ctx.files.markFileUploadComplete(file!.id);
       return reply;
     },
@@ -158,7 +159,6 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
     fieldHastype("fieldId", "TEXT")
   ),
   resolve: async (_, args, ctx) => {
-    const key = random(16);
     const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
     return ctx.petitions.createPetitionFieldReply(
       {

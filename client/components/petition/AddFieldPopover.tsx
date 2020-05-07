@@ -1,21 +1,16 @@
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  PseudoBox,
-  Flex,
   Box,
+  Button,
+  ButtonProps,
   Icon,
-  Text,
   Menu,
   MenuButton,
-  Button,
-  MenuList,
   MenuItem,
-  ButtonProps,
+  MenuList,
+  Text,
 } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { ReactNode, useMemo, Ref, forwardRef } from "react";
+import { forwardRef, Ref, useMemo } from "react";
 import { useIntl } from "react-intl";
 
 export type AddFieldPopoverProps = ButtonProps & {

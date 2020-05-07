@@ -1,5 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as Knex from "knex";
-
 declare module "knex" {
   interface QueryBuilder<TRecord extends {} = any, TResult = any> {
     whereLike: WhereLike<TRecord, TResult>;

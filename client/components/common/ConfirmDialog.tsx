@@ -7,12 +7,12 @@ import {
   AlertDialogOverlay,
   BoxProps,
   Button,
-  Stack,
   IAlertDialog,
+  Stack,
 } from "@chakra-ui/core";
 import { ReactNode, RefObject, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { DialogCallbacks, useDialog } from "./DialogOpenerProvider";
+import { DialogCallbacks } from "./DialogOpenerProvider";
 
 export type ConfirmDialogProps<T> = {
   header: ReactNode;

@@ -327,7 +327,5 @@ export async function seed(knex: Knex): Promise<any> {
       updated_by: `Contact:${contactIds[1]}`,
     },
   ];
-  const replyIds = await knex<PetitionFieldReply>(
-    "petition_field_reply"
-  ).insert(replies);
+  await knex<PetitionFieldReply>("petition_field_reply").insert(replies);
 }

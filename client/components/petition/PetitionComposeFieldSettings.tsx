@@ -9,7 +9,6 @@ import {
   Stack,
   Switch,
   Text,
-  Box,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -154,7 +153,7 @@ function FileUploadSettings({
   field,
   onUpdateField,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdateField">) {
-  const options: FieldOptions["FILE_UPLOAD"] = field.options as any;
+  // const options: FieldOptions["FILE_UPLOAD"] = field.options as any;
   return <></>;
 }
 

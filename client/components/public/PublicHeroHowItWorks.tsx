@@ -1,11 +1,11 @@
 import { Box, BoxProps, Button, Flex, Heading, Text } from "@chakra-ui/core";
 import { ReactNode, useCallback, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { animated, useTransition } from "react-spring";
 import { Card } from "../common/Card";
+import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 import { PublicContainer } from "./layout/PublicContainer";
-import { NakedLink } from "../common/Link";
 
 const IMAGES = [
   { id: 0, url: "/static/images/newrequest.png" },
@@ -14,7 +14,6 @@ const IMAGES = [
 ];
 
 export function PublicHeroHowItWorks({ ...props }: BoxProps) {
-  const intl = useIntl();
   const [index, setIndex] = useState(0);
   const onClick = useCallback(() => setIndex((state) => (state + 1) % 3), []);
   const transitions = useTransition(IMAGES[index], (i) => i.id, {

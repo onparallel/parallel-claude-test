@@ -6,7 +6,7 @@ import { QueryResult } from "@apollo/react-common";
 import { Assert } from "./types";
 
 if (!process.browser) {
-  (<any>global).fetch = require("node-fetch");
+  (global as any).fetch = require("node-fetch");
 }
 
 export interface CreateApolloClientOptions {

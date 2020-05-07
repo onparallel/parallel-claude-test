@@ -85,11 +85,14 @@ export class BaseRepository {
     return fromDataLoader(
       new DataLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(
         async (values) => {
-          const rows = <TableTypes[TName][]>await this.knex
+          const rows = (await this.knex
             .from<TableTypes[TName]>(tableName)
             .select("*")
             .modify((q) => builder?.(q))
-            .whereIn(column, values as TableKey<TName>[]);
+            .whereIn(
+              column,
+              values as TableKey<TName>[]
+            )) as TableTypes[TName][];
           const byValue = indexBy(rows, (r) => r[column]);
           return values.map((value) => byValue[value as any]);
         }

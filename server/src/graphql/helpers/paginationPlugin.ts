@@ -1,14 +1,15 @@
-import { GraphQLResolveInfo } from "graphql";
 import {
   core,
-  intArg,
-  stringArg,
-  plugin,
   dynamicOutputMethod,
+  intArg,
   objectType,
+  plugin,
+  stringArg,
 } from "@nexus/schema";
+import { GraphQLResolveInfo } from "graphql";
+import { omit } from "remeda";
 
-export interface PaginationPluginConfig {}
+export type PaginationPluginConfig = {};
 
 export type PaginationFieldConfig<
   TypeName extends string = any,
@@ -100,7 +101,7 @@ export function paginationPlugin() {
             ];
             const targetType = fieldConfig.type;
 
-            const { targetTypeName, paginationName } = getTypeNames(
+            const { paginationName } = getTypeNames(
               fieldName,
               parentTypeName,
               fieldConfig
@@ -161,15 +162,14 @@ export function paginationPlugin() {
 
 // Extract all of the non-pagination related field config we may want to apply for plugin purposes
 function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig) {
-  const {
-    additionalArgs,
-    extendPagination,
-    resolve,
-    type,
-    validateArgs,
-    ...rest
-  } = fieldConfig;
-  return rest;
+  return omit(fieldConfig, [
+    "searchable",
+    "additionalArgs",
+    "extendPagination",
+    "resolve",
+    "type",
+    "validateArgs",
+  ]);
 }
 
 const getTypeNames = (

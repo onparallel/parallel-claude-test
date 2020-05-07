@@ -1,7 +1,7 @@
 /** @jsx jsx */
-import { css, jsx } from "@emotion/core";
-import { ReactNode } from "react";
 import { Box } from "@chakra-ui/core";
+import { jsx } from "@emotion/core";
+import { ReactNode } from "react";
 
 export interface SrOnlyProps {
   children: ReactNode;

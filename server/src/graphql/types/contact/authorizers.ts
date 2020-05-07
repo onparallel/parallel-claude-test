@@ -1,6 +1,5 @@
-import { FieldAuthorizeResolver, core } from "@nexus/schema";
+import { FieldAuthorizeResolver } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
-import { KeysOfType } from "../../../util/types";
 import { Arg } from "../../helpers/authorize";
 
 export function userHasAccessToContact<

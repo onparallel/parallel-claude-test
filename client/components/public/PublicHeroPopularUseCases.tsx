@@ -1,7 +1,7 @@
+import { BoxProps, Button, Flex, Grid, Heading, Text } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
-import { BoxProps, Flex, Heading, Text, Grid, Button } from "@chakra-ui/core";
 import { ReactNode } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
 import { PublicContainer } from "./layout/PublicContainer";
 

@@ -110,7 +110,7 @@ async function getTableNames() {
     .from("information_schema.tables")
     .where("table_schema", "public");
   const tableNames = rows
-    .map((t) => <string>t.table_name)
+    .map((t) => t.table_name as string)
     .filter((t) => !EXCLUDED_TABLES.includes(t))
     .sort();
   return tableNames;

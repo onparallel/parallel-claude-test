@@ -11,7 +11,6 @@ import {
   MjmlSection,
   MjmlSocial,
   MjmlSocialElement,
-  MjmlSpacer,
   MjmlStyle,
   MjmlText,
   MjmlWrapper,
@@ -41,12 +40,14 @@ export function Layout({ parallelUrl, assetsUrl, children }: LayoutProps) {
             fontSize="16px"
           />
         </MjmlAttributes>
-        <MjmlStyle inline>{/* css */ `
+        <MjmlStyle inline>{
+          /* css */ `
           .link {
             color: #6059f7;
             text-decoration: none;
           }
-        `}</MjmlStyle>
+        `
+        }</MjmlStyle>
       </MjmlHead>
       <MjmlBody backgroundColor="#f6f6f6">
         {/* Header */}

@@ -6,12 +6,16 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type SendoutWorkerPayload = { petition_sendout_id: number };
 
-createQueueWorker(
+createQueueWorker<SendoutWorkerPayload>(
   "completed-email",
-  async ({ petition_sendout_id }: SendoutWorkerPayload, context) => {
-    const sendout = await context.petitions.loadSendout(petition_sendout_id);
+  async (payload, context) => {
+    const sendout = await context.petitions.loadSendout(
+      payload.petition_sendout_id
+    );
     if (!sendout) {
-      throw new Error(`Sendout not found for id ${petition_sendout_id}`);
+      throw new Error(
+        `Sendout not found for id ${payload.petition_sendout_id}`
+      );
     }
     const [petition, sender, contact, fields] = await Promise.all([
       context.petitions.loadPetition(sendout.petition_id),
@@ -57,7 +61,7 @@ createQueueWorker(
       subject,
       text,
       html,
-      created_from: `PetitionSendout:${petition_sendout_id}`,
+      created_from: `PetitionSendout:${payload.petition_sendout_id}`,
     });
     await context.aws.enqueueEmail(email.id);
   }

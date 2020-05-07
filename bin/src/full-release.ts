@@ -1,6 +1,5 @@
 import AWS from "aws-sdk";
-import chalk from "chalk";
-import { execSync, spawnSync, exec } from "child_process";
+import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
 
@@ -8,9 +7,6 @@ AWS.config.credentials = new AWS.SharedIniFileCredentials({
   profile: "parallel-deploy",
 });
 AWS.config.region = "eu-central-1";
-
-const ec2 = new AWS.EC2();
-const elbv2 = new AWS.ELBv2();
 
 async function main() {
   const { commit: _commit, env } = yargs

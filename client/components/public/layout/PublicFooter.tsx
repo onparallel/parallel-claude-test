@@ -1,4 +1,5 @@
 import {
+  Box,
   BoxProps,
   Divider,
   Flex,
@@ -6,8 +7,6 @@ import {
   List,
   ListItem,
   Text,
-  useColorMode,
-  Box,
 } from "@chakra-ui/core";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";

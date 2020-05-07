@@ -1,6 +1,5 @@
 import {
   enumType,
-  FieldAuthorizeResolver,
   idArg,
   inputObjectType,
   mutationField,
@@ -68,11 +67,3 @@ export const changePassword = mutationField("changePassword", {
     }
   },
 });
-
-function rootIsContextUserId<
-  FieldName extends string
->(): FieldAuthorizeResolver<"User", FieldName> {
-  return (root, _, ctx) => {
-    return ctx.user!.id === root.id;
-  };
-}

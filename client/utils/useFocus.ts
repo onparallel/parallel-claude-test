@@ -12,14 +12,14 @@ export function useFocus<T = any>({
     focused,
     useMemo(
       () => ({
-        onFocus: <FocusEventHandler<T>>((e) => {
+        onFocus: ((e) => {
           setFocused(true);
           onFocus?.(e);
-        }),
-        onBlur: <FocusEventHandler<T>>((e) => {
+        }) as FocusEventHandler<T>,
+        onBlur: ((e) => {
           setFocused(false);
           onBlur?.(e);
-        }),
+        }) as FocusEventHandler<T>,
       }),
       [onFocus, onBlur]
     ),

@@ -1,10 +1,10 @@
-import { Box, Flex, Image, Heading, Text } from "@chakra-ui/core";
+import { Box, Flex, Heading, Image } from "@chakra-ui/core";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import NextLink from "next/link";
 import { ReactNode } from "react";
-import { Spacer } from "../common/Spacer";
 import { FormattedMessage } from "react-intl";
+import { Spacer } from "../common/Spacer";
 
 export function ErrorPage({
   header,

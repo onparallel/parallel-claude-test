@@ -5,7 +5,6 @@ import {
   Flex,
   Heading,
   Image,
-  Stack,
   Text,
 } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";

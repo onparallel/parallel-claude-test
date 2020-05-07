@@ -22,6 +22,7 @@ export type DialogOpener = <TResult>(
 
 export const DialogOpenerContext = createContext<DialogOpener>(null as any);
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
   const opener = useContext(DialogOpenerContext);
   return useCallback(

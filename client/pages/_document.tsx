@@ -35,6 +35,7 @@ class MyDocument extends Document<MyDocumentProps> {
     const { raw, compiled } = await loadMessages(locale);
     ctx.renderPage = () =>
       renderPage({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         enhanceApp: (App) => (props) => (
           <App {...props} {...{ locale, messages: compiled }}></App>
         ),
