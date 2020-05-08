@@ -2491,7 +2491,7 @@
   },
   {
     "term": "tour.petition-compose.select-multiple-recipients",
-    "definition": "Si selecciones <b>múltiples destinatarios</b>, cualquiera de ellos podrá contestar a cualquier elemento que hayas pedido.",
+    "definition": "Si seleccionas <b>múltiples destinatarios</b>, cualquiera de ellos podrá contestar a cualquier elemento que hayas pedido.",
     "context": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L762-L772"
   },
