@@ -50,6 +50,7 @@
     "react-dropzone": "^11.0.1",
     "react-hook-form": "^5.6.0",
     "react-intl": "^4.5.1",
+    "react-joyride": "^2.2.1",
     "react-select": "^3.1.0",
     "remeda": "^0.0.19",
     "slate": "^0.57.2",

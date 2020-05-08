@@ -4,17 +4,25 @@ import {
   Checkbox,
   Flex,
   IconButton,
+  List,
+  ListItem,
   MenuItem,
   MenuList,
   Stack,
+  Text,
   useToast,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
+import {
+  withData,
+  WithDataContext,
+} from "@parallel/components/common/withData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition/FailureGeneratingLinkDialog";
 import {
@@ -22,10 +30,6 @@ import {
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition/PetitionRepliesField";
 import { PetitionSendouts } from "@parallel/components/petition/PetitionSendouts";
-import {
-  withData,
-  WithDataContext,
-} from "@parallel/components/common/withData";
 import {
   PetitionFieldReply,
   PetitionRepliesQuery,
@@ -40,6 +44,7 @@ import {
   usePetitionReplies_validatePetitionFieldsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
+import { compose } from "@parallel/utils/compose";
 import {
   usePetitionState,
   useWrapPetitionUpdater,
@@ -215,7 +220,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         <Divider />
         <Box flex="1" overflow="auto">
           <Flex margin={4}>
-            <Stack flex="2" spacing={4}>
+            <Stack flex="2" spacing={4} id="petition-replies">
               {petition!.fields.map((field, index) => (
                 <PetitionRepliesField
                   key={field.id}
@@ -233,6 +238,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             <Spacer flex="1" display={{ base: "none", md: "block" }} />
           </Flex>
           <PetitionSendouts
+            id="sendouts"
             sendouts={petition!.sendouts}
             marginX={4}
             marginTop={12}
@@ -328,24 +334,6 @@ PetitionReplies.mutations = [
   `,
 ];
 
-const GET_PETITION_REPLIES_DATA = gql`
-  query PetitionReplies($id: ID!) {
-    petition(id: $id) {
-      ...PetitionReplies_Petition
-    }
-  }
-  ${PetitionReplies.fragments.petition}
-`;
-
-const GET_PETITION_REPLIES_USER_DATA = gql`
-  query PetitionRepliesUser {
-    me {
-      ...PetitionReplies_User
-    }
-  }
-  ${PetitionReplies.fragments.user}
-`;
-
 function useDownloadReplyFile() {
   const [mutate] = usePetitionReplies_fileUploadReplyDownloadLinkMutation();
   const showFailure = useFailureGeneratingLinkDialog();
@@ -402,11 +390,25 @@ PetitionReplies.getInitialProps = async ({
 }: WithDataContext) => {
   await Promise.all([
     apollo.query<PetitionRepliesQuery, PetitionRepliesQueryVariables>({
-      query: GET_PETITION_REPLIES_DATA,
+      query: gql`
+        query PetitionReplies($id: ID!) {
+          petition(id: $id) {
+            ...PetitionReplies_Petition
+          }
+        }
+        ${PetitionReplies.fragments.petition}
+      `,
       variables: { id: query.petitionId as string },
     }),
     apollo.query<PetitionRepliesUserQuery>({
-      query: GET_PETITION_REPLIES_USER_DATA,
+      query: gql`
+        query PetitionRepliesUser {
+          me {
+            ...PetitionReplies_User
+          }
+        }
+        ${PetitionReplies.fragments.user}
+      `,
     }),
   ]);
   return {
@@ -414,4 +416,119 @@ PetitionReplies.getInitialProps = async ({
   };
 };
 
-export default withData(PetitionReplies);
+export default compose(
+  withOnboarding({
+    key: "PETITION_REVIEW",
+    steps: [
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-replies.your-information"
+            defaultMessage="Here you have your information on the requests"
+          />
+        ),
+        content: (
+          <FormattedMessage
+            id="tour.petition-replies.all-items-on-page"
+            defaultMessage="On this page, you can see all the items that you requested to the recipients."
+          />
+        ),
+        placement: "center",
+        target: "#__next",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-replies.review-items"
+            defaultMessage="Replies"
+          />
+        ),
+        content: (
+          <Text>
+            <FormattedMessage
+              id="tour.petition-replies.completed-items"
+              defaultMessage="If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>."
+              values={{
+                b: (chunks: any[]) => (
+                  <Text as="em" fontStyle="normal" fontWeight="bold">
+                    {chunks}
+                  </Text>
+                ),
+              }}
+            />
+          </Text>
+        ),
+        placement: "right-start",
+        target: "#petition-replies",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-replies.monitor-requests"
+            defaultMessage="Monitor your requests"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petition-replies.you-can"
+                defaultMessage="In this section, you will be able to:"
+              />
+            </Text>
+            <List
+              styleType="disc"
+              stylePos="outside"
+              paddingLeft={5}
+              marginTop={4}
+              spacing={3}
+            >
+              <ListItem>
+                <FormattedMessage
+                  id="tour.petition-replies.track"
+                  defaultMessage="<b>Track</b> whether your recipients have received or opened your message."
+                  values={{
+                    b: (chunks: any[]) => (
+                      <Text as="em" fontStyle="normal" fontWeight="bold">
+                        {chunks}
+                      </Text>
+                    ),
+                  }}
+                />
+              </ListItem>
+              <ListItem>
+                <FormattedMessage
+                  id="tour.petition-replies.next-reminder"
+                  defaultMessage="See when will the <b>next reminder</b> be sent."
+                  values={{
+                    b: (chunks: any[]) => (
+                      <Text as="em" fontStyle="normal" fontWeight="bold">
+                        {chunks}
+                      </Text>
+                    ),
+                  }}
+                />
+              </ListItem>
+              <ListItem>
+                <FormattedMessage
+                  id="tour.petition-replies.send-manual-reminder"
+                  defaultMessage="Manually <b>send reminders</b> to your recipients."
+                  values={{
+                    b: (chunks: any[]) => (
+                      <Text as="em" fontStyle="normal" fontWeight="bold">
+                        {chunks}
+                      </Text>
+                    ),
+                  }}
+                />
+              </ListItem>
+            </List>
+          </>
+        ),
+        placement: "top",
+        target: "#sendouts",
+      },
+    ],
+  }),
+  withData
+)(PetitionReplies);

@@ -1,13 +1,23 @@
 import { BoxProps, Flex } from "@chakra-ui/core";
-import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
+import {
+  AppLayout_UserFragment,
+  OnboardingKey,
+  OnboardingStatus,
+  useAppLayout_updateOnboardingStatusMutation,
+} from "@parallel/graphql/__types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import {
+  OnboardingTour,
+  OnboardingTourContext,
+} from "../common/OnboardingTour";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export type AppLayoutProps = BoxProps & {
   onCreate?: () => void;
-  user: AppLayoutNavbar_UserFragment;
+  user: AppLayout_UserFragment;
 };
 
 export function AppLayout({
@@ -27,33 +37,77 @@ export function AppLayout({
       );
     } catch {}
   }
+
+  /* Onboarding tour cllbacks */
+  const [
+    updateOnboardingStatus,
+  ] = useAppLayout_updateOnboardingStatusMutation();
+  const handleUpdateTour = async function (
+    key: OnboardingKey,
+    status: OnboardingStatus
+  ) {
+    await updateOnboardingStatus({ variables: { key, status } });
+  };
+  const { isRunning, toggle } = useContext(OnboardingTourContext);
+  function handleOnboardingClick() {
+    if (isRunning) {
+      document.querySelector<HTMLElement>(".react-joyride__beacon")?.click();
+    } else {
+      toggle(true);
+    }
+  }
+
   return (
-    <Flex alignItems="stretch" height="100vh" overflow="hidden">
-      <AppLayoutNavbar
-        user={user}
-        zIndex={2}
-        onCreate={onCreate ?? defaultOnCreate}
-      />
-      <Flex
-        as="main"
-        flex="1"
-        flexDirection="column"
-        maxHeight="100vh"
-        backgroundColor="gray.50"
-        overflow="auto"
-        {...props}
-      >
-        {children}
+    <>
+      <Flex alignItems="stretch" height="100vh" overflow="hidden">
+        <AppLayoutNavbar
+          user={user}
+          zIndex={2}
+          onCreate={onCreate ?? defaultOnCreate}
+          onOnboardingClick={handleOnboardingClick}
+        />
+        <Flex
+          as="main"
+          flex="1"
+          flexDirection="column"
+          maxHeight="100vh"
+          backgroundColor="gray.50"
+          overflow="auto"
+          {...props}
+        >
+          {children}
+        </Flex>
       </Flex>
-    </Flex>
+      <OnboardingTour
+        onUpdateTour={handleUpdateTour}
+        status={user.onboardingStatus as any}
+      />
+    </>
   );
 }
 
 AppLayout.fragments = {
   user: gql`
     fragment AppLayout_User on User {
+      id
       ...AppLayoutNavbar_User
+      ...OnboardingTour_User
     }
     ${AppLayoutNavbar.fragments.user}
+    ${OnboardingTour.fragments.user}
   `,
 };
+
+AppLayout.mutations = [
+  gql`
+    mutation AppLayout_updateOnboardingStatus(
+      $key: OnboardingKey!
+      $status: OnboardingStatus!
+    ) {
+      updateOnboardingStatus(key: $key, status: $status) {
+        id
+        onboardingStatus
+      }
+    }
+  `,
+];

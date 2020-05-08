@@ -114,6 +114,8 @@ export interface NexusGenEnums {
     | "INCORRECT_PASSWORD"
     | "INVALID_NEW_PASSWORD"
     | "SUCCESS";
+  OnboardingKey: "PETITION_COMPOSE" | "PETITION_REVIEW" | "PETITIONS_LIST";
+  OnboardingStatus: "FINISHED" | "SKIPPED";
   OrganizationRole: "ADMIN" | "NORMAL";
   OrganizationStatus: db.OrganizationStatus;
   PetitionFieldType: db.PetitionFieldType;
@@ -232,6 +234,8 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
+  OnboardingKey: NexusGenEnums["OnboardingKey"];
+  OnboardingStatus: NexusGenEnums["OnboardingStatus"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
   OrganizationStatus: NexusGenEnums["OrganizationStatus"];
   PetitionFieldType: NexusGenEnums["PetitionFieldType"];
@@ -288,6 +292,7 @@ export interface NexusGenFieldTypes {
     sendReminders: NexusGenRootTypes["SendReminderResult"]; // SendReminderResult!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
+    updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
     updateUser: NexusGenRootTypes["User"]; // User!
@@ -466,6 +471,7 @@ export interface NexusGenFieldTypes {
     fullName: string | null; // String
     id: string; // ID!
     lastName: string | null; // String
+    onboardingStatus: { [key: string]: any }; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     organizationRole: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     updatedAt: Date; // DateTime!
@@ -579,6 +585,11 @@ export interface NexusGenArgTypes {
       // args
       fieldIds: string[]; // [ID!]!
       petitionId: string; // ID!
+    };
+    updateOnboardingStatus: {
+      // args
+      key: NexusGenEnums["OnboardingKey"]; // OnboardingKey!
+      status: NexusGenEnums["OnboardingStatus"]; // OnboardingStatus!
     };
     updatePetition: {
       // args
@@ -698,6 +709,8 @@ export type NexusGenInputNames =
 
 export type NexusGenEnumNames =
   | "ChangePasswordResult"
+  | "OnboardingKey"
+  | "OnboardingStatus"
   | "OrganizationRole"
   | "OrganizationStatus"
   | "PetitionFieldType"

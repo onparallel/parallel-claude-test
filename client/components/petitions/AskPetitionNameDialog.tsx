@@ -43,7 +43,7 @@ export function AskPetitionNameDialog({
         <Text as="label" {...{ htmlFor: "petition-name" }}>
           <FormattedMessage
             id="petitions.create-new-petition.header"
-            defaultMessage="Give your new petition a name"
+            defaultMessage="Give a name to your new petition"
           />
         </Text>
       }

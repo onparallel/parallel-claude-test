@@ -124,6 +124,8 @@ export type Mutation = {
   updateContact: Contact;
   /** Updates the positions of the petition fields */
   updateFieldPositions: Petition;
+  /** Updates the onboarding status for one of the pages. */
+  updateOnboardingStatus: User;
   /** Updates a petition. */
   updatePetition: Petition;
   /** Updates a petition field. */
@@ -223,6 +225,11 @@ export type MutationupdateFieldPositionsArgs = {
   petitionId: Scalars["ID"];
 };
 
+export type MutationupdateOnboardingStatusArgs = {
+  key: OnboardingKey;
+  status: OnboardingStatus;
+};
+
 export type MutationupdatePetitionArgs = {
   data: UpdatePetitionInput;
   petitionId: Scalars["ID"];
@@ -244,6 +251,13 @@ export type MutationvalidatePetitionFieldsArgs = {
   petitionId: Scalars["ID"];
   value: Scalars["Boolean"];
 };
+
+export type OnboardingKey =
+  | "PETITION_COMPOSE"
+  | "PETITION_REVIEW"
+  | "PETITIONS_LIST";
+
+export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
 /** An organization in the system. */
 export type Organization = Timestamps & {
@@ -679,6 +693,8 @@ export type User = Timestamps & {
   id: Scalars["ID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
+  /** The onboarding status for the different views of the app. */
+  onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   organizationRole: OrganizationRole;
   /** Time when the resource was last updated. */
@@ -698,14 +714,36 @@ export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   "id" | "fullName" | "email"
 >;
 
+export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "onboardingStatus"
+>;
+
 export type RecipientSelect_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
   "id" | "fullName" | "email"
 >;
 
-export type AppLayout_UserFragment = {
-  __typename?: "User";
-} & AppLayoutNavbar_UserFragment;
+export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id"
+> &
+  AppLayoutNavbar_UserFragment &
+  OnboardingTour_UserFragment;
+
+export type AppLayout_updateOnboardingStatusMutationVariables = {
+  key: OnboardingKey;
+  status: OnboardingStatus;
+};
+
+export type AppLayout_updateOnboardingStatusMutation = {
+  __typename?: "Mutation";
+} & {
+  updateOnboardingStatus: { __typename?: "User" } & Pick<
+    User,
+    "id" | "onboardingStatus"
+  >;
+};
 
 export type AppLayoutNavbar_UserFragment = {
   __typename?: "User";
@@ -922,12 +960,6 @@ export type ContactsUserQueryVariables = {};
 
 export type ContactsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contacts_UserFragment;
-};
-
-export type AppHomeQueryVariables = {};
-
-export type AppHomeQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & AppLayout_UserFragment;
 };
 
 export type PetitionCompose_PetitionFragment = {
@@ -1555,11 +1587,19 @@ export const AppLayoutNavbar_UserFragmentDoc = gql`
   }
   ${UserMenu_UserFragmentDoc}
 `;
+export const OnboardingTour_UserFragmentDoc = gql`
+  fragment OnboardingTour_User on User {
+    onboardingStatus
+  }
+`;
 export const AppLayout_UserFragmentDoc = gql`
   fragment AppLayout_User on User {
+    id
     ...AppLayoutNavbar_User
+    ...OnboardingTour_User
   }
   ${AppLayoutNavbar_UserFragmentDoc}
+  ${OnboardingTour_UserFragmentDoc}
 `;
 export const Contact_UserFragmentDoc = gql`
   fragment Contact_User on User {
@@ -1836,6 +1876,61 @@ export const PublicPetition_createFileUploadReply_PublicPetitionFragmentDoc = gq
     status
   }
 `;
+export const AppLayout_updateOnboardingStatusDocument = gql`
+  mutation AppLayout_updateOnboardingStatus(
+    $key: OnboardingKey!
+    $status: OnboardingStatus!
+  ) {
+    updateOnboardingStatus(key: $key, status: $status) {
+      id
+      onboardingStatus
+    }
+  }
+`;
+export type AppLayout_updateOnboardingStatusMutationFn = ApolloReactCommon.MutationFunction<
+  AppLayout_updateOnboardingStatusMutation,
+  AppLayout_updateOnboardingStatusMutationVariables
+>;
+
+/**
+ * __useAppLayout_updateOnboardingStatusMutation__
+ *
+ * To run a mutation, you first call `useAppLayout_updateOnboardingStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppLayout_updateOnboardingStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appLayoutUpdateOnboardingStatusMutation, { data, loading, error }] = useAppLayout_updateOnboardingStatusMutation({
+ *   variables: {
+ *      key: // value for 'key'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useAppLayout_updateOnboardingStatusMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    AppLayout_updateOnboardingStatusMutation,
+    AppLayout_updateOnboardingStatusMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    AppLayout_updateOnboardingStatusMutation,
+    AppLayout_updateOnboardingStatusMutationVariables
+  >(AppLayout_updateOnboardingStatusDocument, baseOptions);
+}
+export type AppLayout_updateOnboardingStatusMutationHookResult = ReturnType<
+  typeof useAppLayout_updateOnboardingStatusMutation
+>;
+export type AppLayout_updateOnboardingStatusMutationResult = ApolloReactCommon.MutationResult<
+  AppLayout_updateOnboardingStatusMutation
+>;
+export type AppLayout_updateOnboardingStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  AppLayout_updateOnboardingStatusMutation,
+  AppLayout_updateOnboardingStatusMutationVariables
+>;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: ID!, $data: UpdateContactInput!) {
     updateContact(id: $id, data: $data) {
@@ -2155,58 +2250,6 @@ export type ContactsUserLazyQueryHookResult = ReturnType<
 export type ContactsUserQueryResult = ApolloReactCommon.QueryResult<
   ContactsUserQuery,
   ContactsUserQueryVariables
->;
-export const AppHomeDocument = gql`
-  query AppHome {
-    me {
-      ...AppLayout_User
-    }
-  }
-  ${AppLayout_UserFragmentDoc}
-`;
-
-/**
- * __useAppHomeQuery__
- *
- * To run a query within a React component, call `useAppHomeQuery` and pass it any options that fit your needs.
- * When your component renders, `useAppHomeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAppHomeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useAppHomeQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    AppHomeQuery,
-    AppHomeQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<AppHomeQuery, AppHomeQueryVariables>(
-    AppHomeDocument,
-    baseOptions
-  );
-}
-export function useAppHomeLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    AppHomeQuery,
-    AppHomeQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<AppHomeQuery, AppHomeQueryVariables>(
-    AppHomeDocument,
-    baseOptions
-  );
-}
-export type AppHomeQueryHookResult = ReturnType<typeof useAppHomeQuery>;
-export type AppHomeLazyQueryHookResult = ReturnType<typeof useAppHomeLazyQuery>;
-export type AppHomeQueryResult = ApolloReactCommon.QueryResult<
-  AppHomeQuery,
-  AppHomeQueryVariables
 >;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition(

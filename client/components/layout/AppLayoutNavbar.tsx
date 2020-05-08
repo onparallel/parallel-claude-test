@@ -20,13 +20,15 @@ import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
 
 export type AppLayoutNavbarProps = BoxProps & {
-  onCreate: () => void;
   user: AppLayoutNavbar_UserFragment;
+  onCreate: () => void;
+  onOnboardingClick: () => void;
 };
 
 export function AppLayoutNavbar({
   user,
   onCreate,
+  onOnboardingClick,
   ...props
 }: AppLayoutNavbarProps) {
   const { colorMode } = useColorMode();
@@ -95,6 +97,7 @@ export function AppLayoutNavbar({
       </Flex>
       <Flex justifyContent="center" marginBottom={4}>
         <IconButtonWithTooltip
+          id="new-petition-button"
           variantColor="purple"
           icon="add"
           size="lg"
@@ -112,7 +115,7 @@ export function AppLayoutNavbar({
           <ListItem key={section}>
             <AppLayoutNavbarLink
               href={`/app/${section}`}
-              available={available}
+              isAvailable={available}
               active={pathname.startsWith(`/[locale]/app/${section}`)}
               icon={icon}
             >
@@ -122,6 +125,18 @@ export function AppLayoutNavbar({
         ))}
       </List>
       <Spacer />
+      <Flex justifyContent="center">
+        <IconButtonWithTooltip
+          label={intl.formatMessage({
+            id: "navbar.start-tour",
+            defaultMessage: "Guide me around",
+          })}
+          icon="info-outline"
+          variant="ghost"
+          isRound
+          onClick={onOnboardingClick}
+        />
+      </Flex>
       <Flex justifyContent="center" marginY={4}>
         <UserMenu user={user}></UserMenu>
       </Flex>

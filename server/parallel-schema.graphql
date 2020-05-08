@@ -231,6 +231,11 @@ type Mutation {
   updateFieldPositions(fieldIds: [ID!]!, petitionId: ID!): Petition!
 
   """
+  Updates the onboarding status for one of the pages.
+  """
+  updateOnboardingStatus(key: OnboardingKey!, status: OnboardingStatus!): User!
+
+  """
   Updates a petition.
   """
   updatePetition(data: UpdatePetitionInput!, petitionId: ID!): Petition!
@@ -257,6 +262,17 @@ type Mutation {
     petitionId: ID!
     value: Boolean!
   ): PetitionAndFields!
+}
+
+enum OnboardingKey {
+  PETITION_COMPOSE
+  PETITION_REVIEW
+  PETITIONS_LIST
+}
+
+enum OnboardingStatus {
+  FINISHED
+  SKIPPED
 }
 
 """
@@ -1069,6 +1085,11 @@ type User implements Timestamps {
   The last name of the user.
   """
   lastName: String
+
+  """
+  The onboarding status for the different views of the app.
+  """
+  onboardingStatus: JSONObject!
   organization: Organization!
   organizationRole: OrganizationRole!
 

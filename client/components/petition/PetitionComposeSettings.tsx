@@ -133,7 +133,7 @@ export function PetitionComposeSettings({
   }
 
   return (
-    <Card {...props}>
+    <Card id="petition-message-compose" {...props}>
       <Box padding={4} borderBottom="1px solid" borderBottomColor="gray.200">
         <Heading as="h2" size="sm">
           <FormattedMessage
@@ -143,7 +143,7 @@ export function PetitionComposeSettings({
         </Heading>
       </Box>
       <Stack spacing={2} padding={4}>
-        <FormControl>
+        <FormControl id="petition-select-recipients">
           <FormLabel
             htmlFor="petition-recipients"
             paddingBottom={0}
@@ -204,7 +204,7 @@ export function PetitionComposeSettings({
             style={{ minHeight: "100px" }}
           ></RichTextEditor>
         </Box>
-        <Flex alignItems="center" marginTop={2}>
+        <Flex id="petition-reminders" alignItems="center" marginTop={2}>
           <Checkbox
             id="petition-reminders"
             variantColor="purple"
@@ -227,6 +227,7 @@ export function PetitionComposeSettings({
           />
         ) : null}
         <CollapseContent
+          id="petition-advanced-settings"
           marginTop={2}
           header={
             <Heading size="sm">

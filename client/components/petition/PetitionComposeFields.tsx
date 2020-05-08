@@ -157,7 +157,7 @@ export function PetitionComposeFields({
   );
 
   return (
-    <Card {...props}>
+    <Card id="petition-fields" {...props}>
       {fieldIds.length ? (
         <>
           <Box padding={4}>

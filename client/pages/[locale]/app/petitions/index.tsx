@@ -45,6 +45,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "@parallel/components/common/Link";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { compose } from "@parallel/utils/compose";
 
 const PAGE_SIZE = 10;
 
@@ -469,39 +471,28 @@ Petitions.mutations = [
   `,
 ];
 
-const GET_PETITIONS_DATA = gql`
-  query Petitions(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $status: PetitionStatus
-  ) {
-    petitions(
-      offset: $offset
-      limit: $limit
-      search: $search
-      status: $status
-    ) {
-      ...Petitions_PetitionsList
-    }
-  }
-  ${Petitions.fragments.petitions}
-`;
-
-const GET_PETITIONS_USER_DATA = gql`
-  query PetitionsUser {
-    me {
-      ...Petitions_User
-    }
-  }
-  ${Petitions.fragments.user}
-`;
-
 Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   const { page, search, status } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     apollo.query<PetitionsQuery, PetitionsQueryVariables>({
-      query: GET_PETITIONS_DATA,
+      query: gql`
+        query Petitions(
+          $offset: Int!
+          $limit: Int!
+          $search: String
+          $status: PetitionStatus
+        ) {
+          petitions(
+            offset: $offset
+            limit: $limit
+            search: $search
+            status: $status
+          ) {
+            ...Petitions_PetitionsList
+          }
+        }
+        ${Petitions.fragments.petitions}
+      `,
       variables: {
         offset: PAGE_SIZE * (page - 1),
         limit: PAGE_SIZE,
@@ -509,8 +500,75 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
         status,
       },
     }),
-    apollo.query<PetitionsUserQuery>({ query: GET_PETITIONS_USER_DATA }),
+    apollo.query<PetitionsUserQuery>({
+      query: gql`
+        query PetitionsUser {
+          me {
+            ...Petitions_User
+          }
+        }
+        ${Petitions.fragments.user}
+      `,
+    }),
   ]);
 };
 
-export default withData(Petitions);
+export default compose(
+  withOnboarding({
+    key: "PETITIONS_LIST",
+    steps: [
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petitions-list.welcome"
+            defaultMessage="Welcome to Parallel!"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petitions-list.we-collect"
+                defaultMessage="We are here to help you collect information from your clients."
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petitions-list.show-around"
+                defaultMessage="If this is your first time here, let us show you around!"
+              />
+            </Text>
+          </>
+        ),
+        placement: "center",
+        target: "#__next",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petitions-list.create-petition"
+            defaultMessage="Let's start by creating a petition!"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petitions-list.you-focus"
+                defaultMessage="We want you to focus on what matters, so let us collect the information for you."
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petitions-list.we-notify"
+                defaultMessage="We will let you know when the recipients complete everything."
+              />
+            </Text>
+          </>
+        ),
+        target: "#new-petition-button",
+      },
+    ],
+  }),
+  withData
+)(Petitions);

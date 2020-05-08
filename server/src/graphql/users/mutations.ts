@@ -4,6 +4,7 @@ import {
   inputObjectType,
   mutationField,
   stringArg,
+  arg,
 } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { removeNotDefined } from "../../util/remedaExtensions";
@@ -70,5 +71,28 @@ export const changePassword = mutationField("changePassword", {
       }
       throw error;
     }
+  },
+});
+
+export const OnboardingKey = enumType({
+  name: "OnboardingKey",
+  members: ["PETITIONS_LIST", "PETITION_COMPOSE", "PETITION_REVIEW"],
+});
+
+export const OnboardingStatus = enumType({
+  name: "OnboardingStatus",
+  members: ["FINISHED", "SKIPPED"],
+});
+
+export const updateOnboardingStatus = mutationField("updateOnboardingStatus", {
+  description: "Updates the onboarding status for one of the pages.",
+  type: "User",
+  authorize: authenticate(),
+  args: {
+    key: arg({ type: "OnboardingKey", required: true }),
+    status: arg({ type: "OnboardingStatus", required: true }),
+  },
+  resolve: async (o, { key, status }, ctx) => {
+    return ctx.users.updateUserOnboardingStatus(key, status, ctx.user!);
   },
 });
