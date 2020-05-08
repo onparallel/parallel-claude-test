@@ -15,8 +15,8 @@
     "generate-db-types": "ts-node ./bin/generate-db-types.ts",
     "test": "jest --runInBand",
     "emails": "ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx",
-    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --input '../server/src/emails/{components,common}/**/*.{ts,tsx}' --output '../server/lang'",
-    "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --input '../server/lang' --output-compiled '../server/lang/compiled'"
+    "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../server/src/emails/{components,common}/**/*.{ts,tsx}' --output '../server/lang'",
+    "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../server/lang' --output-compiled '../server/lang/compiled'"
   },
   "dependencies": {
     "@nexus/schema": "^0.14.0-next.1",

@@ -21,7 +21,7 @@
     "term": "footer.slogan",
     "definition": "Trabaja mejor con",
     "context": "Work better with",
-    "reference": "src/emails/common/Layout.tsx#L81-L84"
+    "reference": "src/emails/common/Layout.tsx#L82-L85"
   },
   {
     "term": "forgot-password.click-to-reset",
@@ -57,7 +57,7 @@
     "term": "generic.complete-information-button",
     "definition": "Completa aquí la información",
     "context": "Complete the information here",
-    "reference": "src/emails/components/PetitionReminder.tsx#L175-L178"
+    "reference": "src/emails/components/PetitionReminder.tsx#L173-L176"
   },
   {
     "term": "generic.complete-information-click-link",
@@ -69,13 +69,13 @@
     "term": "generic.submit-text.with-deadline",
     "definition": "Por favor, rellene la siguiente información antes del {deadline}:",
     "context": "Please submit the following information before {deadline}:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L149-L164"
+    "reference": "src/emails/components/PetitionReminder.tsx#L149-L162"
   },
   {
     "term": "generic.submit-text.without-deadline",
     "definition": "Por favor, rellene la siguiente información:",
     "context": "Please submit the following information:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L166-L169"
+    "reference": "src/emails/components/PetitionReminder.tsx#L164-L167"
   },
   {
     "term": "generic.untitled-field",
@@ -117,13 +117,13 @@
     "term": "layout.privacy-link",
     "definition": "Privacidad",
     "context": "Privacy",
-    "reference": "src/emails/common/Layout.tsx#L124-L127"
+    "reference": "src/emails/common/Layout.tsx#L125-L128"
   },
   {
     "term": "layout.terms-and-conditions-link",
     "definition": "Términos y condiciones",
     "context": "Terms and conditions",
-    "reference": "src/emails/common/Layout.tsx#L114-L117"
+    "reference": "src/emails/common/Layout.tsx#L115-L118"
   },
   {
     "term": "new-petition.text",
