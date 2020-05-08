@@ -11,8 +11,6 @@ aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCreden
     profile: "parallel-deploy",
 });
 aws_sdk_1.default.config.region = "eu-central-1";
-const ec2 = new aws_sdk_1.default.EC2();
-const elbv2 = new aws_sdk_1.default.ELBv2();
 async function main() {
     const { commit: _commit, env } = yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")

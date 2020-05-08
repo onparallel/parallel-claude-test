@@ -8,6 +8,7 @@ async function readJson(path) {
 exports.readJson = readJson;
 async function writeJson(path, contents, opts) {
     const { pretty } = { pretty: false, ...opts };
-    await fs_1.promises.writeFile(path, pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents), "utf-8");
+    await fs_1.promises.writeFile(path, (pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents)) +
+        "\n", "utf-8");
 }
 exports.writeJson = writeJson;

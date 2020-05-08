@@ -64,5 +64,7 @@ module.exports = {
     "server/dist",
     "bin/dist",
     "**/__*",
+    "client/public/static/lang",
+    "server/lang/compiled",
   ],
 };
