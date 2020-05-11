@@ -14,19 +14,19 @@
     "full-release": "node dist/full-release.js"
   },
   "dependencies": {
-    "@formatjs/cli": "^1.6.9",
-    "aws-sdk": "^2.665.0",
+    "@formatjs/cli": "^1.6.13",
+    "aws-sdk": "^2.673.0",
     "chalk": "^4.0.0",
     "cli-table3": "^0.6.0",
-    "intl-messageformat-parser": "^5.0.2",
-    "remeda": "^0.0.19",
+    "intl-messageformat-parser": "^5.0.3",
+    "remeda": "^0.0.20",
     "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "@types/node": "^13.13.4",
+    "@types/node": "^13.13.5",
     "@types/yargs": "^15.0.4",
     "rimraf": "^3.0.2",
-    "ts-node": "^8.9.1",
+    "ts-node": "^8.10.1",
     "typescript": "^3.8.3"
   }
 }

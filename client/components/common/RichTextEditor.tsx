@@ -156,7 +156,7 @@ function toggleBlock(editor: Editor, format: string) {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: (n) => LIST_TYPES.includes(n.type),
+    match: (n) => LIST_TYPES.includes(n.type as string),
     split: true,
   });
 
