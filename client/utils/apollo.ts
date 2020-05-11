@@ -5,10 +5,6 @@ import { createHttpLink } from "apollo-link-http";
 import { QueryResult } from "@apollo/react-common";
 import { Assert } from "./types";
 
-if (!process.browser) {
-  (global as any).fetch = require("node-fetch");
-}
-
 export interface CreateApolloClientOptions {
   getToken: () => string;
 }
