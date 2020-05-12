@@ -175,6 +175,7 @@ export interface NexusGenRootTypes {
     items: NexusGenRootTypes["PetitionSendout"][]; // [PetitionSendout!]!
     totalCount: number; // Int!
   };
+  PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldReply: db.PetitionFieldReply;
@@ -392,6 +393,11 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["PetitionSendout"][]; // [PetitionSendout!]!
     totalCount: number; // Int!
   };
+  PublicOrganization: {
+    // field return type
+    id: string; // ID!
+    name: string; // String!
+  };
   PublicPetition: {
     // field return type
     createdAt: Date; // DateTime!
@@ -430,10 +436,12 @@ export interface NexusGenFieldTypes {
   };
   PublicUser: {
     // field return type
+    email: string; // String!
     firstName: string | null; // String
     fullName: string | null; // String
     id: string; // ID!
     lastName: string | null; // String
+    organization: NexusGenRootTypes["PublicOrganization"]; // PublicOrganization!
   };
   Query: {
     // field return type
@@ -685,6 +693,7 @@ export type NexusGenObjectNames =
   | "PetitionProgress"
   | "PetitionSendout"
   | "PetitionSendoutPagination"
+  | "PublicOrganization"
   | "PublicPetition"
   | "PublicPetitionField"
   | "PublicPetitionFieldReply"

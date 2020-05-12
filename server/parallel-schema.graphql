@@ -736,6 +736,21 @@ enum PetitionStatus {
 }
 
 """
+A public view of an organization
+"""
+type PublicOrganization {
+  """
+  The ID of the organization.
+  """
+  id: ID!
+
+  """
+  The name of the organization.
+  """
+  name: String!
+}
+
+"""
 A public view of the petition
 """
 type PublicPetition implements Timestamps {
@@ -873,6 +888,11 @@ A public view of a user
 """
 type PublicUser {
   """
+  The email of the user.
+  """
+  email: String!
+
+  """
   The first name of the user.
   """
   firstName: String
@@ -891,6 +911,11 @@ type PublicUser {
   The last name of the user.
   """
   lastName: String
+
+  """
+  The organization of the user.
+  """
+  organization: PublicOrganization!
 }
 
 type Query {

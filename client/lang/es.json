@@ -129,49 +129,49 @@
     "term": "component.petition-progress-bar.all-pending",
     "definition": "El destinatario no ha rellenado ninguno de los campos.",
     "context": "The recipient has not replied to any of the fields.",
-    "reference": "components/common/PetitionProgressBar.tsx#L87-L90"
+    "reference": "components/common/PetitionProgressBar.tsx#L91-L94"
   },
   {
     "term": "component.petition-progress-bar.completed",
     "definition": "Esta petición se ha completado.",
     "context": "This petition is completed.",
-    "reference": "components/common/PetitionProgressBar.tsx#L97-L100"
+    "reference": "components/common/PetitionProgressBar.tsx#L101-L104"
   },
   {
     "term": "component.petition-progress-bar.no-fields",
     "definition": "Esta petición no tiene campos.",
     "context": "This petition has no fields.",
-    "reference": "components/common/PetitionProgressBar.tsx#L77-L80"
+    "reference": "components/common/PetitionProgressBar.tsx#L81-L84"
   },
   {
     "term": "component.petition-progress-bar.not-replied",
     "definition": "{count, plural, =1{# campo ha sido rellenado} other {# campos han sido rellenados}}.",
     "context": "{count, plural, =1{# field has} other {# fields have}} not been replied.",
-    "reference": "components/common/PetitionProgressBar.tsx#L140-L144"
+    "reference": "components/common/PetitionProgressBar.tsx#L144-L148"
   },
   {
     "term": "component.petition-progress-bar.not-sent",
     "definition": "No has enviado esta petición a nadie todavía",
     "context": "You haven't send this petition to anyone yet.",
-    "reference": "components/common/PetitionProgressBar.tsx#L67-L70"
+    "reference": "components/common/PetitionProgressBar.tsx#L71-L74"
   },
   {
     "term": "component.petition-progress-bar.optional",
     "definition": "{count, plural, =1{# campo no ha sido rellenado pero es opcional} other {# campos no han sido rellenados pero son opcionales}}.",
     "context": "{count, plural, =1{# field has not been replied but it is optional.} other {# fields have not been replied but they are optional.}}",
-    "reference": "components/common/PetitionProgressBar.tsx#L131-L135"
+    "reference": "components/common/PetitionProgressBar.tsx#L135-L139"
   },
   {
     "term": "component.petition-progress-bar.pending",
     "definition": "{count, plural, =1{# campo ha sido rellenado.} other {# campos han sido rellenados.}}",
     "context": "{count, plural, =1{# field has been replied.} other {# fields have been replied.}}",
-    "reference": "components/common/PetitionProgressBar.tsx#L122-L126"
+    "reference": "components/common/PetitionProgressBar.tsx#L126-L130"
   },
   {
     "term": "component.petition-progress-bar.validated",
     "definition": "{count, plural, =1{# campo ha sido rellenado y revisado.} other {# campos han sido rellenados y revisado.}}",
     "context": "{count, plural, =1{# field has} other {# fields have}} been filled and reviewed.",
-    "reference": "components/common/PetitionProgressBar.tsx#L113-L117"
+    "reference": "components/common/PetitionProgressBar.tsx#L117-L121"
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",
@@ -537,13 +537,13 @@
     "term": "generic.dropzone-allowed-types",
     "definition": "Solo los siguientes tipos están permitidos:",
     "context": "Only the following file types are allowed:",
-    "reference": "components/petition/PublicPetitionField.tsx#L392-L395"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L392-L395"
   },
   {
     "term": "generic.dropzone-default",
     "definition": "Arrastra archivos aquí o haz click para seleccionarlos",
     "context": "Drag files here, or click to select them",
-    "reference": "components/petition/PublicPetitionField.tsx#L425-L428"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L425-L428"
   },
   {
     "term": "generic.edit-label",
@@ -561,37 +561,37 @@
     "term": "generic.file-name",
     "definition": "Nombre de archivo",
     "context": "File name",
-    "reference": "components/petition/PublicPetitionField.tsx#L62-L65"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L62-L65"
   },
   {
     "term": "generic.file-size",
     "definition": "Tamaño de archivo",
     "context": "File size",
-    "reference": "components/petition/PublicPetitionField.tsx#L58-L61"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L58-L61"
   },
   {
     "term": "generic.file-types.document",
     "definition": "Documentos (.pdf, .doc, .docx)",
     "context": "Documents (.pdf, .doc, .docx)",
-    "reference": "components/petition/PublicPetitionField.tsx#L400-L403"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L400-L403"
   },
   {
     "term": "generic.file-types.image",
     "definition": "Imágenes (.jpeg, .png, etc.)",
     "context": "Images (.jpeg, .png, etc.)",
-    "reference": "components/petition/PublicPetitionField.tsx#L405-L408"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L405-L408"
   },
   {
     "term": "generic.file-types.pdf",
     "definition": "Documentos PDF",
     "context": "PDF Documents",
-    "reference": "components/petition/PublicPetitionField.tsx#L415-L418"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L415-L418"
   },
   {
     "term": "generic.file-types.video",
     "definition": "Vídeos (.mp4, .avi, etc.)",
     "context": "Videos (.mp4, .avi, etc.)",
-    "reference": "components/petition/PublicPetitionField.tsx#L410-L413"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L410-L413"
   },
   {
     "term": "generic.forms.confirm-password-label",
@@ -669,7 +669,7 @@
     "term": "generic.forms.required-field-error",
     "definition": "Se requiere un valor",
     "context": "A value is required",
-    "reference": "components/petition/PublicPetitionField.tsx#L293-L296"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L293-L296"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -729,7 +729,7 @@
     "term": "generic.optional-field",
     "definition": "Opcional",
     "context": "Optional",
-    "reference": "components/petition/PublicPetitionField.tsx#L89-L92"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L89-L92"
   },
   {
     "term": "generic.petition-status.completed",
@@ -759,7 +759,7 @@
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field",
-    "reference": "components/petition/PublicPetitionField.tsx#L66-L69"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L66-L69"
   },
   {
     "term": "generic.richtext.bold",
@@ -2280,52 +2280,46 @@
     "reference": "pages/[locale]/legal/[doc].tsx#L19-L22"
   },
   {
+    "term": "sendout.automatically-saved-text-1",
+    "definition": "Tu progreso se guarda automaticamente.",
+    "context": "Your progress is automatically saved.",
+    "reference": "components/recipient/RecipientViewProgressCard.tsx#L135-L138"
+  },
+  {
+    "term": "sendout.automatically-saved-text-2",
+    "definition": "Puedes volver cuando quieras para completar la petición.",
+    "context": "You can return at anytime to complete the petition.",
+    "reference": "components/recipient/RecipientViewProgressCard.tsx#L141-L144"
+  },
+  {
     "term": "sendout.completed-petition.toast-description",
     "definition": "Has completado esta petición y {name} será notificado",
     "context": "You have completed this petition and {name} will be notified",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L166-L170"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L165-L169"
   },
   {
     "term": "sendout.completed-petition.toast-title",
     "definition": "¡Petición completada!",
     "context": "Petition completed!",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L161-L164"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L160-L163"
   },
   {
     "term": "sendout.field-reply-submit",
     "definition": "Enviar",
     "context": "Submit",
-    "reference": "components/petition/PublicPetitionField.tsx#L307-L310"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L307-L310"
   },
   {
     "term": "sendout.files-uploaded",
     "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
-    "reference": "components/petition/PublicPetitionField.tsx#L131-L135"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L131-L135"
   },
   {
-    "term": "sendout.first-time-header",
-    "definition": "¿Es la primera vez que usas Parallel?",
-    "context": "Is this your first time using Parallel?",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L295-L298"
-  },
-  {
-    "term": "sendout.first-time-p1",
-    "definition": "No te preocupes, es sencillo. Para completar la petición solamente necesitas rellenar cada uno de los campos de la izquierda.",
-    "context": "Don't worry, it's very simple. To complete this petition you need to fill each of the fields on the left.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L303-L306"
-  },
-  {
-    "term": "sendout.first-time-p2",
-    "definition": "Asegurate de que hayas subido todos los archivos antes de finalizar",
-    "context": "Make sure you have upload all the requested files before submitting.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L309-L312"
-  },
-  {
-    "term": "sendout.first-time-p3",
-    "definition": "Si te equivocases, puedes volver y hacer los cambios que creas pertinentes.",
-    "context": "If you accidentally make any mistakes, you will be able to come back and make any amends necessary.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L315-L318"
+    "term": "sendout.organization",
+    "definition": "Organización",
+    "context": "Business",
+    "reference": "components/recipient/RecipientViewSenderCard.tsx#L33-L36"
   },
   {
     "term": "sendout.petition-completed-alert",
@@ -2334,34 +2328,64 @@
     "reference": "pages/[locale]/petition/[keycode].tsx#L206-L209"
   },
   {
+    "term": "sendout.powered-by",
+    "definition": "Powered by",
+    "context": "Powered by",
+    "reference": "pages/[locale]/petition/[keycode].tsx#L273-L276"
+  },
+  {
+    "term": "sendout.progress",
+    "definition": "Progreso",
+    "context": "Progress",
+    "reference": "components/recipient/RecipientViewProgressCard.tsx#L82"
+  },
+  {
     "term": "sendout.remove-reply-label",
     "definition": "Eliminar respuesta",
     "context": "Remove reply",
-    "reference": "components/petition/PublicPetitionField.tsx#L244-L247"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L244-L247"
   },
   {
     "term": "sendout.replies-submitted",
     "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviad} other {# respuestas enviadas}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "reference": "components/petition/PublicPetitionField.tsx#L125-L129"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L125-L129"
   },
   {
-    "term": "sendout.sender-message",
-    "definition": "<b>{name}</b> te envió la siguiente petición:",
-    "context": "<b>{name}</b> sent you this petition:",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L239-L246"
+    "term": "sendout.security-link",
+    "definition": "Seguridad",
+    "context": "About security",
+    "reference": "components/recipient/RecipientViewSideLinks.tsx#L26-L29"
+  },
+  {
+    "term": "sendout.sender",
+    "definition": "Remitente",
+    "context": "Sender",
+    "reference": "components/recipient/RecipientViewSenderCard.tsx#L46-L49"
+  },
+  {
+    "term": "sendout.sender-email",
+    "definition": "Correo electrónico del remitente",
+    "context": "Sender email",
+    "reference": "components/recipient/RecipientViewSenderCard.tsx#L59-L62"
   },
   {
     "term": "sendout.submit-button",
     "definition": "Finalizar y notificar a {name}",
     "context": "Finalize and notify {name}",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L325-L329"
+    "reference": "components/recipient/RecipientViewProgressCard.tsx#L162-L166"
+  },
+  {
+    "term": "sendout.submit-button-short",
+    "definition": "Finalizar",
+    "context": "Finalize",
+    "reference": "components/recipient/RecipientViewProgressCard.tsx#L156-L160"
   },
   {
     "term": "sendout.text-reply",
     "definition": "Respuesta añadida el {date}",
     "context": "Reply added on {date}",
-    "reference": "components/petition/PublicPetitionField.tsx#L147-L158"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L147-L158"
   },
   {
     "term": "settings.account",

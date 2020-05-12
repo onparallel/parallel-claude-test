@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
-import { PublicPetitionField_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
+import { RecipientViewPetitionField_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitions";
@@ -37,14 +37,14 @@ type CreateReplyText = { type: "TEXT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
 export type PublicPetitionFieldProps = BoxProps & {
-  field: PublicPetitionField_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   isInvalid: boolean;
   uploadProgress?: { [replyId: string]: number };
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (payload: CreateReply) => void;
 };
 
-export function PublicPetitionField({
+export function RecipientViewPetitionField({
   field,
   isInvalid,
   uploadProgress,
@@ -80,12 +80,16 @@ export function PublicPetitionField({
         : {})}
       {...props}
     >
-      <Flex height="24px">
-        <Heading as="h2" fontSize="md">
-          {field.title}
-        </Heading>
+      <Heading as="h2" fontSize="md">
+        {field.title}
         {field.optional ? (
-          <Text marginLeft={2} color="gray.400" fontSize="sm">
+          <Text
+            as="span"
+            marginLeft={2}
+            color="gray.400"
+            fontSize="sm"
+            fontWeight="normal"
+          >
             <FormattedMessage
               id="generic.optional-field"
               defaultMessage="Optional"
@@ -99,17 +103,17 @@ export function PublicPetitionField({
             aria-label={labels.required}
             label={labels.required}
           >
-            <Box
-              fontSize="xl"
+            <Text
+              as="span"
               userSelect="none"
-              position="relative"
-              bottom="4px"
+              marginLeft={1}
+              aria-label={labels.required}
             >
               *
-            </Box>
+            </Text>
           </Tooltip>
         )}
-      </Flex>
+      </Heading>
       {field.description ? (
         <Text fontSize="sm" color="gray.600">
           {field.description?.split("\n").map((line, index) => (
@@ -256,7 +260,7 @@ function TextReplyForm({
   onCreateReply,
   ...props
 }: BoxProps & {
-  field: PublicPetitionField_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   onCreateReply: (payload: CreateReplyText) => void;
 }) {
   const { placeholder, multiline } = field.options as FieldOptions["TEXT"];
@@ -318,7 +322,7 @@ function FileUploadReplyForm({
   onCreateReply,
   ...props
 }: BoxProps & {
-  field: PublicPetitionField_PublicPetitionFieldFragment;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   onCreateReply: (payload: CreateReplyFileUpload) => void;
 }) {
   const { accepts } = field.options as FieldOptions["FILE_UPLOAD"];
@@ -366,8 +370,9 @@ function FileUploadReplyForm({
       rounded="md"
       flexDirection="column"
       justifyContent="center"
-      alignItems="center"
       minHeight="100px"
+      padding={4}
+      textAlign="center"
       {...(disabled
         ? {
             opacity: 0.4,
@@ -432,9 +437,9 @@ function FileUploadReplyForm({
   );
 }
 
-PublicPetitionField.fragments = {
-  publicPetitionField: gql`
-    fragment PublicPetitionField_PublicPetitionField on PublicPetitionField {
+RecipientViewPetitionField.fragments = {
+  PublicPetitionField: gql`
+    fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
       id
       type
       title

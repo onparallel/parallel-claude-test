@@ -3,41 +3,39 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
-  Button,
   CloseButton,
   Flex,
-  Heading,
   Stack,
   Text,
   useToast,
 } from "@chakra-ui/core";
-import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { Title } from "@parallel/components/common/Title";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
+import { RecipientViewProgressCard } from "@parallel/components/recipient/RecipientViewProgressCard";
+import { RecipientViewSenderCard } from "@parallel/components/recipient/RecipientViewSenderCard";
 import {
   CreateFileUploadReplyInput,
   CreateTextReplyInput,
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
-  PublicPetition_createFileUploadReply_FieldFragment,
-  PublicPetition_createFileUploadReply_PublicPetitionFragment,
-  PublicPetition_createTextReply_FieldFragment,
-  PublicPetition_createTextReply_PublicPetitionFragment,
-  PublicPetition_deletePetitionReply_PublicPetitionFieldFragment,
-  PublicPetition_deletePetitionReply_PublicPetitionFragment,
+  RecipientView_createFileUploadReply_FieldFragment,
+  RecipientView_createFileUploadReply_PublicPetitionFragment,
+  RecipientView_createTextReply_FieldFragment,
+  RecipientView_createTextReply_PublicPetitionFragment,
+  RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
+  RecipientView_deletePetitionReply_PublicPetitionFragment,
   usePublicPetitionQuery,
-  usePublicPetition_publicCompletePetitionMutation,
-  usePublicPetition_publicCreateFileUploadReplyMutation,
-  usePublicPetition_publicCreateTextReplyMutation,
-  usePublicPetition_publicDeletePetitionReplyMutation,
-  usePublicPetition_publicFileUploadReplyCompleteMutation,
+  useRecipientView_publicCompletePetitionMutation,
+  useRecipientView_publicCreateFileUploadReplyMutation,
+  useRecipientView_publicCreateTextReplyMutation,
+  useRecipientView_publicDeletePetitionReplyMutation,
+  useRecipientView_publicFileUploadReplyCompleteMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
-import { RenderSlate } from "@parallel/utils/RenderSlate";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import axios, { CancelTokenSource } from "axios";
@@ -47,14 +45,16 @@ import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   CreateReply,
-  PublicPetitionField,
-} from "../../../components/petition/PublicPetitionField";
+  RecipientViewPetitionField,
+} from "../../../components/recipient/RecipientViewPetitionField";
+import RecipientViewSideLinks from "@parallel/components/recipient/RecipientViewSideLinks";
+import { Spacer } from "@parallel/components/common/Spacer";
 
 type PublicPetitionProps = UnwrapPromise<
-  ReturnType<typeof PublicPetition.getInitialProps>
+  ReturnType<typeof RecipientView.getInitialProps>
 >;
 
-function PublicPetition({ keycode }: PublicPetitionProps) {
+function RecipientView({ keycode }: PublicPetitionProps) {
   const intl = useIntl();
   const {
     data: { sendout },
@@ -67,8 +67,8 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
   const createFileUploadReply = useCreateFileUploadReply();
   const [
     fileUploadReplyComplete,
-  ] = usePublicPetition_publicFileUploadReplyCompleteMutation();
-  const [completePetition] = usePublicPetition_publicCompletePetitionMutation();
+  ] = useRecipientView_publicFileUploadReplyCompleteMutation();
+  const [completePetition] = useRecipientView_publicCompletePetitionMutation();
   const toast = useToast();
   const [uploadTokens, setUploadTokens] = useState<{
     [replyId: string]: CancelTokenSource;
@@ -140,7 +140,7 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
     [keycode, petition.id]
   );
 
-  const [submitted, setSubmitted] = useState(false);
+  const [finalized, setFinalized] = useState(false);
   const { allCompleted, completed } = useMemo(() => {
     const fields: [string, boolean][] = petition.fields.map((f) => [
       f.id,
@@ -152,9 +152,9 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
     };
   }, [petition.fields]);
 
-  const handleSubmit = useCallback(
+  const handleFinalize = useCallback(
     async function () {
-      setSubmitted(true);
+      setFinalized(true);
       if (allCompleted) {
         await completePetition({ variables: { keycode } });
         toast({
@@ -182,6 +182,7 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
     [petition.fields, sender]
   );
 
+  const breakpoint = "md";
   return (
     <>
       <Title>{petition.emailSubject}</Title>
@@ -217,149 +218,115 @@ function PublicPetition({ keycode }: PublicPetitionProps) {
           />
         </Alert>
       ) : null}
-      <Box backgroundColor="gray.50" zIndex={1}>
+      <Flex
+        backgroundColor="gray.50"
+        minHeight="100vh"
+        zIndex={1}
+        flexDirection="column"
+        alignItems="center"
+      >
         <Flex
-          flexDirection="row"
+          flexDirection={{ base: "column", [breakpoint]: "row" }}
+          width="100%"
           maxWidth="containers.lg"
-          marginX="auto"
           paddingX={4}
+          paddingTop={8}
+          marginBottom={4}
         >
-          <Flex flex="2" flexDirection="column">
-            <Box marginY={8}>
-              <Logo width={152}></Logo>
+          <Box
+            flex="1"
+            marginRight={{ base: 0, [breakpoint]: 4 }}
+            marginBottom={4}
+          >
+            <Box position="sticky" top={8}>
+              <RecipientViewSenderCard sender={sender} marginBottom={4} />
+              <RecipientViewProgressCard
+                sender={sender}
+                petition={petition}
+                onFinalize={handleFinalize}
+                display={{ base: "none", [breakpoint]: "flex" }}
+                marginBottom={4}
+              />
+              <RecipientViewSideLinks
+                display={{ base: "none", [breakpoint]: "block" }}
+              />
             </Box>
-            <Card
-              padding={4}
-              backgroundColor="transparent"
-              shadow="none"
-              rounded="md"
-              marginBottom={8}
-            >
-              <Text marginBottom={2}>
-                <FormattedMessage
-                  id="sendout.sender-message"
-                  defaultMessage="<b>{name}</b> sent you this petition:"
-                  values={{
-                    name: sender.fullName,
-                    b: (...chunks: any[]) => <b>{chunks}</b>,
-                  }}
-                />
-              </Text>
-              <RenderSlate
-                value={petition?.emailBody}
-                fontSize="md"
-                marginLeft={4}
-              />
-            </Card>
-            <Stack spacing={4} marginBottom={8}>
-              {petition.fields.map((field) => (
-                <PublicPetitionField
-                  id={`field-${field.id}`}
-                  field={field}
-                  key={field.id}
-                  isInvalid={submitted && !completed[field.id]}
-                  uploadProgress={uploadProgress[field.id]}
-                  onCreateReply={(payload) =>
-                    handleCreateReply(field.id, payload)
-                  }
-                  onDeleteReply={(replyId) =>
-                    handleDeleteReply(field.id, replyId)
-                  }
-                />
-              ))}
-            </Stack>
-            <Button
-              variantColor="purple"
-              isDisabled={petition.status === "COMPLETED"}
-              onClick={handleSubmit}
-              display={{ base: "block", md: "none" }}
-              marginBottom={8}
-            >
-              <FormattedMessage
-                id="sendout.submit-button"
-                defaultMessage="Finalize and notify {name}"
-                values={{ name: sender.firstName }}
-              />
-            </Button>
-          </Flex>
-          <Box flex="1" marginLeft={8} display={{ base: "none", md: "block" }}>
-            <Flex
-              flexDirection="column"
-              position="sticky"
-              top={0}
-              minHeight="100vh"
-            >
-              <Card marginTop={{ base: 0, md: "94px" }}>
-                <Box backgroundColor="purple.500" roundedTop="sm" padding={4}>
-                  <Heading as="h2" fontSize="lg" color="white">
-                    <FormattedMessage
-                      id="sendout.first-time-header"
-                      defaultMessage="Is this your first time using Parallel?"
-                    />
-                  </Heading>
-                </Box>
-                <Stack padding={4} spacing={4}>
-                  <Text>
-                    <FormattedMessage
-                      id="sendout.first-time-p1"
-                      defaultMessage="Don't worry, it's very simple. To complete this petition you need to fill each of the fields on the left."
-                    />
-                  </Text>
-                  <Text fontWeight="bold">
-                    <FormattedMessage
-                      id="sendout.first-time-p2"
-                      defaultMessage="Make sure you have upload all the requested files before submitting."
-                    />
-                  </Text>
-                  <Text>
-                    <FormattedMessage
-                      id="sendout.first-time-p3"
-                      defaultMessage="If you accidentally make any mistakes, you will be able to come back and make any amends necessary."
-                    />
-                  </Text>
-                  <Button
-                    variantColor="purple"
-                    isDisabled={petition.status === "COMPLETED"}
-                    onClick={handleSubmit}
-                  >
-                    <FormattedMessage
-                      id="sendout.submit-button"
-                      defaultMessage="Finalize and notify {name}"
-                      values={{ name: sender.firstName }}
-                    />
-                  </Button>
-                </Stack>
-              </Card>
-            </Flex>
           </Box>
+          <Stack flex="2" spacing={4}>
+            {petition.fields.map((field) => (
+              <RecipientViewPetitionField
+                id={`field-${field.id}`}
+                field={field}
+                key={field.id}
+                isInvalid={finalized && !completed[field.id]}
+                uploadProgress={uploadProgress[field.id]}
+                onCreateReply={(payload) =>
+                  handleCreateReply(field.id, payload)
+                }
+                onDeleteReply={(replyId) =>
+                  handleDeleteReply(field.id, replyId)
+                }
+              />
+            ))}
+          </Stack>
         </Flex>
-      </Box>
+        <RecipientViewSideLinks
+          textAlign="center"
+          display={{ base: "block", [breakpoint]: "none" }}
+        />
+        <Spacer />
+        <Flex as="footer" justifyContent="center" paddingY={4}>
+          <Flex flexDirection="column" alignItems="center">
+            <Text as="span" fontSize="sm" marginBottom={2}>
+              <FormattedMessage
+                id="sendout.powered-by"
+                defaultMessage="Powered by"
+              />
+            </Text>
+            <Logo width={100} />
+          </Flex>
+        </Flex>
+        <RecipientViewProgressCard
+          width="100%"
+          sender={sender}
+          petition={petition}
+          onFinalize={handleFinalize}
+          isStickyFooter
+          display={{ base: "flex", [breakpoint]: "none" }}
+        />
+      </Flex>
     </>
   );
 }
 
-PublicPetition.fragments = {
-  publicPetition: gql`
-    fragment PublicPetition_PublicPetition on PublicPetition {
+RecipientView.fragments = {
+  PublicPetition: gql`
+    fragment RecipientView_PublicPetition on PublicPetition {
       id
       status
       deadline
       emailSubject
       emailBody
+      fields {
+        id
+        ...RecipientViewPetitionField_PublicPetitionField
+      }
     }
+    ${RecipientViewPetitionField.fragments.PublicPetitionField}
   `,
-  publicUser: gql`
-    fragment PublicPetition_PublicUser on PublicUser {
-      id
-      firstName
-      fullName
+  PublicUser: gql`
+    fragment RecipientView_PublicUser on PublicUser {
+      ...RecipientViewSenderCard_PublicUser
+      ...RecipientViewProgressCard_PublicUser
     }
+    ${RecipientViewSenderCard.fragments.PublicUser}
+    ${RecipientViewProgressCard.fragments.PublicUser}
   `,
 };
 
-PublicPetition.mutations = [
+RecipientView.mutations = [
   gql`
-    mutation PublicPetition_publicDeletePetitionReply(
+    mutation RecipientView_publicDeletePetitionReply(
       $replyId: ID!
       $keycode: ID!
     ) {
@@ -367,7 +334,7 @@ PublicPetition.mutations = [
     }
   `,
   gql`
-    mutation PublicPetition_publicCreateTextReply(
+    mutation RecipientView_publicCreateTextReply(
       $keycode: ID!
       $fieldId: ID!
       $data: CreateTextReplyInput!
@@ -380,7 +347,7 @@ PublicPetition.mutations = [
     }
   `,
   gql`
-    mutation PublicPetition_publicCreateFileUploadReply(
+    mutation RecipientView_publicCreateFileUploadReply(
       $keycode: ID!
       $fieldId: ID!
       $data: CreateFileUploadReplyInput!
@@ -400,7 +367,7 @@ PublicPetition.mutations = [
     }
   `,
   gql`
-    mutation PublicPetition_publicFileUploadReplyComplete(
+    mutation RecipientView_publicFileUploadReplyComplete(
       $keycode: ID!
       $replyId: ID!
     ) {
@@ -411,7 +378,7 @@ PublicPetition.mutations = [
     }
   `,
   gql`
-    mutation PublicPetition_publicCompletePetition($keycode: ID!) {
+    mutation RecipientView_publicCompletePetition($keycode: ID!) {
       publicCompletePetition(keycode: $keycode) {
         id
         status
@@ -420,28 +387,8 @@ PublicPetition.mutations = [
   `,
 ];
 
-const GET_PUBLIC_PETITION_DATA = gql`
-  query PublicPetition($keycode: ID!) {
-    sendout(keycode: $keycode) {
-      petition {
-        ...PublicPetition_PublicPetition
-        fields {
-          id
-          ...PublicPetitionField_PublicPetitionField
-        }
-      }
-      sender {
-        ...PublicPetition_PublicUser
-      }
-    }
-  }
-  ${PublicPetition.fragments.publicPetition}
-  ${PublicPetition.fragments.publicUser}
-  ${PublicPetitionField.fragments.publicPetitionField}
-`;
-
 function useDeletePetitionReply() {
-  const [mutate] = usePublicPetition_publicDeletePetitionReplyMutation({
+  const [mutate] = useRecipientView_publicDeletePetitionReplyMutation({
     optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
   });
   return useCallback(
@@ -455,17 +402,17 @@ function useDeletePetitionReply() {
         variables: { replyId, keycode },
         update(client) {
           const fieldFragment = gql`
-            fragment PublicPetition_deletePetitionReply_PublicPetitionField on PublicPetitionField {
+            fragment RecipientView_deletePetitionReply_PublicPetitionField on PublicPetitionField {
               replies {
                 id
               }
             }
           `;
           const cachedField = client.readFragment<
-            PublicPetition_deletePetitionReply_PublicPetitionFieldFragment
+            RecipientView_deletePetitionReply_PublicPetitionFieldFragment
           >({ id: fieldId, fragment: fieldFragment });
           client.writeFragment<
-            PublicPetition_deletePetitionReply_PublicPetitionFieldFragment
+            RecipientView_deletePetitionReply_PublicPetitionFieldFragment
           >({
             id: fieldId,
             fragment: fieldFragment,
@@ -475,16 +422,16 @@ function useDeletePetitionReply() {
             },
           });
           const petitionFragment = gql`
-            fragment PublicPetition_deletePetitionReply_PublicPetition on PublicPetition {
+            fragment RecipientView_deletePetitionReply_PublicPetition on PublicPetition {
               status
             }
           `;
           const cachedPetition = client.readFragment<
-            PublicPetition_deletePetitionReply_PublicPetitionFragment
+            RecipientView_deletePetitionReply_PublicPetitionFragment
           >({ id: petitionId, fragment: petitionFragment });
           if (cachedPetition?.status === "COMPLETED") {
             client.writeFragment<
-              PublicPetition_deletePetitionReply_PublicPetitionFragment
+              RecipientView_deletePetitionReply_PublicPetitionFragment
             >({
               id: petitionId,
               fragment: petitionFragment,
@@ -501,7 +448,7 @@ function useDeletePetitionReply() {
 }
 
 function useCreateTextReply() {
-  const [mutate] = usePublicPetition_publicCreateTextReplyMutation();
+  const [mutate] = useRecipientView_publicCreateTextReplyMutation();
   return useCallback(async function (
     keycode: string,
     petitionId: string,
@@ -512,7 +459,7 @@ function useCreateTextReply() {
       variables: { keycode, fieldId, data },
       update(client, { data }) {
         const fieldFragment = gql`
-          fragment PublicPetition_createTextReply_Field on PublicPetitionField {
+          fragment RecipientView_createTextReply_Field on PublicPetitionField {
             replies {
               id
             }
@@ -520,9 +467,9 @@ function useCreateTextReply() {
         `;
         const reply = data!.publicCreateTextReply;
         const cachedField = client.readFragment<
-          PublicPetition_createTextReply_FieldFragment
+          RecipientView_createTextReply_FieldFragment
         >({ id: fieldId, fragment: fieldFragment });
-        client.writeFragment<PublicPetition_createTextReply_FieldFragment>({
+        client.writeFragment<RecipientView_createTextReply_FieldFragment>({
           id: fieldId,
           fragment: fieldFragment,
           data: {
@@ -534,16 +481,16 @@ function useCreateTextReply() {
           },
         });
         const petitionFragment = gql`
-          fragment PublicPetition_createTextReply_PublicPetition on PublicPetition {
+          fragment RecipientView_createTextReply_PublicPetition on PublicPetition {
             status
           }
         `;
         const cachedPetition = client.readFragment<
-          PublicPetition_createTextReply_PublicPetitionFragment
+          RecipientView_createTextReply_PublicPetitionFragment
         >({ id: petitionId, fragment: petitionFragment });
         if (cachedPetition?.status === "COMPLETED") {
           client.writeFragment<
-            PublicPetition_createTextReply_PublicPetitionFragment
+            RecipientView_createTextReply_PublicPetitionFragment
           >({
             id: petitionId,
             fragment: petitionFragment,
@@ -559,7 +506,7 @@ function useCreateTextReply() {
 }
 
 function useCreateFileUploadReply() {
-  const [mutate] = usePublicPetition_publicCreateFileUploadReplyMutation();
+  const [mutate] = useRecipientView_publicCreateFileUploadReplyMutation();
   return useCallback(
     async function (
       keycode: string,
@@ -571,7 +518,7 @@ function useCreateFileUploadReply() {
         variables: { keycode, fieldId, data },
         update(client, { data }) {
           const fieldFragment = gql`
-            fragment PublicPetition_createFileUploadReply_Field on PublicPetitionField {
+            fragment RecipientView_createFileUploadReply_Field on PublicPetitionField {
               replies {
                 id
               }
@@ -579,10 +526,10 @@ function useCreateFileUploadReply() {
           `;
           const { reply } = data!.publicCreateFileUploadReply;
           const cachedField = client.readFragment<
-            PublicPetition_createFileUploadReply_FieldFragment
+            RecipientView_createFileUploadReply_FieldFragment
           >({ id: fieldId, fragment: fieldFragment });
           client.writeFragment<
-            PublicPetition_createFileUploadReply_FieldFragment
+            RecipientView_createFileUploadReply_FieldFragment
           >({
             id: fieldId,
             fragment: fieldFragment,
@@ -595,16 +542,16 @@ function useCreateFileUploadReply() {
             },
           });
           const petitionFragment = gql`
-            fragment PublicPetition_createFileUploadReply_PublicPetition on PublicPetition {
+            fragment RecipientView_createFileUploadReply_PublicPetition on PublicPetition {
               status
             }
           `;
           const cachedPetition = client.readFragment<
-            PublicPetition_createFileUploadReply_PublicPetitionFragment
+            RecipientView_createFileUploadReply_PublicPetitionFragment
           >({ id: petitionId, fragment: petitionFragment });
           if (cachedPetition?.status === "COMPLETED") {
             client.writeFragment<
-              PublicPetition_createFileUploadReply_PublicPetitionFragment
+              RecipientView_createFileUploadReply_PublicPetitionFragment
             >({
               id: petitionId,
               fragment: petitionFragment,
@@ -620,13 +567,26 @@ function useCreateFileUploadReply() {
   );
 }
 
-PublicPetition.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+RecipientView.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   const keycode = query.keycode as string;
   await apollo.query<PublicPetitionQuery, PublicPetitionQueryVariables>({
-    query: GET_PUBLIC_PETITION_DATA,
+    query: gql`
+      query PublicPetition($keycode: ID!) {
+        sendout(keycode: $keycode) {
+          petition {
+            ...RecipientView_PublicPetition
+          }
+          sender {
+            ...RecipientView_PublicUser
+          }
+        }
+      }
+      ${RecipientView.fragments.PublicPetition}
+      ${RecipientView.fragments.PublicUser}
+    `,
     variables: { keycode },
   });
   return { keycode };
 };
 
-export default withData(PublicPetition);
+export default withData(RecipientView);

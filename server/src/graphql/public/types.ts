@@ -126,6 +126,9 @@ export const PublicUser = objectType({
       description: "The ID of the user.",
       resolve: (o) => toGlobalId("User", o.id),
     });
+    t.string("email", {
+      description: "The email of the user.",
+    });
     t.string("firstName", {
       description: "The first name of the user.",
       nullable: true,
@@ -146,6 +149,29 @@ export const PublicUser = objectType({
           return null;
         }
       },
+    });
+    t.field("organization", {
+      description: "The organization of the user.",
+      type: "PublicOrganization",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.organizations.loadOrg(root.org_id))!;
+      },
+    });
+  },
+});
+
+export const PublicOrganization = objectType({
+  name: "PublicOrganization",
+  rootTyping: "db.Organization",
+  description: "A public view of an organization",
+  definition(t) {
+    t.id("id", {
+      description: "The ID of the organization.",
+      resolve: (o) => toGlobalId("Organization", o.id),
+    });
+    t.string("name", {
+      description: "The name of the organization.",
+      resolve: (o) => o.name,
     });
   },
 });

@@ -481,6 +481,15 @@ export type PetitionStatus =
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
 
+/** A public view of an organization */
+export type PublicOrganization = {
+  __typename?: "PublicOrganization";
+  /** The ID of the organization. */
+  id: Scalars["ID"];
+  /** The name of the organization. */
+  name: Scalars["String"];
+};
+
 /** A public view of the petition */
 export type PublicPetition = Timestamps & {
   __typename?: "PublicPetition";
@@ -550,6 +559,8 @@ export type PublicPetitionSendout = {
 /** A public view of a user */
 export type PublicUser = {
   __typename?: "PublicUser";
+  /** The email of the user. */
+  email: Scalars["String"];
   /** The first name of the user. */
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the user. */
@@ -558,6 +569,8 @@ export type PublicUser = {
   id: Scalars["ID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
+  /** The organization of the user. */
+  organization: PublicOrganization;
 };
 
 export type Query = {
@@ -850,7 +863,7 @@ export type PetitionSendouts_PetitionSendoutFragment = {
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
 
-export type PublicPetitionField_PublicPetitionFieldFragment = {
+export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
 } & Pick<
   PublicPetitionField,
@@ -868,6 +881,37 @@ export type PublicPetitionField_PublicPetitionFieldFragment = {
         PublicPetitionFieldReply,
         "id" | "publicContent" | "createdAt"
       >
+    >;
+  };
+
+export type RecipientViewProgressCard_PublicUserFragment = {
+  __typename?: "PublicUser";
+} & Pick<PublicUser, "firstName">;
+
+export type RecipientViewProgressCard_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status"> & {
+    fields: Array<
+      { __typename?: "PublicPetitionField" } & Pick<
+        PublicPetitionField,
+        "id" | "optional"
+      > & {
+          replies: Array<
+            { __typename?: "PublicPetitionFieldReply" } & Pick<
+              PublicPetitionFieldReply,
+              "id"
+            >
+          >;
+        }
+    >;
+  };
+
+export type RecipientViewSenderCard_PublicUserFragment = {
+  __typename?: "PublicUser";
+} & Pick<PublicUser, "id" | "firstName" | "fullName" | "email"> & {
+    organization: { __typename?: "PublicOrganization" } & Pick<
+      PublicOrganization,
+      "name"
     >;
   };
 
@@ -1327,33 +1371,39 @@ export type CurrentUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "fullName" | "email">;
 };
 
-export type PublicPetition_PublicPetitionFragment = {
+export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<
   PublicPetition,
   "id" | "status" | "deadline" | "emailSubject" | "emailBody"
->;
+> & {
+    fields: Array<
+      { __typename?: "PublicPetitionField" } & Pick<PublicPetitionField, "id"> &
+        RecipientViewPetitionField_PublicPetitionFieldFragment
+    >;
+  };
 
-export type PublicPetition_PublicUserFragment = {
+export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
-} & Pick<PublicUser, "id" | "firstName" | "fullName">;
+} & RecipientViewSenderCard_PublicUserFragment &
+  RecipientViewProgressCard_PublicUserFragment;
 
-export type PublicPetition_publicDeletePetitionReplyMutationVariables = {
+export type RecipientView_publicDeletePetitionReplyMutationVariables = {
   replyId: Scalars["ID"];
   keycode: Scalars["ID"];
 };
 
-export type PublicPetition_publicDeletePetitionReplyMutation = {
+export type RecipientView_publicDeletePetitionReplyMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "publicDeletePetitionReply">;
 
-export type PublicPetition_publicCreateTextReplyMutationVariables = {
+export type RecipientView_publicCreateTextReplyMutationVariables = {
   keycode: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: CreateTextReplyInput;
 };
 
-export type PublicPetition_publicCreateTextReplyMutation = {
+export type RecipientView_publicCreateTextReplyMutation = {
   __typename?: "Mutation";
 } & {
   publicCreateTextReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
@@ -1362,13 +1412,13 @@ export type PublicPetition_publicCreateTextReplyMutation = {
   >;
 };
 
-export type PublicPetition_publicCreateFileUploadReplyMutationVariables = {
+export type RecipientView_publicCreateFileUploadReplyMutationVariables = {
   keycode: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: CreateFileUploadReplyInput;
 };
 
-export type PublicPetition_publicCreateFileUploadReplyMutation = {
+export type RecipientView_publicCreateFileUploadReplyMutation = {
   __typename?: "Mutation";
 } & {
   publicCreateFileUploadReply: { __typename?: "CreateFileUploadReply" } & Pick<
@@ -1382,12 +1432,12 @@ export type PublicPetition_publicCreateFileUploadReplyMutation = {
     };
 };
 
-export type PublicPetition_publicFileUploadReplyCompleteMutationVariables = {
+export type RecipientView_publicFileUploadReplyCompleteMutationVariables = {
   keycode: Scalars["ID"];
   replyId: Scalars["ID"];
 };
 
-export type PublicPetition_publicFileUploadReplyCompleteMutation = {
+export type RecipientView_publicFileUploadReplyCompleteMutation = {
   __typename?: "Mutation";
 } & {
   publicFileUploadReplyComplete: {
@@ -1395,11 +1445,11 @@ export type PublicPetition_publicFileUploadReplyCompleteMutation = {
   } & Pick<PublicPetitionFieldReply, "id" | "publicContent">;
 };
 
-export type PublicPetition_publicCompletePetitionMutationVariables = {
+export type RecipientView_publicCompletePetitionMutationVariables = {
   keycode: Scalars["ID"];
 };
 
-export type PublicPetition_publicCompletePetitionMutation = {
+export type RecipientView_publicCompletePetitionMutation = {
   __typename?: "Mutation";
 } & {
   publicCompletePetition: { __typename?: "PublicPetition" } & Pick<
@@ -1407,6 +1457,51 @@ export type PublicPetition_publicCompletePetitionMutation = {
     "id" | "status"
   >;
 };
+
+export type RecipientView_deletePetitionReply_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type RecipientView_deletePetitionReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type RecipientView_createTextReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type RecipientView_createTextReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type RecipientView_createFileUploadReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type RecipientView_createFileUploadReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
 
 export type PublicPetitionQueryVariables = {
   keycode: Scalars["ID"];
@@ -1416,67 +1511,14 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
   sendout?: Maybe<
     { __typename?: "PublicPetitionSendout" } & {
       petition?: Maybe<
-        { __typename?: "PublicPetition" } & {
-          fields: Array<
-            { __typename?: "PublicPetitionField" } & Pick<
-              PublicPetitionField,
-              "id"
-            > &
-              PublicPetitionField_PublicPetitionFieldFragment
-          >;
-        } & PublicPetition_PublicPetitionFragment
+        { __typename?: "PublicPetition" } & RecipientView_PublicPetitionFragment
       >;
       sender?: Maybe<
-        { __typename?: "PublicUser" } & PublicPetition_PublicUserFragment
+        { __typename?: "PublicUser" } & RecipientView_PublicUserFragment
       >;
     }
   >;
 };
-
-export type PublicPetition_deletePetitionReply_PublicPetitionFieldFragment = {
-  __typename?: "PublicPetitionField";
-} & {
-  replies: Array<
-    { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id"
-    >
-  >;
-};
-
-export type PublicPetition_deletePetitionReply_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status">;
-
-export type PublicPetition_createTextReply_FieldFragment = {
-  __typename?: "PublicPetitionField";
-} & {
-  replies: Array<
-    { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id"
-    >
-  >;
-};
-
-export type PublicPetition_createTextReply_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status">;
-
-export type PublicPetition_createFileUploadReply_FieldFragment = {
-  __typename?: "PublicPetitionField";
-} & {
-  replies: Array<
-    { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id"
-    >
-  >;
-};
-
-export type PublicPetition_createFileUploadReply_PublicPetitionFragment = {
-  __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status">;
 
 export type useCreateContact_createContactMutationVariables = {
   data: CreateContactInput;
@@ -1532,20 +1574,15 @@ export const PetitionComposeSettings_ContactFragmentDoc = gql`
     email
   }
 `;
-export const PublicPetitionField_PublicPetitionFieldFragmentDoc = gql`
-  fragment PublicPetitionField_PublicPetitionField on PublicPetitionField {
-    id
-    type
-    title
-    description
-    options
-    optional
-    multiple
-    validated
-    replies {
+export const RecipientViewProgressCard_PublicPetitionFragmentDoc = gql`
+  fragment RecipientViewProgressCard_PublicPetition on PublicPetition {
+    status
+    fields {
       id
-      publicContent
-      createdAt
+      optional
+      replies {
+        id
+      }
     }
   }
 `;
@@ -1824,55 +1861,94 @@ export const Account_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
-export const PublicPetition_PublicPetitionFragmentDoc = gql`
-  fragment PublicPetition_PublicPetition on PublicPetition {
+export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
+    id
+    type
+    title
+    description
+    options
+    optional
+    multiple
+    validated
+    replies {
+      id
+      publicContent
+      createdAt
+    }
+  }
+`;
+export const RecipientView_PublicPetitionFragmentDoc = gql`
+  fragment RecipientView_PublicPetition on PublicPetition {
     id
     status
     deadline
     emailSubject
     emailBody
+    fields {
+      id
+      ...RecipientViewPetitionField_PublicPetitionField
+    }
   }
+  ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
 `;
-export const PublicPetition_PublicUserFragmentDoc = gql`
-  fragment PublicPetition_PublicUser on PublicUser {
+export const RecipientViewSenderCard_PublicUserFragmentDoc = gql`
+  fragment RecipientViewSenderCard_PublicUser on PublicUser {
     id
     firstName
     fullName
+    email
+    organization {
+      name
+    }
   }
 `;
-export const PublicPetition_deletePetitionReply_PublicPetitionFieldFragmentDoc = gql`
-  fragment PublicPetition_deletePetitionReply_PublicPetitionField on PublicPetitionField {
+export const RecipientViewProgressCard_PublicUserFragmentDoc = gql`
+  fragment RecipientViewProgressCard_PublicUser on PublicUser {
+    firstName
+  }
+`;
+export const RecipientView_PublicUserFragmentDoc = gql`
+  fragment RecipientView_PublicUser on PublicUser {
+    ...RecipientViewSenderCard_PublicUser
+    ...RecipientViewProgressCard_PublicUser
+  }
+  ${RecipientViewSenderCard_PublicUserFragmentDoc}
+  ${RecipientViewProgressCard_PublicUserFragmentDoc}
+`;
+export const RecipientView_deletePetitionReply_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientView_deletePetitionReply_PublicPetitionField on PublicPetitionField {
     replies {
       id
     }
   }
 `;
-export const PublicPetition_deletePetitionReply_PublicPetitionFragmentDoc = gql`
-  fragment PublicPetition_deletePetitionReply_PublicPetition on PublicPetition {
+export const RecipientView_deletePetitionReply_PublicPetitionFragmentDoc = gql`
+  fragment RecipientView_deletePetitionReply_PublicPetition on PublicPetition {
     status
   }
 `;
-export const PublicPetition_createTextReply_FieldFragmentDoc = gql`
-  fragment PublicPetition_createTextReply_Field on PublicPetitionField {
+export const RecipientView_createTextReply_FieldFragmentDoc = gql`
+  fragment RecipientView_createTextReply_Field on PublicPetitionField {
     replies {
       id
     }
   }
 `;
-export const PublicPetition_createTextReply_PublicPetitionFragmentDoc = gql`
-  fragment PublicPetition_createTextReply_PublicPetition on PublicPetition {
+export const RecipientView_createTextReply_PublicPetitionFragmentDoc = gql`
+  fragment RecipientView_createTextReply_PublicPetition on PublicPetition {
     status
   }
 `;
-export const PublicPetition_createFileUploadReply_FieldFragmentDoc = gql`
-  fragment PublicPetition_createFileUploadReply_Field on PublicPetitionField {
+export const RecipientView_createFileUploadReply_FieldFragmentDoc = gql`
+  fragment RecipientView_createFileUploadReply_Field on PublicPetitionField {
     replies {
       id
     }
   }
 `;
-export const PublicPetition_createFileUploadReply_PublicPetitionFragmentDoc = gql`
-  fragment PublicPetition_createFileUploadReply_PublicPetition on PublicPetition {
+export const RecipientView_createFileUploadReply_PublicPetitionFragmentDoc = gql`
+  fragment RecipientView_createFileUploadReply_PublicPetition on PublicPetition {
     status
   }
 `;
@@ -3684,60 +3760,60 @@ export type CurrentUserQueryResult = ApolloReactCommon.QueryResult<
   CurrentUserQuery,
   CurrentUserQueryVariables
 >;
-export const PublicPetition_publicDeletePetitionReplyDocument = gql`
-  mutation PublicPetition_publicDeletePetitionReply(
+export const RecipientView_publicDeletePetitionReplyDocument = gql`
+  mutation RecipientView_publicDeletePetitionReply(
     $replyId: ID!
     $keycode: ID!
   ) {
     publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
   }
 `;
-export type PublicPetition_publicDeletePetitionReplyMutationFn = ApolloReactCommon.MutationFunction<
-  PublicPetition_publicDeletePetitionReplyMutation,
-  PublicPetition_publicDeletePetitionReplyMutationVariables
+export type RecipientView_publicDeletePetitionReplyMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_publicDeletePetitionReplyMutation,
+  RecipientView_publicDeletePetitionReplyMutationVariables
 >;
 
 /**
- * __usePublicPetition_publicDeletePetitionReplyMutation__
+ * __useRecipientView_publicDeletePetitionReplyMutation__
  *
- * To run a mutation, you first call `usePublicPetition_publicDeletePetitionReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePublicPetition_publicDeletePetitionReplyMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRecipientView_publicDeletePetitionReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicDeletePetitionReplyMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [publicPetitionPublicDeletePetitionReplyMutation, { data, loading, error }] = usePublicPetition_publicDeletePetitionReplyMutation({
+ * const [recipientViewPublicDeletePetitionReplyMutation, { data, loading, error }] = useRecipientView_publicDeletePetitionReplyMutation({
  *   variables: {
  *      replyId: // value for 'replyId'
  *      keycode: // value for 'keycode'
  *   },
  * });
  */
-export function usePublicPetition_publicDeletePetitionReplyMutation(
+export function useRecipientView_publicDeletePetitionReplyMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PublicPetition_publicDeletePetitionReplyMutation,
-    PublicPetition_publicDeletePetitionReplyMutationVariables
+    RecipientView_publicDeletePetitionReplyMutation,
+    RecipientView_publicDeletePetitionReplyMutationVariables
   >
 ) {
   return ApolloReactHooks.useMutation<
-    PublicPetition_publicDeletePetitionReplyMutation,
-    PublicPetition_publicDeletePetitionReplyMutationVariables
-  >(PublicPetition_publicDeletePetitionReplyDocument, baseOptions);
+    RecipientView_publicDeletePetitionReplyMutation,
+    RecipientView_publicDeletePetitionReplyMutationVariables
+  >(RecipientView_publicDeletePetitionReplyDocument, baseOptions);
 }
-export type PublicPetition_publicDeletePetitionReplyMutationHookResult = ReturnType<
-  typeof usePublicPetition_publicDeletePetitionReplyMutation
+export type RecipientView_publicDeletePetitionReplyMutationHookResult = ReturnType<
+  typeof useRecipientView_publicDeletePetitionReplyMutation
 >;
-export type PublicPetition_publicDeletePetitionReplyMutationResult = ApolloReactCommon.MutationResult<
-  PublicPetition_publicDeletePetitionReplyMutation
+export type RecipientView_publicDeletePetitionReplyMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_publicDeletePetitionReplyMutation
 >;
-export type PublicPetition_publicDeletePetitionReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PublicPetition_publicDeletePetitionReplyMutation,
-  PublicPetition_publicDeletePetitionReplyMutationVariables
+export type RecipientView_publicDeletePetitionReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_publicDeletePetitionReplyMutation,
+  RecipientView_publicDeletePetitionReplyMutationVariables
 >;
-export const PublicPetition_publicCreateTextReplyDocument = gql`
-  mutation PublicPetition_publicCreateTextReply(
+export const RecipientView_publicCreateTextReplyDocument = gql`
+  mutation RecipientView_publicCreateTextReply(
     $keycode: ID!
     $fieldId: ID!
     $data: CreateTextReplyInput!
@@ -3749,23 +3825,23 @@ export const PublicPetition_publicCreateTextReplyDocument = gql`
     }
   }
 `;
-export type PublicPetition_publicCreateTextReplyMutationFn = ApolloReactCommon.MutationFunction<
-  PublicPetition_publicCreateTextReplyMutation,
-  PublicPetition_publicCreateTextReplyMutationVariables
+export type RecipientView_publicCreateTextReplyMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_publicCreateTextReplyMutation,
+  RecipientView_publicCreateTextReplyMutationVariables
 >;
 
 /**
- * __usePublicPetition_publicCreateTextReplyMutation__
+ * __useRecipientView_publicCreateTextReplyMutation__
  *
- * To run a mutation, you first call `usePublicPetition_publicCreateTextReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePublicPetition_publicCreateTextReplyMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRecipientView_publicCreateTextReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicCreateTextReplyMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [publicPetitionPublicCreateTextReplyMutation, { data, loading, error }] = usePublicPetition_publicCreateTextReplyMutation({
+ * const [recipientViewPublicCreateTextReplyMutation, { data, loading, error }] = useRecipientView_publicCreateTextReplyMutation({
  *   variables: {
  *      keycode: // value for 'keycode'
  *      fieldId: // value for 'fieldId'
@@ -3773,29 +3849,29 @@ export type PublicPetition_publicCreateTextReplyMutationFn = ApolloReactCommon.M
  *   },
  * });
  */
-export function usePublicPetition_publicCreateTextReplyMutation(
+export function useRecipientView_publicCreateTextReplyMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PublicPetition_publicCreateTextReplyMutation,
-    PublicPetition_publicCreateTextReplyMutationVariables
+    RecipientView_publicCreateTextReplyMutation,
+    RecipientView_publicCreateTextReplyMutationVariables
   >
 ) {
   return ApolloReactHooks.useMutation<
-    PublicPetition_publicCreateTextReplyMutation,
-    PublicPetition_publicCreateTextReplyMutationVariables
-  >(PublicPetition_publicCreateTextReplyDocument, baseOptions);
+    RecipientView_publicCreateTextReplyMutation,
+    RecipientView_publicCreateTextReplyMutationVariables
+  >(RecipientView_publicCreateTextReplyDocument, baseOptions);
 }
-export type PublicPetition_publicCreateTextReplyMutationHookResult = ReturnType<
-  typeof usePublicPetition_publicCreateTextReplyMutation
+export type RecipientView_publicCreateTextReplyMutationHookResult = ReturnType<
+  typeof useRecipientView_publicCreateTextReplyMutation
 >;
-export type PublicPetition_publicCreateTextReplyMutationResult = ApolloReactCommon.MutationResult<
-  PublicPetition_publicCreateTextReplyMutation
+export type RecipientView_publicCreateTextReplyMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_publicCreateTextReplyMutation
 >;
-export type PublicPetition_publicCreateTextReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PublicPetition_publicCreateTextReplyMutation,
-  PublicPetition_publicCreateTextReplyMutationVariables
+export type RecipientView_publicCreateTextReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_publicCreateTextReplyMutation,
+  RecipientView_publicCreateTextReplyMutationVariables
 >;
-export const PublicPetition_publicCreateFileUploadReplyDocument = gql`
-  mutation PublicPetition_publicCreateFileUploadReply(
+export const RecipientView_publicCreateFileUploadReplyDocument = gql`
+  mutation RecipientView_publicCreateFileUploadReply(
     $keycode: ID!
     $fieldId: ID!
     $data: CreateFileUploadReplyInput!
@@ -3814,23 +3890,23 @@ export const PublicPetition_publicCreateFileUploadReplyDocument = gql`
     }
   }
 `;
-export type PublicPetition_publicCreateFileUploadReplyMutationFn = ApolloReactCommon.MutationFunction<
-  PublicPetition_publicCreateFileUploadReplyMutation,
-  PublicPetition_publicCreateFileUploadReplyMutationVariables
+export type RecipientView_publicCreateFileUploadReplyMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_publicCreateFileUploadReplyMutation,
+  RecipientView_publicCreateFileUploadReplyMutationVariables
 >;
 
 /**
- * __usePublicPetition_publicCreateFileUploadReplyMutation__
+ * __useRecipientView_publicCreateFileUploadReplyMutation__
  *
- * To run a mutation, you first call `usePublicPetition_publicCreateFileUploadReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePublicPetition_publicCreateFileUploadReplyMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRecipientView_publicCreateFileUploadReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicCreateFileUploadReplyMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [publicPetitionPublicCreateFileUploadReplyMutation, { data, loading, error }] = usePublicPetition_publicCreateFileUploadReplyMutation({
+ * const [recipientViewPublicCreateFileUploadReplyMutation, { data, loading, error }] = useRecipientView_publicCreateFileUploadReplyMutation({
  *   variables: {
  *      keycode: // value for 'keycode'
  *      fieldId: // value for 'fieldId'
@@ -3838,29 +3914,29 @@ export type PublicPetition_publicCreateFileUploadReplyMutationFn = ApolloReactCo
  *   },
  * });
  */
-export function usePublicPetition_publicCreateFileUploadReplyMutation(
+export function useRecipientView_publicCreateFileUploadReplyMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PublicPetition_publicCreateFileUploadReplyMutation,
-    PublicPetition_publicCreateFileUploadReplyMutationVariables
+    RecipientView_publicCreateFileUploadReplyMutation,
+    RecipientView_publicCreateFileUploadReplyMutationVariables
   >
 ) {
   return ApolloReactHooks.useMutation<
-    PublicPetition_publicCreateFileUploadReplyMutation,
-    PublicPetition_publicCreateFileUploadReplyMutationVariables
-  >(PublicPetition_publicCreateFileUploadReplyDocument, baseOptions);
+    RecipientView_publicCreateFileUploadReplyMutation,
+    RecipientView_publicCreateFileUploadReplyMutationVariables
+  >(RecipientView_publicCreateFileUploadReplyDocument, baseOptions);
 }
-export type PublicPetition_publicCreateFileUploadReplyMutationHookResult = ReturnType<
-  typeof usePublicPetition_publicCreateFileUploadReplyMutation
+export type RecipientView_publicCreateFileUploadReplyMutationHookResult = ReturnType<
+  typeof useRecipientView_publicCreateFileUploadReplyMutation
 >;
-export type PublicPetition_publicCreateFileUploadReplyMutationResult = ApolloReactCommon.MutationResult<
-  PublicPetition_publicCreateFileUploadReplyMutation
+export type RecipientView_publicCreateFileUploadReplyMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_publicCreateFileUploadReplyMutation
 >;
-export type PublicPetition_publicCreateFileUploadReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PublicPetition_publicCreateFileUploadReplyMutation,
-  PublicPetition_publicCreateFileUploadReplyMutationVariables
+export type RecipientView_publicCreateFileUploadReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_publicCreateFileUploadReplyMutation,
+  RecipientView_publicCreateFileUploadReplyMutationVariables
 >;
-export const PublicPetition_publicFileUploadReplyCompleteDocument = gql`
-  mutation PublicPetition_publicFileUploadReplyComplete(
+export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
+  mutation RecipientView_publicFileUploadReplyComplete(
     $keycode: ID!
     $replyId: ID!
   ) {
@@ -3870,119 +3946,114 @@ export const PublicPetition_publicFileUploadReplyCompleteDocument = gql`
     }
   }
 `;
-export type PublicPetition_publicFileUploadReplyCompleteMutationFn = ApolloReactCommon.MutationFunction<
-  PublicPetition_publicFileUploadReplyCompleteMutation,
-  PublicPetition_publicFileUploadReplyCompleteMutationVariables
+export type RecipientView_publicFileUploadReplyCompleteMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_publicFileUploadReplyCompleteMutation,
+  RecipientView_publicFileUploadReplyCompleteMutationVariables
 >;
 
 /**
- * __usePublicPetition_publicFileUploadReplyCompleteMutation__
+ * __useRecipientView_publicFileUploadReplyCompleteMutation__
  *
- * To run a mutation, you first call `usePublicPetition_publicFileUploadReplyCompleteMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePublicPetition_publicFileUploadReplyCompleteMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRecipientView_publicFileUploadReplyCompleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicFileUploadReplyCompleteMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [publicPetitionPublicFileUploadReplyCompleteMutation, { data, loading, error }] = usePublicPetition_publicFileUploadReplyCompleteMutation({
+ * const [recipientViewPublicFileUploadReplyCompleteMutation, { data, loading, error }] = useRecipientView_publicFileUploadReplyCompleteMutation({
  *   variables: {
  *      keycode: // value for 'keycode'
  *      replyId: // value for 'replyId'
  *   },
  * });
  */
-export function usePublicPetition_publicFileUploadReplyCompleteMutation(
+export function useRecipientView_publicFileUploadReplyCompleteMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PublicPetition_publicFileUploadReplyCompleteMutation,
-    PublicPetition_publicFileUploadReplyCompleteMutationVariables
+    RecipientView_publicFileUploadReplyCompleteMutation,
+    RecipientView_publicFileUploadReplyCompleteMutationVariables
   >
 ) {
   return ApolloReactHooks.useMutation<
-    PublicPetition_publicFileUploadReplyCompleteMutation,
-    PublicPetition_publicFileUploadReplyCompleteMutationVariables
-  >(PublicPetition_publicFileUploadReplyCompleteDocument, baseOptions);
+    RecipientView_publicFileUploadReplyCompleteMutation,
+    RecipientView_publicFileUploadReplyCompleteMutationVariables
+  >(RecipientView_publicFileUploadReplyCompleteDocument, baseOptions);
 }
-export type PublicPetition_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
-  typeof usePublicPetition_publicFileUploadReplyCompleteMutation
+export type RecipientView_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
+  typeof useRecipientView_publicFileUploadReplyCompleteMutation
 >;
-export type PublicPetition_publicFileUploadReplyCompleteMutationResult = ApolloReactCommon.MutationResult<
-  PublicPetition_publicFileUploadReplyCompleteMutation
+export type RecipientView_publicFileUploadReplyCompleteMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_publicFileUploadReplyCompleteMutation
 >;
-export type PublicPetition_publicFileUploadReplyCompleteMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PublicPetition_publicFileUploadReplyCompleteMutation,
-  PublicPetition_publicFileUploadReplyCompleteMutationVariables
+export type RecipientView_publicFileUploadReplyCompleteMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_publicFileUploadReplyCompleteMutation,
+  RecipientView_publicFileUploadReplyCompleteMutationVariables
 >;
-export const PublicPetition_publicCompletePetitionDocument = gql`
-  mutation PublicPetition_publicCompletePetition($keycode: ID!) {
+export const RecipientView_publicCompletePetitionDocument = gql`
+  mutation RecipientView_publicCompletePetition($keycode: ID!) {
     publicCompletePetition(keycode: $keycode) {
       id
       status
     }
   }
 `;
-export type PublicPetition_publicCompletePetitionMutationFn = ApolloReactCommon.MutationFunction<
-  PublicPetition_publicCompletePetitionMutation,
-  PublicPetition_publicCompletePetitionMutationVariables
+export type RecipientView_publicCompletePetitionMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_publicCompletePetitionMutation,
+  RecipientView_publicCompletePetitionMutationVariables
 >;
 
 /**
- * __usePublicPetition_publicCompletePetitionMutation__
+ * __useRecipientView_publicCompletePetitionMutation__
  *
- * To run a mutation, you first call `usePublicPetition_publicCompletePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePublicPetition_publicCompletePetitionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useRecipientView_publicCompletePetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicCompletePetitionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [publicPetitionPublicCompletePetitionMutation, { data, loading, error }] = usePublicPetition_publicCompletePetitionMutation({
+ * const [recipientViewPublicCompletePetitionMutation, { data, loading, error }] = useRecipientView_publicCompletePetitionMutation({
  *   variables: {
  *      keycode: // value for 'keycode'
  *   },
  * });
  */
-export function usePublicPetition_publicCompletePetitionMutation(
+export function useRecipientView_publicCompletePetitionMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PublicPetition_publicCompletePetitionMutation,
-    PublicPetition_publicCompletePetitionMutationVariables
+    RecipientView_publicCompletePetitionMutation,
+    RecipientView_publicCompletePetitionMutationVariables
   >
 ) {
   return ApolloReactHooks.useMutation<
-    PublicPetition_publicCompletePetitionMutation,
-    PublicPetition_publicCompletePetitionMutationVariables
-  >(PublicPetition_publicCompletePetitionDocument, baseOptions);
+    RecipientView_publicCompletePetitionMutation,
+    RecipientView_publicCompletePetitionMutationVariables
+  >(RecipientView_publicCompletePetitionDocument, baseOptions);
 }
-export type PublicPetition_publicCompletePetitionMutationHookResult = ReturnType<
-  typeof usePublicPetition_publicCompletePetitionMutation
+export type RecipientView_publicCompletePetitionMutationHookResult = ReturnType<
+  typeof useRecipientView_publicCompletePetitionMutation
 >;
-export type PublicPetition_publicCompletePetitionMutationResult = ApolloReactCommon.MutationResult<
-  PublicPetition_publicCompletePetitionMutation
+export type RecipientView_publicCompletePetitionMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_publicCompletePetitionMutation
 >;
-export type PublicPetition_publicCompletePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PublicPetition_publicCompletePetitionMutation,
-  PublicPetition_publicCompletePetitionMutationVariables
+export type RecipientView_publicCompletePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_publicCompletePetitionMutation,
+  RecipientView_publicCompletePetitionMutationVariables
 >;
 export const PublicPetitionDocument = gql`
   query PublicPetition($keycode: ID!) {
     sendout(keycode: $keycode) {
       petition {
-        ...PublicPetition_PublicPetition
-        fields {
-          id
-          ...PublicPetitionField_PublicPetitionField
-        }
+        ...RecipientView_PublicPetition
       }
       sender {
-        ...PublicPetition_PublicUser
+        ...RecipientView_PublicUser
       }
     }
   }
-  ${PublicPetition_PublicPetitionFragmentDoc}
-  ${PublicPetitionField_PublicPetitionFieldFragmentDoc}
-  ${PublicPetition_PublicUserFragmentDoc}
+  ${RecipientView_PublicPetitionFragmentDoc}
+  ${RecipientView_PublicUserFragmentDoc}
 `;
 
 /**

@@ -39,6 +39,22 @@ export const icons = {
       </>
     ),
   },
+  business: {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 10h8a2 2 0 012 2v8a2 2 0 01-2 2h-8m0-12a2 2 0 00-2 2v8c0 1.1.9 2 2 2M13 13h.01M4 4h9a2 2 0 012 2v4m-3 12H4M4 4a2 2 0 00-2 2v14c0 1.1.9 2 2 2" />
+        <path d="M16 13h.01M19 13h.01M12.99 16H13M15.99 16H16M18.99 16H19M13 19h.01M16 19h.01M19 19h.01" />
+        <path d="M10 7h2M5 7h2M5 10h2M5 13h2M5 16h2M5 19h2" />
+      </g>
+    ),
+  },
   "log-out": {
     viewBox: "0 0 24 24",
     path: (
@@ -278,6 +294,37 @@ export const icons = {
         strokeLinejoin="round"
       >
         <polygon points="5.5 12 14 3.5 12.5 2 5.5 9 3.5 7 2 8.5"></polygon>
+      </g>
+    ),
+  },
+  email: {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </g>
+    ),
+  },
+  save: {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
       </g>
     ),
   },
