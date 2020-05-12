@@ -8,23 +8,49 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { useCallback, useState, ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { animated, useTransition } from "react-spring";
 import { Card } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 import { PublicContainer } from "./layout/PublicContainer";
 
-const IMAGES = [
-  { id: 0, name: "how_it_works_1" },
-  { id: 1, name: "how_it_works_2" },
-  { id: 2, name: "how_it_works_3" },
-];
-
 export function PublicHowItWorksHero({ ...props }: BoxProps) {
+  const intl = useIntl();
   const [index, setIndex] = useState(0);
   const onClick = useCallback(() => setIndex((state) => (state + 1) % 3), []);
-  const transitions = useTransition(IMAGES[index], (i) => i.id, {
+
+  const images = [
+    {
+      id: 0,
+      name: "how_it_works_1",
+      alt: intl.formatMessage({
+        id: "public.how-it-works-hero.screenshot-1",
+        defaultMessage:
+          "A screenshot of the app showing the creation of a petition.",
+      }),
+    },
+    {
+      id: 1,
+      name: "how_it_works_2",
+      alt: intl.formatMessage({
+        id: "public.how-it-works-hero.screenshot-2",
+        defaultMessage:
+          "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
+      }),
+    },
+    {
+      id: 2,
+      name: "how_it_works_3",
+      alt: intl.formatMessage({
+        id: "public.how-it-works-hero.screenshot-3",
+        defaultMessage:
+          "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
+      }),
+    },
+  ];
+
+  const transitions = useTransition(images[index], (i) => i.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
@@ -41,18 +67,18 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
     >
       <Heading as="h2" fontSize="3xl" fontWeight="bold" color="purple.500">
         <FormattedMessage
-          id="public.home.hero-how-it-works"
+          id="public.how-it-works-hero.title"
           defaultMessage="How it works"
         ></FormattedMessage>
       </Heading>
       <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
-          id="public.home.hero-steps"
+          id="public.how-it-works-hero.description-1"
           defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you."
         ></FormattedMessage>
         <br />
         <FormattedMessage
-          id="public.home.hero-steps-1"
+          id="public.how-it-works-hero.description-2"
           defaultMessage="Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
         ></FormattedMessage>
       </Heading>
@@ -71,13 +97,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.steps.create-request"
+                id="public.how-it-works-hero.create-request"
                 defaultMessage="Create your request"
               ></FormattedMessage>
             }
             description={
               <FormattedMessage
-                id="public.steps.user-friendly"
+                id="public.how-it-works-hero.user-friendly"
                 defaultMessage="Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you."
               ></FormattedMessage>
             }
@@ -88,13 +114,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.steps.set-date"
+                id="public.how-it-works-hero.set-date"
                 defaultMessage="Set a delivery deadline"
               ></FormattedMessage>
             }
             description={
               <FormattedMessage
-                id="public.steps.client-timings"
+                id="public.how-it-works-hero.client-timings"
                 defaultMessage="We automate the information request process. Your client will not know that it is not you who sends the emails."
               ></FormattedMessage>
             }
@@ -105,13 +131,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.steps.receive-inbox"
+                id="public.how-it-works-hero.receive-inbox"
                 defaultMessage="Receive it on time in your inbox"
               ></FormattedMessage>
             }
             description={
               <FormattedMessage
-                id="public.steps.focus-on-work"
+                id="public.how-it-works-hero.focus-on-work"
                 defaultMessage="We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification."
               ></FormattedMessage>
             }

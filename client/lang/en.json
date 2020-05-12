@@ -1677,7 +1677,7 @@
     "term": "public.contact-link",
     "definition": "Contact",
     "context": "Contact",
-    "reference": "components/public/layout/PublicFooter.tsx#L128-L131"
+    "reference": "components/public/layout/PublicFooter.tsx#L133-L136"
   },
   {
     "term": "public.cookies.title",
@@ -1689,7 +1689,7 @@
     "term": "public.footer.company",
     "definition": "Company",
     "context": "Company",
-    "reference": "components/public/layout/PublicFooter.tsx#L104-L107"
+    "reference": "components/public/layout/PublicFooter.tsx#L109-L112"
   },
   {
     "term": "public.footer.language-select-label",
@@ -1701,31 +1701,31 @@
     "term": "public.footer.legal-information",
     "definition": "Legal information",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L140-L143"
+    "reference": "components/public/layout/PublicFooter.tsx#L145-L148"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn profile",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L208-L211"
+    "reference": "components/public/layout/PublicFooter.tsx#L213-L216"
   },
   {
     "term": "public.footer.product",
     "definition": "Product",
     "context": "Product",
-    "reference": "components/public/layout/PublicFooter.tsx#L54-L57"
+    "reference": "components/public/layout/PublicFooter.tsx#L59-L62"
   },
   {
     "term": "public.footer.support",
     "definition": "Support",
     "context": "Support",
-    "reference": "components/public/layout/PublicFooter.tsx#L74-L77"
+    "reference": "components/public/layout/PublicFooter.tsx#L79-L82"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter profile",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L193-L196"
+    "reference": "components/public/layout/PublicFooter.tsx#L198-L201"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -1830,12 +1830,6 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L30-L33"
   },
   {
-    "term": "public.home.hero-how-it-works",
-    "definition": "How it works",
-    "context": "How it works",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L43-L46"
-  },
-  {
     "term": "public.home.hero-leading-digital-transformation",
     "definition": "Leading digital transformation in their companies",
     "context": "Leading digital transformation in their companies",
@@ -1854,18 +1848,6 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L19-L22"
   },
   {
-    "term": "public.home.hero-steps",
-    "definition": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
-    "context": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L49-L52"
-  },
-  {
-    "term": "public.home.hero-steps-1",
-    "definition": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
-    "context": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L54-L57"
-  },
-  {
     "term": "public.home.hero-try-now",
     "definition": "Try it now and let Parallel work for you",
     "context": "Try it now and let Parallel work for you",
@@ -1882,6 +1864,78 @@
     "definition": "Collect information efficiently",
     "context": "Collect information efficiently",
     "reference": "pages/[locale]/index.tsx#L14-L17"
+  },
+  {
+    "term": "public.how-it-works-hero.client-timings",
+    "definition": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
+    "context": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L122-L125"
+  },
+  {
+    "term": "public.how-it-works-hero.create-request",
+    "definition": "Create your request",
+    "context": "Create your request",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L99-L102"
+  },
+  {
+    "term": "public.how-it-works-hero.description-1",
+    "definition": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
+    "context": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L75-L78"
+  },
+  {
+    "term": "public.how-it-works-hero.description-2",
+    "definition": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
+    "context": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L80-L83"
+  },
+  {
+    "term": "public.how-it-works-hero.focus-on-work",
+    "definition": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
+    "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L139-L142"
+  },
+  {
+    "term": "public.how-it-works-hero.receive-inbox",
+    "definition": "Receive it on time in your inbox",
+    "context": "Receive it on time in your inbox",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L133-L136"
+  },
+  {
+    "term": "public.how-it-works-hero.screenshot-1",
+    "definition": "A screenshot of the app showing the creation of a petition.",
+    "context": "A screenshot of the app showing the creation of a petition.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L27-L31"
+  },
+  {
+    "term": "public.how-it-works-hero.screenshot-2",
+    "definition": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
+    "context": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L36-L40"
+  },
+  {
+    "term": "public.how-it-works-hero.screenshot-3",
+    "definition": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
+    "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L45-L49"
+  },
+  {
+    "term": "public.how-it-works-hero.set-date",
+    "definition": "Set a delivery deadline",
+    "context": "Set a delivery deadline",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L116-L119"
+  },
+  {
+    "term": "public.how-it-works-hero.title",
+    "definition": "How it works",
+    "context": "How it works",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L69-L72"
+  },
+  {
+    "term": "public.how-it-works-hero.user-friendly",
+    "definition": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
+    "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
+    "reference": "components/public/PublicHowItWorksHero.tsx#L105-L108"
   },
   {
     "term": "public.invite-button",
@@ -2200,42 +2254,6 @@
     "definition": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
     "context": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
     "reference": "components/public/PublicMainHero.tsx#L92-L96"
-  },
-  {
-    "term": "public.steps.client-timings",
-    "definition": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
-    "context": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L96-L99"
-  },
-  {
-    "term": "public.steps.create-request",
-    "definition": "Create your request",
-    "context": "Create your request",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L73-L76"
-  },
-  {
-    "term": "public.steps.focus-on-work",
-    "definition": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
-    "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L113-L116"
-  },
-  {
-    "term": "public.steps.receive-inbox",
-    "definition": "Receive it on time in your inbox",
-    "context": "Receive it on time in your inbox",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L107-L110"
-  },
-  {
-    "term": "public.steps.set-date",
-    "definition": "Set a delivery deadline",
-    "context": "Set a delivery deadline",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L90-L93"
-  },
-  {
-    "term": "public.steps.user-friendly",
-    "definition": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
-    "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L79-L82"
   },
   {
     "term": "public.support.faq",

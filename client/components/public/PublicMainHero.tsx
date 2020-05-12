@@ -97,7 +97,6 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             margin="auto"
             src={`${imageName}.png"`}
             {...{ srcSet: `${imageName}@2x.png 2x` }}
-            role="presentation"
           />
         </Box>
       </Flex>
