@@ -63,7 +63,13 @@ export const clonePetition = mutationField("clonePetition", {
     if (args.name !== undefined && args.name !== petition.name) {
       return await ctx.petitions.updatePetition(
         petition.id,
-        { name: args.name ?? null },
+        {
+          name: args.name ?? null,
+          email_subject:
+            petition.name === petition.email_subject
+              ? args.name
+              : petition.email_subject,
+        },
         ctx.user!
       );
     } else {
