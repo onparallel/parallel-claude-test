@@ -47,7 +47,12 @@ export function PublicFooter(props: BoxProps) {
         ...props,
       }}
     >
-      <Flex justify="space-between" align="stretch" wrap="wrap">
+      <Flex
+        justify="space-between"
+        align="stretch"
+        wrap="wrap"
+        textAlign={{ base: "center", md: "left" }}
+      >
         <PublicFooterBox
           flex="1"
           minWidth={{ base: "100%", md: 40 }}

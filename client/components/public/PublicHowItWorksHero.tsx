@@ -1,5 +1,13 @@
-import { Box, BoxProps, Button, Flex, Heading, Text } from "@chakra-ui/core";
-import { ReactNode, useCallback, useState } from "react";
+import {
+  Box,
+  BoxProps,
+  Button,
+  Flex,
+  Heading,
+  Image,
+  Text,
+} from "@chakra-ui/core";
+import { useCallback, useState, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { animated, useTransition } from "react-spring";
 import { Card } from "../common/Card";
@@ -8,12 +16,12 @@ import { Spacer } from "../common/Spacer";
 import { PublicContainer } from "./layout/PublicContainer";
 
 const IMAGES = [
-  { id: 0, url: "/static/images/newrequest.png" },
-  { id: 1, url: "/static/images/uploadview.png" },
-  { id: 2, url: "/static/images/downloadview.png" },
+  { id: 0, name: "how_it_works_1" },
+  { id: 1, name: "how_it_works_2" },
+  { id: 2, name: "how_it_works_3" },
 ];
 
-export function PublicHeroHowItWorks({ ...props }: BoxProps) {
+export function PublicHowItWorksHero({ ...props }: BoxProps) {
   const [index, setIndex] = useState(0);
   const onClick = useCallback(() => setIndex((state) => (state + 1) % 3), []);
   const transitions = useTransition(IMAGES[index], (i) => i.id, {
@@ -132,18 +140,30 @@ export function PublicHeroHowItWorks({ ...props }: BoxProps) {
                     key={key}
                     style={{
                       ...props,
+                      display: "flex",
+                      alignItems: "center",
                       position: "absolute",
                       top: 0,
                       left: 0,
                       width: "100%",
                       height: "100%",
-                      backgroundSize: "contain",
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "center",
                       willChange: "opacity",
-                      backgroundImage: `url(${item.url})`,
                     }}
-                  ></animated.div>
+                  >
+                    <Card overflow="hidden">
+                      <Image
+                        src={`/static/images/${item.name}.png`}
+                        {...{
+                          srcSet: [2, 3]
+                            .map(
+                              (size) =>
+                                `/static/images/${item.name}@${size}x.png ${size}x`
+                            )
+                            .join(","),
+                        }}
+                      />
+                    </Card>
+                  </animated.div>
                 );
               })}
             </Box>

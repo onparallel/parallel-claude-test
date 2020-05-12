@@ -38,7 +38,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
           content={intl.formatMessage({
             id: "public.meta-description",
             defaultMessage:
-              "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
+              "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal.",
           })}
         />
         {languages.map(({ locale }) => (

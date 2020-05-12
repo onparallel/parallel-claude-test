@@ -1,8 +1,7 @@
 import { Title } from "@parallel/components/common/Title";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { PublicHeroBlackBanner } from "@parallel/components/public/PublicHeroBlackBanner";
-import { PublicHeroHowItWorks } from "@parallel/components/public/PublicHeroHowItWorks";
-import { PublicHeroPC } from "@parallel/components/public/PublicHeroPc";
+import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
+import { PublicMainHero } from "@parallel/components/public/PublicMainHero";
 import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHeroPopularUseCases";
 import languages from "@parallel/lang/languages.json";
 import { useIntl } from "react-intl";
@@ -18,10 +17,9 @@ function Home() {
         })}
       </Title>
       <PublicLayout>
-        <PublicHeroPC />
-        <PublicHeroBlackBanner />
+        <PublicMainHero />
         <PublicHeroPopularUseCases />
-        <PublicHeroHowItWorks />
+        <PublicHowItWorksHero />
       </PublicLayout>
     </>
   );

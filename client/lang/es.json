@@ -537,13 +537,13 @@
     "term": "generic.dropzone-allowed-types",
     "definition": "Solo los siguientes tipos están permitidos:",
     "context": "Only the following file types are allowed:",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L392-L395"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L397-L400"
   },
   {
     "term": "generic.dropzone-default",
     "definition": "Arrastra archivos aquí o haz click para seleccionarlos",
     "context": "Drag files here, or click to select them",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L425-L428"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L430-L433"
   },
   {
     "term": "generic.edit-label",
@@ -573,25 +573,25 @@
     "term": "generic.file-types.document",
     "definition": "Documentos (.pdf, .doc, .docx)",
     "context": "Documents (.pdf, .doc, .docx)",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L400-L403"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L405-L408"
   },
   {
     "term": "generic.file-types.image",
     "definition": "Imágenes (.jpeg, .png, etc.)",
     "context": "Images (.jpeg, .png, etc.)",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L405-L408"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L410-L413"
   },
   {
     "term": "generic.file-types.pdf",
     "definition": "Documentos PDF",
     "context": "PDF Documents",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L415-L418"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L420-L423"
   },
   {
     "term": "generic.file-types.video",
     "definition": "Vídeos (.mp4, .avi, etc.)",
     "context": "Videos (.mp4, .avi, etc.)",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L410-L413"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L415-L418"
   },
   {
     "term": "generic.forms.confirm-password-label",
@@ -669,7 +669,7 @@
     "term": "generic.forms.required-field-error",
     "definition": "Se requiere un valor",
     "context": "A value is required",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L293-L296"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L297-L300"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -729,7 +729,7 @@
     "term": "generic.optional-field",
     "definition": "Opcional",
     "context": "Optional",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L89-L92"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L93-L96"
   },
   {
     "term": "generic.petition-status.completed",
@@ -1557,7 +1557,7 @@
     "term": "public.book-demo-button",
     "definition": "Solicita una demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicHeroPopularUseCases.tsx#L133-L136"
+    "reference": "components/public/PublicMainHero.tsx#L69-L72"
   },
   {
     "term": "public.book-demo.basic-functions",
@@ -1807,15 +1807,15 @@
   },
   {
     "term": "public.home.hero-collect",
-    "definition": "Automatiza tus procesos de recogida  de información y ahorra tiempo.",
-    "context": "Automate your information collection processes and save time.",
-    "reference": "components/public/PublicHeroPc.tsx#L28-L31"
+    "definition": "Automatiza emails y recopila documentos eficientemente",
+    "context": "Automate emails and collect documents efficiently",
+    "reference": "components/public/PublicMainHero.tsx#L33-L36"
   },
   {
     "term": "public.home.hero-digital-transformation",
     "definition": "¡Pásate a la transformación digital!",
     "context": "Begin your digital transformation!",
-    "reference": "components/public/PublicHeroPc.tsx#L40-L43"
+    "reference": "components/public/PublicMainHero.tsx#L45-L48"
   },
   {
     "term": "public.home.hero-discover-use",
@@ -1833,7 +1833,7 @@
     "term": "public.home.hero-how-it-works",
     "definition": "Cómo funciona",
     "context": "How it works",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L35-L38"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L43-L46"
   },
   {
     "term": "public.home.hero-leading-digital-transformation",
@@ -1845,7 +1845,7 @@
     "term": "public.home.hero-platform",
     "definition": "Parallel es una plataforma para profesionales ocupados. Recopilamos toda la documentación de tu cliente por ti de forma segura y rápida.",
     "context": "Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly.",
-    "reference": "components/public/PublicHeroPc.tsx#L34-L37"
+    "reference": "components/public/PublicMainHero.tsx#L39-L42"
   },
   {
     "term": "public.home.hero-popular-use-cases",
@@ -1854,46 +1854,22 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L19-L22"
   },
   {
-    "term": "public.home.hero-question",
-    "definition": "",
-    "context": "Do you want to reduce the time wasted reviewing recurrent emails?",
-    "reference": "components/public/PublicHero.tsx#L45-L48"
-  },
-  {
-    "term": "public.home.hero-scale-services",
-    "definition": "¿Quién dijo que los servicios profesionales solo escalan con más capital humano?",
-    "context": "Who said professional services only scale with more human capital?",
-    "reference": "components/public/PublicHeroBlackBanner.tsx#L18-L21"
-  },
-  {
     "term": "public.home.hero-steps",
     "definition": "En 3 sencillos pasos podrás crear una petición con la documentación que necesitas que tu cliente te envíe.",
     "context": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L41-L44"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L49-L52"
   },
   {
     "term": "public.home.hero-steps-1",
     "definition": "Nuestra plataforma es segura, así que podrás centrarte en lo importante hasta que te avisemos de que tu cliente ya ha enviado todo.",
     "context": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L46-L49"
-  },
-  {
-    "term": "public.home.hero-subtitle",
-    "definition": "",
-    "context": "A game changer process for daily document workflows.",
-    "reference": "components/public/PublicHero.tsx#L39-L42"
-  },
-  {
-    "term": "public.home.hero-title",
-    "definition": "",
-    "context": "Parallel is the new black",
-    "reference": "components/public/PublicHero.tsx#L33-L36"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L54-L57"
   },
   {
     "term": "public.home.hero-try-now",
     "definition": "Pruébalo ahora y deja que Parallel trabaje por ti",
     "context": "Try it now and let Parallel work for you",
-    "reference": "components/public/PublicHeroPc.tsx#L64-L67"
+    "reference": "components/public/PublicMainHero.tsx#L77-L80"
   },
   {
     "term": "public.home.hero-who-trust-us",
@@ -1902,16 +1878,10 @@
     "reference": "components/public/PublicHeroWhoTrustUs.tsx#L17-L20"
   },
   {
-    "term": "public.home.request-invite-button",
-    "definition": "Prueba Parallel gratis",
-    "context": "Request an invite",
-    "reference": "components/public/PublicHero.tsx#L91-L94"
-  },
-  {
     "term": "public.home.title",
     "definition": "Recopila información eficientemente",
     "context": "Collect information efficiently",
-    "reference": "pages/[locale]/index.tsx#L15-L18"
+    "reference": "pages/[locale]/index.tsx#L14-L17"
   },
   {
     "term": "public.invite-button",
@@ -2035,8 +2005,8 @@
   },
   {
     "term": "public.meta-description",
-    "definition": "Parallel ayuda a profesionales a recopilar y organizar información de sus clientes mediante la automatización de emails y un portal de cliente similar a formularios.",
-    "context": "Parallel helps professionals collect and organize the information from their clients with its email automation platform and form-like client portal.",
+    "definition": "Parallel ayuda a profesionales a recopilar y organizar información de sus clientes mediante la automatización de emails y checklists, y un portal de cliente similar a formularios.",
+    "context": "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal.",
     "reference": "components/public/layout/PublicLayout.tsx#L38-L42"
   },
   {
@@ -2226,40 +2196,46 @@
     "reference": "pages/[locale]/security.tsx#L88-L91"
   },
   {
+    "term": "public.showcase-hero-alt",
+    "definition": "Una profesional está pidiendo a su cliente unos documentos que necesita para un caso. Su cliente le responde \"¡Aquí los tienes!\".",
+    "context": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
+    "reference": "components/public/PublicMainHero.tsx#L92-L96"
+  },
+  {
     "term": "public.steps.client-timings",
     "definition": "Nosotros automatizamos el proceso de pedido de información. Tu cliente no sabrá que no eres tú quien envía los mails.",
     "context": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L88-L91"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L96-L99"
   },
   {
     "term": "public.steps.create-request",
     "definition": "Crea tu petición",
     "context": "Create your request",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L65-L68"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L73-L76"
   },
   {
     "term": "public.steps.focus-on-work",
     "definition": "Enviaremos recordatorios a tu cliente para que no tengas que preocuparte de nada. Cuando esté todo listo, recibirás una notificación.",
     "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L105-L108"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L113-L116"
   },
   {
     "term": "public.steps.receive-inbox",
     "definition": "Recíbelo a tiempo en tu bandeja de entrada",
     "context": "Receive it on time in your inbox",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L99-L102"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L107-L110"
   },
   {
     "term": "public.steps.set-date",
     "definition": "Marca una fecha de entrega",
     "context": "Set a delivery deadline",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L82-L85"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L90-L93"
   },
   {
     "term": "public.steps.user-friendly",
     "definition": "Utiliza nuestra interfaz amigable y fácil de usar. Dinos qué documentación necesitas y quién te la tiene que enviar.",
     "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
-    "reference": "components/public/PublicHeroHowItWorks.tsx#L71-L74"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L79-L82"
   },
   {
     "term": "public.support.faq",
@@ -2295,25 +2271,25 @@
     "term": "sendout.completed-petition.toast-description",
     "definition": "Has completado esta petición y {name} será notificado",
     "context": "You have completed this petition and {name} will be notified",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L165-L169"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L166-L170"
   },
   {
     "term": "sendout.completed-petition.toast-title",
     "definition": "¡Petición completada!",
     "context": "Petition completed!",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L160-L163"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L161-L164"
   },
   {
     "term": "sendout.field-reply-submit",
     "definition": "Enviar",
     "context": "Submit",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L307-L310"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L311-L314"
   },
   {
     "term": "sendout.files-uploaded",
     "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L131-L135"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L135-L139"
   },
   {
     "term": "sendout.organization",
@@ -2325,13 +2301,13 @@
     "term": "sendout.petition-completed-alert",
     "definition": "Esta petición ha sido completada. Si deseas realizar cambios, no te olvides de hacer click de nuevo en el botón de finalizar.",
     "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L206-L209"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L207-L210"
   },
   {
     "term": "sendout.powered-by",
     "definition": "Powered by",
     "context": "Powered by",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L273-L276"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L281-L284"
   },
   {
     "term": "sendout.progress",
@@ -2343,13 +2319,13 @@
     "term": "sendout.remove-reply-label",
     "definition": "Eliminar respuesta",
     "context": "Remove reply",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L244-L247"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L248-L251"
   },
   {
     "term": "sendout.replies-submitted",
     "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviad} other {# respuestas enviadas}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L125-L129"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L129-L133"
   },
   {
     "term": "sendout.security-link",
@@ -2385,7 +2361,7 @@
     "term": "sendout.text-reply",
     "definition": "Respuesta añadida el {date}",
     "context": "Reply added on {date}",
-    "reference": "components/recipient/RecipientViewPetitionField.tsx#L147-L158"
+    "reference": "components/recipient/RecipientViewPetitionField.tsx#L151-L162"
   },
   {
     "term": "settings.account",
