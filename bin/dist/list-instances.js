@@ -34,8 +34,7 @@ async function main() {
             LoadBalancerArn: lb.LoadBalancerArn,
         })
             .promise();
-        const tgArn = ((_a = listeners.Listeners) === null || _a === void 0 ? void 0 : _a.find((l) => l.Protocol === "HTTPS"))
-            .DefaultActions[0].TargetGroupArn;
+        const tgArn = (_a = listeners.Listeners) === null || _a === void 0 ? void 0 : _a.find((l) => l.Protocol === "HTTPS").DefaultActions[0].TargetGroupArn;
         const tgHealth = await elbv2
             .describeTargetHealth({
             TargetGroupArn: tgArn,

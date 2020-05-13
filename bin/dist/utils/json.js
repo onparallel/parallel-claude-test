@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.writeJson = exports.readJson = void 0;
 const fs_1 = require("fs");
 async function readJson(path) {
     const contents = await fs_1.promises.readFile(path, "utf-8");
