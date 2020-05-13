@@ -23,6 +23,11 @@ createQueueWorker<SendoutWorkerPayload>(
       context.contacts.loadContact(sendout.contact_id),
       context.petitions.loadFieldsForPetition(sendout.petition_id),
     ]);
+    if (!petition) {
+      throw new Error(
+        `Petition not found for petition_sendout.petition_id ${sendout.petition_id}`
+      );
+    }
     if (!sender) {
       throw new Error(
         `User not found for petition_sendout.sender_id ${sendout.sender_id}`
@@ -31,11 +36,6 @@ createQueueWorker<SendoutWorkerPayload>(
     if (!contact) {
       throw new Error(
         `Contact not found for petition_sendout.contact_id ${sendout.contact_id}`
-      );
-    }
-    if (!fields) {
-      throw new Error(
-        `Fields not found for petition_sendout.petition_id ${sendout.petition_id}`
       );
     }
     const recipientNameOrEmail =

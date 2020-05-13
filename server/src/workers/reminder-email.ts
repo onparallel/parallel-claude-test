@@ -52,11 +52,6 @@ createQueueWorker(
         `Contact not found for petition_sendout.contact_id ${sendout.contact_id}`
       );
     }
-    if (!fields) {
-      throw new Error(
-        `Fields not found for petition_sendout.petition_id ${sendout.petition_id}`
-      );
-    }
     const senderName = sender.last_name
       ? `${sender.first_name} ${sender.last_name}`
       : sender.first_name!;
