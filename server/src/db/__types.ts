@@ -333,8 +333,6 @@ export interface PetitionSendout {
   keycode: string;
   email_subject: Maybe<string>;
   email_body: Maybe<string>;
-  locale: string;
-  deadline: Maybe<Date>;
   status: PetitionSendoutStatus;
   scheduled_at: Maybe<Date>;
   email_log_id: Maybe<number>;
@@ -360,8 +358,6 @@ export interface CreatePetitionSendout {
   keycode: string;
   email_subject?: Maybe<string>;
   email_body?: Maybe<string>;
-  locale: string;
-  deadline?: Maybe<Date>;
   status: PetitionSendoutStatus;
   scheduled_at?: Maybe<Date>;
   email_log_id?: Maybe<number>;

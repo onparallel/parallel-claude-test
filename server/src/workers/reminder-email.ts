@@ -64,12 +64,12 @@ createQueueWorker(
         subject: sendout.email_subject,
         body: sendout.email_body ? JSON.parse(sendout.email_body) : [],
         fields: fields.map((f) => ({ id: f.id, title: f.title })),
-        deadline: sendout.deadline,
+        deadline: petition.deadline,
         keycode: sendout.keycode,
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
       },
-      { locale: sendout.locale }
+      { locale: petition.locale }
     );
     const email = await context.emails.createEmail({
       from: buildFrom(from, context.config.misc.emailFrom),

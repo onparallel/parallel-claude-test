@@ -53,7 +53,7 @@ createQueueWorker<SendoutWorkerPayload>(
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
       },
-      { locale: sendout.locale }
+      { locale: petition.locale }
     );
     const email = await context.emails.createEmail({
       from: buildFrom(from, context.config.misc.emailFrom),

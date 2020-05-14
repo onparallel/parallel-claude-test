@@ -16,11 +16,17 @@ createQueueWorker<SendoutEmailWorkerPayload>(
         `Sendout not found for id ${payload.petition_sendout_id}`
       );
     }
-    const [sender, contact, fields] = await Promise.all([
+    const [petition, sender, contact, fields] = await Promise.all([
+      context.petitions.loadPetition(sendout.petition_id),
       context.users.loadUser(sendout.sender_id),
       context.contacts.loadContact(sendout.contact_id),
       context.petitions.loadFieldsForPetition(sendout.petition_id),
     ]);
+    if (!petition) {
+      throw new Error(
+        `Petition not found for petition_sendout.petition_id ${sendout.petition_id}`
+      );
+    }
     if (!sender) {
       throw new Error(
         `User not found for petition_sendout.sender_id ${sendout.sender_id}`
@@ -43,12 +49,12 @@ createQueueWorker<SendoutEmailWorkerPayload>(
         subject: sendout.email_subject,
         body: sendout.email_body ? JSON.parse(sendout.email_body) : [],
         fields: fields.map((f) => ({ id: f.id, title: f.title })),
-        deadline: sendout.deadline,
+        deadline: petition.deadline,
         keycode: sendout.keycode,
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
       },
-      { locale: sendout.locale }
+      { locale: petition.locale }
     );
     const email = await context.emails.createEmail({
       from: buildFrom(from, context.config.misc.emailFrom),
