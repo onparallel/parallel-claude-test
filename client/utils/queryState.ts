@@ -1,7 +1,9 @@
+import { Sorting, SortingDirection } from "@parallel/components/common/Table";
 import { useRouter } from "next/router";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { equals } from "remeda";
 import { pathParams, resolveUrl } from "./next";
 
 export class QueryItem<T> {
@@ -22,7 +24,7 @@ export class QueryItem<T> {
     if (this._isDefault) {
       return this._isDefault(value);
     } else {
-      return this.defaultValue === value;
+      return equals(this.defaultValue, value);
     }
   }
 
@@ -40,37 +42,52 @@ export class QueryItem<T> {
 }
 
 export function integer({ max, min }: { max?: number; min?: number } = {}) {
-  return new QueryItem<number | null>(
-    (value) => {
-      if (typeof value === "string") {
-        const parsed = parseInt(value);
-        if (
-          !isNaN(parsed) &&
-          parsed >= (min ?? -Infinity) &&
-          parsed <= (max ?? Infinity)
-        ) {
-          return parsed;
-        }
+  return new QueryItem<number | null>((value) => {
+    if (typeof value === "string") {
+      const parsed = parseInt(value);
+      if (
+        !isNaN(parsed) &&
+        parsed >= (min ?? -Infinity) &&
+        parsed <= (max ?? Infinity)
+      ) {
+        return parsed;
       }
-      return null;
-    },
-    (value) => value.toString()
-  );
+    }
+    return null;
+  });
 }
 
 export function string() {
-  return new QueryItem<string | null>(
-    (value) => {
-      return typeof value === "string" ? value : null;
-    },
-    (value) => value
-  );
+  return new QueryItem<string | null>((value) => {
+    return typeof value === "string" ? value : null;
+  });
 }
 
 export function enums<T extends string>(values: T[]) {
   return new QueryItem<T | null>((value) => {
     return values.includes(value as any) ? (value as T) : null;
   });
+}
+
+export function sorting<T extends string>(fields: readonly T[]) {
+  return new QueryItem<Sorting<T>>(
+    (value) => {
+      if (value) {
+        const [field, direction] = (value as string).split("_");
+        if (
+          fields.includes(field as any) &&
+          ["ASC", "DESC"].includes(direction)
+        ) {
+          return {
+            field: field as T,
+            direction: direction as SortingDirection,
+          };
+        }
+      }
+      return null;
+    },
+    ({ field, direction }) => `${field}_${direction}`
+  );
 }
 
 export interface ParseQueryOptions {
@@ -103,13 +120,14 @@ export function useQueryState<T extends {}>(
   { prefix }: QueryStateOptions = {}
 ) {
   const router = useRouter();
+  const state = useMemo(() => {
+    const state = parseQuery(router.query, shape, { prefix });
+    return state;
+  }, [router.query, router.pathname]);
   return [
-    useMemo(() => {
-      const state = parseQuery(router.query, shape, { prefix });
-      return state;
-    }, [router.query, router.pathname]),
-    useMemo(() => {
-      return async function (
+    state,
+    useCallback(
+      async function (
         state:
           | { [P in keyof T]?: T[P] }
           | ((current: { [P in keyof T]?: T[P] }) => { [P in keyof T]?: T[P] })
@@ -147,7 +165,8 @@ export function useQueryState<T extends {}>(
           `${route}${query ? "?" + query : ""}`,
           { shallow: true }
         );
-      };
-    }, [router.query, router.pathname]),
+      },
+      [router.query, router.pathname]
+    ),
   ] as const;
 }

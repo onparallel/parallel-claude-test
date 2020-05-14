@@ -45,9 +45,14 @@ declare global {
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "JSON";
-    paginationField<FieldName extends string>(
+    paginationField<
+      FieldName extends string,
+      PaginationType extends
+        | core.GetGen<"allOutputTypes", string>
+        | core.AllNexusOutputTypeDefs
+    >(
       fieldName: FieldName,
-      config: PaginationFieldConfig<TypeName, FieldName>
+      config: PaginationFieldConfig<TypeName, FieldName, PaginationType>
     ): void;
   }
 }
@@ -122,6 +127,22 @@ export interface NexusGenEnums {
   PetitionLocale: "en" | "es";
   PetitionSendoutStatus: db.PetitionSendoutStatus;
   PetitionStatus: db.PetitionStatus;
+  QueryContacts_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
+    | "email_ASC"
+    | "email_DESC"
+    | "firstName_ASC"
+    | "firstName_DESC"
+    | "fullName_ASC"
+    | "fullName_DESC"
+    | "lastName_ASC"
+    | "lastName_DESC";
+  QueryPetitions_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
+    | "name_ASC"
+    | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
 }
 
@@ -243,6 +264,8 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PetitionLocale: NexusGenEnums["PetitionLocale"];
   PetitionSendoutStatus: NexusGenEnums["PetitionSendoutStatus"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
+  QueryContacts_OrderBy: NexusGenEnums["QueryContacts_OrderBy"];
+  QueryPetitions_OrderBy: NexusGenEnums["QueryPetitions_OrderBy"];
   Result: NexusGenEnums["Result"];
 }
 
@@ -640,6 +663,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+      sortBy?: NexusGenEnums["QueryContacts_OrderBy"][] | null; // [QueryContacts_OrderBy!]
     };
     organization: {
       // args
@@ -654,6 +678,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+      sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
     };
     sendout: {
@@ -726,6 +751,8 @@ export type NexusGenEnumNames =
   | "PetitionLocale"
   | "PetitionSendoutStatus"
   | "PetitionStatus"
+  | "QueryContacts_OrderBy"
+  | "QueryPetitions_OrderBy"
   | "Result";
 
 export type NexusGenInterfaceNames = "Timestamps";

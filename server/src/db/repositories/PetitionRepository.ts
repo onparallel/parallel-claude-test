@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import Knex, { QueryBuilder } from "knex";
 import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { count } from "../../util/remedaExtensions";
@@ -18,6 +18,7 @@ import {
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreatePetitionSendout,
+  Petition,
   PetitionField,
   PetitionFieldReply,
   PetitionFieldType,
@@ -142,6 +143,10 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     opts: {
       search?: string | null;
+      sortBy?: {
+        column: keyof Petition | QueryBuilder;
+        order?: "asc" | "desc";
+      }[];
       status?: PetitionStatus | null;
     } & PageOpts
   ) {
@@ -160,7 +165,7 @@ export class PetitionRepository extends BaseRepository {
           if (status) {
             q.where("status", status);
           }
-          q.orderBy("id");
+          q.orderBy(opts.sortBy ?? ["id"]);
         })
         .select("*"),
       opts

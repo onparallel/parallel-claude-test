@@ -5,23 +5,46 @@ import {
   objectType,
   plugin,
   stringArg,
+  enumType,
+  arg,
 } from "@nexus/schema";
 import { GraphQLResolveInfo } from "graphql";
 import { omit } from "remeda";
 import { ArgValidationError } from "./errors";
+import { KeysOfType } from "../../util/types";
 
 export type PaginationPluginConfig = {};
 
+type GetObjectType<
+  Type extends
+    | core.GetGen<"allOutputTypes", string>
+    | core.AllNexusOutputTypeDefs
+> = Type extends core.GetGen<"objectNames">
+  ? core.GetGen2<"fieldTypes", Type>
+  : Type extends core.NexusObjectTypeDef<infer TypeName>
+  ? core.GetGen2<"fieldTypes", TypeName>
+  : never;
+
 export type PaginationFieldConfig<
-  TypeName extends string = any,
-  FieldName extends string = any
+  TypeName extends string,
+  FieldName extends string,
+  ItemType extends
+    | core.GetGen<"allOutputTypes", string>
+    | core.AllNexusOutputTypeDefs
 > = {
-  type: core.GetGen<"allOutputTypes", string> | core.AllNexusOutputTypeDefs;
+  type: ItemType;
 
   /**
    * Additional `search` argument that can be used for searching.
    */
   searchable?: boolean;
+  /**
+   * Additional `search` argument that can be used for searching.
+   */
+  sortableBy?: KeysOfType<
+    GetObjectType<ItemType>,
+    string | number | Date | boolean | null
+  >[];
   /**
    * Additional args to use for just this field
    */
@@ -86,9 +109,14 @@ export function paginationPlugin() {
       b.addType(
         dynamicOutputMethod({
           name: "paginationField",
-          typeDefinition: `<FieldName extends string>(
+          typeDefinition: `<
+            FieldName extends string,
+            PaginationType extends
+              | core.GetGen<"allOutputTypes", string>
+              | core.AllNexusOutputTypeDefs
+          >(
             fieldName: FieldName, 
-            config: PaginationFieldConfig<TypeName, FieldName>
+            config: PaginationFieldConfig<TypeName, FieldName, PaginationType>
           ): void`,
           factory({
             typeName: parentTypeName,
@@ -98,11 +126,11 @@ export function paginationPlugin() {
           }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
-              PaginationFieldConfig
+              PaginationFieldConfig<any, any, any>
             ];
             const targetType = fieldConfig.type;
 
-            const { paginationName } = getTypeNames(
+            const { paginationName, sortByName } = getTypeNames(
               fieldName,
               parentTypeName,
               fieldConfig
@@ -131,6 +159,19 @@ export function paginationPlugin() {
               );
             }
 
+            if (!b.hasType(sortByName) && fieldConfig.sortableBy) {
+              b.addType(
+                enumType({
+                  name: sortByName,
+                  description: `Order to use on ${parentTypeName}.${fieldName}`,
+                  members: fieldConfig.sortableBy.flatMap((value) => [
+                    `${value}_ASC`,
+                    `${value}_DESC`,
+                  ]),
+                })
+              );
+            }
+
             // Add the field to the type.
             t.field(fieldName, {
               ...nonPaginationFieldProps(fieldConfig),
@@ -141,6 +182,16 @@ export function paginationPlugin() {
                       search: stringArg({
                         description:
                           "Optional text to search in the collection.",
+                      }),
+                    }
+                  : {}),
+                ...(fieldConfig.sortableBy
+                  ? {
+                      sortBy: arg({
+                        description: "Sorting to use on the collection",
+                        required: false,
+                        type: sortByName as any,
+                        list: [true],
                       }),
                     }
                   : {}),
@@ -162,9 +213,12 @@ export function paginationPlugin() {
 }
 
 // Extract all of the non-pagination related field config we may want to apply for plugin purposes
-function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig) {
+function nonPaginationFieldProps(
+  fieldConfig: PaginationFieldConfig<any, any, any>
+) {
   return omit(fieldConfig, [
     "searchable",
+    "sortableBy",
     "additionalArgs",
     "extendPagination",
     "resolve",
@@ -176,7 +230,7 @@ function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig) {
 const getTypeNames = (
   fieldName: string,
   parentTypeName: string,
-  fieldConfig: PaginationFieldConfig
+  fieldConfig: PaginationFieldConfig<any, any, any>
 ) => {
   const targetTypeName =
     typeof fieldConfig.type === "string"
@@ -188,14 +242,18 @@ const getTypeNames = (
   const paginationName = isPaginationFieldExtended(fieldConfig)
     ? `${parentTypeName}${upperFirst(fieldName)}_Pagination`
     : `${targetTypeName}Pagination`;
+  const sortByName = `${parentTypeName}${upperFirst(fieldName)}_OrderBy`;
 
   return {
     targetTypeName,
     paginationName,
+    sortByName,
   };
 };
 
-function isPaginationFieldExtended(fieldConfig: PaginationFieldConfig) {
+function isPaginationFieldExtended(
+  fieldConfig: PaginationFieldConfig<any, any, any>
+) {
   return Boolean(fieldConfig.extendPagination);
 }
 

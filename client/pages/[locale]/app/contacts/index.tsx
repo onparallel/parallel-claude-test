@@ -21,6 +21,7 @@ import {
   useContactsQuery,
   useContactsUserQuery,
   useContacts_deleteContactsMutation,
+  QueryContacts_OrderBy,
 } from "@parallel/graphql/__types";
 import { assertQuery, clearCache } from "@parallel/utils/apollo";
 import {
@@ -28,6 +29,7 @@ import {
   parseQuery,
   string,
   useQueryState,
+  sorting,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
@@ -35,12 +37,27 @@ import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { memo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useMemo } from "react";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { FORMATS } from "@parallel/utils/dates";
 
 const PAGE_SIZE = 10;
+
+const SORTING = [
+  "firstName",
+  "lastName",
+  "fullName",
+  "email",
+  "createdAt",
+] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   search: string(),
+  sort: sorting(SORTING).orDefault({
+    field: "firstName",
+    direction: "ASC",
+  }),
 };
 
 function Contacts() {
@@ -55,6 +72,9 @@ function Contacts() {
       offset: PAGE_SIZE * (state.page - 1),
       limit: PAGE_SIZE,
       search: state.search,
+      sortBy: [
+        `${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy,
+      ],
     },
   });
 
@@ -87,13 +107,6 @@ function Contacts() {
     );
   }
 
-  function handlePageChange(page: number) {
-    setQueryState((current) => ({
-      ...current,
-      page,
-    }));
-  }
-
   async function handleCreateClick() {
     try {
       await createContact({});
@@ -112,6 +125,8 @@ function Contacts() {
     } catch {}
   }
 
+  const columns = useContactsColumns();
+
   return (
     <>
       <Title>
@@ -123,7 +138,7 @@ function Contacts() {
       <AppLayout user={me}>
         <Box padding={4} paddingBottom={24}>
           <TablePage
-            columns={COLUMNS}
+            columns={columns}
             rows={contacts.items}
             rowKeyProp={"id"}
             selectable
@@ -133,13 +148,16 @@ function Contacts() {
             page={state.page}
             pageSize={PAGE_SIZE}
             totalCount={contacts.totalCount}
+            sort={state.sort}
             onSelectionChange={setSelected}
-            onPageChange={handlePageChange}
+            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
             header={
               <ContactListHeader
                 search={state.search}
                 showActions={Boolean(selected?.length)}
                 onSearchChange={handleSearchChange}
+                onReload={() => refetch()}
                 onCreateClick={handleCreateClick}
                 onDeleteClick={handleDeleteClick}
               />
@@ -176,57 +194,76 @@ function Contacts() {
 
 type ContactSelection = UnwrapArray<Contacts_ContactsListFragment["items"]>;
 
-const COLUMNS: TableColumn<ContactSelection>[] = [
-  {
-    key: "firstName",
-    Header: memo(() => (
-      <FormattedMessage
-        id="contacts.header.first-name"
-        defaultMessage="First name"
-      />
-    )),
-    Cell: memo(({ row }) => (
-      <>
-        {row.firstName || (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.not-specified"
-              defaultMessage="Not specified"
-            />
-          </Text>
-        )}
-      </>
-    )),
-  },
-  {
-    key: "lastName",
-    Header: memo(() => (
-      <FormattedMessage
-        id="contacts.header.last-name"
-        defaultMessage="Last name"
-      />
-    )),
-    Cell: memo(({ row }) => (
-      <>
-        {row.lastName || (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.not-specified"
-              defaultMessage="Not specified"
-            />
-          </Text>
-        )}
-      </>
-    )),
-  },
-  {
-    key: "email",
-    Header: memo(() => (
-      <FormattedMessage id="contacts.header.email" defaultMessage="Email" />
-    )),
-    Cell: memo(({ row }) => <>{row.email}</>),
-  },
-];
+function useContactsColumns(): TableColumn<ContactSelection>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "firstName",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "contacts.header.first-name",
+          defaultMessage: "First name",
+        }),
+        Cell: memo(({ row }) => (
+          <>
+            {row.firstName || (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.not-specified"
+                  defaultMessage="Not specified"
+                />
+              </Text>
+            )}
+          </>
+        )),
+      },
+      {
+        key: "lastName",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "contacts.header.last-name",
+          defaultMessage: "Last name",
+        }),
+        Cell: memo(({ row }) => (
+          <>
+            {row.lastName || (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.not-specified"
+                  defaultMessage="Not specified"
+                />
+              </Text>
+            )}
+          </>
+        )),
+      },
+      {
+        key: "email",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "contacts.header.email",
+          defaultMessage: "Email",
+        }),
+        Cell: memo(({ row }) => <>{row.email}</>),
+      },
+      {
+        key: "createdAt",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "contacts.header.created-at",
+          defaultMessage: "Created at",
+        }),
+        Cell: memo(({ row: { createdAt } }) => {
+          return (
+            <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
+          );
+        }),
+      },
+    ],
+    []
+  );
+}
 
 function ConfirmDeleteContacts({
   selected,
@@ -277,6 +314,7 @@ Contacts.fragments = {
         firstName
         lastName
         email
+        createdAt
       }
       totalCount
     }
@@ -297,36 +335,45 @@ Contacts.mutations = [
   `,
 ];
 
-const GET_CONTACTS_DATA = gql`
-  query Contacts($offset: Int!, $limit: Int!, $search: String) {
-    contacts(offset: $offset, limit: $limit, search: $search) {
-      ...Contacts_ContactsList
-    }
-  }
-  ${Contacts.fragments.contacts}
-`;
-
-const GET_CONTACTS_USER_DATA = gql`
-  query ContactsUser {
-    me {
-      ...Contacts_User
-    }
-  }
-  ${Contacts.fragments.user}
-`;
-
 Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
-  const { page, search } = parseQuery(query, QUERY_STATE);
+  const { page, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     apollo.query<ContactsQuery, ContactsQueryVariables>({
-      query: GET_CONTACTS_DATA,
+      query: gql`
+        query Contacts(
+          $offset: Int!
+          $limit: Int!
+          $search: String
+          $sortBy: [QueryContacts_OrderBy!]
+        ) {
+          contacts(
+            offset: $offset
+            limit: $limit
+            search: $search
+            sortBy: $sortBy
+          ) {
+            ...Contacts_ContactsList
+          }
+        }
+        ${Contacts.fragments.contacts}
+      `,
       variables: {
         offset: PAGE_SIZE * (page - 1),
         limit: PAGE_SIZE,
         search,
+        sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
       },
     }),
-    apollo.query<ContactsUserQuery>({ query: GET_CONTACTS_USER_DATA }),
+    apollo.query<ContactsUserQuery>({
+      query: gql`
+        query ContactsUser {
+          me {
+            ...Contacts_User
+          }
+        }
+        ${Contacts.fragments.user}
+      `,
+    }),
   ]);
 };
 

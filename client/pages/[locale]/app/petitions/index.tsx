@@ -1,38 +1,45 @@
-import { Button, Flex, Text, Box } from "@chakra-ui/core";
+import { Box, Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
   DialogCallbacks,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { Link } from "@parallel/components/common/Link";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
 import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { PetitionListHeader } from "@parallel/components/petitions/PetitionListHeader";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
+import { PetitionListHeader } from "@parallel/components/petitions/PetitionListHeader";
 import {
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
   Petitions_PetitionsListFragment,
+  QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
-  usePetitions_deletePetitionsMutation,
   usePetitions_clonePetitionMutation,
+  usePetitions_deletePetitionsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery, clearCache } from "@parallel/utils/apollo";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   enums,
   integer,
   parseQuery,
+  sorting,
   string,
   useQueryState,
 } from "@parallel/utils/queryState";
@@ -40,20 +47,21 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { memo, useState, MouseEvent } from "react";
+import { memo, MouseEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Link } from "@parallel/components/common/Link";
-import { ContactLink } from "@parallel/components/common/ContactLink";
-import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { compose } from "@parallel/utils/compose";
 
 const PAGE_SIZE = 10;
+
+const SORTING = ["name", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]),
   search: string(),
+  sort: sorting(SORTING).orDefault({
+    field: "createdAt",
+    direction: "DESC",
+  }),
 };
 
 function Petitions() {
@@ -74,6 +82,9 @@ function Petitions() {
         limit: PAGE_SIZE,
         search: state.search,
         status: state.status,
+        sortBy: [
+          `${state.sort.field}_${state.sort.direction}` as QueryPetitions_OrderBy,
+        ],
       },
     })
   );
@@ -168,19 +179,14 @@ function Petitions() {
     );
   }
 
-  function handlePageChange(page: number) {
-    setQueryState((current) => ({
-      ...current,
-      page,
-    }));
-  }
-
   function goToPetition(id: string, section: "compose" | "replies") {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
       `/${router.query.locale}/app/petitions/${id}/${section}`
     );
   }
+
+  const columns = usePetitionsColumns();
 
   return (
     <>
@@ -193,7 +199,7 @@ function Petitions() {
       <AppLayout user={me} onCreate={handleCreateClick}>
         <Box padding={4} paddingBottom={24}>
           <TablePage
-            columns={COLUMNS}
+            columns={columns}
             rows={petitions.items}
             rowKeyProp={"id"}
             selectable
@@ -203,8 +209,10 @@ function Petitions() {
             page={state.page}
             pageSize={PAGE_SIZE}
             totalCount={petitions.totalCount}
+            sort={state.sort}
             onSelectionChange={setSelected}
-            onPageChange={handlePageChange}
+            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
             header={
               <PetitionListHeader
                 search={state.search}
@@ -251,139 +259,142 @@ function Petitions() {
 
 type PetitionSelection = UnwrapArray<Petitions_PetitionsListFragment["items"]>;
 
-const COLUMNS: TableColumn<PetitionSelection>[] = [
-  {
-    key: "name",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.header.name"
-        defaultMessage="Petition name"
-      />
-    )),
-    Cell: memo(({ row }) => (
-      <>
-        {row.name || (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.untitled-petition"
-              defaultMessage="Untitled petition"
-            />
-          </Text>
-        )}
-      </>
-    )),
-  },
-  // {
-  //   key: "customRef",
-  //   Header: memo(() => (
-  //     <FormattedMessage
-  //       id="petitions.header.custom-ref"
-  //       defaultMessage="Reference"
-  //     />
-  //   )),
-  //   Cell: memo(({ row }) => <>{row.customRef}</>),
-  // },
-  {
-    key: "recipient",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.header.recipient"
-        defaultMessage="Recipient"
-      />
-    )),
-    Cell: memo(({ row }) => {
-      if (row.recipients.length === 0) {
-        return null;
-      }
-      const [contact, ...rest] = row.recipients;
-      if (contact) {
-        return rest.length ? (
-          <FormattedMessage
-            id="petitions.recipients"
-            defaultMessage="{contact} and <a>{more} more</a>"
-            values={{
-              contact: (
-                <ContactLink
-                  contact={contact}
-                  onClick={(e: MouseEvent) => e.stopPropagation()}
+function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "name",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "petitions.header.name",
+          defaultMessage: "Petition name",
+        }),
+        Cell: memo(({ row }) => (
+          <>
+            {row.name || (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.untitled-petition"
+                  defaultMessage="Untitled petition"
                 />
-              ),
-              more: rest.length,
-              a: (...chunks: any[]) => (
-                <Link
-                  href="/app/petitions/[petitionId]/replies#sendouts"
-                  as={`/app/petitions/${row.id}/replies/#sendouts`}
-                  onClick={(e: MouseEvent) => e.stopPropagation()}
-                >
-                  {chunks}
-                </Link>
-              ),
-            }}
-          />
-        ) : (
-          <ContactLink
-            contact={contact}
-            onClick={(e: MouseEvent) => e.stopPropagation()}
-          />
-        );
-      } else {
-        return (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.deleted-contact"
-              defaultMessage="Deleted contact"
-            />
-          </Text>
-        );
-      }
-    }),
-  },
-  {
-    key: "deadline",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.header.deadline"
-        defaultMessage="Deadline"
-      />
-    )),
-    Cell: memo(({ row: { deadline } }) => {
-      if (deadline) {
-        return <DateTime value={deadline} format={FORMATS.LLL} />;
-      } else {
-        return (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.no-deadline"
-              defaultMessage="No deadline"
-            />
-          </Text>
-        );
-      }
-    }),
-  },
-  {
-    key: "progress",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.header.progress"
-        defaultMessage="Progress"
-      />
-    )),
-    Cell: memo(({ row }) => (
-      <PetitionProgressBar
-        status={row.status}
-        {...row.progress}
-      ></PetitionProgressBar>
-    )),
-  },
-  {
-    key: "status",
-    Header: memo(() => (
-      <FormattedMessage id="petitions.header.status" defaultMessage="Status" />
-    )),
-    Cell: memo(({ row }) => <PetitionStatusText status={row.status} />),
-  },
-];
+              </Text>
+            )}
+          </>
+        )),
+      },
+      {
+        key: "recipient",
+        header: intl.formatMessage({
+          id: "petitions.header.recipient",
+          defaultMessage: "Recipient",
+        }),
+        Cell: memo(({ row }) => {
+          if (row.recipients.length === 0) {
+            return null;
+          }
+          const [contact, ...rest] = row.recipients;
+          if (contact) {
+            return rest.length ? (
+              <FormattedMessage
+                id="petitions.recipients"
+                defaultMessage="{contact} and <a>{more} more</a>"
+                values={{
+                  contact: (
+                    <ContactLink
+                      contact={contact}
+                      onClick={(e: MouseEvent) => e.stopPropagation()}
+                    />
+                  ),
+                  more: rest.length,
+                  a: (...chunks: any[]) => (
+                    <Link
+                      href="/app/petitions/[petitionId]/replies#sendouts"
+                      as={`/app/petitions/${row.id}/replies/#sendouts`}
+                      onClick={(e: MouseEvent) => e.stopPropagation()}
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                }}
+              />
+            ) : (
+              <ContactLink
+                contact={contact}
+                onClick={(e: MouseEvent) => e.stopPropagation()}
+              />
+            );
+          } else {
+            return (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.deleted-contact"
+                  defaultMessage="Deleted contact"
+                />
+              </Text>
+            );
+          }
+        }),
+      },
+      {
+        key: "deadline",
+        header: intl.formatMessage({
+          id: "petitions.header.deadline",
+          defaultMessage: "Deadline",
+        }),
+        Cell: memo(({ row: { deadline } }) => {
+          if (deadline) {
+            return <DateTime value={deadline} format={FORMATS.LLL} />;
+          } else {
+            return (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.no-deadline"
+                  defaultMessage="No deadline"
+                />
+              </Text>
+            );
+          }
+        }),
+      },
+      {
+        key: "progress",
+        header: intl.formatMessage({
+          id: "petitions.header.progress",
+          defaultMessage: "Progress",
+        }),
+        Cell: memo(({ row }) => (
+          <PetitionProgressBar
+            status={row.status}
+            {...row.progress}
+          ></PetitionProgressBar>
+        )),
+      },
+      {
+        key: "status",
+        header: intl.formatMessage({
+          id: "petitions.header.status",
+          defaultMessage: "Status",
+        }),
+        Cell: memo(({ row }) => <PetitionStatusText status={row.status} />),
+      },
+      {
+        key: "createdAt",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "petitions.header.created-at",
+          defaultMessage: "Created at",
+        }),
+        Cell: memo(({ row: { createdAt } }) => {
+          return (
+            <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
+          );
+        }),
+      },
+    ],
+    []
+  );
+}
 
 function ConfirmDeletePetitionsDialog({
   selected,
@@ -440,6 +451,7 @@ Petitions.fragments = {
           optional
           total
         }
+        createdAt
         recipients {
           ...ContactLink_Contact
         }
@@ -472,7 +484,7 @@ Petitions.mutations = [
 ];
 
 Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
-  const { page, search, status } = parseQuery(query, QUERY_STATE);
+  const { page, search, sort, status } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     apollo.query<PetitionsQuery, PetitionsQueryVariables>({
       query: gql`
@@ -480,12 +492,14 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
           $offset: Int!
           $limit: Int!
           $search: String
+          $sortBy: [QueryPetitions_OrderBy!]
           $status: PetitionStatus
         ) {
           petitions(
             offset: $offset
             limit: $limit
             search: $search
+            sortBy: $sortBy
             status: $status
           ) {
             ...Petitions_PetitionsList
@@ -497,6 +511,7 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
         offset: PAGE_SIZE * (page - 1),
         limit: PAGE_SIZE,
         search,
+        sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
         status,
       },
     }),

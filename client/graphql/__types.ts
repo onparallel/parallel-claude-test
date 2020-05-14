@@ -595,6 +595,7 @@ export type QuerycontactsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
 };
 
 export type QueryorganizationArgs = {
@@ -609,12 +610,33 @@ export type QuerypetitionsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
 };
 
 export type QuerysendoutArgs = {
   keycode: Scalars["ID"];
 };
+
+/** Order to use on Query.contacts */
+export type QueryContacts_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "firstName_ASC"
+  | "firstName_DESC"
+  | "fullName_ASC"
+  | "fullName_DESC"
+  | "lastName_ASC"
+  | "lastName_DESC";
+
+/** Order to use on Query.petitions */
+export type QueryPetitions_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
 
 /** The reminder settings of a petition */
 export type ReminderSettings = {
@@ -971,7 +993,7 @@ export type Contacts_ContactsListFragment = {
     items: Array<
       { __typename?: "Contact" } & Pick<
         Contact,
-        "id" | "fullName" | "firstName" | "lastName" | "email"
+        "id" | "fullName" | "firstName" | "lastName" | "email" | "createdAt"
       >
     >;
   };
@@ -992,6 +1014,7 @@ export type ContactsQueryVariables = {
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
 };
 
 export type ContactsQuery = { __typename?: "Query" } & {
@@ -1267,7 +1290,7 @@ export type Petitions_PetitionsListFragment = {
     items: Array<
       { __typename?: "Petition" } & Pick<
         Petition,
-        "id" | "customRef" | "name" | "status" | "deadline"
+        "id" | "customRef" | "name" | "status" | "deadline" | "createdAt"
       > & {
           progress: { __typename?: "PetitionProgress" } & Pick<
             PetitionProgress,
@@ -1305,6 +1328,7 @@ export type PetitionsQueryVariables = {
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
 };
 
@@ -1652,6 +1676,7 @@ export const Contacts_ContactsListFragmentDoc = gql`
       firstName
       lastName
       email
+      createdAt
     }
     totalCount
   }
@@ -1839,6 +1864,7 @@ export const Petitions_PetitionsListFragmentDoc = gql`
         optional
         total
       }
+      createdAt
       recipients {
         ...ContactLink_Contact
       }
@@ -2215,8 +2241,13 @@ export type Contacts_deleteContactsMutationOptions = ApolloReactCommon.BaseMutat
   Contacts_deleteContactsMutationVariables
 >;
 export const ContactsDocument = gql`
-  query Contacts($offset: Int!, $limit: Int!, $search: String) {
-    contacts(offset: $offset, limit: $limit, search: $search) {
+  query Contacts(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryContacts_OrderBy!]
+  ) {
+    contacts(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
       ...Contacts_ContactsList
     }
   }
@@ -2238,6 +2269,7 @@ export const ContactsDocument = gql`
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
  *      search: // value for 'search'
+ *      sortBy: // value for 'sortBy'
  *   },
  * });
  */
@@ -3322,12 +3354,14 @@ export const PetitionsDocument = gql`
     $offset: Int!
     $limit: Int!
     $search: String
+    $sortBy: [QueryPetitions_OrderBy!]
     $status: PetitionStatus
   ) {
     petitions(
       offset: $offset
       limit: $limit
       search: $search
+      sortBy: $sortBy
       status: $status
     ) {
       ...Petitions_PetitionsList
@@ -3351,6 +3385,7 @@ export const PetitionsDocument = gql`
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
  *      search: // value for 'search'
+ *      sortBy: // value for 'sortBy'
  *      status: // value for 'status'
  *   },
  * });

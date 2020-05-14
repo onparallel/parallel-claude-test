@@ -266,7 +266,7 @@ export const icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <polyline points="4 9 12 17 20 9"></polyline>
+        <polyline points="4 8 12 16 20 8"></polyline>
       </g>
     ),
   },
@@ -280,7 +280,22 @@ export const icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <polyline points="4 17 12 9 20 17"></polyline>
+        <polyline points="4 16 12 8 20 16"></polyline>
+      </g>
+    ),
+  },
+  "arrow-up-down": {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="4 14 12 22 20 14"></polyline>
+        <polyline points="4 10 12 2 20 10"></polyline>
       </g>
     ),
   },

@@ -25,8 +25,10 @@ export function TablePage<T>({
   rowKeyProp,
   selectable,
   highlightable,
+  sort,
   onSelectionChange,
   onRowClick,
+  onSortChange,
   loading,
   header,
   body,
@@ -73,8 +75,10 @@ export function TablePage<T>({
             rowKeyProp={rowKeyProp}
             selectable={selectable}
             highlightable={highlightable}
+            sort={sort}
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}
+            onSortChange={onSortChange}
             borderTop="1px solid"
             borderTopColor={colors.border}
             marginTop="-1px"

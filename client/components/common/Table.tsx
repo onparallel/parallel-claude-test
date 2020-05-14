@@ -1,30 +1,55 @@
+/** @jsx jsx */
 import {
   Box,
   BoxProps,
   Checkbox,
-  PseudoBox,
-  PseudoBoxProps,
-  useColorMode,
   Flex,
+  IconButton,
+  PseudoBox,
+  useColorMode,
 } from "@chakra-ui/core";
-import { ComponentType, useEffect, useMemo, memo, MouseEvent } from "react";
+import { css, jsx } from "@emotion/core";
+import {
+  ComponentType,
+  memo,
+  MouseEvent,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
+import { useIntl } from "react-intl";
 import { useSelectionState } from "../../utils/useSelectionState";
+
+export type SortingDirection = "ASC" | "DESC";
+
+export type Sorting<T extends string> = {
+  field: T;
+  direction: SortingDirection;
+};
+
+function toggleSortingDirection(direction: SortingDirection): SortingDirection {
+  return direction === "ASC" ? "DESC" : "ASC";
+}
 
 export type TableProps<TRow, TAction extends string = string> = BoxProps & {
   columns: TableColumn<TRow, TAction>[];
   rows: TRow[];
   rowKeyProp: keyof TRow;
   selectable?: boolean;
+  sort?: Sorting<any>;
   highlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: TRow, event: MouseEvent) => void;
+  onSortChange?: (sort: Sorting<any>) => void;
   onAction?: (action: TAction, row: TRow, data?: any) => void;
 };
 
 export type TableHeaderProps<TRow, TAction extends string = string> = {
   column: TableColumn<TRow, TAction>;
+  sort: Sorting<any> | undefined;
   allSelected: boolean;
   anySelected: boolean;
+  onSortByClick?: (value: string, event: MouseEvent) => void;
   onToggleAll: (event?: any) => void;
 };
 
@@ -40,10 +65,10 @@ export type TableCellProps<TRow, TAction extends string = string> = {
 export type TableColumn<TRow, TAction extends string = string> = {
   key: string;
   align?: BoxProps["textAlign"];
-  Header: ComponentType<TableHeaderProps<TRow, TAction>>;
-  headerProps?: PseudoBoxProps;
+  isSortable?: true;
+  header: string;
+  Header?: ComponentType<TableHeaderProps<TRow, TAction>>;
   Cell: ComponentType<TableCellProps<TRow, TAction>>;
-  cellProps?: PseudoBoxProps;
 };
 
 function _Table<TRow, TAction extends string = string>({
@@ -52,8 +77,10 @@ function _Table<TRow, TAction extends string = string>({
   rowKeyProp,
   selectable,
   highlightable,
+  sort,
   onSelectionChange,
   onRowClick,
+  onSortChange,
   onAction,
   ...props
 }: TableProps<TRow, TAction>) {
@@ -74,6 +101,23 @@ function _Table<TRow, TAction extends string = string>({
     );
   }, [selection]);
 
+  const handleOnSortByClick = useCallback(
+    (value: string) => {
+      onSortChange?.(
+        sort?.field === value
+          ? {
+              field: value,
+              direction: toggleSortingDirection(sort.direction),
+            }
+          : {
+              field: value,
+              direction: "ASC" as const,
+            }
+      );
+    },
+    [sort, onSortChange]
+  );
+
   columns = useMemo(() => {
     if (!selectable) {
       return columns;
@@ -81,28 +125,31 @@ function _Table<TRow, TAction extends string = string>({
       return [
         {
           key: "selection-checkbox",
+          header: "",
           Header: ({ anySelected, allSelected, onToggleAll }) => (
-            <Box height="16px">
-              <Checkbox
-                isChecked={anySelected && allSelected}
-                isIndeterminate={anySelected && !allSelected}
-                size="md"
-                variantColor="purple"
-                onChange={onToggleAll}
-              />
-            </Box>
+            <PseudoBox
+              as="th"
+              width="1px"
+              paddingLeft={5}
+              paddingRight={2}
+              height="38px"
+              userSelect="none"
+            >
+              <Box height="16px">
+                <Checkbox
+                  isChecked={anySelected && allSelected}
+                  isIndeterminate={anySelected && !allSelected}
+                  size="md"
+                  variantColor="purple"
+                  onChange={onToggleAll}
+                />
+              </Box>
+            </PseudoBox>
           ),
-          headerProps: { width: "1px" },
-          cellProps: {
-            paddingY: 0,
-            paddingRight: 0,
-            _first: { paddingLeft: 3 },
-          },
           Cell: ({ isSelected, toggle }) => {
             return (
               <Flex
                 as="label"
-                height="32px"
                 alignItems="center"
                 justifyContent="center"
                 borderRadius="32px"
@@ -133,27 +180,26 @@ function _Table<TRow, TAction extends string = string>({
           borderBottomColor={colors.border}
         >
           {columns.map((column) => {
-            return (
-              <PseudoBox
+            return column.Header ? (
+              <column.Header
                 key={column.key}
-                as="th"
-                padding={2}
-                _last={{ paddingRight: 5 }}
-                _first={{ paddingLeft: 5 }}
-                fontSize="sm"
-                fontWeight={400}
-                textTransform="uppercase"
-                userSelect="none"
-                textAlign={column.align ?? "left"}
-                {...column.headerProps}
-              >
-                <column.Header
-                  column={column}
-                  allSelected={allSelected}
-                  anySelected={anySelected}
-                  onToggleAll={toggleAll}
-                ></column.Header>
-              </PseudoBox>
+                column={column}
+                sort={sort}
+                onSortByClick={handleOnSortByClick}
+                allSelected={allSelected}
+                anySelected={anySelected}
+                onToggleAll={toggleAll}
+              />
+            ) : (
+              <DefaultHeader
+                key={column.key}
+                column={column as any}
+                sort={sort}
+                onSortByClick={handleOnSortByClick}
+                allSelected={allSelected}
+                anySelected={anySelected}
+                onToggleAll={toggleAll}
+              />
             );
           })}
         </PseudoBox>
@@ -195,7 +241,6 @@ function _Table<TRow, TAction extends string = string>({
                     _first={{ paddingLeft: 5 }}
                     userSelect="none"
                     textAlign={column.align ?? "left"}
-                    {...column.cellProps}
                   >
                     <column.Cell
                       key={key}
@@ -240,4 +285,88 @@ export function useTableColors() {
         };
     }
   }, [colorMode]);
+}
+
+export function DefaultHeader({
+  column,
+  sort,
+  onSortByClick,
+}: TableHeaderProps<any, string>) {
+  const intl = useIntl();
+  return (
+    <PseudoBox
+      key={column.key}
+      as="th"
+      paddingX={2}
+      _last={{ paddingRight: 5 }}
+      _first={{ paddingLeft: 5 }}
+      height="38px"
+      fontSize="sm"
+      fontWeight={400}
+      textTransform="uppercase"
+      userSelect="none"
+      className={sort?.field === column.key ? "sort-active" : undefined}
+      aria-sort={
+        column.isSortable
+          ? sort?.field === column.key
+            ? sort.direction === "ASC"
+              ? "ascending"
+              : "descending"
+            : "none"
+          : undefined
+      }
+      textAlign={column.align ?? "left"}
+      css={css`
+        .sort-by-button {
+          opacity: 0;
+        }
+        &.sort-active .sort-by-button {
+          opacity: 1;
+        }
+        &:hover,
+        &:focus-within {
+          .sort-by-button {
+            opacity: 1;
+          }
+        }
+      `}
+    >
+      <Flex alignItems="center">
+        {column.header}
+        {column.isSortable ? (
+          <IconButton
+            className="sort-by-button"
+            onClick={(event) => onSortByClick?.(column.key, event)}
+            marginLeft={1}
+            icon={
+              sort?.field === column.key
+                ? sort.direction === "ASC"
+                  ? "chevron-up"
+                  : "chevron-down"
+                : "arrow-up-down"
+            }
+            size="xs"
+            variant="ghost"
+            aria-label={
+              sort?.field === column.key
+                ? intl.formatMessage(
+                    {
+                      id: "components.table.change-sorting",
+                      defaultMessage: 'Change sorting for "{column}"',
+                    },
+                    { column: column.header }
+                  )
+                : intl.formatMessage(
+                    {
+                      id: "components.table.sort by",
+                      defaultMessage: 'Sort by "{column}"',
+                    },
+                    { column: column.header }
+                  )
+            }
+          />
+        ) : null}
+      </Flex>
+    </PseudoBox>
+  );
 }

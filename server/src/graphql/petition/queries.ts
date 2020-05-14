@@ -1,7 +1,7 @@
-import { queryField, arg, idArg } from "@nexus/schema";
+import { arg, idArg, queryField } from "@nexus/schema";
+import { fromGlobalId } from "../../util/globalId";
 import { authenticate, authorizeAnd } from "../helpers/authorize";
 import { userHasAccessToPetition } from "./authorizers";
-import { fromGlobalId } from "../../util/globalId";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -15,11 +15,22 @@ export const petitionsQuery = queryField((t) => {
       }),
     },
     searchable: true,
-    resolve: async (_, { offset, limit, search, status }, ctx) => {
+    sortableBy: ["createdAt", "name"],
+    resolve: async (_, { offset, limit, search, sortBy, status }, ctx) => {
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
         status,
         search,
         offset,
+        sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
+          const [field, order] = value.split("_");
+          return {
+            column: ({
+              createdAt: "created_at",
+              name: "name",
+            } as any)[field as any],
+            order: order.toLowerCase() as "asc" | "desc",
+          };
+        }),
         limit,
       });
     },

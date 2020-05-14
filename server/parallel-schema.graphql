@@ -941,6 +941,11 @@ type Query {
     Optional text to search in the collection.
     """
     search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryContacts_OrderBy!]
   ): ContactPagination!
   me: User!
   organization(id: ID!): Organization
@@ -964,9 +969,40 @@ type Query {
     Optional text to search in the collection.
     """
     search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryPetitions_OrderBy!]
     status: PetitionStatus
   ): PetitionPagination!
   sendout(keycode: ID!): PublicPetitionSendout
+}
+
+"""
+Order to use on Query.contacts
+"""
+enum QueryContacts_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  email_ASC
+  email_DESC
+  firstName_ASC
+  firstName_DESC
+  fullName_ASC
+  fullName_DESC
+  lastName_ASC
+  lastName_DESC
+}
+
+"""
+Order to use on Query.petitions
+"""
+enum QueryPetitions_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  name_ASC
+  name_DESC
 }
 
 """

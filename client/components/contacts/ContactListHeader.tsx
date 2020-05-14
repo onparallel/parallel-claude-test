@@ -1,16 +1,17 @@
 import { Box, Button, Stack, MenuList, MenuItem, Icon } from "@chakra-ui/core";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 import { ButtonDropdown } from "../common/ButtonDropdown";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export interface ContactListHeaderProps {
   search: string | null;
   showActions: boolean;
   onSearchChange: (value: string | null) => void;
-  // onStatusChange: (value: PetitionStatus | null) => void;
+  onReload: () => void;
   onDeleteClick: () => void;
   onCreateClick: () => void;
 }
@@ -19,10 +20,11 @@ export function ContactListHeader({
   search: _search,
   showActions,
   onSearchChange,
+  onReload,
   onCreateClick,
   onDeleteClick,
-}: // onStatusChange,
-ContactListHeaderProps) {
+}: ContactListHeaderProps) {
+  const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
   const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [
     onSearchChange,
@@ -40,6 +42,16 @@ ContactListHeaderProps) {
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>
+      <IconButtonWithTooltip
+        onClick={() => onReload()}
+        icon="repeat"
+        placement="bottom"
+        variant="outline"
+        label={intl.formatMessage({
+          id: "generic.reload-data",
+          defaultMessage: "Reload",
+        })}
+      />
       <Spacer />
       {showActions ? (
         <Box>

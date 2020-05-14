@@ -26,7 +26,7 @@ export const SearchInput = forwardRef(function SearchInput(
   const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();
   const [focused, bind] = useFocus<HTMLInputElement>(props);
-  const isActive = Boolean(inputRef.current?.value || focused);
+  const isActive = Boolean(props.value || focused);
 
   const clearLabel = intl.formatMessage({
     id: "component.input.clear-button",

@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import Knex, { QueryBuilder } from "knex";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CreateContact, User, PetitionSendout } from "../__types";
+import { CreateContact, User, PetitionSendout, Contact } from "../__types";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
@@ -31,6 +31,10 @@ export class ContactRepository extends BaseRepository {
     userId: number,
     opts: {
       search?: string | null;
+      sortBy?: {
+        column: keyof Contact | QueryBuilder;
+        order?: "asc" | "desc";
+      }[];
       excludeIds?: number[] | null;
     } & PageOpts
   ) {
@@ -54,7 +58,7 @@ export class ContactRepository extends BaseRepository {
           if (excludeIds) {
             q.whereNotIn("id", excludeIds);
           }
-          q.orderBy("id");
+          q.orderBy(opts.sortBy ?? ["id"]);
         })
         .select("*"),
       opts

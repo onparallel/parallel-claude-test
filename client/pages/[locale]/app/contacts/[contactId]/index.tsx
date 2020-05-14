@@ -40,7 +40,15 @@ import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { forwardRef, memo, ReactNode, Ref, useCallback, useState } from "react";
+import {
+  forwardRef,
+  memo,
+  ReactNode,
+  Ref,
+  useCallback,
+  useState,
+  useMemo,
+} from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -105,6 +113,7 @@ function Contact({ contactId }: ContactProps) {
   );
 
   const { border } = useTableColors();
+  const columns = useContactSendoutsColumns();
 
   return (
     <>
@@ -219,7 +228,7 @@ function Contact({ contactId }: ContactProps) {
               </Box>
               {contact?.sendouts.items.length ? (
                 <Table
-                  columns={SENDOUT_COLUMNS}
+                  columns={columns}
                   rows={contact?.sendouts.items ?? []}
                   rowKeyProp="id"
                   onRowClick={handleRowClick}
@@ -253,88 +262,76 @@ type SendoutSelection = UnwrapArray<
   Contact_ContactFragment["sendouts"]["items"]
 >;
 
-const SENDOUT_COLUMNS: TableColumn<SendoutSelection>[] = [
-  {
-    key: "name",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.header.name"
-        defaultMessage="Petition name"
-      />
-    )),
-    Cell: memo(({ row }) => (
-      <>
-        {row.petition?.name || (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.untitled-petition"
-              defaultMessage="Untitled petition"
-            />
-          </Text>
-        )}
-      </>
-    )),
-  },
-  // {
-  //   key: "subject",
-  //   Header: memo(() => (
-  //     <FormattedMessage
-  //       id="petitions.sendouts-header.subject"
-  //       defaultMessage="Subject"
-  //     />
-  //   )),
-  //   Cell: memo(({ row: { petition } }) => (
-  //     <>{petition ? <Text>{petition.emailSubject}</Text> : null}</>
-  //   )),
-  // },
-  {
-    key: "progress",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.sendouts-header.progress"
-        defaultMessage="Progress"
-      />
-    )),
-    Cell: memo(({ row: { petition } }) => (
-      <>
-        {petition ? (
-          <PetitionProgressBar
-            status={petition.status}
-            {...petition.progress}
-          ></PetitionProgressBar>
-        ) : null}
-      </>
-    )),
-  },
-  {
-    key: "deadline",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.sendouts-header.deadline"
-        defaultMessage="Deadline"
-      />
-    )),
-    Cell: memo(({ row: { petition } }) => (
-      <>
-        {petition?.deadline ? (
-          <DateTime value={petition.deadline} format={FORMATS.LLL} />
-        ) : null}
-      </>
-    )),
-  },
-  {
-    key: "status",
-    Header: memo(() => (
-      <FormattedMessage
-        id="petitions.sendouts-header.status"
-        defaultMessage="Status"
-      />
-    )),
-    Cell: memo(({ row: { petition } }) => (
-      <>{petition ? <PetitionStatusText status={petition.status} /> : null}</>
-    )),
-  },
-];
+function useContactSendoutsColumns(): TableColumn<SendoutSelection>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "name",
+        header: intl.formatMessage({
+          id: "petitions.header.name",
+          defaultMessage: "Petition name",
+        }),
+        Cell: memo(({ row }) => (
+          <>
+            {row.petition?.name || (
+              <Text as="span" color="gray.400" fontStyle="italic">
+                <FormattedMessage
+                  id="generic.untitled-petition"
+                  defaultMessage="Untitled petition"
+                />
+              </Text>
+            )}
+          </>
+        )),
+      },
+      {
+        key: "progress",
+        header: intl.formatMessage({
+          id: "petitions.sendouts-header.progress",
+          defaultMessage: "Progress",
+        }),
+        Cell: memo(({ row: { petition } }) => (
+          <>
+            {petition ? (
+              <PetitionProgressBar
+                status={petition.status}
+                {...petition.progress}
+              ></PetitionProgressBar>
+            ) : null}
+          </>
+        )),
+      },
+      {
+        key: "deadline",
+        header: intl.formatMessage({
+          id: "petitions.sendouts-header.deadline",
+          defaultMessage: "Deadline",
+        }),
+        Cell: memo(({ row: { petition } }) => (
+          <>
+            {petition?.deadline ? (
+              <DateTime value={petition.deadline} format={FORMATS.LLL} />
+            ) : null}
+          </>
+        )),
+      },
+      {
+        key: "status",
+        header: intl.formatMessage({
+          id: "petitions.sendouts-header.status",
+          defaultMessage: "Status",
+        }),
+        Cell: memo(({ row: { petition } }) => (
+          <>
+            {petition ? <PetitionStatusText status={petition.status} /> : null}
+          </>
+        )),
+      },
+    ],
+    []
+  );
+}
 
 Contact.fragments = {
   contact: gql`
