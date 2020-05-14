@@ -2365,7 +2365,7 @@
   },
   {
     "term": "sendout.replies-submitted",
-    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviad} other {# respuestas enviadas}}",
+    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviada} other {# respuestas enviadas}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
     "reference": "components/recipient/RecipientViewPetitionField.tsx#L129-L133"
   },
