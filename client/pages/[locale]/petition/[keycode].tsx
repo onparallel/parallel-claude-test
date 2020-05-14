@@ -125,7 +125,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
               });
               setUploadProgress((curr) => ({
                 ...curr,
-                [fieldId]: omit(curr[fieldId], [reply.id]),
+                [fieldId]: omit(curr[fieldId] ?? {}, [reply.id]),
               }));
             } catch {}
           }
