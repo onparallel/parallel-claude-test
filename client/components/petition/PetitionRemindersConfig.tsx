@@ -23,15 +23,15 @@ import {
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 import { ChangeEvent } from "react";
-import { ReminderSettings } from "@parallel/graphql/__types";
+import { RemindersConfig } from "@parallel/graphql/__types";
 
-export function PetitionReminderSettings({
+export function PetitionRemindersConfig({
   value,
   onChange,
   ...props
 }: {
-  value: ReminderSettings;
-  onChange: (settings: ReminderSettings) => void;
+  value: RemindersConfig;
+  onChange: (settings: RemindersConfig) => void;
 } & Omit<BoxProps, "onChange">) {
   let day = addDays(startOfToday(), value.offset);
   if (value.weekdaysOnly && isWeekend(day)) {

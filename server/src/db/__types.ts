@@ -220,16 +220,13 @@ export interface Petition {
   email_subject: Maybe<string>;
   email_body: Maybe<string>;
   reminders_active: boolean;
-  reminders_offset: Maybe<number>;
-  reminders_time: Maybe<string>;
-  reminders_timezone: Maybe<string>;
-  reminders_weekdays_only: Maybe<boolean>;
   created_at: Date;
   created_by: Maybe<string>;
   updated_at: Date;
   updated_by: Maybe<string>;
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
+  reminders_config: Maybe<any>;
 }
 
 export interface CreatePetition {
@@ -244,16 +241,13 @@ export interface CreatePetition {
   email_subject?: Maybe<string>;
   email_body?: Maybe<string>;
   reminders_active?: boolean;
-  reminders_offset?: Maybe<number>;
-  reminders_time?: Maybe<string>;
-  reminders_timezone?: Maybe<string>;
-  reminders_weekdays_only?: Maybe<boolean>;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
+  reminders_config?: Maybe<any>;
 }
 
 export interface PetitionAccess {

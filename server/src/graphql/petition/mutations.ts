@@ -29,6 +29,7 @@ import {
   userHasAccessToPetition,
   userHasAccessToPetitions,
 } from "./authorizers";
+import { ArgValidationError } from "../helpers/errors";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -117,9 +118,9 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   },
 });
 
-export const ReminderSettingsInput = inputObjectType({
-  name: "ReminderSettingsInput",
-  description: "The reminder settings of a petition",
+export const RemindersConfigInput = inputObjectType({
+  name: "RemindersConfigInput",
+  description: "The reminders settings for the petition",
   definition(t) {
     t.int("offset", {
       description: "The amount of days between reminders.",
@@ -157,8 +158,8 @@ export const updatePetition = mutationField("updatePetition", {
         t.datetime("deadline", { nullable: true });
         t.string("emailSubject", { nullable: true });
         t.json("emailBody", { nullable: true });
-        t.field("reminderSettings", {
-          type: "ReminderSettingsInput",
+        t.field("remindersConfig", {
+          type: "RemindersConfigInput",
           nullable: true,
         });
       },
@@ -166,7 +167,35 @@ export const updatePetition = mutationField("updatePetition", {
   },
   validateArgs: validateAnd(
     maxLength((args) => args.data.name, "data.name", 255),
-    maxLength((args) => args.data.emailSubject, "data.emailSubject", 255)
+    maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
+    (_, args, ctx, info) => {
+      if (args.data.remindersConfig) {
+        const { time, timezone, offset } = args.data.remindersConfig;
+        if (!/(2[0-3]|[01][0-9]):([0-5][0-9])/.test(time)) {
+          throw new ArgValidationError(
+            info,
+            "data.remindersConfig.time",
+            `Value must be a valid 00:00-23:59 time.`
+          );
+        }
+        try {
+          findTimeZone(timezone);
+        } catch {
+          throw new ArgValidationError(
+            info,
+            "data.remindersConfig.timezone",
+            `Value must be a valid timezone.`
+          );
+        }
+        if (offset < 1) {
+          throw new ArgValidationError(
+            info,
+            "data.remindersConfig.offset",
+            `Value must be larger than 0.`
+          );
+        }
+      }
+    }
   ),
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
@@ -176,7 +205,7 @@ export const updatePetition = mutationField("updatePetition", {
       deadline,
       emailSubject,
       emailBody,
-      reminderSettings,
+      remindersConfig,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -194,35 +223,13 @@ export const updatePetition = mutationField("updatePetition", {
     if (emailBody !== undefined) {
       data.email_body = emailBody === null ? null : JSON.stringify(emailBody);
     }
-    if (reminderSettings !== undefined) {
-      if (reminderSettings === null) {
+    if (remindersConfig !== undefined) {
+      if (remindersConfig === null) {
+        data.reminders_config = null;
         data.reminders_active = false;
-        data.reminders_offset = null;
-        data.reminders_time = null;
-        data.reminders_timezone = null;
-        data.reminders_weekdays_only = null;
       } else {
-        if (!/(2[0-3]|[01][0-9]):([0-5][0-9])/.test(reminderSettings.time)) {
-          throw new Error(
-            `Invalid reminderSettings.time ${JSON.stringify(
-              reminderSettings.time
-            )}`
-          );
-        }
-        try {
-          findTimeZone(reminderSettings.timezone);
-        } catch {
-          throw new Error(
-            `Invalid reminderSettings.timezone ${JSON.stringify(
-              reminderSettings.timezone
-            )}`
-          );
-        }
+        data.reminders_config = remindersConfig;
         data.reminders_active = true;
-        data.reminders_offset = reminderSettings.offset;
-        data.reminders_time = reminderSettings.time;
-        data.reminders_timezone = reminderSettings.timezone;
-        data.reminders_weekdays_only = reminderSettings.weekdaysOnly;
       }
     }
     return await ctx.petitions.updatePetition(petitionId, data, ctx.user!);
@@ -481,10 +488,7 @@ export const sendPetition = mutationField("sendPetition", {
             next_reminder_at: petition.reminders_active
               ? calculateNextReminder(
                   args.scheduledAt ?? new Date(),
-                  petition.reminders_offset!,
-                  petition.reminders_time!,
-                  petition.reminders_timezone!,
-                  petition.reminders_weekdays_only!
+                  petition.reminders_config!
                 )
               : null,
             ...pick(petition, [
@@ -493,10 +497,7 @@ export const sendPetition = mutationField("sendPetition", {
               "locale",
               "deadline",
               "reminders_active",
-              "reminders_offset",
-              "reminders_time",
-              "reminders_timezone",
-              "reminders_weekdays_only",
+              "reminders_config",
             ]),
           })),
           ctx.user!

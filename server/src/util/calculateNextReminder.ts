@@ -3,10 +3,17 @@ import { format, utcToZonedTime, toDate } from "date-fns-tz";
 
 export function calculateNextReminder(
   fromDate: Date,
-  offset: number,
-  time: string,
-  timezone: string,
-  weekDaysOnly: boolean
+  {
+    offset,
+    time,
+    timezone,
+    weekdaysOnly,
+  }: {
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  }
 ) {
   // Calculate next reminder
   const sendDate = fromDate;
@@ -18,7 +25,7 @@ export function calculateNextReminder(
     startOfToday()
   );
   let reminderDate = addDays(date, offset);
-  while (weekDaysOnly && isWeekend(reminderDate)) {
+  while (weekdaysOnly && isWeekend(reminderDate)) {
     reminderDate = addDays(reminderDate, 1);
   }
   return toDate(`${format(reminderDate, "yyyy-MM-dd")}T${time}:00`, {

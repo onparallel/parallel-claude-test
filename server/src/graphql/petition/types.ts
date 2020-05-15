@@ -139,19 +139,12 @@ export const Petition = objectType({
           : [];
       },
     });
-    t.field("reminderSettings", {
-      type: "ReminderSettings",
-      description: "The reminder settings of the petition.",
+    t.field("remindersConfig", {
+      type: "RemindersConfig",
+      description: "The reminders configuration for the petition.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return root.reminders_active
-          ? {
-              offset: root.reminders_offset!,
-              time: root.reminders_time!,
-              timezone: root.reminders_timezone!,
-              weekdaysOnly: root.reminders_weekdays_only!,
-            }
-          : null;
+        return root.reminders_config;
       },
     });
   },
@@ -211,8 +204,8 @@ export const PetitionField = objectType({
   },
 });
 
-export const ReminderSettings = objectType({
-  name: "ReminderSettings",
+export const RemindersConfig = objectType({
+  name: "RemindersConfig",
   description: "The reminder settings of a petition",
   definition(t) {
     t.int("offset", {
@@ -277,8 +270,8 @@ export const PetitionSendout = objectType({
       nullable: true,
       resolve: (o) => o.next_reminder_at,
     });
-    t.field("reminderSettings", {
-      type: "ReminderSettings",
+    t.field("RemindersConfig", {
+      type: "RemindersConfig",
       description: "The reminder settings of the petition.",
       nullable: true,
       resolve: async (root, _, ctx) => {

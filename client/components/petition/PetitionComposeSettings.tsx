@@ -34,7 +34,7 @@ import {
   PetitionComposeSettings_ContactFragment,
   PetitionComposeSettings_PetitionFragment,
   PetitionLocale,
-  ReminderSettings,
+  RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -48,7 +48,7 @@ import { CollapseContent } from "../common/CollapseContent";
 import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
-import { PetitionReminderSettings } from "./PetitionReminderSettings";
+import { PetitionRemindersConfig } from "./PetitionRemindersConfig";
 
 export type PetitionComposeSettingsProps = {
   petition: PetitionComposeSettings_PetitionFragment;
@@ -75,16 +75,12 @@ export function PetitionComposeSettings({
     petition.emailBody ?? [{ children: [{ text: "" }] }]
   );
   const [
-    reminderSettings,
-    setReminderSettings,
-  ] = useState<ReminderSettings | null>(petition.reminderSettings ?? null);
+    RemindersConfig,
+    setRemindersConfig,
+  ] = useState<RemindersConfig | null>(petition.RemindersConfig ?? null);
   const updateSubject = useDebouncedCallback(onUpdatePetition, 500, []);
   const updateBody = useDebouncedCallback(onUpdatePetition, 500, []);
-  const updateReminderSettings = useDebouncedCallback(
-    onUpdatePetition,
-    500,
-    []
-  );
+  const updateRemindersConfig = useDebouncedCallback(onUpdatePetition, 500, []);
 
   const handleSubjectChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -108,13 +104,13 @@ export function PetitionComposeSettings({
           weekdaysOnly: false,
         }
       : null;
-    setReminderSettings(value);
-    updateReminderSettings({ reminderSettings: value });
+    setRemindersConfig(value);
+    updateRemindersConfig({ RemindersConfig: value });
   }
 
-  function handleRemindersChange(value: ReminderSettings) {
-    setReminderSettings(value);
-    updateReminderSettings({ reminderSettings: omit(value, ["__typename"]) });
+  function handleRemindersChange(value: RemindersConfig) {
+    setRemindersConfig(value);
+    updateRemindersConfig({ RemindersConfig: omit(value, ["__typename"]) });
   }
 
   async function handleSendClick({ schedule = false } = {}) {
@@ -210,7 +206,7 @@ export function PetitionComposeSettings({
             variantColor="purple"
             size="lg"
             marginRight={2}
-            isChecked={Boolean(reminderSettings)}
+            isChecked={Boolean(RemindersConfig)}
             onChange={handleEnableRemindersChange}
           />
           <Text as="label" {...{ htmlFor: "petition-reminders" }}>
@@ -220,9 +216,9 @@ export function PetitionComposeSettings({
             />
           </Text>
         </Flex>
-        {reminderSettings ? (
-          <PetitionReminderSettings
-            value={reminderSettings}
+        {RemindersConfig ? (
+          <PetitionRemindersConfig
+            value={RemindersConfig}
             onChange={handleRemindersChange}
           />
         ) : null}
@@ -392,7 +388,7 @@ PetitionComposeSettings.fragments = {
       deadline
       emailSubject
       emailBody
-      reminderSettings {
+      RemindersConfig {
         offset
         time
         timezone

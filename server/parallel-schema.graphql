@@ -423,9 +423,9 @@ type Petition implements Timestamps {
   recipients: [Contact]!
 
   """
-  The reminder settings of the petition.
+  The reminders configuration for the petition.
   """
-  reminderSettings: ReminderSettings
+  remindersConfig: RemindersConfig
 
   """
   The sendouts for this petition
@@ -650,7 +650,7 @@ type PetitionSendout implements Timestamps {
   """
   The reminder settings of the petition.
   """
-  reminderSettings: ReminderSettings
+  RemindersConfig: RemindersConfig
 
   """
   Time at which the sendout is scheduled.
@@ -1013,7 +1013,7 @@ enum QueryPetitions_OrderBy {
 """
 The reminder settings of a petition
 """
-type ReminderSettings {
+type RemindersConfig {
   """
   The amount of days between reminders.
   """
@@ -1036,9 +1036,9 @@ type ReminderSettings {
 }
 
 """
-The reminder settings of a petition
+The reminders settings for the petition
 """
-input ReminderSettingsInput {
+input RemindersConfigInput {
   """
   The amount of days between reminders.
   """
@@ -1110,7 +1110,7 @@ input UpdatePetitionInput {
   emailSubject: String
   locale: PetitionLocale
   name: String
-  reminderSettings: ReminderSettingsInput
+  remindersConfig: RemindersConfigInput
 }
 
 input UpdateUserInput {

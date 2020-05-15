@@ -177,19 +177,19 @@
     "term": "component.petition-reminder-settings.next-reminder",
     "definition": "Después de enviar la petición, el primer recordatorio se enviará el {date} y hasta un máximo de 10 recordatorios se enviarán cada {days, plural, =1 {día} other {# días}} a las {time} hasta que la petición se complete",
     "context": "After sending the petition, the first reminder will be sent on {date} and up to 10 reminders will be sent {days, plural, =1 {everyday} other {every # days}} at {time} until the petition is completed.",
-    "reference": "components/petition/PetitionReminderSettings.tsx#L125-L133"
+    "reference": "components/petition/PetitionRemindersConfig.tsx#L125-L133"
   },
   {
     "term": "component.petition-reminder-settings.only-weekdays",
     "definition": "...solamente de lunes a viernes",
     "context": "...only on weekdays",
-    "reference": "components/petition/PetitionReminderSettings.tsx#L116-L119"
+    "reference": "components/petition/PetitionRemindersConfig.tsx#L116-L119"
   },
   {
     "term": "component.petition-reminder-settings.text",
     "definition": "Enviar recordatorios cada <days-input></days-input> días a las <time-input></time-input>",
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>",
-    "reference": "components/petition/PetitionReminderSettings.tsx#L54-L98"
+    "reference": "components/petition/PetitionRemindersConfig.tsx#L54-L98"
   },
   {
     "term": "component.petition-status-filter.all",
