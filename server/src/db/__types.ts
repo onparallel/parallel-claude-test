@@ -387,7 +387,7 @@ export interface PetitionReminder {
   created_at: Date;
   created_by: Maybe<string>;
   sender_id: Maybe<number>;
-  petition_access_id: Maybe<number>;
+  petition_access_id: number;
 }
 
 export interface CreatePetitionReminder {
@@ -398,7 +398,7 @@ export interface CreatePetitionReminder {
   created_at?: Date;
   created_by?: Maybe<string>;
   sender_id?: Maybe<number>;
-  petition_access_id?: Maybe<number>;
+  petition_access_id: number;
 }
 
 export interface PetitionSendout {
