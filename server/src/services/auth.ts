@@ -94,7 +94,7 @@ export class Auth {
 
   private setSession(res: Response, token: string) {
     res.cookie("parallel_session", token, {
-      sameSite: true,
+      sameSite: "lax",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
