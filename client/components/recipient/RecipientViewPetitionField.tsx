@@ -127,13 +127,13 @@ export function RecipientViewPetitionField({
       <Text fontSize="sm" color="gray.500">
         {field.type === "TEXT" ? (
           <FormattedMessage
-            id="sendout.replies-submitted"
+            id="recipient-view.replies-submitted"
             defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
             values={{ count: field.replies.length }}
           />
         ) : field.type === "FILE_UPLOAD" ? (
           <FormattedMessage
-            id="sendout.files-uploaded"
+            id="recipient-view.files-uploaded"
             defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
             values={{ count: field.replies.length }}
           />
@@ -149,7 +149,7 @@ export function RecipientViewPetitionField({
               >
                 {field.type === "TEXT" ? (
                   <FormattedMessage
-                    id="sendout.text-reply"
+                    id="recipient-view.text-reply"
                     defaultMessage="Reply added on {date}"
                     values={{
                       date: (
@@ -246,7 +246,7 @@ function ReplyWrapper({
         size="xs"
         placement="bottom"
         label={intl.formatMessage({
-          id: "sendout.remove-reply-label",
+          id: "recipient-view.remove-reply-label",
           defaultMessage: "Remove reply",
         })}
         marginLeft={1}
@@ -309,7 +309,7 @@ function TextReplyForm({
         marginLeft={{ base: 0, sm: 4 }}
       >
         <FormattedMessage
-          id="sendout.field-reply-submit"
+          id="recipient-view.field-reply-submit"
           defaultMessage="Submit"
         />
       </Button>

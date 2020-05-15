@@ -159,12 +159,12 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         await completePetition({ variables: { keycode } });
         toast({
           title: intl.formatMessage({
-            id: "sendout.completed-petition.toast-title",
+            id: "recipient-view.completed-petition.toast-title",
             defaultMessage: "Petition completed!",
           }),
           description: intl.formatMessage(
             {
-              id: "sendout.completed-petition.toast-description",
+              id: "recipient-view.completed-petition.toast-description",
               defaultMessage:
                 "You have completed this petition and {name} will be notified",
             },
@@ -205,7 +205,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
             <AlertIcon />
             <AlertDescription>
               <FormattedMessage
-                id="sendout.petition-completed-alert"
+                id="recipient-view.petition-completed-alert"
                 defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
               />
             </AlertDescription>
@@ -279,7 +279,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           <Flex flexDirection="column" alignItems="center">
             <Text as="span" fontSize="sm" marginBottom={2}>
               <FormattedMessage
-                id="sendout.powered-by"
+                id="recipient-view.powered-by"
                 defaultMessage="Powered by"
               />
             </Text>

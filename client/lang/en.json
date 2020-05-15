@@ -2298,109 +2298,109 @@
     "reference": "pages/[locale]/legal/[doc].tsx#L19-L22"
   },
   {
-    "term": "sendout.automatically-saved-text-1",
+    "term": "recipient-view.automatically-saved-text-1",
     "definition": "Your progress is automatically saved.",
     "context": "Your progress is automatically saved.",
     "reference": "components/recipient/RecipientViewProgressCard.tsx#L135-L138"
   },
   {
-    "term": "sendout.automatically-saved-text-2",
+    "term": "recipient-view.automatically-saved-text-2",
     "definition": "You can return at anytime to complete the petition.",
     "context": "You can return at anytime to complete the petition.",
     "reference": "components/recipient/RecipientViewProgressCard.tsx#L141-L144"
   },
   {
-    "term": "sendout.completed-petition.toast-description",
+    "term": "recipient-view.completed-petition.toast-description",
     "definition": "You have completed this petition and {name} will be notified",
     "context": "You have completed this petition and {name} will be notified",
     "reference": "pages/[locale]/petition/[keycode].tsx#L166-L170"
   },
   {
-    "term": "sendout.completed-petition.toast-title",
+    "term": "recipient-view.completed-petition.toast-title",
     "definition": "Petition completed!",
     "context": "Petition completed!",
     "reference": "pages/[locale]/petition/[keycode].tsx#L161-L164"
   },
   {
-    "term": "sendout.field-reply-submit",
+    "term": "recipient-view.field-reply-submit",
     "definition": "Submit",
     "context": "Submit",
     "reference": "components/recipient/RecipientViewPetitionField.tsx#L311-L314"
   },
   {
-    "term": "sendout.files-uploaded",
+    "term": "recipient-view.files-uploaded",
     "definition": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
     "reference": "components/recipient/RecipientViewPetitionField.tsx#L135-L139"
   },
   {
-    "term": "sendout.organization",
+    "term": "recipient-view.organization",
     "definition": "Business",
     "context": "Business",
     "reference": "components/recipient/RecipientViewSenderCard.tsx#L33-L36"
   },
   {
-    "term": "sendout.petition-completed-alert",
+    "term": "recipient-view.petition-completed-alert",
     "definition": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
     "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
     "reference": "pages/[locale]/petition/[keycode].tsx#L207-L210"
   },
   {
-    "term": "sendout.powered-by",
+    "term": "recipient-view.powered-by",
     "definition": "Powered by",
     "context": "Powered by",
     "reference": "pages/[locale]/petition/[keycode].tsx#L281-L284"
   },
   {
-    "term": "sendout.progress",
+    "term": "recipient-view.progress",
     "definition": "Progress",
     "context": "Progress",
     "reference": "components/recipient/RecipientViewProgressCard.tsx#L82"
   },
   {
-    "term": "sendout.remove-reply-label",
+    "term": "recipient-view.remove-reply-label",
     "definition": "Remove reply",
     "context": "Remove reply",
     "reference": "components/recipient/RecipientViewPetitionField.tsx#L248-L251"
   },
   {
-    "term": "sendout.replies-submitted",
+    "term": "recipient-view.replies-submitted",
     "definition": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
     "reference": "components/recipient/RecipientViewPetitionField.tsx#L129-L133"
   },
   {
-    "term": "sendout.security-link",
+    "term": "recipient-view.security-link",
     "definition": "About security",
     "context": "About security",
     "reference": "components/recipient/RecipientViewSideLinks.tsx#L26-L29"
   },
   {
-    "term": "sendout.sender",
+    "term": "recipient-view.sender",
     "definition": "Sender",
     "context": "Sender",
     "reference": "components/recipient/RecipientViewSenderCard.tsx#L46-L49"
   },
   {
-    "term": "sendout.sender-email",
+    "term": "recipient-view.sender-email",
     "definition": "Sender email",
     "context": "Sender email",
     "reference": "components/recipient/RecipientViewSenderCard.tsx#L59-L62"
   },
   {
-    "term": "sendout.submit-button",
+    "term": "recipient-view.submit-button",
     "definition": "Finalize and notify {name}",
     "context": "Finalize and notify {name}",
     "reference": "components/recipient/RecipientViewProgressCard.tsx#L162-L166"
   },
   {
-    "term": "sendout.submit-button-short",
+    "term": "recipient-view.submit-button-short",
     "definition": "Finalize",
     "context": "Finalize",
     "reference": "components/recipient/RecipientViewProgressCard.tsx#L156-L160"
   },
   {
-    "term": "sendout.text-reply",
+    "term": "recipient-view.text-reply",
     "definition": "Reply added on {date}",
     "context": "Reply added on {date}",
     "reference": "components/recipient/RecipientViewPetitionField.tsx#L151-L162"

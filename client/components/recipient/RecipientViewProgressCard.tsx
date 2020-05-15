@@ -79,7 +79,10 @@ export function RecipientViewProgressCard({
         alignItems="center"
       >
         <Text as="span">
-          <FormattedMessage id="sendout.progress" defaultMessage="Progress" />
+          <FormattedMessage
+            id="recipient-view.progress"
+            defaultMessage="Progress"
+          />
         </Text>
         <Spacer minWidth={2} />
         <Text as="span">{replied}</Text>
@@ -133,13 +136,13 @@ export function RecipientViewProgressCard({
           <Box>
             <Text fontSize="sm">
               <FormattedMessage
-                id="sendout.automatically-saved-text-1"
+                id="recipient-view.automatically-saved-text-1"
                 defaultMessage="Your progress is automatically saved."
               />
             </Text>
             <Text fontSize="sm">
               <FormattedMessage
-                id="sendout.automatically-saved-text-2"
+                id="recipient-view.automatically-saved-text-2"
                 defaultMessage="You can return at anytime to complete the petition."
               />
             </Text>
@@ -154,13 +157,13 @@ export function RecipientViewProgressCard({
       >
         {isStickyFooter ? (
           <FormattedMessage
-            id="sendout.submit-button-short"
+            id="recipient-view.submit-button-short"
             defaultMessage="Finalize"
             values={{ name: sender.firstName }}
           />
         ) : (
           <FormattedMessage
-            id="sendout.submit-button"
+            id="recipient-view.submit-button"
             defaultMessage="Finalize and notify {name}"
             values={{ name: sender.firstName }}
           />

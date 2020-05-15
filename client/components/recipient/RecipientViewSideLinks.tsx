@@ -24,7 +24,7 @@ export default function RecipientViewSideLinks(
         <ListItem>
           <Link href="/security">
             <FormattedMessage
-              id="sendout.security-link"
+              id="recipient-view.security-link"
               defaultMessage="About security"
             />
           </Link>

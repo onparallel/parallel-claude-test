@@ -78,7 +78,7 @@ export function RecipientViewSenderCard({
                     name="business"
                     size="16px"
                     aria-label={intl.formatMessage({
-                      id: "sendout.organization",
+                      id: "recipient-view.organization",
                       defaultMessage: "Business",
                     })}
                   />
@@ -93,7 +93,7 @@ export function RecipientViewSenderCard({
                 name="user"
                 size="16px"
                 aria-label={intl.formatMessage({
-                  id: "sendout.sender",
+                  id: "recipient-view.sender",
                   defaultMessage: "Sender",
                 })}
               />
@@ -106,7 +106,7 @@ export function RecipientViewSenderCard({
                 name="email"
                 size="16px"
                 aria-label={intl.formatMessage({
-                  id: "sendout.sender-email",
+                  id: "recipient-view.sender-email",
                   defaultMessage: "Sender email",
                 })}
               />
