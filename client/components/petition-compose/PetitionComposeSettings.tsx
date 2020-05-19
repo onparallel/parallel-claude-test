@@ -58,7 +58,7 @@ export type PetitionComposeSettingsProps = {
   ) => Promise<PetitionComposeSettings_ContactFragment[]>;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   onValidate?: () => Promise<void>;
-  onSend: (data: { recipients: string[]; schedule: boolean }) => void;
+  onSend: (data: { contactIds: string[]; schedule: boolean }) => void;
 } & CardProps;
 
 export function PetitionComposeSettings({
@@ -75,9 +75,9 @@ export function PetitionComposeSettings({
     petition.emailBody ?? [{ children: [{ text: "" }] }]
   );
   const [
-    RemindersConfig,
+    remindersConfig,
     setRemindersConfig,
-  ] = useState<RemindersConfig | null>(petition.RemindersConfig ?? null);
+  ] = useState<RemindersConfig | null>(petition.remindersConfig ?? null);
   const updateSubject = useDebouncedCallback(onUpdatePetition, 500, []);
   const updateBody = useDebouncedCallback(onUpdatePetition, 500, []);
   const updateRemindersConfig = useDebouncedCallback(onUpdatePetition, 500, []);
@@ -105,18 +105,18 @@ export function PetitionComposeSettings({
         }
       : null;
     setRemindersConfig(value);
-    updateRemindersConfig({ RemindersConfig: value });
+    updateRemindersConfig({ remindersConfig: value });
   }
 
   function handleRemindersChange(value: RemindersConfig) {
     setRemindersConfig(value);
-    updateRemindersConfig({ RemindersConfig: omit(value, ["__typename"]) });
+    updateRemindersConfig({ remindersConfig: omit(value, ["__typename"]) });
   }
 
   async function handleSendClick({ schedule = false } = {}) {
     onSend({
       schedule,
-      recipients: recipients.map((r) => r.id),
+      contactIds: recipients.map((r) => r.id),
     });
   }
 
@@ -206,7 +206,7 @@ export function PetitionComposeSettings({
             variantColor="purple"
             size="lg"
             marginRight={2}
-            isChecked={Boolean(RemindersConfig)}
+            isChecked={Boolean(remindersConfig)}
             onChange={handleEnableRemindersChange}
           />
           <Text as="label" {...{ htmlFor: "petition-reminders" }}>
@@ -216,9 +216,9 @@ export function PetitionComposeSettings({
             />
           </Text>
         </Flex>
-        {RemindersConfig ? (
+        {remindersConfig ? (
           <PetitionRemindersConfig
-            value={RemindersConfig}
+            value={remindersConfig}
             onChange={handleRemindersChange}
           />
         ) : null}
@@ -388,7 +388,7 @@ PetitionComposeSettings.fragments = {
       deadline
       emailSubject
       emailBody
-      RemindersConfig {
+      remindersConfig {
         offset
         time
         timezone

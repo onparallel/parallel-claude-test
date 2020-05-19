@@ -2,20 +2,19 @@ import * as Knex from "knex";
 import {
   Contact,
   CreateContact,
+  CreateFileUpload,
   CreateOrganization,
   CreatePetition,
-  CreatePetitionSendout,
+  CreatePetitionAccess,
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreateUser,
+  FileUpload,
   Organization,
   Petition,
-  PetitionSendout,
   PetitionField,
   PetitionFieldReply,
   User,
-  CreateFileUpload,
-  FileUpload,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 import { random } from "../src/util/token";
@@ -224,11 +223,11 @@ export async function seed(knex: Knex): Promise<any> {
   ];
   const contactIds = await knex<Contact>("contact").insert(contacts, "id");
 
-  const sendouts: CreatePetitionSendout[] = [
+  const accesses: CreatePetitionAccess[] = [
     {
       petition_id: petitionIds[0],
       contact_id: contactIds[0],
-      sender_id: userIds[2],
+      granter_id: userIds[2],
       keycode: random(16),
       status: "ACTIVE",
       created_by: `User:${userIds[2]}`,
@@ -237,7 +236,7 @@ export async function seed(knex: Knex): Promise<any> {
     {
       petition_id: petitionIds[1],
       contact_id: contactIds[1],
-      sender_id: userIds[2],
+      granter_id: userIds[2],
       keycode: random(16),
       status: "ACTIVE",
       created_by: `User:${userIds[2]}`,
@@ -246,15 +245,15 @@ export async function seed(knex: Knex): Promise<any> {
     {
       petition_id: petitionIds[3],
       contact_id: contactIds[1],
-      sender_id: userIds[2],
+      granter_id: userIds[2],
       keycode: random(16),
       status: "ACTIVE",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
     },
   ];
-  const sendoutIds = await knex<PetitionSendout>("petition_sendout").insert(
-    sendouts,
+  const accessesIds = await knex<PetitionAccess>("petition_access").insert(
+    accesses,
     "id"
   );
 
@@ -293,7 +292,7 @@ export async function seed(knex: Knex): Promise<any> {
   const replies: CreatePetitionFieldReply[] = [
     {
       petition_field_id: fieldIds[0],
-      petition_sendout_id: sendoutIds[0],
+      petition_access_id: accessesIds[0],
       type: "FILE_UPLOAD",
       content: { file_upload_id: fileUploadIds[0] },
       created_by: `Contact:${contactIds[0]}`,
@@ -301,7 +300,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_field_id: fieldIds[2],
-      petition_sendout_id: sendoutIds[0],
+      petition_access_id: accessesIds[0],
       type: "TEXT",
       content: { text: "Santiago Albo Guijarro" },
       created_by: `Contact:${contactIds[0]}`,
@@ -309,7 +308,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_field_id: fieldIds[3],
-      petition_sendout_id: sendoutIds[0],
+      petition_access_id: accessesIds[0],
       type: "FILE_UPLOAD",
       content: { file_upload_id: fileUploadIds[1] },
       created_by: `Contact:${contactIds[0]}`,
@@ -317,7 +316,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_field_id: fieldIds[6],
-      petition_sendout_id: sendoutIds[0],
+      petition_access_id: accessesIds[0],
       type: "FILE_UPLOAD",
       content: { file_upload_id: fileUploadIds[2] },
       created_by: `Contact:${contactIds[1]}`,

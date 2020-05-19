@@ -5,7 +5,7 @@ import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { PublicPetitionNotAvailableError } from "../helpers/errors";
 
-export function replyBelongsToSendout<
+export function replyBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
@@ -20,7 +20,7 @@ export function replyBelongsToSendout<
         args[argReplyId],
         "PetitionFieldReply"
       );
-      return await ctx.petitions.replyBelongsToSendout(
+      return await ctx.petitions.replyBelongsToAccess(
         replyId,
         args[argKeycode]
       );
@@ -29,7 +29,7 @@ export function replyBelongsToSendout<
   };
 }
 
-export function fieldBelongsToSendout<
+export function fieldBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
@@ -41,7 +41,7 @@ export function fieldBelongsToSendout<
   return async (_, args, ctx) => {
     try {
       const { id: fieldId } = fromGlobalId(args[argFieldId], "PetitionField");
-      return await ctx.petitions.fieldBelongsToSendout(
+      return await ctx.petitions.fieldBelongsToAccess(
         fieldId,
         args[argKeycode]
       );
@@ -50,28 +50,28 @@ export function fieldBelongsToSendout<
   };
 }
 
-export function fetchSendout<
+export function fetchPetitionAccess<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string>
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const keycode = args[argKeycode] as string;
-    const sendout = await ctx.petitions.loadSendoutByKeycode(keycode);
-    if (!sendout) {
+    const access = await ctx.petitions.loadAccessByKeycode(keycode);
+    if (!access) {
       throw new PublicPetitionNotAvailableError(
-        `Petition sendout with keycode ${keycode} not found`
+        `Petition access with keycode ${keycode} not found`
       );
-    } else if (sendout.status !== "ACTIVE") {
+    } else if (access.status !== "ACTIVE") {
       throw new PublicPetitionNotAvailableError(
-        `Petition sendout with keycode ${keycode} not active`
+        `Petition access with keycode ${keycode} not active`
       );
     } else {
-      ctx.sendout = sendout;
-      const contact = await ctx.contacts.loadContact(ctx.sendout!.contact_id);
+      ctx.access = access;
+      const contact = await ctx.contacts.loadContact(access.contact_id);
       if (!contact) {
         throw new PublicPetitionNotAvailableError(
-          `Contact for petition sendout with keycode ${keycode} not found`
+          `Contact for petition access with keycode ${keycode} not found`
         );
       } else {
         ctx.contact = contact;

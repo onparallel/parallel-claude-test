@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/react-hooks";
-import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
+import { useAskPetitionNameDialog } from "@parallel/components/petition-list/AskPetitionNameDialog";
 import {
   PetitionLocale,
   useCreatePetition_createPetitionMutation,

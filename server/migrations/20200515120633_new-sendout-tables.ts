@@ -6,6 +6,7 @@ export async function up(knex: Knex): Promise<any> {
     .createTable("petition_access", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable().references("petition.id");
+      t.integer("granter_id").notNullable().references("user.id");
       t.integer("contact_id").notNullable().references("contact.id");
       t.string("keycode").notNullable().unique("petition_access__keycode");
       t.enum("status", ["ACTIVE", "INACTIVE"], {
@@ -56,11 +57,17 @@ export async function up(knex: Knex): Promise<any> {
     })
     .alterTable("petition_reminder", (t) => {
       t.integer("petition_access_id").references("petition_access.id");
+    })
+    .alterTable("petition_field_reply", (t) => {
+      t.integer("petition_access_id").references("petition_access.id");
     });
 }
 
 export async function down(knex: Knex): Promise<any> {
   await knex.schema
+    .alterTable("petition_field_reply", (t) => {
+      t.dropColumn("petition_access_id");
+    })
     .alterTable("petition_reminder", (t) => {
       t.dropColumn("petition_access_id");
     })

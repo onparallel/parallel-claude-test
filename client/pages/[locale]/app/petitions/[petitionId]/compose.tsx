@@ -9,19 +9,19 @@ import {
   WithDataContext,
 } from "@parallel/components/common/withData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { useCompletedPetitionDialog } from "@parallel/components/petition/CompletedPetitionDialog";
-import { useConfirmDeleteFieldDialog } from "@parallel/components/petition/ConfirmDeleteFieldDialog";
-import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
+import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
+import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
+import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
   PetitionComposeFields,
   PetitionComposeFieldsProps,
-} from "@parallel/components/petition/PetitionComposeFields";
-import { PetitionComposeFieldSettings } from "@parallel/components/petition/PetitionComposeFieldSettings";
+} from "@parallel/components/petition-compose/PetitionComposeFields";
+import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
 import {
   PetitionComposeSettings,
   PetitionComposeSettingsProps,
-} from "@parallel/components/petition/PetitionComposeSettings";
-import { useScheduleSendoutDialog } from "@parallel/components/petition/ScheduleSendoutDialog";
+} from "@parallel/components/petition-compose/PetitionComposeSettings";
+import { useScheduleMessageDialog } from "@parallel/components/petition-compose/ScheduleMessageDialog";
 import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
@@ -204,10 +204,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const searchContacts = useSearchContacts();
 
   const showErrorDialog = useErrorDialog();
-  const showScheduleSendoutDialog = useScheduleSendoutDialog();
+  const showScheduleMessageDialog = useScheduleMessageDialog();
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
   const handleSend: PetitionComposeSettingsProps["onSend"] = useCallback(
-    async ({ recipients, schedule }) => {
+    async ({ contactIds, schedule }) => {
       if (petition!.fields.length === 0) {
         try {
           await showErrorDialog({
@@ -240,7 +240,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           return;
         }
       }
-      if (recipients.length === 0) {
+      if (contactIds.length === 0) {
         try {
           await showErrorDialog({
             message: (
@@ -257,7 +257,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       let scheduledAt: Date | null = null;
       if (schedule) {
         try {
-          scheduledAt = await showScheduleSendoutDialog({});
+          scheduledAt = await showScheduleMessageDialog({});
         } catch {
           return;
         }
@@ -265,12 +265,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const { data } = await sendPetition({
         variables: {
           petitionId: petition!.id,
-          recipients,
+          contactIds,
           scheduledAt: scheduledAt?.toISOString() ?? null,
         },
         update(client) {
           // clear stale data
-          delete (client as any).data.data[petitionId].sendouts;
+          delete (client as any).data.data[petitionId].accesses;
           delete (client as any).data.data[petitionId].recipients;
         },
       });
@@ -362,29 +362,27 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onSend={handleSend}
             />
           </Box>
-          {activeField ? null : (
-            <Spacer
-              flex="1"
-              display={{ base: "none", md: "block" }}
-              marginLeft={{ base: 0, md: 4 }}
-            />
-          )}
-          {activeField ? (
-            <Box flex="1" marginLeft={{ base: 0, md: 4 }}>
+          <Box
+            flex="1"
+            marginLeft={{ base: 0, md: 4 }}
+            display={{ base: activeField ? "block" : "none", md: "block" }}
+          >
+            {activeField ? (
               <PetitionComposeFieldSettings
+                key={activeField.id}
                 id="field-settings"
                 marginTop={{ base: 0, md: `${settingsOffset}px` }}
                 transition="margin-top 200ms ease"
                 position={{ base: "relative", md: "sticky" }}
                 top={{ base: 0, md: 4 }}
-                field={activeField!}
+                field={activeField}
                 onUpdateField={(data) =>
                   handleUpdateField(activeField.id, data)
                 }
                 onClose={() => setActiveFieldId(null)}
               />
-            </Box>
-          ) : null}
+            ) : null}
+          </Box>
         </Flex>
       </PetitionLayout>
     </>
@@ -504,21 +502,18 @@ PetitionCompose.mutations = [
   gql`
     mutation PetitionCompose_sendPetition(
       $petitionId: ID!
-      $recipients: [ID!]!
+      $contactIds: [ID!]!
       $scheduledAt: DateTime
     ) {
       sendPetition(
         petitionId: $petitionId
-        recipients: $recipients
+        contactIds: $contactIds
         scheduledAt: $scheduledAt
       ) {
         result
         petition {
           id
           status
-        }
-        sendouts {
-          id
         }
       }
     }

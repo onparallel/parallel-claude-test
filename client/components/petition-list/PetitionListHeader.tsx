@@ -100,7 +100,7 @@ export function PetitionListHeader({
             }
           >
             <FormattedMessage
-              id="component.petition-list-header.actions-button"
+              id="generic.actions-button"
               defaultMessage="Actions"
             ></FormattedMessage>
           </ButtonDropdown>

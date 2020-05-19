@@ -9,6 +9,14 @@ export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
+export type PetitionEventType =
+  | "ACCESS_ACTIVATED"
+  | "ACCESS_DEACTIVATED"
+  | "MESSAGE_SCHEDULED"
+  | "MESSAGE_CANCELLED"
+  | "MESSAGE_PROCESSED"
+  | "REMINDER_PROCESSED";
+
 export type PetitionFieldType = "TEXT" | "FILE_UPLOAD";
 
 export type PetitionMessageStatus =
@@ -40,6 +48,7 @@ export interface TableTypes {
   organization: Organization;
   petition: Petition;
   petition_access: PetitionAccess;
+  petition_event: PetitionEvent;
   petition_field: PetitionField;
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
@@ -56,6 +65,7 @@ export interface TableCreateTypes {
   organization: CreateOrganization;
   petition: CreatePetition;
   petition_access: CreatePetitionAccess;
+  petition_event: CreatePetitionEvent;
   petition_field: CreatePetitionField;
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
@@ -72,6 +82,7 @@ export interface TablePrimaryKeys {
   organization: "id";
   petition: "id";
   petition_access: "id";
+  petition_event: "id";
   petition_field: "id";
   petition_field_reply: "id";
   petition_message: "id";
@@ -253,6 +264,7 @@ export interface CreatePetition {
 export interface PetitionAccess {
   id: number;
   petition_id: number;
+  granter_id: number;
   contact_id: number;
   keycode: string;
   status: PetitionAccessStatus;
@@ -268,6 +280,7 @@ export interface PetitionAccess {
 
 export interface CreatePetitionAccess {
   petition_id: number;
+  granter_id: number;
   contact_id: number;
   keycode: string;
   status: PetitionAccessStatus;
@@ -279,6 +292,21 @@ export interface CreatePetitionAccess {
   created_by?: Maybe<string>;
   updated_at?: Date;
   updated_by?: Maybe<string>;
+}
+
+export interface PetitionEvent {
+  id: number;
+  petition_id: number;
+  type: PetitionEventType;
+  data: Maybe<any>;
+  created_at: Date;
+}
+
+export interface CreatePetitionEvent {
+  petition_id: number;
+  type: PetitionEventType;
+  data?: Maybe<any>;
+  created_at?: Date;
 }
 
 export interface PetitionField {
@@ -321,7 +349,7 @@ export interface CreatePetitionField {
 export interface PetitionFieldReply {
   id: number;
   petition_field_id: number;
-  petition_sendout_id: number;
+  petition_sendout_id: Maybe<number>;
   type: PetitionFieldType;
   content: any;
   created_at: Date;
@@ -330,11 +358,12 @@ export interface PetitionFieldReply {
   updated_by: Maybe<string>;
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
+  petition_access_id: number;
 }
 
 export interface CreatePetitionFieldReply {
   petition_field_id: number;
-  petition_sendout_id: number;
+  petition_sendout_id?: Maybe<number>;
   type: PetitionFieldType;
   content: any;
   created_at?: Date;
@@ -343,6 +372,7 @@ export interface CreatePetitionFieldReply {
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
+  petition_access_id: number;
 }
 
 export interface PetitionMessage {
@@ -374,7 +404,7 @@ export interface CreatePetitionMessage {
 
 export interface PetitionReminder {
   id: number;
-  petition_sendout_id: number;
+  petition_sendout_id: Maybe<number>;
   email_log_id: Maybe<number>;
   type: PetitionReminderType;
   status: PetitionReminderStatus;
@@ -385,7 +415,7 @@ export interface PetitionReminder {
 }
 
 export interface CreatePetitionReminder {
-  petition_sendout_id: number;
+  petition_sendout_id?: Maybe<number>;
   email_log_id?: Maybe<number>;
   type: PetitionReminderType;
   status: PetitionReminderStatus;

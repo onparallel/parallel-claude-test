@@ -34,6 +34,7 @@ import {
   useContactQuery,
   useContactUserQuery,
   useContact_updateContactMutation,
+  Contact_PetitionAccessFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
@@ -77,14 +78,17 @@ function Contact({ contactId }: ContactProps) {
     },
   });
 
-  function goToPetition(id: string, section: "compose" | "replies") {
+  function goToPetition(
+    id: string,
+    section: "compose" | "replies" | "activity"
+  ) {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
       `/${router.query.locale}/app/petitions/${id}/${section}`
     );
   }
 
-  function handleRowClick(row: SendoutSelection) {
+  function handleRowClick(row: PetitionAccessSelection) {
     goToPetition(
       row.petition!.id,
       ({
@@ -112,8 +116,7 @@ function Contact({ contactId }: ContactProps) {
     []
   );
 
-  const { border } = useTableColors();
-  const columns = useContactSendoutsColumns();
+  const columns = useContactPetitionAccessesColumns();
 
   return (
     <>
@@ -216,9 +219,9 @@ function Contact({ contactId }: ContactProps) {
               <Box
                 padding={4}
                 borderBottom="1px solid"
-                borderBottomColor={border}
+                borderBottomColor="gray.200"
               >
-                <Heading size="sm">
+                <Heading fontSize="md">
                   <FormattedMessage
                     id="contact.petitions-header"
                     defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
@@ -226,10 +229,10 @@ function Contact({ contactId }: ContactProps) {
                   />
                 </Heading>
               </Box>
-              {contact?.sendouts.items.length ? (
+              {contact?.accesses.items.length ? (
                 <Table
                   columns={columns}
-                  rows={contact?.sendouts.items ?? []}
+                  rows={contact?.accesses.items ?? []}
                   rowKeyProp="id"
                   onRowClick={handleRowClick}
                   marginBottom={2}
@@ -242,8 +245,8 @@ function Contact({ contactId }: ContactProps) {
                 >
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
-                      id="contact.no-sendouts"
-                      defaultMessage="You haven't send any petitions to {name, select, null {this contact} other {{name}}} yet"
+                      id="contact.no-petitions"
+                      defaultMessage="You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet"
                       values={{ name: contact?.firstName }}
                     />
                   </Text>
@@ -258,11 +261,11 @@ function Contact({ contactId }: ContactProps) {
   );
 }
 
-type SendoutSelection = UnwrapArray<
-  Contact_ContactFragment["sendouts"]["items"]
->;
+type PetitionAccessSelection = Contact_PetitionAccessFragment;
 
-function useContactSendoutsColumns(): TableColumn<SendoutSelection>[] {
+function useContactPetitionAccessesColumns(): TableColumn<
+  PetitionAccessSelection
+>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -272,9 +275,9 @@ function useContactSendoutsColumns(): TableColumn<SendoutSelection>[] {
           id: "petitions.header.name",
           defaultMessage: "Petition name",
         }),
-        Cell: memo(({ row }) => (
+        Cell: memo(({ row: { petition } }) => (
           <>
-            {row.petition?.name || (
+            {petition?.name || (
               <Text as="span" color="gray.400" fontStyle="italic">
                 <FormattedMessage
                   id="generic.untitled-petition"
@@ -286,9 +289,28 @@ function useContactSendoutsColumns(): TableColumn<SendoutSelection>[] {
         )),
       },
       {
+        key: "deadline",
+        header: intl.formatMessage({
+          id: "petition-accesses.deadline-header",
+          defaultMessage: "Deadline",
+        }),
+        Cell: memo(({ row: { petition } }) =>
+          petition?.deadline ? (
+            <DateTime value={petition.deadline} format={FORMATS.LLL} />
+          ) : (
+            <Text as="span" color="gray.400" fontStyle="italic">
+              <FormattedMessage
+                id="generic.no-deadline"
+                defaultMessage="No deadline"
+              />
+            </Text>
+          )
+        ),
+      },
+      {
         key: "progress",
         header: intl.formatMessage({
-          id: "petitions.sendouts-header.progress",
+          id: "petition-accesses.progress-header",
           defaultMessage: "Progress",
         }),
         Cell: memo(({ row: { petition } }) => (
@@ -303,23 +325,9 @@ function useContactSendoutsColumns(): TableColumn<SendoutSelection>[] {
         )),
       },
       {
-        key: "deadline",
-        header: intl.formatMessage({
-          id: "petitions.sendouts-header.deadline",
-          defaultMessage: "Deadline",
-        }),
-        Cell: memo(({ row: { petition } }) => (
-          <>
-            {petition?.deadline ? (
-              <DateTime value={petition.deadline} format={FORMATS.LLL} />
-            ) : null}
-          </>
-        )),
-      },
-      {
         key: "status",
         header: intl.formatMessage({
-          id: "petitions.sendouts-header.status",
+          id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
         Cell: memo(({ row: { petition } }) => (
@@ -341,22 +349,24 @@ Contact.fragments = {
       fullName
       firstName
       lastName
-      sendouts(limit: 100) {
+      accesses(limit: 100) {
         items {
-          id
-          petition {
-            id
-            name
-            emailSubject
-            status
-            deadline
-            progress {
-              validated
-              replied
-              optional
-              total
-            }
-          }
+          ...Contact_PetitionAccess
+        }
+      }
+    }
+    fragment Contact_PetitionAccess on PetitionAccess {
+      id
+      petition {
+        id
+        name
+        status
+        deadline
+        progress {
+          validated
+          replied
+          optional
+          total
         }
       }
     }

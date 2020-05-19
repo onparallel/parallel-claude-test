@@ -12,6 +12,21 @@ A contact in the system.
 """
 type Contact implements Timestamps {
   """
+  The petition accesses for this contact
+  """
+  accesses(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PetitionAccessPagination!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -42,21 +57,6 @@ type Contact implements Timestamps {
   lastName: String
 
   """
-  The sendouts for this contact
-  """
-  sendouts(
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-  ): PetitionSendoutPagination!
-
-  """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
@@ -78,6 +78,13 @@ input CreateContactInput {
   email: String!
   firstName: String
   lastName: String
+}
+
+interface CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
 }
 
 type CreateFileUploadReply {
@@ -207,18 +214,18 @@ type Mutation {
   ): PublicPetitionFieldReply!
 
   """
-  Sends the petition and creates the corresponding sendouts.
+  Sends the petition and creates the corresponding accesses and messages.
   """
   sendPetition(
+    contactIds: [ID!]!
     petitionId: ID!
-    recipients: [ID!]!
     scheduledAt: DateTime
   ): SendPetitionResult!
 
   """
-  Sends a reminder for the corresponding sendouts.
+  Sends a reminder for the specified petition accesses.
   """
-  sendReminders(petitionId: ID!, sendoutIds: [ID!]!): SendReminderResult!
+  sendReminders(accessesIds: [ID!]!, petitionId: ID!): SendReminderResult!
 
   """
   Updates a contact.
@@ -363,6 +370,11 @@ An petition in the system.
 """
 type Petition implements Timestamps {
   """
+  The accesses for this petition
+  """
+  accesses: [PetitionAccess!]!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -428,11 +440,6 @@ type Petition implements Timestamps {
   remindersConfig: RemindersConfig
 
   """
-  The sendouts for this petition
-  """
-  sendouts: [PetitionSendout!]!
-
-  """
   The status of the petition.
   """
   status: PetitionStatus!
@@ -441,6 +448,78 @@ type Petition implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+"""
+A petition access
+"""
+type PetitionAccess implements Timestamps {
+  """
+  The contact of this access.
+  """
+  contact: Contact
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The ID of the petition access.
+  """
+  id: ID!
+
+  """
+  When the next reminder will be sent.
+  """
+  nextReminderAt: DateTime
+
+  """
+  The petition for this message access.
+  """
+  petition: Petition
+
+  """
+  The reminder settings of the petition.
+  """
+  remindersConfig: RemindersConfig
+
+  """
+  The status of the petition access
+  """
+  status: PetitionAccessStatus!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+type PetitionAccessPagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionAccess!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+"""
+The status of a petition access.
+"""
+enum PetitionAccessStatus {
+  """
+  The petition is accessible by the contact.
+  """
+  ACTIVE
+
+  """
+  The petition is not accessible by the contact.
+  """
+  INACTIVE
 }
 
 type PetitionAndField {
@@ -508,6 +587,11 @@ A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
   """
+  The access from where this reply was made.
+  """
+  access: PetitionAccess
+
+  """
   The content of the reply
   """
   content: JSONObject!
@@ -521,11 +605,6 @@ type PetitionFieldReply implements Timestamps {
   The ID of the petition field reply.
   """
   id: ID!
-
-  """
-  The sendout from where this reply was made.
-  """
-  sendout: PetitionSendout
 
   """
   Time when the resource was last updated.
@@ -554,6 +633,91 @@ The locale used for rendering the petition to the contact.
 enum PetitionLocale {
   en
   es
+}
+
+"""
+A petition message
+"""
+type PetitionMessage implements CreatedAt {
+  """
+  The access of this petition message.
+  """
+  access: PetitionAccess!
+
+  """
+  Tells when the email bounced.
+  """
+  bouncedAt: DateTime
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  Tells when the email was delivered.
+  """
+  deliveredAt: DateTime
+
+  """
+  The body of the petition message.
+  """
+  emailBody: JSON
+
+  """
+  The subject of the petition message.
+  """
+  emailSubject: JSON
+
+  """
+  The ID of the petition message.
+  """
+  id: ID!
+
+  """
+  Tells when the email was opened for the first time.
+  """
+  openedAt: DateTime
+
+  """
+  Time at which the message will be sent.
+  """
+  scheduledAt: DateTime
+
+  """
+  If already sent, the date at which the email was sent.
+  """
+  sentAt: DateTime
+
+  """
+  The status of the petition message
+  """
+  status: PetitionMessageStatus!
+}
+
+"""
+The status of a petition message.
+"""
+enum PetitionMessageStatus {
+  """
+  The message was scheduled but has been cancelled.
+  """
+  CANCELLED
+
+  """
+  The message has been processed.
+  """
+  PROCESSED
+
+  """
+  The message is being processed.
+  """
+  PROCESSING
+
+  """
+  The message has been scheduled to be sent at a specific time.
+  """
+  SCHEDULED
 }
 
 type PetitionPagination {
@@ -591,128 +755,6 @@ type PetitionProgress {
   Number of fields validated
   """
   validated: Int!
-}
-
-"""
-A sendout of a petition
-"""
-type PetitionSendout implements Timestamps {
-  """
-  Tells when the email bounced.
-  """
-  bouncedAt: DateTime
-
-  """
-  The receiver of the petition through this sendout.
-  """
-  contact: Contact
-
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-
-  """
-  Tells when the email was delivered.
-  """
-  deliveredAt: DateTime
-
-  """
-  The body of the petition.
-  """
-  emailBody: JSON
-
-  """
-  The subject of the petition.
-  """
-  emailSubject: String
-
-  """
-  The ID of the petition field access.
-  """
-  id: ID!
-
-  """
-  When the next reminder will be sent.
-  """
-  nextReminderAt: DateTime
-
-  """
-  Tells when the email was opened for the first time.
-  """
-  openedAt: DateTime
-
-  """
-  The petition for this sendout.
-  """
-  petition: Petition
-
-  """
-  The reminder settings of the petition.
-  """
-  RemindersConfig: RemindersConfig
-
-  """
-  Time at which the sendout is scheduled.
-  """
-  scheduledAt: DateTime
-
-  """
-  If already sent, the date at which the email was delivered.
-  """
-  sentAt: DateTime
-
-  """
-  The status of the sendout
-  """
-  status: PetitionSendoutStatus!
-
-  """
-  Time when the resource was last updated.
-  """
-  updatedAt: DateTime!
-}
-
-type PetitionSendoutPagination {
-  """
-  The requested slice of items.
-  """
-  items: [PetitionSendout!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
-}
-
-"""
-The status of a sendout.
-"""
-enum PetitionSendoutStatus {
-  """
-  The sendout is active and accessible.
-  """
-  ACTIVE
-
-  """
-  The scheduled sendout was cancelled.
-  """
-  CANCELLED
-
-  """
-  The sendout is not active.
-  """
-  INACTIVE
-
-  """
-  The sendout is being processed.
-  """
-  PROCESSING
-
-  """
-  The sendout has been scheduled.
-  """
-  SCHEDULED
 }
 
 """
@@ -770,16 +812,6 @@ type PublicPetition implements Timestamps {
   deadline: DateTime
 
   """
-  The body of the petition.
-  """
-  emailBody: JSON
-
-  """
-  The subject of the petition.
-  """
-  emailSubject: String
-
-  """
   The field definition of the petition.
   """
   fields: [PublicPetitionField!]!
@@ -803,6 +835,14 @@ type PublicPetition implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+"""
+A public view of a petition access
+"""
+type PublicPetitionAccess {
+  granter: PublicUser
+  petition: PublicPetition
 }
 
 """
@@ -881,14 +921,6 @@ type PublicPetitionFieldReply implements Timestamps {
 }
 
 """
-A public view of a petition sendout
-"""
-type PublicPetitionSendout {
-  petition: PublicPetition
-  sender: PublicUser
-}
-
-"""
 A public view of a user
 """
 type PublicUser {
@@ -924,6 +956,7 @@ type PublicUser {
 }
 
 type Query {
+  access(keycode: ID!): PublicPetitionAccess
   contact(id: ID!): Contact
 
   """
@@ -981,7 +1014,6 @@ type Query {
     sortBy: [QueryPetitions_OrderBy!]
     status: PetitionStatus
   ): PetitionPagination!
-  sendout(keycode: ID!): PublicPetitionSendout
 }
 
 """
@@ -1071,12 +1103,10 @@ enum Result {
 type SendPetitionResult {
   petition: Petition
   result: Result!
-  sendouts: [PetitionSendout!]
 }
 
 type SendReminderResult {
   result: Result!
-  sendouts: [PetitionSendout]
 }
 
 interface Timestamps {

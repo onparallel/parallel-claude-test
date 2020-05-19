@@ -14,3 +14,14 @@ export const Timestamps = interfaceType({
     t.resolveType(() => null);
   },
 });
+
+export const CreatedAt = interfaceType({
+  name: "CreatedAt",
+  definition: (t) => {
+    t.datetime("createdAt", {
+      description: "Time when the resource was created.",
+      resolve: (o) => o.created_at,
+    });
+    t.resolveType(() => null);
+  },
+});

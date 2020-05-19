@@ -7,7 +7,7 @@ import {
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
-import { ContactListHeader } from "@parallel/components/contacts/ContactListHeader";
+import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   withData,

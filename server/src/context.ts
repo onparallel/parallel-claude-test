@@ -9,7 +9,7 @@ import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReminderRepository } from "./db/repositories/ReminderRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
-import { Contact, PetitionSendout, User } from "./db/__types";
+import { Contact, PetitionAccess, User } from "./db/__types";
 import { Auth } from "./services/auth";
 import { Aws } from "./services/aws";
 import { Cognito } from "./services/cognito";
@@ -20,7 +20,7 @@ import { Smtp } from "./services/smtp";
 export class ApiContext {
   user: User | null = null;
   contact: Contact | null = null;
-  sendout: PetitionSendout | null = null;
+  access: PetitionAccess | null = null;
   req!: express.Request;
   constructor(
     @inject(LOGGER) public logger: Logger,

@@ -29,7 +29,7 @@ import { Spacer } from "../common/Spacer";
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "replies";
+  section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
 };
 
@@ -62,7 +62,7 @@ export function PetitionHeader({
       borderBottomColor="gray.200"
       zIndex={1}
       position="relative"
-      minHeight={{ base: 24, md: 16 }}
+      height={{ base: 24, md: 16 }}
       {...props}
     >
       <Flex
@@ -71,7 +71,7 @@ export function PetitionHeader({
         alignItems="center"
         maxWidth={{
           base: "calc(100vw - 92px - 100px)",
-          md: "calc((100vw - 300px)/2)",
+          md: "calc((100vw - 380px)/2)",
         }}
       >
         <Editable
@@ -238,6 +238,26 @@ export function PetitionHeader({
               <FormattedMessage
                 id="petition.header.replies-tab"
                 defaultMessage="Replies"
+              />
+            </PetitionHeaderTab>
+          </NakedLink>
+        )}
+        {petition.status === "DRAFT" ? (
+          <PetitionHeaderTab disabled={true}>
+            <FormattedMessage
+              id="petition.header.activity-tab"
+              defaultMessage="Activity"
+            />
+          </PetitionHeaderTab>
+        ) : (
+          <NakedLink
+            href={`/app/petitions/[petitionId]/activity`}
+            as={`/app/petitions/${petition.id}/activity`}
+          >
+            <PetitionHeaderTab active={current === "activity"}>
+              <FormattedMessage
+                id="petition.header.activity-tab"
+                defaultMessage="Activity"
               />
             </PetitionHeaderTab>
           </NakedLink>

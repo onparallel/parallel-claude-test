@@ -1,14 +1,14 @@
 import { idArg, queryField } from "@nexus/schema";
-import { fetchSendout } from "./authorizers";
+import { fetchPetitionAccess } from "./authorizers";
 
-export const sendoutsQuery = queryField("sendout", {
-  type: "PublicPetitionSendout",
+export const accessQuery = queryField("access", {
+  type: "PublicPetitionAccess",
   args: {
     keycode: idArg({ required: true }),
   },
   nullable: true,
-  authorize: fetchSendout("keycode"),
+  authorize: fetchPetitionAccess("keycode"),
   resolve: async (root, args, ctx) => {
-    return ctx.sendout!;
+    return ctx.access!;
   },
 });

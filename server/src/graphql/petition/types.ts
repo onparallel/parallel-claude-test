@@ -1,6 +1,5 @@
 import { enumType, objectType } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
-import { uniq } from "remeda";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -18,18 +17,6 @@ export const PetitionStatus = enumType({
       description: "The petition has been sent and is awaiting completion.",
     },
     { name: "COMPLETED", description: "The petition has been completed." },
-  ],
-});
-
-export const PetitionSendoutStatus = enumType({
-  name: "PetitionSendoutStatus",
-  description: "The status of a sendout.",
-  members: [
-    { name: "SCHEDULED", description: "The sendout has been scheduled." },
-    { name: "CANCELLED", description: "The scheduled sendout was cancelled." },
-    { name: "PROCESSING", description: "The sendout is being processed." },
-    { name: "ACTIVE", description: "The sendout is active and accessible." },
-    { name: "INACTIVE", description: "The sendout is not active." },
   ],
 });
 
@@ -120,11 +107,11 @@ export const Petition = objectType({
         return await ctx.petitions.loadStatusForPetition(root.id);
       },
     });
-    t.list.field("sendouts", {
-      type: "PetitionSendout",
-      description: "The sendouts for this petition",
+    t.list.field("accesses", {
+      type: "PetitionAccess",
+      description: "The accesses for this petition",
       resolve: async (root, _, ctx) => {
-        return ctx.petitions.loadSendoutsForPetition(root.id);
+        return ctx.petitions.loadAccessesForPetition(root.id);
       },
     });
     t.field("recipients", {
@@ -132,8 +119,10 @@ export const Petition = objectType({
       list: [false],
       description: "The recipients for this petition",
       resolve: async (root, _, ctx) => {
-        const sendouts = await ctx.petitions.loadSendoutsForPetition(root.id);
-        const contactIds = uniq(sendouts.map((s) => s.contact_id));
+        const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
+        const contactIds = accesses
+          .filter((a) => a.status === "ACTIVE")
+          .map((a) => a.contact_id);
         return contactIds.length
           ? await ctx.contacts.loadContact(contactIds)
           : [];
@@ -223,30 +212,107 @@ export const RemindersConfig = objectType({
   },
 });
 
-export const PetitionSendout = objectType({
-  name: "PetitionSendout",
-  description: "A sendout of a petition",
+export const PetitionAccessStatus = enumType({
+  name: "PetitionAccessStatus",
+  description: "The status of a petition access.",
+  members: [
+    {
+      name: "ACTIVE",
+      description: "The petition is accessible by the contact.",
+    },
+    {
+      name: "INACTIVE",
+      description: "The petition is not accessible by the contact.",
+    },
+  ],
+});
+
+export const PetitionAccess = objectType({
+  name: "PetitionAccess",
+  description: "A petition access",
   definition(t) {
     t.implements("Timestamps");
     t.id("id", {
-      description: "The ID of the petition field access.",
-      resolve: (o) => toGlobalId("PetitionSendout", o.id),
+      description: "The ID of the petition access.",
+      resolve: (o) => toGlobalId("PetitionAccess", o.id),
+    });
+    t.field("petition", {
+      type: "Petition",
+      description: "The petition for this message access.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetition(root.petition_id);
+      },
     });
     t.field("contact", {
       type: "Contact",
-      description: "The receiver of the petition through this sendout.",
+      description: "The contact of this access.",
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadContact(root.contact_id);
       },
     });
-    t.string("emailSubject", {
-      description: "The subject of the petition.",
+    t.field("status", {
+      type: "PetitionAccessStatus",
+      description: "The status of the petition access",
+    });
+    t.datetime("nextReminderAt", {
+      description: "When the next reminder will be sent.",
+      nullable: true,
+      resolve: (o) => o.next_reminder_at,
+    });
+    t.field("remindersConfig", {
+      type: "RemindersConfig",
+      description: "The reminder settings of the petition.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return root.reminders_active ? root.reminders_config : null;
+      },
+    });
+  },
+});
+
+export const PetitionMessageStatus = enumType({
+  name: "PetitionMessageStatus",
+  description: "The status of a petition message.",
+  members: [
+    {
+      name: "SCHEDULED",
+      description:
+        "The message has been scheduled to be sent at a specific time.",
+    },
+    {
+      name: "CANCELLED",
+      description: "The message was scheduled but has been cancelled.",
+    },
+    { name: "PROCESSING", description: "The message is being processed." },
+    { name: "PROCESSED", description: "The message has been processed." },
+  ],
+});
+
+export const PetitionMessage = objectType({
+  name: "PetitionMessage",
+  description: "A petition message",
+  definition(t) {
+    t.implements("CreatedAt");
+    t.id("id", {
+      description: "The ID of the petition message.",
+      resolve: (o) => toGlobalId("PetitionMessage", o.id),
+    });
+    t.field("access", {
+      type: "PetitionAccess",
+      description: "The access of this petition message.",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.petition_access_id))!;
+      },
+    });
+    t.json("emailSubject", {
+      description: "The subject of the petition message.",
       nullable: true,
       resolve: (o) => o.email_subject,
     });
     t.json("emailBody", {
-      description: "The body of the petition.",
+      description: "The body of the petition message.",
       nullable: true,
       resolve: (o) => {
         try {
@@ -257,37 +323,16 @@ export const PetitionSendout = objectType({
       },
     });
     t.field("status", {
-      type: "PetitionSendoutStatus",
-      description: "The status of the sendout",
+      type: "PetitionMessageStatus",
+      description: "The status of the petition message",
     });
     t.datetime("scheduledAt", {
-      description: "Time at which the sendout is scheduled.",
+      description: "Time at which the message will be sent.",
       nullable: true,
       resolve: (o) => o.scheduled_at,
     });
-    t.datetime("nextReminderAt", {
-      description: "When the next reminder will be sent.",
-      nullable: true,
-      resolve: (o) => o.next_reminder_at,
-    });
-    t.field("RemindersConfig", {
-      type: "RemindersConfig",
-      description: "The reminder settings of the petition.",
-      nullable: true,
-      resolve: async (root, _, ctx) => {
-        return root.reminders_active
-          ? {
-              offset: root.reminders_offset!,
-              time: root.reminders_time!,
-              timezone: root.reminders_timezone!,
-              weekdaysOnly: root.reminders_weekdays_only!,
-            }
-          : null;
-      },
-    });
     t.datetime("sentAt", {
-      description:
-        "If already sent, the date at which the email was delivered.",
+      description: "If already sent, the date at which the email was sent.",
       nullable: true,
       resolve: async (root, _, ctx) => {
         if (root.email_log_id) {
@@ -331,14 +376,6 @@ export const PetitionSendout = objectType({
         return events.find((e) => e.event === "open")?.created_at ?? null;
       },
     });
-    t.field("petition", {
-      type: "Petition",
-      description: "The petition for this sendout.",
-      nullable: true,
-      resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetition(root.petition_id);
-      },
-    });
   },
 });
 
@@ -373,12 +410,12 @@ export const PetitionFieldReply = objectType({
         }
       },
     });
-    t.field("sendout", {
-      type: "PetitionSendout",
-      description: "The sendout from where this reply was made.",
+    t.field("access", {
+      type: "PetitionAccess",
+      description: "The access from where this reply was made.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadSendout(root.petition_sendout_id);
+        return await ctx.petitions.loadAccess(root.petition_access_id);
       },
     });
   },

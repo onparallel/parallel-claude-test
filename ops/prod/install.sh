@@ -24,10 +24,10 @@ sudo systemctl enable parallel-client.service
 sudo systemctl enable parallel-completed-email-queue.service
 sudo systemctl enable parallel-email-events-queue.service
 sudo systemctl enable parallel-email-sender-queue.service
+sudo systemctl enable parallel-message-email-queue.service
 sudo systemctl enable parallel-reminder-email-queue.service
 sudo systemctl enable parallel-reminder-trigger-cron.service
 sudo systemctl enable parallel-scheduled-trigger-cron.service
-sudo systemctl enable parallel-sendout-email-queue.service
 if [[ "$ENV" == "production" ]]; then
   sudo systemctl enable parallel-reporting-cron.service
 fi

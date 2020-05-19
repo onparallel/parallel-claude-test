@@ -5,9 +5,9 @@ import {
   inputObjectType,
 } from "@nexus/schema";
 import {
-  replyBelongsToSendout,
-  fieldBelongsToSendout,
-  fetchSendout,
+  replyBelongsToAccess,
+  fieldBelongsToAccess,
+  fetchPetitionAccess,
   fieldHastype,
 } from "./authorizers";
 import { fromGlobalId } from "../../util/globalId";
@@ -22,8 +22,8 @@ export const publicDeletePetitionReply = mutationField(
     description: "Deletes a reply to a petition field.",
     type: "Result",
     authorize: authorizeAndP(
-      fetchSendout("keycode"),
-      replyBelongsToSendout("replyId", "keycode")
+      fetchPetitionAccess("keycode"),
+      replyBelongsToAccess("replyId", "keycode")
     ),
     args: {
       replyId: idArg({ required: true }),
@@ -57,8 +57,8 @@ export const publicFileUploadReplyComplete = mutationField(
       replyId: idArg({ required: true }),
     },
     authorize: authorizeAndP(
-      fetchSendout("keycode"),
-      replyBelongsToSendout("replyId", "keycode")
+      fetchPetitionAccess("keycode"),
+      replyBelongsToAccess("replyId", "keycode")
     ),
     resolve: async (_, args, ctx) => {
       const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
@@ -104,8 +104,8 @@ export const publicCreateFileUploadReply = mutationField(
     },
     authorize: authorizeAnd(
       authorizeAndP(
-        fetchSendout("keycode"),
-        fieldBelongsToSendout("fieldId", "keycode")
+        fetchPetitionAccess("keycode"),
+        fieldBelongsToAccess("fieldId", "keycode")
       ),
       fieldHastype("fieldId", "FILE_UPLOAD")
     ),
@@ -127,7 +127,7 @@ export const publicCreateFileUploadReply = mutationField(
         reply: ctx.petitions.createPetitionFieldReply(
           {
             petition_field_id: fieldId,
-            petition_sendout_id: ctx.sendout!.id,
+            petition_access_id: ctx.access!.id,
             type: "FILE_UPLOAD",
             content: { file_upload_id: file.id },
           },
@@ -153,8 +153,8 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   },
   authorize: authorizeAnd(
     authorizeAndP(
-      fetchSendout("keycode"),
-      fieldBelongsToSendout("fieldId", "keycode")
+      fetchPetitionAccess("keycode"),
+      fieldBelongsToAccess("fieldId", "keycode")
     ),
     fieldHastype("fieldId", "TEXT")
   ),
@@ -163,7 +163,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
     return ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: fieldId,
-        petition_sendout_id: ctx.sendout!.id,
+        petition_access_id: ctx.access!.id,
         type: "TEXT",
         content: { text: args.data.text },
       },
@@ -178,13 +178,13 @@ export const completePetition = mutationField("publicCompletePetition", {
   args: {
     keycode: idArg({ required: true }),
   },
-  authorize: fetchSendout("keycode"),
+  authorize: fetchPetitionAccess("keycode"),
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.completePetition(
-      ctx.sendout!.petition_id,
+      ctx.access!.petition_id,
       ctx.contact!
     );
-    await ctx.aws.enqueuePetitionCompleted(ctx.sendout!.id);
+    await ctx.aws.enqueuePetitionCompleted(ctx.access!.id);
     return petition;
   },
 });

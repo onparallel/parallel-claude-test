@@ -7,15 +7,20 @@ import {
   IconButton,
   PseudoBox,
   useColorMode,
+  Icon,
+  PseudoBoxProps,
+  Collapse,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
   ComponentType,
+  Fragment,
   memo,
   MouseEvent,
+  useCallback,
   useEffect,
   useMemo,
-  useCallback,
+  useState,
 } from "react";
 import { useIntl } from "react-intl";
 import { useSelectionState } from "../../utils/useSelectionState";
@@ -36,6 +41,7 @@ export type TableProps<TRow, TAction extends string = string> = BoxProps & {
   rows: TRow[];
   rowKeyProp: keyof TRow;
   selectable?: boolean;
+  expandable?: boolean;
   sort?: Sorting<any>;
   highlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
@@ -58,7 +64,9 @@ export type TableCellProps<TRow, TAction extends string = string> = {
   row: TRow;
   column: TableColumn<TRow, TAction>;
   isSelected?: boolean;
-  toggle?: (event: any) => void;
+  isExpanded?: boolean;
+  toggleSelection?: (event: any) => void;
+  toggleExpand?: (expanded: boolean) => void;
   onAction: (action: TAction, data?: any) => void;
 };
 
@@ -69,6 +77,7 @@ export type TableColumn<TRow, TAction extends string = string> = {
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow, TAction>>;
   Cell: ComponentType<TableCellProps<TRow, TAction>>;
+  cellProps?: PseudoBoxProps;
 };
 
 function _Table<TRow, TAction extends string = string>({
@@ -76,6 +85,7 @@ function _Table<TRow, TAction extends string = string>({
   rows,
   rowKeyProp,
   selectable,
+  expandable,
   highlightable,
   sort,
   onSelectionChange,
@@ -91,6 +101,7 @@ function _Table<TRow, TAction extends string = string>({
     toggle,
     toggleAll,
   } = useSelectionState(rows, rowKeyProp);
+  const [expanded, setExpanded] = useState<any>(null);
   const colors = useTableColors();
 
   useEffect(() => {
@@ -119,56 +130,112 @@ function _Table<TRow, TAction extends string = string>({
   );
 
   columns = useMemo(() => {
-    if (!selectable) {
-      return columns;
-    } else {
-      return [
-        {
-          key: "selection-checkbox",
-          header: "",
-          Header: ({ anySelected, allSelected, onToggleAll }) => (
-            <PseudoBox
-              as="th"
-              width="1px"
-              paddingLeft={5}
-              paddingRight={2}
-              height="38px"
-              userSelect="none"
-            >
-              <Box height="16px">
-                <Checkbox
-                  isChecked={anySelected && allSelected}
-                  isIndeterminate={anySelected && !allSelected}
-                  size="md"
-                  variantColor="purple"
-                  onChange={onToggleAll}
-                />
-              </Box>
-            </PseudoBox>
-          ),
-          Cell: ({ isSelected, toggle }) => {
-            return (
-              <Flex
-                as="label"
-                alignItems="center"
-                justifyContent="center"
-                borderRadius="32px"
-                onClick={toggle}
-              >
-                <Checkbox
-                  isChecked={isSelected}
-                  size="md"
-                  variantColor="purple"
-                  onChange={function () {}}
-                />
-              </Flex>
-            );
+    const updated = [...columns];
+    if (expandable) {
+      updated.unshift({
+        key: "expand-toggle",
+        header: "",
+        Header: () => <PseudoBox as="th" width="1px" />,
+        cellProps: {
+          paddingY: 0,
+          paddingRight: 1,
+          _first: {
+            paddingLeft: 2,
           },
         },
-        ...columns,
-      ];
+        Cell: ({ isExpanded, toggleExpand }) => {
+          const intl = useIntl();
+          return (
+            <PseudoBox
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              as="button"
+              rounded="100%"
+              width={8}
+              height={8}
+              color="gray.700"
+              _hover={{
+                color: "gray.900",
+                backgroundColor: "gray.100",
+              }}
+              aria-label={
+                isExpanded
+                  ? intl.formatMessage({
+                      id: "generic.collapse",
+                      defaultMessage: "Collapse",
+                    })
+                  : intl.formatMessage({
+                      id: "generic.expand",
+                      defaultMessage: "Expand",
+                    })
+              }
+              onClick={() => toggleExpand?.(!isExpanded)}
+            >
+              <Icon
+                name="chevron-right"
+                size="20px"
+                transform={isExpanded ? `rotate(90deg)` : null}
+                transition="transform 150ms ease"
+              />
+            </PseudoBox>
+          );
+        },
+      });
     }
-  }, [selectable]);
+    if (selectable) {
+      updated.unshift({
+        key: "selection-checkbox",
+        header: "",
+        Header: ({ anySelected, allSelected, onToggleAll }) => (
+          <PseudoBox
+            as="th"
+            width="1px"
+            paddingLeft={5}
+            paddingRight={2}
+            height="38px"
+            userSelect="none"
+          >
+            <Box height="16px">
+              <Checkbox
+                isChecked={anySelected && allSelected}
+                isIndeterminate={anySelected && !allSelected}
+                size="md"
+                variantColor="purple"
+                onChange={onToggleAll}
+              />
+            </Box>
+          </PseudoBox>
+        ),
+        cellProps: {
+          paddingY: 0,
+          paddingRight: 0,
+          _first: { paddingLeft: 3 },
+        },
+        Cell: ({ isSelected, toggleSelection: toggle }) => {
+          return (
+            <Flex
+              as="label"
+              alignItems="center"
+              justifyContent="center"
+              height="32px"
+              borderRadius="32px"
+              cursor="pointer"
+              onClick={toggle}
+            >
+              <Checkbox
+                isChecked={isSelected}
+                size="md"
+                variantColor="purple"
+                onChange={function () {}}
+              />
+            </Flex>
+          );
+        },
+      });
+    }
+    return updated;
+  }, [columns, selectable, expandable]);
 
   return (
     <Box as="table" style={{ tableLayout: "auto", width: "100%" }} {...props}>
@@ -208,52 +275,85 @@ function _Table<TRow, TAction extends string = string>({
         {rows.map((row) => {
           const key = row[rowKeyProp] as any;
           const isSelected = selection[key] ?? false;
+          const isExpanded = key === expanded;
 
           function handleAction(action: TAction, data: any) {
             onAction?.(action, row, data);
           }
           return (
-            <PseudoBox
-              key={key}
-              as="tr"
-              backgroundColor={isSelected ? colors.rowSelected : colors.row}
-              _hover={{
-                backgroundColor: isSelected
-                  ? colors.rowSelected
-                  : highlightable
-                  ? colors.rowHover
-                  : colors.row,
-              }}
-              cursor={onRowClick ? "pointer" : "default"}
-              borderTop="1px solid"
-              borderTopColor={colors.border}
-              borderBottom="1px solid"
-              borderBottomColor={colors.border}
-              onClick={(event) => onRowClick?.(row, event as any)}
-            >
-              {columns.map((column) => {
-                return (
+            <Fragment key={key}>
+              <PseudoBox
+                as="tr"
+                backgroundColor={isSelected ? colors.rowSelected : colors.row}
+                _hover={{
+                  backgroundColor: isSelected
+                    ? colors.rowSelected
+                    : highlightable
+                    ? colors.rowHover
+                    : colors.row,
+                }}
+                cursor={onRowClick ? "pointer" : "default"}
+                borderTop="1px solid"
+                borderTopColor={colors.border}
+                {...(expandable
+                  ? {}
+                  : {
+                      borderBottom: "1px solid",
+                      borderBottomColor: colors.border,
+                    })}
+                onClick={(event) => onRowClick?.(row, event as any)}
+              >
+                {columns.map((column) => {
+                  return (
+                    <PseudoBox
+                      key={column.key}
+                      as="td"
+                      padding={2}
+                      _last={{ paddingRight: 5 }}
+                      _first={{ paddingLeft: 5 }}
+                      userSelect="none"
+                      textAlign={column.align ?? "left"}
+                      {...(column.cellProps ?? {})}
+                    >
+                      <column.Cell
+                        key={key}
+                        row={row}
+                        column={column}
+                        isSelected={isSelected}
+                        isExpanded={isExpanded}
+                        toggleSelection={(event) => toggle(key, event)}
+                        toggleExpand={(value) =>
+                          setExpanded(value ? key : null)
+                        }
+                        onAction={handleAction}
+                      ></column.Cell>
+                    </PseudoBox>
+                  );
+                })}
+              </PseudoBox>
+              {expandable ? (
+                <PseudoBox
+                  as="tr"
+                  borderBottom="1px solid"
+                  borderBottomColor={colors.border}
+                >
                   <PseudoBox
-                    key={column.key}
                     as="td"
-                    padding={2}
-                    _last={{ paddingRight: 5 }}
-                    _first={{ paddingLeft: 5 }}
-                    userSelect="none"
-                    textAlign={column.align ?? "left"}
+                    padding={0}
+                    {...{ colSpan: columns.length }}
                   >
-                    <column.Cell
-                      key={key}
-                      row={row}
-                      column={column}
-                      isSelected={isSelected}
-                      toggle={(event) => toggle(key, event)}
-                      onAction={handleAction}
-                    ></column.Cell>
+                    <Collapse isOpen={isExpanded}>
+                      <Box
+                        borderTop="1px solid"
+                        borderTopColor={colors.border}
+                      ></Box>
+                    </Collapse>
                   </PseudoBox>
-                );
-              })}
-            </PseudoBox>
+                </PseudoBox>
+              ) : (
+                <></>
+              )}
+            </Fragment>
           );
         })}
       </Box>

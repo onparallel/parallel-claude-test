@@ -18,8 +18,8 @@ import {
   WithDataContext,
 } from "@parallel/components/common/withData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { useAskPetitionNameDialog } from "@parallel/components/petitions/AskPetitionNameDialog";
-import { PetitionListHeader } from "@parallel/components/petitions/PetitionListHeader";
+import { useAskPetitionNameDialog } from "@parallel/components/petition-list/AskPetitionNameDialog";
+import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionsQuery,
   PetitionsQueryVariables,
@@ -49,6 +49,7 @@ import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { memo, MouseEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
 
 const PAGE_SIZE = 10;
 
@@ -179,7 +180,10 @@ function Petitions() {
     );
   }
 
-  function goToPetition(id: string, section: "compose" | "replies") {
+  function goToPetition(
+    id: string,
+    section: "compose" | "replies" | "activity"
+  ) {
     router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,
       `/${router.query.locale}/app/petitions/${id}/${section}`
@@ -309,8 +313,8 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
                   more: rest.length,
                   a: (...chunks: any[]) => (
                     <Link
-                      href="/app/petitions/[petitionId]/replies#sendouts"
-                      as={`/app/petitions/${row.id}/replies/#sendouts`}
+                      href="/app/petitions/[petitionId]/replies"
+                      as={`/app/petitions/${row.id}/replies`}
                       onClick={(e: MouseEvent) => e.stopPropagation()}
                     >
                       {chunks}
@@ -325,14 +329,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
               />
             );
           } else {
-            return (
-              <Text as="span" color="gray.400" fontStyle="italic">
-                <FormattedMessage
-                  id="generic.deleted-contact"
-                  defaultMessage="Deleted contact"
-                />
-              </Text>
-            );
+            return <DeletedContact />;
           }
         }),
       },
@@ -342,20 +339,18 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.deadline",
           defaultMessage: "Deadline",
         }),
-        Cell: memo(({ row: { deadline } }) => {
-          if (deadline) {
-            return <DateTime value={deadline} format={FORMATS.LLL} />;
-          } else {
-            return (
-              <Text as="span" color="gray.400" fontStyle="italic">
-                <FormattedMessage
-                  id="generic.no-deadline"
-                  defaultMessage="No deadline"
-                />
-              </Text>
-            );
-          }
-        }),
+        Cell: memo(({ row: { deadline } }) =>
+          deadline ? (
+            <DateTime value={deadline} format={FORMATS.LLL} />
+          ) : (
+            <Text as="span" color="gray.400" fontStyle="italic">
+              <FormattedMessage
+                id="generic.no-deadline"
+                defaultMessage="No deadline"
+              />
+            </Text>
+          )
+        ),
       },
       {
         key: "progress",

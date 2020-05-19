@@ -1,9 +1,9 @@
 import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
+export type Selection = Record<string, boolean>;
+
 interface SelectionState {
-  selection: {
-    [id: string]: boolean;
-  };
+  selection: Selection;
   lastSelected: string | null;
 }
 
@@ -11,7 +11,11 @@ interface SelectionState {
  * This hook encapsulates the logic for handling the selection of rows on a
  * table.
  */
-export function useSelectionState<T>(rows: T[], rowKeyProp: keyof T) {
+export function useSelectionState<T>(
+  rows: T[],
+  rowKeyProp: keyof T,
+  onChange?: (selection: Selection) => void
+) {
   const [{ selection }, setState] = useState<SelectionState>({
     selection: Object.fromEntries(
       rows.map((r) => {

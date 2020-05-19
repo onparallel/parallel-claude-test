@@ -1,10 +1,10 @@
+import async from "async";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import { chunk, indexBy, omit } from "remeda";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { chunk, indexBy, omit } from "remeda";
-import async from "async";
-import { PetitionField, PetitionSendout, Petition } from "../__types";
+import { Petition, PetitionAccess, PetitionField } from "../__types";
 
 @injectable()
 export class ReportingRepository extends BaseRepository {
@@ -34,7 +34,7 @@ export class ReportingRepository extends BaseRepository {
     const petitions = await ((async.concatSeries(
       chunk(petitionIds, 100),
       async (batch) => {
-        const [petitions, fields, sendouts] = await Promise.all([
+        const [petitions, fields, accesses] = await Promise.all([
           this.from("petition")
             .whereIn("id", batch)
             .select(
@@ -57,7 +57,7 @@ export class ReportingRepository extends BaseRepository {
                 )
               )
             ),
-          this.from("petition_sendout")
+          this.from("petition_access")
             .whereIn("petition_id", batch)
             .whereNull("deleted_at")
             .groupBy("petition_id")
@@ -70,8 +70,8 @@ export class ReportingRepository extends BaseRepository {
           })[],
           (f) => f.petition_id
         );
-        const sendoutsByPetitionId = indexBy(
-          (sendouts as unknown) as (Pick<PetitionSendout, "petition_id"> & {
+        const accessesByPetitionId = indexBy(
+          (accesses as unknown) as (Pick<PetitionAccess, "petition_id"> & {
             sent_at: Date;
           })[],
           (f) => f.petition_id
@@ -81,7 +81,7 @@ export class ReportingRepository extends BaseRepository {
           completed_at:
             petition.status === "COMPLETED" ? petition.updated_at : null,
           ...omit(fieldsByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
-          ...omit(sendoutsByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
+          ...omit(accessesByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
         }));
       }
     ) as unknown) as Promise<

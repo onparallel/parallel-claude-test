@@ -85,15 +85,14 @@ export function withData<P = {}>(
           };
         }
       } catch (error) {
-        if (error?.graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED") {
+        const code = error?.graphQLErrors?.[0]?.extensions?.code;
+        if (code === "UNAUTHENTICATED") {
           redirect(
             context,
             "/[locale]/login",
             `/${context.query.locale}/login`
           );
-        } else if (
-          error?.graphQLErrors?.[0]?.extensions?.code === "FORBIDDEN"
-        ) {
+        } else if (code === "FORBIDDEN") {
           redirect(context, "/[locale]/app", `/${context.query.locale}/app`);
         } else {
           throw error;

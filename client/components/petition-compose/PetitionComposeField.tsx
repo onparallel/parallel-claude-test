@@ -28,7 +28,7 @@ import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
+import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;

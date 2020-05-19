@@ -7,29 +7,27 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { pick } from "remeda";
 import { findTimeZone } from "timezone-support";
 import { CreatePetition, CreatePetitionField } from "../../db/__types";
 import { calculateNextReminder } from "../../util/calculateNextReminder";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
-import { random } from "../../util/token";
 import {
   authenticate,
   authorizeAnd,
   authorizeAndP,
 } from "../helpers/authorize";
 import { dateTimeArg } from "../helpers/date";
+import { ArgValidationError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import { maxLength, validateAnd } from "../helpers/validateArgs";
 import {
   fieldBelongsToPetition,
   fieldsBelongsToPetition,
   replyBelongsToPetition,
-  sendoutsBelongToPetition,
+  accessesBelongToPetition,
   userHasAccessToPetition,
   userHasAccessToPetitions,
 } from "./authorizers";
-import { ArgValidationError } from "../helpers/errors";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -433,17 +431,13 @@ export const fileUploadReplyDownloadLink = mutationField(
 );
 
 export const sendPetition = mutationField("sendPetition", {
-  description: "Sends the petition and creates the corresponding sendouts.",
+  description:
+    "Sends the petition and creates the corresponding accesses and messages.",
   type: objectType({
     name: "SendPetitionResult",
     definition(t) {
       t.field("result", { type: "Result" });
       t.field("petition", { type: "Petition", nullable: true });
-      t.field("sendouts", {
-        type: "PetitionSendout",
-        list: [true],
-        nullable: true,
-      });
     },
   }),
   authorize: authorizeAnd(
@@ -452,19 +446,25 @@ export const sendPetition = mutationField("sendPetition", {
   ),
   args: {
     petitionId: idArg({ required: true }),
-    recipients: idArg({
+    contactIds: idArg({
       list: [true],
       required: true,
     }),
     scheduledAt: dateTimeArg({}),
   },
+  validateArgs: (_, args, ctx, info) => {
+    if (args.contactIds.length === 0) {
+      throw new ArgValidationError(
+        info,
+        "contactIds",
+        `Must contain at least one recipient.`
+      );
+    }
+  },
   resolve: async (_, args, ctx) => {
     try {
       // Create necessary contacts
-      if (args.recipients.length === 0) {
-        throw new Error("Empty recipients");
-      }
-      const { ids: recipientIds } = fromGlobalIds(args.recipients, "Contact");
+      const { ids: recipientIds } = fromGlobalIds(args.contactIds, "Contact");
       const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
       const [hasAccess, petition] = await Promise.all([
         ctx.contacts.userHasAccessToContacts(ctx.user!.id, recipientIds),
@@ -476,48 +476,48 @@ export const sendPetition = mutationField("sendPetition", {
       if (!petition) {
         throw new Error("Petition not available");
       }
-      const [sendouts] = await Promise.all([
-        ctx.petitions.createSendouts(
-          recipientIds.map((id) => ({
-            petition_id: petitionId,
-            keycode: random(16),
-            status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
-            scheduled_at: args.scheduledAt ?? null,
-            contact_id: id,
-            sender_id: ctx.user!.id,
-            next_reminder_at: petition.reminders_active
-              ? calculateNextReminder(
-                  args.scheduledAt ?? new Date(),
-                  petition.reminders_config!
-                )
-              : null,
-            ...pick(petition, [
-              "email_body",
-              "email_subject",
-              "locale",
-              "deadline",
-              "reminders_active",
-              "reminders_config",
-            ]),
-          })),
+      const accesses = await ctx.petitions.createAccesses(
+        recipientIds.map((id) => ({
+          petition_id: petitionId,
+          contact_id: id,
+          reminders_left: 10,
+          reminders_active: petition.reminders_active,
+          reminders_config: petition.reminders_config,
+          next_reminder_at: petition.reminders_active
+            ? calculateNextReminder(
+                args.scheduledAt ?? new Date(),
+                petition.reminders_config!
+              )
+            : null,
+        })),
+        ctx.user!
+      );
+      const messages = await ctx.petitions.createMessages(
+        accesses.map((access) => ({
+          petition_id: petition.id,
+          petition_access_id: access.id,
+          status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
+          scheduled_at: args.scheduledAt,
+          email_subject: petition.email_subject,
+          email_body: petition.email_body,
+        })),
+        ctx.user!
+      );
+      if (petition.status === "DRAFT") {
+        await ctx.petitions.updatePetition(
+          petitionId,
+          { status: "PENDING" },
           ctx.user!
-        ),
-        petition.status === "DRAFT"
-          ? ctx.petitions.updatePetition(
-              petitionId,
-              { status: "PENDING" },
-              ctx.user!
-            )
-          : null,
-      ]);
+        );
+      }
+
       if (!args.scheduledAt) {
-        await ctx.aws.enqueueSendouts(sendouts.map((s) => s.id));
+        await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));
       }
       return {
         petition: await ctx.petitions.loadPetition(petitionId, {
           refresh: true,
         }),
-        sendouts,
         result: RESULT.SUCCESS,
       };
     } catch (error) {
@@ -529,59 +529,54 @@ export const sendPetition = mutationField("sendPetition", {
 });
 
 export const sendReminder = mutationField("sendReminders", {
-  description: "Sends a reminder for the corresponding sendouts.",
+  description: "Sends a reminder for the specified petition accesses.",
   type: objectType({
     name: "SendReminderResult",
     definition(t) {
       t.field("result", { type: "Result" });
-      t.field("sendouts", {
-        type: "PetitionSendout",
-        list: [false],
-        nullable: true,
-      });
     },
   }),
   authorize: authorizeAnd(
     authenticate(),
     authorizeAndP(
       userHasAccessToPetition("petitionId"),
-      sendoutsBelongToPetition("petitionId", "sendoutIds")
+      accessesBelongToPetition("petitionId", "accessesIds")
     )
   ),
   args: {
     petitionId: idArg({ required: true }),
-    sendoutIds: idArg({ list: [true], required: true }),
+    accessesIds: idArg({ list: [true], required: true }),
   },
-  resolve: async (_, args, ctx) => {
-    const { ids: sendoutIds } = fromGlobalIds(
-      args.sendoutIds,
-      "PetitionSendout"
+  resolve: async (_, args, ctx, info) => {
+    const { ids: accessesIds } = fromGlobalIds(
+      args.accessesIds,
+      "PetitionAccess"
     );
     try {
-      const sendouts = await ctx.petitions.loadSendout(sendoutIds);
-      for (const sendout of sendouts) {
-        if (!sendout || sendout.status !== "ACTIVE") {
-          throw new Error("Invalid sendout");
+      const accesses = await ctx.petitions.loadAccess(accessesIds);
+      for (const access of accesses) {
+        if (!access || access.status !== "ACTIVE") {
+          throw new ArgValidationError(
+            info,
+            "accessesIds",
+            `Petition accesses must have status "ACTIVE".`
+          );
         }
       }
       const reminders = await ctx.reminders.createReminders(
-        sendoutIds.map((id) => ({
+        accessesIds.map((accessId) => ({
           type: "MANUAL",
           status: "PROCESSING",
-          petition_sendout_id: id,
+          petition_access_id: accessId,
           created_by: `User:${ctx.user!.id}`,
         }))
       );
       await ctx.aws.enqueueReminders(reminders.map((r) => r.id));
       return {
-        sendouts,
         result: RESULT.SUCCESS,
       };
     } catch (error) {
       return {
-        sendouts: await ctx.petitions.loadSendout(sendoutIds, {
-          refresh: true,
-        }),
         result: RESULT.FAILURE,
       };
     }

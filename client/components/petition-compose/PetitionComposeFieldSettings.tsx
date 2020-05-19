@@ -19,7 +19,7 @@ import {
 import { FieldOptions } from "@parallel/utils/petitions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
-import { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { SmallPopover } from "../common/SmallPopover";
@@ -46,27 +46,27 @@ export function PetitionComposeFieldSettings({
       padding={4}
       {...props}
     >
-      <Stack spacing={4}>
-        <Stack direction="row" alignItems="center">
-          <Heading size="sm">
-            <FormattedMessage
-              id="petition.field-settings"
-              defaultMessage="Field settings"
-            />
-          </Heading>
-          <Spacer />
-          <IconButton
-            variant="ghost"
-            size="sm"
-            icon="close"
-            aria-label={intl.formatMessage({
-              id: "petition.close-sidebar-button",
-              defaultMessage: "Close",
-            })}
-            onClick={onClose}
+      <Stack direction="row" alignItems="center" marginBottom={2}>
+        <Heading size="sm">
+          <FormattedMessage
+            id="petition.field-settings"
+            defaultMessage="Field settings"
           />
-        </Stack>
-        <Divider />
+        </Heading>
+        <Spacer />
+        <IconButton
+          variant="ghost"
+          size="sm"
+          icon="close"
+          aria-label={intl.formatMessage({
+            id: "petition.close-sidebar-button",
+            defaultMessage: "Close",
+          })}
+          onClick={onClose}
+        />
+      </Stack>
+      <Divider />
+      <Flex flexDirection="column">
         <SettingsRow
           label={
             <FormattedMessage
@@ -144,7 +144,7 @@ export function PetitionComposeFieldSettings({
         ) : field.type === "TEXT" ? (
           <TextSettings field={field} onUpdateField={onUpdateField} />
         ) : null}
-      </Stack>
+      </Flex>
     </Card>
   );
 }
@@ -163,7 +163,6 @@ function TextSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onUpdateField">) {
   const options: FieldOptions["TEXT"] = field.options as any;
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
-  useEffect(() => setPlaceholder(options.placeholder ?? ""), [field.id]);
   const debouncedOnUpdate = useDebouncedCallback(onUpdateField, 300, [
     field.id,
   ]);
@@ -181,7 +180,7 @@ function TextSettings({
   };
 
   return (
-    <Stack spacing={4}>
+    <Flex flexDirection="column">
       <SettingsRow
         label={
           <FormattedMessage
@@ -237,6 +236,7 @@ function TextSettings({
           </>
         }
         controlId="text-placeholder"
+        paddingY={2}
       >
         <Input
           id="text-placeholder"
@@ -246,7 +246,7 @@ function TextSettings({
         />
       </SettingsRow>
       <Divider />
-    </Stack>
+    </Flex>
   );
 }
 
@@ -267,6 +267,7 @@ function SettingsRow({
       <Flex
         as="label"
         alignItems="center"
+        paddingY={4}
         {...{ htmlFor: controlId }}
         {...props}
       >

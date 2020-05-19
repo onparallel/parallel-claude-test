@@ -1,7 +1,7 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
-import { AddFieldPopover } from "@parallel/components/petition/AddFieldPopover";
-import { PetitionComposeField } from "@parallel/components/petition/PetitionComposeField";
+import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
+import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,

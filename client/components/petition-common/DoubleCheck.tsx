@@ -32,13 +32,13 @@ export function DoubleCheck({
             <>
               <Heading size="xs">
                 <FormattedMessage
-                  id="petitions.sendout-bounced"
+                  id="petition-message.message-bounced"
                   defaultMessage="The email bounced."
                 />
               </Heading>
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="petitions.sendout-bounced-explanation"
+                  id="petition-message.message-bounced-explanation"
                   defaultMessage="We couldn't deliver the email to the specified recipient. Please make sure the email is valid."
                 />
               </Text>
@@ -48,7 +48,7 @@ export function DoubleCheck({
           <Box
             display="flex"
             aria-label={intl.formatMessage({
-              id: "petitions.sendout-bounced-explanation",
+              id: "petition-message.message-bounced-explanation",
               defaultMessage:
                 "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
             })}
@@ -66,7 +66,7 @@ export function DoubleCheck({
             deliveredAt ? (
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="petitions.sendout-delivery-explanation-confirmed"
+                  id="petition-message.message-delivered-explanation"
                   defaultMessage="The email is confirmed to have been delivered on {date}"
                   values={{
                     date: (
@@ -81,7 +81,7 @@ export function DoubleCheck({
             ) : (
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="petitions.sendout-delivery-explanation-not-confirmed"
+                  id="petition-message.message-not-delivered-explanation"
                   defaultMessage="We haven't received confirmation of the delivery of the email yet."
                 />
               </Text>
@@ -95,7 +95,7 @@ export function DoubleCheck({
               deliveredAt
                 ? intl.formatMessage(
                     {
-                      id: "petitions.sendout-delivery-explanation-confirmed",
+                      id: "petition-message.message-delivered-explanation",
                       defaultMessage:
                         "The email is confirmed to have been delivered on {date}",
                     },
@@ -107,7 +107,7 @@ export function DoubleCheck({
                     }
                   )
                 : intl.formatMessage({
-                    id: "petitions.sendout-delivery-explanation-not-confirmed",
+                    id: "petition-message.message-not-delivered-explanation",
                     defaultMessage:
                       "We haven't received confirmation of the delivery of the email yet.",
                   })
@@ -119,7 +119,7 @@ export function DoubleCheck({
             openedAt ? (
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="petitions.sendout-opened-explanation-confirmed"
+                  id="petition-message.message-opened-explanation"
                   defaultMessage="The email was opened on {date}"
                   values={{
                     date: (
@@ -134,7 +134,7 @@ export function DoubleCheck({
             ) : (
               <Text fontSize="sm">
                 <FormattedMessage
-                  id="petitions.sendout-opened-explanation-not-confirmed"
+                  id="petition-message.message-not-opened-explanation"
                   defaultMessage="We haven't received confirmation of the email being opened yet."
                 />
               </Text>
@@ -149,7 +149,7 @@ export function DoubleCheck({
               openedAt
                 ? intl.formatMessage(
                     {
-                      id: "petitions.sendout-opened-explanation-confirmed",
+                      id: "petition-message.message-opened-explanation",
                       defaultMessage: "The email was opened on {date}",
                     },
                     {
@@ -160,7 +160,7 @@ export function DoubleCheck({
                     }
                   )
                 : intl.formatMessage({
-                    id: "petitions.sendout-opened-explanation-not-confirmed",
+                    id: "petition-message.message-not-opened-explanation",
                     defaultMessage:
                       "We haven't received confirmation of the email being opened yet.",
                   })

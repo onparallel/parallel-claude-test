@@ -4,6 +4,7 @@ import Knex, { QueryBuilder } from "knex";
 import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { count } from "../../util/remedaExtensions";
+import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import {
@@ -15,16 +16,19 @@ import { KNEX } from "../knex";
 import {
   Contact,
   CreatePetition,
+  CreatePetitionAccess,
   CreatePetitionField,
   CreatePetitionFieldReply,
-  CreatePetitionSendout,
+  CreatePetitionMessage,
   Petition,
+  PetitionAccess,
+  PetitionAccessStatus,
   PetitionField,
   PetitionFieldReply,
   PetitionFieldType,
-  PetitionSendout,
   PetitionStatus,
   User,
+  PetitionMessageStatus,
 } from "../__types";
 
 @injectable()
@@ -70,30 +74,29 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(fieldIds).size;
   }
 
-  async sendoutsBelongToPetition(petitionId: number, sendoutIds: number[]) {
-    const [{ count }] = await this.from("petition_sendout")
+  async accesessBelongToPetition(petitionId: number, accessesIds: number[]) {
+    const [{ count }] = await this.from("petition_access")
       .where({
         petition_id: petitionId,
-        deleted_at: null,
       })
-      .whereIn("id", sendoutIds)
+      .whereIn("id", accessesIds)
       .select(this.count());
-    return count === new Set(sendoutIds).size;
+    return count === new Set(accessesIds).size;
   }
 
-  async replyBelongsToSendout(replyId: number, keycode: string) {
+  async replyBelongsToAccess(replyId: number, keycode: string) {
     const {
       rows: [{ count }],
     } = await this.knex.raw(
       /* sql */ `
       select count(*)::int as count
-        from petition_sendout as ps
-          join petition as p on p.id = ps.petition_id
+        from petition_access as pa
+          join petition as p on p.id = pa.petition_id
           join petition_field as pf on pf.petition_id = p.id
           join petition_field_reply as pfr on pfr.petition_field_id = pf.id
         where
-          ps.keycode = ? and pfr.id = ?
-          and ps.deleted_at is null and p.deleted_at is null and pf.deleted_at is null and pfr.deleted_at is null
+          pa.keycode = ? and pfr.id = ?
+          and p.deleted_at is null and pf.deleted_at is null and pfr.deleted_at is null
         limit 1
     `,
       [keycode, replyId]
@@ -120,18 +123,18 @@ export class PetitionRepository extends BaseRepository {
     return count === 1;
   }
 
-  async fieldBelongsToSendout(fieldId: number, keycode: string) {
+  async fieldBelongsToAccess(fieldId: number, keycode: string) {
     const {
       rows: [{ count }],
     } = await this.knex.raw(
       /* sql */ `
       select count(*)::int as count
-        from petition_sendout as ps
-          join petition as p on p.id = ps.petition_id
+        from petition_access as pa
+          join petition as p on p.id = pa.petition_id
           join petition_field as pf on pf.petition_id = p.id
         where
-          ps.keycode = ? and pf.id = ?
-          and ps.deleted_at is null and p.deleted_at is null and pf.deleted_at is null
+          pa.keycode = ? and pf.id = ?
+          and p.deleted_at is null and pf.deleted_at is null
         limit 1
     `,
       [keycode, fieldId]
@@ -248,19 +251,14 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  readonly loadSendout = this.buildLoadById("petition_sendout", "id");
+  readonly loadAccess = this.buildLoadById("petition_access", "id");
 
-  readonly loadSendoutByKeycode = this.buildLoadBy(
-    "petition_sendout",
-    "keycode",
-    (q) => q.whereNull("deleted_at")
-  );
+  readonly loadAccessByKeycode = this.buildLoadBy("petition_access", "keycode");
 
-  readonly loadSendoutsForPetition = fromDataLoader(
-    new DataLoader<number, PetitionSendout[]>(async (ids) => {
-      const rows = await this.from("petition_sendout")
+  readonly loadAccessesForPetition = fromDataLoader(
+    new DataLoader<number, PetitionAccess[]>(async (ids) => {
+      const rows = await this.from("petition_access")
         .whereIn("petition_id", ids)
-        .whereNull("deleted_at")
         .select("*")
         .orderBy("id", "asc");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
@@ -268,33 +266,98 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  async createSendouts(data: CreatePetitionSendout[], user: User) {
+  async createAccesses(
+    data: Pick<
+      CreatePetitionAccess,
+      | "petition_id"
+      | "contact_id"
+      | "next_reminder_at"
+      | "reminders_active"
+      | "reminders_config"
+      | "reminders_left"
+    >[],
+    user: User
+  ) {
     return await this.insert(
-      "petition_sendout",
+      "petition_access",
       data.map((item) => ({
         ...item,
+        granter_id: user.id,
+        keycode: random(16),
+        status: "ACTIVE",
         created_by: `User:${user.id}`,
         updated_by: `User:${user.id}`,
       }))
     );
   }
 
-  async updatePetitionSendout(
-    petitionSendoutId: number,
-    data: Partial<CreatePetitionSendout>,
-    user?: User
+  readonly loadMessage = this.buildLoadById("petition_message", "id");
+
+  async createMessages(
+    data: Pick<
+      CreatePetitionMessage,
+      | "status"
+      | "petition_access_id"
+      | "email_subject"
+      | "email_body"
+      | "petition_id"
+      | "scheduled_at"
+    >[],
+    user: User
   ) {
-    const [row] = await this.from("petition_sendout")
-      .where("id", petitionSendoutId)
+    return await this.insert(
+      "petition_message",
+      data.map((item) => ({
+        ...item,
+        sender_id: user.id,
+        created_by: `User:${user.id}`,
+      }))
+    );
+  }
+
+  async updatePetitionAccessStatus(
+    accessId: number,
+    status: PetitionAccessStatus,
+    user: User
+  ) {
+    const [row] = await this.from("petition_access")
+      .where("id", accessId)
       .update(
         {
-          ...data,
-          ...(user
-            ? {
-                updated_at: this.now(),
-                updated_by: `User:${user.id}`,
-              }
-            : {}),
+          status,
+          ...(status === "ACTIVE" ? { granter_id: user.id } : {}),
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        },
+        "*"
+      );
+    return row;
+  }
+
+  async updatePetitionAccessNextReminder(
+    accessId: number,
+    nextReminderAt: Date | null,
+    remindersLeft: number
+  ) {
+    const [row] = await this.from("petition_access")
+      .where("id", accessId)
+      .update(
+        {
+          next_reminder_at: nextReminderAt,
+          reminders_left: remindersLeft,
+        },
+        "*"
+      );
+    return row;
+  }
+
+  async processPetitionMessage(messageId: number, emailLogId: number) {
+    const [row] = await this.from("petition_message")
+      .where("id", messageId)
+      .update(
+        {
+          status: "PROCESSED",
+          email_log_id: emailLogId,
         },
         "*"
       );
@@ -641,7 +704,7 @@ export class PetitionRepository extends BaseRepository {
     );
     if (canComplete) {
       return await this.knex.transaction(async (t) => {
-        await this.from("petition_sendout", t)
+        await this.from("petition_access", t)
           .where("petition_id", petitionId)
           .update(
             {
@@ -666,16 +729,16 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
-  async processScheduledSendouts() {
-    return await this.from("petition_sendout")
+  async processScheduledMessages() {
+    return await this.from("petition_message")
       .where("status", "SCHEDULED")
       .whereNotNull("scheduled_at")
       .where("scheduled_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"))
       .update({ status: "PROCESSING" }, "id");
   }
 
-  async processSendoutReminders() {
-    return await this.from("petition_sendout")
+  async getRemindableAccesses() {
+    return await this.from("petition_access")
       .where("status", "ACTIVE")
       .where("reminders_active", true)
       .whereNotNull("next_reminder_at")

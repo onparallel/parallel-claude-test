@@ -1,10 +1,10 @@
 import { objectType } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
 
-export const PublicPetitionSendout = objectType({
-  name: "PublicPetitionSendout",
-  rootTyping: "db.PetitionSendout",
-  description: "A public view of a petition sendout",
+export const PublicPetitionAccess = objectType({
+  name: "PublicPetitionAccess",
+  rootTyping: "db.PetitionAccess",
+  description: "A public view of a petition access",
   definition(t) {
     t.field("petition", {
       type: "PublicPetition",
@@ -13,11 +13,11 @@ export const PublicPetitionSendout = objectType({
         return await ctx.petitions.loadPetition(root.petition_id);
       },
     });
-    t.field("sender", {
+    t.field("granter", {
       type: "PublicUser",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.users.loadUser(root.sender_id);
+        return await ctx.users.loadUser(root.granter_id);
       },
     });
   },
@@ -51,22 +51,6 @@ export const PublicPetition = objectType({
       description: "The field definition of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
-      },
-    });
-    t.string("emailSubject", {
-      description: "The subject of the petition.",
-      nullable: true,
-      resolve: (o) => o.email_subject,
-    });
-    t.json("emailBody", {
-      description: "The body of the petition.",
-      nullable: true,
-      resolve: (o) => {
-        try {
-          return o.email_body ? JSON.parse(o.email_body) : null;
-        } catch {
-          return null;
-        }
       },
     });
   },

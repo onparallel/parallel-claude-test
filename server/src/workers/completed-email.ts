@@ -4,38 +4,36 @@ import { buildFrom } from "../emails/utils/buildFrom";
 import { toGlobalId } from "../util/globalId";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
-type SendoutWorkerPayload = { petition_sendout_id: number };
+type CompletedEmailWorkerPayload = { petition_access_id: number };
 
-createQueueWorker<SendoutWorkerPayload>(
+createQueueWorker<CompletedEmailWorkerPayload>(
   "completed-email",
   async (payload, context) => {
-    const sendout = await context.petitions.loadSendout(
-      payload.petition_sendout_id
+    const access = await context.petitions.loadAccess(
+      payload.petition_access_id
     );
-    if (!sendout) {
-      throw new Error(
-        `Sendout not found for id ${payload.petition_sendout_id}`
-      );
+    if (!access) {
+      throw new Error(`Access not found for id ${payload.petition_access_id}`);
     }
-    const [petition, sender, contact, fields] = await Promise.all([
-      context.petitions.loadPetition(sendout.petition_id),
-      context.users.loadUser(sendout.sender_id),
-      context.contacts.loadContact(sendout.contact_id),
-      context.petitions.loadFieldsForPetition(sendout.petition_id),
+    const [petition, granter, contact, fields] = await Promise.all([
+      context.petitions.loadPetition(access.petition_id),
+      context.users.loadUser(access.granter_id),
+      context.contacts.loadContact(access.contact_id),
+      context.petitions.loadFieldsForPetition(access.petition_id),
     ]);
     if (!petition) {
       throw new Error(
-        `Petition not found for petition_sendout.petition_id ${sendout.petition_id}`
+        `Petition not found for petition_access.petition_id ${access.petition_id}`
       );
     }
-    if (!sender) {
+    if (!granter) {
       throw new Error(
-        `User not found for petition_sendout.sender_id ${sendout.sender_id}`
+        `User not found for petition_access.sender_id ${access.granter_id}`
       );
     }
     if (!contact) {
       throw new Error(
-        `Contact not found for petition_sendout.contact_id ${sendout.contact_id}`
+        `Contact not found for petition_access.contact_id ${access.contact_id}`
       );
     }
     const recipientNameOrEmail =
@@ -45,8 +43,8 @@ createQueueWorker<SendoutWorkerPayload>(
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
-        name: sender.first_name,
-        petitionId: toGlobalId("Petition", sendout.petition_id),
+        name: granter.first_name,
+        petitionId: toGlobalId("Petition", access.petition_id),
         petitionName: petition!.name,
         recipientNameOrEmail,
         fields: fields.map((f) => ({ id: f.id, title: f.title })),
@@ -57,11 +55,11 @@ createQueueWorker<SendoutWorkerPayload>(
     );
     const email = await context.emails.createEmail({
       from: buildFrom(from, context.config.misc.emailFrom),
-      to: sender.email,
+      to: granter.email,
       subject,
       text,
       html,
-      created_from: `PetitionSendout:${payload.petition_sendout_id}`,
+      created_from: `PetitionAccess:${payload.petition_access_id}`,
     });
     await context.aws.enqueueEmail(email.id);
   }

@@ -44,8 +44,8 @@ export function buildConfig() {
       "email-sender": Object.freeze({
         endpoint: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
       }),
-      "sendout-email": Object.freeze({
-        endpoint: process.env.WORKERS_SENDOUT_EMAIL_ENDPOINT!,
+      "message-email": Object.freeze({
+        endpoint: process.env.WORKERS_MESSAGE_EMAIL_ENDPOINT!,
       }),
       "reminder-email": Object.freeze({
         endpoint: process.env.WORKERS_REMINDER_EMAIL_ENDPOINT!,

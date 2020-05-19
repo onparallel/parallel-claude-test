@@ -10,13 +10,12 @@ import {
   useToast,
 } from "@chakra-ui/core";
 import { Logo } from "@parallel/components/common/Logo";
-import { Title } from "@parallel/components/common/Title";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
-import { RecipientViewProgressCard } from "@parallel/components/recipient/RecipientViewProgressCard";
-import { RecipientViewSenderCard } from "@parallel/components/recipient/RecipientViewSenderCard";
+import { RecipientViewProgressCard } from "@parallel/components/recipient-view/RecipientViewProgressCard";
+import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
   CreateFileUploadReplyInput,
   CreateTextReplyInput,
@@ -46,8 +45,8 @@ import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   CreateReply,
   RecipientViewPetitionField,
-} from "../../../components/recipient/RecipientViewPetitionField";
-import RecipientViewSideLinks from "@parallel/components/recipient/RecipientViewSideLinks";
+} from "../../../components/recipient-view/RecipientViewPetitionField";
+import RecipientViewSideLinks from "@parallel/components/recipient-view/RecipientViewSideLinks";
 import { Spacer } from "@parallel/components/common/Spacer";
 
 type PublicPetitionProps = UnwrapPromise<
@@ -57,10 +56,10 @@ type PublicPetitionProps = UnwrapPromise<
 function RecipientView({ keycode }: PublicPetitionProps) {
   const intl = useIntl();
   const {
-    data: { sendout },
+    data: { access },
   } = assertQuery(usePublicPetitionQuery({ variables: { keycode } }));
-  const petition = sendout!.petition!;
-  const sender = sendout!.sender!;
+  const petition = access!.petition!;
+  const granter = access!.granter!;
   const [showCompletedAlert, setShowCompletedAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
   const createTextReply = useCreateTextReply();
@@ -168,7 +167,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
               defaultMessage:
                 "You have completed this petition and {name} will be notified",
             },
-            { name: sender.firstName }
+            { name: granter.firstName }
           ),
           status: "success",
           isClosable: true,
@@ -179,13 +178,12 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         scrollIntoView(node);
       }
     },
-    [petition.fields, sender]
+    [petition.fields, granter]
   );
 
   const breakpoint = "md";
   return (
     <>
-      <Title>{petition.emailSubject}</Title>
       {showCompletedAlert && petition.status === "COMPLETED" ? (
         <Alert
           status="success"
@@ -239,9 +237,9 @@ function RecipientView({ keycode }: PublicPetitionProps) {
             marginBottom={4}
           >
             <Box position="sticky" top={8}>
-              <RecipientViewSenderCard sender={sender} marginBottom={4} />
+              <RecipientViewSenderCard sender={granter} marginBottom={4} />
               <RecipientViewProgressCard
-                sender={sender}
+                sender={granter}
                 petition={petition}
                 onFinalize={handleFinalize}
                 display={{ base: "none", [breakpoint]: "flex" }}
@@ -288,7 +286,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         </Flex>
         <RecipientViewProgressCard
           width="100%"
-          sender={sender}
+          sender={granter}
           petition={petition}
           onFinalize={handleFinalize}
           isStickyFooter
@@ -305,8 +303,6 @@ RecipientView.fragments = {
       id
       status
       deadline
-      emailSubject
-      emailBody
       fields {
         id
         ...RecipientViewPetitionField_PublicPetitionField
@@ -572,11 +568,11 @@ RecipientView.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   await apollo.query<PublicPetitionQuery, PublicPetitionQueryVariables>({
     query: gql`
       query PublicPetition($keycode: ID!) {
-        sendout(keycode: $keycode) {
+        access(keycode: $keycode) {
           petition {
             ...RecipientView_PublicPetition
           }
-          sender {
+          granter {
             ...RecipientView_PublicUser
           }
         }

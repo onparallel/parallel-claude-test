@@ -6,31 +6,25 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FORMATS } from "@parallel/utils/dates";
 import {
-  addHours,
-  addWeeks,
+  addDays,
   format,
   isEqual,
   isFuture,
   isPast,
   isToday,
   isTomorrow,
-  isWeekend,
   parse,
-  roundToNearestMinutes,
   startOfDay,
-  startOfToday,
-  startOfTomorrow,
-  startOfWeek,
+  subMinutes,
 } from "date-fns";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedDate, FormattedMessage, FormattedTime } from "react-intl";
 import { DatePicker } from "../common/DatePicker";
 
-export function ScheduleSendoutDialog({ ...props }: DialogCallbacks<Date>) {
-  const [date, setDate] = useState<Date>(startOfDay(addHours(new Date(), 1)));
-  const [time, setTime] = useState<Date>(
-    roundToNearestMinutes(addHours(new Date(), 1), { nearestTo: 5 })
-  );
+export function PetitionDeadlineDialog({ ...props }: DialogCallbacks<Date>) {
+  const nextWeek = startOfDay(addDays(new Date(), 7));
+  const [date, setDate] = useState<Date>(nextWeek);
+  const [time, setTime] = useState<Date>(subMinutes(addDays(nextWeek, 1), 1));
 
   const result = useMemo(
     () =>
@@ -67,17 +61,11 @@ export function ScheduleSendoutDialog({ ...props }: DialogCallbacks<Date>) {
 
   const alternatives = useMemo(
     () =>
-      ["08:00", "09:00", "18:00"].map((hours) => {
-        const today = startOfToday();
-        const nextMonday = startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
-        const tomorrowOrNextMonday = isWeekend(startOfTomorrow())
-          ? nextMonday
-          : startOfTomorrow();
-        return isWeekend(today)
-          ? parse(hours, "HH:mm", nextMonday)
-          : isFuture(parse(hours, "HH:mm", today))
-          ? parse(hours, "HH:mm", today)
-          : parse(hours, "HH:mm", tomorrowOrNextMonday);
+      ["17:00", "18:00", "23:59"].map((hours) => {
+        const alternativeSameDay = parse(hours, "HH:mm", date);
+        return isFuture(alternativeSameDay)
+          ? alternativeSameDay
+          : parse(hours, "HH:mm", addDays(date, 1));
       }),
     [date]
   );
@@ -91,7 +79,7 @@ export function ScheduleSendoutDialog({ ...props }: DialogCallbacks<Date>) {
       }}
       header={
         <FormattedMessage
-          id="petition.schedule-sendout.header"
+          id="petition.schedule-delivery.header"
           defaultMessage="Select date and time"
         />
       }
@@ -115,7 +103,6 @@ export function ScheduleSendoutDialog({ ...props }: DialogCallbacks<Date>) {
                 marginTop={{ base: 0, sm: 2 }}
                 marginLeft={{ base: 4, sm: 0 }}
                 type="time"
-                step={60 * 5}
                 value={format(time, "HH:mm")}
                 onChange={handleTimeInputChange}
               />
@@ -165,8 +152,8 @@ export function ScheduleSendoutDialog({ ...props }: DialogCallbacks<Date>) {
           onClick={() => props.onResolve(result)}
         >
           <FormattedMessage
-            id="petition.schedule-send-button"
-            defaultMessage="Schedule send"
+            id="petition.set-deadline"
+            defaultMessage="Set deadline"
           />
         </Button>
       }
@@ -175,6 +162,6 @@ export function ScheduleSendoutDialog({ ...props }: DialogCallbacks<Date>) {
   );
 }
 
-export function useScheduleSendoutDialog() {
-  return useDialog(ScheduleSendoutDialog);
+export function usePetitionDeadlineDialog() {
+  return useDialog(PetitionDeadlineDialog);
 }

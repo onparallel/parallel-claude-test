@@ -108,14 +108,14 @@ export function replyBelongsToPetition<
   };
 }
 
-export function sendoutsBelongToPetition<
+export function accessesBelongToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
   TArg2 extends Arg<TypeName, FieldName, string[]>
 >(
   argNamePetitionId: TArg1,
-  argNameSendoutIds: TArg2
+  argNameAccessesIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -123,11 +123,11 @@ export function sendoutsBelongToPetition<
         args[argNamePetitionId],
         "Petition"
       );
-      const { ids: sendoutIds } = fromGlobalIds(
-        args[argNameSendoutIds],
-        "PetitionSendout"
+      const { ids: accessesIds } = fromGlobalIds(
+        args[argNameAccessesIds],
+        "PetitionAccess"
       );
-      return ctx.petitions.sendoutsBelongToPetition(petitionId, sendoutIds);
+      return ctx.petitions.accesessBelongToPetition(petitionId, accessesIds);
     } catch {}
     return false;
   };

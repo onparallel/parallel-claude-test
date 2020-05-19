@@ -18,54 +18,52 @@ createQueueWorker(
     if (reminder.status === "PROCESSED") {
       throw new Error(`Reminder with id ${reminderId} already processed`);
     }
-    const sendout = await context.petitions.loadSendout(
-      reminder.petition_sendout_id
+    const access = await context.petitions.loadAccess(
+      reminder.petition_access_id
     );
-    if (!sendout) {
+    if (!access) {
       throw new Error(
-        `Sendout not found for id petition_reminder.petition_sendout_id ${reminder.petition_sendout_id}`
+        `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
       );
     }
-    const [petition, sender, contact, fields] = await Promise.all([
-      context.petitions.loadPetition(sendout.petition_id),
-      context.users.loadUser(sendout.sender_id),
-      context.contacts.loadContact(sendout.contact_id),
-      context.petitions.loadFieldsForPetition(sendout.petition_id),
+    const [petition, granter, contact, fields] = await Promise.all([
+      context.petitions.loadPetition(access.petition_id),
+      context.users.loadUser(access.granter_id),
+      context.contacts.loadContact(access.contact_id),
+      context.petitions.loadFieldsForPetition(access.petition_id),
     ]);
     if (!petition) {
       throw new Error(
-        `Petition not found for petition_sendout.petition_id ${sendout.petition_id}`
+        `Petition not found for petition_access.petition_id ${access.petition_id}`
       );
     }
     if (petition.status !== "PENDING") {
       throw new Error(
-        `Can not sent reminder for petition ${sendout.petition_id} with status "${petition.status}"`
+        `Can not sent reminder for petition ${access.petition_id} with status "${petition.status}"`
       );
     }
-    if (!sender) {
+    if (!granter) {
       throw new Error(
-        `User not found for petition_sendout.sender_id ${sendout.sender_id}`
+        `User not found for petition_access.granter_id ${access.granter_id}`
       );
     }
     if (!contact) {
       throw new Error(
-        `Contact not found for petition_sendout.contact_id ${sendout.contact_id}`
+        `Contact not found for petition_access.contact_id ${access.contact_id}`
       );
     }
-    const senderName = sender.last_name
-      ? `${sender.first_name} ${sender.last_name}`
-      : sender.first_name!;
+    const senderName = granter.last_name
+      ? `${granter.first_name} ${granter.last_name}`
+      : granter.first_name!;
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
         name: contact.first_name,
         senderName,
-        senderEmail: sender.email,
-        subject: sendout.email_subject,
-        body: sendout.email_body ? JSON.parse(sendout.email_body) : [],
+        senderEmail: granter.email,
         fields: fields.map((f) => ({ id: f.id, title: f.title })),
         deadline: petition.deadline,
-        keycode: sendout.keycode,
+        keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
       },
@@ -79,9 +77,7 @@ createQueueWorker(
       html,
       created_from: `PetitionReminder:${reminder.id}`,
     });
-    await context.reminders.updateReminder(reminder.id, {
-      email_log_id: email.id,
-    });
+    await context.reminders.processReminder(reminder.id, email.id);
     await context.aws.enqueueEmail(email.id);
   }
 );

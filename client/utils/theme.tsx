@@ -27,7 +27,7 @@ export const theme = {
       50: "#fbfcfd",
     },
     purple: {
-      50: "#f0efff",
+      50: "#f8f8ff",
       100: "#d1cfff",
       200: "#b0acfb",
       300: "#938eff",

@@ -9,13 +9,7 @@ import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
 import { PetitionFieldList } from "../common/PetitionFieldList";
-import { RenderSlate } from "../common/RenderSlate";
-import {
-  disclaimer,
-  greeting,
-  petitionFieldList,
-  renderSlateText,
-} from "../common/texts";
+import { disclaimer, greeting, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export interface PetitionReminderProps {
@@ -23,8 +17,6 @@ export interface PetitionReminderProps {
   senderName: string;
   senderEmail: string;
   fields: { id: number; title: string | null }[];
-  subject: string | null;
-  body: any;
   deadline: Date | null;
   keycode: string;
   parallelUrl: string;
@@ -41,14 +33,13 @@ const email: Email<PetitionReminderProps> = {
       { senderName }
     );
   },
-  subject({ subject }: PetitionReminderProps, intl: IntlShape) {
+  subject({ senderName }, intl: IntlShape) {
     return intl.formatMessage(
       {
         id: "petition-reminder.subject",
-        defaultMessage:
-          "Reminder!{subject, select, null {} other { {subject}}}",
+        defaultMessage: "Remember to fill the petition {senderName} sent you",
       },
-      { subject }
+      { senderName }
     );
   },
   text(
@@ -57,7 +48,6 @@ const email: Email<PetitionReminderProps> = {
       senderName,
       senderEmail,
       fields,
-      body,
       deadline,
       keycode,
       parallelUrl,
@@ -74,8 +64,6 @@ const email: Email<PetitionReminderProps> = {
         },
         { senderName, senderEmail }
       )}
-      
-      ${renderSlateText(body)}
 
       ${
         deadline
@@ -109,7 +97,6 @@ const email: Email<PetitionReminderProps> = {
     senderName,
     senderEmail,
     fields,
-    body,
     deadline,
     keycode,
     parallelUrl,
@@ -131,15 +118,6 @@ const email: Email<PetitionReminderProps> = {
                 }}
               ></FormattedMessage>
             </MjmlText>
-          </MjmlColumn>
-        </MjmlSection>
-        <MjmlSection padding="0 20px">
-          <MjmlColumn
-            backgroundColor="#f6f6f6"
-            borderRadius="4px"
-            padding="10px 0"
-          >
-            <RenderSlate value={body} />
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection paddingTop="10px">
@@ -190,30 +168,6 @@ export const props: PetitionReminderProps = {
   name: "Santi",
   senderName: "Derek",
   senderEmail: "derek@parallel.so",
-  subject: null,
-  body: [
-    {
-      children: [
-        { text: "hola Derek, envimae los " },
-        { text: "documentos " },
-        { text: "siguientes ", bold: true },
-        { text: "super guays", bold: true, underline: true },
-      ],
-    },
-    {
-      type: "bulleted-list",
-      children: [
-        {
-          children: [{ text: "foto", bold: true, underline: true }],
-          type: "list-item",
-        },
-        {
-          children: [{ text: "pasaporte", italic: true }],
-          type: "list-item",
-        },
-      ],
-    },
-  ],
   deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   fields: [
     { id: 1, title: "DNI" },

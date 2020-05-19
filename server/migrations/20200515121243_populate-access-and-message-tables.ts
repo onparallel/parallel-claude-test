@@ -32,6 +32,7 @@ interface PetitionSendout {
 interface PetitionAccess {
   id: number;
   petition_id: number;
+  granter_id: number;
   contact_id: number;
   keycode: string;
   status: "ACTIVE" | "INACTIVE";
@@ -83,8 +84,9 @@ export async function up(knex: Knex): Promise<any> {
       const first = group[0];
       const last = group[group.length - 1];
       return {
-        petition_id: group[0].petition_id,
-        contact_id: group[0].contact_id,
+        petition_id: first.petition_id,
+        contact_id: first.contact_id,
+        granter_id: last.sender_id,
         status: "ACTIVE",
         reminders_left: 0,
         reminders_active: false,
@@ -148,10 +150,29 @@ export async function up(knex: Knex): Promise<any> {
     where
       pr.petition_sendout_id = map.petition_sendout_id
   `);
+  await knex.raw(/* sql */ `
+    update petition_field_reply as pfr
+      set
+        petition_access_id = map.petition_access_id
+    from (values
+      ${sendouts
+        .map((s) => {
+          const access = indexed[`${s.petition_id},${s.contact_id}`];
+          return `(${s.id}, ${access.id})`;
+        })
+        .join(",")}
+    ) as map(petition_sendout_id, petition_access_id)
+    where
+      pfr.petition_sendout_id = map.petition_sendout_id
+  `);
 
   // ...
   await knex.raw(/* sql */ `
     alter table petition_reminder
+      alter column petition_access_id set not null;
+  `);
+  await knex.raw(/* sql */ `
+    alter table petition_field_reply
       alter column petition_access_id set not null;
   `);
 }
@@ -162,12 +183,20 @@ export async function down(knex: Knex): Promise<any> {
       alter column petition_access_id drop not null;
   `);
   await knex.raw(/* sql */ `
+    alter table petition_field_reply
+      alter column petition_access_id drop not null;
+  `);
+  await knex.raw(/* sql */ `
     update petition_reminder
       set
         created_by = concat('PetitionSendout:', petition_sendout_id)
       where type = 'AUTOMATIC'
   `);
   await knex<PetitionReminder>("petition_reminder").update(
+    "petition_access_id",
+    null
+  );
+  await knex<PetitionReminder>("petition_field_reply").update(
     "petition_access_id",
     null
   );

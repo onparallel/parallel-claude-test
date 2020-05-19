@@ -122,13 +122,13 @@ export class Aws {
     });
   }
 
-  async enqueueSendouts(sendoutIds: number[]) {
+  async enqueuePetitionMessages(messageIds: number[]) {
     return await this.enqueueMessages(
-      "sendout-email",
-      sendoutIds.map((id) => ({
-        id: `PetitionSendout-${id}`,
-        body: { petition_sendout_id: id },
-        groupId: `PetitionSendout-${id}`,
+      "message-email",
+      messageIds.map((id) => ({
+        id: `PetitionMessage-${id}`,
+        body: { petition_message_id: id },
+        groupId: `PetitionMessage-${id}`,
       }))
     );
   }
@@ -151,10 +151,10 @@ export class Aws {
     });
   }
 
-  async enqueuePetitionCompleted(id: number) {
+  async enqueuePetitionCompleted(accessId: number) {
     await this.enqueueMessages("completed-email", {
-      body: { petition_sendout_id: id },
-      groupId: `PetitionSendout-${id}`,
+      body: { petition_access_id: accessId },
+      groupId: `PetitionAccess-${accessId}`,
     });
   }
 }

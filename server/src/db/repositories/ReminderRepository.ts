@@ -16,10 +16,16 @@ export class ReminderRepository extends BaseRepository {
     return await this.insert("petition_reminder", data).returning("*");
   }
 
-  async updateReminder(id: number, data: Partial<PetitionReminder>) {
-    const rows = await this.from("petition_reminder")
-      .where("id", id)
-      .update(data, "*");
-    return rows[0];
+  async processReminder(reminderId: number, emailLogId: number) {
+    const [row] = await this.from("petition_reminder")
+      .where("id", reminderId)
+      .update(
+        {
+          status: "PROCESSED",
+          email_log_id: emailLogId,
+        },
+        "*"
+      );
+    return row;
   }
 }

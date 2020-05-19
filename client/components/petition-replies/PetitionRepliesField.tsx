@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
-import { PetitionFieldTypeIndicator } from "@parallel/components/petition/PetitionFieldTypeIndicator";
+import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionRepliesField_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapArray } from "@parallel/utils/types";
@@ -233,12 +233,6 @@ function PetitionRepliesFieldReply({
     >
       {children}
       <Box fontSize="sm">
-        {/* <Text as="span">
-          {reply.sendout?.contact?.fullName || reply.sendout?.contact?.email}
-        </Text>
-        <Text as="span" marginX={1}>
-          -
-        </Text> */}
         <DateTime
           as="span"
           color="gray.400"
@@ -261,13 +255,6 @@ PetitionRepliesField.fragments = {
         id
         content
         createdAt
-        sendout {
-          contact {
-            id
-            fullName
-            email
-          }
-        }
       }
     }
   `,

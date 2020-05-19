@@ -51,31 +51,31 @@
     "term": "from.via-parallel",
     "definition": "{senderName} (vía Parallel)",
     "context": "{senderName} (via Parallel)",
-    "reference": "src/emails/components/PetitionReminder.tsx#L37-L40"
+    "reference": "src/emails/components/PetitionReminder.tsx#L35-L38"
   },
   {
     "term": "generic.complete-information-button",
     "definition": "Completa aquí la información",
     "context": "Complete the information here",
-    "reference": "src/emails/components/PetitionReminder.tsx#L173-L176"
+    "reference": "src/emails/components/PetitionReminder.tsx#L167-L170"
   },
   {
     "term": "generic.complete-information-click-link",
     "definition": "Por favor, haz click en el enlace siguiente para responder a la petición.",
     "context": "Please click the link below to complete the information.",
-    "reference": "src/emails/components/PetitionReminder.tsx#L97-L101"
+    "reference": "src/emails/components/PetitionReminder.tsx#L91-L95"
   },
   {
     "term": "generic.submit-text.with-deadline",
     "definition": "Por favor, rellene la siguiente información antes del {deadline}:",
     "context": "Please submit the following information before {deadline}:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L149-L162"
+    "reference": "src/emails/components/PetitionReminder.tsx#L143-L156"
   },
   {
     "term": "generic.submit-text.without-deadline",
     "definition": "Por favor, rellene la siguiente información:",
     "context": "Please submit the following information:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L164-L167"
+    "reference": "src/emails/components/PetitionReminder.tsx#L158-L161"
   },
   {
     "term": "generic.untitled-field",
@@ -157,15 +157,15 @@
   },
   {
     "term": "petition-reminder.subject",
-    "definition": "¡Recordatorio!{subject, select, null {} other { {subject}}}",
-    "context": "Reminder!{subject, select, null {} other { {subject}}}",
-    "reference": "src/emails/components/PetitionReminder.tsx#L46-L50"
+    "definition": "Recuerda completar la petición que te envió {senderName}",
+    "context": "Remember to fill the petition {senderName} sent you",
+    "reference": "src/emails/components/PetitionReminder.tsx#L44-L47"
   },
   {
     "term": "reminder.text",
     "definition": "Recuerda que {senderName} ({senderEmail}) te envió una petición.",
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition.",
-    "reference": "src/emails/components/PetitionReminder.tsx#L125-L132"
+    "reference": "src/emails/components/PetitionReminder.tsx#L119-L126"
   },
   {
     "term": "welcome.click-to-verify",

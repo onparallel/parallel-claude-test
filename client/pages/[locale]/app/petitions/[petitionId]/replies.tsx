@@ -4,13 +4,10 @@ import {
   Checkbox,
   Flex,
   IconButton,
-  List,
-  ListItem,
   MenuItem,
   MenuList,
   Stack,
   Text,
-  useToast,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
 import { Divider } from "@parallel/components/common/Divider";
@@ -24,12 +21,11 @@ import {
   WithDataContext,
 } from "@parallel/components/common/withData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { useFailureGeneratingLinkDialog } from "@parallel/components/petition/FailureGeneratingLinkDialog";
+import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldAction,
-} from "@parallel/components/petition/PetitionRepliesField";
-import { PetitionSendouts } from "@parallel/components/petition/PetitionSendouts";
+} from "@parallel/components/petition-replies/PetitionRepliesField";
 import {
   PetitionFieldReply,
   PetitionRepliesQuery,
@@ -39,7 +35,6 @@ import {
   usePetitionRepliesQuery,
   usePetitionRepliesUserQuery,
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
-  usePetitionReplies_sendRemindersMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
 } from "@parallel/graphql/__types";
@@ -130,8 +125,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     toggleBy,
   } = useSelectionState(petition!.fields, "id");
 
-  const sendReminder = useSendReminder();
-
   return (
     <>
       <Title>
@@ -149,7 +142,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         scrollBody={false}
         state={state}
       >
-        <Stack direction="row" padding={4} backgroundColor="white">
+        <Stack
+          direction="row"
+          paddingX={4}
+          paddingY={2}
+          backgroundColor="white"
+        >
           <SplitButton>
             <Button variant="outline" onClick={toggleAll} padding={0}>
               <Checkbox
@@ -237,14 +235,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             </Stack>
             <Spacer flex="1" display={{ base: "none", md: "block" }} />
           </Flex>
-          <PetitionSendouts
-            id="sendouts"
-            sendouts={petition!.sendouts}
-            marginX={4}
-            marginTop={12}
-            marginBottom={24}
-            onSendReminder={(sendoutId) => sendReminder(petitionId, sendoutId)}
-          />
         </Box>
       </PetitionLayout>
     </>
@@ -259,11 +249,9 @@ PetitionReplies.fragments = {
         ...PetitionRepliesField_PetitionField
       }
       ...PetitionLayout_Petition
-      ...PetitionSendouts_Petition
     }
     ${PetitionLayout.fragments.petition}
     ${PetitionRepliesField.fragments.petitionField}
-    ${PetitionSendouts.fragments.petition}
   `,
   user: gql`
     fragment PetitionReplies_User on User {
@@ -318,20 +306,6 @@ PetitionReplies.mutations = [
       }
     }
   `,
-  gql`
-    mutation PetitionReplies_sendReminders(
-      $petitionId: ID!
-      $sendoutIds: [ID!]!
-    ) {
-      sendReminders(petitionId: $petitionId, sendoutIds: $sendoutIds) {
-        result
-        sendouts {
-          id
-          status
-        }
-      }
-    }
-  `,
 ];
 
 function useDownloadReplyFile() {
@@ -358,30 +332,6 @@ function useDownloadReplyFile() {
     },
     [mutate]
   );
-}
-
-function useSendReminder() {
-  const intl = useIntl();
-  const toast = useToast();
-  const [sendReminders] = usePetitionReplies_sendRemindersMutation();
-  return useCallback(async (petitionId: string, sendoutId: string) => {
-    await sendReminders({
-      variables: { petitionId, sendoutIds: [sendoutId] },
-    });
-    toast({
-      title: intl.formatMessage({
-        id: "petition.reminder-sent.toast-header",
-        defaultMessage: "Reminder sent",
-      }),
-      description: intl.formatMessage({
-        id: "petition.reminder-sent.toast-description",
-        defaultMessage: "The reminder is on it's way",
-      }),
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-  }, []);
 }
 
 PetitionReplies.getInitialProps = async ({
@@ -460,73 +410,6 @@ export default compose(
         ),
         placement: "right-start",
         target: "#petition-replies",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-replies.monitor-requests"
-            defaultMessage="Monitor your requests"
-          />
-        ),
-        content: (
-          <>
-            <Text>
-              <FormattedMessage
-                id="tour.petition-replies.you-can"
-                defaultMessage="In this section, you will be able to:"
-              />
-            </Text>
-            <List
-              styleType="disc"
-              stylePos="outside"
-              paddingLeft={5}
-              marginTop={4}
-              spacing={3}
-            >
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-replies.track"
-                  defaultMessage="<b>Track</b> whether your recipients have received or opened your message."
-                  values={{
-                    b: (chunks: any[]) => (
-                      <Text as="em" fontStyle="normal" fontWeight="bold">
-                        {chunks}
-                      </Text>
-                    ),
-                  }}
-                />
-              </ListItem>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-replies.next-reminder"
-                  defaultMessage="See when will the <b>next reminder</b> be sent."
-                  values={{
-                    b: (chunks: any[]) => (
-                      <Text as="em" fontStyle="normal" fontWeight="bold">
-                        {chunks}
-                      </Text>
-                    ),
-                  }}
-                />
-              </ListItem>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-replies.send-manual-reminder"
-                  defaultMessage="Manually <b>send reminders</b> to your recipients."
-                  values={{
-                    b: (chunks: any[]) => (
-                      <Text as="em" fontStyle="normal" fontWeight="bold">
-                        {chunks}
-                      </Text>
-                    ),
-                  }}
-                />
-              </ListItem>
-            </List>
-          </>
-        ),
-        placement: "top",
-        target: "#sendouts",
       },
     ],
   }),
