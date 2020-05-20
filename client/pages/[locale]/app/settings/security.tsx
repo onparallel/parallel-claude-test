@@ -188,7 +188,7 @@ const GET_SECURITY_DATA = gql`
       ...AppLayout_User
     }
   }
-  ${AppLayout.fragments.user}
+  ${AppLayout.fragments.User}
 `;
 
 function useUpdatePassword() {

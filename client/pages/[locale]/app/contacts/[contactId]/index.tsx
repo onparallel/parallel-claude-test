@@ -342,7 +342,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
 }
 
 Contact.fragments = {
-  contact: gql`
+  Contact: gql`
     fragment Contact_Contact on Contact {
       id
       email
@@ -371,11 +371,11 @@ Contact.fragments = {
       }
     }
   `,
-  user: gql`
+  User: gql`
     fragment Contact_User on User {
       ...AppLayout_User
     }
-    ${AppLayout.fragments.user}
+    ${AppLayout.fragments.User}
   `,
 };
 
@@ -386,7 +386,7 @@ Contact.mutations = [
         ...Contact_Contact
       }
     }
-    ${Contact.fragments.contact}
+    ${Contact.fragments.Contact}
   `,
 ];
 
@@ -432,7 +432,7 @@ const GET_CONTACT_DATA = gql`
       ...Contact_Contact
     }
   }
-  ${Contact.fragments.contact}
+  ${Contact.fragments.Contact}
 `;
 
 const GET_CONTACT_USER_DATA = gql`
@@ -441,7 +441,7 @@ const GET_CONTACT_USER_DATA = gql`
       ...Contact_User
     }
   }
-  ${Contact.fragments.user}
+  ${Contact.fragments.User}
 `;
 
 Contact.getInitialProps = async ({ apollo, query }: WithDataContext) => {

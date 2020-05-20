@@ -85,7 +85,7 @@ export function RecipientSelect({
 }
 
 RecipientSelect.fragments = {
-  contact: gql`
+  Contact: gql`
     fragment RecipientSelect_Contact on Contact {
       id
       fullName

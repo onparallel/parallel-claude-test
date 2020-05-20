@@ -367,7 +367,7 @@ function useDragAndDrop(
 }
 
 PetitionComposeField.fragments = {
-  petitionField: gql`
+  PetitionField: gql`
     fragment PetitionComposeField_PetitionField on PetitionField {
       id
       type

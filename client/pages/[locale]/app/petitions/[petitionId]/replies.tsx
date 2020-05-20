@@ -242,7 +242,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 }
 
 PetitionReplies.fragments = {
-  petition: gql`
+  Petition: gql`
     fragment PetitionReplies_Petition on Petition {
       id
       fields {
@@ -250,14 +250,14 @@ PetitionReplies.fragments = {
       }
       ...PetitionLayout_Petition
     }
-    ${PetitionLayout.fragments.petition}
-    ${PetitionRepliesField.fragments.petitionField}
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionRepliesField.fragments.PetitionField}
   `,
-  user: gql`
+  User: gql`
     fragment PetitionReplies_User on User {
       ...PetitionLayout_User
     }
-    ${PetitionLayout.fragments.user}
+    ${PetitionLayout.fragments.User}
   `,
 };
 
@@ -271,7 +271,7 @@ PetitionReplies.mutations = [
         ...PetitionReplies_Petition
       }
     }
-    ${PetitionReplies.fragments.petition}
+    ${PetitionReplies.fragments.Petition}
   `,
   gql`
     mutation PetitionReplies_validatePetitionFields(
@@ -293,7 +293,7 @@ PetitionReplies.mutations = [
         }
       }
     }
-    ${PetitionLayout.fragments.petition}
+    ${PetitionLayout.fragments.Petition}
   `,
   gql`
     mutation PetitionReplies_fileUploadReplyDownloadLink(
@@ -346,7 +346,7 @@ PetitionReplies.getInitialProps = async ({
             ...PetitionReplies_Petition
           }
         }
-        ${PetitionReplies.fragments.petition}
+        ${PetitionReplies.fragments.Petition}
       `,
       variables: { id: query.petitionId as string },
     }),
@@ -357,7 +357,7 @@ PetitionReplies.getInitialProps = async ({
             ...PetitionReplies_User
           }
         }
-        ${PetitionReplies.fragments.user}
+        ${PetitionReplies.fragments.User}
       `,
     }),
   ]);

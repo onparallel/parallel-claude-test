@@ -73,7 +73,7 @@ export function UserMenu({ user }: UserMenuProps) {
 }
 
 UserMenu.fragments = {
-  user: gql`
+  User: gql`
     fragment UserMenu_User on User {
       fullName
     }

@@ -240,6 +240,6 @@ PetitionComposeFields.fragments = {
         ...PetitionComposeField_PetitionField
       }
     }
-    ${PetitionComposeField.fragments.petitionField}
+    ${PetitionComposeField.fragments.PetitionField}
   `,
 };

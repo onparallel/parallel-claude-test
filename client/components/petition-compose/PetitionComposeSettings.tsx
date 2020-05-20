@@ -382,7 +382,7 @@ PetitionComposeSettings.fragments = {
       email
     }
   `,
-  petition: gql`
+  Petition: gql`
     fragment PetitionComposeSettings_Petition on Petition {
       locale
       deadline

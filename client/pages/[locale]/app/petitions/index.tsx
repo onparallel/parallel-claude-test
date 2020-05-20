@@ -432,7 +432,7 @@ function ConfirmDeletePetitionsDialog({
 }
 
 Petitions.fragments = {
-  petitions: gql`
+  Petitions: gql`
     fragment Petitions_PetitionsList on PetitionPagination {
       items {
         id
@@ -453,13 +453,13 @@ Petitions.fragments = {
       }
       totalCount
     }
-    ${ContactLink.fragments.contact}
+    ${ContactLink.fragments.Contact}
   `,
-  user: gql`
+  User: gql`
     fragment Petitions_User on User {
       ...AppLayout_User
     }
-    ${AppLayout.fragments.user}
+    ${AppLayout.fragments.User}
   `,
 };
 
@@ -500,7 +500,7 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
             ...Petitions_PetitionsList
           }
         }
-        ${Petitions.fragments.petitions}
+        ${Petitions.fragments.Petitions}
       `,
       variables: {
         offset: PAGE_SIZE * (page - 1),
@@ -517,7 +517,7 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
             ...Petitions_User
           }
         }
-        ${Petitions.fragments.user}
+        ${Petitions.fragments.User}
       `,
     }),
   ]);

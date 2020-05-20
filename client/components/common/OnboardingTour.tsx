@@ -216,7 +216,7 @@ export function OnboardingTour({ status, onUpdateTour }: OnboardingTourProps) {
 }
 
 OnboardingTour.fragments = {
-  user: gql`
+  User: gql`
     fragment OnboardingTour_User on User {
       onboardingStatus
     }

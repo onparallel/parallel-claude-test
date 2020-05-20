@@ -390,7 +390,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 }
 
 PetitionCompose.fragments = {
-  petition: gql`
+  Petition: gql`
     fragment PetitionCompose_Petition on Petition {
       id
       ...PetitionLayout_Petition
@@ -403,16 +403,16 @@ PetitionCompose.fragments = {
       ...PetitionComposeField_PetitionField
       ...PetitionComposeFieldSettings_PetitionField
     }
-    ${PetitionLayout.fragments.petition}
-    ${PetitionComposeField.fragments.petitionField}
-    ${PetitionComposeFieldSettings.fragments.petitionField}
-    ${PetitionComposeSettings.fragments.petition}
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionComposeField.fragments.PetitionField}
+    ${PetitionComposeFieldSettings.fragments.PetitionField}
+    ${PetitionComposeSettings.fragments.Petition}
   `,
-  user: gql`
+  User: gql`
     fragment PetitionCompose_User on User {
       ...PetitionLayout_User
     }
-    ${PetitionLayout.fragments.user}
+    ${PetitionLayout.fragments.User}
   `,
 };
 
@@ -427,8 +427,8 @@ PetitionCompose.mutations = [
         ...PetitionComposeSettings_Petition
       }
     }
-    ${PetitionLayout.fragments.petition}
-    ${PetitionComposeSettings.fragments.petition}
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionComposeSettings.fragments.Petition}
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions(
@@ -440,7 +440,7 @@ PetitionCompose.mutations = [
         ...PetitionLayout_Petition
       }
     }
-    ${PetitionLayout.fragments.petition}
+    ${PetitionLayout.fragments.Petition}
   `,
   gql`
     mutation PetitionCompose_createPetitionField(
@@ -458,9 +458,9 @@ PetitionCompose.mutations = [
         }
       }
     }
-    ${PetitionLayout.fragments.petition}
-    ${PetitionComposeField.fragments.petitionField}
-    ${PetitionComposeFieldSettings.fragments.petitionField}
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionComposeField.fragments.PetitionField}
+    ${PetitionComposeFieldSettings.fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_deletePetitionField(
@@ -472,7 +472,7 @@ PetitionCompose.mutations = [
         ...PetitionLayout_Petition
       }
     }
-    ${PetitionLayout.fragments.petition}
+    ${PetitionLayout.fragments.Petition}
   `,
   gql`
     mutation PetitionCompose_updatePetitionField(
@@ -495,9 +495,9 @@ PetitionCompose.mutations = [
         }
       }
     }
-    ${PetitionLayout.fragments.petition}
-    ${PetitionComposeField.fragments.petitionField}
-    ${PetitionComposeFieldSettings.fragments.petitionField}
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionComposeField.fragments.PetitionField}
+    ${PetitionComposeFieldSettings.fragments.PetitionField}
   `,
   gql`
     mutation PetitionCompose_sendPetition(
@@ -642,7 +642,7 @@ function useSearchContacts() {
               }
             }
           }
-          ${RecipientSelect.fragments.contact}
+          ${RecipientSelect.fragments.Contact}
         `,
         variables: { search, exclude },
       });
@@ -665,7 +665,7 @@ PetitionCompose.getInitialProps = async ({
             ...PetitionCompose_Petition
           }
         }
-        ${PetitionCompose.fragments.petition}
+        ${PetitionCompose.fragments.Petition}
       `,
       variables: { id: query.petitionId as string },
     }),
@@ -676,7 +676,7 @@ PetitionCompose.getInitialProps = async ({
             ...PetitionCompose_User
           }
         }
-        ${PetitionCompose.fragments.user}
+        ${PetitionCompose.fragments.User}
       `,
     }),
   ]);

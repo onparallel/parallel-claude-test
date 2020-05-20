@@ -123,13 +123,13 @@ function Account() {
 }
 
 Account.fragments = {
-  user: gql`
+  User: gql`
     fragment Account_User on User {
       firstName
       lastName
       ...AppLayout_User
     }
-    ${AppLayout.fragments.user}
+    ${AppLayout.fragments.User}
   `,
 };
 
@@ -140,7 +140,7 @@ const GET_ACCOUNT_DATA = gql`
       ...Account_User
     }
   }
-  ${Account.fragments.user}
+  ${Account.fragments.User}
 `;
 
 function useUpdateAccount() {

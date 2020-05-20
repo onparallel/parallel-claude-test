@@ -44,17 +44,17 @@ export function PetitionLayout({
 }
 
 PetitionLayout.fragments = {
-  petition: gql`
+  Petition: gql`
     fragment PetitionLayout_Petition on Petition {
       id
       ...PetitionHeader_Petition
     }
-    ${PetitionHeader.fragments.petition}
+    ${PetitionHeader.fragments.Petition}
   `,
-  user: gql`
+  User: gql`
     fragment PetitionLayout_User on User {
       ...AppLayout_User
     }
-    ${AppLayout.fragments.user}
+    ${AppLayout.fragments.User}
   `,
 };

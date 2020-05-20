@@ -245,7 +245,7 @@ function PetitionRepliesFieldReply({
 }
 
 PetitionRepliesField.fragments = {
-  petitionField: gql`
+  PetitionField: gql`
     fragment PetitionRepliesField_PetitionField on PetitionField {
       id
       type

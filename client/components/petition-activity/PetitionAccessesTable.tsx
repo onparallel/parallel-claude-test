@@ -165,7 +165,7 @@ function usePetitionAccessesColumns(): TableColumn<
 }
 
 PetitionAccessesTable.fragments = {
-  petition: gql`
+  Petition: gql`
     fragment PetitionAccessTable_Petition on Petition {
       accesses {
         ...PetitionAccessTable_PetitionAccess
@@ -180,6 +180,6 @@ PetitionAccessesTable.fragments = {
       nextReminderAt
       createdAt
     }
-    ${ContactLink.fragments.contact}
+    ${ContactLink.fragments.Contact}
   `,
 };

@@ -30,7 +30,7 @@ export function ContactLink({
 }
 
 ContactLink.fragments = {
-  contact: gql`
+  Contact: gql`
     fragment ContactLink_Contact on Contact {
       id
       fullName

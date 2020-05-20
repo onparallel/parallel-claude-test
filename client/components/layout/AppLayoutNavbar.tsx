@@ -145,10 +145,10 @@ export function AppLayoutNavbar({
 }
 
 AppLayoutNavbar.fragments = {
-  user: gql`
+  User: gql`
     fragment AppLayoutNavbar_User on User {
       ...UserMenu_User
     }
-    ${UserMenu.fragments.user}
+    ${UserMenu.fragments.User}
   `,
 };

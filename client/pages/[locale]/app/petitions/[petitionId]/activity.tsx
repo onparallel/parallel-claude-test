@@ -97,20 +97,20 @@ function PetitionActivity({ petitionId }: PetitionProps) {
 }
 
 PetitionActivity.fragments = {
-  petition: gql`
+  Petition: gql`
     fragment PetitionActivity_Petition on Petition {
       id
       ...PetitionLayout_Petition
       ...PetitionAccessTable_Petition
     }
-    ${PetitionLayout.fragments.petition}
-    ${PetitionAccessesTable.fragments.petition}
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionAccessesTable.fragments.Petition}
   `,
-  user: gql`
+  User: gql`
     fragment PetitionActivity_User on User {
       ...PetitionLayout_User
     }
-    ${PetitionLayout.fragments.user}
+    ${PetitionLayout.fragments.User}
   `,
 };
 
@@ -124,7 +124,7 @@ PetitionActivity.mutations = [
         ...PetitionActivity_Petition
       }
     }
-    ${PetitionActivity.fragments.petition}
+    ${PetitionActivity.fragments.Petition}
   `,
   gql`
     mutation PetitionActivity_sendReminders(
@@ -174,7 +174,7 @@ PetitionActivity.getInitialProps = async ({
             ...PetitionActivity_Petition
           }
         }
-        ${PetitionActivity.fragments.petition}
+        ${PetitionActivity.fragments.Petition}
       `,
       variables: { id: query.petitionId as string },
     }),
@@ -185,7 +185,7 @@ PetitionActivity.getInitialProps = async ({
             ...PetitionActivity_User
           }
         }
-        ${PetitionActivity.fragments.user}
+        ${PetitionActivity.fragments.User}
       `,
     }),
   ]);

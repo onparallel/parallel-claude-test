@@ -87,14 +87,14 @@ export function AppLayout({
 }
 
 AppLayout.fragments = {
-  user: gql`
+  User: gql`
     fragment AppLayout_User on User {
       id
       ...AppLayoutNavbar_User
       ...OnboardingTour_User
     }
-    ${AppLayoutNavbar.fragments.user}
-    ${OnboardingTour.fragments.user}
+    ${AppLayoutNavbar.fragments.User}
+    ${OnboardingTour.fragments.User}
   `,
 };
 

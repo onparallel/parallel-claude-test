@@ -281,7 +281,7 @@ function SettingsRow({
 }
 
 PetitionComposeFieldSettings.fragments = {
-  petitionField: gql`
+  PetitionField: gql`
     fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
       id
       type

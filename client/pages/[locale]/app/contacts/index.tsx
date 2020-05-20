@@ -306,7 +306,7 @@ function ConfirmDeleteContacts({
 }
 
 Contacts.fragments = {
-  contacts: gql`
+  Contacts: gql`
     fragment Contacts_ContactsList on ContactPagination {
       items {
         id
@@ -319,11 +319,11 @@ Contacts.fragments = {
       totalCount
     }
   `,
-  user: gql`
+  User: gql`
     fragment Contacts_User on User {
       ...AppLayout_User
     }
-    ${AppLayout.fragments.user}
+    ${AppLayout.fragments.User}
   `,
 };
 
@@ -355,7 +355,7 @@ Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
             ...Contacts_ContactsList
           }
         }
-        ${Contacts.fragments.contacts}
+        ${Contacts.fragments.Contacts}
       `,
       variables: {
         offset: PAGE_SIZE * (page - 1),
@@ -371,7 +371,7 @@ Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
             ...Contacts_User
           }
         }
-        ${Contacts.fragments.user}
+        ${Contacts.fragments.User}
       `,
     }),
   ]);

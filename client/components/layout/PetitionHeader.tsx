@@ -327,7 +327,7 @@ const PetitionHeaderTab = forwardRef(function (
 });
 
 PetitionHeader.fragments = {
-  petition: gql`
+  Petition: gql`
     fragment PetitionHeader_Petition on Petition {
       id
       name
