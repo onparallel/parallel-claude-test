@@ -745,6 +745,11 @@ type PublicOrganization {
   id: ID!
 
   """
+  The identifier of the organization.
+  """
+  identifier: String!
+
+  """
   The name of the organization.
   """
   name: String!

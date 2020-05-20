@@ -171,7 +171,9 @@ export const PublicOrganization = objectType({
     });
     t.string("name", {
       description: "The name of the organization.",
-      resolve: (o) => o.name,
+    });
+    t.string("identifier", {
+      description: "The identifier of the organization.",
     });
   },
 });

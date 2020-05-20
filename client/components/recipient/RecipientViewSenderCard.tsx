@@ -1,9 +1,43 @@
-import { Box, Flex, Grid, Icon, Stack, Text } from "@chakra-ui/core";
+import { Box, Flex, Grid, Icon, Stack, Text, Image } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewSenderCard_PublicUserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useIntl } from "react-intl";
+
+function OrganizationLogo({
+  name,
+  identifier,
+  width,
+}: {
+  name: string;
+  identifier: string;
+  width: number;
+}) {
+  let src = "";
+
+  switch (identifier) {
+    case "doctoralia":
+      src = "/static/logos/doctoralia.png";
+      break;
+    case "l4law":
+      src = "/static/logos/l4law.png";
+      break;
+    case "cecamagan":
+      src = "/static/logos/cecamagan_social_dist.png";
+      break;
+    case "encomenda":
+      src = "/static/logos/encomenda.png";
+      break;
+    case "cuatrecasas":
+      src = "/static/logos/cuatrecasas.png";
+      break;
+    default:
+      return <Logo width={width} />;
+  }
+
+  return <Image src={src} alt={name} width={width} />;
+}
 
 export function RecipientViewSenderCard({
   sender,
@@ -12,11 +46,16 @@ export function RecipientViewSenderCard({
   sender: RecipientViewSenderCard_PublicUserFragment;
 }) {
   const intl = useIntl();
+
   return (
     <Card padding={6} {...props}>
       <Stack>
         <Box alignSelf="center">
-          <Logo width={156} />
+          <OrganizationLogo
+            name={sender.organization.name}
+            identifier={sender.organization.identifier}
+            width={156}
+          />
         </Box>
         <Box marginTop={4}>
           <Grid
@@ -26,19 +65,23 @@ export function RecipientViewSenderCard({
             columnGap={2}
             rowGap={2}
           >
-            <Flex as="dt" alignItems="center">
-              <Icon
-                name="business"
-                size="16px"
-                aria-label={intl.formatMessage({
-                  id: "sendout.organization",
-                  defaultMessage: "Business",
-                })}
-              />
-            </Flex>
-            <Box as="dd">
-              <Text as="span">{sender.organization.name}</Text>
-            </Box>
+            {sender.organization.identifier === "none" ? null : (
+              <>
+                <Flex as="dt" alignItems="center">
+                  <Icon
+                    name="business"
+                    size="16px"
+                    aria-label={intl.formatMessage({
+                      id: "sendout.organization",
+                      defaultMessage: "Business",
+                    })}
+                  />
+                </Flex>
+                <Box as="dd">
+                  <Text as="span">{sender.organization.name}</Text>
+                </Box>
+              </>
+            )}
             <Flex as="dt" alignItems="center">
               <Icon
                 name="user"
@@ -81,6 +124,7 @@ RecipientViewSenderCard.fragments = {
       email
       organization {
         name
+        identifier
       }
     }
   `,

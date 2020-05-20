@@ -486,6 +486,8 @@ export type PublicOrganization = {
   __typename?: "PublicOrganization";
   /** The ID of the organization. */
   id: Scalars["ID"];
+  /** The identifier of the organization. */
+  identifier: Scalars["String"];
   /** The name of the organization. */
   name: Scalars["String"];
 };
@@ -933,7 +935,7 @@ export type RecipientViewSenderCard_PublicUserFragment = {
 } & Pick<PublicUser, "id" | "firstName" | "fullName" | "email"> & {
     organization: { __typename?: "PublicOrganization" } & Pick<
       PublicOrganization,
-      "name"
+      "name" | "identifier"
     >;
   };
 
@@ -1926,6 +1928,7 @@ export const RecipientViewSenderCard_PublicUserFragmentDoc = gql`
     email
     organization {
       name
+      identifier
     }
   }
 `;

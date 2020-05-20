@@ -419,6 +419,7 @@ export interface NexusGenFieldTypes {
   PublicOrganization: {
     // field return type
     id: string; // ID!
+    identifier: string; // String!
     name: string; // String!
   };
   PublicPetition: {
