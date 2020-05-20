@@ -1,4 +1,4 @@
-import { enumType, objectType } from "@nexus/schema";
+import { enumType, objectType, interfaceType, core } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
 
 export const PetitionLocale = enumType({
@@ -136,6 +136,7 @@ export const Petition = objectType({
         return root.reminders_config;
       },
     });
+    t.paginationField("events");
   },
 });
 
@@ -306,6 +307,13 @@ export const PetitionMessage = objectType({
         return (await ctx.petitions.loadAccess(root.petition_access_id))!;
       },
     });
+    t.field("sender", {
+      type: "User",
+      description: "The sender of this petition message.",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.sender_id))!;
+      },
+    });
     t.json("emailSubject", {
       description: "The subject of the petition message.",
       nullable: true,
@@ -420,3 +428,197 @@ export const PetitionFieldReply = objectType({
     });
   },
 });
+
+export const PetitionReminderType = enumType({
+  name: "PetitionReminderType",
+  description: "The type of a petition reminder.",
+  members: [
+    {
+      name: "MANUAL",
+      description: "The reminder has been sent manually by a user.",
+    },
+    {
+      name: "AUTOMATIC",
+      description:
+        "The reminder has been sent by the system according to the reminders configuration.",
+    },
+  ],
+});
+
+export const PetitionReminder = objectType({
+  name: "PetitionReminder",
+  definition(t) {
+    t.implements("CreatedAt");
+    t.id("id", {
+      resolve: (o) => toGlobalId("PetitionReminder", o.id),
+    });
+    t.field("type", {
+      type: "PetitionReminderType",
+      description: "The type of the reminder.",
+    });
+    t.field("access", {
+      type: "PetitionAccess",
+      description: "The access of this petition message.",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.petition_access_id))!;
+      },
+    });
+    t.field("sender", {
+      type: "User",
+      nullable: true,
+      description: "The sender of this petition message.",
+      resolve: async (root, _, ctx) => {
+        return root.sender_id
+          ? (await ctx.users.loadUser(root.sender_id))!
+          : null;
+      },
+    });
+  },
+});
+
+export const PetitionEvent = interfaceType({
+  name: "PetitionEvent",
+  definition(t) {
+    t.id("id", {
+      resolve: (o) => toGlobalId("PetitionEvent", o.id),
+    });
+    t.datetime("createdAt", {
+      resolve: (o) => o.created_at,
+    });
+    t.resolveType((p) => {
+      switch (p.type) {
+        case "ACCESS_ACTIVATED":
+          return "AccessActivatedEvent";
+        case "ACCESS_DEACTIVATED":
+          return "AccessDeactivatedEvent";
+        case "MESSAGE_SCHEDULED":
+          return "MessageScheduledEvent";
+        case "MESSAGE_CANCELLED":
+          return "MessageCancelledEvent";
+        case "MESSAGE_PROCESSED":
+          return "MessageProcessedEvent";
+        case "REMINDER_PROCESSED":
+          return "ReminderProcessedEvent";
+      }
+    });
+  },
+  rootTyping: "events.PetitionEvent",
+});
+
+function createPetitionEvent<TypeName extends string>(
+  name: TypeName,
+  definition: (t: core.ObjectDefinitionBlock<TypeName>) => void
+) {
+  return objectType({
+    name,
+    definition(t) {
+      t.implements("PetitionEvent");
+      definition(t);
+    },
+    rootTyping: `events.${name}`,
+  });
+}
+
+export const AccessActivatedEvent = createPetitionEvent(
+  "AccessActivatedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
+);
+
+export const AccessDeactivatedEvent = createPetitionEvent(
+  "AccessDeactivatedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
+);
+
+export const MessageScheduledEvent = createPetitionEvent(
+  "MessageScheduledEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("message", {
+      type: "PetitionMessage",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadMessage(
+          root.data.petition_message_id
+        ))!;
+      },
+    });
+  }
+);
+
+export const MessagesCancelledEvent = createPetitionEvent(
+  "MessageCancelledEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("message", {
+      type: "PetitionMessage",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadMessage(
+          root.data.petition_message_id
+        ))!;
+      },
+    });
+  }
+);
+
+export const MessageProcessedEvent = createPetitionEvent(
+  "MessageProcessedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("message", {
+      type: "PetitionMessage",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadMessage(
+          root.data.petition_message_id
+        ))!;
+      },
+    });
+  }
+);
+
+export const ReminderProcessedEvent = createPetitionEvent(
+  "ReminderProcessedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("reminder", {
+      type: "PetitionReminder",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.reminders.loadReminder(
+          root.data.petition_reminder_id
+        ))!;
+      },
+    });
+  }
+);

@@ -103,14 +103,20 @@ export async function up(knex: Knex): Promise<any> {
     events.push({
       petition_id: message.petition_id,
       type: message.scheduled_at ? "MESSAGE_SCHEDULED" : "MESSAGE_PROCESSED",
-      data: { petition_message_id: message.id },
+      data: {
+        petition_access_id: message.petition_access_id,
+        petition_message_id: message.id,
+      },
       created_at: message.created_at,
     });
     if (message.scheduled_at && message.status === "PROCESSED") {
       events.push({
         petition_id: message.petition_id,
         type: "MESSAGE_PROCESSED",
-        data: { petition_message_id: message.id },
+        data: {
+          petition_access_id: message.petition_access_id,
+          petition_message_id: message.id,
+        },
         created_at: message.scheduled_at,
       });
     }
@@ -120,7 +126,10 @@ export async function up(knex: Knex): Promise<any> {
     events.push({
       petition_id: access.petition_id,
       type: "REMINDER_PROCESSED",
-      data: { petition_access_id: reminder.petition_access_id },
+      data: {
+        petition_access_id: reminder.petition_access_id,
+        petition_reminder_id: reminder.id,
+      },
       created_at: reminder.created_at,
     });
   }
