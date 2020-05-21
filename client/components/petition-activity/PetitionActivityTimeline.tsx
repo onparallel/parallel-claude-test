@@ -1,10 +1,12 @@
 import { Box } from "@chakra-ui/core";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
+import { TimelineIcon, TimelineItem } from "./timeline/helpers";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
-import { TimelineReminderProcessedEvent } from "./timeline/TimelineReminderProcessedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
 import { TimelineMessageProcessedEvent } from "./timeline/TimelineMessageProcessedEvent";
+import { TimelineReminderProcessedEvent } from "./timeline/TimelineReminderProcessedEvent";
+import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -26,6 +28,12 @@ export function PetitionActivityTimeline({
           />
         ) : event.__typename === "AccessDeactivatedEvent" ? (
           <TimelineAccessDeactivatedEvent
+            key={event.id}
+            event={event}
+            userId={userId}
+          />
+        ) : event.__typename === "MessageScheduledEvent" ? (
+          <TimelineMessageScheduledEvent
             key={event.id}
             event={event}
             userId={userId}
@@ -65,6 +73,9 @@ PetitionActivityTimeline.fragments = {
       ... on AccessDeactivatedEvent {
         ...TimelineAccessDeactivatedEvent_AccessDeactivatedEvent
       }
+      ... on MessageScheduledEvent {
+        ...TimelineMessageScheduledEvent_MessageScheduledEvent
+      }
       ... on MessageProcessedEvent {
         ...TimelineMessageProcessedEvent_MessageProcessedEvent
       }
@@ -75,6 +86,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineAccessActivatedEvent.fragments.AccessActivatedEvent}
     ${TimelineAccessDeactivatedEvent.fragments.AccessDeactivatedEvent}
     ${TimelineMessageProcessedEvent.fragments.MessageProcessedEvent}
+    ${TimelineMessageScheduledEvent.fragments.MessageScheduledEvent}
     ${TimelineReminderProcessedEvent.fragments.ReminderProcessedEvent}
   `,
 };

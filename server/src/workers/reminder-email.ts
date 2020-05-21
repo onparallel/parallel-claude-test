@@ -77,7 +77,13 @@ createQueueWorker(
       html,
       created_from: `PetitionReminder:${reminder.id}`,
     });
-    await context.reminders.processReminder(reminder.id, email.id);
-    await context.aws.enqueueEmail(email.id);
+    await Promise.all([
+      context.reminders.processReminder(reminder.id, email.id),
+      context.events.createEvent(petition.id, "REMINDER_PROCESSED", {
+        petition_access_id: access.id,
+        petition_reminder_id: reminder.id,
+      }),
+      context.aws.enqueueEmail(email.id),
+    ]);
   }
 );

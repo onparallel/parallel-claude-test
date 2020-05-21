@@ -3,18 +3,17 @@ import {
   Box,
   BoxProps,
   Checkbox,
+  Collapse,
   Flex,
+  Icon,
   IconButton,
   PseudoBox,
-  useColorMode,
-  Icon,
   PseudoBoxProps,
-  Collapse,
+  useColorMode,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
   ComponentType,
-  Fragment,
   memo,
   MouseEvent,
   useCallback,
@@ -23,6 +22,7 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
+import { noop } from "remeda";
 import { useSelectionState } from "../../utils/useSelectionState";
 
 export type SortingDirection = "ASC" | "DESC";
@@ -36,22 +36,22 @@ function toggleSortingDirection(direction: SortingDirection): SortingDirection {
   return direction === "ASC" ? "DESC" : "ASC";
 }
 
-export type TableProps<TRow, TAction extends string = string> = BoxProps & {
-  columns: TableColumn<TRow, TAction>[];
+export type TableProps<TRow> = BoxProps & {
+  columns: TableColumn<TRow>[];
   rows: TRow[];
   rowKeyProp: keyof TRow;
-  selectable?: boolean;
-  expandable?: boolean;
   sort?: Sorting<any>;
-  highlightable?: boolean;
+  isSelectable?: boolean;
+  isExpandable?: boolean;
+  isHighlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: TRow, event: MouseEvent) => void;
   onSortChange?: (sort: Sorting<any>) => void;
-  onAction?: (action: TAction, row: TRow, data?: any) => void;
+  onAction?: (row: TRow, action: string, data?: any) => void;
 };
 
-export type TableHeaderProps<TRow, TAction extends string = string> = {
-  column: TableColumn<TRow, TAction>;
+export type TableHeaderProps<TRow> = {
+  column: TableColumn<TRow>;
   sort: Sorting<any> | undefined;
   allSelected: boolean;
   anySelected: boolean;
@@ -59,41 +59,41 @@ export type TableHeaderProps<TRow, TAction extends string = string> = {
   onToggleAll: (event?: any) => void;
 };
 
-export type TableCellProps<TRow, TAction extends string = string> = {
-  key: string;
+export type TableCellProps<TRow> = {
   row: TRow;
-  column: TableColumn<TRow, TAction>;
+  rowKey: string;
+  column: TableColumn<TRow>;
   isSelected?: boolean;
   isExpanded?: boolean;
-  toggleSelection?: (event: any) => void;
-  toggleExpand?: (expanded: boolean) => void;
-  onAction: (action: TAction, data?: any) => void;
+  onToggleSelection?: (event: any) => void;
+  onToggleExpand?: (expanded: boolean) => void;
+  onAction: (action: string, data?: any) => void;
 };
 
-export type TableColumn<TRow, TAction extends string = string> = {
+export type TableColumn<TRow> = {
   key: string;
   align?: BoxProps["textAlign"];
   isSortable?: true;
   header: string;
-  Header?: ComponentType<TableHeaderProps<TRow, TAction>>;
-  Cell: ComponentType<TableCellProps<TRow, TAction>>;
+  Header?: ComponentType<TableHeaderProps<TRow>>;
+  CellContent: ComponentType<TableCellProps<TRow>>;
   cellProps?: PseudoBoxProps;
 };
 
-function _Table<TRow, TAction extends string = string>({
+function _Table<TRow>({
   columns,
   rows,
   rowKeyProp,
-  selectable,
-  expandable,
-  highlightable,
+  isSelectable,
+  isExpandable,
+  isHighlightable,
   sort,
   onSelectionChange,
   onRowClick,
   onSortChange,
   onAction,
   ...props
-}: TableProps<TRow, TAction>) {
+}: TableProps<TRow>) {
   const {
     selection,
     allSelected,
@@ -101,7 +101,6 @@ function _Table<TRow, TAction extends string = string>({
     toggle,
     toggleAll,
   } = useSelectionState(rows, rowKeyProp);
-  const [expanded, setExpanded] = useState<any>(null);
   const colors = useTableColors();
 
   useEffect(() => {
@@ -129,9 +128,18 @@ function _Table<TRow, TAction extends string = string>({
     [sort, onSortChange]
   );
 
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const handleToggleExpand = useCallback(function (
+    key: string,
+    value: boolean
+  ) {
+    setExpanded(value ? key : null);
+  },
+  []);
+
   columns = useMemo(() => {
     const updated = [...columns];
-    if (expandable) {
+    if (isExpandable) {
       updated.unshift({
         key: "expand-toggle",
         header: "",
@@ -143,7 +151,7 @@ function _Table<TRow, TAction extends string = string>({
             paddingLeft: 2,
           },
         },
-        Cell: ({ isExpanded, toggleExpand }) => {
+        CellContent: ({ isExpanded, onToggleExpand: toggleExpand }) => {
           const intl = useIntl();
           return (
             <PseudoBox
@@ -183,7 +191,7 @@ function _Table<TRow, TAction extends string = string>({
         },
       });
     }
-    if (selectable) {
+    if (isSelectable) {
       updated.unshift({
         key: "selection-checkbox",
         header: "",
@@ -212,7 +220,7 @@ function _Table<TRow, TAction extends string = string>({
           paddingRight: 0,
           _first: { paddingLeft: 3 },
         },
-        Cell: ({ isSelected, toggleSelection: toggle }) => {
+        CellContent: ({ isSelected, onToggleSelection: toggle }) => {
           return (
             <Flex
               as="label"
@@ -235,7 +243,7 @@ function _Table<TRow, TAction extends string = string>({
       });
     }
     return updated;
-  }, [columns, selectable, expandable]);
+  }, [columns, isSelectable, isExpandable]);
 
   return (
     <Box as="table" style={{ tableLayout: "auto", width: "100%" }} {...props}>
@@ -276,84 +284,21 @@ function _Table<TRow, TAction extends string = string>({
           const key = row[rowKeyProp] as any;
           const isSelected = selection[key] ?? false;
           const isExpanded = key === expanded;
-
-          function handleAction(action: TAction, data: any) {
-            onAction?.(action, row, data);
-          }
           return (
-            <Fragment key={key}>
-              <PseudoBox
-                as="tr"
-                backgroundColor={isSelected ? colors.rowSelected : colors.row}
-                _hover={{
-                  backgroundColor: isSelected
-                    ? colors.rowSelected
-                    : highlightable
-                    ? colors.rowHover
-                    : colors.row,
-                }}
-                cursor={onRowClick ? "pointer" : "default"}
-                borderTop="1px solid"
-                borderTopColor={colors.border}
-                {...(expandable
-                  ? {}
-                  : {
-                      borderBottom: "1px solid",
-                      borderBottomColor: colors.border,
-                    })}
-                onClick={(event) => onRowClick?.(row, event as any)}
-              >
-                {columns.map((column) => {
-                  return (
-                    <PseudoBox
-                      key={column.key}
-                      as="td"
-                      padding={2}
-                      _last={{ paddingRight: 5 }}
-                      _first={{ paddingLeft: 5 }}
-                      userSelect="none"
-                      textAlign={column.align ?? "left"}
-                      {...(column.cellProps ?? {})}
-                    >
-                      <column.Cell
-                        key={key}
-                        row={row}
-                        column={column}
-                        isSelected={isSelected}
-                        isExpanded={isExpanded}
-                        toggleSelection={(event) => toggle(key, event)}
-                        toggleExpand={(value) =>
-                          setExpanded(value ? key : null)
-                        }
-                        onAction={handleAction}
-                      ></column.Cell>
-                    </PseudoBox>
-                  );
-                })}
-              </PseudoBox>
-              {expandable ? (
-                <PseudoBox
-                  as="tr"
-                  borderBottom="1px solid"
-                  borderBottomColor={colors.border}
-                >
-                  <PseudoBox
-                    as="td"
-                    padding={0}
-                    {...{ colSpan: columns.length }}
-                  >
-                    <Collapse isOpen={isExpanded}>
-                      <Box
-                        borderTop="1px solid"
-                        borderTopColor={colors.border}
-                      ></Box>
-                    </Collapse>
-                  </PseudoBox>
-                </PseudoBox>
-              ) : (
-                <></>
-              )}
-            </Fragment>
+            <Row
+              key={key}
+              row={row}
+              rowKey={key}
+              columns={columns}
+              isSelected={isSelected}
+              isExpanded={isExpanded}
+              isExpandable={isExpandable}
+              isHighlightable={isHighlightable}
+              onRowClick={onRowClick}
+              onToggleExpand={handleToggleExpand}
+              onToggleSelection={toggle}
+              onAction={onAction}
+            />
           );
         })}
       </Box>
@@ -387,11 +332,121 @@ export function useTableColors() {
   }, [colorMode]);
 }
 
+function _Row<TRow>({
+  row,
+  rowKey,
+  columns,
+  isSelected,
+  isExpanded,
+  isExpandable,
+  isHighlightable,
+  onRowClick,
+  onAction,
+  onToggleSelection,
+  onToggleExpand,
+}: {
+  row: TRow;
+  rowKey: string;
+  isSelected: boolean;
+  isExpanded: boolean;
+  onToggleSelection: (key: string, event: any) => void;
+  onToggleExpand: (key: string, value: boolean) => void;
+} & Pick<
+  TableProps<TRow>,
+  "columns" | "isExpandable" | "isHighlightable" | "onRowClick" | "onAction"
+>) {
+  const colors = useTableColors();
+  const handleToggleSelection = useCallback(
+    onToggleSelection.bind(null, rowKey),
+    [onToggleSelection, rowKey]
+  );
+  const handleToggleExpand = useCallback(onToggleExpand.bind(null, rowKey), [
+    onToggleExpand,
+    rowKey,
+  ]);
+  const handleAction = useCallback(onAction?.bind(null, row) ?? noop, [
+    onAction,
+    row,
+  ]);
+  return (
+    <>
+      <PseudoBox
+        as="tr"
+        backgroundColor={isSelected ? colors.rowSelected : colors.row}
+        _hover={{
+          backgroundColor: isSelected
+            ? colors.rowSelected
+            : isHighlightable
+            ? colors.rowHover
+            : colors.row,
+        }}
+        cursor={onRowClick ? "pointer" : "default"}
+        borderTop="1px solid"
+        borderTopColor={colors.border}
+        {...(isExpandable
+          ? {}
+          : {
+              borderBottom: "1px solid",
+              borderBottomColor: colors.border,
+            })}
+        onClick={(event) => onRowClick?.(row, event as any)}
+      >
+        {columns.map((column) => {
+          return (
+            <Cell
+              key={column.key}
+              row={row}
+              rowKey={rowKey}
+              column={column}
+              isSelected={isSelected}
+              isExpanded={isExpanded}
+              onToggleSelection={handleToggleSelection}
+              onToggleExpand={handleToggleExpand}
+              onAction={handleAction}
+            />
+          );
+        })}
+      </PseudoBox>
+      {isExpandable ? (
+        <PseudoBox
+          as="tr"
+          borderBottom="1px solid"
+          borderBottomColor={colors.border}
+        >
+          <PseudoBox as="td" padding={0} {...{ colSpan: columns.length }}>
+            <Collapse isOpen={isExpanded}>
+              <Box borderTop="1px solid" borderTopColor={colors.border}></Box>
+            </Collapse>
+          </PseudoBox>
+        </PseudoBox>
+      ) : null}
+    </>
+  );
+}
+const Row: typeof _Row = memo(_Row) as any;
+
+function _Cell<TRow>({ column, ...props }: TableCellProps<TRow>) {
+  return (
+    <PseudoBox
+      as="td"
+      padding={2}
+      _last={{ paddingRight: 5 }}
+      _first={{ paddingLeft: 5 }}
+      userSelect="none"
+      textAlign={column.align ?? "left"}
+      {...(column.cellProps ?? {})}
+    >
+      <column.CellContent column={column} {...props} />
+    </PseudoBox>
+  );
+}
+const Cell: typeof _Cell = memo(_Cell) as any;
+
 export function DefaultHeader({
   column,
   sort,
   onSortByClick,
-}: TableHeaderProps<any, string>) {
+}: TableHeaderProps<any>) {
   const intl = useIntl();
   return (
     <PseudoBox

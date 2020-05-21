@@ -18,7 +18,7 @@ export function DateTime({
   const intl = useIntl();
   const date = new Date(value);
   if (useRelativeTime) {
-    const { value: _value, unit } = selectUnit(date);
+    const { value: _value, unit } = selectUnit(date, Date.now(), { day: 60 });
     if (
       useRelativeTime === "always" ||
       ["second", "minute", "hour"].includes(unit)

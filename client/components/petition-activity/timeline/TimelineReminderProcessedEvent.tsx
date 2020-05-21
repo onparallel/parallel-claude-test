@@ -20,7 +20,7 @@ export function TimelineReminderProcessedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="bell" color="black" backgroundColor="gray.300" />
+        <TimelineIcon icon="bell" color="black" backgroundColor="gray.200" />
       }
     >
       {event.reminder.type === "MANUAL" ? (

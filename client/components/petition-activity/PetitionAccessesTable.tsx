@@ -79,7 +79,7 @@ export function PetitionAccessesTable({
         columns={columns}
         rows={accesses ?? []}
         rowKeyProp="id"
-        selectable
+        isSelectable
         onSelectionChange={setSelection}
         marginBottom={2}
       />
@@ -100,7 +100,7 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.contact-header",
           defaultMessage: "Contact",
         }),
-        Cell: memo(({ row: { contact } }) => (
+        CellContent: memo(({ row: { contact } }) => (
           <>
             {contact ? <ContactLink contact={contact} /> : <DeletedContact />}
           </>
@@ -112,7 +112,7 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
-        Cell: memo(({ row: { status } }) => {
+        CellContent: memo(({ row: { status } }) => {
           return status === "ACTIVE" ? (
             <Text color="green.500">
               <FormattedMessage
@@ -136,7 +136,7 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
-        Cell: memo(({ row: { nextReminderAt } }) =>
+        CellContent: memo(({ row: { nextReminderAt } }) =>
           nextReminderAt ? (
             <DateTime value={nextReminderAt} format={FORMATS.LLL} />
           ) : (
@@ -155,7 +155,7 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.created-at-header",
           defaultMessage: "Created at",
         }),
-        Cell: memo(({ row: { createdAt } }) => (
+        CellContent: memo(({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} />
         )),
       },

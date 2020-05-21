@@ -23,8 +23,8 @@ export function TablePage<T>({
   columns,
   rows,
   rowKeyProp,
-  selectable,
-  highlightable,
+  isSelectable: selectable,
+  isHighlightable: highlightable,
   sort,
   onSelectionChange,
   onRowClick,
@@ -73,8 +73,8 @@ export function TablePage<T>({
             columns={columns}
             rows={rows}
             rowKeyProp={rowKeyProp}
-            selectable={selectable}
-            highlightable={highlightable}
+            isSelectable={selectable}
+            isHighlightable={highlightable}
             sort={sort}
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}

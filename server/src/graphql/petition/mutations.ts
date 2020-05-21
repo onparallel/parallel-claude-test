@@ -492,6 +492,14 @@ export const sendPetition = mutationField("sendPetition", {
         })),
         ctx.user!
       );
+      await ctx.events.createEvent(
+        petitionId,
+        "ACCESS_ACTIVATED",
+        accesses.map((a) => ({
+          petition_access_id: a.id,
+          user_id: ctx.user!.id,
+        }))
+      );
       const messages = await ctx.petitions.createMessages(
         accesses.map((access) => ({
           petition_id: petition.id,
@@ -503,6 +511,7 @@ export const sendPetition = mutationField("sendPetition", {
         })),
         ctx.user!
       );
+
       if (petition.status === "DRAFT") {
         await ctx.petitions.updatePetition(
           petitionId,
@@ -513,6 +522,15 @@ export const sendPetition = mutationField("sendPetition", {
 
       if (!args.scheduledAt) {
         await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));
+      } else {
+        await ctx.events.createEvent(
+          petitionId,
+          "MESSAGE_SCHEDULED",
+          messages.map((m) => ({
+            petition_access_id: m.petition_access_id,
+            petition_message_id: m.id,
+          }))
+        );
       }
       return {
         petition: await ctx.petitions.loadPetition(petitionId, {

@@ -982,7 +982,8 @@ export type PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragmen
 
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
   __typename?: "MessageScheduledEvent";
-} & Pick<MessageScheduledEvent, "id">;
+} & Pick<MessageScheduledEvent, "id"> &
+  TimelineMessageScheduledEvent_MessageScheduledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment = {
   __typename?: "ReminderProcessedEvent";
@@ -1018,6 +1019,20 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
 export type TimelineMessageProcessedEvent_MessageProcessedEventFragment = {
   __typename?: "MessageProcessedEvent";
 } & Pick<MessageProcessedEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "emailSubject" | "scheduledAt"
+    > & {
+        sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+      } & MessageEventsIndicator_PetitionMessageFragment;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
+
+export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
+  __typename?: "MessageScheduledEvent";
+} & Pick<MessageScheduledEvent, "createdAt"> & {
     message: { __typename?: "PetitionMessage" } & Pick<
       PetitionMessage,
       "emailSubject"
@@ -1996,6 +2011,26 @@ export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
     openedAt
   }
 `;
+export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
+  fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
+    message {
+      sender {
+        id
+        fullName
+      }
+      emailSubject
+      ...MessageEventsIndicator_PetitionMessage
+    }
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gql`
   fragment TimelineMessageProcessedEvent_MessageProcessedEvent on MessageProcessedEvent {
     message {
@@ -2004,6 +2039,7 @@ export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gq
         fullName
       }
       emailSubject
+      scheduledAt
       ...MessageEventsIndicator_PetitionMessage
     }
     access {
@@ -2043,6 +2079,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on AccessDeactivatedEvent {
       ...TimelineAccessDeactivatedEvent_AccessDeactivatedEvent
     }
+    ... on MessageScheduledEvent {
+      ...TimelineMessageScheduledEvent_MessageScheduledEvent
+    }
     ... on MessageProcessedEvent {
       ...TimelineMessageProcessedEvent_MessageProcessedEvent
     }
@@ -2052,6 +2091,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   }
   ${TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc}
   ${TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc}
+  ${TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc}
   ${TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc}
   ${TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc}
 `;

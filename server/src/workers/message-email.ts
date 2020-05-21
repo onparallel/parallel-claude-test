@@ -71,10 +71,16 @@ createQueueWorker<MessageEmailWorkerPayload>(
       track_opens: true,
       created_from: `PetitionMessage:${payload.petition_message_id}`,
     });
-    await context.petitions.processPetitionMessage(
-      payload.petition_message_id,
-      email.id
-    );
-    await context.aws.enqueueEmail(email.id);
+    await Promise.all([
+      context.petitions.processPetitionMessage(
+        payload.petition_message_id,
+        email.id
+      ),
+      context.events.createEvent(petition.id, "MESSAGE_PROCESSED", {
+        petition_access_id: access.id,
+        petition_message_id: message.id,
+      }),
+      context.aws.enqueueEmail(email.id),
+    ]);
   }
 );

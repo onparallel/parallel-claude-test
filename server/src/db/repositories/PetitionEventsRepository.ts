@@ -1,9 +1,10 @@
 import { inject, injectable } from "inversify";
-import Knex, { QueryBuilder } from "knex";
+import Knex from "knex";
+import { PetitionEventPayload } from "../../graphql/backing/events";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { Petition, PetitionStatus, PetitionEventType } from "../__types";
+import { PetitionEventType } from "../__types";
 
 @injectable()
 export class PetitionEventsRepository extends BaseRepository {
@@ -14,9 +15,27 @@ export class PetitionEventsRepository extends BaseRepository {
     return await this.loadPageAndCount(
       this.from("petition_event")
         .where("petition_id", petitionId)
-        .orderBy("created_at", "as")
+        .orderBy([
+          { column: "created_at", order: "asc" },
+          { column: "id", order: "asc" },
+        ])
         .select("*"),
       opts
+    );
+  }
+
+  async createEvent<TType extends PetitionEventType>(
+    petitionId: number,
+    type: TType,
+    payload: MaybeArray<PetitionEventPayload[TType]>
+  ) {
+    return await this.insert(
+      "petition_event",
+      (Array.isArray(payload) ? payload : [payload]).map((data) => ({
+        petition_id: petitionId,
+        type,
+        data,
+      }))
     );
   }
 }

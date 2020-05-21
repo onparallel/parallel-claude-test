@@ -275,7 +275,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petitions.header.name",
           defaultMessage: "Petition name",
         }),
-        Cell: memo(({ row: { petition } }) => (
+        CellContent: memo(({ row: { petition } }) => (
           <>
             {petition?.name || (
               <Text as="span" color="gray.400" fontStyle="italic">
@@ -294,7 +294,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.deadline-header",
           defaultMessage: "Deadline",
         }),
-        Cell: memo(({ row: { petition } }) =>
+        CellContent: memo(({ row: { petition } }) =>
           petition?.deadline ? (
             <DateTime value={petition.deadline} format={FORMATS.LLL} />
           ) : (
@@ -313,7 +313,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.progress-header",
           defaultMessage: "Progress",
         }),
-        Cell: memo(({ row: { petition } }) => (
+        CellContent: memo(({ row: { petition } }) => (
           <>
             {petition ? (
               <PetitionProgressBar
@@ -330,7 +330,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
-        Cell: memo(({ row: { petition } }) => (
+        CellContent: memo(({ row: { petition } }) => (
           <>
             {petition ? <PetitionStatusText status={petition.status} /> : null}
           </>

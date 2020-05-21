@@ -47,7 +47,7 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { memo, MouseEvent, useMemo, useState } from "react";
+import { memo, MouseEvent, useMemo, useState, useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
 
@@ -169,7 +169,7 @@ function Petitions() {
     } catch {}
   }
 
-  function handleRowClick(row: PetitionSelection) {
+  const handleRowClick = useCallback(function (row: PetitionSelection) {
     goToPetition(
       row.id,
       ({
@@ -178,7 +178,7 @@ function Petitions() {
         COMPLETED: "replies",
       } as const)[row.status]
     );
-  }
+  }, []);
 
   function goToPetition(
     id: string,
@@ -206,8 +206,8 @@ function Petitions() {
             columns={columns}
             rows={petitions.items}
             rowKeyProp={"id"}
-            selectable
-            highlightable
+            isSelectable
+            isHighlightable
             loading={loading}
             onRowClick={handleRowClick}
             page={state.page}
@@ -274,7 +274,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.name",
           defaultMessage: "Petition name",
         }),
-        Cell: memo(({ row }) => (
+        CellContent: memo(({ row }) => (
           <>
             {row.name || (
               <Text as="span" color="gray.400" fontStyle="italic">
@@ -293,7 +293,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.recipient",
           defaultMessage: "Recipient",
         }),
-        Cell: memo(({ row }) => {
+        CellContent: memo(({ row }) => {
           if (row.recipients.length === 0) {
             return null;
           }
@@ -339,7 +339,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.deadline",
           defaultMessage: "Deadline",
         }),
-        Cell: memo(({ row: { deadline } }) =>
+        CellContent: memo(({ row: { deadline } }) =>
           deadline ? (
             <DateTime value={deadline} format={FORMATS.LLL} />
           ) : (
@@ -358,7 +358,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.progress",
           defaultMessage: "Progress",
         }),
-        Cell: memo(({ row }) => (
+        CellContent: memo(({ row }) => (
           <PetitionProgressBar
             status={row.status}
             {...row.progress}
@@ -371,7 +371,9 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.status",
           defaultMessage: "Status",
         }),
-        Cell: memo(({ row }) => <PetitionStatusText status={row.status} />),
+        CellContent: memo(({ row }) => (
+          <PetitionStatusText status={row.status} />
+        )),
       },
       {
         key: "createdAt",
@@ -380,7 +382,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.created-at",
           defaultMessage: "Created at",
         }),
-        Cell: memo(({ row: { createdAt } }) => {
+        CellContent: memo(({ row: { createdAt } }) => {
           return (
             <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
           );
