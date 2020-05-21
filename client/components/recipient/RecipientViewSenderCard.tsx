@@ -32,6 +32,12 @@ function OrganizationLogo({
     case "cuatrecasas":
       src = "/static/logos/cuatrecasas.png";
       break;
+    case "cscorporateadvisors":
+      src = "/static/logos/cs_corporate_advisors.png";
+      break;
+    case "andersen":
+      src = "/static/logos/andersen.png";
+      break;
     default:
       return <Logo width={width} />;
   }
