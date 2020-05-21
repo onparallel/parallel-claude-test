@@ -1,6 +1,9 @@
 schema: ../server/parallel-schema.graphql
 documents: "**/*.tsx"
 generates:
+  ./graphql/__fragment-matcher.ts:
+    plugins:
+      - fragment-matcher
   ./graphql/__types.ts:
     plugins:
       - typescript

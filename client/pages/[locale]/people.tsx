@@ -247,10 +247,12 @@ function Separator({
     >
       {hasLogo ? (
         <Image
+          border="2px solid"
+          borderColor="white"
           background="white"
           src="/static/images/logo-lila.svg"
           role="presentation"
-          width="30px"
+          width="36px"
         />
       ) : null}
     </Flex>

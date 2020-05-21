@@ -22,7 +22,7 @@ createQueueWorker(
       Bounce: "bounce",
       Open: "open",
     } as any)[payload.eventType];
-    await context.emails.createEvent({
+    await context.emails.createEmailEvent({
       email_log_id: emailLogId,
       event,
       payload: JSON.stringify((payload as any)[event]),

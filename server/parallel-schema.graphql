@@ -5,12 +5,14 @@ type AccessActivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: ID!
+  user: User!
 }
 
 type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: ID!
+  user: User!
 }
 
 enum ChangePasswordResult {
@@ -433,6 +435,21 @@ type Petition implements Timestamps {
   emailSubject: String
 
   """
+  The events for the petition.
+  """
+  events(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PetitionEventPagination!
+
+  """
   The number of fields in the petition.
   """
   fieldCount: Int!
@@ -496,6 +513,11 @@ type PetitionAccess implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  The user who granted the access.
+  """
+  granter: User
 
   """
   The ID of the petition access.
@@ -568,6 +590,18 @@ type PetitionAndFields {
 interface PetitionEvent {
   createdAt: DateTime!
   id: ID!
+}
+
+type PetitionEventPagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionEvent!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 """

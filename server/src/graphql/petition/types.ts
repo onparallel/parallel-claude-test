@@ -136,7 +136,16 @@ export const Petition = objectType({
         return root.reminders_config;
       },
     });
-    t.paginationField("events");
+    t.paginationField("events", {
+      type: "PetitionEvent",
+      description: "The events for the petition.",
+      resolve: async (root, { offset, limit }, ctx) => {
+        return await ctx.events.loadEventsForPetition(root.id, {
+          offset,
+          limit,
+        });
+      },
+    });
   },
 });
 
@@ -243,6 +252,14 @@ export const PetitionAccess = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetition(root.petition_id);
+      },
+    });
+    t.field("granter", {
+      type: "User",
+      description: "The user who granted the access.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.granter_id))!;
       },
     });
     t.field("contact", {
@@ -528,6 +545,12 @@ export const AccessActivatedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
+    t.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.data.user_id))!;
+      },
+    });
   }
 );
 
@@ -538,6 +561,12 @@ export const AccessDeactivatedEvent = createPetitionEvent(
       type: "PetitionAccess",
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.data.user_id))!;
       },
     });
   }

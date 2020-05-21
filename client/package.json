@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.13.5",
+    "@graphql-codegen/fragment-matcher": "^1.14.0",
     "@graphql-codegen/typescript": "^1.13.5",
     "@graphql-codegen/typescript-operations": "^1.13.5",
     "@types/async": "^3.2.2",

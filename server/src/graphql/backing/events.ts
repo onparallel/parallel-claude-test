@@ -7,26 +7,30 @@ type GenericPetitionEvent<TType extends PetitionEventType, TData extends {}> = {
   created_at: Date;
 };
 
-type AccessPetitionEvent<
-  TType extends PetitionEventType
-> = GenericPetitionEvent<TType, { petition_access_id: number }>;
+export type AccessActivatedEvent = GenericPetitionEvent<
+  "ACCESS_ACTIVATED",
+  { petition_access_id: number; user_id: number }
+>;
 
-type MessagePetitionEvent<
-  TType extends PetitionEventType
-> = GenericPetitionEvent<
-  TType,
+export type AccessDeactivatedEvent = GenericPetitionEvent<
+  "ACCESS_DEACTIVATED",
+  { petition_access_id: number; user_id: number }
+>;
+
+export type MessageScheduledEvent = GenericPetitionEvent<
+  "MESSAGE_SCHEDULED",
   { petition_access_id: number; petition_message_id: number }
 >;
 
-export type AccessActivatedEvent = AccessPetitionEvent<"ACCESS_ACTIVATED">;
+export type MessageCancelledEvent = GenericPetitionEvent<
+  "MESSAGE_CANCELLED",
+  { petition_access_id: number; petition_message_id: number }
+>;
 
-export type AccessDeactivatedEvent = AccessPetitionEvent<"ACCESS_DEACTIVATED">;
-
-export type MessageScheduledEvent = MessagePetitionEvent<"MESSAGE_SCHEDULED">;
-
-export type MessageCancelledEvent = MessagePetitionEvent<"MESSAGE_CANCELLED">;
-
-export type MessageProcessedEvent = MessagePetitionEvent<"MESSAGE_PROCESSED">;
+export type MessageProcessedEvent = GenericPetitionEvent<
+  "MESSAGE_PROCESSED",
+  { petition_access_id: number; petition_message_id: number }
+>;
 
 export type ReminderProcessedEvent = GenericPetitionEvent<
   "REMINDER_PROCESSED",

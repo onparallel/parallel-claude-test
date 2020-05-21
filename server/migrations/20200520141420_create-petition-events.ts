@@ -95,7 +95,10 @@ export async function up(knex: Knex): Promise<any> {
     events.push({
       petition_id: access.petition_id,
       type: "ACCESS_ACTIVATED",
-      data: { petition_access_id: access.id },
+      data: {
+        user_id: access.granter_id,
+        petition_access_id: access.id,
+      },
       created_at: access.created_at,
     });
   }

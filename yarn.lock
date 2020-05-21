@@ -1479,6 +1479,14 @@
     "@graphql-toolkit/schema-merging" "~0.10.4"
     tslib "~1.11.1"
 
+"@graphql-codegen/fragment-matcher@^1.14.0":
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/fragment-matcher/-/fragment-matcher-1.14.0.tgz#8eb597138c9b14c2841dad19c44aa51f878054d1"
+  integrity sha512-JAvTqLDc59iNX7yZ/hxldYVIHapPWKiaR2qEi3jrqjRxkjxZqfFLhT1e7uyT6+DemJJNtDK9kY3Xh8eB/bMt6w==
+  dependencies:
+    "@graphql-codegen/plugin-helpers" "1.14.0"
+    tslib "~2.0.0"
+
 "@graphql-codegen/plugin-helpers@1.13.5":
   version "1.13.5"
   resolved "https://registry.yarnpkg.com/@graphql-codegen/plugin-helpers/-/plugin-helpers-1.13.5.tgz#a4ef9b432b547c82a9c6d55068bdc10c2d39bd74"
@@ -1493,6 +1501,22 @@
     param-case "3.0.3"
     pascal-case "3.1.1"
     tslib "~1.11.1"
+    upper-case "2.0.1"
+
+"@graphql-codegen/plugin-helpers@1.14.0":
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/plugin-helpers/-/plugin-helpers-1.14.0.tgz#93c1cc90e2779943b6a6ec53ab6599d997e107f0"
+  integrity sha512-VV74wsEVrzsEXUREQi2ZetO+EkQWj2C+DzjxKmRiFak/RpCasoVPkO/DxspZsljyHi6htIGX5r9m5x8uhfphmg==
+  dependencies:
+    "@graphql-toolkit/common" "~0.10.4"
+    camel-case "4.1.1"
+    common-tags "1.8.0"
+    constant-case "3.0.3"
+    import-from "3.0.0"
+    lower-case "2.0.1"
+    param-case "3.0.3"
+    pascal-case "3.1.1"
+    tslib "~2.0.0"
     upper-case "2.0.1"
 
 "@graphql-codegen/typescript-operations@^1.13.5":
@@ -14634,6 +14658,11 @@ tslib@^1.8.1:
   version "1.11.2"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.2.tgz#9c79d83272c9a7aaf166f73915c9667ecdde3cc9"
   integrity sha512-tTSkux6IGPnUGUd1XAZHcpu85MOkIl5zX49pO+jfsie3eP0B6pyhOlLXm3cAC6T7s+euSDDUUV+Acop5WmtkVg==
+
+tslib@~2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.0.tgz#18d13fc2dce04051e20f074cc8387fd8089ce4f3"
+  integrity sha512-lTqkx847PI7xEDYJntxZH89L2/aXInsyF2luSafe/+0fHOMjlBNXdH6th7f70qxLDhul7KZK0zC8V5ZIyHl0/g==
 
 tsutils@^3.17.1:
   version "3.17.1"

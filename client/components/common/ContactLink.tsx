@@ -20,7 +20,7 @@ export function ContactLink({
   );
   if (contact.fullName) {
     return (
-      <Tooltip label={contact.email} aria-label={contact.email}>
+      <Tooltip showDelay={300} label={contact.email} aria-label={contact.email}>
         {link}
       </Tooltip>
     );

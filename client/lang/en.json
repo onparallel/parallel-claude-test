@@ -936,7 +936,7 @@
     "reference": "components/petition-common/DoubleCheck.tsx#L34-L37"
   },
   {
-    "term": "petition-message.message-bounced-explanation",
+    "term": "component.message-events-indicator.bounced-explanation",
     "definition": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
     "context": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
     "reference": "components/petition-common/DoubleCheck.tsx#L50-L54"
@@ -960,7 +960,7 @@
     "reference": "components/petition-common/DoubleCheck.tsx#L162-L166"
   },
   {
-    "term": "petition-message.message-opened-explanation",
+    "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}",
     "reference": "components/petition-common/DoubleCheck.tsx#L151-L154"

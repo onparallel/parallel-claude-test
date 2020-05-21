@@ -217,7 +217,9 @@ function useReactSelectProps() {
               values={{
                 email: label,
                 b: (...chunks: any[]) => (
-                  <strong style={{ marginLeft: "4px" }}>{chunks}</strong>
+                  <Text as="strong" style={{ marginLeft: "4px" }}>
+                    {chunks}
+                  </Text>
                 ),
               }}
             ></FormattedMessage>

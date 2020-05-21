@@ -1,9 +1,14 @@
-import { ApolloClient, MutationUpdaterFn } from "apollo-boost";
+import {
+  ApolloClient,
+  MutationUpdaterFn,
+  IntrospectionFragmentMatcher,
+} from "apollo-boost";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { setContext } from "apollo-link-context";
 import { createHttpLink } from "apollo-link-http";
 import { QueryResult } from "@apollo/react-common";
 import { Assert } from "./types";
+import result from "@parallel/graphql/__fragment-matcher";
 
 export interface CreateApolloClientOptions {
   getToken: () => string;
@@ -38,8 +43,10 @@ export function createApolloClient(
     link: authLink.concat(httpLink),
     ssrMode: !process.browser,
     cache: new InMemoryCache({
-      // graphql returns unique ids
       dataIdFromObject: (o) => o.id,
+      fragmentMatcher: new IntrospectionFragmentMatcher({
+        introspectionQueryResultData: result,
+      }),
     }).restore(initialState ?? {}),
     connectToDevTools:
       process.browser && process.env.NODE_ENV === "development",

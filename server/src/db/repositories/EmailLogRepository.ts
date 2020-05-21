@@ -44,7 +44,7 @@ export class EmailLogRepository extends BaseRepository {
     return entry ? entry.id : null;
   }
 
-  async createEvent(data: CreateEmailEvent) {
+  async createEmailEvent(data: CreateEmailEvent) {
     return await this.insert("email_event", data);
   }
 

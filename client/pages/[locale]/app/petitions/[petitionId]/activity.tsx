@@ -1,19 +1,14 @@
-import {
-  Box,
-  List,
-  ListItem,
-  Text,
-  useToast,
-  Heading,
-  Flex,
-} from "@chakra-ui/core";
+import { Box, Flex, List, ListItem, Text, useToast } from "@chakra-ui/core";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
+import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import {
   PetitionActivityQuery,
   PetitionActivityQueryVariables,
@@ -34,9 +29,6 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
-import { Card } from "@parallel/components/common/Card";
-import { Spacer } from "@parallel/components/common/Spacer";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -50,6 +42,8 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   const {
     data: { petition },
   } = assertQuery(usePetitionActivityQuery({ variables: { id: petitionId } }));
+
+  console.log(petition?.events);
 
   const [state, setState] = usePetitionState();
   const wrapper = useWrapPetitionUpdater(setState);
@@ -88,6 +82,12 @@ function PetitionActivity({ petitionId }: PetitionProps) {
               accesses={petition!.accesses}
               onSendReminder={() => {}}
             />
+            <Box margin={4}>
+              <PetitionActivityTimeline
+                userId={me.id}
+                events={petition!.events.items}
+              />
+            </Box>
           </Box>
           <Spacer display={{ base: "none", md: "block" }} />
         </Flex>
@@ -102,9 +102,11 @@ PetitionActivity.fragments = {
       id
       ...PetitionLayout_Petition
       ...PetitionAccessTable_Petition
+      ...PetitionActivityTimeline_Petition
     }
     ${PetitionLayout.fragments.Petition}
     ${PetitionAccessesTable.fragments.Petition}
+    ${PetitionActivityTimeline.fragments.Petition}
   `,
   User: gql`
     fragment PetitionActivity_User on User {

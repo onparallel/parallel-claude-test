@@ -190,6 +190,11 @@ export interface NexusGenRootTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
+  PetitionEventPagination: {
+    // root type
+    items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
+    totalCount: number; // Int!
+  };
   PetitionField: db.PetitionField;
   PetitionFieldReply: db.PetitionFieldReply;
   PetitionMessage: db.PetitionMessage;
@@ -290,12 +295,14 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: Date; // DateTime!
     id: string; // ID!
+    user: NexusGenRootTypes["User"]; // User!
   };
   AccessDeactivatedEvent: {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: Date; // DateTime!
     id: string; // ID!
+    user: NexusGenRootTypes["User"]; // User!
   };
   Contact: {
     // field return type
@@ -388,6 +395,7 @@ export interface NexusGenFieldTypes {
     deadline: Date | null; // DateTime
     emailBody: any | null; // JSON
     emailSubject: string | null; // String
+    events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: string; // ID!
@@ -403,6 +411,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: Date; // DateTime!
+    granter: NexusGenRootTypes["User"] | null; // User
     id: string; // ID!
     nextReminderAt: Date | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
@@ -424,6 +433,11 @@ export interface NexusGenFieldTypes {
     // field return type
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
+  };
+  PetitionEventPagination: {
+    // field return type
+    items: NexusGenRootTypes["PetitionEvent"][]; // [PetitionEvent!]!
+    totalCount: number; // Int!
   };
   PetitionField: {
     // field return type
@@ -729,6 +743,13 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
     };
   };
+  Petition: {
+    events: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
+  };
   Query: {
     access: {
       // args
@@ -804,6 +825,7 @@ export type NexusGenObjectNames =
   | "PetitionAccessPagination"
   | "PetitionAndField"
   | "PetitionAndFields"
+  | "PetitionEventPagination"
   | "PetitionField"
   | "PetitionFieldReply"
   | "PetitionMessage"

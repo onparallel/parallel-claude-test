@@ -103,6 +103,21 @@ export const icons = {
       </g>
     ),
   },
+  bell: {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </g>
+    ),
+  },
   user: {
     viewBox: "0 0 24 24",
     path: (
@@ -324,6 +339,23 @@ export const icons = {
       >
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
         <polyline points="22,6 12,13 2,6"></polyline>
+      </g>
+    ),
+  },
+  "email-sent": {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M 10,20 H 4 C 2.9,20 2,19.1 2,18 V 6 C 2,4.9 2.9,4 4,4 h 16 c 1.1,0 2,0.9 2,2 v 9" />
+        <polyline points="22,6 12,13 2,6" />
+        <path d="m 14,20 c 8,0 8,0 8,0" />
+        <path d="m 19,17 3,3 -3,3" />
       </g>
     ),
   },

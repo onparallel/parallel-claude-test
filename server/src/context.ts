@@ -5,6 +5,7 @@ import { ContactRepository } from "./db/repositories/ContactRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
 import { FileUploadRepository } from "./db/repositories/FileUploadRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
+import { PetitionEventsRepository } from "./db/repositories/PetitionEventsRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReminderRepository } from "./db/repositories/ReminderRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
@@ -31,6 +32,7 @@ export class ApiContext {
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emails: EmailLogRepository,
+    public readonly events: PetitionEventsRepository,
     public readonly files: FileUploadRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
@@ -50,6 +52,7 @@ export class WorkerContext {
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emails: EmailLogRepository,
+    public readonly events: PetitionEventsRepository,
     public readonly files: FileUploadRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
