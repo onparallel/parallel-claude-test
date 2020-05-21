@@ -95,7 +95,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
             })}
             margin="auto"
-            src={`${imageName}.png"`}
+            src={`${imageName}.png`}
             {...{ srcSet: `${imageName}@2x.png 2x` }}
           />
         </Box>
