@@ -76,10 +76,6 @@ createQueueWorker<MessageEmailWorkerPayload>(
         payload.petition_message_id,
         email.id
       ),
-      context.events.createEvent(petition.id, "MESSAGE_PROCESSED", {
-        petition_access_id: access.id,
-        petition_message_id: message.id,
-      }),
       context.aws.enqueueEmail(email.id),
     ]);
   }

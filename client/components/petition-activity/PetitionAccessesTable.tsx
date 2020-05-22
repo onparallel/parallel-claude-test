@@ -1,47 +1,104 @@
 import {
+  Button,
   Flex,
   Heading,
   Icon,
-  MenuDivider,
   MenuItem,
   MenuList,
+  Stack,
   Text,
 } from "@chakra-ui/core";
-import { PetitionAccessTable_PetitionAccessFragment } from "@parallel/graphql/__types";
+import {
+  PetitionAccessTable_PetitionAccessFragment,
+  PetitionAccessTable_PetitionFragment,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
-import { memo, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { Card, CardProps } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 import { Table, TableColumn } from "../common/Table";
+import { useConfirmActivateAccessDialog } from "./ConfirmActivateAccessDialog";
+import { useConfirmDeactivateAccessDialog } from "./ConfirmDeactivateAccessDialog";
+import { useConfirmSendReminderDialog } from "./ConfirmSendReminderDialog";
 
 type PetitionAccessSelection = PetitionAccessTable_PetitionAccessFragment;
 
 export function PetitionAccessesTable({
-  accesses,
+  petition,
   onSendReminder,
+  onActivateAccess,
+  onDeactivateAccess,
   ...props
 }: {
-  accesses: PetitionAccessSelection[];
-  onSendReminder: (accessId: string) => void;
+  petition: PetitionAccessTable_PetitionFragment;
+  onSendReminder: (accessIds: string[]) => void;
+  onActivateAccess: (accessId: string) => void;
+  onDeactivateAccess: (accessId: string) => void;
 } & CardProps) {
-  const columns = usePetitionAccessesColumns();
   const [selection, setSelection] = useState<string[]>([]);
+  const selected = useMemo(
+    () => selection.map((id) => petition.accesses.find((a) => a.id === id)!),
+    [selection, petition.accesses]
+  );
+
+  const confirmSendReminder = useConfirmSendReminderDialog();
+  const handleSendreminder = useCallback(async () => {
+    try {
+      await confirmSendReminder({});
+    } catch {
+      return;
+    }
+    onSendReminder(selection);
+  }, [selection]);
+  const confirmActivateAccess = useConfirmActivateAccessDialog();
+  const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
+  const columns = usePetitionAccessesColumns({
+    onActivateAccess: useCallback(async (accessId: string) => {
+      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
+      try {
+        await confirmActivateAccess({
+          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
+        });
+      } catch {
+        return;
+      }
+      onActivateAccess(accessId);
+    }, []),
+    onDeactivateAccess: useCallback(async (accessId) => {
+      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
+      try {
+        await confirmDeactivateAccess({
+          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
+        });
+      } catch {
+        return;
+      }
+      onDeactivateAccess(accessId);
+    }, []),
+  });
   return (
     <Card {...props}>
-      <Flex
+      <Stack
+        direction="row"
         paddingX={4}
         paddingY={2}
         alignItems="center"
         borderBottom="1px solid"
         borderBottomColor="gray.200"
       >
-        <Heading fontSize="md">Recipients</Heading>
+        <Heading fontSize="md">
+          <FormattedMessage
+            id="petition-access.header"
+            defaultMessage="Petition access control"
+          />
+        </Heading>
         <Spacer />
         <ButtonDropdown
           size="sm"
@@ -49,19 +106,17 @@ export function PetitionAccessesTable({
           isDisabled={selection.length === 0}
           dropdown={
             <MenuList minWidth="160px">
-              <MenuItem>
-                <Icon name="copy" marginRight={2} />
+              <MenuItem
+                isDisabled={
+                  petition.status !== "PENDING" ||
+                  selected.some((a) => a.status === "INACTIVE")
+                }
+                onClick={handleSendreminder}
+              >
+                <Icon name="bell" marginRight={2} />
                 <FormattedMessage
-                  id="component.petition-list-header.clone-label"
-                  defaultMessage="Clone petition"
-                />
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem>
-                <Icon name="delete" marginRight={2} />
-                <FormattedMessage
-                  id="component.petition-list-header.delete-label"
-                  defaultMessage="Delete selected"
+                  id="petition-accesses.send-reminder"
+                  defaultMessage="Send reminder"
                 />
               </MenuItem>
             </MenuList>
@@ -72,10 +127,13 @@ export function PetitionAccessesTable({
             defaultMessage="Actions"
           ></FormattedMessage>
         </ButtonDropdown>
-      </Flex>
+        <Button size="sm" variantColor="purple" leftIcon={"user-plus" as any}>
+          Add contact
+        </Button>
+      </Stack>
       <Table
         columns={columns}
-        rows={accesses ?? []}
+        rows={petition.accesses ?? []}
         rowKeyProp="id"
         isSelectable
         onSelectionChange={setSelection}
@@ -85,7 +143,13 @@ export function PetitionAccessesTable({
   );
 }
 
-function usePetitionAccessesColumns(): TableColumn<PetitionAccessSelection>[] {
+function usePetitionAccessesColumns({
+  onActivateAccess,
+  onDeactivateAccess,
+}: {
+  onActivateAccess: (accessId: string) => void;
+  onDeactivateAccess: (accessId: string) => void;
+}): TableColumn<PetitionAccessSelection>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -150,14 +214,50 @@ function usePetitionAccessesColumns(): TableColumn<PetitionAccessSelection>[] {
           <DateTime value={createdAt} format={FORMATS.LLL} />
         ),
       },
+      {
+        key: "actions",
+        header: "",
+        cellProps: {
+          paddingY: 1,
+          width: "1px",
+        },
+        CellContent: ({ row: { id, status }, onAction }) => {
+          const intl = useIntl();
+          return (
+            <IconButtonWithTooltip
+              label={
+                status === "ACTIVE"
+                  ? intl.formatMessage({
+                      id: "petition-accesses.deactivate-access",
+                      defaultMessage: "Remove access",
+                    })
+                  : intl.formatMessage({
+                      id: "petition-accesses.activate-access",
+                      defaultMessage: "Reactivate access",
+                    })
+              }
+              onClick={() =>
+                status === "ACTIVE"
+                  ? onDeactivateAccess(id)
+                  : onActivateAccess(id)
+              }
+              placement="left"
+              icon={(status === "ACTIVE" ? "user-x" : "user-check") as any}
+              size="sm"
+              showDelay={300}
+            />
+          );
+        },
+      },
     ],
-    []
+    [onActivateAccess, onDeactivateAccess]
   );
 }
 
 PetitionAccessesTable.fragments = {
   Petition: gql`
     fragment PetitionAccessTable_Petition on Petition {
+      status
       accesses {
         ...PetitionAccessTable_PetitionAccess
       }

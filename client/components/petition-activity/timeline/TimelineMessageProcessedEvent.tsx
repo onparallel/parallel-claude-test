@@ -15,7 +15,7 @@ export type TimelineMessageProcessedEventProps = {
 };
 
 export function TimelineMessageProcessedEvent({
-  event,
+  event: { message, createdAt },
   userId,
 }: TimelineMessageProcessedEventProps) {
   return (
@@ -29,29 +29,24 @@ export function TimelineMessageProcessedEvent({
       }
     >
       <>
-        {event.message.scheduledAt ? (
+        {message.scheduledAt ? (
           <FormattedMessage
-            id="timeline.message-processed-description-manual"
-            defaultMessage="A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <i>{subject}</i>}} was sent to {contact} {timeAgo}"
+            id="timeline.message-processed-description-scheduled"
+            defaultMessage="A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
             values={{
-              same: userId === event.message.sender!.id,
+              same: userId === message.sender!.id,
               b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              i: (...chunks: any[]) => (
-                <Text as="em" textDecoration="underline" fontStyle="normal">
-                  {chunks}
-                </Text>
-              ),
-              user: event.message.sender!.fullName,
-              subject: event.message.emailSubject,
-              contact: event.access.contact ? (
-                <ContactLink contact={event.access.contact} />
+              user: message.sender!.fullName,
+              subject: message.emailSubject,
+              contact: message.access.contact ? (
+                <ContactLink contact={message.access.contact} />
               ) : (
                 <DeletedContact />
               ),
               timeAgo: (
                 <Link>
                   <DateTime
-                    value={event.createdAt}
+                    value={createdAt}
                     format={FORMATS.LLL}
                     useRelativeTime="always"
                   />
@@ -62,26 +57,21 @@ export function TimelineMessageProcessedEvent({
         ) : (
           <FormattedMessage
             id="timeline.message-processed-description-manual"
-            defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <i>{subject}</i>}} to {contact} {timeAgo}"
+            defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
             values={{
-              same: userId === event.message.sender!.id,
+              same: userId === message.sender!.id,
               b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              i: (...chunks: any[]) => (
-                <Text as="em" textDecoration="underline" fontStyle="normal">
-                  {chunks}
-                </Text>
-              ),
-              user: event.message.sender!.fullName,
-              subject: event.message.emailSubject,
-              contact: event.access.contact ? (
-                <ContactLink contact={event.access.contact} />
+              user: message.sender!.fullName,
+              subject: message.emailSubject,
+              contact: message.access.contact ? (
+                <ContactLink contact={message.access.contact} />
               ) : (
                 <DeletedContact />
               ),
               timeAgo: (
                 <Link>
                   <DateTime
-                    value={event.createdAt}
+                    value={createdAt}
                     format={FORMATS.LLL}
                     useRelativeTime="always"
                   />
@@ -90,7 +80,7 @@ export function TimelineMessageProcessedEvent({
             }}
           />
         )}
-        <MessageEventsIndicator message={event.message} marginLeft={2} />
+        <MessageEventsIndicator message={message} marginLeft={2} />
       </>
     </TimelineItem>
   );
@@ -106,12 +96,12 @@ TimelineMessageProcessedEvent.fragments = {
         }
         emailSubject
         scheduledAt
-        ...MessageEventsIndicator_PetitionMessage
-      }
-      access {
-        contact {
-          ...ContactLink_Contact
+        access {
+          contact {
+            ...ContactLink_Contact
+          }
         }
+        ...MessageEventsIndicator_PetitionMessage
       }
       createdAt
     }

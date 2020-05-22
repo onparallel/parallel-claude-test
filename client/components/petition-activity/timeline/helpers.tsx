@@ -5,6 +5,7 @@ import {
   Box,
   IconProps,
   Icon,
+  useTheme,
 } from "@chakra-ui/core";
 import { ReactNode } from "react";
 
@@ -16,12 +17,13 @@ export function TimelineItem({
   icon: ReactNode;
   children: ReactNode;
 }) {
+  const { colors } = useTheme();
   return (
     <PseudoBox
       display="flex"
       alignItems="center"
       position="relative"
-      background="rgba(0, 0, 0, 0) linear-gradient(rgb(86, 80, 222), rgb(86, 80, 222)) no-repeat 17px / 2px 100%"
+      background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
       paddingY={4}
       {...props}
     >
@@ -38,11 +40,13 @@ export function TimelineItem({
 export function TimelineIcon({
   icon,
   color,
-  backgroundColor,
+  backgroundColor = "gray.50",
+  size = "36px",
 }: {
   icon: IconProps["name"];
   color?: BoxProps["color"];
   backgroundColor?: BoxProps["backgroundColor"];
+  size?: BoxProps["width"];
 }) {
   return (
     <Flex
@@ -53,8 +57,8 @@ export function TimelineIcon({
       justifyContent="center"
       border="2px solid"
       borderColor="gray.50"
-      width="36px"
-      height="36px"
+      width={size}
+      height={size}
     >
       <Icon name={icon} size="14px" />
     </Flex>

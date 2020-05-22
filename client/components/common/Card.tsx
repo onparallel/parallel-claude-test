@@ -1,4 +1,4 @@
-import { PseudoBox, PseudoBoxProps, useColorMode, Box } from "@chakra-ui/core";
+import { PseudoBox, PseudoBoxProps, useColorMode } from "@chakra-ui/core";
 
 export type CardProps = PseudoBoxProps;
 

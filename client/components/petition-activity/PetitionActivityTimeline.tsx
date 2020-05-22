@@ -1,57 +1,71 @@
-import { Box } from "@chakra-ui/core";
+import { Box, BoxProps } from "@chakra-ui/core";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
-import { TimelineIcon, TimelineItem } from "./timeline/helpers";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
+import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
 import { TimelineMessageProcessedEvent } from "./timeline/TimelineMessageProcessedEvent";
-import { TimelineReminderProcessedEvent } from "./timeline/TimelineReminderProcessedEvent";
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
+import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
+import { TimelineReminderProcessedEvent } from "./timeline/TimelineReminderProcessedEvent";
+import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
+import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
+import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
   events: PetitionActivityTimeline_PetitionEventFragment[];
-};
+  onCancelScheduledMessage: (messageId: string) => void;
+} & BoxProps;
 
 export function PetitionActivityTimeline({
   userId,
   events,
+  onCancelScheduledMessage,
+  ...props
 }: PetitionActivityTimelineProps) {
+  const handleCancelScheduledMessage = useMemoFactory(
+    (messageId: string) => () => onCancelScheduledMessage(messageId),
+    [onCancelScheduledMessage]
+  );
   return (
-    <Box as="ol">
-      {events.map((event) =>
-        event.__typename === "AccessActivatedEvent" ? (
-          <TimelineAccessActivatedEvent
-            key={event.id}
-            event={event}
-            userId={userId}
-          />
-        ) : event.__typename === "AccessDeactivatedEvent" ? (
-          <TimelineAccessDeactivatedEvent
-            key={event.id}
-            event={event}
-            userId={userId}
-          />
-        ) : event.__typename === "MessageScheduledEvent" ? (
-          <TimelineMessageScheduledEvent
-            key={event.id}
-            event={event}
-            userId={userId}
-          />
-        ) : event.__typename === "MessageProcessedEvent" ? (
-          <TimelineMessageProcessedEvent
-            key={event.id}
-            event={event}
-            userId={userId}
-          />
-        ) : event.__typename === "ReminderProcessedEvent" ? (
-          <TimelineReminderProcessedEvent
-            key={event.id}
-            event={event}
-            userId={userId}
-          />
-        ) : null
-      )}
+    <Box {...props}>
+      <Box as="ol">
+        {events.map((event) => (
+          <Box as="li" key={event.id} listStyleType="none">
+            {event.__typename === "PetitionCreatedEvent" ? (
+              <TimelinePetitionCreatedEvent event={event} userId={userId} />
+            ) : event.__typename === "PetitionCompletedEvent" ? (
+              <TimelinePetitionCompletedEvent event={event} />
+            ) : event.__typename === "AccessActivatedEvent" ? (
+              <TimelineAccessActivatedEvent event={event} userId={userId} />
+            ) : event.__typename === "AccessDeactivatedEvent" ? (
+              <TimelineAccessDeactivatedEvent event={event} userId={userId} />
+            ) : event.__typename === "AccessOpenedEvent" ? (
+              <TimelineAccessOpenedEvent event={event} />
+            ) : event.__typename === "MessageScheduledEvent" ? (
+              <TimelineMessageScheduledEvent
+                event={event}
+                userId={userId}
+                onCancelScheduledMessage={handleCancelScheduledMessage(
+                  event.message.id
+                )}
+              />
+            ) : event.__typename === "MessageProcessedEvent" ? (
+              <TimelineMessageProcessedEvent event={event} userId={userId} />
+            ) : event.__typename === "ReminderProcessedEvent" ? (
+              <TimelineReminderProcessedEvent event={event} userId={userId} />
+            ) : event.__typename === "ReplyCreatedEvent" ? (
+              <TimelineReplyCreatedEvent event={event} />
+            ) : event.__typename === "ReplyDeletedEvent" ? (
+              <TimelineReplyDeletedEvent event={event} />
+            ) : (
+              <pre>{JSON.stringify(event, null, "  ")}</pre>
+            )}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 }
@@ -67,13 +81,25 @@ PetitionActivityTimeline.fragments = {
     }
     fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
       id
+      ... on PetitionCreatedEvent {
+        ...TimelinePetitionCreatedEvent_PetitionCreatedEvent
+      }
+      ... on PetitionCompletedEvent {
+        ...TimelinePetitionCompletedEvent_PetitionCompletedEvent
+      }
       ... on AccessActivatedEvent {
         ...TimelineAccessActivatedEvent_AccessActivatedEvent
       }
       ... on AccessDeactivatedEvent {
         ...TimelineAccessDeactivatedEvent_AccessDeactivatedEvent
       }
+      ... on AccessOpenedEvent {
+        ...TimelineAccessOpenedEvent_AccessOpenedEvent
+      }
       ... on MessageScheduledEvent {
+        message {
+          id
+        }
         ...TimelineMessageScheduledEvent_MessageScheduledEvent
       }
       ... on MessageProcessedEvent {
@@ -82,11 +108,22 @@ PetitionActivityTimeline.fragments = {
       ... on ReminderProcessedEvent {
         ...TimelineReminderProcessedEvent_ReminderProcessedEvent
       }
+      ... on ReplyCreatedEvent {
+        ...TimelineReplyCreatedEvent_ReplyCreatedEvent
+      }
+      ... on ReplyDeletedEvent {
+        ...TimelineReplyDeletedEvent_ReplyDeletedEvent
+      }
     }
+    ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
+    ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
     ${TimelineAccessActivatedEvent.fragments.AccessActivatedEvent}
     ${TimelineAccessDeactivatedEvent.fragments.AccessDeactivatedEvent}
+    ${TimelineAccessOpenedEvent.fragments.AccessOpenedEvent}
     ${TimelineMessageProcessedEvent.fragments.MessageProcessedEvent}
     ${TimelineMessageScheduledEvent.fragments.MessageScheduledEvent}
     ${TimelineReminderProcessedEvent.fragments.ReminderProcessedEvent}
+    ${TimelineReplyCreatedEvent.fragments.ReplyCreatedEvent}
+    ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}
   `,
 };

@@ -10,12 +10,17 @@ export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export type PetitionEventType =
+  | "PETITION_CREATED"
+  | "PETITION_COMPLETED"
   | "ACCESS_ACTIVATED"
   | "ACCESS_DEACTIVATED"
+  | "ACCESS_OPENED"
   | "MESSAGE_SCHEDULED"
   | "MESSAGE_CANCELLED"
   | "MESSAGE_PROCESSED"
-  | "REMINDER_PROCESSED";
+  | "REMINDER_PROCESSED"
+  | "REPLY_CREATED"
+  | "REPLY_DELETED";
 
 export type PetitionFieldType = "TEXT" | "FILE_UPLOAD";
 

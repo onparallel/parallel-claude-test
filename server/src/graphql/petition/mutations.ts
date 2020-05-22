@@ -21,12 +21,13 @@ import { ArgValidationError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import { maxLength, validateAnd } from "../helpers/validateArgs";
 import {
+  accessesBelongToPetition,
   fieldBelongsToPetition,
   fieldsBelongsToPetition,
   replyBelongsToPetition,
-  accessesBelongToPetition,
   userHasAccessToPetition,
   userHasAccessToPetitions,
+  messageBelongToPetition,
 } from "./authorizers";
 
 export const createPetition = mutationField("createPetition", {
@@ -38,10 +39,11 @@ export const createPetition = mutationField("createPetition", {
     locale: arg({ type: "PetitionLocale", required: true }),
   },
   resolve: async (_, { name, locale }, ctx) => {
-    return await ctx.petitions.createPetition(
+    const petition = await ctx.petitions.createPetition(
       { name, locale, email_subject: name },
       ctx.user!
     );
+    return petition;
   },
 });
 
@@ -477,6 +479,7 @@ export const sendPetition = mutationField("sendPetition", {
         throw new Error("Petition not available");
       }
       const accesses = await ctx.petitions.createAccesses(
+        petitionId,
         recipientIds.map((id) => ({
           petition_id: petitionId,
           contact_id: id,
@@ -492,15 +495,9 @@ export const sendPetition = mutationField("sendPetition", {
         })),
         ctx.user!
       );
-      await ctx.events.createEvent(
-        petitionId,
-        "ACCESS_ACTIVATED",
-        accesses.map((a) => ({
-          petition_access_id: a.id,
-          user_id: ctx.user!.id,
-        }))
-      );
       const messages = await ctx.petitions.createMessages(
+        petitionId,
+        args.scheduledAt ?? null,
         accesses.map((access) => ({
           petition_id: petition.id,
           petition_access_id: access.id,
@@ -522,15 +519,6 @@ export const sendPetition = mutationField("sendPetition", {
 
       if (!args.scheduledAt) {
         await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));
-      } else {
-        await ctx.events.createEvent(
-          petitionId,
-          "MESSAGE_SCHEDULED",
-          messages.map((m) => ({
-            petition_access_id: m.petition_access_id,
-            petition_message_id: m.id,
-          }))
-        );
       }
       return {
         petition: await ctx.petitions.loadPetition(petitionId, {
@@ -548,41 +536,45 @@ export const sendPetition = mutationField("sendPetition", {
 
 export const sendReminder = mutationField("sendReminders", {
   description: "Sends a reminder for the specified petition accesses.",
-  type: objectType({
-    name: "SendReminderResult",
-    definition(t) {
-      t.field("result", { type: "Result" });
-    },
-  }),
+  type: "Result",
   authorize: authorizeAnd(
     authenticate(),
     authorizeAndP(
       userHasAccessToPetition("petitionId"),
-      accessesBelongToPetition("petitionId", "accessesIds")
+      accessesBelongToPetition("petitionId", "accessIds")
     )
   ),
   args: {
     petitionId: idArg({ required: true }),
-    accessesIds: idArg({ list: [true], required: true }),
+    accessIds: idArg({ list: [true], required: true }),
   },
   resolve: async (_, args, ctx, info) => {
-    const { ids: accessesIds } = fromGlobalIds(
-      args.accessesIds,
-      "PetitionAccess"
-    );
-    try {
-      const accesses = await ctx.petitions.loadAccess(accessesIds);
-      for (const access of accesses) {
-        if (!access || access.status !== "ACTIVE") {
-          throw new ArgValidationError(
-            info,
-            "accessesIds",
-            `Petition accesses must have status "ACTIVE".`
-          );
-        }
+    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+    const { ids: accessIds } = fromGlobalIds(args.accessIds, "PetitionAccess");
+
+    const [petition, accesses] = await Promise.all([
+      ctx.petitions.loadPetition(petitionId),
+      ctx.petitions.loadAccess(accessIds),
+    ]);
+    if (!petition || petition.status !== "PENDING") {
+      throw new ArgValidationError(
+        info,
+        "petitionId",
+        `Petition must have status "PENDING".`
+      );
+    }
+    for (const access of accesses) {
+      if (!access || access.status !== "ACTIVE") {
+        throw new ArgValidationError(
+          info,
+          "accessIds",
+          `Petition accesses must have status "ACTIVE".`
+        );
       }
+    }
+    try {
       const reminders = await ctx.reminders.createReminders(
-        accessesIds.map((accessId) => ({
+        accessIds.map((accessId) => ({
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: accessId,
@@ -600,3 +592,27 @@ export const sendReminder = mutationField("sendReminders", {
     }
   },
 });
+
+export const cancelScheduledMessages = mutationField(
+  "cancelScheduledMessages",
+  {
+    description: "Cancels scheduled petition messages.",
+    type: "PetitionMessage",
+    nullable: true,
+    authorize: authorizeAnd(
+      authenticate(),
+      authorizeAndP(
+        userHasAccessToPetition("petitionId"),
+        messageBelongToPetition("petitionId", "messageId")
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      messageId: idArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const { id: messageId } = fromGlobalId(args.messageId, "PetitionMessage");
+      return await ctx.petitions.cancelScheduledMessage(messageId);
+    },
+  }
+);

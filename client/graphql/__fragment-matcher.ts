@@ -35,6 +35,9 @@ const result: IntrospectionResultData = {
             name: "AccessDeactivatedEvent",
           },
           {
+            name: "AccessOpenedEvent",
+          },
+          {
             name: "MessageCancelledEvent",
           },
           {
@@ -44,7 +47,19 @@ const result: IntrospectionResultData = {
             name: "MessageScheduledEvent",
           },
           {
+            name: "PetitionCompletedEvent",
+          },
+          {
+            name: "PetitionCreatedEvent",
+          },
+          {
             name: "ReminderProcessedEvent",
+          },
+          {
+            name: "ReplyCreatedEvent",
+          },
+          {
+            name: "ReplyDeletedEvent",
           },
         ],
       },

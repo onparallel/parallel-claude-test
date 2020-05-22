@@ -3,6 +3,28 @@ import { sortBy } from "remeda";
 
 type Maybe<T> = T | null;
 
+export interface Petition {
+  id: number;
+  org_id: number;
+  owner_id: number;
+  name: Maybe<string>;
+  custom_ref: Maybe<string>;
+  locale: string;
+  is_template: boolean;
+  status: Maybe<"DRAFT" | "PENDING" | "COMPLETED">;
+  deadline: Maybe<Date>;
+  email_subject: Maybe<string>;
+  email_body: Maybe<string>;
+  reminders_active: boolean;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+  reminders_config: Maybe<any>;
+}
+
 interface PetitionAccess {
   id: number;
   petition_id: number;
@@ -50,14 +72,34 @@ interface PetitionEvent {
   id: number;
   petition_id: number;
   type:
+    | "PETITION_CREATED"
+    | "PETITION_COMPLETED"
     | "ACCESS_ACTIVATED"
+    | "ACCESS_OPENED"
     | "ACCESS_DEACTIVATED"
     | "MESSAGE_SCHEDULED"
     | "MESSAGE_CANCELLED"
     | "MESSAGE_PROCESSED"
-    | "REMINDER_PROCESSED";
+    | "REMINDER_PROCESSED"
+    | "REPLY_CREATED"
+    | "REPLY_DELETED";
   data: any;
   created_at: Date;
+}
+
+export interface PetitionFieldReply {
+  id: number;
+  petition_field_id: number;
+  petition_sendout_id: Maybe<number>;
+  type: "FILE_UPLOAD" | "TEXT";
+  content: any;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+  petition_access_id: number;
 }
 
 export async function up(knex: Knex): Promise<any> {
@@ -67,12 +109,17 @@ export async function up(knex: Knex): Promise<any> {
     t.enum(
       "type",
       [
+        "PETITION_CREATED",
+        "PETITION_COMPLETED",
         "ACCESS_ACTIVATED",
         "ACCESS_DEACTIVATED",
+        "ACCESS_OPENED",
         "MESSAGE_SCHEDULED",
         "MESSAGE_CANCELLED",
         "MESSAGE_PROCESSED",
         "REMINDER_PROCESSED",
+        "REPLY_CREATED",
+        "REPLY_DELETED",
       ],
       {
         useNative: true,
@@ -87,10 +134,19 @@ export async function up(knex: Knex): Promise<any> {
     t.index(["petition_id", "type"], "petition_event__petition_id__type");
   });
 
-  const accesses = await knex<PetitionAccess>("petition_access");
-  const messages = await knex<PetitionMessage>("petition_message");
-  const reminders = await knex<PetitionReminder>("petition_reminder");
   const events: Omit<PetitionEvent, "id">[] = [];
+  const petitions = await knex<Petition>("petition");
+  for (const petition of petitions) {
+    events.push({
+      petition_id: petition.id,
+      type: "PETITION_CREATED",
+      data: {
+        user_id: petition.owner_id,
+      },
+      created_at: petition.created_at,
+    });
+  }
+  const accesses = await knex<PetitionAccess>("petition_access");
   for (const access of accesses) {
     events.push({
       petition_id: access.petition_id,
@@ -101,13 +157,24 @@ export async function up(knex: Knex): Promise<any> {
       },
       created_at: access.created_at,
     });
+    if (access.status === "INACTIVE") {
+      events.push({
+        petition_id: access.petition_id,
+        type: "ACCESS_DEACTIVATED",
+        data: {
+          user_id: access.granter_id,
+          petition_access_id: access.id,
+        },
+        created_at: access.updated_at,
+      });
+    }
   }
+  const messages = await knex<PetitionMessage>("petition_message");
   for (const message of messages) {
     events.push({
       petition_id: message.petition_id,
       type: message.scheduled_at ? "MESSAGE_SCHEDULED" : "MESSAGE_PROCESSED",
       data: {
-        petition_access_id: message.petition_access_id,
         petition_message_id: message.id,
       },
       created_at: message.created_at,
@@ -117,24 +184,54 @@ export async function up(knex: Knex): Promise<any> {
         petition_id: message.petition_id,
         type: "MESSAGE_PROCESSED",
         data: {
-          petition_access_id: message.petition_access_id,
           petition_message_id: message.id,
         },
         created_at: message.scheduled_at,
       });
     }
   }
+  const reminders = await knex<PetitionReminder>("petition_reminder");
   for (const reminder of reminders) {
     const access = accesses.find((a) => a.id === reminder.petition_access_id)!;
     events.push({
       petition_id: access.petition_id,
       type: "REMINDER_PROCESSED",
       data: {
-        petition_access_id: reminder.petition_access_id,
         petition_reminder_id: reminder.id,
       },
       created_at: reminder.created_at,
     });
+  }
+  const replies: (PetitionFieldReply & {
+    petition_id: number;
+  })[] = (
+    await knex.raw(/* sql */ `
+    select pfr.*, pf.petition_id from petition_field_reply as pfr join petition_field as pf on pf.id = pfr.petition_field_id
+  `)
+  ).rows;
+  for (const reply of replies) {
+    events.push({
+      petition_id: reply.petition_id,
+      type: "REPLY_CREATED",
+      data: {
+        petition_access_id: reply.petition_access_id,
+        petition_field_id: reply.petition_field_id,
+        petition_field_reply_id: reply.id,
+      },
+      created_at: reply.created_at,
+    });
+    if (reply.deleted_at) {
+      events.push({
+        petition_id: reply.petition_id,
+        type: "REPLY_DELETED",
+        data: {
+          petition_access_id: reply.petition_access_id,
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+        },
+        created_at: reply.deleted_at,
+      });
+    }
   }
   await knex("petition_event").insert(sortBy(events, (e) => e.created_at));
 }

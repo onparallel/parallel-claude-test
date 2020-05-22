@@ -23,13 +23,14 @@ import {
   Petition,
   PetitionAccess,
   PetitionAccessStatus,
+  PetitionEventType,
   PetitionField,
   PetitionFieldReply,
   PetitionFieldType,
   PetitionStatus,
   User,
-  PetitionMessageStatus,
 } from "../__types";
+import { PetitionEventPayload } from "../../graphql/backing/events";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -74,14 +75,24 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(fieldIds).size;
   }
 
-  async accesessBelongToPetition(petitionId: number, accessesIds: number[]) {
+  async accesessBelongToPetition(petitionId: number, accessIds: number[]) {
     const [{ count }] = await this.from("petition_access")
       .where({
         petition_id: petitionId,
       })
-      .whereIn("id", accessesIds)
+      .whereIn("id", accessIds)
       .select(this.count());
-    return count === new Set(accessesIds).size;
+    return count === new Set(accessIds).size;
+  }
+
+  async messagesBelongToPetition(petitionId: number, messagesIds: number[]) {
+    const [{ count }] = await this.from("petition_message")
+      .where({
+        petition_id: petitionId,
+      })
+      .whereIn("id", messagesIds)
+      .select(this.count());
+    return count === new Set(messagesIds).size;
   }
 
   async replyBelongsToAccess(replyId: number, keycode: string) {
@@ -267,9 +278,9 @@ export class PetitionRepository extends BaseRepository {
   );
 
   async createAccesses(
+    petitionId: number,
     data: Pick<
       CreatePetitionAccess,
-      | "petition_id"
       | "contact_id"
       | "next_reminder_at"
       | "reminders_active"
@@ -278,10 +289,11 @@ export class PetitionRepository extends BaseRepository {
     >[],
     user: User
   ) {
-    return await this.insert(
+    const rows = await this.insert(
       "petition_access",
       data.map((item) => ({
         ...item,
+        petition_id: petitionId,
         granter_id: user.id,
         keycode: random(16),
         status: "ACTIVE",
@@ -289,30 +301,61 @@ export class PetitionRepository extends BaseRepository {
         updated_by: `User:${user.id}`,
       }))
     );
+    await this.createEvent(
+      petitionId,
+      "ACCESS_ACTIVATED",
+      rows.map((a) => ({
+        petition_access_id: a.id,
+        user_id: user.id,
+      }))
+    );
+    return rows;
   }
 
   readonly loadMessage = this.buildLoadById("petition_message", "id");
 
   async createMessages(
+    petitionId: number,
+    scheduledAt: Date | null,
     data: Pick<
       CreatePetitionMessage,
-      | "status"
-      | "petition_access_id"
-      | "email_subject"
-      | "email_body"
-      | "petition_id"
-      | "scheduled_at"
+      "status" | "petition_access_id" | "email_subject" | "email_body"
     >[],
     user: User
   ) {
-    return await this.insert(
+    const rows = await this.insert(
       "petition_message",
       data.map((item) => ({
         ...item,
+        scheduled_at: scheduledAt,
+        petition_id: petitionId,
         sender_id: user.id,
         created_by: `User:${user.id}`,
       }))
     );
+    if (scheduledAt) {
+      await this.createEvent(
+        petitionId,
+        "MESSAGE_SCHEDULED",
+        rows.map((m) => ({
+          petition_access_id: m.petition_access_id,
+          petition_message_id: m.id,
+        }))
+      );
+    }
+    return rows;
+  }
+
+  async cancelScheduledMessage(messageId: number) {
+    const [row] = await this.from("petition_message")
+      .where({ id: messageId, status: "SCHEDULED" })
+      .update(
+        {
+          status: "CANCELLED",
+        },
+        "*"
+      );
+    return row ?? null;
   }
 
   async updatePetitionAccessStatus(
@@ -361,6 +404,9 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
+    await this.createEvent(row.petition_id, "MESSAGE_PROCESSED", {
+      petition_message_id: row.id,
+    });
     return row;
   }
 
@@ -375,6 +421,9 @@ export class PetitionRepository extends BaseRepository {
       ...data,
       created_by: `User:${user.id}`,
       updated_by: `User:${user.id}`,
+    });
+    await this.createEvent(row.id, "PETITION_CREATED", {
+      user_id: user.id,
     });
     return row;
   }
@@ -648,7 +697,9 @@ export class PetitionRepository extends BaseRepository {
     contact: Contact
   ) {
     const field = await this.loadField(data.petition_field_id);
-
+    if (!field) {
+      throw new Error("Petition field not found");
+    }
     const [[reply]] = await Promise.all([
       this.insert("petition_field_reply", {
         ...data,
@@ -663,12 +714,23 @@ export class PetitionRepository extends BaseRepository {
         })
         .where({ id: field?.petition_id, status: "COMPLETED" }),
     ]);
+    await this.createEvent(field.petition_id, "REPLY_CREATED", {
+      petition_access_id: reply.petition_access_id,
+      petition_field_id: reply.petition_field_id,
+      petition_field_reply_id: reply.id,
+    });
     return reply;
   }
 
   async deletePetitionFieldReply(replyId: number, contact: Contact) {
     const reply = await this.loadFieldReply(replyId);
     const field = await this.loadField(reply!.petition_field_id);
+    if (!field) {
+      throw new Error("Petition field not found");
+    }
+    if (!reply) {
+      throw new Error("Petition field reply not found");
+    }
     await Promise.all([
       this.from("petition_field_reply")
         .update({
@@ -682,11 +744,16 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `Contact:${contact.id}`,
         })
-        .where({ id: field?.petition_id, status: "COMPLETED" }),
+        .where({ id: field.petition_id, status: "COMPLETED" }),
+      this.createEvent(field!.petition_id, "REPLY_DELETED", {
+        petition_access_id: reply.petition_access_id,
+        petition_field_id: reply.petition_field_id,
+        petition_field_reply_id: reply.id,
+      }),
     ]);
   }
 
-  async completePetition(petitionId: number, contact: Contact) {
+  async completePetition(petitionId: number, accessId: number) {
     const [petition, fields] = await Promise.all([
       this.loadPetition(petitionId),
       this.loadFieldsForPetition(petitionId),
@@ -703,7 +770,7 @@ export class PetitionRepository extends BaseRepository {
       (f) => f.optional || repliesByFieldId[f.id].length > 0
     );
     if (canComplete) {
-      return await this.knex.transaction(async (t) => {
+      const petition = await this.knex.transaction(async (t) => {
         await this.from("petition_access", t)
           .where("petition_id", petitionId)
           .update(
@@ -718,12 +785,17 @@ export class PetitionRepository extends BaseRepository {
             {
               status: "COMPLETED",
               updated_at: this.now(),
-              updated_by: `Contact:${contact.id}`,
+              updated_by: `PetitionAccess:${accessId}`,
             },
             "*"
           );
+
         return updated;
       });
+      await this.createEvent(petitionId, "PETITION_COMPLETED", {
+        petition_access_id: accessId,
+      });
+      return petition;
     } else {
       throw new Error("Can't transition status to COMPLETED");
     }
@@ -756,6 +828,9 @@ export class PetitionRepository extends BaseRepository {
       created_by: `User:${user.id}`,
       updated_by: `User:${user.id}`,
     });
+    await this.createEvent(cloned.id, "PETITION_CREATED", {
+      user_id: user.id,
+    });
 
     const fields = await this.loadFieldsForPetition(petitionId);
     await this.insert(
@@ -774,5 +849,33 @@ export class PetitionRepository extends BaseRepository {
       }))
     );
     return cloned;
+  }
+
+  async loadEventsForPetition(petitionId: number, opts: PageOpts) {
+    return await this.loadPageAndCount(
+      this.from("petition_event")
+        .where("petition_id", petitionId)
+        .orderBy([
+          { column: "created_at", order: "asc" },
+          { column: "id", order: "asc" },
+        ])
+        .select("*"),
+      opts
+    );
+  }
+
+  async createEvent<TType extends PetitionEventType>(
+    petitionId: number,
+    type: TType,
+    payload: MaybeArray<PetitionEventPayload[TType]>
+  ) {
+    return await this.insert(
+      "petition_event",
+      (Array.isArray(payload) ? payload : [payload]).map((data) => ({
+        petition_id: petitionId,
+        type,
+        data,
+      }))
+    );
   }
 }

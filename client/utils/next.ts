@@ -1,5 +1,4 @@
 import { ParsedUrlQuery } from "querystring";
-import { NextComponentType } from "next";
 
 export function resolveUrl(pathname: string, query: ParsedUrlQuery) {
   return pathname.replace(/\[(\.{3})?([^\]]*)]/g, (_, spread, name) => {

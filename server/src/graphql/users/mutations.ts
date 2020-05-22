@@ -76,7 +76,12 @@ export const changePassword = mutationField("changePassword", {
 
 export const OnboardingKey = enumType({
   name: "OnboardingKey",
-  members: ["PETITIONS_LIST", "PETITION_COMPOSE", "PETITION_REVIEW"],
+  members: [
+    "PETITIONS_LIST",
+    "PETITION_COMPOSE",
+    "PETITION_REVIEW",
+    "PETITION_ACTIVITY",
+  ],
 });
 
 export const OnboardingStatus = enumType({

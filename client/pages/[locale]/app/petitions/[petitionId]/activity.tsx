@@ -29,6 +29,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -41,9 +42,8 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   } = assertQuery(usePetitionActivityUserQuery());
   const {
     data: { petition },
+    refetch,
   } = assertQuery(usePetitionActivityQuery({ variables: { id: petitionId } }));
-
-  console.log(petition?.events);
 
   const [state, setState] = usePetitionState();
   const wrapper = useWrapPetitionUpdater(setState);
@@ -57,6 +57,8 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   );
 
   const sendReminder = useSendReminder();
+
+  const handleCancelScheduledMessage = useCancelScheduledMessage(refetch);
 
   return (
     <>
@@ -78,14 +80,17 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         <Flex>
           <Box flex="2">
             <PetitionAccessesTable
+              id="petition-accesses"
               margin={4}
-              accesses={petition!.accesses}
+              petition={petition!}
               onSendReminder={() => {}}
             />
             <Box margin={4}>
               <PetitionActivityTimeline
+                id="petition-activity-timeline"
                 userId={me.id}
                 events={petition!.events.items}
+                onCancelScheduledMessage={handleCancelScheduledMessage}
               />
             </Box>
           </Box>
@@ -131,11 +136,9 @@ PetitionActivity.mutations = [
   gql`
     mutation PetitionActivity_sendReminders(
       $petitionId: ID!
-      $accessesIds: [ID!]!
+      $accessIds: [ID!]!
     ) {
-      sendReminders(petitionId: $petitionId, accessesIds: $accessesIds) {
-        result
-      }
+      sendReminders(petitionId: $petitionId, accessIds: $accessIds)
     }
   `,
 ];
@@ -146,7 +149,7 @@ function useSendReminder() {
   const [sendReminders] = usePetitionActivity_sendRemindersMutation();
   return useCallback(async (petitionId: string, accessId: string) => {
     await sendReminders({
-      variables: { petitionId, accessesIds: [accessId] },
+      variables: { petitionId, accessIds: [accessId] },
     });
     toast({
       title: intl.formatMessage({
@@ -161,6 +164,15 @@ function useSendReminder() {
       duration: 3000,
       isClosable: true,
     });
+  }, []);
+}
+
+function useCancelScheduledMessage(refetch: () => void) {
+  const confirm = useConfirmCancelScheduledMessageDialog();
+  return useCallback(async (messageId: string) => {
+    try {
+      await confirm({});
+    } catch {}
   }, []);
 }
 
@@ -198,12 +210,12 @@ PetitionActivity.getInitialProps = async ({
 
 export default compose(
   withOnboarding({
-    key: "PETITION_REVIEW",
+    key: "PETITION_ACTIVITY",
     steps: [
       {
         title: (
           <FormattedMessage
-            id="tour.petition-replies.monitor-requests"
+            id="tour.petition-activity.monitor-requests"
             defaultMessage="Monitor your requests"
           />
         ),
@@ -211,7 +223,7 @@ export default compose(
           <>
             <Text>
               <FormattedMessage
-                id="tour.petition-replies.you-can"
+                id="tour.petition-activity.you-can"
                 defaultMessage="In this section, you will be able to:"
               />
             </Text>
@@ -224,48 +236,45 @@ export default compose(
             >
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-replies.track"
-                  defaultMessage="<b>Track</b> whether your recipients have received or opened your message."
+                  id="tour.petition-activity.track"
+                  defaultMessage="Manage who can <b>access</b> this petition."
                   values={{
-                    b: (chunks: any[]) => (
-                      <Text as="em" fontStyle="normal" fontWeight="bold">
-                        {chunks}
-                      </Text>
-                    ),
+                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-replies.next-reminder"
+                  id="tour.petition-activity.send-message"
+                  defaultMessage="Send a <b>follow-up</b> message to a recipients."
+                  values={{
+                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+                  }}
+                />
+              </ListItem>
+              <ListItem>
+                <FormattedMessage
+                  id="tour.petition-activity.next-reminder"
                   defaultMessage="See when will the <b>next reminder</b> be sent."
                   values={{
-                    b: (chunks: any[]) => (
-                      <Text as="em" fontStyle="normal" fontWeight="bold">
-                        {chunks}
-                      </Text>
-                    ),
+                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}
                 />
               </ListItem>
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-replies.send-manual-reminder"
+                  id="tour.petition-activity.send-manual-reminder"
                   defaultMessage="Manually <b>send reminders</b> to your recipients."
                   values={{
-                    b: (chunks: any[]) => (
-                      <Text as="em" fontStyle="normal" fontWeight="bold">
-                        {chunks}
-                      </Text>
-                    ),
+                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}
                 />
               </ListItem>
             </List>
           </>
         ),
-        placement: "top",
-        target: "#sendouts",
+        placement: "right",
+        target: "#petition-accesses",
       },
     ],
   }),

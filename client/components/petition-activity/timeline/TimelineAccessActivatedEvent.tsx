@@ -23,13 +23,13 @@ export function TimelineAccessActivatedEvent({
         <TimelineIcon
           icon="user-plus"
           color="white"
-          backgroundColor="green.500"
+          backgroundColor="blue.500"
         />
       }
     >
       <FormattedMessage
         id="timeline.access-activated-description"
-        defaultMessage="{same, select, true {You have} other {<b>{user}</b> has}} given access to {contact} {timeAgo}"
+        defaultMessage="{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}"
         values={{
           same: userId === event.user.id,
           b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,

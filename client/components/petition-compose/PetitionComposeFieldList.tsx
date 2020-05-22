@@ -8,14 +8,15 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { gql } from "apollo-boost";
 import {
   KeyboardEvent,
+  memo,
   useCallback,
   useEffect,
   useReducer,
   useRef,
-  memo,
 } from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy } from "remeda";
@@ -56,10 +57,10 @@ function reset(
 
 export type PetitionComposeFieldListProps = {
   active: Maybe<string>;
-  fields: any;
+  fields: FieldSelection[];
   showErrors: boolean;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
-  onSettingsClick: (fieldId: string) => void;
+  onFieldSettingsClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => void;
   onFieldFocus: (fieldId: string) => void;
   onAddField: (type: PetitionFieldType) => void;
@@ -72,7 +73,7 @@ export const PetitionComposeFieldList = Object.assign(
     fields,
     showErrors,
     onUpdateFieldPositions,
-    onSettingsClick,
+    onFieldSettingsClick,
     onDeleteField,
     onFieldFocus,
     onAddField,
@@ -119,8 +120,27 @@ export const PetitionComposeFieldList = Object.assign(
       title?.focus();
     }, []);
 
-    const handleTitleKeyUp = useCallback(
-      function (fieldId: string, event: KeyboardEvent<any>) {
+    // Memoize field callbacks
+    const handleFocus = useMemoFactory(
+      (fieldId: string) => () => onFieldFocus(fieldId),
+      [onFieldFocus]
+    );
+    const handleSettingsClick = useMemoFactory(
+      (fieldId: string) => () => onFieldSettingsClick(fieldId),
+      [onFieldSettingsClick]
+    );
+    const handleDeleteClick = useMemoFactory(
+      (fieldId: string) => () => onDeleteField(fieldId),
+      [onDeleteField]
+    );
+    const handleFieldEdit = useMemoFactory(
+      (fieldId: string) => (data: UpdatePetitionFieldInput) =>
+        onFieldEdit(fieldId, data),
+      [onFieldEdit]
+    );
+
+    const handleTitleKeyUp = useMemoFactory(
+      (fieldId: string) => (event: KeyboardEvent<any>) => {
         const index = fieldIds.indexOf(fieldId);
         switch (event.key) {
           case "ArrowDown":
@@ -136,11 +156,11 @@ export const PetitionComposeFieldList = Object.assign(
             break;
         }
       },
-      [fieldIds.join(",")]
+      [fieldIds.toString()]
     );
 
-    const handleDescriptionKeyUp = useCallback(
-      function (fieldId: string, event: KeyboardEvent<HTMLTextAreaElement>) {
+    const handleDescriptionKeyUp = useMemoFactory(
+      (fieldId: string) => (event: KeyboardEvent<HTMLTextAreaElement>) => {
         const textarea = event.target as HTMLTextAreaElement;
         const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
         const beforeCursor = textarea.value.substr(0, textarea.selectionStart);
@@ -159,7 +179,7 @@ export const PetitionComposeFieldList = Object.assign(
             break;
         }
       },
-      [fieldIds.join(",")]
+      [fieldIds.toString()]
     );
 
     return (
@@ -177,18 +197,18 @@ export const PetitionComposeFieldList = Object.assign(
             {fieldIds.map((fieldId, index) => (
               <PetitionComposeField
                 id={`field-${fieldId}`}
-                onFocus={onFieldFocus}
                 onMove={handleFieldMove}
                 key={fieldId}
                 field={fieldsById[fieldId]}
                 index={index}
                 active={active === fieldId}
                 showError={showErrors}
-                onSettingsClick={onSettingsClick}
-                onDeleteClick={onDeleteField}
-                onFieldEdit={onFieldEdit}
-                onTitleKeyUp={handleTitleKeyUp}
-                onDescriptionKeyUp={handleDescriptionKeyUp}
+                onFocus={handleFocus(fieldId)}
+                onSettingsClick={handleSettingsClick(fieldId)}
+                onDeleteClick={handleDeleteClick(fieldId)}
+                onFieldEdit={handleFieldEdit(fieldId)}
+                onTitleKeyUp={handleTitleKeyUp(fieldId)}
+                onDescriptionKeyUp={handleDescriptionKeyUp(fieldId)}
               />
             ))}
             <Flex padding={2} justifyContent="center">

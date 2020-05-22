@@ -15,9 +15,9 @@ import { PetitionComposeField } from "@parallel/components/petition-compose/Peti
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
 import {
-  PetitionComposeSettings,
-  PetitionComposeSettingsProps,
-} from "@parallel/components/petition-compose/PetitionComposeSettings";
+  PetitionComposeMessageEditor,
+  PetitionComposeMessageEditorProps,
+} from "@parallel/components/petition-compose/PetitionComposeMessageEditor";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/ScheduleMessageDialog";
 import {
   PetitionComposeQuery,
@@ -149,7 +149,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId, activeFieldId]
   );
 
-  const handleUpdateField = useCallback(
+  const handleFieldEdit = useCallback(
     wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const field = petition!.fields.find((f) => f.id === fieldId);
       await updatePetitionField({
@@ -160,8 +160,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             petition: {
               __typename: "Petition",
               id: petitionId,
-              name: petition!.name,
-              status: petition!.status,
               updatedAt: new Date().toISOString(),
             },
             field: {
@@ -200,7 +198,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showErrorDialog = useErrorDialog();
   const showScheduleMessageDialog = useScheduleMessageDialog();
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
-  const handleSend: PetitionComposeSettingsProps["onSend"] = useCallback(
+  const handleSend: PetitionComposeMessageEditorProps["onSend"] = useCallback(
     async ({ contactIds, schedule }) => {
       if (petition!.fields.length === 0) {
         try {
@@ -345,10 +343,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onDeleteField={handleDeleteField}
               onFieldFocus={handleFieldFocus}
               onUpdateFieldPositions={handleUpdateFieldPositions}
-              onFieldEdit={handleUpdateField}
-              onSettingsClick={setActiveFieldId}
+              onFieldEdit={handleFieldEdit}
+              onFieldSettingsClick={setActiveFieldId}
             />
-            <PetitionComposeSettings
+            <PetitionComposeMessageEditor
               marginTop={4}
               petition={petition!}
               searchContacts={searchContacts}
@@ -370,7 +368,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 position={{ base: "relative", md: "sticky" }}
                 top={{ base: 0, md: 4 }}
                 field={activeField}
-                onFieldEdit={handleUpdateField}
+                onFieldEdit={handleFieldEdit}
                 onClose={() => setActiveFieldId(null)}
               />
             ) : null}
@@ -389,7 +387,7 @@ PetitionCompose.fragments = {
       fields {
         ...PetitionCompose_PetitionField
       }
-      ...PetitionComposeSettings_Petition
+      ...PetitionComposeMessageEditor_Petition
     }
     fragment PetitionCompose_PetitionField on PetitionField {
       ...PetitionComposeField_PetitionField
@@ -398,7 +396,7 @@ PetitionCompose.fragments = {
     ${PetitionLayout.fragments.Petition}
     ${PetitionComposeField.fragments.PetitionField}
     ${PetitionComposeFieldSettings.fragments.PetitionField}
-    ${PetitionComposeSettings.fragments.Petition}
+    ${PetitionComposeMessageEditor.fragments.Petition}
   `,
   User: gql`
     fragment PetitionCompose_User on User {
@@ -416,11 +414,11 @@ PetitionCompose.mutations = [
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_Petition
-        ...PetitionComposeSettings_Petition
+        ...PetitionComposeMessageEditor_Petition
       }
     }
     ${PetitionLayout.fragments.Petition}
-    ${PetitionComposeSettings.fragments.Petition}
+    ${PetitionComposeMessageEditor.fragments.Petition}
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions(
@@ -483,11 +481,11 @@ PetitionCompose.mutations = [
           ...PetitionComposeFieldSettings_PetitionField
         }
         petition {
-          ...PetitionLayout_Petition
+          id
+          updatedAt
         }
       }
     }
-    ${PetitionLayout.fragments.Petition}
     ${PetitionComposeField.fragments.PetitionField}
     ${PetitionComposeFieldSettings.fragments.PetitionField}
   `,
@@ -750,11 +748,7 @@ export default compose(
               id="tour.petition-compose.select-multiple-recipients"
               defaultMessage="If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested."
               values={{
-                b: (chunks: any[]) => (
-                  <Text as="em" fontStyle="normal" fontWeight="bold">
-                    {chunks}
-                  </Text>
-                ),
+                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               }}
             />
           </Text>
@@ -793,11 +787,7 @@ export default compose(
               id="tour.petition-compose.petition-advanced-settings"
               defaultMessage="Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them."
               values={{
-                b: (chunks: any[]) => (
-                  <Text as="em" fontStyle="normal" fontWeight="bold">
-                    {chunks}
-                  </Text>
-                ),
+                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               }}
             />
           </Text>

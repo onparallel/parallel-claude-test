@@ -399,11 +399,7 @@ export default compose(
               id="tour.petition-replies.completed-items"
               defaultMessage="If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>."
               values={{
-                b: (chunks: any[]) => (
-                  <Text as="em" fontStyle="normal" fontWeight="bold">
-                    {chunks}
-                  </Text>
-                ),
+                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               }}
             />
           </Text>

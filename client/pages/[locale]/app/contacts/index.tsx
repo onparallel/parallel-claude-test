@@ -1,5 +1,6 @@
-import { Button, Flex, Text, Box } from "@chakra-ui/core";
+import { Box, Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { DateTime } from "@parallel/components/common/DateTime";
 import {
   DialogCallbacks,
   useDialog,
@@ -7,39 +8,37 @@ import {
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
-import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
+import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   ContactsQuery,
   ContactsQueryVariables,
   ContactsUserQuery,
   Contacts_ContactsListFragment,
+  QueryContacts_OrderBy,
   useContactsQuery,
   useContactsUserQuery,
   useContacts_deleteContactsMutation,
-  QueryContacts_OrderBy,
 } from "@parallel/graphql/__types";
 import { assertQuery, clearCache } from "@parallel/utils/apollo";
+import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
   parseQuery,
+  sorting,
   string,
   useQueryState,
-  sorting,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { memo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useMemo } from "react";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { FORMATS } from "@parallel/utils/dates";
 
 const PAGE_SIZE = 10;
 

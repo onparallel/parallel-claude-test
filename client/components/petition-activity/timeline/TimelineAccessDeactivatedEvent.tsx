@@ -20,16 +20,12 @@ export function TimelineAccessDeactivatedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon
-          icon="forbidden"
-          color="white"
-          backgroundColor="red.500"
-        />
+        <TimelineIcon icon="user-x" color="white" backgroundColor="red.500" />
       }
     >
       <FormattedMessage
-        id="timeline.access-Deactivated-description"
-        defaultMessage="{same, select, true {You have} other {<b>{user}</b> has}} removed access to {contact} {timeAgo}"
+        id="timeline.access-deactivated-description"
+        defaultMessage="{same, select, true {You} other {<b>{user}</b>}} removed access to {contact} {timeAgo}"
         values={{
           same: userId === event.user.id,
           b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,

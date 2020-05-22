@@ -140,7 +140,7 @@ export const Petition = objectType({
       type: "PetitionEvent",
       description: "The events for the petition.",
       resolve: async (root, { offset, limit }, ctx) => {
-        return await ctx.events.loadEventsForPetition(root.id, {
+        return await ctx.petitions.loadEventsForPetition(root.id, {
           offset,
           limit,
         });
@@ -504,10 +504,16 @@ export const PetitionEvent = interfaceType({
     });
     t.resolveType((p) => {
       switch (p.type) {
+        case "PETITION_CREATED":
+          return "PetitionCreatedEvent";
+        case "PETITION_COMPLETED":
+          return "PetitionCompletedEvent";
         case "ACCESS_ACTIVATED":
           return "AccessActivatedEvent";
         case "ACCESS_DEACTIVATED":
           return "AccessDeactivatedEvent";
+        case "ACCESS_OPENED":
+          return "AccessOpenedEvent";
         case "MESSAGE_SCHEDULED":
           return "MessageScheduledEvent";
         case "MESSAGE_CANCELLED":
@@ -516,6 +522,10 @@ export const PetitionEvent = interfaceType({
           return "MessageProcessedEvent";
         case "REMINDER_PROCESSED":
           return "ReminderProcessedEvent";
+        case "REPLY_CREATED":
+          return "ReplyCreatedEvent";
+        case "REPLY_DELETED":
+          return "ReplyDeletedEvent";
       }
     });
   },
@@ -535,6 +545,30 @@ function createPetitionEvent<TypeName extends string>(
     rootTyping: `events.${name}`,
   });
 }
+
+export const PetitionCreatedEvent = createPetitionEvent(
+  "PetitionCreatedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.data.user_id))!;
+      },
+    });
+  }
+);
+
+export const PetitionCompletedEvent = createPetitionEvent(
+  "PetitionCompletedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
+);
 
 export const AccessActivatedEvent = createPetitionEvent(
   "AccessActivatedEvent",
@@ -572,8 +606,8 @@ export const AccessDeactivatedEvent = createPetitionEvent(
   }
 );
 
-export const MessageScheduledEvent = createPetitionEvent(
-  "MessageScheduledEvent",
+export const AccessOpenedEvent = createPetitionEvent(
+  "AccessOpenedEvent",
   (t) => {
     t.field("access", {
       type: "PetitionAccess",
@@ -581,6 +615,12 @@ export const MessageScheduledEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
+  }
+);
+
+export const MessageScheduledEvent = createPetitionEvent(
+  "MessageScheduledEvent",
+  (t) => {
     t.field("message", {
       type: "PetitionMessage",
       resolve: async (root, _, ctx) => {
@@ -595,12 +635,6 @@ export const MessageScheduledEvent = createPetitionEvent(
 export const MessagesCancelledEvent = createPetitionEvent(
   "MessageCancelledEvent",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
-      },
-    });
     t.field("message", {
       type: "PetitionMessage",
       resolve: async (root, _, ctx) => {
@@ -615,12 +649,6 @@ export const MessagesCancelledEvent = createPetitionEvent(
 export const MessageProcessedEvent = createPetitionEvent(
   "MessageProcessedEvent",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
-      },
-    });
     t.field("message", {
       type: "PetitionMessage",
       resolve: async (root, _, ctx) => {
@@ -635,18 +663,68 @@ export const MessageProcessedEvent = createPetitionEvent(
 export const ReminderProcessedEvent = createPetitionEvent(
   "ReminderProcessedEvent",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
-      },
-    });
     t.field("reminder", {
       type: "PetitionReminder",
       resolve: async (root, _, ctx) => {
         return (await ctx.reminders.loadReminder(
           root.data.petition_reminder_id
         ))!;
+      },
+    });
+  }
+);
+
+export const ReplyCreatedEvent = createPetitionEvent(
+  "ReplyCreatedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("field", {
+      type: "PetitionField",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      },
+    });
+    t.field("reply", {
+      type: "PetitionFieldReply",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadFieldReply(
+          root.data.petition_field_reply_id
+        );
+      },
+    });
+  }
+);
+
+export const ReplyDeletedEvent = createPetitionEvent(
+  "ReplyDeletedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.field("field", {
+      type: "PetitionField",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      },
+    });
+    t.field("reply", {
+      type: "PetitionFieldReply",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadFieldReply(
+          root.data.petition_field_reply_id
+        );
       },
     });
   }

@@ -1,0 +1,60 @@
+import { Link } from "@chakra-ui/core";
+import { ContactLink } from "@parallel/components/common/ContactLink";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
+import { TimelineAccessOpenedEvent_AccessOpenedEventFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { gql } from "apollo-boost";
+import { FormattedMessage } from "react-intl";
+import { TimelineIcon, TimelineItem } from "./helpers";
+
+export type TimelineAccessOpenedEventProps = {
+  event: TimelineAccessOpenedEvent_AccessOpenedEventFragment;
+};
+
+export function TimelineAccessOpenedEvent({
+  event,
+}: TimelineAccessOpenedEventProps) {
+  return (
+    <TimelineItem
+      icon={
+        <TimelineIcon icon="view" color="white" backgroundColor="blue.500" />
+      }
+    >
+      <FormattedMessage
+        id="timeline.access-opened-description"
+        defaultMessage="{contact} opened the petition {timeAgo}"
+        values={{
+          contact: event.access.contact ? (
+            <ContactLink contact={event.access.contact} />
+          ) : (
+            <DeletedContact />
+          ),
+          timeAgo: (
+            <Link>
+              <DateTime
+                value={event.createdAt}
+                format={FORMATS.LLL}
+                useRelativeTime="always"
+              />
+            </Link>
+          ),
+        }}
+      />
+    </TimelineItem>
+  );
+}
+
+TimelineAccessOpenedEvent.fragments = {
+  AccessOpenedEvent: gql`
+    fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
+      access {
+        contact {
+          ...ContactLink_Contact
+        }
+      }
+      createdAt
+    }
+    ${ContactLink.fragments.Contact}
+  `,
+};

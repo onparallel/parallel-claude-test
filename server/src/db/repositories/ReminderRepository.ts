@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreatePetitionReminder, PetitionReminder } from "../__types";
+import { CreatePetitionReminder } from "../__types";
 
 @injectable()
 export class ReminderRepository extends BaseRepository {

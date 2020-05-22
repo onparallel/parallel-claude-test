@@ -1,4 +1,4 @@
-import { Link, Text } from "@chakra-ui/core";
+import { Link, Text, Flex, Box, Button } from "@chakra-ui/core";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -12,11 +12,13 @@ import { TimelineIcon, TimelineItem } from "./helpers";
 export type TimelineMessageScheduledEventProps = {
   userId: string;
   event: TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+  onCancelScheduledMessage: () => void;
 };
 
 export function TimelineMessageScheduledEvent({
-  event,
+  event: { message, createdAt },
   userId,
+  onCancelScheduledMessage,
 }: TimelineMessageScheduledEventProps) {
   return (
     <TimelineItem
@@ -24,38 +26,57 @@ export function TimelineMessageScheduledEvent({
         <TimelineIcon icon="time" color="black" backgroundColor="gray.200" />
       }
     >
-      <>
-        <FormattedMessage
-          id="timeline.message-Scheduled-description-manual"
-          defaultMessage="{same, select, true {You} other {<b>{user}</b>}} scheduled a message {subject, select, null {without subject} other {with subject <i>{subject}</i>}} to {contact} {timeAgo}"
-          values={{
-            same: userId === event.message.sender!.id,
-            b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            i: (...chunks: any[]) => (
-              <Text as="em" textDecoration="underline" fontStyle="normal">
-                {chunks}
-              </Text>
-            ),
-            user: event.message.sender!.fullName,
-            subject: event.message.emailSubject,
-            contact: event.access.contact ? (
-              <ContactLink contact={event.access.contact} />
-            ) : (
-              <DeletedContact />
-            ),
-            timeAgo: (
-              <Link>
-                <DateTime
-                  value={event.createdAt}
-                  format={FORMATS.LLL}
-                  useRelativeTime="always"
-                />
-              </Link>
-            ),
-          }}
-        />
-        <MessageEventsIndicator message={event.message} marginLeft={2} />
-      </>
+      <Flex alignItems="center">
+        <Box flex="1">
+          <FormattedMessage
+            id="timeline.message-scheduled-description"
+            defaultMessage="{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+            values={{
+              same: userId === message.sender!.id,
+              b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+              user: message.sender!.fullName,
+              subject: message.emailSubject,
+              contact: message.access.contact ? (
+                <ContactLink contact={message.access.contact} />
+              ) : (
+                <DeletedContact />
+              ),
+              scheduledAt: (
+                <Link fontWeight="bold">
+                  <DateTime
+                    value={message.scheduledAt!}
+                    format={FORMATS.LLL}
+                    useRelativeTime
+                  />
+                </Link>
+              ),
+              timeAgo: (
+                <Link>
+                  <DateTime
+                    value={createdAt}
+                    format={FORMATS.LLL}
+                    useRelativeTime="always"
+                  />
+                </Link>
+              ),
+            }}
+          />
+        </Box>
+        {message.status === "SCHEDULED" ? (
+          <Button
+            size="sm"
+            variant="outline"
+            variantColor="red"
+            marginLeft={4}
+            onClick={onCancelScheduledMessage}
+          >
+            <FormattedMessage
+              id="timeline.message-scheduled-cancel"
+              defaultMessage="Cancel"
+            />
+          </Button>
+        ) : null}
+      </Flex>
     </TimelineItem>
   );
 }
@@ -68,13 +89,15 @@ TimelineMessageScheduledEvent.fragments = {
           id
           fullName
         }
+        status
+        scheduledAt
         emailSubject
-        ...MessageEventsIndicator_PetitionMessage
-      }
-      access {
-        contact {
-          ...ContactLink_Contact
+        access {
+          contact {
+            ...ContactLink_Contact
+          }
         }
+        ...MessageEventsIndicator_PetitionMessage
       }
       createdAt
     }

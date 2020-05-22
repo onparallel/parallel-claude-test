@@ -20,11 +20,10 @@ import {
   ChangeEvent,
   FocusEvent,
   KeyboardEvent,
+  memo,
   MouseEvent,
   useRef,
   useState,
-  useCallback,
-  memo,
 } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
@@ -37,25 +36,13 @@ export type PetitionComposeFieldProps = {
   index: number;
   active: boolean;
   showError: boolean;
-  onFocus: (fieldId: string, event: FocusEvent) => void;
+  onFocus: (event: FocusEvent) => void;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
-  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
-  onSettingsClick: (
-    fieldId: string,
-    event: MouseEvent<HTMLButtonElement>
-  ) => void;
-  onDeleteClick: (
-    fieldId: string,
-    event: MouseEvent<HTMLButtonElement>
-  ) => void;
-  onTitleKeyUp: (
-    fieldId: string,
-    event: KeyboardEvent<HTMLInputElement>
-  ) => void;
-  onDescriptionKeyUp: (
-    fieldId: string,
-    event: KeyboardEvent<HTMLTextAreaElement>
-  ) => void;
+  onFieldEdit: (data: UpdatePetitionFieldInput) => void;
+  onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onTitleKeyUp: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onDescriptionKeyUp: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 } & Omit<BoxProps, "onFocus">;
 
 interface DragItem {
@@ -94,7 +81,6 @@ export const PetitionComposeField = Object.assign(
     );
     const [title, setTitle] = useState(field.title);
     const [description, setDescription] = useState(field.description);
-    const handleFocus = useCallback(onFocus.bind(null, field.id), []);
     return (
       <Box
         ref={elementRef}
@@ -107,7 +93,7 @@ export const PetitionComposeField = Object.assign(
             ? generateCssStripe({ size: "1rem", color: colors.gray[50] })
             : null
         }
-        onFocus={handleFocus}
+        onFocus={onFocus}
         {...props}
       >
         <PseudoBox
@@ -190,7 +176,7 @@ export const PetitionComposeField = Object.assign(
             <PetitionFieldTypeIndicator
               type={field.type}
               index={index}
-              onClick={(event) => onSettingsClick(field.id, event)}
+              onClick={(event) => onSettingsClick(event)}
               marginTop="10px"
               alignSelf="flex-start"
             />
@@ -228,10 +214,10 @@ export const PetitionComposeField = Object.assign(
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setTitle(event.target.value ?? null)
               }
-              onKeyUp={(event) => onTitleKeyUp(field.id, event)}
+              onKeyUp={onTitleKeyUp}
               onBlur={() => {
                 if (title !== field.title) {
-                  onFieldEdit(field.id, { title });
+                  onFieldEdit({ title });
                 }
               }}
             />
@@ -263,7 +249,7 @@ export const PetitionComposeField = Object.assign(
               }
               onBlur={() => {
                 if (description !== field.description) {
-                  onFieldEdit(field.id, { description });
+                  onFieldEdit({ description });
                 }
               }}
               // chakra typings are wrong
@@ -288,7 +274,7 @@ export const PetitionComposeField = Object.assign(
                 id: "petition.field-settings",
                 defaultMessage: "Field settings",
               })}
-              onClick={(event) => onSettingsClick(field.id, event)}
+              onClick={(event) => onSettingsClick(event)}
             />
             <IconButtonWithTooltip
               icon="delete"
@@ -300,7 +286,7 @@ export const PetitionComposeField = Object.assign(
                 id: "petition.field-delete-button",
                 defaultMessage: "Delete field",
               })}
-              onClick={(event) => onDeleteClick(field.id, event)}
+              onClick={(event) => onDeleteClick(event)}
             />
           </Stack>
         </PseudoBox>
@@ -398,5 +384,3 @@ function useDragAndDrop(
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
 }
-
-(PetitionComposeField as any).whyDidYouRender = true;

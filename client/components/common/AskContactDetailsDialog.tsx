@@ -14,8 +14,8 @@ import {
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useMergeRefs } from "./useMergeRefs";
-import { EMAIL_REGEX } from "./validation";
+import { useMergeRefs } from "../../utils/useMergeRefs";
+import { EMAIL_REGEX } from "../../utils/validation";
 
 export type ContactDetailsFormData = {
   email: string;

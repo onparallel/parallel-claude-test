@@ -33,6 +33,13 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   user: User;
 };
 
+export type AccessOpenedEvent = PetitionEvent & {
+  __typename?: "AccessOpenedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+};
+
 export type ChangePasswordResult =
   | "INCORRECT_PASSWORD"
   | "INVALID_NEW_PASSWORD"
@@ -109,7 +116,6 @@ export type FileUploadReplyDownloadLinkResult = {
 
 export type MessageCancelledEvent = PetitionEvent & {
   __typename?: "MessageCancelledEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
@@ -117,7 +123,6 @@ export type MessageCancelledEvent = PetitionEvent & {
 
 export type MessageProcessedEvent = PetitionEvent & {
   __typename?: "MessageProcessedEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
@@ -125,7 +130,6 @@ export type MessageProcessedEvent = PetitionEvent & {
 
 export type MessageScheduledEvent = PetitionEvent & {
   __typename?: "MessageScheduledEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
@@ -133,6 +137,8 @@ export type MessageScheduledEvent = PetitionEvent & {
 
 export type Mutation = {
   __typename?: "Mutation";
+  /** Cancels scheduled petition messages. */
+  cancelScheduledMessages?: Maybe<PetitionMessage>;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Clone petition. */
@@ -164,7 +170,7 @@ export type Mutation = {
   /** Sends the petition and creates the corresponding accesses and messages. */
   sendPetition: SendPetitionResult;
   /** Sends a reminder for the specified petition accesses. */
-  sendReminders: SendReminderResult;
+  sendReminders: Result;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -179,6 +185,11 @@ export type Mutation = {
   updateUser: User;
   /** Updates the validation of a petition field. */
   validatePetitionFields: PetitionAndFields;
+};
+
+export type MutationcancelScheduledMessagesArgs = {
+  messageId: Scalars["ID"];
+  petitionId: Scalars["ID"];
 };
 
 export type MutationchangePasswordArgs = {
@@ -256,7 +267,7 @@ export type MutationsendPetitionArgs = {
 };
 
 export type MutationsendRemindersArgs = {
-  accessesIds: Array<Scalars["ID"]>;
+  accessIds: Array<Scalars["ID"]>;
   petitionId: Scalars["ID"];
 };
 
@@ -298,6 +309,7 @@ export type MutationvalidatePetitionFieldsArgs = {
 };
 
 export type OnboardingKey =
+  | "PETITION_ACTIVITY"
   | "PETITION_COMPOSE"
   | "PETITION_REVIEW"
   | "PETITIONS_LIST";
@@ -436,6 +448,20 @@ export type PetitionAndFields = {
   __typename?: "PetitionAndFields";
   fields: Array<PetitionField>;
   petition: Petition;
+};
+
+export type PetitionCompletedEvent = PetitionEvent & {
+  __typename?: "PetitionCompletedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+};
+
+export type PetitionCreatedEvent = PetitionEvent & {
+  __typename?: "PetitionCreatedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  user: User;
 };
 
 export type PetitionEvent = {
@@ -746,7 +772,6 @@ export type QueryPetitions_OrderBy =
 
 export type ReminderProcessedEvent = PetitionEvent & {
   __typename?: "ReminderProcessedEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   reminder: PetitionReminder;
@@ -777,17 +802,30 @@ export type RemindersConfigInput = {
   weekdaysOnly: Scalars["Boolean"];
 };
 
+export type ReplyCreatedEvent = PetitionEvent & {
+  __typename?: "ReplyCreatedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  field?: Maybe<PetitionField>;
+  id: Scalars["ID"];
+  reply?: Maybe<PetitionFieldReply>;
+};
+
+export type ReplyDeletedEvent = PetitionEvent & {
+  __typename?: "ReplyDeletedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  field?: Maybe<PetitionField>;
+  id: Scalars["ID"];
+  reply?: Maybe<PetitionFieldReply>;
+};
+
 /** Represents the result of an operation. */
 export type Result = "FAILURE" | "SUCCESS";
 
 export type SendPetitionResult = {
   __typename?: "SendPetitionResult";
   petition?: Maybe<Petition>;
-  result: Result;
-};
-
-export type SendReminderResult = {
-  __typename?: "SendReminderResult";
   result: Result;
 };
 
@@ -920,13 +958,13 @@ export type MessageEventsIndicator_PetitionMessageFragment = {
 
 export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
-} & {
-  accesses: Array<
-    {
-      __typename?: "PetitionAccess";
-    } & PetitionAccessTable_PetitionAccessFragment
-  >;
-};
+} & Pick<Petition, "status"> & {
+    accesses: Array<
+      {
+        __typename?: "PetitionAccess";
+      } & PetitionAccessTable_PetitionAccessFragment
+    >;
+  };
 
 export type PetitionAccessTable_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
@@ -946,6 +984,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "AccessDeactivatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment)
       | ({
+          __typename?: "AccessOpenedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment)
+      | ({
           __typename?: "MessageCancelledEvent";
         } & PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment)
       | ({
@@ -955,8 +996,20 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "MessageScheduledEvent";
         } & PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment)
       | ({
+          __typename?: "PetitionCompletedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment)
+      | ({
+          __typename?: "PetitionCreatedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment)
+      | ({
           __typename?: "ReminderProcessedEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment)
+      | ({
+          __typename?: "ReplyCreatedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment)
+      | ({
+          __typename?: "ReplyDeletedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment)
     >;
   };
 };
@@ -971,6 +1024,11 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragme
 } & Pick<AccessDeactivatedEvent, "id"> &
   TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = {
+  __typename?: "AccessOpenedEvent";
+} & Pick<AccessOpenedEvent, "id"> &
+  TimelineAccessOpenedEvent_AccessOpenedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
   __typename?: "MessageCancelledEvent";
 } & Pick<MessageCancelledEvent, "id">;
@@ -982,21 +1040,47 @@ export type PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragmen
 
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
   __typename?: "MessageScheduledEvent";
-} & Pick<MessageScheduledEvent, "id"> &
-  TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+} & Pick<MessageScheduledEvent, "id"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id">;
+  } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
+  __typename?: "PetitionCompletedEvent";
+} & Pick<PetitionCompletedEvent, "id"> &
+  TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
+  __typename?: "PetitionCreatedEvent";
+} & Pick<PetitionCreatedEvent, "id"> &
+  TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment = {
   __typename?: "ReminderProcessedEvent";
 } & Pick<ReminderProcessedEvent, "id"> &
   TimelineReminderProcessedEvent_ReminderProcessedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = {
+  __typename?: "ReplyCreatedEvent";
+} & Pick<ReplyCreatedEvent, "id"> &
+  TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = {
+  __typename?: "ReplyDeletedEvent";
+} & Pick<ReplyDeletedEvent, "id"> &
+  TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment;
+  | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment;
 
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
@@ -1016,6 +1100,14 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
     };
   };
 
+export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
+  __typename?: "AccessOpenedEvent";
+} & Pick<AccessOpenedEvent, "createdAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
+
 export type TimelineMessageProcessedEvent_MessageProcessedEventFragment = {
   __typename?: "MessageProcessedEvent";
 } & Pick<MessageProcessedEvent, "createdAt"> & {
@@ -1024,10 +1116,12 @@ export type TimelineMessageProcessedEvent_MessageProcessedEventFragment = {
       "emailSubject" | "scheduledAt"
     > & {
         sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        };
       } & MessageEventsIndicator_PetitionMessageFragment;
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
   };
 
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
@@ -1035,13 +1129,29 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
 } & Pick<MessageScheduledEvent, "createdAt"> & {
     message: { __typename?: "PetitionMessage" } & Pick<
       PetitionMessage,
-      "emailSubject"
+      "status" | "scheduledAt" | "emailSubject"
     > & {
         sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        };
       } & MessageEventsIndicator_PetitionMessageFragment;
+  };
+
+export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
+  __typename?: "PetitionCompletedEvent";
+} & Pick<PetitionCompletedEvent, "createdAt"> & {
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+  };
+
+export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
+  __typename?: "PetitionCreatedEvent";
+} & Pick<PetitionCreatedEvent, "createdAt"> & {
+    user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
   };
 
 export type TimelineReminderProcessedEvent_ReminderProcessedEventFragment = {
@@ -1052,10 +1162,34 @@ export type TimelineReminderProcessedEvent_ReminderProcessedEventFragment = {
       "type"
     > & {
         sender?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName">>;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        };
       };
+  };
+
+export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
+  __typename?: "ReplyCreatedEvent";
+} & Pick<ReplyCreatedEvent, "createdAt"> & {
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+    field?: Maybe<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "title">
+    >;
+  };
+
+export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
+  __typename?: "ReplyDeletedEvent";
+} & Pick<ReplyDeletedEvent, "createdAt"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+    field?: Maybe<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "title">
+    >;
   };
 
 export type PetitionComposeField_PetitionFieldFragment = {
@@ -1079,11 +1213,11 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "type" | "optional" | "multiple" | "options">;
 
-export type PetitionComposeSettings_ContactFragment = {
+export type PetitionComposeMessageEditor_ContactFragment = {
   __typename?: "Contact";
 } & Pick<Contact, "id" | "fullName" | "email">;
 
-export type PetitionComposeSettings_PetitionFragment = {
+export type PetitionComposeMessageEditor_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "locale" | "deadline" | "emailSubject" | "emailBody"> & {
     remindersConfig?: Maybe<
@@ -1279,17 +1413,12 @@ export type PetitionActivity_updatePetitionMutation = {
 
 export type PetitionActivity_sendRemindersMutationVariables = {
   petitionId: Scalars["ID"];
-  accessesIds: Array<Scalars["ID"]>;
+  accessIds: Array<Scalars["ID"]>;
 };
 
 export type PetitionActivity_sendRemindersMutation = {
   __typename?: "Mutation";
-} & {
-  sendReminders: { __typename?: "SendReminderResult" } & Pick<
-    SendReminderResult,
-    "result"
-  >;
-};
+} & Pick<Mutation, "sendReminders">;
 
 export type PetitionActivityQueryVariables = {
   id: Scalars["ID"];
@@ -1314,7 +1443,7 @@ export type PetitionCompose_PetitionFragment = {
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionFragment &
-  PetitionComposeSettings_PetitionFragment;
+  PetitionComposeMessageEditor_PetitionFragment;
 
 export type PetitionCompose_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -1336,7 +1465,7 @@ export type PetitionCompose_updatePetitionMutation = {
   updatePetition: {
     __typename?: "Petition";
   } & PetitionLayout_PetitionFragment &
-    PetitionComposeSettings_PetitionFragment;
+    PetitionComposeMessageEditor_PetitionFragment;
 };
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = {
@@ -1392,7 +1521,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
       PetitionComposeField_PetitionFieldFragment &
       PetitionComposeFieldSettings_PetitionFieldFragment;
-    petition: { __typename?: "Petition" } & PetitionLayout_PetitionFragment;
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
   };
 };
 
@@ -1831,8 +1960,8 @@ export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
 `;
-export const PetitionComposeSettings_ContactFragmentDoc = gql`
-  fragment PetitionComposeSettings_Contact on Contact {
+export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
+  fragment PetitionComposeMessageEditor_Contact on Contact {
     id
     fullName
     email
@@ -1968,11 +2097,32 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
 `;
 export const PetitionAccessTable_PetitionFragmentDoc = gql`
   fragment PetitionAccessTable_Petition on Petition {
+    status
     accesses {
       ...PetitionAccessTable_PetitionAccess
     }
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
+`;
+export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
+  fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
+    user {
+      id
+      fullName
+    }
+    createdAt
+  }
+`;
+export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = gql`
+  fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
   fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
@@ -2004,6 +2154,17 @@ export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = 
   }
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
+  fragment TimelineAccessOpenedEvent_AccessOpenedEvent on AccessOpenedEvent {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
   fragment MessageEventsIndicator_PetitionMessage on PetitionMessage {
     bouncedAt
@@ -2018,18 +2179,20 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
         id
         fullName
       }
+      status
+      scheduledAt
       emailSubject
-      ...MessageEventsIndicator_PetitionMessage
-    }
-    access {
-      contact {
-        ...ContactLink_Contact
+      access {
+        contact {
+          ...ContactLink_Contact
+        }
       }
+      ...MessageEventsIndicator_PetitionMessage
     }
     createdAt
   }
-  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
+  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
 `;
 export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gql`
   fragment TimelineMessageProcessedEvent_MessageProcessedEvent on MessageProcessedEvent {
@@ -2040,17 +2203,17 @@ export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gq
       }
       emailSubject
       scheduledAt
-      ...MessageEventsIndicator_PetitionMessage
-    }
-    access {
-      contact {
-        ...ContactLink_Contact
+      access {
+        contact {
+          ...ContactLink_Contact
+        }
       }
+      ...MessageEventsIndicator_PetitionMessage
     }
     createdAt
   }
-  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
+  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
 `;
 export const TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc = gql`
   fragment TimelineReminderProcessedEvent_ReminderProcessedEvent on ReminderProcessedEvent {
@@ -2060,11 +2223,39 @@ export const TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc = 
         id
         fullName
       }
+      access {
+        contact {
+          ...ContactLink_Contact
+        }
+      }
     }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
+  fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
     access {
       contact {
         ...ContactLink_Contact
       }
+    }
+    field {
+      title
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
+  fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    field {
+      title
     }
     createdAt
   }
@@ -2073,13 +2264,25 @@ export const TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc = 
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
+    ... on PetitionCreatedEvent {
+      ...TimelinePetitionCreatedEvent_PetitionCreatedEvent
+    }
+    ... on PetitionCompletedEvent {
+      ...TimelinePetitionCompletedEvent_PetitionCompletedEvent
+    }
     ... on AccessActivatedEvent {
       ...TimelineAccessActivatedEvent_AccessActivatedEvent
     }
     ... on AccessDeactivatedEvent {
       ...TimelineAccessDeactivatedEvent_AccessDeactivatedEvent
     }
+    ... on AccessOpenedEvent {
+      ...TimelineAccessOpenedEvent_AccessOpenedEvent
+    }
     ... on MessageScheduledEvent {
+      message {
+        id
+      }
       ...TimelineMessageScheduledEvent_MessageScheduledEvent
     }
     ... on MessageProcessedEvent {
@@ -2088,12 +2291,23 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on ReminderProcessedEvent {
       ...TimelineReminderProcessedEvent_ReminderProcessedEvent
     }
+    ... on ReplyCreatedEvent {
+      ...TimelineReplyCreatedEvent_ReplyCreatedEvent
+    }
+    ... on ReplyDeletedEvent {
+      ...TimelineReplyDeletedEvent_ReplyDeletedEvent
+    }
   }
+  ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
+  ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
   ${TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc}
   ${TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc}
+  ${TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc}
   ${TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc}
   ${TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc}
   ${TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc}
+  ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
+  ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -2145,8 +2359,8 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
 `;
-export const PetitionComposeSettings_PetitionFragmentDoc = gql`
-  fragment PetitionComposeSettings_Petition on Petition {
+export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
+  fragment PetitionComposeMessageEditor_Petition on Petition {
     locale
     deadline
     emailSubject
@@ -2166,11 +2380,11 @@ export const PetitionCompose_PetitionFragmentDoc = gql`
     fields {
       ...PetitionCompose_PetitionField
     }
-    ...PetitionComposeSettings_Petition
+    ...PetitionComposeMessageEditor_Petition
   }
   ${PetitionLayout_PetitionFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
-  ${PetitionComposeSettings_PetitionFragmentDoc}
+  ${PetitionComposeMessageEditor_PetitionFragmentDoc}
 `;
 export const PetitionCompose_UserFragmentDoc = gql`
   fragment PetitionCompose_User on User {
@@ -2795,11 +3009,9 @@ export type PetitionActivity_updatePetitionMutationOptions = ApolloReactCommon.B
 export const PetitionActivity_sendRemindersDocument = gql`
   mutation PetitionActivity_sendReminders(
     $petitionId: ID!
-    $accessesIds: [ID!]!
+    $accessIds: [ID!]!
   ) {
-    sendReminders(petitionId: $petitionId, accessesIds: $accessesIds) {
-      result
-    }
+    sendReminders(petitionId: $petitionId, accessIds: $accessIds)
   }
 `;
 export type PetitionActivity_sendRemindersMutationFn = ApolloReactCommon.MutationFunction<
@@ -2821,7 +3033,7 @@ export type PetitionActivity_sendRemindersMutationFn = ApolloReactCommon.Mutatio
  * const [petitionActivitySendRemindersMutation, { data, loading, error }] = usePetitionActivity_sendRemindersMutation({
  *   variables: {
  *      petitionId: // value for 'petitionId'
- *      accessesIds: // value for 'accessesIds'
+ *      accessIds: // value for 'accessIds'
  *   },
  * });
  */
@@ -2966,11 +3178,11 @@ export const PetitionCompose_updatePetitionDocument = gql`
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionLayout_Petition
-      ...PetitionComposeSettings_Petition
+      ...PetitionComposeMessageEditor_Petition
     }
   }
   ${PetitionLayout_PetitionFragmentDoc}
-  ${PetitionComposeSettings_PetitionFragmentDoc}
+  ${PetitionComposeMessageEditor_PetitionFragmentDoc}
 `;
 export type PetitionCompose_updatePetitionMutationFn = ApolloReactCommon.MutationFunction<
   PetitionCompose_updatePetitionMutation,
@@ -3209,13 +3421,13 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
         ...PetitionComposeFieldSettings_PetitionField
       }
       petition {
-        ...PetitionLayout_Petition
+        id
+        updatedAt
       }
     }
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
-  ${PetitionLayout_PetitionFragmentDoc}
 `;
 export type PetitionCompose_updatePetitionFieldMutationFn = ApolloReactCommon.MutationFunction<
   PetitionCompose_updatePetitionFieldMutation,

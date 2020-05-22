@@ -115,7 +115,7 @@ export function accessesBelongToPetition<
   TArg2 extends Arg<TypeName, FieldName, string[]>
 >(
   argNamePetitionId: TArg1,
-  argNameAccessesIds: TArg2
+  argNameaccessIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -123,11 +123,36 @@ export function accessesBelongToPetition<
         args[argNamePetitionId],
         "Petition"
       );
-      const { ids: accessesIds } = fromGlobalIds(
-        args[argNameAccessesIds],
+      const { ids: accessIds } = fromGlobalIds(
+        args[argNameaccessIds],
         "PetitionAccess"
       );
-      return ctx.petitions.accesessBelongToPetition(petitionId, accessesIds);
+      return ctx.petitions.accesessBelongToPetition(petitionId, accessIds);
+    } catch {}
+    return false;
+  };
+}
+
+export function messageBelongToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
+>(
+  argNamePetitionId: TArg1,
+  argNameMessageId: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id: petitionId } = fromGlobalId(
+        args[argNamePetitionId],
+        "Petition"
+      );
+      const { id: messageId } = fromGlobalId(
+        args[argNameMessageId],
+        "PetitionMessage"
+      );
+      return ctx.petitions.accesessBelongToPetition(petitionId, [messageId]);
     } catch {}
     return false;
   };

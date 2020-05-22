@@ -252,7 +252,7 @@ export async function seed(knex: Knex): Promise<any> {
       updated_by: `User:${userIds[2]}`,
     },
   ];
-  const accessesIds = await knex<PetitionAccess>("petition_access").insert(
+  const accessIds = await knex<PetitionAccess>("petition_access").insert(
     accesses,
     "id"
   );
@@ -292,7 +292,7 @@ export async function seed(knex: Knex): Promise<any> {
   const replies: CreatePetitionFieldReply[] = [
     {
       petition_field_id: fieldIds[0],
-      petition_access_id: accessesIds[0],
+      petition_access_id: accessIds[0],
       type: "FILE_UPLOAD",
       content: { file_upload_id: fileUploadIds[0] },
       created_by: `Contact:${contactIds[0]}`,
@@ -300,7 +300,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_field_id: fieldIds[2],
-      petition_access_id: accessesIds[0],
+      petition_access_id: accessIds[0],
       type: "TEXT",
       content: { text: "Santiago Albo Guijarro" },
       created_by: `Contact:${contactIds[0]}`,
@@ -308,7 +308,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_field_id: fieldIds[3],
-      petition_access_id: accessesIds[0],
+      petition_access_id: accessIds[0],
       type: "FILE_UPLOAD",
       content: { file_upload_id: fileUploadIds[1] },
       created_by: `Contact:${contactIds[0]}`,
@@ -316,7 +316,7 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       petition_field_id: fieldIds[6],
-      petition_access_id: accessesIds[0],
+      petition_access_id: accessIds[0],
       type: "FILE_UPLOAD",
       content: { file_upload_id: fileUploadIds[2] },
       created_by: `Contact:${contactIds[1]}`,

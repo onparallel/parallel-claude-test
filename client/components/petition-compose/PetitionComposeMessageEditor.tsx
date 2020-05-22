@@ -31,8 +31,8 @@ import {
 import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import {
-  PetitionComposeSettings_ContactFragment,
-  PetitionComposeSettings_PetitionFragment,
+  PetitionComposeMessageEditor_ContactFragment,
+  PetitionComposeMessageEditor_PetitionFragment,
   PetitionLocale,
   RemindersConfig,
   UpdatePetitionInput,
@@ -50,24 +50,24 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
 import { PetitionRemindersConfig } from "./PetitionRemindersConfig";
 
-export type PetitionComposeSettingsProps = {
-  petition: PetitionComposeSettings_PetitionFragment;
+export type PetitionComposeMessageEditorProps = {
+  petition: PetitionComposeMessageEditor_PetitionFragment;
   searchContacts: (
     search: string,
     exclude: string[]
-  ) => Promise<PetitionComposeSettings_ContactFragment[]>;
+  ) => Promise<PetitionComposeMessageEditor_ContactFragment[]>;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   onSend: (data: { contactIds: string[]; schedule: boolean }) => void;
 } & CardProps;
 
-export const PetitionComposeSettings = Object.assign(
-  memo(function PetitionComposeSettings({
+export const PetitionComposeMessageEditor = Object.assign(
+  memo(function PetitionComposeMessageEditor({
     petition,
     searchContacts,
     onUpdatePetition,
     onSend,
     ...props
-  }: PetitionComposeSettingsProps) {
+  }: PetitionComposeMessageEditorProps) {
     const intl = useIntl();
     const [recipients, setRecipients] = useState<Recipient[]>([]);
     const [subject, setSubject] = useState(petition.emailSubject ?? "");
@@ -384,14 +384,14 @@ export const PetitionComposeSettings = Object.assign(
   {
     fragments: {
       contact: gql`
-        fragment PetitionComposeSettings_Contact on Contact {
+        fragment PetitionComposeMessageEditor_Contact on Contact {
           id
           fullName
           email
         }
       `,
       Petition: gql`
-        fragment PetitionComposeSettings_Petition on Petition {
+        fragment PetitionComposeMessageEditor_Petition on Petition {
           locale
           deadline
           emailSubject

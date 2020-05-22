@@ -1,20 +1,19 @@
 import {
   idArg,
+  inputObjectType,
   mutationField,
   objectType,
-  inputObjectType,
 } from "@nexus/schema";
-import {
-  replyBelongsToAccess,
-  fieldBelongsToAccess,
-  fetchPetitionAccess,
-  fieldHastype,
-} from "./authorizers";
 import { fromGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { props } from "../../util/promises";
-import { authorizeAndP, authorizeAnd } from "../helpers/authorize";
+import { authorizeAnd, authorizeAndP } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
+import {
+  fetchPetitionAccess,
+  fieldBelongsToAccess,
+  fieldHastype,
+  replyBelongsToAccess,
+} from "./authorizers";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -31,10 +30,10 @@ export const publicDeletePetitionReply = mutationField(
     },
     resolve: async (_, args, ctx) => {
       const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
-      const reply = await ctx.petitions.loadFieldReply(replyId);
-      if (reply!.type === "FILE_UPLOAD") {
+      const reply = (await ctx.petitions.loadFieldReply(replyId))!;
+      if (reply.type === "FILE_UPLOAD") {
         const file = await ctx.files.loadFileUpload(
-          reply!.content["file_upload_id"]
+          reply.content["file_upload_id"]
         );
         await Promise.all([
           ctx.files.deleteFileUpload(file!.id, ctx.contact!),
@@ -122,9 +121,9 @@ export const publicCreateFileUploadReply = mutationField(
         },
         ctx.contact!
       );
-      return await props({
-        endpoint: ctx.aws.getSignedUploadEndpoint(key, contentType),
-        reply: ctx.petitions.createPetitionFieldReply(
+      const [endpoint, reply] = await Promise.all([
+        ctx.aws.getSignedUploadEndpoint(key, contentType),
+        ctx.petitions.createPetitionFieldReply(
           {
             petition_field_id: fieldId,
             petition_access_id: ctx.access!.id,
@@ -133,7 +132,8 @@ export const publicCreateFileUploadReply = mutationField(
           },
           ctx.contact!
         ),
-      });
+      ]);
+      return { endpoint, reply };
     },
   }
 );
@@ -160,7 +160,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   ),
   resolve: async (_, args, ctx) => {
     const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
-    return ctx.petitions.createPetitionFieldReply(
+    const reply = await ctx.petitions.createPetitionFieldReply(
       {
         petition_field_id: fieldId,
         petition_access_id: ctx.access!.id,
@@ -169,6 +169,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
       },
       ctx.contact!
     );
+    return reply;
   },
 });
 
@@ -182,7 +183,7 @@ export const completePetition = mutationField("publicCompletePetition", {
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.completePetition(
       ctx.access!.petition_id,
-      ctx.contact!
+      ctx.access!.id
     );
     await ctx.aws.enqueuePetitionCompleted(ctx.access!.id);
     return petition;

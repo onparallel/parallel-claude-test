@@ -14,7 +14,7 @@ export type TimelineReminderProcessedEventProps = {
 };
 
 export function TimelineReminderProcessedEvent({
-  event,
+  event: { reminder, createdAt },
   userId,
 }: TimelineReminderProcessedEventProps) {
   return (
@@ -23,23 +23,23 @@ export function TimelineReminderProcessedEvent({
         <TimelineIcon icon="bell" color="black" backgroundColor="gray.200" />
       }
     >
-      {event.reminder.type === "MANUAL" ? (
+      {reminder.type === "MANUAL" ? (
         <FormattedMessage
           id="timeline.reminder-processed-description-manual"
           defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}"
           values={{
-            same: userId === event.reminder.sender!.id,
+            same: userId === reminder.sender!.id,
             b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            user: event.reminder.sender!.fullName,
-            contact: event.access.contact ? (
-              <ContactLink contact={event.access.contact} />
+            user: reminder.sender!.fullName,
+            contact: reminder.access.contact ? (
+              <ContactLink contact={reminder.access.contact} />
             ) : (
               <DeletedContact />
             ),
             timeAgo: (
               <Link>
                 <DateTime
-                  value={event.createdAt}
+                  value={createdAt}
                   format={FORMATS.LLL}
                   useRelativeTime="always"
                 />
@@ -52,18 +52,18 @@ export function TimelineReminderProcessedEvent({
           id="timeline.reminder-processed-description-automatic"
           defaultMessage="An automatic reminder was sent to {contact} {timeAgo}"
           values={{
-            same: userId === event.reminder.sender!.id,
+            same: userId === reminder.sender!.id,
             b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            user: event.reminder.sender!.fullName,
-            contact: event.access.contact ? (
-              <ContactLink contact={event.access.contact} />
+            user: reminder.sender!.fullName,
+            contact: reminder.access.contact ? (
+              <ContactLink contact={reminder.access.contact} />
             ) : (
               <DeletedContact />
             ),
             timeAgo: (
               <Link>
                 <DateTime
-                  value={event.createdAt}
+                  value={createdAt}
                   format={FORMATS.LLL}
                   useRelativeTime="always"
                 />
@@ -85,10 +85,10 @@ TimelineReminderProcessedEvent.fragments = {
           id
           fullName
         }
-      }
-      access {
-        contact {
-          ...ContactLink_Contact
+        access {
+          contact {
+            ...ContactLink_Contact
+          }
         }
       }
       createdAt
