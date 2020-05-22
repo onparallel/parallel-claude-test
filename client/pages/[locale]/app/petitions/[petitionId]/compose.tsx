@@ -1,8 +1,8 @@
 import { useApolloClient } from "@apollo/react-hooks";
-import { Box, Flex, useToast, Text } from "@chakra-ui/core";
+import { Box, Flex, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
-import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import {
   withData,
@@ -12,10 +12,7 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
-import {
-  PetitionComposeFields,
-  PetitionComposeFieldsProps,
-} from "@parallel/components/petition-compose/PetitionComposeFields";
+import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
 import {
   PetitionComposeSettings,
@@ -44,6 +41,7 @@ import {
   usePetitionCompose_updatePetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { resolveUrl } from "@parallel/utils/next";
 import {
@@ -58,8 +56,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { compose } from "@parallel/utils/compose";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -194,12 +190,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const handleFieldFocus: PetitionComposeFieldsProps["onFieldFocus"] = (
-    fieldId
-  ) => {
+  const handleFieldFocus = useCallback(function (fieldId: string) {
     //Set field as active only if settings were already showing for another field
     setActiveFieldId((active) => active && fieldId);
-  };
+  }, []);
 
   const searchContacts = useSearchContacts();
 
@@ -343,7 +337,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             flex="2"
             display={{ base: activeFieldId ? "none" : "block", md: "block" }}
           >
-            <PetitionComposeFields
+            <PetitionComposeFieldList
               showErrors={showErrors}
               fields={petition!.fields}
               active={activeFieldId}
@@ -351,7 +345,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onDeleteField={handleDeleteField}
               onFieldFocus={handleFieldFocus}
               onUpdateFieldPositions={handleUpdateFieldPositions}
-              onUpdateField={handleUpdateField}
+              onFieldEdit={handleUpdateField}
               onSettingsClick={setActiveFieldId}
             />
             <PetitionComposeSettings
@@ -376,9 +370,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 position={{ base: "relative", md: "sticky" }}
                 top={{ base: 0, md: 4 }}
                 field={activeField}
-                onUpdateField={(data) =>
-                  handleUpdateField(activeField.id, data)
-                }
+                onFieldEdit={handleUpdateField}
                 onClose={() => setActiveFieldId(null)}
               />
             ) : null}

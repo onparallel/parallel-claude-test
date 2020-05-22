@@ -2,6 +2,7 @@ import { Box, Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import {
   DialogCallbacks,
   useDialog,
@@ -47,9 +48,8 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { memo, MouseEvent, useMemo, useState, useCallback } from "react";
+import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 
 const PAGE_SIZE = 10;
 
@@ -130,44 +130,47 @@ function Petitions() {
     }));
   }
 
-  async function handleDeleteClick() {
-    try {
-      await confirmDelete({
-        selected: petitions.items.filter((p) => selected!.includes(p.id)),
-      });
-      await deletePetition({
-        variables: { ids: selected! },
-      });
-    } catch {}
-  }
+  const handleDeleteClick = useCallback(
+    async function () {
+      try {
+        await confirmDelete({
+          selected: petitions.items.filter((p) => selected!.includes(p.id)),
+        });
+        await deletePetition({
+          variables: { ids: selected! },
+        });
+      } catch {}
+    },
+    [petitions, selected]
+  );
 
-  async function handleCloneClick() {
-    try {
-      const petition = petitions.items.find((p) => selected[0] === p.id);
-      const name = await askPetitionName({
-        defaultName: petition?.name ?? undefined,
-      });
-      const { data } = await clonePetition({
-        variables: { petitionId: selected![0], name },
-      });
-      router.push(
-        `/[locale]/app/petitions/[petitionId]/compose`,
-        `/${router.query.locale}/app/petitions/${
-          data!.clonePetition.id
-        }/compose`
-      );
-    } catch {}
-  }
+  const handleCloneClick = useCallback(
+    async function () {
+      try {
+        const petition = petitions.items.find((p) => selected[0] === p.id);
+        const name = await askPetitionName({
+          defaultName: petition?.name ?? undefined,
+        });
+        const { data } = await clonePetition({
+          variables: { petitionId: selected![0], name },
+        });
+        router.push(
+          `/[locale]/app/petitions/[petitionId]/compose`,
+          `/${router.query.locale}/app/petitions/${
+            data!.clonePetition.id
+          }/compose`
+        );
+      } catch {}
+    },
+    [petitions, selected]
+  );
 
-  async function handleCreateClick() {
+  const handleCreateClick = useCallback(async function () {
     try {
       const id = await createPetition();
-      if (state.status === null || state.status === "DRAFT") {
-        refetch();
-      }
       goToPetition(id, "compose");
     } catch {}
-  }
+  }, []);
 
   const handleRowClick = useCallback(function (row: PetitionSelection) {
     goToPetition(
@@ -200,7 +203,7 @@ function Petitions() {
           defaultMessage: "Petitions",
         })}
       </Title>
-      <AppLayout user={me} onCreate={handleCreateClick}>
+      <AppLayout user={me}>
         <Box padding={4} paddingBottom={24}>
           <TablePage
             columns={columns}
@@ -274,7 +277,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.name",
           defaultMessage: "Petition name",
         }),
-        CellContent: memo(({ row }) => (
+        CellContent: ({ row }) => (
           <>
             {row.name || (
               <Text as="span" color="gray.400" fontStyle="italic">
@@ -285,7 +288,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
               </Text>
             )}
           </>
-        )),
+        ),
       },
       {
         key: "recipient",
@@ -293,7 +296,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.recipient",
           defaultMessage: "Recipient",
         }),
-        CellContent: memo(({ row }) => {
+        CellContent: ({ row }) => {
           if (row.recipients.length === 0) {
             return null;
           }
@@ -331,7 +334,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           } else {
             return <DeletedContact />;
           }
-        }),
+        },
       },
       {
         key: "deadline",
@@ -339,7 +342,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.deadline",
           defaultMessage: "Deadline",
         }),
-        CellContent: memo(({ row: { deadline } }) =>
+        CellContent: ({ row: { deadline } }) =>
           deadline ? (
             <DateTime value={deadline} format={FORMATS.LLL} />
           ) : (
@@ -349,8 +352,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
                 defaultMessage="No deadline"
               />
             </Text>
-          )
-        ),
+          ),
       },
       {
         key: "progress",
@@ -358,12 +360,9 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.progress",
           defaultMessage: "Progress",
         }),
-        CellContent: memo(({ row }) => (
-          <PetitionProgressBar
-            status={row.status}
-            {...row.progress}
-          ></PetitionProgressBar>
-        )),
+        CellContent: ({ row }) => (
+          <PetitionProgressBar status={row.status} {...row.progress} />
+        ),
       },
       {
         key: "status",
@@ -371,9 +370,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.status",
           defaultMessage: "Status",
         }),
-        CellContent: memo(({ row }) => (
-          <PetitionStatusText status={row.status} />
-        )),
+        CellContent: ({ row }) => <PetitionStatusText status={row.status} />,
       },
       {
         key: "createdAt",
@@ -382,11 +379,9 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.created-at",
           defaultMessage: "Created at",
         }),
-        CellContent: memo(({ row: { createdAt } }) => {
-          return (
-            <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
-          );
-        }),
+        CellContent: ({ row: { createdAt } }) => (
+          <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
+        ),
       },
     ],
     []

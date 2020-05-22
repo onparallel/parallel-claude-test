@@ -23,6 +23,8 @@ import {
   MouseEvent,
   useRef,
   useState,
+  useCallback,
+  memo,
 } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
@@ -35,13 +37,26 @@ export type PetitionComposeFieldProps = {
   index: number;
   active: boolean;
   showError: boolean;
+  onFocus: (fieldId: string, event: FocusEvent) => void;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
-  onFieldEdit: (data: UpdatePetitionFieldInput) => void;
-  onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onTitleKeyUp: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onDescriptionKeyUp: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
-} & BoxProps;
+  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onSettingsClick: (
+    fieldId: string,
+    event: MouseEvent<HTMLButtonElement>
+  ) => void;
+  onDeleteClick: (
+    fieldId: string,
+    event: MouseEvent<HTMLButtonElement>
+  ) => void;
+  onTitleKeyUp: (
+    fieldId: string,
+    event: KeyboardEvent<HTMLInputElement>
+  ) => void;
+  onDescriptionKeyUp: (
+    fieldId: string,
+    event: KeyboardEvent<HTMLTextAreaElement>
+  ) => void;
+} & Omit<BoxProps, "onFocus">;
 
 interface DragItem {
   index: number;
@@ -49,246 +64,264 @@ interface DragItem {
   type: string;
 }
 
-export function PetitionComposeField({
-  field,
-  index,
-  active,
-  showError,
-  onMove,
-  onSettingsClick,
-  onFieldEdit,
-  onDeleteClick,
-  onTitleKeyUp,
-  onDescriptionKeyUp,
-  ...props
-}: PetitionComposeFieldProps) {
-  const intl = useIntl();
-  const labels = {
-    required: intl.formatMessage({
-      id: "generic.required-field",
-      defaultMessage: "Required field",
-    }),
-  };
-  const { colors } = useTheme();
-  const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
-    field.id,
+export const PetitionComposeField = Object.assign(
+  memo(function PetitionComposeField({
+    field,
     index,
-    onMove
-  );
-  const [title, setTitle] = useState(field.title);
-  const [description, setDescription] = useState(field.description);
-
-  return (
-    <Box
-      ref={elementRef}
-      borderY="1px solid"
-      borderColor="gray.200"
-      marginTop="-1px"
-      aria-current={active ? "true" : "false"}
-      css={
-        isDragging
-          ? generateCssStripe({ size: "1rem", color: colors.gray[50] })
-          : null
-      }
-      {...props}
-    >
-      <PseudoBox
-        ref={previewRef}
-        display="flex"
-        flexDirection="row"
-        opacity={isDragging ? 0 : 1}
-        position="relative"
-        css={css`
-          & {
-            background-color: ${active ? colors.purple[50] : colors.white};
-            [draggable] {
-              opacity: 0;
-              transition: opacity 150ms;
-            }
-            .field-actions {
-              display: none;
-            }
-          }
-          &:hover {
-            [draggable] {
-              opacity: 1;
-            }
-          }
-          &:hover,
-          &:focus-within {
-            background-color: ${active ? colors.purple[50] : colors.gray[50]};
-            .field-actions {
-              display: block;
-            }
-          }
-        `}
+    active,
+    showError,
+    onMove,
+    onFocus,
+    onSettingsClick,
+    onFieldEdit,
+    onDeleteClick,
+    onTitleKeyUp,
+    onDescriptionKeyUp,
+    ...props
+  }: PetitionComposeFieldProps) {
+    const intl = useIntl();
+    const labels = {
+      required: intl.formatMessage({
+        id: "generic.required-field",
+        defaultMessage: "Required field",
+      }),
+    };
+    const { colors } = useTheme();
+    const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
+      field.id,
+      index,
+      onMove
+    );
+    const [title, setTitle] = useState(field.title);
+    const [description, setDescription] = useState(field.description);
+    const handleFocus = useCallback(onFocus.bind(null, field.id), []);
+    return (
+      <Box
+        ref={elementRef}
+        borderY="1px solid"
+        borderColor="gray.200"
+        marginTop="-1px"
+        aria-current={active ? "true" : "false"}
+        css={
+          isDragging
+            ? generateCssStripe({ size: "1rem", color: colors.gray[50] })
+            : null
+        }
+        onFocus={handleFocus}
+        {...props}
       >
         <PseudoBox
-          ref={dragRef}
+          ref={previewRef}
           display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          padding={2}
-          width="32px"
-          cursor="grab"
-          color="gray.400"
-          _hover={{
-            color: "gray.700",
-          }}
-          aria-label={intl.formatMessage({
-            id: "petition.drag-to-sort-label",
-            defaultMessage: "Drag to sort this petition fields",
-          })}
+          flexDirection="row"
+          opacity={isDragging ? 0 : 1}
+          position="relative"
+          css={css`
+            & {
+              background-color: ${active ? colors.purple[50] : colors.white};
+              [draggable] {
+                opacity: 0;
+                transition: opacity 150ms;
+              }
+              .field-actions {
+                display: none;
+              }
+            }
+            &:hover {
+              [draggable] {
+                opacity: 1;
+              }
+            }
+            &:hover,
+            &:focus-within {
+              background-color: ${active ? colors.purple[50] : colors.gray[50]};
+              .field-actions {
+                display: block;
+              }
+            }
+          `}
         >
-          <Icon name="drag-handle" focusable={false} role="presentation" />
-        </PseudoBox>
-        {field.optional ? null : (
-          <Box marginX={-2} position="relative">
-            <Tooltip
-              placement="top"
-              zIndex={1000}
-              showDelay={300}
-              aria-label={labels.required}
-              label={labels.required}
-            >
-              <Box
-                width={4}
-                height={4}
-                backgroundColor="red"
-                textAlign="center"
-                marginTop="13px"
-                fontSize="xl"
-                color="red.600"
-                userSelect="none"
+          <PseudoBox
+            ref={dragRef}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            padding={2}
+            width="32px"
+            cursor="grab"
+            color="gray.400"
+            _hover={{
+              color: "gray.700",
+            }}
+            aria-label={intl.formatMessage({
+              id: "petition.drag-to-sort-label",
+              defaultMessage: "Drag to sort this petition fields",
+            })}
+          >
+            <Icon name="drag-handle" focusable={false} role="presentation" />
+          </PseudoBox>
+          {field.optional ? null : (
+            <Box marginX={-2} position="relative">
+              <Tooltip
+                placement="top"
+                zIndex={1000}
+                showDelay={300}
+                aria-label={labels.required}
+                label={labels.required}
               >
-                <Box position="relative" bottom="4px" pointerEvents="none">
-                  *
+                <Box
+                  width={4}
+                  height={4}
+                  backgroundColor="red"
+                  textAlign="center"
+                  marginTop="13px"
+                  fontSize="xl"
+                  color="red.600"
+                  userSelect="none"
+                >
+                  <Box position="relative" bottom="4px" pointerEvents="none">
+                    *
+                  </Box>
                 </Box>
-              </Box>
-            </Tooltip>
+              </Tooltip>
+            </Box>
+          )}
+          <Box marginLeft={3}>
+            <PetitionFieldTypeIndicator
+              type={field.type}
+              index={index}
+              onClick={(event) => onSettingsClick(field.id, event)}
+              marginTop="10px"
+              alignSelf="flex-start"
+            />
           </Box>
-        )}
-        <Box marginLeft={3}>
-          <PetitionFieldTypeIndicator
-            type={field.type}
-            index={index}
-            onClick={onSettingsClick}
-            marginTop="10px"
-            alignSelf="flex-start"
-          />
-        </Box>
-        <Box
-          flex="1"
-          paddingLeft={2}
-          paddingTop={2}
-          paddingBottom={10}
-          paddingRight={2}
-        >
-          <Input
-            id={`field-title-${field.id}`}
-            aria-label={intl.formatMessage({
-              id: "petition.field-title-label",
-              defaultMessage: "Field title",
-            })}
-            placeholder={intl.formatMessage({
-              id: "petition.field-title-placeholder",
-              defaultMessage: "Enter a field title",
-            })}
-            value={title ?? ""}
-            width="100%"
-            maxLength={255}
-            border="none"
-            paddingX={2}
-            height={6}
-            backgroundColor={showError && !title ? "red.100" : "transparent"}
-            _focus={{
-              boxShadow: "none",
-            }}
-            onFocus={(event: FocusEvent<HTMLInputElement>) =>
-              event.target.select()
-            }
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setTitle(event.target.value ?? null)
-            }
-            onKeyUp={onTitleKeyUp}
-            onBlur={() => {
-              if (title !== field.title) {
-                onFieldEdit({ title });
+          <Box
+            flex="1"
+            paddingLeft={2}
+            paddingTop={2}
+            paddingBottom={10}
+            paddingRight={2}
+          >
+            <Input
+              id={`field-title-${field.id}`}
+              aria-label={intl.formatMessage({
+                id: "petition.field-title-label",
+                defaultMessage: "Field title",
+              })}
+              placeholder={intl.formatMessage({
+                id: "petition.field-title-placeholder",
+                defaultMessage: "Enter a field title",
+              })}
+              value={title ?? ""}
+              width="100%"
+              maxLength={255}
+              border="none"
+              paddingX={2}
+              height={6}
+              backgroundColor={showError && !title ? "red.100" : "transparent"}
+              _focus={{
+                boxShadow: "none",
+              }}
+              onFocus={(event: FocusEvent<HTMLInputElement>) =>
+                event.target.select()
               }
-            }}
-          />
-          <GrowingTextarea
-            id={`field-description-${field.id}`}
-            placeholder={intl.formatMessage({
-              id: "petition.field-description-placeholder",
-              defaultMessage: "Add a description...",
-            })}
-            aria-label={intl.formatMessage({
-              id: "petition.field-description-label",
-              defaultMessage: "Field description",
-            })}
-            marginTop={1}
-            fontSize="sm"
-            background="transparent"
-            value={description ?? ""}
-            border="none"
-            height="20px"
-            paddingX={2}
-            paddingY={0}
-            minHeight={0}
-            {...{ rows: 1 }}
-            _focus={{
-              boxShadow: "none",
-            }}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              setDescription(event.target.value ?? null)
-            }
-            onBlur={() => {
-              if (description !== field.description) {
-                onFieldEdit({ description });
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setTitle(event.target.value ?? null)
               }
-            }}
-            // chakra typings are wrong
-            onKeyUp={onDescriptionKeyUp as any}
-          />
-        </Box>
-        <Stack
-          className="field-actions"
-          position="absolute"
-          bottom="0"
-          right="0"
-          direction="row"
-          padding={1}
-        >
-          <IconButtonWithTooltip
-            icon="settings"
-            size="sm"
-            variant="ghost"
-            placement="bottom"
-            color="gray.600"
-            label={intl.formatMessage({
-              id: "petition.field-settings",
-              defaultMessage: "Field settings",
-            })}
-            onClick={onSettingsClick}
-          />
-          <IconButtonWithTooltip
-            icon="delete"
-            size="sm"
-            variant="ghost"
-            placement="bottom"
-            color="gray.600"
-            label={intl.formatMessage({
-              id: "petition.field-delete-button",
-              defaultMessage: "Delete field",
-            })}
-            onClick={onDeleteClick}
-          />
-        </Stack>
-      </PseudoBox>
-    </Box>
-  );
-}
+              onKeyUp={(event) => onTitleKeyUp(field.id, event)}
+              onBlur={() => {
+                if (title !== field.title) {
+                  onFieldEdit(field.id, { title });
+                }
+              }}
+            />
+            <GrowingTextarea
+              id={`field-description-${field.id}`}
+              placeholder={intl.formatMessage({
+                id: "petition.field-description-placeholder",
+                defaultMessage: "Add a description...",
+              })}
+              aria-label={intl.formatMessage({
+                id: "petition.field-description-label",
+                defaultMessage: "Field description",
+              })}
+              marginTop={1}
+              fontSize="sm"
+              background="transparent"
+              value={description ?? ""}
+              border="none"
+              height="20px"
+              paddingX={2}
+              paddingY={0}
+              minHeight={0}
+              {...{ rows: 1 }}
+              _focus={{
+                boxShadow: "none",
+              }}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setDescription(event.target.value ?? null)
+              }
+              onBlur={() => {
+                if (description !== field.description) {
+                  onFieldEdit(field.id, { description });
+                }
+              }}
+              // chakra typings are wrong
+              onKeyUp={onDescriptionKeyUp as any}
+            />
+          </Box>
+          <Stack
+            className="field-actions"
+            position="absolute"
+            bottom="0"
+            right="0"
+            direction="row"
+            padding={1}
+          >
+            <IconButtonWithTooltip
+              icon="settings"
+              size="sm"
+              variant="ghost"
+              placement="bottom"
+              color="gray.600"
+              label={intl.formatMessage({
+                id: "petition.field-settings",
+                defaultMessage: "Field settings",
+              })}
+              onClick={(event) => onSettingsClick(field.id, event)}
+            />
+            <IconButtonWithTooltip
+              icon="delete"
+              size="sm"
+              variant="ghost"
+              placement="bottom"
+              color="gray.600"
+              label={intl.formatMessage({
+                id: "petition.field-delete-button",
+                defaultMessage: "Delete field",
+              })}
+              onClick={(event) => onDeleteClick(field.id, event)}
+            />
+          </Stack>
+        </PseudoBox>
+      </Box>
+    );
+  }),
+  {
+    fragments: {
+      PetitionField: gql`
+        fragment PetitionComposeField_PetitionField on PetitionField {
+          id
+          type
+          title
+          description
+          optional
+          multiple
+        }
+      `,
+    },
+  }
+);
 
 function useDragAndDrop(
   id: string,
@@ -366,15 +399,4 @@ function useDragAndDrop(
   return { elementRef, dragRef, previewRef, isDragging };
 }
 
-PetitionComposeField.fragments = {
-  PetitionField: gql`
-    fragment PetitionComposeField_PetitionField on PetitionField {
-      id
-      type
-      title
-      description
-      optional
-      multiple
-    }
-  `,
-};
+(PetitionComposeField as any).whyDidYouRender = true;

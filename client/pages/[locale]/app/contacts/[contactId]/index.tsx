@@ -16,39 +16,33 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
 import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
 import { Spacer } from "@parallel/components/common/Spacer";
-import {
-  Table,
-  TableColumn,
-  useTableColors,
-} from "@parallel/components/common/Table";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
   withData,
   WithDataContext,
 } from "@parallel/components/common/withData";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   ContactQuery,
   ContactQueryVariables,
   ContactUserQuery,
-  Contact_ContactFragment,
+  Contact_PetitionAccessFragment,
   useContactQuery,
   useContactUserQuery,
   useContact_updateContactMutation,
-  Contact_PetitionAccessFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
-import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import {
   forwardRef,
-  memo,
   ReactNode,
   Ref,
   useCallback,
-  useState,
   useMemo,
+  useState,
 } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -275,7 +269,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petitions.header.name",
           defaultMessage: "Petition name",
         }),
-        CellContent: memo(({ row: { petition } }) => (
+        CellContent: ({ row: { petition } }) => (
           <>
             {petition?.name || (
               <Text as="span" color="gray.400" fontStyle="italic">
@@ -286,7 +280,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
               </Text>
             )}
           </>
-        )),
+        ),
       },
       {
         key: "deadline",
@@ -294,7 +288,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.deadline-header",
           defaultMessage: "Deadline",
         }),
-        CellContent: memo(({ row: { petition } }) =>
+        CellContent: ({ row: { petition } }) =>
           petition?.deadline ? (
             <DateTime value={petition.deadline} format={FORMATS.LLL} />
           ) : (
@@ -304,8 +298,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
                 defaultMessage="No deadline"
               />
             </Text>
-          )
-        ),
+          ),
       },
       {
         key: "progress",
@@ -313,16 +306,13 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.progress-header",
           defaultMessage: "Progress",
         }),
-        CellContent: memo(({ row: { petition } }) => (
-          <>
-            {petition ? (
-              <PetitionProgressBar
-                status={petition.status}
-                {...petition.progress}
-              ></PetitionProgressBar>
-            ) : null}
-          </>
-        )),
+        CellContent: ({ row: { petition } }) =>
+          petition ? (
+            <PetitionProgressBar
+              status={petition.status}
+              {...petition.progress}
+            ></PetitionProgressBar>
+          ) : null,
       },
       {
         key: "status",
@@ -330,11 +320,8 @@ function useContactPetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
-        CellContent: memo(({ row: { petition } }) => (
-          <>
-            {petition ? <PetitionStatusText status={petition.status} /> : null}
-          </>
-        )),
+        CellContent: ({ row: { petition } }) =>
+          petition ? <PetitionStatusText status={petition.status} /> : null,
       },
     ],
     []

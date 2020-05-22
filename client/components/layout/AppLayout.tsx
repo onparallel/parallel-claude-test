@@ -8,7 +8,7 @@ import {
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useCallback } from "react";
 import {
   OnboardingTour,
   OnboardingTourContext,
@@ -16,19 +16,13 @@ import {
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export type AppLayoutProps = BoxProps & {
-  onCreate?: () => void;
   user: AppLayout_UserFragment;
 };
 
-export function AppLayout({
-  user,
-  onCreate,
-  children,
-  ...props
-}: AppLayoutProps) {
+export function AppLayout({ user, children, ...props }: AppLayoutProps) {
   const router = useRouter();
   const createPetition = useCreatePetition();
-  async function defaultOnCreate() {
+  const handleOnCreate = useCallback(async function () {
     try {
       const id = await createPetition();
       router.push(
@@ -36,9 +30,9 @@ export function AppLayout({
         `/${router.query.locale}/app/petitions/${id}/compose`
       );
     } catch {}
-  }
+  }, []);
 
-  /* Onboarding tour cllbacks */
+  /* Onboarding tour callbacks */
   const [
     updateOnboardingStatus,
   ] = useAppLayout_updateOnboardingStatusMutation();
@@ -49,13 +43,16 @@ export function AppLayout({
     await updateOnboardingStatus({ variables: { key, status } });
   };
   const { isRunning, toggle } = useContext(OnboardingTourContext);
-  function handleOnboardingClick() {
-    if (isRunning) {
-      document.querySelector<HTMLElement>(".react-joyride__beacon")?.click();
-    } else {
-      toggle(true);
-    }
-  }
+  const handleOnboardingClick = useCallback(
+    function () {
+      if (isRunning) {
+        document.querySelector<HTMLElement>(".react-joyride__beacon")?.click();
+      } else {
+        toggle(true);
+      }
+    },
+    [isRunning, toggle]
+  );
 
   return (
     <>
@@ -63,7 +60,7 @@ export function AppLayout({
         <AppLayoutNavbar
           user={user}
           zIndex={2}
-          onCreate={onCreate ?? defaultOnCreate}
+          onCreate={handleOnCreate}
           onOnboardingClick={handleOnboardingClick}
         />
         <Flex

@@ -10,7 +10,7 @@ import {
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import { useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
@@ -25,130 +25,133 @@ export type AppLayoutNavbarProps = BoxProps & {
   onOnboardingClick: () => void;
 };
 
-export function AppLayoutNavbar({
-  user,
-  onCreate,
-  onOnboardingClick,
-  ...props
-}: AppLayoutNavbarProps) {
-  const { colorMode } = useColorMode();
-  const { pathname } = useRouter();
-  const intl = useIntl();
-  const items = useMemo(
-    () => [
-      {
-        section: "petitions",
-        icon: "paper-plane",
-        available: true,
-        text: intl.formatMessage({
-          id: "navbar.petitions-link",
-          defaultMessage: "Petitions",
-        }),
-      },
-      {
-        section: "templates",
-        icon: "file-text",
-        available: false,
-        text: intl.formatMessage({
-          id: "navbar.templates-link",
-          defaultMessage: "Templates",
-        }),
-      },
-      {
-        section: "contacts",
-        icon: "users",
-        available: true,
-        text: intl.formatMessage({
-          id: "navbar.contacts-link",
-          defaultMessage: "Contacts",
-        }),
-      },
-    ],
-    [intl.locale]
-  );
-  return (
-    <Flex
-      flexDirection="column"
-      as="nav"
-      shadow="md"
-      width={24}
-      backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
-      {...props}
-    >
-      <Flex justifyContent="center" marginTop={6} marginBottom={6}>
-        <NakedLink href="/app">
-          <Box as="a" width="40px" height="40px" position="relative">
-            <PseudoBox
-              position="absolute"
-              cursor="pointer"
-              transition="transform 150ms"
-              _hover={{
-                color: {
-                  light: "gray.900",
-                  dark: "purple.200",
-                }[colorMode],
-                transform: "scale(1.1)",
-              }}
-            >
-              <Logo width={40} hideText={true}></Logo>
-            </PseudoBox>
-          </Box>
-        </NakedLink>
+export const AppLayoutNavbar = Object.assign(
+  memo(function AppLayoutNavbar({
+    user,
+    onCreate,
+    onOnboardingClick,
+    ...props
+  }: AppLayoutNavbarProps) {
+    const { colorMode } = useColorMode();
+    const { pathname } = useRouter();
+    const intl = useIntl();
+    const items = useMemo(
+      () => [
+        {
+          section: "petitions",
+          icon: "paper-plane",
+          available: true,
+          text: intl.formatMessage({
+            id: "navbar.petitions-link",
+            defaultMessage: "Petitions",
+          }),
+        },
+        {
+          section: "templates",
+          icon: "file-text",
+          available: false,
+          text: intl.formatMessage({
+            id: "navbar.templates-link",
+            defaultMessage: "Templates",
+          }),
+        },
+        {
+          section: "contacts",
+          icon: "users",
+          available: true,
+          text: intl.formatMessage({
+            id: "navbar.contacts-link",
+            defaultMessage: "Contacts",
+          }),
+        },
+      ],
+      [intl.locale]
+    );
+    return (
+      <Flex
+        flexDirection="column"
+        as="nav"
+        shadow="md"
+        width={24}
+        backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
+        {...props}
+      >
+        <Flex justifyContent="center" marginTop={6} marginBottom={6}>
+          <NakedLink href="/app">
+            <Box as="a" width="40px" height="40px" position="relative">
+              <PseudoBox
+                position="absolute"
+                cursor="pointer"
+                transition="transform 150ms"
+                _hover={{
+                  color: {
+                    light: "gray.900",
+                    dark: "purple.200",
+                  }[colorMode],
+                  transform: "scale(1.1)",
+                }}
+              >
+                <Logo width={40} hideText={true}></Logo>
+              </PseudoBox>
+            </Box>
+          </NakedLink>
+        </Flex>
+        <Flex justifyContent="center" marginBottom={4}>
+          <IconButtonWithTooltip
+            id="new-petition-button"
+            variantColor="purple"
+            icon="add"
+            size="lg"
+            isRound
+            onClick={onCreate}
+            showDelay={300}
+            label={intl.formatMessage({
+              id: "navbar.new-button",
+              defaultMessage: "Create a new petition",
+            })}
+          />
+        </Flex>
+        <List>
+          {items.map(({ section, available, icon, text }) => (
+            <ListItem key={section}>
+              <AppLayoutNavbarLink
+                href={`/app/${section}`}
+                isAvailable={available}
+                active={pathname.startsWith(`/[locale]/app/${section}`)}
+                icon={icon}
+              >
+                {text}
+              </AppLayoutNavbarLink>
+            </ListItem>
+          ))}
+        </List>
+        <Spacer />
+        <Flex justifyContent="center">
+          <IconButtonWithTooltip
+            label={intl.formatMessage({
+              id: "navbar.start-tour",
+              defaultMessage: "Guide me around",
+            })}
+            icon="info-outline"
+            variant="ghost"
+            isRound
+            onClick={onOnboardingClick}
+          />
+        </Flex>
+        <Flex justifyContent="center" marginY={4}>
+          <UserMenu user={user}></UserMenu>
+        </Flex>
       </Flex>
-      <Flex justifyContent="center" marginBottom={4}>
-        <IconButtonWithTooltip
-          id="new-petition-button"
-          variantColor="purple"
-          icon="add"
-          size="lg"
-          isRound
-          onClick={onCreate}
-          showDelay={300}
-          label={intl.formatMessage({
-            id: "navbar.new-button",
-            defaultMessage: "Create a new petition",
-          })}
-        />
-      </Flex>
-      <List>
-        {items.map(({ section, available, icon, text }) => (
-          <ListItem key={section}>
-            <AppLayoutNavbarLink
-              href={`/app/${section}`}
-              isAvailable={available}
-              active={pathname.startsWith(`/[locale]/app/${section}`)}
-              icon={icon}
-            >
-              {text}
-            </AppLayoutNavbarLink>
-          </ListItem>
-        ))}
-      </List>
-      <Spacer />
-      <Flex justifyContent="center">
-        <IconButtonWithTooltip
-          label={intl.formatMessage({
-            id: "navbar.start-tour",
-            defaultMessage: "Guide me around",
-          })}
-          icon="info-outline"
-          variant="ghost"
-          isRound
-          onClick={onOnboardingClick}
-        />
-      </Flex>
-      <Flex justifyContent="center" marginY={4}>
-        <UserMenu user={user}></UserMenu>
-      </Flex>
-    </Flex>
-  );
-}
-
-AppLayoutNavbar.fragments = {
-  User: gql`
-    fragment AppLayoutNavbar_User on User {
-      ...UserMenu_User
-    }
-    ${UserMenu.fragments.User}
-  `,
-};
+    );
+  }),
+  {
+    fragments: {
+      User: gql`
+        fragment AppLayoutNavbar_User on User {
+          ...UserMenu_User
+        }
+        ${UserMenu.fragments.User}
+      `,
+    },
+  }
+);

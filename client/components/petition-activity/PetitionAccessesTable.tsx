@@ -22,8 +22,6 @@ import { Table, TableColumn } from "../common/Table";
 
 type PetitionAccessSelection = PetitionAccessTable_PetitionAccessFragment;
 
-type PetitionAccessAction = "SEND_REMINDER";
-
 export function PetitionAccessesTable({
   accesses,
   onSendReminder,
@@ -87,10 +85,7 @@ export function PetitionAccessesTable({
   );
 }
 
-function usePetitionAccessesColumns(): TableColumn<
-  PetitionAccessSelection,
-  PetitionAccessAction
->[] {
+function usePetitionAccessesColumns(): TableColumn<PetitionAccessSelection>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -100,11 +95,8 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.contact-header",
           defaultMessage: "Contact",
         }),
-        CellContent: memo(({ row: { contact } }) => (
-          <>
-            {contact ? <ContactLink contact={contact} /> : <DeletedContact />}
-          </>
-        )),
+        CellContent: ({ row: { contact } }) =>
+          contact ? <ContactLink contact={contact} /> : <DeletedContact />,
       },
       {
         key: "status",
@@ -112,7 +104,7 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
-        CellContent: memo(({ row: { status } }) => {
+        CellContent: ({ row: { status } }) => {
           return status === "ACTIVE" ? (
             <Text color="green.500">
               <FormattedMessage
@@ -128,7 +120,7 @@ function usePetitionAccessesColumns(): TableColumn<
               />
             </Flex>
           ) : null;
-        }),
+        },
       },
       {
         key: "next-reminder",
@@ -136,7 +128,7 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
-        CellContent: memo(({ row: { nextReminderAt } }) =>
+        CellContent: ({ row: { nextReminderAt } }) =>
           nextReminderAt ? (
             <DateTime value={nextReminderAt} format={FORMATS.LLL} />
           ) : (
@@ -146,8 +138,7 @@ function usePetitionAccessesColumns(): TableColumn<
                 defaultMessage="Not set"
               />
             </Text>
-          )
-        ),
+          ),
       },
       {
         key: "createdAt",
@@ -155,9 +146,9 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.created-at-header",
           defaultMessage: "Created at",
         }),
-        CellContent: memo(({ row: { createdAt } }) => (
+        CellContent: ({ row: { createdAt } }) => (
           <DateTime value={createdAt} format={FORMATS.LLL} />
-        )),
+        ),
       },
     ],
     []

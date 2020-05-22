@@ -205,7 +205,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.first-name",
           defaultMessage: "First name",
         }),
-        CellContent: memo(({ row }) => (
+        CellContent: ({ row }) => (
           <>
             {row.firstName || (
               <Text as="span" color="gray.400" fontStyle="italic">
@@ -216,7 +216,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
               </Text>
             )}
           </>
-        )),
+        ),
       },
       {
         key: "lastName",
@@ -225,7 +225,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.last-name",
           defaultMessage: "Last name",
         }),
-        CellContent: memo(({ row }) => (
+        CellContent: ({ row }) => (
           <>
             {row.lastName || (
               <Text as="span" color="gray.400" fontStyle="italic">
@@ -236,7 +236,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
               </Text>
             )}
           </>
-        )),
+        ),
       },
       {
         key: "email",
@@ -245,7 +245,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.email",
           defaultMessage: "Email",
         }),
-        CellContent: memo(({ row }) => <>{row.email}</>),
+        CellContent: ({ row }) => <>{row.email}</>,
       },
       {
         key: "createdAt",
@@ -254,11 +254,9 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           id: "contacts.header.created-at",
           defaultMessage: "Created at",
         }),
-        CellContent: memo(({ row: { createdAt } }) => {
-          return (
-            <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
-          );
-        }),
+        CellContent: ({ row: { createdAt } }) => (
+          <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
+        ),
       },
     ],
     []

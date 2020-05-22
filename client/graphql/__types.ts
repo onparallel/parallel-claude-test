@@ -1065,11 +1065,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   "id" | "type" | "title" | "description" | "optional" | "multiple"
 >;
 
-export type PetitionComposeFieldSettings_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "optional" | "multiple" | "options">;
-
-export type PetitionComposeFields_PetitionFragment = {
+export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
 } & {
   fields: Array<
@@ -1078,6 +1074,10 @@ export type PetitionComposeFields_PetitionFragment = {
     } & PetitionComposeField_PetitionFieldFragment
   >;
 };
+
+export type PetitionComposeFieldSettings_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "optional" | "multiple" | "options">;
 
 export type PetitionComposeSettings_ContactFragment = {
   __typename?: "Contact";
@@ -1823,8 +1823,8 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     multiple
   }
 `;
-export const PetitionComposeFields_PetitionFragmentDoc = gql`
-  fragment PetitionComposeFields_Petition on Petition {
+export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
+  fragment PetitionComposeFieldList_Petition on Petition {
     fields {
       ...PetitionComposeField_PetitionField
     }
