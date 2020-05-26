@@ -203,8 +203,7 @@ export const PetitionComposeMessageEditor = Object.assign(
               })}
               value={body}
               onChange={handleBodyChange}
-              style={{ minHeight: "100px" }}
-            ></RichTextEditor>
+            />
           </Box>
           <Flex id="petition-reminders" alignItems="center" marginTop={2}>
             <Checkbox

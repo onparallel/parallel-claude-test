@@ -18,6 +18,7 @@ import {
   usePetitionActivityUserQuery,
   usePetitionActivity_sendRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
+  usePetitionActivity_cancelScheduledMessageMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -25,11 +26,14 @@ import {
   usePetitionState,
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
-import { UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapPromise, UnwrapArray, Assert } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
+import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
+import { differenceInMinutes } from "date-fns";
+import { useSendMessageDialogDialog } from "@parallel/components/petition-activity/SendMessageDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -37,6 +41,7 @@ type PetitionProps = UnwrapPromise<
 
 function PetitionActivity({ petitionId }: PetitionProps) {
   const intl = useIntl();
+  const toast = useToast();
   const {
     data: { me },
   } = assertQuery(usePetitionActivityUserQuery());
@@ -47,8 +52,8 @@ function PetitionActivity({ petitionId }: PetitionProps) {
 
   const [state, setState] = usePetitionState();
   const wrapper = useWrapPetitionUpdater(setState);
-  const [updatePetition] = usePetitionActivity_updatePetitionMutation();
 
+  const [updatePetition] = usePetitionActivity_updatePetitionMutation();
   const handleOnUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
@@ -56,9 +61,89 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     [petitionId]
   );
 
-  const sendReminder = useSendReminder();
+  const showSendMessageDialog = useSendMessageDialogDialog();
+  const handleSendMessage = useCallback(
+    async (accessId: string[]) => {
+      try {
+        await showSendMessageDialog({});
+      } catch {
+        return;
+      }
+    },
+    [petitionId]
+  );
 
-  const handleCancelScheduledMessage = useCancelScheduledMessage(refetch);
+  const confirmSendReminder = useConfirmSendReminderDialog();
+  const [sendReminders] = usePetitionActivity_sendRemindersMutation();
+  const handleSendReminders = useCallback(
+    async (accessIds: string[]) => {
+      try {
+        await confirmSendReminder({});
+      } catch {
+        return;
+      }
+      await sendReminders({
+        variables: { petitionId, accessIds: accessIds },
+      });
+      toast({
+        title: intl.formatMessage({
+          id: "petition.reminder-sent.toast-header",
+          defaultMessage: "Reminder sent",
+        }),
+        description: intl.formatMessage({
+          id: "petition.reminder-sent.toast-description",
+          defaultMessage: "The reminder is on it's way",
+        }),
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+    [petitionId]
+  );
+
+  const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
+  const [
+    cancelScheduledMessage,
+  ] = usePetitionActivity_cancelScheduledMessageMutation();
+  const handleCancelScheduledMessage = useCallback(
+    async (messageId: string) => {
+      try {
+        await confirmCancelScheduledMessage({});
+      } catch {
+        return;
+      }
+      await cancelScheduledMessage({ variables: { petitionId, messageId } });
+      await refetch();
+    },
+    [petitionId, refetch]
+  );
+
+  // process events
+  const events = useMemo(() => {
+    const original = petition!.events.items;
+    const result: typeof original = [];
+    let last: UnwrapArray<typeof original> | null = null;
+    for (const event of original) {
+      switch (event.__typename) {
+        case "AccessOpenedEvent": {
+          // Omit too consecutive open events
+          if (last && last.__typename === "AccessOpenedEvent") {
+            const difference = differenceInMinutes(
+              new Date(event.createdAt),
+              new Date(last.createdAt)
+            );
+            if (difference <= 5) {
+              continue;
+            }
+          }
+        }
+      }
+      result.push(event);
+      last = event;
+    }
+    return result;
+  }, [petition!.events.items]);
 
   return (
     <>
@@ -83,13 +168,16 @@ function PetitionActivity({ petitionId }: PetitionProps) {
               id="petition-accesses"
               margin={4}
               petition={petition!}
-              onSendReminder={() => {}}
+              onSendMessage={handleSendMessage}
+              onSendReminders={handleSendReminders}
+              onActivateAccess={() => {}}
+              onDeactivateAccess={() => {}}
             />
             <Box margin={4}>
               <PetitionActivityTimeline
                 id="petition-activity-timeline"
                 userId={me.id}
-                events={petition!.events.items}
+                events={events}
                 onCancelScheduledMessage={handleCancelScheduledMessage}
               />
             </Box>
@@ -141,40 +229,18 @@ PetitionActivity.mutations = [
       sendReminders(petitionId: $petitionId, accessIds: $accessIds)
     }
   `,
+  gql`
+    mutation PetitionActivity_cancelScheduledMessage(
+      $petitionId: ID!
+      $messageId: ID!
+    ) {
+      cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
+        id
+        status
+      }
+    }
+  `,
 ];
-
-function useSendReminder() {
-  const intl = useIntl();
-  const toast = useToast();
-  const [sendReminders] = usePetitionActivity_sendRemindersMutation();
-  return useCallback(async (petitionId: string, accessId: string) => {
-    await sendReminders({
-      variables: { petitionId, accessIds: [accessId] },
-    });
-    toast({
-      title: intl.formatMessage({
-        id: "petition.reminder-sent.toast-header",
-        defaultMessage: "Reminder sent",
-      }),
-      description: intl.formatMessage({
-        id: "petition.reminder-sent.toast-description",
-        defaultMessage: "The reminder is on it's way",
-      }),
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-  }, []);
-}
-
-function useCancelScheduledMessage(refetch: () => void) {
-  const confirm = useConfirmCancelScheduledMessageDialog();
-  return useCallback(async (messageId: string) => {
-    try {
-      await confirm({});
-    } catch {}
-  }, []);
-}
 
 PetitionActivity.getInitialProps = async ({
   apollo,
@@ -264,7 +330,7 @@ export default compose(
               <ListItem>
                 <FormattedMessage
                   id="tour.petition-activity.send-manual-reminder"
-                  defaultMessage="Manually <b>send reminders</b> to your recipients."
+                  defaultMessage="<b>Send reminders</b> manually to the recipients."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}

@@ -1,8 +1,7 @@
-import { Link, Text, Flex, Box, Button } from "@chakra-ui/core";
+import { Box, Button, Flex, Link, Text } from "@chakra-ui/core";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
 import { TimelineMessageScheduledEvent_MessageScheduledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
@@ -97,11 +96,9 @@ TimelineMessageScheduledEvent.fragments = {
             ...ContactLink_Contact
           }
         }
-        ...MessageEventsIndicator_PetitionMessage
       }
       createdAt
     }
-    ${MessageEventsIndicator.fragments.PetitionMessage}
     ${ContactLink.fragments.Contact}
   `,
 };

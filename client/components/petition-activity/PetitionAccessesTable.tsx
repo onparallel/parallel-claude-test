@@ -32,13 +32,15 @@ type PetitionAccessSelection = PetitionAccessTable_PetitionAccessFragment;
 
 export function PetitionAccessesTable({
   petition,
-  onSendReminder,
+  onSendMessage,
+  onSendReminders,
   onActivateAccess,
   onDeactivateAccess,
   ...props
 }: {
   petition: PetitionAccessTable_PetitionFragment;
-  onSendReminder: (accessIds: string[]) => void;
+  onSendMessage: (accessIds: string[]) => void;
+  onSendReminders: (accessIds: string[]) => void;
   onActivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
 } & CardProps) {
@@ -48,14 +50,11 @@ export function PetitionAccessesTable({
     [selection, petition.accesses]
   );
 
-  const confirmSendReminder = useConfirmSendReminderDialog();
-  const handleSendreminder = useCallback(async () => {
-    try {
-      await confirmSendReminder({});
-    } catch {
-      return;
-    }
-    onSendReminder(selection);
+  const handleSendMessage = useCallback(async () => {
+    onSendMessage(selection);
+  }, [selection]);
+  const handleSendReminders = useCallback(async () => {
+    onSendReminders(selection);
   }, [selection]);
   const confirmActivateAccess = useConfirmActivateAccessDialog();
   const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
@@ -111,7 +110,20 @@ export function PetitionAccessesTable({
                   petition.status !== "PENDING" ||
                   selected.some((a) => a.status === "INACTIVE")
                 }
-                onClick={handleSendreminder}
+                onClick={handleSendMessage}
+              >
+                <Icon name="email" marginRight={2} />
+                <FormattedMessage
+                  id="petition-accesses.send-message"
+                  defaultMessage="Send message"
+                />
+              </MenuItem>
+              <MenuItem
+                isDisabled={
+                  petition.status !== "PENDING" ||
+                  selected.some((a) => a.status === "INACTIVE")
+                }
+                onClick={handleSendReminders}
               >
                 <Icon name="bell" marginRight={2} />
                 <FormattedMessage

@@ -5,29 +5,33 @@ import {
   useCallback,
   useContext,
   useState,
+  Fragment,
 } from "react";
 
-export type DialogCallbacks<T> = {
+export type DialogProps<T> = {
+  position: number;
   onResolve: (value?: T) => void;
   onReject: (reason?: any) => void;
 };
 
 export type Dialog<TProps, TResult> = ComponentType<
-  TProps & DialogCallbacks<TResult>
+  TProps & DialogProps<TResult>
 >;
 
 export type DialogOpener = <TResult>(
-  opener: (callbacks: DialogCallbacks<TResult>) => ReactNode
+  opener: (callbacks: DialogProps<TResult>) => ReactNode
 ) => Promise<TResult>;
 
-export const DialogOpenerContext = createContext<DialogOpener>(null as any);
+export const DialogOpenerContext = createContext<{
+  opener: DialogOpener;
+}>(null as any);
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
-  const opener = useContext(DialogOpenerContext);
+  const { opener } = useContext(DialogOpenerContext);
   return useCallback(
-    (props: Omit<TProps, keyof DialogCallbacks<TResult>>) =>
-      opener((callbacks: DialogCallbacks<TResult>) => (
+    (props: Omit<TProps, keyof DialogProps<TResult>>) =>
+      opener((callbacks: DialogProps<TResult>) => (
         <Dialog {...({ ...callbacks, ...props } as any)} />
       )),
     [Dialog]
@@ -35,30 +39,33 @@ export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
 }
 
 export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
-  const [dialog, setDialog] = useState<ReactNode>([]);
-  const opener = useCallback(function opener<TResult>(
-    opener: (callbacks: DialogCallbacks<TResult>) => ReactNode
-  ) {
-    return new Promise<TResult>((resolve, reject) => {
-      setDialog(
-        opener({
-          onResolve: (result?: TResult) => {
-            setDialog(null);
+  const [stack, setStack] = useState<ReactNode[]>([]);
+  const opener: DialogOpener = useCallback(
+    function (opener) {
+      return new Promise((resolve, reject) => {
+        const dialog = opener({
+          position: stack.length,
+          onResolve: (result) => {
+            setStack((stack) => stack.slice(0, -1));
             resolve(result);
           },
           onReject: (reason?: any) => {
-            setDialog(null);
+            setStack((stack) => stack.slice(0, -1));
             reject(reason);
           },
-        })
-      );
-    });
-  },
-  []);
+        });
+        setStack((stack) => [...stack, dialog]);
+      });
+    },
+    [stack]
+  );
   return (
-    <DialogOpenerContext.Provider value={opener}>
+    <DialogOpenerContext.Provider value={{ opener }}>
       {children}
-      {dialog}
+      {stack.map((dialog, index) => (
+        // as long as it's a stack, using index as key is ok
+        <Fragment key={index}>{dialog}</Fragment>
+      ))}
     </DialogOpenerContext.Provider>
   );
 }

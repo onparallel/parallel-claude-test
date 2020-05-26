@@ -52,9 +52,6 @@ export function TimelineReminderProcessedEvent({
           id="timeline.reminder-processed-description-automatic"
           defaultMessage="An automatic reminder was sent to {contact} {timeAgo}"
           values={{
-            same: userId === reminder.sender!.id,
-            b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            user: reminder.sender!.fullName,
             contact: reminder.access.contact ? (
               <ContactLink contact={reminder.access.contact} />
             ) : (

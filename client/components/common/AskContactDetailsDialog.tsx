@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { useRef } from "react";
@@ -28,7 +28,7 @@ export function AskContactDetailsDialog({
   ...props
 }: {
   defaultEmail?: string;
-} & DialogCallbacks<ContactDetailsFormData>) {
+} & DialogProps<ContactDetailsFormData>) {
   const intl = useIntl();
   const { handleSubmit, register, errors } = useForm<ContactDetailsFormData>({
     defaultValues: { email: defaultEmail ?? "", firstName: "", lastName: "" },

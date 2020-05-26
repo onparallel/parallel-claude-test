@@ -346,7 +346,11 @@ export class PetitionRepository extends BaseRepository {
     return rows;
   }
 
-  async cancelScheduledMessage(messageId: number) {
+  async cancelScheduledMessage(
+    petitionId: number,
+    messageId: number,
+    user: User
+  ) {
     const [row] = await this.from("petition_message")
       .where({ id: messageId, status: "SCHEDULED" })
       .update(
@@ -355,6 +359,10 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
+    await this.createEvent(petitionId, "MESSAGE_CANCELLED", {
+      petition_message_id: messageId,
+      user_id: user.id,
+    });
     return row ?? null;
   }
 

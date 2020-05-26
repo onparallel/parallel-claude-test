@@ -10,9 +10,9 @@ import {
   IAlertDialog,
   Stack,
 } from "@chakra-ui/core";
-import { ReactNode, RefObject, useRef } from "react";
+import { ReactNode, RefObject, useRef, useContext } from "react";
 import { FormattedMessage } from "react-intl";
-import { DialogCallbacks } from "./DialogOpenerProvider";
+import { DialogProps, DialogOpenerContext } from "./DialogOpenerProvider";
 
 export type ConfirmDialogProps<T> = {
   header: ReactNode;
@@ -21,7 +21,7 @@ export type ConfirmDialogProps<T> = {
   cancel?: ReactNode;
   focusRef?: RefObject<HTMLElement>;
   content?: BoxProps;
-} & DialogCallbacks<T> &
+} & DialogProps<T> &
   Omit<IAlertDialog, "children" | "isOpen" | "leastDestructiveRef" | "onClose">;
 
 export function ConfirmDialog<T = void>({
@@ -30,6 +30,7 @@ export function ConfirmDialog<T = void>({
   confirm,
   cancel,
   focusRef,
+  position,
   onResolve,
   onReject,
   content,
@@ -48,25 +49,27 @@ export function ConfirmDialog<T = void>({
       cancel
     );
   return (
-    <AlertDialog
-      isOpen={true}
-      leastDestructiveRef={focusRef || cancelRef}
-      onClose={() => onReject()}
-      {...props}
-    >
-      <AlertDialogOverlay />
-      <AlertDialogContent {...content}>
-        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-          {header}
-        </AlertDialogHeader>
-        <AlertDialogBody>{body}</AlertDialogBody>
-        <AlertDialogFooter>
-          <Stack direction="row">
-            {cancel}
-            {confirm}
-          </Stack>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <>
+      <AlertDialog
+        isOpen={true}
+        leastDestructiveRef={focusRef || cancelRef}
+        onClose={() => onReject()}
+        {...props}
+      >
+        <AlertDialogOverlay zIndex={1400 + position * 2} />
+        <AlertDialogContent zIndex={1400 + position * 2 + 1} {...content}>
+          <AlertDialogHeader fontSize="lg" fontWeight="bold">
+            {header}
+          </AlertDialogHeader>
+          <AlertDialogBody>{body}</AlertDialogBody>
+          <AlertDialogFooter>
+            <Stack direction="row">
+              {cancel}
+              {confirm}
+            </Stack>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

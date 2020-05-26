@@ -1,7 +1,7 @@
 import { Button, FormControl, Input, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { useRef } from "react";
@@ -16,7 +16,7 @@ export type CreatePetitionFormData = {
 export function AskPetitionNameDialog({
   defaultName,
   ...props
-}: { defaultName?: string } & DialogCallbacks<string>) {
+}: { defaultName?: string } & DialogProps<string>) {
   const intl = useIntl();
   const {
     handleSubmit,

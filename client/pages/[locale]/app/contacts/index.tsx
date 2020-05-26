@@ -2,7 +2,7 @@ import { Box, Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -267,7 +267,7 @@ function ConfirmDeleteContacts({
   ...props
 }: {
   selected: ContactSelection[];
-} & DialogCallbacks<void>) {
+} & DialogProps<void>) {
   const count = selected.length;
   const email = selected.length && selected[0].email;
   return (

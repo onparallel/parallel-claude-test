@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Input } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FORMATS } from "@parallel/utils/dates";
@@ -26,7 +26,7 @@ import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedDate, FormattedMessage, FormattedTime } from "react-intl";
 import { DatePicker } from "../common/DatePicker";
 
-export function ScheduleMessageDialog({ ...props }: DialogCallbacks<Date>) {
+export function ScheduleMessageDialog({ ...props }: DialogProps<Date>) {
   const [date, setDate] = useState<Date>(startOfDay(addHours(new Date(), 1)));
   const [time, setTime] = useState<Date>(
     roundToNearestMinutes(addHours(new Date(), 1), { nearestTo: 5 })

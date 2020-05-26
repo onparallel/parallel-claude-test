@@ -485,6 +485,7 @@ export const PetitionReminder = objectType({
       nullable: true,
       description: "The sender of this petition message.",
       resolve: async (root, _, ctx) => {
+        console.log(root);
         return root.sender_id
           ? (await ctx.users.loadUser(root.sender_id))!
           : null;
@@ -641,6 +642,12 @@ export const MessagesCancelledEvent = createPetitionEvent(
         return (await ctx.petitions.loadMessage(
           root.data.petition_message_id
         ))!;
+      },
+    });
+    t.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.data.user_id))!;
       },
     });
   }

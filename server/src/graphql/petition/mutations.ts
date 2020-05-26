@@ -578,41 +578,40 @@ export const sendReminder = mutationField("sendReminders", {
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: accessId,
+          sender_id: ctx.user!.id,
           created_by: `User:${ctx.user!.id}`,
         }))
       );
       await ctx.aws.enqueueReminders(reminders.map((r) => r.id));
-      return {
-        result: RESULT.SUCCESS,
-      };
+      return RESULT.SUCCESS;
     } catch (error) {
-      return {
-        result: RESULT.FAILURE,
-      };
+      return RESULT.FAILURE;
     }
   },
 });
 
-export const cancelScheduledMessages = mutationField(
-  "cancelScheduledMessages",
-  {
-    description: "Cancels scheduled petition messages.",
-    type: "PetitionMessage",
-    nullable: true,
-    authorize: authorizeAnd(
-      authenticate(),
-      authorizeAndP(
-        userHasAccessToPetition("petitionId"),
-        messageBelongToPetition("petitionId", "messageId")
-      )
-    ),
-    args: {
-      petitionId: idArg({ required: true }),
-      messageId: idArg({ required: true }),
-    },
-    resolve: async (_, args, ctx) => {
-      const { id: messageId } = fromGlobalId(args.messageId, "PetitionMessage");
-      return await ctx.petitions.cancelScheduledMessage(messageId);
-    },
-  }
-);
+export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
+  description: "Cancels a scheduled petition message.",
+  type: "PetitionMessage",
+  nullable: true,
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(
+      userHasAccessToPetition("petitionId"),
+      messageBelongToPetition("petitionId", "messageId")
+    )
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    messageId: idArg({ required: true }),
+  },
+  resolve: async (_, args, ctx) => {
+    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+    const { id: messageId } = fromGlobalId(args.messageId, "PetitionMessage");
+    return await ctx.petitions.cancelScheduledMessage(
+      petitionId,
+      messageId,
+      ctx.user!
+    );
+  },
+});

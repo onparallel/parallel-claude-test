@@ -149,6 +149,7 @@ type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   id: ID!
   message: PetitionMessage!
+  user: User!
 }
 
 type MessageProcessedEvent implements PetitionEvent {
@@ -165,9 +166,9 @@ type MessageScheduledEvent implements PetitionEvent {
 
 type Mutation {
   """
-  Cancels scheduled petition messages.
+  Cancels a scheduled petition message.
   """
-  cancelScheduledMessages(messageId: ID!, petitionId: ID!): PetitionMessage
+  cancelScheduledMessage(messageId: ID!, petitionId: ID!): PetitionMessage
 
   """
   Changes the password for the current logged in user.

@@ -152,7 +152,7 @@ export function messageBelongToPetition<
         args[argNameMessageId],
         "PetitionMessage"
       );
-      return ctx.petitions.accesessBelongToPetition(petitionId, [messageId]);
+      return ctx.petitions.messagesBelongToPetition(petitionId, [messageId]);
     } catch {}
     return false;
   };

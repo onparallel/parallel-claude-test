@@ -1,12 +1,12 @@
 import { Button } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmDeleteFieldDialog({ ...props }: DialogCallbacks<void>) {
+export function ConfirmDeleteFieldDialog({ ...props }: DialogProps<void>) {
   return (
     <ConfirmDialog
       header={

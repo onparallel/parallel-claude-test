@@ -119,6 +119,7 @@ export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
+  user: User;
 };
 
 export type MessageProcessedEvent = PetitionEvent & {
@@ -137,8 +138,8 @@ export type MessageScheduledEvent = PetitionEvent & {
 
 export type Mutation = {
   __typename?: "Mutation";
-  /** Cancels scheduled petition messages. */
-  cancelScheduledMessages?: Maybe<PetitionMessage>;
+  /** Cancels a scheduled petition message. */
+  cancelScheduledMessage?: Maybe<PetitionMessage>;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Clone petition. */
@@ -187,7 +188,7 @@ export type Mutation = {
   validatePetitionFields: PetitionAndFields;
 };
 
-export type MutationcancelScheduledMessagesArgs = {
+export type MutationcancelScheduledMessageArgs = {
   messageId: Scalars["ID"];
   petitionId: Scalars["ID"];
 };
@@ -1031,7 +1032,8 @@ export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = 
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
   __typename?: "MessageCancelledEvent";
-} & Pick<MessageCancelledEvent, "id">;
+} & Pick<MessageCancelledEvent, "id"> &
+  TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragment = {
   __typename?: "MessageProcessedEvent";
@@ -1108,6 +1110,22 @@ export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
     };
   };
 
+export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
+  __typename?: "MessageCancelledEvent";
+} & Pick<MessageCancelledEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "status" | "scheduledAt" | "emailSubject"
+    > & {
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        };
+      };
+    user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+  };
+
 export type TimelineMessageProcessedEvent_MessageProcessedEventFragment = {
   __typename?: "MessageProcessedEvent";
 } & Pick<MessageProcessedEvent, "createdAt"> & {
@@ -1137,7 +1155,7 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
             { __typename?: "Contact" } & ContactLink_ContactFragment
           >;
         };
-      } & MessageEventsIndicator_PetitionMessageFragment;
+      };
   };
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
@@ -1419,6 +1437,19 @@ export type PetitionActivity_sendRemindersMutationVariables = {
 export type PetitionActivity_sendRemindersMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "sendReminders">;
+
+export type PetitionActivity_cancelScheduledMessageMutationVariables = {
+  petitionId: Scalars["ID"];
+  messageId: Scalars["ID"];
+};
+
+export type PetitionActivity_cancelScheduledMessageMutation = {
+  __typename?: "Mutation";
+} & {
+  cancelScheduledMessage?: Maybe<
+    { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id" | "status">
+  >;
+};
 
 export type PetitionActivityQueryVariables = {
   id: Scalars["ID"];
@@ -2165,13 +2196,6 @@ export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
   }
   ${ContactLink_ContactFragmentDoc}
 `;
-export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
-  fragment MessageEventsIndicator_PetitionMessage on PetitionMessage {
-    bouncedAt
-    deliveredAt
-    openedAt
-  }
-`;
 export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gql`
   fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
     message {
@@ -2187,12 +2211,37 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
           ...ContactLink_Contact
         }
       }
-      ...MessageEventsIndicator_PetitionMessage
     }
     createdAt
   }
   ${ContactLink_ContactFragmentDoc}
-  ${MessageEventsIndicator_PetitionMessageFragmentDoc}
+`;
+export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
+  fragment TimelineMessageCancelledEvent_MessageCancelledEvent on MessageCancelledEvent {
+    message {
+      status
+      scheduledAt
+      emailSubject
+      access {
+        contact {
+          ...ContactLink_Contact
+        }
+      }
+    }
+    user {
+      id
+      fullName
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
+  fragment MessageEventsIndicator_PetitionMessage on PetitionMessage {
+    bouncedAt
+    deliveredAt
+    openedAt
+  }
 `;
 export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gql`
   fragment TimelineMessageProcessedEvent_MessageProcessedEvent on MessageProcessedEvent {
@@ -2285,6 +2334,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
       }
       ...TimelineMessageScheduledEvent_MessageScheduledEvent
     }
+    ... on MessageCancelledEvent {
+      ...TimelineMessageCancelledEvent_MessageCancelledEvent
+    }
     ... on MessageProcessedEvent {
       ...TimelineMessageProcessedEvent_MessageProcessedEvent
     }
@@ -2304,6 +2356,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc}
   ${TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc}
   ${TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc}
+  ${TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc}
   ${TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc}
   ${TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc}
   ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
@@ -3057,6 +3110,61 @@ export type PetitionActivity_sendRemindersMutationResult = ApolloReactCommon.Mut
 export type PetitionActivity_sendRemindersMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionActivity_sendRemindersMutation,
   PetitionActivity_sendRemindersMutationVariables
+>;
+export const PetitionActivity_cancelScheduledMessageDocument = gql`
+  mutation PetitionActivity_cancelScheduledMessage(
+    $petitionId: ID!
+    $messageId: ID!
+  ) {
+    cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
+      id
+      status
+    }
+  }
+`;
+export type PetitionActivity_cancelScheduledMessageMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionActivity_cancelScheduledMessageMutation,
+  PetitionActivity_cancelScheduledMessageMutationVariables
+>;
+
+/**
+ * __usePetitionActivity_cancelScheduledMessageMutation__
+ *
+ * To run a mutation, you first call `usePetitionActivity_cancelScheduledMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionActivity_cancelScheduledMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionActivityCancelScheduledMessageMutation, { data, loading, error }] = usePetitionActivity_cancelScheduledMessageMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      messageId: // value for 'messageId'
+ *   },
+ * });
+ */
+export function usePetitionActivity_cancelScheduledMessageMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionActivity_cancelScheduledMessageMutation,
+    PetitionActivity_cancelScheduledMessageMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionActivity_cancelScheduledMessageMutation,
+    PetitionActivity_cancelScheduledMessageMutationVariables
+  >(PetitionActivity_cancelScheduledMessageDocument, baseOptions);
+}
+export type PetitionActivity_cancelScheduledMessageMutationHookResult = ReturnType<
+  typeof usePetitionActivity_cancelScheduledMessageMutation
+>;
+export type PetitionActivity_cancelScheduledMessageMutationResult = ApolloReactCommon.MutationResult<
+  PetitionActivity_cancelScheduledMessageMutation
+>;
+export type PetitionActivity_cancelScheduledMessageMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionActivity_cancelScheduledMessageMutation,
+  PetitionActivity_cancelScheduledMessageMutationVariables
 >;
 export const PetitionActivityDocument = gql`
   query PetitionActivity($id: ID!) {

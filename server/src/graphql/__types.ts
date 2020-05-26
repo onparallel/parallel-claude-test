@@ -346,6 +346,7 @@ export interface NexusGenFieldTypes {
     createdAt: Date; // DateTime!
     id: string; // ID!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
+    user: NexusGenRootTypes["User"]; // User!
   };
   MessageProcessedEvent: {
     // field return type
@@ -361,7 +362,7 @@ export interface NexusGenFieldTypes {
   };
   Mutation: {
     // field return type
-    cancelScheduledMessages: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
+    cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     clonePetition: NexusGenRootTypes["Petition"]; // Petition!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -651,7 +652,7 @@ export interface NexusGenArgTypes {
     };
   };
   Mutation: {
-    cancelScheduledMessages: {
+    cancelScheduledMessage: {
       // args
       messageId: string; // ID!
       petitionId: string; // ID!

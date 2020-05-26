@@ -7,7 +7,7 @@ export type PetitionEventPayload = {
   ACCESS_DEACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_OPENED: { petition_access_id: number };
   MESSAGE_SCHEDULED: { petition_message_id: number };
-  MESSAGE_CANCELLED: { petition_message_id: number };
+  MESSAGE_CANCELLED: { petition_message_id: number; user_id: number };
   MESSAGE_PROCESSED: { petition_message_id: number };
   REMINDER_PROCESSED: { petition_reminder_id: number };
   REPLY_CREATED: {

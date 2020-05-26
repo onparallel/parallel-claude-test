@@ -4,7 +4,7 @@ import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { Link } from "@parallel/components/common/Link";
@@ -393,7 +393,7 @@ function ConfirmDeletePetitionsDialog({
   ...props
 }: {
   selected: PetitionSelection[];
-} & DialogCallbacks<void>) {
+} & DialogProps<void>) {
   const count = selected.length;
   const name = selected.length && selected[0].name;
   return (

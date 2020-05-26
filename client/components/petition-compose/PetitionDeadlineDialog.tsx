@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Input } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FORMATS } from "@parallel/utils/dates";
@@ -21,7 +21,7 @@ import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedDate, FormattedMessage, FormattedTime } from "react-intl";
 import { DatePicker } from "../common/DatePicker";
 
-export function PetitionDeadlineDialog({ ...props }: DialogCallbacks<Date>) {
+export function PetitionDeadlineDialog({ ...props }: DialogProps<Date>) {
   const nextWeek = startOfDay(addDays(new Date(), 7));
   const [date, setDate] = useState<Date>(nextWeek);
   const [time, setTime] = useState<Date>(subMinutes(addDays(nextWeek, 1), 1));

@@ -203,7 +203,7 @@ function TextSettings({
           color="green"
           isChecked={options.multiline}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onUpdateField(field.id, {
+            onFieldEdit(field.id, {
               options: { ...field.options, multiline: event.target.checked },
             })
           }

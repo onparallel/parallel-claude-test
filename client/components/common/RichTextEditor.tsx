@@ -10,7 +10,6 @@ import {
   CSSProperties,
   KeyboardEvent,
   memo,
-  TextareaHTMLAttributes,
   useCallback,
   useMemo,
 } from "react";
@@ -30,6 +29,7 @@ import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
+import { EditableProps } from "slate-react/dist/components/editable";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -40,9 +40,10 @@ const HOTKEYS = {
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
 export type RichTextEditorProps = {
+  isDisabled?: boolean;
   value: RichTextEditorContent;
   onChange: (value: RichTextEditorContent) => void;
-} & Omit<TextareaHTMLAttributes<HTMLDivElement>, "value" | "onChange">;
+} & Omit<EditableProps, "value" | "onChange">;
 
 export type RichTextBlock = {
   children: (RichTextBlock | RichTextLeaf)[];
@@ -59,35 +60,41 @@ export type RichTextEditorContent = RichTextBlock[];
 export function RichTextEditor({
   value,
   onChange,
-  disabled,
-  style: editorStyle,
+  isDisabled,
+  onKeyDown: _onKeyDown,
   ...props
 }: RichTextEditorProps) {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
-  const onKeyDown = useCallback((event: KeyboardEvent) => {
+  const onKeyDown: RichTextEditorProps["onKeyDown"] = useCallback((event) => {
     for (const [hotkey, mark] of Object.entries(HOTKEYS)) {
       if (isHotkey(hotkey, event.nativeEvent)) {
         event.preventDefault();
         toggleMark(editor, mark);
       }
     }
+    _onKeyDown?.(event);
   }, []);
-  const styles = useStyles();
+  const outerStyles = useOuterStyles();
+  const style = useMemo(
+    () =>
+      ({
+        padding: "12px 16px",
+        minHeight: "120px",
+      } as CSSProperties),
+    []
+  );
 
   return (
-    <PseudoBox aria-disabled={disabled} {...styles}>
+    <PseudoBox aria-disabled={isDisabled} {...outerStyles}>
       <Slate editor={editor} value={value} onChange={onChange as any}>
-        <Toolbar disabled={disabled} />
-        <PseudoBox>
-          <MemoEditable
-            readOnly={disabled}
+        <Toolbar disabled={isDisabled} />
+        <PseudoBox maxHeight="360px" overflow="auto">
+          <Editable
+            readOnly={isDisabled}
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             onKeyDown={onKeyDown}
-            style={{
-              ...editorStyle,
-              padding: "12px 16px",
-            }}
+            style={style}
             {...props}
           />
         </PseudoBox>
@@ -95,8 +102,6 @@ export function RichTextEditor({
     </PseudoBox>
   );
 }
-
-const MemoEditable = memo(Editable);
 
 const Toolbar = memo(function _Toolbar({
   disabled,
@@ -277,7 +282,7 @@ function MarkButton({ format, icon, ...props }: MarkButtonProps) {
   );
 }
 
-function useStyles() {
+function useOuterStyles() {
   const theme = useTheme();
   const { colorMode } = useColorMode();
   return useMemo(() => {

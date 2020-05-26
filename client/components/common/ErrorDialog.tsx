@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { ReactNode, useRef } from "react";
@@ -10,7 +10,7 @@ import { FormattedMessage } from "react-intl";
 export function ErrorDialog({
   message,
   ...props
-}: { message: ReactNode } & DialogCallbacks<void>) {
+}: { message: ReactNode } & DialogProps<void>) {
   const focusRef = useRef(null);
   return (
     <ConfirmDialog

@@ -12,6 +12,7 @@ import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent"
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancelledEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -52,6 +53,8 @@ export function PetitionActivityTimeline({
                   event.message.id
                 )}
               />
+            ) : event.__typename === "MessageCancelledEvent" ? (
+              <TimelineMessageCancelledEvent event={event} userId={userId} />
             ) : event.__typename === "MessageProcessedEvent" ? (
               <TimelineMessageProcessedEvent event={event} userId={userId} />
             ) : event.__typename === "ReminderProcessedEvent" ? (
@@ -102,6 +105,9 @@ PetitionActivityTimeline.fragments = {
         }
         ...TimelineMessageScheduledEvent_MessageScheduledEvent
       }
+      ... on MessageCancelledEvent {
+        ...TimelineMessageCancelledEvent_MessageCancelledEvent
+      }
       ... on MessageProcessedEvent {
         ...TimelineMessageProcessedEvent_MessageProcessedEvent
       }
@@ -122,6 +128,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineAccessOpenedEvent.fragments.AccessOpenedEvent}
     ${TimelineMessageProcessedEvent.fragments.MessageProcessedEvent}
     ${TimelineMessageScheduledEvent.fragments.MessageScheduledEvent}
+    ${TimelineMessageCancelledEvent.fragments.MessageCancelledEvent}
     ${TimelineReminderProcessedEvent.fragments.ReminderProcessedEvent}
     ${TimelineReplyCreatedEvent.fragments.ReplyCreatedEvent}
     ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}

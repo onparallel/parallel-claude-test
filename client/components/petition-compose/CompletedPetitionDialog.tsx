@@ -1,14 +1,14 @@
 import { Button } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
-  DialogCallbacks,
+  DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
-export function CompletedPetitionDialog({ ...props }: DialogCallbacks<void>) {
+export function CompletedPetitionDialog({ ...props }: DialogProps<void>) {
   const focusRef = useRef(null);
   const router = useRouter();
   return (
