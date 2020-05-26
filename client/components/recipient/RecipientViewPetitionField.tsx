@@ -354,17 +354,17 @@ function FileUploadReplyForm({
     getRootProps,
     getInputProps,
     isDragActive,
-    isDragAccept,
+    isDragReject,
   } = useDropzone({ accept, onDrop, multiple: field.multiple, disabled });
   const { colors } = useTheme();
   return (
     <Flex
       color={
-        isDragActive ? (isDragAccept ? "gray.600" : "red.500") : "gray.500"
+        isDragActive ? (isDragReject ? "red.500" : "gray.600") : "gray.500"
       }
       border="2px dashed"
       borderColor={
-        isDragActive ? (isDragAccept ? "gray.400" : "red.500") : "gray.300"
+        isDragActive ? (isDragReject ? "red.500" : "gray.400") : "gray.300"
       }
       cursor="pointer"
       rounded="md"
@@ -383,7 +383,7 @@ function FileUploadReplyForm({
         isDragActive
           ? generateCssStripe({
               size: "1rem",
-              color: isDragAccept ? colors.gray[50] : colors.red[50],
+              color: isDragReject ? colors.red[50] : colors.gray[50],
             })
           : null
       }
@@ -392,7 +392,7 @@ function FileUploadReplyForm({
     >
       <input {...getInputProps()} />
       <Box pointerEvents="none">
-        {isDragActive && !isDragAccept ? (
+        {isDragActive && isDragReject ? (
           <>
             <FormattedMessage
               id="generic.dropzone-allowed-types"
