@@ -14,7 +14,7 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { ChangeEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import {
@@ -24,6 +24,8 @@ import {
 } from "../common/RichTextEditor";
 import { SplitButton } from "../common/SplitButton";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
+import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
+import { SendButton } from "../petition-common/SendButton";
 
 export function SendMessageDialogDialog({
   ...props
@@ -70,84 +72,20 @@ export function SendMessageDialogDialog({
         />
       }
       body={
-        <>
-          <FormControl isInvalid={showErrors && !subject}>
-            <FormLabel htmlFor="petition-subject" paddingBottom={0}>
-              <FormattedMessage
-                id="petition.subject-label"
-                defaultMessage="Subject"
-              />
-            </FormLabel>
-            <Input
-              id="petition-subject"
-              type="text"
-              ref={subjectRef}
-              value={subject}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setSubject(event.target.value)
-              }
-              placeholder={intl.formatMessage({
-                id: "petition.subject-placeholder",
-                defaultMessage: "Enter the subject of the email",
-              })}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="petition.subject-required"
-                defaultMessage="A subject helps the recipient understand the context of your petition."
-              />
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl
-            isInvalid={showErrors && isEmptyContent(body)}
-            marginTop={4}
-          >
-            <RichTextEditor
-              value={body}
-              onChange={setBody}
-              placeholder={intl.formatMessage({
-                id: "petition.body-placeholder",
-                defaultMessage: "Write a message to include in the email",
-              })}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="petition.body-required"
-                defaultMessage="Customizing the initial message improves the response time of the recipients."
-              />
-            </FormErrorMessage>
-          </FormControl>
-        </>
+        <MessageEmailEditor
+          showErrors={showErrors}
+          subjectRef={subjectRef}
+          subject={subject}
+          body={body}
+          onSubjectChange={setSubject}
+          onBodyChange={setBody}
+        />
       }
       confirm={
-        <SplitButton dividerColor="purple.600">
-          <Button
-            type="submit"
-            variantColor="purple"
-            leftIcon={"paper-plane" as any}
-            onClick={handleSendClick}
-          >
-            <FormattedMessage id="petition.send-button" defaultMessage="Send" />
-          </Button>
-          <ButtonDropdown
-            as={IconButton}
-            variantColor="purple"
-            icon="chevron-down"
-            aria-label="Options"
-            minWidth={8}
-            dropdown={
-              <MenuList minWidth={0} placement="top-end">
-                <MenuItem onClick={handleScheduleClick}>
-                  <Icon name="time" marginRight={2} />
-                  <FormattedMessage
-                    id="petition.schedule-send-button"
-                    defaultMessage="Schedule send"
-                  />
-                </MenuItem>
-              </MenuList>
-            }
-          ></ButtonDropdown>
-        </SplitButton>
+        <SendButton
+          onSendClick={handleSendClick}
+          onScheduleClick={handleScheduleClick}
+        />
       }
       {...props}
     />

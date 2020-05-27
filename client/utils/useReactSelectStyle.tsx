@@ -52,7 +52,13 @@ export const SIZES = {
  */
 export function useReactSelectStyle<
   OptionType extends OptionTypeBase = { label: string; value: string }
->({ size }: { size: keyof typeof SIZES } = { size: "md" }) {
+>({
+  size = "md",
+  hasError = false,
+}: {
+  size: keyof typeof SIZES;
+  hasError: boolean;
+}) {
   const { colors, radii, sizes } = useTheme();
   const intl = useIntl();
   const labels = useMemo(
@@ -145,11 +151,22 @@ export function useReactSelectStyle<
             ...styles,
             borderColor: isDisabled
               ? colors.gray[100]
+              : hasError
+              ? colors.red[500]
               : isFocused
               ? colors.blue[500]
               : "inherit",
+            boxShadow: hasError
+              ? `0 0 0 1px ${colors.red[500]}`
+              : isFocused
+              ? `0 0 0 1px ${colors.blue[500]}`
+              : undefined,
             "&:hover": {
-              borderColor: isFocused ? theme.colors.primary : colors.gray[300],
+              borderColor: hasError
+                ? colors.red[500]
+                : isFocused
+                ? theme.colors.primary
+                : colors.gray[300],
             },
           };
         },
@@ -191,6 +208,6 @@ export function useReactSelectStyle<
         },
       },
     }),
-    []
+    [size, hasError]
   );
 }

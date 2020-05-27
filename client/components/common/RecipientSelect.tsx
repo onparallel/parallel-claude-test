@@ -1,4 +1,12 @@
-import { Box, Icon, Text, useToast } from "@chakra-ui/core";
+import {
+  Box,
+  Icon,
+  Text,
+  useToast,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+} from "@chakra-ui/core";
 import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -9,24 +17,26 @@ import { components, OptionProps } from "react-select";
 import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
 import { pick } from "remeda";
 import { useReactSelectStyle } from "../../utils/useReactSelectStyle";
+import { useId } from "@reach/auto-id";
 
 export type Recipient = RecipientSelect_ContactFragment;
 
 type RecipientSelectProps = Pick<Props<Recipient>, "inputId"> & {
   value: Recipient[];
+  showErrors: boolean;
   onChange: (recipients: Recipient[]) => void;
   searchContacts: (search: string, exclude: string[]) => Promise<Recipient[]>;
 };
 
 export function RecipientSelect({
   value,
+  showErrors,
   searchContacts,
   onChange,
   ...props
 }: RecipientSelectProps) {
   const intl = useIntl();
   const [isCreating, setIsCreating] = useState(false);
-  const reactSelectProps = useReactSelectProps();
   const createContact = useCreateContact();
   const toast = useToast();
 
@@ -65,22 +75,40 @@ export function RecipientSelect({
     }
     setIsCreating(false);
   }
+  const inputId = `recipient-select-${useId()}`;
+  const hasError = showErrors && value.length === 0;
+  const reactSelectProps = useReactSelectProps({ hasError });
 
   return (
-    <AsyncCreatableSelect<Recipient>
-      placeholder={intl.formatMessage({
-        id: "component.recipient-select.placeholder",
-        defaultMessage: "Enter recipients...",
-      })}
-      value={value}
-      isDisabled={isCreating}
-      onChange={(value) => onChange((value as any) ?? [])}
-      onCreateOption={handleCreate}
-      isMulti
-      loadOptions={loadOptions}
-      {...reactSelectProps}
-      {...props}
-    />
+    <FormControl isInvalid={hasError}>
+      <FormLabel htmlFor={inputId} paddingBottom={0}>
+        <FormattedMessage
+          id="component.recipient-select.label"
+          defaultMessage="Recipients"
+        />
+      </FormLabel>
+      <AsyncCreatableSelect<Recipient>
+        inputId={inputId}
+        placeholder={intl.formatMessage({
+          id: "component.recipient-select.placeholder",
+          defaultMessage: "Enter recipients...",
+        })}
+        value={value}
+        isDisabled={isCreating}
+        onChange={(value) => onChange((value as any) ?? [])}
+        onCreateOption={handleCreate}
+        isMulti
+        loadOptions={loadOptions}
+        {...reactSelectProps}
+        {...props}
+      />
+      <FormErrorMessage>
+        <FormattedMessage
+          id="component.recipient-select.required-error"
+          defaultMessage="Please specify at least one recipient"
+        />
+      </FormErrorMessage>
+    </FormControl>
   );
 }
 
@@ -94,8 +122,8 @@ RecipientSelect.fragments = {
   `,
 };
 
-function useReactSelectProps() {
-  const styleProps = useReactSelectStyle<Recipient>({ size: "md" });
+function useReactSelectProps({ hasError }: { hasError: boolean }) {
+  const styleProps = useReactSelectStyle<Recipient>({ size: "md", hasError });
   return useMemo(
     () =>
       ({

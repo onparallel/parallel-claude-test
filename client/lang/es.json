@@ -1314,7 +1314,7 @@
     "reference": "components/petition-compose/ScheduleMessageDialog.tsx#L167-L170"
   },
   {
-    "term": "petition.send-button",
+    "term": "component.send-button.send",
     "definition": "Enviar",
     "context": "Send",
     "reference": "components/petition-compose/PetitionComposeSettings.tsx#L353-L356"

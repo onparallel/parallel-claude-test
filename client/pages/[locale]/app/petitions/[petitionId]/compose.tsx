@@ -56,6 +56,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { isEmptyContent } from "@parallel/components/common/RichTextEditor";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -232,19 +233,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           return;
         }
       }
-      if (contactIds.length === 0) {
-        try {
-          await showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="petition.no-recipients-error"
-                defaultMessage="Please specify at least one recipient."
-              />
-            ),
-          });
-        } finally {
-          return;
-        }
+      if (
+        contactIds.length === 0 ||
+        !petition!.emailSubject ||
+        petition!.emailBody === null ||
+        isEmptyContent(petition!.emailBody)
+      ) {
+        setShowErrors(true);
+        return;
       }
       let scheduledAt: Date | null = null;
       if (schedule) {
@@ -349,6 +345,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             <PetitionComposeMessageEditor
               marginTop={4}
               petition={petition!}
+              showErrors={showErrors}
               searchContacts={searchContacts}
               onUpdatePetition={handleUpdatePetition}
               onSend={handleSend}

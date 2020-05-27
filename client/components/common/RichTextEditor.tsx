@@ -1,3 +1,4 @@
+/** @jsx jsx */
 import {
   PseudoBox,
   PseudoBoxProps,
@@ -11,6 +12,7 @@ import { CSSProperties, memo, useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
+import { css, jsx } from "@emotion/core";
 import {
   Editable,
   RenderElementProps,
@@ -340,10 +342,13 @@ function useOuterStyles() {
         opacity: 0.4,
         cursor: "not-allowed",
       },
-      _invalid: {
-        borderColor: _errorBorderColor,
-        boxShadow: `0 0 0 1px ${_errorBorderColor}`,
-      },
+      css: css`
+        &[aria-invalid="true"],
+        &[aria-invalid="true"]:focus-within {
+          border-color: ${_errorBorderColor};
+          box-shadow: 0 0 0 1px ${_errorBorderColor};
+        }
+      `,
     } as PseudoBoxProps;
   }, []);
 }

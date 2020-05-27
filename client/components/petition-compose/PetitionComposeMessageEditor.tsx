@@ -10,7 +10,6 @@ import {
   Heading,
   Icon,
   IconButton,
-  Input,
   MenuItem,
   MenuList,
   PseudoBox,
@@ -25,7 +24,6 @@ import {
 } from "@parallel/components/common/RecipientSelect";
 import {
   isEmptyContent,
-  RichTextEditor,
   RichTextEditorContent,
 } from "@parallel/components/common/RichTextEditor";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -40,18 +38,21 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
-import { ChangeEvent, useCallback, useState, memo } from "react";
+import { ChangeEvent, memo, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { CollapseContent } from "../common/CollapseContent";
 import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
 import { PetitionRemindersConfig } from "./PetitionRemindersConfig";
+import { SendButton } from "../petition-common/SendButton";
 
 export type PetitionComposeMessageEditorProps = {
   petition: PetitionComposeMessageEditor_PetitionFragment;
+  showErrors: boolean;
   searchContacts: (
     search: string,
     exclude: string[]
@@ -63,6 +64,7 @@ export type PetitionComposeMessageEditorProps = {
 export const PetitionComposeMessageEditor = Object.assign(
   memo(function PetitionComposeMessageEditor({
     petition,
+    showErrors,
     searchContacts,
     onUpdatePetition,
     onSend,
@@ -86,13 +88,10 @@ export const PetitionComposeMessageEditor = Object.assign(
       []
     );
 
-    const handleSubjectChange = useCallback(
-      (event: ChangeEvent<HTMLInputElement>) => {
-        setSubject(event.target.value);
-        updateSubject({ emailSubject: event.target.value || null });
-      },
-      []
-    );
+    const handleSubjectChange = useCallback((value: string) => {
+      setSubject(value);
+      updateSubject({ emailSubject: value || null });
+    }, []);
 
     const handleBodyChange = useCallback((value: RichTextEditorContent) => {
       setBody(value);
@@ -145,24 +144,14 @@ export const PetitionComposeMessageEditor = Object.assign(
           </Heading>
         </Box>
         <Stack spacing={2} padding={4}>
-          <FormControl id="petition-select-recipients">
-            <FormLabel
-              htmlFor="petition-recipients"
-              paddingBottom={0}
-              minWidth="120px"
-            >
-              <FormattedMessage
-                id="petition.recipients-label"
-                defaultMessage="Recipients"
-              />
-            </FormLabel>
+          <Box id="petition-select-recipients">
             <RecipientSelect
-              inputId="petition-recipients"
+              showErrors={showErrors}
               searchContacts={searchContacts}
               value={recipients}
               onChange={setRecipients}
             />
-          </FormControl>
+          </Box>
           {recipients.length >= 2 ? (
             <Alert status="info">
               <AlertIcon />
@@ -173,38 +162,13 @@ export const PetitionComposeMessageEditor = Object.assign(
               />
             </Alert>
           ) : null}
-          <FormControl>
-            <FormLabel
-              htmlFor="petition-subject"
-              paddingBottom={0}
-              minWidth="120px"
-            >
-              <FormattedMessage
-                id="petition.subject-label"
-                defaultMessage="Subject"
-              />
-            </FormLabel>
-            <Input
-              id="petition-subject"
-              type="text"
-              value={subject ?? ""}
-              placeholder={intl.formatMessage({
-                id: "petition.subject-placeholder",
-                defaultMessage: "Enter the subject of the email",
-              })}
-              onChange={handleSubjectChange}
-            />
-          </FormControl>
-          <Box>
-            <RichTextEditor
-              placeholder={intl.formatMessage({
-                id: "petition.body-placeholder",
-                defaultMessage: "Write a message to include in the email",
-              })}
-              value={body}
-              onChange={handleBodyChange}
-            />
-          </Box>
+          <MessageEmailEditor
+            showErrors={showErrors}
+            subject={subject}
+            body={body}
+            onSubjectChange={handleSubjectChange}
+            onBodyChange={handleBodyChange}
+          />
           <Flex id="petition-reminders" alignItems="center" marginTop={2}>
             <Checkbox
               id="petition-reminders"
@@ -343,38 +307,10 @@ export const PetitionComposeMessageEditor = Object.assign(
           </CollapseContent>
           <Flex marginTop={2}>
             <Spacer />
-            <SplitButton dividerColor="purple.600">
-              <Button
-                variantColor="purple"
-                leftIcon={"paper-plane" as any}
-                onClick={() => handleSendClick()}
-              >
-                <FormattedMessage
-                  id="petition.send-button"
-                  defaultMessage="Send"
-                />
-              </Button>
-              <ButtonDropdown
-                as={IconButton}
-                variantColor="purple"
-                icon="chevron-down"
-                aria-label="Options"
-                minWidth={8}
-                dropdown={
-                  <MenuList minWidth={0} placement="top-end">
-                    <MenuItem
-                      onClick={() => handleSendClick({ schedule: true })}
-                    >
-                      <Icon name="time" marginRight={2} />
-                      <FormattedMessage
-                        id="petition.schedule-send-button"
-                        defaultMessage="Schedule send"
-                      />
-                    </MenuItem>
-                  </MenuList>
-                }
-              ></ButtonDropdown>
-            </SplitButton>
+            <SendButton
+              onSendClick={() => handleSendClick()}
+              onScheduleClick={() => handleSendClick({ schedule: true })}
+            />
           </Flex>
         </Stack>
       </Card>

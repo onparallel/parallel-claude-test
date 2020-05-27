@@ -29,7 +29,7 @@ export function ConfirmActivateAccessDialog({
         <Button variantColor="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="petition.confirm-activate-access-message.confirm"
-            defaultMessage="Yes, activate"
+            defaultMessage="Yes, activate access"
           />
         </Button>
       }
