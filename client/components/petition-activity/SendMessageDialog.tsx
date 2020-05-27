@@ -41,7 +41,7 @@ export function SendMessageDialogDialog({
   const isValid = Boolean(subject && !isEmptyContent(body));
   const subjectRef = useRef<HTMLInputElement>(null);
   const showScheduleMessageDialog = useScheduleMessageDialog();
-  const handleScheduleClick = useCallback(async () => {
+  const handleScheduleClick = async () => {
     try {
       if (!isValid) {
         setShowErrors(true);
@@ -50,14 +50,14 @@ export function SendMessageDialogDialog({
       const scheduledAt = await showScheduleMessageDialog({});
       props.onResolve({ subject, body, scheduledAt });
     } catch {}
-  }, [isValid]);
-  const handleSendClick = useCallback(() => {
+  };
+  const handleSendClick = () => {
     if (!isValid) {
       setShowErrors(true);
       return;
     }
     props.onResolve({ subject, body, scheduledAt: null });
-  }, [isValid]);
+  };
 
   return (
     <ConfirmDialog
