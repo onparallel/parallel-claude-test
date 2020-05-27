@@ -1,7 +1,7 @@
 import {
-  Box,
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Icon,
   IconButton,
@@ -14,34 +14,55 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import {
+  isEmptyContent,
   RichTextEditor,
   RichTextEditorContent,
 } from "../common/RichTextEditor";
 import { SplitButton } from "../common/SplitButton";
-import { useCallback } from "react";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
-export function SendMessageDialogDialog({ ...props }: DialogProps<void>) {
+export function SendMessageDialogDialog({
+  ...props
+}: DialogProps<{
+  subject: string;
+  body: RichTextEditorContent;
+  scheduledAt: Date | null;
+}>) {
   const intl = useIntl();
+  const [showErrors, setShowErrors] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState<RichTextEditorContent>([
     { children: [{ text: "" }] },
   ]);
+  const isValid = Boolean(subject && !isEmptyContent(body));
+  const subjectRef = useRef<HTMLInputElement>(null);
   const showScheduleMessageDialog = useScheduleMessageDialog();
   const handleScheduleClick = useCallback(async () => {
     try {
-      const scheduleAt = await showScheduleMessageDialog({});
-      console.log(scheduleAt);
+      if (!isValid) {
+        setShowErrors(true);
+        return;
+      }
+      const scheduledAt = await showScheduleMessageDialog({});
+      props.onResolve({ subject, body, scheduledAt });
     } catch {}
-  }, []);
-  const handleSendClick = useCallback(() => {}, []);
+  }, [isValid]);
+  const handleSendClick = useCallback(() => {
+    if (!isValid) {
+      setShowErrors(true);
+      return;
+    }
+    props.onResolve({ subject, body, scheduledAt: null });
+  }, [isValid]);
+
   return (
     <ConfirmDialog
       size="2xl"
+      focusRef={subjectRef}
       header={
         <FormattedMessage
           id="petition.send-message-header.header"
@@ -50,7 +71,7 @@ export function SendMessageDialogDialog({ ...props }: DialogProps<void>) {
       }
       body={
         <>
-          <FormControl>
+          <FormControl isInvalid={showErrors && !subject}>
             <FormLabel htmlFor="petition-subject" paddingBottom={0}>
               <FormattedMessage
                 id="petition.subject-label"
@@ -60,6 +81,7 @@ export function SendMessageDialogDialog({ ...props }: DialogProps<void>) {
             <Input
               id="petition-subject"
               type="text"
+              ref={subjectRef}
               value={subject}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setSubject(event.target.value)
@@ -69,8 +91,17 @@ export function SendMessageDialogDialog({ ...props }: DialogProps<void>) {
                 defaultMessage: "Enter the subject of the email",
               })}
             />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="petition.subject-required"
+                defaultMessage="A subject helps the recipient understand the context of your petition."
+              />
+            </FormErrorMessage>
           </FormControl>
-          <Box marginTop={4}>
+          <FormControl
+            isInvalid={showErrors && isEmptyContent(body)}
+            marginTop={4}
+          >
             <RichTextEditor
               value={body}
               onChange={setBody}
@@ -79,7 +110,13 @@ export function SendMessageDialogDialog({ ...props }: DialogProps<void>) {
                 defaultMessage: "Write a message to include in the email",
               })}
             />
-          </Box>
+            <FormErrorMessage>
+              <FormattedMessage
+                id="petition.body-required"
+                defaultMessage="Customizing the initial message improves the response time of the recipients."
+              />
+            </FormErrorMessage>
+          </FormControl>
         </>
       }
       confirm={

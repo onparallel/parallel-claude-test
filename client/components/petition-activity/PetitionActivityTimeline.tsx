@@ -4,10 +4,10 @@ import { gql } from "apollo-boost";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
-import { TimelineMessageProcessedEvent } from "./timeline/TimelineMessageProcessedEvent";
+import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
-import { TimelineReminderProcessedEvent } from "./timeline/TimelineReminderProcessedEvent";
+import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
@@ -55,10 +55,10 @@ export function PetitionActivityTimeline({
               />
             ) : event.__typename === "MessageCancelledEvent" ? (
               <TimelineMessageCancelledEvent event={event} userId={userId} />
-            ) : event.__typename === "MessageProcessedEvent" ? (
-              <TimelineMessageProcessedEvent event={event} userId={userId} />
-            ) : event.__typename === "ReminderProcessedEvent" ? (
-              <TimelineReminderProcessedEvent event={event} userId={userId} />
+            ) : event.__typename === "MessageSentEvent" ? (
+              <TimelineMessageSentEvent event={event} userId={userId} />
+            ) : event.__typename === "ReminderSentEvent" ? (
+              <TimelineReminderSentEvent event={event} userId={userId} />
             ) : event.__typename === "ReplyCreatedEvent" ? (
               <TimelineReplyCreatedEvent event={event} />
             ) : event.__typename === "ReplyDeletedEvent" ? (
@@ -108,11 +108,11 @@ PetitionActivityTimeline.fragments = {
       ... on MessageCancelledEvent {
         ...TimelineMessageCancelledEvent_MessageCancelledEvent
       }
-      ... on MessageProcessedEvent {
-        ...TimelineMessageProcessedEvent_MessageProcessedEvent
+      ... on MessageSentEvent {
+        ...TimelineMessageSentEvent_MessageSentEvent
       }
-      ... on ReminderProcessedEvent {
-        ...TimelineReminderProcessedEvent_ReminderProcessedEvent
+      ... on ReminderSentEvent {
+        ...TimelineReminderSentEvent_ReminderSentEvent
       }
       ... on ReplyCreatedEvent {
         ...TimelineReplyCreatedEvent_ReplyCreatedEvent
@@ -126,10 +126,10 @@ PetitionActivityTimeline.fragments = {
     ${TimelineAccessActivatedEvent.fragments.AccessActivatedEvent}
     ${TimelineAccessDeactivatedEvent.fragments.AccessDeactivatedEvent}
     ${TimelineAccessOpenedEvent.fragments.AccessOpenedEvent}
-    ${TimelineMessageProcessedEvent.fragments.MessageProcessedEvent}
+    ${TimelineMessageSentEvent.fragments.MessageSentEvent}
     ${TimelineMessageScheduledEvent.fragments.MessageScheduledEvent}
     ${TimelineMessageCancelledEvent.fragments.MessageCancelledEvent}
-    ${TimelineReminderProcessedEvent.fragments.ReminderProcessedEvent}
+    ${TimelineReminderSentEvent.fragments.ReminderSentEvent}
     ${TimelineReplyCreatedEvent.fragments.ReplyCreatedEvent}
     ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}
   `,

@@ -157,8 +157,8 @@
   },
   {
     "term": "petition-reminder.subject",
-    "definition": "Remember to fill the petition {senderName} sent you",
-    "context": "Remember to fill the petition {senderName} sent you",
+    "definition": "Remember that {senderName} sent you a petition",
+    "context": "Remember that {senderName} sent you a petition",
     "reference": "src/emails/components/PetitionReminder.tsx#L44-L47"
   },
   {

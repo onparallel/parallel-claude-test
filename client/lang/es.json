@@ -2412,16 +2412,16 @@
     "reference": "components/petition-activity/timeline/TimelineAccessDeactivatedEvent.tsx#L30-L52"
   },
   {
-    "term": "timeline.message-processed-description-manual",
+    "term": "timeline.message-sent-description-manual",
     "definition": "",
     "context": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <i>{subject}</i>}} to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageProcessedEvent.tsx#L63-L91"
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L63-L91"
   },
   {
-    "term": "timeline.message-processed-description-scheduled",
+    "term": "timeline.message-sent-description-scheduled",
     "definition": "",
     "context": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <i>{subject}</i>}} was sent to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageProcessedEvent.tsx#L33-L61"
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L33-L61"
   },
   {
     "term": "timeline.message-scheduled-description-manual",
@@ -2436,16 +2436,16 @@
     "reference": "components/petition-activity/timeline/TimelinePetitionCreatedEvent.tsx#L25-L42"
   },
   {
-    "term": "timeline.reminder-processed-description-automatic",
+    "term": "timeline.reminder-sent-description-automatic",
     "definition": "",
     "context": "An automatic reminder was sent to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineReminderProcessedEvent.tsx#L51-L73"
+    "reference": "components/petition-activity/timeline/TimelineReminderSentEvent.tsx#L51-L73"
   },
   {
-    "term": "timeline.reminder-processed-description-manual",
+    "term": "timeline.reminder-sent-description-manual",
     "definition": "",
     "context": "{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineReminderProcessedEvent.tsx#L27-L49"
+    "reference": "components/petition-activity/timeline/TimelineReminderSentEvent.tsx#L27-L49"
   },
   {
     "term": "timeline.reply-created-deleted-field",

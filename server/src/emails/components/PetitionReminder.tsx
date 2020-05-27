@@ -37,7 +37,7 @@ const email: Email<PetitionReminderProps> = {
     return intl.formatMessage(
       {
         id: "petition-reminder.subject",
-        defaultMessage: "Remember to fill the petition {senderName} sent you",
+        defaultMessage: "Remember that {senderName} sent you a petition",
       },
       { senderName }
     );

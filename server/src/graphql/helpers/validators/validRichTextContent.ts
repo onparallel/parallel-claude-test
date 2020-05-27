@@ -1,0 +1,64 @@
+import { jsonSchema } from "./jsonSchema";
+
+export const validRichTextContent = jsonSchema({
+  definitions: {
+    "list-item": {
+      type: "object",
+      properties: {
+        children: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/leaf",
+          },
+        },
+        type: { enum: ["list-item"] },
+      },
+      required: ["type"],
+    },
+    list: {
+      type: "object",
+      properties: {
+        type: { enum: ["bulleted-list", "numbered-list"] },
+        children: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/list-item",
+          },
+        },
+      },
+      required: ["type"],
+    },
+    block: {
+      type: "object",
+      properties: {
+        children: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/leaf",
+          },
+        },
+        type: { enum: ["paragraph"] },
+      },
+    },
+    leaf: {
+      type: "object",
+      properties: {
+        text: { type: "string" },
+        bold: { type: "boolean" },
+        italic: { type: "boolean" },
+        underline: { type: "boolean" },
+      },
+      required: ["text"],
+    },
+    root: {
+      type: "array",
+      items: {
+        anyOf: [
+          { $ref: "#/definitions/block" },
+          { $ref: "#/definitions/list" },
+        ],
+      },
+    },
+  },
+  $ref: "#/definitions/root",
+});

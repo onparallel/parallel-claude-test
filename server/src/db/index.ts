@@ -6,7 +6,6 @@ import { EmailLogRepository } from "./repositories/EmailLogRepository";
 import { FileUploadRepository } from "./repositories/FileUploadRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
-import { ReminderRepository } from "./repositories/ReminderRepository";
 import { UserRepository } from "./repositories/UserRepository";
 import { ReportingRepository } from "./repositories/ReportingRepository";
 
@@ -19,7 +18,6 @@ export const dbModule = new ContainerModule((bind) => {
   bind<FileUploadRepository>(FileUploadRepository).toSelf();
   bind<OrganizationRepository>(OrganizationRepository).toSelf();
   bind<PetitionRepository>(PetitionRepository).toSelf();
-  bind<ReminderRepository>(ReminderRepository).toSelf();
   bind<UserRepository>(UserRepository).toSelf();
   bind<ReportingRepository>(ReportingRepository).toSelf();
 });

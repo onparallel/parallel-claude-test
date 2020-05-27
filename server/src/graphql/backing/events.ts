@@ -8,8 +8,8 @@ export type PetitionEventPayload = {
   ACCESS_OPENED: { petition_access_id: number };
   MESSAGE_SCHEDULED: { petition_message_id: number };
   MESSAGE_CANCELLED: { petition_message_id: number; user_id: number };
-  MESSAGE_PROCESSED: { petition_message_id: number };
-  REMINDER_PROCESSED: { petition_reminder_id: number };
+  MESSAGE_SENT: { petition_message_id: number };
+  REMINDER_SENT: { petition_reminder_id: number };
   REPLY_CREATED: {
     petition_access_id: number;
     petition_field_id: number;
@@ -36,8 +36,8 @@ export type AccessDeactivatedEvent = GenericPetitionEvent<"ACCESS_DEACTIVATED">;
 export type AccessOpenedEvent = GenericPetitionEvent<"ACCESS_OPENED">;
 export type MessageScheduledEvent = GenericPetitionEvent<"MESSAGE_SCHEDULED">;
 export type MessageCancelledEvent = GenericPetitionEvent<"MESSAGE_CANCELLED">;
-export type MessageProcessedEvent = GenericPetitionEvent<"MESSAGE_PROCESSED">;
-export type ReminderProcessedEvent = GenericPetitionEvent<"REMINDER_PROCESSED">;
+export type MessageSentEvent = GenericPetitionEvent<"MESSAGE_SENT">;
+export type ReminderSentEvent = GenericPetitionEvent<"REMINDER_SENT">;
 export type ReplyCreatedEvent = GenericPetitionEvent<"REPLY_CREATED">;
 export type ReplyDeletedEvent = GenericPetitionEvent<"REPLY_DELETED">;
 
@@ -49,7 +49,7 @@ export type PetitionEvent =
   | AccessOpenedEvent
   | MessageScheduledEvent
   | MessageCancelledEvent
-  | MessageProcessedEvent
-  | ReminderProcessedEvent
+  | MessageSentEvent
+  | ReminderSentEvent
   | ReplyCreatedEvent
   | ReplyDeletedEvent;

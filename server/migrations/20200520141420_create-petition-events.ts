@@ -79,8 +79,8 @@ interface PetitionEvent {
     | "ACCESS_DEACTIVATED"
     | "MESSAGE_SCHEDULED"
     | "MESSAGE_CANCELLED"
-    | "MESSAGE_PROCESSED"
-    | "REMINDER_PROCESSED"
+    | "MESSAGE_SENT"
+    | "REMINDER_SENT"
     | "REPLY_CREATED"
     | "REPLY_DELETED";
   data: any;
@@ -116,8 +116,8 @@ export async function up(knex: Knex): Promise<any> {
         "ACCESS_OPENED",
         "MESSAGE_SCHEDULED",
         "MESSAGE_CANCELLED",
-        "MESSAGE_PROCESSED",
-        "REMINDER_PROCESSED",
+        "MESSAGE_SENT",
+        "REMINDER_SENT",
         "REPLY_CREATED",
         "REPLY_DELETED",
       ],
@@ -173,7 +173,7 @@ export async function up(knex: Knex): Promise<any> {
   for (const message of messages) {
     events.push({
       petition_id: message.petition_id,
-      type: message.scheduled_at ? "MESSAGE_SCHEDULED" : "MESSAGE_PROCESSED",
+      type: message.scheduled_at ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
       data: {
         petition_message_id: message.id,
       },
@@ -182,7 +182,7 @@ export async function up(knex: Knex): Promise<any> {
     if (message.scheduled_at && message.status === "PROCESSED") {
       events.push({
         petition_id: message.petition_id,
-        type: "MESSAGE_PROCESSED",
+        type: "MESSAGE_SENT",
         data: {
           petition_message_id: message.id,
         },
@@ -195,7 +195,7 @@ export async function up(knex: Knex): Promise<any> {
     const access = accesses.find((a) => a.id === reminder.petition_access_id)!;
     events.push({
       petition_id: access.petition_id,
-      type: "REMINDER_PROCESSED",
+      type: "REMINDER_SENT",
       data: {
         petition_reminder_id: reminder.id,
       },

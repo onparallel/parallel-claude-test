@@ -8,7 +8,8 @@ createCronWorker("reminder-trigger", async (context) => {
   for (const batch of chunk(accesses, 10)) {
     await eachOf(batch, async (access) => {
       const hasMore = access.reminders_left > 1;
-      const reminders = await context.reminders.createReminders(
+      const reminders = await context.petitions.createReminders(
+        access.petition_id,
         accesses.map((access) => ({
           petition_access_id: access.id,
           status: "PROCESSING",

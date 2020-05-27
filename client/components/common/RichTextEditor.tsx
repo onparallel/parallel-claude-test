@@ -4,15 +4,10 @@ import {
   Stack,
   useColorMode,
   useTheme,
+  useFormControl,
 } from "@chakra-ui/core";
 import isHotkey from "is-hotkey";
-import {
-  CSSProperties,
-  KeyboardEvent,
-  memo,
-  useCallback,
-  useMemo,
-} from "react";
+import { CSSProperties, memo, useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
@@ -24,12 +19,12 @@ import {
   useSlate,
   withReact,
 } from "slate-react";
+import { EditableProps } from "slate-react/dist/components/editable";
 import { get } from "styled-system";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
-import { EditableProps } from "slate-react/dist/components/editable";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -41,6 +36,9 @@ const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
 export type RichTextEditorProps = {
   isDisabled?: boolean;
+  isInvalid?: boolean;
+  isRequired?: boolean;
+  isReadOnly?: boolean;
   value: RichTextEditorContent;
   onChange: (value: RichTextEditorContent) => void;
 } & Omit<EditableProps, "value" | "onChange">;
@@ -61,9 +59,18 @@ export function RichTextEditor({
   value,
   onChange,
   isDisabled,
+  isInvalid,
+  isRequired,
+  isReadOnly,
   onKeyDown: _onKeyDown,
   ...props
 }: RichTextEditorProps) {
+  const formControl = useFormControl({
+    isDisabled,
+    isInvalid,
+    isRequired,
+    isReadOnly,
+  });
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const onKeyDown: RichTextEditorProps["onKeyDown"] = useCallback((event) => {
     for (const [hotkey, mark] of Object.entries(HOTKEYS)) {
@@ -85,12 +92,16 @@ export function RichTextEditor({
   );
 
   return (
-    <PseudoBox aria-disabled={isDisabled} {...outerStyles}>
+    <PseudoBox
+      aria-disabled={formControl.isDisabled}
+      aria-invalid={formControl.isInvalid}
+      {...outerStyles}
+    >
       <Slate editor={editor} value={value} onChange={onChange as any}>
-        <Toolbar disabled={isDisabled} />
+        <Toolbar disabled={formControl.isDisabled || formControl.isReadOnly} />
         <PseudoBox maxHeight="360px" overflow="auto">
           <Editable
-            readOnly={isDisabled}
+            readOnly={formControl.isDisabled && formControl.isReadOnly}
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             onKeyDown={onKeyDown}
@@ -329,10 +340,10 @@ function useOuterStyles() {
         opacity: 0.4,
         cursor: "not-allowed",
       },
-      // _invalid: {
-      //   borderColor: _errorBorderColor,
-      //   boxShadow: `0 0 0 1px ${_errorBorderColor}`
-      // }
+      _invalid: {
+        borderColor: _errorBorderColor,
+        boxShadow: `0 0 0 1px ${_errorBorderColor}`,
+      },
     } as PseudoBoxProps;
   }, []);
 }

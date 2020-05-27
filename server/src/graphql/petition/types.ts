@@ -519,10 +519,10 @@ export const PetitionEvent = interfaceType({
           return "MessageScheduledEvent";
         case "MESSAGE_CANCELLED":
           return "MessageCancelledEvent";
-        case "MESSAGE_PROCESSED":
-          return "MessageProcessedEvent";
-        case "REMINDER_PROCESSED":
-          return "ReminderProcessedEvent";
+        case "MESSAGE_SENT":
+          return "MessageSentEvent";
+        case "REMINDER_SENT":
+          return "ReminderSentEvent";
         case "REPLY_CREATED":
           return "ReplyCreatedEvent";
         case "REPLY_DELETED":
@@ -653,27 +653,22 @@ export const MessagesCancelledEvent = createPetitionEvent(
   }
 );
 
-export const MessageProcessedEvent = createPetitionEvent(
-  "MessageProcessedEvent",
-  (t) => {
-    t.field("message", {
-      type: "PetitionMessage",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadMessage(
-          root.data.petition_message_id
-        ))!;
-      },
-    });
-  }
-);
+export const MessageSentEvent = createPetitionEvent("MessageSentEvent", (t) => {
+  t.field("message", {
+    type: "PetitionMessage",
+    resolve: async (root, _, ctx) => {
+      return (await ctx.petitions.loadMessage(root.data.petition_message_id))!;
+    },
+  });
+});
 
-export const ReminderProcessedEvent = createPetitionEvent(
-  "ReminderProcessedEvent",
+export const ReminderSentEvent = createPetitionEvent(
+  "ReminderSentEvent",
   (t) => {
     t.field("reminder", {
       type: "PetitionReminder",
       resolve: async (root, _, ctx) => {
-        return (await ctx.reminders.loadReminder(
+        return (await ctx.petitions.loadReminder(
           root.data.petition_reminder_id
         ))!;
       },

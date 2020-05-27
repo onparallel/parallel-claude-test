@@ -41,10 +41,10 @@ const result: IntrospectionResultData = {
             name: "MessageCancelledEvent",
           },
           {
-            name: "MessageProcessedEvent",
+            name: "MessageScheduledEvent",
           },
           {
-            name: "MessageScheduledEvent",
+            name: "MessageSentEvent",
           },
           {
             name: "PetitionCompletedEvent",
@@ -53,7 +53,7 @@ const result: IntrospectionResultData = {
             name: "PetitionCreatedEvent",
           },
           {
-            name: "ReminderProcessedEvent",
+            name: "ReminderSentEvent",
           },
           {
             name: "ReplyCreatedEvent",

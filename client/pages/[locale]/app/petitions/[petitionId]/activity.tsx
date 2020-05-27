@@ -7,8 +7,11 @@ import {
   WithDataContext,
 } from "@parallel/components/common/withData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
+import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
+import { useSendMessageDialogDialog } from "@parallel/components/petition-activity/SendMessageDialog";
 import {
   PetitionActivityQuery,
   PetitionActivityQueryVariables,
@@ -16,9 +19,10 @@ import {
   UpdatePetitionInput,
   usePetitionActivityQuery,
   usePetitionActivityUserQuery,
+  usePetitionActivity_cancelScheduledMessageMutation,
   usePetitionActivity_sendRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
-  usePetitionActivity_cancelScheduledMessageMutation,
+  usePetitionActivity_sendMessagesMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -26,14 +30,11 @@ import {
   usePetitionState,
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
-import { UnwrapPromise, UnwrapArray, Assert } from "@parallel/utils/types";
+import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
+import { differenceInMinutes } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
-import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
-import { differenceInMinutes } from "date-fns";
-import { useSendMessageDialogDialog } from "@parallel/components/petition-activity/SendMessageDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -61,14 +62,36 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     [petitionId]
   );
 
+  const [sendMessages] = usePetitionActivity_sendMessagesMutation();
   const showSendMessageDialog = useSendMessageDialogDialog();
   const handleSendMessage = useCallback(
-    async (accessId: string[]) => {
+    async (accessIds: string[]) => {
       try {
-        await showSendMessageDialog({});
-      } catch {
-        return;
-      }
+        const { subject, body, scheduledAt } = await showSendMessageDialog({});
+        await sendMessages({
+          variables: {
+            petitionId,
+            accessIds,
+            subject,
+            body,
+            scheduledAt: scheduledAt?.toISOString() ?? null,
+          },
+        });
+        toast({
+          title: intl.formatMessage({
+            id: "petition.message-sent.toast-header",
+            defaultMessage: "Message sent",
+          }),
+          description: intl.formatMessage({
+            id: "petition.message-sent.toast-description",
+            defaultMessage: "The message is on it's way",
+          }),
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        await refetch();
+      } catch {}
     },
     [petitionId]
   );
@@ -98,6 +121,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         duration: 3000,
         isClosable: true,
       });
+      await refetch();
     },
     [petitionId]
   );
@@ -220,6 +244,23 @@ PetitionActivity.mutations = [
       }
     }
     ${PetitionActivity.fragments.Petition}
+  `,
+  gql`
+    mutation PetitionActivity_sendMessages(
+      $petitionId: ID!
+      $accessIds: [ID!]!
+      $subject: String!
+      $body: JSON!
+      $scheduledAt: DateTime
+    ) {
+      sendMessages(
+        petitionId: $petitionId
+        accessIds: $accessIds
+        subject: $subject
+        body: $body
+        scheduledAt: $scheduledAt
+      )
+    }
   `,
   gql`
     mutation PetitionActivity_sendReminders(

@@ -13,7 +13,8 @@ import {
   authenticate,
   authorizeAnd,
 } from "../helpers/authorize";
-import { maxLength, validateAnd } from "../helpers/validateArgs";
+import { validateAnd } from "../helpers/validateArgs";
+import { maxLength } from "../helpers/validators/maxLength";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",

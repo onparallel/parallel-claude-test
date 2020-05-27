@@ -11,7 +11,7 @@ createQueueWorker(
   "reminder-email",
   async (payload: ReminderEmailWorkerPayload, context) => {
     const reminderId = payload.petition_reminder_id;
-    const reminder = await context.reminders.loadReminder(reminderId);
+    const reminder = await context.petitions.loadReminder(reminderId);
     if (!reminder) {
       throw new Error(`Reminder with id ${reminderId} not found`);
     }
@@ -78,10 +78,7 @@ createQueueWorker(
       created_from: `PetitionReminder:${reminder.id}`,
     });
     await Promise.all([
-      context.reminders.processReminder(reminder.id, email.id),
-      context.petitions.createEvent(petition.id, "REMINDER_PROCESSED", {
-        petition_reminder_id: reminder.id,
-      }),
+      context.petitions.processReminder(reminder.id, email.id),
       context.aws.enqueueEmail(email.id),
     ]);
   }

@@ -122,15 +122,15 @@ export type MessageCancelledEvent = PetitionEvent & {
   user: User;
 };
 
-export type MessageProcessedEvent = PetitionEvent & {
-  __typename?: "MessageProcessedEvent";
+export type MessageScheduledEvent = PetitionEvent & {
+  __typename?: "MessageScheduledEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
 };
 
-export type MessageScheduledEvent = PetitionEvent & {
-  __typename?: "MessageScheduledEvent";
+export type MessageSentEvent = PetitionEvent & {
+  __typename?: "MessageSentEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
@@ -168,6 +168,8 @@ export type Mutation = {
   publicDeletePetitionReply: Result;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
+  /** Sends a petition message to the speicified contacts. */
+  sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
   sendPetition: SendPetitionResult;
   /** Sends a reminder for the specified petition accesses. */
@@ -259,6 +261,14 @@ export type MutationpublicDeletePetitionReplyArgs = {
 export type MutationpublicFileUploadReplyCompleteArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["ID"];
+};
+
+export type MutationsendMessagesArgs = {
+  accessIds: Array<Scalars["ID"]>;
+  body: Scalars["JSON"];
+  petitionId: Scalars["ID"];
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+  subject: Scalars["String"];
 };
 
 export type MutationsendPetitionArgs = {
@@ -771,13 +781,6 @@ export type QueryPetitions_OrderBy =
   | "name_ASC"
   | "name_DESC";
 
-export type ReminderProcessedEvent = PetitionEvent & {
-  __typename?: "ReminderProcessedEvent";
-  createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
-  reminder: PetitionReminder;
-};
-
 /** The reminder settings of a petition */
 export type RemindersConfig = {
   __typename?: "RemindersConfig";
@@ -801,6 +804,13 @@ export type RemindersConfigInput = {
   timezone: Scalars["String"];
   /** Whether to send reminders only from monday to friday. */
   weekdaysOnly: Scalars["Boolean"];
+};
+
+export type ReminderSentEvent = PetitionEvent & {
+  __typename?: "ReminderSentEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  reminder: PetitionReminder;
 };
 
 export type ReplyCreatedEvent = PetitionEvent & {
@@ -991,11 +1001,11 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "MessageCancelledEvent";
         } & PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment)
       | ({
-          __typename?: "MessageProcessedEvent";
-        } & PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragment)
-      | ({
           __typename?: "MessageScheduledEvent";
         } & PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment)
+      | ({
+          __typename?: "MessageSentEvent";
+        } & PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment)
       | ({
           __typename?: "PetitionCompletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment)
@@ -1003,8 +1013,8 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment)
       | ({
-          __typename?: "ReminderProcessedEvent";
-        } & PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment)
+          __typename?: "ReminderSentEvent";
+        } & PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment)
       | ({
           __typename?: "ReplyCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment)
@@ -1035,16 +1045,16 @@ export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragmen
 } & Pick<MessageCancelledEvent, "id"> &
   TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragment = {
-  __typename?: "MessageProcessedEvent";
-} & Pick<MessageProcessedEvent, "id"> &
-  TimelineMessageProcessedEvent_MessageProcessedEventFragment;
-
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
   __typename?: "MessageScheduledEvent";
 } & Pick<MessageScheduledEvent, "id"> & {
     message: { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id">;
   } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
+  __typename?: "MessageSentEvent";
+} & Pick<MessageSentEvent, "id"> &
+  TimelineMessageSentEvent_MessageSentEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
   __typename?: "PetitionCompletedEvent";
@@ -1056,10 +1066,10 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
 } & Pick<PetitionCreatedEvent, "id"> &
   TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment = {
-  __typename?: "ReminderProcessedEvent";
-} & Pick<ReminderProcessedEvent, "id"> &
-  TimelineReminderProcessedEvent_ReminderProcessedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
+  __typename?: "ReminderSentEvent";
+} & Pick<ReminderSentEvent, "id"> &
+  TimelineReminderSentEvent_ReminderSentEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = {
   __typename?: "ReplyCreatedEvent";
@@ -1076,11 +1086,11 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_MessageProcessedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_ReminderProcessedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment;
 
@@ -1126,22 +1136,6 @@ export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
     user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
   };
 
-export type TimelineMessageProcessedEvent_MessageProcessedEventFragment = {
-  __typename?: "MessageProcessedEvent";
-} & Pick<MessageProcessedEvent, "createdAt"> & {
-    message: { __typename?: "PetitionMessage" } & Pick<
-      PetitionMessage,
-      "emailSubject" | "scheduledAt"
-    > & {
-        sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
-        access: { __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        };
-      } & MessageEventsIndicator_PetitionMessageFragment;
-  };
-
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
   __typename?: "MessageScheduledEvent";
 } & Pick<MessageScheduledEvent, "createdAt"> & {
@@ -1158,6 +1152,22 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
       };
   };
 
+export type TimelineMessageSentEvent_MessageSentEventFragment = {
+  __typename?: "MessageSentEvent";
+} & Pick<MessageSentEvent, "createdAt"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<
+      PetitionMessage,
+      "emailSubject" | "scheduledAt"
+    > & {
+        sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+        access: { __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        };
+      } & MessageEventsIndicator_PetitionMessageFragment;
+  };
+
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
 } & Pick<PetitionCompletedEvent, "createdAt"> & {
@@ -1172,9 +1182,9 @@ export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
     user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
   };
 
-export type TimelineReminderProcessedEvent_ReminderProcessedEventFragment = {
-  __typename?: "ReminderProcessedEvent";
-} & Pick<ReminderProcessedEvent, "createdAt"> & {
+export type TimelineReminderSentEvent_ReminderSentEventFragment = {
+  __typename?: "ReminderSentEvent";
+} & Pick<ReminderSentEvent, "createdAt"> & {
     reminder: { __typename?: "PetitionReminder" } & Pick<
       PetitionReminder,
       "type"
@@ -1428,6 +1438,18 @@ export type PetitionActivity_updatePetitionMutation = {
     __typename?: "Petition";
   } & PetitionActivity_PetitionFragment;
 };
+
+export type PetitionActivity_sendMessagesMutationVariables = {
+  petitionId: Scalars["ID"];
+  accessIds: Array<Scalars["ID"]>;
+  subject: Scalars["String"];
+  body: Scalars["JSON"];
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+};
+
+export type PetitionActivity_sendMessagesMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "sendMessages">;
 
 export type PetitionActivity_sendRemindersMutationVariables = {
   petitionId: Scalars["ID"];
@@ -2243,8 +2265,8 @@ export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
     openedAt
   }
 `;
-export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gql`
-  fragment TimelineMessageProcessedEvent_MessageProcessedEvent on MessageProcessedEvent {
+export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
+  fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
     message {
       sender {
         id
@@ -2264,8 +2286,8 @@ export const TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc = gq
   ${ContactLink_ContactFragmentDoc}
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
 `;
-export const TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc = gql`
-  fragment TimelineReminderProcessedEvent_ReminderProcessedEvent on ReminderProcessedEvent {
+export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
+  fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
     reminder {
       type
       sender {
@@ -2337,11 +2359,11 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on MessageCancelledEvent {
       ...TimelineMessageCancelledEvent_MessageCancelledEvent
     }
-    ... on MessageProcessedEvent {
-      ...TimelineMessageProcessedEvent_MessageProcessedEvent
+    ... on MessageSentEvent {
+      ...TimelineMessageSentEvent_MessageSentEvent
     }
-    ... on ReminderProcessedEvent {
-      ...TimelineReminderProcessedEvent_ReminderProcessedEvent
+    ... on ReminderSentEvent {
+      ...TimelineReminderSentEvent_ReminderSentEvent
     }
     ... on ReplyCreatedEvent {
       ...TimelineReplyCreatedEvent_ReplyCreatedEvent
@@ -2357,8 +2379,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc}
   ${TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc}
   ${TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc}
-  ${TimelineMessageProcessedEvent_MessageProcessedEventFragmentDoc}
-  ${TimelineReminderProcessedEvent_ReminderProcessedEventFragmentDoc}
+  ${TimelineMessageSentEvent_MessageSentEventFragmentDoc}
+  ${TimelineReminderSentEvent_ReminderSentEventFragmentDoc}
   ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
   ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
 `;
@@ -3058,6 +3080,70 @@ export type PetitionActivity_updatePetitionMutationResult = ApolloReactCommon.Mu
 export type PetitionActivity_updatePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionActivity_updatePetitionMutation,
   PetitionActivity_updatePetitionMutationVariables
+>;
+export const PetitionActivity_sendMessagesDocument = gql`
+  mutation PetitionActivity_sendMessages(
+    $petitionId: ID!
+    $accessIds: [ID!]!
+    $subject: String!
+    $body: JSON!
+    $scheduledAt: DateTime
+  ) {
+    sendMessages(
+      petitionId: $petitionId
+      accessIds: $accessIds
+      subject: $subject
+      body: $body
+      scheduledAt: $scheduledAt
+    )
+  }
+`;
+export type PetitionActivity_sendMessagesMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionActivity_sendMessagesMutation,
+  PetitionActivity_sendMessagesMutationVariables
+>;
+
+/**
+ * __usePetitionActivity_sendMessagesMutation__
+ *
+ * To run a mutation, you first call `usePetitionActivity_sendMessagesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionActivity_sendMessagesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionActivitySendMessagesMutation, { data, loading, error }] = usePetitionActivity_sendMessagesMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      accessIds: // value for 'accessIds'
+ *      subject: // value for 'subject'
+ *      body: // value for 'body'
+ *      scheduledAt: // value for 'scheduledAt'
+ *   },
+ * });
+ */
+export function usePetitionActivity_sendMessagesMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionActivity_sendMessagesMutation,
+    PetitionActivity_sendMessagesMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionActivity_sendMessagesMutation,
+    PetitionActivity_sendMessagesMutationVariables
+  >(PetitionActivity_sendMessagesDocument, baseOptions);
+}
+export type PetitionActivity_sendMessagesMutationHookResult = ReturnType<
+  typeof usePetitionActivity_sendMessagesMutation
+>;
+export type PetitionActivity_sendMessagesMutationResult = ApolloReactCommon.MutationResult<
+  PetitionActivity_sendMessagesMutation
+>;
+export type PetitionActivity_sendMessagesMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionActivity_sendMessagesMutation,
+  PetitionActivity_sendMessagesMutationVariables
 >;
 export const PetitionActivity_sendRemindersDocument = gql`
   mutation PetitionActivity_sendReminders(

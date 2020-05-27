@@ -1,4 +1,4 @@
-import { TimelineReminderProcessedEvent_ReminderProcessedEventFragment } from "@parallel/graphql/__types";
+import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
 import { Text, Link } from "@chakra-ui/core";
 import { FormattedMessage } from "react-intl";
@@ -8,15 +8,15 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { FORMATS } from "@parallel/utils/dates";
 
-export type TimelineReminderProcessedEventProps = {
+export type TimelineReminderSentEventProps = {
   userId: string;
-  event: TimelineReminderProcessedEvent_ReminderProcessedEventFragment;
+  event: TimelineReminderSentEvent_ReminderSentEventFragment;
 };
 
-export function TimelineReminderProcessedEvent({
+export function TimelineReminderSentEvent({
   event: { reminder, createdAt },
   userId,
-}: TimelineReminderProcessedEventProps) {
+}: TimelineReminderSentEventProps) {
   return (
     <TimelineItem
       icon={
@@ -25,7 +25,7 @@ export function TimelineReminderProcessedEvent({
     >
       {reminder.type === "MANUAL" ? (
         <FormattedMessage
-          id="timeline.reminder-processed-description-manual"
+          id="timeline.reminder-sent-description-manual"
           defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}"
           values={{
             same: userId === reminder.sender!.id,
@@ -49,7 +49,7 @@ export function TimelineReminderProcessedEvent({
         />
       ) : (
         <FormattedMessage
-          id="timeline.reminder-processed-description-automatic"
+          id="timeline.reminder-sent-description-automatic"
           defaultMessage="An automatic reminder was sent to {contact} {timeAgo}"
           values={{
             contact: reminder.access.contact ? (
@@ -73,9 +73,9 @@ export function TimelineReminderProcessedEvent({
   );
 }
 
-TimelineReminderProcessedEvent.fragments = {
-  ReminderProcessedEvent: gql`
-    fragment TimelineReminderProcessedEvent_ReminderProcessedEvent on ReminderProcessedEvent {
+TimelineReminderSentEvent.fragments = {
+  ReminderSentEvent: gql`
+    fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
       reminder {
         type
         sender {

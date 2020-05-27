@@ -6,7 +6,6 @@ import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
 import { FileUploadRepository } from "./db/repositories/FileUploadRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
-import { ReminderRepository } from "./db/repositories/ReminderRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, PetitionAccess, User } from "./db/__types";
@@ -34,8 +33,7 @@ export class ApiContext {
     public readonly files: FileUploadRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
-    public readonly petitions: PetitionRepository,
-    public readonly reminders: ReminderRepository
+    public readonly petitions: PetitionRepository
   ) {}
 }
 
@@ -54,7 +52,6 @@ export class WorkerContext {
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
-    public readonly reminders: ReminderRepository,
     public readonly reporting: ReportingRepository
   ) {}
 }

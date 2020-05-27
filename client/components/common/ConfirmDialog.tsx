@@ -57,7 +57,11 @@ export function ConfirmDialog<T = void>({
         {...props}
       >
         <AlertDialogOverlay zIndex={1400 + position * 2} />
-        <AlertDialogContent zIndex={1400 + position * 2 + 1} {...content}>
+        <AlertDialogContent
+          rounded="md"
+          zIndex={1400 + position * 2 + 1}
+          {...content}
+        >
           <AlertDialogHeader fontSize="lg" fontWeight="bold">
             {header}
           </AlertDialogHeader>

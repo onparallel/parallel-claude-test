@@ -29,6 +29,7 @@ import {
   PetitionFieldType,
   PetitionStatus,
   User,
+  CreatePetitionReminder,
 } from "../__types";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 
@@ -333,16 +334,14 @@ export class PetitionRepository extends BaseRepository {
         created_by: `User:${user.id}`,
       }))
     );
-    if (scheduledAt) {
-      await this.createEvent(
-        petitionId,
-        "MESSAGE_SCHEDULED",
-        rows.map((m) => ({
-          petition_access_id: m.petition_access_id,
-          petition_message_id: m.id,
-        }))
-      );
-    }
+    await this.createEvent(
+      petitionId,
+      scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
+      rows.map((m) => ({
+        petition_access_id: m.petition_access_id,
+        petition_message_id: m.id,
+      }))
+    );
     return rows;
   }
 
@@ -412,9 +411,6 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    await this.createEvent(row.petition_id, "MESSAGE_PROCESSED", {
-      petition_message_id: row.id,
-    });
     return row;
   }
 
@@ -857,6 +853,35 @@ export class PetitionRepository extends BaseRepository {
       }))
     );
     return cloned;
+  }
+
+  readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
+
+  async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
+    const reminders = await this.insert("petition_reminder", data).returning(
+      "*"
+    );
+    await this.createEvent(
+      petitionId,
+      "REMINDER_SENT",
+      reminders.map((reminder) => ({
+        petition_reminder_id: reminder.id,
+      }))
+    );
+    return reminders;
+  }
+
+  async processReminder(reminderId: number, emailLogId: number) {
+    const [row] = await this.from("petition_reminder")
+      .where("id", reminderId)
+      .update(
+        {
+          status: "PROCESSED",
+          email_log_id: emailLogId,
+        },
+        "*"
+      );
+    return row;
   }
 
   async loadEventsForPetition(petitionId: number, opts: PageOpts) {

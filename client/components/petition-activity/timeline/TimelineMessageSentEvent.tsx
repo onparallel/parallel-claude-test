@@ -3,21 +3,21 @@ import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
-import { TimelineMessageProcessedEvent_MessageProcessedEventFragment } from "@parallel/graphql/__types";
+import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
-export type TimelineMessageProcessedEventProps = {
+export type TimelineMessageSentEventProps = {
   userId: string;
-  event: TimelineMessageProcessedEvent_MessageProcessedEventFragment;
+  event: TimelineMessageSentEvent_MessageSentEventFragment;
 };
 
-export function TimelineMessageProcessedEvent({
+export function TimelineMessageSentEvent({
   event: { message, createdAt },
   userId,
-}: TimelineMessageProcessedEventProps) {
+}: TimelineMessageSentEventProps) {
   return (
     <TimelineItem
       icon={
@@ -31,7 +31,7 @@ export function TimelineMessageProcessedEvent({
       <>
         {message.scheduledAt ? (
           <FormattedMessage
-            id="timeline.message-processed-description-scheduled"
+            id="timeline.message-sent-description-scheduled"
             defaultMessage="A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
             values={{
               same: userId === message.sender!.id,
@@ -56,7 +56,7 @@ export function TimelineMessageProcessedEvent({
           />
         ) : (
           <FormattedMessage
-            id="timeline.message-processed-description-manual"
+            id="timeline.message-sent-description-manual"
             defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
             values={{
               same: userId === message.sender!.id,
@@ -86,9 +86,9 @@ export function TimelineMessageProcessedEvent({
   );
 }
 
-TimelineMessageProcessedEvent.fragments = {
-  MessageProcessedEvent: gql`
-    fragment TimelineMessageProcessedEvent_MessageProcessedEvent on MessageProcessedEvent {
+TimelineMessageSentEvent.fragments = {
+  MessageSentEvent: gql`
+    fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
       message {
         sender {
           id

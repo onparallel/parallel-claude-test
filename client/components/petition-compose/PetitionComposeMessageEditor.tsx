@@ -193,7 +193,7 @@ export const PetitionComposeMessageEditor = Object.assign(
                 defaultMessage: "Enter the subject of the email",
               })}
               onChange={handleSubjectChange}
-            ></Input>
+            />
           </FormControl>
           <Box>
             <RichTextEditor

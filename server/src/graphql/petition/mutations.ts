@@ -19,7 +19,9 @@ import {
 import { dateTimeArg } from "../helpers/date";
 import { ArgValidationError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
-import { maxLength, validateAnd } from "../helpers/validateArgs";
+import { validateAnd } from "../helpers/validateArgs";
+import { maxLength } from "../helpers/validators/maxLength";
+import { notEmpty } from "../helpers/validators/notEmpty";
 import {
   accessesBelongToPetition,
   fieldBelongsToPetition,
@@ -29,6 +31,10 @@ import {
   userHasAccessToPetitions,
   messageBelongToPetition,
 } from "./authorizers";
+import { jsonArg } from "../helpers/json";
+import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
+import { database } from "faker";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -168,34 +174,11 @@ export const updatePetition = mutationField("updatePetition", {
   validateArgs: validateAnd(
     maxLength((args) => args.data.name, "data.name", 255),
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
-    (_, args, ctx, info) => {
-      if (args.data.remindersConfig) {
-        const { time, timezone, offset } = args.data.remindersConfig;
-        if (!/(2[0-3]|[01][0-9]):([0-5][0-9])/.test(time)) {
-          throw new ArgValidationError(
-            info,
-            "data.remindersConfig.time",
-            `Value must be a valid 00:00-23:59 time.`
-          );
-        }
-        try {
-          findTimeZone(timezone);
-        } catch {
-          throw new ArgValidationError(
-            info,
-            "data.remindersConfig.timezone",
-            `Value must be a valid timezone.`
-          );
-        }
-        if (offset < 1) {
-          throw new ArgValidationError(
-            info,
-            "data.remindersConfig.offset",
-            `Value must be larger than 0.`
-          );
-        }
-      }
-    }
+    validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
+    validRemindersConfig(
+      (args) => args.data.remindersConfig,
+      "data.remindersConfig"
+    )
   ),
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
@@ -499,10 +482,8 @@ export const sendPetition = mutationField("sendPetition", {
         petitionId,
         args.scheduledAt ?? null,
         accesses.map((access) => ({
-          petition_id: petition.id,
           petition_access_id: access.id,
           status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
-          scheduled_at: args.scheduledAt,
           email_subject: petition.email_subject,
           email_body: petition.email_body,
         })),
@@ -527,9 +508,72 @@ export const sendPetition = mutationField("sendPetition", {
         result: RESULT.SUCCESS,
       };
     } catch (error) {
+      ctx.logger.error(error);
       return {
         result: RESULT.FAILURE,
       };
+    }
+  },
+});
+
+export const sendMessages = mutationField("sendMessages", {
+  description: "Sends a petition message to the speicified contacts.",
+  type: "Result",
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(
+      userHasAccessToPetition("petitionId"),
+      accessesBelongToPetition("petitionId", "accessIds")
+    )
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    accessIds: idArg({ list: [true], required: true }),
+    subject: stringArg({ required: true }),
+    body: jsonArg({ required: true }),
+    scheduledAt: dateTimeArg({}),
+  },
+  validateArgs: validateAnd(
+    (_, args, ctx, info) => {
+      if (args.accessIds.length === 0) {
+        throw new ArgValidationError(
+          info,
+          "accessIds",
+          `Must contain at least one access.`
+        );
+      }
+    },
+    maxLength((args) => args.subject, "subject", 255),
+    notEmpty((args) => args.subject, "subject"),
+    validRichTextContent((args) => args.body, "body")
+  ),
+  resolve: async (_, args, ctx) => {
+    try {
+      // Create necessary contacts
+      const { ids: accessIds } = fromGlobalIds(
+        args.accessIds,
+        "PetitionAccess"
+      );
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+      const messages = await ctx.petitions.createMessages(
+        petitionId,
+        args.scheduledAt ?? null,
+        accessIds.map((accessId) => ({
+          petition_access_id: accessId,
+          status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
+          email_subject: args.subject,
+          email_body: JSON.stringify(args.body),
+        })),
+        ctx.user!
+      );
+
+      if (!args.scheduledAt) {
+        await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));
+      }
+      return RESULT.SUCCESS;
+    } catch (error) {
+      ctx.logger.error(error);
+      return RESULT.FAILURE;
     }
   },
 });
@@ -573,7 +617,8 @@ export const sendReminder = mutationField("sendReminders", {
       }
     }
     try {
-      const reminders = await ctx.reminders.createReminders(
+      const reminders = await ctx.petitions.createReminders(
+        petitionId,
         accessIds.map((accessId) => ({
           type: "MANUAL",
           status: "PROCESSING",
