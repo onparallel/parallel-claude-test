@@ -8,10 +8,6 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  Icon,
-  IconButton,
-  MenuItem,
-  MenuList,
   PseudoBox,
   Select,
   Stack,
@@ -21,15 +17,14 @@ import { Card, CardProps } from "@parallel/components/common/Card";
 import {
   Recipient,
   RecipientSelect,
+  RecipientSelectProps,
 } from "@parallel/components/common/RecipientSelect";
 import {
   isEmptyContent,
   RichTextEditorContent,
 } from "@parallel/components/common/RichTextEditor";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { SplitButton } from "@parallel/components/common/SplitButton";
 import {
-  PetitionComposeMessageEditor_ContactFragment,
   PetitionComposeMessageEditor_PetitionFragment,
   PetitionLocale,
   RemindersConfig,
@@ -41,22 +36,19 @@ import { gql } from "apollo-boost";
 import { ChangeEvent, memo, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { CollapseContent } from "../common/CollapseContent";
 import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
+import { SendButton } from "../petition-common/SendButton";
 import { usePetitionDeadlineDialog } from "./PetitionDeadlineDialog";
 import { PetitionRemindersConfig } from "./PetitionRemindersConfig";
-import { SendButton } from "../petition-common/SendButton";
 
 export type PetitionComposeMessageEditorProps = {
   petition: PetitionComposeMessageEditor_PetitionFragment;
   showErrors: boolean;
-  searchContacts: (
-    search: string,
-    exclude: string[]
-  ) => Promise<PetitionComposeMessageEditor_ContactFragment[]>;
+  onSearchContacts: RecipientSelectProps["onSearchContacts"];
+  onCreateContact: RecipientSelectProps["onCreateContact"];
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   onSend: (data: { contactIds: string[]; schedule: boolean }) => void;
 } & CardProps;
@@ -65,7 +57,8 @@ export const PetitionComposeMessageEditor = Object.assign(
   memo(function PetitionComposeMessageEditor({
     petition,
     showErrors,
-    searchContacts,
+    onSearchContacts,
+    onCreateContact,
     onUpdatePetition,
     onSend,
     ...props
@@ -98,23 +91,10 @@ export const PetitionComposeMessageEditor = Object.assign(
       updateBody({ emailBody: isEmptyContent(value) ? null : value });
     }, []);
 
-    function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
-      const value = event.target.checked
-        ? {
-            offset: 2,
-            time: "09:00",
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            weekdaysOnly: false,
-          }
-        : null;
-      setRemindersConfig(value);
-      updateRemindersConfig({ remindersConfig: value });
-    }
-
-    function handleRemindersChange(value: RemindersConfig) {
+    function handleRemindersChange(value: RemindersConfig | null) {
       setRemindersConfig(value);
       updateRemindersConfig({
-        remindersConfig: omit(value, ["__typename"]),
+        remindersConfig: value ? omit(value, ["__typename"]) : value,
       });
     }
 
@@ -147,7 +127,8 @@ export const PetitionComposeMessageEditor = Object.assign(
           <Box id="petition-select-recipients">
             <RecipientSelect
               showErrors={showErrors}
-              searchContacts={searchContacts}
+              onSearchContacts={onSearchContacts}
+              onCreateContact={onCreateContact}
               value={recipients}
               onChange={setRecipients}
             />
@@ -169,28 +150,12 @@ export const PetitionComposeMessageEditor = Object.assign(
             onSubjectChange={handleSubjectChange}
             onBodyChange={handleBodyChange}
           />
-          <Flex id="petition-reminders" alignItems="center" marginTop={2}>
-            <Checkbox
-              id="petition-reminders"
-              variantColor="purple"
-              size="lg"
-              marginRight={2}
-              isChecked={Boolean(remindersConfig)}
-              onChange={handleEnableRemindersChange}
-            />
-            <Text as="label" {...{ htmlFor: "petition-reminders" }}>
-              <FormattedMessage
-                id="petition.reminders-label"
-                defaultMessage="Enable automatic reminders"
-              />
-            </Text>
-          </Flex>
-          {remindersConfig ? (
-            <PetitionRemindersConfig
-              value={remindersConfig}
-              onChange={handleRemindersChange}
-            />
-          ) : null}
+          <PetitionRemindersConfig
+            id="petition-reminders"
+            value={remindersConfig}
+            onChange={handleRemindersChange}
+            marginTop={2}
+          />
           <CollapseContent
             id="petition-advanced-settings"
             marginTop={2}

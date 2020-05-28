@@ -15,7 +15,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
 import { useCallback, useMemo, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, useIntl, FormattedNumber } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { Card, CardProps } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
@@ -24,9 +24,6 @@ import { DeletedContact } from "../common/DeletedContact";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 import { Table, TableColumn } from "../common/Table";
-import { useConfirmActivateAccessDialog } from "./ConfirmActivateAccessDialog";
-import { useConfirmDeactivateAccessDialog } from "./ConfirmDeactivateAccessDialog";
-import { useConfirmSendReminderDialog } from "./ConfirmSendReminderDialog";
 
 type PetitionAccessSelection = PetitionAccessTable_PetitionAccessFragment;
 
@@ -34,14 +31,16 @@ export function PetitionAccessesTable({
   petition,
   onSendMessage,
   onSendReminders,
-  onActivateAccess,
+  onAddPetitionAccess,
+  onReactivateAccess,
   onDeactivateAccess,
   ...props
 }: {
   petition: PetitionAccessTable_PetitionFragment;
   onSendMessage: (accessIds: string[]) => void;
   onSendReminders: (accessIds: string[]) => void;
-  onActivateAccess: (accessId: string) => void;
+  onAddPetitionAccess: () => void;
+  onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
 } & CardProps) {
   const [selection, setSelection] = useState<string[]>([]);
@@ -56,31 +55,9 @@ export function PetitionAccessesTable({
   const handleSendReminders = useCallback(async () => {
     onSendReminders(selection);
   }, [selection]);
-  const confirmActivateAccess = useConfirmActivateAccessDialog();
-  const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
   const columns = usePetitionAccessesColumns({
-    onActivateAccess: useCallback(async (accessId: string) => {
-      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
-      try {
-        await confirmActivateAccess({
-          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
-        });
-      } catch {
-        return;
-      }
-      onActivateAccess(accessId);
-    }, []),
-    onDeactivateAccess: useCallback(async (accessId) => {
-      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
-      try {
-        await confirmDeactivateAccess({
-          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
-        });
-      } catch {
-        return;
-      }
-      onDeactivateAccess(accessId);
-    }, []),
+    onReactivateAccess,
+    onDeactivateAccess,
   });
   return (
     <Card {...props}>
@@ -139,7 +116,12 @@ export function PetitionAccessesTable({
             defaultMessage="Actions"
           ></FormattedMessage>
         </ButtonDropdown>
-        <Button size="sm" variantColor="purple" leftIcon={"user-plus" as any}>
+        <Button
+          size="sm"
+          variantColor="purple"
+          leftIcon={"user-plus" as any}
+          onClick={onAddPetitionAccess}
+        >
           Add contact
         </Button>
       </Stack>
@@ -156,10 +138,10 @@ export function PetitionAccessesTable({
 }
 
 function usePetitionAccessesColumns({
-  onActivateAccess,
+  onReactivateAccess,
   onDeactivateAccess,
 }: {
-  onActivateAccess: (accessId: string) => void;
+  onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
 }): TableColumn<PetitionAccessSelection>[] {
   const intl = useIntl();
@@ -198,6 +180,7 @@ function usePetitionAccessesColumns({
           ) : null;
         },
       },
+
       {
         key: "next-reminder",
         header: intl.formatMessage({
@@ -215,6 +198,25 @@ function usePetitionAccessesColumns({
               />
             </Text>
           ),
+      },
+      {
+        key: "reminders-sent",
+        header: intl.formatMessage({
+          id: "petition-accesses.reminders-sent-header",
+          defaultMessage: "Reminders sent",
+        }),
+        CellContent: ({ row: { reminderCount, nextReminderAt } }) => {
+          return reminderCount ? (
+            <FormattedNumber value={reminderCount} />
+          ) : (
+            <Text color="gray.400" fontStyle="italic">
+              <FormattedMessage
+                id="petition-accesses.no-reminders-sent"
+                defaultMessage="No reminders sent"
+              />
+            </Text>
+          );
+        },
       },
       {
         key: "createdAt",
@@ -251,7 +253,7 @@ function usePetitionAccessesColumns({
               onClick={() =>
                 status === "ACTIVE"
                   ? onDeactivateAccess(id)
-                  : onActivateAccess(id)
+                  : onReactivateAccess(id)
               }
               placement="left"
               icon={(status === "ACTIVE" ? "user-x" : "user-check") as any}
@@ -262,7 +264,7 @@ function usePetitionAccessesColumns({
         },
       },
     ],
-    [onActivateAccess, onDeactivateAccess]
+    [onReactivateAccess, onDeactivateAccess]
   );
 }
 
@@ -281,6 +283,7 @@ PetitionAccessesTable.fragments = {
       }
       status
       nextReminderAt
+      reminderCount
       createdAt
     }
     ${ContactLink.fragments.Contact}

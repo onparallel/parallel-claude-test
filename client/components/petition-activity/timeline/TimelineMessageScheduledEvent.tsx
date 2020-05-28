@@ -42,11 +42,7 @@ export function TimelineMessageScheduledEvent({
               ),
               scheduledAt: (
                 <Link fontWeight="bold">
-                  <DateTime
-                    value={message.scheduledAt!}
-                    format={FORMATS.LLL}
-                    useRelativeTime
-                  />
+                  <DateTime value={message.scheduledAt!} format={FORMATS.LLL} />
                 </Link>
               ),
               timeAgo: (

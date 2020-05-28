@@ -15,9 +15,9 @@ import { Link, NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { Title } from "@parallel/components/common/Title";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import { postJson } from "@parallel/utils/rest";
@@ -418,4 +418,4 @@ Login.getInitialProps = async ({ res, apollo }: WithDataContext) => {
   }
 };
 
-export default withData(Login);
+export default withApolloData(Login);

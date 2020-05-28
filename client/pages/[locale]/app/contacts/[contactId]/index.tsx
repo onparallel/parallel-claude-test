@@ -18,9 +18,9 @@ import { PetitionStatusText } from "@parallel/components/common/PetitionStatusTe
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   ContactQuery,
@@ -445,4 +445,4 @@ Contact.getInitialProps = async ({ apollo, query }: WithDataContext) => {
     contactId: query.contactId as string,
   };
 };
-export default withData(Contact);
+export default withApolloData(Contact);

@@ -25,7 +25,7 @@ function redirect(context: NextPageContext, pathname: string, asHref: string) {
   }
 }
 
-export function withData<P = {}>(
+export function withApolloData<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Component: NextComponentType<WithDataContext, P, P>
 ) {

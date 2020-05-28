@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/core";
+import { Button, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmActivateAccessDialog({
+export function ConfirmReactivateAccessDialog({
   nameOrEmail,
   ...props
 }: { nameOrEmail: string } & DialogProps<void>) {
@@ -15,14 +15,17 @@ export function ConfirmActivateAccessDialog({
       header={
         <FormattedMessage
           id="petition.confirm-activate-access-message.header"
-          defaultMessage="Activate contact access"
+          defaultMessage="Reactivate contact access"
         />
       }
       body={
         <FormattedMessage
           id="petition.confirm-activate-access-message.body"
-          defaultMessage="Are you sure you want to activate access to {nameOrEmail}?"
-          values={{ nameOrEmail }}
+          defaultMessage="Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
+          values={{
+            nameOrEmail,
+            b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+          }}
         />
       }
       confirm={
@@ -38,6 +41,6 @@ export function ConfirmActivateAccessDialog({
   );
 }
 
-export function useConfirmActivateAccessDialog() {
-  return useDialog(ConfirmActivateAccessDialog);
+export function useConfirmReactivateAccessDialog() {
+  return useDialog(ConfirmReactivateAccessDialog);
 }

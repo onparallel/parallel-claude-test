@@ -17,9 +17,9 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
@@ -409,5 +409,5 @@ export default compose(
       },
     ],
   }),
-  withData
+  withApolloData
 )(PetitionReplies);

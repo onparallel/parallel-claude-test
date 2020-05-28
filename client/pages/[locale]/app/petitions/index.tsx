@@ -15,9 +15,9 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useAskPetitionNameDialog } from "@parallel/components/petition-list/AskPetitionNameDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
@@ -577,5 +577,5 @@ export default compose(
       },
     ],
   }),
-  withData
+  withApolloData
 )(Petitions);

@@ -11,9 +11,9 @@ import {
 } from "@chakra-ui/core";
 import { Logo } from "@parallel/components/common/Logo";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { RecipientViewProgressCard } from "@parallel/components/recipient-view/RecipientViewProgressCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
@@ -585,4 +585,4 @@ RecipientView.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   return { keycode };
 };
 
-export default withData(RecipientView);
+export default withApolloData(RecipientView);

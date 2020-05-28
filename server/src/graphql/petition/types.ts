@@ -279,6 +279,12 @@ export const PetitionAccess = objectType({
       nullable: true,
       resolve: (o) => o.next_reminder_at,
     });
+    t.int("reminderCount", {
+      description: "Number of reminders sent.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadReminderCountForAccess(root.id);
+      },
+    });
     t.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminder settings of the petition.",

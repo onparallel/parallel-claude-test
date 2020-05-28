@@ -1,7 +1,7 @@
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import Router from "next/router";
 
 function AppHome() {
@@ -18,4 +18,4 @@ AppHome.getInitialProps = async ({ apollo, query, res }: WithDataContext) => {
   return {};
 };
 
-export default withData(AppHome);
+export default withApolloData(AppHome);

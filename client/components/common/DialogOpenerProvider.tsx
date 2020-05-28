@@ -6,6 +6,7 @@ import {
   useContext,
   useState,
   Fragment,
+  cloneElement,
 } from "react";
 
 export type DialogProps<T> = {
@@ -44,17 +45,17 @@ export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
     function (opener) {
       return new Promise((resolve, reject) => {
         const dialog = opener({
-          position: stack.length,
+          position: 0,
           onResolve: (result) => {
-            setStack((stack) => stack.slice(0, -1));
+            setStack(stack.slice(0, -1));
             resolve(result);
           },
           onReject: (reason?: any) => {
-            setStack((stack) => stack.slice(0, -1));
+            setStack(stack.slice(0, -1));
             reject(reason);
           },
         });
-        setStack((stack) => [...stack, dialog]);
+        setStack([...stack, dialog]);
       });
     },
     [stack]
@@ -64,7 +65,9 @@ export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
       {children}
       {stack.map((dialog, index) => (
         // as long as it's a stack, using index as key is ok
-        <Fragment key={index}>{dialog}</Fragment>
+        <Fragment key={index}>
+          {cloneElement(dialog as any, { position: index })}
+        </Fragment>
       ))}
     </DialogOpenerContext.Provider>
   );

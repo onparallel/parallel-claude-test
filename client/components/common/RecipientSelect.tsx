@@ -1,126 +1,141 @@
 import {
   Box,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Icon,
   Text,
   useToast,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
 } from "@chakra-ui/core";
 import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
-import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
+import { useId } from "@reach/auto-id";
 import { gql } from "apollo-boost";
-import { memo, ReactNode, useCallback, useMemo, useState } from "react";
+import {
+  forwardRef,
+  memo,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+  Ref,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, OptionProps } from "react-select";
 import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
 import { pick } from "remeda";
 import { useReactSelectStyle } from "../../utils/useReactSelectStyle";
-import { useId } from "@reach/auto-id";
 
 export type Recipient = RecipientSelect_ContactFragment;
 
-type RecipientSelectProps = Pick<Props<Recipient>, "inputId"> & {
+export type RecipientSelectProps = Pick<Props<Recipient>, "inputId"> & {
   value: Recipient[];
   showErrors: boolean;
   onChange: (recipients: Recipient[]) => void;
-  searchContacts: (search: string, exclude: string[]) => Promise<Recipient[]>;
+  onCreateContact: (data: { defaultEmail?: string }) => Promise<Recipient>;
+  onSearchContacts: (search: string, exclude: string[]) => Promise<Recipient[]>;
 };
 
-export function RecipientSelect({
-  value,
-  showErrors,
-  searchContacts,
-  onChange,
-  ...props
-}: RecipientSelectProps) {
-  const intl = useIntl();
-  const [isCreating, setIsCreating] = useState(false);
-  const createContact = useCreateContact();
-  const toast = useToast();
+export const RecipientSelect = Object.assign(
+  forwardRef(function (
+    {
+      value,
+      showErrors,
+      onSearchContacts,
+      onCreateContact,
+      onChange,
+      ...props
+    }: RecipientSelectProps,
+    ref: Ref<AsyncCreatableSelect<Recipient>>
+  ) {
+    const intl = useIntl();
+    const [isCreating, setIsCreating] = useState(false);
+    const toast = useToast();
 
-  const loadOptions = useCallback(
-    async (search) => {
-      const exclude = [];
-      for (const recipient of value) {
-        exclude.push(recipient.id);
+    const loadOptions = useCallback(
+      async (search) => {
+        const exclude = [];
+        for (const recipient of value) {
+          exclude.push(recipient.id);
+        }
+        return await onSearchContacts(search, exclude);
+      },
+      [onSearchContacts, value]
+    );
+
+    async function handleCreate(email: string) {
+      setIsCreating(true);
+      try {
+        const contact = await onCreateContact({ defaultEmail: email });
+        onChange([...value, pick(contact, ["id", "email", "fullName"])]);
+      } catch (error) {
+        if (error?.graphQLErrors?.[0]?.message === "EXISTING_CONTACT") {
+          toast({
+            title: intl.formatMessage({
+              id: "component.recipient-select.existing-contact.title",
+              defaultMessage: "Existing contact",
+            }),
+            description: intl.formatMessage({
+              id: "component.recipient-select.existing-contact.description",
+              defaultMessage: "This contact already exists.",
+            }),
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
       }
-      return await searchContacts(search, exclude);
+      setIsCreating(false);
+    }
+    const inputId = `recipient-select-${useId()}`;
+    const hasError = showErrors && value.length === 0;
+    const reactSelectProps = useReactSelectProps({ hasError });
+
+    return (
+      <FormControl isInvalid={hasError}>
+        <FormLabel htmlFor={inputId} paddingBottom={0}>
+          <FormattedMessage
+            id="component.recipient-select.label"
+            defaultMessage="Recipients"
+          />
+        </FormLabel>
+        <AsyncCreatableSelect<Recipient>
+          inputId={inputId}
+          placeholder={intl.formatMessage({
+            id: "component.recipient-select.placeholder",
+            defaultMessage: "Enter recipients...",
+          })}
+          ref={ref}
+          value={value}
+          isDisabled={isCreating}
+          onChange={(value) => onChange((value as any) ?? [])}
+          onCreateOption={handleCreate}
+          isMulti
+          loadOptions={loadOptions}
+          {...reactSelectProps}
+          {...props}
+        />
+        <FormErrorMessage>
+          <FormattedMessage
+            id="component.recipient-select.required-error"
+            defaultMessage="Please specify at least one recipient"
+          />
+        </FormErrorMessage>
+      </FormControl>
+    );
+  }),
+  {
+    fragments: {
+      Contact: gql`
+        fragment RecipientSelect_Contact on Contact {
+          id
+          fullName
+          email
+        }
+      `,
     },
-    [searchContacts, value]
-  );
-
-  async function handleCreate(email: string) {
-    setIsCreating(true);
-    try {
-      const contact = await createContact({ defaultEmail: email });
-      onChange([...value, pick(contact, ["id", "email", "fullName"])]);
-    } catch (error) {
-      if (error?.graphQLErrors?.[0]?.message === "EXISTING_CONTACT") {
-        toast({
-          title: intl.formatMessage({
-            id: "component.recipient-select.existing-contact.title",
-            defaultMessage: "Existing contact",
-          }),
-          description: intl.formatMessage({
-            id: "component.recipient-select.existing-contact.description",
-            defaultMessage: "This contact already exists.",
-          }),
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    }
-    setIsCreating(false);
   }
-  const inputId = `recipient-select-${useId()}`;
-  const hasError = showErrors && value.length === 0;
-  const reactSelectProps = useReactSelectProps({ hasError });
-
-  return (
-    <FormControl isInvalid={hasError}>
-      <FormLabel htmlFor={inputId} paddingBottom={0}>
-        <FormattedMessage
-          id="component.recipient-select.label"
-          defaultMessage="Recipients"
-        />
-      </FormLabel>
-      <AsyncCreatableSelect<Recipient>
-        inputId={inputId}
-        placeholder={intl.formatMessage({
-          id: "component.recipient-select.placeholder",
-          defaultMessage: "Enter recipients...",
-        })}
-        value={value}
-        isDisabled={isCreating}
-        onChange={(value) => onChange((value as any) ?? [])}
-        onCreateOption={handleCreate}
-        isMulti
-        loadOptions={loadOptions}
-        {...reactSelectProps}
-        {...props}
-      />
-      <FormErrorMessage>
-        <FormattedMessage
-          id="component.recipient-select.required-error"
-          defaultMessage="Please specify at least one recipient"
-        />
-      </FormErrorMessage>
-    </FormControl>
-  );
-}
-
-RecipientSelect.fragments = {
-  Contact: gql`
-    fragment RecipientSelect_Contact on Contact {
-      id
-      fullName
-      email
-    }
-  `,
-};
+);
 
 function useReactSelectProps({ hasError }: { hasError: boolean }) {
   const styleProps = useReactSelectStyle<Recipient>({ size: "md", hasError });

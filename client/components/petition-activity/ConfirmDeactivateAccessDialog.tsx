@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/core";
+import { Button, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -21,8 +21,11 @@ export function ConfirmDeactivateAccessDialog({
       body={
         <FormattedMessage
           id="petition.confirm-deactivate-access-message.body"
-          defaultMessage="Are you sure you want to remove access to {nameOrEmail}?"
-          values={{ nameOrEmail }}
+          defaultMessage="Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
+          values={{
+            nameOrEmail,
+            b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+          }}
         />
       }
       confirm={

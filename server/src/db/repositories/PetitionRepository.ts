@@ -2,6 +2,7 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder } from "knex";
 import { groupBy, indexBy, omit, sortBy } from "remeda";
+import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { count } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
@@ -20,18 +21,16 @@ import {
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreatePetitionMessage,
+  CreatePetitionReminder,
   Petition,
   PetitionAccess,
-  PetitionAccessStatus,
   PetitionEventType,
   PetitionField,
   PetitionFieldReply,
   PetitionFieldType,
   PetitionStatus,
   User,
-  CreatePetitionReminder,
 } from "../__types";
-import { PetitionEventPayload } from "../../graphql/backing/events";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -365,23 +364,79 @@ export class PetitionRepository extends BaseRepository {
     return row ?? null;
   }
 
-  async updatePetitionAccessStatus(
-    accessId: number,
-    status: PetitionAccessStatus,
+  async deactivateAccesses(
+    petitionId: number,
+    accessIds: number[],
     user: User
   ) {
-    const [row] = await this.from("petition_access")
-      .where("id", accessId)
+    const [accesses, messages] = await Promise.all([
+      this.from("petition_access")
+        .whereIn("id", accessIds)
+        .where("status", "ACTIVE")
+        .update(
+          {
+            status: "INACTIVE",
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+          },
+          "*"
+        ),
+      this.from("petition_message")
+        .whereIn("petition_access_id", accessIds)
+        .where("status", "SCHEDULED")
+        .update(
+          {
+            status: "CANCELLED",
+          },
+          "*"
+        ),
+    ]);
+    await this.createEvent(
+      petitionId,
+      "ACCESS_DEACTIVATED",
+      accesses.map((access) => ({
+        petition_access_id: access.id,
+        user_id: user.id,
+      }))
+    );
+    if (messages.length > 0) {
+      await this.createEvent(
+        petitionId,
+        "MESSAGE_CANCELLED",
+        messages.map((message) => ({
+          petition_message_id: message.id,
+          user_id: user.id,
+        }))
+      );
+    }
+    return accesses;
+  }
+
+  async reactivateAccesses(
+    petitionId: number,
+    accessIds: number[],
+    user: User
+  ) {
+    const accesses = await this.from("petition_access")
+      .whereIn("id", accessIds)
+      .where("status", "INACTIVE")
       .update(
         {
-          status,
-          ...(status === "ACTIVE" ? { granter_id: user.id } : {}),
+          status: "ACTIVE",
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },
         "*"
       );
-    return row;
+    await this.createEvent(
+      petitionId,
+      "ACCESS_ACTIVATED",
+      accesses.map((access) => ({
+        petition_access_id: access.id,
+        user_id: user.id,
+      }))
+    );
+    return accesses;
   }
 
   async updatePetitionAccessNextReminder(
@@ -856,6 +911,17 @@ export class PetitionRepository extends BaseRepository {
   }
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
+
+  readonly loadReminderCountForAccess = fromDataLoader(
+    new DataLoader<number, number>(async (ids) => {
+      const rows = await this.from("petition_reminder")
+        .whereIn("petition_access_id", ids)
+        .groupBy("petition_access_id")
+        .select("petition_access_id", this.count());
+      const byPetitioinAccessId = indexBy(rows, (r) => r.petition_access_id);
+      return ids.map((id) => byPetitioinAccessId[id]?.count ?? 0);
+    })
+  );
 
   async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
     const reminders = await this.insert("petition_reminder", data).returning(

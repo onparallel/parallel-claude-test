@@ -10,9 +10,9 @@ import {
   Stack,
 } from "@chakra-ui/core";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
@@ -163,4 +163,4 @@ Account.getInitialProps = async ({ apollo }: WithDataContext) => {
   await apollo.query<AccountQuery>({ query: GET_ACCOUNT_DATA });
 };
 
-export default withData(Account);
+export default withApolloData(Account);

@@ -237,6 +237,7 @@ export interface NexusGenRootTypes {
   ReplyDeletedEvent: events.ReplyDeletedEvent;
   SendPetitionResult: {
     // root type
+    accesses?: NexusGenRootTypes["PetitionAccess"][] | null; // [PetitionAccess!]
     petition?: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
@@ -368,6 +369,7 @@ export interface NexusGenFieldTypes {
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createPetition: NexusGenRootTypes["Petition"]; // Petition!
     createPetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
+    deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetitionField: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitions: NexusGenEnums["Result"]; // Result!
@@ -377,6 +379,7 @@ export interface NexusGenFieldTypes {
     publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendReminders: NexusGenEnums["Result"]; // Result!
@@ -426,6 +429,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     nextReminderAt: Date | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
+    reminderCount: number; // Int!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     status: NexusGenEnums["PetitionAccessStatus"]; // PetitionAccessStatus!
     updatedAt: Date; // DateTime!
@@ -607,6 +611,7 @@ export interface NexusGenFieldTypes {
   };
   SendPetitionResult: {
     // field return type
+    accesses: NexusGenRootTypes["PetitionAccess"][] | null; // [PetitionAccess!]
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
@@ -682,6 +687,11 @@ export interface NexusGenArgTypes {
       petitionId: string; // ID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
+    deactivateAccesses: {
+      // args
+      accessIds: string[]; // [ID!]!
+      petitionId: string; // ID!
+    };
     deleteContacts: {
       // args
       ids: string[]; // [ID!]!
@@ -725,6 +735,11 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       replyId: string; // ID!
+    };
+    reactivateAccesses: {
+      // args
+      accessIds: string[]; // [ID!]!
+      petitionId: string; // ID!
     };
     sendMessages: {
       // args

@@ -1,31 +1,17 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Icon,
-  IconButton,
-  Input,
-  MenuItem,
-  MenuList,
-} from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { ChangeEvent, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { ButtonDropdown } from "../common/ButtonDropdown";
+import { useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
 import {
   isEmptyContent,
-  RichTextEditor,
   RichTextEditorContent,
 } from "../common/RichTextEditor";
-import { SplitButton } from "../common/SplitButton";
-import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
+import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
 export function SendMessageDialogDialog({
   ...props
@@ -34,7 +20,6 @@ export function SendMessageDialogDialog({
   body: RichTextEditorContent;
   scheduledAt: Date | null;
 }>) {
-  const intl = useIntl();
   const [showErrors, setShowErrors] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState<RichTextEditorContent>([

@@ -199,6 +199,11 @@ type Mutation {
   ): PetitionAndField!
 
   """
+  Deactivates the specified active petition accesses.
+  """
+  deactivateAccesses(accessIds: [ID!]!, petitionId: ID!): [PetitionAccess!]!
+
+  """
   Delete contacts.
   """
   deleteContacts(ids: [ID!]!): Result!
@@ -256,6 +261,11 @@ type Mutation {
     keycode: ID!
     replyId: ID!
   ): PublicPetitionFieldReply!
+
+  """
+  Reactivates the specified inactive petition accesses.
+  """
+  reactivateAccesses(accessIds: [ID!]!, petitionId: ID!): [PetitionAccess!]!
 
   """
   Sends a petition message to the speicified contacts.
@@ -554,6 +564,11 @@ type PetitionAccess implements Timestamps {
   The petition for this message access.
   """
   petition: Petition
+
+  """
+  Number of reminders sent.
+  """
+  reminderCount: Int!
 
   """
   The reminder settings of the petition.
@@ -1271,6 +1286,7 @@ enum Result {
 }
 
 type SendPetitionResult {
+  accesses: [PetitionAccess!]
   petition: Petition
   result: Result!
 }

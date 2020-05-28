@@ -11,9 +11,9 @@ import {
 } from "@chakra-ui/core";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
@@ -209,4 +209,4 @@ Security.getInitialProps = async ({ apollo }: WithDataContext) => {
   await apollo.query<SecurityQuery>({ query: GET_SECURITY_DATA });
 };
 
-export default withData(Security);
+export default withApolloData(Security);

@@ -9,9 +9,9 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
@@ -374,4 +374,4 @@ Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
   ]);
 };
 
-export default withData(Contacts);
+export default withApolloData(Contacts);

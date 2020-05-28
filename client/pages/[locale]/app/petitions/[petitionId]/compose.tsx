@@ -1,13 +1,12 @@
-import { useApolloClient } from "@apollo/react-hooks";
 import { Box, Flex, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
+import { isEmptyContent } from "@parallel/components/common/RichTextEditor";
 import { Title } from "@parallel/components/common/Title";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
@@ -22,8 +21,6 @@ import { useScheduleMessageDialog } from "@parallel/components/petition-compose/
 import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
-  PetitionComposeSearchContactsQuery,
-  PetitionComposeSearchContactsQueryVariables,
   PetitionComposeUserQuery,
   PetitionCompose_createPetitionField_PetitionFragment,
   PetitionCompose_PetitionFieldFragment,
@@ -49,14 +46,14 @@ import {
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { isEmptyContent } from "@parallel/components/common/RichTextEditor";
+import { useSearchContacts } from "../../../../../utils/useSearchContacts";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -194,7 +191,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     setActiveFieldId((active) => active && fieldId);
   }, []);
 
-  const searchContacts = useSearchContacts();
+  const handleSearchContacts = useSearchContacts();
+  const handleCreateContact = useCreateContact();
 
   const showErrorDialog = useErrorDialog();
   const showScheduleMessageDialog = useScheduleMessageDialog();
@@ -346,7 +344,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               marginTop={4}
               petition={petition!}
               showErrors={showErrors}
-              searchContacts={searchContacts}
+              onCreateContact={handleCreateContact}
+              onSearchContacts={handleSearchContacts}
               onUpdatePetition={handleUpdatePetition}
               onSend={handleSend}
             />
@@ -610,36 +609,6 @@ function useDeletePetitionField() {
   );
 }
 
-function useSearchContacts() {
-  const apollo = useApolloClient();
-  return useDebouncedAsync(
-    async (search: string, exclude: string[]) => {
-      const { data } = await apollo.query<
-        PetitionComposeSearchContactsQuery,
-        PetitionComposeSearchContactsQueryVariables
-      >({
-        query: gql`
-          query PetitionComposeSearchContacts(
-            $search: String
-            $exclude: [ID!]
-          ) {
-            contacts(limit: 10, search: $search, exclude: $exclude) {
-              items {
-                ...RecipientSelect_Contact
-              }
-            }
-          }
-          ${RecipientSelect.fragments.Contact}
-        `,
-        variables: { search, exclude },
-      });
-      return data.contacts.items;
-    },
-    300,
-    []
-  );
-}
-
 PetitionCompose.getInitialProps = async ({
   apollo,
   query,
@@ -794,5 +763,5 @@ export default compose(
       },
     ],
   }),
-  withData
+  withApolloData
 )(PetitionCompose);

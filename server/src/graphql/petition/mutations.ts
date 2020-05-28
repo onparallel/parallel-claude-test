@@ -423,6 +423,11 @@ export const sendPetition = mutationField("sendPetition", {
     definition(t) {
       t.field("result", { type: "Result" });
       t.field("petition", { type: "Petition", nullable: true });
+      t.field("accesses", {
+        type: "PetitionAccess",
+        list: [true],
+        nullable: true,
+      });
     },
   }),
   authorize: authorizeAnd(
@@ -505,6 +510,7 @@ export const sendPetition = mutationField("sendPetition", {
         petition: await ctx.petitions.loadPetition(petitionId, {
           refresh: true,
         }),
+        accesses,
         result: RESULT.SUCCESS,
       };
     } catch (error) {
@@ -578,7 +584,7 @@ export const sendMessages = mutationField("sendMessages", {
   },
 });
 
-export const sendReminder = mutationField("sendReminders", {
+export const sendReminders = mutationField("sendReminders", {
   description: "Sends a reminder for the specified petition accesses.",
   type: "Result",
   authorize: authorizeAnd(
@@ -615,6 +621,13 @@ export const sendReminder = mutationField("sendReminders", {
           `Petition accesses must have status "ACTIVE".`
         );
       }
+      if (access.reminders_left <= 0) {
+        throw new ArgValidationError(
+          info,
+          `accessIds[${accesses.indexOf(access)}]`,
+          `Maximum number of allowed reminders reached.`
+        );
+      }
     }
     try {
       const reminders = await ctx.petitions.createReminders(
@@ -632,6 +645,58 @@ export const sendReminder = mutationField("sendReminders", {
     } catch (error) {
       return RESULT.FAILURE;
     }
+  },
+});
+
+export const deactivateAccesses = mutationField("deactivateAccesses", {
+  description: "Deactivates the specified active petition accesses.",
+  type: "PetitionAccess",
+  list: [true],
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(
+      userHasAccessToPetition("petitionId"),
+      accessesBelongToPetition("petitionId", "accessIds")
+    )
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    accessIds: idArg({ list: [true], required: true }),
+  },
+  resolve: async (_, args, ctx, info) => {
+    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+    const { ids: accessIds } = fromGlobalIds(args.accessIds, "PetitionAccess");
+    return await ctx.petitions.deactivateAccesses(
+      petitionId,
+      accessIds,
+      ctx.user!
+    );
+  },
+});
+
+export const reactivateAccesses = mutationField("reactivateAccesses", {
+  description: "Reactivates the specified inactive petition accesses.",
+  type: "PetitionAccess",
+  list: [true],
+  authorize: authorizeAnd(
+    authenticate(),
+    authorizeAndP(
+      userHasAccessToPetition("petitionId"),
+      accessesBelongToPetition("petitionId", "accessIds")
+    )
+  ),
+  args: {
+    petitionId: idArg({ required: true }),
+    accessIds: idArg({ list: [true], required: true }),
+  },
+  resolve: async (_, args, ctx, info) => {
+    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+    const { ids: accessIds } = fromGlobalIds(args.accessIds, "PetitionAccess");
+    return await ctx.petitions.reactivateAccesses(
+      petitionId,
+      accessIds,
+      ctx.user!
+    );
   },
 });
 

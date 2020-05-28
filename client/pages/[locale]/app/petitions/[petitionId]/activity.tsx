@@ -3,11 +3,13 @@ import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import {
-  withData,
+  withApolloData,
   WithDataContext,
-} from "@parallel/components/common/withData";
+} from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
+import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmDeactivateAccessDialog";
+import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
@@ -20,9 +22,11 @@ import {
   usePetitionActivityQuery,
   usePetitionActivityUserQuery,
   usePetitionActivity_cancelScheduledMessageMutation,
+  usePetitionActivity_deactivateAccessesMutation,
+  usePetitionActivity_reactivateAccessesMutation,
+  usePetitionActivity_sendMessagesMutation,
   usePetitionActivity_sendRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
-  usePetitionActivity_sendMessagesMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -35,6 +39,9 @@ import { gql } from "apollo-boost";
 import { differenceInMinutes } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
+import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { useCreateContact } from "@parallel/utils/useCreateContact";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -63,11 +70,11 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   );
 
   const [sendMessages] = usePetitionActivity_sendMessagesMutation();
-  const showSendMessageDialog = useSendMessageDialogDialog();
+  const sendMessageDialog = useSendMessageDialogDialog();
   const handleSendMessage = useCallback(
     async (accessIds: string[]) => {
       try {
-        const { subject, body, scheduledAt } = await showSendMessageDialog({});
+        const { subject, body, scheduledAt } = await sendMessageDialog({});
         await sendMessages({
           variables: {
             petitionId,
@@ -126,6 +133,31 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     [petitionId]
   );
 
+  const addPetitionAccessDialog = useAddPetitionAccessDialog();
+  const handleSearchContacts = useSearchContacts();
+  const handleCreateContact = useCreateContact();
+  const handleAddPetitionAccess = useCallback(async () => {
+    try {
+      const currentRecipientIds = petition!.accesses
+        .filter((a) => a.contact)
+        .map((a) => a.contact!.id);
+      const {
+        recipientIds,
+        subject,
+        body,
+        scheduledAt,
+      } = await addPetitionAccessDialog({
+        onCreateContact: handleCreateContact,
+        onSearchContacts: async (search: string, exclude: string[]) => {
+          return await handleSearchContacts(search, [
+            ...exclude,
+            ...currentRecipientIds,
+          ]);
+        },
+      });
+    } catch {}
+  }, [petition!.accesses]);
+
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
   const [
     cancelScheduledMessage,
@@ -141,6 +173,46 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       await refetch();
     },
     [petitionId, refetch]
+  );
+
+  const confirmRectivateAccess = useConfirmReactivateAccessDialog();
+  const [reactivateAccess] = usePetitionActivity_reactivateAccessesMutation();
+  const handleReactivateAccess = useCallback(
+    async (accessId: string) => {
+      const { contact } = petition!.accesses.find((a) => a.id === accessId)!;
+      try {
+        await confirmRectivateAccess({
+          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
+        });
+      } catch {
+        return;
+      }
+      await reactivateAccess({
+        variables: { petitionId, accessIds: [accessId] },
+      });
+      await refetch();
+    },
+    [petitionId, petition!.accesses]
+  );
+
+  const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
+  const [deactivateAccess] = usePetitionActivity_deactivateAccessesMutation();
+  const handleDeactivateAccess = useCallback(
+    async (accessId) => {
+      const { contact } = petition!.accesses.find((a) => a.id === accessId)!;
+      try {
+        await confirmDeactivateAccess({
+          nameOrEmail: contact?.fullName ?? contact?.email ?? "",
+        });
+      } catch {
+        return;
+      }
+      await deactivateAccess({
+        variables: { petitionId, accessIds: [accessId] },
+      });
+      await refetch();
+    },
+    [petitionId, petition!.accesses]
   );
 
   // process events
@@ -194,8 +266,9 @@ function PetitionActivity({ petitionId }: PetitionProps) {
               petition={petition!}
               onSendMessage={handleSendMessage}
               onSendReminders={handleSendReminders}
-              onActivateAccess={() => {}}
-              onDeactivateAccess={() => {}}
+              onAddPetitionAccess={handleAddPetitionAccess}
+              onReactivateAccess={handleReactivateAccess}
+              onDeactivateAccess={handleDeactivateAccess}
             />
             <Box margin={4}>
               <PetitionActivityTimeline
@@ -271,6 +344,28 @@ PetitionActivity.mutations = [
     }
   `,
   gql`
+    mutation PetitionActivity_deactivateAccesses(
+      $petitionId: ID!
+      $accessIds: [ID!]!
+    ) {
+      deactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionActivity_reactivateAccesses(
+      $petitionId: ID!
+      $accessIds: [ID!]!
+    ) {
+      reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
     mutation PetitionActivity_cancelScheduledMessage(
       $petitionId: ID!
       $messageId: ID!
@@ -278,6 +373,25 @@ PetitionActivity.mutations = [
       cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
         id
         status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionsActivity_sendPetition(
+      $petitionId: ID!
+      $contactIds: [ID!]!
+      $scheduledAt: DateTime
+    ) {
+      sendPetition(
+        petitionId: $petitionId
+        contactIds: $contactIds
+        scheduledAt: $scheduledAt
+      ) {
+        result
+        petition {
+          id
+          status
+        }
       }
     }
   `,
@@ -385,5 +499,5 @@ export default compose(
       },
     ],
   }),
-  withData
+  withApolloData
 )(PetitionActivity);
