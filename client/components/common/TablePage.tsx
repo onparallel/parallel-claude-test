@@ -88,13 +88,13 @@ export function TablePage<T>({
       <Stack
         direction="row"
         spacing={2}
-        padding={4}
+        padding={2}
         borderTop="1px solid"
         alignItems="center"
         borderTopColor={colors.border}
         marginTop="-1px"
       >
-        <Box>
+        <Box marginLeft={2}>
           {totalCount ? (
             <FormattedMessage
               id="component.table.total-results"
