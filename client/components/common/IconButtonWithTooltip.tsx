@@ -3,6 +3,7 @@ import {
   Tooltip,
   IconButton,
   TooltipProps,
+  useTheme,
 } from "@chakra-ui/core";
 
 export type IconButtonWithTooltipProps = Omit<IconButtonProps, "aria-label"> &
@@ -17,6 +18,7 @@ export function IconButtonWithTooltip({
   isDisabled,
   ...props
 }: IconButtonWithTooltipProps) {
+  const { zIndices } = useTheme();
   return isDisabled ? (
     <IconButton isDisabled aria-label={label} {...props} />
   ) : (
@@ -25,7 +27,7 @@ export function IconButtonWithTooltip({
       label={label}
       showDelay={showDelay}
       placement={placement}
-      zIndex={1000}
+      zIndex={zIndices.tooltip}
     >
       <IconButton aria-label={label} {...props} />
     </Tooltip>

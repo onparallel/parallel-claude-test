@@ -14,7 +14,7 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
-import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
+import { PetitionStatusIndicator } from "@parallel/components/common/PetitionStatusIndicator";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
@@ -321,7 +321,9 @@ function useContactPetitionAccessesColumns(): TableColumn<
           defaultMessage: "Status",
         }),
         CellContent: ({ row: { petition } }) =>
-          petition ? <PetitionStatusText status={petition.status} /> : null,
+          petition ? (
+            <PetitionStatusIndicator status={petition.status} />
+          ) : null,
       },
     ],
     []

@@ -32,7 +32,8 @@ export function DateTimePicker({
               )
             );
           }}
-          isDateDisabled={isDisabledDate}
+          isPastAllowed={isPastAllowed}
+          isDisabledDate={isDisabledDate}
         />
       </Box>
       <Flex flex="1" direction="column" marginLeft={{ base: 0, sm: 4 }}>

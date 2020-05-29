@@ -77,6 +77,7 @@ export function AddPetitionAccessDialog({
       recipientIds: recipients.map((r) => r.id),
       subject,
       body,
+      remindersConfig,
       scheduledAt: null,
     });
   };

@@ -10,9 +10,9 @@ import {
   IAlertDialog,
   Stack,
 } from "@chakra-ui/core";
-import { ReactNode, RefObject, useRef, useContext } from "react";
+import { ReactNode, RefObject, useRef } from "react";
 import { FormattedMessage } from "react-intl";
-import { DialogProps, DialogOpenerContext } from "./DialogOpenerProvider";
+import { DialogProps } from "./DialogOpenerProvider";
 
 export type ConfirmDialogProps<T> = {
   header: ReactNode;

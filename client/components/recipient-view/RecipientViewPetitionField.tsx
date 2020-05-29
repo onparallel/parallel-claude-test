@@ -53,6 +53,7 @@ export function RecipientViewPetitionField({
   ...props
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
+  const theme = useTheme();
 
   const labels = {
     filesize: intl.formatMessage({
@@ -98,7 +99,7 @@ export function RecipientViewPetitionField({
         ) : (
           <Tooltip
             placement="right"
-            zIndex={1000}
+            zIndex={theme.zIndices.tooltip}
             showDelay={300}
             aria-label={labels.required}
             label={labels.required}

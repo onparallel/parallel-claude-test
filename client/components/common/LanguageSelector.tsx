@@ -8,8 +8,8 @@ import {
   SelectProps,
   useColorMode,
 } from "@chakra-ui/core";
-import languages from "@parallel/lang/languages.json";
 import { useIntl } from "react-intl";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export type LanguageSelectorProp = Pick<SelectProps, "value" | "onChange"> &
   PseudoBoxProps;
@@ -21,6 +21,7 @@ export function LanguageSelector({
 }: LanguageSelectorProp) {
   const { colorMode } = useColorMode();
   const intl = useIntl();
+  const locales = useSupportedLocales();
   return (
     <PseudoBox {...props}>
       <InputGroup size="sm" display="inline-flex">
@@ -42,9 +43,9 @@ export function LanguageSelector({
             defaultMessage: "Change language",
           })}
         >
-          {languages.map(({ locale, text }) => (
-            <option key={locale} value={locale}>
-              {text}
+          {locales.map(({ label, key }) => (
+            <option key={key} value={key}>
+              {label}
             </option>
           ))}
         </Select>

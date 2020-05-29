@@ -1,12 +1,12 @@
-import { Box, Flex, List, ListItem, Text, useToast } from "@chakra-ui/core";
+import { Box, List, ListItem, Text, useToast } from "@chakra-ui/core";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
 import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmDeactivateAccessDialog";
 import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmReactivateAccessDialog";
@@ -36,13 +36,12 @@ import {
   useWrapPetitionUpdater,
 } from "@parallel/utils/petitions";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { useCreateContact } from "@parallel/utils/useCreateContact";
+import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { gql } from "apollo-boost";
 import { differenceInMinutes } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
-import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { useCreateContact } from "@parallel/utils/useCreateContact";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>

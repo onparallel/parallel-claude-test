@@ -1,6 +1,7 @@
 import {
   Box,
   BoxProps,
+  Checkbox,
   Flex,
   Input,
   NumberDecrementStepper,
@@ -9,22 +10,20 @@ import {
   NumberInputField,
   NumberInputStepper,
   Text,
-  Checkbox,
 } from "@chakra-ui/core";
 import { FORMATS } from "@parallel/utils/dates";
+import { Maybe } from "@parallel/utils/types";
 import {
   addDays,
+  addWeeks,
+  isWeekend,
   parse,
   startOfToday,
-  isWeekend,
   startOfWeek,
-  addWeeks,
 } from "date-fns";
+import { ChangeEvent } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
-import { ChangeEvent } from "react";
-import { Maybe } from "@parallel/utils/types";
-import { useId } from "@reach/auto-id";
 
 export type RemindersConfig = {
   offset: number;

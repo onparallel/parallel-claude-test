@@ -205,6 +205,7 @@ export type MutationchangePasswordArgs = {
 };
 
 export type MutationclonePetitionArgs = {
+  deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
   petitionId: Scalars["ID"];
@@ -215,6 +216,7 @@ export type MutationcreateContactArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
+  deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name: Scalars["String"];
 };
@@ -970,7 +972,8 @@ export type AppLayoutNavbar_UserFragment = {
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name" | "status" | "updatedAt">;
+} & Pick<Petition, "id" | "name" | "status" | "updatedAt"> &
+  PetitionSettingsModal_PetitionFragment;
 
 export type PetitionLayout_PetitionFragment = {
   __typename?: "Petition";
@@ -1251,6 +1254,10 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
     >;
   };
 
+export type PetitionSettingsModal_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "status" | "locale" | "deadline">;
+
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
@@ -1278,7 +1285,7 @@ export type PetitionComposeMessageEditor_ContactFragment = {
 
 export type PetitionComposeMessageEditor_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "locale" | "deadline" | "emailSubject" | "emailBody"> & {
+} & Pick<Petition, "emailSubject" | "emailBody"> & {
     remindersConfig?: Maybe<
       { __typename?: "RemindersConfig" } & Pick<
         RemindersConfig,
@@ -1788,7 +1795,13 @@ export type Petitions_PetitionsListFragment = {
     items: Array<
       { __typename?: "Petition" } & Pick<
         Petition,
-        "id" | "customRef" | "name" | "status" | "deadline" | "createdAt"
+        | "id"
+        | "locale"
+        | "customRef"
+        | "name"
+        | "status"
+        | "deadline"
+        | "createdAt"
       > & {
           progress: { __typename?: "PetitionProgress" } & Pick<
             PetitionProgress,
@@ -1817,6 +1830,7 @@ export type Petitions_clonePetitionMutationVariables = {
   petitionId: Scalars["ID"];
   name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
+  deadline?: Maybe<Scalars["DateTime"]>;
 };
 
 export type Petitions_clonePetitionMutation = { __typename?: "Mutation" } & {
@@ -2050,6 +2064,7 @@ export type useCreateContact_createContactMutation = {
 export type useCreatePetition_createPetitionMutationVariables = {
   name: Scalars["String"];
   locale: PetitionLocale;
+  deadline?: Maybe<Scalars["DateTime"]>;
 };
 
 export type useCreatePetition_createPetitionMutation = {
@@ -2193,13 +2208,23 @@ export const Contacts_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
+export const PetitionSettingsModal_PetitionFragmentDoc = gql`
+  fragment PetitionSettingsModal_Petition on Petition {
+    id
+    status
+    locale
+    deadline
+  }
+`;
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
     name
     status
     updatedAt
+    ...PetitionSettingsModal_Petition
   }
+  ${PetitionSettingsModal_PetitionFragmentDoc}
 `;
 export const PetitionLayout_PetitionFragmentDoc = gql`
   fragment PetitionLayout_Petition on Petition {
@@ -2517,8 +2542,6 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
 `;
 export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionComposeMessageEditor_Petition on Petition {
-    locale
-    deadline
     emailSubject
     emailBody
     remindersConfig {
@@ -2603,6 +2626,7 @@ export const Petitions_PetitionsListFragmentDoc = gql`
   fragment Petitions_PetitionsList on PetitionPagination {
     items {
       id
+      locale
       customRef
       name
       status
@@ -4457,8 +4481,14 @@ export const Petitions_clonePetitionDocument = gql`
     $petitionId: ID!
     $name: String
     $locale: PetitionLocale!
+    $deadline: DateTime
   ) {
-    clonePetition(petitionId: $petitionId, name: $name, locale: $locale) {
+    clonePetition(
+      petitionId: $petitionId
+      name: $name
+      locale: $locale
+      deadline: $deadline
+    ) {
       id
     }
   }
@@ -4484,6 +4514,7 @@ export type Petitions_clonePetitionMutationFn = ApolloReactCommon.MutationFuncti
  *      petitionId: // value for 'petitionId'
  *      name: // value for 'name'
  *      locale: // value for 'locale'
+ *      deadline: // value for 'deadline'
  *   },
  * });
  */
@@ -5302,8 +5333,9 @@ export const useCreatePetition_createPetitionDocument = gql`
   mutation useCreatePetition_createPetition(
     $name: String!
     $locale: PetitionLocale!
+    $deadline: DateTime
   ) {
-    createPetition(name: $name, locale: $locale) {
+    createPetition(name: $name, locale: $locale, deadline: $deadline) {
       id
     }
   }
@@ -5328,6 +5360,7 @@ export type useCreatePetition_createPetitionMutationFn = ApolloReactCommon.Mutat
  *   variables: {
  *      name: // value for 'name'
  *      locale: // value for 'locale'
+ *      deadline: // value for 'deadline'
  *   },
  * });
  */

@@ -4,14 +4,14 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/core";
-import { ChangeEvent, useRef, Ref } from "react";
+import { useId } from "@reach/auto-id";
+import { ChangeEvent, Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   isEmptyContent,
   RichTextEditor,
   RichTextEditorContent,
 } from "../common/RichTextEditor";
-import { useId } from "@reach/auto-id";
 
 export function MessageEmailEditor({
   showErrors,

@@ -10,7 +10,7 @@ import {
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
-import { PetitionStatusText } from "@parallel/components/common/PetitionStatusText";
+import { PetitionStatusIndicator } from "@parallel/components/common/PetitionStatusIndicator";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
@@ -147,12 +147,18 @@ function Petitions() {
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const petition = petitions.items.find((p) => selected[0] === p.id);
-        const { name } = await createPetitionDialog({
-          defaultName: petition?.name ?? undefined,
+        const petition = petitions.items.find((p) => p.id === selected[0])!;
+        const { name, locale, deadline } = await createPetitionDialog({
+          defaultName: petition.name ?? undefined,
+          defaultLocale: petition.locale,
         });
         const { data } = await clonePetition({
-          variables: { petitionId: selected![0], name },
+          variables: {
+            petitionId: petition.id,
+            name,
+            locale,
+            deadline: deadline?.toISOString() ?? null,
+          },
         });
         router.push(
           `/[locale]/app/petitions/[petitionId]/compose`,
@@ -370,7 +376,9 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.status",
           defaultMessage: "Status",
         }),
-        CellContent: ({ row }) => <PetitionStatusText status={row.status} />,
+        CellContent: ({ row }) => (
+          <PetitionStatusIndicator status={row.status} />
+        ),
       },
       {
         key: "createdAt",
@@ -433,6 +441,7 @@ Petitions.fragments = {
     fragment Petitions_PetitionsList on PetitionPagination {
       items {
         id
+        locale
         customRef
         name
         status
@@ -471,8 +480,14 @@ Petitions.mutations = [
       $petitionId: ID!
       $name: String
       $locale: PetitionLocale!
+      $deadline: DateTime
     ) {
-      clonePetition(petitionId: $petitionId, name: $name, locale: $locale) {
+      clonePetition(
+        petitionId: $petitionId
+        name: $name
+        locale: $locale
+        deadline: $deadline
+      ) {
         id
       }
     }

@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useMergeRefs } from "../../utils/useMergeRefs";
 import { DateTimePicker } from "../common/DateTimePicker";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export type CreatePetitionFormData = {
   name: string;
@@ -57,6 +58,11 @@ export function CreatePetitionDialog({
       locale: (defaultLocale as PetitionLocale) ?? "en",
     },
   });
+
+  const focusRef = useRef<HTMLInputElement>(null);
+  const inputRef = useMergeRefs(focusRef, register({ required: true }));
+
+  const [addDeadline, setAddDeadline] = useState(false);
   // next friday at 18:00
   const defaultDeadline = parse(
     "18:00",
@@ -68,12 +74,7 @@ export function CreatePetitionDialog({
       5
     )
   );
-  const [addDeadline, setAddDeadline] = useState(false);
   const [deadline, setDeadline] = useState<Date>(defaultDeadline);
-
-  const focusRef = useRef<HTMLInputElement>(null);
-  const inputRef = useMergeRefs(focusRef, register({ required: true }));
-
   const suggestions = useMemo(
     () =>
       ["17:00", "18:00", "23:59"].map((hours) => {
@@ -84,6 +85,7 @@ export function CreatePetitionDialog({
       }),
     [format(deadline, "yyyy-MM-dd")]
   );
+  const locales = useSupportedLocales();
   return (
     <ConfirmDialog
       size="xl"
@@ -132,36 +134,17 @@ export function CreatePetitionDialog({
                 id="component.create-petition-dialog.locale-label"
                 defaultMessage="Language of the petition"
               />
-              {/* <Text
-                fontSize="sm"
-                as="span"
-                fontStyle="italic"
-                color="gray.400"
-                marginLeft={2}
-              >
-                <FormattedMessage
-                  id="generic.can-be-changed-later"
-                  defaultMessage="you can change this later"
-                />
-              </Text> */}
             </FormLabel>
             <Select
               id="petition-locale"
               name="petition-locale"
               ref={register()}
             >
-              <option value="en">
-                {intl.formatMessage({
-                  id: "petition.locale.en",
-                  defaultMessage: "English",
-                })}
-              </option>
-              <option value="es">
-                {intl.formatMessage({
-                  id: "petition.locale.es",
-                  defaultMessage: "Spanish",
-                })}
-              </option>
+              {locales.map((locale) => (
+                <option key={locale.key} value={locale.key}>
+                  {locale.localizedLabel}
+                </option>
+              ))}
             </Select>
           </FormControl>
           <Box marginTop={1}>
@@ -172,21 +155,9 @@ export function CreatePetitionDialog({
             >
               <Text fontSize="md" as="span">
                 <FormattedMessage
-                  id="component.create-petition-dialog.continue-button"
+                  id="component.create-petition-dialog.add-deadline"
                   defaultMessage="Add a deadline"
                 />
-                {/* <Text
-                  fontSize="sm"
-                  as="span"
-                  fontStyle="italic"
-                  color="gray.400"
-                  marginLeft={2}
-                >
-                  <FormattedMessage
-                    id="generic.can-be-changed-later"
-                    defaultMessage="you can change this later"
-                  />
-                </Text> */}
               </Text>
             </Checkbox>
             <Collapse isOpen={addDeadline}>

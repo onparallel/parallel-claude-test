@@ -49,6 +49,7 @@ import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { gql } from "apollo-boost";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { pick } from "remeda";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -81,9 +82,13 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             __typename: "PetitionAndFields",
             petition: {
               __typename: "Petition",
-              id: petition!.id,
-              name: petition!.name,
-              status: petition!.status,
+              ...pick(petition!, [
+                "id",
+                "name",
+                "status",
+                "locale",
+                "deadline",
+              ]),
               updatedAt: new Date().toISOString(),
             },
             fields: fieldIds.map((id) => ({

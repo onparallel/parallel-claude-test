@@ -62,7 +62,7 @@ export function PetitionProgressBar({
           </ProgressTrack>
         </Box>
       </PopoverTrigger>
-      <PopoverContent zIndex={4}>
+      <PopoverContent zIndex={theme.zIndices.popover}>
         <PopoverArrow />
         <PopoverBody>
           {status === "DRAFT" ? (

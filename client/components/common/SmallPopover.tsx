@@ -5,6 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   PopoverProps,
+  useTheme,
 } from "@chakra-ui/core";
 import { cloneElement, ReactNode, useState } from "react";
 import { useId } from "@reach/auto-id";
@@ -19,6 +20,7 @@ export function SmallPopover({
   children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const theme = useTheme();
   const popoverId = `popover-${useId()}`;
   return (
     <Popover
@@ -34,7 +36,7 @@ export function SmallPopover({
           ...(isOpen ? { "aria-describedby": popoverId } : {}),
         })}
       </PopoverTrigger>
-      <PopoverContent zIndex={1000} maxWidth={240}>
+      <PopoverContent zIndex={theme.zIndices.popover} maxWidth={240}>
         <PopoverArrow />
         <Box paddingY={2} paddingX={3} id={popoverId}>
           {content}

@@ -54,6 +54,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { pick, omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
+import { Link } from "@parallel/components/common/Link";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -347,15 +348,47 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               onFieldEdit={handleFieldEdit}
               onFieldSettingsClick={setActiveFieldId}
             />
-            <PetitionComposeMessageEditor
-              marginTop={4}
-              petition={petition!}
-              showErrors={showErrors}
-              onCreateContact={handleCreateContact}
-              onSearchContacts={handleSearchContacts}
-              onUpdatePetition={handleUpdatePetition}
-              onSend={handleSend}
-            />
+            {petition!.status === "DRAFT" ? (
+              <PetitionComposeMessageEditor
+                marginTop={4}
+                petition={petition!}
+                showErrors={showErrors}
+                onCreateContact={handleCreateContact}
+                onSearchContacts={handleSearchContacts}
+                onUpdatePetition={handleUpdatePetition}
+                onSend={handleSend}
+              />
+            ) : (
+              <Box
+                color="gray.500"
+                marginTop={12}
+                paddingX={4}
+                textAlign="center"
+              >
+                <Text>
+                  <FormattedMessage
+                    id="petition.already-sent"
+                    defaultMessage="This petition has already been sent."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition.send-from-activity"
+                    defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+                    values={{
+                      a: (...chunks: any[]) => (
+                        <Link
+                          href="/app/petitions/[petitionId]/activity"
+                          as={`/app/petitions/${petitionId}/activity`}
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                    }}
+                  />
+                </Text>
+              </Box>
+            )}
           </Box>
           <Box
             flex="1"

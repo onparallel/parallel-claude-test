@@ -21,8 +21,9 @@ export function useCreatePetition() {
       mutation useCreatePetition_createPetition(
         $name: String!
         $locale: PetitionLocale!
+        $deadline: DateTime
       ) {
-        createPetition(name: $name, locale: $locale) {
+        createPetition(name: $name, locale: $locale, deadline: $deadline) {
           id
         }
       }
@@ -46,7 +47,7 @@ export function useCreatePetition() {
         defaultLocale: query.locale as PetitionLocale,
       });
       const { data, errors } = await createPetition({
-        variables: { name, locale, deadline },
+        variables: { name, locale, deadline: deadline?.toISOString() ?? null },
       });
       if (errors) {
         throw errors;
