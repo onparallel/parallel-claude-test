@@ -95,6 +95,9 @@ export function withApolloData<P = {}>(
         } else if (code === "FORBIDDEN") {
           redirect(context, "/[locale]/app", `/${context.query.locale}/app`);
         } else {
+          if (error?.graphQLErrors?.[0]?.extensions) {
+            console.error(error?.graphQLErrors?.[0]?.extensions);
+          }
           throw error;
         }
       }
