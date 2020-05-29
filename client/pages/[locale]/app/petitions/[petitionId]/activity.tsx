@@ -511,7 +511,7 @@ export default compose(
               <ListItem>
                 <FormattedMessage
                   id="tour.petition-activity.send-message"
-                  defaultMessage="Send a <b>follow-up</b> message to a recipients."
+                  defaultMessage="Send a <b>follow-up message</b> to recipients."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}

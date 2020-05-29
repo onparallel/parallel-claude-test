@@ -109,8 +109,8 @@ export const PetitionComposeMessageEditor = Object.assign(
               <AlertIcon />
               <FormattedMessage
                 id="petition.message-settings.same-petition-warning"
-                defaultMessage="All {recipients} recipients will receive a link to the same petition so they can fill it out collaboratively."
-                values={{ recipients: recipients.length }}
+                defaultMessage="All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
+                values={{ recipientCount: recipients.length }}
               />
             </Alert>
           ) : null}

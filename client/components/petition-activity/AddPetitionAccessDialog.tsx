@@ -107,7 +107,7 @@ export function AddPetitionAccessDialog({
             <Alert status="info" marginTop={4}>
               <AlertIcon />
               <FormattedMessage
-                id="component.send-petition-dialog..same-petition-warning"
+                id="component.send-petition-dialog.same-petition-warning"
                 defaultMessage="Recipients will receive a link to the same petition so they can fill it out collaboratively."
               />
             </Alert>
