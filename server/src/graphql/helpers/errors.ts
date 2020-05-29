@@ -20,7 +20,8 @@ export class ArgValidationError extends ApolloError {
   constructor(
     { parentType, fieldName }: GraphQLResolveInfo,
     argName: string,
-    message: string
+    message: string,
+    extra?: any
   ) {
     super(
       `Validation error on argument "${argName}" for "${parentType}.${fieldName}": ${message}`,
@@ -30,6 +31,7 @@ export class ArgValidationError extends ApolloError {
         fieldName,
         argName,
         message,
+        extra,
       }
     );
   }

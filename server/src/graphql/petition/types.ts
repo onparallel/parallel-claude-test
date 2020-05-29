@@ -277,7 +277,11 @@ export const PetitionAccess = objectType({
     t.datetime("nextReminderAt", {
       description: "When the next reminder will be sent.",
       nullable: true,
-      resolve: (o) => o.next_reminder_at,
+      resolve: (o) => (o.reminders_left === 0 ? null : o.next_reminder_at),
+    });
+    t.int("remindersLeft", {
+      description: "Number of reminders left.",
+      resolve: (o) => o.reminders_left,
     });
     t.int("reminderCount", {
       description: "Number of reminders sent.",
@@ -491,7 +495,6 @@ export const PetitionReminder = objectType({
       nullable: true,
       description: "The sender of this petition message.",
       resolve: async (root, _, ctx) => {
-        console.log(root);
         return root.sender_id
           ? (await ctx.users.loadUser(root.sender_id))!
           : null;

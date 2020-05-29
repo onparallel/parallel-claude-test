@@ -27,6 +27,7 @@ import {
   usePetitionActivity_sendMessagesMutation,
   usePetitionActivity_sendRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
+  usePetitionsActivity_sendPetitionMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -112,9 +113,41 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       } catch {
         return;
       }
-      await sendReminders({
-        variables: { petitionId, accessIds: accessIds },
-      });
+      try {
+        await sendReminders({
+          variables: { petitionId, accessIds: accessIds },
+        });
+      } catch (error) {
+        const extra = error?.graphQLErrors?.[0]?.extensions?.extra;
+        switch (extra?.errorCode) {
+          case "NO_REMINDERS_LEFT": {
+            const access = petition!.accesses.find(
+              (a) => a.id === extra.petitionAccessId
+            )!;
+            toast({
+              title: intl.formatMessage({
+                id: "petition.no-reminders-left.toast-header",
+                defaultMessage: "No reminders left",
+              }),
+              description: intl.formatMessage(
+                {
+                  id: "petition.no-reminders-left.toast-description",
+                  defaultMessage:
+                    "You have sent the maximum number of reminders to {nameOrEmail}",
+                },
+                {
+                  nameOrEmail:
+                    access.contact!.fullName || access.contact!.email,
+                }
+              ),
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+            return;
+          }
+        }
+      }
       toast({
         title: intl.formatMessage({
           id: "petition.reminder-sent.toast-header",
@@ -130,12 +163,13 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       });
       await refetch();
     },
-    [petitionId]
+    [petitionId, petition!.accesses]
   );
 
   const addPetitionAccessDialog = useAddPetitionAccessDialog();
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
+  const [sendPetition] = usePetitionsActivity_sendPetitionMutation();
   const handleAddPetitionAccess = useCallback(async () => {
     try {
       const currentRecipientIds = petition!.accesses
@@ -146,6 +180,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         subject,
         body,
         scheduledAt,
+        remindersConfig,
       } = await addPetitionAccessDialog({
         onCreateContact: handleCreateContact,
         onSearchContacts: async (search: string, exclude: string[]) => {
@@ -155,8 +190,19 @@ function PetitionActivity({ petitionId }: PetitionProps) {
           ]);
         },
       });
+      await sendPetition({
+        variables: {
+          petitionId,
+          contactIds: recipientIds,
+          subject,
+          body,
+          scheduledAt: scheduledAt?.toISOString() ?? null,
+          remindersConfig,
+        },
+      });
+      await refetch();
     } catch {}
-  }, [petition!.accesses]);
+  }, [petitionId, petition!.accesses]);
 
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
   const [
@@ -172,7 +218,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       await cancelScheduledMessage({ variables: { petitionId, messageId } });
       await refetch();
     },
-    [petitionId, refetch]
+    [petitionId]
   );
 
   const confirmRectivateAccess = useConfirmReactivateAccessDialog();
@@ -258,29 +304,26 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         scrollBody
         state={state}
       >
-        <Flex>
-          <Box flex="2">
-            <PetitionAccessesTable
-              id="petition-accesses"
-              margin={4}
-              petition={petition!}
-              onSendMessage={handleSendMessage}
-              onSendReminders={handleSendReminders}
-              onAddPetitionAccess={handleAddPetitionAccess}
-              onReactivateAccess={handleReactivateAccess}
-              onDeactivateAccess={handleDeactivateAccess}
+        <Box>
+          <PetitionAccessesTable
+            id="petition-accesses"
+            margin={4}
+            petition={petition!}
+            onSendMessage={handleSendMessage}
+            onSendReminders={handleSendReminders}
+            onAddPetitionAccess={handleAddPetitionAccess}
+            onReactivateAccess={handleReactivateAccess}
+            onDeactivateAccess={handleDeactivateAccess}
+          />
+          <Box margin={4}>
+            <PetitionActivityTimeline
+              id="petition-activity-timeline"
+              userId={me.id}
+              events={events}
+              onCancelScheduledMessage={handleCancelScheduledMessage}
             />
-            <Box margin={4}>
-              <PetitionActivityTimeline
-                id="petition-activity-timeline"
-                userId={me.id}
-                events={events}
-                onCancelScheduledMessage={handleCancelScheduledMessage}
-              />
-            </Box>
           </Box>
-          <Spacer display={{ base: "none", md: "block" }} />
-        </Flex>
+        </Box>
       </PetitionLayout>
     </>
   );
@@ -380,18 +423,20 @@ PetitionActivity.mutations = [
     mutation PetitionsActivity_sendPetition(
       $petitionId: ID!
       $contactIds: [ID!]!
+      $subject: String!
+      $body: JSON!
+      $remindersConfig: RemindersConfigInput
       $scheduledAt: DateTime
     ) {
       sendPetition(
         petitionId: $petitionId
         contactIds: $contactIds
+        subject: $subject
+        body: $body
+        remindersConfig: $remindersConfig
         scheduledAt: $scheduledAt
       ) {
         result
-        petition {
-          id
-          status
-        }
       }
     }
   `,

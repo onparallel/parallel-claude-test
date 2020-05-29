@@ -29,17 +29,17 @@ type PetitionAccessSelection = PetitionAccessTable_PetitionAccessFragment;
 
 export function PetitionAccessesTable({
   petition,
+  onAddPetitionAccess,
   onSendMessage,
   onSendReminders,
-  onAddPetitionAccess,
   onReactivateAccess,
   onDeactivateAccess,
   ...props
 }: {
   petition: PetitionAccessTable_PetitionFragment;
+  onAddPetitionAccess: () => void;
   onSendMessage: (accessIds: string[]) => void;
   onSendReminders: (accessIds: string[]) => void;
-  onAddPetitionAccess: () => void;
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
 } & CardProps) {
@@ -56,6 +56,8 @@ export function PetitionAccessesTable({
     onSendReminders(selection);
   }, [selection]);
   const columns = usePetitionAccessesColumns({
+    onSendMessage,
+    onSendReminders,
     onReactivateAccess,
     onDeactivateAccess,
   });
@@ -63,13 +65,13 @@ export function PetitionAccessesTable({
     <Card {...props}>
       <Stack
         direction="row"
-        paddingX={4}
-        paddingY={2}
+        padding={2}
+        paddingLeft={4}
         alignItems="center"
         borderBottom="1px solid"
         borderBottomColor="gray.200"
       >
-        <Heading fontSize="md">
+        <Heading fontSize="lg">
           <FormattedMessage
             id="petition-access.header"
             defaultMessage="Petition access control"
@@ -77,7 +79,6 @@ export function PetitionAccessesTable({
         </Heading>
         <Spacer />
         <ButtonDropdown
-          size="sm"
           rightIcon="chevron-down"
           isDisabled={selection.length === 0}
           dropdown={
@@ -117,7 +118,6 @@ export function PetitionAccessesTable({
           ></FormattedMessage>
         </ButtonDropdown>
         <Button
-          size="sm"
           variantColor="purple"
           leftIcon={"user-plus" as any}
           onClick={onAddPetitionAccess}
@@ -140,9 +140,13 @@ export function PetitionAccessesTable({
 function usePetitionAccessesColumns({
   onReactivateAccess,
   onDeactivateAccess,
+  onSendMessage,
+  onSendReminders,
 }: {
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
+  onSendMessage: (accessIds: string[]) => void;
+  onSendReminders: (accessIds: string[]) => void;
 }): TableColumn<PetitionAccessSelection>[] {
   const intl = useIntl();
   return useMemo(
@@ -180,24 +184,31 @@ function usePetitionAccessesColumns({
           ) : null;
         },
       },
-
       {
         key: "next-reminder",
         header: intl.formatMessage({
           id: "petition-accesses.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
-        CellContent: ({ row: { nextReminderAt } }) =>
-          nextReminderAt ? (
+        CellContent: ({ row: { nextReminderAt, remindersLeft } }) => {
+          return nextReminderAt ? (
             <DateTime value={nextReminderAt} format={FORMATS.LLL} />
-          ) : (
+          ) : remindersLeft ? (
             <Text color="gray.400" fontStyle="italic">
               <FormattedMessage
                 id="petitions.reminders-not-set"
                 defaultMessage="Not set"
               />
             </Text>
-          ),
+          ) : (
+            <Text color="gray.400" fontStyle="italic">
+              <FormattedMessage
+                id="petitions.no-reminders-left"
+                defaultMessage="No reminders left"
+              />
+            </Text>
+          );
+        },
       },
       {
         key: "reminders-sent",
@@ -235,36 +246,63 @@ function usePetitionAccessesColumns({
           paddingY: 1,
           width: "1px",
         },
-        CellContent: ({ row: { id, status }, onAction }) => {
+        CellContent: ({ row: { id, status } }) => {
           const intl = useIntl();
           return (
-            <IconButtonWithTooltip
-              label={
-                status === "ACTIVE"
-                  ? intl.formatMessage({
-                      id: "petition-accesses.deactivate-access",
-                      defaultMessage: "Remove access",
-                    })
-                  : intl.formatMessage({
-                      id: "petition-accesses.activate-access",
-                      defaultMessage: "Reactivate access",
-                    })
-              }
-              onClick={() =>
-                status === "ACTIVE"
-                  ? onDeactivateAccess(id)
-                  : onReactivateAccess(id)
-              }
-              placement="left"
-              icon={(status === "ACTIVE" ? "user-x" : "user-check") as any}
-              size="sm"
-              showDelay={300}
-            />
+            <Stack direction="row" spacing={2}>
+              <IconButtonWithTooltip
+                label={intl.formatMessage({
+                  id: "petition-accesses.send-message",
+                  defaultMessage: "Send message",
+                })}
+                onClick={() => onSendMessage([id])}
+                placement="bottom"
+                icon="email"
+                size="sm"
+                showDelay={300}
+              />
+              <IconButtonWithTooltip
+                label={intl.formatMessage({
+                  id: "petition-accesses.send-reminder",
+                  defaultMessage: "Send reminder",
+                })}
+                onClick={() => onSendReminders([id])}
+                placement="bottom"
+                icon="bell"
+                size="sm"
+                showDelay={300}
+              />
+              {status === "ACTIVE" ? (
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "petition-accesses.deactivate-access",
+                    defaultMessage: "Remove access",
+                  })}
+                  onClick={() => onDeactivateAccess(id)}
+                  placement="bottom"
+                  icon={"user-x" as any}
+                  size="sm"
+                  showDelay={300}
+                />
+              ) : (
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "petition-accesses.activate-access",
+                    defaultMessage: "Reactivate access",
+                  })}
+                  onClick={() => onReactivateAccess(id)}
+                  placement="left"
+                  icon={"user-check" as any}
+                  size="sm"
+                  showDelay={300}
+                />
+              )}
+            </Stack>
           );
         },
       },
     ],
-    [onReactivateAccess, onDeactivateAccess]
+    [onReactivateAccess, onDeactivateAccess, onSendMessage, onSendReminders]
   );
 }
 
@@ -283,6 +321,7 @@ PetitionAccessesTable.fragments = {
       }
       status
       nextReminderAt
+      remindersLeft
       reminderCount
       createdAt
     }

@@ -924,9 +924,15 @@ export class PetitionRepository extends BaseRepository {
   );
 
   async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
-    const reminders = await this.insert("petition_reminder", data).returning(
-      "*"
-    );
+    const reminders = await this.knex.transaction(async (t) => {
+      await this.from("petition_access", t)
+        .whereIn(
+          "id",
+          data.map((r) => r.petition_access_id)
+        )
+        .update({ reminders_left: this.knex.raw("reminders_left - 1") });
+      return await this.insert("petition_reminder", data, t).returning("*");
+    });
     await this.createEvent(
       petitionId,
       "REMINDER_SENT",

@@ -16,8 +16,9 @@ import {
   subMonths,
   isWeekend,
   subDays,
+  isPast,
 } from "date-fns";
-import { memo, useState } from "react";
+import { memo, useState, useCallback } from "react";
 import { FormattedDate, useIntl } from "react-intl";
 import { chunk } from "remeda";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
@@ -25,11 +26,13 @@ import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 export function DatePicker({
   value,
   onChange,
-  isDateDisabled,
+  isDisabledDate,
+  isPastAllowed,
 }: {
   value?: Date | null;
   onChange?: (value: Date) => void;
-  isDateDisabled?: (value: Date) => boolean;
+  isPastAllowed?: boolean;
+  isDisabledDate?: (date: Date) => boolean;
 }) {
   const intl = useIntl();
   const [currentMonth, setCurrentMonth] = useState(
@@ -40,10 +43,26 @@ export function DatePicker({
   const year = getYear(currentMonth);
   const firstDayOfWeek = 1;
 
-  function handleDateSelected(date: Date) {
-    setCurrentMonth(startOfMonth(date));
-    onChange?.(date);
-  }
+  const handleDateSelected = useCallback(
+    function (date: Date) {
+      setCurrentMonth(startOfMonth(date));
+      onChange?.(date);
+    },
+    [onChange]
+  );
+
+  const _isDisabledDate = useCallback(
+    function (date: Date) {
+      if (!isPastAllowed && isPast(date) && !isToday(date)) {
+        return true;
+      }
+      if (isDisabledDate) {
+        return isDisabledDate(date);
+      }
+      return false;
+    },
+    [isPastAllowed, isDisabledDate]
+  );
 
   return (
     <Flex direction="column">
@@ -86,7 +105,7 @@ export function DatePicker({
         firstDayOfWeek={firstDayOfWeek}
         selectedDate={selectedDate}
         onDateSelected={handleDateSelected}
-        isDateDisabled={isDateDisabled}
+        isDateDisabled={_isDisabledDate}
       />
     </Flex>
   );

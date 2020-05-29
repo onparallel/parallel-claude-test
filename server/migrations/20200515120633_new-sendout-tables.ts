@@ -35,6 +35,13 @@ export async function up(knex: Knex): Promise<any> {
       )
       `
     )
+    .raw(
+      /* sql */ `
+      alter table petition_access add constraint petition_access__reminders_left_check check (
+        reminders_left >= 0
+      )
+      `
+    )
     .createTable("petition_message", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable().references("petition.id");

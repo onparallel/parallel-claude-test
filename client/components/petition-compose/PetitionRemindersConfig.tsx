@@ -60,25 +60,23 @@ export function PetitionRemindersConfig({
         : null
     );
   }
-  const checkboxId = `enable-reminders-${useId()}`;
-
   return (
     <Box {...props}>
       <Flex alignItems="center">
         <Checkbox
-          id={checkboxId}
           variantColor="purple"
           size="lg"
           marginRight={2}
           isChecked={value !== null}
           onChange={handleEnableRemindersChange}
-        />
-        <Text as="label" {...{ htmlFor: checkboxId }}>
-          <FormattedMessage
-            id="petition.reminders-label"
-            defaultMessage="Enable automatic reminders"
-          />
-        </Text>
+        >
+          <Text fontSize="md" as="span">
+            <FormattedMessage
+              id="petition.reminders-label"
+              defaultMessage="Enable automatic reminders"
+            />
+          </Text>
+        </Checkbox>
       </Flex>
       {value ? (
         <Box

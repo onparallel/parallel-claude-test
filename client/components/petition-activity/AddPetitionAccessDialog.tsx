@@ -35,7 +35,8 @@ export function AddPetitionAccessDialog({
   recipientIds: string[];
   subject: string;
   body: RichTextEditorContent;
-  scheduledAt: Date | null;
+  remindersConfig: Maybe<RemindersConfig>;
+  scheduledAt: Maybe<Date>;
 }>) {
   const [showErrors, setShowErrors] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
@@ -61,6 +62,7 @@ export function AddPetitionAccessDialog({
         recipientIds: recipients.map((r) => r.id),
         subject,
         body,
+        remindersConfig,
         scheduledAt,
       });
     } catch {}

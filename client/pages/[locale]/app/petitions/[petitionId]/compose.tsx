@@ -51,7 +51,7 @@ import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { pick, omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
 
@@ -232,11 +232,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       }
       if (
+        !petition ||
         contactIds.length === 0 ||
-        !petition!.emailSubject ||
-        petition!.emailBody === null ||
+        !petition.emailSubject ||
+        petition.emailBody === null ||
         isEmptyContent(petition!.emailBody)
       ) {
+        alert(1);
         setShowErrors(true);
         return;
       }
@@ -252,6 +254,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: {
           petitionId: petition!.id,
           contactIds,
+          subject: petition.emailSubject,
+          body: petition.emailBody,
+          remindersConfig: petition.remindersConfig
+            ? omit(petition.remindersConfig, ["__typename"])
+            : null,
           scheduledAt: scheduledAt?.toISOString() ?? null,
         },
         update(client) {
@@ -489,11 +496,17 @@ PetitionCompose.mutations = [
     mutation PetitionCompose_sendPetition(
       $petitionId: ID!
       $contactIds: [ID!]!
+      $subject: String!
+      $body: JSON!
+      $remindersConfig: RemindersConfigInput
       $scheduledAt: DateTime
     ) {
       sendPetition(
         petitionId: $petitionId
         contactIds: $contactIds
+        subject: $subject
+        body: $body
+        remindersConfig: $remindersConfig
         scheduledAt: $scheduledAt
       ) {
         result

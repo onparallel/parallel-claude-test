@@ -431,6 +431,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     reminderCount: number; // Int!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
+    remindersLeft: number; // Int!
     status: NexusGenEnums["PetitionAccessStatus"]; // PetitionAccessStatus!
     updatedAt: Date; // DateTime!
   };
@@ -670,6 +671,8 @@ export interface NexusGenArgTypes {
     };
     clonePetition: {
       // args
+      deadline?: Date | null; // DateTime
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name?: string | null; // String
       petitionId: string; // ID!
     };
@@ -679,6 +682,7 @@ export interface NexusGenArgTypes {
     };
     createPetition: {
       // args
+      deadline?: Date | null; // DateTime
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name: string; // String!
     };
@@ -751,9 +755,12 @@ export interface NexusGenArgTypes {
     };
     sendPetition: {
       // args
+      body: any; // JSON!
       contactIds: string[]; // [ID!]!
       petitionId: string; // ID!
+      remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: Date | null; // DateTime
+      subject: string; // String!
     };
     sendReminders: {
       // args

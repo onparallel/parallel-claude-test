@@ -205,6 +205,7 @@ export type MutationchangePasswordArgs = {
 };
 
 export type MutationclonePetitionArgs = {
+  locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
   petitionId: Scalars["ID"];
 };
@@ -286,9 +287,12 @@ export type MutationsendMessagesArgs = {
 };
 
 export type MutationsendPetitionArgs = {
+  body: Scalars["JSON"];
   contactIds: Array<Scalars["ID"]>;
   petitionId: Scalars["ID"];
+  remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
+  subject: Scalars["String"];
 };
 
 export type MutationsendRemindersArgs = {
@@ -444,6 +448,8 @@ export type PetitionAccess = Timestamps & {
   reminderCount: Scalars["Int"];
   /** The reminder settings of the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
+  /** Number of reminders left. */
+  remindersLeft: Scalars["Int"];
   /** The status of the petition access */
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */
@@ -998,7 +1004,12 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
 } & Pick<
   PetitionAccess,
-  "id" | "status" | "nextReminderAt" | "reminderCount" | "createdAt"
+  | "id"
+  | "status"
+  | "nextReminderAt"
+  | "remindersLeft"
+  | "reminderCount"
+  | "createdAt"
 > & {
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
@@ -1522,6 +1533,9 @@ export type PetitionActivity_cancelScheduledMessageMutation = {
 export type PetitionsActivity_sendPetitionMutationVariables = {
   petitionId: Scalars["ID"];
   contactIds: Array<Scalars["ID"]>;
+  subject: Scalars["String"];
+  body: Scalars["JSON"];
+  remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -1531,11 +1545,7 @@ export type PetitionsActivity_sendPetitionMutation = {
   sendPetition: { __typename?: "SendPetitionResult" } & Pick<
     SendPetitionResult,
     "result"
-  > & {
-      petition?: Maybe<
-        { __typename?: "Petition" } & Pick<Petition, "id" | "status">
-      >;
-    };
+  >;
 };
 
 export type PetitionActivityQueryVariables = {
@@ -1646,6 +1656,9 @@ export type PetitionCompose_updatePetitionFieldMutation = {
 export type PetitionCompose_sendPetitionMutationVariables = {
   petitionId: Scalars["ID"];
   contactIds: Array<Scalars["ID"]>;
+  subject: Scalars["String"];
+  body: Scalars["JSON"];
+  remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -1803,6 +1816,7 @@ export type Petitions_deletePetitionsMutation = {
 export type Petitions_clonePetitionMutationVariables = {
   petitionId: Scalars["ID"];
   name?: Maybe<Scalars["String"]>;
+  locale: PetitionLocale;
 };
 
 export type Petitions_clonePetitionMutation = { __typename?: "Mutation" } & {
@@ -2209,6 +2223,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     }
     status
     nextReminderAt
+    remindersLeft
     reminderCount
     createdAt
   }
@@ -3432,18 +3447,20 @@ export const PetitionsActivity_sendPetitionDocument = gql`
   mutation PetitionsActivity_sendPetition(
     $petitionId: ID!
     $contactIds: [ID!]!
+    $subject: String!
+    $body: JSON!
+    $remindersConfig: RemindersConfigInput
     $scheduledAt: DateTime
   ) {
     sendPetition(
       petitionId: $petitionId
       contactIds: $contactIds
+      subject: $subject
+      body: $body
+      remindersConfig: $remindersConfig
       scheduledAt: $scheduledAt
     ) {
       result
-      petition {
-        id
-        status
-      }
     }
   }
 `;
@@ -3467,6 +3484,9 @@ export type PetitionsActivity_sendPetitionMutationFn = ApolloReactCommon.Mutatio
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      contactIds: // value for 'contactIds'
+ *      subject: // value for 'subject'
+ *      body: // value for 'body'
+ *      remindersConfig: // value for 'remindersConfig'
  *      scheduledAt: // value for 'scheduledAt'
  *   },
  * });
@@ -3912,11 +3932,17 @@ export const PetitionCompose_sendPetitionDocument = gql`
   mutation PetitionCompose_sendPetition(
     $petitionId: ID!
     $contactIds: [ID!]!
+    $subject: String!
+    $body: JSON!
+    $remindersConfig: RemindersConfigInput
     $scheduledAt: DateTime
   ) {
     sendPetition(
       petitionId: $petitionId
       contactIds: $contactIds
+      subject: $subject
+      body: $body
+      remindersConfig: $remindersConfig
       scheduledAt: $scheduledAt
     ) {
       result
@@ -3947,6 +3973,9 @@ export type PetitionCompose_sendPetitionMutationFn = ApolloReactCommon.MutationF
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      contactIds: // value for 'contactIds'
+ *      subject: // value for 'subject'
+ *      body: // value for 'body'
+ *      remindersConfig: // value for 'remindersConfig'
  *      scheduledAt: // value for 'scheduledAt'
  *   },
  * });
@@ -4424,8 +4453,12 @@ export type Petitions_deletePetitionsMutationOptions = ApolloReactCommon.BaseMut
   Petitions_deletePetitionsMutationVariables
 >;
 export const Petitions_clonePetitionDocument = gql`
-  mutation Petitions_clonePetition($petitionId: ID!, $name: String) {
-    clonePetition(petitionId: $petitionId, name: $name) {
+  mutation Petitions_clonePetition(
+    $petitionId: ID!
+    $name: String
+    $locale: PetitionLocale!
+  ) {
+    clonePetition(petitionId: $petitionId, name: $name, locale: $locale) {
       id
     }
   }
@@ -4450,6 +4483,7 @@ export type Petitions_clonePetitionMutationFn = ApolloReactCommon.MutationFuncti
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      name: // value for 'name'
+ *      locale: // value for 'locale'
  *   },
  * });
  */

@@ -19,7 +19,7 @@ import {
   WithDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { useAskPetitionNameDialog } from "@parallel/components/petition-list/AskPetitionNameDialog";
+import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionsQuery,
@@ -99,7 +99,7 @@ function Petitions() {
     },
   });
 
-  const askPetitionName = useAskPetitionNameDialog();
+  const createPetitionDialog = useCreatePetitionDialog();
   const [clonePetition] = usePetitions_clonePetitionMutation({
     update(cache) {
       // clear caches where new item would appear
@@ -148,7 +148,7 @@ function Petitions() {
     async function () {
       try {
         const petition = petitions.items.find((p) => selected[0] === p.id);
-        const name = await askPetitionName({
+        const { name } = await createPetitionDialog({
           defaultName: petition?.name ?? undefined,
         });
         const { data } = await clonePetition({
@@ -467,8 +467,12 @@ Petitions.mutations = [
     }
   `,
   gql`
-    mutation Petitions_clonePetition($petitionId: ID!, $name: String) {
-      clonePetition(petitionId: $petitionId, name: $name) {
+    mutation Petitions_clonePetition(
+      $petitionId: ID!
+      $name: String
+      $locale: PetitionLocale!
+    ) {
+      clonePetition(petitionId: $petitionId, name: $name, locale: $locale) {
         id
       }
     }

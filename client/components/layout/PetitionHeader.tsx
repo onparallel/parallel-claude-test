@@ -136,21 +136,16 @@ export function PetitionHeader({
                     fontSize="sm"
                     marginLeft={4}
                     display={{ base: "none", sm: "flex" }}
+                    position="relative"
+                    top="2px"
                   >
                     {state === "SAVING" ? (
-                      <Flex color="gray.500" alignItems="center">
-                        <Spinner
-                          size="sm"
-                          marginRight={2}
-                          position="relative"
-                          speed="0.8s"
-                          bottom="-1px"
-                        />
+                      <Text color="gray.500" fontSize="xs" fontStyle="italic">
                         <FormattedMessage
                           id="generic.saving-changes"
                           defaultMessage="Saving..."
                         />
-                      </Flex>
+                      </Text>
                     ) : state === "SAVED" ? (
                       <Tooltip
                         zIndex={1000}
@@ -158,34 +153,20 @@ export function PetitionHeader({
                         aria-label={lastSavedTooltip}
                         label={lastSavedTooltip}
                       >
-                        <Flex color="green.500" alignItems="center">
-                          <Icon
-                            name="check"
-                            size="16px"
-                            role="presentation"
-                            focusable={false}
-                            marginRight={2}
-                          />
+                        <Text color="gray.500" fontSize="xs" fontStyle="italic">
                           <FormattedMessage
                             id="generic.changes-saved"
                             defaultMessage="Saved"
                           />
-                        </Flex>
+                        </Text>
                       </Tooltip>
                     ) : state === "ERROR" ? (
-                      <Flex color="red.500" alignItems="center">
-                        <Icon
-                          name="warning"
-                          size="16px"
-                          role="presentation"
-                          focusable={false}
-                          marginRight={2}
-                        />
+                      <Text color="red.500" fontSize="xs" fontStyle="italic">
                         <FormattedMessage
                           id="petition.status.error"
                           defaultMessage="Error"
                         />
-                      </Flex>
+                      </Text>
                     ) : null}
                   </Flex>
                 </Flex>

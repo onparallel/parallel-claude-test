@@ -178,7 +178,12 @@ type Mutation {
   """
   Clone petition.
   """
-  clonePetition(name: String, petitionId: ID!): Petition!
+  clonePetition(
+    deadline: DateTime
+    locale: PetitionLocale!
+    name: String
+    petitionId: ID!
+  ): Petition!
 
   """
   Create a contact.
@@ -188,7 +193,11 @@ type Mutation {
   """
   Create petition.
   """
-  createPetition(locale: PetitionLocale!, name: String!): Petition!
+  createPetition(
+    deadline: DateTime
+    locale: PetitionLocale!
+    name: String!
+  ): Petition!
 
   """
   Creates a petition field
@@ -282,9 +291,12 @@ type Mutation {
   Sends the petition and creates the corresponding accesses and messages.
   """
   sendPetition(
+    body: JSON!
     contactIds: [ID!]!
     petitionId: ID!
+    remindersConfig: RemindersConfigInput
     scheduledAt: DateTime
+    subject: String!
   ): SendPetitionResult!
 
   """
@@ -574,6 +586,11 @@ type PetitionAccess implements Timestamps {
   The reminder settings of the petition.
   """
   remindersConfig: RemindersConfig
+
+  """
+  Number of reminders left.
+  """
+  remindersLeft: Int!
 
   """
   The status of the petition access

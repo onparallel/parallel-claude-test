@@ -38,7 +38,7 @@ export function ContactListHeader({
     [debouncedOnSearchChange]
   );
   return (
-    <Stack direction="row" padding={4}>
+    <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
         <SearchInput value={search ?? ""} onChange={handleSearchChange} />
       </Box>

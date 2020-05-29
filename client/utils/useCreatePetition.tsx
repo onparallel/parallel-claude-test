@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/react-hooks";
-import { useAskPetitionNameDialog } from "@parallel/components/petition-list/AskPetitionNameDialog";
+import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import {
   PetitionLocale,
   useCreatePetition_createPetitionMutation,
@@ -38,16 +38,15 @@ export function useCreatePetition() {
     }
   );
 
-  const askPetitionName = useAskPetitionNameDialog();
+  const showCreatePetitionDialog = useCreatePetitionDialog();
 
   return useCallback(
     async function () {
-      const name = await askPetitionName({});
+      const { name, locale, deadline } = await showCreatePetitionDialog({
+        defaultLocale: query.locale as PetitionLocale,
+      });
       const { data, errors } = await createPetition({
-        variables: {
-          name,
-          locale: query.locale as PetitionLocale,
-        },
+        variables: { name, locale, deadline },
       });
       if (errors) {
         throw errors;

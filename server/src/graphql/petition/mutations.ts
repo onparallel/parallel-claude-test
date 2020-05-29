@@ -7,10 +7,9 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { findTimeZone } from "timezone-support";
 import { CreatePetition, CreatePetitionField } from "../../db/__types";
 import { calculateNextReminder } from "../../util/calculateNextReminder";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
 import {
   authenticate,
   authorizeAnd,
@@ -18,23 +17,23 @@ import {
 } from "../helpers/authorize";
 import { dateTimeArg } from "../helpers/date";
 import { ArgValidationError } from "../helpers/errors";
+import { jsonArg } from "../helpers/json";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
-import { notEmpty } from "../helpers/validators/notEmpty";
+import { notEmptyString } from "../helpers/validators/notEmptyString";
+import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
+import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 import {
   accessesBelongToPetition,
   fieldBelongsToPetition,
   fieldsBelongsToPetition,
+  messageBelongToPetition,
   replyBelongsToPetition,
   userHasAccessToPetition,
   userHasAccessToPetitions,
-  messageBelongToPetition,
 } from "./authorizers";
-import { jsonArg } from "../helpers/json";
-import { validRichTextContent } from "../helpers/validators/validRichTextContent";
-import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
-import { database } from "faker";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -43,10 +42,11 @@ export const createPetition = mutationField("createPetition", {
   args: {
     name: stringArg({ required: true }),
     locale: arg({ type: "PetitionLocale", required: true }),
+    deadline: dateTimeArg({}),
   },
-  resolve: async (_, { name, locale }, ctx) => {
+  resolve: async (_, { name, locale, deadline }, ctx) => {
     const petition = await ctx.petitions.createPetition(
-      { name, locale, email_subject: name },
+      { name, locale, deadline: deadline ?? null, email_subject: name },
       ctx.user!
     );
     return petition;
@@ -62,26 +62,26 @@ export const clonePetition = mutationField("clonePetition", {
   ),
   args: {
     petitionId: idArg({ required: true }),
-    name: stringArg({ required: false }),
+    name: stringArg({}),
+    locale: arg({ type: "PetitionLocale", required: true }),
+    deadline: dateTimeArg({}),
   },
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     const petition = await ctx.petitions.clonePetition(petitionId, ctx.user!);
-    if (args.name !== undefined && args.name !== petition.name) {
-      return await ctx.petitions.updatePetition(
-        petition.id,
-        {
-          name: args.name ?? null,
-          email_subject:
-            petition.name === petition.email_subject
-              ? args.name
-              : petition.email_subject,
-        },
-        ctx.user!
-      );
-    } else {
-      return petition;
-    }
+    return await ctx.petitions.updatePetition(
+      petition.id,
+      {
+        name: args.name ?? null,
+        locale: args.locale,
+        email_subject:
+          petition.name === petition.email_subject
+            ? args.name
+            : petition.email_subject,
+        deadline: args.deadline ?? null,
+      },
+      ctx.user!
+    );
   },
 });
 
@@ -436,21 +436,19 @@ export const sendPetition = mutationField("sendPetition", {
   ),
   args: {
     petitionId: idArg({ required: true }),
-    contactIds: idArg({
-      list: [true],
-      required: true,
-    }),
+    contactIds: idArg({ list: [true], required: true }),
+    subject: stringArg({ required: true }),
+    body: jsonArg({ required: true }),
     scheduledAt: dateTimeArg({}),
+    remindersConfig: arg({ type: "RemindersConfigInput" }),
   },
-  validateArgs: (_, args, ctx, info) => {
-    if (args.contactIds.length === 0) {
-      throw new ArgValidationError(
-        info,
-        "contactIds",
-        `Must contain at least one recipient.`
-      );
-    }
-  },
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.contactIds, "contactIds"),
+    maxLength((args) => args.subject, "subject", 255),
+    notEmptyString((args) => args.subject, "subject"),
+    validRichTextContent((args) => args.body, "body"),
+    validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
+  ),
   resolve: async (_, args, ctx) => {
     try {
       // Create necessary contacts
@@ -472,12 +470,12 @@ export const sendPetition = mutationField("sendPetition", {
           petition_id: petitionId,
           contact_id: id,
           reminders_left: 10,
-          reminders_active: petition.reminders_active,
-          reminders_config: petition.reminders_config,
-          next_reminder_at: petition.reminders_active
+          reminders_active: Boolean(args.remindersConfig),
+          reminders_config: args.remindersConfig,
+          next_reminder_at: args.remindersConfig
             ? calculateNextReminder(
                 args.scheduledAt ?? new Date(),
-                petition.reminders_config!
+                args.remindersConfig
               )
             : null,
         })),
@@ -489,8 +487,8 @@ export const sendPetition = mutationField("sendPetition", {
         accesses.map((access) => ({
           petition_access_id: access.id,
           status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
-          email_subject: petition.email_subject,
-          email_body: petition.email_body,
+          email_subject: args.subject,
+          email_body: JSON.stringify(args.body),
         })),
         ctx.user!
       );
@@ -540,17 +538,9 @@ export const sendMessages = mutationField("sendMessages", {
     scheduledAt: dateTimeArg({}),
   },
   validateArgs: validateAnd(
-    (_, args, ctx, info) => {
-      if (args.accessIds.length === 0) {
-        throw new ArgValidationError(
-          info,
-          "accessIds",
-          `Must contain at least one access.`
-        );
-      }
-    },
+    notEmptyArray((args) => args.accessIds, "accessIds"),
     maxLength((args) => args.subject, "subject", 255),
-    notEmpty((args) => args.subject, "subject"),
+    notEmptyString((args) => args.subject, "subject"),
     validRichTextContent((args) => args.body, "body")
   ),
   resolve: async (_, args, ctx) => {
@@ -621,11 +611,15 @@ export const sendReminders = mutationField("sendReminders", {
           `Petition accesses must have status "ACTIVE".`
         );
       }
-      if (access.reminders_left <= 0) {
+      if (access.reminders_left === 0) {
         throw new ArgValidationError(
           info,
           `accessIds[${accesses.indexOf(access)}]`,
-          `Maximum number of allowed reminders reached.`
+          `No reminders left.`,
+          {
+            errorCode: "NO_REMINDERS_LEFT",
+            petitionAccessId: toGlobalId("PetitionAccess", access.id),
+          }
         );
       }
     }
