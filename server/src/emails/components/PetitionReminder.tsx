@@ -177,6 +177,6 @@ export const props: PetitionReminderProps = {
     { id: 5, title: null },
   ],
   keycode: "asdfghjkl",
-  assetsUrl: "http://localhost",
   parallelUrl: "http://localhost",
+  assetsUrl: "https://static-staging.parallel.so",
 };

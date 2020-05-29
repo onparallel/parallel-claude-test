@@ -51,31 +51,31 @@
     "term": "from.via-parallel",
     "definition": "{senderName} (via Parallel)",
     "context": "{senderName} (via Parallel)",
-    "reference": "src/emails/components/PetitionReminder.tsx#L35-L38"
+    "reference": "src/emails/components/PetitionReminder.tsx#L29-L32"
   },
   {
     "term": "generic.complete-information-button",
     "definition": "Complete the information here",
     "context": "Complete the information here",
-    "reference": "src/emails/components/PetitionReminder.tsx#L167-L170"
+    "reference": "src/emails/components/PetitionReminder.tsx#L151-L154"
   },
   {
     "term": "generic.complete-information-click-link",
     "definition": "Please click the link below to complete the information.",
     "context": "Please click the link below to complete the information.",
-    "reference": "src/emails/components/PetitionReminder.tsx#L91-L95"
+    "reference": "src/emails/components/PetitionReminder.tsx#L85-L89"
   },
   {
     "term": "generic.submit-text.with-deadline",
     "definition": "Please submit the following information before {deadline}:",
     "context": "Please submit the following information before {deadline}:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L143-L156"
+    "reference": "src/emails/components/PetitionReminder.tsx#L127-L140"
   },
   {
     "term": "generic.submit-text.without-deadline",
     "definition": "Please submit the following information:",
     "context": "Please submit the following information:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L158-L161"
+    "reference": "src/emails/components/PetitionReminder.tsx#L142-L145"
   },
   {
     "term": "generic.untitled-field",
@@ -159,13 +159,13 @@
     "term": "petition-reminder.subject",
     "definition": "Remember that {senderName} sent you a petition",
     "context": "Remember that {senderName} sent you a petition",
-    "reference": "src/emails/components/PetitionReminder.tsx#L44-L47"
+    "reference": "src/emails/components/PetitionReminder.tsx#L38-L41"
   },
   {
     "term": "reminder.text",
     "definition": "Remember that {senderName} ({senderEmail}) sent you a petition.",
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition.",
-    "reference": "src/emails/components/PetitionReminder.tsx#L119-L126"
+    "reference": "src/emails/components/PetitionReminder.tsx#L112-L119"
   },
   {
     "term": "welcome.click-to-verify",

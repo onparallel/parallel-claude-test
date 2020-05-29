@@ -145,6 +145,6 @@ export const props: PetitionCompletedProps = {
     { id: 4, title: "Prueba" },
     { id: 5, title: null },
   ],
-  assetsUrl: "http://localhost",
   parallelUrl: "http://localhost",
+  assetsUrl: "https://static-staging.parallel.so",
 };
