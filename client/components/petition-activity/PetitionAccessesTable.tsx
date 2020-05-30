@@ -61,6 +61,12 @@ export function PetitionAccessesTable({
     onReactivateAccess,
     onDeactivateAccess,
   });
+
+  const showActions =
+    selection.length > 0 &&
+    petition.status === "PENDING" &&
+    selected.every((a) => a.status === "ACTIVE");
+
   return (
     <Card {...props}>
       <Stack
@@ -78,45 +84,46 @@ export function PetitionAccessesTable({
           />
         </Heading>
         <Spacer />
-        <ButtonDropdown
-          rightIcon="chevron-down"
-          isDisabled={selection.length === 0}
-          dropdown={
-            <MenuList minWidth="160px">
-              <MenuItem
-                isDisabled={
-                  petition.status !== "PENDING" ||
-                  selected.some((a) => a.status === "INACTIVE")
-                }
-                onClick={handleSendMessage}
-              >
-                <Icon name="email" marginRight={2} />
-                <FormattedMessage
-                  id="petition-accesses.send-message"
-                  defaultMessage="Send message"
-                />
-              </MenuItem>
-              <MenuItem
-                isDisabled={
-                  petition.status !== "PENDING" ||
-                  selected.some((a) => a.status === "INACTIVE")
-                }
-                onClick={handleSendReminders}
-              >
-                <Icon name="bell" marginRight={2} />
-                <FormattedMessage
-                  id="petition-accesses.send-reminder"
-                  defaultMessage="Send reminder"
-                />
-              </MenuItem>
-            </MenuList>
-          }
-        >
-          <FormattedMessage
-            id="generic.actions-button"
-            defaultMessage="Actions"
-          ></FormattedMessage>
-        </ButtonDropdown>
+        {showActions ? (
+          <ButtonDropdown
+            rightIcon="chevron-down"
+            dropdown={
+              <MenuList minWidth="160px">
+                <MenuItem
+                  isDisabled={
+                    petition.status !== "PENDING" ||
+                    selected.some((a) => a.status === "INACTIVE")
+                  }
+                  onClick={handleSendMessage}
+                >
+                  <Icon name="email" marginRight={2} />
+                  <FormattedMessage
+                    id="petition-accesses.send-message"
+                    defaultMessage="Send message"
+                  />
+                </MenuItem>
+                <MenuItem
+                  isDisabled={
+                    petition.status !== "PENDING" ||
+                    selected.some((a) => a.status === "INACTIVE")
+                  }
+                  onClick={handleSendReminders}
+                >
+                  <Icon name="bell" marginRight={2} />
+                  <FormattedMessage
+                    id="petition-accesses.send-reminder"
+                    defaultMessage="Send reminder"
+                  />
+                </MenuItem>
+              </MenuList>
+            }
+          >
+            <FormattedMessage
+              id="generic.actions-button"
+              defaultMessage="Actions"
+            ></FormattedMessage>
+          </ButtonDropdown>
+        ) : null}
         <Button
           variantColor="purple"
           leftIcon={"user-plus" as any}
