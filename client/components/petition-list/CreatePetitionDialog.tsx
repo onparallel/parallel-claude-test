@@ -135,11 +135,7 @@ export function CreatePetitionDialog({
                 defaultMessage="Language of the petition"
               />
             </FormLabel>
-            <Select
-              id="petition-locale"
-              name="petition-locale"
-              ref={register()}
-            >
+            <Select id="petition-locale" name="locale" ref={register()}>
               {locales.map((locale) => (
                 <option key={locale.key} value={locale.key}>
                   {locale.localizedLabel}
