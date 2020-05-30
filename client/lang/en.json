@@ -2616,6 +2616,18 @@
     "reference": "pages/[locale]/app/settings/security.tsx#L82-L85"
   },
   {
+    "term": "supported-locales.english",
+    "definition": "English",
+    "context": "English",
+    "reference": "utils/useSupportedLocales.ts#L11-L14"
+  },
+  {
+    "term": "supported-locales.spanish",
+    "definition": "Spanish",
+    "context": "Spanish",
+    "reference": "utils/useSupportedLocales.ts#L19-L22"
+  },
+  {
     "term": "timeline.access-activated-description",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}",

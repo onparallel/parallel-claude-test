@@ -17,7 +17,7 @@ export function useSupportedLocales() {
         key: "es",
         label: "Español",
         localizedLabel: intl.formatMessage({
-          id: "supported-locales.english",
+          id: "supported-locales.spanish",
           defaultMessage: "Spanish",
         }),
       },
