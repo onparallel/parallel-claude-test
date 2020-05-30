@@ -15,7 +15,7 @@ import { Hubspot } from "@parallel/components/scripts/Hubspot";
 import { theme } from "@parallel/utils/theme";
 import { AppProps } from "next/app";
 import { DndProvider } from "react-dnd";
-import Backend from "react-dnd-html5-backend";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 const resetConfig = (theme: ITheme) => ({
   light: {
@@ -50,7 +50,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
           <ColorModeProvider value="light">
             {/* Force light mode until a fix is found for the server vs client discrepancies */}
             <CSSReset config={resetConfig} />
-            <DndProvider backend={Backend}>
+            <DndProvider backend={HTML5Backend}>
               <DialogOpenerProvider>
                 <Component {...pageProps} />
               </DialogOpenerProvider>
