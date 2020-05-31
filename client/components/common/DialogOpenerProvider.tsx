@@ -7,6 +7,7 @@ import {
   useState,
   Fragment,
   cloneElement,
+  useMemo,
 } from "react";
 
 export type DialogProps<T> = {
@@ -41,27 +42,29 @@ export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
 
 export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   const [stack, setStack] = useState<ReactNode[]>([]);
-  const opener: DialogOpener = useCallback(
-    function (opener) {
-      return new Promise((resolve, reject) => {
-        const dialog = opener({
-          position: 0,
-          onResolve: (result) => {
-            setStack(stack.slice(0, -1));
-            resolve(result);
-          },
-          onReject: (reason?: any) => {
-            setStack(stack.slice(0, -1));
-            reject(reason);
-          },
+  const value = useMemo(
+    () => ({
+      opener: function (opener) {
+        return new Promise((resolve, reject) => {
+          const dialog = opener({
+            position: 0,
+            onResolve: (result) => {
+              setStack((stack) => stack.slice(0, -1));
+              resolve(result as any);
+            },
+            onReject: (reason?: any) => {
+              setStack((stack) => stack.slice(0, -1));
+              reject(reason);
+            },
+          });
+          setStack((stack) => [...stack, dialog]);
         });
-        setStack([...stack, dialog]);
-      });
-    },
-    [stack]
+      } as DialogOpener,
+    }),
+    []
   );
   return (
-    <DialogOpenerContext.Provider value={{ opener }}>
+    <DialogOpenerContext.Provider value={value}>
       {children}
       {stack.map((dialog, index) => (
         // as long as it's a stack, using index as key is ok
