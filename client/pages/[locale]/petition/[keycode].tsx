@@ -432,6 +432,7 @@ function useDeletePetitionReply() {
               id: petitionId,
               fragment: petitionFragment,
               data: {
+                ...cachedPetition,
                 status: "PENDING",
               },
             });
