@@ -11,6 +11,7 @@ import {
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,
+  PetitionStatus,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
@@ -56,6 +57,7 @@ export function PetitionAccessesTable({
     onSendReminders(selection);
   }, [selection]);
   const columns = usePetitionAccessesColumns({
+    petitionStatus: petition.status,
     onSendMessage,
     onSendReminders,
     onReactivateAccess,
@@ -63,9 +65,7 @@ export function PetitionAccessesTable({
   });
 
   const showActions =
-    selection.length > 0 &&
-    petition.status === "PENDING" &&
-    selected.every((a) => a.status === "ACTIVE");
+    selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
 
   return (
     <Card {...props}>
@@ -90,10 +90,7 @@ export function PetitionAccessesTable({
             dropdown={
               <MenuList minWidth="160px">
                 <MenuItem
-                  isDisabled={
-                    petition.status !== "PENDING" ||
-                    selected.some((a) => a.status === "INACTIVE")
-                  }
+                  isDisabled={selected.some((a) => a.status === "INACTIVE")}
                   onClick={handleSendMessage}
                 >
                   <Icon name="email" marginRight={2} />
@@ -145,11 +142,13 @@ export function PetitionAccessesTable({
 }
 
 function usePetitionAccessesColumns({
+  petitionStatus,
   onReactivateAccess,
   onDeactivateAccess,
   onSendMessage,
   onSendReminders,
 }: {
+  petitionStatus: PetitionStatus;
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
   onSendMessage: (accessIds: string[]) => void;
@@ -256,29 +255,34 @@ function usePetitionAccessesColumns({
         CellContent: ({ row: { id, status } }) => {
           const intl = useIntl();
           return (
-            <Stack direction="row" spacing={2}>
-              <IconButtonWithTooltip
-                label={intl.formatMessage({
-                  id: "petition-accesses.send-message",
-                  defaultMessage: "Send message",
-                })}
-                onClick={() => onSendMessage([id])}
-                placement="bottom"
-                icon="email"
-                size="sm"
-                showDelay={300}
-              />
-              <IconButtonWithTooltip
-                label={intl.formatMessage({
-                  id: "petition-accesses.send-reminder",
-                  defaultMessage: "Send reminder",
-                })}
-                onClick={() => onSendReminders([id])}
-                placement="bottom"
-                icon="bell"
-                size="sm"
-                showDelay={300}
-              />
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              {status === "ACTIVE" ? (
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "petition-accesses.send-message",
+                    defaultMessage: "Send message",
+                  })}
+                  onClick={() => onSendMessage([id])}
+                  placement="bottom"
+                  icon="email"
+                  size="sm"
+                  showDelay={300}
+                />
+              ) : null}
+              {status === "ACTIVE" ? (
+                <IconButtonWithTooltip
+                  isDisabled={petitionStatus !== "PENDING"}
+                  label={intl.formatMessage({
+                    id: "petition-accesses.send-reminder",
+                    defaultMessage: "Send reminder",
+                  })}
+                  onClick={() => onSendReminders([id])}
+                  placement="bottom"
+                  icon="bell"
+                  size="sm"
+                  showDelay={300}
+                />
+              ) : null}
               {status === "ACTIVE" ? (
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
@@ -309,7 +313,13 @@ function usePetitionAccessesColumns({
         },
       },
     ],
-    [onReactivateAccess, onDeactivateAccess, onSendMessage, onSendReminders]
+    [
+      petitionStatus,
+      onReactivateAccess,
+      onDeactivateAccess,
+      onSendMessage,
+      onSendReminders,
+    ]
   );
 }
 
