@@ -75,6 +75,7 @@ createQueueWorker(
       subject,
       text,
       html,
+      reply_to: granter.email,
       created_from: `PetitionReminder:${reminder.id}`,
     });
     await Promise.all([

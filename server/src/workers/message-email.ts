@@ -68,6 +68,7 @@ createQueueWorker<MessageEmailWorkerPayload>(
       subject,
       text,
       html,
+      reply_to: sender.email,
       track_opens: true,
       created_from: `PetitionMessage:${payload.petition_message_id}`,
     });

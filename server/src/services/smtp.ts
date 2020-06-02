@@ -5,7 +5,14 @@ import { createTransport } from "nodemailer";
 type Mail = ReturnType<typeof createTransport>;
 type MailOptions = Pick<
   Parameters<Mail["sendMail"]>[0],
-  "from" | "to" | "subject" | "html" | "text" | "headers" | "attachments"
+  | "from"
+  | "to"
+  | "subject"
+  | "html"
+  | "text"
+  | "headers"
+  | "attachments"
+  | "replyTo"
 >;
 
 @injectable()

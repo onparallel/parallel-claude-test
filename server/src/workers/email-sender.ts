@@ -13,6 +13,7 @@ createQueueWorker<EmailSenderWorkerPayload>(
         subject: email.subject,
         html: email.html,
         text: email.text,
+        replyTo: email.reply_to ?? undefined,
         headers: {
           "X-SES-CONFIGURATION-SET":
             context.config.ses.configurationSet[

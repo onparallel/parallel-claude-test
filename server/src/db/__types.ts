@@ -153,6 +153,7 @@ export interface EmailLog {
   sent_at: Maybe<Date>;
   response: Maybe<string>;
   external_id: Maybe<string>;
+  reply_to: Maybe<string>;
 }
 
 export interface CreateEmailLog {
@@ -167,6 +168,7 @@ export interface CreateEmailLog {
   sent_at?: Maybe<Date>;
   response?: Maybe<string>;
   external_id?: Maybe<string>;
+  reply_to?: Maybe<string>;
 }
 
 export interface FileUpload {
