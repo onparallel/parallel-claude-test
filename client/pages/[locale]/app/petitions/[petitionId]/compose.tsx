@@ -239,7 +239,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         petition.emailBody === null ||
         isEmptyContent(petition!.emailBody)
       ) {
-        alert(1);
         setShowErrors(true);
         return;
       }
