@@ -226,7 +226,7 @@ export const PetitionComposeFieldList = Object.assign(
             </Flex>
           </>
         ) : (
-          <Flex flexDirection="column" alignItems="center">
+          <Box textAlign="center" padding={4}>
             <Heading as="h2" size="md" marginTop={8} marginBottom={2}>
               <FormattedMessage
                 id="petition.empty-header"
@@ -251,7 +251,7 @@ export const PetitionComposeFieldList = Object.assign(
                 defaultMessage="Add field"
               />
             </AddFieldPopover>
-          </Flex>
+          </Box>
         )}
       </Card>
     );
