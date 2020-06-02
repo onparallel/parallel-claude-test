@@ -311,7 +311,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const pathname = "/[locale]/app/petitions";
       router.push(pathname, resolveUrl(pathname, router.query));
     },
-    [petition!.id, petition!.fields]
+    [petition]
   );
 
   return (
