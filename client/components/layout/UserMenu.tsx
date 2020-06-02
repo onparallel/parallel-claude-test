@@ -8,6 +8,8 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  MenuOptionGroup,
+  MenuItemOption,
 } from "@chakra-ui/core";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";
@@ -15,12 +17,15 @@ import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export interface UserMenuProps {
+  isMobile?: boolean;
   user: UserMenu_UserFragment;
+  onLocaleChange?: (locale: string) => void;
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
   const apollo = useApolloClient();
@@ -31,6 +36,7 @@ export function UserMenu({ user }: UserMenuProps) {
     await apollo.clearStore();
     router.push("/[locale]/login", `/${router.query.locale}/login`);
   }
+  const locales = useSupportedLocales();
 
   return (
     <Menu>
@@ -49,7 +55,7 @@ export function UserMenu({ user }: UserMenuProps) {
       >
         <Avatar name={user.fullName!} size="md"></Avatar>
       </MenuButton>
-      <MenuList placement="right-end">
+      <MenuList placement={isMobile ? "top-end" : "right-end"}>
         <NakedLink href="/app/settings/account">
           <MenuItem as="a">
             <Icon name="user" marginRight={2} />
@@ -59,6 +65,23 @@ export function UserMenu({ user }: UserMenuProps) {
             />
           </MenuItem>
         </NakedLink>
+        {isMobile ? (
+          <MenuOptionGroup
+            value={router.query.locale}
+            title={intl.formatMessage({
+              id: "component.user-menu.ui-language",
+              defaultMessage: "Language",
+            })}
+            onChange={onLocaleChange as any}
+            type="radio"
+          >
+            {locales.map(({ key, localizedLabel }) => (
+              <MenuItemOption key={key} value={key}>
+                {localizedLabel}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
+        ) : null}
         <MenuDivider />
         <MenuItem onClick={handleLogoutClick}>
           <Icon name="log-out" marginRight={2} />

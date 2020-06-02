@@ -303,7 +303,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         scrollBody
         state={state}
       >
-        <Box>
+        <Box minWidth="containers.lg">
           <PetitionAccessesTable
             id="petition-accesses"
             margin={4}

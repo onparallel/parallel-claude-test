@@ -1,4 +1,6 @@
+/** @jsx jsx */
 import { BoxProps, Flex } from "@chakra-ui/core";
+import { css, jsx } from "@emotion/core";
 import {
   AppLayout_UserFragment,
   OnboardingKey,
@@ -8,7 +10,7 @@ import {
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
-import { useContext, useCallback } from "react";
+import { useCallback, useContext } from "react";
 import {
   OnboardingTour,
   OnboardingTourContext,
@@ -53,26 +55,49 @@ export function AppLayout({ user, children, ...props }: AppLayoutProps) {
     },
     [isRunning, toggle]
   );
-
+  const breakpoint = "sm";
   return (
     <>
-      <Flex alignItems="stretch" height="100vh" overflow="hidden">
+      <Flex
+        alignItems="stretch"
+        overflow="hidden"
+        css={css`
+          height: 100vh;
+          height: -webkit-fill-available;
+        `}
+      >
         <AppLayoutNavbar
           user={user}
           zIndex={2}
           onCreate={handleOnCreate}
           onOnboardingClick={handleOnboardingClick}
+          display={{ base: "none", [breakpoint]: "flex" }}
         />
         <Flex
-          as="main"
           flex="1"
           flexDirection="column"
           maxHeight="100vh"
+          minWidth="0"
           backgroundColor="gray.50"
-          overflow="auto"
-          {...props}
         >
-          {children}
+          <Flex
+            flex="1"
+            as="main"
+            direction="column"
+            minHeight={0}
+            overflow="auto"
+            {...props}
+          >
+            {children}
+          </Flex>
+          <AppLayoutNavbar
+            isMobile
+            user={user}
+            zIndex={2}
+            onCreate={handleOnCreate}
+            display={{ base: "flex", [breakpoint]: "none" }}
+            onOnboardingClick={handleOnboardingClick}
+          />
         </Flex>
       </Flex>
       <OnboardingTour

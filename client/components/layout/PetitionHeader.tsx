@@ -130,8 +130,9 @@ export function PetitionHeader({
               onChange={setName}
               fontSize="xl"
               maxWidth={{
-                base: "calc(100vw - 92px - 100px)",
-                md: "calc((100vw - 480px)/2)",
+                base: `calc(100vw - ${16 + 18 + 16 + 40 + 16}px)`,
+                sm: `calc(100vw - ${96 + 16 + 18 + 16 + 40 + 16}px)`,
+                md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 18 + 16}px)`,
               }}
               onSubmit={() => onUpdatePetition({ name: name || null })}
               placeholder={

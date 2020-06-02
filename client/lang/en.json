@@ -441,25 +441,31 @@
     "term": "component.user-menu.log-out",
     "definition": "Log out",
     "context": "Log out",
-    "reference": "components/layout/UserMenu.tsx#L65-L68"
+    "reference": "components/layout/UserMenu.tsx#L88-L91"
   },
   {
     "term": "component.user-menu.my-account",
     "definition": "My Account",
     "context": "My Account",
-    "reference": "components/layout/UserMenu.tsx#L56-L59"
+    "reference": "components/layout/UserMenu.tsx#L62-L65"
+  },
+  {
+    "term": "component.user-menu.ui-language",
+    "definition": "Language",
+    "context": "Language",
+    "reference": "components/layout/UserMenu.tsx#L71-L74"
   },
   {
     "term": "components.table.change-sorting",
     "definition": "Change sorting for \"{column}\"",
     "context": "Change sorting for \"{column}\"",
-    "reference": "components/common/Table.tsx#L508-L511"
+    "reference": "components/common/Table.tsx#L509-L512"
   },
   {
     "term": "components.table.sort by",
     "definition": "Sort by \"{column}\"",
     "context": "Sort by \"{column}\"",
-    "reference": "components/common/Table.tsx#L515-L518"
+    "reference": "components/common/Table.tsx#L516-L519"
   },
   {
     "term": "contact.edit-details-button",
@@ -483,13 +489,13 @@
     "term": "contacts.confirm-delete.body",
     "definition": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L282-L290"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L286-L294"
   },
   {
     "term": "contacts.confirm-delete.header",
     "definition": "Delete contacts",
     "context": "Delete contacts",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L276-L279"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L280-L283"
   },
   {
     "term": "contacts.create-new-contact.continue-button",
@@ -507,37 +513,37 @@
     "term": "contacts.header.created-at",
     "definition": "Created at",
     "context": "Created at",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L252-L255"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L256-L259"
   },
   {
     "term": "contacts.header.email",
     "definition": "Email",
     "context": "Email",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L243-L246"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L247-L250"
   },
   {
     "term": "contacts.header.first-name",
     "definition": "First name",
     "context": "First name",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L203-L206"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L207-L210"
   },
   {
     "term": "contacts.header.last-name",
     "definition": "Last name",
     "context": "Last name",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L223-L226"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L227-L230"
   },
   {
     "term": "contacts.no-contacts",
     "definition": "You have no contacts yet. Start by creating one now!",
     "context": "You have no contacts yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L178-L181"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L182-L185"
   },
   {
     "term": "contacts.no-results",
     "definition": "There's no contacts matching your search",
     "context": "There's no contacts matching your search",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L169-L172"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L173-L176"
   },
   {
     "term": "contacts.title",
@@ -669,7 +675,7 @@
     "term": "generic.changes-saved",
     "definition": "Saved",
     "context": "Saved",
-    "reference": "components/layout/PetitionHeader.tsx#L202-L205"
+    "reference": "components/layout/PetitionHeader.tsx#L203-L206"
   },
   {
     "term": "generic.collapse",
@@ -681,7 +687,7 @@
     "term": "generic.confirm-delete-button",
     "definition": "Yes, delete",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L428-L431"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L437-L440"
   },
   {
     "term": "generic.deleted-contact",
@@ -867,13 +873,13 @@
     "term": "generic.no-deadline",
     "definition": "No deadline",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L356-L359"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L365-L368"
   },
   {
     "term": "generic.not-specified",
     "definition": "Not specified",
     "context": "Not specified",
-    "reference": "pages/[locale]/app/contacts/index.tsx#L231-L234"
+    "reference": "pages/[locale]/app/contacts/index.tsx#L235-L238"
   },
   {
     "term": "generic.optional-field",
@@ -969,55 +975,55 @@
     "term": "generic.untitled-petition",
     "definition": "Untitled petition",
     "context": "Untitled petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L290-L293"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L294-L297"
   },
   {
     "term": "header.user-menu-button",
     "definition": "User menu",
     "context": "User menu",
-    "reference": "components/layout/UserMenu.tsx#L40-L43"
+    "reference": "components/layout/UserMenu.tsx#L46-L49"
   },
   {
     "term": "navbar.change-language",
     "definition": "Change language",
     "context": "Change language",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L149-L152"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L207-L210"
   },
   {
     "term": "navbar.coming-soon",
     "definition": "Coming soon",
     "context": "Coming soon",
-    "reference": "components/layout/AppLayoutNavbarLink.tsx#L24-L27"
+    "reference": "components/layout/AppLayoutNavbarLink.tsx#L26-L29"
   },
   {
     "term": "navbar.contacts-link",
     "definition": "Contacts",
     "context": "Contacts",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L69-L72"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L75-L78"
   },
   {
     "term": "navbar.new-button",
     "definition": "Create a new petition",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L125-L128"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L146-L149"
   },
   {
     "term": "navbar.petitions-link",
     "definition": "Petitions",
     "context": "Petitions",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L51-L54"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L57-L60"
   },
   {
     "term": "navbar.start-tour",
     "definition": "Guide me around",
     "context": "Guide me around",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L174-L177"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L236-L239"
   },
   {
     "term": "navbar.templates-link",
     "definition": "Templates",
     "context": "Templates",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L60-L63"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L66-L69"
   },
   {
     "term": "petition-access.header",
@@ -1083,7 +1089,7 @@
     "term": "petition-accesses.progress-header",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L305-L308"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L310-L313"
   },
   {
     "term": "petition-accesses.reminders-sent-header",
@@ -1107,7 +1113,7 @@
     "term": "petition-accesses.status-header",
     "definition": "Status",
     "context": "Status",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L319-L322"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L324-L327"
   },
   {
     "term": "petition.activity-not-available",
@@ -1383,7 +1389,7 @@
     "term": "petition.name-label",
     "definition": "Petition name",
     "context": "Petition name",
-    "reference": "components/layout/PetitionHeader.tsx#L145-L148"
+    "reference": "components/layout/PetitionHeader.tsx#L146-L149"
   },
   {
     "term": "petition.no-fields-error",
@@ -1569,7 +1575,7 @@
     "term": "petition.settings-button",
     "definition": "Petition settings",
     "context": "Petition settings",
-    "reference": "components/layout/PetitionHeader.tsx#L227-L230"
+    "reference": "components/layout/PetitionHeader.tsx#L228-L231"
   },
   {
     "term": "petition.settings-header",
@@ -1581,61 +1587,61 @@
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/layout/PetitionHeader.tsx#L210-L213"
+    "reference": "components/layout/PetitionHeader.tsx#L211-L214"
   },
   {
     "term": "petitions.confirm-delete.body",
     "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L416-L424"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L425-L433"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Delete petitions",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L410-L413"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L419-L422"
   },
   {
     "term": "petitions.header.created-at",
     "definition": "Created at",
     "context": "Created at",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L386-L389"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L395-L398"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Deadline",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L347-L350"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L351-L354"
   },
   {
     "term": "petitions.header.name",
     "definition": "Petition name",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L282-L285"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L286-L289"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L365-L368"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L374-L377"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Recipient",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L301-L304"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L305-L308"
   },
   {
     "term": "petitions.header.status",
     "definition": "Status",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L375-L378"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L384-L387"
   },
   {
     "term": "petitions.no-petitions",
     "definition": "You have no petitions yet. Start by creating one now!",
     "context": "You have no petitions yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L257-L260"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L261-L264"
   },
   {
     "term": "petitions.no-reminders-left",
@@ -1647,13 +1653,13 @@
     "term": "petitions.no-results",
     "definition": "There's no petitions matching your search",
     "context": "There's no petitions matching your search",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L248-L251"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L252-L255"
   },
   {
     "term": "petitions.recipients",
     "definition": "{contact} and <a>{more} more</a>",
     "context": "{contact} and <a>{more} more</a>",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L312-L333"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L316-L337"
   },
   {
     "term": "petitions.reminders-not-set",
@@ -2883,37 +2889,37 @@
     "term": "tour.petitions-list.create-petition",
     "definition": "Let's start by creating a petition!",
     "context": "Let's start by creating a petition!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L574-L577"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L583-L586"
   },
   {
     "term": "tour.petitions-list.show-around",
     "definition": "If this is your first time here, let us show you around!",
     "context": "If this is your first time here, let us show you around!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L562-L565"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L571-L574"
   },
   {
     "term": "tour.petitions-list.we-collect",
     "definition": "We are here to help you collect information from your clients.",
     "context": "We are here to help you collect information from your clients.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L556-L559"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L565-L568"
   },
   {
     "term": "tour.petitions-list.we-notify",
     "definition": "We will let you know when the recipients complete everything.",
     "context": "We will let you know when the recipients complete everything.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L588-L591"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L597-L600"
   },
   {
     "term": "tour.petitions-list.welcome",
     "definition": "Welcome to Parallel!",
     "context": "Welcome to Parallel!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L548-L551"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L557-L560"
   },
   {
     "term": "tour.petitions-list.you-focus",
     "definition": "We want you to focus on what matters, so let us collect the information for you.",
     "context": "We want you to focus on what matters, so let us collect the information for you.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L582-L585"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L591-L594"
   },
   {
     "term": "tour.skip",

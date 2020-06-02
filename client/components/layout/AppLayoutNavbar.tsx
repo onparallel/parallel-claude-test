@@ -29,6 +29,7 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { resolveUrl } from "@parallel/utils/next";
 
 export type AppLayoutNavbarProps = BoxProps & {
+  isMobile?: boolean;
   user: AppLayoutNavbar_UserFragment;
   onCreate: () => void;
   onOnboardingClick: () => void;
@@ -36,6 +37,7 @@ export type AppLayoutNavbarProps = BoxProps & {
 
 export const AppLayoutNavbar = Object.assign(
   memo(function AppLayoutNavbar({
+    isMobile,
     user,
     onCreate,
     onOnboardingClick,
@@ -79,7 +81,7 @@ export const AppLayoutNavbar = Object.assign(
       [intl.locale]
     );
     const locales = useSupportedLocales();
-    function changeLocale(locale: string) {
+    function handleLocaleChange(locale: string) {
       router.push(
         router.pathname,
         resolveUrl(router.pathname, {
@@ -90,35 +92,49 @@ export const AppLayoutNavbar = Object.assign(
     }
     return (
       <Flex
-        flexDirection="column"
+        alignItems="stretch"
         as="nav"
-        shadow="md"
-        width={24}
         backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
-        paddingY={4}
+        {...(isMobile
+          ? {
+              flexDirection: "row",
+              minHeight: 16,
+              height: 16,
+              shadow:
+                "0 -4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);",
+              paddingX: 1,
+            }
+          : {
+              flexDirection: "column",
+              minWidth: 24,
+              paddingY: 4,
+              shadow: "md",
+            })}
         {...props}
       >
-        <Flex justifyContent="center" marginTop={6} marginBottom={6}>
-          <NakedLink href="/app">
-            <Box as="a" width="40px" height="40px" position="relative">
-              <PseudoBox
-                position="absolute"
-                cursor="pointer"
-                transition="transform 150ms"
-                _hover={{
-                  color: {
-                    light: "gray.900",
-                    dark: "purple.200",
-                  }[colorMode],
-                  transform: "scale(1.1)",
-                }}
-              >
-                <Logo width={40} hideText={true}></Logo>
-              </PseudoBox>
-            </Box>
-          </NakedLink>
-        </Flex>
-        <Flex justifyContent="center" marginBottom={4}>
+        {isMobile ? null : (
+          <Flex justifyContent="center" marginTop={6} marginBottom={6}>
+            <NakedLink href="/app">
+              <Box as="a" width="40px" height="40px" position="relative">
+                <PseudoBox
+                  position="absolute"
+                  cursor="pointer"
+                  transition="transform 150ms"
+                  _hover={{
+                    color: {
+                      light: "gray.900",
+                      dark: "purple.200",
+                    }[colorMode],
+                    transform: "scale(1.1)",
+                  }}
+                >
+                  <Logo width={40} hideText={true}></Logo>
+                </PseudoBox>
+              </Box>
+            </NakedLink>
+          </Flex>
+        )}
+        <Flex justifyContent="center" alignItems="center">
           <IconButtonWithTooltip
             id="new-petition-button"
             variantColor="purple"
@@ -133,7 +149,20 @@ export const AppLayoutNavbar = Object.assign(
             })}
           />
         </Flex>
-        <List>
+        <List
+          as={Flex}
+          alignSelf="stretch"
+          {...(isMobile
+            ? {
+                flex: 1,
+                flexDirection: "row",
+                justifyContent: "center",
+                marginX: 1,
+              }
+            : {
+                flexDirection: "column",
+              })}
+        >
           {items.map(({ section, available, icon, text }) => (
             <ListItem key={section}>
               <AppLayoutNavbarLink
@@ -141,72 +170,85 @@ export const AppLayoutNavbar = Object.assign(
                 isAvailable={available}
                 active={pathname.startsWith(`/[locale]/app/${section}`)}
                 icon={icon}
+                isMobile={isMobile}
               >
                 {text}
               </AppLayoutNavbarLink>
             </ListItem>
           ))}
         </List>
-        <Spacer />
-        <Stack>
-          <Flex justifyContent="center">
-            <Tooltip
-              zIndex={theme.zIndices.tooltip}
-              showDelay={300}
-              aria-label={intl.formatMessage({
-                id: "navbar.change-language",
-                defaultMessage: "Change language",
-              })}
-              label={intl.formatMessage({
-                id: "navbar.change-language",
-                defaultMessage: "Change language",
-              })}
-            >
-              <ButtonDropdown
-                as={IconButton}
-                aria-label={intl.formatMessage({
-                  id: "navbar.change-language",
-                  defaultMessage: "Change language",
-                })}
-                icon={"globe" as any}
-                variant="ghost"
-                isRound
-                dropdown={
-                  <MenuList placement="right">
-                    {locales.map(({ key, localizedLabel }) => (
-                      <MenuItem
-                        as="button"
-                        key={key}
-                        onClick={() => changeLocale(key)}
-                        fontWeight={
-                          router.query.locale === key ? "bold" : "normal"
-                        }
-                      >
-                        {localizedLabel}
-                      </MenuItem>
-                    ))}
-                  </MenuList>
-                }
-              />
-            </Tooltip>
-          </Flex>
-          <Flex justifyContent="center">
-            <IconButtonWithTooltip
-              showDelay={300}
-              label={intl.formatMessage({
-                id: "navbar.start-tour",
-                defaultMessage: "Guide me around",
-              })}
-              icon="info-outline"
-              variant="ghost"
-              isRound
-              onClick={onOnboardingClick}
+        {isMobile ? (
+          <Flex justifyContent="center" alignItems="center">
+            <UserMenu
+              user={user}
+              isMobile
+              onLocaleChange={handleLocaleChange}
             />
           </Flex>
-          <Flex justifyContent="center">
-            <UserMenu user={user}></UserMenu>
-          </Flex>
-        </Stack>
+        ) : (
+          <>
+            <Spacer />
+            <Stack>
+              <Flex justifyContent="center">
+                <Tooltip
+                  zIndex={theme.zIndices.tooltip}
+                  showDelay={300}
+                  aria-label={intl.formatMessage({
+                    id: "navbar.change-language",
+                    defaultMessage: "Change language",
+                  })}
+                  label={intl.formatMessage({
+                    id: "navbar.change-language",
+                    defaultMessage: "Change language",
+                  })}
+                >
+                  <ButtonDropdown
+                    as={IconButton}
+                    aria-label={intl.formatMessage({
+                      id: "navbar.change-language",
+                      defaultMessage: "Change language",
+                    })}
+                    icon={"globe" as any}
+                    variant="ghost"
+                    isRound
+                    dropdown={
+                      <MenuList placement="right">
+                        {locales.map(({ key, localizedLabel }) => (
+                          <MenuItem
+                            as="button"
+                            key={key}
+                            onClick={() => handleLocaleChange(key)}
+                            fontWeight={
+                              router.query.locale === key ? "bold" : "normal"
+                            }
+                          >
+                            {localizedLabel}
+                          </MenuItem>
+                        ))}
+                      </MenuList>
+                    }
+                  />
+                </Tooltip>
+              </Flex>
+              <Flex justifyContent="center">
+                <IconButtonWithTooltip
+                  showDelay={300}
+                  label={intl.formatMessage({
+                    id: "navbar.start-tour",
+                    defaultMessage: "Guide me around",
+                  })}
+                  icon="info-outline"
+                  variant="ghost"
+                  isRound
+                  onClick={onOnboardingClick}
+                />
+              </Flex>
+              <Flex justifyContent="center" alignItems="center">
+                <UserMenu user={user} />
+              </Flex>
+            </Stack>
+          </>
+        )}
       </Flex>
     );
   }),

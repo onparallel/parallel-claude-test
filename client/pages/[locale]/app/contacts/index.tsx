@@ -135,7 +135,11 @@ function Contacts() {
         })}
       </Title>
       <AppLayout user={me}>
-        <Box padding={4} paddingBottom={24}>
+        <Box
+          padding={4}
+          paddingBottom={{ base: 4, md: 24 }}
+          minWidth="containers.lg"
+        >
           <TablePage
             columns={columns}
             rows={contacts.items}

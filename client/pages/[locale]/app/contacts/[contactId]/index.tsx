@@ -292,7 +292,12 @@ function useContactPetitionAccessesColumns(): TableColumn<
           petition?.deadline ? (
             <DateTime value={petition.deadline} format={FORMATS.LLL} />
           ) : (
-            <Text as="span" color="gray.400" fontStyle="italic">
+            <Text
+              as="span"
+              color="gray.400"
+              fontStyle="italic"
+              whiteSpace="nowrap"
+            >
               <FormattedMessage
                 id="generic.no-deadline"
                 defaultMessage="No deadline"

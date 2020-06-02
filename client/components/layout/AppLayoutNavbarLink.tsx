@@ -10,6 +10,7 @@ export interface AppLayoutNavbarLinkProps {
   active: boolean;
   icon: string;
   isAvailable: boolean;
+  isMobile?: boolean;
   children: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export function AppLayoutNavbarLink({
   active,
   icon,
   isAvailable,
+  isMobile,
   children,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
@@ -28,7 +30,8 @@ export function AppLayoutNavbarLink({
   return isAvailable ? (
     <Link
       href={href}
-      borderX="4px solid"
+      borderX={!isMobile ? "4px solid" : undefined}
+      borderY={isMobile ? "4px solid" : undefined}
       borderColor="transparent"
       display="block"
       userSelect="none"
@@ -42,16 +45,23 @@ export function AppLayoutNavbarLink({
       _active={{
         textDecoration: "none",
       }}
-      borderRightColor={active ? "purple.600" : "transparent"}
+      borderTopColor={isMobile && active ? "purple.600" : "transparent"}
+      borderRightColor={!isMobile && active ? "purple.600" : "transparent"}
     >
-      <AppLayoutNavbarLinkContent icon={icon}>
+      <AppLayoutNavbarLinkContent icon={icon} isMobile={isMobile}>
         {children}
       </AppLayoutNavbarLinkContent>
     </Link>
   ) : (
     <Tooltip label={label} aria-label={label} placement="right" showDelay={300}>
-      <Box opacity={0.5} cursor="default">
-        <AppLayoutNavbarLinkContent icon={icon} isDisabled>
+      <Box
+        opacity={0.5}
+        cursor="default"
+        borderX={!isMobile ? "4px solid" : undefined}
+        borderY={isMobile ? "4px solid" : undefined}
+        borderColor="transparent"
+      >
+        <AppLayoutNavbarLinkContent icon={icon} isDisabled isMobile={isMobile}>
           {children}
         </AppLayoutNavbarLinkContent>
       </Box>
@@ -62,16 +72,19 @@ export function AppLayoutNavbarLink({
 function AppLayoutNavbarLinkContent({
   icon,
   isDisabled,
+  isMobile,
   children,
 }: {
   icon: string;
   isDisabled?: boolean;
+  isMobile?: boolean;
   children: ReactNode;
 }) {
   return (
     <Box
       textAlign="center"
-      paddingY={3}
+      paddingY={isMobile ? 2 : 3}
+      paddingX={isMobile ? 2 : undefined}
       css={
         isDisabled
           ? null
@@ -82,7 +95,7 @@ function AppLayoutNavbarLinkContent({
             `
       }
     >
-      <Box marginBottom={2}>
+      <Box marginBottom={1}>
         <Icon
           aria-hidden="true"
           focusable={false}

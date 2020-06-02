@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/core";
+import { Box, Button, Flex, Text, useTheme } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -210,7 +210,11 @@ function Petitions() {
         })}
       </Title>
       <AppLayout user={me}>
-        <Box padding={4} paddingBottom={24}>
+        <Box
+          padding={4}
+          paddingBottom={{ base: 4, md: 24 }}
+          minWidth="containers.lg"
+        >
           <TablePage
             columns={columns}
             rows={petitions.items}
@@ -352,7 +356,12 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           deadline ? (
             <DateTime value={deadline} format={FORMATS.LLL} />
           ) : (
-            <Text as="span" color="gray.400" fontStyle="italic">
+            <Text
+              as="span"
+              color="gray.400"
+              fontStyle="italic"
+              whiteSpace="nowrap"
+            >
               <FormattedMessage
                 id="generic.no-deadline"
                 defaultMessage="No deadline"

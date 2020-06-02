@@ -460,6 +460,7 @@ export function DefaultHeader({
       fontWeight={400}
       textTransform="uppercase"
       userSelect="none"
+      whiteSpace="nowrap"
       className={sort?.field === column.key ? "sort-active" : undefined}
       aria-sort={
         column.isSortable
