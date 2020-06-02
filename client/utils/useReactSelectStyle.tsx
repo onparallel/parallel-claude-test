@@ -68,7 +68,7 @@ export function useReactSelectStyle<
         defaultMessage: "Clear",
       }),
     }),
-    []
+    [intl.locale]
   );
   return useMemo<SelectProps<OptionType>>(
     () => ({

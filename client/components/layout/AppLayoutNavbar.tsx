@@ -6,6 +6,9 @@ import {
   ListItem,
   PseudoBox,
   useColorMode,
+  IconButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/core";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
@@ -18,6 +21,9 @@ import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
+import { ButtonDropdown } from "../common/ButtonDropdown";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { resolveUrl } from "@parallel/utils/next";
 
 export type AppLayoutNavbarProps = BoxProps & {
   user: AppLayoutNavbar_UserFragment;
@@ -35,6 +41,7 @@ export const AppLayoutNavbar = Object.assign(
     const { colorMode } = useColorMode();
     const { pathname } = useRouter();
     const intl = useIntl();
+    const router = useRouter();
     const items = useMemo(
       () => [
         {
@@ -67,6 +74,16 @@ export const AppLayoutNavbar = Object.assign(
       ],
       [intl.locale]
     );
+    const locales = useSupportedLocales();
+    function changeLocale(locale: string) {
+      router.push(
+        router.pathname,
+        resolveUrl(router.pathname, {
+          ...router.query,
+          locale,
+        })
+      );
+    }
     return (
       <Flex
         flexDirection="column"
@@ -126,6 +143,32 @@ export const AppLayoutNavbar = Object.assign(
           ))}
         </List>
         <Spacer />
+        <Flex justifyContent="center">
+          <ButtonDropdown
+            as={IconButton}
+            aria-label={intl.formatMessage({
+              id: "navbar.change-language",
+              defaultMessage: "Change language",
+            })}
+            icon={"globe" as any}
+            variant="ghost"
+            isRound
+            dropdown={
+              <MenuList placement="right">
+                {locales.map(({ key, localizedLabel }) => (
+                  <MenuItem
+                    as="button"
+                    key={key}
+                    onClick={() => changeLocale(key)}
+                    fontWeight={router.query.locale === key ? "bold" : "normal"}
+                  >
+                    {localizedLabel}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            }
+          />
+        </Flex>
         <Flex justifyContent="center">
           <IconButtonWithTooltip
             label={intl.formatMessage({

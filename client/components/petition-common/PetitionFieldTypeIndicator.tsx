@@ -25,7 +25,7 @@ export function PetitionFieldTypeIndicator({
         defaultMessage: "Text field",
       }),
     }[type];
-  }, [type]);
+  }, [type, intl.locale]);
   return (
     <Tooltip
       label={label}

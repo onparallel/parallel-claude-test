@@ -314,6 +314,7 @@ function usePetitionAccessesColumns({
       },
     ],
     [
+      intl.locale,
       petitionStatus,
       onReactivateAccess,
       onDeactivateAccess,

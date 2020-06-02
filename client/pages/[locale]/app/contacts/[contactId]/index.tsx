@@ -326,7 +326,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           ) : null,
       },
     ],
-    []
+    [intl.locale]
   );
 }
 

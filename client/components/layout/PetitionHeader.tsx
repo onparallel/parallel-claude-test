@@ -102,7 +102,7 @@ export function PetitionHeader({
         ),
       },
     ],
-    [petition.status]
+    [petition.status, intl.locale]
   );
   return (
     <>

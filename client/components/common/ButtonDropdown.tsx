@@ -1,29 +1,16 @@
-import {
-  Button,
-  ButtonProps,
-  IconButton,
-  IconButtonProps,
-  Menu,
-  MenuButton,
-} from "@chakra-ui/core";
-import { ReactNode } from "react";
+import { Button, Menu, MenuButton } from "@chakra-ui/core";
+import { ComponentType, ReactNode } from "react";
 
-type ButtonDropdownProps = {
+type ButtonDropdownProps<T extends ComponentType<any> = typeof Button> = {
   dropdown: ReactNode;
-} & (
-  | ({
-      as?: typeof Button;
-    } & Omit<ButtonProps, "as">)
-  | ({
-      as: typeof IconButton;
-    } & Omit<IconButtonProps, "as">)
-);
+  as?: T;
+} & (T extends ComponentType<infer P> ? P : never);
 
-export function ButtonDropdown({
+export function ButtonDropdown<T extends ComponentType<any> = typeof Button>({
   as,
   dropdown,
   ...props
-}: ButtonDropdownProps) {
+}: ButtonDropdownProps<T>) {
   return (
     <Menu>
       <MenuButton as={as || Button} {...props} />

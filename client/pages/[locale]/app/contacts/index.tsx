@@ -258,7 +258,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         ),
       },
     ],
-    []
+    [intl.locale]
   );
 }
 

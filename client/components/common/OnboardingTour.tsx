@@ -21,7 +21,7 @@ import {
 import { useIntl } from "react-intl";
 import ReactJoyride, {
   CallBackProps,
-  Locale,
+  Locale as ReactJoyrideLocale,
   Step,
   TooltipRenderProps,
 } from "react-joyride";
@@ -167,8 +167,8 @@ export function OnboardingTour({ status, onUpdateTour }: OnboardingTourProps) {
           id: "tour.close",
           defaultMessage: "Close",
         }),
-      } as Locale),
-    []
+      } as ReactJoyrideLocale),
+    [intl.locale]
   );
   useEffect(() => {
     if (key && !status[key]) {

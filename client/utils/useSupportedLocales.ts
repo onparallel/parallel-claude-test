@@ -22,6 +22,6 @@ export function useSupportedLocales() {
         }),
       },
     ],
-    []
+    [intl.locale]
   );
 }

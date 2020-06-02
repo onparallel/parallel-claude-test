@@ -35,7 +35,7 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
         defaultMessage: "Text field",
       }),
     };
-  }, []);
+  }, [intl.locale]);
   return (
     <Menu>
       <MenuButton as={Button} ref={ref} {...props}></MenuButton>

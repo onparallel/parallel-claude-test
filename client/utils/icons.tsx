@@ -55,6 +55,23 @@ export const icons = {
       </g>
     ),
   },
+  globe: {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle r="10" cy="12" cx="12" />
+        <line y2="9" x2="21" y1="9" x1="3" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        <line x1="3" y1="15" x2="21" y2="15" />
+      </g>
+    ),
+  },
   "log-out": {
     viewBox: "0 0 24 24",
     path: (

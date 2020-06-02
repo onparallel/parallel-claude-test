@@ -392,7 +392,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
         ),
       },
     ],
-    []
+    [intl.locale]
   );
 }
 
