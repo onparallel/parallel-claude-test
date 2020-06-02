@@ -9,6 +9,9 @@ import {
   IconButton,
   MenuList,
   MenuItem,
+  Tooltip,
+  useTheme,
+  Stack,
 } from "@chakra-ui/core";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { gql } from "apollo-boost";
@@ -41,6 +44,7 @@ export const AppLayoutNavbar = Object.assign(
     const { colorMode } = useColorMode();
     const { pathname } = useRouter();
     const intl = useIntl();
+    const theme = useTheme();
     const router = useRouter();
     const items = useMemo(
       () => [
@@ -91,6 +95,7 @@ export const AppLayoutNavbar = Object.assign(
         shadow="md"
         width={24}
         backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
+        paddingY={4}
         {...props}
       >
         <Flex justifyContent="center" marginTop={6} marginBottom={6}>
@@ -143,47 +148,65 @@ export const AppLayoutNavbar = Object.assign(
           ))}
         </List>
         <Spacer />
-        <Flex justifyContent="center">
-          <ButtonDropdown
-            as={IconButton}
-            aria-label={intl.formatMessage({
-              id: "navbar.change-language",
-              defaultMessage: "Change language",
-            })}
-            icon={"globe" as any}
-            variant="ghost"
-            isRound
-            dropdown={
-              <MenuList placement="right">
-                {locales.map(({ key, localizedLabel }) => (
-                  <MenuItem
-                    as="button"
-                    key={key}
-                    onClick={() => changeLocale(key)}
-                    fontWeight={router.query.locale === key ? "bold" : "normal"}
-                  >
-                    {localizedLabel}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            }
-          />
-        </Flex>
-        <Flex justifyContent="center">
-          <IconButtonWithTooltip
-            label={intl.formatMessage({
-              id: "navbar.start-tour",
-              defaultMessage: "Guide me around",
-            })}
-            icon="info-outline"
-            variant="ghost"
-            isRound
-            onClick={onOnboardingClick}
-          />
-        </Flex>
-        <Flex justifyContent="center" marginY={4}>
-          <UserMenu user={user}></UserMenu>
-        </Flex>
+        <Stack>
+          <Flex justifyContent="center">
+            <Tooltip
+              zIndex={theme.zIndices.tooltip}
+              showDelay={300}
+              aria-label={intl.formatMessage({
+                id: "navbar.change-language",
+                defaultMessage: "Change language",
+              })}
+              label={intl.formatMessage({
+                id: "navbar.change-language",
+                defaultMessage: "Change language",
+              })}
+            >
+              <ButtonDropdown
+                as={IconButton}
+                aria-label={intl.formatMessage({
+                  id: "navbar.change-language",
+                  defaultMessage: "Change language",
+                })}
+                icon={"globe" as any}
+                variant="ghost"
+                isRound
+                dropdown={
+                  <MenuList placement="right">
+                    {locales.map(({ key, localizedLabel }) => (
+                      <MenuItem
+                        as="button"
+                        key={key}
+                        onClick={() => changeLocale(key)}
+                        fontWeight={
+                          router.query.locale === key ? "bold" : "normal"
+                        }
+                      >
+                        {localizedLabel}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                }
+              />
+            </Tooltip>
+          </Flex>
+          <Flex justifyContent="center">
+            <IconButtonWithTooltip
+              showDelay={300}
+              label={intl.formatMessage({
+                id: "navbar.start-tour",
+                defaultMessage: "Guide me around",
+              })}
+              icon="info-outline"
+              variant="ghost"
+              isRound
+              onClick={onOnboardingClick}
+            />
+          </Flex>
+          <Flex justifyContent="center">
+            <UserMenu user={user}></UserMenu>
+          </Flex>
+        </Stack>
       </Flex>
     );
   }),
