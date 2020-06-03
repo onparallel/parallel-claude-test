@@ -48,6 +48,8 @@ export function SendMessageDialogDialog({
 
   return (
     <ConfirmDialog
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
       size="2xl"
       focusRef={subjectRef}
       header={
