@@ -31,6 +31,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
 import {
   usePetitionState,
   useWrapPetitionUpdater,
@@ -85,14 +86,27 @@ function PetitionActivity({ petitionId }: PetitionProps) {
           },
         });
         toast({
-          title: intl.formatMessage({
-            id: "petition.message-sent.toast-header",
-            defaultMessage: "Message sent",
-          }),
-          description: intl.formatMessage({
-            id: "petition.message-sent.toast-description",
-            defaultMessage: "The message is on it's way",
-          }),
+          title: scheduledAt
+            ? intl.formatMessage({
+                id: "petition.message-scheduled.toast-header",
+                defaultMessage: "Message scheduled",
+              })
+            : intl.formatMessage({
+                id: "petition.message-sent.toast-header",
+                defaultMessage: "Message sent",
+              }),
+          description: scheduledAt
+            ? intl.formatMessage(
+                {
+                  id: "petition.message-scheduled.toast-description",
+                  defaultMessage: "The message will be sent on {date}",
+                },
+                { date: intl.formatDate(scheduledAt, FORMATS.LL) }
+              )
+            : intl.formatMessage({
+                id: "petition.message-sent.toast-description",
+                defaultMessage: "The message is on it's way",
+              }),
           status: "success",
           duration: 3000,
           isClosable: true,

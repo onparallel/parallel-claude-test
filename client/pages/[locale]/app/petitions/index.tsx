@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text, useTheme } from "@chakra-ui/core";
+import { Box, Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
