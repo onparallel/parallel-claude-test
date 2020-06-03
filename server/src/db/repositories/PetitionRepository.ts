@@ -487,13 +487,63 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  /**
+   * Delete petition, deactivate all accesses and cancel all scheduled sendouts
+   */
   async deletePetitionById(petitionId: MaybeArray<number>, user: User) {
+    const petitionIds = Array.isArray(petitionId) ? petitionId : [petitionId];
+    const [accesses, messages] = await Promise.all([
+      this.from("petition_access")
+        .whereIn("petition_id", petitionIds)
+        .where("status", "ACTIVE")
+        .update(
+          {
+            status: "INACTIVE",
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+          },
+          "*"
+        ),
+      this.from("petition_message")
+        .whereIn("petition_id", petitionIds)
+        .where("status", "SCHEDULED")
+        .update(
+          {
+            status: "CANCELLED",
+          },
+          "*"
+        ),
+    ]);
+    for (const [, _accesses] of Object.entries(
+      groupBy(accesses, (a) => a.petition_id)
+    )) {
+      await this.createEvent(
+        _accesses[0].petition_id,
+        "ACCESS_DEACTIVATED",
+        _accesses.map((access) => ({
+          petition_access_id: access.id,
+          user_id: user.id,
+        }))
+      );
+    }
+    for (const [, _messages] of Object.entries(
+      groupBy(messages, (m) => m.petition_id)
+    )) {
+      await this.createEvent(
+        _messages[0].petition_id,
+        "MESSAGE_CANCELLED",
+        _messages.map((message) => ({
+          petition_message_id: message.id,
+          user_id: user.id,
+        }))
+      );
+    }
     return await this.from("petition")
       .update({
         deleted_at: this.now(),
         deleted_by: `User:${user.id}`,
       })
-      .whereIn("id", Array.isArray(petitionId) ? petitionId : [petitionId]);
+      .whereIn("id", petitionIds);
   }
 
   async updatePetition(
@@ -946,13 +996,14 @@ export class PetitionRepository extends BaseRepository {
   async processReminder(reminderId: number, emailLogId: number) {
     const [row] = await this.from("petition_reminder")
       .where("id", reminderId)
-      .update(
-        {
-          status: "PROCESSED",
-          email_log_id: emailLogId,
-        },
-        "*"
-      );
+      .update({ status: "PROCESSED", email_log_id: emailLogId }, "*");
+    return row;
+  }
+
+  async reminderFailed(reminderId: number) {
+    const [row] = await this.from("petition_reminder")
+      .where("id", reminderId)
+      .update({ status: "ERROR" }, "*");
     return row;
   }
 

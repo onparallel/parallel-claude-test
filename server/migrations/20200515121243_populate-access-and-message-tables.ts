@@ -76,6 +76,9 @@ export async function up(knex: Knex): Promise<any> {
   const sendouts = await knex<PetitionSendout>("petition_sendout").orderBy(
     "id"
   );
+  if (sendouts.length === 0) {
+    return;
+  }
   const groups = groupBy(sendouts, (s) => `${s.petition_id},${s.contact_id}`);
   // create accesses
   const _accesses: Omit<PetitionAccess, "id">[] = Object.values(groups)
@@ -101,6 +104,7 @@ export async function up(knex: Knex): Promise<any> {
         ...pick(last, ["keycode"]),
       };
     });
+
   const accesses = await knex<PetitionAccess>("petition_access").insert(
     _accesses,
     "*"

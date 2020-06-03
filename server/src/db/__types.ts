@@ -30,7 +30,7 @@ export type PetitionMessageStatus =
   | "PROCESSING"
   | "PROCESSED";
 
-export type PetitionReminderStatus = "PROCESSING" | "PROCESSED";
+export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
