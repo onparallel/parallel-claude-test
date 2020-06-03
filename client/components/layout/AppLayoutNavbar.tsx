@@ -161,6 +161,7 @@ export const AppLayoutNavbar = Object.assign(
               }
             : {
                 flexDirection: "column",
+                marginY: 2,
               })}
         >
           {items.map(({ section, available, icon, text }) => (
