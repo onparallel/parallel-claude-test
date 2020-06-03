@@ -381,6 +381,10 @@ export const fileUploadReplyDownloadLink = mutationField(
     args: {
       petitionId: idArg({ required: true }),
       replyId: idArg({ required: true }),
+      preview: booleanArg({
+        description:
+          "If true will use content-disposition inline instead of attachment",
+      }),
     },
     resolve: async (_, args, ctx) => {
       try {
@@ -403,7 +407,8 @@ export const fileUploadReplyDownloadLink = mutationField(
           result: RESULT.SUCCESS,
           url: await ctx.aws.getSignedDownloadEndpoint(
             file!.path,
-            file!.filename
+            file!.filename,
+            args.preview ? "inline" : "attachment"
           ),
         };
       } catch {

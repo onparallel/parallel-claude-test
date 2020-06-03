@@ -1,32 +1,30 @@
-/** @jsx jsx */
 import {
   Box,
   BoxProps,
   Button,
   Checkbox,
   Flex,
-  PseudoBox,
   PseudoBoxProps,
   Stack,
   Text,
 } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionRepliesField_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapArray } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
-import { MouseEvent } from "react";
+import { Fragment, MouseEvent, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
+import { SrOnly } from "../common/SrOnly";
 
 export type PetitionRepliesFieldAction = {
-  type: "DOWNLOAD_FILE";
+  type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
   reply: UnwrapArray<PetitionRepliesField_PetitionFieldFragment["replies"]>;
 };
 
@@ -62,6 +60,10 @@ export function PetitionRepliesField({
       id: "petition.petition-field.reply-file-download",
       defaultMessage: "Download file",
     }),
+    preview: intl.formatMessage({
+      id: "petition.petition-field.reply-file-preview",
+      defaultMessage: "Preview file",
+    }),
   };
   return (
     <Card
@@ -87,9 +89,9 @@ export function PetitionRepliesField({
           />
           <Box marginLeft={4}>
             {field.title ? (
-              <Text>{field.title}</Text>
+              <Text as="h4">{field.title}</Text>
             ) : (
-              <Text as="span" color="gray.400" fontStyle="italic">
+              <Text as="h4" color="gray.400" fontStyle="italic">
                 <FormattedMessage
                   id="generic.untitled-field"
                   defaultMessage="Untitled field"
@@ -118,84 +120,98 @@ export function PetitionRepliesField({
             </Button>
           </Box>
         </Flex>
+        <Box marginBottom={2}>
+          {field.description ? (
+            <Text color="gray.600" fontSize="sm">
+              {field.description?.split("\n").map((line, index) => (
+                <Fragment key={index}>
+                  {line}
+                  <br />
+                </Fragment>
+              ))}
+            </Text>
+          ) : (
+            <Text color="gray.400" fontSize="sm" fontStyle="italic">
+              <FormattedMessage
+                id="generic.no-description"
+                defaultMessage="No description"
+              />
+            </Text>
+          )}
+        </Box>
         {field.replies.length ? (
-          <>
-            <Box marginBottom={2}>
-              <Text color="gray.400" fontSize="sm">
-                <FormattedMessage
-                  id="petition.petition-field.replies-label"
-                  defaultMessage="{replies, plural, =1 {There is one reply to this field.} other {There are # replies to this field.}}"
-                  values={{ replies: field.replies.length }}
-                />
-              </Text>
-            </Box>
-            {field.type === "TEXT" ? (
-              <Stack
-                spacing={4}
-                css={css`
-                  .copy-to-clipboard {
-                    display: none;
-                  }
-                  &:hover .copy-to-clipboard {
-                    display: inline-flex;
-                  }
-                `}
-              >
-                {field.replies.map((reply) => (
-                  <PetitionRepliesFieldReply key={reply.id} reply={reply}>
-                    {(reply.content.text as string)
-                      .split(/\n/)
-                      .map((line, index) => (
-                        <Text key={index}>{line}</Text>
-                      ))}
+          field.type === "TEXT" ? (
+            <Stack spacing={4}>
+              {field.replies.map((reply) => (
+                <PetitionRepliesFieldReply
+                  key={reply.id}
+                  reply={reply}
+                  actions={
                     <CopyToClipboardButton
-                      className="copy-to-clipboard"
-                      placement="left"
-                      position="absolute"
-                      right={6}
-                      top="0"
-                      size="sm"
+                      size="xs"
                       text={reply.content.text}
                     />
-                  </PetitionRepliesFieldReply>
-                ))}
-              </Stack>
-            ) : field.type === "FILE_UPLOAD" ? (
-              <Stack spacing={4}>
-                {field.replies.map((reply) => (
-                  <PetitionRepliesFieldReply key={reply.id} reply={reply}>
-                    <Box display="inling-flex">
-                      <Text as="span" aria-label={labels.filename}>
-                        {reply.content.filename}
-                      </Text>
-                      <Text as="span" marginX={2}>
-                        -
-                      </Text>
-                      <Text
-                        as="span"
-                        aria-label={labels.filesize}
-                        fontSize="sm"
-                        color="gray.400"
-                      >
-                        <FileSize value={reply.content.size} />
-                      </Text>
-                      <IconButtonWithTooltip
-                        marginLeft={2}
-                        marginBottom={1}
-                        size="xs"
-                        icon="download"
-                        placement="right"
-                        label={labels.download}
-                        onClick={() =>
-                          onAction({ type: "DOWNLOAD_FILE", reply })
-                        }
-                      ></IconButtonWithTooltip>
-                    </Box>
-                  </PetitionRepliesFieldReply>
-                ))}
-              </Stack>
-            ) : null}
-          </>
+                  }
+                >
+                  {(reply.content.text as string)
+                    .split(/\n/)
+                    .map((line, index) => (
+                      <Fragment key={index}>
+                        {line}
+                        <br />
+                      </Fragment>
+                    ))}
+                </PetitionRepliesFieldReply>
+              ))}
+            </Stack>
+          ) : field.type === "FILE_UPLOAD" ? (
+            <Stack spacing={4}>
+              {field.replies.map((reply) => (
+                <PetitionRepliesFieldReply
+                  key={reply.id}
+                  reply={reply}
+                  actions={[
+                    <IconButtonWithTooltip
+                      key="1"
+                      size="xs"
+                      icon="download"
+                      label={labels.download}
+                      onClick={() => onAction({ type: "DOWNLOAD_FILE", reply })}
+                    />,
+                    ...(isPreviewable(reply.content.contentType)
+                      ? [
+                          <IconButtonWithTooltip
+                            key="2"
+                            size="xs"
+                            icon="view"
+                            label={labels.preview}
+                            onClick={() =>
+                              onAction({ type: "PREVIEW_FILE", reply })
+                            }
+                          />,
+                        ]
+                      : []),
+                  ]}
+                >
+                  <Box display="inling-flex">
+                    <SrOnly>{labels.filename}</SrOnly>
+                    <Text as="span">{reply.content.filename}</Text>
+                    <Text as="span" marginX={2}>
+                      -
+                    </Text>
+                    <Text
+                      as="span"
+                      aria-label={labels.filesize}
+                      fontSize="sm"
+                      color="gray.400"
+                    >
+                      <FileSize value={reply.content.size} />
+                    </Text>
+                  </Box>
+                </PetitionRepliesFieldReply>
+              ))}
+            </Stack>
+          ) : null
         ) : (
           <Box paddingY={4}>
             <Text color="gray.400" fontStyle="italic" textAlign="center">
@@ -211,36 +227,46 @@ export function PetitionRepliesField({
   );
 }
 
+function isPreviewable(contentType: string) {
+  return contentType === "application/pdf" || contentType.startsWith("image/");
+}
+
 function PetitionRepliesFieldReply({
+  actions,
   children,
   reply,
   ...props
 }: {
+  actions: ReactNode;
   reply: UnwrapArray<PetitionRepliesField_PetitionFieldFragment["replies"]>;
 } & PseudoBoxProps) {
   return (
-    <PseudoBox
-      marginLeft={4}
-      paddingLeft={4}
-      paddingRight={16}
-      borderLeft="2px solid"
-      borderColor="gray.200"
-      _hover={{
-        borderColor: "gray.300",
-      }}
-      position="relative"
-      {...props}
-    >
-      {children}
-      <Box fontSize="sm">
-        <DateTime
-          as="span"
-          color="gray.400"
-          value={reply.createdAt}
-          format={FORMATS.LLL}
-        />
-      </Box>
-    </PseudoBox>
+    <Flex {...props}>
+      <Stack
+        spacing={1}
+        paddingRight={2}
+        borderRight="2px solid"
+        borderColor="gray.200"
+      >
+        {actions}
+      </Stack>
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        flex="1"
+        marginLeft={2}
+      >
+        {children}
+        <Box fontSize="sm">
+          <DateTime
+            as="span"
+            color="gray.400"
+            value={reply.createdAt}
+            format={FORMATS.LLL}
+          />
+        </Box>
+      </Flex>
+    </Flex>
   );
 }
 
@@ -250,6 +276,7 @@ PetitionRepliesField.fragments = {
       id
       type
       title
+      description
       validated
       replies {
         id

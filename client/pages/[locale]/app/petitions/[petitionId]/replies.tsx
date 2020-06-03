@@ -113,8 +113,13 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const handleAction = async function (action: PetitionRepliesFieldAction) {
     switch (action.type) {
       case "DOWNLOAD_FILE":
+      case "PREVIEW_FILE":
         try {
-          await downloadReplyFile(petitionId, action.reply);
+          await downloadReplyFile(
+            petitionId,
+            action.reply,
+            action.type === "PREVIEW_FILE"
+          );
         } catch {}
         break;
     }
@@ -304,8 +309,13 @@ PetitionReplies.mutations = [
     mutation PetitionReplies_fileUploadReplyDownloadLink(
       $petitionId: ID!
       $replyId: ID!
+      $preview: Boolean
     ) {
-      fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+      fileUploadReplyDownloadLink(
+        petitionId: $petitionId
+        replyId: $replyId
+        preview: $preview
+      ) {
         result
         url
       }
@@ -319,11 +329,12 @@ function useDownloadReplyFile() {
   return useCallback(
     async function downloadReplyFile(
       petitionId: string,
-      reply: Pick<PetitionFieldReply, "id" | "content">
+      reply: Pick<PetitionFieldReply, "id" | "content">,
+      preview: boolean
     ) {
       const _window = window.open(undefined, "_blank")!;
       const { data } = await mutate({
-        variables: { petitionId, replyId: reply.id },
+        variables: { petitionId, replyId: reply.id, preview },
       });
       const { url, result } = data!.fileUploadReplyDownloadLink;
       if (result === "SUCCESS") {

@@ -712,6 +712,7 @@ export interface NexusGenArgTypes {
     fileUploadReplyDownloadLink: {
       // args
       petitionId: string; // ID!
+      preview?: boolean | null; // Boolean
       replyId: string; // ID!
     };
     publicCompletePetition: {

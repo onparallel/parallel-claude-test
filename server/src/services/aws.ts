@@ -111,13 +111,17 @@ export class Aws {
       .promise();
   }
 
-  async getSignedDownloadEndpoint(key: string, filename: string) {
+  async getSignedDownloadEndpoint(
+    key: string,
+    filename: string,
+    cdType: "attachment" | "inline"
+  ) {
     return await this.s3.getSignedUrlPromise("getObject", {
       Bucket: this.config.s3.uplodsBucketName,
       Key: key,
       Expires: 60 * 30,
       ResponseContentDisposition: contentDisposition(filename, {
-        type: "attachment",
+        type: cdType,
       }),
     });
   }

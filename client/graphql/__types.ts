@@ -246,6 +246,7 @@ export type MutationdeletePetitionsArgs = {
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
   petitionId: Scalars["ID"];
+  preview?: Maybe<Scalars["Boolean"]>;
   replyId: Scalars["ID"];
 };
 
@@ -1296,7 +1297,10 @@ export type PetitionComposeMessageEditor_PetitionFragment = {
 
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "title" | "validated"> & {
+} & Pick<
+  PetitionField,
+  "id" | "type" | "title" | "description" | "validated"
+> & {
     replies: Array<
       { __typename?: "PetitionFieldReply" } & Pick<
         PetitionFieldReply,
@@ -1763,6 +1767,7 @@ export type PetitionReplies_validatePetitionFieldsMutation = {
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = {
   petitionId: Scalars["ID"];
   replyId: Scalars["ID"];
+  preview?: Maybe<Scalars["Boolean"]>;
 };
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
@@ -2597,6 +2602,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     id
     type
     title
+    description
     validated
     replies {
       id
@@ -4264,8 +4270,13 @@ export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
   mutation PetitionReplies_fileUploadReplyDownloadLink(
     $petitionId: ID!
     $replyId: ID!
+    $preview: Boolean
   ) {
-    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+    fileUploadReplyDownloadLink(
+      petitionId: $petitionId
+      replyId: $replyId
+      preview: $preview
+    ) {
       result
       url
     }
@@ -4291,6 +4302,7 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationFn = ApolloReactC
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      replyId: // value for 'replyId'
+ *      preview: // value for 'preview'
  *   },
  * });
  */

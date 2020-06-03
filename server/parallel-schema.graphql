@@ -232,6 +232,11 @@ type Mutation {
   """
   fileUploadReplyDownloadLink(
     petitionId: ID!
+
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
     replyId: ID!
   ): FileUploadReplyDownloadLinkResult!
 
