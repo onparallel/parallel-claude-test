@@ -148,13 +148,7 @@ export function PetitionHeader({
                 defaultMessage: "Petition name",
               })}
             >
-              {({
-                isEditing,
-                onRequestEdit,
-              }: {
-                isEditing: boolean;
-                onRequestEdit: () => void;
-              }) => (
+              {({ isEditing }: { isEditing: boolean }) => (
                 <>
                   <Flex flex="1 1 auto" minWidth={0} padding={1}>
                     <EditablePreview

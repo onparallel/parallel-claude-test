@@ -145,6 +145,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           })}
       </Title>
       <PetitionLayout
+        key={petition!.id}
         user={me}
         petition={petition!}
         onUpdatePetition={handleOnUpdatePetition}

@@ -324,6 +324,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           })}
       </Title>
       <PetitionLayout
+        key={petition!.id}
         user={me}
         petition={petition!}
         onUpdatePetition={handleUpdatePetition}
