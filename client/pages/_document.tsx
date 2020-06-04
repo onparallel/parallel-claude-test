@@ -9,6 +9,7 @@ import Document, {
   NextScript,
 } from "next/document";
 import { IntlConfig } from "react-intl";
+import { logger } from "@parallel/utils/logger";
 
 const LANG_DIR = process.env.ROOT + "/public/static/lang";
 
@@ -33,13 +34,19 @@ class MyDocument extends Document<MyDocumentProps> {
     const { renderPage } = ctx;
     const locale = getLocale(ctx);
     const { raw, compiled } = await loadMessages(locale);
-    ctx.renderPage = () =>
-      renderPage({
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        enhanceApp: (App) => (props) => (
-          <App {...props} {...{ locale, messages: compiled }}></App>
-        ),
-      });
+    ctx.renderPage = () => {
+      try {
+        return renderPage({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          enhanceApp: (App) => (props) => (
+            <App {...props} {...{ locale, messages: compiled }}></App>
+          ),
+        });
+      } catch (error) {
+        logger.error(error.stack, { error });
+        throw error;
+      }
+    };
     const initialProps = await Document.getInitialProps(ctx);
     return { ...initialProps, locale, messages: raw };
   }

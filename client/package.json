@@ -56,7 +56,9 @@
     "slate-history": "^0.58.1",
     "slate-react": "^0.58.2",
     "smooth-scroll-into-view-if-needed": "^1.1.28",
-    "vanilla-text-mask": "^5.1.1"
+    "vanilla-text-mask": "^5.1.1",
+    "winston": "^3.2.1",
+    "winston-cloudwatch": "^2.3.2"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.15.0",

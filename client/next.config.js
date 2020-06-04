@@ -1,18 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const PROD = process.env.NODE_ENV === "production";
-const assetsUrl = PROD
-  ? {
-      staging: "https://static-staging.parallel.so",
-      production: "https://static.parallel.so",
-    }[process.env.ENV] || ""
-  : "";
 const config = {
   env: {
     ROOT: __dirname,
-    ASSETS_URL: assetsUrl,
   },
   crossOrigin: "anonymous",
-  assetPrefix: assetsUrl,
+  assetPrefix: process.env.ASSETS_URL,
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;

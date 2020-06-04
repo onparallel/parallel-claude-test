@@ -78,10 +78,12 @@ async function main() {
       encoding: "utf-8",
     }
   );
-  execSync(`cp -a secrets/${env}/. ${buildDir}/server/`, {
-    cwd: WORK_DIR,
-    encoding: "utf-8",
-  });
+  for (const dir of ["server", "client"]) {
+    execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
+      cwd: WORK_DIR,
+      encoding: "utf-8",
+    });
+  }
   execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
 
   console.log("Zip and upload to S3");
