@@ -102,9 +102,16 @@ export function withApolloData<P = {}>(
             console.error(error?.graphQLErrors?.[0]?.extensions);
           }
           if (!process.browser) {
-            require("@parallel/utils/logger").logger.error(error.message, {
-              error,
-            });
+            const logger = require("@parallel/utils/logger").logger;
+            if (
+              ![
+                // Errors that are OK
+                "PUBLIC_PETITION_NOT_AVAILABLE",
+              ].includes(code)
+            )
+              logger.error(error.message, {
+                error,
+              });
           }
           throw error;
         }
