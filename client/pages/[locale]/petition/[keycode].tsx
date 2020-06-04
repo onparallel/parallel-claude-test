@@ -9,13 +9,17 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/core";
+import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
+import { Spacer } from "@parallel/components/common/Spacer";
+import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithDataContext,
 } from "@parallel/components/common/withApolloData";
 import { RecipientViewProgressCard } from "@parallel/components/recipient-view/RecipientViewProgressCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
+import RecipientViewSideLinks from "@parallel/components/recipient-view/RecipientViewSideLinks";
 import {
   CreateFileUploadReplyInput,
   CreateTextReplyInput,
@@ -46,8 +50,6 @@ import {
   CreateReply,
   RecipientViewPetitionField,
 } from "../../../components/recipient-view/RecipientViewPetitionField";
-import RecipientViewSideLinks from "@parallel/components/recipient-view/RecipientViewSideLinks";
-import { Spacer } from "@parallel/components/common/Spacer";
 
 type PublicPetitionProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -184,6 +186,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
   const breakpoint = "md";
   return (
     <>
+      <Title />
       {showCompletedAlert && petition.status === "COMPLETED" ? (
         <Alert
           status="success"
@@ -281,7 +284,11 @@ function RecipientView({ keycode }: PublicPetitionProps) {
                 defaultMessage="Powered by"
               />
             </Text>
-            <Logo width={100} />
+            <NakedLink href="/" passHref>
+              <Box as="a">
+                <Logo width={100} />
+              </Box>
+            </NakedLink>
           </Flex>
         </Flex>
         <RecipientViewProgressCard
