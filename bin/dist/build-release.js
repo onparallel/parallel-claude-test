@@ -61,10 +61,12 @@ async function main() {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });
-    child_process_1.execSync(`cp -a secrets/${env}/. ${buildDir}/server/`, {
-        cwd: WORK_DIR,
-        encoding: "utf-8",
-    });
+    for (const dir of ["server", "client"]) {
+        child_process_1.execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
+            cwd: WORK_DIR,
+            encoding: "utf-8",
+        });
+    }
     child_process_1.execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
     console.log("Zip and upload to S3");
     child_process_1.execSync(`tar -zcf ${buildId}.tar.gz ${buildId}`, {
