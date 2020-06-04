@@ -49,9 +49,13 @@ export const icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M12 10h8a2 2 0 012 2v8a2 2 0 01-2 2h-8m0-12a2 2 0 00-2 2v8c0 1.1.9 2 2 2M13 13h.01M4 4h9a2 2 0 012 2v4m-3 12H4M4 4a2 2 0 00-2 2v14c0 1.1.9 2 2 2" />
-        <path d="M16 13h.01M19 13h.01M12.99 16H13M15.99 16H16M18.99 16H19M13 19h.01M16 19h.01M19 19h.01" />
-        <path d="M10 7h2M5 7h2M5 10h2M5 13h2M5 16h2M5 19h2" />
+        <path d="m 20,12 2,2 v 8 H 11 V 18 H 8 v 4 H 2 V 4 C 2,2.9 2.9,2 4,2 h 11 c 1.1,0 2,0.9 2,2 v 18" />
+        <path d="M 5,6 H 7" />
+        <path d="m 12,6 h 2" />
+        <path d="M 5,10 H 7" />
+        <path d="m 12,10 h 2" />
+        <path d="M 5,14 H 7" />
+        <path d="m 12,14 h 2" />
       </g>
     ),
   },
