@@ -63,6 +63,7 @@ class MyDocument extends Document<MyDocumentProps> {
           <script
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
               [
+                "Object.fromEntries",
                 "Intl.PluralRules",
                 "Intl.PluralRules.~locale.es",
                 "Intl.PluralRules.~locale.en",
