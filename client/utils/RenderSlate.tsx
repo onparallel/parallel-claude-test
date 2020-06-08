@@ -1,12 +1,9 @@
-import {
-  RichTextBlock,
-  RichTextEditorContent,
-  RichTextLeaf,
-} from "@parallel/components/common/RichTextEditor";
+import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
+import { Element, Text as Leaf } from "slate";
 import { memo } from "react";
-import { Box, Text, BoxProps, List, ListItem } from "@chakra-ui/core";
+import { Box, Text, BoxProps } from "@chakra-ui/core";
 
-function render(node: RichTextBlock | RichTextLeaf, index: number) {
+function render(node: Element | Leaf, index: number) {
   if (Array.isArray(node.children)) {
     const props: BoxProps = { key: index };
     switch (node.type) {
@@ -15,22 +12,16 @@ function render(node: RichTextBlock | RichTextLeaf, index: number) {
         props.as = "p";
         break;
       case "bulleted-list":
-        props.as = List;
-        props.paddingLeft = 5;
+        props.as = "ul";
+        props.paddingLeft = 6;
         break;
       case "list-item":
-        props.as = ListItem;
-        props.listStyleType = "disc";
-        props.listStylePosition = "outside";
+        props.as = "li";
         break;
     }
     return (
       <Box {...props}>
-        {paragraphIsEmpty(node as RichTextBlock) ? (
-          <br />
-        ) : (
-          node.children.map(render)
-        )}
+        {paragraphIsEmpty(node as Element) ? <br /> : node.children.map(render)}
       </Box>
     );
   } else if (typeof node.text === "string") {
@@ -53,7 +44,7 @@ function render(node: RichTextBlock | RichTextLeaf, index: number) {
   return null;
 }
 
-function paragraphIsEmpty(node: RichTextBlock) {
+function paragraphIsEmpty(node: Element) {
   return node.children.length === 1 && node.children[0]?.text === "";
 }
 

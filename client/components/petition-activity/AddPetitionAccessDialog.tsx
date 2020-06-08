@@ -11,10 +11,8 @@ import {
   RecipientSelect,
   RecipientSelectProps,
 } from "../common/RecipientSelect";
-import {
-  isEmptyContent,
-  RichTextEditorContent,
-} from "../common/RichTextEditor";
+import { RichTextEditorContent } from "../common/RichTextEditor";
+import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";

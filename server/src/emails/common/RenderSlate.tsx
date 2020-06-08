@@ -1,29 +1,27 @@
 import { MjmlText } from "mjml-react";
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, Fragment } from "react";
 
-function render(node: any, index: number) {
+function render(node: any) {
   if (Array.isArray(node.children)) {
     switch (node.type) {
       case "paragraph":
       case undefined:
         return (
-          <MjmlText key={index} padding="0 20px" lineHeight="24px">
-            <p style={{ margin: 0 }}>
-              {paragraphIsEmpty(node) ? <br /> : node.children.map(render)}
-            </p>
-          </MjmlText>
+          <p style={{ margin: 0 }}>
+            {paragraphIsEmpty(node) ? <br /> : node.children.map(render)}
+          </p>
         );
       case "bulleted-list":
         return (
-          <MjmlText key={index} padding="0 20px 0 45px" lineHeight="24px">
-            <ul style={{ margin: 0, padding: 0 }}>
-              {node.children.map((child: any, index: number) => (
-                <li key={index} style={{ margin: 0, padding: 0 }}>
-                  {child.children.map(render)}
-                </li>
-              ))}
-            </ul>
-          </MjmlText>
+          <ul style={{ margin: 0, paddingLeft: "24px" }}>
+            {node.children.map((child: any, index: number) => (
+              <li key={index}>
+                {child.children.map((child: any, index: number) => (
+                  <Fragment key={index}>{render(child)}</Fragment>
+                ))}
+              </li>
+            ))}
+          </ul>
         );
     }
   } else if (typeof node.text === "string") {
@@ -37,11 +35,7 @@ function render(node: any, index: number) {
     if (node.underline) {
       style.textDecoration = "underline";
     }
-    return (
-      <span key={index} style={style}>
-        {node.text}
-      </span>
-    );
+    return <span style={style}>{node.text}</span>;
   }
   return null;
 }
@@ -51,5 +45,13 @@ function paragraphIsEmpty(node: any) {
 }
 
 export function RenderSlate({ value }: { value: any }) {
-  return <>{value?.map(render)}</>;
+  return (
+    <>
+      {value?.map((node: any, index: number) => (
+        <MjmlText key={index} padding="0 20px" lineHeight="24px">
+          {render(node)}
+        </MjmlText>
+      ))}
+    </>
+  );
 }

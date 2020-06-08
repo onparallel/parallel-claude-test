@@ -8,10 +8,10 @@ import { useId } from "@reach/auto-id";
 import { ChangeEvent, Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
-  isEmptyContent,
   RichTextEditor,
   RichTextEditorContent,
 } from "../common/RichTextEditor";
+import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 
 export function MessageEmailEditor({
   showErrors,

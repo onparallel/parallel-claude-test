@@ -5,10 +5,8 @@ import {
   RecipientSelect,
   RecipientSelectProps,
 } from "@parallel/components/common/RecipientSelect";
-import {
-  isEmptyContent,
-  RichTextEditorContent,
-} from "@parallel/components/common/RichTextEditor";
+import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   PetitionComposeMessageEditor_PetitionFragment,

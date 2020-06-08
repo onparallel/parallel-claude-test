@@ -193,17 +193,50 @@ export const props: NewPetitionProps = {
       ],
     },
     {
-      children: [{ text: "" }],
+      children: [{ text: "hmmm" }],
     },
     {
       type: "bulleted-list",
       children: [
         {
-          children: [{ text: "foto", bold: true, underline: true }],
+          children: [
+            {
+              type: "paragraph",
+              children: [{ text: "foto", bold: true, underline: true }],
+            },
+          ],
           type: "list-item",
         },
         {
-          children: [{ text: "pasaporte", italic: true }],
+          children: [
+            {
+              type: "paragraph",
+              children: [{ text: "pasaporte", italic: true }],
+            },
+            {
+              type: "bulleted-list",
+              children: [
+                {
+                  children: [
+                    {
+                      type: "paragraph",
+                      children: [{ text: "foto", bold: true, underline: true }],
+                    },
+                  ],
+                  type: "list-item",
+                },
+                {
+                  children: [
+                    {
+                      type: "paragraph",
+                      children: [{ text: "pasaporte", italic: true }],
+                    },
+                  ],
+                  type: "list-item",
+                },
+              ],
+            },
+          ],
           type: "list-item",
         },
       ],

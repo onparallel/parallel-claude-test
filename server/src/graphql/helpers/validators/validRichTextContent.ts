@@ -7,9 +7,12 @@ export const validRichTextContent = jsonSchema({
       properties: {
         children: {
           type: "array",
-          items: {
-            $ref: "#/definitions/leaf",
-          },
+          minItems: 1,
+          additionalItems: false,
+          items: [
+            { $ref: "#/definitions/paragraph" },
+            { $ref: "#/definitions/list" },
+          ],
         },
         type: { enum: ["list-item"] },
       },
@@ -28,7 +31,7 @@ export const validRichTextContent = jsonSchema({
       },
       required: ["type"],
     },
-    block: {
+    paragraph: {
       type: "object",
       properties: {
         children: {
@@ -54,7 +57,7 @@ export const validRichTextContent = jsonSchema({
       type: "array",
       items: {
         anyOf: [
-          { $ref: "#/definitions/block" },
+          { $ref: "#/definitions/paragraph" },
           { $ref: "#/definitions/list" },
         ],
       },

@@ -1,7 +1,7 @@
 import { Box, Flex, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { isEmptyContent } from "@parallel/components/common/RichTextEditor";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
