@@ -21,7 +21,7 @@ import { Card } from "@parallel/components/common/Card";
 import { RecipientViewPetitionField_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
-import { FieldOptions } from "@parallel/utils/petitions";
+import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { gql } from "apollo-boost";
 import { Fragment, useCallback } from "react";
 import { useDropzone } from "react-dropzone";

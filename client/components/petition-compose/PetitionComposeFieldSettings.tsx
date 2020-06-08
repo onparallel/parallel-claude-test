@@ -16,7 +16,7 @@ import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { FieldOptions } from "@parallel/utils/petitions";
+import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
 import { ChangeEvent, ReactNode, useState } from "react";

@@ -1,7 +1,7 @@
 import { Box, Flex, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
@@ -41,20 +41,17 @@ import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { resolveUrl } from "@parallel/utils/next";
-import {
-  usePetitionState,
-  useWrapPetitionUpdater,
-} from "@parallel/utils/petitions";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
+import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick, omit } from "remeda";
+import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
-import { Link } from "@parallel/components/common/Link";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -73,7 +70,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     data: { petition },
   } = assertQuery(usePetitionComposeQuery({ variables: { id: petitionId } }));
 
-  const [state, setState] = usePetitionState();
+  const [state, wrapper] = usePetitionState();
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
@@ -111,7 +108,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, []);
 
   const confirmDelete = useConfirmDeleteFieldDialog();
-  const wrapper = useWrapPetitionUpdater(setState);
 
   const [updatePetition] = usePetitionCompose_updatePetitionMutation();
   const updateFieldPositions = useUpdateFieldPositions();

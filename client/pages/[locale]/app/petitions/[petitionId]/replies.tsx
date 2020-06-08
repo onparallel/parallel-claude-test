@@ -40,11 +40,8 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
-import {
-  usePetitionState,
-  useWrapPetitionUpdater,
-} from "@parallel/utils/petitions";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { gql } from "apollo-boost";
 import { useCallback } from "react";
@@ -65,8 +62,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     refetch,
   } = assertQuery(usePetitionRepliesQuery({ variables: { id: petitionId } }));
 
-  const [state, setState] = usePetitionState();
-  const wrapper = useWrapPetitionUpdater(setState);
+  const [state, wrapper] = usePetitionState();
   const [updatePetition] = usePetitionReplies_updatePetitionMutation();
   const [
     validatePetitionFields,

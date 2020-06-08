@@ -32,12 +32,9 @@ import {
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import {
-  usePetitionState,
-  useWrapPetitionUpdater,
-} from "@parallel/utils/petitions";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
+import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { gql } from "apollo-boost";
 import { differenceInMinutes } from "date-fns";
@@ -59,8 +56,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     refetch,
   } = assertQuery(usePetitionActivityQuery({ variables: { id: petitionId } }));
 
-  const [state, setState] = usePetitionState();
-  const wrapper = useWrapPetitionUpdater(setState);
+  const [state, wrapper] = usePetitionState();
 
   const [updatePetition] = usePetitionActivity_updatePetitionMutation();
   const handleOnUpdatePetition = useCallback(
