@@ -2,9 +2,9 @@ import { memo, useEffect } from "react";
 import Head from "next/head";
 import Router from "next/router";
 
-declare function gtag(command: string, event: string, params?: any): void;
-
 export const GoogleAnalytics = memo(() => {
+  const gtagId = "UA-153451031-1";
+
   useEffect(() => {
     function handler() {
       setTimeout(() => {
@@ -21,7 +21,7 @@ export const GoogleAnalytics = memo(() => {
     <Head>
       <script
         async
-        src={`https://www.googletagmanager.com/gtag/js?id=UA-153451031-1`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${gtagId}`}
       />
       <script
         dangerouslySetInnerHTML={{
@@ -29,7 +29,7 @@ export const GoogleAnalytics = memo(() => {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'UA-153451031-1', { 'send_page_view': false });
+            gtag('config', '${gtagId}', { 'send_page_view': false });
           `,
         }}
       />

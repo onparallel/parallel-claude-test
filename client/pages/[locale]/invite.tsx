@@ -16,6 +16,12 @@ function Invite() {
     query.locale
       ? {
           target: "#form-container",
+          onFormSubmit: function () {
+            gtag("event", "HS-invite-submit", {
+              event_category: "HS-form-submit",
+              event_label: "new-invite",
+            });
+          },
           ...({
             es: {
               portalId: "6692004",

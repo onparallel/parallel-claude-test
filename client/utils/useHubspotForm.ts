@@ -6,6 +6,7 @@ export type HubspotFormProps = {
   target: string;
   portalId: string;
   formId: string;
+  onFormSubmit?: () => any;
 };
 
 export function useHubspotForm(data: HubspotFormProps | null) {
@@ -26,5 +27,12 @@ export function useHubspotForm(data: HubspotFormProps | null) {
       script.onload = () => hbspt!.forms.create(data);
       document.head.appendChild(script);
     }
+    // Hubspot expects jQuery when using onFormSubmit so we fake it out here
+    (window as any).jQuery = function (nodeOrSelector: string | Element) {
+      if (typeof nodeOrSelector == "string") {
+        return document.querySelector(nodeOrSelector);
+      }
+      return nodeOrSelector;
+    };
   }, [data?.target, data?.portalId, data?.formId]);
 }
