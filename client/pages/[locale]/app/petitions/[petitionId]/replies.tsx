@@ -47,6 +47,7 @@ import { gql } from "apollo-boost";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
+import { useDownloadAllDialog } from "@parallel/components/petition-replies/DownloadAllDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -120,6 +121,11 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         break;
     }
   };
+
+  const downloadAllDialog = useDownloadAllDialog();
+  const handleDownloadAllClick = useCallback(async () => {
+    await downloadAllDialog({});
+  }, []);
 
   const {
     selection,
@@ -221,6 +227,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
               />
             </Button>
           ) : null}
+          <Button leftIcon="download" onClick={handleDownloadAllClick}>
+            <FormattedMessage
+              id="petition.replies.download-all"
+              defaultMessage="Download all"
+            />
+          </Button>
         </Stack>
         <Divider />
         <Box flex="1" overflow="auto">
