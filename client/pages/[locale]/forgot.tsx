@@ -342,7 +342,7 @@ function PasswordResetForm({
       <Box marginTop={4} textAlign="center">
         <NormalLink role="button" onClick={onBackToForgotPassword}>
           <FormattedMessage
-            id="public.login.back-to-login-link"
+            id="public.login.back-to-forgot-link"
             defaultMessage="Go back to forgot password"
           ></FormattedMessage>
         </NormalLink>

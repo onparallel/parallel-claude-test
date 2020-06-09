@@ -168,7 +168,7 @@ export function PublicFooter(props: BoxProps) {
               <Link href="/legal/[doc]" as="/legal/cookies">
                 <FormattedMessage
                   id="public.cookies.title"
-                  defaultMessage="Cookies"
+                  defaultMessage="Cookie policy"
                 ></FormattedMessage>
               </Link>
             </ListItem>

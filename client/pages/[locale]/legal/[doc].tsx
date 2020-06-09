@@ -18,7 +18,7 @@ function LegalDoc({ content, doc }: LegalDocProps) {
   const titles: Record<string, string> = {
     terms: intl.formatMessage({
       id: "public.terms.title",
-      defaultMessage: "Terms & conditions",
+      defaultMessage: "Terms & Conditions",
     }),
     privacy: intl.formatMessage({
       id: "public.privacy.title",

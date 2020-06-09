@@ -201,7 +201,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Button as="a" variantColor="purple">
             <FormattedMessage
               id="public.invite-button"
-              defaultMessage="Request an invite"
+              defaultMessage="Try Parallel free"
             ></FormattedMessage>
           </Button>
         </NakedLink>

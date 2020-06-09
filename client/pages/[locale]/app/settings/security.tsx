@@ -92,7 +92,7 @@ function Security() {
             <FormControl isInvalid={!!errors.password}>
               <FormLabel htmlFor="password">
                 <FormattedMessage
-                  id="generic.forms.password-label"
+                  id="generic.forms.old-password-label"
                   defaultMessage="Old password"
                 ></FormattedMessage>
               </FormLabel>

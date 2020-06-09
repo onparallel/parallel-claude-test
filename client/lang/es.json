@@ -675,7 +675,7 @@
     "term": "generic.changes-saved",
     "definition": "Guardado",
     "context": "Saved",
-    "reference": "components/layout/PetitionHeader.tsx#L203-L206"
+    "reference": "components/layout/PetitionHeader.tsx#L197-L200"
   },
   {
     "term": "generic.collapse",
@@ -804,6 +804,12 @@
     "reference": "pages/[locale]/login.tsx#L332-L335"
   },
   {
+    "term": "generic.forms.old-password-label",
+    "definition": "Contraseña antigua",
+    "context": "Old password",
+    "reference": "pages/[locale]/app/settings/security.tsx#L94-L97"
+  },
+  {
     "term": "generic.forms.password-label",
     "definition": "Contraseña",
     "context": "Password",
@@ -915,7 +921,7 @@
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L205-L208"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L206-L209"
   },
   {
     "term": "generic.required-field",
@@ -1143,7 +1149,7 @@
     "term": "petition.already-sent",
     "definition": "Esta petición ya ha sido enviada.",
     "context": "This petition has already been sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L368-L371"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L369-L372"
   },
   {
     "term": "petition.change-deadline",
@@ -1539,19 +1545,19 @@
     "term": "petition.replies.select-all",
     "definition": "Todos",
     "context": "All",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L185-L188"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L186-L189"
   },
   {
     "term": "petition.replies.select-none",
     "definition": "Ninguno",
     "context": "None",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L191-L194"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L192-L195"
   },
   {
     "term": "petition.replies.validate-selected",
     "definition": "Marcar como revisado",
     "context": "Mark as reviewed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L221-L224"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L222-L225"
   },
   {
     "term": "petition.schedule-delivery.header",
@@ -1569,7 +1575,7 @@
     "term": "petition.send-from-activity",
     "definition": "Si quieres enviarle la petición a alguine más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L374-L387"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L375-L388"
   },
   {
     "term": "petition.send-message-header.header",
@@ -1593,7 +1599,7 @@
     "term": "petition.settings-button",
     "definition": "Ajustes de la petición",
     "context": "Petition settings",
-    "reference": "components/layout/PetitionHeader.tsx#L228-L231"
+    "reference": "components/layout/PetitionHeader.tsx#L222-L225"
   },
   {
     "term": "petition.settings-header",
@@ -1605,7 +1611,7 @@
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/layout/PetitionHeader.tsx#L211-L214"
+    "reference": "components/layout/PetitionHeader.tsx#L205-L208"
   },
   {
     "term": "petitions.confirm-delete.body",
@@ -2208,6 +2214,12 @@
     "reference": "pages/[locale]/login.tsx#L184-L187"
   },
   {
+    "term": "public.login.back-to-forgot-link",
+    "definition": "Volver atrás",
+    "context": "Go back to forgot password",
+    "reference": "pages/[locale]/forgot.tsx#L344-L347"
+  },
+  {
     "term": "public.login.back-to-login-link",
     "definition": "Volver atrás",
     "context": "Go back to login",
@@ -2480,7 +2492,7 @@
   {
     "term": "public.terms.title",
     "definition": "Términos y condiciones",
-    "context": "Terms & conditions",
+    "context": "Terms & Conditions",
     "reference": "pages/[locale]/legal/[doc].tsx#L19-L22"
   },
   {
@@ -2499,13 +2511,13 @@
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "Has completado esta petición y {name} será notificado",
     "context": "You have completed this petition and {name} will be notified",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L165-L169"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L167-L171"
   },
   {
     "term": "recipient-view.completed-petition.toast-title",
     "definition": "¡Petición completada!",
     "context": "Petition completed!",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L160-L163"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L162-L165"
   },
   {
     "term": "recipient-view.field-reply-submit",
@@ -2529,13 +2541,13 @@
     "term": "recipient-view.petition-completed-alert",
     "definition": "Esta petición ha sido completada. Si deseas realizar cambios, no te olvides de hacer click de nuevo en el botón de finalizar.",
     "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L205-L208"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L208-L211"
   },
   {
     "term": "recipient-view.powered-by",
     "definition": "Powered by",
     "context": "Powered by",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L279-L282"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L282-L285"
   },
   {
     "term": "recipient-view.progress",
@@ -2676,6 +2688,12 @@
     "reference": "components/petition-activity/timeline/TimelineAccessOpenedEvent.tsx#L24-L43"
   },
   {
+    "term": "timeline.message-cancelled-description",
+    "definition": "{same, select, true {Cancelaste} other {<b>{user}</b> canceló}} un mensaje programado {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {<b>{user}</b>}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "reference": "components/petition-activity/timeline/TimelineMessageCancelledEvent.tsx#L30-L53"
+  },
+  {
     "term": "timeline.message-scheduled-cancel",
     "definition": "Cancelar",
     "context": "Cancel",
@@ -2683,13 +2701,13 @@
   },
   {
     "term": "timeline.message-scheduled-description",
-    "definition": "{same, select, true {Programaste} other {<b>{user}</b> programó}} un mensaje para {scheduledAt} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} to {contact} {timeAgo}",
+    "definition": "{same, select, true {Programaste} other {<b>{user}</b> programó}} un mensaje para {scheduledAt} {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "reference": "components/petition-activity/timeline/TimelineMessageScheduledEvent.tsx#L30-L58"
   },
   {
     "term": "timeline.message-sent-description-manual",
-    "definition": "{same, select, true {Enviaste} other {<b>{user}</b> envió}} un mensaje {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} a {contact} {timeAgo}",
+    "definition": "{same, select, true {Enviaste} other {<b>{user}</b> envió}} un mensaje {subject, select, null {sin asunto} other {con asunto <b>{subject}</b>}} para {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L58-L81"
   },
@@ -2775,133 +2793,133 @@
     "term": "tour.petition-activity.monitor-requests",
     "definition": "Monitoriza tus peticiones",
     "context": "Monitor your requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L496-L499"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L497-L500"
   },
   {
     "term": "tour.petition-activity.next-reminder",
     "definition": "Conoce cuándo se enviará el <b>próximo recordatorio</b>.",
     "context": "See when will the <b>next reminder</b> be sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L535-L541"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L536-L542"
   },
   {
     "term": "tour.petition-activity.send-manual-reminder",
     "definition": "<b>Envía recordatorios</b> manualmente a los destinatarios.",
     "context": "<b>Send reminders</b> manually to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L544-L550"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L545-L551"
   },
   {
     "term": "tour.petition-activity.send-message",
     "definition": "Envía un <b>mensaje de seguimiento</b> a los destinatarios.",
     "context": "Send a <b>follow-up message</b> to recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L526-L532"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L527-L533"
   },
   {
     "term": "tour.petition-activity.track",
     "definition": "Gestionar quién tiene <b>acceso</b> a esta petición.",
     "context": "Manage who can <b>access</b> this petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L517-L523"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L518-L524"
   },
   {
     "term": "tour.petition-activity.you-can",
     "definition": "En esta sección podrás:",
     "context": "In this section, you will be able to:",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L504-L507"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L505-L508"
   },
   {
     "term": "tour.petition-compose.add-petition-fields",
     "definition": "Aquí puedes añadir los destinatarios, tu primer mensaje, y configurar los recordatorios automáticos.",
     "context": "Here you can add the recipients, your first message, and configure your automatic reminders.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L740-L743"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L741-L744"
   },
   {
     "term": "tour.petition-compose.add-petition-fields-title",
     "definition": "Mensaje y recordatorios automáticos",
     "context": "Message and automatic reminders",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L733-L736"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L734-L737"
   },
   {
     "term": "tour.petition-compose.create-petition",
     "definition": "Completemos tu primera petición",
     "context": "Let's fill out your first petition",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L695-L698"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L696-L699"
   },
   {
     "term": "tour.petition-compose.field-types",
     "definition": "Aquí puedes añadir lo que necesites de tus destinatarios y escoger el tipo de información (archivos o respuestas escritas).",
     "context": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies).",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L722-L725"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L723-L726"
   },
   {
     "term": "tour.petition-compose.petition-advanced-settings",
     "definition": "Escoge aquí el <b>idioma</b> de la página de subida de información y los mensajes automáticos que enviaremos a tus destinatarios, así como la <b>fecha límite</b> que quieras que les informemos.",
     "context": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L797-L803"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L798-L804"
   },
   {
     "term": "tour.petition-compose.petition-advanced-settings-title",
     "definition": "¿Necesitas más personalización?",
     "context": "Need more customization?",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L790-L793"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L791-L794"
   },
   {
     "term": "tour.petition-compose.petition-reminders",
     "definition": "Sabemos que cada situación y cada cliente es diferente. Por eso, ayúdanos por favor a entender mejor cuándo es el mejor momento para enviar los recordatorios.",
     "context": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L779-L782"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L780-L783"
   },
   {
     "term": "tour.petition-compose.petition-reminders-title",
     "definition": "Nos encargaremos de esto, pero cuéntanos un poco más.",
     "context": "We will handle this, but tell us a little bit more.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L772-L775"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L773-L776"
   },
   {
     "term": "tour.petition-compose.select-multiple-recipients",
     "definition": "Si seleccionas <b>múltiples destinatarios</b>, cualquiera de ellos podrá contestar a cualquier elemento que hayas pedido.",
     "context": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L758-L764"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L759-L765"
   },
   {
     "term": "tour.petition-compose.select-recipients-title",
     "definition": "Escoge tus destinatarios",
     "context": "Select your recipients",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L751-L754"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L752-L755"
   },
   {
     "term": "tour.petition-compose.set-petition",
     "definition": "En esta página podrás configurar la información que necesitas de tus destinatarios.",
     "context": "On this page, you can set up the information that you need from your recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L703-L706"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L704-L707"
   },
   {
     "term": "tour.petition-compose.show-around",
     "definition": "¡Déjanos enseñarte paso a paso!",
     "context": "Let us show you step by step!",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L709-L712"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L710-L713"
   },
   {
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "En esta página puedes ver todos los elementos que has pedido a los destinatarios.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L397-L400"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L398-L401"
   },
   {
     "term": "tour.petition-replies.completed-items",
     "definition": "Si tus destinatarios han completado la información, podrás <b>descargar</b>, <b>copiar los textos</b> de las respuestas, o <b>marcarlos como revisados</b>.",
     "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L414-L420"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L415-L421"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Respuestas",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L407-L410"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L408-L411"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Aquí tienes la información acerca de las peticiones",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L391-L394"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L392-L395"
   },
   {
     "term": "tour.petitions-list.create-petition",
