@@ -59,7 +59,6 @@ export class ReportingRepository extends BaseRepository {
             ),
           this.from("petition_access")
             .whereIn("petition_id", batch)
-            .whereNull("deleted_at")
             .groupBy("petition_id")
             .select("petition_id", this.knex.raw("min(created_at) as sent_at")),
         ]);
