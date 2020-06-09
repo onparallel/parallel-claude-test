@@ -12,6 +12,7 @@ import {
   FileUpload,
   Organization,
   Petition,
+  PetitionAccess,
   PetitionField,
   PetitionFieldReply,
   User,
