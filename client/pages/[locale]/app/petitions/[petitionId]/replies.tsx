@@ -122,6 +122,9 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     }
   };
 
+  const showDownloadAll = petition!.fields.some(
+    (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
+  );
   const downloadAllDialog = useDownloadAllDialog();
   const handleDownloadAllClick = useCallback(async () => {
     try {
@@ -235,12 +238,14 @@ function PetitionReplies({ petitionId }: PetitionProps) {
               />
             </Button>
           ) : null}
-          <Button leftIcon="download" onClick={handleDownloadAllClick}>
-            <FormattedMessage
-              id="petition.replies.download-all"
-              defaultMessage="Download all"
-            />
-          </Button>
+          {showDownloadAll ? (
+            <Button leftIcon="download" onClick={handleDownloadAllClick}>
+              <FormattedMessage
+                id="petition.replies.download-all"
+                defaultMessage="Download all"
+              />
+            </Button>
+          ) : null}
         </Stack>
         <Divider />
         <Box flex="1" overflow="auto">
