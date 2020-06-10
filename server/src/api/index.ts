@@ -3,6 +3,7 @@ import { Container } from "inversify";
 import { ApiContext } from "../context";
 import morgan from "morgan";
 import { LOGGER, Logger } from "../services/logger";
+import { downloads } from "./downloads";
 
 export function api(container: Container) {
   const logger = container.get<Logger>(LOGGER);
@@ -36,5 +37,6 @@ export function api(container: Container) {
         .post("/confirm-forgot-password", (req, res, next) =>
           req.context.auth.confirmForgotPassword(req, res, next)
         )
-    );
+    )
+    .use("/downloads", downloads);
 }

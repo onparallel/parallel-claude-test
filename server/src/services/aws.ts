@@ -126,6 +126,15 @@ export class Aws {
     });
   }
 
+  downloadFile(key: string) {
+    return this.s3
+      .getObject({
+        Bucket: this.config.s3.uplodsBucketName,
+        Key: key,
+      })
+      .createReadStream();
+  }
+
   async enqueuePetitionMessages(messageIds: number[]) {
     return await this.enqueueMessages(
       "message-email",

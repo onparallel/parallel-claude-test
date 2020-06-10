@@ -124,8 +124,16 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   const downloadAllDialog = useDownloadAllDialog();
   const handleDownloadAllClick = useCallback(async () => {
-    await downloadAllDialog({});
-  }, []);
+    try {
+      const pattern = await downloadAllDialog({});
+      window.open(
+        `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
+          pattern
+        )}`,
+        "_blank"
+      );
+    } catch {}
+  }, [petitionId]);
 
   const {
     selection,

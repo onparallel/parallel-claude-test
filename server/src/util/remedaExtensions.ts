@@ -59,3 +59,24 @@ export function count() {
   // eslint-disable-next-line prefer-rest-params
   return purry(_count, arguments);
 }
+
+export function zip<T1, T2>(array1: T1[], array2: T2[]): [T1, T2][];
+export function zip<T1, T2, T3>(
+  array1: T1[],
+  array2: T2[],
+  array3: T3[]
+): [T1, T2, T3][];
+export function zip<T1, T2, T3, T4>(
+  array1: T1[],
+  array2: T2[],
+  array3: T3[],
+  array4: T4[]
+): [T1, T2, T3, T4][];
+export function zip<T extends Array<any>>(...arrays: T[]) {
+  const result = [];
+  const maxLength = Math.max(...arrays.map((a) => a.length));
+  for (let i = 0; i < maxLength; i++) {
+    result.push(arrays.map((a) => a[i]));
+  }
+  return result;
+}

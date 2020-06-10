@@ -25,8 +25,8 @@ const placeholders: Placeholder[] = [
 ];
 
 export function DownloadAllDialog({ ...props }: DialogProps<string>) {
-  const [option, setOption] = useState<"ORIGINAL" | "RENAME">("ORIGINAL");
-  const [pattern, setPattern] = useState("");
+  const [option, setOption] = useState<"ORIGINAL" | "RENAME">("RENAME");
+  const [pattern, setPattern] = useState("#field-number#_#field-title#");
   const inputRef = useRef();
   const handleConfirmClick = () => {
     if (option === "ORIGINAL") {
@@ -60,12 +60,6 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
             }}
             value={option}
           >
-            <Radio value="ORIGINAL">
-              <FormattedMessage
-                id="component.download-all-dialog.keep-original"
-                defaultMessage="Keep the original name"
-              />
-            </Radio>
             <Radio value="RENAME">
               <FormattedMessage
                 id="component.download-all-dialog.rename"
@@ -111,6 +105,12 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
                 />
               </Text>
             </Box>
+            <Radio value="ORIGINAL">
+              <FormattedMessage
+                id="component.download-all-dialog.keep-original"
+                defaultMessage="Keep the original name"
+              />
+            </Radio>
           </RadioGroup>
         </>
       }
