@@ -1621,7 +1621,7 @@
   },
   {
     "term": "petition.send-from-activity",
-    "definition": "Si quieres enviarle la petición a alguine más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
+    "definition": "Si quieres enviarle la petición a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
     "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L371-L384"
   },
