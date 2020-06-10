@@ -73,7 +73,7 @@
   },
   {
     "term": "component.create-petition-dialog.header",
-    "definition": "Creando peticicón",
+    "definition": "Creando petición",
     "context": "Creating petition",
     "reference": "components/petition-list/CreatePetitionDialog.tsx#L105-L108"
   },
