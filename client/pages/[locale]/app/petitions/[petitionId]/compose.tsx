@@ -181,7 +181,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         const title = document.querySelector<HTMLElement>(
           `#field-title-${field.id}`
         );
-        title?.click();
+        title?.focus();
       });
     }),
     [petitionId]
