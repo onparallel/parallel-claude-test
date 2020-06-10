@@ -30,7 +30,7 @@ const placeholders: Placeholder[] = [
 export function DownloadAllDialog({ ...props }: DialogProps<string>) {
   const [option, setOption] = useState<"ORIGINAL" | "RENAME">("RENAME");
   const [pattern, setPattern] = useState("#field-number#_#field-title#");
-  const inputRef = useRef<PlaceholderInputRef>();
+  const inputRef = useRef<PlaceholderInputRef>(null);
   const handleConfirmClick = () => {
     if (option === "ORIGINAL") {
       props.onResolve("#file-name#");

@@ -1,29 +1,29 @@
 /** @jsx jsx */
-import { Box, PseudoBox, useTheme, PseudoBoxProps } from "@chakra-ui/core";
+import { PseudoBox, PseudoBoxProps, useTheme } from "@chakra-ui/core";
 import Popper, { PopperProps } from "@chakra-ui/core/dist/Popper";
 import { jsx } from "@emotion/core";
 import {
   Placeholder,
   PlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
+import { slateNodesToTextWithPlaceholders } from "@parallel/utils/slate/placeholders/slateNodesToTextWithPlaceholders";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
+import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
+import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
 import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import { useCallback, useMemo, useRef, useState, forwardRef } from "react";
+import { forwardRef, useCallback, useMemo, useRef } from "react";
 import { pipe } from "remeda";
-import { createEditor, Transforms, Editor } from "slate";
+import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
-import { Slate, withReact, ReactEditor } from "slate-react";
+import { ReactEditor, Slate, withReact } from "slate-react";
 import {
   useSingleLine,
   withSingleLine,
 } from "../../utils/slate/withSingleLine";
 import { Card } from "./Card";
-import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
-import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
-import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
-import { slateNodesToTextWithPlaceholders } from "@parallel/utils/slate/placeholders/slateNodesToTextWithPlaceholders";
 
 export type PlaceholderInputProps = {
   placeholders: Placeholder[];
