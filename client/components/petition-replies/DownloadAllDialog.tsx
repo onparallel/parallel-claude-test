@@ -13,7 +13,10 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 import { useState, useRef } from "react";
-import { PlaceholderInput } from "../common/PlaceholderInput";
+import {
+  PlaceholderInput,
+  PlaceholderInputRef,
+} from "../common/PlaceholderInput";
 import { Placeholder } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 
 const placeholders: Placeholder[] = [
@@ -27,7 +30,7 @@ const placeholders: Placeholder[] = [
 export function DownloadAllDialog({ ...props }: DialogProps<string>) {
   const [option, setOption] = useState<"ORIGINAL" | "RENAME">("RENAME");
   const [pattern, setPattern] = useState("#field-number#_#field-title#");
-  const inputRef = useRef();
+  const inputRef = useRef<PlaceholderInputRef>();
   const handleConfirmClick = () => {
     if (option === "ORIGINAL") {
       props.onResolve("#file-name#");
@@ -37,6 +40,7 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
   };
   return (
     <ConfirmDialog
+      focusRef={inputRef as any}
       header={
         <FormattedMessage
           id="component.download-all-dialog.header"
@@ -54,8 +58,10 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
           <RadioGroup
             marginTop={2}
             onChange={(e) => {
-              console.log(inputRef);
               const option = e.target.value as any;
+              if (option === "RENAME") {
+                setTimeout(() => inputRef.current?.focus());
+              }
               setOption(option);
             }}
             value={option}

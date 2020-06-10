@@ -12,9 +12,9 @@ import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
 import { useCallback, useMemo, useRef, useState, forwardRef } from "react";
 import { pipe } from "remeda";
-import { createEditor } from "slate";
+import { createEditor, Transforms, Editor } from "slate";
 import { withHistory } from "slate-history";
-import { Slate, withReact } from "slate-react";
+import { Slate, withReact, ReactEditor } from "slate-react";
 import {
   useSingleLine,
   withSingleLine,
@@ -25,128 +25,135 @@ import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { slateNodesToTextWithPlaceholders } from "@parallel/utils/slate/placeholders/slateNodesToTextWithPlaceholders";
 
-export const PlaceholderInput = forwardRef(
-  (
-    {
-      placeholders,
-      value,
-      isDisabled,
-      onChange,
-      ...props
-    }: {
-      placeholders: Placeholder[];
-      value: string;
-      isDisabled?: boolean;
-      onChange: (value: string) => void;
-    } & Omit<PseudoBoxProps, "onChange">,
-    ref
-  ) => {
-    const editor = useMemo(
-      () =>
-        pipe(
-          createEditor(),
-          withReact,
-          withHistory,
-          withSingleLine,
-          withPlaceholders(placeholders)
-        ),
-      [placeholders]
-    );
-    if (typeof ref === "function") {
-      ref(editor);
-    } else if (ref) {
-      ref.current = editor;
-    }
+export type PlaceholderInputProps = {
+  placeholders: Placeholder[];
+  value: string;
+  isDisabled?: boolean;
+  onChange: (value: string) => void;
+} & Omit<PseudoBoxProps, "onChange">;
 
-    const { onChangeSelection } = useSingleLine(editor);
+export type PlaceholderInputRef = {
+  focus: () => void;
+};
 
-    const {
-      onAddPlaceholder,
-      onChangePlaceholder,
-      onKeyDownPlaceholder,
-      onHighlightOption,
-      selectedIndex,
-      search,
-      target,
-      values,
-    } = usePlaceholders(placeholders);
-
-    const { onKeyDown: onKeyDownFixDeleteAll } = useFixDeleteAll();
-
-    const handleChange = useCallback(
-      (value) => {
-        onChangePlaceholder(editor);
-        onChangeSelection(editor.selection);
-        onChange(slateNodesToTextWithPlaceholders(value));
+export const PlaceholderInput = forwardRef<
+  PlaceholderInputRef,
+  PlaceholderInputProps
+>(({ placeholders, value, isDisabled, onChange, ...props }, ref) => {
+  const editor = useMemo(
+    () =>
+      pipe(
+        createEditor(),
+        withReact,
+        withHistory,
+        withSingleLine,
+        withPlaceholders(placeholders)
+      ),
+    [placeholders]
+  );
+  const _ref = useMemo(
+    () => ({
+      focus: () => {
+        ReactEditor.focus(editor);
+        Transforms.select(editor, Editor.end(editor, []));
       },
-      [onChange, onChangePlaceholder, onChangeSelection]
-    );
-
-    const plugins = useMemo(() => {
-      return [PlaceholderPlugin(placeholders)];
-    }, [placeholders]);
-
-    const wrapper = useRef<HTMLElement>();
-    const placeholderMenuId = `placeholder-menu-${useId()}`;
-    const isOpen = Boolean(target);
-    const styles = useInputLikeStyles();
-
-    const slateValue = useMemo(
-      () => [
-        {
-          type: "paragraph",
-          children: textWithPlaceholderToSlateNodes(value, placeholders),
-        },
-      ],
-      [value]
-    );
-
-    return (
-      <>
-        <PseudoBox
-          ref={wrapper}
-          role="combobox"
-          aria-controls={placeholderMenuId}
-          aria-haspopup="listbox"
-          aria-expanded={isOpen}
-          aria-disabled={isDisabled}
-          height={10}
-          display="flex"
-          alignItems="center"
-          paddingX={3}
-          {...styles}
-          {...props}
-        >
-          <Slate editor={editor} value={slateValue} onChange={handleChange}>
-            <EditablePlugins
-              plugins={plugins}
-              readOnly={isDisabled}
-              onKeyDown={[onKeyDownPlaceholder, onKeyDownFixDeleteAll]}
-              onKeyDownDeps={[selectedIndex, search, target]}
-              style={{
-                flex: 1,
-                padding: "0 0.25rem",
-                whiteSpace: "pre",
-                overflow: "hidden",
-              }}
-            />
-          </Slate>
-        </PseudoBox>
-        <PlaceholderMenu
-          menuId={placeholderMenuId}
-          values={values}
-          selectedIndex={selectedIndex}
-          isOpen={isOpen}
-          anchor={wrapper.current}
-          onAddPlaceholder={(placeholder) =>
-            onAddPlaceholder(editor, placeholder)
-          }
-          onHighlightOption={onHighlightOption}
-        />
-      </>
-    );
+    }),
+    [editor]
+  );
+  if (typeof ref === "function") {
+    ref(_ref);
+  } else if (ref) {
+    ref.current = _ref;
   }
-);
+
+  const { onChangeSelection } = useSingleLine(editor);
+
+  const {
+    onAddPlaceholder,
+    onChangePlaceholder,
+    onKeyDownPlaceholder,
+    onHighlightOption,
+    selectedIndex,
+    search,
+    target,
+    values,
+  } = usePlaceholders(placeholders);
+
+  const { onKeyDown: onKeyDownFixDeleteAll } = useFixDeleteAll();
+
+  const handleChange = useCallback(
+    (value) => {
+      onChangePlaceholder(editor);
+      onChangeSelection(editor.selection);
+      onChange(slateNodesToTextWithPlaceholders(value));
+    },
+    [onChange, onChangePlaceholder, onChangeSelection]
+  );
+
+  const plugins = useMemo(() => {
+    return [PlaceholderPlugin(placeholders)];
+  }, [placeholders]);
+
+  const wrapper = useRef<HTMLElement>();
+  const placeholderMenuId = `placeholder-menu-${useId()}`;
+  const isOpen = Boolean(target);
+  const styles = useInputLikeStyles();
+
+  const slateValue = useMemo(
+    () => [
+      {
+        type: "paragraph",
+        children: textWithPlaceholderToSlateNodes(value, placeholders),
+      },
+    ],
+    [value]
+  );
+
+  return (
+    <>
+      <PseudoBox
+        ref={wrapper}
+        role="combobox"
+        aria-controls={placeholderMenuId}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-disabled={isDisabled}
+        height={10}
+        display="flex"
+        alignItems="center"
+        paddingX={3}
+        {...styles}
+        {...props}
+      >
+        <Slate editor={editor} value={slateValue} onChange={handleChange}>
+          <EditablePlugins
+            plugins={plugins}
+            readOnly={isDisabled}
+            onKeyDown={[onKeyDownPlaceholder, onKeyDownFixDeleteAll]}
+            onKeyDownDeps={[selectedIndex, search, target]}
+            style={{
+              flex: 1,
+              padding: "0 0.25rem",
+              whiteSpace: "pre",
+              overflow: "hidden",
+            }}
+          />
+        </Slate>
+      </PseudoBox>
+      <PlaceholderMenu
+        menuId={placeholderMenuId}
+        values={values}
+        selectedIndex={selectedIndex}
+        isOpen={isOpen}
+        anchor={wrapper.current}
+        onAddPlaceholder={(placeholder) =>
+          onAddPlaceholder(editor, placeholder)
+        }
+        onHighlightOption={onHighlightOption}
+      />
+    </>
+  );
+});
 
 function PlaceholderMenu({
   menuId,
