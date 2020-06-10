@@ -108,6 +108,42 @@
     "reference": "components/common/DateTime.tsx#L58-L61"
   },
   {
+    "term": "component.download-all-dialog.description",
+    "definition": "Select if you want to rename the individual files.",
+    "context": "Select if you want to rename the individual files.",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L53-L56"
+  },
+  {
+    "term": "component.download-all-dialog.download-button",
+    "definition": "Download files",
+    "context": "Download files",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L125-L128"
+  },
+  {
+    "term": "component.download-all-dialog.header",
+    "definition": "Download all files",
+    "context": "Download all files",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L45-L48"
+  },
+  {
+    "term": "component.download-all-dialog.keep-original",
+    "definition": "Keep the original name",
+    "context": "Keep the original name",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L115-L118"
+  },
+  {
+    "term": "component.download-all-dialog.placeholder-hint",
+    "definition": "Hint: Type {key} to add replaceable placeholders",
+    "context": "Hint: Type {key} to add replaceable placeholders",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L85-L111"
+  },
+  {
+    "term": "component.download-all-dialog.rename",
+    "definition": "Rename files",
+    "context": "Rename files",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L70-L73"
+  },
+  {
     "term": "component.error-dialog.header",
     "definition": "Error",
     "context": "Error",
@@ -399,7 +435,7 @@
     "term": "component.send-petition-dialog.same-petition-warning",
     "definition": "Recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "Recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition-activity/AddPetitionAccessDialog.tsx#L109-L112"
+    "reference": "components/petition-activity/AddPetitionAccessDialog.tsx#L107-L110"
   },
   {
     "term": "component.table.next-page-button",
@@ -921,7 +957,7 @@
     "term": "generic.reload-data",
     "definition": "Reload",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L206-L209"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L219-L222"
   },
   {
     "term": "generic.required-field",
@@ -933,25 +969,25 @@
     "term": "generic.richtext.bold",
     "definition": "Bold",
     "context": "Bold",
-    "reference": "components/common/RichTextEditor.tsx#L136-L139"
+    "reference": "components/common/RichTextEditor.tsx#L146-L149"
   },
   {
     "term": "generic.richtext.italic",
     "definition": "Italic",
     "context": "Italic",
-    "reference": "components/common/RichTextEditor.tsx#L145-L148"
+    "reference": "components/common/RichTextEditor.tsx#L155-L158"
   },
   {
     "term": "generic.richtext.list",
     "definition": "Bullet list",
     "context": "Bullet list",
-    "reference": "components/common/RichTextEditor.tsx#L163-L166"
+    "reference": "components/common/RichTextEditor.tsx#L173-L176"
   },
   {
     "term": "generic.richtext.underline",
     "definition": "Underline",
     "context": "Underline",
-    "reference": "components/common/RichTextEditor.tsx#L154-L157"
+    "reference": "components/common/RichTextEditor.tsx#L164-L167"
   },
   {
     "term": "generic.save-changes",
@@ -976,6 +1012,12 @@
     "definition": "Tomorrow at {time}",
     "context": "Tomorrow at {time}",
     "reference": "components/common/DateTimePicker.tsx#L84-L90"
+  },
+  {
+    "term": "generic.unexpected-error-happened",
+    "definition": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+    "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+    "reference": "utils/usePetitionState.ts#L26-L30"
   },
   {
     "term": "generic.untitled-field",
@@ -1149,7 +1191,7 @@
     "term": "petition.already-sent",
     "definition": "This petition has already been sent.",
     "context": "This petition has already been sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L369-L372"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L365-L368"
   },
   {
     "term": "petition.change-deadline",
@@ -1377,37 +1419,37 @@
     "term": "petition.message-scheduled.toast-description",
     "definition": "The message will be sent on {date}",
     "context": "The message will be sent on {date}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L100-L103"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L96-L99"
   },
   {
     "term": "petition.message-scheduled.toast-header",
     "definition": "Message scheduled",
     "context": "Message scheduled",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L90-L93"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L86-L89"
   },
   {
     "term": "petition.message-sent.toast-description",
     "definition": "The message is on it's way",
     "context": "The message is on it's way",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L106-L109"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L102-L105"
   },
   {
     "term": "petition.message-sent.toast-header",
     "definition": "Message sent",
     "context": "Message sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L94-L97"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L90-L93"
   },
   {
     "term": "petition.message-settings.header",
     "definition": "Who do you want to send it to?",
     "context": "Who do you want to send it to?",
-    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L91-L94"
+    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L89-L92"
   },
   {
     "term": "petition.message-settings.same-petition-warning",
     "definition": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L110-L114"
+    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L108-L112"
   },
   {
     "term": "petition.name-label",
@@ -1419,25 +1461,25 @@
     "term": "petition.no-fields-error",
     "definition": "Please add at least one field to the petition.",
     "context": "Please add at least one field to the petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L207-L210"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L203-L206"
   },
   {
     "term": "petition.no-fields-without-title-error",
     "definition": "Please add a title to every field.",
     "context": "Please add a title to every field.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L225-L228"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L221-L224"
   },
   {
     "term": "petition.no-reminders-left.toast-description",
     "definition": "You have sent the maximum number of reminders to {nameOrEmail}",
     "context": "You have sent the maximum number of reminders to {nameOrEmail}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L146-L150"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L142-L146"
   },
   {
     "term": "petition.no-reminders-left.toast-header",
     "definition": "No reminders left",
     "context": "No reminders left",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L141-L144"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L137-L140"
   },
   {
     "term": "petition.petition-field.no-replies",
@@ -1467,49 +1509,49 @@
     "term": "petition.petition-scheduled-toast.description",
     "definition": "Your petition will be sent on {date}.",
     "context": "Your petition will be sent on {date}.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L300-L303"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L296-L299"
   },
   {
     "term": "petition.petition-scheduled-toast.title",
     "definition": "Petition scheduled",
     "context": "Petition scheduled",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L290-L293"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L286-L289"
   },
   {
     "term": "petition.petition-send-error.description",
     "definition": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
     "context": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L278-L282"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L274-L278"
   },
   {
     "term": "petition.petition-send-error.title",
     "definition": "Error",
     "context": "Error",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L274-L277"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L270-L273"
   },
   {
     "term": "petition.petition-sent-toast.description",
     "definition": "Your petition is on it's way.",
     "context": "Your petition is on it's way.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L306-L309"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L302-L305"
   },
   {
     "term": "petition.petition-sent-toast.title",
     "definition": "Petition sent",
     "context": "Petition sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L294-L297"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L290-L293"
   },
   {
     "term": "petition.reminder-sent.toast-description",
     "definition": "The reminder is on it's way",
     "context": "The reminder is on it's way",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L169-L172"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L165-L168"
   },
   {
     "term": "petition.reminder-sent.toast-header",
     "definition": "Reminder sent",
     "context": "Reminder sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L165-L168"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L161-L164"
   },
   {
     "term": "petition.reminders-label",
@@ -1530,6 +1572,12 @@
     "reference": "components/layout/PetitionHeader.tsx#L81-L84"
   },
   {
+    "term": "petition.replies.download-all",
+    "definition": "Download all",
+    "context": "Download all",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L243-L246"
+  },
+  {
     "term": "petition.replies.download-file-error-dialog.body",
     "definition": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
     "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
@@ -1545,19 +1593,19 @@
     "term": "petition.replies.select-all",
     "definition": "All",
     "context": "All",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L186-L189"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L199-L202"
   },
   {
     "term": "petition.replies.select-none",
     "definition": "None",
     "context": "None",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L192-L195"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L205-L208"
   },
   {
     "term": "petition.replies.validate-selected",
     "definition": "Mark as reviewed",
     "context": "Mark as reviewed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L222-L225"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L235-L238"
   },
   {
     "term": "petition.schedule-delivery.header",
@@ -1575,13 +1623,13 @@
     "term": "petition.send-from-activity",
     "definition": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L375-L388"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L371-L384"
   },
   {
     "term": "petition.send-message-header.header",
     "definition": "Send message",
     "context": "Send message",
-    "reference": "components/petition-activity/SendMessageDialog.tsx#L56-L59"
+    "reference": "components/petition-activity/SendMessageDialog.tsx#L54-L57"
   },
   {
     "term": "petition.set-a-deadline",
@@ -2793,133 +2841,133 @@
     "term": "tour.petition-activity.monitor-requests",
     "definition": "Monitor your requests",
     "context": "Monitor your requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L497-L500"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L493-L496"
   },
   {
     "term": "tour.petition-activity.next-reminder",
     "definition": "See when will the <b>next reminder</b> be sent.",
     "context": "See when will the <b>next reminder</b> be sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L536-L542"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L532-L538"
   },
   {
     "term": "tour.petition-activity.send-manual-reminder",
     "definition": "<b>Send reminders</b> manually to the recipients.",
     "context": "<b>Send reminders</b> manually to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L545-L551"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L541-L547"
   },
   {
     "term": "tour.petition-activity.send-message",
     "definition": "Send a <b>follow-up message</b> to recipients.",
     "context": "Send a <b>follow-up message</b> to recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L527-L533"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L523-L529"
   },
   {
     "term": "tour.petition-activity.track",
     "definition": "Manage who can <b>access</b> this petition.",
     "context": "Manage who can <b>access</b> this petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L518-L524"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L514-L520"
   },
   {
     "term": "tour.petition-activity.you-can",
     "definition": "In this section, you will be able to:",
     "context": "In this section, you will be able to:",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L505-L508"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L501-L504"
   },
   {
     "term": "tour.petition-compose.add-petition-fields",
     "definition": "Here you can add the recipients, your first message, and configure your automatic reminders.",
     "context": "Here you can add the recipients, your first message, and configure your automatic reminders.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L741-L744"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L737-L740"
   },
   {
     "term": "tour.petition-compose.add-petition-fields-title",
     "definition": "Message and automatic reminders",
     "context": "Message and automatic reminders",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L734-L737"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L730-L733"
   },
   {
     "term": "tour.petition-compose.create-petition",
     "definition": "Let's fill out your first petition",
     "context": "Let's fill out your first petition",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L696-L699"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L692-L695"
   },
   {
     "term": "tour.petition-compose.field-types",
     "definition": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies).",
     "context": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies).",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L723-L726"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L719-L722"
   },
   {
     "term": "tour.petition-compose.petition-advanced-settings",
     "definition": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them.",
     "context": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L798-L804"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L794-L800"
   },
   {
     "term": "tour.petition-compose.petition-advanced-settings-title",
     "definition": "Need more customization?",
     "context": "Need more customization?",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L791-L794"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L787-L790"
   },
   {
     "term": "tour.petition-compose.petition-reminders",
     "definition": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders.",
     "context": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L780-L783"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L776-L779"
   },
   {
     "term": "tour.petition-compose.petition-reminders-title",
     "definition": "We will handle this, but tell us a little bit more.",
     "context": "We will handle this, but tell us a little bit more.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L773-L776"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L769-L772"
   },
   {
     "term": "tour.petition-compose.select-multiple-recipients",
     "definition": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
     "context": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L759-L765"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L755-L761"
   },
   {
     "term": "tour.petition-compose.select-recipients-title",
     "definition": "Select your recipients",
     "context": "Select your recipients",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L752-L755"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L748-L751"
   },
   {
     "term": "tour.petition-compose.set-petition",
     "definition": "On this page, you can set up the information that you need from your recipients.",
     "context": "On this page, you can set up the information that you need from your recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L704-L707"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L700-L703"
   },
   {
     "term": "tour.petition-compose.show-around",
     "definition": "Let us show you step by step!",
     "context": "Let us show you step by step!",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L710-L713"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L706-L709"
   },
   {
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "On this page, you can see all the items that you requested to the recipients.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L398-L401"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L419-L422"
   },
   {
     "term": "tour.petition-replies.completed-items",
     "definition": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
     "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L415-L421"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L436-L442"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Replies",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L408-L411"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L429-L432"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Here you have your information on the requests",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L392-L395"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L413-L416"
   },
   {
     "term": "tour.petitions-list.create-petition",
