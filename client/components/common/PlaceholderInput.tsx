@@ -96,7 +96,7 @@ export const PlaceholderInput = forwardRef<
 
   const wrapper = useRef<HTMLElement>();
   const placeholderMenuId = `placeholder-menu-${useId()}`;
-  const isOpen = Boolean(target);
+  const isOpen = Boolean(target && values.length > 0);
   const styles = useInputLikeStyles();
 
   const slateValue = useMemo(
@@ -180,7 +180,7 @@ function PlaceholderMenu({
     return { onCreate: setWidth, onUpdate: setWidth };
   }, []);
   const itemId = `placeholder-${useId()}`;
-  const selected = values[selectedIndex];
+  const selected = values[selectedIndex] as Placeholder | undefined;
   return (
     <Popper
       usePortal
@@ -194,13 +194,15 @@ function PlaceholderMenu({
       <Card
         id={menuId}
         role="listbox"
-        aria-activedescendant={`${itemId}-${selected.value}`}
+        aria-activedescendant={
+          selected ? `${itemId}-${selected.value}` : undefined
+        }
         overflow="auto"
         maxHeight="180px"
         paddingY={1}
       >
         {values.map((placeholder, index) => {
-          const isSelected = placeholder.value === selected.value;
+          const isSelected = placeholder.value === selected?.value;
           return (
             <PseudoBox
               key={placeholder.value}

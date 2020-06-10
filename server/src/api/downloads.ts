@@ -1,11 +1,12 @@
 import contentDisposition from "content-disposition";
+import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
 import { indexBy } from "remeda";
 import sanitize from "sanitize-filename";
 import { ApiContext } from "../context";
+import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { fromGlobalId } from "../util/globalId";
 import { zip } from "../util/remedaExtensions";
-import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { authenticate } from "./helpers/authenticate";
 
 /**
@@ -132,8 +133,13 @@ function rename<T extends string>(
   placeholders: readonly T[],
   replacer: (value: T) => string
 ) {
-  return pattern
-    .split(/(#[a-z-]+#)/g)
+  const parts = pattern.split(
+    new RegExp(
+      `(#(?:${placeholders.map((p) => escapeStringRegexp(p)).join("|")})#)`,
+      "g"
+    )
+  );
+  return parts
     .map((part) => {
       if (part.startsWith("#") && part.endsWith("#")) {
         const value = part.slice(1, -1);

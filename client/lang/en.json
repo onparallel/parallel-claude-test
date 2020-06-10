@@ -111,37 +111,67 @@
     "term": "component.download-all-dialog.description",
     "definition": "Select if you want to rename the individual files.",
     "context": "Select if you want to rename the individual files.",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L53-L56"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L94-L97"
   },
   {
     "term": "component.download-all-dialog.download-button",
     "definition": "Download files",
     "context": "Download files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L125-L128"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L166-L169"
   },
   {
     "term": "component.download-all-dialog.header",
     "definition": "Download all files",
     "context": "Download all files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L45-L48"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L86-L89"
   },
   {
     "term": "component.download-all-dialog.keep-original",
     "definition": "Keep the original name",
     "context": "Keep the original name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L115-L118"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L156-L159"
   },
   {
     "term": "component.download-all-dialog.placeholder-hint",
     "definition": "Hint: Type {key} to add replaceable placeholders",
     "context": "Hint: Type {key} to add replaceable placeholders",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L85-L111"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L126-L152"
   },
   {
     "term": "component.download-all-dialog.rename",
     "definition": "Rename files",
     "context": "Rename files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L70-L73"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L111-L114"
+  },
+  {
+    "term": "component.download-dialog.placeholder-contact-first-name",
+    "definition": "Contact first name",
+    "context": "Contact first name",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L60-L63"
+  },
+  {
+    "term": "component.download-dialog.placeholder-contact-last-name",
+    "definition": "Contact last name",
+    "context": "Contact last name",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L67-L70"
+  },
+  {
+    "term": "component.download-dialog.placeholder-field-number",
+    "definition": "Field number",
+    "context": "Field number",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L46-L49"
+  },
+  {
+    "term": "component.download-dialog.placeholder-field-title",
+    "definition": "Field title",
+    "context": "Field title",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L53-L56"
+  },
+  {
+    "term": "component.download-dialog.placeholder-file-name",
+    "definition": "File name",
+    "context": "File name",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L74-L77"
   },
   {
     "term": "component.error-dialog.header",

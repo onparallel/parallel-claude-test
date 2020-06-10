@@ -5,8 +5,8 @@ import {
 } from "@udecode/slate-plugins";
 import { useCallback, useReducer } from "react";
 import { Editor, Range, Transforms } from "slate";
-import { Placeholder } from "./PlaceholderPlugin";
 import { insertPlaceholder } from "./insertPlaceholder";
+import { Placeholder } from "./PlaceholderPlugin";
 
 export function usePlaceholders(placeholders: Placeholder[] = []) {
   type PlaceholderState = {
@@ -27,7 +27,7 @@ export function usePlaceholders(placeholders: Placeholder[] = []) {
   );
   const values = search
     ? placeholders.filter((c) =>
-        c.value.toLowerCase().includes(search.toLowerCase())
+        c.label.toLowerCase().includes(search.toLowerCase())
       )
     : placeholders;
 

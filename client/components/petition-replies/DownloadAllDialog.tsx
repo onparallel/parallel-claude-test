@@ -1,33 +1,25 @@
 import {
-  Text,
-  RadioGroup,
-  Radio,
-  Button,
   Box,
+  Button,
   PseudoBox,
+  Radio,
+  RadioGroup,
+  Text,
 } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { FormattedMessage } from "react-intl";
-import { useState, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
   PlaceholderInput,
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
-import { Placeholder } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-
-const placeholders: Placeholder[] = [
-  { value: "field-number", label: "Field number" },
-  { value: "field-title", label: "Field title" },
-  { value: "contact-first-name", label: "Contact first name" },
-  { value: "contact-last-name", label: "Contact last name" },
-  { value: "file-name", label: "File name" },
-];
 
 export function DownloadAllDialog({ ...props }: DialogProps<string>) {
+  const intl = useIntl();
   const [option, setOption] = useState<"ORIGINAL" | "RENAME">("RENAME");
   const [pattern, setPattern] = useState("#field-number#_#field-title#");
   const inputRef = useRef<PlaceholderInputRef>(null);
@@ -38,6 +30,46 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
       props.onResolve(pattern);
     }
   };
+  const placeholders = useMemo(
+    () => [
+      {
+        value: "field-number",
+        label: intl.formatMessage({
+          id: "component.download-dialog.placeholder-field-number",
+          defaultMessage: "Field number",
+        }),
+      },
+      {
+        value: "field-title",
+        label: intl.formatMessage({
+          id: "component.download-dialog.placeholder-field-title",
+          defaultMessage: "Field title",
+        }),
+      },
+      {
+        value: "contact-first-name",
+        label: intl.formatMessage({
+          id: "component.download-dialog.placeholder-contact-first-name",
+          defaultMessage: "Contact first name",
+        }),
+      },
+      {
+        value: "contact-last-name",
+        label: intl.formatMessage({
+          id: "component.download-dialog.placeholder-contact-last-name",
+          defaultMessage: "Contact last name",
+        }),
+      },
+      {
+        value: "file-name",
+        label: intl.formatMessage({
+          id: "component.download-dialog.placeholder-file-name",
+          defaultMessage: "File name",
+        }),
+      },
+    ],
+    [intl.locale]
+  );
   return (
     <ConfirmDialog
       focusRef={inputRef as any}
