@@ -1,10 +1,9 @@
 /** @jsx jsx */
-import { Box, BoxProps, PseudoBox, VisuallyHidden } from "@chakra-ui/core";
+import { Box, BoxProps, PseudoBox } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { MentionPlugin } from "@udecode/slate-plugins";
 import { forwardRef, ReactNode, Ref } from "react";
 import { RenderElementProps, useFocused, useSelected } from "slate-react";
-import { useIntl } from "react-intl";
 
 export type Placeholder = {
   value: string;
@@ -45,7 +44,6 @@ const PlaceholderToken = forwardRef(function (
   },
   ref: Ref<HTMLElement>
 ) {
-  const intl = useIntl();
   const selected = useSelected();
   const focused = useFocused();
   return (

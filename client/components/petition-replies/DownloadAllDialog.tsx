@@ -18,7 +18,6 @@ import {
   PlaceholderInput,
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
-import { SrOnly } from "../common/SrOnly";
 
 export function DownloadAllDialog({ ...props }: DialogProps<string>) {
   const intl = useIntl();
