@@ -96,6 +96,7 @@ export const PlaceholderInput = forwardRef<
 
   const wrapper = useRef<HTMLElement>();
   const placeholderMenuId = `placeholder-menu-${useId()}`;
+  const itemIdPrefix = `placeholder-menu-item-${useId()}`;
   const isOpen = Boolean(target && values.length > 0);
   const styles = useInputLikeStyles();
 
@@ -108,13 +109,14 @@ export const PlaceholderInput = forwardRef<
     ],
     [value]
   );
+  const selected = isOpen ? values[selectedIndex] : undefined;
 
   return (
     <>
       <PseudoBox
         ref={wrapper}
         role="combobox"
-        aria-controls={placeholderMenuId}
+        aria-owns={placeholderMenuId}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-disabled={isDisabled}
@@ -137,11 +139,17 @@ export const PlaceholderInput = forwardRef<
               whiteSpace: "pre",
               overflow: "hidden",
             }}
+            aria-controls={placeholderMenuId}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              selected ? `${itemIdPrefix}-${selected.value}` : undefined
+            }
           />
         </Slate>
       </PseudoBox>
       <PlaceholderMenu
         menuId={placeholderMenuId}
+        itemIdPrefix={itemIdPrefix}
         values={values}
         selectedIndex={selectedIndex}
         isOpen={isOpen}
@@ -157,6 +165,7 @@ export const PlaceholderInput = forwardRef<
 
 function PlaceholderMenu({
   menuId,
+  itemIdPrefix,
   anchor,
   values,
   selectedIndex,
@@ -165,6 +174,7 @@ function PlaceholderMenu({
   onHighlightOption,
 }: {
   menuId: string;
+  itemIdPrefix: string;
   anchor: PopperProps["anchorEl"];
   values: Placeholder[];
   selectedIndex: number;
@@ -179,8 +189,6 @@ function PlaceholderMenu({
     };
     return { onCreate: setWidth, onUpdate: setWidth };
   }, []);
-  const itemId = `placeholder-${useId()}`;
-  const selected = values[selectedIndex] as Placeholder | undefined;
   return (
     <Popper
       usePortal
@@ -194,19 +202,16 @@ function PlaceholderMenu({
       <Card
         id={menuId}
         role="listbox"
-        aria-activedescendant={
-          selected ? `${itemId}-${selected.value}` : undefined
-        }
         overflow="auto"
         maxHeight="180px"
         paddingY={1}
       >
         {values.map((placeholder, index) => {
-          const isSelected = placeholder.value === selected?.value;
+          const isSelected = index === selectedIndex;
           return (
             <PseudoBox
               key={placeholder.value}
-              id={`${itemId}-${placeholder.value}`}
+              id={`${itemIdPrefix}-${placeholder.value}`}
               role="option"
               aria-selected={isSelected ? "true" : undefined}
               backgroundColor={isSelected ? "gray.100" : "white"}

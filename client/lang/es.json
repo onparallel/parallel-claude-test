@@ -111,67 +111,67 @@
     "term": "component.download-all-dialog.description",
     "definition": "Selecciona si quieres renombrar los archivos.",
     "context": "Select if you want to rename the individual files.",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L94-L97"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L87-L90"
   },
   {
     "term": "component.download-all-dialog.download-button",
     "definition": "Descargar",
     "context": "Download files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L166-L169"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L157-L160"
   },
   {
     "term": "component.download-all-dialog.header",
     "definition": "Descargar archivos",
     "context": "Download all files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L86-L89"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L79-L82"
   },
   {
     "term": "component.download-all-dialog.keep-original",
     "definition": "Mantener el nombre original",
     "context": "Keep the original name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L156-L159"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L147-L150"
   },
   {
     "term": "component.download-all-dialog.placeholder-hint",
-    "definition": "Pista: Introduce {key} para añadir parámetros a sustituir",
-    "context": "Hint: Type {key} to add replaceable placeholders",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L126-L152"
+    "definition": "Pista: Introduce <x>almohadilla</x> para añadir parámetros a sustituir",
+    "context": "Hint: Type <x>hash key</x> to add replaceable placeholders",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L119-L143"
   },
   {
     "term": "component.download-all-dialog.rename",
     "definition": "Renombrar archivos",
     "context": "Rename files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L111-L114"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L104-L107"
   },
   {
     "term": "component.download-dialog.placeholder-contact-first-name",
     "definition": "Nombre del contacto",
     "context": "Contact first name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L60-L63"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L53-L56"
   },
   {
     "term": "component.download-dialog.placeholder-contact-last-name",
     "definition": "Apellido del contacto",
     "context": "Contact last name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L67-L70"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L60-L63"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
-    "definition": "Número de campo",
+    "definition": "Número del campo",
     "context": "Field number",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L46-L49"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L39-L42"
   },
   {
     "term": "component.download-dialog.placeholder-field-title",
     "definition": "Título del campo",
     "context": "Field title",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L53-L56"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L46-L49"
   },
   {
     "term": "component.download-dialog.placeholder-file-name",
     "definition": "Nombre del archivo",
     "context": "File name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L74-L77"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L67-L70"
   },
   {
     "term": "component.error-dialog.header",
@@ -370,6 +370,12 @@
     "definition": "Pendientes",
     "context": "Pending",
     "reference": "components/common/PetitionStatusFilter.tsx#L34-L37"
+  },
+  {
+    "term": "component.placeholder-input.placeholder",
+    "definition": "Parámetro",
+    "context": "Placeholder",
+    "reference": "utils/slate/placeholders/PlaceholderPlugin.tsx#L72-L75"
   },
   {
     "term": "component.react-select.loading",
@@ -2241,31 +2247,31 @@
     "term": "public.invite.consent",
     "definition": "Parallel necesita la información que nos proporcionas para ponernos en contacto contigo acerca de nuestros productos. Puedes darte de baja de estas comunicaciones en cualquier momento.",
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
-    "reference": "pages/[locale]/invite.tsx#L88-L91"
+    "reference": "pages/[locale]/invite.tsx#L94-L97"
   },
   {
     "term": "public.invite.request-invite",
     "definition": "¡Pide tu invitación hoy!",
     "context": "Request your invite today!",
-    "reference": "pages/[locale]/invite.tsx#L57-L60"
+    "reference": "pages/[locale]/invite.tsx#L63-L66"
   },
   {
     "term": "public.invite.review-privacy",
     "definition": "Para más información, por favor revisa nuestra <a>Política de Privacidad</a>.",
     "context": "For more information, please review our <a>Privacy Policy</a>.",
-    "reference": "pages/[locale]/invite.tsx#L94-L104"
+    "reference": "pages/[locale]/invite.tsx#L100-L110"
   },
   {
     "term": "public.invite.tell-us-about-yourself",
     "definition": "Cuéntanos un poco sobre ti y te enviaremos un <a>acceso gratuito</a>.",
     "context": "Tell us a bit about yourself, and we will send you a <a>free access</a>.",
-    "reference": "pages/[locale]/invite.tsx#L63-L78"
+    "reference": "pages/[locale]/invite.tsx#L69-L84"
   },
   {
     "term": "public.invite.title",
     "definition": "Pide una invitación",
     "context": "Request an invite",
-    "reference": "pages/[locale]/invite.tsx#L35-L38"
+    "reference": "pages/[locale]/invite.tsx#L41-L44"
   },
   {
     "term": "public.login-button",

@@ -5,6 +5,7 @@ import {
   Radio,
   RadioGroup,
   Text,
+  VisuallyHidden,
 } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -17,6 +18,7 @@ import {
   PlaceholderInput,
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
+import { SrOnly } from "../common/SrOnly";
 
 export function DownloadAllDialog({ ...props }: DialogProps<string>) {
   const intl = useIntl();
@@ -116,10 +118,11 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
               <Text as="div" fontSize="xs" color="gray.500">
                 <FormattedMessage
                   id="component.download-all-dialog.placeholder-hint"
-                  defaultMessage="Hint: Type {key} to add replaceable placeholders"
+                  defaultMessage="Hint: Type <x>hash key</x> to add replaceable placeholders"
                   values={{
-                    key: (
+                    x: (...chunks: any[]) => (
                       <PseudoBox
+                        as="span"
                         display="inline-block"
                         border="1px solid"
                         borderBottomWidth="3px"
@@ -128,15 +131,12 @@ export function DownloadAllDialog({ ...props }: DialogProps<string>) {
                         textTransform="uppercase"
                         fontSize="xs"
                         paddingX={1}
-                        position="relative"
                         cursor="default"
-                        _hover={{
-                          borderBottomWidth: "1px",
-                          top: "2px",
-                          marginBottom: "2px",
-                        }}
                       >
-                        #
+                        <VisuallyHidden>{chunks}</VisuallyHidden>
+                        <Box as="span" aria-hidden="true">
+                          #
+                        </Box>
                       </PseudoBox>
                     ),
                   }}
