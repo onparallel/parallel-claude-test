@@ -7,6 +7,7 @@ import {
   PseudoBoxProps,
   Stack,
   Text,
+  VisuallyHidden,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -21,7 +22,6 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
-import { SrOnly } from "../common/SrOnly";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
@@ -194,7 +194,7 @@ export function PetitionRepliesField({
                   ]}
                 >
                   <Box display="inling-flex">
-                    <SrOnly>{labels.filename}</SrOnly>
+                    <VisuallyHidden>{labels.filename}</VisuallyHidden>
                     <Text as="span">{reply.content.filename}</Text>
                     <Text as="span" marginX={2}>
                       -

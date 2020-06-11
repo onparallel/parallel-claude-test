@@ -1,4 +1,4 @@
-import { SrOnly } from "@parallel/components/common/SrOnly";
+import { VisuallyHidden } from "@chakra-ui/core";
 
 export interface LogoProps {
   width?: number;
@@ -9,7 +9,7 @@ export interface LogoProps {
 export function Logo({ hideText, ...rest }: LogoProps) {
   return (
     <>
-      <SrOnly>Parallel</SrOnly>
+      <VisuallyHidden>Parallel</VisuallyHidden>
       <svg
         {...rest}
         viewBox={hideText ? "0 3 24 25" : "0 0 152 30"}
