@@ -20,6 +20,11 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
+import {
+  Login_UserFragment,
+  useCurrentUserQuery,
+} from "@parallel/graphql/__types";
+import { assertQuery } from "@parallel/utils/apollo";
 import { postJson } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { gql } from "apollo-boost";
@@ -28,16 +33,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
-interface LoginProps {
-  me?: {
-    email: string;
-    fullName: string;
-  };
-}
-
-function Login({ me }: LoginProps) {
+function Login() {
   const router = useRouter();
   const client = useApolloClient();
+  const {
+    data: { me },
+  } = assertQuery(useCurrentUserQuery());
   const [showContinueAs, setShowContinueAs] = useState(!!me);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordChange, setPasswordChange] = useState<{
@@ -140,10 +141,7 @@ function Login({ me }: LoginProps) {
 }
 
 interface AlreadyLoggedInProps {
-  me: {
-    email: string;
-    fullName: string;
-  };
+  me: Login_UserFragment;
   onRelogin: () => void;
   onContinueAs: () => void;
 }
@@ -400,19 +398,21 @@ function PasswordChangeForm({
   );
 }
 
-Login.getInitialProps = async ({ res, apollo }: WithDataContext) => {
+Login.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
   try {
-    const result = await apollo.query({
-      query: gql`
+    await fetchQuery(
+      gql`
         query CurrentUser {
           me {
-            fullName
-            email
+            ...Login_User
           }
         }
-      `,
-    });
-    return result.data;
+        fragment Login_User on User {
+          fullName
+          email
+        }
+      `
+    );
   } catch (error) {
     return {};
   }

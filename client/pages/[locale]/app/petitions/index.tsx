@@ -503,11 +503,11 @@ Petitions.mutations = [
   `,
 ];
 
-Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+Petitions.getInitialProps = async ({ query, fetchQuery }: WithDataContext) => {
   const { page, search, sort, status } = parseQuery(query, QUERY_STATE);
   await Promise.all([
-    apollo.query<PetitionsQuery, PetitionsQueryVariables>({
-      query: gql`
+    fetchQuery<PetitionsQuery, PetitionsQueryVariables>(
+      gql`
         query Petitions(
           $offset: Int!
           $limit: Int!
@@ -527,24 +527,24 @@ Petitions.getInitialProps = async ({ apollo, query }: WithDataContext) => {
         }
         ${Petitions.fragments.Petitions}
       `,
-      variables: {
-        offset: PAGE_SIZE * (page - 1),
-        limit: PAGE_SIZE,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
-        status,
-      },
-    }),
-    apollo.query<PetitionsUserQuery>({
-      query: gql`
-        query PetitionsUser {
-          me {
-            ...Petitions_User
-          }
+      {
+        variables: {
+          offset: PAGE_SIZE * (page - 1),
+          limit: PAGE_SIZE,
+          search,
+          sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
+          status,
+        },
+      }
+    ),
+    fetchQuery<PetitionsUserQuery>(gql`
+      query PetitionsUser {
+        me {
+          ...Petitions_User
         }
-        ${Petitions.fragments.User}
-      `,
-    }),
+      }
+      ${Petitions.fragments.User}
+    `),
   ]);
 };
 

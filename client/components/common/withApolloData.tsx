@@ -1,14 +1,26 @@
 import { ApolloProvider } from "@apollo/react-hooks";
 import { createApolloClient } from "@parallel/utils/apollo";
-import { ApolloClient } from "apollo-boost";
+import {
+  ApolloClient,
+  OperationVariables,
+  DocumentNode,
+  ApolloQueryResult,
+} from "apollo-boost";
 import { parse as parseCookie } from "cookie";
 import { NextComponentType } from "next";
 import { NextPageContext } from "next/dist/next-server/lib/utils";
-import React from "react";
 import Router from "next/router";
+import React from "react";
 
 export type WithDataContext = NextPageContext & {
   apollo: ApolloClient<any>;
+  fetchQuery<T = any, TVariables = OperationVariables>(
+    query: DocumentNode,
+    options?: {
+      variables?: TVariables;
+      ignoreCache?: boolean;
+    }
+  ): Promise<ApolloQueryResult<T>>;
 };
 
 export type WithDataProps<P> = {
@@ -66,7 +78,45 @@ export function withApolloData<P = {}>(
       );
       try {
         const componentProps: P =
-          (await getInitialProps?.({ ...context, apollo })) ?? ({} as P);
+          (await getInitialProps?.({
+            ...context,
+            apollo,
+            async fetchQuery<T = any, TVariables = OperationVariables>(
+              query: DocumentNode,
+              options?: {
+                variables?: TVariables;
+                ignoreCache?: boolean;
+              }
+            ) {
+              if (process.browser) {
+                // On the browser we fetch from cache and fire a request
+                return await new Promise<ApolloQueryResult<T>>((resolve) => {
+                  const subscription = apollo
+                    .watchQuery<T, TVariables>({
+                      query,
+                      variables: options?.variables,
+                      fetchPolicy: options?.ignoreCache
+                        ? "network-only"
+                        : "cache-and-network",
+                    })
+                    .subscribe((result) => {
+                      // stale is true when there was nothing on the cache
+                      if (!result.stale) {
+                        resolve(result);
+                      }
+                      if (!result.loading) {
+                        subscription.unsubscribe();
+                      }
+                    });
+                });
+              } else {
+                return await apollo.query<T, TVariables>({
+                  query,
+                  variables: options?.variables,
+                });
+              }
+            },
+          })) ?? ({} as P);
 
         if (process.browser) {
           return {

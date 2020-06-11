@@ -453,12 +453,12 @@ PetitionActivity.mutations = [
 ];
 
 PetitionActivity.getInitialProps = async ({
-  apollo,
   query,
+  fetchQuery,
 }: WithDataContext) => {
   await Promise.all([
-    apollo.query<PetitionActivityQuery, PetitionActivityQueryVariables>({
-      query: gql`
+    fetchQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
+      gql`
         query PetitionActivity($id: ID!) {
           petition(id: $id) {
             ...PetitionActivity_Petition
@@ -466,18 +466,20 @@ PetitionActivity.getInitialProps = async ({
         }
         ${PetitionActivity.fragments.Petition}
       `,
-      variables: { id: query.petitionId as string },
-    }),
-    apollo.query<PetitionActivityUserQuery>({
-      query: gql`
+      {
+        variables: { id: query.petitionId as string },
+      }
+    ),
+    fetchQuery<PetitionActivityUserQuery>(
+      gql`
         query PetitionActivityUser {
           me {
             ...PetitionActivity_User
           }
         }
         ${PetitionActivity.fragments.User}
-      `,
-    }),
+      `
+    ),
   ]);
   return {
     petitionId: query.petitionId as string,

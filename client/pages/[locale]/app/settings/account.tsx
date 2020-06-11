@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import {
   Box,
   Button,
@@ -19,7 +19,9 @@ import {
   AccountQuery,
   Account_updateAccountMutation,
   Account_updateAccountMutationVariables,
+  useAccountQuery,
 } from "@parallel/graphql/__types";
+import { assertQuery } from "@parallel/utils/apollo";
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
@@ -30,8 +32,9 @@ interface NameChangeFormData {
 }
 
 function Account() {
-  const { data } = useQuery<AccountQuery>(GET_ACCOUNT_DATA);
-  const me = data!.me;
+  const {
+    data: { me },
+  } = assertQuery(useAccountQuery());
   const { handleSubmit, register, errors } = useForm<NameChangeFormData>({
     defaultValues: {
       firstName: me.firstName ?? undefined,
@@ -133,16 +136,6 @@ Account.fragments = {
   `,
 };
 
-const GET_ACCOUNT_DATA = gql`
-  query Account {
-    me {
-      id
-      ...Account_User
-    }
-  }
-  ${Account.fragments.User}
-`;
-
 function useUpdateAccount() {
   return useMutation<
     Account_updateAccountMutation,
@@ -159,8 +152,16 @@ function useUpdateAccount() {
   `);
 }
 
-Account.getInitialProps = async ({ apollo }: WithDataContext) => {
-  await apollo.query<AccountQuery>({ query: GET_ACCOUNT_DATA });
+Account.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
+  await fetchQuery<AccountQuery>(gql`
+    query Account {
+      me {
+        id
+        ...Account_User
+      }
+    }
+    ${Account.fragments.User}
+  `);
 };
 
 export default withApolloData(Account);

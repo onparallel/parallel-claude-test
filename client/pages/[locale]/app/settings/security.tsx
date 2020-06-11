@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import {
   Box,
   Button,
@@ -20,7 +20,9 @@ import {
   SecurityQuery,
   Security_updatePasswordMutation,
   Security_updatePasswordMutationVariables,
+  useSecurityQuery,
 } from "@parallel/graphql/__types";
+import { assertQuery } from "@parallel/utils/apollo";
 import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -34,8 +36,9 @@ interface PasswordChangeFormData {
 function Security() {
   const toast = useToast();
   const intl = useIntl();
-  const { data } = useQuery<SecurityQuery>(GET_SECURITY_DATA);
-  const { me } = data!;
+  const {
+    data: { me },
+  } = assertQuery(useSecurityQuery());
   const [updatePassword] = useUpdatePassword();
   const { handleSubmit, register, errors, getValues, setError } = useForm<
     PasswordChangeFormData
@@ -181,16 +184,6 @@ function Security() {
   );
 }
 
-const GET_SECURITY_DATA = gql`
-  query Security {
-    me {
-      id
-      ...AppLayout_User
-    }
-  }
-  ${AppLayout.fragments.User}
-`;
-
 function useUpdatePassword() {
   return useMutation<
     Security_updatePasswordMutation,
@@ -205,8 +198,16 @@ function useUpdatePassword() {
   `);
 }
 
-Security.getInitialProps = async ({ apollo }: WithDataContext) => {
-  await apollo.query<SecurityQuery>({ query: GET_SECURITY_DATA });
+Security.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
+  await fetchQuery<SecurityQuery>(gql`
+    query Security {
+      me {
+        id
+        ...AppLayout_User
+      }
+    }
+    ${AppLayout.fragments.User}
+  `);
 };
 
 export default withApolloData(Security);

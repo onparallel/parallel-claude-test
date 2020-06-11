@@ -571,10 +571,13 @@ function useCreateFileUploadReply() {
   );
 }
 
-RecipientView.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+RecipientView.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithDataContext) => {
   const keycode = query.keycode as string;
-  await apollo.query<PublicPetitionQuery, PublicPetitionQueryVariables>({
-    query: gql`
+  await fetchQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
+    gql`
       query PublicPetition($keycode: ID!) {
         access(keycode: $keycode) {
           petition {
@@ -588,8 +591,10 @@ RecipientView.getInitialProps = async ({ apollo, query }: WithDataContext) => {
       ${RecipientView.fragments.PublicPetition}
       ${RecipientView.fragments.PublicUser}
     `,
-    variables: { keycode },
-  });
+    {
+      variables: { keycode },
+    }
+  );
   return { keycode };
 };
 

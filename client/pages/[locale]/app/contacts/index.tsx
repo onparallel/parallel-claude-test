@@ -336,11 +336,11 @@ Contacts.mutations = [
   `,
 ];
 
-Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+Contacts.getInitialProps = async ({ query, fetchQuery }: WithDataContext) => {
   const { page, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
-    apollo.query<ContactsQuery, ContactsQueryVariables>({
-      query: gql`
+    fetchQuery<ContactsQuery, ContactsQueryVariables>(
+      gql`
         query Contacts(
           $offset: Int!
           $limit: Int!
@@ -358,23 +358,25 @@ Contacts.getInitialProps = async ({ apollo, query }: WithDataContext) => {
         }
         ${Contacts.fragments.Contacts}
       `,
-      variables: {
-        offset: PAGE_SIZE * (page - 1),
-        limit: PAGE_SIZE,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
-      },
-    }),
-    apollo.query<ContactsUserQuery>({
-      query: gql`
+      {
+        variables: {
+          offset: PAGE_SIZE * (page - 1),
+          limit: PAGE_SIZE,
+          search,
+          sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
+        },
+      }
+    ),
+    fetchQuery<ContactsUserQuery>(
+      gql`
         query ContactsUser {
           me {
             ...Contacts_User
           }
         }
         ${Contacts.fragments.User}
-      `,
-    }),
+      `
+    ),
   ]);
 };
 

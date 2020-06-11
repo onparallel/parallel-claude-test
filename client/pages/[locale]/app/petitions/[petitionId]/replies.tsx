@@ -373,12 +373,12 @@ function useDownloadReplyFile() {
 }
 
 PetitionReplies.getInitialProps = async ({
-  apollo,
   query,
+  fetchQuery,
 }: WithDataContext) => {
   await Promise.all([
-    apollo.query<PetitionRepliesQuery, PetitionRepliesQueryVariables>({
-      query: gql`
+    fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
+      gql`
         query PetitionReplies($id: ID!) {
           petition(id: $id) {
             ...PetitionReplies_Petition
@@ -386,18 +386,20 @@ PetitionReplies.getInitialProps = async ({
         }
         ${PetitionReplies.fragments.Petition}
       `,
-      variables: { id: query.petitionId as string },
-    }),
-    apollo.query<PetitionRepliesUserQuery>({
-      query: gql`
+      {
+        variables: { id: query.petitionId as string },
+      }
+    ),
+    fetchQuery<PetitionRepliesUserQuery>(
+      gql`
         query PetitionRepliesUser {
           me {
             ...PetitionReplies_User
           }
         }
         ${PetitionReplies.fragments.User}
-      `,
-    }),
+      `
+    ),
   ]);
   return {
     petitionId: query.petitionId as string,

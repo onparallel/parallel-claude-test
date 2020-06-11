@@ -652,12 +652,12 @@ function useDeletePetitionField() {
 }
 
 PetitionCompose.getInitialProps = async ({
-  apollo,
   query,
+  fetchQuery,
 }: WithDataContext) => {
   await Promise.all([
-    apollo.query<PetitionComposeQuery, PetitionComposeQueryVariables>({
-      query: gql`
+    fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
+      gql`
         query PetitionCompose($id: ID!) {
           petition(id: $id) {
             ...PetitionCompose_Petition
@@ -665,18 +665,21 @@ PetitionCompose.getInitialProps = async ({
         }
         ${PetitionCompose.fragments.Petition}
       `,
-      variables: { id: query.petitionId as string },
-    }),
-    apollo.query<PetitionComposeUserQuery>({
-      query: gql`
+      {
+        variables: { id: query.petitionId as string },
+        ignoreCache: true,
+      }
+    ),
+    fetchQuery<PetitionComposeUserQuery>(
+      gql`
         query PetitionComposeUser {
           me {
             ...PetitionCompose_User
           }
         }
         ${PetitionCompose.fragments.User}
-      `,
-    }),
+      `
+    ),
   ]);
   return {
     petitionId: query.petitionId as string,

@@ -420,33 +420,29 @@ const ToggleInput = forwardRef(function ToggleInput(
   );
 });
 
-const GET_CONTACT_DATA = gql`
-  query Contact($id: ID!) {
-    contact(id: $id) {
-      ...Contact_Contact
-    }
-  }
-  ${Contact.fragments.Contact}
-`;
-
-const GET_CONTACT_USER_DATA = gql`
-  query ContactUser {
-    me {
-      ...Contact_User
-    }
-  }
-  ${Contact.fragments.User}
-`;
-
-Contact.getInitialProps = async ({ apollo, query }: WithDataContext) => {
+Contact.getInitialProps = async ({ query, fetchQuery }: WithDataContext) => {
   await Promise.all([
-    apollo.query<ContactQuery, ContactQueryVariables>({
-      query: GET_CONTACT_DATA,
-      variables: { id: query.contactId as string },
-    }),
-    apollo.query<ContactUserQuery>({
-      query: GET_CONTACT_USER_DATA,
-    }),
+    fetchQuery<ContactQuery, ContactQueryVariables>(
+      gql`
+        query Contact($id: ID!) {
+          contact(id: $id) {
+            ...Contact_Contact
+          }
+        }
+        ${Contact.fragments.Contact}
+      `,
+      {
+        variables: { id: query.contactId as string },
+      }
+    ),
+    fetchQuery<ContactUserQuery>(gql`
+      query ContactUser {
+        me {
+          ...Contact_User
+        }
+      }
+      ${Contact.fragments.User}
+    `),
   ]);
   return {
     contactId: query.contactId as string,

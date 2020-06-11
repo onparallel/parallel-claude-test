@@ -2,6 +2,7 @@ import gql from "graphql-tag";
 import * as ApolloReactCommon from "@apollo/react-common";
 import * as ApolloReactHooks from "@apollo/react-hooks";
 export type Maybe<T> = T | null;
+export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -953,10 +954,10 @@ export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
   AppLayoutNavbar_UserFragment &
   OnboardingTour_UserFragment;
 
-export type AppLayout_updateOnboardingStatusMutationVariables = {
+export type AppLayout_updateOnboardingStatusMutationVariables = Exact<{
   key: OnboardingKey;
   status: OnboardingStatus;
-};
+}>;
 
 export type AppLayout_updateOnboardingStatusMutation = {
   __typename?: "Mutation";
@@ -1392,18 +1393,18 @@ export type Contact_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
 
-export type Contact_updateContactMutationVariables = {
+export type Contact_updateContactMutationVariables = Exact<{
   id: Scalars["ID"];
   data: UpdateContactInput;
-};
+}>;
 
 export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
   updateContact: { __typename?: "Contact" } & Contact_ContactFragment;
 };
 
-export type ContactQueryVariables = {
+export type ContactQueryVariables = Exact<{
   id: Scalars["ID"];
-};
+}>;
 
 export type ContactQuery = { __typename?: "Query" } & {
   contact?: Maybe<{ __typename?: "Contact" } & Contact_ContactFragment>;
@@ -1430,20 +1431,20 @@ export type Contacts_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
 
-export type Contacts_deleteContactsMutationVariables = {
+export type Contacts_deleteContactsMutationVariables = Exact<{
   ids: Array<Scalars["ID"]>;
-};
+}>;
 
 export type Contacts_deleteContactsMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deleteContacts">;
 
-export type ContactsQueryVariables = {
+export type ContactsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
-};
+}>;
 
 export type ContactsQuery = { __typename?: "Query" } & {
   contacts: {
@@ -1468,10 +1469,10 @@ export type PetitionActivity_UserFragment = {
   __typename?: "User";
 } & PetitionLayout_UserFragment;
 
-export type PetitionActivity_updatePetitionMutationVariables = {
+export type PetitionActivity_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
-};
+}>;
 
 export type PetitionActivity_updatePetitionMutation = {
   __typename?: "Mutation";
@@ -1481,31 +1482,31 @@ export type PetitionActivity_updatePetitionMutation = {
   } & PetitionActivity_PetitionFragment;
 };
 
-export type PetitionActivity_sendMessagesMutationVariables = {
+export type PetitionActivity_sendMessagesMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   accessIds: Array<Scalars["ID"]>;
   subject: Scalars["String"];
   body: Scalars["JSON"];
   scheduledAt?: Maybe<Scalars["DateTime"]>;
-};
+}>;
 
 export type PetitionActivity_sendMessagesMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "sendMessages">;
 
-export type PetitionActivity_sendRemindersMutationVariables = {
+export type PetitionActivity_sendRemindersMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   accessIds: Array<Scalars["ID"]>;
-};
+}>;
 
 export type PetitionActivity_sendRemindersMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "sendReminders">;
 
-export type PetitionActivity_deactivateAccessesMutationVariables = {
+export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   accessIds: Array<Scalars["ID"]>;
-};
+}>;
 
 export type PetitionActivity_deactivateAccessesMutation = {
   __typename?: "Mutation";
@@ -1515,10 +1516,10 @@ export type PetitionActivity_deactivateAccessesMutation = {
   >;
 };
 
-export type PetitionActivity_reactivateAccessesMutationVariables = {
+export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   accessIds: Array<Scalars["ID"]>;
-};
+}>;
 
 export type PetitionActivity_reactivateAccessesMutation = {
   __typename?: "Mutation";
@@ -1528,10 +1529,10 @@ export type PetitionActivity_reactivateAccessesMutation = {
   >;
 };
 
-export type PetitionActivity_cancelScheduledMessageMutationVariables = {
+export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   messageId: Scalars["ID"];
-};
+}>;
 
 export type PetitionActivity_cancelScheduledMessageMutation = {
   __typename?: "Mutation";
@@ -1541,14 +1542,14 @@ export type PetitionActivity_cancelScheduledMessageMutation = {
   >;
 };
 
-export type PetitionsActivity_sendPetitionMutationVariables = {
+export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   contactIds: Array<Scalars["ID"]>;
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
-};
+}>;
 
 export type PetitionsActivity_sendPetitionMutation = {
   __typename?: "Mutation";
@@ -1559,9 +1560,9 @@ export type PetitionsActivity_sendPetitionMutation = {
   >;
 };
 
-export type PetitionActivityQueryVariables = {
+export type PetitionActivityQueryVariables = Exact<{
   id: Scalars["ID"];
-};
+}>;
 
 export type PetitionActivityQuery = { __typename?: "Query" } & {
   petition?: Maybe<
@@ -1593,10 +1594,10 @@ export type PetitionCompose_UserFragment = {
   __typename?: "User";
 } & PetitionLayout_UserFragment;
 
-export type PetitionCompose_updatePetitionMutationVariables = {
+export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
-};
+}>;
 
 export type PetitionCompose_updatePetitionMutation = {
   __typename?: "Mutation";
@@ -1607,10 +1608,10 @@ export type PetitionCompose_updatePetitionMutation = {
     PetitionComposeMessageEditor_PetitionFragment;
 };
 
-export type PetitionCompose_updateFieldPositionsMutationVariables = {
+export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   fieldIds: Array<Scalars["ID"]>;
-};
+}>;
 
 export type PetitionCompose_updateFieldPositionsMutation = {
   __typename?: "Mutation";
@@ -1619,10 +1620,10 @@ export type PetitionCompose_updateFieldPositionsMutation = {
     PetitionLayout_PetitionFragment;
 };
 
-export type PetitionCompose_createPetitionFieldMutationVariables = {
+export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   type: PetitionFieldType;
-};
+}>;
 
 export type PetitionCompose_createPetitionFieldMutation = {
   __typename?: "Mutation";
@@ -1635,10 +1636,10 @@ export type PetitionCompose_createPetitionFieldMutation = {
   };
 };
 
-export type PetitionCompose_deletePetitionFieldMutationVariables = {
+export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
-};
+}>;
 
 export type PetitionCompose_deletePetitionFieldMutation = {
   __typename?: "Mutation";
@@ -1647,11 +1648,11 @@ export type PetitionCompose_deletePetitionFieldMutation = {
     PetitionLayout_PetitionFragment;
 };
 
-export type PetitionCompose_updatePetitionFieldMutationVariables = {
+export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: UpdatePetitionFieldInput;
-};
+}>;
 
 export type PetitionCompose_updatePetitionFieldMutation = {
   __typename?: "Mutation";
@@ -1664,14 +1665,14 @@ export type PetitionCompose_updatePetitionFieldMutation = {
   };
 };
 
-export type PetitionCompose_sendPetitionMutationVariables = {
+export type PetitionCompose_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   contactIds: Array<Scalars["ID"]>;
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
-};
+}>;
 
 export type PetitionCompose_sendPetitionMutation = {
   __typename?: "Mutation";
@@ -1704,9 +1705,9 @@ export type PetitionCompose_deletePetitionField_PetitionFragment = {
   fields: Array<{ __typename?: "PetitionField" } & Pick<PetitionField, "id">>;
 };
 
-export type PetitionComposeQueryVariables = {
+export type PetitionComposeQueryVariables = Exact<{
   id: Scalars["ID"];
-};
+}>;
 
 export type PetitionComposeQuery = { __typename?: "Query" } & {
   petition?: Maybe<
@@ -1734,10 +1735,10 @@ export type PetitionReplies_UserFragment = {
   __typename?: "User";
 } & PetitionLayout_UserFragment;
 
-export type PetitionReplies_updatePetitionMutationVariables = {
+export type PetitionReplies_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   data: UpdatePetitionInput;
-};
+}>;
 
 export type PetitionReplies_updatePetitionMutation = {
   __typename?: "Mutation";
@@ -1747,11 +1748,11 @@ export type PetitionReplies_updatePetitionMutation = {
   } & PetitionReplies_PetitionFragment;
 };
 
-export type PetitionReplies_validatePetitionFieldsMutationVariables = {
+export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   fieldIds: Array<Scalars["ID"]>;
   value: Scalars["Boolean"];
-};
+}>;
 
 export type PetitionReplies_validatePetitionFieldsMutation = {
   __typename?: "Mutation";
@@ -1764,11 +1765,11 @@ export type PetitionReplies_validatePetitionFieldsMutation = {
   };
 };
 
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = {
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   replyId: Scalars["ID"];
   preview?: Maybe<Scalars["Boolean"]>;
-};
+}>;
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   __typename?: "Mutation";
@@ -1778,9 +1779,9 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
-export type PetitionRepliesQueryVariables = {
+export type PetitionRepliesQueryVariables = Exact<{
   id: Scalars["ID"];
-};
+}>;
 
 export type PetitionRepliesQuery = { __typename?: "Query" } & {
   petition?: Maybe<
@@ -1823,32 +1824,32 @@ export type Petitions_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
 
-export type Petitions_deletePetitionsMutationVariables = {
+export type Petitions_deletePetitionsMutationVariables = Exact<{
   ids: Array<Scalars["ID"]>;
-};
+}>;
 
 export type Petitions_deletePetitionsMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deletePetitions">;
 
-export type Petitions_clonePetitionMutationVariables = {
+export type Petitions_clonePetitionMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
-};
+}>;
 
 export type Petitions_clonePetitionMutation = { __typename?: "Mutation" } & {
   clonePetition: { __typename?: "Petition" } & Pick<Petition, "id">;
 };
 
-export type PetitionsQueryVariables = {
+export type PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
-};
+}>;
 
 export type PetitionsQuery = { __typename?: "Query" } & {
   petitions: {
@@ -1868,16 +1869,10 @@ export type Account_UserFragment = { __typename?: "User" } & Pick<
 > &
   AppLayout_UserFragment;
 
-export type AccountQueryVariables = {};
-
-export type AccountQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
-};
-
-export type Account_updateAccountMutationVariables = {
+export type Account_updateAccountMutationVariables = Exact<{
   id: Scalars["ID"];
   data: UpdateUserInput;
-};
+}>;
 
 export type Account_updateAccountMutation = { __typename?: "Mutation" } & {
   updateUser: { __typename?: "User" } & Pick<
@@ -1886,26 +1881,37 @@ export type Account_updateAccountMutation = { __typename?: "Mutation" } & {
   >;
 };
 
+export type AccountQueryVariables = {};
+
+export type AccountQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
+};
+
+export type Security_updatePasswordMutationVariables = Exact<{
+  password: Scalars["String"];
+  newPassword: Scalars["String"];
+}>;
+
+export type Security_updatePasswordMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "changePassword">;
+
 export type SecurityQueryVariables = {};
 
 export type SecurityQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
 };
 
-export type Security_updatePasswordMutationVariables = {
-  password: Scalars["String"];
-  newPassword: Scalars["String"];
-};
-
-export type Security_updatePasswordMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "changePassword">;
-
 export type CurrentUserQueryVariables = {};
 
 export type CurrentUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "fullName" | "email">;
+  me: { __typename?: "User" } & Login_UserFragment;
 };
+
+export type Login_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "fullName" | "email"
+>;
 
 export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
@@ -1921,20 +1927,20 @@ export type RecipientView_PublicUserFragment = {
 } & RecipientViewSenderCard_PublicUserFragment &
   RecipientViewProgressCard_PublicUserFragment;
 
-export type RecipientView_publicDeletePetitionReplyMutationVariables = {
+export type RecipientView_publicDeletePetitionReplyMutationVariables = Exact<{
   replyId: Scalars["ID"];
   keycode: Scalars["ID"];
-};
+}>;
 
 export type RecipientView_publicDeletePetitionReplyMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "publicDeletePetitionReply">;
 
-export type RecipientView_publicCreateTextReplyMutationVariables = {
+export type RecipientView_publicCreateTextReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: CreateTextReplyInput;
-};
+}>;
 
 export type RecipientView_publicCreateTextReplyMutation = {
   __typename?: "Mutation";
@@ -1945,11 +1951,11 @@ export type RecipientView_publicCreateTextReplyMutation = {
   >;
 };
 
-export type RecipientView_publicCreateFileUploadReplyMutationVariables = {
+export type RecipientView_publicCreateFileUploadReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   fieldId: Scalars["ID"];
   data: CreateFileUploadReplyInput;
-};
+}>;
 
 export type RecipientView_publicCreateFileUploadReplyMutation = {
   __typename?: "Mutation";
@@ -1965,10 +1971,10 @@ export type RecipientView_publicCreateFileUploadReplyMutation = {
     };
 };
 
-export type RecipientView_publicFileUploadReplyCompleteMutationVariables = {
+export type RecipientView_publicFileUploadReplyCompleteMutationVariables = Exact<{
   keycode: Scalars["ID"];
   replyId: Scalars["ID"];
-};
+}>;
 
 export type RecipientView_publicFileUploadReplyCompleteMutation = {
   __typename?: "Mutation";
@@ -1978,9 +1984,9 @@ export type RecipientView_publicFileUploadReplyCompleteMutation = {
   } & Pick<PublicPetitionFieldReply, "id" | "publicContent">;
 };
 
-export type RecipientView_publicCompletePetitionMutationVariables = {
+export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"];
-};
+}>;
 
 export type RecipientView_publicCompletePetitionMutation = {
   __typename?: "Mutation";
@@ -2036,9 +2042,9 @@ export type RecipientView_createFileUploadReply_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status">;
 
-export type PublicPetitionQueryVariables = {
+export type PublicPetitionQueryVariables = Exact<{
   keycode: Scalars["ID"];
-};
+}>;
 
 export type PublicPetitionQuery = { __typename?: "Query" } & {
   access?: Maybe<
@@ -2053,9 +2059,9 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type useCreateContact_createContactMutationVariables = {
+export type useCreateContact_createContactMutationVariables = Exact<{
   data: CreateContactInput;
-};
+}>;
 
 export type useCreateContact_createContactMutation = {
   __typename?: "Mutation";
@@ -2066,20 +2072,20 @@ export type useCreateContact_createContactMutation = {
   >;
 };
 
-export type useCreatePetition_createPetitionMutationVariables = {
+export type useCreatePetition_createPetitionMutationVariables = Exact<{
   name: Scalars["String"];
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
-};
+}>;
 
 export type useCreatePetition_createPetitionMutation = {
   __typename?: "Mutation";
 } & { createPetition: { __typename?: "Petition" } & Pick<Petition, "id"> };
 
-export type PetitionComposeSearchContactsQueryVariables = {
+export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
   exclude?: Maybe<Array<Scalars["ID"]>>;
-};
+}>;
 
 export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   contacts: { __typename?: "ContactPagination" } & {
@@ -2665,6 +2671,12 @@ export const Account_UserFragmentDoc = gql`
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
+`;
+export const Login_UserFragmentDoc = gql`
+  fragment Login_User on User {
+    fullName
+    email
+  }
 `;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
@@ -4678,59 +4690,6 @@ export type PetitionsUserQueryResult = ApolloReactCommon.QueryResult<
   PetitionsUserQuery,
   PetitionsUserQueryVariables
 >;
-export const AccountDocument = gql`
-  query Account {
-    me {
-      id
-      ...Account_User
-    }
-  }
-  ${Account_UserFragmentDoc}
-`;
-
-/**
- * __useAccountQuery__
- *
- * To run a query within a React component, call `useAccountQuery` and pass it any options that fit your needs.
- * When your component renders, `useAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAccountQuery({
- *   variables: {
- *   },
- * });
- */
-export function useAccountQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    AccountQuery,
-    AccountQueryVariables
-  >
-) {
-  return ApolloReactHooks.useQuery<AccountQuery, AccountQueryVariables>(
-    AccountDocument,
-    baseOptions
-  );
-}
-export function useAccountLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    AccountQuery,
-    AccountQueryVariables
-  >
-) {
-  return ApolloReactHooks.useLazyQuery<AccountQuery, AccountQueryVariables>(
-    AccountDocument,
-    baseOptions
-  );
-}
-export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
-export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
-export type AccountQueryResult = ApolloReactCommon.QueryResult<
-  AccountQuery,
-  AccountQueryVariables
->;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($id: ID!, $data: UpdateUserInput!) {
     updateUser(id: $id, data: $data) {
@@ -4784,6 +4743,108 @@ export type Account_updateAccountMutationResult = ApolloReactCommon.MutationResu
 export type Account_updateAccountMutationOptions = ApolloReactCommon.BaseMutationOptions<
   Account_updateAccountMutation,
   Account_updateAccountMutationVariables
+>;
+export const AccountDocument = gql`
+  query Account {
+    me {
+      id
+      ...Account_User
+    }
+  }
+  ${Account_UserFragmentDoc}
+`;
+
+/**
+ * __useAccountQuery__
+ *
+ * To run a query within a React component, call `useAccountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAccountQuery(
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
+    AccountQuery,
+    AccountQueryVariables
+  >
+) {
+  return ApolloReactHooks.useQuery<AccountQuery, AccountQueryVariables>(
+    AccountDocument,
+    baseOptions
+  );
+}
+export function useAccountLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    AccountQuery,
+    AccountQueryVariables
+  >
+) {
+  return ApolloReactHooks.useLazyQuery<AccountQuery, AccountQueryVariables>(
+    AccountDocument,
+    baseOptions
+  );
+}
+export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
+export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
+export type AccountQueryResult = ApolloReactCommon.QueryResult<
+  AccountQuery,
+  AccountQueryVariables
+>;
+export const Security_updatePasswordDocument = gql`
+  mutation Security_updatePassword($password: String!, $newPassword: String!) {
+    changePassword(password: $password, newPassword: $newPassword)
+  }
+`;
+export type Security_updatePasswordMutationFn = ApolloReactCommon.MutationFunction<
+  Security_updatePasswordMutation,
+  Security_updatePasswordMutationVariables
+>;
+
+/**
+ * __useSecurity_updatePasswordMutation__
+ *
+ * To run a mutation, you first call `useSecurity_updatePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSecurity_updatePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [securityUpdatePasswordMutation, { data, loading, error }] = useSecurity_updatePasswordMutation({
+ *   variables: {
+ *      password: // value for 'password'
+ *      newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useSecurity_updatePasswordMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    Security_updatePasswordMutation,
+    Security_updatePasswordMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    Security_updatePasswordMutation,
+    Security_updatePasswordMutationVariables
+  >(Security_updatePasswordDocument, baseOptions);
+}
+export type Security_updatePasswordMutationHookResult = ReturnType<
+  typeof useSecurity_updatePasswordMutation
+>;
+export type Security_updatePasswordMutationResult = ApolloReactCommon.MutationResult<
+  Security_updatePasswordMutation
+>;
+export type Security_updatePasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  Security_updatePasswordMutation,
+  Security_updatePasswordMutationVariables
 >;
 export const SecurityDocument = gql`
   query Security {
@@ -4840,62 +4901,13 @@ export type SecurityQueryResult = ApolloReactCommon.QueryResult<
   SecurityQuery,
   SecurityQueryVariables
 >;
-export const Security_updatePasswordDocument = gql`
-  mutation Security_updatePassword($password: String!, $newPassword: String!) {
-    changePassword(password: $password, newPassword: $newPassword)
-  }
-`;
-export type Security_updatePasswordMutationFn = ApolloReactCommon.MutationFunction<
-  Security_updatePasswordMutation,
-  Security_updatePasswordMutationVariables
->;
-
-/**
- * __useSecurity_updatePasswordMutation__
- *
- * To run a mutation, you first call `useSecurity_updatePasswordMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSecurity_updatePasswordMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [securityUpdatePasswordMutation, { data, loading, error }] = useSecurity_updatePasswordMutation({
- *   variables: {
- *      password: // value for 'password'
- *      newPassword: // value for 'newPassword'
- *   },
- * });
- */
-export function useSecurity_updatePasswordMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
-    Security_updatePasswordMutation,
-    Security_updatePasswordMutationVariables
-  >
-) {
-  return ApolloReactHooks.useMutation<
-    Security_updatePasswordMutation,
-    Security_updatePasswordMutationVariables
-  >(Security_updatePasswordDocument, baseOptions);
-}
-export type Security_updatePasswordMutationHookResult = ReturnType<
-  typeof useSecurity_updatePasswordMutation
->;
-export type Security_updatePasswordMutationResult = ApolloReactCommon.MutationResult<
-  Security_updatePasswordMutation
->;
-export type Security_updatePasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  Security_updatePasswordMutation,
-  Security_updatePasswordMutationVariables
->;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     me {
-      fullName
-      email
+      ...Login_User
     }
   }
+  ${Login_UserFragmentDoc}
 `;
 
 /**
