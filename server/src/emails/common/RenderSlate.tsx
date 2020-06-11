@@ -8,14 +8,20 @@ function render(node: any) {
       case undefined:
         return (
           <p style={{ margin: 0 }}>
-            {paragraphIsEmpty(node) ? <br /> : node.children.map(render)}
+            {paragraphIsEmpty(node) ? (
+              <br />
+            ) : (
+              node.children.map((child: any, index: number) => (
+                <Fragment key={index}>{render(child)}</Fragment>
+              ))
+            )}
           </p>
         );
       case "bulleted-list":
         return (
           <ul style={{ margin: 0, paddingLeft: "24px" }}>
             {node.children.map((child: any, index: number) => (
-              <li key={index}>
+              <li key={index} style={{ marginLeft: 0 }}>
                 {child.children.map((child: any, index: number) => (
                   <Fragment key={index}>{render(child)}</Fragment>
                 ))}
