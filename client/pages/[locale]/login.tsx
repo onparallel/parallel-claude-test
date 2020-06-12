@@ -24,7 +24,6 @@ import {
   Login_UserFragment,
   useCurrentUserQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
 import { postJson } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { gql } from "apollo-boost";
@@ -36,10 +35,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 function Login() {
   const router = useRouter();
   const client = useApolloClient();
-  const {
-    data: { me },
-  } = assertQuery(useCurrentUserQuery());
-  const [showContinueAs, setShowContinueAs] = useState(!!me);
+  const { data } = useCurrentUserQuery();
+  const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordChange, setPasswordChange] = useState<{
     required: boolean;
@@ -116,7 +113,7 @@ function Login() {
         <PublicUserFormContainer>
           {showContinueAs ? (
             <AlreadyLoggedIn
-              me={me!}
+              me={data!.me}
               onRelogin={() => setShowContinueAs(false)}
               onContinueAs={() =>
                 router.push(
