@@ -163,7 +163,7 @@
   },
   {
     "term": "reminder.click-finalize",
-    "definition": "No olvides hacer click en el botón de <b>Finalizar</b> si ya ha enviado toda la información.",
+    "definition": "No olvides hacer click en el botón de <b>Finalizar</b> si ya has enviado toda la información.",
     "context": "Don't forget to click the <b>Finalize</b> button if you have submitted everything.",
     "reference": "src/emails/components/PetitionReminder.tsx#L169-L175"
   },
