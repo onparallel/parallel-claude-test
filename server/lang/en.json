@@ -163,8 +163,8 @@
   },
   {
     "term": "reminder.click-finalize",
-    "definition": "Don't forget to click the <b>Finalize</b> button if you have submitted everything.",
-    "context": "Don't forget to click the <b>Finalize</b> button if you have submitted everything.",
+    "definition": "If you already submitted all the information, click <b>Finalize</b> on the page.",
+    "context": "If you already submitted all the information, click <b>Finalize</b> on the page.",
     "reference": "src/emails/components/PetitionReminder.tsx#L169-L175"
   },
   {
