@@ -3,19 +3,19 @@
     "term": "closing.sender",
     "definition": "The Parallel team",
     "context": "The Parallel team",
-    "reference": "src/emails/common/texts.tsx#L11-L14"
+    "reference": "src/emails/common/texts.tsx#L12-L15"
   },
   {
     "term": "closing.text",
     "definition": "Regards,",
     "context": "Regards,",
-    "reference": "src/emails/common/texts.tsx#L7-L10"
+    "reference": "src/emails/common/texts.tsx#L8-L11"
   },
   {
     "term": "disclaimer",
     "definition": "This is an email sent via Parallel from the verified account {email}",
     "context": "This is an email sent via Parallel from the verified account {email}",
-    "reference": "src/emails/common/texts.tsx#L76-L80"
+    "reference": "src/emails/common/texts.tsx#L77-L81"
   },
   {
     "term": "footer.slogan",
@@ -51,49 +51,49 @@
     "term": "from.via-parallel",
     "definition": "{senderName} (via Parallel)",
     "context": "{senderName} (via Parallel)",
-    "reference": "src/emails/components/PetitionReminder.tsx#L29-L32"
+    "reference": "src/emails/components/PetitionReminder.tsx#L32-L35"
   },
   {
     "term": "generic.complete-information-button",
     "definition": "Complete the information here",
     "context": "Complete the information here",
-    "reference": "src/emails/components/PetitionReminder.tsx#L151-L154"
+    "reference": "src/emails/components/PetitionReminder.tsx#L180-L183"
   },
   {
     "term": "generic.complete-information-click-link",
     "definition": "Please click the link below to complete the information.",
     "context": "Please click the link below to complete the information.",
-    "reference": "src/emails/components/PetitionReminder.tsx#L85-L89"
+    "reference": "src/emails/components/PetitionReminder.tsx#L100-L104"
   },
   {
     "term": "generic.submit-text.with-deadline",
     "definition": "Please submit the following information before {deadline}:",
     "context": "Please submit the following information before {deadline}:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L127-L140"
+    "reference": "src/emails/components/PetitionReminder.tsx#L144-L157"
   },
   {
     "term": "generic.submit-text.without-deadline",
     "definition": "Please submit the following information:",
     "context": "Please submit the following information:",
-    "reference": "src/emails/components/PetitionReminder.tsx#L142-L145"
+    "reference": "src/emails/components/PetitionReminder.tsx#L159-L162"
   },
   {
     "term": "generic.untitled-field",
     "definition": "Untitled field",
     "context": "Untitled field",
-    "reference": "src/emails/common/texts.tsx#L41-L44"
+    "reference": "src/emails/common/texts.tsx#L42-L45"
   },
   {
     "term": "generic.untitled-petition",
     "definition": "Untitled petition",
     "context": "Untitled petition",
-    "reference": "src/emails/components/PetitionCompleted.tsx#L110-L113"
+    "reference": "src/emails/components/PetitionCompleted.tsx#L113-L116"
   },
   {
     "term": "greeting",
     "definition": "Hi{name, select, null {} other { {name}}},",
     "context": "Hi{name, select, null {} other { {name}}},",
-    "reference": "src/emails/common/texts.tsx#L20-L23"
+    "reference": "src/emails/common/texts.tsx#L21-L24"
   },
   {
     "term": "invitation.details",
@@ -129,43 +129,49 @@
     "term": "new-petition.text",
     "definition": "{senderName} ({senderEmail}) sent you a petition:",
     "context": "{senderName} ({senderEmail}) sent you a petition:",
-    "reference": "src/emails/components/NewPetition.tsx#L118-L125"
+    "reference": "src/emails/components/NewPetition.tsx#L121-L128"
   },
   {
     "term": "petition-completed.access-button",
     "definition": "Access the information here",
     "context": "Access the information here",
-    "reference": "src/emails/components/PetitionCompleted.tsx#L121-L124"
+    "reference": "src/emails/components/PetitionCompleted.tsx#L124-L127"
   },
   {
     "term": "petition-completed.access-click-link",
     "definition": "You can click the link below to access the information.",
     "context": "You can click the link below to access the information.",
-    "reference": "src/emails/components/PetitionCompleted.tsx#L69-L73"
+    "reference": "src/emails/components/PetitionCompleted.tsx#L72-L76"
   },
   {
     "term": "petition-completed.subject",
     "definition": "Petition \"{petitionName}\" completed!",
     "context": "Petition \"{petitionName}\" completed!",
-    "reference": "src/emails/components/PetitionCompleted.tsx#L32-L35"
+    "reference": "src/emails/components/PetitionCompleted.tsx#L35-L38"
   },
   {
     "term": "petition-completed.text",
     "definition": "{recipient} completed the petition you sent to him.",
     "context": "{recipient} completed the petition you sent to him.",
-    "reference": "src/emails/components/PetitionCompleted.tsx#L95-L101"
+    "reference": "src/emails/components/PetitionCompleted.tsx#L98-L104"
   },
   {
     "term": "petition-reminder.subject",
     "definition": "Remember that {senderName} sent you a petition",
     "context": "Remember that {senderName} sent you a petition",
-    "reference": "src/emails/components/PetitionReminder.tsx#L38-L41"
+    "reference": "src/emails/components/PetitionReminder.tsx#L41-L44"
+  },
+  {
+    "term": "reminder.click-finalize",
+    "definition": "Don't forget to click the <b>Finalize</b> button if you have submitted everything.",
+    "context": "Don't forget to click the <b>Finalize</b> button if you have submitted everything.",
+    "reference": "src/emails/components/PetitionReminder.tsx#L169-L175"
   },
   {
     "term": "reminder.text",
     "definition": "Remember that {senderName} ({senderEmail}) sent you a petition.",
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition.",
-    "reference": "src/emails/components/PetitionReminder.tsx#L112-L119"
+    "reference": "src/emails/components/PetitionReminder.tsx#L127-L134"
   },
   {
     "term": "welcome.click-to-verify",

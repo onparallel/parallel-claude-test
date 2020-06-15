@@ -69,21 +69,33 @@ const email: Email<PetitionReminderProps> = {
       )}
 
       ${
-        deadline
-          ? intl.formatMessage(
+        fields.length > 0
+          ? outdent`
+            ${
+              deadline
+                ? intl.formatMessage(
+                    {
+                      id: "generic.submit-text.with-deadline",
+                      defaultMessage:
+                        "Please submit the following information before {deadline}:",
+                    },
+                    { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+                  )
+                : intl.formatMessage({
+                    id: "generic.submit-text.without-deadline",
+                    defaultMessage: "Please submit the following information:",
+                  })
+            }
+            ${petitionFieldList({ fields }, intl)}`
+          : intl.formatMessage(
               {
-                id: "generic.submit-text.with-deadline",
+                id: "reminder.click-finalize",
                 defaultMessage:
-                  "Please submit the following information before {deadline}:",
+                  "Don't forget to click the <b>Finalize</b> button if you have submitted everything.",
               },
-              { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+              { b: (...chunks) => chunks }
             )
-          : intl.formatMessage({
-              id: "generic.submit-text.without-deadline",
-              defaultMessage: "Please submit the following information:",
-            })
       }
-      ${petitionFieldList({ fields }, intl)}
 
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
@@ -123,32 +135,46 @@ const email: Email<PetitionReminderProps> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection paddingTop="10px">
+        <MjmlSection paddingTop="0px">
           <MjmlColumn>
-            <MjmlText>
-              {deadline ? (
+            {fields.length > 0 ? (
+              <>
+                <MjmlText>
+                  {deadline ? (
+                    <FormattedMessage
+                      id="generic.submit-text.with-deadline"
+                      defaultMessage="Please submit the following information before {deadline}:"
+                      values={{
+                        deadline: (
+                          <span style={{ textDecoration: "underline" }}>
+                            <DateTime
+                              value={deadline}
+                              format={FORMATS.LLL}
+                            ></DateTime>
+                          </span>
+                        ),
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="generic.submit-text.without-deadline"
+                      defaultMessage="Please submit the following information:"
+                    />
+                  )}
+                </MjmlText>
+                <PetitionFieldList fields={fields} />
+              </>
+            ) : (
+              <MjmlText>
                 <FormattedMessage
-                  id="generic.submit-text.with-deadline"
-                  defaultMessage="Please submit the following information before {deadline}:"
+                  id="reminder.click-finalize"
+                  defaultMessage="Don't forget to click the <b>Finalize</b> button if you have submitted everything."
                   values={{
-                    deadline: (
-                      <span style={{ textDecoration: "underline" }}>
-                        <DateTime
-                          value={deadline}
-                          format={FORMATS.LLL}
-                        ></DateTime>
-                      </span>
-                    ),
+                    b: (...chunks: any[]) => <strong>{chunks}</strong>,
                   }}
                 />
-              ) : (
-                <FormattedMessage
-                  id="generic.submit-text.without-deadline"
-                  defaultMessage="Please submit the following information:"
-                />
-              )}
-            </MjmlText>
-            <PetitionFieldList fields={fields} />
+              </MjmlText>
+            )}
             <MjmlSpacer height="10px" />
             <Button href={`${parallelUrl}/${locale}/petition/${keycode}`}>
               <FormattedMessage
