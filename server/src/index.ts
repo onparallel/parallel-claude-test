@@ -1,5 +1,6 @@
 import "./init";
 import { ApolloServer } from "apollo-server-express";
+import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -7,11 +8,10 @@ import express from "express";
 import { api } from "./api";
 import { createContainer } from "./container";
 import { ApiContext } from "./context";
+import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
 import { LOGGER, Logger } from "./services/logger";
 import { stopwatchEnd } from "./util/stopwatch";
-import { FormatErrorWithContextExtension } from "graphql-format-error-context-extension";
-import { UnknownError } from "./graphql/helpers/errors";
 
 const app = express();
 const container = createContainer();
@@ -21,35 +21,38 @@ app.use("/api", bodyParser.json(), cors(), cookieParser(), api(container));
 const server = new ApolloServer({
   schema,
   tracing: process.env.NODE_ENV === "development",
-  extensions: [
-    () =>
-      new FormatErrorWithContextExtension<ApiContext>((error, context) => {
-        // Mask internal server errors and log them
-        if (error.extensions?.code === "INTERNAL_SERVER_ERROR") {
-          context.logger.error(error.message, error.extensions?.exception);
-          return new UnknownError("Internal server error");
-        } else {
-          return error;
-        }
-      }),
-    () => ({
-      requestDidStart({ operationName, variables, context }) {
+  plugins: [
+    {
+      requestDidStart() {
         const time = process.hrtime();
-        return () => {
-          const duration = stopwatchEnd(time);
-          (context as ApiContext).logger.info(
-            `GraphQL operation "${operationName}" - ${duration}ms`,
-            {
-              operation: {
-                name: operationName,
-                variables,
-              },
-              duration,
+        return {
+          willSendResponse({
+            request: { operationName, variables },
+            response,
+            context,
+          }) {
+            if (response.errors) {
+              response.errors = response.errors.map((error) => {
+                if (error.extensions?.code === "INTERNAL_SERVER_ERROR") {
+                  context.logger.error(
+                    error.message,
+                    error.extensions?.exception
+                  );
+                  return new UnknownError("Internal server error");
+                } else {
+                  return error;
+                }
+              });
             }
-          );
+            const duration = stopwatchEnd(time);
+            context.logger.info(
+              `GraphQL operation "${operationName}" - ${duration}ms`,
+              { operation: { name: operationName, variables }, duration }
+            );
+          },
         };
       },
-    }),
+    } as ApolloServerPlugin<ApiContext>,
   ],
   context: async ({ req }) => {
     const context = container.get<ApiContext>(ApiContext);

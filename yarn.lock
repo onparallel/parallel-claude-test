@@ -7714,11 +7714,6 @@ graphql-extensions@^0.12.2:
     apollo-server-env "^2.4.4"
     apollo-server-types "^0.5.0"
 
-graphql-format-error-context-extension@^0.2.15:
-  version "0.2.15"
-  resolved "https://registry.yarnpkg.com/graphql-format-error-context-extension/-/graphql-format-error-context-extension-0.2.15.tgz#91867640801ee3696f926a84b4cd345f2f0c2ecd"
-  integrity sha512-FvWifA2tEpPbKjhT85SnneAbfQFOi6KAmriOaaNDDML40MR0mucvU5GcW9+UHioKanzqp4BcY9fxyh/kuV718Q==
-
 graphql-iso-date@^3.6.1:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.6.1.tgz#bd2d0dc886e0f954cbbbc496bbf1d480b57ffa96"
