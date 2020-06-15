@@ -8,7 +8,10 @@ import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import { PetitionFieldList } from "../common/PetitionFieldList";
+import {
+  PetitionFieldList,
+  PetitionFieldListProps,
+} from "../common/PetitionFieldList";
 import { disclaimer, greeting, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
@@ -16,7 +19,7 @@ export interface PetitionReminderProps {
   name: string | null;
   senderName: string;
   senderEmail: string;
-  fields: { id: number; title: string | null }[];
+  fields: PetitionFieldListProps["fields"];
   deadline: Date | null;
   keycode: string;
   parallelUrl: string;
@@ -170,11 +173,9 @@ export const props: PetitionReminderProps = {
   senderEmail: "derek@parallel.so",
   deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   fields: [
-    { id: 1, title: "DNI" },
-    { id: 2, title: "Escrituras" },
-    { id: 3, title: "Certificado de rentas del trabajo" },
-    { id: 4, title: "Prueba" },
-    { id: 5, title: null },
+    { position: 1, id: 235, title: "Escrituras" },
+    { position: 2, id: 345, title: "Certificado de rentas del trabajo" },
+    { position: 4, id: 6905, title: null },
   ],
   keycode: "asdfghjkl",
   parallelUrl: "http://localhost",

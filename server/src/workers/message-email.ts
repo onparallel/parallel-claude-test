@@ -1,3 +1,4 @@
+import { pick } from "remeda";
 import { buildEmail } from "../emails/buildEmail";
 import NewPetition from "../emails/components/NewPetition";
 import { buildFrom } from "../emails/utils/buildFrom";
@@ -54,7 +55,7 @@ createQueueWorker<MessageEmailWorkerPayload>(
         senderEmail: sender.email,
         subject: message.email_subject,
         body: message.email_body ? JSON.parse(message.email_body) : [],
-        fields: fields.map((f) => ({ id: f.id, title: f.title })),
+        fields: fields.map(pick(["id", "title", "position"])),
         deadline: petition.deadline,
         keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,

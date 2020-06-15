@@ -2,6 +2,7 @@ import { buildEmail } from "../emails/buildEmail";
 import PetitionReminder from "../emails/components/PetitionReminder";
 import { buildFrom } from "../emails/utils/buildFrom";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { pick } from "remeda";
 
 type ReminderEmailWorkerPayload = {
   petition_reminder_id: number;
@@ -53,6 +54,10 @@ createQueueWorker(
           `Contact not found for petition_access.contact_id ${access.contact_id}`
         );
       }
+      const replies = await context.petitions.loadRepliesForField(
+        fields.map((f) => f.id)
+      );
+      const missing = fields.filter((f, index) => replies[index]?.length === 0);
       const senderName = granter.last_name
         ? `${granter.first_name} ${granter.last_name}`
         : granter.first_name!;
@@ -62,7 +67,7 @@ createQueueWorker(
           name: contact.first_name,
           senderName,
           senderEmail: granter.email,
-          fields: fields.map((f) => ({ id: f.id, title: f.title })),
+          fields: missing.map(pick(["id", "title", "position"])),
           deadline: petition.deadline,
           keycode: access.keycode,
           assetsUrl: context.config.misc.assetsUrl,

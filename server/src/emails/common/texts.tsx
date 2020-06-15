@@ -1,6 +1,7 @@
 import { IntlShape } from "react-intl";
 import outdent from "outdent";
 import { DateTimeProps } from "./DateTime";
+import { PetitionField } from "./PetitionFieldList";
 
 export function closing({}, intl: IntlShape) {
   return outdent`
@@ -29,14 +30,14 @@ export function petitionFieldList(
   {
     fields,
   }: {
-    fields: { id: number; title: string | null }[];
+    fields: PetitionField[];
   },
   intl: IntlShape
 ) {
   return fields
     .map(
-      ({ title }, index) =>
-        `${index + 1}. ${
+      ({ position, title }, index) =>
+        `${position + 1}. ${
           title ||
           intl.formatMessage({
             id: "generic.untitled-field",

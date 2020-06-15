@@ -8,13 +8,16 @@ import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import { PetitionFieldList } from "../common/PetitionFieldList";
+import {
+  PetitionFieldList,
+  PetitionFieldListProps,
+} from "../common/PetitionFieldList";
 import { RenderSlate } from "../common/RenderSlate";
 import {
+  disclaimer,
   greeting,
   petitionFieldList,
   renderSlateText,
-  disclaimer,
 } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
@@ -22,7 +25,7 @@ export interface NewPetitionProps {
   name: string | null;
   senderName: string;
   senderEmail: string;
-  fields: { id: number; title: string | null }[];
+  fields: PetitionFieldListProps["fields"];
   subject: string | null;
   body: any | null;
   deadline: Date | null;
@@ -245,11 +248,11 @@ export const props: NewPetitionProps = {
   deadline: null,
   // deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   fields: [
-    { id: 1, title: "DNI" },
-    { id: 2, title: "Escrituras" },
-    { id: 3, title: "Certificado de rentas del trabajo" },
-    { id: 4, title: "Prueba" },
-    { id: 5, title: null },
+    { position: 0, id: 123, title: "DNI" },
+    { position: 1, id: 235, title: "Escrituras" },
+    { position: 2, id: 345, title: "Certificado de rentas del trabajo" },
+    { position: 3, id: 32, title: "Prueba" },
+    { position: 4, id: 6905, title: null },
   ],
   keycode: "asdfghjkl",
   parallelUrl: "https://staging.parallel.so",

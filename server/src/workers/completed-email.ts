@@ -1,3 +1,4 @@
+import { pick } from "remeda";
 import { buildEmail } from "../emails/buildEmail";
 import PetitionCompleted from "../emails/components/PetitionCompleted";
 import { buildFrom } from "../emails/utils/buildFrom";
@@ -47,7 +48,7 @@ createQueueWorker<CompletedEmailWorkerPayload>(
         petitionId: toGlobalId("Petition", access.petition_id),
         petitionName: petition!.name,
         recipientNameOrEmail,
-        fields: fields.map((f) => ({ id: f.id, title: f.title })),
+        fields: fields.map(pick(["id", "title", "position"])),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
       },

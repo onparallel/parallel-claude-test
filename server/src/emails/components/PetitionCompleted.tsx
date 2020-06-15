@@ -7,7 +7,10 @@ import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout } from "../common/Layout";
-import { PetitionFieldList } from "../common/PetitionFieldList";
+import {
+  PetitionFieldList,
+  PetitionFieldListProps,
+} from "../common/PetitionFieldList";
 import { closing, greeting, petitionFieldList } from "../common/texts";
 
 export interface PetitionCompletedProps {
@@ -15,7 +18,7 @@ export interface PetitionCompletedProps {
   petitionId: string;
   petitionName: string | null;
   recipientNameOrEmail: string;
-  fields: { id: number; title: string | null }[];
+  fields: PetitionFieldListProps["fields"];
   parallelUrl: string;
   assetsUrl: string;
 }
@@ -139,11 +142,11 @@ export const props: PetitionCompletedProps = {
   petitionName: "Declaración de la renta",
   recipientNameOrEmail: "Santi Albo",
   fields: [
-    { id: 1, title: "DNI" },
-    { id: 2, title: "Escrituras" },
-    { id: 3, title: "Certificado de rentas del trabajo" },
-    { id: 4, title: "Prueba" },
-    { id: 5, title: null },
+    { position: 0, id: 123, title: "DNI" },
+    { position: 1, id: 235, title: "Escrituras" },
+    { position: 2, id: 345, title: "Certificado de rentas del trabajo" },
+    { position: 3, id: 32, title: "Prueba" },
+    { position: 4, id: 6905, title: null },
   ],
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
