@@ -16,7 +16,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
@@ -503,7 +503,10 @@ Petitions.mutations = [
   `,
 ];
 
-Petitions.getInitialProps = async ({ query, fetchQuery }: WithDataContext) => {
+Petitions.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithApolloDataContext) => {
   const { page, search, sort, status } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<PetitionsQuery, PetitionsQueryVariables>(

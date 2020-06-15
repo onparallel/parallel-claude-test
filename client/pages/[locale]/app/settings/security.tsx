@@ -12,7 +12,7 @@ import {
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -198,7 +198,7 @@ function useUpdatePassword() {
   `);
 }
 
-Security.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
+Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery<SecurityQuery>(gql`
     query Security {
       me {

@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/core";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -152,7 +152,7 @@ function useUpdateAccount() {
   `);
 }
 
-Account.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
+Account.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery<AccountQuery>(gql`
     query Account {
       me {

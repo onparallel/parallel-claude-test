@@ -10,7 +10,7 @@ import { TablePage } from "@parallel/components/common/TablePage";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -336,7 +336,10 @@ Contacts.mutations = [
   `,
 ];
 
-Contacts.getInitialProps = async ({ query, fetchQuery }: WithDataContext) => {
+Contacts.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithApolloDataContext) => {
   const { page, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<ContactsQuery, ContactsQueryVariables>(

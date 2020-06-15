@@ -19,7 +19,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
@@ -420,7 +420,10 @@ const ToggleInput = forwardRef(function ToggleInput(
   );
 });
 
-Contact.getInitialProps = async ({ query, fetchQuery }: WithDataContext) => {
+Contact.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<ContactQuery, ContactQueryVariables>(
       gql`

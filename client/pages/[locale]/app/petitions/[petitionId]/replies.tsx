@@ -18,7 +18,7 @@ import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
@@ -375,7 +375,7 @@ function useDownloadReplyFile() {
 PetitionReplies.getInitialProps = async ({
   query,
   fetchQuery,
-}: WithDataContext) => {
+}: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
       gql`

@@ -16,7 +16,7 @@ import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
@@ -395,7 +395,7 @@ function PasswordChangeForm({
   );
 }
 
-Login.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
+Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   try {
     await fetchQuery(
       gql`
@@ -408,7 +408,8 @@ Login.getInitialProps = async ({ fetchQuery }: WithDataContext) => {
           fullName
           email
         }
-      `
+      `,
+      { ignoreCache: true }
     );
   } catch (error) {
     return {};

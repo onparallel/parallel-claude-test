@@ -3,7 +3,7 @@ import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
@@ -455,7 +455,7 @@ PetitionActivity.mutations = [
 PetitionActivity.getInitialProps = async ({
   query,
   fetchQuery,
-}: WithDataContext) => {
+}: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
       gql`

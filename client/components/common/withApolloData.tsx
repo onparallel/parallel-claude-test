@@ -12,7 +12,7 @@ import { NextPageContext } from "next/dist/next-server/lib/utils";
 import Router from "next/router";
 import React from "react";
 
-export type WithDataContext = NextPageContext & {
+export type WithApolloDataContext = NextPageContext & {
   apollo: ApolloClient<any>;
   fetchQuery<T = any, TVariables = OperationVariables>(
     query: DocumentNode,
@@ -39,7 +39,7 @@ function redirect(context: NextPageContext, pathname: string, asHref: string) {
 
 export function withApolloData<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  Component: NextComponentType<WithDataContext, P, P>
+  Component: NextComponentType<WithApolloDataContext, P, P>
 ) {
   const WithData: NextComponentType<
     NextPageContext,
@@ -88,32 +88,32 @@ export function withApolloData<P = {}>(
                 ignoreCache?: boolean;
               }
             ) {
-              if (process.browser) {
-                // On the browser we fetch from cache and fire a request
-                return await new Promise<ApolloQueryResult<T>>((resolve) => {
-                  const subscription = apollo
-                    .watchQuery<T, TVariables>({
-                      query,
-                      variables: options?.variables,
-                      fetchPolicy: options?.ignoreCache
-                        ? "network-only"
-                        : "cache-and-network",
-                    })
-                    .subscribe((result) => {
-                      // stale is true when there was nothing on the cache
-                      if (!result.stale) {
-                        resolve(result);
-                      }
-                      if (!result.loading) {
-                        subscription.unsubscribe();
-                      }
-                    });
-                });
-              } else {
+              if (!process.browser || options?.ignoreCache) {
                 return await apollo.query<T, TVariables>({
                   query,
                   variables: options?.variables,
                 });
+              } else {
+                // On the browser we fetch from cache and fire a request
+                return await new Promise<ApolloQueryResult<T>>(
+                  (resolve, reject) => {
+                    const subscription = apollo
+                      .watchQuery<T, TVariables>({
+                        query,
+                        variables: options?.variables,
+                        fetchPolicy: "cache-and-network",
+                      })
+                      .subscribe((result) => {
+                        // stale is true when there was nothing on the cache
+                        if (!result.stale) {
+                          resolve(result);
+                        }
+                        if (!result.loading) {
+                          subscription.unsubscribe();
+                        }
+                      }, reject);
+                  }
+                );
               }
             },
           })) ?? ({} as P);

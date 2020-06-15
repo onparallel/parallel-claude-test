@@ -5,7 +5,7 @@ import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
@@ -654,7 +654,7 @@ function useDeletePetitionField() {
 PetitionCompose.getInitialProps = async ({
   query,
   fetchQuery,
-}: WithDataContext) => {
+}: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
       gql`

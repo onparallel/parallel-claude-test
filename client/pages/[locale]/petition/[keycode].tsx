@@ -15,7 +15,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
-  WithDataContext,
+  WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { RecipientViewProgressCard } from "@parallel/components/recipient-view/RecipientViewProgressCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
@@ -574,7 +574,7 @@ function useCreateFileUploadReply() {
 RecipientView.getInitialProps = async ({
   query,
   fetchQuery,
-}: WithDataContext) => {
+}: WithApolloDataContext) => {
   const keycode = query.keycode as string;
   await fetchQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
     gql`
