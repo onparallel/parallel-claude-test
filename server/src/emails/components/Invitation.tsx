@@ -6,14 +6,12 @@ import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
-import { Layout } from "../common/Layout";
+import { Layout, LayoutProps } from "../common/Layout";
 
-export interface InvitationProps {
+export type InvitationProps = {
   email: string;
   password: string;
-  assetsUrl: string;
-  parallelUrl: string;
-}
+} & Omit<LayoutProps, "children">;
 
 const email: Email<InvitationProps> = {
   from({}, intl) {
@@ -31,10 +29,22 @@ const email: Email<InvitationProps> = {
   ) {
     return outdent``;
   },
-  html({ email, password, assetsUrl, parallelUrl }: InvitationProps) {
+  html({
+    email,
+    password,
+    assetsUrl,
+    parallelUrl,
+    logoUrl,
+    logoAlt,
+  }: InvitationProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection>
           <MjmlColumn>
             <Greeting name={null} />
@@ -75,4 +85,6 @@ export const props: InvitationProps = {
   password: "Qwerty1!",
   assetsUrl: "http://localhost",
   parallelUrl: "http://localhost",
+  logoUrl: "http://localhost/static/emails/logo.png",
+  logoAlt: "Parallel",
 };

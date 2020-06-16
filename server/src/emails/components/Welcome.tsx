@@ -5,14 +5,12 @@ import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
-import { Layout } from "../common/Layout";
+import { Layout, LayoutProps } from "../common/Layout";
 import { closing } from "../common/texts";
 
 export type WelcomeProps = {
   verificationUrl: string;
-  parallelUrl: string;
-  assetsUrl: string;
-};
+} & Omit<LayoutProps, "children">;
 
 const email: Email<WelcomeProps> = {
   from({}, intl) {
@@ -40,10 +38,21 @@ const email: Email<WelcomeProps> = {
       ${closing({}, intl)}
     `;
   },
-  html({ verificationUrl, parallelUrl, assetsUrl }: WelcomeProps) {
+  html({
+    verificationUrl,
+    parallelUrl,
+    assetsUrl,
+    logoUrl,
+    logoAlt,
+  }: WelcomeProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection>
           <MjmlColumn>
             <MjmlText fontSize="16px">
@@ -78,4 +87,6 @@ export const props: WelcomeProps = {
   assetsUrl: "http://localhost",
   parallelUrl: "http://localhost",
   verificationUrl: "login",
+  logoUrl: "http://localhost/static/emails/logo.png",
+  logoAlt: "Parallel",
 };

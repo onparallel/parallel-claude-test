@@ -7,7 +7,7 @@ import { Button } from "../common/Button";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
-import { Layout } from "../common/Layout";
+import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldList,
   PetitionFieldListProps,
@@ -15,16 +15,14 @@ import {
 import { disclaimer, greeting, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
-export interface PetitionReminderProps {
+export type PetitionReminderProps = {
   name: string | null;
   senderName: string;
   senderEmail: string;
   fields: PetitionFieldListProps["fields"];
   deadline: Date | null;
   keycode: string;
-  parallelUrl: string;
-  assetsUrl: string;
-}
+} & Omit<LayoutProps, "children">;
 
 const email: Email<PetitionReminderProps> = {
   from({ senderName }, intl) {
@@ -116,10 +114,17 @@ const email: Email<PetitionReminderProps> = {
     keycode,
     parallelUrl,
     assetsUrl,
+    logoUrl,
+    logoAlt,
   }: PetitionReminderProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
             <Greeting name={name} />
@@ -206,4 +211,6 @@ export const props: PetitionReminderProps = {
   keycode: "asdfghjkl",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
+  logoUrl: "http://localhost/static/logos/doctoralia.png",
+  logoAlt: "L4Law",
 };

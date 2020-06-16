@@ -6,14 +6,12 @@ import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
-import { Layout } from "../common/Layout";
+import { Layout, LayoutProps } from "../common/Layout";
 
-export interface ForgotPasswordProps {
+export type ForgotPasswordProps = {
   name: string | null;
-  assetsUrl: string;
-  parallelUrl: string;
   resetUrl: string;
-}
+} & Omit<LayoutProps, "children">;
 
 const email: Email<ForgotPasswordProps> = {
   from({}, intl) {
@@ -28,9 +26,21 @@ const email: Email<ForgotPasswordProps> = {
   text({ name, parallelUrl, resetUrl }: ForgotPasswordProps, intl: IntlShape) {
     return outdent``;
   },
-  html({ name, assetsUrl, parallelUrl, resetUrl }: ForgotPasswordProps) {
+  html({
+    name,
+    assetsUrl,
+    parallelUrl,
+    resetUrl,
+    logoUrl,
+    logoAlt,
+  }: ForgotPasswordProps) {
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection>
           <MjmlColumn>
             <Greeting name={name} />
@@ -66,4 +76,6 @@ export const props: ForgotPasswordProps = {
   assetsUrl: "http://localhost",
   parallelUrl: "http://localhost",
   resetUrl: "/en/login",
+  logoUrl: "http://localhost/static/emails/logo.png",
+  logoAlt: "Parallel",
 };

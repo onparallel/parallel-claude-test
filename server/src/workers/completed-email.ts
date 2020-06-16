@@ -37,6 +37,15 @@ createQueueWorker<CompletedEmailWorkerPayload>(
         `Contact not found for petition_access.contact_id ${access.contact_id}`
       );
     }
+    const [org, logoUrl] = await Promise.all([
+      context.organizations.loadOrg(granter.org_id),
+      context.organizations.getOrgLogoUrl(granter.org_id),
+    ]);
+    if (!org) {
+      throw new Error(
+        `Organization not found for user.org_id ${access.contact_id}`
+      );
+    }
     const recipientNameOrEmail =
       (contact.first_name && contact.last_name
         ? `${contact.first_name} ${contact.last_name}`
@@ -51,6 +60,9 @@ createQueueWorker<CompletedEmailWorkerPayload>(
         fields: fields.map(pick(["id", "title", "position"])),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
+        logoUrl:
+          logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
+        logoAlt: logoUrl ? org.name : "Parallel",
       },
       { locale: petition.locale }
     );

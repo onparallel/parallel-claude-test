@@ -20,11 +20,19 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 export type LayoutProps = {
   parallelUrl: string;
+  logoUrl: string;
+  logoAlt: string;
   assetsUrl: string;
   children: ReactNode;
 };
 
-export function Layout({ parallelUrl, assetsUrl, children }: LayoutProps) {
+export function Layout({
+  parallelUrl,
+  logoUrl,
+  logoAlt,
+  assetsUrl,
+  children,
+}: LayoutProps) {
   const { locale } = useIntl();
   return (
     <Mjml>
@@ -53,11 +61,7 @@ export function Layout({ parallelUrl, assetsUrl, children }: LayoutProps) {
         {/* Header */}
         <MjmlSection>
           <MjmlColumn>
-            <MjmlImage
-              alt="Parallel"
-              width="200px"
-              src={`${assetsUrl}/static/emails/logo.png`}
-            ></MjmlImage>
+            <MjmlImage alt={logoAlt} width="200px" src={logoUrl}></MjmlImage>
           </MjmlColumn>
         </MjmlSection>
 

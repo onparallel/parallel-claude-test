@@ -38,7 +38,16 @@ createQueueWorker<MessageEmailWorkerPayload>(
         `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`
       );
     }
-    const contact = await context.contacts.loadContact(access.contact_id);
+    const [contact, org, logoUrl] = await Promise.all([
+      context.contacts.loadContact(access.contact_id),
+      context.organizations.loadOrg(sender.org_id),
+      context.organizations.getOrgLogoUrl(sender.org_id),
+    ]);
+    if (!org) {
+      throw new Error(
+        `Organization not found for user.org_id ${access.contact_id}`
+      );
+    }
     if (!contact) {
       throw new Error(
         `Contact not found for petition_access.contact_id ${access.contact_id}`
@@ -60,6 +69,9 @@ createQueueWorker<MessageEmailWorkerPayload>(
         keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
+        logoUrl:
+          logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
+        logoAlt: logoUrl ? org.name : "Parallel",
       },
       { locale: petition.locale }
     );

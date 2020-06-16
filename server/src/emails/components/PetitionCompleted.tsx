@@ -6,22 +6,20 @@ import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
-import { Layout } from "../common/Layout";
+import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldList,
   PetitionFieldListProps,
 } from "../common/PetitionFieldList";
 import { closing, greeting, petitionFieldList } from "../common/texts";
 
-export interface PetitionCompletedProps {
+export type PetitionCompletedProps = {
   name: string | null;
   petitionId: string;
   petitionName: string | null;
   recipientNameOrEmail: string;
   fields: PetitionFieldListProps["fields"];
-  parallelUrl: string;
-  assetsUrl: string;
-}
+} & Omit<LayoutProps, "children">;
 
 const email: Email<PetitionCompletedProps> = {
   from({}, intl) {
@@ -87,10 +85,17 @@ const email: Email<PetitionCompletedProps> = {
     fields,
     parallelUrl,
     assetsUrl,
+    logoUrl,
+    logoAlt,
   }: PetitionCompletedProps) {
     const { locale } = useIntl();
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection>
           <MjmlColumn>
             <Greeting name={name} />
@@ -150,4 +155,6 @@ export const props: PetitionCompletedProps = {
   ],
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
+  logoUrl: "http://localhost/static/emails/logo.png",
+  logoAlt: "Parallel",
 };

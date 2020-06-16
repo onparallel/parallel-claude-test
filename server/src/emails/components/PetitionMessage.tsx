@@ -7,7 +7,7 @@ import { Button } from "../common/Button";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
-import { Layout } from "../common/Layout";
+import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldList,
   PetitionFieldListProps,
@@ -21,7 +21,7 @@ import {
 } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
-export interface PetitionMessageProps {
+export type PetitionMessageProps = {
   name: string | null;
   senderName: string;
   senderEmail: string;
@@ -30,9 +30,7 @@ export interface PetitionMessageProps {
   body: any | null;
   deadline: Date | null;
   keycode: string;
-  parallelUrl: string;
-  assetsUrl: string;
-}
+} & Omit<LayoutProps, "children">;
 
 const email: Email<PetitionMessageProps> = {
   from({ senderName }, intl) {
@@ -109,11 +107,18 @@ const email: Email<PetitionMessageProps> = {
     keycode,
     parallelUrl,
     assetsUrl,
+    logoUrl,
+    logoAlt,
   }: PetitionMessageProps) {
     const { locale } = useIntl();
 
     return (
-      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl}>
+      <Layout
+        assetsUrl={assetsUrl}
+        parallelUrl={parallelUrl}
+        logoUrl={logoUrl}
+        logoAlt={logoAlt}
+      >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
             <Greeting name={name} />
@@ -257,4 +262,6 @@ export const props: PetitionMessageProps = {
   keycode: "asdfghjkl",
   parallelUrl: "https://staging.parallel.so",
   assetsUrl: "https://static-staging.parallel.so",
+  logoUrl: "http://localhost/static/emails/logo.png",
+  logoAlt: "Parallel",
 };
