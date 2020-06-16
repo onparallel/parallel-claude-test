@@ -129,7 +129,7 @@
     "term": "new-petition.text",
     "definition": "{senderName} ({senderEmail}) sent you a petition:",
     "context": "{senderName} ({senderEmail}) sent you a petition:",
-    "reference": "src/emails/components/NewPetition.tsx#L121-L128"
+    "reference": "src/emails/components/PetitionMessage.tsx#L121-L128"
   },
   {
     "term": "petition-completed.access-button",

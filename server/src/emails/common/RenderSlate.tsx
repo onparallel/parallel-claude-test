@@ -19,7 +19,7 @@ function render(node: any) {
         );
       case "bulleted-list":
         return (
-          <ul style={{ margin: 0, paddingLeft: "24px" }}>
+          <ul style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}>
             {node.children.map((child: any, index: number) => (
               <li key={index} style={{ marginLeft: 0 }}>
                 {child.children.map((child: any, index: number) => (

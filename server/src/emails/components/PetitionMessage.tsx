@@ -21,7 +21,7 @@ import {
 } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
-export interface NewPetitionProps {
+export interface PetitionMessageProps {
   name: string | null;
   senderName: string;
   senderEmail: string;
@@ -34,7 +34,7 @@ export interface NewPetitionProps {
   assetsUrl: string;
 }
 
-const email: Email<NewPetitionProps> = {
+const email: Email<PetitionMessageProps> = {
   from({ senderName }, intl) {
     return intl.formatMessage(
       {
@@ -109,7 +109,7 @@ const email: Email<NewPetitionProps> = {
     keycode,
     parallelUrl,
     assetsUrl,
-  }: NewPetitionProps) {
+  }: PetitionMessageProps) {
     const { locale } = useIntl();
 
     return (
@@ -181,7 +181,7 @@ const email: Email<NewPetitionProps> = {
 };
 export default email;
 
-export const props: NewPetitionProps = {
+export const props: PetitionMessageProps = {
   name: "Derek",
   senderName: "Santi",
   senderEmail: "santi@parallel.so",

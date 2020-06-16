@@ -1,6 +1,6 @@
 import { pick } from "remeda";
 import { buildEmail } from "../emails/buildEmail";
-import NewPetition from "../emails/components/NewPetition";
+import PetitionMessage from "../emails/components/PetitionMessage";
 import { buildFrom } from "../emails/utils/buildFrom";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
@@ -48,7 +48,7 @@ createQueueWorker<MessageEmailWorkerPayload>(
       ? `${sender.first_name} ${sender.last_name}`
       : sender.first_name!;
     const { html, text, subject, from } = await buildEmail(
-      NewPetition,
+      PetitionMessage,
       {
         name: contact.first_name,
         senderName,
