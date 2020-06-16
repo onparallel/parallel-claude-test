@@ -983,6 +983,11 @@ type PublicOrganization {
   identifier: String!
 
   """
+  The logo of the organization.
+  """
+  logoUrl: String
+
+  """
   The name of the organization.
   """
   name: String!

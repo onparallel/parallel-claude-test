@@ -159,6 +159,14 @@ export const PublicOrganization = objectType({
     t.string("identifier", {
       description: "The identifier of the organization.",
     });
+    t.field("logoUrl", {
+      type: "String",
+      description: "The logo of the organization.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.organizations.getOrgLogoUrl(root.id);
+      },
+    });
   },
 });
 

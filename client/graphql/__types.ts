@@ -659,6 +659,8 @@ export type PublicOrganization = {
   id: Scalars["ID"];
   /** The identifier of the organization. */
   identifier: Scalars["String"];
+  /** The logo of the organization. */
+  logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
 };
@@ -1358,7 +1360,7 @@ export type RecipientViewSenderCard_PublicUserFragment = {
 } & Pick<PublicUser, "id" | "firstName" | "fullName" | "email"> & {
     organization: { __typename?: "PublicOrganization" } & Pick<
       PublicOrganization,
-      "name" | "identifier"
+      "name" | "identifier" | "logoUrl"
     >;
   };
 
@@ -1410,7 +1412,7 @@ export type ContactQuery = { __typename?: "Query" } & {
   contact?: Maybe<{ __typename?: "Contact" } & Contact_ContactFragment>;
 };
 
-export type ContactUserQueryVariables = {};
+export type ContactUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contact_UserFragment;
@@ -1452,7 +1454,7 @@ export type ContactsQuery = { __typename?: "Query" } & {
   } & Contacts_ContactsListFragment;
 };
 
-export type ContactsUserQueryVariables = {};
+export type ContactsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contacts_UserFragment;
@@ -1570,7 +1572,9 @@ export type PetitionActivityQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type PetitionActivityUserQueryVariables = {};
+export type PetitionActivityUserQueryVariables = Exact<{
+  [key: string]: never;
+}>;
 
 export type PetitionActivityUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionActivity_UserFragment;
@@ -1715,7 +1719,7 @@ export type PetitionComposeQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type PetitionComposeUserQueryVariables = {};
+export type PetitionComposeUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionComposeUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionCompose_UserFragment;
@@ -1789,7 +1793,7 @@ export type PetitionRepliesQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type PetitionRepliesUserQueryVariables = {};
+export type PetitionRepliesUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionReplies_UserFragment;
@@ -1857,7 +1861,7 @@ export type PetitionsQuery = { __typename?: "Query" } & {
   } & Petitions_PetitionsListFragment;
 };
 
-export type PetitionsUserQueryVariables = {};
+export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type PetitionsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Petitions_UserFragment;
@@ -1881,7 +1885,7 @@ export type Account_updateAccountMutation = { __typename?: "Mutation" } & {
   >;
 };
 
-export type AccountQueryVariables = {};
+export type AccountQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AccountQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
@@ -1896,13 +1900,13 @@ export type Security_updatePasswordMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "changePassword">;
 
-export type SecurityQueryVariables = {};
+export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
 };
 
-export type CurrentUserQueryVariables = {};
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Login_UserFragment;
@@ -2716,6 +2720,7 @@ export const RecipientViewSenderCard_PublicUserFragmentDoc = gql`
     organization {
       name
       identifier
+      logoUrl
     }
   }
 `;

@@ -5,46 +5,6 @@ import { RecipientViewSenderCard_PublicUserFragment } from "@parallel/graphql/__
 import { gql } from "apollo-boost";
 import { useIntl } from "react-intl";
 
-function OrganizationLogo({
-  name,
-  identifier,
-  width,
-}: {
-  name: string;
-  identifier: string;
-  width: number;
-}) {
-  let src = "";
-
-  switch (identifier) {
-    case "doctoralia":
-      src = "/static/logos/doctoralia.png";
-      break;
-    case "l4law":
-      src = "/static/logos/l4law.png";
-      break;
-    case "cecamagan":
-      src = "/static/logos/cecamagan_social_dist.png";
-      break;
-    case "encomenda":
-      src = "/static/logos/encomenda.png";
-      break;
-    case "cuatrecasas":
-      src = "/static/logos/cuatrecasas.png";
-      break;
-    case "cscorporateadvisors":
-      src = "/static/logos/cs_corporate_advisors.png";
-      break;
-    case "andersen":
-      src = "/static/logos/andersen.png";
-      break;
-    default:
-      return <Logo width={width} />;
-  }
-
-  return <Image src={src} alt={name} width={width} />;
-}
-
 export function RecipientViewSenderCard({
   sender,
   ...props
@@ -55,68 +15,70 @@ export function RecipientViewSenderCard({
 
   return (
     <Card padding={6} {...props}>
-      <Stack>
-        <Box alignSelf="center">
-          <OrganizationLogo
-            name={sender.organization.name}
-            identifier={sender.organization.identifier}
-            width={156}
+      <Flex justifyContent="center">
+        {sender.organization.logoUrl ? (
+          <Image
+            src={sender.organization.logoUrl}
+            alt={sender.organization.name}
+            width={200}
           />
-        </Box>
-        <Box marginTop={4}>
-          <Grid
-            as="dl"
-            templateColumns="16px 1fr"
-            templateRows="repeat(3, 1fr)"
-            columnGap={2}
-            rowGap={2}
-          >
-            {sender.organization.identifier === "none" ? null : (
-              <>
-                <Flex as="dt" alignItems="center">
-                  <Icon
-                    name="business"
-                    size="16px"
-                    aria-label={intl.formatMessage({
-                      id: "recipient-view.organization",
-                      defaultMessage: "Business",
-                    })}
-                  />
-                </Flex>
-                <Box as="dd">
-                  <Text as="span">{sender.organization.name}</Text>
-                </Box>
-              </>
-            )}
-            <Flex as="dt" alignItems="center">
-              <Icon
-                name="user"
-                size="16px"
-                aria-label={intl.formatMessage({
-                  id: "recipient-view.sender",
-                  defaultMessage: "Sender",
-                })}
-              />
-            </Flex>
-            <Box as="dd">
-              <Text as="span">{sender.fullName}</Text>
-            </Box>
-            <Flex as="dt" alignItems="center">
-              <Icon
-                name="email"
-                size="16px"
-                aria-label={intl.formatMessage({
-                  id: "recipient-view.sender-email",
-                  defaultMessage: "Sender email",
-                })}
-              />
-            </Flex>
-            <Box as="dd">
-              <Text as="span">{sender.email}</Text>
-            </Box>
-          </Grid>
-        </Box>
-      </Stack>
+        ) : (
+          <Logo width={156} />
+        )}
+      </Flex>
+      <Box marginTop={6}>
+        <Grid
+          as="dl"
+          templateColumns="16px 1fr"
+          templateRows="repeat(3, 1fr)"
+          columnGap={2}
+          rowGap={2}
+        >
+          {sender.organization.identifier === "none" ? null : (
+            <>
+              <Flex as="dt" alignItems="center">
+                <Icon
+                  name="business"
+                  size="16px"
+                  aria-label={intl.formatMessage({
+                    id: "recipient-view.organization",
+                    defaultMessage: "Business",
+                  })}
+                />
+              </Flex>
+              <Box as="dd">
+                <Text as="span">{sender.organization.name}</Text>
+              </Box>
+            </>
+          )}
+          <Flex as="dt" alignItems="center">
+            <Icon
+              name="user"
+              size="16px"
+              aria-label={intl.formatMessage({
+                id: "recipient-view.sender",
+                defaultMessage: "Sender",
+              })}
+            />
+          </Flex>
+          <Box as="dd">
+            <Text as="span">{sender.fullName}</Text>
+          </Box>
+          <Flex as="dt" alignItems="center">
+            <Icon
+              name="email"
+              size="16px"
+              aria-label={intl.formatMessage({
+                id: "recipient-view.sender-email",
+                defaultMessage: "Sender email",
+              })}
+            />
+          </Flex>
+          <Box as="dd">
+            <Text as="span">{sender.email}</Text>
+          </Box>
+        </Grid>
+      </Box>
     </Card>
   );
 }
@@ -131,6 +93,7 @@ RecipientViewSenderCard.fragments = {
       organization {
         name
         identifier
+        logoUrl
       }
     }
   `,

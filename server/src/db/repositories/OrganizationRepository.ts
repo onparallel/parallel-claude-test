@@ -2,10 +2,14 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
+import { Config, CONFIG } from "../../config";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex) {
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(KNEX) knex: Knex
+  ) {
     super(knex);
   }
 
@@ -23,5 +27,24 @@ export class OrganizationRepository extends BaseRepository {
         .select("*"),
       opts
     );
+  }
+
+  async getOrgLogoUrl(orgId: number) {
+    const org = await this.loadOrg(orgId);
+    if (
+      org &&
+      [
+        "doctoralia",
+        "l4law",
+        "cecamagan",
+        "encomenda",
+        "cuatrecasas",
+        "cscorporateadvisors",
+        "andersen",
+      ].includes(org.identifier)
+    ) {
+      return `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`;
+    }
+    return null;
   }
 }

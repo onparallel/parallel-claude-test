@@ -526,6 +526,7 @@ export interface NexusGenFieldTypes {
     // field return type
     id: string; // ID!
     identifier: string; // String!
+    logoUrl: string | null; // String
     name: string; // String!
   };
   PublicPetition: {
