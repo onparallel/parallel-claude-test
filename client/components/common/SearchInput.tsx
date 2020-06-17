@@ -1,3 +1,4 @@
+/** @jsx jsx */
 import {
   Icon,
   IconButton,
@@ -13,6 +14,7 @@ import { useFocus } from "@parallel/utils/useFocus";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, Ref, useRef } from "react";
 import { useIntl } from "react-intl";
+import { jsx, css } from "@emotion/core";
 
 export type SearchInputProps = InputProps &
   Required<Pick<InputProps, "value" | "onChange">>;
@@ -67,6 +69,21 @@ export const SearchInput = forwardRef(function SearchInput(
         }
         {...props}
         {...bind}
+        css={css`
+          &::-ms-clear,
+          &::-ms-reveal {
+            display: none;
+            width: 0;
+            height: 0;
+          }
+
+          &::-webkit-search-decoration,
+          &::-webkit-search-cancel-button,
+          &::-webkit-search-results-button,
+          &::-webkit-search-results-decoration {
+            display: none;
+          }
+        `}
       />
       {isActive ? (
         <InputRightElement>
