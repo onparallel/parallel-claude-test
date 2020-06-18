@@ -1,5 +1,5 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/core";
-import { Card, CardProps } from "@parallel/components/common/Card";
+import { Card, CardProps, CardHeader } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
@@ -186,14 +186,12 @@ export const PetitionComposeFieldList = Object.assign(
       <Card id="petition-fields" {...props}>
         {fieldIds.length ? (
           <>
-            <Box padding={4}>
-              <Heading as="h2" size="sm">
-                <FormattedMessage
-                  id="petition.fields-header"
-                  defaultMessage="This is the information that you need"
-                />
-              </Heading>
-            </Box>
+            <CardHeader headingAs="h2">
+              <FormattedMessage
+                id="petition.fields-header"
+                defaultMessage="This is the information that you need"
+              />
+            </CardHeader>
             {fieldIds.map((fieldId, index) => (
               <PetitionComposeField
                 id={`field-${fieldId}`}

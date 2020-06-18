@@ -11,7 +11,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/core";
-import { Card } from "@parallel/components/common/Card";
+import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
 import { PetitionStatusIndicator } from "@parallel/components/common/PetitionStatusIndicator";
@@ -121,10 +121,9 @@ function Contact({ contactId }: ContactProps) {
               as={isEditing ? "form" : "div"}
               onSubmit={isEditing ? handleContactSaveSubmit : undefined}
             >
-              <Heading as="h2" padding={4} size="md">
+              <CardHeader headingAs="h2" headingFontSize="lg">
                 {`${contact?.fullName ?? ""} <${contact?.email}>`}
-              </Heading>
-              <Divider marginY={0} />
+              </CardHeader>
               <Stack padding={4}>
                 <FormControl>
                   <FormLabel htmlFor="contact-first-name" fontWeight="bold">
@@ -209,20 +208,14 @@ function Contact({ contactId }: ContactProps) {
                 )}
               </Flex>
             </Card>
-            <Card backgroundColor="white" marginTop={4}>
-              <Box
-                padding={4}
-                borderBottom="1px solid"
-                borderBottomColor="gray.200"
-              >
-                <Heading fontSize="md">
-                  <FormattedMessage
-                    id="contact.petitions-header"
-                    defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
-                    values={{ name: contact?.firstName }}
-                  />
-                </Heading>
-              </Box>
+            <Card marginTop={4}>
+              <CardHeader>
+                <FormattedMessage
+                  id="contact.petitions-header"
+                  defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
+                  values={{ name: contact?.firstName }}
+                />
+              </CardHeader>
               {contact?.accesses.items.length ? (
                 <Table
                   columns={columns}

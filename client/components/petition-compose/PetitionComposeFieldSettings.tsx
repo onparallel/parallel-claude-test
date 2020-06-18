@@ -1,16 +1,13 @@
 import {
   BoxProps,
   Flex,
-  Heading,
   Icon,
-  IconButton,
   Image,
   Input,
-  Stack,
   Switch,
   Text,
 } from "@chakra-ui/core";
-import { Card } from "@parallel/components/common/Card";
+import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
@@ -20,11 +17,10 @@ import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { gql } from "apollo-boost";
 import { ChangeEvent, ReactNode, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { Divider } from "../common/Divider";
+import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
 
-export type PetitionComposeFieldSettingsProps = BoxProps & {
+export type PetitionComposeFieldSettingsProps = {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
@@ -34,33 +30,16 @@ export function PetitionComposeFieldSettings({
   field,
   onFieldEdit,
   onClose,
-  ...props
 }: PetitionComposeFieldSettingsProps) {
-  const intl = useIntl();
-
   return (
-    <Card padding={4} {...props}>
-      <Stack direction="row" alignItems="center" marginBottom={2}>
-        <Heading size="sm">
-          <FormattedMessage
-            id="petition.field-settings"
-            defaultMessage="Field settings"
-          />
-        </Heading>
-        <Spacer />
-        <IconButton
-          variant="ghost"
-          size="sm"
-          icon="close"
-          aria-label={intl.formatMessage({
-            id: "petition.close-sidebar-button",
-            defaultMessage: "Close",
-          })}
-          onClick={onClose}
+    <Card>
+      <CardHeader isCloseable onClose={onClose}>
+        <FormattedMessage
+          id="petition.field-settings"
+          defaultMessage="Field settings"
         />
-      </Stack>
-      <Divider />
-      <Flex flexDirection="column">
+      </CardHeader>
+      <Flex flexDirection="column" padding={4} marginBottom={-4}>
         <SettingsRow
           label={
             <FormattedMessage
@@ -89,7 +68,6 @@ export function PetitionComposeFieldSettings({
             }
           />
         </SettingsRow>
-        <Divider />
         <SettingsRow
           label={
             field.type === "FILE_UPLOAD" ? (
@@ -132,7 +110,6 @@ export function PetitionComposeFieldSettings({
             }
           />
         </SettingsRow>
-        <Divider />
         {field.type === "FILE_UPLOAD" ? (
           <FileUploadSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "TEXT" ? (
@@ -203,7 +180,6 @@ function TextSettings({
           }
         />
       </SettingsRow>
-      <Divider />
       <SettingsRow
         label={
           <FormattedMessage
@@ -228,16 +204,15 @@ function TextSettings({
           </>
         }
         controlId="text-placeholder"
-        paddingY={2}
       >
         <Input
           id="text-placeholder"
           value={placeholder}
           marginLeft={2}
+          size="sm"
           onChange={handlePlaceholderChange}
         />
       </SettingsRow>
-      <Divider />
     </Flex>
   );
 }
@@ -259,7 +234,7 @@ function SettingsRow({
       <Flex
         as="label"
         alignItems="center"
-        paddingY={4}
+        marginBottom={4}
         {...{ htmlFor: controlId }}
         {...props}
       >
