@@ -48,6 +48,7 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import { useDownloadAllDialog } from "@parallel/components/petition-replies/DownloadAllDialog";
+import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -249,8 +250,8 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         </Stack>
         <Divider />
         <Box flex="1" overflow="auto">
-          <Flex margin={4}>
-            <Stack flex="2" spacing={4} id="petition-replies">
+          <PaneWithFlyout active={false} alignWith={null} flyout={<></>}>
+            <Stack flex="2" spacing={4} padding={4} id="petition-replies">
               {petition!.fields.map((field, index) => (
                 <PetitionRepliesField
                   key={field.id}
@@ -265,8 +266,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                 />
               ))}
             </Stack>
-            <Spacer flex="1" display={{ base: "none", md: "block" }} />
-          </Flex>
+          </PaneWithFlyout>
         </Box>
       </PetitionLayout>
     </>

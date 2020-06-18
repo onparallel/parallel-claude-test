@@ -52,6 +52,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
+import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -79,25 +80,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
     return null;
   }, [activeFieldId, petition!.fields]);
-
-  // This handles the position of the settings card
-  const [settingsOffset, setSettingsOffset] = useState(0);
-  useEffect(() => {
-    if (!activeFieldId) {
-      return;
-    }
-    const field = document.querySelector<HTMLElement>(
-      `#field-${activeFieldId}`
-    )!;
-    const { height: fieldHeight } = field.getBoundingClientRect();
-    const fieldOffset = field.offsetTop - field.parentElement!.offsetTop;
-    const settings = document.querySelector<HTMLElement>("#field-settings");
-    if (!settings) {
-      return;
-    }
-    const { height: settingsHeight } = settings.getBoundingClientRect();
-    setSettingsOffset(fieldOffset + fieldHeight / 2 - settingsHeight / 2);
-  }, [activeFieldId, petition!.fields]);
+  const activeFieldElement = useMemo(() => {
+    return activeFieldId
+      ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)!
+      : null;
+  }, [activeFieldId]);
 
   // When the petition is completed show a dialog to avoid unintended changes
   const completedDialog = useCompletedPetitionDialog();
@@ -328,11 +315,23 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         scrollBody
         state={state}
       >
-        <Flex flexDirection="row" padding={4}>
-          <Box
-            flex="2"
-            display={{ base: activeFieldId ? "none" : "block", md: "block" }}
-          >
+        <PaneWithFlyout
+          active={Boolean(activeField)}
+          alignWith={activeFieldElement}
+          flyout={
+            activeField && (
+              <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
+                <PetitionComposeFieldSettings
+                  key={activeField.id}
+                  field={activeField}
+                  onFieldEdit={handleFieldEdit}
+                  onClose={() => setActiveFieldId(null)}
+                />
+              </Box>
+            )
+          }
+        >
+          <Box padding={4}>
             <PetitionComposeFieldList
               showErrors={showErrors}
               fields={petition!.fields}
@@ -386,26 +385,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               </Box>
             )}
           </Box>
-          <Box
-            flex="1"
-            marginLeft={{ base: 0, md: 4 }}
-            display={{ base: activeField ? "block" : "none", md: "block" }}
-          >
-            {activeField ? (
-              <PetitionComposeFieldSettings
-                key={activeField.id}
-                id="field-settings"
-                marginTop={{ base: 0, md: `${settingsOffset}px` }}
-                transition="margin-top 200ms ease"
-                position={{ base: "relative", md: "sticky" }}
-                top={{ base: 0, md: 4 }}
-                field={activeField}
-                onFieldEdit={handleFieldEdit}
-                onClose={() => setActiveFieldId(null)}
-              />
-            ) : null}
-          </Box>
-        </Flex>
+        </PaneWithFlyout>
       </PetitionLayout>
     </>
   );

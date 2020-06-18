@@ -1,0 +1,61 @@
+import { Box, Flex } from "@chakra-ui/core";
+import { Maybe } from "@parallel/utils/types";
+import { ReactNode, useEffect, useRef, useState } from "react";
+
+export type PaneWithFlyoutProps = {
+  active: boolean;
+  flyout: ReactNode;
+  alignWith: Maybe<HTMLElement>;
+  children: ReactNode;
+};
+
+export function PaneWithFlyout({
+  active,
+  flyout,
+  alignWith,
+  children,
+}: PaneWithFlyoutProps) {
+  const [flyoutOffset, setFlyoutOffset] = useState(0);
+  const flyoutRef = useRef<HTMLElement>(null);
+  const paneRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!active || !alignWith || !flyoutRef.current) {
+      setFlyoutOffset(0);
+      return;
+    }
+    const {
+      top: paneTop,
+      height: paneHeight,
+    } = paneRef.current!.getBoundingClientRect();
+    const {
+      height: alignWithHeight,
+      top: alignWithTop,
+    } = alignWith.getBoundingClientRect();
+    const { height: flyoutHeight } = flyoutRef.current.getBoundingClientRect();
+    const offset =
+      alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;
+    const maxOffset = paneHeight - flyoutHeight;
+    setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
+  }, [active, alignWith]);
+
+  return (
+    <Flex ref={paneRef} flexDirection="row" minHeight="100%">
+      <Box flex="2" display={{ base: active ? "none" : "block", md: "block" }}>
+        {children}
+      </Box>
+      <Box flex="1" display={{ base: active ? "block" : "none", md: "block" }}>
+        {active ? (
+          <Box
+            ref={flyoutRef}
+            marginTop={{ base: 0, md: `${flyoutOffset}px` }}
+            transition="margin-top 200ms ease"
+            position={{ base: "relative", md: "sticky" }}
+            top={0}
+          >
+            {flyout}
+          </Box>
+        ) : null}
+      </Box>
+    </Flex>
+  );
+}
