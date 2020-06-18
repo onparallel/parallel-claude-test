@@ -72,6 +72,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   } = assertQuery(usePetitionComposeQuery({ variables: { id: petitionId } }));
 
   const [state, wrapper] = usePetitionState();
+
+  // active here means settings are showing
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {

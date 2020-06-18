@@ -39,13 +39,7 @@ export function PetitionComposeFieldSettings({
   const intl = useIntl();
 
   return (
-    <Card
-      borderRight="2px solid"
-      borderRightColor="gray.200"
-      backgroundColor="white"
-      padding={4}
-      {...props}
-    >
+    <Card padding={4} {...props}>
       <Stack direction="row" alignItems="center" marginBottom={2}>
         <Heading size="sm">
           <FormattedMessage
