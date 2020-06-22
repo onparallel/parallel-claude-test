@@ -39,7 +39,7 @@ export function PaneWithFlyout({
   }, [active, alignWith]);
 
   return (
-    <Flex ref={paneRef} flexDirection="row" minHeight="100%">
+    <Flex ref={paneRef} minHeight="100%">
       <Box flex="2" display={{ base: active ? "none" : "block", md: "block" }}>
         {children}
       </Box>

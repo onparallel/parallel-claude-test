@@ -166,6 +166,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         section="replies"
         scrollBody={false}
         state={state}
+        display="flex"
+        flexDirection="column"
+        minHeight={0}
+        overflow="visible"
       >
         <Stack
           direction="row"
