@@ -1,6 +1,7 @@
 import { Box, Flex } from "@chakra-ui/core";
 import { Maybe } from "@parallel/utils/types";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 export type PaneWithFlyoutProps = {
   active: boolean;
@@ -36,6 +37,19 @@ export function PaneWithFlyout({
       alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;
     const maxOffset = paneHeight - flyoutHeight;
     setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
+  }, [active, alignWith]);
+  useEffect(() => {
+    if (active) {
+      const timeout = setTimeout(() => {
+        if (flyoutRef.current) {
+          scrollIntoView(flyoutRef.current, {
+            scrollMode: "if-needed",
+            block: "nearest",
+          });
+        }
+      }, 200);
+      return () => clearTimeout(timeout);
+    }
   }, [active, alignWith]);
 
   return (
