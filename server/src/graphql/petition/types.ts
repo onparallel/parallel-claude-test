@@ -414,6 +414,19 @@ export const PetitionMessage = objectType({
   },
 });
 
+export const PetitionFieldReplyStatus = enumType({
+  name: "PetitionFieldReplyStatus",
+  description: "The status of a petition.",
+  members: [
+    {
+      name: "PENDING",
+      description: "The reply has not been approved or rejected.",
+    },
+    { name: "REJECTED", description: "The reply has been rejected." },
+    { name: "APPROVED", description: "The reply has been approved." },
+  ],
+});
+
 export const PetitionFieldReply = objectType({
   name: "PetitionFieldReply",
   description: "A reply to a petition field",
@@ -423,8 +436,12 @@ export const PetitionFieldReply = objectType({
       description: "The ID of the petition field reply.",
       resolve: (o) => toGlobalId("PetitionFieldReply", o.id),
     });
+    t.field("status", {
+      type: "PetitionFieldReplyStatus",
+      description: "The status of the reply.",
+    });
     t.jsonObject("content", {
-      description: "The content of the reply",
+      description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
         switch (root.type) {
           case "TEXT": {

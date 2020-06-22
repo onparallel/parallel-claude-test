@@ -8,14 +8,19 @@ import {
   Stack,
   Text,
   VisuallyHidden,
+  Tooltip,
+  IconButton,
+  ButtonProps,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
-import { PetitionRepliesField_PetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  PetitionRepliesField_PetitionFieldFragment,
+  PetitionRepliesField_PetitionFieldReplyFragment,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { UnwrapArray } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
-import { Fragment, MouseEvent, ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
@@ -25,204 +30,197 @@ import { Spacer } from "../common/Spacer";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
-  reply: UnwrapArray<PetitionRepliesField_PetitionFieldFragment["replies"]>;
+  reply: PetitionRepliesField_PetitionFieldReplyFragment;
 };
 
 export type PetitionRepliesFieldProps = BoxProps & {
   field: PetitionRepliesField_PetitionFieldFragment;
   index: number;
-  selected: boolean;
-  onToggle: (event: MouseEvent) => void;
+  highlighted: boolean;
+  commentCount: number;
+  newCommentCount: number;
+  isShowingComments: boolean;
   onAction: (action: PetitionRepliesFieldAction) => void;
+  onToggleComments: () => void;
   onValidateToggle: () => void;
 };
 
 export function PetitionRepliesField({
   field,
   index,
-  selected,
-  onToggle,
+  highlighted,
+  commentCount,
+  newCommentCount,
+  isShowingComments,
   onAction,
+  onToggleComments,
   onValidateToggle,
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
-  const labels = {
-    filesize: intl.formatMessage({
-      id: "generic.file-size",
-      defaultMessage: "File size",
-    }),
-    filename: intl.formatMessage({
-      id: "generic.file-name",
-      defaultMessage: "File name",
-    }),
-    download: intl.formatMessage({
-      id: "petition.petition-field.reply-file-download",
-      defaultMessage: "Download file",
-    }),
-    preview: intl.formatMessage({
-      id: "petition.petition-field.reply-file-preview",
-      defaultMessage: "Preview file",
-    }),
-  };
   return (
     <Card
       display="flex"
+      flexDirection="column"
       position="relative"
-      backgroundColor={selected ? "purple.50" : "white"}
+      backgroundColor={highlighted ? "purple.50" : "white"}
+      paddingY={{ base: 4 }}
+      paddingX={{ base: 4, md: 6 }}
       {...props}
     >
-      <Flex alignItems="center" marginLeft={4}>
-        <Checkbox
-          variantColor="purple"
-          isChecked={selected}
-          isReadOnly
-          onClick={onToggle}
-        />
-      </Flex>
-      <Flex flex="1" flexDirection="column" padding={4}>
-        <Flex alignItems="center">
-          <PetitionFieldTypeIndicator
-            type={field.type}
-            index={index}
-            as="div"
-          />
-          <Box marginLeft={4}>
-            {field.title ? (
-              <Text as="h4">{field.title}</Text>
-            ) : (
-              <Text as="h4" color="gray.400" fontStyle="italic">
-                <FormattedMessage
-                  id="generic.untitled-field"
-                  defaultMessage="Untitled field"
-                />
-              </Text>
-            )}
-          </Box>
-          <Spacer />
-          <Box>
-            <Button
-              size="sm"
-              variant={field.validated ? "solid" : "ghost"}
-              onClick={onValidateToggle}
-            >
-              <Checkbox
-                isChecked={field.validated}
-                isReadOnly
-                size="md"
-                pointerEvents="none"
-                marginRight={2}
-              />
-              <FormattedMessage
-                id="petition.petition-field.validate-button"
-                defaultMessage="Reviewed"
-              ></FormattedMessage>
-            </Button>
-          </Box>
-        </Flex>
-        <Box marginBottom={2}>
-          {field.description ? (
-            <Text color="gray.600" fontSize="sm">
-              {field.description?.split("\n").map((line, index) => (
-                <Fragment key={index}>
-                  {line}
-                  <br />
-                </Fragment>
-              ))}
-            </Text>
+      <Flex alignItems="center">
+        <PetitionFieldTypeIndicator type={field.type} index={index} as="div" />
+        <Box marginLeft={4}>
+          {field.title ? (
+            <Text as="h4">{field.title}</Text>
           ) : (
-            <Text color="gray.400" fontSize="sm" fontStyle="italic">
+            <Text as="h4" color="gray.400" fontStyle="italic">
               <FormattedMessage
-                id="generic.no-description"
-                defaultMessage="No description"
+                id="generic.untitled-field"
+                defaultMessage="Untitled field"
               />
             </Text>
           )}
         </Box>
-        {field.replies.length ? (
-          field.type === "TEXT" ? (
-            <Stack spacing={4}>
-              {field.replies.map((reply) => (
-                <PetitionRepliesFieldReply
-                  key={reply.id}
-                  reply={reply}
-                  actions={
-                    <CopyToClipboardButton
-                      size="xs"
-                      text={reply.content.text}
-                    />
-                  }
-                >
-                  {(reply.content.text as string)
-                    .split(/\n/)
-                    .map((line, index) => (
-                      <Fragment key={index}>
-                        {line}
-                        <br />
-                      </Fragment>
-                    ))}
-                </PetitionRepliesFieldReply>
-              ))}
-            </Stack>
-          ) : field.type === "FILE_UPLOAD" ? (
-            <Stack spacing={4}>
-              {field.replies.map((reply) => (
-                <PetitionRepliesFieldReply
-                  key={reply.id}
-                  reply={reply}
-                  actions={[
-                    <IconButtonWithTooltip
-                      key="1"
-                      size="xs"
-                      icon="download"
-                      label={labels.download}
-                      onClick={() => onAction({ type: "DOWNLOAD_FILE", reply })}
-                    />,
-                    ...(isPreviewable(reply.content.contentType)
-                      ? [
-                          <IconButtonWithTooltip
-                            key="2"
-                            size="xs"
-                            icon="view"
-                            label={labels.preview}
-                            onClick={() =>
-                              onAction({ type: "PREVIEW_FILE", reply })
-                            }
-                          />,
-                        ]
-                      : []),
-                  ]}
-                >
-                  <Box display="inling-flex">
-                    <VisuallyHidden>{labels.filename}</VisuallyHidden>
-                    <Text as="span">{reply.content.filename}</Text>
-                    <Text as="span" marginX={2}>
-                      -
-                    </Text>
-                    <Text
-                      as="span"
-                      aria-label={labels.filesize}
-                      fontSize="sm"
-                      color="gray.400"
-                    >
-                      <FileSize value={reply.content.size} />
-                    </Text>
-                  </Box>
-                </PetitionRepliesFieldReply>
-              ))}
-            </Stack>
-          ) : null
-        ) : (
-          <Box paddingY={4}>
-            <Text color="gray.400" fontStyle="italic" textAlign="center">
-              <FormattedMessage
-                id="petition.petition-field.no-replies"
-                defaultMessage="There are no replies to this field yet"
-              />
-            </Text>
-          </Box>
-        )}
+        <Spacer />
+        {/* <Button
+          size="sm"
+          variant={field.validated ? "solid" : "ghost"}
+          onClick={onValidateToggle}
+        >
+          <Checkbox
+            isChecked={field.validated}
+            isReadOnly
+            size="md"
+            pointerEvents="none"
+            marginRight={2}
+          />
+          <FormattedMessage
+            id="petition-replies.validate-field-button"
+            defaultMessage="Reviewed"
+          ></FormattedMessage>
+        </Button> */}
+        <CommentButton
+          isShowingComments={isShowingComments}
+          commentCount={commentCount}
+          newCommentCount={newCommentCount}
+          onClick={onToggleComments}
+        />
       </Flex>
+      <Box marginBottom={2}>
+        {field.description ? (
+          <Text color="gray.600" fontSize="sm">
+            {field.description?.split("\n").map((line, index) => (
+              <Fragment key={index}>
+                {line}
+                <br />
+              </Fragment>
+            ))}
+          </Text>
+        ) : (
+          <Text color="gray.400" fontSize="sm" fontStyle="italic">
+            <FormattedMessage
+              id="generic.no-description"
+              defaultMessage="No description"
+            />
+          </Text>
+        )}
+      </Box>
+      {field.replies.length ? (
+        field.type === "TEXT" ? (
+          <Stack spacing={4}>
+            {field.replies.map((reply) => (
+              <PetitionRepliesFieldReply
+                key={reply.id}
+                reply={reply}
+                actions={
+                  <CopyToClipboardButton size="xs" text={reply.content.text} />
+                }
+              >
+                {(reply.content.text as string)
+                  .split(/\n/)
+                  .map((line, index) => (
+                    <Fragment key={index}>
+                      {line}
+                      <br />
+                    </Fragment>
+                  ))}
+              </PetitionRepliesFieldReply>
+            ))}
+          </Stack>
+        ) : field.type === "FILE_UPLOAD" ? (
+          <Stack spacing={4}>
+            {field.replies.map((reply) => (
+              <PetitionRepliesFieldReply
+                key={reply.id}
+                reply={reply}
+                actions={[
+                  <IconButtonWithTooltip
+                    key="1"
+                    size="xs"
+                    icon="download"
+                    label={intl.formatMessage({
+                      id: "petition-replies.petition-field-reply.file-download",
+                      defaultMessage: "Download file",
+                    })}
+                    onClick={() => onAction({ type: "DOWNLOAD_FILE", reply })}
+                  />,
+                  ...(isPreviewable(reply.content.contentType)
+                    ? [
+                        <IconButtonWithTooltip
+                          key="2"
+                          size="xs"
+                          icon="view"
+                          label={intl.formatMessage({
+                            id:
+                              "petition-replies.petition-field-reply.file-preview",
+                            defaultMessage: "Preview file",
+                          })}
+                          onClick={() =>
+                            onAction({ type: "PREVIEW_FILE", reply })
+                          }
+                        />,
+                      ]
+                    : []),
+                ]}
+              >
+                <Box display="inling-flex">
+                  <VisuallyHidden>
+                    {intl.formatMessage({
+                      id: "generic.file-name",
+                      defaultMessage: "File name",
+                    })}
+                  </VisuallyHidden>
+                  <Text as="span">{reply.content.filename}</Text>
+                  <Text as="span" marginX={2}>
+                    -
+                  </Text>
+                  <Text
+                    as="span"
+                    aria-label={intl.formatMessage({
+                      id: "generic.file-size",
+                      defaultMessage: "File size",
+                    })}
+                    fontSize="sm"
+                    color="gray.500"
+                  >
+                    <FileSize value={reply.content.size} />
+                  </Text>
+                </Box>
+              </PetitionRepliesFieldReply>
+            ))}
+          </Stack>
+        ) : null
+      ) : (
+        <Box paddingY={4}>
+          <Text color="gray.400" fontStyle="italic" textAlign="center">
+            <FormattedMessage
+              id="petition-replies.petition-field.no-replies"
+              defaultMessage="There are no replies to this field yet"
+            />
+          </Text>
+        </Box>
+      )}
     </Card>
   );
 }
@@ -238,8 +236,9 @@ function PetitionRepliesFieldReply({
   ...props
 }: {
   actions: ReactNode;
-  reply: UnwrapArray<PetitionRepliesField_PetitionFieldFragment["replies"]>;
+  reply: PetitionRepliesField_PetitionFieldReplyFragment;
 } & PseudoBoxProps) {
+  const intl = useIntl();
   return (
     <Flex {...props}>
       <Stack
@@ -260,12 +259,72 @@ function PetitionRepliesFieldReply({
         <Box fontSize="sm">
           <DateTime
             as="span"
-            color="gray.400"
+            color="gray.500"
             value={reply.createdAt}
             format={FORMATS.LLL}
           />
         </Box>
       </Flex>
+      <Stack direction="row" spacing={1}>
+        <IconButtonWithTooltip
+          icon="check"
+          label={intl.formatMessage({
+            id: "petition-replies.petition-field-reply.approve",
+            defaultMessage: "Approve",
+          })}
+          variantColor="green"
+          size="xs"
+          placement="bottom"
+          role="switch"
+          aria-checked={reply.status === "APPROVED"}
+          {...(reply.status === "APPROVED"
+            ? {
+                backgroundColor: "green.500",
+                color: "white",
+                _hover: {
+                  backgroundColor: "green.600",
+                  color: "white",
+                },
+              }
+            : {
+                backgroundColor: "gray.100",
+                color: "black",
+                _hover: {
+                  backgroundColor: "green.500",
+                  color: "white",
+                },
+              })}
+        />
+        <IconButtonWithTooltip
+          icon="close"
+          label={intl.formatMessage({
+            id: "petition-replies.petition-field-reply.reject",
+            defaultMessage: "Reject",
+          })}
+          variantColor="red"
+          size="xs"
+          placement="bottom"
+          role="switch"
+          aria-checked={reply.status === "REJECTED"}
+          {...(reply.status === "REJECTED"
+            ? {
+                backgroundColor: "red.500",
+                color: "white",
+                _hover: {
+                  backgroundColor: "red.600",
+                  color: "white",
+                },
+              }
+            : {
+                backgroundColor: "gray.100",
+                color: "black",
+                _hover: {
+                  backgroundColor: "red.500",
+                  color: "white",
+                },
+              })}
+        />
+      </Stack>
     </Flex>
   );
 }
@@ -279,10 +338,64 @@ PetitionRepliesField.fragments = {
       description
       validated
       replies {
-        id
-        content
-        createdAt
+        ...PetitionRepliesField_PetitionFieldReply
       }
+    }
+    fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      status
+      createdAt
     }
   `,
 };
+
+function CommentButton({
+  commentCount,
+  newCommentCount,
+  isShowingComments,
+  onClick,
+}: Pick<
+  PetitionRepliesFieldProps,
+  "newCommentCount" | "commentCount" | "isShowingComments"
+> &
+  Pick<ButtonProps, "onClick">) {
+  const intl = useIntl();
+  const common = {
+    role: "switch",
+    "aria-checked": isShowingComments,
+    size: "sm",
+    variant: isShowingComments ? "solid" : "ghost",
+    variantColor: isShowingComments ? "purple" : "gray",
+    "aria-label": intl.formatMessage(
+      {
+        id: "petition-replies.comments-label",
+        defaultMessage:
+          "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+      },
+      { commentCount }
+    ),
+    onClick,
+  } as const;
+  return (
+    <Box position="relative">
+      {commentCount > 0 ? (
+        <Button leftIcon={"comment" as any} fontWeight="normal" {...common}>
+          {intl.formatNumber(commentCount)}
+        </Button>
+      ) : (
+        <IconButton icon={"comment" as any} {...common} />
+      )}
+      {newCommentCount ? (
+        <Box
+          backgroundColor="purple.500"
+          size={2}
+          position="absolute"
+          top="50%"
+          transform="translate(-150%,-50%)"
+          rounded="9999px"
+        />
+      ) : null}
+    </Box>
+  );
+}

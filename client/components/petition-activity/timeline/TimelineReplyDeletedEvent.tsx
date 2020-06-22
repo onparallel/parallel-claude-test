@@ -58,8 +58,8 @@ function FieldTitle({
         ) : (
           <Text as="span" color="gray.400" fontStyle="italic">
             <FormattedMessage
-              id="timeline.reply-created-field-no-title"
-              defaultMessage="No title"
+              id="generic.untitled-field"
+              defaultMessage="Untitled field"
             />
           </Text>
         )

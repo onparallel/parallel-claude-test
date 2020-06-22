@@ -4,7 +4,10 @@
  * be called.
  * Use this method instead of `input.value = 'foo'`.
  */
-export function setNativeValue(element: HTMLInputElement, value: string) {
+export function setNativeValue(
+  element: HTMLInputElement | HTMLTextAreaElement,
+  value: string
+) {
   const valueSetter = Object.getOwnPropertyDescriptor(element, "value")!.set!;
   const prototype = Object.getPrototypeOf(element);
   const prototypeValueSetter = Object.getOwnPropertyDescriptor(
@@ -17,4 +20,5 @@ export function setNativeValue(element: HTMLInputElement, value: string) {
   } else {
     valueSetter.call(element, value);
   }
+  element.dispatchEvent(new Event("input", { bubbles: true }));
 }

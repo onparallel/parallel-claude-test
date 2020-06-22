@@ -740,7 +740,7 @@ type PetitionFieldReply implements Timestamps {
   access: PetitionAccess
 
   """
-  The content of the reply
+  The content of the reply.
   """
   content: JSONObject!
 
@@ -755,9 +755,34 @@ type PetitionFieldReply implements Timestamps {
   id: ID!
 
   """
+  The status of the reply.
+  """
+  status: PetitionFieldReplyStatus!
+
+  """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+"""
+The status of a petition.
+"""
+enum PetitionFieldReplyStatus {
+  """
+  The reply has been approved.
+  """
+  APPROVED
+
+  """
+  The reply has not been approved or rejected.
+  """
+  PENDING
+
+  """
+  The reply has been rejected.
+  """
+  REJECTED
 }
 
 """

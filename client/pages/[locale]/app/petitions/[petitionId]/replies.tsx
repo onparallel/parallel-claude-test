@@ -9,11 +9,11 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
+import { Box, Button, Stack, Text } from "@chakra-ui/core";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { SplitButton } from "@parallel/components/common/SplitButton";
 import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
@@ -25,6 +25,7 @@ import {
   DownloadAllDialog,
   useDownloadAllDialog,
 } from "@parallel/components/petition-replies/DownloadAllDialog";
+import { useDownloadAllDialog } from "@parallel/components/petition-replies/DownloadAllDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
   PetitionRepliesField,
@@ -46,11 +47,11 @@ import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { useSelectionState } from "@parallel/utils/useSelectionState";
 import { gql } from "apollo-boost";
-import { useCallback } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
+import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -65,6 +66,17 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     data: { petition },
     refetch,
   } = assertQuery(usePetitionRepliesQuery({ variables: { id: petitionId } }));
+
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
+  const activeField = useMemo(
+    () => petition!.fields.find((f) => f.id === activeFieldId),
+    [activeFieldId, petition!.fields]
+  );
+  const activeFieldElement = useMemo(() => {
+    return activeFieldId
+      ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)!
+      : null;
+  }, [activeFieldId]);
 
   const [state, wrapper] = usePetitionState();
   const [updatePetition] = usePetitionReplies_updatePetitionMutation();
@@ -124,10 +136,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         break;
     }
   };
-
-  const showDownloadAll = petition!.fields.some(
-    (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
-  );
   const downloadAllDialog = useDownloadAllDialog();
   const handleDownloadAllClick = useCallback(async () => {
     try {
@@ -141,15 +149,11 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     } catch {}
   }, [petitionId, petition!.fields]);
 
-  const {
-    selection,
-    selected,
-    anySelected,
-    allSelected,
-    toggle,
-    toggleAll,
-    toggleBy,
-  } = useSelectionState(petition!.fields, "id");
+  const showDownloadAll = petition!.fields.some(
+    (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
+  );
+
+  const hasPendingComments = true;
 
   return (
     <>
@@ -177,47 +181,8 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           direction="row"
           paddingX={4}
           paddingY={2}
-          backgroundColor="white"
+          backgroundColor={hasPendingComments ? "yellow.50" : "white"}
         >
-          <SplitButton>
-            <Button variant="outline" onClick={toggleAll} padding={0}>
-              <Checkbox
-                isReadOnly
-                onClick={(event) => event.preventDefault()}
-                isChecked={anySelected && allSelected}
-                isIndeterminate={anySelected && !allSelected}
-                size="md"
-                variantColor="purple"
-              />
-            </Button>
-            <ButtonDropdown
-              as={IconButton}
-              variant="outline"
-              icon="chevron-down"
-              aria-label="op"
-              minWidth={8}
-              dropdown={
-                <MenuList
-                  minWidth="160px"
-                  placement="bottom-start"
-                  marginLeft="-40px"
-                >
-                  <MenuItem onClick={() => toggleBy(() => true)}>
-                    <FormattedMessage
-                      id="petition.replies.select-all"
-                      defaultMessage="All"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={() => toggleBy(() => false)}>
-                    <FormattedMessage
-                      id="petition.replies.select-none"
-                      defaultMessage="None"
-                    />
-                  </MenuItem>
-                </MenuList>
-              }
-            ></ButtonDropdown>
-          </SplitButton>
           <IconButtonWithTooltip
             onClick={() => refetch()}
             icon="repeat"
@@ -229,19 +194,26 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             })}
           />
           <Spacer />
-          {anySelected ? (
-            <Button
-              leftIcon="check"
-              onClick={() =>
-                handleValidateToggle(
-                  selected.map((r) => r.id),
-                  true
-                )
-              }
-            >
+          {/* <Button
+            leftIcon="check"
+            onClick={() =>
+              handleValidateToggle(
+                selected.map((r) => r.id),
+                true
+              )
+            }
+          >
+            <FormattedMessage
+              id="petition.replies.validate-selected"
+              defaultMessage="Mark as reviewed"
+            />
+          </Button> */}
+          {hasPendingComments ? (
+            <Button variantColor="yellow">
               <FormattedMessage
-                id="petition.replies.validate-selected"
-                defaultMessage="Mark as reviewed"
+                id="petition-replies.submit-comments"
+                defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
+                values={{ commentCount: 2 }}
               />
             </Button>
           ) : null}
@@ -260,19 +232,41 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         </Stack>
         <Divider />
         <Box flex="1" overflow="auto">
-          <PaneWithFlyout active={false} alignWith={null} flyout={<></>}>
+          <PaneWithFlyout
+            active={Boolean(activeFieldId)}
+            alignWith={activeFieldElement}
+            flyout={
+              <Box padding={4} paddingLeft={{ md: 0 }}>
+                <PetitionRepliesFieldComments
+                  key={activeFieldId!}
+                  field={activeField}
+                  comments={[]}
+                  onClose={() => setActiveFieldId(null)}
+                  onAddComment={() => {}}
+                />
+              </Box>
+            }
+          >
             <Stack flex="2" spacing={4} padding={4} id="petition-replies">
               {petition!.fields.map((field, index) => (
                 <PetitionRepliesField
+                  id={`field-${field.id}`}
                   key={field.id}
                   field={field}
                   index={index}
-                  selected={selection[field.id]}
+                  highlighted={activeFieldId === field.id}
                   onValidateToggle={() =>
                     handleValidateToggle([field.id], !field.validated)
                   }
                   onAction={handleAction}
-                  onToggle={(event) => toggle(field.id, event)}
+                  isShowingComments={activeFieldId === field.id}
+                  commentCount={index}
+                  newCommentCount={index > 1 ? index - 1 : 0}
+                  onToggleComments={() =>
+                    setActiveFieldId(
+                      activeFieldId === field.id ? null : field.id
+                    )
+                  }
                 />
               ))}
             </Stack>

@@ -542,15 +542,26 @@ export type PetitionFieldReply = Timestamps & {
   __typename?: "PetitionFieldReply";
   /** The access from where this reply was made. */
   access?: Maybe<PetitionAccess>;
-  /** The content of the reply */
+  /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The ID of the petition field reply. */
   id: Scalars["ID"];
+  /** The status of the reply. */
+  status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
+
+/** The status of a petition. */
+export type PetitionFieldReplyStatus =
+  /** The reply has been approved. */
+  | "APPROVED"
+  /** The reply has not been approved or rejected. */
+  | "PENDING"
+  /** The reply has been rejected. */
+  | "REJECTED";
 
 /** Type of a petition field */
 export type PetitionFieldType =
@@ -1327,12 +1338,15 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   "id" | "type" | "title" | "description" | "validated"
 > & {
     replies: Array<
-      { __typename?: "PetitionFieldReply" } & Pick<
-        PetitionFieldReply,
-        "id" | "content" | "createdAt"
-      >
+      {
+        __typename?: "PetitionFieldReply";
+      } & PetitionRepliesField_PetitionFieldReplyFragment
     >;
   };
+
+export type PetitionRepliesField_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+} & Pick<PetitionFieldReply, "id" | "content" | "status" | "createdAt">;
 
 export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
@@ -2630,6 +2644,14 @@ export const PetitionCompose_deletePetitionField_PetitionFragmentDoc = gql`
     }
   }
 `;
+export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+    status
+    createdAt
+  }
+`;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionField on PetitionField {
     id
@@ -2638,11 +2660,10 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     description
     validated
     replies {
-      id
-      content
-      createdAt
+      ...PetitionRepliesField_PetitionFieldReply
     }
   }
+  ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
 `;
 export const DownloadAllDialog_PetitionFieldFragmentDoc = gql`
   fragment DownloadAllDialog_PetitionField on PetitionField {

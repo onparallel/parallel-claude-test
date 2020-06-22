@@ -1518,25 +1518,25 @@
     "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L137-L140"
   },
   {
-    "term": "petition.petition-field.no-replies",
+    "term": "petition-replies.petition-field.no-replies",
     "definition": "No hay respuestas a este campo todavía",
     "context": "There are no replies to this field yet",
     "reference": "components/petition-replies/PetitionRepliesField.tsx#L218-L221"
   },
   {
-    "term": "petition.petition-field.reply-file-download",
+    "term": "petition-replies.petition-field-reply.file-download",
     "definition": "Descargar archivo",
     "context": "Download file",
     "reference": "components/petition-replies/PetitionRepliesField.tsx#L59-L62"
   },
   {
-    "term": "petition.petition-field.reply-file-preview",
+    "term": "petition-replies.petition-field-reply.file-preview",
     "definition": "Previsualizar",
     "context": "Preview file",
     "reference": "components/petition-replies/PetitionRepliesField.tsx#L63-L66"
   },
   {
-    "term": "petition.petition-field.validate-button",
+    "term": "petition-replies.validate-field-button",
     "definition": "Revisado",
     "context": "Reviewed",
     "reference": "components/petition-replies/PetitionRepliesField.tsx#L116-L119"

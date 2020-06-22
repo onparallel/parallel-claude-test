@@ -129,6 +129,7 @@ export interface NexusGenEnums {
   OrganizationRole: "ADMIN" | "NORMAL";
   OrganizationStatus: db.OrganizationStatus;
   PetitionAccessStatus: db.PetitionAccessStatus;
+  PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
   PetitionFieldType: db.PetitionFieldType;
   PetitionLocale: "en" | "es";
   PetitionMessageStatus: db.PetitionMessageStatus;
@@ -285,6 +286,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   OrganizationRole: NexusGenEnums["OrganizationRole"];
   OrganizationStatus: NexusGenEnums["OrganizationStatus"];
   PetitionAccessStatus: NexusGenEnums["PetitionAccessStatus"];
+  PetitionFieldReplyStatus: NexusGenEnums["PetitionFieldReplyStatus"];
   PetitionFieldType: NexusGenEnums["PetitionFieldType"];
   PetitionLocale: NexusGenEnums["PetitionLocale"];
   PetitionMessageStatus: NexusGenEnums["PetitionMessageStatus"];
@@ -485,6 +487,7 @@ export interface NexusGenFieldTypes {
     content: { [key: string]: any }; // JSONObject!
     createdAt: Date; // DateTime!
     id: string; // ID!
+    status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: Date; // DateTime!
   };
   PetitionMessage: {
@@ -943,6 +946,7 @@ export type NexusGenEnumNames =
   | "OrganizationRole"
   | "OrganizationStatus"
   | "PetitionAccessStatus"
+  | "PetitionFieldReplyStatus"
   | "PetitionFieldType"
   | "PetitionLocale"
   | "PetitionMessageStatus"

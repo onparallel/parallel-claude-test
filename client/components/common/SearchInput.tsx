@@ -38,8 +38,6 @@ export const SearchInput = forwardRef(function SearchInput(
   function handleClearClick() {
     const input = inputRef.current!;
     setNativeValue(input, "");
-    const event = new Event("input", { bubbles: true });
-    input.dispatchEvent(event);
     input.focus();
   }
 

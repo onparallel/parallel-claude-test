@@ -22,6 +22,8 @@ export type PetitionEventType =
   | "REPLY_CREATED"
   | "REPLY_DELETED";
 
+export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
+
 export type PetitionFieldType = "TEXT" | "FILE_UPLOAD";
 
 export type PetitionMessageStatus =
@@ -29,6 +31,11 @@ export type PetitionMessageStatus =
   | "CANCELLED"
   | "PROCESSING"
   | "PROCESSED";
+
+export type PetitionNotificationType =
+  | "REPLY_CREATED"
+  | "COMMENT_CREATED"
+  | "PETITION_COMPLETED";
 
 export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
@@ -55,8 +62,10 @@ export interface TableTypes {
   petition_access: PetitionAccess;
   petition_event: PetitionEvent;
   petition_field: PetitionField;
+  petition_field_comment: PetitionFieldComment;
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
+  petition_notification: PetitionNotification;
   petition_reminder: PetitionReminder;
   petition_sendout: PetitionSendout;
   user: User;
@@ -72,8 +81,10 @@ export interface TableCreateTypes {
   petition_access: CreatePetitionAccess;
   petition_event: CreatePetitionEvent;
   petition_field: CreatePetitionField;
+  petition_field_comment: CreatePetitionFieldComment;
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
+  petition_notification: CreatePetitionNotification;
   petition_reminder: CreatePetitionReminder;
   petition_sendout: CreatePetitionSendout;
   user: CreateUser;
@@ -89,8 +100,10 @@ export interface TablePrimaryKeys {
   petition_access: "id";
   petition_event: "id";
   petition_field: "id";
+  petition_field_comment: "id";
   petition_field_reply: "id";
   petition_message: "id";
+  petition_notification: "id";
   petition_reminder: "id";
   petition_sendout: "id";
   user: "id";
@@ -353,6 +366,27 @@ export interface CreatePetitionField {
   deleted_by?: Maybe<string>;
 }
 
+export interface PetitionFieldComment {
+  id: number;
+  petition_id: number;
+  petition_field_id: number;
+  petition_field_reply_id: Maybe<number>;
+  content: string;
+  user_id: Maybe<number>;
+  contact_id: Maybe<number>;
+  is_published: boolean;
+}
+
+export interface CreatePetitionFieldComment {
+  petition_id: number;
+  petition_field_id: number;
+  petition_field_reply_id?: Maybe<number>;
+  content: string;
+  user_id?: Maybe<number>;
+  contact_id?: Maybe<number>;
+  is_published?: boolean;
+}
+
 export interface PetitionFieldReply {
   id: number;
   petition_field_id: number;
@@ -366,6 +400,7 @@ export interface PetitionFieldReply {
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
   petition_access_id: number;
+  status: PetitionFieldReplyStatus;
 }
 
 export interface CreatePetitionFieldReply {
@@ -380,6 +415,7 @@ export interface CreatePetitionFieldReply {
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
   petition_access_id: number;
+  status?: PetitionFieldReplyStatus;
 }
 
 export interface PetitionMessage {
@@ -407,6 +443,25 @@ export interface CreatePetitionMessage {
   email_log_id?: Maybe<number>;
   created_at?: Date;
   created_by?: Maybe<string>;
+}
+
+export interface PetitionNotification {
+  id: number;
+  user_id: number;
+  petition_id: number;
+  type: PetitionNotificationType;
+  data: Maybe<any>;
+  is_read: boolean;
+  created_at: Date;
+}
+
+export interface CreatePetitionNotification {
+  user_id: number;
+  petition_id: number;
+  type: PetitionNotificationType;
+  data?: Maybe<any>;
+  is_read?: boolean;
+  created_at?: Date;
 }
 
 export interface PetitionReminder {
