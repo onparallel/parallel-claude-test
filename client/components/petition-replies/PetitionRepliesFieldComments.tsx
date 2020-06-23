@@ -8,36 +8,41 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { Card, CardHeader } from "@parallel/components/common/Card";
-import { PetitionFieldType } from "@parallel/graphql/__types";
+import {
+  PetitionFieldType,
+  PetitionRepliesFieldComments_PetitionFieldFragment,
+  PetitionRepliesFieldComments_PetitionFieldCommentFragment,
+  PetitionRepliesFieldComments_PetitionFieldReplyFragment,
+} from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
+import { gql } from "apollo-boost";
 import {
   ChangeEvent,
   Fragment,
   KeyboardEvent,
-  useState,
-  useRef,
   useEffect,
+  useRef,
+  useState,
 } from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
 import { fileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { SmallPopover } from "../common/SmallPopover";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { setNativeValue } from "@parallel/utils/setNativeValue";
+import { DeletedContact } from "../common/DeletedContact";
 
 export type PetitionRepliesFieldCommentsProps = {
-  field: any;
-  comments: [];
+  field: PetitionRepliesFieldComments_PetitionFieldFragment;
   onAddComment: (value: string) => void;
   onClose: () => void;
 };
 
 export function PetitionRepliesFieldComments({
   field,
-  comments,
   onAddComment,
   onClose,
 }: PetitionRepliesFieldCommentsProps) {
@@ -106,20 +111,10 @@ export function PetitionRepliesFieldComments({
         overflow="auto"
         ref={commentsRef}
       >
-        {[4, 5, 6].map((i, index, comments) => (
-          <Fragment key={i}>
-            <FieldComment
-              comment={{
-                author: {
-                  fullName: "Santi Albo",
-                },
-                content: "lol que dise tron, esto esta mal",
-                isRead: i === 5 ? false : true,
-                publishedAt:
-                  i === 6 ? null : new Date("2020-06-18 17:30").toISOString(),
-              }}
-            />
-            {index === comments.length - 1 ? null : <Divider />}
+        {field.comments.map((comment, index) => (
+          <Fragment key={comment.id}>
+            <FieldComment comment={comment} />
+            {index === field.comments.length - 1 ? null : <Divider />}
           </Fragment>
         ))}
       </Box>
@@ -141,7 +136,7 @@ export function PetitionRepliesFieldComments({
                 defaultMessage: "Select a reference reply",
               })}
             </option>
-            {field.replies.map((reply: any) => (
+            {field.replies.map((reply) => (
               <option key={reply.id} value={reply.id}>
                 {replyToText(intl, field.type, reply)}
               </option>
@@ -185,11 +180,11 @@ export function PetitionRepliesFieldComments({
   );
 }
 
-PetitionRepliesFieldComments.fragments = {
-  PetitionField: null,
-};
-
-function replyToText(intl: IntlShape, type: PetitionFieldType, reply: any) {
+function replyToText(
+  intl: IntlShape,
+  type: PetitionFieldType,
+  reply: PetitionRepliesFieldComments_PetitionFieldReplyFragment
+) {
   switch (type) {
     case "TEXT": {
       const text = reply.content.text as string;
@@ -207,26 +202,25 @@ function clearInput(element: HTMLInputElement | HTMLTextAreaElement) {
 }
 
 function FieldComment({
-  comment: { content, publishedAt, isRead, author },
+  comment: { content, publishedAt, author },
 }: {
-  comment: {
-    content: string;
-    publishedAt: null | string;
-    isRead: boolean;
-    author: { fullName: string };
-  };
+  comment: PetitionRepliesFieldComments_PetitionFieldCommentFragment;
 }) {
   return (
     <Box
       paddingX={4}
       paddingY={2}
-      backgroundColor={
-        publishedAt ? (isRead ? "white" : "purple.50") : "yellow.50"
-      }
+      backgroundColor={publishedAt ? "white" : "yellow.50"}
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
-          {author.fullName}
+          {author?.__typename === "Contact" ? (
+            <ContactLink contact={author} />
+          ) : author?.__typename === "User" ? (
+            author.fullName
+          ) : (
+            <DeletedContact />
+          )}
         </Box>
         {publishedAt ? (
           <DateTime
@@ -266,3 +260,37 @@ function FieldComment({
     </Box>
   );
 }
+
+PetitionRepliesFieldComments.fragments = {
+  PetitionField: gql`
+    fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
+      title
+      type
+      comments {
+        ...PetitionRepliesFieldComments_PetitionFieldComment
+      }
+      replies {
+        ...PetitionRepliesFieldComments_PetitionFieldReply
+      }
+    }
+    fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
+      id
+      author {
+        ... on User {
+          id
+          fullName
+        }
+        ... on Contact {
+          ...ContactLink_Contact
+        }
+      }
+      content
+      publishedAt
+    }
+    fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+    }
+    ${ContactLink.fragments.Contact}
+  `,
+};

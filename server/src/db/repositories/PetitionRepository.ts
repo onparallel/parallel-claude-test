@@ -30,6 +30,7 @@ import {
   PetitionFieldType,
   PetitionStatus,
   User,
+  PetitionFieldComment,
 } from "../__types";
 
 @injectable()
@@ -760,9 +761,9 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_field_id", ids)
         .whereNull("deleted_at")
         .select("*");
-      const byPetitionId = groupBy(rows, (r) => r.petition_field_id);
+      const byPetitionFieldId = groupBy(rows, (r) => r.petition_field_id);
       return ids.map((id) => {
-        return sortBy(byPetitionId[id as any] || [], (r) => r.created_at);
+        return sortBy(byPetitionFieldId[id as any] || [], (r) => r.created_at);
       });
     })
   );
@@ -1034,4 +1035,30 @@ export class PetitionRepository extends BaseRepository {
       }))
     );
   }
+
+  readonly loadCommentsForField = fromDataLoader(
+    new DataLoader<number, PetitionFieldComment[]>(async (ids) => {
+      const rows = await this.from("petition_field_comment")
+        .whereIn("petition_field_id", ids)
+        .whereNull("deleted_at")
+        .select("*");
+      console.log(rows);
+      const byPetitionFieldId = groupBy(rows, (r) => r.petition_field_id);
+      return ids.map((id) => {
+        const comments = byPetitionFieldId[id] ?? [];
+        comments.sort((a, b) => {
+          if (a.published_at && !b.published_at) {
+            return -1;
+          } else if (!a.published_at && b.published_at) {
+            return +1;
+          } else if (a.published_at && b.published_at) {
+            return a.published_at.valueOf() - b.published_at.valueOf();
+          } else {
+            return a.created_at.valueOf() - b.created_at.valueOf();
+          }
+        });
+        return comments;
+      });
+    })
+  );
 }

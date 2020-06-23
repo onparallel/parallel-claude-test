@@ -1,14 +1,3 @@
-import {
-  Box,
-  Button,
-  Checkbox,
-  IconButton,
-  MenuItem,
-  MenuList,
-  Stack,
-  Text,
-} from "@chakra-ui/core";
-import { ButtonDropdown } from "@parallel/components/common/ButtonDropdown";
 import { Box, Button, Stack, Text } from "@chakra-ui/core";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -25,12 +14,12 @@ import {
   DownloadAllDialog,
   useDownloadAllDialog,
 } from "@parallel/components/petition-replies/DownloadAllDialog";
-import { useDownloadAllDialog } from "@parallel/components/petition-replies/DownloadAllDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
   PetitionRepliesField,
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
+import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import {
   PetitionFieldReply,
   PetitionRepliesQuery,
@@ -48,10 +37,9 @@ import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { gql } from "apollo-boost";
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
-import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -284,11 +272,13 @@ PetitionReplies.fragments = {
       ...PetitionLayout_Petition
       fields {
         ...PetitionRepliesField_PetitionField
+        ...PetitionRepliesFieldComments_PetitionField
         ...DownloadAllDialog_PetitionField
       }
     }
     ${PetitionLayout.fragments.Petition}
     ${PetitionRepliesField.fragments.PetitionField}
+    ${PetitionRepliesFieldComments.fragments.PetitionField}
     ${DownloadAllDialog.fragments.PetitionField}
   `,
   User: gql`

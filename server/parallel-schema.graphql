@@ -82,6 +82,8 @@ type Contact implements Timestamps {
   updatedAt: DateTime!
 }
 
+union ContactOrUser = Contact | User
+
 type ContactPagination {
   """
   The requested slice of items.
@@ -685,6 +687,11 @@ A field within a petition.
 """
 type PetitionField {
   """
+  The comments for this field.
+  """
+  comments: [PetitionFieldComment!]!
+
+  """
   The description of the petition field.
   """
   description: String
@@ -728,6 +735,36 @@ type PetitionField {
   Determines if the content of this field has been validated.
   """
   validated: Boolean!
+}
+
+"""
+A comment on a petition field
+"""
+type PetitionFieldComment {
+  """
+  The author of the comment.
+  """
+  author: ContactOrUser
+
+  """
+  The content of the comment.
+  """
+  content: String!
+
+  """
+  The ID of the petition field comment.
+  """
+  id: ID!
+
+  """
+  Time when the comment was published.
+  """
+  publishedAt: DateTime
+
+  """
+  The reply the comment is refering to.
+  """
+  reply: PetitionFieldReply
 }
 
 """

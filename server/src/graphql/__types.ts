@@ -204,6 +204,7 @@ export interface NexusGenRootTypes {
     totalCount: number; // Int!
   };
   PetitionField: db.PetitionField;
+  PetitionFieldComment: db.PetitionFieldComment;
   PetitionFieldReply: db.PetitionFieldReply;
   PetitionMessage: db.PetitionMessage;
   PetitionPagination: {
@@ -269,6 +270,9 @@ export interface NexusGenRootTypes {
   DateTime: Date;
   JSON: any;
   JSONObject: { [key: string]: any };
+  ContactOrUser:
+    | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
+    | ({ __type: "User" } & NexusGenRootTypes["User"]);
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -471,6 +475,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionField: {
     // field return type
+    comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
     id: string; // ID!
     multiple: boolean; // Boolean!
@@ -480,6 +485,14 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     validated: boolean; // Boolean!
+  };
+  PetitionFieldComment: {
+    // field return type
+    author: NexusGenRootTypes["ContactOrUser"] | null; // ContactOrUser
+    content: string; // String!
+    id: string; // ID!
+    publishedAt: Date | null; // DateTime
+    reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
   };
   PetitionFieldReply: {
     // field return type
@@ -861,6 +874,7 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
+  ContactOrUser: "Contact" | "User";
   CreatedAt: "PetitionMessage" | "PetitionReminder";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -909,6 +923,7 @@ export type NexusGenObjectNames =
   | "PetitionCreatedEvent"
   | "PetitionEventPagination"
   | "PetitionField"
+  | "PetitionFieldComment"
   | "PetitionFieldReply"
   | "PetitionMessage"
   | "PetitionPagination"
@@ -971,7 +986,7 @@ export type NexusGenScalarNames =
   | "JSONObject"
   | "String";
 
-export type NexusGenUnionNames = never;
+export type NexusGenUnionNames = "ContactOrUser";
 
 export interface NexusGenTypes {
   context: ctx.ApiContext;

@@ -73,6 +73,8 @@ export type ContactaccessesArgs = {
   offset?: Maybe<Scalars["Int"]>;
 };
 
+export type ContactOrUser = Contact | User;
+
 export type ContactPagination = {
   __typename?: "ContactPagination";
   /** The requested slice of items. */
@@ -517,6 +519,8 @@ export type PetitionEventPagination = {
 /** A field within a petition. */
 export type PetitionField = {
   __typename?: "PetitionField";
+  /** The comments for this field. */
+  comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
@@ -535,6 +539,21 @@ export type PetitionField = {
   type: PetitionFieldType;
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+};
+
+/** A comment on a petition field */
+export type PetitionFieldComment = {
+  __typename?: "PetitionFieldComment";
+  /** The author of the comment. */
+  author?: Maybe<ContactOrUser>;
+  /** The content of the comment. */
+  content: Scalars["String"];
+  /** The ID of the petition field comment. */
+  id: Scalars["ID"];
+  /** Time when the comment was published. */
+  publishedAt?: Maybe<Scalars["DateTime"]>;
+  /** The reply the comment is refering to. */
+  reply?: Maybe<PetitionFieldReply>;
 };
 
 /** A reply to a petition field */
@@ -1348,6 +1367,34 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
 } & Pick<PetitionFieldReply, "id" | "content" | "status" | "createdAt">;
 
+export type PetitionRepliesFieldComments_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "title" | "type"> & {
+    comments: Array<
+      {
+        __typename?: "PetitionFieldComment";
+      } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
+    >;
+    replies: Array<
+      {
+        __typename?: "PetitionFieldReply";
+      } & PetitionRepliesFieldComments_PetitionFieldReplyFragment
+    >;
+  };
+
+export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
+  __typename?: "PetitionFieldComment";
+} & Pick<PetitionFieldComment, "id" | "content" | "publishedAt"> & {
+    author?: Maybe<
+      | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
+    >;
+  };
+
+export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+} & Pick<PetitionFieldReply, "id" | "content">;
+
 export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
 } & Pick<
@@ -1768,6 +1815,7 @@ export type PetitionReplies_PetitionFragment = {
       {
         __typename?: "PetitionField";
       } & PetitionRepliesField_PetitionFieldFragment &
+        PetitionRepliesFieldComments_PetitionFieldFragment &
         DownloadAllDialog_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionFragment;
@@ -2665,6 +2713,43 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
 `;
+export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
+  fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
+    id
+    author {
+      ... on User {
+        id
+        fullName
+      }
+      ... on Contact {
+        ...ContactLink_Contact
+      }
+    }
+    content
+    publishedAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
+    id
+    content
+  }
+`;
+export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
+  fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
+    title
+    type
+    comments {
+      ...PetitionRepliesFieldComments_PetitionFieldComment
+    }
+    replies {
+      ...PetitionRepliesFieldComments_PetitionFieldReply
+    }
+  }
+  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
+  ${PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc}
+`;
 export const DownloadAllDialog_PetitionFieldFragmentDoc = gql`
   fragment DownloadAllDialog_PetitionField on PetitionField {
     title
@@ -2686,11 +2771,13 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     ...PetitionLayout_Petition
     fields {
       ...PetitionRepliesField_PetitionField
+      ...PetitionRepliesFieldComments_PetitionField
       ...DownloadAllDialog_PetitionField
     }
   }
   ${PetitionLayout_PetitionFragmentDoc}
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
+  ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${DownloadAllDialog_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`

@@ -1,4 +1,5 @@
 import * as Knex from "knex";
+import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<any> {
   await knex.schema
@@ -14,8 +15,24 @@ export async function up(knex: Knex): Promise<any> {
       t.text("content").notNullable();
       t.integer("user_id").references("user.id");
       t.integer("contact_id").references("contact.id");
-      t.boolean("is_published").notNullable().defaultTo(false);
+      t.timestamp("published_at");
+      timestamps(t);
     })
+    .raw(
+      /* sql */ `
+      create index "pfc__petition_id__petition_field_id" on petition_field_comment (
+        petition_id,
+        petition_field_id
+      ) where deleted_at is null
+    `
+    )
+    .raw(
+      /* sql */ `
+      create index "pfc__petition_field_id" on petition_field_comment (
+        petition_field_id
+      ) where deleted_at is null
+    `
+    )
 
     .alterTable("petition_field_reply", (t) => {
       t.enum("status", ["PENDING", "REJECTED", "APPROVED"], {

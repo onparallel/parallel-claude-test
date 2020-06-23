@@ -13,6 +13,18 @@ const result: IntrospectionResultData = {
   __schema: {
     types: [
       {
+        kind: "UNION",
+        name: "ContactOrUser",
+        possibleTypes: [
+          {
+            name: "Contact",
+          },
+          {
+            name: "User",
+          },
+        ],
+      },
+      {
         kind: "INTERFACE",
         name: "CreatedAt",
         possibleTypes: [

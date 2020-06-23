@@ -374,7 +374,13 @@ export interface PetitionFieldComment {
   content: string;
   user_id: Maybe<number>;
   contact_id: Maybe<number>;
-  is_published: boolean;
+  published_at: Maybe<Date>;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
 }
 
 export interface CreatePetitionFieldComment {
@@ -384,7 +390,13 @@ export interface CreatePetitionFieldComment {
   content: string;
   user_id?: Maybe<number>;
   contact_id?: Maybe<number>;
-  is_published?: boolean;
+  published_at?: Maybe<Date>;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
 }
 
 export interface PetitionFieldReply {
