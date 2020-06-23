@@ -5,22 +5,26 @@ import {
   TooltipProps,
   useTheme,
 } from "@chakra-ui/core";
+import { forwardRef } from "react";
 
 export type IconButtonWithTooltipProps = Omit<IconButtonProps, "aria-label"> &
   Pick<TooltipProps, "placement" | "showDelay"> & {
     label: string;
   };
 
-export function IconButtonWithTooltip({
-  label,
-  placement,
-  showDelay,
-  isDisabled,
-  ...props
-}: IconButtonWithTooltipProps) {
+export const IconButtonWithTooltip = forwardRef(function (
+  {
+    label,
+    placement,
+    showDelay,
+    isDisabled,
+    ...props
+  }: IconButtonWithTooltipProps,
+  ref
+) {
   const { zIndices } = useTheme();
   return isDisabled ? (
-    <IconButton isDisabled aria-label={label} {...props} />
+    <IconButton isDisabled aria-label={label} {...props} ref={ref} />
   ) : (
     <Tooltip
       aria-label={label}
@@ -29,7 +33,7 @@ export function IconButtonWithTooltip({
       placement={placement}
       zIndex={zIndices.tooltip}
     >
-      <IconButton aria-label={label} {...props} />
+      <IconButton aria-label={label} {...props} ref={ref} />
     </Tooltip>
   );
-}
+});

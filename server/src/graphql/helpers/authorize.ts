@@ -59,7 +59,7 @@ export function hasOrgRole<TypeName extends string, FieldName extends string>(
   };
 }
 
-export function authorizeAnd<TypeName extends string, FieldName extends string>(
+export function chain<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
@@ -70,10 +70,7 @@ export function authorizeAnd<TypeName extends string, FieldName extends string>(
   };
 }
 
-export function authorizeAndP<
-  TypeName extends string,
-  FieldName extends string
->(
+export function and<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {

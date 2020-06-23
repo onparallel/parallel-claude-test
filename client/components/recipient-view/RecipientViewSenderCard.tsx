@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, Icon, Stack, Text, Image } from "@chakra-ui/core";
+import { Box, Flex, Grid, Icon, Image, Text } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewSenderCard_PublicUserFragment } from "@parallel/graphql/__types";

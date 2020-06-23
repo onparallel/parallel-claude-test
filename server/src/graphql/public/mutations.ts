@@ -6,7 +6,7 @@ import {
 } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { random } from "../../util/token";
-import { authorizeAnd, authorizeAndP } from "../helpers/authorize";
+import { chain, and } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
 import {
   fetchPetitionAccess,
@@ -20,7 +20,7 @@ export const publicDeletePetitionReply = mutationField(
   {
     description: "Deletes a reply to a petition field.",
     type: "Result",
-    authorize: authorizeAndP(
+    authorize: and(
       fetchPetitionAccess("keycode"),
       replyBelongsToAccess("replyId", "keycode")
     ),
@@ -55,7 +55,7 @@ export const publicFileUploadReplyComplete = mutationField(
       keycode: idArg({ required: true }),
       replyId: idArg({ required: true }),
     },
-    authorize: authorizeAndP(
+    authorize: and(
       fetchPetitionAccess("keycode"),
       replyBelongsToAccess("replyId", "keycode")
     ),
@@ -101,8 +101,8 @@ export const publicCreateFileUploadReply = mutationField(
         },
       }).asArg({ required: true }),
     },
-    authorize: authorizeAnd(
-      authorizeAndP(
+    authorize: chain(
+      and(
         fetchPetitionAccess("keycode"),
         fieldBelongsToAccess("fieldId", "keycode")
       ),
@@ -151,8 +151,8 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
       },
     }).asArg({ required: true }),
   },
-  authorize: authorizeAnd(
-    authorizeAndP(
+  authorize: chain(
+    and(
       fetchPetitionAccess("keycode"),
       fieldBelongsToAccess("fieldId", "keycode")
     ),

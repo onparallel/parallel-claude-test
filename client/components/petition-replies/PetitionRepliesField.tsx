@@ -2,15 +2,13 @@ import {
   Box,
   BoxProps,
   Button,
-  Checkbox,
+  ButtonProps,
   Flex,
+  IconButton,
   PseudoBoxProps,
   Stack,
   Text,
   VisuallyHidden,
-  Tooltip,
-  IconButton,
-  ButtonProps,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -102,8 +100,8 @@ export function PetitionRepliesField({
         </Button> */}
         <CommentButton
           isShowingComments={isShowingComments}
-          commentCount={commentCount}
-          newCommentCount={newCommentCount}
+          commentCount={field.comments.length}
+          newCommentCount={field.comments.filter((c) => c.isUnread).length}
           onClick={onToggleComments}
         />
       </Flex>
@@ -340,6 +338,10 @@ PetitionRepliesField.fragments = {
       replies {
         ...PetitionRepliesField_PetitionFieldReply
       }
+      comments {
+        id
+        isUnread
+      }
     }
     fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
       id
@@ -380,7 +382,7 @@ function CommentButton({
   return (
     <Box position="relative">
       {commentCount > 0 ? (
-        <Button leftIcon={"comment" as any} fontWeight="normal" {...common}>
+        <Button rightIcon={"comment" as any} fontWeight="normal" {...common}>
           {intl.formatNumber(commentCount)}
         </Button>
       ) : (

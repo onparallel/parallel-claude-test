@@ -8,18 +8,14 @@ import {
 } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { removeNotDefined } from "../../util/remedaExtensions";
-import {
-  argIsContextUserId,
-  authenticate,
-  authorizeAnd,
-} from "../helpers/authorize";
+import { argIsContextUserId, authenticate, chain } from "../helpers/authorize";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
   description: "Updates the user with the provided data.",
-  authorize: authorizeAnd(authenticate(), argIsContextUserId("id")),
+  authorize: chain(authenticate(), argIsContextUserId("id")),
   args: {
     id: idArg({ required: true }),
     data: inputObjectType({

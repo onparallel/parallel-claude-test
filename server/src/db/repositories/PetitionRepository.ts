@@ -4,6 +4,7 @@ import Knex, { QueryBuilder } from "knex";
 import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { keyBuilder } from "../../util/keyBuilder";
 import { count } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
@@ -26,11 +27,11 @@ import {
   PetitionAccess,
   PetitionEventType,
   PetitionField,
+  PetitionFieldComment,
   PetitionFieldReply,
   PetitionFieldType,
   PetitionStatus,
   User,
-  PetitionFieldComment,
 } from "../__types";
 
 @injectable()
@@ -1037,28 +1038,121 @@ export class PetitionRepository extends BaseRepository {
   }
 
   readonly loadCommentsForField = fromDataLoader(
-    new DataLoader<number, PetitionFieldComment[]>(async (ids) => {
-      const rows = await this.from("petition_field_comment")
-        .whereIn("petition_field_id", ids)
-        .whereNull("deleted_at")
-        .select("*");
-      console.log(rows);
-      const byPetitionFieldId = groupBy(rows, (r) => r.petition_field_id);
-      return ids.map((id) => {
-        const comments = byPetitionFieldId[id] ?? [];
-        comments.sort((a, b) => {
-          if (a.published_at && !b.published_at) {
-            return -1;
-          } else if (!a.published_at && b.published_at) {
-            return +1;
-          } else if (a.published_at && b.published_at) {
-            return a.published_at.valueOf() - b.published_at.valueOf();
-          } else {
-            return a.created_at.valueOf() - b.created_at.valueOf();
-          }
-        });
-        return comments;
-      });
-    })
+    new DataLoader<
+      { userId: number; petitionId: number; petitionFieldId: number },
+      PetitionFieldComment[],
+      string
+    >(
+      async (ids) => {
+        const rows = await this.from("petition_field_comment")
+          .where((qb) => {
+            for (const { userId, petitionId, petitionFieldId } of ids) {
+              qb = qb.orWhere((qb) => {
+                qb.where({
+                  petition_id: petitionId,
+                  petition_field_id: petitionFieldId,
+                }).andWhere((qb) => {
+                  qb.whereNotNull("published_at").orWhere("user_id", userId);
+                });
+              });
+            }
+          })
+          .whereNull("deleted_at")
+          .select("*");
+
+        const byId = groupBy(
+          rows,
+          keyBuilder(["user_id", "petition_id", "petition_field_id"])
+        );
+        return ids
+          .map(keyBuilder(["userId", "petitionId", "petitionFieldId"]))
+          .map((key) => {
+            const comments = byId[key] ?? [];
+            comments.sort((a, b) => {
+              if (a.published_at && !b.published_at) {
+                return -1;
+              } else if (!a.published_at && b.published_at) {
+                return +1;
+              } else if (a.published_at && b.published_at) {
+                return a.published_at.valueOf() - b.published_at.valueOf();
+              } else {
+                return a.created_at.valueOf() - b.created_at.valueOf();
+              }
+            });
+            return comments;
+          });
+      },
+      {
+        cacheKeyFn: keyBuilder(["userId", "petitionId", "petitionFieldId"]),
+      }
+    )
+  );
+
+  readonly getIsCommentUnread = fromDataLoader(
+    new DataLoader<
+      {
+        userId: number;
+        petitionId: number;
+        petitionFieldId: number;
+        petitionFieldCommentId: number;
+      },
+      boolean,
+      string
+    >(
+      async (ids) => {
+        const rows = await this.from("petition_notification")
+          .where((qb) => {
+            for (const {
+              userId,
+              petitionId,
+              petitionFieldId,
+              petitionFieldCommentId,
+            } of ids) {
+              qb = qb.orWhere((qb2) => {
+                qb2
+                  .where({
+                    user_id: userId,
+                    petition_id: petitionId,
+                  })
+                  .whereRaw("data ->> 'petition_field_id' = ?", petitionFieldId)
+                  .whereRaw(
+                    "data ->> 'petition_field_comment_id' = ?",
+                    petitionFieldCommentId
+                  );
+              });
+            }
+          })
+          .where("type", "COMMENT_CREATED")
+          .select("*");
+
+        const byId = indexBy(
+          rows,
+          keyBuilder([
+            "user_id",
+            "petition_id",
+            (r) => r.data.petition_field_id,
+            (r) => r.data.petition_field_comment_id,
+          ])
+        );
+        return ids
+          .map(
+            keyBuilder([
+              "userId",
+              "petitionId",
+              "petitionFieldId",
+              "petitionFieldCommentId",
+            ])
+          )
+          .map((key) => !(byId[key]?.is_read ?? true));
+      },
+      {
+        cacheKeyFn: keyBuilder([
+          "userId",
+          "petitionId",
+          "petitionFieldId",
+          "petitionFieldCommentId",
+        ]),
+      }
+    )
   );
 }

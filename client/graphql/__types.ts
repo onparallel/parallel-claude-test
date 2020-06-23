@@ -550,6 +550,8 @@ export type PetitionFieldComment = {
   content: Scalars["String"];
   /** The ID of the petition field comment. */
   id: Scalars["ID"];
+  /** Wether the comment has been read or not. */
+  isUnread: Scalars["Boolean"];
   /** Time when the comment was published. */
   publishedAt?: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
@@ -1361,6 +1363,12 @@ export type PetitionRepliesField_PetitionFieldFragment = {
         __typename?: "PetitionFieldReply";
       } & PetitionRepliesField_PetitionFieldReplyFragment
     >;
+    comments: Array<
+      { __typename?: "PetitionFieldComment" } & Pick<
+        PetitionFieldComment,
+        "id" | "isUnread"
+      >
+    >;
   };
 
 export type PetitionRepliesField_PetitionFieldReplyFragment = {
@@ -1384,7 +1392,10 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
 
 export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
-} & Pick<PetitionFieldComment, "id" | "content" | "publishedAt"> & {
+} & Pick<
+  PetitionFieldComment,
+  "id" | "content" | "publishedAt" | "isUnread"
+> & {
     author?: Maybe<
       | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
       | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
@@ -2710,6 +2721,10 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     replies {
       ...PetitionRepliesField_PetitionFieldReply
     }
+    comments {
+      id
+      isUnread
+    }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
 `;
@@ -2727,6 +2742,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     }
     content
     publishedAt
+    isUnread
   }
   ${ContactLink_ContactFragmentDoc}
 `;

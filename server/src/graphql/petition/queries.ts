@@ -1,6 +1,6 @@
 import { arg, idArg, queryField } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
-import { authenticate, authorizeAnd } from "../helpers/authorize";
+import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToPetition } from "./authorizers";
 
 export const petitionsQuery = queryField((t) => {
@@ -42,7 +42,7 @@ export const petitionQuery = queryField("petition", {
   args: {
     id: idArg({ required: true }),
   },
-  authorize: authorizeAnd(authenticate(), userHasAccessToPetition("id")),
+  authorize: chain(authenticate(), userHasAccessToPetition("id")),
   nullable: true,
   resolve: async (root, args, ctx) => {
     const { id } = fromGlobalId(args.id, "Petition");

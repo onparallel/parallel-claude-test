@@ -1,5 +1,4 @@
 import DataLoader from "dataloader";
-import { MaybePromise } from "./types";
 
 export interface FromDataLoaderOptions {
   cache?: boolean;

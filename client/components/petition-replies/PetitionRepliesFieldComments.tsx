@@ -3,16 +3,16 @@ import {
   Box,
   Button,
   Collapse,
-  Select,
+  IconButton,
+  MenuItem,
+  MenuList,
   Stack,
   Text,
 } from "@chakra-ui/core";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
-  PetitionFieldType,
-  PetitionRepliesFieldComments_PetitionFieldFragment,
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
-  PetitionRepliesFieldComments_PetitionFieldReplyFragment,
+  PetitionRepliesFieldComments_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -26,14 +26,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { ButtonDropdown } from "../common/ButtonDropdown";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
+import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
-import { fileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { SmallPopover } from "../common/SmallPopover";
-import { DeletedContact } from "../common/DeletedContact";
+import { Spacer } from "../common/Spacer";
 
 export type PetitionRepliesFieldCommentsProps = {
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
@@ -49,22 +50,20 @@ export function PetitionRepliesFieldComments({
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
-  const [referenceReply, setReferenceReply] = useState<string | null>(null);
-  const [selectFocused, selectFocusBind] = useFocus({ onBlurDelay: 300 });
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    commentsRef.current!.scrollTo({ top: 99999, behavior: "smooth" });
+    commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
   }, []);
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key === "Enter" && event.metaKey) {
       event.preventDefault();
       onAddComment(draft);
-      clearInput(textareaRef.current!);
+      setNativeValue(textareaRef.current!, "");
     }
   }
 
@@ -72,23 +71,16 @@ export function PetitionRepliesFieldComments({
     setDraft(event.target.value);
   }
 
-  function handleReferenceReplyChange(event: ChangeEvent<HTMLSelectElement>) {
-    setReferenceReply(event.target.value || null);
-  }
-
   function handleSubmitClick() {
     onAddComment(draft);
-    setReferenceReply(null);
-    clearInput(textareaRef.current!);
+    setNativeValue(textareaRef.current!, "");
   }
 
   function handleCancelClick() {
-    clearInput(textareaRef.current!);
+    setNativeValue(textareaRef.current!, "");
   }
 
-  const isExpanded = Boolean(
-    inputFocused || selectFocused || referenceReply || draft
-  );
+  const isExpanded = Boolean(inputFocused || draft);
 
   return (
     <Card>
@@ -102,47 +94,32 @@ export function PetitionRepliesFieldComments({
           </Text>
         )}
       </CardHeader>
-      <Box
-        maxHeight={{
-          base: `calc(100vh - 410px)`,
-          sm: `calc(100vh - 346px)`,
-          md: `calc(100vh - 346px)`,
-        }}
-        overflow="auto"
-        ref={commentsRef}
-      >
-        {field.comments.map((comment, index) => (
-          <Fragment key={comment.id}>
-            <FieldComment comment={comment} />
-            {index === field.comments.length - 1 ? null : <Divider />}
-          </Fragment>
-        ))}
-      </Box>
-      <Divider />
-      <Box padding={2}>
-        <Collapse isOpen={isExpanded} paddingBottom={2}>
-          <Select
-            size="sm"
-            rounded="md"
-            paddingX={1}
-            height="38px"
-            value={referenceReply ?? ""}
-            onChange={handleReferenceReplyChange}
-            {...selectFocusBind}
+      {field.comments.length > 0 ? (
+        <>
+          <Box
+            maxHeight={{
+              base: `calc(100vh - 364px)`,
+              sm: `calc(100vh - 300px)`,
+              md: `calc(100vh - 300px)`,
+            }}
+            overflow="auto"
+            ref={commentsRef}
           >
-            <option value="">
-              {intl.formatMessage({
-                id: "petition-replies.select-reference-reply.label",
-                defaultMessage: "Select a reference reply",
-              })}
-            </option>
-            {field.replies.map((reply) => (
-              <option key={reply.id} value={reply.id}>
-                {replyToText(intl, field.type, reply)}
-              </option>
+            {field.comments.map((comment, index) => (
+              <Fragment key={comment.id}>
+                <FieldComment
+                  comment={comment}
+                  onEdit={() => {}}
+                  onDelete={() => {}}
+                />
+                {index === field.comments.length - 1 ? null : <Divider />}
+              </Fragment>
             ))}
-          </Select>
-        </Collapse>
+          </Box>
+          <Divider />
+        </>
+      ) : null}
+      <Box padding={2}>
         <GrowingTextarea
           ref={textareaRef}
           height="20px"
@@ -163,7 +140,7 @@ export function PetitionRepliesFieldComments({
         <Collapse isOpen={isExpanded} paddingTop={2}>
           <Stack direction="row" justifyContent="flex-end">
             <Button size="sm" onClick={handleCancelClick}>
-              Cancel
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
             <Button
               size="sm"
@@ -171,7 +148,7 @@ export function PetitionRepliesFieldComments({
               isDisabled={draft.length === 0}
               onClick={handleSubmitClick}
             >
-              Submit
+              <FormattedMessage id="generic.submit" defaultMessage="Submit" />
             </Button>
           </Stack>
         </Collapse>
@@ -180,52 +157,68 @@ export function PetitionRepliesFieldComments({
   );
 }
 
-function replyToText(
-  intl: IntlShape,
-  type: PetitionFieldType,
-  reply: PetitionRepliesFieldComments_PetitionFieldReplyFragment
-) {
-  switch (type) {
-    case "TEXT": {
-      const text = reply.content.text as string;
-      return text.slice(0, 50) + (text.length > length ? "..." : "");
-    }
-    case "FILE_UPLOAD":
-      const filename = reply.content.filename as string;
-      const size = reply.content.size as number;
-      return `${filename} - ${fileSize(intl, size)}`;
-  }
-}
-
-function clearInput(element: HTMLInputElement | HTMLTextAreaElement) {
-  setNativeValue(element, "");
-}
-
 function FieldComment({
-  comment: { content, publishedAt, author },
+  comment,
+  onDelete,
+  onEdit,
 }: {
   comment: PetitionRepliesFieldComments_PetitionFieldCommentFragment;
+  onDelete: () => void;
+  onEdit: (content: string) => void;
 }) {
+  const intl = useIntl();
+  const [isEditing, setIsEditing] = useState(false);
+  const [content, setContent] = useState(comment.content);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  function handleEditClick() {
+    setContent(comment.content);
+    setIsEditing(true);
+    setTimeout(() => {
+      textareaRef.current!.focus();
+      textareaRef.current!.select();
+    });
+  }
+
+  function handleCancelClick() {
+    setIsEditing(false);
+  }
+
+  function handleSaveClick() {
+    setIsEditing(false);
+    onEdit(content);
+  }
+
+  function handleContentChange(event: ChangeEvent<HTMLTextAreaElement>) {
+    setContent(event.target.value);
+  }
+
   return (
     <Box
       paddingX={4}
       paddingY={2}
-      backgroundColor={publishedAt ? "white" : "yellow.50"}
+      backgroundColor={
+        !comment.publishedAt
+          ? "yellow.50"
+          : comment.isUnread
+          ? "purple.50"
+          : "white"
+      }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
-          {author?.__typename === "Contact" ? (
-            <ContactLink contact={author} />
-          ) : author?.__typename === "User" ? (
-            author.fullName
+          {comment.author?.__typename === "Contact" ? (
+            <ContactLink contact={comment.author} />
+          ) : comment.author?.__typename === "User" ? (
+            comment.author.fullName
           ) : (
             <DeletedContact />
           )}
         </Box>
-        {publishedAt ? (
+        {comment.publishedAt ? (
           <DateTime
             color="gray.500"
-            value={publishedAt}
+            value={comment.publishedAt}
             format={FORMATS.LLL}
             useRelativeTime
           />
@@ -248,15 +241,60 @@ function FieldComment({
             </Badge>
           </SmallPopover>
         )}
+        <Spacer />
+        <ButtonDropdown
+          as={IconButton}
+          dropdown={
+            <MenuList minWidth="160px" placement="bottom-end">
+              <MenuItem onClick={handleEditClick}>
+                <FormattedMessage id="generic.edit" defaultMessage="Edit" />
+              </MenuItem>
+              <MenuItem onClick={onDelete}>
+                <FormattedMessage id="generic.delete" defaultMessage="Delete" />
+              </MenuItem>
+            </MenuList>
+          }
+          variant="ghost"
+          size="xs"
+          icon={"more-vertical" as any}
+          aria-label={intl.formatMessage({
+            id: "generic.more-options",
+            defaultMessage: "More options...",
+          })}
+        />
       </Box>
-      <Box fontSize="sm">
-        {content.split("\n").map((line, index) => (
-          <Fragment key={index}>
-            {line}
-            <br />
-          </Fragment>
-        ))}
-      </Box>
+      {isEditing ? (
+        <Box marginTop={1} marginX={-2}>
+          <GrowingTextarea
+            ref={textareaRef}
+            height="20px"
+            size="sm"
+            rounded="md"
+            paddingX={2}
+            minHeight={0}
+            {...{ rows: 1 }}
+            value={content}
+            onChange={handleContentChange as any}
+          />
+          <Stack direction="row" justifyContent="flex-end" marginTop={2}>
+            <Button size="sm" onClick={handleCancelClick}>
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+            </Button>
+            <Button size="sm" variantColor="purple" onClick={handleSaveClick}>
+              <FormattedMessage id="generic.save" defaultMessage="Save" />
+            </Button>
+          </Stack>
+        </Box>
+      ) : (
+        <Box fontSize="sm">
+          {content.split("\n").map((line, index) => (
+            <Fragment key={index}>
+              {line}
+              <br />
+            </Fragment>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 }
@@ -286,6 +324,7 @@ PetitionRepliesFieldComments.fragments = {
       }
       content
       publishedAt
+      isUnread
     }
     fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
       id

@@ -1,7 +1,7 @@
 import { idArg, inputObjectType, mutationField } from "@nexus/schema";
 import { CreateContact } from "../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
-import { authenticate, authorizeAnd } from "../helpers/authorize";
+import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
 import { RESULT } from "../helpers/result";
 
@@ -43,7 +43,7 @@ export const createContact = mutationField("createContact", {
 export const updateContact = mutationField("updateContact", {
   description: "Updates a contact.",
   type: "Contact",
-  authorize: authorizeAnd(authenticate(), userHasAccessToContact("id")),
+  authorize: chain(authenticate(), userHasAccessToContact("id")),
   args: {
     id: idArg({ required: true }),
     data: inputObjectType({
@@ -71,7 +71,7 @@ export const updateContact = mutationField("updateContact", {
 export const deleteContacts = mutationField("deleteContacts", {
   description: "Delete contacts.",
   type: "Result",
-  authorize: authorizeAnd(authenticate(), userHasAccessToContacts("ids")),
+  authorize: chain(authenticate(), userHasAccessToContacts("ids")),
   args: {
     ids: idArg({ required: true, list: [true] }),
   },

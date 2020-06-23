@@ -1,4 +1,4 @@
-import { Flex, Box, BoxProps } from "@chakra-ui/core";
+import { Box, BoxProps } from "@chakra-ui/core";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,

@@ -59,5 +59,16 @@ export const PetitionFieldComment = objectType({
       nullable: true,
       resolve: (o) => o.published_at,
     });
+    t.boolean("isUnread", {
+      description: "Wether the comment has been read or not.",
+      resolve: async (root, _, ctx) => {
+        return ctx.petitions.getIsCommentUnread({
+          userId: ctx.user!.id,
+          petitionId: root.petition_id,
+          petitionFieldId: root.petition_field_id,
+          petitionFieldCommentId: root.id,
+        });
+      },
+    });
   },
 });

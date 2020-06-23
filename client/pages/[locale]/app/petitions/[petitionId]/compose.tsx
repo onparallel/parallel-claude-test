@@ -1,4 +1,4 @@
-import { Box, Flex, Text, useToast } from "@chakra-ui/core";
+import { Box, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -7,6 +7,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
@@ -52,7 +53,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
-import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>

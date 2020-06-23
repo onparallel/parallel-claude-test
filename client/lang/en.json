@@ -18,7 +18,7 @@
     "reference": "components/common/Card.tsx#L61-L64"
   },
   {
-    "term": "component.confirm-dialog.cancel-button",
+    "term": "generic.cancel",
     "definition": "Cancel",
     "context": "Cancel",
     "reference": "components/common/ConfirmDialog.tsx#L43-L46"

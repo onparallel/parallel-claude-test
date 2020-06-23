@@ -1,6 +1,6 @@
 import { idArg, queryField } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
-import { authenticate, authorizeAnd } from "../helpers/authorize";
+import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToContact } from "./authorizers";
 
 export const contactQueries = queryField((t) => {
@@ -57,7 +57,7 @@ export const contactQueries = queryField((t) => {
     args: {
       id: idArg({ required: true }),
     },
-    authorize: authorizeAnd(authenticate(), userHasAccessToContact("id")),
+    authorize: chain(authenticate(), userHasAccessToContact("id")),
     nullable: true,
     resolve: async (root, args, ctx) => {
       const { id } = fromGlobalId(args.id, "Contact");

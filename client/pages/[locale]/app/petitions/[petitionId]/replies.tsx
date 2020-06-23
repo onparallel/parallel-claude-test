@@ -56,10 +56,9 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   } = assertQuery(usePetitionRepliesQuery({ variables: { id: petitionId } }));
 
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
-  const activeField = useMemo(
-    () => petition!.fields.find((f) => f.id === activeFieldId),
-    [activeFieldId, petition!.fields]
-  );
+  const activeField = activeFieldId
+    ? petition!.fields.find((f) => f.id === activeFieldId)
+    : null;
   const activeFieldElement = useMemo(() => {
     return activeFieldId
       ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)!
@@ -141,7 +140,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
   );
 
-  const hasPendingComments = true;
+  let pendingComments = 0;
+  for (const field of petition!.fields) {
+    for (const comment of field.comments) {
+      pendingComments += comment.publishedAt ? 0 : 1;
+    }
+  }
 
   return (
     <>
@@ -169,7 +173,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           direction="row"
           paddingX={4}
           paddingY={2}
-          backgroundColor={hasPendingComments ? "yellow.50" : "white"}
+          backgroundColor={pendingComments ? "yellow.50" : "white"}
         >
           <IconButtonWithTooltip
             onClick={() => refetch()}
@@ -196,12 +200,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
               defaultMessage="Mark as reviewed"
             />
           </Button> */}
-          {hasPendingComments ? (
+          {pendingComments ? (
             <Button variantColor="yellow">
               <FormattedMessage
                 id="petition-replies.submit-comments"
                 defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-                values={{ commentCount: 2 }}
+                values={{ commentCount: pendingComments }}
               />
             </Button>
           ) : null}
@@ -227,8 +231,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
               <Box padding={4} paddingLeft={{ md: 0 }}>
                 <PetitionRepliesFieldComments
                   key={activeFieldId!}
-                  field={activeField}
-                  comments={[]}
+                  field={activeField!}
                   onClose={() => setActiveFieldId(null)}
                   onAddComment={() => {}}
                 />

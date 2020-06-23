@@ -757,6 +757,11 @@ type PetitionFieldComment {
   id: ID!
 
   """
+  Wether the comment has been read or not.
+  """
+  isUnread: Boolean!
+
+  """
   Time when the comment was published.
   """
   publishedAt: DateTime

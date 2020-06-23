@@ -1,6 +1,6 @@
 import { enumType, objectType } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
-import { authorizeAnd, hasOrgRole } from "../helpers/authorize";
+import { chain, hasOrgRole } from "../helpers/authorize";
 import { belongsToOrg } from "./authorizers";
 
 export const OrganizationStatus = enumType({
@@ -36,7 +36,7 @@ export const Organization = objectType({
     t.paginationField("users", {
       type: "User",
       description: "The users in the organization.",
-      authorize: authorizeAnd(belongsToOrg(), hasOrgRole("ADMIN")),
+      authorize: chain(belongsToOrg(), hasOrgRole("ADMIN")),
       resolve: async (root, { offset, limit }, ctx, info) => {
         return await ctx.organizations.loadOrgUsers(root.id, { offset, limit });
       },

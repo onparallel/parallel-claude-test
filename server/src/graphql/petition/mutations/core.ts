@@ -7,23 +7,23 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { CreatePetition, CreatePetitionField } from "../../db/__types";
-import { calculateNextReminder } from "../../util/calculateNextReminder";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { CreatePetition, CreatePetitionField } from "../../../db/__types";
+import { calculateNextReminder } from "../../../util/calculateNextReminder";
 import {
-  authenticate,
-  authorizeAnd,
-  authorizeAndP,
-} from "../helpers/authorize";
-import { dateTimeArg } from "../helpers/date";
-import { ArgValidationError } from "../helpers/errors";
-import { jsonArg } from "../helpers/json";
-import { RESULT } from "../helpers/result";
-import { validateAnd } from "../helpers/validateArgs";
-import { maxLength } from "../helpers/validators/maxLength";
-import { notEmptyString } from "../helpers/validators/notEmptyString";
-import { validRemindersConfig } from "../helpers/validators/validRemindersConfig";
-import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+  fromGlobalId,
+  fromGlobalIds,
+  toGlobalId,
+} from "../../../util/globalId";
+import { authenticate, chain, and } from "../../helpers/authorize";
+import { dateTimeArg } from "../../helpers/date";
+import { ArgValidationError } from "../../helpers/errors";
+import { jsonArg } from "../../helpers/json";
+import { RESULT } from "../../helpers/result";
+import { validateAnd } from "../../helpers/validateArgs";
+import { maxLength } from "../../helpers/validators/maxLength";
+import { notEmptyString } from "../../helpers/validators/notEmptyString";
+import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
+import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import {
   accessesBelongToPetition,
   fieldBelongsToPetition,
@@ -32,8 +32,8 @@ import {
   replyBelongsToPetition,
   userHasAccessToPetition,
   userHasAccessToPetitions,
-} from "./authorizers";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+} from "../authorizers";
+import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -56,10 +56,7 @@ export const createPetition = mutationField("createPetition", {
 export const clonePetition = mutationField("clonePetition", {
   description: "Clone petition.",
   type: "Petition",
-  authorize: authorizeAnd(
-    authenticate(),
-    userHasAccessToPetition("petitionId")
-  ),
+  authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
   args: {
     petitionId: idArg({ required: true }),
     name: stringArg({}),
@@ -88,7 +85,7 @@ export const clonePetition = mutationField("clonePetition", {
 export const deletePetitions = mutationField("deletePetitions", {
   description: "Delete petitions.",
   type: "Result",
-  authorize: authorizeAnd(authenticate(), userHasAccessToPetitions("ids")),
+  authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
   args: {
     ids: idArg({ required: true, list: [true] }),
   },
@@ -102,10 +99,7 @@ export const deletePetitions = mutationField("deletePetitions", {
 export const updateFieldPositions = mutationField("updateFieldPositions", {
   description: "Updates the positions of the petition fields",
   type: "Petition",
-  authorize: authorizeAnd(
-    authenticate(),
-    userHasAccessToPetition("petitionId")
-  ),
+  authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
   args: {
     petitionId: idArg({ required: true }),
     fieldIds: idArg({
@@ -150,10 +144,7 @@ export const RemindersConfigInput = inputObjectType({
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "Petition",
-  authorize: authorizeAnd(
-    authenticate(),
-    userHasAccessToPetition("petitionId")
-  ),
+  authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
   args: {
     petitionId: idArg({ required: true }),
     data: inputObjectType({
@@ -222,10 +213,7 @@ export const updatePetition = mutationField("updatePetition", {
 export const createPetitionField = mutationField("createPetitionField", {
   description: "Creates a petition field",
   type: "PetitionAndField",
-  authorize: authorizeAnd(
-    authenticate(),
-    userHasAccessToPetition("petitionId")
-  ),
+  authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
   args: {
     petitionId: idArg({ required: true }),
     type: arg({ type: "PetitionFieldType", required: true }),
@@ -243,9 +231,9 @@ export const createPetitionField = mutationField("createPetitionField", {
 export const deletePetitionField = mutationField("deletePetitionField", {
   description: "Delete petitions fields.",
   type: "Petition",
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       fieldBelongsToPetition("petitionId", "fieldId")
     )
@@ -274,9 +262,9 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       t.field("field", { type: "PetitionField" });
     },
   }),
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       fieldBelongsToPetition("petitionId", "fieldId")
     )
@@ -335,9 +323,9 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       t.field("fields", { type: "PetitionField", list: [true] });
     },
   }),
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldIds")
     )
@@ -371,9 +359,9 @@ export const fileUploadReplyDownloadLink = mutationField(
         t.string("url", { nullable: true });
       },
     }),
-    authorize: authorizeAnd(
+    authorize: chain(
       authenticate(),
-      authorizeAndP(
+      and(
         userHasAccessToPetition("petitionId"),
         replyBelongsToPetition("petitionId", "replyId")
       )
@@ -435,10 +423,7 @@ export const sendPetition = mutationField("sendPetition", {
       });
     },
   }),
-  authorize: authorizeAnd(
-    authenticate(),
-    authorizeAndP(userHasAccessToPetition("petitionId"))
-  ),
+  authorize: chain(authenticate(), and(userHasAccessToPetition("petitionId"))),
   args: {
     petitionId: idArg({ required: true }),
     contactIds: idArg({ list: [true], required: true }),
@@ -528,9 +513,9 @@ export const sendPetition = mutationField("sendPetition", {
 export const sendMessages = mutationField("sendMessages", {
   description: "Sends a petition message to the speicified contacts.",
   type: "Result",
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       accessesBelongToPetition("petitionId", "accessIds")
     )
@@ -582,9 +567,9 @@ export const sendMessages = mutationField("sendMessages", {
 export const sendReminders = mutationField("sendReminders", {
   description: "Sends a reminder for the specified petition accesses.",
   type: "Result",
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       accessesBelongToPetition("petitionId", "accessIds")
     )
@@ -651,9 +636,9 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
   description: "Deactivates the specified active petition accesses.",
   type: "PetitionAccess",
   list: [true],
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       accessesBelongToPetition("petitionId", "accessIds")
     )
@@ -677,9 +662,9 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
   description: "Reactivates the specified inactive petition accesses.",
   type: "PetitionAccess",
   list: [true],
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       accessesBelongToPetition("petitionId", "accessIds")
     )
@@ -703,9 +688,9 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
   description: "Cancels a scheduled petition message.",
   type: "PetitionMessage",
   nullable: true,
-  authorize: authorizeAnd(
+  authorize: chain(
     authenticate(),
-    authorizeAndP(
+    and(
       userHasAccessToPetition("petitionId"),
       messageBelongToPetition("petitionId", "messageId")
     )

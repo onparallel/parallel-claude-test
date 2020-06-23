@@ -23,14 +23,7 @@ export async function up(knex: Knex): Promise<any> {
       create index "pfc__petition_id__petition_field_id" on petition_field_comment (
         petition_id,
         petition_field_id
-      ) where deleted_at is null
-    `
-    )
-    .raw(
-      /* sql */ `
-      create index "pfc__petition_field_id" on petition_field_comment (
-        petition_field_id
-      ) where deleted_at is null
+      )
     `
     )
 
@@ -61,17 +54,22 @@ export async function up(knex: Knex): Promise<any> {
         .notNullable()
         .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
     }).raw(/* sql */ `
-      create index "pn__reply_created__petition_id__petition_reply_id" on petition_notification (
+      create unique index "pn__reply_created__petition_id__petition_reply_id" on petition_notification (
+        user_id,
         petition_id,
+        ((data ->> 'petition_field_id')::int),
         ((data ->> 'petition_reply_id')::int)
       ) where type = 'REPLY_CREATED'
     `).raw(/* sql */ `
-      create index "pn__comment_created__petition_id__petition_field_id" on petition_notification (
+      create unique index "pn__comment_created__petition_id__petition_field_id" on petition_notification (
+        user_id,
         petition_id,
-        ((data ->> 'petition_field_id')::int)
+        ((data ->> 'petition_field_id')::int),
+        ((data ->> 'petition_field_comment_id')::int)
       ) where type = 'COMMENT_CREATED'
     `).raw(/* sql */ `
       create index "pn__petition_id__type" on petition_notification (
+        user_id,
         petition_id,
         type
       )

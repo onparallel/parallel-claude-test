@@ -40,10 +40,7 @@ export function ConfirmDialog<T = void>({
   cancel =
     cancel === undefined ? (
       <Button ref={cancelRef} onClick={() => onReject()}>
-        <FormattedMessage
-          id="component.confirm-dialog.cancel-button"
-          defaultMessage="Cancel"
-        />
+        <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
       </Button>
     ) : (
       cancel
