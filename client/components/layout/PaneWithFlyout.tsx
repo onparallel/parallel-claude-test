@@ -2,6 +2,7 @@ import { Box, Flex } from "@chakra-ui/core";
 import { Maybe } from "@parallel/utils/types";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import ResizeObserver from "react-resize-observer";
 
 export type PaneWithFlyoutProps = {
   active: boolean;
@@ -19,7 +20,11 @@ export function PaneWithFlyout({
   const [flyoutOffset, setFlyoutOffset] = useState(0);
   const flyoutRef = useRef<HTMLElement>(null);
   const paneRef = useRef<HTMLElement>(null);
-  useEffect(() => {
+
+  useEffect(positionFlyout, [active, alignWith]);
+  useEffect(scrollFlyoutIntoView, [active, alignWith]);
+
+  function positionFlyout() {
     if (!active || !alignWith || !flyoutRef.current) {
       setFlyoutOffset(0);
       return;
@@ -37,8 +42,9 @@ export function PaneWithFlyout({
       alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;
     const maxOffset = paneHeight - flyoutHeight;
     setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
-  }, [active, alignWith]);
-  useEffect(() => {
+  }
+
+  function scrollFlyoutIntoView() {
     if (active) {
       const timeout = setTimeout(() => {
         if (flyoutRef.current) {
@@ -50,7 +56,7 @@ export function PaneWithFlyout({
       }, 200);
       return () => clearTimeout(timeout);
     }
-  }, [active, alignWith]);
+  }
 
   return (
     <Flex ref={paneRef} minHeight="100%">
@@ -66,6 +72,7 @@ export function PaneWithFlyout({
             position={{ base: "relative", md: "sticky" }}
             top={0}
           >
+            <ResizeObserver onResize={positionFlyout} />
             {flyout}
           </Box>
         ) : null}
