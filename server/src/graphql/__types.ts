@@ -396,6 +396,7 @@ export interface NexusGenFieldTypes {
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["Petition"]; // Petition!
     updatePetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
+    updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updateUser: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndFields"]; // PetitionAndFields!
   };
@@ -825,6 +826,13 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
       fieldId: string; // ID!
+      petitionId: string; // ID!
+    };
+    updatePetitionFieldComment: {
+      // args
+      content: string; // String!
+      petitionFieldCommentId: string; // ID!
+      petitionFieldId: string; // ID!
       petitionId: string; // ID!
     };
     updateUser: {

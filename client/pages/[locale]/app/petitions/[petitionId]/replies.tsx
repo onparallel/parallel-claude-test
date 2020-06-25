@@ -3,7 +3,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Title } from "@parallel/components/common/Title";
+import { Title } from "@parallel/coponents/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -37,6 +37,9 @@ import {
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
   usePetitionReplies_deletePetitionFieldCommentMutation,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
+  usePetitionReplies_updatePetitionFieldCommentMutation,
+  PetitionReplies_updatePetitionFieldCommentMutationVariables,
+  PetitionRepliesFieldComments_PetitionFieldCommentFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -46,6 +49,8 @@ import { gql } from "apollo-boost";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
+import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
+import { useApolloClient } from "@apollo/react-hooks";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -162,6 +167,19 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     });
   }
 
+  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
+  async function handleUpdateComment(
+    petitionFieldCommentId: string,
+    content: string
+  ) {
+    await updatePetitionFieldComment({
+      petitionId,
+      petitionFieldId: activeFieldId!,
+      petitionFieldCommentId,
+      content,
+    });
+  }
+
   const deletePetitionFieldComment = useDeletePetitionFieldComment();
   async function handleDeleteComment(petitionFieldCommentId: string) {
     await deletePetitionFieldComment({
@@ -256,8 +274,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                 <PetitionRepliesFieldComments
                   key={activeFieldId!}
                   field={activeField!}
+                  userId={me.id}
                   onClose={() => setActiveFieldId(null)}
                   onAddComment={handleAddComment}
+                  onUpdateComment={handleUpdateComment}
                   onDeleteComment={handleDeleteComment}
                 />
               </Box>
@@ -386,6 +406,24 @@ PetitionReplies.mutations = [
     ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
   `,
   gql`
+    mutation PetitionReplies_updatePetitionFieldComment(
+      $petitionId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldCommentId: ID!
+      $content: String!
+    ) {
+      updatePetitionFieldComment(
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+        petitionFieldCommentId: $petitionFieldCommentId
+        content: $content
+      ) {
+        ...PetitionRepliesFieldComments_PetitionFieldComment
+      }
+    }
+    ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
+  `,
+  gql`
     mutation PetitionReplies_deletePetitionFieldComment(
       $petitionId: ID!
       $petitionFieldId: ID!
@@ -397,7 +435,6 @@ PetitionReplies.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
       )
     }
-    ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
   `,
 ];
 
@@ -471,6 +508,38 @@ function useCreatePetitionFieldComment() {
       });
     },
     [createPetitionFieldComment]
+  );
+}
+
+function useUpdatePetitionFieldComment() {
+  const [
+    updatePetitionFieldComment,
+  ] = usePetitionReplies_updatePetitionFieldCommentMutation();
+  const apollo = useApolloClient();
+  return useCallback(
+    async (
+      variables: PetitionReplies_updatePetitionFieldCommentMutationVariables
+    ) => {
+      await updatePetitionFieldComment({
+        variables,
+        optimisticResponse: () => {
+          const comment = apollo.readFragment<
+            PetitionRepliesFieldComments_PetitionFieldCommentFragment
+          >({
+            fragment:
+              PetitionRepliesFieldComments.fragments.PetitionFieldComment,
+            id: variables.petitionFieldCommentId,
+          });
+          return {
+            updatePetitionFieldComment: {
+              ...comment!,
+              content: variables.content,
+            },
+          };
+        },
+      });
+    },
+    [updatePetitionFieldComment]
   );
 }
 

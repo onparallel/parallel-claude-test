@@ -89,3 +89,46 @@ export const deletePetitionFieldComment = mutationField(
     },
   }
 );
+
+export const updatePetitionFieldComment = mutationField(
+  "updatePetitionFieldComment",
+  {
+    description: "Update a petition field comment.",
+    type: "PetitionFieldComment",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        commentBelongsToPetition("petitionId", "petitionFieldCommentId"),
+        async function commentAuhtorIsContextUser(root, args, ctx, info) {
+          const petitionFieldCommentId = fromGlobalId(
+            args.petitionFieldCommentId,
+            "PetitionFieldComment"
+          ).id;
+          const comment = await ctx.petitions.loadPetitionFieldComment(
+            petitionFieldCommentId
+          );
+          return (comment && comment.user_id === ctx.user!.id) ?? false;
+        }
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldId: idArg({ required: true }),
+      petitionFieldCommentId: idArg({ required: true }),
+      content: stringArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionFieldCommentId = fromGlobalId(
+        args.petitionFieldCommentId,
+        "PetitionFieldComment"
+      ).id;
+      return await ctx.petitions.updatePetitionFieldComment(
+        petitionFieldCommentId,
+        args.content,
+        ctx.user!
+      );
+    },
+  }
+);

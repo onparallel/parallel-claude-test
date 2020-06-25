@@ -39,15 +39,19 @@ import { Spacer } from "../common/Spacer";
 
 export type PetitionRepliesFieldCommentsProps = {
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
+  userId: string;
   onAddComment: (value: string) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
+  onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
   onClose: () => void;
 };
 
 export function PetitionRepliesFieldComments({
   field,
+  userId,
   onAddComment,
   onDeleteComment,
+  onUpdateComment,
   onClose,
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
@@ -118,7 +122,8 @@ export function PetitionRepliesFieldComments({
               <Fragment key={comment.id}>
                 <FieldComment
                   comment={comment}
-                  onEdit={() => {}}
+                  isEditable={comment.author?.id === userId}
+                  onEdit={(content) => onUpdateComment(comment.id, content)}
                   onDelete={() => onDeleteComment(comment.id)}
                 />
                 {index === field.comments.length - 1 ? null : <Divider />}
@@ -168,10 +173,12 @@ export function PetitionRepliesFieldComments({
 
 function FieldComment({
   comment,
+  isEditable,
   onDelete,
   onEdit,
 }: {
   comment: PetitionRepliesFieldComments_PetitionFieldCommentFragment;
+  isEditable: boolean;
   onDelete: () => void;
   onEdit: (content: string) => void;
 }) {
@@ -187,6 +194,14 @@ function FieldComment({
       textareaRef.current!.focus();
       textareaRef.current!.select();
     });
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && event.metaKey) {
+      event.preventDefault();
+      setIsEditing(false);
+      onEdit(content);
+    }
   }
 
   function handleCancelClick() {
@@ -255,9 +270,11 @@ function FieldComment({
           as={IconButton}
           dropdown={
             <MenuList minWidth="160px" placement="bottom-end">
-              <MenuItem onClick={handleEditClick}>
-                <FormattedMessage id="generic.edit" defaultMessage="Edit" />
-              </MenuItem>
+              {isEditable ? (
+                <MenuItem onClick={handleEditClick}>
+                  <FormattedMessage id="generic.edit" defaultMessage="Edit" />
+                </MenuItem>
+              ) : null}
               <MenuItem onClick={onDelete}>
                 <FormattedMessage id="generic.delete" defaultMessage="Delete" />
               </MenuItem>
@@ -283,6 +300,7 @@ function FieldComment({
             minHeight={0}
             {...{ rows: 1 }}
             value={content}
+            onKeyDown={handleKeyDown as any}
             onChange={handleContentChange as any}
           />
           <Stack direction="row" justifyContent="flex-end" marginTop={2}>

@@ -1047,7 +1047,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadCommentsForField = fromDataLoader(
+  readonly loadPetitionFieldCommentsForField = fromDataLoader(
     new DataLoader<
       { userId: number; petitionId: number; petitionFieldId: number },
       PetitionFieldComment[],
@@ -1072,10 +1072,10 @@ export class PetitionRepository extends BaseRepository {
 
         const byId = groupBy(
           rows,
-          keyBuilder(["user_id", "petition_id", "petition_field_id"])
+          keyBuilder(["petition_id", "petition_field_id"])
         );
         return ids
-          .map(keyBuilder(["userId", "petitionId", "petitionFieldId"]))
+          .map(keyBuilder(["petitionId", "petitionFieldId"]))
           .map((key) => {
             const comments = byId[key] ?? [];
             comments.sort((a, b) => {
@@ -1098,7 +1098,13 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
-  readonly getIsCommentUnread = fromDataLoader(
+  readonly loadPetitionFieldComment = this.buildLoadById(
+    "petition_field_comment",
+    "id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  readonly getPetitionFieldCommentIsUnread = fromDataLoader(
     new DataLoader<
       {
         userId: number;
@@ -1193,6 +1199,24 @@ export class PetitionRepository extends BaseRepository {
         {
           deleted_at: this.now(),
           deleted_by: `User:${user.id}`,
+        },
+        "*"
+      );
+    return rows[0];
+  }
+
+  async updatePetitionFieldComment(
+    petitionFieldCommentId: number,
+    content: string,
+    user: User
+  ) {
+    const rows = await this.from("petition_field_comment")
+      .where("id", petitionFieldCommentId)
+      .update(
+        {
+          content,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
         },
         "*"
       );

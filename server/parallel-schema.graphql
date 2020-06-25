@@ -366,6 +366,16 @@ type Mutation {
   ): PetitionAndField!
 
   """
+  Update a petition field comment.
+  """
+  updatePetitionFieldComment(
+    content: String!
+    petitionFieldCommentId: ID!
+    petitionFieldId: ID!
+    petitionId: ID!
+  ): PetitionFieldComment!
+
+  """
   Updates the user with the provided data.
   """
   updateUser(data: UpdateUserInput!, id: ID!): User!

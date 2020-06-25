@@ -195,6 +195,8 @@ export type Mutation = {
   updatePetition: Petition;
   /** Updates a petition field. */
   updatePetitionField: PetitionAndField;
+  /** Update a petition field comment. */
+  updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the validation of a petition field. */
@@ -346,6 +348,13 @@ export type MutationupdatePetitionArgs = {
 export type MutationupdatePetitionFieldArgs = {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["ID"];
+  petitionId: Scalars["ID"];
+};
+
+export type MutationupdatePetitionFieldCommentArgs = {
+  content: Scalars["String"];
+  petitionFieldCommentId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
   petitionId: Scalars["ID"];
 };
 
@@ -1911,6 +1920,21 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
 };
 
+export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["ID"];
+  content: Scalars["String"];
+}>;
+
+export type PetitionReplies_updatePetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetitionFieldComment: {
+    __typename?: "PetitionFieldComment";
+  } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
+};
+
 export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   petitionFieldId: Scalars["ID"];
@@ -1935,9 +1959,7 @@ export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & {
   comments: Array<
-    {
-      __typename?: "PetitionFieldComment";
-    } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
+    { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
   >;
 };
 
@@ -2875,10 +2897,9 @@ export const PetitionReplies_createPetitionFieldComment_PetitionFieldFragmentDoc
 export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_deletePetitionFieldComment_PetitionField on PetitionField {
     comments {
-      ...PetitionRepliesFieldComments_PetitionFieldComment
+      id
     }
   }
-  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
 export const Petitions_PetitionsListFragmentDoc = gql`
   fragment Petitions_PetitionsList on PetitionPagination {
@@ -4649,6 +4670,70 @@ export type PetitionReplies_createPetitionFieldCommentMutationResult = ApolloRea
 export type PetitionReplies_createPetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionReplies_createPetitionFieldCommentMutation,
   PetitionReplies_createPetitionFieldCommentMutationVariables
+>;
+export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
+  mutation PetitionReplies_updatePetitionFieldComment(
+    $petitionId: ID!
+    $petitionFieldId: ID!
+    $petitionFieldCommentId: ID!
+    $content: String!
+  ) {
+    updatePetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      petitionFieldCommentId: $petitionFieldCommentId
+      content: $content
+    ) {
+      ...PetitionRepliesFieldComments_PetitionFieldComment
+    }
+  }
+  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
+`;
+export type PetitionReplies_updatePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_updatePetitionFieldCommentMutation,
+  PetitionReplies_updatePetitionFieldCommentMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_updatePetitionFieldCommentMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_updatePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_updatePetitionFieldCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesUpdatePetitionFieldCommentMutation, { data, loading, error }] = usePetitionReplies_updatePetitionFieldCommentMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function usePetitionReplies_updatePetitionFieldCommentMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReplies_updatePetitionFieldCommentMutation,
+    PetitionReplies_updatePetitionFieldCommentMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReplies_updatePetitionFieldCommentMutation,
+    PetitionReplies_updatePetitionFieldCommentMutationVariables
+  >(PetitionReplies_updatePetitionFieldCommentDocument, baseOptions);
+}
+export type PetitionReplies_updatePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldCommentMutation
+>;
+export type PetitionReplies_updatePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_updatePetitionFieldCommentMutation
+>;
+export type PetitionReplies_updatePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_updatePetitionFieldCommentMutation,
+  PetitionReplies_updatePetitionFieldCommentMutationVariables
 >;
 export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_deletePetitionFieldComment(
