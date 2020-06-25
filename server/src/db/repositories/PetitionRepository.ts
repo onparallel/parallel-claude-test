@@ -1197,7 +1197,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async deletePetitionFieldComment(petitionFieldCommentId: number, user: User) {
-    const rows = await this.from("petition_field_comment")
+    const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
       .update(
         {
@@ -1206,7 +1206,16 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    return rows[0];
+    if (comment.published_at) {
+      await this.from("petition_notification")
+        .where({
+          petition_id: comment.petition_id,
+          type: "COMMENT_CREATED",
+        })
+        .whereRaw("data ->> 'petition_field_id' = ?", comment.petition_field_id)
+        .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id)
+        .delete();
+    }
   }
 
   async updatePetitionFieldComment(
@@ -1240,5 +1249,33 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
+  }
+
+  async markPetitionFieldCommentsAsRead(
+    petitionFieldCommentIds: number[],
+    user: User
+  ) {
+    const comments = (await this.loadPetitionFieldComment(
+      petitionFieldCommentIds
+    )) as PetitionFieldComment[];
+    await this.from("petition_notification")
+      .where({
+        user_id: user.id,
+        type: "COMMENT_CREATED",
+      })
+      .where((qb) => {
+        for (const comment of comments) {
+          qb = qb.orWhere((qb) => {
+            qb.where("petition_id", comment.petition_id)
+              .whereRaw(
+                "data ->> 'petition_field_id' = ?",
+                comment.petition_field_id
+              )
+              .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id);
+          });
+        }
+      })
+      .update({ is_read: true });
+    return comments;
   }
 }

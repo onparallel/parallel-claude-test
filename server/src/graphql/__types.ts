@@ -382,6 +382,7 @@ export interface NexusGenFieldTypes {
     deletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
+    markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -749,6 +750,11 @@ export interface NexusGenArgTypes {
       petitionId: string; // ID!
       preview?: boolean | null; // Boolean
       replyId: string; // ID!
+    };
+    markPetitionFieldCommentsAsRead: {
+      // args
+      petitionFieldCommentIds: string[]; // [ID!]!
+      petitionId: string; // ID!
     };
     publicCompletePetition: {
       // args

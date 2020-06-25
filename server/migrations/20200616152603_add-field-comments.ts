@@ -55,14 +55,12 @@ export async function up(knex: Knex): Promise<any> {
         .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
     }).raw(/* sql */ `
       create unique index "pn__reply_created__petition_id__petition_reply_id" on petition_notification (
-        user_id,
         petition_id,
         ((data ->> 'petition_field_id')::int),
         ((data ->> 'petition_reply_id')::int)
       ) where type = 'REPLY_CREATED'
     `).raw(/* sql */ `
       create unique index "pn__comment_created__petition_id__petition_field_id" on petition_notification (
-        user_id,
         petition_id,
         ((data ->> 'petition_field_id')::int),
         ((data ->> 'petition_field_comment_id')::int)

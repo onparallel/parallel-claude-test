@@ -1,6 +1,11 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { Arg } from "../helpers/authorize";
+import { MaybeArray } from "../../util/types";
+
+function unMaybeArray<T>(items: MaybeArray<T>) {
+  return Array.isArray(items) ? items : [items];
+}
 
 export function userHasAccessToPetition<
   TypeName extends string,
@@ -158,14 +163,14 @@ export function messageBelongToPetition<
   };
 }
 
-export function commentBelongsToPetition<
+export function commentsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
+  TArg2 extends Arg<TypeName, FieldName, string | string[]>
 >(
   argNamePetitionId: TArg1,
-  argNameCommentId: TArg2
+  argNameCommentIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -173,11 +178,11 @@ export function commentBelongsToPetition<
         args[argNamePetitionId],
         "Petition"
       );
-      const { id: commentId } = fromGlobalId(
-        args[argNameCommentId],
+      const { ids: commentIds } = fromGlobalIds(
+        unMaybeArray(args[argNameCommentIds]),
         "PetitionFieldComment"
       );
-      return ctx.petitions.commentsBelongToPetition(petitionId, [commentId]);
+      return ctx.petitions.commentsBelongToPetition(petitionId, commentIds);
     } catch {}
     return false;
   };

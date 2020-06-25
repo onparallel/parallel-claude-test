@@ -64,6 +64,7 @@ export function PetitionRepliesFieldComments({
   const commentsRef = useRef<HTMLElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Scroll to bttom when a comment is added
   const previousCommentCount = usePreviousValue(field.comments.length);
   useEffect(() => {
     if (

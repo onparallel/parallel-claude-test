@@ -1,18 +1,18 @@
 import { idArg, mutationField, stringArg } from "@nexus/schema";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import {
   and,
   authenticate,
   chain,
   ifArgDefined,
 } from "../../helpers/authorize";
+import { RESULT } from "../../helpers/result";
 import {
+  commentsBelongsToPetition,
   fieldBelongsToPetition,
   replyBelongsToPetition,
   userHasAccessToPetition,
-  commentBelongsToPetition,
 } from "../authorizers";
-import { fromGlobalId } from "../../../util/globalId";
-import { RESULT } from "../../helpers/result";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -68,7 +68,7 @@ export const deletePetitionFieldComment = mutationField(
       and(
         userHasAccessToPetition("petitionId"),
         fieldBelongsToPetition("petitionId", "petitionFieldId"),
-        commentBelongsToPetition("petitionId", "petitionFieldCommentId")
+        commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
       )
     ),
     args: {
@@ -100,7 +100,7 @@ export const updatePetitionFieldComment = mutationField(
       and(
         userHasAccessToPetition("petitionId"),
         fieldBelongsToPetition("petitionId", "petitionFieldId"),
-        commentBelongsToPetition("petitionId", "petitionFieldCommentId"),
+        commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
         async function commentAuhtorIsContextUser(root, args, ctx, info) {
           const petitionFieldCommentId = fromGlobalId(
             args.petitionFieldCommentId,
@@ -151,6 +151,36 @@ export const submitUnpublishedComments = mutationField(
       );
       // TODO enqueue email to notify recipients about comments
       return comments;
+    },
+  }
+);
+
+export const markPetitionFieldCommentsAsRead = mutationField(
+  "markPetitionFieldCommentsAsRead",
+  {
+    description: "Marks the specified comments as read.",
+    type: "PetitionFieldComment",
+    list: [true],
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldCommentIds: idArg({ required: true, list: [true] }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionFieldCommentIds = fromGlobalIds(
+        args.petitionFieldCommentIds,
+        "PetitionFieldComment"
+      ).ids;
+      return await ctx.petitions.markPetitionFieldCommentsAsRead(
+        petitionFieldCommentIds,
+        ctx.user!
+      );
     },
   }
 );

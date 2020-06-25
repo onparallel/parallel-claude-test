@@ -41,6 +41,7 @@ import {
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
   usePetitionReplies_submitUnpublishedCommentsMutation,
+  usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -48,6 +49,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { gql } from "apollo-boost";
 import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
@@ -75,6 +77,25 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     return activeFieldId
       ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)!
       : null;
+  }, [activeFieldId]);
+
+  const [
+    markPetitionFieldCommentsAsRead,
+  ] = usePetitionReplies_markPetitionFieldCommentsAsReadMutation();
+  useEffect(() => {
+    if (activeFieldId) {
+      const timeout = setTimeout(async () => {
+        await markPetitionFieldCommentsAsRead({
+          variables: {
+            petitionId,
+            petitionFieldCommentIds: activeField!.comments
+              .filter((c) => c.isUnread)
+              .map((c) => c.id),
+          },
+        });
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
   }, [activeFieldId]);
 
   const [state, wrapper] = usePetitionState();
@@ -456,6 +477,20 @@ PetitionReplies.mutations = [
       submitUnpublishedComments(petitionId: $petitionId) {
         id
         publishedAt
+      }
+    }
+  `,
+  gql`
+    mutation PetitionReplies_markPetitionFieldCommentsAsRead(
+      $petitionId: ID!
+      $petitionFieldCommentIds: [ID!]!
+    ) {
+      markPetitionFieldCommentsAsRead(
+        petitionId: $petitionId
+        petitionFieldCommentIds: $petitionFieldCommentIds
+      ) {
+        id
+        isUnread
       }
     }
   `,

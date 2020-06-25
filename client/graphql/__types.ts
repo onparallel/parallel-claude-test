@@ -167,6 +167,8 @@ export type Mutation = {
   deletePetitions: Result;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  /** Marks the specified comments as read. */
+  markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Marks a filled petition as ready for review. */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
@@ -272,6 +274,11 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
   petitionId: Scalars["ID"];
   preview?: Maybe<Scalars["Boolean"]>;
   replyId: Scalars["ID"];
+};
+
+export type MutationmarkPetitionFieldCommentsAsReadArgs = {
+  petitionFieldCommentIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["ID"];
 };
 
 export type MutationpublicCompletePetitionArgs = {
@@ -1962,6 +1969,22 @@ export type PetitionReplies_submitUnpublishedCommentsMutation = {
     { __typename?: "PetitionFieldComment" } & Pick<
       PetitionFieldComment,
       "id" | "publishedAt"
+    >
+  >;
+};
+
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  petitionFieldCommentIds: Array<Scalars["ID"]>;
+}>;
+
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
+  __typename?: "Mutation";
+} & {
+  markPetitionFieldCommentsAsRead: Array<
+    { __typename?: "PetitionFieldComment" } & Pick<
+      PetitionFieldComment,
+      "id" | "isUnread"
     >
   >;
 };
@@ -4864,6 +4887,64 @@ export type PetitionReplies_submitUnpublishedCommentsMutationResult = ApolloReac
 export type PetitionReplies_submitUnpublishedCommentsMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionReplies_submitUnpublishedCommentsMutation,
   PetitionReplies_submitUnpublishedCommentsMutationVariables
+>;
+export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
+  mutation PetitionReplies_markPetitionFieldCommentsAsRead(
+    $petitionId: ID!
+    $petitionFieldCommentIds: [ID!]!
+  ) {
+    markPetitionFieldCommentsAsRead(
+      petitionId: $petitionId
+      petitionFieldCommentIds: $petitionFieldCommentIds
+    ) {
+      id
+      isUnread
+    }
+  }
+`;
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_markPetitionFieldCommentsAsReadMutation,
+  PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_markPetitionFieldCommentsAsReadMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_markPetitionFieldCommentsAsReadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_markPetitionFieldCommentsAsReadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesMarkPetitionFieldCommentsAsReadMutation, { data, loading, error }] = usePetitionReplies_markPetitionFieldCommentsAsReadMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      petitionFieldCommentIds: // value for 'petitionFieldCommentIds'
+ *   },
+ * });
+ */
+export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReplies_markPetitionFieldCommentsAsReadMutation,
+    PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReplies_markPetitionFieldCommentsAsReadMutation,
+    PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
+  >(PetitionReplies_markPetitionFieldCommentsAsReadDocument, baseOptions);
+}
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
+  typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation
+>;
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_markPetitionFieldCommentsAsReadMutation
+>;
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_markPetitionFieldCommentsAsReadMutation,
+  PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: ID!) {
