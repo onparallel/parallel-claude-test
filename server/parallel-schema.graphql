@@ -337,6 +337,11 @@ type Mutation {
   sendReminders(accessIds: [ID!]!, petitionId: ID!): Result!
 
   """
+  Submits all unpublished comments.
+  """
+  submitUnpublishedComments(petitionId: ID!): [PetitionFieldComment!]!
+
+  """
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: ID!): Contact!

@@ -40,6 +40,7 @@ import {
   usePetitionReplies_updatePetitionFieldCommentMutation,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
+  usePetitionReplies_submitUnpublishedCommentsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -189,6 +190,16 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     });
   }
 
+  const [
+    submitUnpublishedComments,
+    { loading: isSubmitting },
+  ] = usePetitionReplies_submitUnpublishedCommentsMutation();
+  async function handleSubmitUnpublished() {
+    await submitUnpublishedComments({
+      variables: { petitionId },
+    });
+  }
+
   return (
     <>
       <Title>
@@ -243,7 +254,11 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             />
           </Button> */}
           {pendingComments ? (
-            <Button variantColor="yellow">
+            <Button
+              variantColor="yellow"
+              isDisabled={isSubmitting}
+              onClick={handleSubmitUnpublished}
+            >
               <FormattedMessage
                 id="petition-replies.submit-comments"
                 defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
@@ -434,6 +449,14 @@ PetitionReplies.mutations = [
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
       )
+    }
+  `,
+  gql`
+    mutation PetitionReplies_submitUnpublishedComments($petitionId: ID!) {
+      submitUnpublishedComments(petitionId: $petitionId) {
+        id
+        publishedAt
+      }
     }
   `,
 ];

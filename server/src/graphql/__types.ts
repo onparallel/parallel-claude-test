@@ -391,6 +391,7 @@ export interface NexusGenFieldTypes {
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendReminders: NexusGenEnums["Result"]; // Result!
+    submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -800,6 +801,10 @@ export interface NexusGenArgTypes {
     sendReminders: {
       // args
       accessIds: string[]; // [ID!]!
+      petitionId: string; // ID!
+    };
+    submitUnpublishedComments: {
+      // args
       petitionId: string; // ID!
     };
     updateContact: {

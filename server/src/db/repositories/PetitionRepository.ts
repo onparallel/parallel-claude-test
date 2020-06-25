@@ -1083,7 +1083,11 @@ export class PetitionRepository extends BaseRepository {
                 return -1;
               } else if (!a.published_at && b.published_at) {
                 return +1;
-              } else if (a.published_at && b.published_at) {
+              } else if (
+                a.published_at &&
+                b.published_at &&
+                a.published_at.valueOf() !== b.published_at.valueOf()
+              ) {
                 return a.published_at.valueOf() - b.published_at.valueOf();
               } else {
                 return a.created_at.valueOf() - b.created_at.valueOf();
@@ -1221,5 +1225,20 @@ export class PetitionRepository extends BaseRepository {
         "*"
       );
     return rows[0];
+  }
+
+  async publishPetitionFieldCommentsForUser(petitionId: number, user: User) {
+    return await this.from("petition_field_comment")
+      .where({
+        petition_id: petitionId,
+        user_id: user.id,
+      })
+      .whereNull("published_at")
+      .update(
+        {
+          published_at: this.now(),
+        },
+        "*"
+      );
   }
 }

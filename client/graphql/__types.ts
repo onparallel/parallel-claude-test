@@ -185,6 +185,8 @@ export type Mutation = {
   sendPetition: SendPetitionResult;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  /** Submits all unpublished comments. */
+  submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -322,6 +324,10 @@ export type MutationsendPetitionArgs = {
 
 export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["ID"];
+};
+
+export type MutationsubmitUnpublishedCommentsArgs = {
   petitionId: Scalars["ID"];
 };
 
@@ -1944,6 +1950,21 @@ export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deletePetitionFieldComment">;
+
+export type PetitionReplies_submitUnpublishedCommentsMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+}>;
+
+export type PetitionReplies_submitUnpublishedCommentsMutation = {
+  __typename?: "Mutation";
+} & {
+  submitUnpublishedComments: Array<
+    { __typename?: "PetitionFieldComment" } & Pick<
+      PetitionFieldComment,
+      "id" | "publishedAt"
+    >
+  >;
+};
 
 export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -4792,6 +4813,57 @@ export type PetitionReplies_deletePetitionFieldCommentMutationResult = ApolloRea
 export type PetitionReplies_deletePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionReplies_deletePetitionFieldCommentMutation,
   PetitionReplies_deletePetitionFieldCommentMutationVariables
+>;
+export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
+  mutation PetitionReplies_submitUnpublishedComments($petitionId: ID!) {
+    submitUnpublishedComments(petitionId: $petitionId) {
+      id
+      publishedAt
+    }
+  }
+`;
+export type PetitionReplies_submitUnpublishedCommentsMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_submitUnpublishedCommentsMutation,
+  PetitionReplies_submitUnpublishedCommentsMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_submitUnpublishedCommentsMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_submitUnpublishedCommentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_submitUnpublishedCommentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesSubmitUnpublishedCommentsMutation, { data, loading, error }] = usePetitionReplies_submitUnpublishedCommentsMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionReplies_submitUnpublishedCommentsMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReplies_submitUnpublishedCommentsMutation,
+    PetitionReplies_submitUnpublishedCommentsMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReplies_submitUnpublishedCommentsMutation,
+    PetitionReplies_submitUnpublishedCommentsMutationVariables
+  >(PetitionReplies_submitUnpublishedCommentsDocument, baseOptions);
+}
+export type PetitionReplies_submitUnpublishedCommentsMutationHookResult = ReturnType<
+  typeof usePetitionReplies_submitUnpublishedCommentsMutation
+>;
+export type PetitionReplies_submitUnpublishedCommentsMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_submitUnpublishedCommentsMutation
+>;
+export type PetitionReplies_submitUnpublishedCommentsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_submitUnpublishedCommentsMutation,
+  PetitionReplies_submitUnpublishedCommentsMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: ID!) {

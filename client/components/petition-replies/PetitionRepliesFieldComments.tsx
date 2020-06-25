@@ -8,6 +8,8 @@ import {
   MenuList,
   Stack,
   Text,
+  Flex,
+  Icon,
 } from "@chakra-ui/core";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
@@ -107,32 +109,41 @@ export function PetitionRepliesFieldComments({
           </Text>
         )}
       </CardHeader>
-      {field.comments.length > 0 ? (
-        <>
-          <Box
-            maxHeight={{
-              base: `calc(100vh - 364px)`,
-              sm: `calc(100vh - 300px)`,
-              md: `calc(100vh - 300px)`,
-            }}
-            overflow="auto"
-            ref={commentsRef}
+      <Box
+        maxHeight={{
+          base: `calc(100vh - 364px)`,
+          sm: `calc(100vh - 300px)`,
+          md: `calc(100vh - 300px)`,
+        }}
+        overflow="auto"
+        ref={commentsRef}
+      >
+        {field.comments.map((comment, index) => (
+          <Fragment key={comment.id}>
+            <FieldComment
+              comment={comment}
+              isEditable={comment.author?.id === userId}
+              onEdit={(content) => onUpdateComment(comment.id, content)}
+              onDelete={() => onDeleteComment(comment.id)}
+            />
+            {index === field.comments.length - 1 ? null : <Divider />}
+          </Fragment>
+        ))}
+        {field.comments.length === 0 ? (
+          <Flex
+            flexDirection="column"
+            paddingX={4}
+            justifyContent="center"
+            alignItems="center"
+            height="120px"
           >
-            {field.comments.map((comment, index) => (
-              <Fragment key={comment.id}>
-                <FieldComment
-                  comment={comment}
-                  isEditable={comment.author?.id === userId}
-                  onEdit={(content) => onUpdateComment(comment.id, content)}
-                  onDelete={() => onDeleteComment(comment.id)}
-                />
-                {index === field.comments.length - 1 ? null : <Divider />}
-              </Fragment>
-            ))}
-          </Box>
-          <Divider />
-        </>
-      ) : null}
+            <Box color="gray.200">
+              <Icon name="comment" size="64px" />
+            </Box>
+          </Flex>
+        ) : null}
+      </Box>
+      <Divider />
       <Box padding={2}>
         <GrowingTextarea
           ref={textareaRef}

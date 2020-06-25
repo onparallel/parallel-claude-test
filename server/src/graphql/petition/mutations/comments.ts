@@ -132,3 +132,25 @@ export const updatePetitionFieldComment = mutationField(
     },
   }
 );
+
+export const submitUnpublishedComments = mutationField(
+  "submitUnpublishedComments",
+  {
+    description: "Submits all unpublished comments.",
+    type: "PetitionFieldComment",
+    list: [true],
+    authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
+    args: {
+      petitionId: idArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
+      const comments = await ctx.petitions.publishPetitionFieldCommentsForUser(
+        petitionId,
+        ctx.user!
+      );
+      // TODO enqueue email to notify recipients about comments
+      return comments;
+    },
+  }
+);
