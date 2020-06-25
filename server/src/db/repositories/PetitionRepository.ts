@@ -97,6 +97,16 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(messagesIds).size;
   }
 
+  async commentsBelongToPetition(petitionId: number, commentIds: number[]) {
+    const [{ count }] = await this.from("petition_field_comment")
+      .where({
+        petition_id: petitionId,
+      })
+      .whereIn("id", commentIds)
+      .select(this.count());
+    return count === new Set(commentIds).size;
+  }
+
   async replyBelongsToAccess(replyId: number, keycode: string) {
     const {
       rows: [{ count }],
@@ -1155,4 +1165,37 @@ export class PetitionRepository extends BaseRepository {
       }
     )
   );
+
+  async createPetitionFieldComment(
+    data: {
+      petitionId: number;
+      petitionFieldId: number;
+      petitionFieldReplyId: number | null;
+      content: string;
+    },
+    user: User
+  ) {
+    const rows = await this.insert("petition_field_comment", {
+      petition_id: data.petitionId,
+      petition_field_id: data.petitionFieldId,
+      petition_field_reply_id: data.petitionFieldReplyId,
+      content: data.content,
+      user_id: user.id,
+      created_by: `User:${user.id}`,
+    });
+    return rows[0];
+  }
+
+  async deletePetitionFieldComment(petitionFieldCommentId: number, user: User) {
+    const rows = await this.from("petition_field_comment")
+      .where("id", petitionFieldCommentId)
+      .update(
+        {
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        },
+        "*"
+      );
+    return rows[0];
+  }
 }

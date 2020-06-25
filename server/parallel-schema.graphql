@@ -216,6 +216,16 @@ type Mutation {
   ): PetitionAndField!
 
   """
+  Create a petition field comment.
+  """
+  createPetitionFieldComment(
+    content: String!
+    petitionFieldId: ID!
+    petitionFieldReplyId: ID
+    petitionId: ID!
+  ): PetitionFieldComment!
+
+  """
   Deactivates the specified active petition accesses.
   """
   deactivateAccesses(accessIds: [ID!]!, petitionId: ID!): [PetitionAccess!]!
@@ -229,6 +239,15 @@ type Mutation {
   Delete petitions fields.
   """
   deletePetitionField(fieldId: ID!, petitionId: ID!): Petition!
+
+  """
+  Delete a petition field comment.
+  """
+  deletePetitionFieldComment(
+    petitionFieldCommentId: ID!
+    petitionFieldId: ID!
+    petitionId: ID!
+  ): Result!
 
   """
   Delete petitions.

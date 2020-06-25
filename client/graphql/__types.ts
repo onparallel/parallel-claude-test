@@ -153,12 +153,16 @@ export type Mutation = {
   createPetition: Petition;
   /** Creates a petition field */
   createPetitionField: PetitionAndField;
+  /** Create a petition field comment. */
+  createPetitionFieldComment: PetitionFieldComment;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
   /** Delete petitions fields. */
   deletePetitionField: Petition;
+  /** Delete a petition field comment. */
+  deletePetitionFieldComment: Result;
   /** Delete petitions. */
   deletePetitions: Result;
   /** Generates a download link for a file reply. */
@@ -229,6 +233,13 @@ export type MutationcreatePetitionFieldArgs = {
   type: PetitionFieldType;
 };
 
+export type MutationcreatePetitionFieldCommentArgs = {
+  content: Scalars["String"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldReplyId?: Maybe<Scalars["ID"]>;
+  petitionId: Scalars["ID"];
+};
+
 export type MutationdeactivateAccessesArgs = {
   accessIds: Array<Scalars["ID"]>;
   petitionId: Scalars["ID"];
@@ -240,6 +251,12 @@ export type MutationdeleteContactsArgs = {
 
 export type MutationdeletePetitionFieldArgs = {
   fieldId: Scalars["ID"];
+  petitionId: Scalars["ID"];
+};
+
+export type MutationdeletePetitionFieldCommentArgs = {
+  petitionFieldCommentId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
   petitionId: Scalars["ID"];
 };
 
@@ -1390,6 +1407,10 @@ export type PetitionRepliesFieldComments_PetitionFieldFragment = {
     >;
   };
 
+export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+} & Pick<PetitionFieldReply, "id" | "content">;
+
 export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
 } & Pick<
@@ -1401,10 +1422,6 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
       | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
     >;
   };
-
-export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
-  __typename?: "PetitionFieldReply";
-} & Pick<PetitionFieldReply, "id" | "content">;
 
 export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
@@ -1877,6 +1894,51 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
+
+export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldReplyId?: Maybe<Scalars["ID"]>;
+  content: Scalars["String"];
+}>;
+
+export type PetitionReplies_createPetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & {
+  createPetitionFieldComment: {
+    __typename?: "PetitionFieldComment";
+  } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
+};
+
+export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["ID"];
+}>;
+
+export type PetitionReplies_deletePetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "deletePetitionFieldComment">;
+
+export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & {
+  comments: Array<
+    {
+      __typename?: "PetitionFieldComment";
+    } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
+  >;
+};
+
+export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & {
+  comments: Array<
+    {
+      __typename?: "PetitionFieldComment";
+    } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
+  >;
 };
 
 export type PetitionRepliesQueryVariables = Exact<{
@@ -2801,6 +2863,22 @@ export const PetitionReplies_UserFragmentDoc = gql`
     ...PetitionLayout_User
   }
   ${PetitionLayout_UserFragmentDoc}
+`;
+export const PetitionReplies_createPetitionFieldComment_PetitionFieldFragmentDoc = gql`
+  fragment PetitionReplies_createPetitionFieldComment_PetitionField on PetitionField {
+    comments {
+      ...PetitionRepliesFieldComments_PetitionFieldComment
+    }
+  }
+  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
+`;
+export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc = gql`
+  fragment PetitionReplies_deletePetitionFieldComment_PetitionField on PetitionField {
+    comments {
+      ...PetitionRepliesFieldComments_PetitionFieldComment
+    }
+  }
+  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
 export const Petitions_PetitionsListFragmentDoc = gql`
   fragment Petitions_PetitionsList on PetitionPagination {
@@ -4507,6 +4585,128 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationResult = ApolloRe
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionReplies_fileUploadReplyDownloadLinkMutation,
   PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
+>;
+export const PetitionReplies_createPetitionFieldCommentDocument = gql`
+  mutation PetitionReplies_createPetitionFieldComment(
+    $petitionId: ID!
+    $petitionFieldId: ID!
+    $petitionFieldReplyId: ID
+    $content: String!
+  ) {
+    createPetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      petitionFieldReplyId: $petitionFieldReplyId
+      content: $content
+    ) {
+      ...PetitionRepliesFieldComments_PetitionFieldComment
+    }
+  }
+  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
+`;
+export type PetitionReplies_createPetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_createPetitionFieldCommentMutation,
+  PetitionReplies_createPetitionFieldCommentMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_createPetitionFieldCommentMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_createPetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_createPetitionFieldCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesCreatePetitionFieldCommentMutation, { data, loading, error }] = usePetitionReplies_createPetitionFieldCommentMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      petitionFieldReplyId: // value for 'petitionFieldReplyId'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function usePetitionReplies_createPetitionFieldCommentMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReplies_createPetitionFieldCommentMutation,
+    PetitionReplies_createPetitionFieldCommentMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReplies_createPetitionFieldCommentMutation,
+    PetitionReplies_createPetitionFieldCommentMutationVariables
+  >(PetitionReplies_createPetitionFieldCommentDocument, baseOptions);
+}
+export type PetitionReplies_createPetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_createPetitionFieldCommentMutation
+>;
+export type PetitionReplies_createPetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_createPetitionFieldCommentMutation
+>;
+export type PetitionReplies_createPetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_createPetitionFieldCommentMutation,
+  PetitionReplies_createPetitionFieldCommentMutationVariables
+>;
+export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
+  mutation PetitionReplies_deletePetitionFieldComment(
+    $petitionId: ID!
+    $petitionFieldId: ID!
+    $petitionFieldCommentId: ID!
+  ) {
+    deletePetitionFieldComment(
+      petitionId: $petitionId
+      petitionFieldId: $petitionFieldId
+      petitionFieldCommentId: $petitionFieldCommentId
+    )
+  }
+`;
+export type PetitionReplies_deletePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_deletePetitionFieldCommentMutation,
+  PetitionReplies_deletePetitionFieldCommentMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_deletePetitionFieldCommentMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_deletePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_deletePetitionFieldCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesDeletePetitionFieldCommentMutation, { data, loading, error }] = usePetitionReplies_deletePetitionFieldCommentMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
+ *   },
+ * });
+ */
+export function usePetitionReplies_deletePetitionFieldCommentMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReplies_deletePetitionFieldCommentMutation,
+    PetitionReplies_deletePetitionFieldCommentMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReplies_deletePetitionFieldCommentMutation,
+    PetitionReplies_deletePetitionFieldCommentMutationVariables
+  >(PetitionReplies_deletePetitionFieldCommentDocument, baseOptions);
+}
+export type PetitionReplies_deletePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_deletePetitionFieldCommentMutation
+>;
+export type PetitionReplies_deletePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_deletePetitionFieldCommentMutation
+>;
+export type PetitionReplies_deletePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_deletePetitionFieldCommentMutation,
+  PetitionReplies_deletePetitionFieldCommentMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: ID!) {

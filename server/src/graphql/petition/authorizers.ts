@@ -157,3 +157,28 @@ export function messageBelongToPetition<
     return false;
   };
 }
+
+export function commentBelongsToPetition<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string>
+>(
+  argNamePetitionId: TArg1,
+  argNameCommentId: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id: petitionId } = fromGlobalId(
+        args[argNamePetitionId],
+        "Petition"
+      );
+      const { id: commentId } = fromGlobalId(
+        args[argNameCommentId],
+        "PetitionFieldComment"
+      );
+      return ctx.petitions.commentsBelongToPetition(petitionId, [commentId]);
+    } catch {}
+    return false;
+  };
+}

@@ -38,8 +38,8 @@ export type Arg<
 export function argIsContextUserId<
   TypeName extends string,
   FieldName extends string,
-  T extends string
->(argName: T): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends Arg<TypeName, FieldName, string>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       const { id } = fromGlobalId(args[argName], "User");
@@ -81,7 +81,7 @@ export function and<TypeName extends string, FieldName extends string>(
   };
 }
 
-export function authorizeOr<TypeName extends string, FieldName extends string>(
+export function or<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
@@ -91,5 +91,20 @@ export function authorizeOr<TypeName extends string, FieldName extends string>(
       }
     }
     return false;
+  };
+}
+export function ifArgDefined<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName>
+>(
+  argName: TArg,
+  authorizer: FieldAuthorizeResolver<TypeName, FieldName>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    if (args[argName] !== null) {
+      await authorizer(root, args, ctx, info);
+    }
+    return true;
   };
 }

@@ -31,6 +31,12 @@ import {
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
+  usePetitionReplies_createPetitionFieldCommentMutation,
+  PetitionReplies_createPetitionFieldCommentMutationVariables,
+  PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
+  PetitionReplies_deletePetitionFieldCommentMutationVariables,
+  usePetitionReplies_deletePetitionFieldCommentMutation,
+  PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -147,6 +153,24 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     }
   }
 
+  const createPetitionFieldComment = useCreatePetitionFieldComment();
+  async function handleAddComment(content: string) {
+    await createPetitionFieldComment({
+      petitionId,
+      petitionFieldId: activeFieldId!,
+      content,
+    });
+  }
+
+  const deletePetitionFieldComment = useDeletePetitionFieldComment();
+  async function handleDeleteComment(petitionFieldCommentId: string) {
+    await deletePetitionFieldComment({
+      petitionId,
+      petitionFieldId: activeFieldId!,
+      petitionFieldCommentId,
+    });
+  }
+
   return (
     <>
       <Title>
@@ -233,7 +257,8 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                   key={activeFieldId!}
                   field={activeField!}
                   onClose={() => setActiveFieldId(null)}
-                  onAddComment={() => {}}
+                  onAddComment={handleAddComment}
+                  onDeleteComment={handleDeleteComment}
                 />
               </Box>
             }
@@ -342,6 +367,38 @@ PetitionReplies.mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionReplies_createPetitionFieldComment(
+      $petitionId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldReplyId: ID
+      $content: String!
+    ) {
+      createPetitionFieldComment(
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+        petitionFieldReplyId: $petitionFieldReplyId
+        content: $content
+      ) {
+        ...PetitionRepliesFieldComments_PetitionFieldComment
+      }
+    }
+    ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
+  `,
+  gql`
+    mutation PetitionReplies_deletePetitionFieldComment(
+      $petitionId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldCommentId: ID!
+    ) {
+      deletePetitionFieldComment(
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+        petitionFieldCommentId: $petitionFieldCommentId
+      )
+    }
+    ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
+  `,
 ];
 
 function useDownloadReplyFile() {
@@ -368,6 +425,97 @@ function useDownloadReplyFile() {
       }
     },
     [mutate]
+  );
+}
+
+function useCreatePetitionFieldComment() {
+  const [
+    createPetitionFieldComment,
+  ] = usePetitionReplies_createPetitionFieldCommentMutation();
+  return useCallback(
+    async (
+      variables: PetitionReplies_createPetitionFieldCommentMutationVariables
+    ) => {
+      await createPetitionFieldComment({
+        variables,
+        update(client, { data }) {
+          if (!data) {
+            return;
+          }
+          const options = {
+            fragment: gql`
+              fragment PetitionReplies_createPetitionFieldComment_PetitionField on PetitionField {
+                comments {
+                  ...PetitionRepliesFieldComments_PetitionFieldComment
+                }
+              }
+              ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
+            `,
+            fragmentName:
+              "PetitionReplies_createPetitionFieldComment_PetitionField",
+            id: variables.petitionFieldId,
+          };
+          const field = client.readFragment<
+            PetitionReplies_createPetitionFieldComment_PetitionFieldFragment
+          >(options);
+          client.writeFragment<
+            PetitionReplies_createPetitionFieldComment_PetitionFieldFragment
+          >({
+            ...options,
+            data: {
+              ...field,
+              comments: [...field!.comments, data!.createPetitionFieldComment],
+            },
+          });
+        },
+      });
+    },
+    [createPetitionFieldComment]
+  );
+}
+
+function useDeletePetitionFieldComment() {
+  const [
+    deletePetitionFieldComment,
+  ] = usePetitionReplies_deletePetitionFieldCommentMutation();
+  return useCallback(
+    async (
+      variables: PetitionReplies_deletePetitionFieldCommentMutationVariables
+    ) => {
+      await deletePetitionFieldComment({
+        variables,
+        update(client, { data }) {
+          if (!data) {
+            return;
+          }
+          const options = {
+            fragment: gql`
+              fragment PetitionReplies_deletePetitionFieldComment_PetitionField on PetitionField {
+                comments {
+                  id
+                }
+              }
+            `,
+            id: variables.petitionFieldId,
+          };
+          const field = client.readFragment<
+            PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment
+          >(options);
+          client.writeFragment<
+            PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment
+          >({
+            ...options,
+            data: {
+              ...field,
+              comments: field!.comments.filter(
+                (c) => c.id !== variables.petitionFieldCommentId
+              ),
+            },
+          });
+        },
+      });
+    },
+    [deletePetitionFieldComment]
   );
 }
 

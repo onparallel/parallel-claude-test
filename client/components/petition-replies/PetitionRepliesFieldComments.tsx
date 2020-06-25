@@ -18,6 +18,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { gql } from "apollo-boost";
+import { usePreviousValue } from "beautiful-react-hooks";
 import {
   ChangeEvent,
   Fragment,
@@ -39,12 +40,14 @@ import { Spacer } from "../common/Spacer";
 export type PetitionRepliesFieldCommentsProps = {
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   onAddComment: (value: string) => void;
+  onDeleteComment: (petitionFieldCommentId: string) => void;
   onClose: () => void;
 };
 
 export function PetitionRepliesFieldComments({
   field,
   onAddComment,
+  onDeleteComment,
   onClose,
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
@@ -55,9 +58,15 @@ export function PetitionRepliesFieldComments({
   const commentsRef = useRef<HTMLElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  const previousCommentCount = usePreviousValue(field.comments.length);
   useEffect(() => {
-    commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
-  }, []);
+    if (
+      previousCommentCount === undefined ||
+      field.comments.length > previousCommentCount
+    ) {
+      commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
+    }
+  }, [field.comments.length, previousCommentCount]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && event.metaKey) {
@@ -110,7 +119,7 @@ export function PetitionRepliesFieldComments({
                 <FieldComment
                   comment={comment}
                   onEdit={() => {}}
-                  onDelete={() => {}}
+                  onDelete={() => onDeleteComment(comment.id)}
                 />
                 {index === field.comments.length - 1 ? null : <Divider />}
               </Fragment>
@@ -300,36 +309,43 @@ function FieldComment({
 }
 
 PetitionRepliesFieldComments.fragments = {
-  PetitionField: gql`
-    fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
-      title
-      type
-      comments {
-        ...PetitionRepliesFieldComments_PetitionFieldComment
-      }
-      replies {
-        ...PetitionRepliesFieldComments_PetitionFieldReply
-      }
-    }
-    fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
-      id
-      author {
-        ... on User {
-          id
-          fullName
+  get PetitionField() {
+    return gql`
+      fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
+        title
+        type
+        comments {
+          ...PetitionRepliesFieldComments_PetitionFieldComment
         }
-        ... on Contact {
-          ...ContactLink_Contact
+        replies {
+          ...PetitionRepliesFieldComments_PetitionFieldReply
         }
       }
-      content
-      publishedAt
-      isUnread
-    }
-    fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-    }
-    ${ContactLink.fragments.Contact}
-  `,
+      fragment PetitionRepliesFieldComments_PetitionFieldReply on PetitionFieldReply {
+        id
+        content
+      }
+      ${this.PetitionFieldComment}
+      ${ContactLink.fragments.Contact}
+    `;
+  },
+  get PetitionFieldComment() {
+    return gql`
+      fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
+        id
+        author {
+          ... on User {
+            id
+            fullName
+          }
+          ... on Contact {
+            ...ContactLink_Contact
+          }
+        }
+        content
+        publishedAt
+        isUnread
+      }
+    `;
+  },
 };

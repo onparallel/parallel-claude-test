@@ -8,6 +8,9 @@ export type UnwrapPromise<T> = T extends Promise<infer U> ? U : never;
 
 export type Maybe<T> = T | null;
 
-export type KeysOfType<T, U> = {
-  [P in keyof T]: T[P] extends U ? P : never;
-}[keyof T];
+export type KeysOfType<T, U> = Exclude<
+  {
+    [P in keyof T]: T[P] extends U ? P : never;
+  }[keyof T],
+  undefined
+>;
