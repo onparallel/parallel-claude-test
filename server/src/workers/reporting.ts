@@ -52,13 +52,14 @@ createCronWorker("reporting", async (context) => {
     { header: "Status", key: "status" },
   ];
   const data = await context.reporting.loadReportingData();
-  organizations.addRows(data.organizations);
+  organizations.addRows(data.organizations, "n");
   users.addRows(
     data.users.map((user) => ({
       ...user,
       created_at: formatDate(user.created_at),
       last_active_at: formatDate(user.last_active_at),
-    }))
+    })),
+    "n"
   );
   petitions.addRows(
     data.petitions.map((petition) => ({
@@ -66,7 +67,8 @@ createCronWorker("reporting", async (context) => {
       created_at: formatDate(petition.created_at),
       sent_at: formatDate(petition.sent_at),
       completed_at: formatDate(petition.completed_at),
-    }))
+    })),
+    "n"
   );
   await context.smtp.sendEmail({
     from: "El becario <no-reply@parallel.so>",

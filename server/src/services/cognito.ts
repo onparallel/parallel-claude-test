@@ -114,10 +114,13 @@ export class Cognito {
 
   async refreshSession(email: string, refreshToken: string) {
     const user = this.getUser(email);
-    return (await promisify(user.refreshSession.bind(user))(
-      new CognitoRefreshToken({
-        RefreshToken: refreshToken,
-      })
-    )) as CognitoUserSession;
+    return new Promise<CognitoUserSession>((resolve, reject) => {
+      user.refreshSession(
+        new CognitoRefreshToken({
+          RefreshToken: refreshToken,
+        }),
+        (err, result) => (err ? reject(err) : resolve(result))
+      );
+    });
   }
 }
