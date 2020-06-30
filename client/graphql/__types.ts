@@ -723,6 +723,23 @@ export type PetitionStatus =
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
 
+/** A public view of a contact */
+export type PublicContact = {
+  __typename?: "PublicContact";
+  /** The email of the user. */
+  email: Scalars["String"];
+  /** The first name of the user. */
+  firstName?: Maybe<Scalars["String"]>;
+  /** The full name of the user. */
+  fullName?: Maybe<Scalars["String"]>;
+  /** The ID of the contact. */
+  id: Scalars["ID"];
+  /** The last name of the user. */
+  lastName?: Maybe<Scalars["String"]>;
+};
+
+export type PublicContactOrUser = PublicContact | PublicUser;
+
 /** A public view of an organization */
 export type PublicOrganization = {
   __typename?: "PublicOrganization";
@@ -758,6 +775,7 @@ export type PublicPetition = Timestamps & {
 /** A public view of a petition access */
 export type PublicPetitionAccess = {
   __typename?: "PublicPetitionAccess";
+  contact?: Maybe<PublicContact>;
   granter?: Maybe<PublicUser>;
   petition?: Maybe<PublicPetition>;
 };
@@ -765,6 +783,8 @@ export type PublicPetitionAccess = {
 /** A field within a petition. */
 export type PublicPetitionField = {
   __typename?: "PublicPetitionField";
+  /** The comments for this field. */
+  comments: Array<PublicPetitionFieldComment>;
   /** The description of the petition field. */
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
@@ -783,6 +803,21 @@ export type PublicPetitionField = {
   type: PetitionFieldType;
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+};
+
+/** A comment on a petition field */
+export type PublicPetitionFieldComment = {
+  __typename?: "PublicPetitionFieldComment";
+  /** The author of the comment. */
+  author?: Maybe<PublicContactOrUser>;
+  /** The content of the comment. */
+  content: Scalars["String"];
+  /** The ID of the petition field comment. */
+  id: Scalars["ID"];
+  /** Time when the comment was published. */
+  publishedAt?: Maybe<Scalars["DateTime"]>;
+  /** The reply the comment is refering to. */
+  reply?: Maybe<PublicPetitionFieldReply>;
 };
 
 /** A reply to a petition field */
@@ -1466,6 +1501,28 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
     >;
   };
 
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<PublicPetitionField, "title"> & {
+    comments: Array<
+      {
+        __typename?: "PublicPetitionFieldComment";
+      } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
+    >;
+  };
+
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment = {
+  __typename?: "PublicPetitionFieldComment";
+} & Pick<PublicPetitionFieldComment, "id" | "content" | "publishedAt"> & {
+    author?: Maybe<
+      | ({ __typename?: "PublicContact" } & Pick<
+          PublicContact,
+          "id" | "fullName"
+        >)
+      | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
+    >;
+  };
+
 export type RecipientViewProgressCard_PublicUserFragment = {
   __typename?: "PublicUser";
 } & Pick<PublicUser, "firstName">;
@@ -2146,7 +2203,8 @@ export type RecipientView_PublicPetitionFragment = {
 } & Pick<PublicPetition, "id" | "status" | "deadline"> & {
     fields: Array<
       { __typename?: "PublicPetitionField" } & Pick<PublicPetitionField, "id"> &
-        RecipientViewPetitionField_PublicPetitionFieldFragment
+        RecipientViewPetitionField_PublicPetitionFieldFragment &
+        RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment
     >;
   };
 
@@ -2282,6 +2340,9 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
       >;
       granter?: Maybe<
         { __typename?: "PublicUser" } & RecipientView_PublicUserFragment
+      >;
+      contact?: Maybe<
+        { __typename?: "PublicContact" } & Pick<PublicContact, "id">
       >;
     }
   >;
@@ -3006,6 +3067,32 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
     }
   }
 `;
+export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
+    id
+    author {
+      ... on PublicUser {
+        id
+        fullName
+      }
+      ... on PublicContact {
+        id
+        fullName
+      }
+    }
+    content
+    publishedAt
+  }
+`;
+export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionField on PublicPetitionField {
+    title
+    comments {
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+    }
+  }
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
+`;
 export const RecipientView_PublicPetitionFragmentDoc = gql`
   fragment RecipientView_PublicPetition on PublicPetition {
     id
@@ -3014,9 +3101,11 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     fields {
       id
       ...RecipientViewPetitionField_PublicPetitionField
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
     }
   }
   ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientViewSenderCard_PublicUserFragmentDoc = gql`
   fragment RecipientViewSenderCard_PublicUser on PublicUser {
@@ -5851,6 +5940,9 @@ export const PublicPetitionDocument = gql`
       }
       granter {
         ...RecipientView_PublicUser
+      }
+      contact {
+        id
       }
     }
   }

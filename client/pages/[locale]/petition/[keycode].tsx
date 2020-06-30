@@ -17,6 +17,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewProgressCard } from "@parallel/components/recipient-view/RecipientViewProgressCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import RecipientViewSideLinks from "@parallel/components/recipient-view/RecipientViewSideLinks";
@@ -39,7 +40,7 @@ import {
   useRecipientView_publicFileUploadReplyCompleteMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
-import { UnwrapPromise } from "@parallel/utils/types";
+import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import axios, { CancelTokenSource } from "axios";
 import { useCallback, useMemo, useState } from "react";
@@ -62,6 +63,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
   } = assertQuery(usePublicPetitionQuery({ variables: { keycode } }));
   const petition = access!.petition!;
   const granter = access!.granter!;
+  const contact = access!.contact!;
   const [showCompletedAlert, setShowCompletedAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
   const createTextReply = useCreateTextReply();
@@ -183,6 +185,10 @@ function RecipientView({ keycode }: PublicPetitionProps) {
     [petition.fields, granter]
   );
 
+  const [selectedFieldId, setSelectedFieldId] = useState<Maybe<string>>(null);
+  const selectedField =
+    selectedFieldId && petition.fields.find((f) => f.id === selectedFieldId);
+
   const breakpoint = "md";
   return (
     <>
@@ -261,6 +267,8 @@ function RecipientView({ keycode }: PublicPetitionProps) {
                 key={field.id}
                 isInvalid={finalized && !completed[field.id]}
                 uploadProgress={uploadProgress[field.id]}
+                contactId={contact.id}
+                onOpenCommentsClick={() => setSelectedFieldId(field.id)}
                 onCreateReply={(payload) =>
                   handleCreateReply(field.id, payload)
                 }
@@ -300,6 +308,16 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           display={{ base: "flex", [breakpoint]: "none" }}
         />
       </Flex>
+      {selectedField ? (
+        <RecipientViewPetitionFieldCommentsDialog
+          field={selectedField}
+          contactId={contact.id}
+          onClose={() => setSelectedFieldId(null)}
+          onAddComment={() => {}}
+          onDeleteComment={() => {}}
+          onUpdateComment={() => {}}
+        />
+      ) : null}
     </>
   );
 }
@@ -313,9 +331,11 @@ RecipientView.fragments = {
       fields {
         id
         ...RecipientViewPetitionField_PublicPetitionField
+        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
     }
     ${RecipientViewPetitionField.fragments.PublicPetitionField}
+    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
   `,
   PublicUser: gql`
     fragment RecipientView_PublicUser on PublicUser {
@@ -585,6 +605,9 @@ RecipientView.getInitialProps = async ({
           }
           granter {
             ...RecipientView_PublicUser
+          }
+          contact {
+            id
           }
         }
       }

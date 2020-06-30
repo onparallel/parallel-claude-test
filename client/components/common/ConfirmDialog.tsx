@@ -46,31 +46,29 @@ export function ConfirmDialog<T = void>({
       cancel
     );
   return (
-    <>
-      <AlertDialog
-        isOpen={true}
-        leastDestructiveRef={focusRef || cancelRef}
-        onClose={() => onReject()}
-        {...props}
+    <AlertDialog
+      isOpen={true}
+      leastDestructiveRef={focusRef || cancelRef}
+      onClose={() => onReject()}
+      {...props}
+    >
+      <AlertDialogOverlay zIndex={1400 + position * 2} />
+      <AlertDialogContent
+        rounded="md"
+        zIndex={1400 + position * 2 + 1}
+        {...content}
       >
-        <AlertDialogOverlay zIndex={1400 + position * 2} />
-        <AlertDialogContent
-          rounded="md"
-          zIndex={1400 + position * 2 + 1}
-          {...content}
-        >
-          <AlertDialogHeader fontSize="lg" fontWeight="bold">
-            {header}
-          </AlertDialogHeader>
-          <AlertDialogBody>{body}</AlertDialogBody>
-          <AlertDialogFooter>
-            <Stack direction="row">
-              {cancel}
-              {confirm}
-            </Stack>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+          {header}
+        </AlertDialogHeader>
+        <AlertDialogBody>{body}</AlertDialogBody>
+        <AlertDialogFooter>
+          <Stack direction="row">
+            {cancel}
+            {confirm}
+          </Stack>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

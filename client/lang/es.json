@@ -2581,7 +2581,7 @@
   },
   {
     "term": "recipient-view.automatically-saved-text-1",
-    "definition": "Tu progreso se guarda automaticamente.",
+    "definition": "Tu progreso se guarda automáticamente.",
     "context": "Your progress is automatically saved.",
     "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L138-L141"
   },

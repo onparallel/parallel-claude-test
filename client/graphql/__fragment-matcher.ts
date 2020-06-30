@@ -76,6 +76,18 @@ const result: IntrospectionResultData = {
         ],
       },
       {
+        kind: "UNION",
+        name: "PublicContactOrUser",
+        possibleTypes: [
+          {
+            name: "PublicContact",
+          },
+          {
+            name: "PublicUser",
+          },
+        ],
+      },
+      {
         kind: "INTERFACE",
         name: "Timestamps",
         possibleTypes: [

@@ -142,16 +142,10 @@ export const icons = {
   "more-vertical": {
     viewBox: "0 0 24 24",
     path: (
-      <g
-        stroke="currentColor"
-        strokeWidth={2}
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="2"></circle>
-        <circle cx="12" cy="4" r="2"></circle>
-        <circle cx="12" cy="20" r="2"></circle>
+      <g fill="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <circle cx="12" cy="3" r="3"></circle>
+        <circle cx="12" cy="21" r="3"></circle>
       </g>
     ),
   },

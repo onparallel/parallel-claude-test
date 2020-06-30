@@ -1078,6 +1078,38 @@ enum PetitionStatus {
 }
 
 """
+A public view of a contact
+"""
+type PublicContact {
+  """
+  The email of the user.
+  """
+  email: String!
+
+  """
+  The first name of the user.
+  """
+  firstName: String
+
+  """
+  The full name of the user.
+  """
+  fullName: String
+
+  """
+  The ID of the contact.
+  """
+  id: ID!
+
+  """
+  The last name of the user.
+  """
+  lastName: String
+}
+
+union PublicContactOrUser = PublicContact | PublicUser
+
+"""
 A public view of an organization
 """
 type PublicOrganization {
@@ -1146,6 +1178,7 @@ type PublicPetition implements Timestamps {
 A public view of a petition access
 """
 type PublicPetitionAccess {
+  contact: PublicContact
   granter: PublicUser
   petition: PublicPetition
 }
@@ -1154,6 +1187,11 @@ type PublicPetitionAccess {
 A field within a petition.
 """
 type PublicPetitionField {
+  """
+  The comments for this field.
+  """
+  comments: [PublicPetitionFieldComment!]!
+
   """
   The description of the petition field.
   """
@@ -1198,6 +1236,36 @@ type PublicPetitionField {
   Determines if the content of this field has been validated.
   """
   validated: Boolean!
+}
+
+"""
+A comment on a petition field
+"""
+type PublicPetitionFieldComment {
+  """
+  The author of the comment.
+  """
+  author: PublicContactOrUser
+
+  """
+  The content of the comment.
+  """
+  content: String!
+
+  """
+  The ID of the petition field comment.
+  """
+  id: ID!
+
+  """
+  Time when the comment was published.
+  """
+  publishedAt: DateTime
+
+  """
+  The reply the comment is refering to.
+  """
+  reply: PublicPetitionFieldReply
 }
 
 """

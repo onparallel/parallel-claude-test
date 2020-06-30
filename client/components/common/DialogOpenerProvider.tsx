@@ -10,7 +10,7 @@ import {
   useMemo,
 } from "react";
 
-export type DialogProps<T> = {
+export type DialogProps<T = void> = {
   position: number;
   onResolve: (value?: T) => void;
   onReject: (reason?: any) => void;

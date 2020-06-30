@@ -1047,7 +1047,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadPetitionFieldCommentsForField = fromDataLoader(
+  readonly loadPetitionFieldCommentsForFieldAndUser = fromDataLoader(
     new DataLoader<
       { userId: number; petitionId: number; petitionFieldId: number },
       PetitionFieldComment[],
@@ -1076,31 +1076,71 @@ export class PetitionRepository extends BaseRepository {
         );
         return ids
           .map(keyBuilder(["petitionId", "petitionFieldId"]))
-          .map((key) => {
-            const comments = byId[key] ?? [];
-            comments.sort((a, b) => {
-              if (a.published_at && !b.published_at) {
-                return -1;
-              } else if (!a.published_at && b.published_at) {
-                return +1;
-              } else if (
-                a.published_at &&
-                b.published_at &&
-                a.published_at.valueOf() !== b.published_at.valueOf()
-              ) {
-                return a.published_at.valueOf() - b.published_at.valueOf();
-              } else {
-                return a.created_at.valueOf() - b.created_at.valueOf();
-              }
-            });
-            return comments;
-          });
+          .map((key) => this.sortComments(byId[key] ?? []));
       },
       {
         cacheKeyFn: keyBuilder(["userId", "petitionId", "petitionFieldId"]),
       }
     )
   );
+
+  readonly loadPetitionFieldCommentsForFieldAndContact = fromDataLoader(
+    new DataLoader<
+      { contactId: number; petitionId: number; petitionFieldId: number },
+      PetitionFieldComment[],
+      string
+    >(
+      async (ids) => {
+        const rows = await this.from("petition_field_comment")
+          .where((qb) => {
+            for (const { contactId, petitionId, petitionFieldId } of ids) {
+              qb = qb.orWhere((qb) => {
+                qb.where({
+                  petition_id: petitionId,
+                  petition_field_id: petitionFieldId,
+                }).andWhere((qb) => {
+                  qb.whereNotNull("published_at").orWhere(
+                    "contact_id",
+                    contactId
+                  );
+                });
+              });
+            }
+          })
+          .whereNull("deleted_at")
+          .select("*");
+
+        const byId = groupBy(
+          rows,
+          keyBuilder(["petition_id", "petition_field_id"])
+        );
+        return ids
+          .map(keyBuilder(["petitionId", "petitionFieldId"]))
+          .map((key) => this.sortComments(byId[key] ?? []));
+      },
+      {
+        cacheKeyFn: keyBuilder(["contactId", "petitionId", "petitionFieldId"]),
+      }
+    )
+  );
+
+  private sortComments(comments: PetitionFieldComment[]) {
+    return comments.slice(0).sort((a, b) => {
+      if (a.published_at && !b.published_at) {
+        return -1;
+      } else if (!a.published_at && b.published_at) {
+        return +1;
+      } else if (
+        a.published_at &&
+        b.published_at &&
+        a.published_at.valueOf() !== b.published_at.valueOf()
+      ) {
+        return a.published_at.valueOf() - b.published_at.valueOf();
+      } else {
+        return a.created_at.valueOf() - b.created_at.valueOf();
+      }
+    });
+  }
 
   readonly loadPetitionFieldComment = this.buildLoadById(
     "petition_field_comment",

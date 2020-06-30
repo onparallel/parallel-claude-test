@@ -13,8 +13,8 @@ import {
   Stack,
   Text,
   Textarea,
-  useTheme,
   Tooltip,
+  useTheme,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
@@ -30,6 +30,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { handleInputChange } from "react-select/src/utils";
 
 export type CreateReply = CreateReplyText | CreateReplyFileUpload;
 
@@ -37,17 +38,21 @@ type CreateReplyText = { type: "TEXT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
 export type PublicPetitionFieldProps = BoxProps & {
+  contactId: string;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   isInvalid: boolean;
   uploadProgress?: { [replyId: string]: number };
+  onOpenCommentsClick: () => void;
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (payload: CreateReply) => void;
 };
 
 export function RecipientViewPetitionField({
+  contactId,
   field,
   isInvalid,
   uploadProgress,
+  onOpenCommentsClick,
   onDeleteReply,
   onCreateReply,
   ...props
@@ -72,7 +77,7 @@ export function RecipientViewPetitionField({
 
   return (
     <Card
-      padding={4}
+      overflow="hidden"
       {...(isInvalid
         ? {
             border: "2px solid",
@@ -81,115 +86,122 @@ export function RecipientViewPetitionField({
         : {})}
       {...props}
     >
-      <Heading as="h2" fontSize="md">
-        {field.title}
-        {field.optional ? (
-          <Text
-            as="span"
-            marginLeft={2}
-            color="gray.400"
-            fontSize="sm"
-            fontWeight="normal"
-          >
-            <FormattedMessage
-              id="generic.optional-field"
-              defaultMessage="Optional"
-            />
-          </Text>
-        ) : (
-          <Tooltip
-            placement="right"
-            zIndex={theme.zIndices.tooltip}
-            showDelay={300}
-            aria-label={labels.required}
-            label={labels.required}
-          >
-            <Text
-              as="span"
-              userSelect="none"
-              marginLeft={1}
-              aria-label={labels.required}
-            >
-              *
-            </Text>
-          </Tooltip>
-        )}
-      </Heading>
-      {field.description ? (
-        <Text fontSize="sm" color="gray.600">
-          {field.description?.split("\n").map((line, index) => (
-            <Fragment key={index}>
-              {line}
-              <br />
-            </Fragment>
-          ))}
-        </Text>
-      ) : null}
-      <Text fontSize="sm" color="gray.500">
-        {field.type === "TEXT" ? (
-          <FormattedMessage
-            id="recipient-view.replies-submitted"
-            defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: field.replies.length }}
-          />
-        ) : field.type === "FILE_UPLOAD" ? (
-          <FormattedMessage
-            id="recipient-view.files-uploaded"
-            defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-            values={{ count: field.replies.length }}
-          />
-        ) : null}
-      </Text>
-      {field.replies.length ? (
-        <List as={Stack} marginTop={1} alignItems="flex-start">
-          {field.replies.map((reply) => (
-            <ListItem key={reply.id}>
-              <ReplyWrapper
-                progress={uploadProgress?.[reply.id]}
-                onDeleteReply={() => onDeleteReply(reply.id)}
-              >
-                {field.type === "TEXT" ? (
+      <Box padding={4}>
+        <Flex>
+          <Box flex="1">
+            <Heading as="h2" fontSize="md">
+              {field.title}
+              {field.optional ? (
+                <Text
+                  as="span"
+                  marginLeft={2}
+                  color="gray.400"
+                  fontSize="sm"
+                  fontWeight="normal"
+                >
                   <FormattedMessage
-                    id="recipient-view.text-reply"
-                    defaultMessage="Reply added on {date}"
-                    values={{
-                      date: (
-                        <DateTime
-                          value={reply.createdAt}
-                          format={FORMATS.LLL}
-                        />
-                      ),
-                    }}
+                    id="generic.optional-field"
+                    defaultMessage="Optional"
                   />
-                ) : field.type === "FILE_UPLOAD" ? (
-                  <>
-                    <Text as="span" aria-label={labels.filename}>
-                      {reply.publicContent?.filename}
-                    </Text>
-                    <Text as="span" marginX={2}>
-                      -
-                    </Text>
-                    <Text
-                      as="span"
-                      aria-label={labels.filesize}
-                      fontSize="sm"
-                      color="gray.500"
-                    >
-                      <FileSize value={reply.publicContent?.size} />
-                    </Text>
-                  </>
-                ) : null}
-              </ReplyWrapper>
-            </ListItem>
-          ))}
-        </List>
-      ) : null}
-      <Box marginTop={2}>
-        {field.type === "TEXT" ? (
-          <TextReplyForm field={field} onCreateReply={onCreateReply} />
-        ) : field.type === "FILE_UPLOAD" ? (
-          <FileUploadReplyForm field={field} onCreateReply={onCreateReply} />
+                </Text>
+              ) : (
+                <Tooltip
+                  placement="right"
+                  zIndex={theme.zIndices.tooltip}
+                  showDelay={300}
+                  aria-label={labels.required}
+                  label={labels.required}
+                >
+                  <Text
+                    as="span"
+                    userSelect="none"
+                    marginLeft={1}
+                    aria-label={labels.required}
+                  >
+                    *
+                  </Text>
+                </Tooltip>
+              )}
+            </Heading>
+            {field.description ? (
+              <Text fontSize="sm" color="gray.600">
+                {field.description?.split("\n").map((line, index) => (
+                  <Fragment key={index}>
+                    {line}
+                    <br />
+                  </Fragment>
+                ))}
+              </Text>
+            ) : null}
+          </Box>
+          <Button onClick={onOpenCommentsClick}>Questions?</Button>
+        </Flex>
+        <Text fontSize="sm" color="gray.500">
+          {field.type === "TEXT" ? (
+            <FormattedMessage
+              id="recipient-view.replies-submitted"
+              defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+              values={{ count: field.replies.length }}
+            />
+          ) : field.type === "FILE_UPLOAD" ? (
+            <FormattedMessage
+              id="recipient-view.files-uploaded"
+              defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+              values={{ count: field.replies.length }}
+            />
+          ) : null}
+        </Text>
+        {field.replies.length ? (
+          <List as={Stack} marginTop={1} alignItems="flex-start">
+            {field.replies.map((reply) => (
+              <ListItem key={reply.id}>
+                <ReplyWrapper
+                  progress={uploadProgress?.[reply.id]}
+                  onDeleteReply={() => onDeleteReply(reply.id)}
+                >
+                  {field.type === "TEXT" ? (
+                    <FormattedMessage
+                      id="recipient-view.text-reply"
+                      defaultMessage="Reply added on {date}"
+                      values={{
+                        date: (
+                          <DateTime
+                            value={reply.createdAt}
+                            format={FORMATS.LLL}
+                          />
+                        ),
+                      }}
+                    />
+                  ) : field.type === "FILE_UPLOAD" ? (
+                    <>
+                      <Text as="span" aria-label={labels.filename}>
+                        {reply.publicContent?.filename}
+                      </Text>
+                      <Text as="span" marginX={2}>
+                        -
+                      </Text>
+                      <Text
+                        as="span"
+                        aria-label={labels.filesize}
+                        fontSize="sm"
+                        color="gray.500"
+                      >
+                        <FileSize value={reply.publicContent?.size} />
+                      </Text>
+                    </>
+                  ) : null}
+                </ReplyWrapper>
+              </ListItem>
+            ))}
+          </List>
         ) : null}
+        <Box marginTop={2}>
+          {field.type === "TEXT" ? (
+            <TextReplyForm field={field} onCreateReply={onCreateReply} />
+          ) : field.type === "FILE_UPLOAD" ? (
+            <FileUploadReplyForm field={field} onCreateReply={onCreateReply} />
+          ) : null}
+        </Box>
       </Box>
     </Card>
   );
@@ -439,21 +451,23 @@ function FileUploadReplyForm({
 }
 
 RecipientViewPetitionField.fragments = {
-  PublicPetitionField: gql`
-    fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
-      id
-      type
-      title
-      description
-      options
-      optional
-      multiple
-      validated
-      replies {
+  get PublicPetitionField() {
+    return gql`
+      fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
         id
-        publicContent
-        createdAt
+        type
+        title
+        description
+        options
+        optional
+        multiple
+        validated
+        replies {
+          id
+          publicContent
+          createdAt
+        }
       }
-    }
-  `,
+    `;
+  },
 };

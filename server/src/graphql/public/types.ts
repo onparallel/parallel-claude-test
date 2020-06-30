@@ -1,4 +1,4 @@
-import { objectType } from "@nexus/schema";
+import { objectType, unionType } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
 
 export const PublicPetitionAccess = objectType({
@@ -18,6 +18,13 @@ export const PublicPetitionAccess = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.granter_id);
+      },
+    });
+    t.field("contact", {
+      type: "PublicContact",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.contacts.loadContact(root.contact_id);
       },
     });
   },
@@ -96,6 +103,17 @@ export const PublicPetitionField = objectType({
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadRepliesForField(root.id);
+      },
+    });
+    t.list.field("comments", {
+      type: "PublicPetitionFieldComment",
+      description: "The comments for this field.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldCommentsForFieldAndContact({
+          contactId: ctx.contact!.id,
+          petitionId: root.petition_id,
+          petitionFieldId: root.id,
+        });
       },
     });
   },
@@ -200,6 +218,105 @@ export const PublicPetitionFieldReply = objectType({
           }
         }
       },
+    });
+  },
+});
+
+export const PublicContact = objectType({
+  name: "PublicContact",
+  rootTyping: "db.Contact",
+  description: "A public view of a contact",
+  definition(t) {
+    t.id("id", {
+      description: "The ID of the contact.",
+      resolve: (o) => toGlobalId("Contact", o.id),
+    });
+    t.string("email", {
+      description: "The email of the user.",
+    });
+    t.string("firstName", {
+      description: "The first name of the user.",
+      nullable: true,
+      resolve: (o) => o.first_name,
+    });
+    t.string("lastName", {
+      description: "The last name of the user.",
+      nullable: true,
+      resolve: (o) => o.last_name,
+    });
+    t.string("fullName", {
+      description: "The full name of the user.",
+      nullable: true,
+      resolve: (o) => {
+        if (o.first_name) {
+          return o.last_name ? `${o.first_name} ${o.last_name}` : o.first_name;
+        } else {
+          return null;
+        }
+      },
+    });
+  },
+});
+
+export const PublicContactOrUser = unionType({
+  name: "PublicContactOrUser",
+  definition(t) {
+    t.members("PublicContact", "PublicUser");
+    t.resolveType((o) => {
+      if (o.__type === "Contact") {
+        return "PublicContact";
+      } else if (o.__type === "User") {
+        return "PublicUser";
+      }
+      throw new Error("Missing __type on PublicContactOrUser");
+    });
+  },
+  rootTyping: /* ts */ `
+    | ({__type: "Contact"} & NexusGenRootTypes["Contact"])
+    | ({__type: "User"} & NexusGenRootTypes["User"])
+  `,
+});
+
+export const PublicPetitionFieldComment = objectType({
+  name: "PublicPetitionFieldComment",
+  description: "A comment on a petition field",
+  definition(t) {
+    t.id("id", {
+      description: "The ID of the petition field comment.",
+      resolve: (o) => toGlobalId("PetitionFieldComment", o.id),
+    });
+    t.field("author", {
+      type: "PublicContactOrUser",
+      description: "The author of the comment.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        if (root.contact_id !== null) {
+          const contact = await ctx.contacts.loadContact(root.contact_id);
+          return contact && { __type: "Contact", ...contact };
+        } else if (root.user_id !== null) {
+          const user = await ctx.users.loadUser(root.user_id);
+          return user && { __type: "User", ...user };
+        }
+        throw new Error(`Both "contact_id" and "user_id" are null`);
+      },
+    });
+    t.string("content", {
+      description: "The content of the comment.",
+    });
+    t.field("reply", {
+      description: "The reply the comment is refering to.",
+      type: "PublicPetitionFieldReply",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return root.petition_field_reply_id !== null
+          ? await ctx.petitions.loadFieldReply(root.petition_field_reply_id)
+          : null;
+      },
+    });
+    t.datetime("publishedAt", {
+      description: "Time when the comment was published.",
+      nullable: true,
+      resolve: (o) => o.published_at,
     });
   },
 });

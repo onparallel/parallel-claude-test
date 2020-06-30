@@ -331,7 +331,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                     handleValidateToggle([field.id], !field.validated)
                   }
                   onAction={handleAction}
-                  isShowingComments={activeFieldId === field.id}
+                  isActive={activeFieldId === field.id}
                   commentCount={index}
                   newCommentCount={index > 1 ? index - 1 : 0}
                   onToggleComments={() =>

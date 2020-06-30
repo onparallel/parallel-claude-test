@@ -220,10 +220,15 @@ export interface NexusGenRootTypes {
     validated: number; // Int!
   };
   PetitionReminder: db.PetitionReminder;
+  PublicContact: db.Contact;
   PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
   PublicPetitionAccess: db.PetitionAccess;
   PublicPetitionField: db.PetitionField;
+  PublicPetitionFieldComment: {
+    // root type
+    content: string; // String!
+  };
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicUser: db.User;
   Query: {};
@@ -271,6 +276,9 @@ export interface NexusGenRootTypes {
   JSON: any;
   JSONObject: { [key: string]: any };
   ContactOrUser:
+    | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
+    | ({ __type: "User" } & NexusGenRootTypes["User"]);
+  PublicContactOrUser:
     | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
     | ({ __type: "User" } & NexusGenRootTypes["User"]);
 }
@@ -544,6 +552,14 @@ export interface NexusGenFieldTypes {
     sender: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionReminderType"]; // PetitionReminderType!
   };
+  PublicContact: {
+    // field return type
+    email: string; // String!
+    firstName: string | null; // String
+    fullName: string | null; // String
+    id: string; // ID!
+    lastName: string | null; // String
+  };
   PublicOrganization: {
     // field return type
     id: string; // ID!
@@ -563,11 +579,13 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionAccess: {
     // field return type
+    contact: NexusGenRootTypes["PublicContact"] | null; // PublicContact
     granter: NexusGenRootTypes["PublicUser"] | null; // PublicUser
     petition: NexusGenRootTypes["PublicPetition"] | null; // PublicPetition
   };
   PublicPetitionField: {
     // field return type
+    comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     description: string | null; // String
     id: string; // ID!
     multiple: boolean; // Boolean!
@@ -577,6 +595,14 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     validated: boolean; // Boolean!
+  };
+  PublicPetitionFieldComment: {
+    // field return type
+    author: NexusGenRootTypes["PublicContactOrUser"] | null; // PublicContactOrUser
+    content: string; // String!
+    id: string; // ID!
+    publishedAt: Date | null; // DateTime
+    reply: NexusGenRootTypes["PublicPetitionFieldReply"] | null; // PublicPetitionFieldReply
   };
   PublicPetitionFieldReply: {
     // field return type
@@ -910,6 +936,7 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractResolveReturnTypes {
   ContactOrUser: "Contact" | "User";
+  PublicContactOrUser: "PublicContact" | "PublicUser";
   CreatedAt: "PetitionMessage" | "PetitionReminder";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -964,10 +991,12 @@ export type NexusGenObjectNames =
   | "PetitionPagination"
   | "PetitionProgress"
   | "PetitionReminder"
+  | "PublicContact"
   | "PublicOrganization"
   | "PublicPetition"
   | "PublicPetitionAccess"
   | "PublicPetitionField"
+  | "PublicPetitionFieldComment"
   | "PublicPetitionFieldReply"
   | "PublicUser"
   | "Query"
@@ -1021,7 +1050,7 @@ export type NexusGenScalarNames =
   | "JSONObject"
   | "String";
 
-export type NexusGenUnionNames = "ContactOrUser";
+export type NexusGenUnionNames = "ContactOrUser" | "PublicContactOrUser";
 
 export interface NexusGenTypes {
   context: ctx.ApiContext;

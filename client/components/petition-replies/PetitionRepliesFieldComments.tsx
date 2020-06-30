@@ -123,7 +123,7 @@ export function PetitionRepliesFieldComments({
           <Fragment key={comment.id}>
             <FieldComment
               comment={comment}
-              isEditable={comment.author?.id === userId}
+              userId={userId}
               onEdit={(content) => onUpdateComment(comment.id, content)}
               onDelete={() => onDeleteComment(comment.id)}
             />
@@ -185,12 +185,12 @@ export function PetitionRepliesFieldComments({
 
 function FieldComment({
   comment,
-  isEditable,
+  userId,
   onDelete,
   onEdit,
 }: {
   comment: PetitionRepliesFieldComments_PetitionFieldCommentFragment;
-  isEditable: boolean;
+  userId: string;
   onDelete: () => void;
   onEdit: (content: string) => void;
 }) {
@@ -243,7 +243,11 @@ function FieldComment({
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
-          {comment.author?.__typename === "Contact" ? (
+          {comment.author?.id === userId ? (
+            <Text fontStyle="italic">
+              <FormattedMessage id="generic.you" defaultMessage="You" />
+            </Text>
+          ) : comment.author?.__typename === "Contact" ? (
             <ContactLink contact={comment.author} />
           ) : comment.author?.__typename === "User" ? (
             comment.author.fullName
@@ -280,9 +284,11 @@ function FieldComment({
         <Spacer />
         <ButtonDropdown
           as={IconButton}
+          color="gray.400"
+          _hover={{ color: "gray.600", backgroundColor: "gray.100" }}
           dropdown={
             <MenuList minWidth="160px" placement="bottom-end">
-              {isEditable ? (
+              {comment.author?.id === userId ? (
                 <MenuItem onClick={handleEditClick}>
                   <FormattedMessage id="generic.edit" defaultMessage="Edit" />
                 </MenuItem>

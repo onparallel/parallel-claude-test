@@ -205,7 +205,7 @@ export const PetitionField = objectType({
       type: "PetitionFieldComment",
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldCommentsForField({
+        return await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser({
           userId: ctx.user!.id,
           petitionId: root.petition_id,
           petitionFieldId: root.id,

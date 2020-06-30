@@ -37,7 +37,7 @@ export type PetitionRepliesFieldProps = BoxProps & {
   highlighted: boolean;
   commentCount: number;
   newCommentCount: number;
-  isShowingComments: boolean;
+  isActive: boolean;
   onAction: (action: PetitionRepliesFieldAction) => void;
   onToggleComments: () => void;
   onValidateToggle: () => void;
@@ -49,7 +49,7 @@ export function PetitionRepliesField({
   highlighted,
   commentCount,
   newCommentCount,
-  isShowingComments,
+  isActive: isShowingComments,
   onAction,
   onToggleComments,
   onValidateToggle,
@@ -99,7 +99,7 @@ export function PetitionRepliesField({
           ></FormattedMessage>
         </Button> */}
         <CommentButton
-          isShowingComments={isShowingComments}
+          isActive={isShowingComments}
           commentCount={field.comments.length}
           newCommentCount={field.comments.filter((c) => c.isUnread).length}
           onClick={onToggleComments}
@@ -355,20 +355,21 @@ PetitionRepliesField.fragments = {
 function CommentButton({
   commentCount,
   newCommentCount,
-  isShowingComments,
+  isActive,
   onClick,
-}: Pick<
-  PetitionRepliesFieldProps,
-  "newCommentCount" | "commentCount" | "isShowingComments"
-> &
-  Pick<ButtonProps, "onClick">) {
+}: {
+  commentCount: number;
+  newCommentCount: number;
+  isActive: boolean;
+  onClick: ButtonProps["onClick"];
+}) {
   const intl = useIntl();
   const common = {
     role: "switch",
-    "aria-checked": isShowingComments,
+    "aria-checked": isActive,
     size: "sm",
-    variant: isShowingComments ? "solid" : "ghost",
-    variantColor: isShowingComments ? "purple" : "gray",
+    variant: isActive ? "solid" : "ghost",
+    variantColor: isActive ? "purple" : "gray",
     "aria-label": intl.formatMessage(
       {
         id: "petition-replies.comments-label",
