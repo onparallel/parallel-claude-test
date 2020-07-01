@@ -134,13 +134,12 @@ export function PetitionRepliesFieldComments({
           <Flex
             flexDirection="column"
             paddingX={4}
+            paddingY={8}
             justifyContent="center"
             alignItems="center"
-            height="120px"
+            color="gray.200"
           >
-            <Box color="gray.200">
-              <Icon name="comment" size="64px" />
-            </Box>
+            <Icon name="comment" size="64px" />
           </Flex>
         ) : null}
       </Box>

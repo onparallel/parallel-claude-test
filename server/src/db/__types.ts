@@ -9,6 +9,8 @@ export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
+export type PetitionContactNotificationType = "COMMENT_CREATED";
+
 export type PetitionEventType =
   | "PETITION_CREATED"
   | "PETITION_COMPLETED"
@@ -32,11 +34,6 @@ export type PetitionMessageStatus =
   | "PROCESSING"
   | "PROCESSED";
 
-export type PetitionNotificationType =
-  | "REPLY_CREATED"
-  | "COMMENT_CREATED"
-  | "PETITION_COMPLETED";
-
 export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
@@ -50,6 +47,8 @@ export type PetitionSendoutStatus =
 
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
 
+export type PetitionUserNotificationType = "COMMENT_CREATED";
+
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
 export interface TableTypes {
@@ -60,14 +59,15 @@ export interface TableTypes {
   organization: Organization;
   petition: Petition;
   petition_access: PetitionAccess;
+  petition_contact_notification: PetitionContactNotification;
   petition_event: PetitionEvent;
   petition_field: PetitionField;
   petition_field_comment: PetitionFieldComment;
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
-  petition_notification: PetitionNotification;
   petition_reminder: PetitionReminder;
   petition_sendout: PetitionSendout;
+  petition_user_notification: PetitionUserNotification;
   user: User;
 }
 
@@ -79,14 +79,15 @@ export interface TableCreateTypes {
   organization: CreateOrganization;
   petition: CreatePetition;
   petition_access: CreatePetitionAccess;
+  petition_contact_notification: CreatePetitionContactNotification;
   petition_event: CreatePetitionEvent;
   petition_field: CreatePetitionField;
   petition_field_comment: CreatePetitionFieldComment;
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
-  petition_notification: CreatePetitionNotification;
   petition_reminder: CreatePetitionReminder;
   petition_sendout: CreatePetitionSendout;
+  petition_user_notification: CreatePetitionUserNotification;
   user: CreateUser;
 }
 
@@ -98,14 +99,15 @@ export interface TablePrimaryKeys {
   organization: "id";
   petition: "id";
   petition_access: "id";
+  petition_contact_notification: "id";
   petition_event: "id";
   petition_field: "id";
   petition_field_comment: "id";
   petition_field_reply: "id";
   petition_message: "id";
-  petition_notification: "id";
   petition_reminder: "id";
   petition_sendout: "id";
+  petition_user_notification: "id";
   user: "id";
 }
 
@@ -314,6 +316,25 @@ export interface CreatePetitionAccess {
   updated_by?: Maybe<string>;
 }
 
+export interface PetitionContactNotification {
+  id: number;
+  contact_id: number;
+  petition_id: number;
+  type: PetitionContactNotificationType;
+  data: Maybe<any>;
+  is_read: boolean;
+  created_at: Date;
+}
+
+export interface CreatePetitionContactNotification {
+  contact_id: number;
+  petition_id: number;
+  type: PetitionContactNotificationType;
+  data?: Maybe<any>;
+  is_read?: boolean;
+  created_at?: Date;
+}
+
 export interface PetitionEvent {
   id: number;
   petition_id: number;
@@ -457,25 +478,6 @@ export interface CreatePetitionMessage {
   created_by?: Maybe<string>;
 }
 
-export interface PetitionNotification {
-  id: number;
-  user_id: number;
-  petition_id: number;
-  type: PetitionNotificationType;
-  data: Maybe<any>;
-  is_read: boolean;
-  created_at: Date;
-}
-
-export interface CreatePetitionNotification {
-  user_id: number;
-  petition_id: number;
-  type: PetitionNotificationType;
-  data?: Maybe<any>;
-  is_read?: boolean;
-  created_at?: Date;
-}
-
 export interface PetitionReminder {
   id: number;
   petition_sendout_id: Maybe<number>;
@@ -548,6 +550,25 @@ export interface CreatePetitionSendout {
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
+}
+
+export interface PetitionUserNotification {
+  id: number;
+  user_id: number;
+  petition_id: number;
+  type: PetitionUserNotificationType;
+  data: Maybe<any>;
+  is_read: boolean;
+  created_at: Date;
+}
+
+export interface CreatePetitionUserNotification {
+  user_id: number;
+  petition_id: number;
+  type: PetitionUserNotificationType;
+  data?: Maybe<any>;
+  is_read?: boolean;
+  created_at?: Date;
 }
 
 export interface User {

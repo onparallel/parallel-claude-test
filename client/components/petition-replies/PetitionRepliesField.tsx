@@ -98,7 +98,7 @@ export function PetitionRepliesField({
             defaultMessage="Reviewed"
           ></FormattedMessage>
         </Button> */}
-        <CommentButton
+        <CommentsButton
           isActive={isShowingComments}
           commentCount={field.comments.length}
           newCommentCount={field.comments.filter((c) => c.isUnread).length}
@@ -352,7 +352,7 @@ PetitionRepliesField.fragments = {
   `,
 };
 
-function CommentButton({
+function CommentsButton({
   commentCount,
   newCommentCount,
   isActive,

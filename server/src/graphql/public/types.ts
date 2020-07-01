@@ -279,6 +279,7 @@ export const PublicContactOrUser = unionType({
 
 export const PublicPetitionFieldComment = objectType({
   name: "PublicPetitionFieldComment",
+  rootTyping: "db.PetitionFieldComment",
   description: "A comment on a petition field",
   definition(t) {
     t.id("id", {
@@ -317,6 +318,17 @@ export const PublicPetitionFieldComment = objectType({
       description: "Time when the comment was published.",
       nullable: true,
       resolve: (o) => o.published_at,
+    });
+    t.boolean("isUnread", {
+      description: "Wether the comment has been read or not.",
+      resolve: async (root, _, ctx) => {
+        return ctx.petitions.getPetitionFieldCommentIsUnreadForContact({
+          contactId: ctx.contact!.id,
+          petitionId: root.petition_id,
+          petitionFieldId: root.petition_field_id,
+          petitionFieldCommentId: root.id,
+        });
+      },
     });
   },
 });

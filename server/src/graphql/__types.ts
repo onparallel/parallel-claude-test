@@ -225,10 +225,7 @@ export interface NexusGenRootTypes {
   PublicPetition: db.Petition;
   PublicPetitionAccess: db.PetitionAccess;
   PublicPetitionField: db.PetitionField;
-  PublicPetitionFieldComment: {
-    // root type
-    content: string; // String!
-  };
+  PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicUser: db.User;
   Query: {};
@@ -393,9 +390,14 @@ export interface NexusGenFieldTypes {
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
+    publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    publicDeletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
+    publicSubmitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
+    publicUpdatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
@@ -601,6 +603,7 @@ export interface NexusGenFieldTypes {
     author: NexusGenRootTypes["PublicContactOrUser"] | null; // PublicContactOrUser
     content: string; // String!
     id: string; // ID!
+    isUnread: boolean; // Boolean!
     publishedAt: Date | null; // DateTime
     reply: NexusGenRootTypes["PublicPetitionFieldReply"] | null; // PublicPetitionFieldReply
   };
@@ -792,11 +795,24 @@ export interface NexusGenArgTypes {
       fieldId: string; // ID!
       keycode: string; // ID!
     };
+    publicCreatePetitionFieldComment: {
+      // args
+      content: string; // String!
+      petitionFieldId: string; // ID!
+      petitionFieldReplyId?: string | null; // ID
+      petitionId: string; // ID!
+    };
     publicCreateTextReply: {
       // args
       data: NexusGenInputs["CreateTextReplyInput"]; // CreateTextReplyInput!
       fieldId: string; // ID!
       keycode: string; // ID!
+    };
+    publicDeletePetitionFieldComment: {
+      // args
+      petitionFieldCommentId: string; // ID!
+      petitionFieldId: string; // ID!
+      petitionId: string; // ID!
     };
     publicDeletePetitionReply: {
       // args
@@ -807,6 +823,22 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       replyId: string; // ID!
+    };
+    publicMarkPetitionFieldCommentsAsRead: {
+      // args
+      petitionFieldCommentIds: string[]; // [ID!]!
+      petitionId: string; // ID!
+    };
+    publicSubmitUnpublishedComments: {
+      // args
+      petitionId: string; // ID!
+    };
+    publicUpdatePetitionFieldComment: {
+      // args
+      content: string; // String!
+      petitionFieldCommentId: string; // ID!
+      petitionFieldId: string; // ID!
+      petitionId: string; // ID!
     };
     reactivateAccesses: {
       // args

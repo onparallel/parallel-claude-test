@@ -3,10 +3,11 @@ import {
   inputObjectType,
   mutationField,
   objectType,
+  stringArg,
 } from "@nexus/schema";
-import { fromGlobalId } from "../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { random } from "../../util/token";
-import { chain, and } from "../helpers/authorize";
+import { chain, and, authenticate, ifArgDefined } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
 import {
   fetchPetitionAccess,
@@ -14,6 +15,12 @@ import {
   fieldHastype,
   replyBelongsToAccess,
 } from "./authorizers";
+import {
+  userHasAccessToPetition,
+  fieldBelongsToPetition,
+  replyBelongsToPetition,
+  commentsBelongsToPetition,
+} from "../petition/authorizers";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -173,7 +180,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   },
 });
 
-export const completePetition = mutationField("publicCompletePetition", {
+export const publicCompletePetition = mutationField("publicCompletePetition", {
   description: "Marks a filled petition as ready for review.",
   type: "PublicPetition",
   args: {
@@ -189,3 +196,174 @@ export const completePetition = mutationField("publicCompletePetition", {
     return petition;
   },
 });
+
+export const publicCreatePetitionFieldComment = mutationField(
+  "publicCreatePetitionFieldComment",
+  {
+    description: "Create a petition field comment.",
+    type: "PublicPetitionFieldComment",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        ifArgDefined(
+          "petitionFieldReplyId",
+          replyBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
+        )
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldId: idArg({ required: true }),
+      petitionFieldReplyId: idArg(),
+      content: stringArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
+      const petitionFieldId = fromGlobalId(
+        args.petitionFieldId,
+        "PetitionField"
+      ).id;
+      const petitionFieldReplyId = args.petitionFieldReplyId
+        ? fromGlobalId(args.petitionFieldReplyId, "PetitionFieldReply").id
+        : null;
+      return await ctx.petitions.createPetitionFieldCommentFromContact(
+        {
+          petitionId,
+          petitionFieldId,
+          petitionFieldReplyId,
+          content: args.content,
+        },
+        ctx.contact!
+      );
+    },
+  }
+);
+
+export const publicDeletePetitionFieldComment = mutationField(
+  "publicDeletePetitionFieldComment",
+  {
+    description: "Delete a petition field comment.",
+    type: "Result",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldId: idArg({ required: true }),
+      petitionFieldCommentId: idArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionFieldCommentId = fromGlobalId(
+        args.petitionFieldCommentId,
+        "PetitionFieldComment"
+      ).id;
+      await ctx.petitions.deletePetitionFieldComment(
+        petitionFieldCommentId,
+        ctx.user!
+      );
+      return RESULT.SUCCESS;
+    },
+  }
+);
+
+export const publicUpdatePetitionFieldComment = mutationField(
+  "publicUpdatePetitionFieldComment",
+  {
+    description: "Update a petition field comment.",
+    type: "PetitionFieldComment",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
+        async function commentAuhtorIsContextContact(root, args, ctx, info) {
+          const petitionFieldCommentId = fromGlobalId(
+            args.petitionFieldCommentId,
+            "PetitionFieldComment"
+          ).id;
+          const comment = await ctx.petitions.loadPetitionFieldComment(
+            petitionFieldCommentId
+          );
+          return (comment && comment.contact_id === ctx.contact!.id) ?? false;
+        }
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldId: idArg({ required: true }),
+      petitionFieldCommentId: idArg({ required: true }),
+      content: stringArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionFieldCommentId = fromGlobalId(
+        args.petitionFieldCommentId,
+        "PetitionFieldComment"
+      ).id;
+      return await ctx.petitions.updatePetitionFieldCommentFromContact(
+        petitionFieldCommentId,
+        args.content,
+        ctx.contact!
+      );
+    },
+  }
+);
+
+export const publicSubmitUnpublishedComments = mutationField(
+  "publicSubmitUnpublishedComments",
+  {
+    description: "Submits all unpublished comments.",
+    type: "PetitionFieldComment",
+    list: [true],
+    authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
+    args: {
+      petitionId: idArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
+      const comments = await ctx.petitions.publishPetitionFieldCommentsForContact(
+        petitionId,
+        ctx.contact!
+      );
+      // TODO enqueue email to notify users about comments
+      return comments;
+    },
+  }
+);
+
+export const publicMarkPetitionFieldCommentsAsRead = mutationField(
+  "publicMarkPetitionFieldCommentsAsRead",
+  {
+    description: "Marks the specified comments as read.",
+    type: "PetitionFieldComment",
+    list: [true],
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldCommentIds: idArg({ required: true, list: [true] }),
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionFieldCommentIds = fromGlobalIds(
+        args.petitionFieldCommentIds,
+        "PetitionFieldComment"
+      ).ids;
+      return await ctx.petitions.markPetitionFieldCommentsAsReadForContact(
+        petitionFieldCommentIds,
+        ctx.contact!
+      );
+    },
+  }
+);

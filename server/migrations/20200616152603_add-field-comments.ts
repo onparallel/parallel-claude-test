@@ -36,51 +36,70 @@ export async function up(knex: Knex): Promise<any> {
         .defaultTo("PENDING");
     })
 
-    .createTable("petition_notification", (t) => {
+    .createTable("petition_user_notification", (t) => {
       t.increments("id");
       t.integer("user_id").notNullable().references("user.id");
       t.integer("petition_id").notNullable().references("petition.id");
-      t.enum(
-        "type",
-        ["REPLY_CREATED", "COMMENT_CREATED", "PETITION_COMPLETED"],
-        {
-          useNative: true,
-          enumName: "petition_notification_type",
-        }
-      ).notNullable();
+      t.enum("type", ["COMMENT_CREATED"], {
+        useNative: true,
+        enumName: "petition_user_notification_type",
+      }).notNullable();
+      t.jsonb("data");
+      t.boolean("is_read").notNullable().defaultTo(false);
+      t.timestamp("created_at")
+        .notNullable()
+        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    })
+
+    .createTable("petition_contact_notification", (t) => {
+      t.increments("id");
+      t.integer("contact_id").notNullable().references("contact.id");
+      t.integer("petition_id").notNullable().references("petition.id");
+      t.enum("type", ["COMMENT_CREATED"], {
+        useNative: true,
+        enumName: "petition_contact_notification_type",
+      }).notNullable();
       t.jsonb("data");
       t.boolean("is_read").notNullable().defaultTo(false);
       t.timestamp("created_at")
         .notNullable()
         .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
     }).raw(/* sql */ `
-      create unique index "pn__reply_created__petition_id__petition_reply_id" on petition_notification (
-        petition_id,
-        ((data ->> 'petition_field_id')::int),
-        ((data ->> 'petition_reply_id')::int)
-      ) where type = 'REPLY_CREATED'
-    `).raw(/* sql */ `
-      create unique index "pn__comment_created__petition_id__petition_field_id" on petition_notification (
+      create index "pun__comment_created__petition_id__data" on petition_user_notification (
         petition_id,
         ((data ->> 'petition_field_id')::int),
         ((data ->> 'petition_field_comment_id')::int)
-      ) where type = 'COMMENT_CREATED'
-    `).raw(/* sql */ `
-      create index "pn__petition_id__type" on petition_notification (
+      ) where type = 'COMMENT_CREATED';
+      create unique index "pun__comment_created__user_id__petition_id__data" on petition_user_notification (
         user_id,
         petition_id,
-        type
-      )
+        ((data ->> 'petition_field_id')::int),
+        ((data ->> 'petition_field_comment_id')::int)
+      ) where type = 'COMMENT_CREATED';
+
+      create index "pcn__comment_created__petition_id__data" on petition_contact_notification (
+        petition_id,
+        ((data ->> 'petition_field_id')::int),
+        ((data ->> 'petition_field_comment_id')::int)
+      ) where type = 'COMMENT_CREATED';
+      create unique index "pcn__comment_created__contact_id__petition_id__data" on petition_contact_notification (
+        contact_id,
+        petition_id,
+        ((data ->> 'petition_field_id')::int),
+        ((data ->> 'petition_field_comment_id')::int)
+      ) where type = 'COMMENT_CREATED';
     `);
 }
 
 export async function down(knex: Knex): Promise<any> {
   await knex.schema
-    .dropTable("petition_notification")
+    .dropTable("petition_contact_notification")
+    .dropTable("petition_user_notification")
     .alterTable("petition_field_reply", (t) => {
       t.dropColumn("status");
     })
     .dropTable("petition_field_comment")
-    .raw(/* sql */ `drop type petition_notification_type`)
+    .raw(/* sql */ `drop type petition_user_notification_type`)
+    .raw(/* sql */ `drop type petition_contact_notification_type`)
     .raw(/* sql */ `drop type petition_field_reply_status`);
 }

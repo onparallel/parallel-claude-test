@@ -45,7 +45,7 @@ export const createPetitionFieldComment = mutationField(
       const petitionFieldReplyId = args.petitionFieldReplyId
         ? fromGlobalId(args.petitionFieldReplyId, "PetitionFieldReply").id
         : null;
-      return await ctx.petitions.createPetitionFieldComment(
+      return await ctx.petitions.createPetitionFieldCommentFromUser(
         {
           petitionId,
           petitionFieldId,
@@ -124,7 +124,7 @@ export const updatePetitionFieldComment = mutationField(
         args.petitionFieldCommentId,
         "PetitionFieldComment"
       ).id;
-      return await ctx.petitions.updatePetitionFieldComment(
+      return await ctx.petitions.updatePetitionFieldCommentFromUser(
         petitionFieldCommentId,
         args.content,
         ctx.user!
@@ -177,7 +177,7 @@ export const markPetitionFieldCommentsAsRead = mutationField(
         args.petitionFieldCommentIds,
         "PetitionFieldComment"
       ).ids;
-      return await ctx.petitions.markPetitionFieldCommentsAsRead(
+      return await ctx.petitions.markPetitionFieldCommentsAsReadForUser(
         petitionFieldCommentIds,
         ctx.user!
       );

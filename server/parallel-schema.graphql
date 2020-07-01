@@ -290,6 +290,16 @@ type Mutation {
   ): CreateFileUploadReply!
 
   """
+  Create a petition field comment.
+  """
+  publicCreatePetitionFieldComment(
+    content: String!
+    petitionFieldId: ID!
+    petitionFieldReplyId: ID
+    petitionId: ID!
+  ): PublicPetitionFieldComment!
+
+  """
   Creates a reply to a text field.
   """
   publicCreateTextReply(
@@ -297,6 +307,15 @@ type Mutation {
     fieldId: ID!
     keycode: ID!
   ): PublicPetitionFieldReply!
+
+  """
+  Delete a petition field comment.
+  """
+  publicDeletePetitionFieldComment(
+    petitionFieldCommentId: ID!
+    petitionFieldId: ID!
+    petitionId: ID!
+  ): Result!
 
   """
   Deletes a reply to a petition field.
@@ -310,6 +329,29 @@ type Mutation {
     keycode: ID!
     replyId: ID!
   ): PublicPetitionFieldReply!
+
+  """
+  Marks the specified comments as read.
+  """
+  publicMarkPetitionFieldCommentsAsRead(
+    petitionFieldCommentIds: [ID!]!
+    petitionId: ID!
+  ): [PetitionFieldComment!]!
+
+  """
+  Submits all unpublished comments.
+  """
+  publicSubmitUnpublishedComments(petitionId: ID!): [PetitionFieldComment!]!
+
+  """
+  Update a petition field comment.
+  """
+  publicUpdatePetitionFieldComment(
+    content: String!
+    petitionFieldCommentId: ID!
+    petitionFieldId: ID!
+    petitionId: ID!
+  ): PetitionFieldComment!
 
   """
   Reactivates the specified inactive petition accesses.
@@ -1256,6 +1298,11 @@ type PublicPetitionFieldComment {
   The ID of the petition field comment.
   """
   id: ID!
+
+  """
+  Wether the comment has been read or not.
+  """
+  isUnread: Boolean!
 
   """
   Time when the comment was published.

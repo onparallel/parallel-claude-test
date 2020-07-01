@@ -408,6 +408,79 @@ RecipientView.mutations = [
       }
     }
   `,
+  gql`
+    mutation RecipientView_createPetitionFieldComment(
+      $petitionId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldReplyId: ID
+      $content: String!
+    ) {
+      publicCreatePetitionFieldComment(
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+        petitionFieldReplyId: $petitionFieldReplyId
+        content: $content
+      ) {
+        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+      }
+    }
+    ${RecipientViewPetitionFieldCommentsDialog.fragments
+      .PublicPetitionFieldComment}
+  `,
+  gql`
+    mutation RecipientView_updatePetitionFieldComment(
+      $petitionId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldCommentId: ID!
+      $content: String!
+    ) {
+      publicUpdatePetitionFieldComment(
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+        petitionFieldCommentId: $petitionFieldCommentId
+        content: $content
+      ) {
+        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+      }
+    }
+    ${RecipientViewPetitionFieldCommentsDialog.fragments
+      .PublicPetitionFieldComment}
+  `,
+  gql`
+    mutation RecipientView_deletePetitionFieldComment(
+      $petitionId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldCommentId: ID!
+    ) {
+      publicDeletePetitionFieldComment(
+        petitionId: $petitionId
+        petitionFieldId: $petitionFieldId
+        petitionFieldCommentId: $petitionFieldCommentId
+      )
+    }
+  `,
+  gql`
+    mutation RecipientView_submitUnpublishedComments($petitionId: ID!) {
+      publicSubmitUnpublishedComments(petitionId: $petitionId) {
+        id
+        publishedAt
+      }
+    }
+  `,
+  gql`
+    mutation RecipientView_markPetitionFieldCommentsAsRead(
+      $petitionId: ID!
+      $petitionFieldCommentIds: [ID!]!
+    ) {
+      publicMarkPetitionFieldCommentsAsRead(
+        petitionId: $petitionId
+        petitionFieldCommentIds: $petitionFieldCommentIds
+      ) {
+        id
+        isUnread
+      }
+    }
+  `,
 ];
 
 function useDeletePetitionReply() {

@@ -16,6 +16,7 @@ import {
   Stack,
   Text,
   Icon,
+  Flex,
 } from "@chakra-ui/core";
 import {
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
@@ -78,8 +79,6 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const isExpanded = Boolean(inputFocused || draft);
 
-  const closeRef = useRef<HTMLButtonElement>(null);
-
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
@@ -94,7 +93,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
             </Text>
           )}
         </ModalHeader>
-        <ModalCloseButton ref={closeRef} />
+        <ModalCloseButton />
         <Divider />
         <ModalBody padding={0} overflow="auto" minHeight="0">
           {field.comments.map((comment, i) => (
@@ -110,9 +109,21 @@ export function RecipientViewPetitionFieldCommentsDialog({
             </>
           ))}
           {field.comments.length === 0 ? (
-            <Box color="gray.200">
-              <Icon name="comment" size="64px" />
-            </Box>
+            <Flex
+              flexDirection="column"
+              paddingX={4}
+              paddingY={8}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Icon color="gray.200" name="comment" size="64px" />
+              <Text color="gray.400">
+                <FormattedMessage
+                  id="recipient-view.field-comments.cta"
+                  defaultMessage="Have any questions? Ask here"
+                />
+              </Text>
+            </Flex>
           ) : null}
         </ModalBody>
         <Divider />
@@ -126,8 +137,8 @@ export function RecipientViewPetitionFieldCommentsDialog({
             minHeight={0}
             {...{ rows: 1 }}
             placeholder={intl.formatMessage({
-              id: "recipient'view.field-comments.placeholder",
-              defaultMessage: "Have any questions? Ask here",
+              id: "recipient-view.field-comments.placeholder",
+              defaultMessage: "Type a new comment",
             })}
             value={draft}
             onKeyDown={handleKeyDown as any}
@@ -205,7 +216,13 @@ function FieldComment({
     <Box
       paddingX={6}
       paddingY={2}
-      backgroundColor={!comment.publishedAt ? "yellow.50" : "white"}
+      backgroundColor={
+        !comment.publishedAt
+          ? "yellow.50"
+          : comment.isUnread
+          ? "purple.50"
+          : "white"
+      }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
@@ -341,6 +358,7 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
         }
         content
         publishedAt
+        isUnread
       }
     `;
   },
