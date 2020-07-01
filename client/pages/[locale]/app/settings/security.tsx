@@ -54,7 +54,7 @@ function Security() {
     if (data) {
       switch (data.changePassword) {
         case "INCORRECT_PASSWORD":
-          setError("password", "validate");
+          setError("password", { type: "validate" });
           break;
         case "SUCCESS":
           toast({

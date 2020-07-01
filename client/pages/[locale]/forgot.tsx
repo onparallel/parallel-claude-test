@@ -223,13 +223,13 @@ function PasswordResetForm({
     errors,
     getValues,
     setError,
-    clearError,
+    clearErrors,
   } = useForm<PasswordResetFormData>({ mode: "onBlur" });
   useEffect(() => {
     if (verificationCodeError) {
-      setError("verificationCode", "validate");
+      setError("verificationCode", { type: "validate" });
     } else {
-      clearError("verificationCode");
+      clearErrors("verificationCode");
     }
   }, [verificationCodeError]);
   return (
