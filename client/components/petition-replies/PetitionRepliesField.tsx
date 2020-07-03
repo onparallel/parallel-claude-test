@@ -346,7 +346,7 @@ function CommentsButton({
     variantColor: isActive ? "purple" : "gray",
     "aria-label": intl.formatMessage(
       {
-        id: "petition-replies.comments-label",
+        id: "generic.comments-button-label",
         defaultMessage:
           "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
       },

@@ -59,7 +59,7 @@ export function CardHeader({
                 size="xs"
                 icon="close"
                 aria-label={intl.formatMessage({
-                  id: "component.card-header.close",
+                  id: "generic.close",
                   defaultMessage: "Close",
                 })}
                 onClick={onClose}

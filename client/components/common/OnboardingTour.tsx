@@ -164,7 +164,7 @@ export function OnboardingTour({ status, onUpdateTour }: OnboardingTourProps) {
           defaultMessage: "Skip",
         }),
         close: intl.formatMessage({
-          id: "tour.close",
+          id: "generic.close",
           defaultMessage: "Close",
         }),
       } as ReactJoyrideLocale),

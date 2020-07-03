@@ -117,61 +117,67 @@
     "term": "component.download-all-dialog.description",
     "definition": "Select if you want to rename the individual files.",
     "context": "Select if you want to rename the individual files.",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L130-L133"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L86-L89"
   },
   {
     "term": "component.download-all-dialog.download-button",
     "definition": "Download files",
     "context": "Download files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L180-L183"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L156-L159"
   },
   {
     "term": "component.download-all-dialog.header",
     "definition": "Download all files",
     "context": "Download all files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L122-L125"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L78-L81"
   },
   {
     "term": "component.download-all-dialog.keep-original",
     "definition": "Keep the original name",
     "context": "Keep the original name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L170-L173"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L146-L149"
+  },
+  {
+    "term": "component.download-all-dialog.placeholder-hint",
+    "definition": "Hint: Type <x>hash key</x> to add replaceable placeholders",
+    "context": "Hint: Type <x>hash key</x> to add replaceable placeholders",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L118-L142"
   },
   {
     "term": "component.download-all-dialog.rename",
     "definition": "Rename files",
     "context": "Rename files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L147-L150"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L103-L106"
   },
   {
     "term": "component.download-dialog.placeholder-contact-first-name",
     "definition": "Contact first name",
     "context": "Contact first name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L47-L50"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L52-L55"
   },
   {
     "term": "component.download-dialog.placeholder-contact-last-name",
     "definition": "Contact last name",
     "context": "Contact last name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L54-L57"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L59-L62"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Field number",
     "context": "Field number",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L33-L36"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L38-L41"
   },
   {
     "term": "component.download-dialog.placeholder-field-title",
     "definition": "Field title",
     "context": "Field title",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L40-L43"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L45-L48"
   },
   {
     "term": "component.download-dialog.placeholder-file-name",
     "definition": "File name",
     "context": "File name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L61-L64"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L66-L69"
   },
   {
     "term": "component.error-dialog.header",
@@ -543,19 +549,19 @@
     "term": "contact.edit-details-button",
     "definition": "Edit",
     "context": "Edit",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L203-L206"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L201-L204"
   },
   {
     "term": "contact.no-petitions",
     "definition": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
     "context": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L234-L238"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L232-L236"
   },
   {
     "term": "contact.petitions-header",
     "definition": "Petitions sent{name, select, null {} other { to {name}}}",
     "context": "Petitions sent{name, select, null {} other { to {name}}}",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L213-L217"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L211-L215"
   },
   {
     "term": "contacts.confirm-delete.body",
@@ -738,16 +744,28 @@
     "reference": "components/petition-list/CreatePetitionDialog.tsx#L171-L174"
   },
   {
+    "term": "generic.cancel",
+    "definition": "Cancel",
+    "context": "Cancel",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L335"
+  },
+  {
     "term": "generic.cancel-save-changes",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L177-L180"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L175-L178"
   },
   {
     "term": "generic.changes-saved",
     "definition": "Saved",
     "context": "Saved",
     "reference": "components/layout/PetitionHeader.tsx#L197-L200"
+  },
+  {
+    "term": "generic.close",
+    "definition": "Close",
+    "context": "Close",
+    "reference": "components/common/OnboardingTour.tsx#L166-L169"
   },
   {
     "term": "generic.collapse",
@@ -762,6 +780,12 @@
     "reference": "pages/[locale]/app/petitions/index.tsx#L437-L440"
   },
   {
+    "term": "generic.delete",
+    "definition": "Delete",
+    "context": "Delete",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L302-L305"
+  },
+  {
     "term": "generic.deleted-contact",
     "definition": "Deleted contact",
     "context": "Deleted contact",
@@ -771,13 +795,19 @@
     "term": "generic.dropzone-allowed-types",
     "definition": "Only the following file types are allowed:",
     "context": "Only the following file types are allowed:",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L398-L401"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L410-L413"
   },
   {
     "term": "generic.dropzone-default",
     "definition": "Drag files here, or click to select them",
     "context": "Drag files here, or click to select them",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L431-L434"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L443-L446"
+  },
+  {
+    "term": "generic.edit",
+    "definition": "Edit",
+    "context": "Edit",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L299"
   },
   {
     "term": "generic.expand",
@@ -789,37 +819,37 @@
     "term": "generic.file-name",
     "definition": "File name",
     "context": "File name",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L63-L66"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L69-L72"
   },
   {
     "term": "generic.file-size",
     "definition": "File size",
     "context": "File size",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L59-L62"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L65-L68"
   },
   {
     "term": "generic.file-types.document",
     "definition": "Documents (.pdf, .doc, .docx)",
     "context": "Documents (.pdf, .doc, .docx)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L406-L409"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L418-L421"
   },
   {
     "term": "generic.file-types.image",
     "definition": "Images (.jpeg, .png, etc.)",
     "context": "Images (.jpeg, .png, etc.)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L411-L414"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L423-L426"
   },
   {
     "term": "generic.file-types.pdf",
     "definition": "PDF Documents",
     "context": "PDF Documents",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L421-L424"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L433-L436"
   },
   {
     "term": "generic.file-types.video",
     "definition": "Videos (.mp4, .avi, etc.)",
     "context": "Videos (.mp4, .avi, etc.)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L416-L419"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L428-L431"
   },
   {
     "term": "generic.for-example",
@@ -909,7 +939,7 @@
     "term": "generic.forms.required-field-error",
     "definition": "A value is required",
     "context": "A value is required",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L298-L301"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L310-L313"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -954,6 +984,12 @@
     "reference": "components/petition-compose/CompletedPetitionDialog.tsx#L47-L50"
   },
   {
+    "term": "generic.more-options",
+    "definition": "More options...",
+    "context": "More options...",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L312-L315"
+  },
+  {
     "term": "generic.no-deadline",
     "definition": "No deadline",
     "context": "No deadline",
@@ -963,7 +999,7 @@
     "term": "generic.no-description",
     "definition": "No description",
     "context": "No description",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L135-L138"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L123-L126"
   },
   {
     "term": "generic.not-specified",
@@ -975,7 +1011,7 @@
     "term": "generic.optional-field",
     "definition": "Optional",
     "context": "Optional",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L94-L97"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L102-L105"
   },
   {
     "term": "generic.petition-status.completed",
@@ -999,13 +1035,13 @@
     "term": "generic.reload-data",
     "definition": "Reload",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L226-L229"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L267-L270"
   },
   {
     "term": "generic.required-field",
     "definition": "Required field",
     "context": "Required field",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L67-L70"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L73-L76"
   },
   {
     "term": "generic.richtext.bold",
@@ -1032,16 +1068,28 @@
     "reference": "components/common/RichTextEditor.tsx#L164-L167"
   },
   {
+    "term": "generic.save",
+    "definition": "Save",
+    "context": "Save",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L338"
+  },
+  {
     "term": "generic.save-changes",
     "definition": "Save",
     "context": "Save",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L191-L194"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L189-L192"
   },
   {
     "term": "generic.saving-changes",
     "definition": "Saving...",
     "context": "Saving...",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L186-L189"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L184-L187"
+  },
+  {
+    "term": "generic.submit",
+    "definition": "Submit",
+    "context": "Submit",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L182"
   },
   {
     "term": "generic.today-at",
@@ -1065,13 +1113,19 @@
     "term": "generic.untitled-field",
     "definition": "Untitled field",
     "context": "Untitled field",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L95-L98"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L112-L115"
   },
   {
     "term": "generic.untitled-petition",
     "definition": "Untitled petition",
     "context": "Untitled petition",
     "reference": "pages/[locale]/app/petitions/index.tsx#L294-L297"
+  },
+  {
+    "term": "generic.you",
+    "definition": "You",
+    "context": "You",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L254"
   },
   {
     "term": "header.user-menu-button",
@@ -1167,7 +1221,7 @@
     "term": "petition-accesses.deadline-header",
     "definition": "Deadline",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L280-L283"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L278-L281"
   },
   {
     "term": "petition-accesses.next-reminder-header",
@@ -1185,7 +1239,7 @@
     "term": "petition-accesses.progress-header",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L303-L306"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L301-L304"
   },
   {
     "term": "petition-accesses.reminders-sent-header",
@@ -1209,7 +1263,73 @@
     "term": "petition-accesses.status-header",
     "definition": "Status",
     "context": "Status",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L317-L320"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L315-L318"
+  },
+  {
+    "term": "petition-replies.comment-pending.label",
+    "definition": "Pending",
+    "context": "Pending",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L283-L286"
+  },
+  {
+    "term": "generic.comments-button-label",
+    "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+    "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L471-L475"
+  },
+  {
+    "term": "petition-replies.download-all",
+    "definition": "Download all",
+    "context": "Download all",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L302-L305"
+  },
+  {
+    "term": "petition-replies.field-comments.placeholder",
+    "definition": "Type a new comment",
+    "context": "Type a new comment",
+    "reference": "components/petition-replies/PetitionRepliesFieldComments.tsx#L157-L160"
+  },
+  {
+    "term": "petition-replies.pending-comment-popover",
+    "definition": "Send all your pending comments at once to notify in a single email",
+    "context": "Send all your pending comments at once to notify in a single email",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L275-L278"
+  },
+  {
+    "term": "petition-replies.petition-field-reply.approve",
+    "definition": "Approve",
+    "context": "Approve",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L260-L263"
+  },
+  {
+    "term": "petition-replies.petition-field-reply.file-download",
+    "definition": "Download file",
+    "context": "Download file",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L145-L149"
+  },
+  {
+    "term": "petition-replies.petition-field-reply.file-preview",
+    "definition": "Preview file",
+    "context": "Preview file",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L157-L161"
+  },
+  {
+    "term": "petition-replies.petition-field-reply.reject",
+    "definition": "Reject",
+    "context": "Reject",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L292-L295"
+  },
+  {
+    "term": "petition-replies.petition-field.no-replies",
+    "definition": "There are no replies to this field yet",
+    "context": "There are no replies to this field yet",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L204-L207"
+  },
+  {
+    "term": "petition-replies.submit-comments",
+    "definition": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
+    "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L293-L297"
   },
   {
     "term": "petition.activity-not-available",
@@ -1516,30 +1636,6 @@
     "definition": "No reminders left",
     "context": "No reminders left",
     "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L137-L140"
-  },
-  {
-    "term": "petition-replies.petition-field.no-replies",
-    "definition": "There are no replies to this field yet",
-    "context": "There are no replies to this field yet",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L218-L221"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.file-download",
-    "definition": "Download file",
-    "context": "Download file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L59-L62"
-  },
-  {
-    "term": "petition-replies.petition-field-reply.file-preview",
-    "definition": "Preview file",
-    "context": "Preview file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L63-L66"
-  },
-  {
-    "term": "petition-replies.validate-field-button",
-    "definition": "Reviewed",
-    "context": "Reviewed",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L116-L119"
   },
   {
     "term": "petition.petition-scheduled-toast.description",
@@ -2595,25 +2691,37 @@
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "You have completed this petition and {name} will be notified",
     "context": "You have completed this petition and {name} will be notified",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L167-L171"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L175-L179"
   },
   {
     "term": "recipient-view.completed-petition.toast-title",
     "definition": "Petition completed!",
     "context": "Petition completed!",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L162-L165"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L170-L173"
+  },
+  {
+    "term": "recipient-view.field-comments.cta",
+    "definition": "Have any questions? Ask here",
+    "context": "Have any questions? Ask here",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L144-L147"
+  },
+  {
+    "term": "recipient-view.field-comments.placeholder",
+    "definition": "Type a new comment",
+    "context": "Type a new comment",
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L162-L165"
   },
   {
     "term": "recipient-view.field-reply-submit",
     "definition": "Submit",
     "context": "Submit",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L312-L315"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L324-L327"
   },
   {
     "term": "recipient-view.files-uploaded",
     "definition": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L136-L140"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L148-L152"
   },
   {
     "term": "recipient-view.organization",
@@ -2625,13 +2733,13 @@
     "term": "recipient-view.petition-completed-alert",
     "definition": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
     "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L208-L211"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L295-L298"
   },
   {
     "term": "recipient-view.powered-by",
     "definition": "Powered by",
     "context": "Powered by",
-    "reference": "pages/[locale]/petition/[keycode].tsx#L282-L285"
+    "reference": "pages/[locale]/petition/[keycode].tsx#L412-L415"
   },
   {
     "term": "recipient-view.progress",
@@ -2640,16 +2748,22 @@
     "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L82-L85"
   },
   {
+    "term": "recipient-view.questions-button",
+    "definition": "Questions?",
+    "context": "Questions?",
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L506-L509"
+  },
+  {
     "term": "recipient-view.remove-reply-label",
     "definition": "Remove reply",
     "context": "Remove reply",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L249-L252"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L261-L264"
   },
   {
     "term": "recipient-view.replies-submitted",
     "definition": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L130-L134"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L142-L146"
   },
   {
     "term": "recipient-view.security-link",
@@ -2682,10 +2796,22 @@
     "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L159-L163"
   },
   {
+    "term": "recipient-view.submit-unpublished-comments-button",
+    "definition": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
+    "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
+    "reference": "pages/[locale]/petition/[keycode].tsx#L333-L337"
+  },
+  {
+    "term": "recipient-view.submit-unpublished-comments-text",
+    "definition": "You have some pending comments. Submit them at once to notify {sender} in a single email.",
+    "context": "You have some pending comments. Submit them at once to notify {sender} in a single email.",
+    "reference": "pages/[locale]/petition/[keycode].tsx#L320-L324"
+  },
+  {
     "term": "recipient-view.text-reply",
     "definition": "Reply added on {date}",
     "context": "Reply added on {date}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L152-L163"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L164-L175"
   },
   {
     "term": "settings.account",
@@ -2838,12 +2964,6 @@
     "reference": "components/petition-activity/timeline/TimelineReplyCreatedEvent.tsx#L23-L43"
   },
   {
-    "term": "timeline.reply-created-field-no-title",
-    "definition": "No title",
-    "context": "No title",
-    "reference": "components/petition-activity/timeline/TimelineReplyDeletedEvent.tsx#L60-L63"
-  },
-  {
     "term": "timeline.reply-deleted-description",
     "definition": "{contact} deleted a reply to the field {title} {timeAgo}",
     "context": "{contact} deleted a reply to the field {title} {timeAgo}",
@@ -2854,12 +2974,6 @@
     "definition": "Back",
     "context": "Back",
     "reference": "components/common/OnboardingTour.tsx#L158-L161"
-  },
-  {
-    "term": "tour.close",
-    "definition": "Close",
-    "context": "Close",
-    "reference": "components/common/OnboardingTour.tsx#L166-L169"
   },
   {
     "term": "tour.last",
@@ -2985,25 +3099,25 @@
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "On this page, you can see all the items that you requested to the recipients.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L429-L432"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L737-L740"
   },
   {
     "term": "tour.petition-replies.completed-items",
     "definition": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
     "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L446-L452"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L754-L760"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Replies",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L439-L442"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L747-L750"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Here you have your information on the requests",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L423-L426"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L731-L734"
   },
   {
     "term": "tour.petitions-list.create-petition",
