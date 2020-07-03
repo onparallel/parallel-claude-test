@@ -294,9 +294,8 @@ type Mutation {
   """
   publicCreatePetitionFieldComment(
     content: String!
+    keycode: ID!
     petitionFieldId: ID!
-    petitionFieldReplyId: ID
-    petitionId: ID!
   ): PublicPetitionFieldComment!
 
   """
@@ -312,9 +311,9 @@ type Mutation {
   Delete a petition field comment.
   """
   publicDeletePetitionFieldComment(
+    keycode: ID!
     petitionFieldCommentId: ID!
     petitionFieldId: ID!
-    petitionId: ID!
   ): Result!
 
   """
@@ -334,24 +333,24 @@ type Mutation {
   Marks the specified comments as read.
   """
   publicMarkPetitionFieldCommentsAsRead(
+    keycode: ID!
     petitionFieldCommentIds: [ID!]!
-    petitionId: ID!
-  ): [PetitionFieldComment!]!
+  ): [PublicPetitionFieldComment!]!
 
   """
   Submits all unpublished comments.
   """
-  publicSubmitUnpublishedComments(petitionId: ID!): [PetitionFieldComment!]!
+  publicSubmitUnpublishedComments(keycode: ID!): [PublicPetitionFieldComment!]!
 
   """
   Update a petition field comment.
   """
   publicUpdatePetitionFieldComment(
     content: String!
+    keycode: ID!
     petitionFieldCommentId: ID!
     petitionFieldId: ID!
-    petitionId: ID!
-  ): PetitionFieldComment!
+  ): PublicPetitionFieldComment!
 
   """
   Reactivates the specified inactive petition accesses.

@@ -101,7 +101,8 @@ export function PetitionRepliesField({
         <CommentsButton
           isActive={isShowingComments}
           commentCount={field.comments.length}
-          newCommentCount={field.comments.filter((c) => c.isUnread).length}
+          hasNewComments={field.comments.some((c) => c.isUnread)}
+          hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
           onClick={onToggleComments}
         />
       </Flex>
@@ -341,6 +342,7 @@ PetitionRepliesField.fragments = {
       comments {
         id
         isUnread
+        publishedAt
       }
     }
     fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
@@ -354,12 +356,14 @@ PetitionRepliesField.fragments = {
 
 function CommentsButton({
   commentCount,
-  newCommentCount,
+  hasNewComments,
+  hasUnpublishedComments,
   isActive,
   onClick,
 }: {
   commentCount: number;
-  newCommentCount: number;
+  hasNewComments: boolean;
+  hasUnpublishedComments: boolean;
   isActive: boolean;
   onClick: ButtonProps["onClick"];
 }) {
@@ -384,21 +388,29 @@ function CommentsButton({
     <Box position="relative">
       {commentCount > 0 ? (
         <Button rightIcon={"comment" as any} fontWeight="normal" {...common}>
+          {hasNewComments || hasUnpublishedComments ? (
+            <Box
+              {...(!hasNewComments
+                ? { borderColor: "yellow.500" }
+                : !hasUnpublishedComments
+                ? { borderColor: isActive ? "white" : "purple.500" }
+                : {
+                    borderLeftColor: "yellow.500",
+                    borderTopColor: "yellow.500",
+                    borderRightColor: isActive ? "white" : "purple.500",
+                    borderBottomColor: isActive ? "white" : "purple.500",
+                  })}
+              borderWidth="4px"
+              transform="rotate(-45deg)"
+              rounded="9999px"
+              marginRight={2}
+            />
+          ) : null}
           {intl.formatNumber(commentCount)}
         </Button>
       ) : (
         <IconButton icon={"comment" as any} {...common} />
       )}
-      {newCommentCount ? (
-        <Box
-          backgroundColor="purple.500"
-          size={2}
-          position="absolute"
-          top="50%"
-          transform="translate(-150%,-50%)"
-          rounded="9999px"
-        />
-      ) : null}
     </Box>
   );
 }

@@ -395,9 +395,9 @@ export interface NexusGenFieldTypes {
     publicDeletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
-    publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
-    publicSubmitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
-    publicUpdatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
@@ -798,9 +798,8 @@ export interface NexusGenArgTypes {
     publicCreatePetitionFieldComment: {
       // args
       content: string; // String!
+      keycode: string; // ID!
       petitionFieldId: string; // ID!
-      petitionFieldReplyId?: string | null; // ID
-      petitionId: string; // ID!
     };
     publicCreateTextReply: {
       // args
@@ -810,9 +809,9 @@ export interface NexusGenArgTypes {
     };
     publicDeletePetitionFieldComment: {
       // args
+      keycode: string; // ID!
       petitionFieldCommentId: string; // ID!
       petitionFieldId: string; // ID!
-      petitionId: string; // ID!
     };
     publicDeletePetitionReply: {
       // args
@@ -826,19 +825,19 @@ export interface NexusGenArgTypes {
     };
     publicMarkPetitionFieldCommentsAsRead: {
       // args
+      keycode: string; // ID!
       petitionFieldCommentIds: string[]; // [ID!]!
-      petitionId: string; // ID!
     };
     publicSubmitUnpublishedComments: {
       // args
-      petitionId: string; // ID!
+      keycode: string; // ID!
     };
     publicUpdatePetitionFieldComment: {
       // args
       content: string; // String!
+      keycode: string; // ID!
       petitionFieldCommentId: string; // ID!
       petitionFieldId: string; // ID!
-      petitionId: string; // ID!
     };
     reactivateAccesses: {
       // args

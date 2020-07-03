@@ -126,7 +126,8 @@ export function RecipientViewPetitionField({
         </Heading>
         <CommentsButton
           commentCount={field.comments.length}
-          newCommentCount={field.comments.filter((c) => c.isUnread).length}
+          hasNewComments={field.comments.some((c) => c.isUnread)}
+          hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
           onClick={onOpenCommentsClick}
         />
       </Flex>
@@ -457,11 +458,13 @@ function FileUploadReplyForm({
 
 function CommentsButton({
   commentCount,
-  newCommentCount,
+  hasNewComments,
+  hasUnpublishedComments,
   onClick,
 }: {
   commentCount: number;
-  newCommentCount: number;
+  hasNewComments: number;
+  hasUnpublishedComments: number;
   onClick: ButtonProps["onClick"];
 }) {
   const intl = useIntl();
@@ -469,6 +472,7 @@ function CommentsButton({
     role: "switch",
     size: "sm",
     variant: "ghost",
+    fontWeight: "normal",
     "aria-label": intl.formatMessage(
       {
         id: "petition-replies.comments-label",
@@ -483,6 +487,24 @@ function CommentsButton({
     <Box position="relative">
       {commentCount > 0 ? (
         <Button rightIcon={"comment" as any} {...common}>
+          {hasNewComments || hasUnpublishedComments ? (
+            <Box
+              {...(!hasNewComments
+                ? { borderColor: "yellow.500" }
+                : !hasUnpublishedComments
+                ? { borderColor: "purple.500" }
+                : {
+                    borderLeftColor: "yellow.500",
+                    borderTopColor: "yellow.500",
+                    borderRightColor: "purple.500",
+                    borderBottomColor: "purple.500",
+                  })}
+              borderWidth="4px"
+              transform="rotate(-45deg)"
+              rounded="9999px"
+              marginRight={2}
+            />
+          ) : null}
           {intl.formatNumber(commentCount)}
         </Button>
       ) : (
@@ -493,16 +515,6 @@ function CommentsButton({
           />
         </Button>
       )}
-      {newCommentCount ? (
-        <Box
-          backgroundColor="purple.500"
-          size={2}
-          position="absolute"
-          top="50%"
-          transform="translate(-150%,-50%)"
-          rounded="9999px"
-        />
-      ) : null}
     </Box>
   );
 }
@@ -527,6 +539,7 @@ RecipientViewPetitionField.fragments = {
         comments {
           id
           isUnread
+          publishedAt
         }
       }
     `;

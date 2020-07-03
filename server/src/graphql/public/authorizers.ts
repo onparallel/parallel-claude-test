@@ -1,54 +1,10 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { PetitionFieldType } from "../../db/__types";
-import { fromGlobalId } from "../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { PublicPetitionNotAvailableError } from "../helpers/errors";
-
-export function replyBelongsToAccess<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
->(
-  argReplyId: TArg1,
-  argKeycode: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const { id: replyId } = fromGlobalId(
-        args[argReplyId],
-        "PetitionFieldReply"
-      );
-      return await ctx.petitions.replyBelongsToAccess(
-        replyId,
-        args[argKeycode]
-      );
-    } catch {}
-    return false;
-  };
-}
-
-export function fieldBelongsToAccess<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
->(
-  argFieldId: TArg1,
-  argKeycode: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const { id: fieldId } = fromGlobalId(args[argFieldId], "PetitionField");
-      return await ctx.petitions.fieldBelongsToAccess(
-        fieldId,
-        args[argKeycode]
-      );
-    } catch {}
-    return false;
-  };
-}
+import { unMaybeArray } from "../../util/arrays";
 
 export function fetchPetitionAccess<
   TypeName extends string,
@@ -104,6 +60,63 @@ export function fieldHastype<
       return Array.isArray(fieldType)
         ? fieldType.includes(field!.type)
         : fieldType === field!.type;
+    } catch {}
+    return false;
+  };
+}
+
+export function fieldBelongsToAccess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>
+>(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const { id: fieldId } = fromGlobalId(args[argFieldId], "PetitionField");
+      return await ctx.petitions.fieldsBelongToPetition(
+        ctx.access!.petition_id,
+        [fieldId]
+      );
+    } catch {}
+    return false;
+  };
+}
+
+export function replyBelongsToAccess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>
+>(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const { id: replyId } = fromGlobalId(
+        args[argReplyId],
+        "PetitionFieldReply"
+      );
+      return await ctx.petitions.repliesBelongsToPetition(
+        ctx.access!.petition_id,
+        [replyId]
+      );
+    } catch {}
+    return false;
+  };
+}
+
+export function commentsBelongsToAccess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string | string[]>
+>(argCommentId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const { ids: commentIds } = fromGlobalIds(
+        unMaybeArray(args[argCommentId]),
+        "PetitionFieldComment"
+      );
+      return await ctx.petitions.commentsBelongToPetition(
+        ctx.access!.petition_id,
+        commentIds
+      );
     } catch {}
     return false;
   };

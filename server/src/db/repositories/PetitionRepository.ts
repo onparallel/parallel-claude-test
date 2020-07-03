@@ -103,66 +103,26 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
       })
       .whereIn("id", commentIds)
+      .whereNull("deleted_at")
       .select(this.count());
     return count === new Set(commentIds).size;
   }
 
-  async replyBelongsToAccess(replyId: number, keycode: string) {
+  async repliesBelongsToPetition(petitionId: number, replyIds: number[]) {
     const {
       rows: [{ count }],
     } = await this.knex.raw(
       /* sql */ `
-      select count(*)::int as count
-        from petition_access as pa
-          join petition as p on p.id = pa.petition_id
-          join petition_field as pf on pf.petition_id = p.id
+      select count(distinct pfr.id)::int as count
+          from petition_field as pf
           join petition_field_reply as pfr on pfr.petition_field_id = pf.id
         where
-          pa.keycode = ? and pfr.id = ?
-          and p.deleted_at is null and pf.deleted_at is null and pfr.deleted_at is null
-        limit 1
+          pf.petition_id = ? and pfr.id in ?
+          and pf.deleted_at is null and pfr.deleted_at is null
     `,
-      [keycode, replyId]
+      [petitionId, replyIds]
     );
-    return count === 1;
-  }
-
-  async replyBelongsToPetition(replyId: number, petitionId: number) {
-    const {
-      rows: [{ count }],
-    } = await this.knex.raw(
-      /* sql */ `
-      select count(*)::int as count
-        from petition as p
-          join petition_field as pf on pf.petition_id = p.id
-          join petition_field_reply as pfr on pfr.petition_field_id = pf.id
-        where
-          p.id = ? and pfr.id = ?
-          and p.deleted_at is null and pf.deleted_at is null and pfr.deleted_at is null
-        limit 1
-    `,
-      [petitionId, replyId]
-    );
-    return count === 1;
-  }
-
-  async fieldBelongsToAccess(fieldId: number, keycode: string) {
-    const {
-      rows: [{ count }],
-    } = await this.knex.raw(
-      /* sql */ `
-      select count(*)::int as count
-        from petition_access as pa
-          join petition as p on p.id = pa.petition_id
-          join petition_field as pf on pf.petition_id = p.id
-        where
-          pa.keycode = ? and pf.id = ?
-          and p.deleted_at is null and pf.deleted_at is null
-        limit 1
-    `,
-      [keycode, fieldId]
-    );
-    return count === 1;
+    return count === new Set(replyIds).size;
   }
 
   async loadPetitionsForUser(
@@ -1301,22 +1261,6 @@ export class PetitionRepository extends BaseRepository {
       user_id: user.id,
       created_by: `User:${user.id}`,
     });
-    // Create contact notifications
-    const accesses = await this.loadAccessesForPetition(comment.petition_id);
-    await this.insert(
-      "petition_contact_notification",
-      accesses
-        .filter((access) => access.status === "ACTIVE")
-        .map((access) => ({
-          type: "COMMENT_CREATED",
-          petition_id: comment.petition_id,
-          contact_id: access.contact_id,
-          data: {
-            petition_field_id: comment.petition_field_id,
-            petition_field_comment_id: comment.id,
-          },
-        }))
-    );
     return comment;
   }
 
@@ -1337,27 +1281,19 @@ export class PetitionRepository extends BaseRepository {
       contact_id: contact.id,
       created_by: `Contact:${contact.id}`,
     });
-    // Create user notifications
-    const petition = await this.loadPetition(comment.petition_id);
-    await this.insert("petition_user_notification", {
-      type: "COMMENT_CREATED",
-      petition_id: comment.petition_id,
-      user_id: petition!.owner_id,
-      data: {
-        petition_field_id: comment.petition_field_id,
-        petition_field_comment_id: comment.id,
-      },
-    });
     return comment;
   }
 
-  async deletePetitionFieldComment(petitionFieldCommentId: number, user: User) {
+  async deletePetitionFieldComment(
+    petitionFieldCommentId: number,
+    deletedBy: string
+  ) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
       .update(
         {
           deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
+          deleted_by: deletedBy,
         },
         "*"
       );
@@ -1409,6 +1345,7 @@ export class PetitionRepository extends BaseRepository {
   ) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
+      .whereNull("deleted_at")
       .update(
         {
           content,
@@ -1421,36 +1358,72 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async publishPetitionFieldCommentsForUser(petitionId: number, user: User) {
-    return await this.from("petition_field_comment")
+    const comments = await this.from("petition_field_comment")
       .where({
         petition_id: petitionId,
         user_id: user.id,
       })
       .whereNull("published_at")
+      .whereNull("deleted_at")
       .update(
         {
           published_at: this.now(),
         },
         "*"
       );
+    // Create contact notifications
+    const accesses = await this.loadAccessesForPetition(petitionId);
+    await this.insert(
+      "petition_contact_notification",
+      accesses
+        .filter((access) => access.status === "ACTIVE")
+        .flatMap((access) =>
+          comments.map((comment) => ({
+            type: "COMMENT_CREATED",
+            petition_id: comment.petition_id,
+            contact_id: access.contact_id,
+            data: {
+              petition_field_id: comment.petition_field_id,
+              petition_field_comment_id: comment.id,
+            },
+          }))
+        )
+    );
+    return comments;
   }
 
   async publishPetitionFieldCommentsForContact(
     petitionId: number,
     contact: Contact
   ) {
-    return await this.from("petition_field_comment")
+    const comments = await this.from("petition_field_comment")
       .where({
         petition_id: petitionId,
         contact_id: contact.id,
       })
       .whereNull("published_at")
+      .whereNull("deleted_at")
       .update(
         {
           published_at: this.now(),
         },
         "*"
       );
+    // Create user notifications
+    const petition = await this.loadPetition(petitionId);
+    await this.insert(
+      "petition_user_notification",
+      comments.map((comment) => ({
+        type: "COMMENT_CREATED",
+        petition_id: comment.petition_id,
+        user_id: petition!.owner_id,
+        data: {
+          petition_field_id: comment.petition_field_id,
+          petition_field_comment_id: comment.id,
+        },
+      }))
+    );
+    return comments;
   }
 
   async markPetitionFieldCommentsAsReadForUser(

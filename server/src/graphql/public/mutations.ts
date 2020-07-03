@@ -7,29 +7,24 @@ import {
 } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { random } from "../../util/token";
-import { chain, and, authenticate, ifArgDefined } from "../helpers/authorize";
+import { and, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
 import {
+  commentsBelongsToAccess,
   fetchPetitionAccess,
   fieldBelongsToAccess,
   fieldHastype,
   replyBelongsToAccess,
 } from "./authorizers";
-import {
-  userHasAccessToPetition,
-  fieldBelongsToPetition,
-  replyBelongsToPetition,
-  commentsBelongsToPetition,
-} from "../petition/authorizers";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
   {
     description: "Deletes a reply to a petition field.",
     type: "Result",
-    authorize: and(
+    authorize: chain(
       fetchPetitionAccess("keycode"),
-      replyBelongsToAccess("replyId", "keycode")
+      replyBelongsToAccess("replyId")
     ),
     args: {
       replyId: idArg({ required: true }),
@@ -62,9 +57,9 @@ export const publicFileUploadReplyComplete = mutationField(
       keycode: idArg({ required: true }),
       replyId: idArg({ required: true }),
     },
-    authorize: and(
+    authorize: chain(
       fetchPetitionAccess("keycode"),
-      replyBelongsToAccess("replyId", "keycode")
+      replyBelongsToAccess("replyId")
     ),
     resolve: async (_, args, ctx) => {
       const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
@@ -109,10 +104,7 @@ export const publicCreateFileUploadReply = mutationField(
       }).asArg({ required: true }),
     },
     authorize: chain(
-      and(
-        fetchPetitionAccess("keycode"),
-        fieldBelongsToAccess("fieldId", "keycode")
-      ),
+      and(fetchPetitionAccess("keycode"), fieldBelongsToAccess("fieldId")),
       fieldHastype("fieldId", "FILE_UPLOAD")
     ),
     resolve: async (_, args, ctx) => {
@@ -159,10 +151,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
     }).asArg({ required: true }),
   },
   authorize: chain(
-    and(
-      fetchPetitionAccess("keycode"),
-      fieldBelongsToAccess("fieldId", "keycode")
-    ),
+    and(fetchPetitionAccess("keycode"), fieldBelongsToAccess("fieldId")),
     fieldHastype("fieldId", "TEXT")
   ),
   resolve: async (_, args, ctx) => {
@@ -203,36 +192,24 @@ export const publicCreatePetitionFieldComment = mutationField(
     description: "Create a petition field comment.",
     type: "PublicPetitionFieldComment",
     authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetition("petitionId"),
-        fieldBelongsToPetition("petitionId", "petitionFieldId"),
-        ifArgDefined(
-          "petitionFieldReplyId",
-          replyBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
-        )
-      )
+      fetchPetitionAccess("keycode"),
+      fieldBelongsToAccess("petitionFieldId")
     ),
     args: {
-      petitionId: idArg({ required: true }),
+      keycode: idArg({ required: true }),
       petitionFieldId: idArg({ required: true }),
-      petitionFieldReplyId: idArg(),
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
       const petitionFieldId = fromGlobalId(
         args.petitionFieldId,
         "PetitionField"
       ).id;
-      const petitionFieldReplyId = args.petitionFieldReplyId
-        ? fromGlobalId(args.petitionFieldReplyId, "PetitionFieldReply").id
-        : null;
       return await ctx.petitions.createPetitionFieldCommentFromContact(
         {
-          petitionId,
+          petitionId: ctx.access!.petition_id,
           petitionFieldId,
-          petitionFieldReplyId,
+          petitionFieldReplyId: null,
           content: args.content,
         },
         ctx.contact!
@@ -247,15 +224,14 @@ export const publicDeletePetitionFieldComment = mutationField(
     description: "Delete a petition field comment.",
     type: "Result",
     authorize: chain(
-      authenticate(),
+      fetchPetitionAccess("keycode"),
       and(
-        userHasAccessToPetition("petitionId"),
-        fieldBelongsToPetition("petitionId", "petitionFieldId"),
-        commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
+        fieldBelongsToAccess("petitionFieldId"),
+        commentsBelongsToAccess("petitionFieldCommentId")
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
+      keycode: idArg({ required: true }),
       petitionFieldId: idArg({ required: true }),
       petitionFieldCommentId: idArg({ required: true }),
     },
@@ -266,7 +242,7 @@ export const publicDeletePetitionFieldComment = mutationField(
       ).id;
       await ctx.petitions.deletePetitionFieldComment(
         petitionFieldCommentId,
-        ctx.user!
+        `Contact:${ctx.contact!.id}`
       );
       return RESULT.SUCCESS;
     },
@@ -277,13 +253,12 @@ export const publicUpdatePetitionFieldComment = mutationField(
   "publicUpdatePetitionFieldComment",
   {
     description: "Update a petition field comment.",
-    type: "PetitionFieldComment",
+    type: "PublicPetitionFieldComment",
     authorize: chain(
-      authenticate(),
+      fetchPetitionAccess("keycode"),
       and(
-        userHasAccessToPetition("petitionId"),
-        fieldBelongsToPetition("petitionId", "petitionFieldId"),
-        commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
+        fieldBelongsToAccess("petitionFieldId"),
+        commentsBelongsToAccess("petitionFieldCommentId"),
         async function commentAuhtorIsContextContact(root, args, ctx, info) {
           const petitionFieldCommentId = fromGlobalId(
             args.petitionFieldCommentId,
@@ -297,7 +272,7 @@ export const publicUpdatePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
+      keycode: idArg({ required: true }),
       petitionFieldId: idArg({ required: true }),
       petitionFieldCommentId: idArg({ required: true }),
       content: stringArg({ required: true }),
@@ -320,16 +295,15 @@ export const publicSubmitUnpublishedComments = mutationField(
   "publicSubmitUnpublishedComments",
   {
     description: "Submits all unpublished comments.",
-    type: "PetitionFieldComment",
+    type: "PublicPetitionFieldComment",
     list: [true],
-    authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
+    authorize: chain(fetchPetitionAccess("keycode")),
     args: {
-      petitionId: idArg({ required: true }),
+      keycode: idArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
       const comments = await ctx.petitions.publishPetitionFieldCommentsForContact(
-        petitionId,
+        ctx.access!.petition_id,
         ctx.contact!
       );
       // TODO enqueue email to notify users about comments
@@ -342,17 +316,14 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
   "publicMarkPetitionFieldCommentsAsRead",
   {
     description: "Marks the specified comments as read.",
-    type: "PetitionFieldComment",
+    type: "PublicPetitionFieldComment",
     list: [true],
     authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetition("petitionId"),
-        commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
-      )
+      fetchPetitionAccess("keycode"),
+      commentsBelongsToAccess("petitionFieldCommentIds")
     ),
     args: {
-      petitionId: idArg({ required: true }),
+      keycode: idArg({ required: true }),
       petitionFieldCommentIds: idArg({ required: true, list: [true] }),
     },
     resolve: async (_, args, ctx) => {

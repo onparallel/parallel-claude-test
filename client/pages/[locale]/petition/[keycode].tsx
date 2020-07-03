@@ -1,3 +1,4 @@
+import { useApolloClient } from "@apollo/react-hooks";
 import {
   Alert,
   AlertDescription,
@@ -8,6 +9,7 @@ import {
   Stack,
   Text,
   useToast,
+  Button,
 } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
@@ -26,24 +28,35 @@ import {
   CreateTextReplyInput,
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
+  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
   RecipientView_createFileUploadReply_FieldFragment,
   RecipientView_createFileUploadReply_PublicPetitionFragment,
+  RecipientView_createPetitionFieldCommentMutationVariables,
+  RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment,
   RecipientView_createTextReply_FieldFragment,
   RecipientView_createTextReply_PublicPetitionFragment,
+  RecipientView_deletePetitionFieldCommentMutationVariables,
+  RecipientView_deletePetitionFieldComment_PetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFragment,
+  RecipientView_updatePetitionFieldCommentMutationVariables,
   usePublicPetitionQuery,
+  useRecipientView_createPetitionFieldCommentMutation,
+  useRecipientView_deletePetitionFieldCommentMutation,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_publicCreateFileUploadReplyMutation,
   useRecipientView_publicCreateTextReplyMutation,
   useRecipientView_publicDeletePetitionReplyMutation,
   useRecipientView_publicFileUploadReplyCompleteMutation,
+  useRecipientView_updatePetitionFieldCommentMutation,
+  useRecipientView_submitUnpublishedCommentsMutation,
+  useRecipientView_markPetitionFieldCommentsAsReadMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import axios, { CancelTokenSource } from "axios";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -144,21 +157,14 @@ function RecipientView({ keycode }: PublicPetitionProps) {
   );
 
   const [finalized, setFinalized] = useState(false);
-  const { allCompleted, completed } = useMemo(() => {
-    const fields: [string, boolean][] = petition.fields.map((f) => [
-      f.id,
-      f.optional || f.replies.length > 0,
-    ]);
-    return {
-      allCompleted: fields.every(([_, completed]) => completed),
-      completed: Object.fromEntries(fields),
-    };
-  }, [petition.fields]);
 
   const handleFinalize = useCallback(
     async function () {
       setFinalized(true);
-      if (allCompleted) {
+      const canFinalize = petition.fields.every(
+        (f) => f.optional || f.replies.length > 0
+      );
+      if (canFinalize) {
         await completePetition({ variables: { keycode } });
         toast({
           title: intl.formatMessage({
@@ -177,7 +183,10 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           isClosable: true,
         });
       } else {
-        const field = petition.fields.find((f) => !completed[f.id])!;
+        // Scroll to first field without replies
+        const field = petition.fields.find(
+          (f) => f.replies.length === 0 && !f.optional
+        )!;
         const node = document.querySelector(`#field-${field.id}`)!;
         scrollIntoView(node);
       }
@@ -187,44 +196,150 @@ function RecipientView({ keycode }: PublicPetitionProps) {
 
   const [selectedFieldId, setSelectedFieldId] = useState<Maybe<string>>(null);
   const selectedField =
-    selectedFieldId && petition.fields.find((f) => f.id === selectedFieldId);
+    petition.fields.find((f) => f.id === selectedFieldId) ?? null;
+
+  const createPetitionFieldComment = useCreatePetitionFieldComment();
+  async function handleAddComment(content: string) {
+    await createPetitionFieldComment({
+      keycode,
+      petitionFieldId: selectedFieldId!,
+      content,
+    });
+  }
+
+  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
+  async function handleUpdateComment(
+    petitionFieldCommentId: string,
+    content: string
+  ) {
+    await updatePetitionFieldComment({
+      keycode,
+      petitionFieldId: selectedFieldId!,
+      petitionFieldCommentId,
+      content,
+    });
+  }
+
+  const deletePetitionFieldComment = useDeletePetitionFieldComment();
+  async function handleDeleteComment(petitionFieldCommentId: string) {
+    await deletePetitionFieldComment({
+      keycode,
+      petitionFieldId: selectedFieldId!,
+      petitionFieldCommentId,
+    });
+  }
+
+  const [
+    submitUnpublishedComments,
+    { loading: isSubmitting },
+  ] = useRecipientView_submitUnpublishedCommentsMutation();
+  async function handleSubmitUnpublished() {
+    await submitUnpublishedComments({
+      variables: { keycode },
+    });
+  }
+
+  const pendingComments = petition.fields.reduce(
+    (acc, f) => acc + f.comments.filter((c) => !c.publishedAt).length,
+    0
+  );
+
+  // Prevent closing when theres pending comments
+  useEffect(() => {
+    if (pendingComments) {
+      window.addEventListener("beforeunload", handler);
+      return () => window.removeEventListener("beforeunload", handler);
+    }
+    function handler(event: BeforeUnloadEvent) {
+      event.returnValue = "";
+      event.preventDefault();
+    }
+  }, [pendingComments]);
+
+  const [
+    markPetitionFieldCommentsAsRead,
+  ] = useRecipientView_markPetitionFieldCommentsAsReadMutation();
+  useEffect(() => {
+    if (selectedFieldId) {
+      const timeout = setTimeout(async () => {
+        await markPetitionFieldCommentsAsRead({
+          variables: {
+            keycode,
+            petitionFieldCommentIds: selectedField!.comments
+              .filter((c) => c.isUnread)
+              .map((c) => c.id),
+          },
+        });
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [selectedFieldId]);
 
   const breakpoint = "md";
   return (
     <>
       <Title />
-      {showCompletedAlert && petition.status === "COMPLETED" ? (
-        <Alert
-          status="success"
-          variant="subtle"
-          position="sticky"
-          top="0"
-          zIndex={2}
-        >
-          <Flex
-            maxWidth="containers.lg"
-            alignItems="center"
-            marginX="auto"
-            width="100%"
-            paddingLeft={4}
-            paddingRight={12}
-          >
-            <AlertIcon />
-            <AlertDescription>
-              <FormattedMessage
-                id="recipient-view.petition-completed-alert"
-                defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
-              />
-            </AlertDescription>
-          </Flex>
-          <CloseButton
-            position="absolute"
-            right="8px"
-            top="8px"
-            onClick={() => setShowCompletedAlert(false)}
-          />
-        </Alert>
-      ) : null}
+      <Box position="sticky" top={0} zIndex={2}>
+        {showCompletedAlert && petition.status === "COMPLETED" ? (
+          <Alert status="success" variant="subtle" zIndex={2}>
+            <Flex
+              maxWidth="containers.lg"
+              alignItems="center"
+              marginX="auto"
+              width="100%"
+              paddingLeft={4}
+              paddingRight={12}
+            >
+              <AlertIcon />
+              <AlertDescription>
+                <FormattedMessage
+                  id="recipient-view.petition-completed-alert"
+                  defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
+                />
+              </AlertDescription>
+            </Flex>
+            <CloseButton
+              position="absolute"
+              right="8px"
+              top="8px"
+              onClick={() => setShowCompletedAlert(false)}
+            />
+          </Alert>
+        ) : null}
+        {pendingComments ? (
+          <Box backgroundColor="yellow.100" shadow="sm">
+            <Flex
+              maxWidth="containers.lg"
+              alignItems="center"
+              marginX="auto"
+              width="100%"
+              paddingX={4}
+              paddingY={2}
+            >
+              <Text flex="1" color="yellow.900">
+                <FormattedMessage
+                  id="recipient-view.submit-unpublished-comments-text"
+                  defaultMessage="You have some pending comments. Submit them at once to notify {sender} in a single email."
+                  values={{ sender: <b>{granter.fullName}</b> }}
+                />
+              </Text>
+              <Button
+                variantColor="yellow"
+                size="sm"
+                marginLeft={4}
+                onClick={handleSubmitUnpublished}
+                isDisabled={isSubmitting}
+              >
+                <FormattedMessage
+                  id="recipient-view.submit-unpublished-comments-button"
+                  defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
+                  values={{ commentCount: pendingComments }}
+                />
+              </Button>
+            </Flex>
+          </Box>
+        ) : null}
+      </Box>
       <Flex
         backgroundColor="gray.50"
         minHeight="100vh"
@@ -265,7 +380,9 @@ function RecipientView({ keycode }: PublicPetitionProps) {
                 id={`field-${field.id}`}
                 field={field}
                 key={field.id}
-                isInvalid={finalized && !completed[field.id]}
+                isInvalid={
+                  finalized && field.replies.length === 0 && !field.optional
+                }
                 uploadProgress={uploadProgress[field.id]}
                 contactId={contact.id}
                 onOpenCommentsClick={() => setSelectedFieldId(field.id)}
@@ -284,7 +401,12 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           display={{ base: "block", [breakpoint]: "none" }}
         />
         <Spacer />
-        <Flex as="footer" justifyContent="center" paddingY={4}>
+        <Flex
+          as="footer"
+          justifyContent="center"
+          paddingTop={4}
+          paddingBottom={8}
+        >
           <Flex flexDirection="column" alignItems="center">
             <Text as="span" fontSize="sm" marginBottom={2}>
               <FormattedMessage
@@ -313,9 +435,9 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           field={selectedField}
           contactId={contact.id}
           onClose={() => setSelectedFieldId(null)}
-          onAddComment={() => {}}
-          onDeleteComment={() => {}}
-          onUpdateComment={() => {}}
+          onAddComment={handleAddComment}
+          onDeleteComment={handleDeleteComment}
+          onUpdateComment={handleUpdateComment}
         />
       ) : null}
     </>
@@ -410,15 +532,13 @@ RecipientView.mutations = [
   `,
   gql`
     mutation RecipientView_createPetitionFieldComment(
-      $petitionId: ID!
+      $keycode: ID!
       $petitionFieldId: ID!
-      $petitionFieldReplyId: ID
       $content: String!
     ) {
       publicCreatePetitionFieldComment(
-        petitionId: $petitionId
+        keycode: $keycode
         petitionFieldId: $petitionFieldId
-        petitionFieldReplyId: $petitionFieldReplyId
         content: $content
       ) {
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
@@ -429,13 +549,13 @@ RecipientView.mutations = [
   `,
   gql`
     mutation RecipientView_updatePetitionFieldComment(
-      $petitionId: ID!
+      $keycode: ID!
       $petitionFieldId: ID!
       $petitionFieldCommentId: ID!
       $content: String!
     ) {
       publicUpdatePetitionFieldComment(
-        petitionId: $petitionId
+        keycode: $keycode
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
@@ -448,20 +568,20 @@ RecipientView.mutations = [
   `,
   gql`
     mutation RecipientView_deletePetitionFieldComment(
-      $petitionId: ID!
+      $keycode: ID!
       $petitionFieldId: ID!
       $petitionFieldCommentId: ID!
     ) {
       publicDeletePetitionFieldComment(
-        petitionId: $petitionId
+        keycode: $keycode
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
       )
     }
   `,
   gql`
-    mutation RecipientView_submitUnpublishedComments($petitionId: ID!) {
-      publicSubmitUnpublishedComments(petitionId: $petitionId) {
+    mutation RecipientView_submitUnpublishedComments($keycode: ID!) {
+      publicSubmitUnpublishedComments(keycode: $keycode) {
         id
         publishedAt
       }
@@ -469,11 +589,11 @@ RecipientView.mutations = [
   `,
   gql`
     mutation RecipientView_markPetitionFieldCommentsAsRead(
-      $petitionId: ID!
+      $keycode: ID!
       $petitionFieldCommentIds: [ID!]!
     ) {
       publicMarkPetitionFieldCommentsAsRead(
-        petitionId: $petitionId
+        keycode: $keycode
         petitionFieldCommentIds: $petitionFieldCommentIds
       ) {
         id
@@ -661,6 +781,134 @@ function useCreateFileUploadReply() {
       });
     },
     [mutate]
+  );
+}
+
+function useCreatePetitionFieldComment() {
+  const [
+    createPetitionFieldComment,
+  ] = useRecipientView_createPetitionFieldCommentMutation();
+  return useCallback(
+    async (
+      variables: RecipientView_createPetitionFieldCommentMutationVariables
+    ) => {
+      await createPetitionFieldComment({
+        variables,
+        update(client, { data }) {
+          if (!data) {
+            return;
+          }
+          const options = {
+            fragment: gql`
+              fragment RecipientView_createPetitionFieldComment_PublicPetitionField on PublicPetitionField {
+                comments {
+                  ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+                }
+              }
+              ${RecipientViewPetitionFieldCommentsDialog.fragments
+                .PublicPetitionFieldComment}
+            `,
+            fragmentName:
+              "RecipientView_createPetitionFieldComment_PublicPetitionField",
+            id: variables.petitionFieldId,
+          };
+          const field = client.readFragment<
+            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
+          >(options);
+          client.writeFragment<
+            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
+          >({
+            ...options,
+            data: {
+              ...field,
+              comments: [
+                ...field!.comments,
+                data!.publicCreatePetitionFieldComment,
+              ],
+            },
+          });
+        },
+      });
+    },
+    [createPetitionFieldComment]
+  );
+}
+
+function useUpdatePetitionFieldComment() {
+  const [
+    updatePetitionFieldComment,
+  ] = useRecipientView_updatePetitionFieldCommentMutation();
+  const apollo = useApolloClient();
+  return useCallback(
+    async (
+      variables: RecipientView_updatePetitionFieldCommentMutationVariables
+    ) => {
+      await updatePetitionFieldComment({
+        variables,
+        optimisticResponse: () => {
+          const comment = apollo.readFragment<
+            RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
+          >({
+            fragment:
+              RecipientViewPetitionFieldCommentsDialog.fragments
+                .PublicPetitionFieldComment,
+            id: variables.petitionFieldCommentId,
+          });
+          return {
+            publicUpdatePetitionFieldComment: {
+              ...comment!,
+              content: variables.content,
+            },
+          };
+        },
+      });
+    },
+    [updatePetitionFieldComment]
+  );
+}
+
+function useDeletePetitionFieldComment() {
+  const [
+    deletePetitionFieldComment,
+  ] = useRecipientView_deletePetitionFieldCommentMutation();
+  return useCallback(
+    async (
+      variables: RecipientView_deletePetitionFieldCommentMutationVariables
+    ) => {
+      await deletePetitionFieldComment({
+        variables,
+        update(client, { data }) {
+          if (!data) {
+            return;
+          }
+          const options = {
+            fragment: gql`
+              fragment RecipientView_deletePetitionFieldComment_PublicPetitionField on PublicPetitionField {
+                comments {
+                  id
+                }
+              }
+            `,
+            id: variables.petitionFieldId,
+          };
+          const field = client.readFragment<
+            RecipientView_deletePetitionFieldComment_PetitionFieldFragment
+          >(options);
+          client.writeFragment<
+            RecipientView_deletePetitionFieldComment_PetitionFieldFragment
+          >({
+            ...options,
+            data: {
+              ...field,
+              comments: field!.comments.filter(
+                (c) => c.id !== variables.petitionFieldCommentId
+              ),
+            },
+          });
+        },
+      });
+    },
+    [deletePetitionFieldComment]
   );
 }
 

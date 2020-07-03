@@ -587,6 +587,7 @@ function useUpdatePetitionFieldComment() {
             fragment:
               PetitionRepliesFieldComments.fragments.PetitionFieldComment,
             id: variables.petitionFieldCommentId,
+            fragmentName: "PetitionRepliesFieldComments_PetitionFieldComment",
           });
           return {
             updatePetitionFieldComment: {

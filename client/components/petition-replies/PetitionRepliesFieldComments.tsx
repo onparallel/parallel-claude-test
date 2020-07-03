@@ -361,7 +361,6 @@ PetitionRepliesFieldComments.fragments = {
         content
       }
       ${this.PetitionFieldComment}
-      ${ContactLink.fragments.Contact}
     `;
   },
   get PetitionFieldComment() {
@@ -381,6 +380,7 @@ PetitionRepliesFieldComments.fragments = {
         publishedAt
         isUnread
       }
+      ${ContactLink.fragments.Contact}
     `;
   },
 };

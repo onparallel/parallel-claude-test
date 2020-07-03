@@ -1,11 +1,7 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { Arg } from "../helpers/authorize";
-import { MaybeArray } from "../../util/types";
-
-function unMaybeArray<T>(items: MaybeArray<T>) {
-  return Array.isArray(items) ? items : [items];
-}
+import { unMaybeArray } from "../../util/arrays";
 
 export function userHasAccessToPetition<
   TypeName extends string,
@@ -107,7 +103,7 @@ export function replyBelongsToPetition<
         args[argNameReplyId],
         "PetitionFieldReply"
       );
-      return ctx.petitions.replyBelongsToPetition(replyId, petitionId);
+      return ctx.petitions.repliesBelongsToPetition(petitionId, [replyId]);
     } catch {}
     return false;
   };

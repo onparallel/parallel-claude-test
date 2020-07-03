@@ -26,7 +26,14 @@ import { FORMATS } from "@parallel/utils/dates";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { gql } from "apollo-boost";
-import { ChangeEvent, Fragment, KeyboardEvent, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  Fragment,
+  KeyboardEvent,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { DateTime } from "../common/DateTime";
@@ -35,11 +42,14 @@ import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
+import { usePreviousValue } from "beautiful-react-hooks";
 
 export function RecipientViewPetitionFieldCommentsDialog({
   contactId,
   field,
   onAddComment,
+  onDeleteComment,
+  onUpdateComment,
   onClose,
 }: {
   contactId: string;
@@ -55,6 +65,18 @@ export function RecipientViewPetitionFieldCommentsDialog({
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Scroll to bttom when a comment is added
+  const commentsRef = useRef<HTMLElement>(null);
+  const previousCommentCount = usePreviousValue(field.comments.length);
+  useEffect(() => {
+    if (
+      previousCommentCount === undefined ||
+      field.comments.length > previousCommentCount
+    ) {
+      commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
+    }
+  }, [field.comments.length, previousCommentCount]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && event.metaKey) {
@@ -95,18 +117,18 @@ export function RecipientViewPetitionFieldCommentsDialog({
         </ModalHeader>
         <ModalCloseButton />
         <Divider />
-        <ModalBody padding={0} overflow="auto" minHeight="0">
+        <ModalBody padding={0} overflow="auto" minHeight="0" ref={commentsRef}>
           {field.comments.map((comment, i) => (
-            <>
+            <Fragment key={comment.id}>
               {i !== 0 ? <Divider /> : null}
               <FieldComment
                 key={comment.id}
                 comment={comment}
                 contactId={contactId}
-                onEdit={() => {}}
-                onDelete={() => {}}
+                onEdit={(content) => onUpdateComment(comment.id, content)}
+                onDelete={() => onDeleteComment(comment.id)}
               />
-            </>
+            </Fragment>
           ))}
           {field.comments.length === 0 ? (
             <Flex

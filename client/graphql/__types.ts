@@ -173,12 +173,22 @@ export type Mutation = {
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: CreateFileUploadReply;
+  /** Create a petition field comment. */
+  publicCreatePetitionFieldComment: PublicPetitionFieldComment;
   /** Creates a reply to a text field. */
   publicCreateTextReply: PublicPetitionFieldReply;
+  /** Delete a petition field comment. */
+  publicDeletePetitionFieldComment: Result;
   /** Deletes a reply to a petition field. */
   publicDeletePetitionReply: Result;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
+  /** Marks the specified comments as read. */
+  publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
+  /** Submits all unpublished comments. */
+  publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
+  /** Update a petition field comment. */
+  publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Sends a petition message to the speicified contacts. */
@@ -291,10 +301,22 @@ export type MutationpublicCreateFileUploadReplyArgs = {
   keycode: Scalars["ID"];
 };
 
+export type MutationpublicCreatePetitionFieldCommentArgs = {
+  content: Scalars["String"];
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+};
+
 export type MutationpublicCreateTextReplyArgs = {
   data: CreateTextReplyInput;
   fieldId: Scalars["ID"];
   keycode: Scalars["ID"];
+};
+
+export type MutationpublicDeletePetitionFieldCommentArgs = {
+  keycode: Scalars["ID"];
+  petitionFieldCommentId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
 };
 
 export type MutationpublicDeletePetitionReplyArgs = {
@@ -305,6 +327,22 @@ export type MutationpublicDeletePetitionReplyArgs = {
 export type MutationpublicFileUploadReplyCompleteArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["ID"];
+};
+
+export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
+  keycode: Scalars["ID"];
+  petitionFieldCommentIds: Array<Scalars["ID"]>;
+};
+
+export type MutationpublicSubmitUnpublishedCommentsArgs = {
+  keycode: Scalars["ID"];
+};
+
+export type MutationpublicUpdatePetitionFieldCommentArgs = {
+  content: Scalars["String"];
+  keycode: Scalars["ID"];
+  petitionFieldCommentId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
 };
 
 export type MutationreactivateAccessesArgs = {
@@ -1442,7 +1480,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     comments: Array<
       { __typename?: "PetitionFieldComment" } & Pick<
         PetitionFieldComment,
-        "id" | "isUnread"
+        "id" | "isUnread" | "publishedAt"
       >
     >;
   };
@@ -1504,7 +1542,7 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
     comments: Array<
       { __typename?: "PublicPetitionFieldComment" } & Pick<
         PublicPetitionFieldComment,
-        "id" | "isUnread"
+        "id" | "isUnread" | "publishedAt"
       >
     >;
   };
@@ -2294,6 +2332,76 @@ export type RecipientView_publicCompletePetitionMutation = {
   >;
 };
 
+export type RecipientView_createPetitionFieldCommentMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  content: Scalars["String"];
+}>;
+
+export type RecipientView_createPetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreatePetitionFieldComment: {
+    __typename?: "PublicPetitionFieldComment";
+  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+};
+
+export type RecipientView_updatePetitionFieldCommentMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["ID"];
+  content: Scalars["String"];
+}>;
+
+export type RecipientView_updatePetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & {
+  publicUpdatePetitionFieldComment: {
+    __typename?: "PublicPetitionFieldComment";
+  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+};
+
+export type RecipientView_deletePetitionFieldCommentMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["ID"];
+}>;
+
+export type RecipientView_deletePetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "publicDeletePetitionFieldComment">;
+
+export type RecipientView_submitUnpublishedCommentsMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type RecipientView_submitUnpublishedCommentsMutation = {
+  __typename?: "Mutation";
+} & {
+  publicSubmitUnpublishedComments: Array<
+    { __typename?: "PublicPetitionFieldComment" } & Pick<
+      PublicPetitionFieldComment,
+      "id" | "publishedAt"
+    >
+  >;
+};
+
+export type RecipientView_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldCommentIds: Array<Scalars["ID"]>;
+}>;
+
+export type RecipientView_markPetitionFieldCommentsAsReadMutation = {
+  __typename?: "Mutation";
+} & {
+  publicMarkPetitionFieldCommentsAsRead: Array<
+    { __typename?: "PublicPetitionFieldComment" } & Pick<
+      PublicPetitionFieldComment,
+      "id" | "isUnread"
+    >
+  >;
+};
+
 export type RecipientView_deletePetitionReply_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
 } & {
@@ -2338,6 +2446,27 @@ export type RecipientView_createFileUploadReply_FieldFragment = {
 export type RecipientView_createFileUploadReply_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status">;
+
+export type RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  comments: Array<
+    {
+      __typename?: "PublicPetitionFieldComment";
+    } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
+  >;
+};
+
+export type RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  comments: Array<
+    { __typename?: "PublicPetitionFieldComment" } & Pick<
+      PublicPetitionFieldComment,
+      "id"
+    >
+  >;
+};
 
 export type PublicPetitionQueryVariables = Exact<{
   keycode: Scalars["ID"];
@@ -2924,6 +3053,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     comments {
       id
       isUnread
+      publishedAt
     }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
@@ -3079,6 +3209,7 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
     comments {
       id
       isUnread
+      publishedAt
     }
   }
 `;
@@ -3183,6 +3314,21 @@ export const RecipientView_createFileUploadReply_FieldFragmentDoc = gql`
 export const RecipientView_createFileUploadReply_PublicPetitionFragmentDoc = gql`
   fragment RecipientView_createFileUploadReply_PublicPetition on PublicPetition {
     status
+  }
+`;
+export const RecipientView_createPetitionFieldComment_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientView_createPetitionFieldComment_PublicPetitionField on PublicPetitionField {
+    comments {
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+    }
+  }
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
+`;
+export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientView_deletePetitionFieldComment_PublicPetitionField on PublicPetitionField {
+    comments {
+      id
+    }
   }
 `;
 export const AppLayout_updateOnboardingStatusDocument = gql`
@@ -5947,6 +6093,298 @@ export type RecipientView_publicCompletePetitionMutationResult = ApolloReactComm
 export type RecipientView_publicCompletePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
   RecipientView_publicCompletePetitionMutation,
   RecipientView_publicCompletePetitionMutationVariables
+>;
+export const RecipientView_createPetitionFieldCommentDocument = gql`
+  mutation RecipientView_createPetitionFieldComment(
+    $keycode: ID!
+    $petitionFieldId: ID!
+    $content: String!
+  ) {
+    publicCreatePetitionFieldComment(
+      keycode: $keycode
+      petitionFieldId: $petitionFieldId
+      content: $content
+    ) {
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+    }
+  }
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
+`;
+export type RecipientView_createPetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_createPetitionFieldCommentMutation,
+  RecipientView_createPetitionFieldCommentMutationVariables
+>;
+
+/**
+ * __useRecipientView_createPetitionFieldCommentMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_createPetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_createPetitionFieldCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewCreatePetitionFieldCommentMutation, { data, loading, error }] = useRecipientView_createPetitionFieldCommentMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function useRecipientView_createPetitionFieldCommentMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    RecipientView_createPetitionFieldCommentMutation,
+    RecipientView_createPetitionFieldCommentMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    RecipientView_createPetitionFieldCommentMutation,
+    RecipientView_createPetitionFieldCommentMutationVariables
+  >(RecipientView_createPetitionFieldCommentDocument, baseOptions);
+}
+export type RecipientView_createPetitionFieldCommentMutationHookResult = ReturnType<
+  typeof useRecipientView_createPetitionFieldCommentMutation
+>;
+export type RecipientView_createPetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_createPetitionFieldCommentMutation
+>;
+export type RecipientView_createPetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_createPetitionFieldCommentMutation,
+  RecipientView_createPetitionFieldCommentMutationVariables
+>;
+export const RecipientView_updatePetitionFieldCommentDocument = gql`
+  mutation RecipientView_updatePetitionFieldComment(
+    $keycode: ID!
+    $petitionFieldId: ID!
+    $petitionFieldCommentId: ID!
+    $content: String!
+  ) {
+    publicUpdatePetitionFieldComment(
+      keycode: $keycode
+      petitionFieldId: $petitionFieldId
+      petitionFieldCommentId: $petitionFieldCommentId
+      content: $content
+    ) {
+      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
+    }
+  }
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
+`;
+export type RecipientView_updatePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_updatePetitionFieldCommentMutation,
+  RecipientView_updatePetitionFieldCommentMutationVariables
+>;
+
+/**
+ * __useRecipientView_updatePetitionFieldCommentMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_updatePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_updatePetitionFieldCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewUpdatePetitionFieldCommentMutation, { data, loading, error }] = useRecipientView_updatePetitionFieldCommentMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function useRecipientView_updatePetitionFieldCommentMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    RecipientView_updatePetitionFieldCommentMutation,
+    RecipientView_updatePetitionFieldCommentMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    RecipientView_updatePetitionFieldCommentMutation,
+    RecipientView_updatePetitionFieldCommentMutationVariables
+  >(RecipientView_updatePetitionFieldCommentDocument, baseOptions);
+}
+export type RecipientView_updatePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof useRecipientView_updatePetitionFieldCommentMutation
+>;
+export type RecipientView_updatePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_updatePetitionFieldCommentMutation
+>;
+export type RecipientView_updatePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_updatePetitionFieldCommentMutation,
+  RecipientView_updatePetitionFieldCommentMutationVariables
+>;
+export const RecipientView_deletePetitionFieldCommentDocument = gql`
+  mutation RecipientView_deletePetitionFieldComment(
+    $keycode: ID!
+    $petitionFieldId: ID!
+    $petitionFieldCommentId: ID!
+  ) {
+    publicDeletePetitionFieldComment(
+      keycode: $keycode
+      petitionFieldId: $petitionFieldId
+      petitionFieldCommentId: $petitionFieldCommentId
+    )
+  }
+`;
+export type RecipientView_deletePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_deletePetitionFieldCommentMutation,
+  RecipientView_deletePetitionFieldCommentMutationVariables
+>;
+
+/**
+ * __useRecipientView_deletePetitionFieldCommentMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_deletePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_deletePetitionFieldCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewDeletePetitionFieldCommentMutation, { data, loading, error }] = useRecipientView_deletePetitionFieldCommentMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
+ *   },
+ * });
+ */
+export function useRecipientView_deletePetitionFieldCommentMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    RecipientView_deletePetitionFieldCommentMutation,
+    RecipientView_deletePetitionFieldCommentMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    RecipientView_deletePetitionFieldCommentMutation,
+    RecipientView_deletePetitionFieldCommentMutationVariables
+  >(RecipientView_deletePetitionFieldCommentDocument, baseOptions);
+}
+export type RecipientView_deletePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof useRecipientView_deletePetitionFieldCommentMutation
+>;
+export type RecipientView_deletePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_deletePetitionFieldCommentMutation
+>;
+export type RecipientView_deletePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_deletePetitionFieldCommentMutation,
+  RecipientView_deletePetitionFieldCommentMutationVariables
+>;
+export const RecipientView_submitUnpublishedCommentsDocument = gql`
+  mutation RecipientView_submitUnpublishedComments($keycode: ID!) {
+    publicSubmitUnpublishedComments(keycode: $keycode) {
+      id
+      publishedAt
+    }
+  }
+`;
+export type RecipientView_submitUnpublishedCommentsMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_submitUnpublishedCommentsMutation,
+  RecipientView_submitUnpublishedCommentsMutationVariables
+>;
+
+/**
+ * __useRecipientView_submitUnpublishedCommentsMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_submitUnpublishedCommentsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_submitUnpublishedCommentsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewSubmitUnpublishedCommentsMutation, { data, loading, error }] = useRecipientView_submitUnpublishedCommentsMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *   },
+ * });
+ */
+export function useRecipientView_submitUnpublishedCommentsMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    RecipientView_submitUnpublishedCommentsMutation,
+    RecipientView_submitUnpublishedCommentsMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    RecipientView_submitUnpublishedCommentsMutation,
+    RecipientView_submitUnpublishedCommentsMutationVariables
+  >(RecipientView_submitUnpublishedCommentsDocument, baseOptions);
+}
+export type RecipientView_submitUnpublishedCommentsMutationHookResult = ReturnType<
+  typeof useRecipientView_submitUnpublishedCommentsMutation
+>;
+export type RecipientView_submitUnpublishedCommentsMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_submitUnpublishedCommentsMutation
+>;
+export type RecipientView_submitUnpublishedCommentsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_submitUnpublishedCommentsMutation,
+  RecipientView_submitUnpublishedCommentsMutationVariables
+>;
+export const RecipientView_markPetitionFieldCommentsAsReadDocument = gql`
+  mutation RecipientView_markPetitionFieldCommentsAsRead(
+    $keycode: ID!
+    $petitionFieldCommentIds: [ID!]!
+  ) {
+    publicMarkPetitionFieldCommentsAsRead(
+      keycode: $keycode
+      petitionFieldCommentIds: $petitionFieldCommentIds
+    ) {
+      id
+      isUnread
+    }
+  }
+`;
+export type RecipientView_markPetitionFieldCommentsAsReadMutationFn = ApolloReactCommon.MutationFunction<
+  RecipientView_markPetitionFieldCommentsAsReadMutation,
+  RecipientView_markPetitionFieldCommentsAsReadMutationVariables
+>;
+
+/**
+ * __useRecipientView_markPetitionFieldCommentsAsReadMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_markPetitionFieldCommentsAsReadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_markPetitionFieldCommentsAsReadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewMarkPetitionFieldCommentsAsReadMutation, { data, loading, error }] = useRecipientView_markPetitionFieldCommentsAsReadMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      petitionFieldCommentIds: // value for 'petitionFieldCommentIds'
+ *   },
+ * });
+ */
+export function useRecipientView_markPetitionFieldCommentsAsReadMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    RecipientView_markPetitionFieldCommentsAsReadMutation,
+    RecipientView_markPetitionFieldCommentsAsReadMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    RecipientView_markPetitionFieldCommentsAsReadMutation,
+    RecipientView_markPetitionFieldCommentsAsReadMutationVariables
+  >(RecipientView_markPetitionFieldCommentsAsReadDocument, baseOptions);
+}
+export type RecipientView_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
+  typeof useRecipientView_markPetitionFieldCommentsAsReadMutation
+>;
+export type RecipientView_markPetitionFieldCommentsAsReadMutationResult = ApolloReactCommon.MutationResult<
+  RecipientView_markPetitionFieldCommentsAsReadMutation
+>;
+export type RecipientView_markPetitionFieldCommentsAsReadMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  RecipientView_markPetitionFieldCommentsAsReadMutation,
+  RecipientView_markPetitionFieldCommentsAsReadMutationVariables
 >;
 export const PublicPetitionDocument = gql`
   query PublicPetition($keycode: ID!) {

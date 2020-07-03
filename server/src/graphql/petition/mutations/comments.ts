@@ -83,7 +83,7 @@ export const deletePetitionFieldComment = mutationField(
       ).id;
       await ctx.petitions.deletePetitionFieldComment(
         petitionFieldCommentId,
-        ctx.user!
+        `User:${ctx.user!.id}`
       );
       return RESULT.SUCCESS;
     },
