@@ -3,6 +3,7 @@ import {
   Box,
   BoxProps,
   Button,
+  ButtonProps,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -15,8 +16,6 @@ import {
   Textarea,
   Tooltip,
   useTheme,
-  ButtonProps,
-  IconButton,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
@@ -25,14 +24,14 @@ import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { gql } from "apollo-boost";
-import { Fragment, useCallback } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { handleInputChange } from "react-select/src/utils";
 
 export type CreateReply = CreateReplyText | CreateReplyFileUpload;
 
@@ -134,12 +133,7 @@ export function RecipientViewPetitionField({
       <Box>
         {field.description ? (
           <Text fontSize="sm" color="gray.600">
-            {field.description?.split("\n").map((line, index) => (
-              <Fragment key={index}>
-                {line}
-                <br />
-              </Fragment>
-            ))}
+            <BreakLines text={field.description} />
           </Text>
         ) : null}
       </Box>
@@ -463,8 +457,8 @@ function CommentsButton({
   onClick,
 }: {
   commentCount: number;
-  hasNewComments: number;
-  hasUnpublishedComments: number;
+  hasNewComments: boolean;
+  hasUnpublishedComments: boolean;
   onClick: ButtonProps["onClick"];
 }) {
   const intl = useIntl();

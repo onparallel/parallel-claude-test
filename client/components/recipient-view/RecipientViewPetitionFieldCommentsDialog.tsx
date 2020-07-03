@@ -1,22 +1,22 @@
 import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalOverlay,
   Badge,
   Box,
   Button,
   Collapse,
+  Flex,
+  Icon,
   IconButton,
   MenuItem,
   MenuList,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Stack,
   Text,
-  Icon,
-  Flex,
 } from "@chakra-ui/core";
 import {
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
@@ -26,15 +26,17 @@ import { FORMATS } from "@parallel/utils/dates";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { gql } from "apollo-boost";
+import { usePreviousValue } from "beautiful-react-hooks";
 import {
   ChangeEvent,
   Fragment,
   KeyboardEvent,
+  useEffect,
   useRef,
   useState,
-  useEffect,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { BreakLines } from "../common/BreakLines";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
@@ -42,7 +44,6 @@ import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
-import { usePreviousValue } from "beautiful-react-hooks";
 
 export function RecipientViewPetitionFieldCommentsDialog({
   contactId,
@@ -340,12 +341,7 @@ function FieldComment({
         </Box>
       ) : (
         <Box fontSize="sm">
-          {content.split("\n").map((line, index) => (
-            <Fragment key={index}>
-              {line}
-              <br />
-            </Fragment>
-          ))}
+          <BreakLines text={content} />
         </Box>
       )}
     </Box>

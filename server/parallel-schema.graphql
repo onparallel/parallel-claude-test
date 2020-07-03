@@ -430,6 +430,15 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Updates the status of a petition field reply.
+  """
+  updatePetitionFieldReplyStatus(
+    petitionFieldReplyId: ID!
+    petitionId: ID!
+    status: PetitionFieldReplyStatus!
+  ): PetitionFieldReply!
+
+  """
   Updates the user with the provided data.
   """
   updateUser(data: UpdateUserInput!, id: ID!): User!

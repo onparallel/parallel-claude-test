@@ -211,6 +211,8 @@ export type Mutation = {
   updatePetitionField: PetitionAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
+  /** Updates the status of a petition field reply. */
+  updatePetitionFieldReplyStatus: PetitionFieldReply;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the validation of a petition field. */
@@ -407,6 +409,12 @@ export type MutationupdatePetitionFieldCommentArgs = {
   petitionFieldCommentId: Scalars["ID"];
   petitionFieldId: Scalars["ID"];
   petitionId: Scalars["ID"];
+};
+
+export type MutationupdatePetitionFieldReplyStatusArgs = {
+  petitionFieldReplyId: Scalars["ID"];
+  petitionId: Scalars["ID"];
+  status: PetitionFieldReplyStatus;
 };
 
 export type MutationupdateUserArgs = {
@@ -2092,6 +2100,21 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
       PetitionFieldComment,
       "id" | "isUnread"
     >
+  >;
+};
+
+export type PetitionReplies_updatePetitionFieldReplyStatusMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  petitionFieldReplyId: Scalars["ID"];
+  status: PetitionFieldReplyStatus;
+}>;
+
+export type PetitionReplies_updatePetitionFieldReplyStatusMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetitionFieldReplyStatus: { __typename?: "PetitionFieldReply" } & Pick<
+    PetitionFieldReply,
+    "id" | "status"
   >;
 };
 
@@ -5196,6 +5219,67 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutationResult = Apol
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionReplies_markPetitionFieldCommentsAsReadMutation,
   PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
+>;
+export const PetitionReplies_updatePetitionFieldReplyStatusDocument = gql`
+  mutation PetitionReplies_updatePetitionFieldReplyStatus(
+    $petitionId: ID!
+    $petitionFieldReplyId: ID!
+    $status: PetitionFieldReplyStatus!
+  ) {
+    updatePetitionFieldReplyStatus(
+      petitionId: $petitionId
+      petitionFieldReplyId: $petitionFieldReplyId
+      status: $status
+    ) {
+      id
+      status
+    }
+  }
+`;
+export type PetitionReplies_updatePetitionFieldReplyStatusMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_updatePetitionFieldReplyStatusMutation,
+  PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_updatePetitionFieldReplyStatusMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_updatePetitionFieldReplyStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_updatePetitionFieldReplyStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesUpdatePetitionFieldReplyStatusMutation, { data, loading, error }] = usePetitionReplies_updatePetitionFieldReplyStatusMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      petitionFieldReplyId: // value for 'petitionFieldReplyId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function usePetitionReplies_updatePetitionFieldReplyStatusMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionReplies_updatePetitionFieldReplyStatusMutation,
+    PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionReplies_updatePetitionFieldReplyStatusMutation,
+    PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+  >(PetitionReplies_updatePetitionFieldReplyStatusDocument, baseOptions);
+}
+export type PetitionReplies_updatePetitionFieldReplyStatusMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldReplyStatusMutation
+>;
+export type PetitionReplies_updatePetitionFieldReplyStatusMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_updatePetitionFieldReplyStatusMutation
+>;
+export type PetitionReplies_updatePetitionFieldReplyStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_updatePetitionFieldReplyStatusMutation,
+  PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: ID!) {

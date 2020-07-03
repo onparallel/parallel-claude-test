@@ -3,13 +3,13 @@ import {
   Box,
   Button,
   Collapse,
+  Flex,
+  Icon,
   IconButton,
   MenuItem,
   MenuList,
   Stack,
   Text,
-  Flex,
-  Icon,
 } from "@chakra-ui/core";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
@@ -30,6 +30,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { BreakLines } from "../common/BreakLines";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
@@ -331,12 +332,7 @@ function FieldComment({
         </Box>
       ) : (
         <Box fontSize="sm">
-          {content.split("\n").map((line, index) => (
-            <Fragment key={index}>
-              {line}
-              <br />
-            </Fragment>
-          ))}
+          <BreakLines text={content} />
         </Box>
       )}
     </Box>

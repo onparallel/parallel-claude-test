@@ -13,13 +13,15 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
+  PetitionFieldReplyStatus,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { BreakLines } from "../common/BreakLines";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
@@ -40,6 +42,10 @@ export type PetitionRepliesFieldProps = BoxProps & {
   isActive: boolean;
   onAction: (action: PetitionRepliesFieldAction) => void;
   onToggleComments: () => void;
+  onUpdateReplyStatus: (
+    replyId: string,
+    status: PetitionFieldReplyStatus
+  ) => void;
   onValidateToggle: () => void;
 };
 
@@ -53,6 +59,7 @@ export function PetitionRepliesField({
   onAction,
   onToggleComments,
   onValidateToggle,
+  onUpdateReplyStatus,
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
@@ -109,12 +116,7 @@ export function PetitionRepliesField({
       <Box marginBottom={2}>
         {field.description ? (
           <Text color="gray.600" fontSize="sm">
-            {field.description?.split("\n").map((line, index) => (
-              <Fragment key={index}>
-                {line}
-                <br />
-              </Fragment>
-            ))}
+            <BreakLines text={field.description} />
           </Text>
         ) : (
           <Text color="gray.400" fontSize="sm" fontStyle="italic">
@@ -126,64 +128,50 @@ export function PetitionRepliesField({
         )}
       </Box>
       {field.replies.length ? (
-        field.type === "TEXT" ? (
-          <Stack spacing={4}>
-            {field.replies.map((reply) => (
-              <PetitionRepliesFieldReply
-                key={reply.id}
-                reply={reply}
-                actions={
+        <Stack spacing={4}>
+          {field.replies.map((reply) => (
+            <PetitionRepliesFieldReply
+              key={reply.id}
+              reply={reply}
+              onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
+              actions={
+                field.type === "TEXT" ? (
                   <CopyToClipboardButton size="xs" text={reply.content.text} />
-                }
-              >
-                {(reply.content.text as string)
-                  .split(/\n/)
-                  .map((line, index) => (
-                    <Fragment key={index}>
-                      {line}
-                      <br />
-                    </Fragment>
-                  ))}
-              </PetitionRepliesFieldReply>
-            ))}
-          </Stack>
-        ) : field.type === "FILE_UPLOAD" ? (
-          <Stack spacing={4}>
-            {field.replies.map((reply) => (
-              <PetitionRepliesFieldReply
-                key={reply.id}
-                reply={reply}
-                actions={[
-                  <IconButtonWithTooltip
-                    key="1"
-                    size="xs"
-                    icon="download"
-                    label={intl.formatMessage({
-                      id: "petition-replies.petition-field-reply.file-download",
-                      defaultMessage: "Download file",
-                    })}
-                    onClick={() => onAction({ type: "DOWNLOAD_FILE", reply })}
-                  />,
-                  ...(isPreviewable(reply.content.contentType)
-                    ? [
-                        <IconButtonWithTooltip
-                          key="2"
-                          size="xs"
-                          icon="view"
-                          label={intl.formatMessage({
-                            id:
-                              "petition-replies.petition-field-reply.file-preview",
-                            defaultMessage: "Preview file",
-                          })}
-                          onClick={() =>
-                            onAction({ type: "PREVIEW_FILE", reply })
-                          }
-                        />,
-                      ]
-                    : []),
-                ]}
-              >
-                <Box display="inling-flex">
+                ) : field.type === "FILE_UPLOAD" ? (
+                  <>
+                    <IconButtonWithTooltip
+                      size="xs"
+                      icon="download"
+                      label={intl.formatMessage({
+                        id:
+                          "petition-replies.petition-field-reply.file-download",
+                        defaultMessage: "Download file",
+                      })}
+                      onClick={() => onAction({ type: "DOWNLOAD_FILE", reply })}
+                    />
+                    {isPreviewable(reply.content.contentType) ? (
+                      <IconButtonWithTooltip
+                        key="2"
+                        size="xs"
+                        icon="view"
+                        label={intl.formatMessage({
+                          id:
+                            "petition-replies.petition-field-reply.file-preview",
+                          defaultMessage: "Preview file",
+                        })}
+                        onClick={() =>
+                          onAction({ type: "PREVIEW_FILE", reply })
+                        }
+                      />
+                    ) : null}
+                  </>
+                ) : null
+              }
+            >
+              {field.type === "TEXT" ? (
+                <BreakLines text={reply.content.text} />
+              ) : field.type === "FILE_UPLOAD" ? (
+                <Box>
                   <VisuallyHidden>
                     {intl.formatMessage({
                       id: "generic.file-name",
@@ -206,10 +194,10 @@ export function PetitionRepliesField({
                     <FileSize value={reply.content.size} />
                   </Text>
                 </Box>
-              </PetitionRepliesFieldReply>
-            ))}
-          </Stack>
-        ) : null
+              ) : null}
+            </PetitionRepliesFieldReply>
+          ))}
+        </Stack>
       ) : (
         <Box paddingY={4}>
           <Text color="gray.400" fontStyle="italic" textAlign="center">
@@ -232,10 +220,12 @@ function PetitionRepliesFieldReply({
   actions,
   children,
   reply,
+  onUpdateStatus,
   ...props
 }: {
   actions: ReactNode;
   reply: PetitionRepliesField_PetitionFieldReplyFragment;
+  onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
 } & PseudoBoxProps) {
   const intl = useIntl();
   return (
@@ -293,6 +283,9 @@ function PetitionRepliesFieldReply({
                   color: "white",
                 },
               })}
+          onClick={() =>
+            onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")
+          }
         />
         <IconButtonWithTooltip
           icon="close"
@@ -322,37 +315,14 @@ function PetitionRepliesFieldReply({
                   color: "white",
                 },
               })}
+          onClick={() =>
+            onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")
+          }
         />
       </Stack>
     </Flex>
   );
 }
-
-PetitionRepliesField.fragments = {
-  PetitionField: gql`
-    fragment PetitionRepliesField_PetitionField on PetitionField {
-      id
-      type
-      title
-      description
-      validated
-      replies {
-        ...PetitionRepliesField_PetitionFieldReply
-      }
-      comments {
-        id
-        isUnread
-        publishedAt
-      }
-    }
-    fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
-      id
-      content
-      status
-      createdAt
-    }
-  `,
-};
 
 function CommentsButton({
   commentCount,
@@ -414,3 +384,29 @@ function CommentsButton({
     </Box>
   );
 }
+
+PetitionRepliesField.fragments = {
+  PetitionField: gql`
+    fragment PetitionRepliesField_PetitionField on PetitionField {
+      id
+      type
+      title
+      description
+      validated
+      replies {
+        ...PetitionRepliesField_PetitionFieldReply
+      }
+      comments {
+        id
+        isUnread
+        publishedAt
+      }
+    }
+    fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      status
+      createdAt
+    }
+  `,
+};

@@ -32,6 +32,7 @@ import {
   PetitionFieldType,
   PetitionStatus,
   User,
+  PetitionFieldReplyStatus,
 } from "../__types";
 
 @injectable()
@@ -117,10 +118,12 @@ export class PetitionRepository extends BaseRepository {
           from petition_field as pf
           join petition_field_reply as pfr on pfr.petition_field_id = pf.id
         where
-          pf.petition_id = ? and pfr.id in ?
+          pf.petition_id = ? and pfr.id in (${replyIds
+            .map((_) => "?")
+            .join(", ")})
           and pf.deleted_at is null and pfr.deleted_at is null
     `,
-      [petitionId, replyIds]
+      [petitionId, ...replyIds]
     );
     return count === new Set(replyIds).size;
   }
@@ -832,6 +835,16 @@ export class PetitionRepository extends BaseRepository {
         petition_field_reply_id: reply.id,
       }),
     ]);
+  }
+
+  async updatePetitionFieldReplyStatus(
+    replyId: number,
+    status: PetitionFieldReplyStatus
+  ) {
+    const [reply] = await this.from("petition_field_reply")
+      .where("id", replyId)
+      .update({ status }, "*");
+    return reply;
   }
 
   async completePetition(petitionId: number, accessId: number) {

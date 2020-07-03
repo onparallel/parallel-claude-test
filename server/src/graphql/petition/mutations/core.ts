@@ -348,6 +348,38 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
   },
 });
 
+export const updatePetitionFieldReplyStatus = mutationField(
+  "updatePetitionFieldReplyStatus",
+  {
+    description: "Updates the status of a petition field reply.",
+    type: "PetitionFieldReply",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetition("petitionId"),
+        replyBelongsToPetition("petitionId", "petitionFieldReplyId")
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      petitionFieldReplyId: idArg({ required: true }),
+      status: arg({ type: "PetitionFieldReplyStatus", required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const { id: petitionFieldReplyId } = fromGlobalId(
+        args.petitionFieldReplyId,
+        "PetitionFieldReply"
+      );
+      const { status } = args;
+
+      return await ctx.petitions.updatePetitionFieldReplyStatus(
+        petitionFieldReplyId,
+        status
+      );
+    },
+  }
+);
+
 export const fileUploadReplyDownloadLink = mutationField(
   "fileUploadReplyDownloadLink",
   {

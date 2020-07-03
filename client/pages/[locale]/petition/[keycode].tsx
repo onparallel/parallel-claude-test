@@ -4,12 +4,12 @@ import {
   AlertDescription,
   AlertIcon,
   Box,
+  Button,
   CloseButton,
   Flex,
   Stack,
   Text,
   useToast,
-  Button,
 } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
@@ -36,27 +36,27 @@ import {
   RecipientView_createTextReply_FieldFragment,
   RecipientView_createTextReply_PublicPetitionFragment,
   RecipientView_deletePetitionFieldCommentMutationVariables,
-  RecipientView_deletePetitionFieldComment_PetitionFieldFragment,
+  RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFragment,
   RecipientView_updatePetitionFieldCommentMutationVariables,
   usePublicPetitionQuery,
   useRecipientView_createPetitionFieldCommentMutation,
   useRecipientView_deletePetitionFieldCommentMutation,
+  useRecipientView_markPetitionFieldCommentsAsReadMutation,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_publicCreateFileUploadReplyMutation,
   useRecipientView_publicCreateTextReplyMutation,
   useRecipientView_publicDeletePetitionReplyMutation,
   useRecipientView_publicFileUploadReplyCompleteMutation,
-  useRecipientView_updatePetitionFieldCommentMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
-  useRecipientView_markPetitionFieldCommentsAsReadMutation,
+  useRecipientView_updatePetitionFieldCommentMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { gql } from "apollo-boost";
 import axios, { CancelTokenSource } from "axios";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -892,10 +892,10 @@ function useDeletePetitionFieldComment() {
             id: variables.petitionFieldId,
           };
           const field = client.readFragment<
-            RecipientView_deletePetitionFieldComment_PetitionFieldFragment
+            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
           >(options);
           client.writeFragment<
-            RecipientView_deletePetitionFieldComment_PetitionFieldFragment
+            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
           >({
             ...options,
             data: {

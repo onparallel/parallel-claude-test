@@ -1,9 +1,9 @@
+import { useApolloClient } from "@apollo/react-hooks";
 import { Box, Button, Stack, Text } from "@chakra-ui/core";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Title } from "@parallel/coponents/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -20,40 +20,41 @@ import {
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
+import { Title } from "@parallel/components/common/Title";
 import {
   PetitionFieldReply,
+  PetitionFieldReplyStatus,
+  PetitionRepliesFieldComments_PetitionFieldCommentFragment,
   PetitionRepliesQuery,
   PetitionRepliesQueryVariables,
   PetitionRepliesUserQuery,
-  UpdatePetitionInput,
-  usePetitionRepliesQuery,
-  usePetitionRepliesUserQuery,
-  usePetitionReplies_fileUploadReplyDownloadLinkMutation,
-  usePetitionReplies_updatePetitionMutation,
-  usePetitionReplies_validatePetitionFieldsMutation,
-  usePetitionReplies_createPetitionFieldCommentMutation,
   PetitionReplies_createPetitionFieldCommentMutationVariables,
   PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
-  usePetitionReplies_deletePetitionFieldCommentMutation,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
-  usePetitionReplies_updatePetitionFieldCommentMutation,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
-  PetitionRepliesFieldComments_PetitionFieldCommentFragment,
-  usePetitionReplies_submitUnpublishedCommentsMutation,
+  PetitionReplies_updatePetitionFieldReplyStatusMutationVariables,
+  UpdatePetitionInput,
+  usePetitionRepliesQuery,
+  usePetitionRepliesUserQuery,
+  usePetitionReplies_createPetitionFieldCommentMutation,
+  usePetitionReplies_deletePetitionFieldCommentMutation,
+  usePetitionReplies_fileUploadReplyDownloadLinkMutation,
   usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
+  usePetitionReplies_submitUnpublishedCommentsMutation,
+  usePetitionReplies_updatePetitionFieldCommentMutation,
+  usePetitionReplies_updatePetitionFieldReplyStatusMutation,
+  usePetitionReplies_updatePetitionMutation,
+  usePetitionReplies_validatePetitionFieldsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { gql } from "apollo-boost";
-import { useCallback, useMemo, useState } from "react";
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
-import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
-import { useApolloClient } from "@apollo/react-hooks";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -221,6 +222,18 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     });
   }
 
+  const updatePetitionFieldReplyStatus = useUpdatePetitionFieldReplyStatus();
+  async function handleUpdateReplyStatus(
+    petitionFieldReplyId: string,
+    status: PetitionFieldReplyStatus
+  ) {
+    await updatePetitionFieldReplyStatus({
+      petitionId,
+      petitionFieldReplyId,
+      status,
+    });
+  }
+
   return (
     <>
       <Title>
@@ -339,6 +352,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                       activeFieldId === field.id ? null : field.id
                     )
                   }
+                  onUpdateReplyStatus={handleUpdateReplyStatus}
                 />
               ))}
             </Stack>
@@ -494,6 +508,22 @@ PetitionReplies.mutations = [
       }
     }
   `,
+  gql`
+    mutation PetitionReplies_updatePetitionFieldReplyStatus(
+      $petitionId: ID!
+      $petitionFieldReplyId: ID!
+      $status: PetitionFieldReplyStatus!
+    ) {
+      updatePetitionFieldReplyStatus(
+        petitionId: $petitionId
+        petitionFieldReplyId: $petitionFieldReplyId
+        status: $status
+      ) {
+        id
+        status
+      }
+    }
+  `,
 ];
 
 function useDownloadReplyFile() {
@@ -644,6 +674,26 @@ function useDeletePetitionFieldComment() {
       });
     },
     [deletePetitionFieldComment]
+  );
+}
+
+function useUpdatePetitionFieldReplyStatus() {
+  const [
+    updatePetitionFieldReplyStatus,
+  ] = usePetitionReplies_updatePetitionFieldReplyStatusMutation({
+    optimisticResponse: ({ petitionFieldReplyId, status }) => ({
+      updatePetitionFieldReplyStatus: {
+        __typename: "PetitionFieldReply",
+        id: petitionFieldReplyId,
+        status,
+      },
+    }),
+  });
+  return useCallback(
+    async (
+      variables: PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+    ) => await updatePetitionFieldReplyStatus({ variables }),
+    [updatePetitionFieldReplyStatus]
   );
 }
 
