@@ -11,7 +11,7 @@ import {
   EditablePlugins,
   EditablePluginsProps,
   isMarkActive,
-  isNodeInSelection,
+  isNodeTypeIn,
   ItalicPlugin,
   ListPlugin,
   MARK_BOLD,
@@ -186,7 +186,7 @@ function ListButton({
   type: string;
 } & Omit<IconButtonWithTooltipProps, "type">) {
   const editor = useSlate();
-  const isActive = isNodeInSelection(editor, type);
+  const isActive = isNodeTypeIn(editor, type);
   return (
     <IconButtonWithTooltip
       placement="bottom"

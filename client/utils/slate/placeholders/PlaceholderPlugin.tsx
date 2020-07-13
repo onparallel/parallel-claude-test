@@ -22,7 +22,7 @@ export function PlaceholderPlugin(placeholders: Placeholder[]) {
         <PlaceholderToken
           value={element.placeholder as string}
           label={placeholder.label}
-          {...attributes}
+          attributes={attributes}
         >
           {children}
         </PlaceholderToken>
@@ -31,25 +31,24 @@ export function PlaceholderPlugin(placeholders: Placeholder[]) {
   });
 }
 
-const PlaceholderToken = forwardRef(function (
-  {
-    value,
-    label,
-    children,
-    ...props
-  }: BoxProps & {
-    value: string;
-    label: string;
-    children: ReactNode;
-  },
-  ref: Ref<HTMLElement>
-) {
+const PlaceholderToken = function ({
+  value,
+  label,
+  attributes,
+  children,
+}: BoxProps & {
+  value: string;
+  label: string;
+  attributes: any;
+  children: ReactNode;
+}) {
   const selected = useSelected();
   const focused = useFocused();
   return (
     <Box
-      {...props}
       contentEditable={false}
+      data-slate-value={value}
+      {...attributes}
       as="span"
       display="inline-block"
       backgroundColor="purple.500"
@@ -61,8 +60,6 @@ const PlaceholderToken = forwardRef(function (
       paddingX={1}
       position="relative"
       top="-1px"
-      ref={ref}
-      data-slate-value={value}
     >
       <PseudoBox
         as="span"
@@ -73,4 +70,4 @@ const PlaceholderToken = forwardRef(function (
       {children}
     </Box>
   );
-});
+};

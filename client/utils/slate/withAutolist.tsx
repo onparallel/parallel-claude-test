@@ -1,6 +1,7 @@
 import {
   toggleList,
-  getTextFromBlockStartToAnchor,
+  getRangeFromBlockStart,
+  getText,
 } from "@udecode/slate-plugins";
 import { Editor, Range, Transforms } from "slate";
 import { nodeTypes } from "../../components/common/RichTextEditor";
@@ -18,16 +19,13 @@ export function withAutolist(
       const SPACE = " ";
 
       if (text === SPACE && selection && Range.isCollapsed(selection)) {
-        const beforeTextEntry = getTextFromBlockStartToAnchor(editor);
+        const beforeAnchor = getRangeFromBlockStart(editor, {
+          at: selection.anchor,
+        });
+        const beforeText = getText(editor, beforeAnchor);
 
-        const SHORTCUTS: { [key: string]: string } = {
-          "*": options.typeLi,
-          "-": options.typeLi,
-        };
-
-        const type = SHORTCUTS[beforeTextEntry.text];
-        if (type) {
-          Transforms.select(editor, beforeTextEntry.range as Range);
+        if (["*", "-"].includes(beforeText)) {
+          Transforms.select(editor, beforeAnchor!);
           Transforms.delete(editor);
 
           toggleList(editor, { ...options, typeList: options.typeUl });

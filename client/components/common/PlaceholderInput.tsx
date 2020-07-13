@@ -13,7 +13,7 @@ import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlacehold
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
 import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
 import { useId } from "@reach/auto-id";
-import { EditablePlugins } from "@udecode/slate-plugins";
+import { EditablePlugins, withInlineVoid } from "@udecode/slate-plugins";
 import { forwardRef, useCallback, useMemo, useRef } from "react";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
@@ -40,6 +40,10 @@ export const PlaceholderInput = forwardRef<
   PlaceholderInputRef,
   PlaceholderInputProps
 >(({ placeholders, value, isDisabled, onChange, ...props }, ref) => {
+  const plugins = useMemo(() => {
+    return [PlaceholderPlugin(placeholders)];
+  }, [placeholders]);
+
   const editor = useMemo(
     () =>
       pipe(
@@ -47,9 +51,10 @@ export const PlaceholderInput = forwardRef<
         withReact,
         withHistory,
         withSingleLine,
-        withPlaceholders(placeholders)
+        withPlaceholders(placeholders),
+        withInlineVoid({ plugins })
       ),
-    [placeholders]
+    [placeholders, plugins]
   );
   const _ref = useMemo(
     () => ({
@@ -89,10 +94,6 @@ export const PlaceholderInput = forwardRef<
     },
     [onChange, onChangePlaceholder, onChangeSelection]
   );
-
-  const plugins = useMemo(() => {
-    return [PlaceholderPlugin(placeholders)];
-  }, [placeholders]);
 
   const wrapper = useRef<HTMLElement>();
   const placeholderMenuId = `placeholder-menu-${useId()}`;

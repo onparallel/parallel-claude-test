@@ -28,7 +28,7 @@
     "@next/bundle-analyzer": "^9.4.4",
     "@reach/auto-id": "^0.10.5",
     "@types/js-cookie": "^2.2.6",
-    "@udecode/slate-plugins": "^0.60.2",
+    "@udecode/slate-plugins": "^0.61.1",
     "@welldone-software/why-did-you-render": "^4.2.5",
     "apollo-boost": "^0.4.9",
     "apollo-link-context": "^1.0.20",
