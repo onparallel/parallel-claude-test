@@ -17,7 +17,7 @@ export function CookieConsent({}: CookieConsentProps) {
   }, []);
 
   function handleConsentClick() {
-    Cookie.set(COOKIE_NAME, "true");
+    Cookie.set(COOKIE_NAME, "true", { sameSite: "strict" });
     setShowConsentBanner(false);
   }
 
