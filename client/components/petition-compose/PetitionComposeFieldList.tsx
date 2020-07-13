@@ -139,16 +139,16 @@ export const PetitionComposeFieldList = Object.assign(
       [onFieldEdit]
     );
 
-    const handleTitleKeyUp = useMemoFactory(
+    const handleTitleKeyDown = useMemoFactory(
       (fieldId: string) => (event: KeyboardEvent<any>) => {
         const index = fieldIds.indexOf(fieldId);
         switch (event.key) {
           case "ArrowDown":
-            focusDescription(fieldId);
+            setTimeout(() => focusDescription(fieldId));
             break;
           case "ArrowUp":
             if (index > 0) {
-              focusDescription(fieldIds[index - 1]);
+              setTimeout(() => focusDescription(fieldIds[index - 1]));
             }
             break;
           case "Enter":
@@ -159,7 +159,7 @@ export const PetitionComposeFieldList = Object.assign(
       [fieldIds.toString()]
     );
 
-    const handleDescriptionKeyUp = useMemoFactory(
+    const handleDescriptionKeyDown = useMemoFactory(
       (fieldId: string) => (event: KeyboardEvent<HTMLTextAreaElement>) => {
         const textarea = event.target as HTMLTextAreaElement;
         const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
@@ -205,8 +205,8 @@ export const PetitionComposeFieldList = Object.assign(
                 onSettingsClick={handleSettingsClick(fieldId)}
                 onDeleteClick={handleDeleteClick(fieldId)}
                 onFieldEdit={handleFieldEdit(fieldId)}
-                onTitleKeyUp={handleTitleKeyUp(fieldId)}
-                onDescriptionKeyUp={handleDescriptionKeyUp(fieldId)}
+                onTitleKeyDown={handleTitleKeyDown(fieldId)}
+                onDescriptionKeyDown={handleDescriptionKeyDown(fieldId)}
               />
             ))}
             <Flex padding={2} justifyContent="center">

@@ -41,8 +41,8 @@ export type PetitionComposeFieldProps = {
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onTitleKeyUp: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onDescriptionKeyUp: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onDescriptionKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 } & Omit<BoxProps, "onFocus">;
 
 interface DragItem {
@@ -62,8 +62,8 @@ export const PetitionComposeField = Object.assign(
     onSettingsClick,
     onFieldEdit,
     onDeleteClick,
-    onTitleKeyUp,
-    onDescriptionKeyUp,
+    onTitleKeyDown,
+    onDescriptionKeyDown,
     ...props
   }: PetitionComposeFieldProps) {
     const intl = useIntl();
@@ -215,7 +215,7 @@ export const PetitionComposeField = Object.assign(
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setTitle(event.target.value ?? null)
               }
-              onKeyUp={onTitleKeyUp}
+              onKeyDown={onTitleKeyDown}
               onBlur={() => {
                 if (title !== field.title) {
                   onFieldEdit({ title });
@@ -254,7 +254,7 @@ export const PetitionComposeField = Object.assign(
                 }
               }}
               // chakra typings are wrong
-              onKeyUp={onDescriptionKeyUp as any}
+              onKeyDown={onDescriptionKeyDown as any}
             />
           </Box>
           <Stack
