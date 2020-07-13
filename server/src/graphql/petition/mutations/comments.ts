@@ -9,9 +9,9 @@ import {
 import { RESULT } from "../../helpers/result";
 import {
   commentsBelongsToPetition,
-  fieldBelongsToPetition,
+  fieldsBelongsToPetition,
   replyBelongsToPetition,
-  userHasAccessToPetition,
+  userHasAccessToPetitions,
 } from "../authorizers";
 
 export const createPetitionFieldComment = mutationField(
@@ -22,8 +22,8 @@ export const createPetitionFieldComment = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetition("petitionId"),
-        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        userHasAccessToPetitions("petitionId"),
+        fieldsBelongsToPetition("petitionId", "petitionFieldId"),
         ifArgDefined(
           "petitionFieldReplyId",
           replyBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
@@ -66,8 +66,8 @@ export const deletePetitionFieldComment = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetition("petitionId"),
-        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        userHasAccessToPetitions("petitionId"),
+        fieldsBelongsToPetition("petitionId", "petitionFieldId"),
         commentsBelongsToPetition("petitionId", "petitionFieldCommentId")
       )
     ),
@@ -98,8 +98,8 @@ export const updatePetitionFieldComment = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetition("petitionId"),
-        fieldBelongsToPetition("petitionId", "petitionFieldId"),
+        userHasAccessToPetitions("petitionId"),
+        fieldsBelongsToPetition("petitionId", "petitionFieldId"),
         commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
         async function commentAuhtorIsContextUser(root, args, ctx, info) {
           const petitionFieldCommentId = fromGlobalId(
@@ -139,7 +139,7 @@ export const submitUnpublishedComments = mutationField(
     description: "Submits all unpublished comments.",
     type: "PetitionFieldComment",
     list: [true],
-    authorize: chain(authenticate(), userHasAccessToPetition("petitionId")),
+    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     args: {
       petitionId: idArg({ required: true }),
     },
@@ -164,7 +164,7 @@ export const markPetitionFieldCommentsAsRead = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetition("petitionId"),
+        userHasAccessToPetitions("petitionId"),
         commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
       )
     ),

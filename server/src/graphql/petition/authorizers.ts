@@ -3,57 +3,18 @@ import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { Arg } from "../helpers/authorize";
 import { unMaybeArray } from "../../util/arrays";
 
-export function userHasAccessToPetition<
-  TypeName extends string,
-  FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => {
-    try {
-      const { id } = fromGlobalId(args[argName], "Petition");
-      return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, [id]);
-    } catch {}
-    return false;
-  };
-}
-
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string[]>
+  TArg extends Arg<TypeName, FieldName, string | string[]>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const ids = args[argName].map((arg: string) => {
-        const { id } = fromGlobalId(arg, "Petition");
-        return id;
-      });
-      return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, ids);
-    } catch {}
-    return false;
-  };
-}
-
-export function fieldBelongsToPetition<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
->(
-  argNamePetitionId: TArg1,
-  argNameFieldId: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (_, args, ctx) => {
-    try {
-      const { id: petitionId } = fromGlobalId(
-        args[argNamePetitionId],
+      const { ids: petitionIds } = fromGlobalIds(
+        unMaybeArray(args[argName]),
         "Petition"
       );
-      const { id: fieldId } = fromGlobalId(
-        args[argNameFieldId],
-        "PetitionField"
-      );
-      return ctx.petitions.fieldsBelongToPetition(petitionId, [fieldId]);
+      return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, petitionIds);
     } catch {}
     return false;
   };
@@ -63,20 +24,20 @@ export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string[]>
+  TArg2 extends Arg<TypeName, FieldName, string | string[]>
 >(
   argNamePetitionId: TArg1,
   argNameFieldIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
+      const { ids: fieldIds } = fromGlobalIds(
+        unMaybeArray(args[argNameFieldIds]),
+        "PetitionField"
+      );
       const { id: petitionId } = fromGlobalId(
         args[argNamePetitionId],
         "Petition"
-      );
-      const { ids: fieldIds } = fromGlobalIds(
-        args[argNameFieldIds],
-        "PetitionField"
       );
       return ctx.petitions.fieldsBelongToPetition(petitionId, fieldIds);
     } catch {}
