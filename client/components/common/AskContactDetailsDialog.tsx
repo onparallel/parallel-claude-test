@@ -44,6 +44,7 @@ export function AskContactDetailsDialog({
   }
   return (
     <ConfirmDialog
+      closeOnOverlayClick={false}
       focusRef={defaultEmail ? nameRef : emailRef}
       content={{
         as: "form",
