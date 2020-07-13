@@ -4,12 +4,7 @@ import Knex, { Transaction, QueryBuilder } from "knex";
 import { indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray, UnwrapPromise } from "../../util/types";
-import {
-  TableCreateTypes,
-  TablePrimaryKeys,
-  TableTypes,
-  Maybe,
-} from "../__types";
+import { TableCreateTypes, TablePrimaryKeys, TableTypes } from "../__types";
 
 export interface PageOpts {
   offset?: number | null;
@@ -20,15 +15,6 @@ type TableNames = keyof TableTypes;
 type TableKey<
   TName extends TableNames
 > = TableTypes[TName][TablePrimaryKeys[TName]] & (string | number);
-
-interface Timestamped {
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-}
 
 @injectable()
 export class BaseRepository {
