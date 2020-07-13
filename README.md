@@ -25,6 +25,7 @@ The backend uses the following libraries:
 - [GraphQL Nexus](https://nexus.js.org/) for creating the GraphQL schema with full TypeScript support.
 - [InversifyJS](http://inversify.io/) for doing Dependency Injection.
 - [Knex.js](https://knexjs.org/) for building and running SQL queries.
+- [Dataloader](https://github.com/graphql/dataloader) for avoiding the N + 1 query problem with GraphQL.
 
 ### Commands
 
