@@ -76,66 +76,67 @@ export async function up(knex: Knex): Promise<any> {
   const sendouts = await knex<PetitionSendout>("petition_sendout").orderBy(
     "id"
   );
-  if (sendouts.length === 0) {
-    return;
-  }
-  const groups = groupBy(sendouts, (s) => `${s.petition_id},${s.contact_id}`);
-  // create accesses
-  const _accesses: Omit<PetitionAccess, "id">[] = Object.values(groups)
-    .map(sortBy((s) => s.created_at))
-    .map((group) => {
-      const first = group[0];
-      const last = group[group.length - 1];
+  if (sendouts.length > 0) {
+    const groups = groupBy(sendouts, (s) => `${s.petition_id},${s.contact_id}`);
+    // create accesses
+    const _accesses: Omit<PetitionAccess, "id">[] = Object.values(groups)
+      .map(sortBy((s) => s.created_at))
+      .map((group) => {
+        const first = group[0];
+        const last = group[group.length - 1];
+        return {
+          petition_id: first.petition_id,
+          contact_id: first.contact_id,
+          granter_id: last.sender_id,
+          status: "ACTIVE",
+          reminders_left: 0,
+          reminders_active: false,
+          reminders_config: null,
+          next_reminder_at: null,
+          ...pick(first, [
+            "created_at",
+            "created_by",
+            "updated_at",
+            "updated_by",
+          ]),
+          ...pick(last, ["keycode"]),
+        };
+      });
+
+    const accesses = await knex<PetitionAccess>("petition_access").insert(
+      _accesses,
+      "*"
+    );
+
+    const indexed = indexBy(
+      accesses,
+      (a) => `${a.petition_id},${a.contact_id}`
+    );
+
+    const _messages: Omit<PetitionMessage, "id">[] = sendouts.map((s) => {
+      const access = indexed[`${s.petition_id},${s.contact_id}`];
       return {
-        petition_id: first.petition_id,
-        contact_id: first.contact_id,
-        granter_id: last.sender_id,
-        status: "ACTIVE",
-        reminders_left: 0,
-        reminders_active: false,
-        reminders_config: null,
-        next_reminder_at: null,
-        ...pick(first, [
+        petition_access_id: access.id,
+        status:
+          s.status === "SCHEDULED"
+            ? "SCHEDULED"
+            : s.status === "CANCELLED"
+            ? "CANCELLED"
+            : "PROCESSED",
+        ...pick(s, [
+          "petition_id",
+          "sender_id",
+          "email_log_id",
+          "email_subject",
+          "email_body",
+          "scheduled_at",
           "created_at",
           "created_by",
-          "updated_at",
-          "updated_by",
         ]),
-        ...pick(last, ["keycode"]),
       };
     });
-
-  const accesses = await knex<PetitionAccess>("petition_access").insert(
-    _accesses,
-    "*"
-  );
-
-  const indexed = indexBy(accesses, (a) => `${a.petition_id},${a.contact_id}`);
-
-  const _messages: Omit<PetitionMessage, "id">[] = sendouts.map((s) => {
-    const access = indexed[`${s.petition_id},${s.contact_id}`];
-    return {
-      petition_access_id: access.id,
-      status:
-        s.status === "SCHEDULED"
-          ? "SCHEDULED"
-          : s.status === "CANCELLED"
-          ? "CANCELLED"
-          : "PROCESSED",
-      ...pick(s, [
-        "petition_id",
-        "sender_id",
-        "email_log_id",
-        "email_subject",
-        "email_body",
-        "scheduled_at",
-        "created_at",
-        "created_by",
-      ]),
-    };
-  });
-  await knex<PetitionMessage>("petition_message").insert(_messages);
-  await knex.raw(/* sql */ `
+    await knex<PetitionMessage>("petition_message").insert(_messages);
+    await knex.raw(/* sql */ `
     update petition_reminder as pr
       set
         petition_access_id = map.petition_access_id,
@@ -154,7 +155,7 @@ export async function up(knex: Knex): Promise<any> {
     where
       pr.petition_sendout_id = map.petition_sendout_id
   `);
-  await knex.raw(/* sql */ `
+    await knex.raw(/* sql */ `
     update petition_field_reply as pfr
       set
         petition_access_id = map.petition_access_id
@@ -169,7 +170,7 @@ export async function up(knex: Knex): Promise<any> {
     where
       pfr.petition_sendout_id = map.petition_sendout_id
   `);
-
+  }
   // ...
   await knex.raw(/* sql */ `
     alter table petition_reminder
