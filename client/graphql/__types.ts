@@ -1298,6 +1298,28 @@ export type PetitionComposeMessageEditor_PetitionFragment = {
     >;
   };
 
+export type DownloadAllDialog_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "title" | "type"> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
+        "content"
+      > & {
+          access?: Maybe<
+            { __typename?: "PetitionAccess" } & {
+              contact?: Maybe<
+                { __typename?: "Contact" } & Pick<
+                  Contact,
+                  "firstName" | "lastName"
+                >
+              >;
+            }
+          >;
+        }
+    >;
+  };
+
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
@@ -1731,7 +1753,8 @@ export type PetitionReplies_PetitionFragment = {
     fields: Array<
       {
         __typename?: "PetitionField";
-      } & PetitionRepliesField_PetitionFieldFragment
+      } & PetitionRepliesField_PetitionFieldFragment &
+        DownloadAllDialog_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionFragment;
 
@@ -2621,16 +2644,33 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     }
   }
 `;
+export const DownloadAllDialog_PetitionFieldFragmentDoc = gql`
+  fragment DownloadAllDialog_PetitionField on PetitionField {
+    title
+    type
+    replies {
+      content
+      access {
+        contact {
+          firstName
+          lastName
+        }
+      }
+    }
+  }
+`;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
+    ...PetitionLayout_Petition
     fields {
       ...PetitionRepliesField_PetitionField
+      ...DownloadAllDialog_PetitionField
     }
-    ...PetitionLayout_Petition
   }
-  ${PetitionRepliesField_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionRepliesField_PetitionFieldFragmentDoc}
+  ${DownloadAllDialog_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {

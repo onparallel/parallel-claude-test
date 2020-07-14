@@ -1,8 +1,10 @@
-/** @jsx jsx */
 import { Box, BoxProps, PseudoBox } from "@chakra-ui/core";
-import { jsx } from "@emotion/core";
-import { MentionPlugin } from "@udecode/slate-plugins";
-import { forwardRef, ReactNode, Ref } from "react";
+import {
+  getElementDeserializer,
+  getRenderElement,
+  SlatePlugin,
+} from "@udecode/slate-plugins";
+import { ReactNode } from "react";
 import { RenderElementProps, useFocused, useSelected } from "slate-react";
 
 export type Placeholder = {
@@ -10,25 +12,34 @@ export type Placeholder = {
   label: string;
 };
 
-export function PlaceholderPlugin(placeholders: Placeholder[]) {
-  return MentionPlugin({
-    typeMention: "placeholder",
-    prefix: "#",
-    component: ({ children, attributes, element }: RenderElementProps) => {
-      const placeholder = placeholders.find(
-        (p) => p.value === element.placeholder
-      )!;
-      return (
-        <PlaceholderToken
-          value={element.placeholder as string}
-          label={placeholder.label}
-          attributes={attributes}
-        >
-          {children}
-        </PlaceholderToken>
-      );
+export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
+  return {
+    renderElement: getRenderElement({
+      type: "placeholder",
+      component: ({ children, attributes, element }: RenderElementProps) => {
+        const placeholder = placeholders.find(
+          (p) => p.value === element.placeholder
+        )!;
+        return (
+          <PlaceholderToken
+            value={element.placeholder as string}
+            label={placeholder.label}
+            attributes={attributes}
+          >
+            {children}
+          </PlaceholderToken>
+        );
+      },
+    }),
+    deserialize: {
+      element: getElementDeserializer("placeholder", {
+        createElement: (el) => ({
+          type: "placeholder",
+          value: el.getAttribute("data-placeholder"),
+        }),
+      }),
     },
-  });
+  };
 }
 
 const PlaceholderToken = function ({
@@ -47,7 +58,7 @@ const PlaceholderToken = function ({
   return (
     <Box
       contentEditable={false}
-      data-slate-value={value}
+      data-placeholder={value}
       {...attributes}
       as="span"
       display="inline-block"
@@ -58,6 +69,7 @@ const PlaceholderToken = function ({
       shadow={selected && focused ? "outline" : "none"}
       textTransform="uppercase"
       paddingX={1}
+      marginX="0.1em"
       position="relative"
       top="-1px"
     >

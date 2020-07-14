@@ -7,5 +7,6 @@ export function insertPlaceholder(editor: Editor, placeholder: Placeholder) {
     placeholder: placeholder.value,
     children: [{ text: "" }],
   });
+
   Transforms.move(editor);
 }

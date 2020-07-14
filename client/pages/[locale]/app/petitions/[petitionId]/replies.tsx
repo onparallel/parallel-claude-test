@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Flex,
   IconButton,
   MenuItem,
   MenuList,
@@ -20,7 +19,12 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  DownloadAllDialog,
+  useDownloadAllDialog,
+} from "@parallel/components/petition-replies/DownloadAllDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
   PetitionRepliesField,
@@ -47,8 +51,6 @@ import { gql } from "apollo-boost";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
-import { useDownloadAllDialog } from "@parallel/components/petition-replies/DownloadAllDialog";
-import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -129,7 +131,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const downloadAllDialog = useDownloadAllDialog();
   const handleDownloadAllClick = useCallback(async () => {
     try {
-      const pattern = await downloadAllDialog({});
+      const pattern = await downloadAllDialog({ fields: petition!.fields });
       window.open(
         `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
           pattern
@@ -137,7 +139,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         "_blank"
       );
     } catch {}
-  }, [petitionId]);
+  }, [petitionId, petition!.fields]);
 
   const {
     selection,
@@ -281,13 +283,15 @@ PetitionReplies.fragments = {
   Petition: gql`
     fragment PetitionReplies_Petition on Petition {
       id
+      ...PetitionLayout_Petition
       fields {
         ...PetitionRepliesField_PetitionField
+        ...DownloadAllDialog_PetitionField
       }
-      ...PetitionLayout_Petition
     }
     ${PetitionLayout.fragments.Petition}
     ${PetitionRepliesField.fragments.PetitionField}
+    ${DownloadAllDialog.fragments.PetitionField}
   `,
   User: gql`
     fragment PetitionReplies_User on User {

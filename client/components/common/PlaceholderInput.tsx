@@ -1,7 +1,11 @@
-/** @jsx jsx */
-import { PseudoBox, PseudoBoxProps, useTheme } from "@chakra-ui/core";
+import {
+  Box,
+  PseudoBox,
+  PseudoBoxProps,
+  useTheme,
+  Tooltip,
+} from "@chakra-ui/core";
 import Popper, { PopperProps } from "@chakra-ui/core/dist/Popper";
-import { jsx } from "@emotion/core";
 import {
   Placeholder,
   PlaceholderPlugin,
@@ -13,8 +17,8 @@ import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlacehold
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
 import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
 import { useId } from "@reach/auto-id";
-import { EditablePlugins, withInlineVoid } from "@udecode/slate-plugins";
-import { forwardRef, useCallback, useMemo, useRef } from "react";
+import { EditablePlugins } from "@udecode/slate-plugins";
+import { forwardRef, useCallback, useMemo, useRef, MouseEvent } from "react";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
@@ -24,6 +28,7 @@ import {
   withSingleLine,
 } from "../../utils/slate/withSingleLine";
 import { Card } from "./Card";
+import { useIntl } from "react-intl";
 
 export type PlaceholderInputProps = {
   placeholders: Placeholder[];
@@ -40,10 +45,7 @@ export const PlaceholderInput = forwardRef<
   PlaceholderInputRef,
   PlaceholderInputProps
 >(({ placeholders, value, isDisabled, onChange, ...props }, ref) => {
-  const plugins = useMemo(() => {
-    return [PlaceholderPlugin(placeholders)];
-  }, [placeholders]);
-
+  const intl = useIntl();
   const editor = useMemo(
     () =>
       pipe(
@@ -51,11 +53,15 @@ export const PlaceholderInput = forwardRef<
         withReact,
         withHistory,
         withSingleLine,
-        withPlaceholders(placeholders),
-        withInlineVoid({ plugins })
+        withPlaceholders(placeholders)
       ),
-    [placeholders, plugins]
+    [placeholders]
   );
+
+  const plugins = useMemo(() => {
+    return [PlaceholderPlugin(placeholders)];
+  }, [placeholders]);
+
   const _ref = useMemo(
     () => ({
       focus: () => {
@@ -112,6 +118,17 @@ export const PlaceholderInput = forwardRef<
   );
   const selected = isOpen ? values[selectedIndex] : undefined;
 
+  function onPlaceholderButtonClick(event: MouseEvent) {
+    event.stopPropagation();
+    Transforms.insertText(editor, "#", { at: editor.selection?.anchor });
+    ReactEditor.focus(editor);
+  }
+
+  const hint = intl.formatMessage({
+    id: "component.placeholder-input.hint",
+    defaultMessage: "Press # to add replaceable placeholders",
+  });
+
   return (
     <>
       <PseudoBox
@@ -124,7 +141,8 @@ export const PlaceholderInput = forwardRef<
         height={10}
         display="flex"
         alignItems="center"
-        paddingX={3}
+        paddingLeft={3}
+        paddingRight={2}
         {...styles}
         {...props}
       >
@@ -147,6 +165,41 @@ export const PlaceholderInput = forwardRef<
             }
           />
         </Slate>
+        <Tooltip
+          label={hint}
+          aria-label={hint}
+          showDelay={300}
+          zIndex={1500}
+          placement="top"
+        >
+          <PseudoBox
+            as="button"
+            display="inline-block"
+            border="1px solid"
+            borderBottomWidth="3px"
+            color="gray.600"
+            borderColor="gray.300"
+            rounded="sm"
+            textTransform="uppercase"
+            fontSize="xs"
+            paddingX={1}
+            marginLeft={1}
+            cursor="default"
+            _hover={{
+              borderColor: "gray.400",
+              color: "gray.900",
+            }}
+            _active={{
+              borderBottomWidth: "1px",
+            }}
+            animation="border-bottom-width 150ms ease"
+            onClick={onPlaceholderButtonClick}
+          >
+            <Box as="span" aria-hidden="true">
+              #
+            </Box>
+          </PseudoBox>
+        </Tooltip>
       </PseudoBox>
       <PlaceholderMenu
         menuId={placeholderMenuId}

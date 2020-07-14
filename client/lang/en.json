@@ -12,6 +12,12 @@
     "reference": "components/common/BurgerButton.tsx#L33-L36"
   },
   {
+    "term": "component.card-header.close",
+    "definition": "Close",
+    "context": "Close",
+    "reference": "components/common/Card.tsx#L61-L64"
+  },
+  {
     "term": "component.confirm-dialog.cancel-button",
     "definition": "Cancel",
     "context": "Cancel",
@@ -111,67 +117,61 @@
     "term": "component.download-all-dialog.description",
     "definition": "Select if you want to rename the individual files.",
     "context": "Select if you want to rename the individual files.",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L87-L90"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L130-L133"
   },
   {
     "term": "component.download-all-dialog.download-button",
     "definition": "Download files",
     "context": "Download files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L157-L160"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L180-L183"
   },
   {
     "term": "component.download-all-dialog.header",
     "definition": "Download all files",
     "context": "Download all files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L79-L82"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L122-L125"
   },
   {
     "term": "component.download-all-dialog.keep-original",
     "definition": "Keep the original name",
     "context": "Keep the original name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L147-L150"
-  },
-  {
-    "term": "component.download-all-dialog.placeholder-hint",
-    "definition": "Hint: Type <x>hash key</x> to add replaceable placeholders",
-    "context": "Hint: Type <x>hash key</x> to add replaceable placeholders",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L119-L143"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L170-L173"
   },
   {
     "term": "component.download-all-dialog.rename",
     "definition": "Rename files",
     "context": "Rename files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L104-L107"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L147-L150"
   },
   {
     "term": "component.download-dialog.placeholder-contact-first-name",
     "definition": "Contact first name",
     "context": "Contact first name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L53-L56"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L47-L50"
   },
   {
     "term": "component.download-dialog.placeholder-contact-last-name",
     "definition": "Contact last name",
     "context": "Contact last name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L60-L63"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L54-L57"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Field number",
     "context": "Field number",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L39-L42"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L33-L36"
   },
   {
     "term": "component.download-dialog.placeholder-field-title",
     "definition": "Field title",
     "context": "Field title",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L46-L49"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L40-L43"
   },
   {
     "term": "component.download-dialog.placeholder-file-name",
     "definition": "File name",
     "context": "File name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L67-L70"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L61-L64"
   },
   {
     "term": "component.error-dialog.header",
@@ -372,10 +372,10 @@
     "reference": "components/common/PetitionStatusFilter.tsx#L34-L37"
   },
   {
-    "term": "component.placeholder-input.placeholder",
-    "definition": "Placeholder",
-    "context": "Placeholder",
-    "reference": "utils/slate/placeholders/PlaceholderPlugin.tsx#L72-L75"
+    "term": "component.placeholder-input.hint",
+    "definition": "Press # to add replaceable placeholders",
+    "context": "Press # to add replaceable placeholders",
+    "reference": "components/common/PlaceholderInput.tsx#L127-L130"
   },
   {
     "term": "component.react-select.loading",
@@ -447,7 +447,7 @@
     "term": "component.search-input.placeholder",
     "definition": "Search...",
     "context": "Search...",
-    "reference": "components/common/SearchInput.tsx#L63-L66"
+    "reference": "components/common/SearchInput.tsx#L65-L68"
   },
   {
     "term": "component.send-button.options",
@@ -543,19 +543,19 @@
     "term": "contact.edit-details-button",
     "definition": "Edit",
     "context": "Edit",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L204-L207"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L203-L206"
   },
   {
     "term": "contact.no-petitions",
     "definition": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
     "context": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L241-L245"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L234-L238"
   },
   {
     "term": "contact.petitions-header",
     "definition": "Petitions sent{name, select, null {} other { to {name}}}",
     "context": "Petitions sent{name, select, null {} other { to {name}}}",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L219-L223"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L213-L217"
   },
   {
     "term": "contacts.confirm-delete.body",
@@ -573,13 +573,13 @@
     "term": "contacts.create-new-contact.continue-button",
     "definition": "Continue",
     "context": "Continue",
-    "reference": "components/common/AskContactDetailsDialog.tsx#L114-L117"
+    "reference": "components/common/AskContactDetailsDialog.tsx#L115-L118"
   },
   {
     "term": "contacts.create-new-contact.header",
     "definition": "Enter the contact details",
     "context": "Enter the contact details",
-    "reference": "components/common/AskContactDetailsDialog.tsx#L53-L56"
+    "reference": "components/common/AskContactDetailsDialog.tsx#L54-L57"
   },
   {
     "term": "contacts.header.created-at",
@@ -669,61 +669,61 @@
     "term": "field-settings.file-multiple-description",
     "definition": "Enabling this allows the recipient to upload multiple files to this field.",
     "context": "Enabling this allows the recipient to upload multiple files to this field.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L116-L119"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L88-L91"
   },
   {
     "term": "field-settings.file-multiple-label",
     "definition": "Allow multiple file uploads",
     "context": "Allow multiple file uploads",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L102-L105"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L74-L77"
   },
   {
     "term": "field-settings.multiple-description",
     "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L121-L124"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L93-L96"
   },
   {
     "term": "field-settings.multiple-label",
     "definition": "Allow multiple replies",
     "context": "Allow multiple replies",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L107-L110"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L79-L82"
   },
   {
     "term": "field-settings.required-description",
     "definition": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
     "context": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L79-L82"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L52-L55"
   },
   {
     "term": "field-settings.required-label",
     "definition": "Required",
     "context": "Required",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L72-L75"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L45-L48"
   },
   {
     "term": "field-settings.text-multiline-description",
     "definition": "Enabling this will display a multi-line input field instead of a single line.",
     "context": "Enabling this will display a multi-line input field instead of a single line.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L191-L194"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L162-L165"
   },
   {
     "term": "field-settings.text-multiline-label",
     "definition": "Multi-line",
     "context": "Multi-line",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L184-L187"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L155-L158"
   },
   {
     "term": "field-settings.text-placeholder-description",
     "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L223-L226"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L193-L196"
   },
   {
     "term": "field-settings.text-placeholder-label",
     "definition": "Placeholder",
     "context": "Placeholder",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L215-L218"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L185-L188"
   },
   {
     "term": "generic.actions-button",
@@ -741,7 +741,7 @@
     "term": "generic.cancel-save-changes",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L178-L181"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L177-L180"
   },
   {
     "term": "generic.changes-saved",
@@ -822,6 +822,12 @@
     "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L416-L419"
   },
   {
+    "term": "generic.for-example",
+    "definition": "E.g. {example}",
+    "context": "E.g. {example}",
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L162-L166"
+  },
+  {
     "term": "generic.forms.confirm-password-label",
     "definition": "Confirm password",
     "context": "Confirm password",
@@ -831,31 +837,31 @@
     "term": "generic.forms.email-label",
     "definition": "Email",
     "context": "Email",
-    "reference": "pages/[locale]/login.tsx#L225-L228"
+    "reference": "pages/[locale]/login.tsx#L220-L223"
   },
   {
     "term": "generic.forms.email-placeholder",
     "definition": "name@example.com",
     "context": "name@example.com",
-    "reference": "components/common/AskContactDetailsDialog.tsx#L74-L77"
+    "reference": "components/common/AskContactDetailsDialog.tsx#L75-L78"
   },
   {
     "term": "generic.forms.first-name-label",
     "definition": "First name",
     "context": "First name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L68-L71"
+    "reference": "pages/[locale]/app/settings/account.tsx#L71-L74"
   },
   {
     "term": "generic.forms.invalid-email-error",
     "definition": "Please, enter a valid email",
     "context": "Please, enter a valid email",
-    "reference": "pages/[locale]/login.tsx#L241-L244"
+    "reference": "pages/[locale]/login.tsx#L236-L239"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
     "definition": "Old password is incorrect",
     "context": "Old password is incorrect",
-    "reference": "pages/[locale]/app/settings/security.tsx#L114-L117"
+    "reference": "pages/[locale]/app/settings/security.tsx#L117-L120"
   },
   {
     "term": "generic.forms.invalid-verification-code",
@@ -867,37 +873,37 @@
     "term": "generic.forms.last-name-label",
     "definition": "Last name",
     "context": "Last name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L90-L93"
+    "reference": "pages/[locale]/app/settings/account.tsx#L93-L96"
   },
   {
     "term": "generic.forms.new-password-label",
     "definition": "New password",
     "context": "New password",
-    "reference": "pages/[locale]/login.tsx#L332-L335"
+    "reference": "pages/[locale]/login.tsx#L327-L330"
   },
   {
     "term": "generic.forms.old-password-label",
     "definition": "Old password",
     "context": "Old password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L94-L97"
+    "reference": "pages/[locale]/app/settings/security.tsx#L97-L100"
   },
   {
     "term": "generic.forms.password-label",
     "definition": "Password",
     "context": "Password",
-    "reference": "pages/[locale]/login.tsx#L356-L359"
+    "reference": "pages/[locale]/login.tsx#L351-L354"
   },
   {
     "term": "generic.forms.password-policy-error",
     "definition": "The password must have a least 8 characters",
     "context": "The password must have a least 8 characters",
-    "reference": "pages/[locale]/login.tsx#L347-L350"
+    "reference": "pages/[locale]/login.tsx#L342-L345"
   },
   {
     "term": "generic.forms.passwords-must-match",
     "definition": "Passwords must match",
     "context": "Passwords must match",
-    "reference": "pages/[locale]/login.tsx#L371-L374"
+    "reference": "pages/[locale]/login.tsx#L366-L369"
   },
   {
     "term": "generic.forms.required-field-error",
@@ -909,25 +915,25 @@
     "term": "generic.forms.required-first-name-error",
     "definition": "First name is required",
     "context": "First name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L81-L84"
+    "reference": "pages/[locale]/app/settings/account.tsx#L84-L87"
   },
   {
     "term": "generic.forms.required-last-name-error",
     "definition": "Last name is required",
     "context": "Last name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L103-L106"
+    "reference": "pages/[locale]/app/settings/account.tsx#L106-L109"
   },
   {
     "term": "generic.forms.required-old-password-error",
     "definition": "Old password is required",
     "context": "Old password is required",
-    "reference": "pages/[locale]/app/settings/security.tsx#L106-L109"
+    "reference": "pages/[locale]/app/settings/security.tsx#L109-L112"
   },
   {
     "term": "generic.forms.required-password-error",
     "definition": "Please, enter a password",
     "context": "Please, enter a password",
-    "reference": "pages/[locale]/login.tsx#L262-L265"
+    "reference": "pages/[locale]/login.tsx#L257-L260"
   },
   {
     "term": "generic.forms.required-verification-code",
@@ -993,7 +999,7 @@
     "term": "generic.reload-data",
     "definition": "Reload",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L219-L222"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L226-L229"
   },
   {
     "term": "generic.required-field",
@@ -1029,13 +1035,13 @@
     "term": "generic.save-changes",
     "definition": "Save",
     "context": "Save",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L192-L195"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L191-L194"
   },
   {
     "term": "generic.saving-changes",
     "definition": "Saving...",
     "context": "Saving...",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L187-L190"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L186-L189"
   },
   {
     "term": "generic.today-at",
@@ -1161,7 +1167,7 @@
     "term": "petition-accesses.deadline-header",
     "definition": "Deadline",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L287-L290"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L280-L283"
   },
   {
     "term": "petition-accesses.next-reminder-header",
@@ -1179,7 +1185,7 @@
     "term": "petition-accesses.progress-header",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L310-L313"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L303-L306"
   },
   {
     "term": "petition-accesses.reminders-sent-header",
@@ -1203,7 +1209,7 @@
     "term": "petition-accesses.status-header",
     "definition": "Status",
     "context": "Status",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L324-L327"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L317-L320"
   },
   {
     "term": "petition.activity-not-available",
@@ -1215,31 +1221,25 @@
     "term": "petition.add-another-field-button",
     "definition": "Add another field",
     "context": "Add another field",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L221-L224"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L219-L222"
   },
   {
     "term": "petition.add-field-button",
     "definition": "Add field",
     "context": "Add field",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L249-L252"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L247-L250"
   },
   {
     "term": "petition.already-sent",
     "definition": "This petition has already been sent.",
     "context": "This petition has already been sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L365-L368"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L366-L369"
   },
   {
     "term": "petition.change-deadline",
     "definition": "Change deadline",
     "context": "Change deadline",
     "reference": "components/petition-common/PetitionSettingsModal.tsx#L151-L154"
-  },
-  {
-    "term": "petition.close-sidebar-button",
-    "definition": "Close",
-    "context": "Close",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L61-L64"
   },
   {
     "term": "petition.completed-petition-dialog.body",
@@ -1365,13 +1365,13 @@
     "term": "petition.empty-header",
     "definition": "What information do you want us to collect?",
     "context": "What information do you want us to collect?",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L231-L234"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L229-L232"
   },
   {
     "term": "petition.empty-text",
     "definition": "Let's add our first field",
     "context": "Let's add our first field",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L237-L240"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L235-L238"
   },
   {
     "term": "petition.field-delete-button",
@@ -1395,7 +1395,7 @@
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L51-L54"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L37-L40"
   },
   {
     "term": "petition.field-title-label",
@@ -1425,7 +1425,7 @@
     "term": "petition.fields-header",
     "definition": "This is the information that you need",
     "context": "This is the information that you need",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L191-L194"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L190-L193"
   },
   {
     "term": "petition.header.activity-tab",
@@ -1497,13 +1497,13 @@
     "term": "petition.no-fields-error",
     "definition": "Please add at least one field to the petition.",
     "context": "Please add at least one field to the petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L203-L206"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L192-L195"
   },
   {
     "term": "petition.no-fields-without-title-error",
     "definition": "Please add a title to every field.",
     "context": "Please add a title to every field.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L221-L224"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L210-L213"
   },
   {
     "term": "petition.no-reminders-left.toast-description",
@@ -1545,37 +1545,37 @@
     "term": "petition.petition-scheduled-toast.description",
     "definition": "Your petition will be sent on {date}.",
     "context": "Your petition will be sent on {date}.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L296-L299"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L285-L288"
   },
   {
     "term": "petition.petition-scheduled-toast.title",
     "definition": "Petition scheduled",
     "context": "Petition scheduled",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L286-L289"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L275-L278"
   },
   {
     "term": "petition.petition-send-error.description",
     "definition": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
     "context": "There was an error sending your petition. Try again and, if it fails, reach out to support for help.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L274-L278"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L263-L267"
   },
   {
     "term": "petition.petition-send-error.title",
     "definition": "Error",
     "context": "Error",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L270-L273"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L259-L262"
   },
   {
     "term": "petition.petition-sent-toast.description",
     "definition": "Your petition is on it's way.",
     "context": "Your petition is on it's way.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L302-L305"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L291-L294"
   },
   {
     "term": "petition.petition-sent-toast.title",
     "definition": "Petition sent",
     "context": "Petition sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L290-L293"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L279-L282"
   },
   {
     "term": "petition.reminder-sent.toast-description",
@@ -1611,7 +1611,7 @@
     "term": "petition.replies.download-all",
     "definition": "Download all",
     "context": "Download all",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L243-L246"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L250-L253"
   },
   {
     "term": "petition.replies.download-file-error-dialog.body",
@@ -1629,19 +1629,19 @@
     "term": "petition.replies.select-all",
     "definition": "All",
     "context": "All",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L199-L202"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L206-L209"
   },
   {
     "term": "petition.replies.select-none",
     "definition": "None",
     "context": "None",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L205-L208"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L212-L215"
   },
   {
     "term": "petition.replies.validate-selected",
     "definition": "Mark as reviewed",
     "context": "Mark as reviewed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L235-L238"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L242-L245"
   },
   {
     "term": "petition.schedule-delivery.header",
@@ -1659,7 +1659,7 @@
     "term": "petition.send-from-activity",
     "definition": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L371-L384"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L372-L385"
   },
   {
     "term": "petition.send-message-header.header",
@@ -2277,25 +2277,25 @@
     "term": "public.login-button",
     "definition": "Login",
     "context": "Login",
-    "reference": "pages/[locale]/login.tsx#L276-L279"
+    "reference": "pages/[locale]/login.tsx#L271-L274"
   },
   {
     "term": "public.login.already-logged-in.continue-button",
     "definition": "Continue as {name}",
     "context": "Continue as {name}",
-    "reference": "pages/[locale]/login.tsx#L176-L180"
+    "reference": "pages/[locale]/login.tsx#L171-L175"
   },
   {
     "term": "public.login.already-logged-in.explanation",
     "definition": "You are already logged in as {name}",
     "context": "You are already logged in as {name}",
-    "reference": "pages/[locale]/login.tsx#L161-L165"
+    "reference": "pages/[locale]/login.tsx#L156-L160"
   },
   {
     "term": "public.login.already-logged-in.relogin",
     "definition": "Login as someone else",
     "context": "Login as someone else",
-    "reference": "pages/[locale]/login.tsx#L184-L187"
+    "reference": "pages/[locale]/login.tsx#L179-L182"
   },
   {
     "term": "public.login.back-to-forgot-link",
@@ -2307,61 +2307,61 @@
     "term": "public.login.back-to-login-link",
     "definition": "Go back to login",
     "context": "Go back to login",
-    "reference": "pages/[locale]/login.tsx#L393-L396"
+    "reference": "pages/[locale]/login.tsx#L388-L391"
   },
   {
     "term": "public.login.explanation",
     "definition": "Login using your email and password",
     "context": "Login using your email and password",
-    "reference": "pages/[locale]/login.tsx#L216-L219"
+    "reference": "pages/[locale]/login.tsx#L211-L214"
   },
   {
     "term": "public.login.forgot-password-link",
     "definition": "I forgot my password",
     "context": "I forgot my password",
-    "reference": "pages/[locale]/login.tsx#L284-L287"
+    "reference": "pages/[locale]/login.tsx#L279-L282"
   },
   {
     "term": "public.login.header",
     "definition": "Enter Parallel",
     "context": "Enter Parallel",
-    "reference": "pages/[locale]/login.tsx#L210-L213"
+    "reference": "pages/[locale]/login.tsx#L205-L208"
   },
   {
     "term": "public.login.invalid-login.description",
     "definition": "The email or password are invalid.",
     "context": "The email or password are invalid.",
-    "reference": "pages/[locale]/login.tsx#L73-L76"
+    "reference": "pages/[locale]/login.tsx#L71-L74"
   },
   {
     "term": "public.login.invalid-login.title",
     "definition": "Invalid login",
     "context": "Invalid login",
-    "reference": "pages/[locale]/login.tsx#L69-L72"
+    "reference": "pages/[locale]/login.tsx#L67-L70"
   },
   {
     "term": "public.login.password-update-button",
     "definition": "Update password",
     "context": "Update password",
-    "reference": "pages/[locale]/login.tsx#L385-L388"
+    "reference": "pages/[locale]/login.tsx#L380-L383"
   },
   {
     "term": "public.login.password-update-explanation",
     "definition": "First time users need to update their password",
     "context": "First time users need to update their password",
-    "reference": "pages/[locale]/login.tsx#L323-L326"
+    "reference": "pages/[locale]/login.tsx#L318-L321"
   },
   {
     "term": "public.login.password-update-header",
     "definition": "Update your password",
     "context": "Update your password",
-    "reference": "pages/[locale]/login.tsx#L317-L320"
+    "reference": "pages/[locale]/login.tsx#L312-L315"
   },
   {
     "term": "public.login.title",
     "definition": "Login",
     "context": "Login",
-    "reference": "pages/[locale]/login.tsx#L109-L112"
+    "reference": "pages/[locale]/login.tsx#L107-L110"
   },
   {
     "term": "public.meta-description",
@@ -2619,7 +2619,7 @@
     "term": "recipient-view.organization",
     "definition": "Business",
     "context": "Business",
-    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L80-L83"
+    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L43-L46"
   },
   {
     "term": "recipient-view.petition-completed-alert",
@@ -2661,13 +2661,13 @@
     "term": "recipient-view.sender",
     "definition": "Sender",
     "context": "Sender",
-    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L95-L98"
+    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L58-L61"
   },
   {
     "term": "recipient-view.sender-email",
     "definition": "Sender email",
     "context": "Sender email",
-    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L108-L111"
+    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L71-L74"
   },
   {
     "term": "recipient-view.submit-button",
@@ -2691,25 +2691,25 @@
     "term": "settings.account",
     "definition": "Account",
     "context": "Account",
-    "reference": "pages/[locale]/app/settings/account.tsx#L51"
+    "reference": "pages/[locale]/app/settings/account.tsx#L54"
   },
   {
     "term": "settings.account.change-password-button",
     "definition": "Change password",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L171-L174"
+    "reference": "pages/[locale]/app/settings/security.tsx#L174-L177"
   },
   {
     "term": "settings.account.name-header",
     "definition": "Name",
     "context": "Name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L56-L59"
+    "reference": "pages/[locale]/app/settings/account.tsx#L59-L62"
   },
   {
     "term": "settings.account.update-name-button",
     "definition": "Save changes",
     "context": "Save changes",
-    "reference": "pages/[locale]/app/settings/account.tsx#L112-L115"
+    "reference": "pages/[locale]/app/settings/account.tsx#L115-L118"
   },
   {
     "term": "settings.header",
@@ -2721,25 +2721,25 @@
     "term": "settings.security",
     "definition": "Security",
     "context": "Security",
-    "reference": "pages/[locale]/app/settings/security.tsx#L77"
+    "reference": "pages/[locale]/app/settings/security.tsx#L80"
   },
   {
     "term": "settings.security.password-change-toast-description",
     "definition": "Your password has been successfully changed.",
     "context": "Your password has been successfully changed.",
-    "reference": "pages/[locale]/app/settings/security.tsx#L62-L65"
+    "reference": "pages/[locale]/app/settings/security.tsx#L65-L68"
   },
   {
     "term": "settings.security.password-change-toast-title",
     "definition": "Password changed",
     "context": "Password changed",
-    "reference": "pages/[locale]/app/settings/security.tsx#L58-L61"
+    "reference": "pages/[locale]/app/settings/security.tsx#L61-L64"
   },
   {
     "term": "settings.security.password-header",
     "definition": "Change password",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L82-L85"
+    "reference": "pages/[locale]/app/settings/security.tsx#L85-L88"
   },
   {
     "term": "supported-locales.english",
@@ -2877,169 +2877,169 @@
     "term": "tour.petition-activity.monitor-requests",
     "definition": "Monitor your requests",
     "context": "Monitor your requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L493-L496"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L495-L498"
   },
   {
     "term": "tour.petition-activity.next-reminder",
     "definition": "See when will the <b>next reminder</b> be sent.",
     "context": "See when will the <b>next reminder</b> be sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L532-L538"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L534-L540"
   },
   {
     "term": "tour.petition-activity.send-manual-reminder",
     "definition": "<b>Send reminders</b> manually to the recipients.",
     "context": "<b>Send reminders</b> manually to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L541-L547"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L543-L549"
   },
   {
     "term": "tour.petition-activity.send-message",
     "definition": "Send a <b>follow-up message</b> to recipients.",
     "context": "Send a <b>follow-up message</b> to recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L523-L529"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L525-L531"
   },
   {
     "term": "tour.petition-activity.track",
     "definition": "Manage who can <b>access</b> this petition.",
     "context": "Manage who can <b>access</b> this petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L514-L520"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L516-L522"
   },
   {
     "term": "tour.petition-activity.you-can",
     "definition": "In this section, you will be able to:",
     "context": "In this section, you will be able to:",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L501-L504"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L503-L506"
   },
   {
     "term": "tour.petition-compose.add-petition-fields",
     "definition": "Here you can add the recipients, your first message, and configure your automatic reminders.",
     "context": "Here you can add the recipients, your first message, and configure your automatic reminders.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L737-L740"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L722-L725"
   },
   {
     "term": "tour.petition-compose.add-petition-fields-title",
     "definition": "Message and automatic reminders",
     "context": "Message and automatic reminders",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L730-L733"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L715-L718"
   },
   {
     "term": "tour.petition-compose.create-petition",
     "definition": "Let's fill out your first petition",
     "context": "Let's fill out your first petition",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L692-L695"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L677-L680"
   },
   {
     "term": "tour.petition-compose.field-types",
     "definition": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies).",
     "context": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies).",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L719-L722"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L704-L707"
   },
   {
     "term": "tour.petition-compose.petition-advanced-settings",
     "definition": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them.",
     "context": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L794-L800"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L779-L785"
   },
   {
     "term": "tour.petition-compose.petition-advanced-settings-title",
     "definition": "Need more customization?",
     "context": "Need more customization?",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L787-L790"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L772-L775"
   },
   {
     "term": "tour.petition-compose.petition-reminders",
     "definition": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders.",
     "context": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L776-L779"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L761-L764"
   },
   {
     "term": "tour.petition-compose.petition-reminders-title",
     "definition": "We will handle this, but tell us a little bit more.",
     "context": "We will handle this, but tell us a little bit more.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L769-L772"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L754-L757"
   },
   {
     "term": "tour.petition-compose.select-multiple-recipients",
     "definition": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
     "context": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L755-L761"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L740-L746"
   },
   {
     "term": "tour.petition-compose.select-recipients-title",
     "definition": "Select your recipients",
     "context": "Select your recipients",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L748-L751"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L733-L736"
   },
   {
     "term": "tour.petition-compose.set-petition",
     "definition": "On this page, you can set up the information that you need from your recipients.",
     "context": "On this page, you can set up the information that you need from your recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L700-L703"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L685-L688"
   },
   {
     "term": "tour.petition-compose.show-around",
     "definition": "Let us show you step by step!",
     "context": "Let us show you step by step!",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L706-L709"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/compose.tsx#L691-L694"
   },
   {
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "On this page, you can see all the items that you requested to the recipients.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L419-L422"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L429-L432"
   },
   {
     "term": "tour.petition-replies.completed-items",
     "definition": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
     "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L436-L442"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L446-L452"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Replies",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L429-L432"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L439-L442"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Here you have your information on the requests",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L413-L416"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L423-L426"
   },
   {
     "term": "tour.petitions-list.create-petition",
     "definition": "Let's start by creating a petition!",
     "context": "Let's start by creating a petition!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L583-L586"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L586-L589"
   },
   {
     "term": "tour.petitions-list.show-around",
     "definition": "If this is your first time here, let us show you around!",
     "context": "If this is your first time here, let us show you around!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L571-L574"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L574-L577"
   },
   {
     "term": "tour.petitions-list.we-collect",
     "definition": "We are here to help you collect information from your clients.",
     "context": "We are here to help you collect information from your clients.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L565-L568"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L568-L571"
   },
   {
     "term": "tour.petitions-list.we-notify",
     "definition": "We will let you know when the recipients complete everything.",
     "context": "We will let you know when the recipients complete everything.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L597-L600"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L600-L603"
   },
   {
     "term": "tour.petitions-list.welcome",
     "definition": "Welcome to Parallel!",
     "context": "Welcome to Parallel!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L557-L560"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L560-L563"
   },
   {
     "term": "tour.petitions-list.you-focus",
     "definition": "We want you to focus on what matters, so let us collect the information for you.",
     "context": "We want you to focus on what matters, so let us collect the information for you.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L591-L594"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L594-L597"
   },
   {
     "term": "tour.skip",
