@@ -12,18 +12,6 @@
     "reference": "components/common/BurgerButton.tsx#L33-L36"
   },
   {
-    "term": "component.card-header.close",
-    "definition": "Cerrar",
-    "context": "Close",
-    "reference": "components/common/Card.tsx#L61-L64"
-  },
-  {
-    "term": "generic.cancel",
-    "definition": "Cancelar",
-    "context": "Cancel",
-    "reference": "components/common/ConfirmDialog.tsx#L43-L46"
-  },
-  {
     "term": "component.contact-list-header.actions-button",
     "definition": "Acciones",
     "context": "Actions",
@@ -117,67 +105,61 @@
     "term": "component.download-all-dialog.description",
     "definition": "Selecciona si quieres renombrar los archivos.",
     "context": "Select if you want to rename the individual files.",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L86-L89"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L130-L133"
   },
   {
     "term": "component.download-all-dialog.download-button",
     "definition": "Descargar",
     "context": "Download files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L156-L159"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L180-L183"
   },
   {
     "term": "component.download-all-dialog.header",
     "definition": "Descargar archivos",
     "context": "Download all files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L78-L81"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L122-L125"
   },
   {
     "term": "component.download-all-dialog.keep-original",
     "definition": "Mantener el nombre original",
     "context": "Keep the original name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L146-L149"
-  },
-  {
-    "term": "component.download-all-dialog.placeholder-hint",
-    "definition": "Pista: Introduce <x>almohadilla</x> para añadir parámetros a sustituir",
-    "context": "Hint: Type <x>hash key</x> to add replaceable placeholders",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L118-L142"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L170-L173"
   },
   {
     "term": "component.download-all-dialog.rename",
     "definition": "Renombrar archivos",
     "context": "Rename files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L103-L106"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L147-L150"
   },
   {
     "term": "component.download-dialog.placeholder-contact-first-name",
     "definition": "Nombre del contacto",
     "context": "Contact first name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L52-L55"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L47-L50"
   },
   {
     "term": "component.download-dialog.placeholder-contact-last-name",
     "definition": "Apellido del contacto",
     "context": "Contact last name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L59-L62"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L54-L57"
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Número del campo",
     "context": "Field number",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L38-L41"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L33-L36"
   },
   {
     "term": "component.download-dialog.placeholder-field-title",
     "definition": "Título del campo",
     "context": "Field title",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L45-L48"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L40-L43"
   },
   {
     "term": "component.download-dialog.placeholder-file-name",
     "definition": "Nombre del archivo",
     "context": "File name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L66-L69"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L61-L64"
   },
   {
     "term": "component.error-dialog.header",
@@ -453,7 +435,7 @@
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search...",
-    "reference": "components/common/SearchInput.tsx#L65-L68"
+    "reference": "components/common/SearchInput.tsx#L63-L66"
   },
   {
     "term": "component.send-button.options",
@@ -774,6 +756,12 @@
     "reference": "components/common/Table.tsx#L172-L175"
   },
   {
+    "term": "generic.comments-button-label",
+    "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+    "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L471-L475"
+  },
+  {
     "term": "generic.confirm-delete-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
@@ -1035,7 +1023,7 @@
     "term": "generic.reload-data",
     "definition": "Refrescar",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L267-L270"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L270-L273"
   },
   {
     "term": "generic.required-field",
@@ -1272,16 +1260,10 @@
     "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L283-L286"
   },
   {
-    "term": "generic.comments-button-label",
-    "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-    "context": "{commentCount, plural, =0 {No hay comentarios} =1 {# comment} other {# comentarios}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L471-L475"
-  },
-  {
     "term": "petition-replies.download-all",
     "definition": "Descargar todo",
     "context": "Download all",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L302-L305"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L305-L308"
   },
   {
     "term": "petition-replies.field-comments.placeholder",
@@ -1329,7 +1311,7 @@
     "term": "petition-replies.submit-comments",
     "definition": "Enviar {commentCount, plural, =1 {# comentario} other{# comentarios}}",
     "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L293-L297"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L296-L300"
   },
   {
     "term": "petition.activity-not-available",
@@ -1720,24 +1702,6 @@
     "definition": "Error descargando {filename}",
     "context": "Error downloading {filename}",
     "reference": "components/petition-replies/FailureGeneratingLinkDialog.tsx#L18-L24"
-  },
-  {
-    "term": "petition.replies.select-all",
-    "definition": "Todos",
-    "context": "All",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L206-L209"
-  },
-  {
-    "term": "petition.replies.select-none",
-    "definition": "Ninguno",
-    "context": "None",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L212-L215"
-  },
-  {
-    "term": "petition.replies.validate-selected",
-    "definition": "Marcar como revisado",
-    "context": "Mark as reviewed",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L242-L245"
   },
   {
     "term": "petition.schedule-delivery.header",
@@ -3099,25 +3063,25 @@
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "En esta página puedes ver todos los elementos que has pedido a los destinatarios.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L737-L740"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L742-L745"
   },
   {
     "term": "tour.petition-replies.completed-items",
     "definition": "Si tus destinatarios han completado la información, podrás <b>descargar</b>, <b>copiar los textos</b> de las respuestas, o <b>marcarlos como revisados</b>.",
     "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L754-L760"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L759-L765"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Respuestas",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L747-L750"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L752-L755"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Aquí tienes la información acerca de las peticiones",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L731-L734"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L736-L739"
   },
   {
     "term": "tour.petitions-list.create-petition",
