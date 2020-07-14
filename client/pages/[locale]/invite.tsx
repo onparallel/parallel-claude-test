@@ -45,7 +45,6 @@ function Invite() {
         paddingY={{ base: 8, md: 16 }}
         wrapper={{
           textAlign: "center",
-          backgroundColor: "purple.50",
           marginBottom: -8,
         }}
       >
@@ -59,13 +58,13 @@ function Invite() {
             <Heading as="h1">
               <FormattedMessage
                 id="public.invite.request-invite"
-                defaultMessage="Request your invite today!"
+                defaultMessage="Request your invite!"
               />
             </Heading>
             <Text marginTop={8}>
               <FormattedMessage
                 id="public.invite.tell-us-about-yourself"
-                defaultMessage="Tell us a bit about yourself, and we will send you a <a>free access</a>."
+                defaultMessage="Leave us your email. We will send you the <a>invitation</a> as soon as possible."
                 values={{
                   a: (chunks: any[]) => (
                     <Text

@@ -1995,37 +1995,43 @@
     "term": "public.book-demo.basic-functions",
     "definition": "<b>Funcionalidades básicas para nuestra plataforma:</b> peticiones, contactos y gestión de documentos.",
     "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
-    "reference": "pages/[locale]/book-demo.tsx#L82-L88"
+    "reference": "pages/[locale]/book-demo.tsx#L88-L94"
   },
   {
     "term": "public.book-demo.checklist",
     "definition": "<b>Cómo enviar un checklist:</b> a varios destinatarios, tipos de campos de información.",
     "context": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
-    "reference": "pages/[locale]/book-demo.tsx#L91-L97"
+    "reference": "pages/[locale]/book-demo.tsx#L97-L103"
+  },
+  {
+    "term": "public.book-demo.contact-soon",
+    "definition": "Alguien de nuestro equipo se pondrá en contacto contigo lo antes posible.",
+    "context": "Someone from our team will contact you as soon as possible.",
+    "reference": "pages/[locale]/book-demo.tsx#L68-L71"
   },
   {
     "term": "public.book-demo.follow",
     "definition": "<b>Seguir el estado de tus peticiones:</b> progreso, confirmación de entrega y lectura.",
     "context": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
-    "reference": "pages/[locale]/book-demo.tsx#L100-L106"
+    "reference": "pages/[locale]/book-demo.tsx#L106-L112"
   },
   {
     "term": "public.book-demo.other-functionalities",
     "definition": "<b>Otras funcionalidades:</b> capas de seguridad adicionales, recordatorios.",
     "context": "<b>Other functionalities:</b> additional security layers, reminders.",
-    "reference": "pages/[locale]/book-demo.tsx#L118-L124"
+    "reference": "pages/[locale]/book-demo.tsx#L124-L130"
   },
   {
     "term": "public.book-demo.request-invite",
-    "definition": "¡Solicita una demo hoy!",
-    "context": "Book a demo today!",
+    "definition": "¡Solicita una demo!",
+    "context": "Book a demo!",
     "reference": "pages/[locale]/book-demo.tsx#L62-L65"
   },
   {
     "term": "public.book-demo.review-and-download",
     "definition": "<b>Revisar y descargar la información recibida:</b> revisar checklists completados y descargar documentos.",
     "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
-    "reference": "pages/[locale]/book-demo.tsx#L109-L115"
+    "reference": "pages/[locale]/book-demo.tsx#L115-L121"
   },
   {
     "term": "public.book-demo.title",
@@ -2037,7 +2043,7 @@
     "term": "public.book-demo.what-we-explain",
     "definition": "En esta demo explicaremos:",
     "context": "In this demo we will explain:",
-    "reference": "pages/[locale]/book-demo.tsx#L68-L71"
+    "reference": "pages/[locale]/book-demo.tsx#L74-L77"
   },
   {
     "term": "public.case.laura.centralized-information",
@@ -2104,6 +2110,42 @@
     "definition": "Sin Parallel",
     "context": "Without Parallel",
     "reference": "pages/[locale]/people.tsx#L57-L60"
+  },
+  {
+    "term": "public.claim.documents-organized",
+    "definition": "Documentos, organizados",
+    "context": "Documents, organized",
+    "reference": "components/public/PublicHeroClaim.tsx#L41-L44"
+  },
+  {
+    "term": "public.claim.focus",
+    "definition": "Deja que el control te dé paz mental",
+    "context": "Let control give you peace of mind",
+    "reference": "components/public/PublicHeroClaim.tsx#L71-L74"
+  },
+  {
+    "term": "public.claim.follow-up",
+    "definition": "Parallel facilita el seguimiento sobre el estado y las conversaciones alrededor de las transacciones para ti y tus destinatarios.",
+    "context": "Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients.",
+    "reference": "components/public/PublicHeroClaim.tsx#L62-L65"
+  },
+  {
+    "term": "public.claim.forget-emails",
+    "definition": "Olvídate de los correos desordenados, Parallel te ayuda a encontrar, revisar y trabajar con la información relevante rápidamente.",
+    "context": "Forget about unorganized emails, petitions in Parallel helps you find, review and work with the relevant documents quickly.",
+    "reference": "components/public/PublicHeroClaim.tsx#L47-L50"
+  },
+  {
+    "term": "public.claim.multiple-recipients",
+    "definition": "Con control puedes decidir y empezar a trabajar cuando sabes que puedes o lo necesitas, deja que el foco te mantenga productivo.",
+    "context": "With control, you can decide and start working when you know you can or need to. Let focus help you stay productive.",
+    "reference": "components/public/PublicHeroClaim.tsx#L77-L80"
+  },
+  {
+    "term": "public.claim.speed",
+    "definition": "Conoce el estado, acelera las transacciones",
+    "context": "Know the status, speed up transactions",
+    "reference": "components/public/PublicHeroClaim.tsx#L56-L59"
   },
   {
     "term": "public.contact-link",
@@ -2238,16 +2280,22 @@
     "reference": "pages/404.tsx#L52"
   },
   {
+    "term": "public.home.hero-claim",
+    "definition": "Libera tu tiempo y tu mente",
+    "context": "Free your time and your mind",
+    "reference": "components/public/PublicHeroClaim.tsx#L17-L20"
+  },
+  {
     "term": "public.home.hero-collect",
-    "definition": "Automatiza emails y recopila documentos eficientemente",
-    "context": "Automate emails and collect documents efficiently",
+    "definition": "Parallel consigue los documentos que necesitas, sin esfuerzo",
+    "context": "Parallel obtains the documents you need, without effort",
     "reference": "components/public/PublicMainHero.tsx#L33-L36"
   },
   {
-    "term": "public.home.hero-digital-transformation",
-    "definition": "¡Pásate a la transformación digital!",
-    "context": "Begin your digital transformation!",
-    "reference": "components/public/PublicMainHero.tsx#L45-L48"
+    "term": "public.home.hero-control",
+    "definition": "Enviando un Parallel obtendrás control sobre el progreso de los documentos y la información que necesitas.",
+    "context": "Sending a Parallel gives you control over the progress of the documents and the information you need.",
+    "reference": "components/public/PublicHeroClaim.tsx#L23-L26"
   },
   {
     "term": "public.home.hero-discover-use",
@@ -2269,8 +2317,8 @@
   },
   {
     "term": "public.home.hero-platform",
-    "definition": "Parallel es una plataforma para profesionales ocupados. Recopilamos toda la documentación de tu cliente por ti de forma segura y rápida.",
-    "context": "Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly.",
+    "definition": "Controlando el estado de los documentos que pides, podrás mantener tu foco en las tareas importantes y ser más productivo.",
+    "context": "Controlling the status of the documents you request, you will keep your focus on tasks that matter and become more productive.",
     "reference": "components/public/PublicMainHero.tsx#L39-L42"
   },
   {
@@ -2280,9 +2328,15 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L19-L22"
   },
   {
+    "term": "public.home.hero-process",
+    "definition": "Convierte la recopilación de información en un proceso profesional y escalable.",
+    "context": "Turn your document collection into a professional and scalable process.",
+    "reference": "components/public/PublicMainHero.tsx#L45-L48"
+  },
+  {
     "term": "public.home.hero-try-now",
-    "definition": "Pruébalo ahora y deja que Parallel trabaje por ti",
-    "context": "Try it now and let Parallel work for you",
+    "definition": "Prueba nuestra solución segura y rápida para gestionar documentos.",
+    "context": "Try our secure and fast solution to manage documents.",
     "reference": "components/public/PublicMainHero.tsx#L77-L80"
   },
   {
@@ -2295,7 +2349,7 @@
     "term": "public.home.title",
     "definition": "Recopila información eficientemente",
     "context": "Collect information efficiently",
-    "reference": "pages/[locale]/index.tsx#L12-L15"
+    "reference": "pages/[locale]/index.tsx#L13-L16"
   },
   {
     "term": "public.how-it-works-hero.client-timings",
@@ -2371,33 +2425,33 @@
   },
   {
     "term": "public.invite-button",
-    "definition": "Prueba Parallel gratis",
-    "context": "Try Parallel free",
+    "definition": "Pide una invitación",
+    "context": "Request an invite",
     "reference": "pages/[locale]/people.tsx#L220-L223"
   },
   {
     "term": "public.invite.consent",
     "definition": "Parallel necesita la información que nos proporcionas para ponernos en contacto contigo acerca de nuestros productos. Puedes darte de baja de estas comunicaciones en cualquier momento.",
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
-    "reference": "pages/[locale]/invite.tsx#L91-L94"
+    "reference": "pages/[locale]/invite.tsx#L90-L93"
   },
   {
     "term": "public.invite.request-invite",
-    "definition": "¡Pide tu invitación hoy!",
-    "context": "Request your invite today!",
-    "reference": "pages/[locale]/invite.tsx#L60-L63"
+    "definition": "¡Pide tu invitación!",
+    "context": "Request your invite!",
+    "reference": "pages/[locale]/invite.tsx#L59-L62"
   },
   {
     "term": "public.invite.review-privacy",
     "definition": "Para más información, por favor revisa nuestra <a>Política de Privacidad</a>.",
     "context": "For more information, please review our <a>Privacy Policy</a>.",
-    "reference": "pages/[locale]/invite.tsx#L97-L107"
+    "reference": "pages/[locale]/invite.tsx#L96-L106"
   },
   {
     "term": "public.invite.tell-us-about-yourself",
-    "definition": "Cuéntanos un poco sobre ti y te enviaremos un <a>acceso gratuito</a>.",
-    "context": "Tell us a bit about yourself, and we will send you a <a>free access</a>.",
-    "reference": "pages/[locale]/invite.tsx#L66-L81"
+    "definition": "Déjanos tu correo. Te enviaremos la <a>invitación</a> lo antes posible.",
+    "context": "Leave us your email. We will send you the <a>invitation</a> as soon as possible.",
+    "reference": "pages/[locale]/invite.tsx#L65-L80"
   },
   {
     "term": "public.invite.title",

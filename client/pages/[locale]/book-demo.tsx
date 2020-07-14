@@ -47,7 +47,7 @@ function BookDemo() {
         paddingY={{ base: 8, md: 16 }}
         wrapper={{
           textAlign: "center",
-          backgroundColor: "purple.50",
+          // backgroundColor: "purple.50",
           marginBottom: -8,
         }}
       >
@@ -61,9 +61,15 @@ function BookDemo() {
             <Heading as="h1">
               <FormattedMessage
                 id="public.book-demo.request-invite"
-                defaultMessage="Book a demo today!"
+                defaultMessage="Book a demo!"
               />
             </Heading>
+            <Text marginTop={8}>
+              <FormattedMessage
+                id="public.book-demo.contact-soon"
+                defaultMessage="Someone from our team will contact you as soon as possible."
+              />
+            </Text>
             <Heading size="md" marginTop={8}>
               <FormattedMessage
                 id="public.book-demo.what-we-explain"

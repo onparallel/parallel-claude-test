@@ -32,19 +32,19 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           <Heading as="h1" fontFamily="hero" fontSize="5xl" fontWeight="light">
             <FormattedMessage
               id="public.home.hero-collect"
-              defaultMessage="Automate emails and collect documents efficiently"
+              defaultMessage="Parallel obtains the documents you need, without effort"
             />
           </Heading>
           <Text marginTop={8}>
             <FormattedMessage
               id="public.home.hero-platform"
-              defaultMessage="Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly."
+              defaultMessage="Controlling the status of the documents you request, you will keep your focus on tasks that matter and become more productive."
             />
           </Text>
           <Text marginTop={4}>
             <FormattedMessage
-              id="public.home.hero-digital-transformation"
-              defaultMessage="Begin your digital transformation!"
+              id="public.home.hero-process"
+              defaultMessage="Turn your document collection into a professional and scalable process."
             />
           </Text>
           <Flex
@@ -60,7 +60,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
               >
                 <FormattedMessage
                   id="public.invite-button"
-                  defaultMessage="Try Parallel free"
+                  defaultMessage="Request an invite"
                 />
               </Button>
             </NakedLink>
@@ -76,7 +76,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           <Text marginTop={8}>
             <FormattedMessage
               id="public.home.hero-try-now"
-              defaultMessage="Try it now and let Parallel work for you"
+              defaultMessage="Try our secure and fast solution to manage documents."
             />
           </Text>
         </Box>

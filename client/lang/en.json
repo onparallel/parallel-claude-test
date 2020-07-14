@@ -1995,37 +1995,43 @@
     "term": "public.book-demo.basic-functions",
     "definition": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
     "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
-    "reference": "pages/[locale]/book-demo.tsx#L82-L88"
+    "reference": "pages/[locale]/book-demo.tsx#L88-L94"
   },
   {
     "term": "public.book-demo.checklist",
     "definition": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
     "context": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
-    "reference": "pages/[locale]/book-demo.tsx#L91-L97"
+    "reference": "pages/[locale]/book-demo.tsx#L97-L103"
+  },
+  {
+    "term": "public.book-demo.contact-soon",
+    "definition": "Someone from our team will contact you as soon as possible.",
+    "context": "Someone from our team will contact you as soon as possible.",
+    "reference": "pages/[locale]/book-demo.tsx#L68-L71"
   },
   {
     "term": "public.book-demo.follow",
     "definition": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
     "context": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
-    "reference": "pages/[locale]/book-demo.tsx#L100-L106"
+    "reference": "pages/[locale]/book-demo.tsx#L106-L112"
   },
   {
     "term": "public.book-demo.other-functionalities",
     "definition": "<b>Other functionalities:</b> additional security layers, reminders.",
     "context": "<b>Other functionalities:</b> additional security layers, reminders.",
-    "reference": "pages/[locale]/book-demo.tsx#L118-L124"
+    "reference": "pages/[locale]/book-demo.tsx#L124-L130"
   },
   {
     "term": "public.book-demo.request-invite",
-    "definition": "Book a demo today!",
-    "context": "Book a demo today!",
+    "definition": "Book a demo!",
+    "context": "Book a demo!",
     "reference": "pages/[locale]/book-demo.tsx#L62-L65"
   },
   {
     "term": "public.book-demo.review-and-download",
     "definition": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
     "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
-    "reference": "pages/[locale]/book-demo.tsx#L109-L115"
+    "reference": "pages/[locale]/book-demo.tsx#L115-L121"
   },
   {
     "term": "public.book-demo.title",
@@ -2037,7 +2043,7 @@
     "term": "public.book-demo.what-we-explain",
     "definition": "In this demo we will explain:",
     "context": "In this demo we will explain:",
-    "reference": "pages/[locale]/book-demo.tsx#L68-L71"
+    "reference": "pages/[locale]/book-demo.tsx#L74-L77"
   },
   {
     "term": "public.case.laura.centralized-information",
@@ -2104,6 +2110,42 @@
     "definition": "Without Parallel",
     "context": "Without Parallel",
     "reference": "pages/[locale]/people.tsx#L57-L60"
+  },
+  {
+    "term": "public.claim.documents-organized",
+    "definition": "Documents, organized",
+    "context": "Documents, organized",
+    "reference": "components/public/PublicHeroClaim.tsx#L41-L44"
+  },
+  {
+    "term": "public.claim.focus",
+    "definition": "Let control give you peace of mind",
+    "context": "Let control give you peace of mind",
+    "reference": "components/public/PublicHeroClaim.tsx#L71-L74"
+  },
+  {
+    "term": "public.claim.follow-up",
+    "definition": "Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients.",
+    "context": "Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients.",
+    "reference": "components/public/PublicHeroClaim.tsx#L62-L65"
+  },
+  {
+    "term": "public.claim.forget-emails",
+    "definition": "Forget about unorganized emails, petitions in Parallel helps you find, review and work with the relevant documents quickly.",
+    "context": "Forget about unorganized emails, petitions in Parallel helps you find, review and work with the relevant documents quickly.",
+    "reference": "components/public/PublicHeroClaim.tsx#L47-L50"
+  },
+  {
+    "term": "public.claim.multiple-recipients",
+    "definition": "With control, you can decide and start working when you know you can or need to. Let focus help you stay productive.",
+    "context": "With control, you can decide and start working when you know you can or need to. Let focus help you stay productive.",
+    "reference": "components/public/PublicHeroClaim.tsx#L77-L80"
+  },
+  {
+    "term": "public.claim.speed",
+    "definition": "Know the status, speed up transactions",
+    "context": "Know the status, speed up transactions",
+    "reference": "components/public/PublicHeroClaim.tsx#L56-L59"
   },
   {
     "term": "public.contact-link",
@@ -2238,16 +2280,22 @@
     "reference": "pages/404.tsx#L52"
   },
   {
+    "term": "public.home.hero-claim",
+    "definition": "Free your time and your mind",
+    "context": "Free your time and your mind",
+    "reference": "components/public/PublicHeroClaim.tsx#L17-L20"
+  },
+  {
     "term": "public.home.hero-collect",
-    "definition": "Automate emails and collect documents efficiently",
-    "context": "Automate emails and collect documents efficiently",
+    "definition": "Parallel obtains the documents you need, without effort",
+    "context": "Parallel obtains the documents you need, without effort",
     "reference": "components/public/PublicMainHero.tsx#L33-L36"
   },
   {
-    "term": "public.home.hero-digital-transformation",
-    "definition": "Begin your digital transformation!",
-    "context": "Begin your digital transformation!",
-    "reference": "components/public/PublicMainHero.tsx#L45-L48"
+    "term": "public.home.hero-control",
+    "definition": "Sending a Parallel gives you control over the progress of the documents and the information you need.",
+    "context": "Sending a Parallel gives you control over the progress of the documents and the information you need.",
+    "reference": "components/public/PublicHeroClaim.tsx#L23-L26"
   },
   {
     "term": "public.home.hero-discover-use",
@@ -2269,8 +2317,8 @@
   },
   {
     "term": "public.home.hero-platform",
-    "definition": "Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly.",
-    "context": "Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly.",
+    "definition": "Controlling the status of the documents you request, you will keep your focus on tasks that matter and become more productive.",
+    "context": "Controlling the status of the documents you request, you will keep your focus on tasks that matter and become more productive.",
     "reference": "components/public/PublicMainHero.tsx#L39-L42"
   },
   {
@@ -2280,9 +2328,15 @@
     "reference": "components/public/PublicHeroPopularUseCases.tsx#L19-L22"
   },
   {
+    "term": "public.home.hero-process",
+    "definition": "Turn your document collection into a professional and scalable process.",
+    "context": "Turn your document collection into a professional and scalable process.",
+    "reference": "components/public/PublicMainHero.tsx#L45-L48"
+  },
+  {
     "term": "public.home.hero-try-now",
-    "definition": "Try it now and let Parallel work for you",
-    "context": "Try it now and let Parallel work for you",
+    "definition": "Try our secure and fast solution to manage documents.",
+    "context": "Try our secure and fast solution to manage documents.",
     "reference": "components/public/PublicMainHero.tsx#L77-L80"
   },
   {
@@ -2295,7 +2349,7 @@
     "term": "public.home.title",
     "definition": "Collect information efficiently",
     "context": "Collect information efficiently",
-    "reference": "pages/[locale]/index.tsx#L12-L15"
+    "reference": "pages/[locale]/index.tsx#L13-L16"
   },
   {
     "term": "public.how-it-works-hero.client-timings",
@@ -2371,33 +2425,33 @@
   },
   {
     "term": "public.invite-button",
-    "definition": "Try Parallel free",
-    "context": "Try Parallel free",
+    "definition": "Request an invite",
+    "context": "Request an invite",
     "reference": "pages/[locale]/people.tsx#L220-L223"
   },
   {
     "term": "public.invite.consent",
     "definition": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
-    "reference": "pages/[locale]/invite.tsx#L91-L94"
+    "reference": "pages/[locale]/invite.tsx#L90-L93"
   },
   {
     "term": "public.invite.request-invite",
-    "definition": "Request your invite today!",
-    "context": "Request your invite today!",
-    "reference": "pages/[locale]/invite.tsx#L60-L63"
+    "definition": "Request your invite!",
+    "context": "Request your invite!",
+    "reference": "pages/[locale]/invite.tsx#L59-L62"
   },
   {
     "term": "public.invite.review-privacy",
     "definition": "For more information, please review our <a>Privacy Policy</a>.",
     "context": "For more information, please review our <a>Privacy Policy</a>.",
-    "reference": "pages/[locale]/invite.tsx#L97-L107"
+    "reference": "pages/[locale]/invite.tsx#L96-L106"
   },
   {
     "term": "public.invite.tell-us-about-yourself",
-    "definition": "Tell us a bit about yourself, and we will send you a <a>free access</a>.",
-    "context": "Tell us a bit about yourself, and we will send you a <a>free access</a>.",
-    "reference": "pages/[locale]/invite.tsx#L66-L81"
+    "definition": "Leave us your email. We will send you the <a>invitation</a> as soon as possible.",
+    "context": "Leave us your email. We will send you the <a>invitation</a> as soon as possible.",
+    "reference": "pages/[locale]/invite.tsx#L65-L80"
   },
   {
     "term": "public.invite.title",

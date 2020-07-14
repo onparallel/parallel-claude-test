@@ -65,7 +65,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
         backgroundColor: "white",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="bold" color="purple.500">
+      <Heading as="h2" fontSize="3xl" fontWeight="bold">
         <FormattedMessage
           id="public.how-it-works-hero.title"
           defaultMessage="How it works"
@@ -201,7 +201,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Button as="a" variantColor="purple">
             <FormattedMessage
               id="public.invite-button"
-              defaultMessage="Try Parallel free"
+              defaultMessage="Request an invite"
             />
           </Button>
         </NakedLink>

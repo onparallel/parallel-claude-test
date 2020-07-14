@@ -219,7 +219,7 @@ function People() {
             <Button as="a" variantColor="purple" marginTop={8}>
               <FormattedMessage
                 id="public.invite-button"
-                defaultMessage="Try Parallel free"
+                defaultMessage="Request an invite"
               />
             </Button>
           </NakedLink>

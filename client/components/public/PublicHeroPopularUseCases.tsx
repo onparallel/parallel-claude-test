@@ -15,7 +15,7 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
         backgroundColor: "gray.50",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="bold" color="purple.600">
+      <Heading as="h2" fontSize="3xl" fontWeight="bold">
         <FormattedMessage
           id="public.home.hero-popular-use-cases"
           defaultMessage="Popular use cases"

@@ -138,7 +138,7 @@ function PublicHeaderMenu(props: StackProps) {
           <Button flex="1" as="a" variantColor="purple">
             <FormattedMessage
               id="public.invite-button"
-              defaultMessage="Try Parallel free"
+              defaultMessage="Request an invite"
             />
           </Button>
         </NakedLink>

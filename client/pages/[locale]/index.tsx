@@ -1,4 +1,5 @@
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicHeroClaim } from "@parallel/components/public/PublicHeroClaim";
 import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHeroPopularUseCases";
 import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
 import { PublicMainHero } from "@parallel/components/public/PublicMainHero";
@@ -15,6 +16,7 @@ function Home() {
       })}
     >
       <PublicMainHero />
+      <PublicHeroClaim />
       <PublicHeroPopularUseCases />
       <PublicHowItWorksHero />
     </PublicLayout>
