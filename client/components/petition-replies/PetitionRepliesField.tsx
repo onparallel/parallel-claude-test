@@ -138,7 +138,7 @@ export function PetitionRepliesField({
                 field.type === "TEXT" ? (
                   <CopyToClipboardButton size="xs" text={reply.content.text} />
                 ) : field.type === "FILE_UPLOAD" ? (
-                  <>
+                  <Stack spacing={1}>
                     <IconButtonWithTooltip
                       size="xs"
                       icon="download"
@@ -164,7 +164,7 @@ export function PetitionRepliesField({
                         }
                       />
                     ) : null}
-                  </>
+                  </Stack>
                 ) : null
               }
             >
@@ -230,14 +230,9 @@ function PetitionRepliesFieldReply({
   const intl = useIntl();
   return (
     <Flex {...props}>
-      <Stack
-        spacing={1}
-        paddingRight={2}
-        borderRight="2px solid"
-        borderColor="gray.200"
-      >
+      <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
         {actions}
-      </Stack>
+      </Box>
       <Flex
         flexDirection="column"
         justifyContent="center"
@@ -261,28 +256,11 @@ function PetitionRepliesFieldReply({
             id: "petition-replies.petition-field-reply.approve",
             defaultMessage: "Approve",
           })}
-          variantColor="green"
           size="xs"
           placement="bottom"
+          variantColor={reply.status === "APPROVED" ? "green" : "gray"}
           role="switch"
           aria-checked={reply.status === "APPROVED"}
-          {...(reply.status === "APPROVED"
-            ? {
-                backgroundColor: "green.500",
-                color: "white",
-                _hover: {
-                  backgroundColor: "green.600",
-                  color: "white",
-                },
-              }
-            : {
-                backgroundColor: "gray.100",
-                color: "black",
-                _hover: {
-                  backgroundColor: "green.500",
-                  color: "white",
-                },
-              })}
           onClick={() =>
             onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")
           }
@@ -293,28 +271,11 @@ function PetitionRepliesFieldReply({
             id: "petition-replies.petition-field-reply.reject",
             defaultMessage: "Reject",
           })}
-          variantColor="red"
           size="xs"
           placement="bottom"
           role="switch"
+          variantColor={reply.status === "REJECTED" ? "red" : "gray"}
           aria-checked={reply.status === "REJECTED"}
-          {...(reply.status === "REJECTED"
-            ? {
-                backgroundColor: "red.500",
-                color: "white",
-                _hover: {
-                  backgroundColor: "red.600",
-                  color: "white",
-                },
-              }
-            : {
-                backgroundColor: "gray.100",
-                color: "black",
-                _hover: {
-                  backgroundColor: "red.500",
-                  color: "white",
-                },
-              })}
           onClick={() =>
             onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")
           }
