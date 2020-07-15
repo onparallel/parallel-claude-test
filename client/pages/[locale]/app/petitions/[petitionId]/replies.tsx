@@ -246,10 +246,14 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             </Button>
           ) : null}
           {showDownloadAll ? (
-            <Button leftIcon="download" onClick={handleDownloadAllClick}>
+            <Button
+              variantColor="purple"
+              leftIcon="download"
+              onClick={handleDownloadAllClick}
+            >
               <FormattedMessage
                 id="petition.replies.download-all"
-                defaultMessage="Download all"
+                defaultMessage="Download files"
               />
             </Button>
           ) : null}

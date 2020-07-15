@@ -1609,9 +1609,9 @@
   },
   {
     "term": "petition.replies.download-all",
-    "definition": "Descargar todo",
-    "context": "Download all",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L250-L253"
+    "definition": "Descargar archivos",
+    "context": "Download files",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L254-L257"
   },
   {
     "term": "petition.replies.download-file-error-dialog.body",
