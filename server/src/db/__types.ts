@@ -22,7 +22,9 @@ export type PetitionEventType =
   | "MESSAGE_SENT"
   | "REMINDER_SENT"
   | "REPLY_CREATED"
-  | "REPLY_DELETED";
+  | "REPLY_DELETED"
+  | "COMMENT_PUBLISHED"
+  | "COMMENT_DELETED";
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
 

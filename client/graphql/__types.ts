@@ -46,6 +46,23 @@ export type ChangePasswordResult =
   | "INVALID_NEW_PASSWORD"
   | "SUCCESS";
 
+export type CommentDeletedEvent = PetitionEvent & {
+  __typename?: "CommentDeletedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  field?: Maybe<PetitionField>;
+  id: Scalars["ID"];
+};
+
+export type CommentPublishedEvent = PetitionEvent & {
+  __typename?: "CommentPublishedEvent";
+  access: PetitionAccess;
+  comment?: Maybe<PetitionFieldComment>;
+  createdAt: Scalars["DateTime"];
+  field?: Maybe<PetitionField>;
+  id: Scalars["ID"];
+};
+
 /** A contact in the system. */
 export type Contact = Timestamps & {
   __typename?: "Contact";
@@ -647,11 +664,13 @@ export type PetitionFieldComment = {
 export type PetitionFieldReply = Timestamps & {
   __typename?: "PetitionFieldReply";
   /** The access from where this reply was made. */
-  access?: Maybe<PetitionAccess>;
+  access: PetitionAccess;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The petition field for this reply. */
+  field: PetitionField;
   /** The ID of the petition field reply. */
   id: Scalars["ID"];
   /** The status of the reply. */
@@ -1010,7 +1029,6 @@ export type ReplyDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
   id: Scalars["ID"];
-  reply?: Maybe<PetitionFieldReply>;
 };
 
 /** Represents the result of an operation. */
@@ -1190,6 +1208,12 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "AccessOpenedEvent";
         } & PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment)
       | ({
+          __typename?: "CommentDeletedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment)
+      | ({
+          __typename?: "CommentPublishedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment)
+      | ({
           __typename?: "MessageCancelledEvent";
         } & PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment)
       | ({
@@ -1231,6 +1255,14 @@ export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = 
   __typename?: "AccessOpenedEvent";
 } & Pick<AccessOpenedEvent, "id"> &
   TimelineAccessOpenedEvent_AccessOpenedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment = {
+  __typename?: "CommentDeletedEvent";
+} & Pick<CommentDeletedEvent, "id">;
+
+export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
+  __typename?: "CommentPublishedEvent";
+} & Pick<CommentPublishedEvent, "id">;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
   __typename?: "MessageCancelledEvent";
@@ -1277,6 +1309,8 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
@@ -1460,16 +1494,14 @@ export type DownloadAllDialog_PetitionFieldFragment = {
         PetitionFieldReply,
         "content"
       > & {
-          access?: Maybe<
-            { __typename?: "PetitionAccess" } & {
-              contact?: Maybe<
-                { __typename?: "Contact" } & Pick<
-                  Contact,
-                  "firstName" | "lastName"
-                >
-              >;
-            }
-          >;
+          access: { __typename?: "PetitionAccess" } & {
+            contact?: Maybe<
+              { __typename?: "Contact" } & Pick<
+                Contact,
+                "firstName" | "lastName"
+              >
+            >;
+          };
         }
     >;
   };

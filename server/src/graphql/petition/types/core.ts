@@ -363,9 +363,16 @@ export const PetitionFieldReply = objectType({
     t.field("access", {
       type: "PetitionAccess",
       description: "The access from where this reply was made.",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.petition_access_id))!;
+      },
+    });
+    t.field("field", {
+      type: "PetitionField",
+      description: "The petition field for this reply.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadAccess(root.petition_access_id);
+        return await ctx.petitions.loadField(root.petition_field_id);
       },
     });
   },

@@ -50,6 +50,12 @@ const result: IntrospectionResultData = {
             name: "AccessOpenedEvent",
           },
           {
+            name: "CommentDeletedEvent",
+          },
+          {
+            name: "CommentPublishedEvent",
+          },
+          {
             name: "MessageCancelledEvent",
           },
           {

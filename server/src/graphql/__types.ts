@@ -158,6 +158,8 @@ export interface NexusGenRootTypes {
   AccessActivatedEvent: events.AccessActivatedEvent;
   AccessDeactivatedEvent: events.AccessDeactivatedEvent;
   AccessOpenedEvent: events.AccessOpenedEvent;
+  CommentDeletedEvent: events.CommentDeletedEvent;
+  CommentPublishedEvent: events.CommentPublishedEvent;
   Contact: db.Contact;
   ContactPagination: {
     // root type
@@ -325,6 +327,20 @@ export interface NexusGenFieldTypes {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: Date; // DateTime!
+    id: string; // ID!
+  };
+  CommentDeletedEvent: {
+    // field return type
+    createdAt: Date; // DateTime!
+    deletedBy: NexusGenRootTypes["ContactOrUser"] | null; // ContactOrUser
+    field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
+    id: string; // ID!
+  };
+  CommentPublishedEvent: {
+    // field return type
+    comment: NexusGenRootTypes["PetitionFieldComment"] | null; // PetitionFieldComment
+    createdAt: Date; // DateTime!
+    field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: string; // ID!
   };
   Contact: {
@@ -513,9 +529,10 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldReply: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"] | null; // PetitionAccess
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     content: { [key: string]: any }; // JSONObject!
     createdAt: Date; // DateTime!
+    field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: string; // ID!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: Date; // DateTime!
@@ -661,7 +678,6 @@ export interface NexusGenFieldTypes {
     createdAt: Date; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: string; // ID!
-    reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
   };
   SendPetitionResult: {
     // field return type
@@ -980,6 +996,8 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "AccessActivatedEvent"
     | "AccessDeactivatedEvent"
     | "AccessOpenedEvent"
+    | "CommentDeletedEvent"
+    | "CommentPublishedEvent"
     | "MessageCancelledEvent"
     | "MessageScheduledEvent"
     | "MessageSentEvent"
@@ -1005,6 +1023,8 @@ export type NexusGenObjectNames =
   | "AccessActivatedEvent"
   | "AccessDeactivatedEvent"
   | "AccessOpenedEvent"
+  | "CommentDeletedEvent"
+  | "CommentPublishedEvent"
   | "Contact"
   | "ContactPagination"
   | "CreateFileUploadReply"

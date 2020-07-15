@@ -34,6 +34,10 @@ export const PetitionEvent = interfaceType({
           return "ReplyCreatedEvent";
         case "REPLY_DELETED":
           return "ReplyDeletedEvent";
+        case "COMMENT_PUBLISHED":
+          return "CommentPublishedEvent";
+        case "COMMENT_DELETED":
+          return "CommentDeletedEvent";
       }
     });
   },
@@ -227,13 +231,53 @@ export const ReplyDeletedEvent = createPetitionEvent(
         return await ctx.petitions.loadField(root.data.petition_field_id);
       },
     });
-    t.field("reply", {
-      type: "PetitionFieldReply",
+  }
+);
+
+export const CommentPublishedEvent = createPetitionEvent(
+  "CommentPublishedEvent",
+  (t) => {
+    t.field("field", {
+      type: "PetitionField",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadFieldReply(
-          root.data.petition_field_reply_id
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      },
+    });
+    t.field("comment", {
+      type: "PetitionFieldComment",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldComment(
+          root.data.petition_field_comment_id
         );
+      },
+    });
+  }
+);
+
+export const CommentDeletedEvent = createPetitionEvent(
+  "CommentDeletedEvent",
+  (t) => {
+    t.field("field", {
+      type: "PetitionField",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      },
+    });
+    t.field("deletedBy", {
+      type: "ContactOrUser",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        if (root.data.contact_id !== undefined) {
+          const contact = await ctx.contacts.loadContact(root.data.contact_id);
+          return contact && { __type: "Contact", ...contact };
+        } else if (root.data.user_id !== undefined) {
+          const user = await ctx.users.loadUser(root.data.user_id);
+          return user && { __type: "User", ...user };
+        }
+        throw new Error(`Both "contact_id" and "user_id" are undefined`);
       },
     });
   }

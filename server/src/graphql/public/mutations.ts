@@ -236,13 +236,19 @@ export const publicDeletePetitionFieldComment = mutationField(
       petitionFieldCommentId: idArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
+      const petitionFieldId = fromGlobalId(
+        args.petitionFieldId,
+        "PetitionField"
+      ).id;
       const petitionFieldCommentId = fromGlobalId(
         args.petitionFieldCommentId,
         "PetitionFieldComment"
       ).id;
-      await ctx.petitions.deletePetitionFieldComment(
+      await ctx.petitions.deletePetitionFieldCommentFromContact(
+        ctx.access!.petition_id,
+        petitionFieldId,
         petitionFieldCommentId,
-        `Contact:${ctx.contact!.id}`
+        ctx.contact!
       );
       return RESULT.SUCCESS;
     },

@@ -77,13 +77,20 @@ export const deletePetitionFieldComment = mutationField(
       petitionFieldCommentId: idArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
+      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
+      const petitionFieldId = fromGlobalId(
+        args.petitionFieldId,
+        "PetitionField"
+      ).id;
       const petitionFieldCommentId = fromGlobalId(
         args.petitionFieldCommentId,
         "PetitionFieldComment"
       ).id;
-      await ctx.petitions.deletePetitionFieldComment(
+      await ctx.petitions.deletePetitionFieldCommentFromUser(
+        petitionId,
+        petitionFieldId,
         petitionFieldCommentId,
-        `User:${ctx.user!.id}`
+        ctx.user!
       );
       return RESULT.SUCCESS;
     },

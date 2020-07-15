@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder } from "knex";
-import { groupBy, indexBy, omit, sortBy } from "remeda";
+import { groupBy, indexBy, omit, sortBy, pick } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -1008,7 +1008,7 @@ export class PetitionRepository extends BaseRepository {
   async createEvent<TType extends PetitionEventType>(
     petitionId: number,
     type: TType,
-    payload: MaybeArray<PetitionEventPayload[TType]>
+    payload: MaybeArray<PetitionEventPayload<TType>>
   ) {
     return await this.insert(
       "petition_event",
@@ -1297,7 +1297,45 @@ export class PetitionRepository extends BaseRepository {
     return comment;
   }
 
-  async deletePetitionFieldComment(
+  async deletePetitionFieldCommentFromUser(
+    petitionId: number,
+    petitionFieldId: number,
+    petitionFieldCommentId: number,
+    user: User
+  ) {
+    await Promise.all([
+      this.deletePetitionFieldComment(
+        petitionFieldCommentId,
+        `User:${user.id}`
+      ),
+      this.createEvent(petitionId, "COMMENT_DELETED", {
+        petition_field_id: petitionFieldId,
+        petition_field_comment_id: petitionFieldCommentId,
+        user_id: user.id,
+      }),
+    ]);
+  }
+
+  async deletePetitionFieldCommentFromContact(
+    petitionId: number,
+    petitionFieldId: number,
+    petitionFieldCommentId: number,
+    contact: Contact
+  ) {
+    await Promise.all([
+      this.deletePetitionFieldComment(
+        petitionFieldCommentId,
+        `Contact:${contact.id}`
+      ),
+      this.createEvent(petitionId, "COMMENT_DELETED", {
+        petition_field_id: petitionFieldId,
+        petition_field_comment_id: petitionFieldCommentId,
+        contact_id: contact.id,
+      }),
+    ]);
+  }
+
+  private async deletePetitionFieldComment(
     petitionFieldCommentId: number,
     deletedBy: string
   ) {
@@ -1384,6 +1422,7 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
+
     // Create contact notifications
     const accesses = await this.loadAccessesForPetition(petitionId);
     await this.insert(
@@ -1401,6 +1440,15 @@ export class PetitionRepository extends BaseRepository {
             },
           }))
         )
+    );
+
+    await this.createEvent(
+      petitionId,
+      "COMMENT_PUBLISHED",
+      comments.map((comment) => ({
+        petition_field_id: comment.petition_field_id,
+        petition_field_comment_id: comment.id,
+      }))
     );
     return comments;
   }
@@ -1422,7 +1470,8 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    // Create user notifications
+
+    // Create user notifications and events
     const petition = await this.loadPetition(petitionId);
     await this.insert(
       "petition_user_notification",
@@ -1434,6 +1483,15 @@ export class PetitionRepository extends BaseRepository {
           petition_field_id: comment.petition_field_id,
           petition_field_comment_id: comment.id,
         },
+      }))
+    );
+
+    await this.createEvent(
+      petitionId,
+      "COMMENT_PUBLISHED",
+      comments.map((comment) => ({
+        petition_field_id: comment.petition_field_id,
+        petition_field_comment_id: comment.id,
       }))
     );
     return comments;
