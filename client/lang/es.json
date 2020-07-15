@@ -823,7 +823,7 @@
   },
   {
     "term": "generic.for-example",
-    "definition": "Por ejemplo, ",
+    "definition": "Por ejemplo, {example}",
     "context": "E.g. {example}",
     "reference": "components/petition-replies/DownloadAllDialog.tsx#L162-L166"
   },
