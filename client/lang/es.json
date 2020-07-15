@@ -1687,7 +1687,7 @@
   },
   {
     "term": "petition.settings-header",
-    "definition": "¿A quién se la quieres enviar?",
+    "definition": "Ajustes de la petición",
     "context": "Petition settings",
     "reference": "components/petition-common/PetitionSettingsModal.tsx#L58-L61"
   },
