@@ -523,6 +523,7 @@ export interface NexusGenFieldTypes {
     author: NexusGenRootTypes["ContactOrUser"] | null; // ContactOrUser
     content: string; // String!
     id: string; // ID!
+    isEdited: boolean; // Boolean!
     isUnread: boolean; // Boolean!
     publishedAt: Date | null; // DateTime
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply

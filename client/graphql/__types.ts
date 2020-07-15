@@ -48,15 +48,14 @@ export type ChangePasswordResult =
 
 export type CommentDeletedEvent = PetitionEvent & {
   __typename?: "CommentDeletedEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  deletedBy?: Maybe<ContactOrUser>;
   field?: Maybe<PetitionField>;
   id: Scalars["ID"];
 };
 
 export type CommentPublishedEvent = PetitionEvent & {
   __typename?: "CommentPublishedEvent";
-  access: PetitionAccess;
   comment?: Maybe<PetitionFieldComment>;
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
@@ -652,6 +651,8 @@ export type PetitionFieldComment = {
   content: Scalars["String"];
   /** The ID of the petition field comment. */
   id: Scalars["ID"];
+  /** Whether the comment has been edited after being published. */
+  isEdited: Scalars["Boolean"];
   /** Wether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
   /** Time when the comment was published. */
@@ -670,7 +671,7 @@ export type PetitionFieldReply = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The petition field for this reply. */
-  field: PetitionField;
+  field?: Maybe<PetitionField>;
   /** The ID of the petition field reply. */
   id: Scalars["ID"];
   /** The status of the reply. */
@@ -879,7 +880,7 @@ export type PublicPetitionFieldComment = {
   content: Scalars["String"];
   /** The ID of the petition field comment. */
   id: Scalars["ID"];
-  /** Wether the comment has been read or not. */
+  /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
   /** Time when the comment was published. */
   publishedAt?: Maybe<Scalars["DateTime"]>;
@@ -991,7 +992,7 @@ export type RemindersConfig = {
   time: Scalars["String"];
   /** The timezone the time is referring to. */
   timezone: Scalars["String"];
-  /** Wether to send reminders only from monday to friday. */
+  /** Whether to send reminders only from monday to friday. */
   weekdaysOnly: Scalars["Boolean"];
 };
 
@@ -1258,11 +1259,13 @@ export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = 
 
 export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment = {
   __typename?: "CommentDeletedEvent";
-} & Pick<CommentDeletedEvent, "id">;
+} & Pick<CommentDeletedEvent, "id"> &
+  TimelineCommentDeletedEvent_CommentDeletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
   __typename?: "CommentPublishedEvent";
-} & Pick<CommentPublishedEvent, "id">;
+} & Pick<CommentPublishedEvent, "id"> &
+  TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
   __typename?: "MessageCancelledEvent";
@@ -1320,6 +1323,10 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment;
 
+export type PetitionFieldReference_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "title">;
+
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
 } & Pick<AccessActivatedEvent, "createdAt"> & {
@@ -1344,6 +1351,41 @@ export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+  };
+
+export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
+  __typename?: "CommentDeletedEvent";
+} & Pick<CommentDeletedEvent, "createdAt"> & {
+    field?: Maybe<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldReference_PetitionFieldFragment
+    >;
+    deletedBy?: Maybe<
+      | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
+      | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
+    >;
+  };
+
+export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
+  __typename?: "CommentPublishedEvent";
+} & Pick<CommentPublishedEvent, "createdAt"> & {
+    field?: Maybe<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldReference_PetitionFieldFragment
+    >;
+    comment?: Maybe<
+      { __typename?: "PetitionFieldComment" } & Pick<
+        PetitionFieldComment,
+        "isEdited" | "content"
+      > & {
+          author?: Maybe<
+            | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
+            | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
+          >;
+        }
+    >;
   };
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
@@ -1427,23 +1469,27 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
 } & Pick<ReplyCreatedEvent, "createdAt"> & {
+    field?: Maybe<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldReference_PetitionFieldFragment
+    >;
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
-    field?: Maybe<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "title">
-    >;
   };
 
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
 } & Pick<ReplyDeletedEvent, "createdAt"> & {
+    field?: Maybe<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldReference_PetitionFieldFragment
+    >;
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
-    field?: Maybe<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "title">
-    >;
   };
 
 export type PetitionSettingsModal_PetitionFragment = {
@@ -1552,7 +1598,7 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
 } & Pick<
   PetitionFieldComment,
-  "id" | "content" | "publishedAt" | "isUnread"
+  "id" | "content" | "publishedAt" | "isUnread" | "isEdited"
 > & {
     author?: Maybe<
       | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
@@ -2905,32 +2951,81 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   }
   ${ContactLink_ContactFragmentDoc}
 `;
+export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldReference_PetitionField on PetitionField {
+    title
+  }
+`;
 export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   fragment TimelineReplyCreatedEvent_ReplyCreatedEvent on ReplyCreatedEvent {
+    field {
+      ...PetitionFieldReference_PetitionField
+    }
     access {
       contact {
         ...ContactLink_Contact
       }
     }
-    field {
-      title
-    }
     createdAt
   }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
+    field {
+      ...PetitionFieldReference_PetitionField
+    }
     access {
       contact {
         ...ContactLink_Contact
       }
     }
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
+  fragment TimelineCommentPublishedEvent_CommentPublishedEvent on CommentPublishedEvent {
     field {
-      title
+      ...PetitionFieldReference_PetitionField
+    }
+    comment {
+      author {
+        ... on User {
+          id
+          fullName
+        }
+        ... on Contact {
+          ...ContactLink_Contact
+        }
+      }
+      isEdited
+      content
     }
     createdAt
   }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
+export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
+  fragment TimelineCommentDeletedEvent_CommentDeletedEvent on CommentDeletedEvent {
+    field {
+      ...PetitionFieldReference_PetitionField
+    }
+    deletedBy {
+      ... on User {
+        id
+        fullName
+      }
+      ... on Contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
@@ -2972,6 +3067,12 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on ReplyDeletedEvent {
       ...TimelineReplyDeletedEvent_ReplyDeletedEvent
     }
+    ... on CommentPublishedEvent {
+      ...TimelineCommentPublishedEvent_CommentPublishedEvent
+    }
+    ... on CommentDeletedEvent {
+      ...TimelineCommentDeletedEvent_CommentDeletedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -2984,6 +3085,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineReminderSentEvent_ReminderSentEventFragmentDoc}
   ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
   ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
+  ${TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc}
+  ${TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -3128,6 +3231,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     content
     publishedAt
     isUnread
+    isEdited
   }
   ${ContactLink_ContactFragmentDoc}
 `;

@@ -21,18 +21,18 @@ export function TimelineItem({
   return (
     <PseudoBox
       display="flex"
-      alignItems="center"
       position="relative"
+      alignItems="stretch"
       background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
       paddingY={4}
       {...props}
     >
-      <Flex width="36px" alignItems="center" justifyContent="center">
+      <Flex width="36px" justifyContent="center">
         {icon}
       </Flex>
-      <Box flex="1" marginLeft={2}>
-        {children}
-      </Box>
+      <Flex flex="1" marginLeft={2} alignItems="center">
+        <Box flex="1">{children}</Box>
+      </Flex>
     </PseudoBox>
   );
 }

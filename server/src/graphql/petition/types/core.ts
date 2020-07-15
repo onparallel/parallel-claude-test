@@ -229,7 +229,7 @@ export const RemindersConfig = objectType({
       description: "The timezone the time is referring to.",
     });
     t.boolean("weekdaysOnly", {
-      description: "Wether to send reminders only from monday to friday.",
+      description: "Whether to send reminders only from monday to friday.",
     });
   },
 });

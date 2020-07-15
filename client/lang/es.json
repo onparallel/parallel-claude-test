@@ -2923,14 +2923,14 @@
   },
   {
     "term": "timeline.reply-created-description",
-    "definition": "{contact} respondió al campo {title} {timeAgo}",
-    "context": "{contact} replied to the field {title} {timeAgo}",
+    "definition": "{contact} respondió al campo {field} {timeAgo}",
+    "context": "{contact} replied to the field {field} {timeAgo}",
     "reference": "components/petition-activity/timeline/TimelineReplyCreatedEvent.tsx#L23-L43"
   },
   {
     "term": "timeline.reply-deleted-description",
-    "definition": "{contact} eliminó una respuesta al campo {title} {timeAgo}",
-    "context": "{contact} deleted a reply to the field {title} {timeAgo}",
+    "definition": "{contact} eliminó una respuesta al campo {field} {timeAgo}",
+    "context": "{contact} deleted a reply to the field {field} {timeAgo}",
     "reference": "components/petition-activity/timeline/TimelineReplyDeletedEvent.tsx#L23-L43"
   },
   {

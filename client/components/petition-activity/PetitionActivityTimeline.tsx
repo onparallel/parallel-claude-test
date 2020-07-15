@@ -1,18 +1,20 @@
 import { Box, BoxProps } from "@chakra-ui/core";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { gql } from "apollo-boost";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
-import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
+import { TimelineCommentDeletedEvent } from "./timeline/TimelineCommentDeletedEvent copy";
+import { TimelineCommentPublishedEvent } from "./timeline/TimelineCommentPublishedEvent";
+import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancelledEvent";
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
+import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
+import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
-import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancelledEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -63,6 +65,10 @@ export function PetitionActivityTimeline({
               <TimelineReplyCreatedEvent event={event} />
             ) : event.__typename === "ReplyDeletedEvent" ? (
               <TimelineReplyDeletedEvent event={event} />
+            ) : event.__typename === "CommentPublishedEvent" ? (
+              <TimelineCommentPublishedEvent event={event} userId={userId} />
+            ) : event.__typename === "CommentDeletedEvent" ? (
+              <TimelineCommentDeletedEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -120,6 +126,12 @@ PetitionActivityTimeline.fragments = {
       ... on ReplyDeletedEvent {
         ...TimelineReplyDeletedEvent_ReplyDeletedEvent
       }
+      ... on CommentPublishedEvent {
+        ...TimelineCommentPublishedEvent_CommentPublishedEvent
+      }
+      ... on CommentDeletedEvent {
+        ...TimelineCommentDeletedEvent_CommentDeletedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -132,5 +144,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineReminderSentEvent.fragments.ReminderSentEvent}
     ${TimelineReplyCreatedEvent.fragments.ReplyCreatedEvent}
     ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}
+    ${TimelineCommentPublishedEvent.fragments.CommentPublishedEvent}
+    ${TimelineCommentDeletedEvent.fragments.CommentDeletedEvent}
   `,
 };

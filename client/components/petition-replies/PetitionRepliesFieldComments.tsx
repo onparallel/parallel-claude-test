@@ -242,27 +242,41 @@ function FieldComment({
       }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
-        <Box as="strong" marginRight={2}>
+        <Box>
           {comment.author?.id === userId ? (
-            <Text fontStyle="italic">
+            <Text as="strong" fontStyle="italic">
               <FormattedMessage id="generic.you" defaultMessage="You" />
             </Text>
           ) : comment.author?.__typename === "Contact" ? (
-            <ContactLink contact={comment.author} />
+            <Text as="strong">
+              <ContactLink contact={comment.author} />
+            </Text>
           ) : comment.author?.__typename === "User" ? (
-            comment.author.fullName
+            <Text as="strong">{comment.author.fullName}</Text>
           ) : (
             <DeletedContact />
           )}
+          {comment.publishedAt ? (
+            <>
+              <DateTime
+                color="gray.500"
+                value={comment.publishedAt}
+                format={FORMATS.LLL}
+                useRelativeTime
+                marginLeft={2}
+              />
+              {comment.isEdited ? (
+                <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
+                  <FormattedMessage
+                    id="generic.edited-comment-indicator"
+                    defaultMessage="Edited"
+                  />
+                </Text>
+              ) : null}
+            </>
+          ) : null}
         </Box>
-        {comment.publishedAt ? (
-          <DateTime
-            color="gray.500"
-            value={comment.publishedAt}
-            format={FORMATS.LLL}
-            useRelativeTime
-          />
-        ) : (
+        {comment.publishedAt ? null : (
           <SmallPopover
             content={
               <Text fontSize="sm">
@@ -273,7 +287,12 @@ function FieldComment({
               </Text>
             }
           >
-            <Badge variantColor="yellow" variant="outline" cursor="default">
+            <Badge
+              variantColor="yellow"
+              variant="outline"
+              cursor="default"
+              marginLeft={2}
+            >
               <FormattedMessage
                 id="petition-replies.comment-pending.label"
                 defaultMessage="Pending"
@@ -375,6 +394,7 @@ PetitionRepliesFieldComments.fragments = {
         content
         publishedAt
         isUnread
+        isEdited
       }
       ${ContactLink.fragments.Contact}
     `;

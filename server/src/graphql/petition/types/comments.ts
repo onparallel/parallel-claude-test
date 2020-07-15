@@ -70,5 +70,11 @@ export const PetitionFieldComment = objectType({
         });
       },
     });
+    t.boolean("isEdited", {
+      description: "Whether the comment has been edited after being published.",
+      resolve: async (root, _, ctx) => {
+        return root.published_at ? root.updated_at > root.published_at : false;
+      },
+    });
   },
 });

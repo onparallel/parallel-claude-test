@@ -863,6 +863,11 @@ type PetitionFieldComment {
   id: ID!
 
   """
+  Whether the comment has been edited after being published.
+  """
+  isEdited: Boolean!
+
+  """
   Wether the comment has been read or not.
   """
   isUnread: Boolean!
@@ -1327,7 +1332,7 @@ type PublicPetitionFieldComment {
   id: ID!
 
   """
-  Wether the comment has been read or not.
+  Whether the comment has been read or not.
   """
   isUnread: Boolean!
 
@@ -1509,7 +1514,7 @@ type RemindersConfig {
   timezone: String!
 
   """
-  Wether to send reminders only from monday to friday.
+  Whether to send reminders only from monday to friday.
   """
   weekdaysOnly: Boolean!
 }

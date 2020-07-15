@@ -1,12 +1,13 @@
+import { Link } from "@chakra-ui/core";
+import { ContactLink } from "@parallel/components/common/ContactLink";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineReplyDeletedEvent_ReplyDeletedEventFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
 import { gql } from "apollo-boost";
-import { Text, Link } from "@chakra-ui/core";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon, TimelineItem } from "./helpers";
-import { ContactLink } from "@parallel/components/common/ContactLink";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { FORMATS } from "@parallel/utils/dates";
+import { PetitionFieldReference } from "../PetitionFieldReference";
 
 export type TimelineReplyDeletedEventProps = {
   event: TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
@@ -22,14 +23,14 @@ export function TimelineReplyDeletedEvent({
     >
       <FormattedMessage
         id="timeline.reply-deleted-description"
-        defaultMessage="{contact} deleted a reply to the field {title} {timeAgo}"
+        defaultMessage="{contact} deleted a reply to the field {field} {timeAgo}"
         values={{
           contact: access.contact ? (
             <ContactLink contact={access.contact} />
           ) : (
             <DeletedContact />
           ),
-          title: <FieldTitle field={field} />,
+          field: <PetitionFieldReference field={field} />,
           timeAgo: (
             <Link>
               <DateTime
@@ -45,49 +46,20 @@ export function TimelineReplyDeletedEvent({
   );
 }
 
-function FieldTitle({
-  field,
-}: {
-  field: TimelineReplyDeletedEvent_ReplyDeletedEventFragment["field"];
-}) {
-  return (
-    <Text as="span" display="inline" marginX="2px">
-      {field ? (
-        field.title ? (
-          <Text as="strong">{field.title}</Text>
-        ) : (
-          <Text as="span" color="gray.400" fontStyle="italic">
-            <FormattedMessage
-              id="generic.untitled-field"
-              defaultMessage="Untitled field"
-            />
-          </Text>
-        )
-      ) : (
-        <Text as="span" color="gray.400" fontStyle="italic">
-          <FormattedMessage
-            id="timeline.reply-created-deleted-field"
-            defaultMessage="Deleted field"
-          />
-        </Text>
-      )}
-    </Text>
-  );
-}
-
 TimelineReplyDeletedEvent.fragments = {
   ReplyDeletedEvent: gql`
     fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
+      field {
+        ...PetitionFieldReference_PetitionField
+      }
       access {
         contact {
           ...ContactLink_Contact
         }
       }
-      field {
-        title
-      }
       createdAt
     }
+    ${PetitionFieldReference.fragments.PetitionField}
     ${ContactLink.fragments.Contact}
   `,
 };

@@ -293,6 +293,22 @@ export const icons = {
       </g>
     ),
   },
+  "comment-x": {
+    viewBox: "0 0 24 24",
+    path: (
+      <g
+        stroke="currentColor"
+        fill="none"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M 15,17 H 12 L 9,21 8,17 H 7 C 5,17 3,15 3,13 V 7 C 3,5 5,3 7,3 h 10 c 2,0 4,2 4,4 v 6" />
+        <line y2="20" x2="23" y1="15" x1="18" />
+        <line y2="20" x2="18" y1="15" x1="23" />
+      </g>
+    ),
+  },
   filter: {
     viewBox: "0 0 24 24",
     path: (
