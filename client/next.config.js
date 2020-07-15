@@ -4,7 +4,7 @@ const config = {
     ROOT: __dirname,
   },
   crossOrigin: "anonymous",
-  assetPrefix: process.env.ASSETS_URL,
+  assetPrefix: process.env.NEXT_PUBLIC_ASSETS_URL,
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;

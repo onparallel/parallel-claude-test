@@ -61,7 +61,7 @@ function useTranslations() {
   });
   const setLocale = useCallback(async function (locale: string) {
     const res = await fetch(
-      `${process.env.ASSETS_URL}/static/lang/${locale}.json`
+      `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.json`
     );
     const messages = await res.json();
     setState(({ cache }) => ({
