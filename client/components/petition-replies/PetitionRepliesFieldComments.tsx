@@ -147,6 +147,7 @@ export function PetitionRepliesFieldComments({
       <Divider />
       <Box padding={2}>
         <GrowingTextarea
+          id="petition-replies-comments-input"
           ref={textareaRef}
           height="20px"
           size="sm"

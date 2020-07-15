@@ -55,6 +55,7 @@ import { gql } from "apollo-boost";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -224,9 +225,20 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   const updatePetitionFieldReplyStatus = useUpdatePetitionFieldReplyStatus();
   async function handleUpdateReplyStatus(
+    petitionFieldId: string,
     petitionFieldReplyId: string,
     status: PetitionFieldReplyStatus
   ) {
+    if (status === "REJECTED") {
+      setActiveFieldId(petitionFieldId);
+      setTimeout(() => {
+        const input = document.querySelector<HTMLTextAreaElement>(
+          "#petition-replies-comments-input"
+        );
+        scrollIntoView(input!, { block: "center", behavior: "smooth" });
+        input!.focus();
+      }, 150);
+    }
     await updatePetitionFieldReplyStatus({
       petitionId,
       petitionFieldReplyId,
@@ -352,7 +364,9 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                       activeFieldId === field.id ? null : field.id
                     )
                   }
-                  onUpdateReplyStatus={handleUpdateReplyStatus}
+                  onUpdateReplyStatus={(replyId, status) =>
+                    handleUpdateReplyStatus(field.id, replyId, status)
+                  }
                 />
               ))}
             </Stack>
