@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder } from "knex";
-import { groupBy, indexBy, omit, sortBy, pick } from "remeda";
+import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -29,10 +29,10 @@ import {
   PetitionField,
   PetitionFieldComment,
   PetitionFieldReply,
+  PetitionFieldReplyStatus,
   PetitionFieldType,
   PetitionStatus,
   User,
-  PetitionFieldReplyStatus,
 } from "../__types";
 
 @injectable()

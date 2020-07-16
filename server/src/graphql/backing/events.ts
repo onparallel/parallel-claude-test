@@ -1,6 +1,4 @@
 import { PetitionEventType } from "../../db/__types";
-import { Maybe } from "../../util/types";
-
 export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
   PETITION_COMPLETED: { petition_access_id: number };

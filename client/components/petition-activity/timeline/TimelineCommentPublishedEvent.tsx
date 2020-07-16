@@ -1,15 +1,15 @@
-import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
-import { Text, Link, Box, useTheme, Icon, Flex } from "@chakra-ui/core";
-import { FormattedMessage } from "react-intl";
-import { TimelineIcon, TimelineItem } from "./helpers";
-import { ContactLink } from "@parallel/components/common/ContactLink";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { FORMATS } from "@parallel/utils/dates";
-import { PetitionFieldReference } from "../PetitionFieldReference";
+import { Box, Link, Text, useTheme } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
+import { ContactLink } from "@parallel/components/common/ContactLink";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { Divider } from "@parallel/components/common/Divider";
+import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { gql } from "apollo-boost";
+import { FormattedMessage } from "react-intl";
+import { PetitionFieldReference } from "../PetitionFieldReference";
+import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineCommentPublishedEventProps = {
   userId: string;
