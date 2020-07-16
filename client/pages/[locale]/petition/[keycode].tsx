@@ -486,7 +486,7 @@ RecipientView.mutations = [
     ) {
       publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
         id
-        publicContent
+        content
         createdAt
       }
     }
@@ -505,7 +505,7 @@ RecipientView.mutations = [
         endpoint
         reply {
           id
-          publicContent
+          content
           createdAt
         }
       }
@@ -518,7 +518,7 @@ RecipientView.mutations = [
     ) {
       publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
         id
-        publicContent
+        content
       }
     }
   `,

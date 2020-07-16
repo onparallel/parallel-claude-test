@@ -198,7 +198,11 @@ export const PublicPetitionFieldReply = objectType({
       description: "The ID of the petition field reply.",
       resolve: (o) => toGlobalId("PetitionFieldReply", o.id),
     });
-    t.jsonObject("publicContent", {
+    t.field("status", {
+      description: "The status of the petition field reply.",
+      type: "PetitionFieldReplyStatus",
+    });
+    t.jsonObject("content", {
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
         switch (root.type) {

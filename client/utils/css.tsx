@@ -5,18 +5,19 @@ import { css, keyframes } from "@emotion/core";
  */
 export function generateCssStripe({
   size = "1rem",
-  color = "rgba(255, 255, 255, 1)",
+  color = "transparent",
+  secondaryColor = "transparent",
 }) {
   return css`
     background-image: linear-gradient(
       135deg,
       ${color} 25%,
-      transparent 25%,
-      transparent 50%,
+      ${secondaryColor} 25%,
+      ${secondaryColor} 50%,
       ${color} 50%,
       ${color} 75%,
-      transparent 75%,
-      transparent
+      ${secondaryColor} 75%,
+      ${secondaryColor}
     );
     background-size: ${size} ${size};
     background-position: left;

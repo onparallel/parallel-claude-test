@@ -16,15 +16,19 @@ import {
   Textarea,
   Tooltip,
   useTheme,
+  Icon,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
-import { RecipientViewPetitionField_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  RecipientViewPetitionField_PublicPetitionFieldFragment,
+  PetitionFieldReplyStatus,
+} from "@parallel/graphql/__types";
 import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { gql } from "apollo-boost";
-import { useCallback } from "react";
+import { useCallback, ReactNode } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -157,6 +161,7 @@ export function RecipientViewPetitionField({
           {field.replies.map((reply) => (
             <ListItem key={reply.id}>
               <ReplyWrapper
+                status={reply.status}
                 progress={uploadProgress?.[reply.id]}
                 onDeleteReply={() => onDeleteReply(reply.id)}
               >
@@ -176,7 +181,7 @@ export function RecipientViewPetitionField({
                 ) : field.type === "FILE_UPLOAD" ? (
                   <>
                     <Text as="span" aria-label={labels.filename}>
-                      {reply.publicContent?.filename}
+                      {reply.content?.filename}
                     </Text>
                     <Text as="span" marginX={2}>
                       -
@@ -187,7 +192,7 @@ export function RecipientViewPetitionField({
                       fontSize="sm"
                       color="gray.500"
                     >
-                      <FileSize value={reply.publicContent?.size} />
+                      <FileSize value={reply.content?.size} />
                     </Text>
                   </>
                 ) : null}
@@ -208,19 +213,31 @@ export function RecipientViewPetitionField({
 }
 
 function ReplyWrapper({
+  status,
   progress,
   children,
   onDeleteReply,
-  ...props
-}: BoxProps & { progress?: number; onDeleteReply: () => void }) {
+}: {
+  status: PetitionFieldReplyStatus;
+  progress?: number;
+  onDeleteReply: () => void;
+  children: ReactNode;
+}) {
   const intl = useIntl();
   const { colors } = useTheme();
   return (
-    <Flex alignItems="center" {...props}>
-      <Box
+    <Flex alignItems="center">
+      <Flex
+        alignItems="center"
         fontSize="sm"
-        backgroundColor="gray.100"
-        paddingX={1}
+        backgroundColor={
+          status === "APPROVED"
+            ? "green.100"
+            : status === "REJECTED"
+            ? "red.100"
+            : "gray.100"
+        }
+        paddingX={2}
         rounded="sm"
         position="relative"
         {...(progress !== undefined
@@ -239,10 +256,9 @@ function ReplyWrapper({
           top={0}
           height="100%"
           rounded="sm"
-          backgroundColor="gray.300"
           transition="width 100ms ease"
           willChange="width"
-          width={progress !== undefined ? `${Math.round(progress * 100)}%` : 0}
+          width={`${Math.round((progress ?? 0) * 100)}%`}
           css={[
             generateCssStripe({ color: colors.gray[200] }),
             animatedStripe({}),
@@ -251,19 +267,26 @@ function ReplyWrapper({
         <Box position="relative" lineHeight="24px" minHeight="24px" zIndex={1}>
           {children}
         </Box>
-      </Box>
-      <IconButtonWithTooltip
-        onClick={onDeleteReply}
-        variant="ghost"
-        icon="close"
-        size="xs"
-        placement="bottom"
-        label={intl.formatMessage({
-          id: "recipient-view.remove-reply-label",
-          defaultMessage: "Remove reply",
-        })}
-        marginLeft={1}
-      />
+        {status === "APPROVED" ? (
+          <Icon name="check" color="green.500" marginLeft={2} />
+        ) : status === "REJECTED" ? (
+          <Icon name="close" color="red.500" size="12px" marginLeft={2} />
+        ) : null}
+      </Flex>
+      {status !== "APPROVED" ? (
+        <IconButtonWithTooltip
+          onClick={onDeleteReply}
+          variant="ghost"
+          icon="delete"
+          size="xs"
+          placement="bottom"
+          label={intl.formatMessage({
+            id: "recipient-view.remove-reply-label",
+            defaultMessage: "Remove reply",
+          })}
+          marginLeft={1}
+        />
+      ) : null}
     </Flex>
   );
 }
@@ -527,7 +550,8 @@ RecipientViewPetitionField.fragments = {
         validated
         replies {
           id
-          publicContent
+          status
+          content
           createdAt
         }
         comments {

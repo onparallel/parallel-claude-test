@@ -628,9 +628,10 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionFieldReply: {
     // field return type
+    content: { [key: string]: any }; // JSONObject!
     createdAt: Date; // DateTime!
     id: string; // ID!
-    publicContent: { [key: string]: any }; // JSONObject!
+    status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: Date; // DateTime!
   };
   PublicUser: {

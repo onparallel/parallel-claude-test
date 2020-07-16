@@ -16,6 +16,7 @@ import {
   fieldHastype,
   replyBelongsToAccess,
 } from "./authorizers";
+import { WhitelistedError } from "../helpers/errors";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -33,6 +34,12 @@ export const publicDeletePetitionReply = mutationField(
     resolve: async (_, args, ctx) => {
       const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
       const reply = (await ctx.petitions.loadFieldReply(replyId))!;
+      if (reply.status === "APPROVED") {
+        throw new WhitelistedError(
+          "Can't delete an approved reply",
+          "INVALID_REPLY_STATUS"
+        );
+      }
       if (reply.type === "FILE_UPLOAD") {
         const file = await ctx.files.loadFileUpload(
           reply.content["file_upload_id"]

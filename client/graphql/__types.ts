@@ -891,12 +891,14 @@ export type PublicPetitionFieldComment = {
 /** A reply to a petition field */
 export type PublicPetitionFieldReply = Timestamps & {
   __typename?: "PublicPetitionFieldReply";
+  /** The public content of the reply */
+  content: Scalars["JSONObject"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The ID of the petition field reply. */
   id: Scalars["ID"];
-  /** The public content of the reply */
-  publicContent: Scalars["JSONObject"];
+  /** The status of the petition field reply. */
+  status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -1622,7 +1624,7 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
     replies: Array<
       { __typename?: "PublicPetitionFieldReply" } & Pick<
         PublicPetitionFieldReply,
-        "id" | "publicContent" | "createdAt"
+        "id" | "status" | "content" | "createdAt"
       >
     >;
     comments: Array<
@@ -2383,7 +2385,7 @@ export type RecipientView_publicCreateTextReplyMutation = {
 } & {
   publicCreateTextReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
     PublicPetitionFieldReply,
-    "id" | "publicContent" | "createdAt"
+    "id" | "content" | "createdAt"
   >;
 };
 
@@ -2402,7 +2404,7 @@ export type RecipientView_publicCreateFileUploadReplyMutation = {
   > & {
       reply: { __typename?: "PublicPetitionFieldReply" } & Pick<
         PublicPetitionFieldReply,
-        "id" | "publicContent" | "createdAt"
+        "id" | "content" | "createdAt"
       >;
     };
 };
@@ -2417,7 +2419,7 @@ export type RecipientView_publicFileUploadReplyCompleteMutation = {
 } & {
   publicFileUploadReplyComplete: {
     __typename?: "PublicPetitionFieldReply";
-  } & Pick<PublicPetitionFieldReply, "id" | "publicContent">;
+  } & Pick<PublicPetitionFieldReply, "id" | "content">;
 };
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
@@ -3362,7 +3364,8 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
     validated
     replies {
       id
-      publicContent
+      status
+      content
       createdAt
     }
     comments {
@@ -6093,7 +6096,7 @@ export const RecipientView_publicCreateTextReplyDocument = gql`
   ) {
     publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
       id
-      publicContent
+      content
       createdAt
     }
   }
@@ -6157,7 +6160,7 @@ export const RecipientView_publicCreateFileUploadReplyDocument = gql`
       endpoint
       reply {
         id
-        publicContent
+        content
         createdAt
       }
     }
@@ -6215,7 +6218,7 @@ export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
   ) {
     publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
       id
-      publicContent
+      content
     }
   }
 `;

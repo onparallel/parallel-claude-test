@@ -36,3 +36,11 @@ export class ArgValidationError extends ApolloError {
     );
   }
 }
+
+export class WhitelistedError extends ApolloError {
+  readonly name = "WhitelistedError";
+
+  constructor(message: string, code: string, extensions?: Record<string, any>) {
+    super(message, code, extensions);
+  }
+}

@@ -1352,6 +1352,11 @@ A reply to a petition field
 """
 type PublicPetitionFieldReply implements Timestamps {
   """
+  The public content of the reply
+  """
+  content: JSONObject!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -1362,9 +1367,9 @@ type PublicPetitionFieldReply implements Timestamps {
   id: ID!
 
   """
-  The public content of the reply
+  The status of the petition field reply.
   """
-  publicContent: JSONObject!
+  status: PetitionFieldReplyStatus!
 
   """
   Time when the resource was last updated.
