@@ -306,7 +306,14 @@ export const PetitionAccess = objectType({
       description: "The reminder settings of the petition.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        return root.reminders_active ? root.reminders_config : null;
+        return root.reminders_config;
+      },
+    });
+    t.boolean("remindersActive", {
+      description:
+        "Whether automatic reminders are active or not for this petition access",
+      resolve: (root) => {
+        return root.reminders_active;
       },
     });
   },

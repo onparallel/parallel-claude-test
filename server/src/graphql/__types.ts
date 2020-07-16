@@ -468,6 +468,7 @@ export interface NexusGenFieldTypes {
     nextReminderAt: Date | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     reminderCount: number; // Int!
+    remindersActive: boolean; // Boolean!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     remindersLeft: number; // Int!
     status: NexusGenEnums["PetitionAccessStatus"]; // PetitionAccessStatus!

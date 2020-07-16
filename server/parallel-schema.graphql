@@ -701,6 +701,11 @@ type PetitionAccess implements Timestamps {
   reminderCount: Int!
 
   """
+  Whether automatic reminders are active or not for this petition access
+  """
+  remindersActive: Boolean!
+
+  """
   The reminder settings of the petition.
   """
   remindersConfig: RemindersConfig
