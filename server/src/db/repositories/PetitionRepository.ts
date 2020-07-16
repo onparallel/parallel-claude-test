@@ -109,6 +109,24 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(commentIds).size;
   }
 
+  async repliesBelongsToField(fieldId: number, replyIds: number[]) {
+    const {
+      rows: [{ count }],
+    } = await this.knex.raw(
+      /* sql */ `
+      select count(distinct pfr.id)::int as count
+        from petition_field_reply as pfr
+        where
+          pfr.petition_field_id = ? and pfr.id in (${replyIds
+            .map((_) => "?")
+            .join(", ")})
+          and pfr.deleted_at is null
+    `,
+      [fieldId, ...replyIds]
+    );
+    return count === new Set(replyIds).size;
+  }
+
   async repliesBelongsToPetition(petitionId: number, replyIds: number[]) {
     const {
       rows: [{ count }],
@@ -748,32 +766,17 @@ export class PetitionRepository extends BaseRepository {
     value: boolean,
     user: User
   ) {
-    return await this.knex.transaction(async (t) => {
-      const [fields, [petition]] = await Promise.all([
-        this.from("petition_field", t)
-          .whereIn("id", fieldIds)
-          .where("petition_id", petitionId)
-          .update(
-            {
-              validated: value,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          ),
-
-        this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          ),
-      ]);
-      return { fields, petition };
-    });
+    return await this.from("petition_field")
+      .whereIn("id", fieldIds)
+      .where("petition_id", petitionId)
+      .update(
+        {
+          validated: value,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        },
+        "*"
+      );
   }
 
   async createPetitionFieldReply(
@@ -837,14 +840,13 @@ export class PetitionRepository extends BaseRepository {
     ]);
   }
 
-  async updatePetitionFieldReplyStatus(
-    replyId: number,
+  async updatePetitionFieldRepliesStatus(
+    replyIds: number[],
     status: PetitionFieldReplyStatus
   ) {
-    const [reply] = await this.from("petition_field_reply")
-      .where("id", replyId)
+    return await this.from("petition_field_reply")
+      .whereIn("id", replyIds)
       .update({ status }, "*");
-    return reply;
   }
 
   async completePetition(petitionId: number, accessId: number) {

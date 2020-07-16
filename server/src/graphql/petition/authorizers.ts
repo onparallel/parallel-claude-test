@@ -31,13 +31,13 @@ export function fieldsBelongsToPetition<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { ids: fieldIds } = fromGlobalIds(
-        unMaybeArray(args[argNameFieldIds]),
-        "PetitionField"
-      );
       const { id: petitionId } = fromGlobalId(
         args[argNamePetitionId],
         "Petition"
+      );
+      const { ids: fieldIds } = fromGlobalIds(
+        unMaybeArray(args[argNameFieldIds]),
+        "PetitionField"
       );
       return ctx.petitions.fieldsBelongToPetition(petitionId, fieldIds);
     } catch {}
@@ -45,14 +45,14 @@ export function fieldsBelongsToPetition<
   };
 }
 
-export function replyBelongsToPetition<
+export function repliesBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
+  TArg2 extends Arg<TypeName, FieldName, string | string[]>
 >(
   argNamePetitionId: TArg1,
-  argNameReplyId: TArg2
+  argNameReplyIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
@@ -60,11 +60,36 @@ export function replyBelongsToPetition<
         args[argNamePetitionId],
         "Petition"
       );
-      const { id: replyId } = fromGlobalId(
-        args[argNameReplyId],
+      const { ids: replyIds } = fromGlobalIds(
+        unMaybeArray(args[argNameReplyIds]),
         "PetitionFieldReply"
       );
-      return ctx.petitions.repliesBelongsToPetition(petitionId, [replyId]);
+      return ctx.petitions.repliesBelongsToPetition(petitionId, replyIds);
+    } catch {}
+    return false;
+  };
+}
+
+export function repliesBelongsToField<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>,
+  TArg2 extends Arg<TypeName, FieldName, string | string[]>
+>(
+  argNameFieldId: TArg1,
+  argNameReplyIds: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { id: petitionFieldId } = fromGlobalId(
+        args[argNameFieldId],
+        "PetitionField"
+      );
+      const { ids: replyIds } = fromGlobalIds(
+        unMaybeArray(args[argNameReplyIds]),
+        "PetitionFieldReply"
+      );
+      return ctx.petitions.repliesBelongsToField(petitionFieldId, replyIds);
     } catch {}
     return false;
   };

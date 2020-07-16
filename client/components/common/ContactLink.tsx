@@ -1,8 +1,7 @@
 import { ContactLink_ContactFragment } from "@parallel/graphql/__types";
-import { Tooltip } from "@chakra-ui/core";
-import { Link, LinkProps } from "./Link";
 import { gql } from "apollo-boost";
 import { DisableableTooltip } from "./DisableableTooltip";
+import { Link, LinkProps } from "./Link";
 
 export function ContactLink({
   contact,

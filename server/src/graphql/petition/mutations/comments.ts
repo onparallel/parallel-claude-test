@@ -10,7 +10,7 @@ import { RESULT } from "../../helpers/result";
 import {
   commentsBelongsToPetition,
   fieldsBelongsToPetition,
-  replyBelongsToPetition,
+  repliesBelongsToPetition,
   userHasAccessToPetitions,
 } from "../authorizers";
 
@@ -26,7 +26,7 @@ export const createPetitionFieldComment = mutationField(
         fieldsBelongsToPetition("petitionId", "petitionFieldId"),
         ifArgDefined(
           "petitionFieldReplyId",
-          replyBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
+          repliesBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
         )
       )
     ),

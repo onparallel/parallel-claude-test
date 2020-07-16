@@ -446,11 +446,12 @@ type Mutation {
   """
   Updates the status of a petition field reply.
   """
-  updatePetitionFieldReplyStatus(
-    petitionFieldReplyId: ID!
+  updatePetitionFieldRepliesStatus(
+    petitionFieldId: ID!
+    petitionFieldReplyIds: [ID!]!
     petitionId: ID!
     status: PetitionFieldReplyStatus!
-  ): PetitionFieldReply!
+  ): PetitionFieldAndReplies!
 
   """
   Updates the user with the provided data.
@@ -464,7 +465,7 @@ type Mutation {
     fieldIds: [ID!]!
     petitionId: ID!
     value: Boolean!
-  ): PetitionAndFields!
+  ): [PetitionField!]!
 }
 
 enum OnboardingKey {
@@ -754,11 +755,6 @@ type PetitionAndField {
   petition: Petition!
 }
 
-type PetitionAndFields {
-  fields: [PetitionField!]!
-  petition: Petition!
-}
-
 type PetitionCompletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
@@ -841,6 +837,11 @@ type PetitionField {
   Determines if the content of this field has been validated.
   """
   validated: Boolean!
+}
+
+type PetitionFieldAndReplies {
+  field: PetitionField!
+  replies: [PetitionFieldReply!]!
 }
 
 """

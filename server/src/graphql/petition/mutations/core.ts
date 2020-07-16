@@ -29,7 +29,8 @@ import {
   accessesBelongToPetition,
   fieldsBelongsToPetition,
   messageBelongToPetition,
-  replyBelongsToPetition,
+  repliesBelongsToField,
+  repliesBelongsToPetition,
   userHasAccessToPetitions,
 } from "../authorizers";
 
@@ -314,13 +315,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
 export const validatePetitionFields = mutationField("validatePetitionFields", {
   description: "Updates the validation of a petition field.",
-  type: objectType({
-    name: "PetitionAndFields",
-    definition(t) {
-      t.field("petition", { type: "Petition" });
-      t.field("fields", { type: "PetitionField", list: [true] });
-    },
-  }),
+  type: "PetitionField",
+  list: [true],
   authorize: chain(
     authenticate(),
     and(
@@ -337,43 +333,91 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     const { ids: fieldIds } = fromGlobalIds(args.fieldIds, "PetitionField");
     const { value } = args;
-    return await ctx.petitions.validatePetitionFields(
+    const fields = await ctx.petitions.validatePetitionFields(
       petitionId,
       fieldIds,
       value,
       ctx.user!
     );
+    if (value) {
+      const replies = await ctx.petitions.loadRepliesForField(fieldIds, {
+        cache: false,
+      });
+      await ctx.petitions.updatePetitionFieldRepliesStatus(
+        replies.flatMap((r) =>
+          r.filter((r) => r.status === "PENDING").map((r) => r.id)
+        ),
+        "APPROVED"
+      );
+    }
+    return fields;
   },
 });
 
-export const updatePetitionFieldReplyStatus = mutationField(
-  "updatePetitionFieldReplyStatus",
+export const updatePetitionFieldRepliesStatus = mutationField(
+  "updatePetitionFieldRepliesStatus",
   {
     description: "Updates the status of a petition field reply.",
-    type: "PetitionFieldReply",
+    type: objectType({
+      name: "PetitionFieldAndReplies",
+      definition(t) {
+        t.field("field", { type: "PetitionField" });
+        t.field("replies", { type: "PetitionFieldReply", list: [true] });
+      },
+    }),
     authorize: chain(
       authenticate(),
       and(
         userHasAccessToPetitions("petitionId"),
-        replyBelongsToPetition("petitionId", "petitionFieldReplyId")
+        fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+        repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
       )
     ),
     args: {
       petitionId: idArg({ required: true }),
-      petitionFieldReplyId: idArg({ required: true }),
+      petitionFieldId: idArg({ required: true }),
+      petitionFieldReplyIds: idArg({ required: true, list: [true] }),
       status: arg({ type: "PetitionFieldReplyStatus", required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const { id: petitionFieldReplyId } = fromGlobalId(
-        args.petitionFieldReplyId,
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+      const { id: petitionFieldId } = fromGlobalId(
+        args.petitionFieldId,
+        "PetitionField"
+      );
+      const { ids: petitionFieldReplyIds } = fromGlobalIds(
+        args.petitionFieldReplyIds,
         "PetitionFieldReply"
       );
       const { status } = args;
-
-      return await ctx.petitions.updatePetitionFieldReplyStatus(
-        petitionFieldReplyId,
+      const replies = await ctx.petitions.updatePetitionFieldRepliesStatus(
+        petitionFieldReplyIds,
         status
       );
+      if (status === "APPROVED") {
+        const allReplies = await ctx.petitions.loadRepliesForField(
+          petitionFieldId
+        );
+        if (
+          allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))
+        ) {
+          return {
+            replies,
+            field: (
+              await ctx.petitions.validatePetitionFields(
+                petitionId,
+                [petitionFieldId],
+                true,
+                ctx.user!
+              )
+            )[0],
+          };
+        }
+      }
+      return {
+        replies,
+        field: (await ctx.petitions.loadField(petitionFieldId))!,
+      };
     },
   }
 );
@@ -393,7 +437,7 @@ export const fileUploadReplyDownloadLink = mutationField(
       authenticate(),
       and(
         userHasAccessToPetitions("petitionId"),
-        replyBelongsToPetition("petitionId", "replyId")
+        repliesBelongsToPetition("petitionId", "replyId")
       )
     ),
     args: {

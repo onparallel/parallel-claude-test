@@ -4,6 +4,7 @@ import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -20,7 +21,6 @@ import {
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
-import { Title } from "@parallel/components/common/Title";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
@@ -33,7 +33,7 @@ import {
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
-  PetitionReplies_updatePetitionFieldReplyStatusMutationVariables,
+  PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
   UpdatePetitionInput,
   usePetitionRepliesQuery,
   usePetitionRepliesUserQuery,
@@ -43,7 +43,7 @@ import {
   usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
   usePetitionReplies_submitUnpublishedCommentsMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
-  usePetitionReplies_updatePetitionFieldReplyStatusMutation,
+  usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
 } from "@parallel/graphql/__types";
@@ -107,35 +107,61 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   ] = usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
-  const handleValidateToggle = useCallback(
-    wrapper(async (fieldIds: string[], value: boolean) => {
-      validatePetitionFields({
-        variables: { petitionId: petition!.id, fieldIds, value },
-        optimisticResponse: {
-          validatePetitionFields: {
-            __typename: "PetitionAndFields",
-            petition: {
-              __typename: "Petition",
-              ...pick(petition!, [
-                "id",
-                "name",
-                "status",
-                "locale",
-                "deadline",
-              ]),
-              updatedAt: new Date().toISOString(),
-            },
-            fields: fieldIds.map((id) => ({
-              __typename: "PetitionField",
-              id,
-              validated: value,
+  async function handleValidateToggle(fieldIds: string[], value: boolean) {
+    await validatePetitionFields({
+      variables: { petitionId: petition!.id, fieldIds, value },
+      optimisticResponse: {
+        validatePetitionFields: fieldIds.map((id) => {
+          const field = petition!.fields.find((f) => f.id === id)!;
+          return {
+            __typename: "PetitionField",
+            id,
+            validated: value,
+            replies: field.replies.map((reply) => ({
+              ...pick(reply, ["__typename", "id"]),
+              status:
+                value && reply.status === "PENDING" ? "APPROVED" : reply.status,
             })),
-          },
-        },
-      });
-    }),
-    []
-  );
+          };
+        }),
+      },
+    });
+  }
+
+  const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
+  async function handleUpdateRepliesStatus(
+    petitionFieldId: string,
+    petitionFieldReplyIds: string[],
+    status: PetitionFieldReplyStatus
+  ) {
+    if (status === "REJECTED") {
+      setActiveFieldId(petitionFieldId);
+      setTimeout(() => {
+        const input = document.querySelector<HTMLTextAreaElement>(
+          "#petition-replies-comments-input"
+        );
+        scrollIntoView(input!, { block: "center", behavior: "smooth" });
+        input!.focus();
+      }, 150);
+    }
+    const field = petition!.fields.find((f) => f.id === petitionFieldId)!;
+    await updatePetitionFieldRepliesStatus(
+      {
+        petitionId,
+        petitionFieldId,
+        petitionFieldReplyIds,
+        status,
+      },
+      // field is automatically validated if there are no pending replies
+      status === "APPROVED"
+        ? field.validated ||
+            field.replies.every(
+              (r) =>
+                petitionFieldReplyIds.includes(r.id) || r.status !== "PENDING"
+            )
+        : field.validated
+    );
+  }
 
   const handleOnUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
@@ -220,29 +246,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   async function handleSubmitUnpublished() {
     await submitUnpublishedComments({
       variables: { petitionId },
-    });
-  }
-
-  const updatePetitionFieldReplyStatus = useUpdatePetitionFieldReplyStatus();
-  async function handleUpdateReplyStatus(
-    petitionFieldId: string,
-    petitionFieldReplyId: string,
-    status: PetitionFieldReplyStatus
-  ) {
-    if (status === "REJECTED") {
-      setActiveFieldId(petitionFieldId);
-      setTimeout(() => {
-        const input = document.querySelector<HTMLTextAreaElement>(
-          "#petition-replies-comments-input"
-        );
-        scrollIntoView(input!, { block: "center", behavior: "smooth" });
-        input!.focus();
-      }, 150);
-    }
-    await updatePetitionFieldReplyStatus({
-      petitionId,
-      petitionFieldReplyId,
-      status,
     });
   }
 
@@ -351,7 +354,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                     )
                   }
                   onUpdateReplyStatus={(replyId, status) =>
-                    handleUpdateReplyStatus(field.id, replyId, status)
+                    handleUpdateRepliesStatus(field.id, [replyId], status)
                   }
                 />
               ))}
@@ -410,16 +413,14 @@ PetitionReplies.mutations = [
         fieldIds: $fieldIds
         value: $value
       ) {
-        fields {
+        id
+        validated
+        replies {
           id
-          validated
-        }
-        petition {
-          ...PetitionLayout_Petition
+          status
         }
       }
     }
-    ${PetitionLayout.fragments.Petition}
   `,
   gql`
     mutation PetitionReplies_fileUploadReplyDownloadLink(
@@ -509,18 +510,26 @@ PetitionReplies.mutations = [
     }
   `,
   gql`
-    mutation PetitionReplies_updatePetitionFieldReplyStatus(
+    mutation PetitionReplies_updatePetitionFieldRepliesStatus(
       $petitionId: ID!
-      $petitionFieldReplyId: ID!
+      $petitionFieldId: ID!
+      $petitionFieldReplyIds: [ID!]!
       $status: PetitionFieldReplyStatus!
     ) {
-      updatePetitionFieldReplyStatus(
+      updatePetitionFieldRepliesStatus(
         petitionId: $petitionId
-        petitionFieldReplyId: $petitionFieldReplyId
+        petitionFieldId: $petitionFieldId
+        petitionFieldReplyIds: $petitionFieldReplyIds
         status: $status
       ) {
-        id
-        status
+        field {
+          id
+          validated
+        }
+        replies {
+          id
+          status
+        }
       }
     }
   `,
@@ -677,23 +686,38 @@ function useDeletePetitionFieldComment() {
   );
 }
 
-function useUpdatePetitionFieldReplyStatus() {
+function useUpdatePetitionFieldRepliesStatus() {
   const [
-    updatePetitionFieldReplyStatus,
-  ] = usePetitionReplies_updatePetitionFieldReplyStatusMutation({
-    optimisticResponse: ({ petitionFieldReplyId, status }) => ({
-      updatePetitionFieldReplyStatus: {
-        __typename: "PetitionFieldReply",
-        id: petitionFieldReplyId,
-        status,
-      },
-    }),
-  });
+    updatePetitionFieldRepliesStatus,
+  ] = usePetitionReplies_updatePetitionFieldRepliesStatusMutation();
   return useCallback(
     async (
-      variables: PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
-    ) => await updatePetitionFieldReplyStatus({ variables }),
-    [updatePetitionFieldReplyStatus]
+      variables: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
+      optimisticValidated: boolean
+    ) =>
+      await updatePetitionFieldRepliesStatus({
+        variables,
+        optimisticResponse: (({
+          petitionFieldId,
+          petitionFieldReplyIds,
+          status,
+        }: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables) => ({
+          updatePetitionFieldRepliesStatus: {
+            __typename: "PetitionFieldAndReplies",
+            field: {
+              __typename: "PetitionField",
+              id: petitionFieldId,
+              validated: optimisticValidated,
+            },
+            replies: petitionFieldReplyIds.map((id) => ({
+              __typename: "PetitionFieldReply",
+              id,
+              status,
+            })),
+          },
+        })) as any,
+      }),
+    [updatePetitionFieldRepliesStatus]
   );
 }
 

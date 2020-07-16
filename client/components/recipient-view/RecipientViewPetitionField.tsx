@@ -8,6 +8,7 @@ import {
   FormControl,
   FormErrorMessage,
   Heading,
+  Icon,
   Input,
   List,
   ListItem,
@@ -16,28 +17,26 @@ import {
   Textarea,
   Tooltip,
   useTheme,
-  Icon,
-  Switch,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
 import {
-  RecipientViewPetitionField_PublicPetitionFieldFragment,
   PetitionFieldReplyStatus,
+  RecipientViewPetitionField_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
 import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { gql } from "apollo-boost";
-import { useCallback, ReactNode } from "react";
+import { ReactNode, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
+import { DisableableTooltip } from "../common/DisableableTooltip";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { DisableableTooltip } from "../common/DisableableTooltip";
 
 export type CreateReply = CreateReplyText | CreateReplyFileUpload;
 

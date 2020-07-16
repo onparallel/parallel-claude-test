@@ -7,9 +7,8 @@ import {
   IconButton,
   PseudoBoxProps,
   Stack,
-  Text,
   Switch,
-  Checkbox,
+  Text,
   VisuallyHidden,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
@@ -29,6 +28,7 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
+import { noop } from "remeda";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
@@ -113,6 +113,7 @@ export function PetitionRepliesField({
             <Switch
               color="green"
               isChecked={field.validated}
+              onChange={noop}
               size="sm"
               pointerEvents="none"
               marginRight={2}

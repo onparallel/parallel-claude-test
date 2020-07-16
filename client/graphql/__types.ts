@@ -228,11 +228,11 @@ export type Mutation = {
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply. */
-  updatePetitionFieldReplyStatus: PetitionFieldReply;
+  updatePetitionFieldRepliesStatus: PetitionFieldAndReplies;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the validation of a petition field. */
-  validatePetitionFields: PetitionAndFields;
+  validatePetitionFields: Array<PetitionField>;
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -427,8 +427,9 @@ export type MutationupdatePetitionFieldCommentArgs = {
   petitionId: Scalars["ID"];
 };
 
-export type MutationupdatePetitionFieldReplyStatusArgs = {
-  petitionFieldReplyId: Scalars["ID"];
+export type MutationupdatePetitionFieldRepliesStatusArgs = {
+  petitionFieldId: Scalars["ID"];
+  petitionFieldReplyIds: Array<Scalars["ID"]>;
   petitionId: Scalars["ID"];
   status: PetitionFieldReplyStatus;
 };
@@ -584,12 +585,6 @@ export type PetitionAndField = {
   petition: Petition;
 };
 
-export type PetitionAndFields = {
-  __typename?: "PetitionAndFields";
-  fields: Array<PetitionField>;
-  petition: Petition;
-};
-
 export type PetitionCompletedEvent = PetitionEvent & {
   __typename?: "PetitionCompletedEvent";
   access: PetitionAccess;
@@ -640,6 +635,12 @@ export type PetitionField = {
   type: PetitionFieldType;
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+};
+
+export type PetitionFieldAndReplies = {
+  __typename?: "PetitionFieldAndReplies";
+  field: PetitionField;
+  replies: Array<PetitionFieldReply>;
 };
 
 /** A comment on a petition field */
@@ -2093,12 +2094,19 @@ export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
 export type PetitionReplies_validatePetitionFieldsMutation = {
   __typename?: "Mutation";
 } & {
-  validatePetitionFields: { __typename?: "PetitionAndFields" } & {
-    fields: Array<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "validated">
-    >;
-    petition: { __typename?: "Petition" } & PetitionLayout_PetitionFragment;
-  };
+  validatePetitionFields: Array<
+    { __typename?: "PetitionField" } & Pick<
+      PetitionField,
+      "id" | "validated"
+    > & {
+        replies: Array<
+          { __typename?: "PetitionFieldReply" } & Pick<
+            PetitionFieldReply,
+            "id" | "status"
+          >
+        >;
+      }
+  >;
 };
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -2186,19 +2194,30 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
   >;
 };
 
-export type PetitionReplies_updatePetitionFieldReplyStatusMutationVariables = Exact<{
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
   petitionId: Scalars["ID"];
-  petitionFieldReplyId: Scalars["ID"];
+  petitionFieldId: Scalars["ID"];
+  petitionFieldReplyIds: Array<Scalars["ID"]>;
   status: PetitionFieldReplyStatus;
 }>;
 
-export type PetitionReplies_updatePetitionFieldReplyStatusMutation = {
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   __typename?: "Mutation";
 } & {
-  updatePetitionFieldReplyStatus: { __typename?: "PetitionFieldReply" } & Pick<
-    PetitionFieldReply,
-    "id" | "status"
-  >;
+  updatePetitionFieldRepliesStatus: {
+    __typename?: "PetitionFieldAndReplies";
+  } & {
+    field: { __typename?: "PetitionField" } & Pick<
+      PetitionField,
+      "id" | "validated"
+    >;
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
+        "id" | "status"
+      >
+    >;
+  };
 };
 
 export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
@@ -4954,16 +4973,14 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
       fieldIds: $fieldIds
       value: $value
     ) {
-      fields {
+      id
+      validated
+      replies {
         id
-        validated
-      }
-      petition {
-        ...PetitionLayout_Petition
+        status
       }
     }
   }
-  ${PetitionLayout_PetitionFragmentDoc}
 `;
 export type PetitionReplies_validatePetitionFieldsMutationFn = ApolloReactCommon.MutationFunction<
   PetitionReplies_validatePetitionFieldsMutation,
@@ -5366,66 +5383,75 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = Apo
   PetitionReplies_markPetitionFieldCommentsAsReadMutation,
   PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
 >;
-export const PetitionReplies_updatePetitionFieldReplyStatusDocument = gql`
-  mutation PetitionReplies_updatePetitionFieldReplyStatus(
+export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
+  mutation PetitionReplies_updatePetitionFieldRepliesStatus(
     $petitionId: ID!
-    $petitionFieldReplyId: ID!
+    $petitionFieldId: ID!
+    $petitionFieldReplyIds: [ID!]!
     $status: PetitionFieldReplyStatus!
   ) {
-    updatePetitionFieldReplyStatus(
+    updatePetitionFieldRepliesStatus(
       petitionId: $petitionId
-      petitionFieldReplyId: $petitionFieldReplyId
+      petitionFieldId: $petitionFieldId
+      petitionFieldReplyIds: $petitionFieldReplyIds
       status: $status
     ) {
-      id
-      status
+      field {
+        id
+        validated
+      }
+      replies {
+        id
+        status
+      }
     }
   }
 `;
-export type PetitionReplies_updatePetitionFieldReplyStatusMutationFn = ApolloReactCommon.MutationFunction<
-  PetitionReplies_updatePetitionFieldReplyStatusMutation,
-  PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionReplies_updatePetitionFieldRepliesStatusMutation,
+  PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
 >;
 
 /**
- * __usePetitionReplies_updatePetitionFieldReplyStatusMutation__
+ * __usePetitionReplies_updatePetitionFieldRepliesStatusMutation__
  *
- * To run a mutation, you first call `usePetitionReplies_updatePetitionFieldReplyStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_updatePetitionFieldReplyStatusMutation` returns a tuple that includes:
+ * To run a mutation, you first call `usePetitionReplies_updatePetitionFieldRepliesStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_updatePetitionFieldRepliesStatusMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [petitionRepliesUpdatePetitionFieldReplyStatusMutation, { data, loading, error }] = usePetitionReplies_updatePetitionFieldReplyStatusMutation({
+ * const [petitionRepliesUpdatePetitionFieldRepliesStatusMutation, { data, loading, error }] = usePetitionReplies_updatePetitionFieldRepliesStatusMutation({
  *   variables: {
  *      petitionId: // value for 'petitionId'
- *      petitionFieldReplyId: // value for 'petitionFieldReplyId'
+ *      petitionFieldId: // value for 'petitionFieldId'
+ *      petitionFieldReplyIds: // value for 'petitionFieldReplyIds'
  *      status: // value for 'status'
  *   },
  * });
  */
-export function usePetitionReplies_updatePetitionFieldReplyStatusMutation(
+export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    PetitionReplies_updatePetitionFieldReplyStatusMutation,
-    PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+    PetitionReplies_updatePetitionFieldRepliesStatusMutation,
+    PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
   >
 ) {
   return ApolloReactHooks.useMutation<
-    PetitionReplies_updatePetitionFieldReplyStatusMutation,
-    PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
-  >(PetitionReplies_updatePetitionFieldReplyStatusDocument, baseOptions);
+    PetitionReplies_updatePetitionFieldRepliesStatusMutation,
+    PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
+  >(PetitionReplies_updatePetitionFieldRepliesStatusDocument, baseOptions);
 }
-export type PetitionReplies_updatePetitionFieldReplyStatusMutationHookResult = ReturnType<
-  typeof usePetitionReplies_updatePetitionFieldReplyStatusMutation
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
 >;
-export type PetitionReplies_updatePetitionFieldReplyStatusMutationResult = ApolloReactCommon.MutationResult<
-  PetitionReplies_updatePetitionFieldReplyStatusMutation
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationResult = ApolloReactCommon.MutationResult<
+  PetitionReplies_updatePetitionFieldRepliesStatusMutation
 >;
-export type PetitionReplies_updatePetitionFieldReplyStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  PetitionReplies_updatePetitionFieldReplyStatusMutation,
-  PetitionReplies_updatePetitionFieldReplyStatusMutationVariables
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionReplies_updatePetitionFieldRepliesStatusMutation,
+  PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: ID!) {
