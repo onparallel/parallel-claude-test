@@ -1,7 +1,7 @@
 import { createCronWorker } from "./helpers/createCronWorker";
 import { chunk } from "remeda";
 import { eachOf } from "async";
-import { calculateNextReminder } from "../util/calculateNextReminder";
+import { calculateNextReminder } from "../util/reminderUtils";
 
 createCronWorker("reminder-trigger", async (context) => {
   const accesses = await context.petitions.getRemindableAccesses();

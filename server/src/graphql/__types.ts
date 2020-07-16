@@ -419,6 +419,7 @@ export interface NexusGenFieldTypes {
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendReminders: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
+    switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -889,6 +890,13 @@ export interface NexusGenArgTypes {
     submitUnpublishedComments: {
       // args
       petitionId: string; // ID!
+    };
+    switchAutomaticReminders: {
+      // args
+      accessIds: string[]; // [ID!]!
+      petitionId: string; // ID!
+      remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
+      start?: boolean | null; // Boolean
     };
     updateContact: {
       // args

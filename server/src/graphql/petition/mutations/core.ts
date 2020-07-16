@@ -8,15 +8,10 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { CreatePetition, CreatePetitionField } from "../../../db/__types";
-import { calculateNextReminder } from "../../../util/calculateNextReminder";
-import {
-  fromGlobalId,
-  fromGlobalIds,
-  toGlobalId,
-} from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
+import { calculateNextReminder } from "../../../util/reminderUtils";
 import { and, authenticate, chain } from "../../helpers/authorize";
 import { dateTimeArg } from "../../helpers/date";
-import { ArgValidationError } from "../../helpers/errors";
 import { jsonArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
 import { validateAnd } from "../../helpers/validateArgs";
@@ -33,6 +28,11 @@ import {
   repliesBelongsToPetition,
   userHasAccessToPetitions,
 } from "../authorizers";
+import {
+  validateAccessesRemindersLeft,
+  validateAccessesStatus,
+  validatePetitionStatus,
+} from "../validations";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -660,33 +660,11 @@ export const sendReminders = mutationField("sendReminders", {
       ctx.petitions.loadPetition(petitionId),
       ctx.petitions.loadAccess(accessIds),
     ]);
-    if (!petition || petition.status !== "PENDING") {
-      throw new ArgValidationError(
-        info,
-        "petitionId",
-        `Petition must have status "PENDING".`
-      );
-    }
-    for (const access of accesses) {
-      if (!access || access.status !== "ACTIVE") {
-        throw new ArgValidationError(
-          info,
-          "accessIds",
-          `Petition accesses must have status "ACTIVE".`
-        );
-      }
-      if (access.reminders_left === 0) {
-        throw new ArgValidationError(
-          info,
-          `accessIds[${accesses.indexOf(access)}]`,
-          `No reminders left.`,
-          {
-            errorCode: "NO_REMINDERS_LEFT",
-            petitionAccessId: toGlobalId("PetitionAccess", access.id),
-          }
-        );
-      }
-    }
+
+    validatePetitionStatus(petition, "PENDING", info);
+    validateAccessesStatus(accesses, "ACTIVE", info);
+    validateAccessesRemindersLeft(accesses, info);
+
     try {
       const reminders = await ctx.petitions.createReminders(
         petitionId,
@@ -705,6 +683,63 @@ export const sendReminders = mutationField("sendReminders", {
     }
   },
 });
+
+export const switchAutomaticReminders = mutationField(
+  "switchAutomaticReminders",
+  {
+    description:
+      "Switches automatic reminders for the specified petition accesses.",
+    type: "PetitionAccess",
+    list: [true],
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetitions("petitionId"),
+        accessesBelongToPetition("petitionId", "accessIds")
+      )
+    ),
+    args: {
+      start: booleanArg({ required: false }),
+      petitionId: idArg({ required: true }),
+      accessIds: idArg({ list: [true], required: true }),
+      remindersConfig: arg({ type: "RemindersConfigInput", required: false }),
+    },
+    validateArgs: validRemindersConfig(
+      (args) => args.remindersConfig,
+      "remindersConfig"
+    ),
+    resolve: async (_, args, ctx, info) => {
+      debugger;
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+      const { ids: accessIds } = fromGlobalIds(
+        args.accessIds,
+        "PetitionAccess"
+      );
+
+      const [petition, accesses] = await Promise.all([
+        ctx.petitions.loadPetition(petitionId),
+        ctx.petitions.loadAccess(accessIds),
+      ]);
+
+      validatePetitionStatus(petition, "PENDING", info);
+      validateAccessesStatus(accesses, "ACTIVE", info);
+
+      if (args.start && args.remindersConfig) {
+        validateAccessesRemindersLeft(accesses, info);
+        const validAccessIds: number[] = accesses
+          .filter((a) => a !== null)
+          .map((a) => a!.id);
+
+        return await ctx.petitions.startAccessReminders(
+          validAccessIds,
+          args.remindersConfig
+        );
+      } else {
+        return await ctx.petitions.stopAccessReminders(accessIds);
+      }
+    },
+  }
+);
 
 export const deactivateAccesses = mutationField("deactivateAccesses", {
   description: "Deactivates the specified active petition accesses.",

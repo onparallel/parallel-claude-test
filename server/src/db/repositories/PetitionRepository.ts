@@ -36,6 +36,10 @@ import {
   PetitionUserNotification,
   PetitionContactNotification,
 } from "../__types";
+import {
+  PetitionAccessReminderConfig,
+  calculateNextReminder,
+} from "../../util/reminderUtils";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -994,6 +998,28 @@ export class PetitionRepository extends BaseRepository {
       .where("id", reminderId)
       .update({ status: "ERROR" }, "*");
     return row;
+  }
+
+  async stopAccessReminders(accessIds: number[]) {
+    return await this.from("petition_access")
+      .whereIn("id", accessIds)
+      .update({ reminders_active: false }, "*");
+  }
+
+  async startAccessReminders(
+    accessIds: number[],
+    reminderConfig: PetitionAccessReminderConfig
+  ) {
+    return await this.from("petition_access")
+      .whereIn("id", accessIds)
+      .update(
+        {
+          reminders_active: true,
+          reminders_config: reminderConfig,
+          next_reminder_at: calculateNextReminder(new Date(), reminderConfig),
+        },
+        "*"
+      );
   }
 
   async loadEventsForPetition(petitionId: number, opts: PageOpts) {

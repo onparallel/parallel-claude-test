@@ -403,6 +403,16 @@ type Mutation {
   submitUnpublishedComments(petitionId: ID!): [PetitionFieldComment!]!
 
   """
+  Switches automatic reminders for the specified petition accesses.
+  """
+  switchAutomaticReminders(
+    accessIds: [ID!]!
+    petitionId: ID!
+    remindersConfig: RemindersConfigInput
+    start: Boolean
+  ): [PetitionAccess!]!
+
+  """
   Updates a contact.
   """
   updateContact(data: UpdateContactInput!, id: ID!): Contact!
