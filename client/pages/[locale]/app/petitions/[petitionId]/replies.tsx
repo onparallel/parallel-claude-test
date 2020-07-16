@@ -285,20 +285,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             })}
           />
           <Spacer />
-          {/* <Button
-            leftIcon="check"
-            onClick={() =>
-              handleValidateToggle(
-                selected.map((r) => r.id),
-                true
-              )
-            }
-          >
-            <FormattedMessage
-              id="petition.replies.validate-selected"
-              defaultMessage="Mark as reviewed"
-            />
-          </Button> */}
           {pendingComments ? (
             <Button
               variantColor="yellow"

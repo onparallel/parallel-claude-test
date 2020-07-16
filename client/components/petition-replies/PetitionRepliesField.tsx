@@ -8,6 +8,8 @@ import {
   PseudoBoxProps,
   Stack,
   Text,
+  Switch,
+  Checkbox,
   VisuallyHidden,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
@@ -73,45 +75,70 @@ export function PetitionRepliesField({
       paddingX={{ base: 4, md: 6 }}
       {...props}
     >
-      <Flex alignItems="center">
-        <PetitionFieldTypeIndicator type={field.type} index={index} as="div" />
-        <Box marginLeft={4}>
-          {field.title ? (
-            <Text as="h4">{field.title}</Text>
-          ) : (
-            <Text as="h4" color="gray.400" fontStyle="italic">
-              <FormattedMessage
-                id="generic.untitled-field"
-                defaultMessage="Untitled field"
-              />
-            </Text>
-          )}
-        </Box>
-        <Spacer />
-        {/* <Button
-          size="sm"
-          variant={field.validated ? "solid" : "ghost"}
-          onClick={onValidateToggle}
-        >
-          <Checkbox
-            isChecked={field.validated}
-            isReadOnly
-            size="md"
-            pointerEvents="none"
-            marginRight={2}
+      <Flex alignItems="center" flexWrap="wrap" justifyContent="space-between">
+        <Flex width={{ base: "100%", lg: "auto" }} flex="1">
+          <PetitionFieldTypeIndicator
+            type={field.type}
+            index={index}
+            as="div"
           />
-          <FormattedMessage
-            id="petition-replies.validate-field-button"
-            defaultMessage="Reviewed"
-          ></FormattedMessage>
-        </Button> */}
-        <CommentsButton
-          isActive={isShowingComments}
-          commentCount={field.comments.length}
-          hasNewComments={field.comments.some((c) => c.isUnread)}
-          hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
-          onClick={onToggleComments}
-        />
+          <Box marginLeft={4}>
+            {field.title ? (
+              <Text as="h4" whiteSpace="nowrap">
+                {field.title}
+              </Text>
+            ) : (
+              <Text
+                as="h4"
+                color="gray.400"
+                fontStyle="italic"
+                whiteSpace="nowrap"
+              >
+                <FormattedMessage
+                  id="generic.untitled-field"
+                  defaultMessage="Untitled field"
+                />
+              </Text>
+            )}
+          </Box>
+        </Flex>
+        <Flex width={{ base: "100%", lg: "auto" }}>
+          <Spacer />
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onValidateToggle}
+            marginRight={1}
+          >
+            <Switch
+              color="green"
+              isChecked={field.validated}
+              size="sm"
+              pointerEvents="none"
+              marginRight={2}
+              position="relative"
+              top="1px"
+              role="presentation"
+            />
+            <FormattedMessage
+              id="petition-replies.validate-field-button"
+              defaultMessage="Reviewed"
+            ></FormattedMessage>
+          </Button>
+          {/* This Flex element makes the reviewed buttons to be aligned */}
+          <Flex width="66px">
+            <Spacer />
+            <CommentsButton
+              isActive={isShowingComments}
+              commentCount={field.comments.length}
+              hasNewComments={field.comments.some((c) => c.isUnread)}
+              hasUnpublishedComments={field.comments.some(
+                (c) => !c.publishedAt
+              )}
+              onClick={onToggleComments}
+            />
+          </Flex>
+        </Flex>
       </Flex>
       <Box marginBottom={2}>
         {field.description ? (
