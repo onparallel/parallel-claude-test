@@ -32,6 +32,7 @@ import {
   validateAccessesRemindersLeft,
   validateAccessesStatus,
   validatePetitionStatus,
+  validateArgumentIsSet,
 } from "../validations";
 
 export const createPetition = mutationField("createPetition", {
@@ -724,15 +725,17 @@ export const switchAutomaticReminders = mutationField(
       validatePetitionStatus(petition, "PENDING", info);
       validateAccessesStatus(accesses, "ACTIVE", info);
 
-      if (args.start && args.remindersConfig) {
+      if (args.start) {
         validateAccessesRemindersLeft(accesses, info);
+        validateArgumentIsSet(args, "remindersConfig", info);
+
         const validAccessIds: number[] = accesses
           .filter((a) => a !== null)
           .map((a) => a!.id);
 
         return await ctx.petitions.startAccessReminders(
           validAccessIds,
-          args.remindersConfig
+          args.remindersConfig!
         );
       } else {
         return await ctx.petitions.stopAccessReminders(accessIds);

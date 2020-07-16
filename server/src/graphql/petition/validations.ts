@@ -57,3 +57,17 @@ export function validateAccessesRemindersLeft(
     }
   }
 }
+
+export function validateArgumentIsSet(
+  args: any,
+  argumentsKey: string,
+  info: GraphQLResolveInfo
+) {
+  if (!args.hasOwnProperty(argumentsKey)) {
+    throw new ArgValidationError(
+      info,
+      argumentsKey,
+      `Argument ${argumentsKey} is required.`
+    );
+  }
+}
