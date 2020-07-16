@@ -377,9 +377,9 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           <Stack flex="2" spacing={4}>
             {petition.fields.map((field) => (
               <RecipientViewPetitionField
+                key={field.id}
                 id={`field-${field.id}`}
                 field={field}
-                key={field.id}
                 isInvalid={
                   finalized && field.replies.length === 0 && !field.optional
                 }
@@ -485,11 +485,10 @@ RecipientView.mutations = [
       $data: CreateTextReplyInput!
     ) {
       publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
-        id
-        content
-        createdAt
+        ...RecipientViewPetitionField_PublicPetitionFieldReply
       }
     }
+    ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
   `,
   gql`
     mutation RecipientView_publicCreateFileUploadReply(
@@ -504,12 +503,11 @@ RecipientView.mutations = [
       ) {
         endpoint
         reply {
-          id
-          content
-          createdAt
+          ...RecipientViewPetitionField_PublicPetitionFieldReply
         }
       }
     }
+    ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
   `,
   gql`
     mutation RecipientView_publicFileUploadReplyComplete(

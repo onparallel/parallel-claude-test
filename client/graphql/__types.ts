@@ -1622,10 +1622,9 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   | "validated"
 > & {
     replies: Array<
-      { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id" | "status" | "content" | "createdAt"
-      >
+      {
+        __typename?: "PublicPetitionFieldReply";
+      } & RecipientViewPetitionField_PublicPetitionFieldReplyFragment
     >;
     comments: Array<
       { __typename?: "PublicPetitionFieldComment" } & Pick<
@@ -1634,6 +1633,10 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
       >
     >;
   };
+
+export type RecipientViewPetitionField_PublicPetitionFieldReplyFragment = {
+  __typename?: "PublicPetitionFieldReply";
+} & Pick<PublicPetitionFieldReply, "id" | "status" | "content" | "createdAt">;
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
@@ -2383,10 +2386,9 @@ export type RecipientView_publicCreateTextReplyMutationVariables = Exact<{
 export type RecipientView_publicCreateTextReplyMutation = {
   __typename?: "Mutation";
 } & {
-  publicCreateTextReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
-    PublicPetitionFieldReply,
-    "id" | "content" | "createdAt"
-  >;
+  publicCreateTextReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionField_PublicPetitionFieldReplyFragment;
 };
 
 export type RecipientView_publicCreateFileUploadReplyMutationVariables = Exact<{
@@ -2402,10 +2404,9 @@ export type RecipientView_publicCreateFileUploadReplyMutation = {
     CreateFileUploadReply,
     "endpoint"
   > & {
-      reply: { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id" | "content" | "createdAt"
-      >;
+      reply: {
+        __typename?: "PublicPetitionFieldReply";
+      } & RecipientViewPetitionField_PublicPetitionFieldReplyFragment;
     };
 };
 
@@ -3352,6 +3353,14 @@ export const Login_UserFragmentDoc = gql`
     email
   }
 `;
+export const RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc = gql`
+  fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
+    id
+    status
+    content
+    createdAt
+  }
+`;
 export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
     id
@@ -3363,10 +3372,7 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
     multiple
     validated
     replies {
-      id
-      status
-      content
-      createdAt
+      ...RecipientViewPetitionField_PublicPetitionFieldReply
     }
     comments {
       id
@@ -3374,6 +3380,7 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
       publishedAt
     }
   }
+  ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
@@ -6095,11 +6102,10 @@ export const RecipientView_publicCreateTextReplyDocument = gql`
     $data: CreateTextReplyInput!
   ) {
     publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
-      id
-      content
-      createdAt
+      ...RecipientViewPetitionField_PublicPetitionFieldReply
     }
   }
+  ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
 export type RecipientView_publicCreateTextReplyMutationFn = ApolloReactCommon.MutationFunction<
   RecipientView_publicCreateTextReplyMutation,
@@ -6159,12 +6165,11 @@ export const RecipientView_publicCreateFileUploadReplyDocument = gql`
     ) {
       endpoint
       reply {
-        id
-        content
-        createdAt
+        ...RecipientViewPetitionField_PublicPetitionFieldReply
       }
     }
   }
+  ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
 export type RecipientView_publicCreateFileUploadReplyMutationFn = ApolloReactCommon.MutationFunction<
   RecipientView_publicCreateFileUploadReplyMutation,

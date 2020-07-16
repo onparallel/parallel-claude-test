@@ -549,16 +549,24 @@ RecipientViewPetitionField.fragments = {
         multiple
         validated
         replies {
-          id
-          status
-          content
-          createdAt
+          ...RecipientViewPetitionField_PublicPetitionFieldReply
         }
         comments {
           id
           isUnread
           publishedAt
         }
+      }
+      ${this.PublicPetitionFieldReply}
+    `;
+  },
+  get PublicPetitionFieldReply() {
+    return gql`
+      fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
+        id
+        status
+        content
+        createdAt
       }
     `;
   },

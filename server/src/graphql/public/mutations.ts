@@ -111,7 +111,8 @@ export const publicCreateFileUploadReply = mutationField(
       }).asArg({ required: true }),
     },
     authorize: chain(
-      and(fetchPetitionAccess("keycode"), fieldBelongsToAccess("fieldId")),
+      fetchPetitionAccess("keycode"),
+      fieldBelongsToAccess("fieldId"),
       fieldHastype("fieldId", "FILE_UPLOAD")
     ),
     resolve: async (_, args, ctx) => {
@@ -158,7 +159,8 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
     }).asArg({ required: true }),
   },
   authorize: chain(
-    and(fetchPetitionAccess("keycode"), fieldBelongsToAccess("fieldId")),
+    fetchPetitionAccess("keycode"),
+    fieldBelongsToAccess("fieldId"),
     fieldHastype("fieldId", "TEXT")
   ),
   resolve: async (_, args, ctx) => {
