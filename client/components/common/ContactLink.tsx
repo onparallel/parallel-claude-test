@@ -2,6 +2,7 @@ import { ContactLink_ContactFragment } from "@parallel/graphql/__types";
 import { Tooltip } from "@chakra-ui/core";
 import { Link, LinkProps } from "./Link";
 import { gql } from "apollo-boost";
+import { DisableableTooltip } from "./DisableableTooltip";
 
 export function ContactLink({
   contact,
@@ -9,24 +10,22 @@ export function ContactLink({
 }: {
   contact: ContactLink_ContactFragment;
 } & Omit<LinkProps, "href" | "as">) {
-  const link = (
-    <Link
-      href="/app/contacts/[contactId]"
-      as={`/app/contacts/${contact.id}`}
-      {...props}
+  return (
+    <DisableableTooltip
+      isDisabled={contact.fullName === null}
+      showDelay={300}
+      label={contact.email}
+      aria-label={contact.email}
     >
-      {contact.fullName || contact.email}
-    </Link>
+      <Link
+        href="/app/contacts/[contactId]"
+        as={`/app/contacts/${contact.id}`}
+        {...props}
+      >
+        {contact.fullName || contact.email}
+      </Link>
+    </DisableableTooltip>
   );
-  if (contact.fullName) {
-    return (
-      <Tooltip showDelay={300} label={contact.email} aria-label={contact.email}>
-        {link}
-      </Tooltip>
-    );
-  } else {
-    return link;
-  }
 }
 
 ContactLink.fragments = {

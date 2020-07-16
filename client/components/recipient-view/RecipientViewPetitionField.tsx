@@ -17,6 +17,7 @@ import {
   Tooltip,
   useTheme,
   Icon,
+  Switch,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import { Card } from "@parallel/components/common/Card";
@@ -36,6 +37,7 @@ import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { DisableableTooltip } from "../common/DisableableTooltip";
 
 export type CreateReply = CreateReplyText | CreateReplyFileUpload;
 
@@ -225,54 +227,77 @@ function ReplyWrapper({
 }) {
   const intl = useIntl();
   const { colors } = useTheme();
+  const label =
+    status === "APPROVED"
+      ? intl.formatMessage({
+          id: "recipient-view.approved-reply",
+          defaultMessage: "This reply has been approved",
+        })
+      : intl.formatMessage({
+          id: "recipient-view.rejected-reply",
+          defaultMessage: "This reply has been rejected",
+        });
   return (
     <Flex alignItems="center">
-      <Flex
-        alignItems="center"
-        fontSize="sm"
-        backgroundColor={
-          status === "APPROVED"
-            ? "green.100"
-            : status === "REJECTED"
-            ? "red.100"
-            : "gray.100"
-        }
-        paddingX={2}
-        rounded="sm"
-        position="relative"
-        {...(progress !== undefined
-          ? {
-              "aria-valuemax": 100,
-              "aria-valuemin": 0,
-              "aria-valuenow": Math.round(progress * 100),
-              role: "progressbar",
-            }
-          : {})}
+      <DisableableTooltip
+        isDisabled={status === "PENDING"}
+        showDelay={300}
+        placement="right"
+        label={label}
+        aria-label={label}
       >
-        <Box
-          display={progress !== undefined ? "block" : "none"}
-          position="absolute"
-          left={0}
-          top={0}
-          height="100%"
+        <Flex
+          alignItems="center"
+          fontSize="sm"
+          backgroundColor={
+            status === "APPROVED"
+              ? "green.100"
+              : status === "REJECTED"
+              ? "red.100"
+              : "gray.100"
+          }
+          paddingX={2}
           rounded="sm"
-          transition="width 100ms ease"
-          willChange="width"
-          width={`${Math.round((progress ?? 0) * 100)}%`}
-          css={[
-            generateCssStripe({ color: colors.gray[200] }),
-            animatedStripe({}),
-          ]}
-        ></Box>
-        <Box position="relative" lineHeight="24px" minHeight="24px" zIndex={1}>
-          {children}
-        </Box>
-        {status === "APPROVED" ? (
-          <Icon name="check" color="green.500" marginLeft={2} />
-        ) : status === "REJECTED" ? (
-          <Icon name="close" color="red.500" size="12px" marginLeft={2} />
-        ) : null}
-      </Flex>
+          position="relative"
+          {...(progress !== undefined
+            ? {
+                "aria-valuemax": 100,
+                "aria-valuemin": 0,
+                "aria-valuenow": Math.round(progress * 100),
+                role: "progressbar",
+              }
+            : {})}
+        >
+          <Box
+            display={progress !== undefined ? "block" : "none"}
+            position="absolute"
+            left={0}
+            top={0}
+            height="100%"
+            rounded="sm"
+            transition="width 100ms ease"
+            willChange="width"
+            width={`${Math.round((progress ?? 0) * 100)}%`}
+            css={[
+              generateCssStripe({ color: colors.gray[200] }),
+              animatedStripe({}),
+            ]}
+          ></Box>
+          <Box
+            position="relative"
+            lineHeight="24px"
+            minHeight="24px"
+            zIndex={1}
+          >
+            {children}
+          </Box>
+          {status === "APPROVED" ? (
+            <Icon name="check" color="green.500" marginLeft={2} />
+          ) : status === "REJECTED" ? (
+            <Icon name="close" color="red.500" size="12px" marginLeft={2} />
+          ) : null}
+        </Flex>
+      </DisableableTooltip>
       {status !== "APPROVED" ? (
         <IconButtonWithTooltip
           onClick={onDeleteReply}
