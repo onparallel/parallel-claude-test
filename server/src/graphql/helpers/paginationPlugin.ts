@@ -1,17 +1,17 @@
 import {
+  arg,
   core,
   dynamicOutputMethod,
+  enumType,
   intArg,
   objectType,
   plugin,
   stringArg,
-  enumType,
-  arg,
 } from "@nexus/schema";
 import { GraphQLResolveInfo } from "graphql";
 import { omit } from "remeda";
-import { ArgValidationError } from "./errors";
 import { KeysOfType } from "../../util/types";
+import { ArgValidationError } from "./errors";
 
 export type PaginationPluginConfig = {};
 
@@ -43,7 +43,7 @@ export type PaginationFieldConfig<
    */
   sortableBy?: KeysOfType<
     GetObjectType<ItemType>,
-    string | number | Date | boolean | null
+    string | number | Date | boolean | null | undefined
   >[];
   /**
    * Additional args to use for just this field
