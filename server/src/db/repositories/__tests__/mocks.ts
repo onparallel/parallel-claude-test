@@ -11,7 +11,12 @@ import {
   PetitionField,
   PetitionFieldType,
   User,
+  PetitionAccess,
+  CreatePetitionAccess,
+  Contact,
+  CreateContact,
 } from "../../__types";
+import { random } from "../../../util/token";
 
 export class Mocks {
   constructor(private knex: Knex) {}
@@ -50,6 +55,30 @@ export class Mocks {
             last_name: lastName,
             email: faker.internet.email(firstName, lastName),
             cognito_id: faker.random.uuid(),
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+  }
+
+  async createRandomContacts(
+    orgId: number,
+    ownerId: number,
+    amount: number,
+    builder?: (index: number) => Partial<Contact>
+  ) {
+    return await this.knex<Contact>("contact")
+      .insert(
+        range(0, amount).map<CreateContact>((index) => {
+          const firstName = faker.name.firstName();
+          const lastName = faker.name.lastName();
+          return {
+            owner_id: ownerId,
+            org_id: orgId,
+            first_name: firstName,
+            last_name: lastName,
+            email: faker.internet.email(firstName, lastName),
             ...builder?.(index),
           };
         })
@@ -98,6 +127,25 @@ export class Mocks {
             ...builder?.(index),
           };
         })
+      )
+      .returning("*");
+  }
+
+  async createPetitionAccess(
+    petitionId: number,
+    ownerId: number,
+    clientIds: number[]
+  ) {
+    return await this.knex<PetitionAccess>("petition_access")
+      .insert(
+        range(0, clientIds.length).map<CreatePetitionAccess>((index) => ({
+          petition_id: petitionId,
+          granter_id: ownerId,
+          contact_id: clientIds[index],
+          status: "ACTIVE",
+          keycode: random(16),
+          reminders_left: 10,
+        }))
       )
       .returning("*");
   }

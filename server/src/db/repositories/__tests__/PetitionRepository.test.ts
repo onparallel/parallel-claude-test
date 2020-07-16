@@ -3,10 +3,17 @@ import Knex from "knex";
 import { createContainer } from "../../../container";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
-import { Organization, User, Petition, PetitionField } from "../../__types";
+import {
+  Organization,
+  User,
+  Petition,
+  PetitionField,
+  PetitionAccess,
+  Contact,
+} from "../../__types";
 import { Mocks } from "./mocks";
 import { PetitionRepository } from "../PetitionRepository";
-import { pick, range, sortBy, indexBy } from "remeda";
+import { pick, range, sortBy } from "remeda";
 import faker from "faker";
 
 describe("repositories/PetitionRepository", () => {
@@ -324,6 +331,71 @@ describe("repositories/PetitionRepository", () => {
           deleted_at: null,
         }))
       );
+    });
+  });
+
+  describe("PetitionAccess Reminders", () => {
+    let org: Organization;
+    let user: User;
+    let contact: Contact;
+    let petition: Petition;
+    let fields: PetitionField;
+    let petitionAccess: PetitionAccess;
+
+    beforeAll(async () => {
+      await deleteAllData(knex);
+      [org] = await mocks.createRandomOrganizations(1);
+      [user] = await mocks.createRandomUsers(org.id, 1);
+      [contact] = await mocks.createRandomContacts(org.id, user.id, 1);
+      [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+      [fields] = await mocks.createRandomPetitionFields(petition.id, 1);
+      [petitionAccess] = await mocks.createPetitionAccess(
+        petition.id,
+        user.id,
+        [contact.id]
+      );
+    });
+
+    test("petition starts without reminders", () => {
+      expect(petitionAccess.reminders_active).toBe(false);
+      expect(petitionAccess.reminders_config).toBeNull();
+    });
+
+    test("sets automatic reminders", async () => {
+      const [startedPetitionAccess] = await petitions.startAccessReminders(
+        [petitionAccess.id],
+        {
+          offset: 1,
+          time: new Date().toString(),
+          timezone: "Europe/Madrid",
+          weekdaysOnly: true,
+        }
+      );
+
+      expect(startedPetitionAccess.reminders_active).toBe(true);
+      expect(startedPetitionAccess.reminders_config).not.toBeNull();
+      expect(startedPetitionAccess.reminders_config).toHaveProperty("time");
+      expect(startedPetitionAccess.reminders_config).toHaveProperty("offset");
+      expect(startedPetitionAccess.reminders_config).toHaveProperty("timezone");
+      expect(startedPetitionAccess.reminders_config).toHaveProperty(
+        "weekdaysOnly"
+      );
+    });
+
+    test("starts and stops a reminder", async () => {
+      await petitions.startAccessReminders([petitionAccess.id], {
+        offset: 1,
+        time: new Date().toString(),
+        timezone: "Europe/Madrid",
+        weekdaysOnly: true,
+      });
+
+      const [stoppedPetitionAccess] = await petitions.stopAccessReminders([
+        petitionAccess.id,
+      ]);
+
+      expect(stoppedPetitionAccess.reminders_active).toBe(false);
+      expect(stoppedPetitionAccess.reminders_config).not.toBeNull();
     });
   });
 });
