@@ -138,7 +138,7 @@ export class Mocks {
   ) {
     return await this.knex<PetitionAccess>("petition_access")
       .insert(
-        range(0, clientIds.length).map<CreatePetitionAccess>((index) => ({
+        contactIds.map<CreatePetitionAccess>((contactId) => ({
           petition_id: petitionId,
           granter_id: ownerId,
           contact_id: clientIds[index],
