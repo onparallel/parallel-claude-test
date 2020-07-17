@@ -141,7 +141,7 @@ export class Mocks {
         contactIds.map<CreatePetitionAccess>((contactId) => ({
           petition_id: petitionId,
           granter_id: ownerId,
-          contact_id: clientIds[index],
+          contact_id: contactId,
           status: "ACTIVE",
           keycode: random(16),
           reminders_left: 10,
