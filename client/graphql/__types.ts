@@ -652,7 +652,7 @@ export type PetitionFieldComment = {
   id: Scalars["ID"];
   /** Whether the comment has been edited after being published. */
   isEdited: Scalars["Boolean"];
-  /** Wether the comment has been read or not. */
+  /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
   /** Time when the comment was published. */
   publishedAt?: Maybe<Scalars["DateTime"]>;
