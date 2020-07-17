@@ -700,7 +700,7 @@ export const switchAutomaticReminders = mutationField(
       )
     ),
     args: {
-      start: booleanArg({ required: false }),
+      start: booleanArg({ required: true }),
       petitionId: idArg({ required: true }),
       accessIds: idArg({ list: [true], required: true }),
       remindersConfig: arg({ type: "RemindersConfigInput", required: false }),

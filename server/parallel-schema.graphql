@@ -409,7 +409,7 @@ type Mutation {
     accessIds: [ID!]!
     petitionId: ID!
     remindersConfig: RemindersConfigInput
-    start: Boolean
+    start: Boolean!
   ): [PetitionAccess!]!
 
   """

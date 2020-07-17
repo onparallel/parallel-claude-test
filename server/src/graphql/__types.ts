@@ -896,7 +896,7 @@ export interface NexusGenArgTypes {
       accessIds: string[]; // [ID!]!
       petitionId: string; // ID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
-      start?: boolean | null; // Boolean
+      start: boolean; // Boolean!
     };
     updateContact: {
       // args
