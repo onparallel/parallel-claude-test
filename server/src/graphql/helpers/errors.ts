@@ -44,3 +44,20 @@ export class WhitelistedError extends ApolloError {
     super(message, code, extensions);
   }
 }
+
+export class ValidatorOrConditionError extends ApolloError {
+  readonly name = "ValidatorOrConditionError";
+  constructor(
+    { parentType, fieldName }: GraphQLResolveInfo,
+    message: string,
+    extra?: any
+  ) {
+    super(
+      `Validator error on OR condition for ${parentType}.${fieldName}: ${message}`,
+      "VALIDATOR_CONDITION_ERROR",
+      {
+        extra,
+      }
+    );
+  }
+}

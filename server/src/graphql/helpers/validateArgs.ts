@@ -1,4 +1,7 @@
 import { FieldValidateArgsResolver } from "./validateArgsPlugin";
+import { ValidatorOrConditionError } from "./errors";
+import { ApolloError } from "apollo-server-express";
+import { Maybe } from "../../db/__types";
 
 export function validateAnd<TypeName extends string, FieldName extends string>(
   ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]
@@ -7,5 +10,28 @@ export function validateAnd<TypeName extends string, FieldName extends string>(
     await Promise.all(
       validators.map((validator) => validator(root, args, ctx, info))
     );
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateOr<TypeName extends string, FieldName extends string>(
+  ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]
+) {
+  return (async (root, args, ctx, info) => {
+    const results: Maybe<ApolloError>[] = await Promise.all(
+      validators.map(async (validator) => {
+        try {
+          await validator(root, args, ctx, info);
+          return null;
+        } catch ({ message }) {
+          return message;
+        }
+      })
+    );
+
+    // if every validator throws an error, the OR condition fails
+    if (results.every((r) => r !== null)) {
+      const errorMessage = results.filter((r) => r !== null).join("; ");
+      throw new ValidatorOrConditionError(info, errorMessage);
+    }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

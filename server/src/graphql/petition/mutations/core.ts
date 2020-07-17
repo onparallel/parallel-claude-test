@@ -28,11 +28,13 @@ import {
   repliesBelongsToPetition,
   userHasAccessToPetitions,
 } from "../authorizers";
+import { validateOr } from "../../helpers/validateArgs";
+import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
+import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import {
   validateAccessesRemindersLeft,
   validateAccessesStatus,
   validatePetitionStatus,
-  validateArgumentIsSet,
 } from "../validations";
 
 export const createPetition = mutationField("createPetition", {
@@ -705,12 +707,14 @@ export const switchAutomaticReminders = mutationField(
       accessIds: idArg({ list: [true], required: true }),
       remindersConfig: arg({ type: "RemindersConfigInput", required: false }),
     },
-    validateArgs: validRemindersConfig(
-      (args) => args.remindersConfig,
-      "remindersConfig"
+    validateArgs: validateOr(
+      validBooleanValue((args) => args.start, "start", false),
+      validateAnd(
+        validIsDefined((args) => args.remindersConfig, "remindersConfig"),
+        validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
+      )
     ),
     resolve: async (_, args, ctx, info) => {
-      debugger;
       const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
       const { ids: accessIds } = fromGlobalIds(
         args.accessIds,
@@ -727,8 +731,6 @@ export const switchAutomaticReminders = mutationField(
 
       if (args.start) {
         validateAccessesRemindersLeft(accesses, info);
-        validateArgumentIsSet(args, "remindersConfig", info);
-
         const validAccessIds: number[] = accesses
           .filter((a) => a !== null)
           .map((a) => a!.id);
