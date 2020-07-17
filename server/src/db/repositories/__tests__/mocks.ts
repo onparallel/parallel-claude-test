@@ -134,7 +134,7 @@ export class Mocks {
   async createPetitionAccess(
     petitionId: number,
     ownerId: number,
-    clientIds: number[]
+    contactIds: number[]
   ) {
     return await this.knex<PetitionAccess>("petition_access")
       .insert(
