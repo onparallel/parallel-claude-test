@@ -308,7 +308,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
               onClick={handleDownloadAllClick}
             >
               <FormattedMessage
-                id="petition.replies.download-all"
+                id="petition-replies.download-all"
                 defaultMessage="Download files"
               />
             </Button>

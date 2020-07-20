@@ -50,7 +50,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       ${intl.formatMessage(
         {
           id: "petition-comments-contact-notification.intro-text",
-          defaultMessage: "{ name } has added comments to your petition:",
+          defaultMessage: "{ name } commented on your petition:",
         },
         { name: authorName }
       )}
@@ -58,7 +58,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       ${intl.formatMessage({
         id: "petition-comments-contact-notification.access-click-link",
         defaultMessage:
-          "You can click the link below to reply to the comments.",
+          "Follow the link below link to read and reply to the comments.",
       })}
       ${parallelUrl}/${intl.locale}/petition/${keycode}
 
@@ -89,7 +89,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-contact-notification.intro-text"
-                defaultMessage="{ name } has added comments to your petition:"
+                defaultMessage="{ name } commented on your petition:"
                 values={{
                   name: <b>{authorName}</b>,
                 }}
@@ -104,7 +104,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             <Button href={`${parallelUrl}/${locale}/petition/${keycode}`}>
               <FormattedMessage
                 id="petition-comments-contact-notification.access-button"
-                defaultMessage="See to the comments here"
+                defaultMessage="See the comments here"
               />
             </Button>
             <Closing />

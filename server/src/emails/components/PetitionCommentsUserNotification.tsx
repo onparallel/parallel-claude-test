@@ -54,7 +54,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
         {
           id: "petition-comments-user-notification.intro-text",
           defaultMessage:
-            "{ nameOrEmail } has added comments to { petitionName, select, null {your petition} other {{petitionName}}}:",
+            "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}:",
         },
         { nameOrEmail: authorNameOrEmail, petitionName }
       )}
@@ -62,7 +62,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
       ${intl.formatMessage({
         id: "petition-comments-user-notification.access-click-link",
         defaultMessage:
-          "You can click the link below to reply to the comments.",
+          "Follow the link below link to read and reply to the comments.",
       })}
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies
 

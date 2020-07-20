@@ -69,8 +69,7 @@ const email: Email<PetitionCompletedProps> = {
 
       ${intl.formatMessage({
         id: "petition-completed.access-click-link",
-        defaultMessage:
-          "You can click the link below to access the information.",
+        defaultMessage: "Follow the link below link to access the information.",
       })}
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies
 
