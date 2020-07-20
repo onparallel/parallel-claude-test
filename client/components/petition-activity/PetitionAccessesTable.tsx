@@ -46,6 +46,7 @@ export function PetitionAccessesTable({
   onDeactivateAccess: (accessId: string) => void;
   onConfigureReminders: (accessIds: string[]) => void;
 } & CardProps) {
+  const intl = useIntl();
   const [selection, setSelection] = useState<string[]>([]);
   const selected = useMemo(
     () => selection.map((id) => petition.accesses.find((a) => a.id === id)!),
@@ -127,7 +128,7 @@ export function PetitionAccessesTable({
                 >
                   <Icon name="settings" marginRight={2} />
                   <FormattedMessage
-                    id="petition-accesses.start-reminder"
+                    id="petition-accesses.reminder-settings"
                     defaultMessage="Reminder settings"
                   />
                 </MenuItem>
@@ -145,7 +146,10 @@ export function PetitionAccessesTable({
           leftIcon={"user-plus" as any}
           onClick={onAddPetitionAccess}
         >
-          Add contact
+          {intl.formatMessage({
+            id: "petition.add-contact-button",
+            defaultMessage: "Add contact",
+          })}
         </Button>
       </Stack>
       <Table

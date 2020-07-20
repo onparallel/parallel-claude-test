@@ -297,15 +297,15 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         toast({
           title: start
             ? intl.formatMessage({
-                id: "petition.configure-reminders-started.toast-header",
+                id: "petition.reminder-settings-started.toast-header",
                 defaultMessage: "Reminders started",
               })
             : intl.formatMessage({
-                id: "petition.configure-reminders-stopped.toast-header",
+                id: "petition.reminder-settings-stopped.toast-header",
                 defaultMessage: "Reminders stopped",
               }),
           description: intl.formatMessage({
-            id: "petition.configure-reminders-success.toast-body",
+            id: "petition.reminder-settings-success.toast-body",
             defaultMessage: "Reminders have been successfully configured.",
           }),
           duration: 5000,
@@ -316,11 +316,11 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         if (e && !["CLOSE", "CANCEL"].includes(e.reason)) {
           toast({
             title: intl.formatMessage({
-              id: "petition.configure-reminders-error.toast-header",
+              id: "petition.reminder-settings-error.toast-header",
               defaultMessage: "Error",
             }),
             description: intl.formatMessage({
-              id: "petition.configure-reminders-error.toast-body",
+              id: "petition.reminder-settings-error.toast-body",
               defaultMessage:
                 "There was an error setting the reminders. Please try again.",
             }),

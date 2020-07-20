@@ -321,19 +321,19 @@
     "term": "component.petition-reminder-settings.next-reminder",
     "definition": "Después de enviar la petición, el primer recordatorio se enviará el {date} y hasta un máximo de 10 recordatorios se enviarán cada {days, plural, =1 {día} other {# días}} a las {time} hasta que la petición se complete",
     "context": "After sending the petition, the first reminder will be sent on {date} and up to 10 reminders will be sent {days, plural, =1 {everyday} other {every # days}} at {time} until the petition is completed.",
-    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L167-L175"
+    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L170-L178"
   },
   {
     "term": "component.petition-reminder-settings.only-weekdays",
     "definition": "...solamente de lunes a viernes",
     "context": "...only on weekdays",
-    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L158-L161"
+    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L161-L164"
   },
   {
     "term": "component.petition-reminder-settings.text",
     "definition": "Enviar recordatorios cada <days-input></days-input> días a las <time-input></time-input>",
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>",
-    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L92-L140"
+    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L95-L143"
   },
   {
     "term": "component.petition-status-filter.all",
@@ -459,7 +459,7 @@
     "term": "component.send-petition-dialog.same-petition-warning",
     "definition": "Los destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
     "context": "Recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition-activity/AddPetitionAccessDialog.tsx#L107-L110"
+    "reference": "components/petition-activity/AddPetitionAccessDialog.tsx#L109-L112"
   },
   {
     "term": "component.table.next-page-button",
@@ -1173,43 +1173,43 @@
     "term": "petition-access.header",
     "definition": "Control de acceso",
     "context": "Petition access control",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L81-L84"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L88-L91"
   },
   {
     "term": "petition-access.status-active",
     "definition": "Activo",
     "context": "Active",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L178-L181"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L201-L204"
   },
   {
     "term": "petition-access.status-inactive",
     "definition": "Inactivo",
     "context": "Inactive",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L185-L188"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L208-L211"
   },
   {
     "term": "petition-accesses.activate-access",
     "definition": "Reactivar acceso",
     "context": "Reactivate access",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L300-L303"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L325-L328"
   },
   {
     "term": "petition-accesses.contact-header",
     "definition": "Contacto",
     "context": "Contact",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L162-L165"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L185-L188"
   },
   {
     "term": "petition-accesses.created-at-header",
     "definition": "Fecha de creación",
     "context": "Created at",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L240-L243"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L265-L268"
   },
   {
     "term": "petition-accesses.deactivate-access",
     "definition": "Revocar acceso",
     "context": "Remove access",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L288-L291"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L313-L316"
   },
   {
     "term": "petition-accesses.deadline-header",
@@ -1221,13 +1221,13 @@
     "term": "petition-accesses.next-reminder-header",
     "definition": "Siguiente recordatorio",
     "context": "Next reminder",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L195-L198"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L218-L221"
   },
   {
     "term": "petition-accesses.no-reminders-sent",
     "definition": "No se han enviado recordatorios",
     "context": "No reminders sent",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L230-L233"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L255-L258"
   },
   {
     "term": "petition-accesses.progress-header",
@@ -1236,22 +1236,28 @@
     "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L301-L304"
   },
   {
+    "term": "petition-accesses.reminder-settings",
+    "definition": "Configurar recordatorios",
+    "context": "Reminder settings",
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L130-L133"
+  },
+  {
     "term": "petition-accesses.reminders-sent-header",
     "definition": "Recordatorios enviados",
     "context": "Reminders sent",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L221-L224"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L246-L249"
   },
   {
     "term": "petition-accesses.send-message",
     "definition": "Enviar mensaje",
     "context": "Send message",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L261-L264"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L286-L289"
   },
   {
     "term": "petition-accesses.send-reminder",
     "definition": "Enviar recordatorio",
     "context": "Send reminder",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L275-L278"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L300-L303"
   },
   {
     "term": "petition-accesses.status-header",
@@ -1348,6 +1354,12 @@
     "definition": "Añadir otro campo",
     "context": "Add another field",
     "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L219-L222"
+  },
+  {
+    "term": "petition.add-contact-button",
+    "definition": "Añadir contacto",
+    "context": "Add contact",
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L149-L152"
   },
   {
     "term": "petition.add-field-button",
@@ -1581,37 +1593,37 @@
     "term": "petition.message-scheduled.toast-description",
     "definition": "El mensaje se enviará el {date}",
     "context": "The message will be sent on {date}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L96-L99"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L98-L101"
   },
   {
     "term": "petition.message-scheduled.toast-header",
     "definition": "Mensaje programado",
     "context": "Message scheduled",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L86-L89"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L88-L91"
   },
   {
     "term": "petition.message-sent.toast-description",
     "definition": "El mensaje está en camino",
     "context": "The message is on it's way",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L102-L105"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L104-L107"
   },
   {
     "term": "petition.message-sent.toast-header",
     "definition": "Mensaje enviado",
     "context": "Message sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L90-L93"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L92-L95"
   },
   {
     "term": "petition.message-settings.header",
     "definition": "¿A quién quieres enviarselo?",
     "context": "Who do you want to send it to?",
-    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L89-L92"
+    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L91-L94"
   },
   {
     "term": "petition.message-settings.same-petition-warning",
     "definition": "Todos los {recipientCount} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L108-L112"
+    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L110-L114"
   },
   {
     "term": "petition.name-label",
@@ -1635,13 +1647,13 @@
     "term": "petition.no-reminders-left.toast-description",
     "definition": "Has enviado el máximo número de recordatorios a {nameOrEmail}",
     "context": "You have sent the maximum number of reminders to {nameOrEmail}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L142-L146"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L144-L148"
   },
   {
     "term": "petition.no-reminders-left.toast-header",
     "definition": "No hay más recordatorios",
     "context": "No reminders left",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L137-L140"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L139-L142"
   },
   {
     "term": "petition.petition-scheduled-toast.description",
@@ -1683,19 +1695,61 @@
     "term": "petition.reminder-sent.toast-description",
     "definition": "El recordatorio está en camino",
     "context": "The reminder is on it's way",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L165-L168"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L167-L170"
   },
   {
     "term": "petition.reminder-sent.toast-header",
     "definition": "Recordatorio enviado",
     "context": "Reminder sent",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L161-L164"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L163-L166"
+  },
+  {
+    "term": "petition.reminder-settings-dialog.confirm",
+    "definition": "Aplicar cambios",
+    "context": "Apply changes",
+    "reference": "components/petition-activity/ConfigureRemindersDialog.tsx#L55-L58"
+  },
+  {
+    "term": "petition.reminder-settings-dialog.header",
+    "definition": "Configurar recordatorios automáticos",
+    "context": "Configure automatic reminders",
+    "reference": "components/petition-activity/ConfigureRemindersDialog.tsx#L31-L34"
+  },
+  {
+    "term": "petition.reminder-settings-error.toast-body",
+    "definition": "Se produjo un error al intentar configurar los recordatorios.",
+    "context": "There was an error setting the reminders. Please try again.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L322-L326"
+  },
+  {
+    "term": "petition.reminder-settings-error.toast-header",
+    "definition": "Error",
+    "context": "Error",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L318-L321"
+  },
+  {
+    "term": "petition.reminder-settings-started.toast-header",
+    "definition": "Recordatorios iniciados",
+    "context": "Reminders started",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L299-L302"
+  },
+  {
+    "term": "petition.reminder-settings-stopped.toast-header",
+    "definition": "Recordatorios detenidos",
+    "context": "Reminders stopped",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L303-L306"
+  },
+  {
+    "term": "petition.reminder-settings-success.toast-body",
+    "definition": "Los recordatorios fueron configurados correctamente.",
+    "context": "Reminders have been successfully configured.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L307-L310"
   },
   {
     "term": "petition.reminders-label",
     "definition": "Activar recordatorios automáticos",
     "context": "Enable automatic reminders",
-    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L73-L76"
+    "reference": "components/petition-compose/PetitionRemindersConfig.tsx#L76-L79"
   },
   {
     "term": "petition.remove-deadline",
@@ -1833,7 +1887,7 @@
     "term": "petitions.no-reminders-left",
     "definition": "No quedan recodatorios",
     "context": "No reminders left",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L211-L214"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L236-L239"
   },
   {
     "term": "petitions.no-results",
@@ -1851,7 +1905,7 @@
     "term": "petitions.reminders-not-set",
     "definition": "Sin recordatorios",
     "context": "Not set",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L204-L207"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L229-L232"
   },
   {
     "term": "petitions.title",
@@ -3003,37 +3057,37 @@
     "term": "tour.petition-activity.monitor-requests",
     "definition": "Monitoriza tus peticiones",
     "context": "Monitor your requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L495-L498"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L578-L581"
   },
   {
     "term": "tour.petition-activity.next-reminder",
     "definition": "Conoce cuándo se enviará el <b>próximo recordatorio</b>.",
     "context": "See when will the <b>next reminder</b> be sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L534-L540"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L617-L623"
   },
   {
     "term": "tour.petition-activity.send-manual-reminder",
     "definition": "<b>Envía recordatorios</b> manualmente a los destinatarios.",
     "context": "<b>Send reminders</b> manually to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L543-L549"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L626-L632"
   },
   {
     "term": "tour.petition-activity.send-message",
     "definition": "Envía un <b>mensaje de seguimiento</b> a los destinatarios.",
     "context": "Send a <b>follow-up message</b> to recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L525-L531"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L608-L614"
   },
   {
     "term": "tour.petition-activity.track",
     "definition": "Gestionar quién tiene <b>acceso</b> a esta petición.",
     "context": "Manage who can <b>access</b> this petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L516-L522"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L599-L605"
   },
   {
     "term": "tour.petition-activity.you-can",
     "definition": "En esta sección podrás:",
     "context": "In this section, you will be able to:",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L503-L506"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx#L586-L589"
   },
   {
     "term": "tour.petition-compose.add-petition-fields",
