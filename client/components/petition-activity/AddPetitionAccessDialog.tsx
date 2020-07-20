@@ -45,6 +45,8 @@ export function AddPetitionAccessDialog({
   const [remindersConfig, setRemindersConfig] = useState<
     Maybe<RemindersConfig>
   >(null);
+  const [enabledReminders, setEnableReminders] = useState<boolean>(false);
+
   const isValid = Boolean(subject && !isEmptyContent(body));
   const recipientsRef = useRef<HTMLInputElement>(null);
 
@@ -122,6 +124,8 @@ export function AddPetitionAccessDialog({
           <PetitionRemindersConfig
             marginTop={2}
             value={remindersConfig}
+            enabled={enabledReminders}
+            onSwitched={setEnableReminders}
             onChange={setRemindersConfig}
           />
         </>

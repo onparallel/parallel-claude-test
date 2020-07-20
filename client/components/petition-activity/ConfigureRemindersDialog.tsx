@@ -24,17 +24,6 @@ export function ConfigureRemindersDialog({
     defaultConfig
   );
 
-  const handleChangeConfig = (config: Maybe<RemindersConfig>) => {
-    setActive(config !== null);
-    if (!!config) {
-      setConfig({
-        time: config!.time,
-        timezone: config!.timezone,
-        offset: config!.offset,
-        weekdaysOnly: config!.weekdaysOnly,
-      });
-    }
-  };
   return (
     <ConfirmDialog
       size="xl"
@@ -47,8 +36,10 @@ export function ConfigureRemindersDialog({
       body={
         <PetitionRemindersConfig
           id="petition-reminders"
-          value={reminderIsActive ? remindersConfig : null}
-          onChange={handleChangeConfig}
+          value={remindersConfig}
+          onChange={setConfig}
+          enabled={reminderIsActive}
+          onSwitched={setActive}
           marginTop={2}
         />
       }

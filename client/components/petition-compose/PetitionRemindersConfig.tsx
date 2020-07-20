@@ -35,10 +35,14 @@ export type RemindersConfig = {
 export function PetitionRemindersConfig({
   value,
   onChange,
+  onSwitched,
+  enabled,
   ...props
 }: {
   value: Maybe<RemindersConfig>;
   onChange: (config: Maybe<RemindersConfig>) => void;
+  onSwitched: (enabled: boolean) => void;
+  enabled: boolean;
 } & Omit<BoxProps, "onChange">) {
   let day = addDays(startOfToday(), value?.offset ?? 2);
   if (value?.weekdaysOnly && isWeekend(day)) {
@@ -48,16 +52,15 @@ export function PetitionRemindersConfig({
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
-    onChange(
-      event.target.checked
-        ? {
-            offset: value?.offset || 2,
-            time: value?.time || "09:00",
-            timezone: value?.timezone || timezone,
-            weekdaysOnly: value?.weekdaysOnly || false,
-          }
-        : null
-    );
+    onSwitched(event.target.checked);
+    if (!value) {
+      onChange({
+        offset: 2,
+        time: "09:00",
+        timezone,
+        weekdaysOnly: false,
+      });
+    }
   }
   return (
     <Box {...props}>
@@ -66,7 +69,7 @@ export function PetitionRemindersConfig({
           variantColor="purple"
           size="lg"
           marginRight={2}
-          isChecked={value !== null}
+          isChecked={enabled}
           onChange={handleEnableRemindersChange}
         >
           <Text fontSize="md" as="span">
@@ -77,7 +80,7 @@ export function PetitionRemindersConfig({
           </Text>
         </Checkbox>
       </Flex>
-      {value ? (
+      {value && enabled ? (
         <Box
           as="form"
           {...{ noValidate: true }}

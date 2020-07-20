@@ -75,6 +75,8 @@ export const PetitionComposeMessageEditor = Object.assign(
       });
     }
 
+    const [enabledReminders, setEnableReminders] = useState<boolean>(false);
+
     async function handleSendClick({ schedule = false } = {}) {
       onSend({
         schedule,
@@ -122,6 +124,8 @@ export const PetitionComposeMessageEditor = Object.assign(
           <PetitionRemindersConfig
             id="petition-reminders"
             value={remindersConfig}
+            enabled={enabledReminders}
+            onSwitched={setEnableReminders}
             onChange={handleRemindersChange}
             marginTop={2}
           />
