@@ -357,8 +357,10 @@ describe("repositories/PetitionRepository", () => {
     });
 
     test("petition starts without reminders", () => {
-      expect(petitionAccess.reminders_active).toBe(false);
-      expect(petitionAccess.reminders_config).toBeNull();
+      expect(petitionAccess).toMatchObject({
+        reminders_active: false,
+        reminders_config: null,
+      });
     });
 
     test("sets automatic reminders", async () => {
@@ -366,26 +368,27 @@ describe("repositories/PetitionRepository", () => {
         [petitionAccess.id],
         {
           offset: 1,
-          time: new Date().toString(),
+          time: "12:00",
           timezone: "Europe/Madrid",
           weekdaysOnly: true,
         }
       );
 
-      expect(startedPetitionAccess.reminders_active).toBe(true);
-      expect(startedPetitionAccess.reminders_config).not.toBeNull();
-      expect(startedPetitionAccess.reminders_config).toHaveProperty("time");
-      expect(startedPetitionAccess.reminders_config).toHaveProperty("offset");
-      expect(startedPetitionAccess.reminders_config).toHaveProperty("timezone");
-      expect(startedPetitionAccess.reminders_config).toHaveProperty(
-        "weekdaysOnly"
-      );
+      expect(startedPetitionAccess).toMatchObject({
+        reminders_active: true,
+        reminders_config: {
+          time: "12:00",
+          offset: 1,
+          timezone: "Europe/Madrid",
+          weekdaysOnly: true,
+        },
+      });
     });
 
     test("starts and stops a reminder", async () => {
       await petitions.startAccessReminders([petitionAccess.id], {
         offset: 1,
-        time: new Date().toString(),
+        time: "10:00",
         timezone: "Europe/Madrid",
         weekdaysOnly: true,
       });
@@ -394,8 +397,15 @@ describe("repositories/PetitionRepository", () => {
         petitionAccess.id,
       ]);
 
-      expect(stoppedPetitionAccess.reminders_active).toBe(false);
-      expect(stoppedPetitionAccess.reminders_config).not.toBeNull();
+      expect(stoppedPetitionAccess).toMatchObject({
+        reminders_active: false,
+        reminders_config: {
+          offset: 1,
+          time: "10:00",
+          timezone: "Europe/Madrid",
+          weekdaysOnly: true,
+        },
+      });
     });
   });
 });
