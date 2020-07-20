@@ -278,6 +278,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   const configureRemindersDialog = useConfigureRemindersDialog();
   const handleConfigureReminders = useCallback(
     async (accessIds: string[]) => {
+      let start = false;
       try {
         const firstAccess = petition!.accesses.find(
           (a) => a.id === accessIds[0]
@@ -288,17 +289,47 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         });
 
         delete remindersConfig?.__typename;
+        start = !!remindersConfig;
         await switchReminders({
-          variables: {
-            start: !!remindersConfig,
-            accessIds,
-            petitionId,
-            remindersConfig,
-          },
+          variables: { start, accessIds, petitionId, remindersConfig },
         });
         await refetch();
-      } catch {
-        return;
+        toast({
+          title: start
+            ? intl.formatMessage({
+                id: "petition.configure-reminders-started.toast-header",
+                defaultMessage: "Reminders started",
+              })
+            : intl.formatMessage({
+                id: "petition.configure-reminders-stopped.toast-header",
+                defaultMessage: "Reminders stopped",
+              }),
+          description: intl.formatMessage({
+            id: "petition.configure-reminders-success.toast-body",
+            defaultMessage: "Reminders have been successfully configured.",
+          }),
+          duration: 5000,
+          isClosable: true,
+          status: "success",
+        });
+      } catch (e) {
+        if (e && !["CLOSE", "CANCEL"].includes(e.reason)) {
+          toast({
+            title: intl.formatMessage({
+              id: "petition.configure-reminders-error.toast-header",
+              defaultMessage: "Error",
+            }),
+            description: intl.formatMessage({
+              id: "petition.configure-reminders-error.toast-body",
+              defaultMessage:
+                "There was an error setting the reminders. Please try again.",
+            }),
+            duration: 5000,
+            isClosable: true,
+            status: "error",
+          });
+          return;
+        }
       }
     },
     [petitionId, petition!.accesses]

@@ -39,7 +39,7 @@ export function ConfirmDialog<T = void>({
   const cancelRef = useRef<HTMLElement>(null);
   cancel =
     cancel === undefined ? (
-      <Button ref={cancelRef} onClick={() => onReject()}>
+      <Button ref={cancelRef} onClick={() => onReject({ reason: "CANCEL" })}>
         <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
       </Button>
     ) : (
@@ -49,7 +49,7 @@ export function ConfirmDialog<T = void>({
     <AlertDialog
       isOpen={true}
       leastDestructiveRef={focusRef || cancelRef}
-      onClose={() => onReject()}
+      onClose={() => onReject({ reason: "CLOSE" })}
       {...props}
     >
       <AlertDialogOverlay zIndex={1400 + position * 2} />
