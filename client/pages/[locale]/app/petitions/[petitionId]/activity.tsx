@@ -9,6 +9,7 @@ import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
 import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmDeactivateAccessDialog";
+import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/ConfigureRemindersDialog";
 import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
@@ -28,6 +29,7 @@ import {
   usePetitionActivity_sendRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
   usePetitionsActivity_sendPetitionMutation,
+  usePetitionActivity_switchAutomaticRemindersMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -270,6 +272,38 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     [petitionId, petition!.accesses]
   );
 
+  const [
+    switchReminders,
+  ] = usePetitionActivity_switchAutomaticRemindersMutation();
+  const configureRemindersDialog = useConfigureRemindersDialog();
+  const handleConfigureReminders = useCallback(
+    async (accessIds: string[]) => {
+      try {
+        const firstAccess = petition!.accesses.find(
+          (a) => a.id === accessIds[0]
+        );
+        const { remindersConfig } = await configureRemindersDialog({
+          enabled: !!(firstAccess && firstAccess!.remindersActive),
+          defaultConfig: firstAccess!.remindersConfig || null,
+        });
+
+        delete remindersConfig?.__typename;
+        await switchReminders({
+          variables: {
+            start: !!remindersConfig,
+            accessIds,
+            petitionId,
+            remindersConfig,
+          },
+        });
+        await refetch();
+      } catch {
+        return;
+      }
+    },
+    [petitionId, petition!.accesses]
+  );
+
   // process events
   const events = useMemo(() => {
     const original = petition!.events.items;
@@ -324,6 +358,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
             onAddPetitionAccess={handleAddPetitionAccess}
             onReactivateAccess={handleReactivateAccess}
             onDeactivateAccess={handleDeactivateAccess}
+            onConfigureReminders={handleConfigureReminders}
           />
           <Box margin={4}>
             <PetitionActivityTimeline
@@ -447,6 +482,23 @@ PetitionActivity.mutations = [
         scheduledAt: $scheduledAt
       ) {
         result
+      }
+    }
+  `,
+  gql`
+    mutation PetitionActivity_switchAutomaticReminders(
+      $start: Boolean!
+      $petitionId: ID!
+      $accessIds: [ID!]!
+      $remindersConfig: RemindersConfigInput
+    ) {
+      switchAutomaticReminders(
+        start: $start
+        petitionId: $petitionId
+        accessIds: $accessIds
+        remindersConfig: $remindersConfig
+      ) {
+        id
       }
     }
   `,

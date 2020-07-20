@@ -35,6 +35,7 @@ export function PetitionAccessesTable({
   onSendReminders,
   onReactivateAccess,
   onDeactivateAccess,
+  onConfigureReminders,
   ...props
 }: {
   petition: PetitionAccessTable_PetitionFragment;
@@ -43,6 +44,7 @@ export function PetitionAccessesTable({
   onSendReminders: (accessIds: string[]) => void;
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
+  onConfigureReminders: (accessIds: string[]) => void;
 } & CardProps) {
   const [selection, setSelection] = useState<string[]>([]);
   const selected = useMemo(
@@ -63,6 +65,10 @@ export function PetitionAccessesTable({
     onReactivateAccess,
     onDeactivateAccess,
   });
+
+  const handleConfigureReminders = useCallback(async () => {
+    onConfigureReminders(selection);
+  }, [selection]);
 
   const showActions =
     selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
@@ -110,6 +116,19 @@ export function PetitionAccessesTable({
                   <FormattedMessage
                     id="petition-accesses.send-reminder"
                     defaultMessage="Send reminder"
+                  />
+                </MenuItem>
+                <MenuItem
+                  isDisabled={
+                    petition.status !== "PENDING" ||
+                    selected.some((a) => a.status === "INACTIVE")
+                  }
+                  onClick={handleConfigureReminders}
+                >
+                  <Icon name="settings" marginRight={2} />
+                  <FormattedMessage
+                    id="petition-accesses.start-reminder"
+                    defaultMessage="Reminder settings"
                   />
                 </MenuItem>
               </MenuList>
@@ -196,8 +215,10 @@ function usePetitionAccessesColumns({
           id: "petition-accesses.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
-        CellContent: ({ row: { nextReminderAt, remindersLeft } }) => {
-          return nextReminderAt ? (
+        CellContent: ({
+          row: { nextReminderAt, remindersLeft, remindersActive },
+        }) => {
+          return remindersActive && nextReminderAt ? (
             <DateTime value={nextReminderAt} format={FORMATS.LLL} />
           ) : remindersLeft ? (
             <Text color="gray.400" fontStyle="italic">
@@ -332,6 +353,12 @@ PetitionAccessesTable.fragments = {
         ...PetitionAccessTable_PetitionAccess
       }
     }
+    fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
+      offset
+      time
+      timezone
+      weekdaysOnly
+    }
     fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
       id
       contact {
@@ -341,6 +368,10 @@ PetitionAccessesTable.fragments = {
       nextReminderAt
       remindersLeft
       reminderCount
+      remindersActive
+      remindersConfig {
+        ...PetitionAccessTable_PetitionAccessRemindersConfig
+      }
       createdAt
     }
     ${ContactLink.fragments.Contact}

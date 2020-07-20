@@ -51,10 +51,10 @@ export function PetitionRemindersConfig({
     onChange(
       event.target.checked
         ? {
-            offset: 2,
-            time: "09:00",
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            weekdaysOnly: false,
+            offset: value?.offset || 2,
+            time: value?.time || "09:00",
+            timezone: value?.timezone || timezone,
+            weekdaysOnly: value?.weekdaysOnly || false,
           }
         : null
     );

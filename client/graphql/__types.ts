@@ -213,6 +213,8 @@ export type Mutation = {
   sendReminders: Result;
   /** Submits all unpublished comments. */
   submitUnpublishedComments: Array<PetitionFieldComment>;
+  /** Switches automatic reminders for the specified petition accesses. */
+  switchAutomaticReminders: Array<PetitionAccess>;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -392,6 +394,13 @@ export type MutationsubmitUnpublishedCommentsArgs = {
   petitionId: Scalars["ID"];
 };
 
+export type MutationswitchAutomaticRemindersArgs = {
+  accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["ID"];
+  remindersConfig?: Maybe<RemindersConfigInput>;
+  start: Scalars["Boolean"];
+};
+
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
   id: Scalars["ID"];
@@ -552,6 +561,8 @@ export type PetitionAccess = Timestamps & {
   petition?: Maybe<Petition>;
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
+  /** Whether automatic reminders are active or not for this petition access */
+  remindersActive: Scalars["Boolean"];
   /** The reminder settings of the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
   /** Number of reminders left. */
@@ -1183,6 +1194,10 @@ export type PetitionAccessTable_PetitionFragment = {
     >;
   };
 
+export type PetitionAccessTable_PetitionAccessRemindersConfigFragment = {
+  __typename?: "RemindersConfig";
+} & Pick<RemindersConfig, "offset" | "time" | "timezone" | "weekdaysOnly">;
+
 export type PetitionAccessTable_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
 } & Pick<
@@ -1192,9 +1207,15 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   | "nextReminderAt"
   | "remindersLeft"
   | "reminderCount"
+  | "remindersActive"
   | "createdAt"
 > & {
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    remindersConfig?: Maybe<
+      {
+        __typename?: "RemindersConfig";
+      } & PetitionAccessTable_PetitionAccessRemindersConfigFragment
+    >;
   };
 
 export type PetitionActivityTimeline_PetitionFragment = {
@@ -1902,6 +1923,21 @@ export type PetitionsActivity_sendPetitionMutation = {
   sendPetition: { __typename?: "SendPetitionResult" } & Pick<
     SendPetitionResult,
     "result"
+  >;
+};
+
+export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
+  start: Scalars["Boolean"];
+  petitionId: Scalars["ID"];
+  accessIds: Array<Scalars["ID"]>;
+  remindersConfig?: Maybe<RemindersConfigInput>;
+}>;
+
+export type PetitionActivity_switchAutomaticRemindersMutation = {
+  __typename?: "Mutation";
+} & {
+  switchAutomaticReminders: Array<
+    { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id">
   >;
 };
 
@@ -2815,6 +2851,14 @@ export const ContactLink_ContactFragmentDoc = gql`
     email
   }
 `;
+export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
+  fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
+    offset
+    time
+    timezone
+    weekdaysOnly
+  }
+`;
 export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
   fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
     id
@@ -2825,9 +2869,14 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     nextReminderAt
     remindersLeft
     reminderCount
+    remindersActive
+    remindersConfig {
+      ...PetitionAccessTable_PetitionAccessRemindersConfig
+    }
     createdAt
   }
   ${ContactLink_ContactFragmentDoc}
+  ${PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc}
 `;
 export const PetitionAccessTable_PetitionFragmentDoc = gql`
   fragment PetitionAccessTable_Petition on Petition {
@@ -4322,6 +4371,69 @@ export type PetitionsActivity_sendPetitionMutationResult = ApolloReactCommon.Mut
 export type PetitionsActivity_sendPetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionsActivity_sendPetitionMutation,
   PetitionsActivity_sendPetitionMutationVariables
+>;
+export const PetitionActivity_switchAutomaticRemindersDocument = gql`
+  mutation PetitionActivity_switchAutomaticReminders(
+    $start: Boolean!
+    $petitionId: ID!
+    $accessIds: [ID!]!
+    $remindersConfig: RemindersConfigInput
+  ) {
+    switchAutomaticReminders(
+      start: $start
+      petitionId: $petitionId
+      accessIds: $accessIds
+      remindersConfig: $remindersConfig
+    ) {
+      id
+    }
+  }
+`;
+export type PetitionActivity_switchAutomaticRemindersMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionActivity_switchAutomaticRemindersMutation,
+  PetitionActivity_switchAutomaticRemindersMutationVariables
+>;
+
+/**
+ * __usePetitionActivity_switchAutomaticRemindersMutation__
+ *
+ * To run a mutation, you first call `usePetitionActivity_switchAutomaticRemindersMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionActivity_switchAutomaticRemindersMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionActivitySwitchAutomaticRemindersMutation, { data, loading, error }] = usePetitionActivity_switchAutomaticRemindersMutation({
+ *   variables: {
+ *      start: // value for 'start'
+ *      petitionId: // value for 'petitionId'
+ *      accessIds: // value for 'accessIds'
+ *      remindersConfig: // value for 'remindersConfig'
+ *   },
+ * });
+ */
+export function usePetitionActivity_switchAutomaticRemindersMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionActivity_switchAutomaticRemindersMutation,
+    PetitionActivity_switchAutomaticRemindersMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionActivity_switchAutomaticRemindersMutation,
+    PetitionActivity_switchAutomaticRemindersMutationVariables
+  >(PetitionActivity_switchAutomaticRemindersDocument, baseOptions);
+}
+export type PetitionActivity_switchAutomaticRemindersMutationHookResult = ReturnType<
+  typeof usePetitionActivity_switchAutomaticRemindersMutation
+>;
+export type PetitionActivity_switchAutomaticRemindersMutationResult = ApolloReactCommon.MutationResult<
+  PetitionActivity_switchAutomaticRemindersMutation
+>;
+export type PetitionActivity_switchAutomaticRemindersMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionActivity_switchAutomaticRemindersMutation,
+  PetitionActivity_switchAutomaticRemindersMutationVariables
 >;
 export const PetitionActivityDocument = gql`
   query PetitionActivity($id: ID!) {
