@@ -49,6 +49,9 @@ export const Layout: FC<LayoutProps> = function Layout({
         </MjmlAttributes>
         <MjmlStyle inline>{
           /* css */ `
+          body {
+            padding: 0 16px;
+          }
           .link {
             color: #6059f7;
             text-decoration: none;
