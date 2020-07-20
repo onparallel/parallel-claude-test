@@ -26,6 +26,7 @@ sudo systemctl enable parallel-email-events-queue.service
 sudo systemctl enable parallel-email-sender-queue.service
 sudo systemctl enable parallel-message-email-queue.service
 sudo systemctl enable parallel-reminder-email-queue.service
+sudo systemctl enable parallel-comments-email-queue.service
 sudo systemctl enable parallel-reminder-trigger-cron.service
 sudo systemctl enable parallel-scheduled-trigger-cron.service
 if [[ "$ENV" == "production" ]]; then
