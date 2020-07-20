@@ -11,7 +11,7 @@ import { Layout, LayoutProps } from "../common/Layout";
 export type ForgotPasswordProps = {
   name: string | null;
   resetUrl: string;
-} & Omit<LayoutProps, "children">;
+} & LayoutProps;
 
 const email: Email<ForgotPasswordProps> = {
   from({}, intl) {

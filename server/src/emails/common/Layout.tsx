@@ -15,7 +15,7 @@ import {
   MjmlText,
   MjmlWrapper,
 } from "mjml-react";
-import React, { ReactNode } from "react";
+import React, { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type LayoutProps = {
@@ -23,16 +23,15 @@ export type LayoutProps = {
   logoUrl: string;
   logoAlt: string;
   assetsUrl: string;
-  children: ReactNode;
 };
 
-export function Layout({
+export const Layout: FC<LayoutProps> = function Layout({
   parallelUrl,
   logoUrl,
   logoAlt,
   assetsUrl,
   children,
-}: LayoutProps) {
+}) {
   const { locale } = useIntl();
   return (
     <Mjml>
@@ -137,4 +136,4 @@ export function Layout({
       </MjmlBody>
     </Mjml>
   );
-}
+};

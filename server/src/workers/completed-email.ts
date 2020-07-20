@@ -43,20 +43,20 @@ createQueueWorker<CompletedEmailWorkerPayload>(
     ]);
     if (!org) {
       throw new Error(
-        `Organization not found for user.org_id ${access.contact_id}`
+        `Organization not found for granter.org_id ${granter.org_id}`
       );
     }
-    const recipientNameOrEmail =
+    const contactNameOrEmail =
       (contact.first_name && contact.last_name
         ? `${contact.first_name} ${contact.last_name}`
-        : contact.first_name!) || contact.email;
+        : contact.first_name) || contact.email;
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
         name: granter.first_name,
         petitionId: toGlobalId("Petition", access.petition_id),
         petitionName: petition!.name,
-        recipientNameOrEmail,
+        contactNameOrEmail,
         fields: fields.map(pick(["id", "title", "position"])),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,

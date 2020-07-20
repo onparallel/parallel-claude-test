@@ -29,7 +29,7 @@ enum ChangePasswordResult {
 
 type CommentDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
-  deletedBy: ContactOrUser
+  deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: ID!
 }
@@ -95,8 +95,6 @@ type Contact implements Timestamps {
   """
   updatedAt: DateTime!
 }
-
-union ContactOrUser = Contact | User
 
 type ContactPagination {
   """
@@ -851,7 +849,7 @@ type PetitionFieldComment {
   """
   The author of the comment.
   """
-  author: ContactOrUser
+  author: UserOrPetitionAccess
 
   """
   The content of the comment.
@@ -1182,8 +1180,6 @@ type PublicContact {
   lastName: String
 }
 
-union PublicContactOrUser = PublicContact | PublicUser
-
 """
 A public view of an organization
 """
@@ -1320,7 +1316,7 @@ type PublicPetitionFieldComment {
   """
   The author of the comment.
   """
-  author: PublicContactOrUser
+  author: PublicUserOrContact
 
   """
   The content of the comment.
@@ -1412,6 +1408,8 @@ type PublicUser {
   """
   organization: PublicOrganization!
 }
+
+union PublicUserOrContact = PublicContact | PublicUser
 
 type Query {
   access(keycode: ID!): PublicPetitionAccess
@@ -1670,6 +1668,8 @@ type User implements Timestamps {
   """
   updatedAt: DateTime!
 }
+
+union UserOrPetitionAccess = PetitionAccess | User
 
 type UserPagination {
   """

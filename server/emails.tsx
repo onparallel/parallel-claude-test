@@ -42,10 +42,11 @@ app.get("/:email", async (req, res, next) => {
       }
     }
     const {
-      default: { html: Component, text },
+      default: { html: Component, text, subject },
       props,
     } = await import(componentFile);
     const messages = await import(messagesFile);
+    const intl = createIntl({ messages, locale });
     if (type === "html") {
       const { html } = render(
         <IntlProvider locale={locale} messages={messages}>
@@ -58,9 +59,15 @@ app.get("/:email", async (req, res, next) => {
           validationLevel: "soft",
         }
       );
-      res.send(html.replace(/<\/body>/, LR_SCRIPT + "\n</body>"));
+      res.send(
+        html
+          .replace(
+            /<title>\s*<\/title>/,
+            `<title>${subject(props, intl)}</title>`
+          )
+          .replace(/<\/body>/, LR_SCRIPT + "\n</body>")
+      );
     } else {
-      const intl = createIntl({ messages, locale });
       res.type("text/plain").send(text(props, intl));
     }
   } catch (error) {

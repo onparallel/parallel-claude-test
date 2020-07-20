@@ -22,7 +22,7 @@ export type PetitionReminderProps = {
   fields: PetitionFieldListProps["fields"];
   deadline: Date | null;
   keycode: string;
-} & Omit<LayoutProps, "children">;
+} & LayoutProps;
 
 const email: Email<PetitionReminderProps> = {
   from({ senderName }, intl) {
@@ -211,6 +211,6 @@ export const props: PetitionReminderProps = {
   keycode: "asdfghjkl",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/logos/doctoralia.png",
-  logoAlt: "L4Law",
+  logoUrl: "/static/emails/logo.png",
+  logoAlt: "Parallel",
 };

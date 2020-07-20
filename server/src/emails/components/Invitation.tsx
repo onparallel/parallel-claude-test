@@ -11,7 +11,7 @@ import { Layout, LayoutProps } from "../common/Layout";
 export type InvitationProps = {
   email: string;
   password: string;
-} & Omit<LayoutProps, "children">;
+} & LayoutProps;
 
 const email: Email<InvitationProps> = {
   from({}, intl) {

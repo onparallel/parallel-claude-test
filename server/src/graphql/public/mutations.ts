@@ -5,9 +5,11 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
+import { prop } from "remeda";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { random } from "../../util/token";
 import { and, chain } from "../helpers/authorize";
+import { WhitelistedError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import {
   commentsBelongsToAccess,
@@ -16,7 +18,6 @@ import {
   fieldHastype,
   replyBelongsToAccess,
 } from "./authorizers";
-import { WhitelistedError } from "../helpers/errors";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -317,11 +318,19 @@ export const publicSubmitUnpublishedComments = mutationField(
       keycode: idArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const comments = await ctx.petitions.publishPetitionFieldCommentsForAccess(
+      const {
+        comments,
+        users,
+      } = await ctx.petitions.publishPetitionFieldCommentsForAccess(
         ctx.access!.petition_id,
         ctx.access!
       );
-      // TODO enqueue email to notify users about comments
+      await ctx.aws.enqueuePetitionCommentsUserNotification(
+        ctx.access!.petition_id,
+        ctx.access!.id,
+        users.map(prop("id")),
+        comments.map(prop("id"))
+      );
       return comments;
     },
   }
@@ -346,9 +355,9 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
         args.petitionFieldCommentIds,
         "PetitionFieldComment"
       ).ids;
-      return await ctx.petitions.markPetitionFieldCommentsAsReadForContact(
+      return await ctx.petitions.markPetitionFieldCommentsAsReadForAccess(
         petitionFieldCommentIds,
-        ctx.contact!
+        ctx.access!.id
       );
     },
   }

@@ -17,9 +17,9 @@ export type PetitionCompletedProps = {
   name: string | null;
   petitionId: string;
   petitionName: string | null;
-  recipientNameOrEmail: string;
+  contactNameOrEmail: string;
   fields: PetitionFieldListProps["fields"];
-} & Omit<LayoutProps, "children">;
+} & LayoutProps;
 
 const email: Email<PetitionCompletedProps> = {
   from({}, intl) {
@@ -42,7 +42,7 @@ const email: Email<PetitionCompletedProps> = {
       name,
       petitionId,
       petitionName,
-      recipientNameOrEmail,
+      contactNameOrEmail: recipientNameOrEmail,
       fields,
       parallelUrl,
     }: PetitionCompletedProps,
@@ -81,7 +81,7 @@ const email: Email<PetitionCompletedProps> = {
     name,
     petitionId,
     petitionName,
-    recipientNameOrEmail,
+    contactNameOrEmail: recipientNameOrEmail,
     fields,
     parallelUrl,
     assetsUrl,
@@ -145,7 +145,7 @@ export const props: PetitionCompletedProps = {
   name: "Derek",
   petitionId: "1234567890",
   petitionName: "Declaración de la renta",
-  recipientNameOrEmail: "Santi Albo",
+  contactNameOrEmail: "Santi Albo",
   fields: [
     { position: 0, id: 123, title: "DNI" },
     { position: 1, id: 235, title: "Escrituras" },

@@ -320,7 +320,7 @@ export interface CreatePetitionAccess {
 
 export interface PetitionContactNotification {
   id: number;
-  contact_id: number;
+  petition_access_id: number;
   petition_id: number;
   type: PetitionContactNotificationType;
   data: Maybe<any>;
@@ -329,7 +329,7 @@ export interface PetitionContactNotification {
 }
 
 export interface CreatePetitionContactNotification {
-  contact_id: number;
+  petition_access_id: number;
   petition_id: number;
   type: PetitionContactNotificationType;
   data?: Maybe<any>;

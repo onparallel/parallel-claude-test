@@ -10,7 +10,7 @@ import { closing } from "../common/texts";
 
 export type WelcomeProps = {
   verificationUrl: string;
-} & Omit<LayoutProps, "children">;
+} & LayoutProps;
 
 const email: Email<WelcomeProps> = {
   from({}, intl) {

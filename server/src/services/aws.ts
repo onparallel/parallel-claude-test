@@ -170,4 +170,40 @@ export class Aws {
       groupId: `PetitionAccess-${accessId}`,
     });
   }
+
+  async enqueuePetitionCommentsContactNotification(
+    petitionId: number,
+    userId: number,
+    accessIds: number[],
+    commentIds: number[]
+  ) {
+    await this.enqueueMessages("comments-email", {
+      body: {
+        type: "CONTACT_NOTIFICATION",
+        petition_id: petitionId,
+        user_id: userId,
+        petition_access_ids: accessIds,
+        petition_field_comment_ids: commentIds,
+      },
+      groupId: `PetitionFieldComment-${commentIds.join(",")}`,
+    });
+  }
+
+  async enqueuePetitionCommentsUserNotification(
+    petitionId: number,
+    accessId: number,
+    userIds: number[],
+    commentIds: number[]
+  ) {
+    await this.enqueueMessages("comments-email", {
+      body: {
+        type: "USER_NOTIFICATION",
+        petition_id: petitionId,
+        petition_access_id: accessId,
+        user_ids: userIds,
+        petition_field_comment_ids: commentIds,
+      },
+      groupId: `PetitionFieldComment-${commentIds.join(",")}`,
+    });
+  }
 }

@@ -30,7 +30,7 @@ export type PetitionMessageProps = {
   body: any | null;
   deadline: Date | null;
   keycode: string;
-} & Omit<LayoutProps, "children">;
+} & LayoutProps;
 
 const email: Email<PetitionMessageProps> = {
   from({ senderName }, intl) {

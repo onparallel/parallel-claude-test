@@ -33,6 +33,8 @@ import {
   PetitionFieldType,
   PetitionStatus,
   User,
+  PetitionUserNotification,
+  PetitionContactNotification,
 } from "../__types";
 
 @injectable()
@@ -1032,12 +1034,12 @@ export class PetitionRepository extends BaseRepository {
         const rows = await this.from("petition_field_comment")
           .where((qb) => {
             for (const { userId, petitionId, petitionFieldId } of ids) {
-              qb = qb.orWhere((qb) => {
+              qb = qb.orWhere((qb: QueryBuilder<PetitionFieldComment>) => {
                 qb.where({
                   petition_id: petitionId,
                   petition_field_id: petitionFieldId,
-                }).andWhere((qb) => {
-                  qb.whereNotNull("published_at").orWhere("user_id", userId);
+                }).andWhere((qb: QueryBuilder<PetitionFieldComment>) => {
+                  qb.whereNotNull("published_at").orWhere({ user_id: userId });
                 });
               });
             }
@@ -1059,25 +1061,24 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
-  readonly loadPetitionFieldCommentsForFieldAndContact = fromDataLoader(
+  readonly loadPetitionFieldCommentsForFieldAndAccess = fromDataLoader(
     new DataLoader<
-      { contactId: number; petitionId: number; petitionFieldId: number },
+      { accessId: number; petitionId: number; petitionFieldId: number },
       PetitionFieldComment[],
       string
     >(
       async (ids) => {
         const rows = await this.from("petition_field_comment")
           .where((qb) => {
-            for (const { contactId, petitionId, petitionFieldId } of ids) {
-              qb = qb.orWhere((qb) => {
+            for (const { accessId, petitionId, petitionFieldId } of ids) {
+              qb = qb.orWhere((qb: QueryBuilder<PetitionFieldComment>) => {
                 qb.where({
                   petition_id: petitionId,
                   petition_field_id: petitionFieldId,
-                }).andWhere((qb) => {
-                  qb.whereNotNull("published_at").orWhere(
-                    "contact_id",
-                    contactId
-                  );
+                }).andWhere((qb: QueryBuilder<PetitionFieldComment>) => {
+                  qb.whereNotNull("published_at").orWhere({
+                    petition_access_id: accessId,
+                  });
                 });
               });
             }
@@ -1094,7 +1095,7 @@ export class PetitionRepository extends BaseRepository {
           .map((key) => this.sortComments(byId[key] ?? []));
       },
       {
-        cacheKeyFn: keyBuilder(["contactId", "petitionId", "petitionFieldId"]),
+        cacheKeyFn: keyBuilder(["accessId", "petitionId", "petitionFieldId"]),
       }
     )
   );
@@ -1136,14 +1137,14 @@ export class PetitionRepository extends BaseRepository {
     >(
       async (ids) => {
         const rows = await this.from("petition_user_notification")
-          .where((qb) => {
+          .where((qb: QueryBuilder<PetitionUserNotification>) => {
             for (const {
               userId,
               petitionId,
               petitionFieldId,
               petitionFieldCommentId,
             } of ids) {
-              qb = qb.orWhere((qb2) => {
+              qb = qb.orWhere((qb2: QueryBuilder<PetitionUserNotification>) => {
                 qb2
                   .where({
                     user_id: userId,
@@ -1194,7 +1195,7 @@ export class PetitionRepository extends BaseRepository {
   readonly getPetitionFieldCommentIsUnreadForContact = fromDataLoader(
     new DataLoader<
       {
-        contactId: number;
+        petitionAccessId: number;
         petitionId: number;
         petitionFieldId: number;
         petitionFieldCommentId: number;
@@ -1204,25 +1205,30 @@ export class PetitionRepository extends BaseRepository {
     >(
       async (ids) => {
         const rows = await this.from("petition_contact_notification")
-          .where((qb) => {
+          .where((qb: QueryBuilder<PetitionContactNotification>) => {
             for (const {
-              contactId,
+              petitionAccessId,
               petitionId,
               petitionFieldId,
               petitionFieldCommentId,
             } of ids) {
-              qb = qb.orWhere((qb2) => {
-                qb2
-                  .where({
-                    contact_id: contactId,
-                    petition_id: petitionId,
-                  })
-                  .whereRaw("data ->> 'petition_field_id' = ?", petitionFieldId)
-                  .whereRaw(
-                    "data ->> 'petition_field_comment_id' = ?",
-                    petitionFieldCommentId
-                  );
-              });
+              qb = qb.orWhere(
+                (qb2: QueryBuilder<PetitionContactNotification>) => {
+                  qb2
+                    .where({
+                      petition_access_id: petitionAccessId,
+                      petition_id: petitionId,
+                    })
+                    .whereRaw(
+                      "data ->> 'petition_field_id' = ?",
+                      petitionFieldId
+                    )
+                    .whereRaw(
+                      "data ->> 'petition_field_comment_id' = ?",
+                      petitionFieldCommentId
+                    );
+                }
+              );
             }
           })
           .where("type", "COMMENT_CREATED")
@@ -1231,7 +1237,7 @@ export class PetitionRepository extends BaseRepository {
         const byId = indexBy(
           rows,
           keyBuilder([
-            "contact_id",
+            "petition_access_id",
             "petition_id",
             (r) => r.data.petition_field_id,
             (r) => r.data.petition_field_comment_id,
@@ -1240,7 +1246,7 @@ export class PetitionRepository extends BaseRepository {
         return ids
           .map(
             keyBuilder([
-              "contactId",
+              "petitionAccessId",
               "petitionId",
               "petitionFieldId",
               "petitionFieldCommentId",
@@ -1250,7 +1256,7 @@ export class PetitionRepository extends BaseRepository {
       },
       {
         cacheKeyFn: keyBuilder([
-          "contactId",
+          "petitionAccessId",
           "petitionId",
           "petitionFieldId",
           "petitionFieldCommentId",
@@ -1435,7 +1441,7 @@ export class PetitionRepository extends BaseRepository {
           comments.map((comment) => ({
             type: "COMMENT_CREATED",
             petition_id: comment.petition_id,
-            contact_id: access.contact_id,
+            petition_access_id: access.id,
             data: {
               petition_field_id: comment.petition_field_id,
               petition_field_comment_id: comment.id,
@@ -1452,7 +1458,7 @@ export class PetitionRepository extends BaseRepository {
         petition_field_comment_id: comment.id,
       }))
     );
-    return comments;
+    return { comments, accesses };
   }
 
   async publishPetitionFieldCommentsForAccess(
@@ -1475,17 +1481,21 @@ export class PetitionRepository extends BaseRepository {
 
     // Create user notifications and events
     const petition = await this.loadPetition(petitionId);
+    // When petitions are shareable fetch users here.
+    const users = [{ id: petition!.owner_id }];
     await this.insert(
       "petition_user_notification",
-      comments.map((comment) => ({
-        type: "COMMENT_CREATED",
-        petition_id: comment.petition_id,
-        user_id: petition!.owner_id,
-        data: {
-          petition_field_id: comment.petition_field_id,
-          petition_field_comment_id: comment.id,
-        },
-      }))
+      users.flatMap((user) =>
+        comments.map((comment) => ({
+          type: "COMMENT_CREATED",
+          petition_id: comment.petition_id,
+          user_id: user.id,
+          data: {
+            petition_field_id: comment.petition_field_id,
+            petition_field_comment_id: comment.id,
+          },
+        }))
+      )
     );
 
     await this.createEvent(
@@ -1496,7 +1506,7 @@ export class PetitionRepository extends BaseRepository {
         petition_field_comment_id: comment.id,
       }))
     );
-    return comments;
+    return { comments, users };
   }
 
   async markPetitionFieldCommentsAsReadForUser(
@@ -1511,10 +1521,10 @@ export class PetitionRepository extends BaseRepository {
         user_id: user.id,
         type: "COMMENT_CREATED",
       })
-      .where((qb) => {
+      .where((qb: QueryBuilder<PetitionUserNotification>) => {
         for (const comment of comments) {
-          qb = qb.orWhere((qb) => {
-            qb.where("petition_id", comment.petition_id)
+          qb = qb.orWhere((qb: QueryBuilder<PetitionUserNotification>) => {
+            qb.where({ petition_id: comment.petition_id })
               .whereRaw(
                 "data ->> 'petition_field_id' = ?",
                 comment.petition_field_id
@@ -1527,22 +1537,22 @@ export class PetitionRepository extends BaseRepository {
     return comments;
   }
 
-  async markPetitionFieldCommentsAsReadForContact(
+  async markPetitionFieldCommentsAsReadForAccess(
     petitionFieldCommentIds: number[],
-    contact: Contact
+    accessId: number
   ) {
     const comments = (await this.loadPetitionFieldComment(
       petitionFieldCommentIds
     )) as PetitionFieldComment[];
     await this.from("petition_contact_notification")
       .where({
-        contact_id: contact.id,
+        petition_access_id: accessId,
         type: "COMMENT_CREATED",
       })
-      .where((qb) => {
+      .where((qb: QueryBuilder<PetitionContactNotification>) => {
         for (const comment of comments) {
-          qb = qb.orWhere((qb) => {
-            qb.where("petition_id", comment.petition_id)
+          qb = qb.orWhere((qb: QueryBuilder<PetitionContactNotification>) => {
+            qb.where({ petition_id: comment.petition_id })
               .whereRaw(
                 "data ->> 'petition_field_id' = ?",
                 comment.petition_field_id

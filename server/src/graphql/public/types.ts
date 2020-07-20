@@ -109,8 +109,8 @@ export const PublicPetitionField = objectType({
       type: "PublicPetitionFieldComment",
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldCommentsForFieldAndContact({
-          contactId: ctx.contact!.id,
+        return await ctx.petitions.loadPetitionFieldCommentsForFieldAndAccess({
+          accessId: ctx.access!.id,
           petitionId: root.petition_id,
           petitionFieldId: root.id,
         });
@@ -331,7 +331,7 @@ export const PublicPetitionFieldComment = objectType({
       description: "Whether the comment has been read or not.",
       resolve: async (root, _, ctx) => {
         return ctx.petitions.getPetitionFieldCommentIsUnreadForContact({
-          contactId: ctx.contact!.id,
+          petitionAccessId: ctx.access!.id,
           petitionId: root.petition_id,
           petitionFieldId: root.petition_field_id,
           petitionFieldCommentId: root.id,

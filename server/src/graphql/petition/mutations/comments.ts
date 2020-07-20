@@ -13,6 +13,7 @@ import {
   repliesBelongsToPetition,
   userHasAccessToPetitions,
 } from "../authorizers";
+import { prop } from "remeda";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -152,11 +153,19 @@ export const submitUnpublishedComments = mutationField(
     },
     resolve: async (_, args, ctx) => {
       const petitionId = fromGlobalId(args.petitionId, "Petition").id;
-      const comments = await ctx.petitions.publishPetitionFieldCommentsForUser(
+      const {
+        comments,
+        accesses,
+      } = await ctx.petitions.publishPetitionFieldCommentsForUser(
         petitionId,
         ctx.user!
       );
-      // TODO enqueue email to notify recipients about comments
+      await ctx.aws.enqueuePetitionCommentsContactNotification(
+        petitionId,
+        ctx.user!.id,
+        accesses.map(prop("id")),
+        comments.map(prop("id"))
+      );
       return comments;
     },
   }

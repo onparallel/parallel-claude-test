@@ -49,7 +49,9 @@ export async function up(knex: Knex): Promise<any> {
 
   await knex.schema.createTable("petition_contact_notification", (t) => {
     t.increments("id");
-    t.integer("contact_id").notNullable().references("contact.id");
+    t.integer("petition_access_id")
+      .notNullable()
+      .references("petition_access.id");
     t.integer("petition_id").notNullable().references("petition.id");
     t.enum("type", ["COMMENT_CREATED"], {
       useNative: true,
@@ -80,8 +82,8 @@ export async function up(knex: Knex): Promise<any> {
         ((data ->> 'petition_field_id')::int),
         ((data ->> 'petition_field_comment_id')::int)
       ) where type = 'COMMENT_CREATED';
-      create unique index "pcn__comment_created__contact_id__petition_id__data" on petition_contact_notification (
-        contact_id,
+      create unique index "pcn__comment_created__petition_access_id__petition_id__data" on petition_contact_notification (
+        petition_access_id,
         petition_id,
         ((data ->> 'petition_field_id')::int),
         ((data ->> 'petition_field_comment_id')::int)
