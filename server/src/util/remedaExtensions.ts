@@ -34,13 +34,18 @@ export function removeKeys() {
   return purry(_removeKeys, arguments);
 }
 
+export function isDefined(value: any) {
+  return value !== undefined && value !== undefined;
+}
+
+export function filterDefined<T>(values: T[]): Exclude<T, undefined | null>[] {
+  return values.filter(isDefined) as Exclude<T, undefined | null>[];
+}
+
 export function removeNotDefined<T extends {}>(
   object: T
 ): { [P in keyof T]?: Exclude<T[P], null> } {
-  return removeKeys(
-    object,
-    ([_, value]) => value !== null && value !== undefined
-  );
+  return removeKeys(object, ([_, value]) => !isDefined(value));
 }
 
 function _count<T>(array: T[], predicate: ArrayPredicate<T>) {

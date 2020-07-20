@@ -33,10 +33,14 @@ export function TimelineCommentDeletedEvent({
         id="timeline.comment-deleted"
         defaultMessage="{same, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
         values={{
-          same: deletedBy?.id === userId,
+          same: deletedBy?.__typename === "User" && deletedBy?.id === userId,
           someone:
-            deletedBy?.__typename === "Contact" ? (
-              <ContactLink contact={deletedBy} />
+            deletedBy?.__typename === "PetitionAccess" ? (
+              deletedBy.contact ? (
+                <ContactLink contact={deletedBy.contact} />
+              ) : (
+                <DeletedContact />
+              )
             ) : deletedBy?.__typename === "User" ? (
               deletedBy.fullName
             ) : (
@@ -69,8 +73,10 @@ TimelineCommentDeletedEvent.fragments = {
           id
           fullName
         }
-        ... on Contact {
-          ...ContactLink_Contact
+        ... on PetitionAccess {
+          contact {
+            ...ContactLink_Contact
+          }
         }
       }
       createdAt

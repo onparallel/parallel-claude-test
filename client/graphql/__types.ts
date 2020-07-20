@@ -49,7 +49,7 @@ export type ChangePasswordResult =
 export type CommentDeletedEvent = PetitionEvent & {
   __typename?: "CommentDeletedEvent";
   createdAt: Scalars["DateTime"];
-  deletedBy?: Maybe<ContactOrUser>;
+  deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["ID"];
 };
@@ -88,8 +88,6 @@ export type ContactaccessesArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
 };
-
-export type ContactOrUser = Contact | User;
 
 export type ContactPagination = {
   __typename?: "ContactPagination";
@@ -647,7 +645,7 @@ export type PetitionFieldAndReplies = {
 export type PetitionFieldComment = {
   __typename?: "PetitionFieldComment";
   /** The author of the comment. */
-  author?: Maybe<ContactOrUser>;
+  author?: Maybe<UserOrPetitionAccess>;
   /** The content of the comment. */
   content: Scalars["String"];
   /** The ID of the petition field comment. */
@@ -805,8 +803,6 @@ export type PublicContact = {
   lastName?: Maybe<Scalars["String"]>;
 };
 
-export type PublicContactOrUser = PublicContact | PublicUser;
-
 /** A public view of an organization */
 export type PublicOrganization = {
   __typename?: "PublicOrganization";
@@ -876,7 +872,7 @@ export type PublicPetitionField = {
 export type PublicPetitionFieldComment = {
   __typename?: "PublicPetitionFieldComment";
   /** The author of the comment. */
-  author?: Maybe<PublicContactOrUser>;
+  author?: Maybe<PublicUserOrContact>;
   /** The content of the comment. */
   content: Scalars["String"];
   /** The ID of the petition field comment. */
@@ -920,6 +916,8 @@ export type PublicUser = {
   /** The organization of the user. */
   organization: PublicOrganization;
 };
+
+export type PublicUserOrContact = PublicContact | PublicUser;
 
 export type Query = {
   __typename?: "Query";
@@ -1101,6 +1099,8 @@ export type User = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
+
+export type UserOrPetitionAccess = PetitionAccess | User;
 
 export type UserPagination = {
   __typename?: "UserPagination";
@@ -1365,7 +1365,11 @@ export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
       } & PetitionFieldReference_PetitionFieldFragment
     >;
     deletedBy?: Maybe<
-      | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        })
       | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
     >;
   };
@@ -1384,7 +1388,11 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
         "isEdited" | "content"
       > & {
           author?: Maybe<
-            | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
+            | ({ __typename?: "PetitionAccess" } & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & ContactLink_ContactFragment
+                >;
+              })
             | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
           >;
         }
@@ -1604,7 +1612,11 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   "id" | "content" | "publishedAt" | "isUnread" | "isEdited"
 > & {
     author?: Maybe<
-      | ({ __typename?: "Contact" } & ContactLink_ContactFragment)
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        })
       | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
     >;
   };
@@ -3019,8 +3031,10 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
           id
           fullName
         }
-        ... on Contact {
-          ...ContactLink_Contact
+        ... on PetitionAccess {
+          contact {
+            ...ContactLink_Contact
+          }
         }
       }
       isEdited
@@ -3041,8 +3055,10 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
         id
         fullName
       }
-      ... on Contact {
-        ...ContactLink_Contact
+      ... on PetitionAccess {
+        contact {
+          ...ContactLink_Contact
+        }
       }
     }
     createdAt
@@ -3246,8 +3262,10 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
         id
         fullName
       }
-      ... on Contact {
-        ...ContactLink_Contact
+      ... on PetitionAccess {
+        contact {
+          ...ContactLink_Contact
+        }
       }
     }
     content

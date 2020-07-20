@@ -396,7 +396,7 @@ export interface PetitionFieldComment {
   petition_field_reply_id: Maybe<number>;
   content: string;
   user_id: Maybe<number>;
-  contact_id: Maybe<number>;
+  petition_access_id: Maybe<number>;
   published_at: Maybe<Date>;
   created_at: Date;
   created_by: Maybe<string>;
@@ -412,7 +412,7 @@ export interface CreatePetitionFieldComment {
   petition_field_reply_id?: Maybe<number>;
   content: string;
   user_id?: Maybe<number>;
-  contact_id?: Maybe<number>;
+  petition_access_id?: Maybe<number>;
   published_at?: Maybe<Date>;
   created_at?: Date;
   created_by?: Maybe<string>;

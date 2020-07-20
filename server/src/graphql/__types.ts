@@ -274,12 +274,12 @@ export interface NexusGenRootTypes {
   DateTime: Date;
   JSON: any;
   JSONObject: { [key: string]: any };
-  ContactOrUser:
+  PublicUserOrContact:
     | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
     | ({ __type: "User" } & NexusGenRootTypes["User"]);
-  PublicContactOrUser:
-    | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
-    | ({ __type: "User" } & NexusGenRootTypes["User"]);
+  UserOrPetitionAccess:
+    | ({ __type: "User" } & NexusGenRootTypes["User"])
+    | ({ __type: "PetitionAccess" } & NexusGenRootTypes["PetitionAccess"]);
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -332,7 +332,7 @@ export interface NexusGenFieldTypes {
   CommentDeletedEvent: {
     // field return type
     createdAt: Date; // DateTime!
-    deletedBy: NexusGenRootTypes["ContactOrUser"] | null; // ContactOrUser
+    deletedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: string; // ID!
   };
@@ -520,7 +520,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldComment: {
     // field return type
-    author: NexusGenRootTypes["ContactOrUser"] | null; // ContactOrUser
+    author: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     content: string; // String!
     id: string; // ID!
     isEdited: boolean; // Boolean!
@@ -619,7 +619,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionFieldComment: {
     // field return type
-    author: NexusGenRootTypes["PublicContactOrUser"] | null; // PublicContactOrUser
+    author: NexusGenRootTypes["PublicUserOrContact"] | null; // PublicUserOrContact
     content: string; // String!
     id: string; // ID!
     isUnread: boolean; // Boolean!
@@ -992,8 +992,8 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
-  ContactOrUser: "Contact" | "User";
-  PublicContactOrUser: "PublicContact" | "PublicUser";
+  PublicUserOrContact: "PublicContact" | "PublicUser";
+  UserOrPetitionAccess: "PetitionAccess" | "User";
   CreatedAt: "PetitionMessage" | "PetitionReminder";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -1111,7 +1111,7 @@ export type NexusGenScalarNames =
   | "JSONObject"
   | "String";
 
-export type NexusGenUnionNames = "ContactOrUser" | "PublicContactOrUser";
+export type NexusGenUnionNames = "PublicUserOrContact" | "UserOrPetitionAccess";
 
 export interface NexusGenTypes {
   context: ctx.ApiContext;

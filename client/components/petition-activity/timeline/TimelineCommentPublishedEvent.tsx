@@ -33,60 +33,73 @@ export function TimelineCommentPublishedEvent({
       </Link>
     ),
   };
-  return comment ? (
-    <Box
-      background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
-      paddingY={4}
-      width="680px"
-      maxWidth="100%"
-    >
-      <Card overflow="hidden">
-        <Box paddingX={4} paddingY={2} backgroundColor="gray.50">
-          <FormattedMessage
-            id="timeline.comment-published-description"
-            defaultMessage="{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
-            values={{
-              ...values,
-              same: comment.author?.id === userId,
-              author:
-                comment.author?.__typename === "Contact" ? (
-                  <ContactLink contact={comment.author} />
-                ) : comment.author?.__typename === "User" ? (
-                  comment.author.fullName
-                ) : (
-                  <DeletedContact />
-                ),
-            }}
+  if (comment) {
+    const { author, content, isEdited } = comment;
+    return (
+      <Box
+        background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
+        paddingY={4}
+        width="680px"
+        maxWidth="100%"
+      >
+        <Card overflow="hidden">
+          <Box paddingX={4} paddingY={2} backgroundColor="gray.50">
+            <FormattedMessage
+              id="timeline.comment-published-description"
+              defaultMessage="{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+              values={{
+                ...values,
+                same: author?.__typename === "User" && author?.id === userId,
+                author:
+                  author?.__typename === "PetitionAccess" ? (
+                    author.contact ? (
+                      <ContactLink contact={author.contact} />
+                    ) : (
+                      <DeletedContact />
+                    )
+                  ) : author?.__typename === "User" ? (
+                    author.fullName
+                  ) : (
+                    <DeletedContact />
+                  ),
+              }}
+            />
+            {isEdited ? (
+              <Text as="span" color="gray.400" marginLeft={2} fontSize="sm">
+                <FormattedMessage
+                  id="generic.edited-comment-indicator"
+                  defaultMessage="Edited"
+                />
+              </Text>
+            ) : null}
+          </Box>
+          <Divider />
+          <Box padding={4}>{content}</Box>
+        </Card>
+      </Box>
+    );
+  } else {
+    return (
+      <TimelineItem
+        icon={
+          <TimelineIcon
+            icon="comment"
+            color="black"
+            backgroundColor="gray.200"
           />
-          {comment.isEdited ? (
-            <Text as="span" color="gray.400" marginLeft={2} fontSize="sm">
-              <FormattedMessage
-                id="generic.edited-comment-indicator"
-                defaultMessage="Edited"
-              />
-            </Text>
-          ) : null}
-        </Box>
-        <Divider />
-        <Box padding={4}>{comment.content}</Box>
-      </Card>
-    </Box>
-  ) : (
-    <TimelineItem
-      icon={
-        <TimelineIcon icon="comment" color="black" backgroundColor="gray.200" />
-      }
-      paddingY={2}
-    >
-      <FormattedMessage
-        id="timeline.comment-published-deleted"
-        defaultMessage="Someone wrote a (now deleted) comment on field {field} {timeAgo}"
-        values={{
-          ...values,
-        }}
-      />
-    </TimelineItem>
-  );
+        }
+        paddingY={2}
+      >
+        <FormattedMessage
+          id="timeline.comment-published-deleted"
+          defaultMessage="Someone wrote a (now deleted) comment on field {field} {timeAgo}"
+          values={{
+            ...values,
+          }}
+        />
+      </TimelineItem>
+    );
+  }
 }
 
 TimelineCommentPublishedEvent.fragments = {
@@ -101,8 +114,10 @@ TimelineCommentPublishedEvent.fragments = {
             id
             fullName
           }
-          ... on Contact {
-            ...ContactLink_Contact
+          ... on PetitionAccess {
+            contact {
+              ...ContactLink_Contact
+            }
           }
         }
         isEdited

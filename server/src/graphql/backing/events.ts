@@ -26,7 +26,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   COMMENT_DELETED: {
     petition_field_id: number;
     user_id?: number;
-    contact_id?: number;
+    petition_access_id?: number;
     petition_field_comment_id: number;
   };
 }[TType];

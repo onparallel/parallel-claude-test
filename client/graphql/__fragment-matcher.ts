@@ -13,18 +13,6 @@ const result: IntrospectionResultData = {
   __schema: {
     types: [
       {
-        kind: "UNION",
-        name: "ContactOrUser",
-        possibleTypes: [
-          {
-            name: "Contact",
-          },
-          {
-            name: "User",
-          },
-        ],
-      },
-      {
         kind: "INTERFACE",
         name: "CreatedAt",
         possibleTypes: [
@@ -83,7 +71,7 @@ const result: IntrospectionResultData = {
       },
       {
         kind: "UNION",
-        name: "PublicContactOrUser",
+        name: "PublicUserOrContact",
         possibleTypes: [
           {
             name: "PublicContact",
@@ -117,6 +105,18 @@ const result: IntrospectionResultData = {
           },
           {
             name: "PublicPetitionFieldReply",
+          },
+          {
+            name: "User",
+          },
+        ],
+      },
+      {
+        kind: "UNION",
+        name: "UserOrPetitionAccess",
+        possibleTypes: [
+          {
+            name: "PetitionAccess",
           },
           {
             name: "User",

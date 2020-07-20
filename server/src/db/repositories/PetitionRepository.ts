@@ -1279,22 +1279,22 @@ export class PetitionRepository extends BaseRepository {
     return comment;
   }
 
-  async createPetitionFieldCommentFromContact(
+  async createPetitionFieldCommentFromAccess(
     data: {
       petitionId: number;
       petitionFieldId: number;
       petitionFieldReplyId: number | null;
       content: string;
     },
-    contact: Contact
+    access: PetitionAccess
   ) {
     const [comment] = await this.insert("petition_field_comment", {
       petition_id: data.petitionId,
       petition_field_id: data.petitionFieldId,
       petition_field_reply_id: data.petitionFieldReplyId,
       content: data.content,
-      contact_id: contact.id,
-      created_by: `Contact:${contact.id}`,
+      petition_access_id: access.id,
+      created_by: `PetitionAccess:${access.id}`,
     });
     return comment;
   }
@@ -1318,21 +1318,21 @@ export class PetitionRepository extends BaseRepository {
     ]);
   }
 
-  async deletePetitionFieldCommentFromContact(
+  async deletePetitionFieldCommentFromAccess(
     petitionId: number,
     petitionFieldId: number,
     petitionFieldCommentId: number,
-    contact: Contact
+    access: PetitionAccess
   ) {
     await Promise.all([
       this.deletePetitionFieldComment(
         petitionFieldCommentId,
-        `Contact:${contact.id}`
+        `PetitionAccess:${access.id}`
       ),
       this.createEvent(petitionId, "COMMENT_DELETED", {
         petition_field_id: petitionFieldId,
         petition_field_comment_id: petitionFieldCommentId,
-        contact_id: contact.id,
+        petition_access_id: access.id,
       }),
     ]);
   }
@@ -1455,14 +1455,14 @@ export class PetitionRepository extends BaseRepository {
     return comments;
   }
 
-  async publishPetitionFieldCommentsForContact(
+  async publishPetitionFieldCommentsForAccess(
     petitionId: number,
-    contact: Contact
+    access: PetitionAccess
   ) {
     const comments = await this.from("petition_field_comment")
       .where({
         petition_id: petitionId,
-        contact_id: contact.id,
+        petition_access_id: access.id,
       })
       .whereNull("published_at")
       .whereNull("deleted_at")

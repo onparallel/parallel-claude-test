@@ -267,17 +267,19 @@ export const CommentDeletedEvent = createPetitionEvent(
       },
     });
     t.field("deletedBy", {
-      type: "ContactOrUser",
+      type: "UserOrPetitionAccess",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        if (root.data.contact_id !== undefined) {
-          const contact = await ctx.contacts.loadContact(root.data.contact_id);
-          return contact && { __type: "Contact", ...contact };
-        } else if (root.data.user_id !== undefined) {
+        if (root.data.user_id !== undefined) {
           const user = await ctx.users.loadUser(root.data.user_id);
           return user && { __type: "User", ...user };
+        } else if (root.data.petition_access_id !== undefined) {
+          const access = await ctx.petitions.loadAccess(
+            root.data.petition_access_id
+          );
+          return access && { __type: "PetitionAccess", ...access };
         }
-        throw new Error(`Both "contact_id" and "user_id" are undefined`);
+        throw new Error(`Both "user_id" and "petition_access_id" are null`);
       },
     });
   }

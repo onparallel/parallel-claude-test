@@ -185,7 +185,7 @@ export function PetitionRepliesFieldComments({
 }
 
 function FieldComment({
-  comment,
+  comment: { id, author, publishedAt, isUnread, isEdited, content: _content },
   userId,
   onDelete,
   onEdit,
@@ -197,11 +197,11 @@ function FieldComment({
 }) {
   const intl = useIntl();
   const [isEditing, setIsEditing] = useState(false);
-  const [content, setContent] = useState(comment.content);
+  const [content, setContent] = useState(_content);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   function handleEditClick() {
-    setContent(comment.content);
+    setContent(_content);
     setIsEditing(true);
     setTimeout(() => {
       textareaRef.current!.focus();
@@ -235,38 +235,36 @@ function FieldComment({
       paddingX={4}
       paddingY={2}
       backgroundColor={
-        !comment.publishedAt
-          ? "yellow.50"
-          : comment.isUnread
-          ? "purple.50"
-          : "white"
+        !publishedAt ? "yellow.50" : isUnread ? "purple.50" : "white"
       }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box>
-          {comment.author?.id === userId ? (
+          {author?.__typename === "User" && author?.id === userId ? (
             <Text as="strong" fontStyle="italic">
               <FormattedMessage id="generic.you" defaultMessage="You" />
             </Text>
-          ) : comment.author?.__typename === "Contact" ? (
-            <Text as="strong">
-              <ContactLink contact={comment.author} />
-            </Text>
-          ) : comment.author?.__typename === "User" ? (
-            <Text as="strong">{comment.author.fullName}</Text>
-          ) : (
-            <DeletedContact />
-          )}
-          {comment.publishedAt ? (
+          ) : author?.__typename === "PetitionAccess" ? (
+            author.contact ? (
+              <Text as="strong">
+                <ContactLink contact={author.contact!} />
+              </Text>
+            ) : (
+              <DeletedContact />
+            )
+          ) : author?.__typename === "User" ? (
+            <Text as="strong">{author.fullName}</Text>
+          ) : null}
+          {publishedAt ? (
             <>
               <DateTime
                 color="gray.500"
-                value={comment.publishedAt}
+                value={publishedAt}
                 format={FORMATS.LLL}
                 useRelativeTime
                 marginLeft={2}
               />
-              {comment.isEdited ? (
+              {isEdited ? (
                 <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
                   <FormattedMessage
                     id="generic.edited-comment-indicator"
@@ -277,7 +275,7 @@ function FieldComment({
             </>
           ) : null}
         </Box>
-        {comment.publishedAt ? null : (
+        {publishedAt ? null : (
           <SmallPopover
             content={
               <Text fontSize="sm">
@@ -308,7 +306,7 @@ function FieldComment({
           _hover={{ color: "gray.600", backgroundColor: "gray.100" }}
           dropdown={
             <MenuList minWidth="160px" placement="bottom-end">
-              {comment.author?.id === userId ? (
+              {author?.__typename === "User" && author?.id === userId ? (
                 <MenuItem onClick={handleEditClick}>
                   <FormattedMessage id="generic.edit" defaultMessage="Edit" />
                 </MenuItem>
@@ -388,8 +386,10 @@ PetitionRepliesFieldComments.fragments = {
             id
             fullName
           }
-          ... on Contact {
-            ...ContactLink_Contact
+          ... on PetitionAccess {
+            contact {
+              ...ContactLink_Contact
+            }
           }
         }
         content

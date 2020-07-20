@@ -1,4 +1,4 @@
-import { objectType, unionType } from "@nexus/schema";
+import { objectType, unionType, core } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
 
 export const PublicPetitionAccess = objectType({
@@ -262,17 +262,17 @@ export const PublicContact = objectType({
   },
 });
 
-export const PublicContactOrUser = unionType({
-  name: "PublicContactOrUser",
+export const PublicUserOrContact = unionType({
+  name: "PublicUserOrContact",
   definition(t) {
-    t.members("PublicContact", "PublicUser");
+    t.members("PublicUser", "PublicContact");
     t.resolveType((o) => {
-      if (o.__type === "Contact") {
-        return "PublicContact";
-      } else if (o.__type === "User") {
-        return "PublicUser";
+      if (["User", "Contact"].includes(o.__type)) {
+        return `Public${o.__type}` as core.AbstractResolveReturn<
+          "PublicUserOrContact"
+        >;
       }
-      throw new Error("Missing __type on PublicContactOrUser");
+      throw new Error("Missing __type on PublicUserOrContact");
     });
   },
   rootTyping: /* ts */ `
@@ -291,18 +291,22 @@ export const PublicPetitionFieldComment = objectType({
       resolve: (o) => toGlobalId("PetitionFieldComment", o.id),
     });
     t.field("author", {
-      type: "PublicContactOrUser",
+      type: "PublicUserOrContact",
       description: "The author of the comment.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        if (root.contact_id !== null) {
-          const contact = await ctx.contacts.loadContact(root.contact_id);
-          return contact && { __type: "Contact", ...contact };
-        } else if (root.user_id !== null) {
+        if (root.user_id !== null) {
           const user = await ctx.users.loadUser(root.user_id);
           return user && { __type: "User", ...user };
+        } else if (root.petition_access_id !== null) {
+          const access = await ctx.petitions.loadAccess(
+            root.petition_access_id
+          );
+          const contact =
+            access && (await ctx.contacts.loadContact(access.contact_id));
+          return contact && { __type: "Contact", ...contact };
         }
-        throw new Error(`Both "contact_id" and "user_id" are null`);
+        throw new Error(`Both "user_id" and "petition_access_id" are null`);
       },
     });
     t.string("content", {

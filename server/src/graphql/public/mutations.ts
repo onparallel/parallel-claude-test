@@ -214,14 +214,14 @@ export const publicCreatePetitionFieldComment = mutationField(
         args.petitionFieldId,
         "PetitionField"
       ).id;
-      return await ctx.petitions.createPetitionFieldCommentFromContact(
+      return await ctx.petitions.createPetitionFieldCommentFromAccess(
         {
           petitionId: ctx.access!.petition_id,
           petitionFieldId,
           petitionFieldReplyId: null,
           content: args.content,
         },
-        ctx.contact!
+        ctx.access!
       );
     },
   }
@@ -253,11 +253,11 @@ export const publicDeletePetitionFieldComment = mutationField(
         args.petitionFieldCommentId,
         "PetitionFieldComment"
       ).id;
-      await ctx.petitions.deletePetitionFieldCommentFromContact(
+      await ctx.petitions.deletePetitionFieldCommentFromAccess(
         ctx.access!.petition_id,
         petitionFieldId,
         petitionFieldCommentId,
-        ctx.contact!
+        ctx.access!
       );
       return RESULT.SUCCESS;
     },
@@ -282,7 +282,7 @@ export const publicUpdatePetitionFieldComment = mutationField(
           const comment = await ctx.petitions.loadPetitionFieldComment(
             petitionFieldCommentId
           );
-          return (comment && comment.contact_id === ctx.contact!.id) ?? false;
+          return comment?.petition_access_id === ctx.access!.id ?? false;
         }
       )
     ),
@@ -317,9 +317,9 @@ export const publicSubmitUnpublishedComments = mutationField(
       keycode: idArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const comments = await ctx.petitions.publishPetitionFieldCommentsForContact(
+      const comments = await ctx.petitions.publishPetitionFieldCommentsForAccess(
         ctx.access!.petition_id,
-        ctx.contact!
+        ctx.access!
       );
       // TODO enqueue email to notify users about comments
       return comments;

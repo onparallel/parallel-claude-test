@@ -5,7 +5,7 @@ import { gql } from "apollo-boost";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
-import { TimelineCommentDeletedEvent } from "./timeline/TimelineCommentDeletedEvent copy";
+import { TimelineCommentDeletedEvent } from "./timeline/TimelineCommentDeletedEvent";
 import { TimelineCommentPublishedEvent } from "./timeline/TimelineCommentPublishedEvent";
 import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancelledEvent";
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";

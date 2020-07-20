@@ -1,20 +1,20 @@
 import { objectType, unionType } from "@nexus/schema";
 import { toGlobalId } from "../../../util/globalId";
 
-export const ContactOrUser = unionType({
-  name: "ContactOrUser",
+export const UserOrPetitionAccess = unionType({
+  name: "UserOrPetitionAccess",
   definition(t) {
-    t.members("Contact", "User");
+    t.members("User", "PetitionAccess");
     t.resolveType((o) => {
-      if (o.__type === "Contact" || o.__type === "User") {
+      if (["User", "PetitionAccess"].includes(o.__type)) {
         return o.__type;
       }
-      throw new Error("Missing __type on ContactOrUser");
+      throw new Error("Missing __type on UserOrPetitionAccess");
     });
   },
   rootTyping: /* ts */ `
-    | ({__type: "Contact"} & NexusGenRootTypes["Contact"])
     | ({__type: "User"} & NexusGenRootTypes["User"])
+    | ({__type: "PetitionAccess"} & NexusGenRootTypes["PetitionAccess"])
   `,
 });
 
@@ -27,18 +27,20 @@ export const PetitionFieldComment = objectType({
       resolve: (o) => toGlobalId("PetitionFieldComment", o.id),
     });
     t.field("author", {
-      type: "ContactOrUser",
+      type: "UserOrPetitionAccess",
       description: "The author of the comment.",
       nullable: true,
       resolve: async (root, _, ctx) => {
-        if (root.contact_id !== null) {
-          const contact = await ctx.contacts.loadContact(root.contact_id);
-          return contact && { __type: "Contact", ...contact };
-        } else if (root.user_id !== null) {
+        if (root.user_id !== null) {
           const user = await ctx.users.loadUser(root.user_id);
           return user && { __type: "User", ...user };
+        } else if (root.petition_access_id !== null) {
+          const access = await ctx.petitions.loadAccess(
+            root.petition_access_id
+          );
+          return access && { __type: "PetitionAccess", ...access };
         }
-        throw new Error(`Both "contact_id" and "user_id" are null`);
+        throw new Error(`Both "user_id" and "petition_access_id" are null`);
       },
     });
     t.string("content", {

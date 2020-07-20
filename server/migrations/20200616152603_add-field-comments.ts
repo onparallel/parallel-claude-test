@@ -11,7 +11,7 @@ export async function up(knex: Knex): Promise<any> {
     t.integer("petition_field_reply_id").references("petition_field_reply.id");
     t.text("content").notNullable();
     t.integer("user_id").references("user.id");
-    t.integer("contact_id").references("contact.id");
+    t.integer("petition_access_id").references("petition_access.id");
     t.timestamp("published_at");
     timestamps(t);
   });
