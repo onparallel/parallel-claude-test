@@ -110,12 +110,23 @@ export class ContactRepository extends BaseRepository {
   }
 
   async deleteContactById(contactId: MaybeArray<number>, user: User) {
-    return await this.from("contact")
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${user.id}`,
-      })
-      .whereIn("id", Array.isArray(contactId) ? contactId : [contactId]);
+    return await this.knex.transaction(async (t) => {
+      await this.from("contact", t)
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        })
+        .whereIn("id", Array.isArray(contactId) ? contactId : [contactId]);
+
+      await this.from("petition_access", t)
+        .update({
+          status: "INACTIVE",
+        })
+        .whereIn(
+          "contact_id",
+          Array.isArray(contactId) ? contactId : [contactId]
+        );
+    });
   }
 
   async getOrCreateContacts(emails: string[], user: User) {
