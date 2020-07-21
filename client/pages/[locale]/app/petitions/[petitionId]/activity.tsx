@@ -274,24 +274,24 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   const events = useMemo(() => {
     const original = petition!.events.items;
     const result: typeof original = [];
-    let last: UnwrapArray<typeof original> | null = null;
+    let lastOpen: UnwrapArray<typeof original> | null = null;
     for (const event of original) {
       switch (event.__typename) {
         case "AccessOpenedEvent": {
           // Omit too consecutive open events
-          if (last && last.__typename === "AccessOpenedEvent") {
+          if (lastOpen) {
             const difference = differenceInMinutes(
               new Date(event.createdAt),
-              new Date(last.createdAt)
+              new Date(lastOpen.createdAt)
             );
             if (difference <= 5) {
               continue;
             }
           }
+          lastOpen = event;
         }
       }
       result.push(event);
-      last = event;
     }
     return result;
   }, [petition!.events.items]);
