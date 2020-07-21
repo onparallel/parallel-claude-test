@@ -35,7 +35,7 @@ export function removeKeys() {
 }
 
 export function isDefined(value: any) {
-  return value !== undefined && value !== undefined;
+  return value !== undefined && value !== null;
 }
 
 export function filterDefined<T>(values: T[]): Exclude<T, undefined | null>[] {
