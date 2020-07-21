@@ -116,7 +116,12 @@ export function RecipientViewPetitionFieldCommentsDialog({
             </Text>
           )}
         </ModalHeader>
-        <ModalCloseButton />
+        <ModalCloseButton
+          aria-label={intl.formatMessage({
+            id: "generic.close",
+            defaultMessage: "Close",
+          })}
+        />
         <Divider />
         <ModalBody padding={0} overflow="auto" minHeight="0" ref={commentsRef}>
           {field.comments.map((comment, i) => (

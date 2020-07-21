@@ -729,7 +729,7 @@
     "term": "generic.cancel",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L335"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L340"
   },
   {
     "term": "generic.cancel-save-changes",
@@ -747,7 +747,7 @@
     "term": "generic.close",
     "definition": "Close",
     "context": "Close",
-    "reference": "components/common/OnboardingTour.tsx#L166-L169"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L120-L123"
   },
   {
     "term": "generic.collapse",
@@ -759,7 +759,7 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L518-L522"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L517-L521"
   },
   {
     "term": "generic.confirm-delete-button",
@@ -771,7 +771,7 @@
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L302-L305"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L307-L310"
   },
   {
     "term": "generic.deleted-contact",
@@ -795,7 +795,7 @@
     "term": "generic.edit",
     "definition": "Edit",
     "context": "Edit",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L299"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L304"
   },
   {
     "term": "generic.edited-comment-indicator",
@@ -981,7 +981,7 @@
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options...",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L312-L315"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L317-L320"
   },
   {
     "term": "generic.no-deadline",
@@ -993,7 +993,7 @@
     "term": "generic.no-description",
     "definition": "No description",
     "context": "No description",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L151-L154"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L163-L166"
   },
   {
     "term": "generic.not-specified",
@@ -1065,7 +1065,7 @@
     "term": "generic.save",
     "definition": "Save",
     "context": "Save",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L338"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L343"
   },
   {
     "term": "generic.save-changes",
@@ -1083,7 +1083,7 @@
     "term": "generic.submit",
     "definition": "Submit",
     "context": "Submit",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L182"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L187"
   },
   {
     "term": "generic.today-at",
@@ -1119,7 +1119,7 @@
     "term": "generic.you",
     "definition": "You",
     "context": "You",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L254"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L259"
   },
   {
     "term": "header.user-menu-button",
@@ -1263,7 +1263,7 @@
     "term": "petition-replies.comment-pending.label",
     "definition": "Pending",
     "context": "Pending",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L283-L286"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L288-L291"
   },
   {
     "term": "petition-replies.download-all",
@@ -1281,37 +1281,37 @@
     "term": "petition-replies.pending-comment-popover",
     "definition": "Send all your pending comments at once to notify in a single email",
     "context": "Send all your pending comments at once to notify in a single email",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L275-L278"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L280-L283"
   },
   {
     "term": "petition-replies.petition-field-reply.approve",
     "definition": "Approve",
     "context": "Approve",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L283-L286"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L295-L298"
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
     "definition": "Download file",
     "context": "Download file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L173-L177"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L185-L189"
   },
   {
     "term": "petition-replies.petition-field-reply.file-preview",
     "definition": "Preview file",
     "context": "Preview file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L185-L189"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L197-L201"
   },
   {
     "term": "petition-replies.petition-field-reply.reject",
     "definition": "Reject",
     "context": "Reject",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L298-L301"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L310-L313"
   },
   {
     "term": "petition-replies.petition-field.no-replies",
     "definition": "There are no replies to this field yet",
     "context": "There are no replies to this field yet",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L232-L235"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L244-L247"
   },
   {
     "term": "petition-replies.submit-comments",
@@ -1323,7 +1323,19 @@
     "term": "petition-replies.validate-field-button",
     "definition": "Reviewed",
     "context": "Reviewed",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L124-L127"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L136-L139"
+  },
+  {
+    "term": "petition-replies.validate-field-button.not-validated",
+    "definition": "Not reviewed",
+    "context": "Not reviewed",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L118-L121"
+  },
+  {
+    "term": "petition-replies.validate-field-button.validated",
+    "definition": "Reviewed",
+    "context": "Reviewed",
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L114-L117"
   },
   {
     "term": "petition.activity-not-available",
@@ -2679,13 +2691,13 @@
     "term": "recipient-view.field-comments.cta",
     "definition": "Have any questions? Ask here",
     "context": "Have any questions? Ask here",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L144-L147"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L149-L152"
   },
   {
     "term": "recipient-view.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L162-L165"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L167-L170"
   },
   {
     "term": "recipient-view.field-reply-submit",
@@ -2727,7 +2739,7 @@
     "term": "recipient-view.questions-button",
     "definition": "Questions?",
     "context": "Questions?",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L553-L556"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L552-L555"
   },
   {
     "term": "recipient-view.rejected-reply",
