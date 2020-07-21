@@ -385,7 +385,7 @@
   },
   {
     "term": "component.recipient-select.enter-email",
-    "definition": "También puedes introducir un correo eletrónico válido.",
+    "definition": "También puedes introducir un correo electrónico válido.",
     "context": "You can also enter a valid email.",
     "reference": "components/common/RecipientSelect.tsx#L178-L181"
   },
@@ -877,7 +877,7 @@
   },
   {
     "term": "generic.forms.invalid-email-error",
-    "definition": "Por favor, introduzca un correo eletrónico válido",
+    "definition": "Por favor, introduzca un correo electrónico válido",
     "context": "Please, enter a valid email",
     "reference": "pages/[locale]/login.tsx#L236-L239"
   },
@@ -2161,7 +2161,7 @@
   },
   {
     "term": "public.forgot-password.toast-description",
-    "definition": "Le hemos enviado un correo eletrónico. Siga las instrucciones para restablecer su contaseña.",
+    "definition": "Le hemos enviado un correo electrónico. Siga las instrucciones para restablecer su contaseña.",
     "context": "An email is on its way to you with a verification code.",
     "reference": "pages/[locale]/forgot.tsx#L52-L56"
   },
@@ -2389,7 +2389,7 @@
   },
   {
     "term": "public.login.explanation",
-    "definition": "Accede usando tu correo eletrónico y contraseña",
+    "definition": "Accede usando tu correo electrónico y contraseña",
     "context": "Login using your email and password",
     "reference": "pages/[locale]/login.tsx#L211-L214"
   },
