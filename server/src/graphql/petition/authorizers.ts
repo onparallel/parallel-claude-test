@@ -169,3 +169,20 @@ export function commentsBelongsToPetition<
     return false;
   };
 }
+
+export function accessesBelongToValidUsers<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string[]>
+>(argNameAccessIds: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const { ids: accessIds } = fromGlobalIds(
+        args[argNameAccessIds],
+        "PetitionAccess"
+      );
+      return ctx.petitions.accessesBelongToValidUsers(accessIds);
+    } catch {}
+    return false;
+  };
+}

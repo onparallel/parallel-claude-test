@@ -27,6 +27,7 @@ import {
   repliesBelongsToField,
   repliesBelongsToPetition,
   userHasAccessToPetitions,
+  accessesBelongToValidUsers,
 } from "../authorizers";
 import { validateOr } from "../../helpers/validateArgs";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
@@ -780,7 +781,8 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
     authenticate(),
     and(
       userHasAccessToPetitions("petitionId"),
-      accessesBelongToPetition("petitionId", "accessIds")
+      accessesBelongToPetition("petitionId", "accessIds"),
+      accessesBelongToValidUsers("accessIds")
     )
   ),
   args: {

@@ -1590,4 +1590,18 @@ export class PetitionRepository extends BaseRepository {
       .update({ is_read: true });
     return comments;
   }
+
+  async accessesBelongToValidUsers(accessIds: number[]) {
+    const contactIds = (
+      await this.from("petition_access")
+        .whereIn("id", accessIds)
+        .select("contact_id")
+    ).map((a) => a.contact_id);
+
+    const contacts = await this.from("contact")
+      .whereIn("id", contactIds)
+      .whereNull("deleted_at");
+
+    return contacts.length > 0;
+  }
 }

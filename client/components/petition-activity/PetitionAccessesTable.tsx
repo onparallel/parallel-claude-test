@@ -277,9 +277,9 @@ function usePetitionAccessesColumns({
           paddingY: 1,
           width: "1px",
         },
-        CellContent: ({ row: { id, status } }) => {
+        CellContent: ({ row: { id, status, contact } }) => {
           const intl = useIntl();
-          return (
+          return contact ? (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               {status === "ACTIVE" ? (
                 <IconButtonWithTooltip
@@ -334,7 +334,7 @@ function usePetitionAccessesColumns({
                 />
               )}
             </Stack>
-          );
+          ) : null;
         },
       },
     ],
