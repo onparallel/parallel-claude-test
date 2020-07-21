@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/core";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
+import { useTimeInput } from "@parallel/utils/useTimeInput";
 import {
   addDays,
   addWeeks,
@@ -50,6 +51,9 @@ export function PetitionRemindersConfig({
   }
   const firstReminder = parse(value?.time ?? "09:00", "HH:mm", day);
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeInput = useTimeInput(value?.time ?? "", {
+    onChange: (time) => value && time && onChange({ ...value, timezone, time }),
+  });
 
   function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
     onSwitched(event.target.checked);
@@ -62,6 +66,7 @@ export function PetitionRemindersConfig({
       });
     }
   }
+
   return (
     <Box {...props}>
       <Flex alignItems="center">
@@ -128,15 +133,7 @@ export function PetitionRemindersConfig({
                     width="120px"
                     marginX={2}
                     step={5 * 60}
-                    value={value.time}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                      event.target.value &&
-                      onChange({
-                        ...value,
-                        timezone,
-                        time: event.target.value,
-                      })
-                    }
+                    {...timeInput}
                   />
                 ),
               }}

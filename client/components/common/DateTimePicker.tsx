@@ -4,6 +4,7 @@ import { format, isEqual, isToday, isTomorrow, parse } from "date-fns";
 import { ChangeEvent } from "react";
 import { FormattedDate, FormattedMessage, FormattedTime } from "react-intl";
 import { DatePicker } from "./DatePicker";
+import { useTimeInput } from "@parallel/utils/useTimeInput";
 
 export function DateTimePicker({
   value,
@@ -18,6 +19,9 @@ export function DateTimePicker({
   isPastAllowed?: boolean;
   isDisabledDate?: (date: Date) => boolean;
 }) {
+  const timeInput = useTimeInput(format(value, "HH:mm"), {
+    onChange: (time) => time && onChange(parse(time, "HH:mm", value)),
+  });
   return (
     <Flex>
       <Box display={{ base: "none", sm: "block" }}>
@@ -57,12 +61,7 @@ export function DateTimePicker({
             marginTop={{ base: 0, sm: 2 }}
             marginLeft={{ base: 4, sm: 0 }}
             type="time"
-            value={format(value, "HH:mm")}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              if (event.target.value) {
-                onChange(parse(event.target.value, "HH:mm", value));
-              }
-            }}
+            {...timeInput}
           />
         </Flex>
         {suggestions.map((date) => (
