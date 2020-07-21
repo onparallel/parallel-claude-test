@@ -510,7 +510,6 @@ function CommentsButton({
 }) {
   const intl = useIntl();
   const common = {
-    role: "switch",
     size: "sm",
     variant: "ghost",
     fontWeight: "normal",

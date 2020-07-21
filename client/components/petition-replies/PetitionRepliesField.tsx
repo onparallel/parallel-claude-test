@@ -328,8 +328,7 @@ function CommentsButton({
 }) {
   const intl = useIntl();
   const common = {
-    role: "switch",
-    "aria-checked": isActive,
+    "aria-pressed": isActive,
     size: "sm",
     variant: isActive ? "solid" : "ghost",
     variantColor: isActive ? "purple" : "gray",
