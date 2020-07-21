@@ -108,6 +108,18 @@ export function PetitionRepliesField({
             size="sm"
             variant="ghost"
             onClick={onValidateToggle}
+            aria-pressed={field.validated}
+            aria-label={
+              field.validated
+                ? intl.formatMessage({
+                    id: "petition-replies.validate-field-button.validated",
+                    defaultMessage: "Reviewed",
+                  })
+                : intl.formatMessage({
+                    id: "petition-replies.validate-field-button.not-validated",
+                    defaultMessage: "Not reviewed",
+                  })
+            }
             marginRight={1}
           >
             <Switch
@@ -119,7 +131,7 @@ export function PetitionRepliesField({
               marginRight={2}
               position="relative"
               top="1px"
-              role="presentation"
+              aria-hidden={field.validated}
             />
             <FormattedMessage
               id="petition-replies.validate-field-button"
