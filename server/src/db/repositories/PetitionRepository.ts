@@ -487,7 +487,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   /**
-   * Delete petition, deactivate all accesses and cancel all scheduled sendouts
+   * Delete petition, deactivate all accesses and cancel all scheduled messages
    */
   async deletePetitionById(petitionId: MaybeArray<number>, user: User) {
     const petitionIds = Array.isArray(petitionId) ? petitionId : [petitionId];
