@@ -45,7 +45,7 @@ export function filterDefined<T>(values: T[]): Exclude<T, undefined | null>[] {
 export function removeNotDefined<T extends {}>(
   object: T
 ): { [P in keyof T]?: Exclude<T[P], null> } {
-  return removeKeys(object, ([_, value]) => !isDefined(value));
+  return removeKeys(object, ([_, value]) => isDefined(value));
 }
 
 function _count<T>(array: T[], predicate: ArrayPredicate<T>) {
