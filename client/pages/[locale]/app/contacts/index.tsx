@@ -25,7 +25,11 @@ import {
   useContactsUserQuery,
   useContacts_deleteContactsMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery, clearCache } from "@parallel/utils/apollo";
+import {
+  assertQuery,
+  clearCache,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
@@ -66,17 +70,22 @@ function Contacts() {
   const {
     data: { me },
   } = assertQuery(useContactsUserQuery());
-  const { data, loading, refetch } = useContactsQuery({
-    variables: {
-      offset: PAGE_SIZE * (state.page - 1),
-      limit: PAGE_SIZE,
-      search: state.search,
-      sortBy: [
-        `${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy,
-      ],
-    },
-  });
-
+  const {
+    data: { contacts },
+    loading,
+    refetch,
+  } = useAssertQueryOrPreviousData(
+    useContactsQuery({
+      variables: {
+        offset: PAGE_SIZE * (state.page - 1),
+        limit: PAGE_SIZE,
+        search: state.search,
+        sortBy: [
+          `${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy,
+        ],
+      },
+    })
+  );
   const createContact = useCreateContact();
 
   const [deleteContact] = useContacts_deleteContactsMutation({
@@ -85,8 +94,6 @@ function Contacts() {
       refetch();
     },
   });
-
-  const { contacts } = data!;
 
   const [selected, setSelected] = useState<string[]>();
   const confirmDelete = useDialog(ConfirmDeleteContacts);
@@ -289,7 +296,7 @@ function ConfirmDeleteContacts({
           values={{
             count,
             email,
-            b: (...chunks: any[]) => <b>{chunks}</b>,
+            b: (chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }

@@ -34,7 +34,11 @@ import {
   usePetitions_clonePetitionMutation,
   usePetitions_deletePetitionsMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery, clearCache } from "@parallel/utils/apollo";
+import {
+  assertQuery,
+  clearCache,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
@@ -76,7 +80,7 @@ function Petitions() {
     data: { petitions },
     loading,
     refetch,
-  } = assertQuery(
+  } = useAssertQueryOrPreviousData(
     usePetitionsQuery({
       variables: {
         offset: PAGE_SIZE * (state.page - 1),
