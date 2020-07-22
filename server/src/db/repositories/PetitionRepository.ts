@@ -1592,17 +1592,19 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async accessesBelongToValidContacts(accessIds: number[]) {
-    const contactIds = (
-      await this.from("petition_access")
-        .whereIn("id", accessIds)
-        .select("contact_id")
-    ).map((a) => a.contact_id);
-
-    const contacts = await this.from("contact")
-      .whereIn("id", contactIds)
-      .whereNull("deleted_at")
-      .select("id");
-
-    return contacts.length === accessIds.length;
+    const {
+      rows: [{ count }],
+    } = await this.knex.raw(
+      /* sql */ `
+      select count(distinct c.id)::int as count
+        from petition_access as pa
+          join contact as c on c.id = pa.contact_id
+        where
+          pa.id in (${accessIds.map((_) => "?").join(", ")})
+          and c.deleted_at is null
+    `,
+      [...accessIds]
+    );
+    return count === new Set(accessIds).size;
   }
 }
