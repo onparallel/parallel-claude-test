@@ -101,7 +101,7 @@ function Feature({
   return (
     <Box flex="1" textAlign="left" maxWidth="360px" minWidth="300px" margin={4}>
       <Flex justifyContent="center" alignItems="bottom" height="180px">
-        <Image src={imageSrc} maxWidth="80%" />
+        <Image src={imageSrc} maxWidth="80%" role="presentation" />
       </Flex>
       <Heading as="h4" fontSize="md" marginY={4}>
         {header}
