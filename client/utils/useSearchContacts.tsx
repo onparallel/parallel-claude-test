@@ -5,6 +5,7 @@ import {
   PetitionComposeSearchContactsQueryVariables,
 } from "@parallel/graphql/__types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+
 export function useSearchContacts() {
   const apollo = useApolloClient();
   return useDebouncedAsync(
@@ -28,7 +29,7 @@ export function useSearchContacts() {
         `,
         variables: { search, exclude },
       });
-      return data.contacts.items;
+      return data!.contacts.items;
     },
     300,
     []
