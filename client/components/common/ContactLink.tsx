@@ -1,5 +1,5 @@
+import { gql } from "@apollo/client";
 import { ContactLink_ContactFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
 import { DisableableTooltip } from "./DisableableTooltip";
 import { Link, LinkProps } from "./Link";
 

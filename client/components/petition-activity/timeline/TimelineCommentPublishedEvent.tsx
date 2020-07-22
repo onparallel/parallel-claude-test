@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, Link, Text, useTheme } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { ContactLink } from "@parallel/components/common/ContactLink";
@@ -6,7 +7,6 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { Divider } from "@parallel/components/common/Divider";
 import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
 import { TimelineIcon, TimelineItem } from "./helpers";

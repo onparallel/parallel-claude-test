@@ -1,11 +1,11 @@
-import { ApolloProvider } from "@apollo/react-hooks";
-import { createApolloClient } from "@parallel/utils/apollo";
 import {
   ApolloClient,
-  OperationVariables,
-  DocumentNode,
+  ApolloProvider,
   ApolloQueryResult,
-} from "apollo-boost";
+  DocumentNode,
+  OperationVariables,
+} from "@apollo/client";
+import { createApolloClient } from "@parallel/utils/apollo";
 import { parse as parseCookie } from "cookie";
 import { NextComponentType } from "next";
 import { NextPageContext } from "next/dist/next-server/lib/utils";

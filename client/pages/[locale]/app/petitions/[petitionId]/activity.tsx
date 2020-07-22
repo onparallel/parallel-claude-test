@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, List, ListItem, Text, useToast } from "@chakra-ui/core";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Title } from "@parallel/components/common/Title";
@@ -7,9 +8,9 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
+import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/ConfigureRemindersDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
 import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmDeactivateAccessDialog";
-import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/ConfigureRemindersDialog";
 import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmReactivateAccessDialog";
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
@@ -27,9 +28,9 @@ import {
   usePetitionActivity_reactivateAccessesMutation,
   usePetitionActivity_sendMessagesMutation,
   usePetitionActivity_sendRemindersMutation,
+  usePetitionActivity_switchAutomaticRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
   usePetitionsActivity_sendPetitionMutation,
-  usePetitionActivity_switchAutomaticRemindersMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -38,7 +39,6 @@ import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { gql } from "apollo-boost";
 import { differenceInMinutes } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

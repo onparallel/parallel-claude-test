@@ -1,4 +1,5 @@
 /** @jsx jsx */
+import { gql } from "@apollo/client";
 import { BoxProps, Flex } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import {
@@ -8,7 +9,6 @@ import {
   useAppLayout_updateOnboardingStatusMutation,
 } from "@parallel/graphql/__types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
-import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback, useContext } from "react";
 import {

@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
@@ -46,7 +47,6 @@ import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

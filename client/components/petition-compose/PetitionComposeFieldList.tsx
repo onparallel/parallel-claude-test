@@ -1,5 +1,6 @@
+import { gql } from "@apollo/client";
 import { Box, Flex, Heading, Text } from "@chakra-ui/core";
-import { Card, CardProps, CardHeader } from "@parallel/components/common/Card";
+import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
@@ -9,7 +10,6 @@ import {
 } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { gql } from "apollo-boost";
 import {
   KeyboardEvent,
   memo,

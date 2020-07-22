@@ -16,12 +16,13 @@ generates:
       scalars:
         DateTime: string
         JSONObject: "{ [key: string]: any }"
-      apolloReactHooksImportFrom: "@apollo/react-hooks"
+      apolloReactHooksImportFrom: "@apollo/client"
       apolloReactCommonImportFrom: "@apollo/react-common"
       withComponent: false
       withHOC: false
       withHooks: true
       withMutationFn: true
+      gqlImport: "@apollo/client#gql"
       reactApolloVersion: 3
 
 hooks:

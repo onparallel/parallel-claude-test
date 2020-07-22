@@ -1,11 +1,10 @@
-import { useMutation } from "@apollo/react-hooks";
+import { gql, useMutation } from "@apollo/client";
 import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import {
   PetitionLocale,
   useCreatePetition_createPetitionMutation,
   useCreatePetition_createPetitionMutationVariables,
 } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { clearCache } from "./apollo";

@@ -1,11 +1,10 @@
-import { useApolloClient } from "@apollo/react-hooks";
+import { gql, useApolloClient } from "@apollo/client";
 import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
 import {
   PetitionComposeSearchContactsQuery,
   PetitionComposeSearchContactsQueryVariables,
 } from "@parallel/graphql/__types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { gql } from "apollo-boost";
 export function useSearchContacts() {
   const apollo = useApolloClient();
   return useDebouncedAsync(

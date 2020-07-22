@@ -1,4 +1,5 @@
 /** @jsx jsx */
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -15,7 +16,6 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
-import { gql } from "apollo-boost";
 import {
   ChangeEvent,
   FocusEvent,

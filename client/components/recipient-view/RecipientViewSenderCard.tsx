@@ -1,8 +1,8 @@
+import { gql } from "@apollo/client";
 import { Box, Flex, Grid, Icon, Image, Text } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewSenderCard_PublicUserFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
 import { useIntl } from "react-intl";
 
 export function RecipientViewSenderCard({

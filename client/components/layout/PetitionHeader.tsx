@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -18,7 +19,6 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
 import { forwardRef, ReactNode, Ref, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";

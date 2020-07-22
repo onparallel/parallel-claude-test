@@ -1,7 +1,7 @@
-import { Box, Icon, BoxProps } from "@chakra-ui/core";
+import { gql } from "@apollo/client";
+import { Box, BoxProps, Icon } from "@chakra-ui/core";
 import { MessageEventsIndicator_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
 import { useIntl } from "react-intl";
 
 export type MessageEventsIndicatorProps = BoxProps & {

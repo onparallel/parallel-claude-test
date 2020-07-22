@@ -1,12 +1,12 @@
+import { gql } from "@apollo/client";
+import { Link, Text } from "@chakra-ui/core";
+import { ContactLink } from "@parallel/components/common/ContactLink";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
-import { Text, Link } from "@chakra-ui/core";
+import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon, TimelineItem } from "./helpers";
-import { ContactLink } from "@parallel/components/common/ContactLink";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { FORMATS } from "@parallel/utils/dates";
 
 export type TimelineReminderSentEventProps = {
   userId: string;

@@ -1,4 +1,4 @@
-import { useApolloClient } from "@apollo/react-hooks";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Avatar,
   Box,
@@ -26,7 +26,6 @@ import {
 } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

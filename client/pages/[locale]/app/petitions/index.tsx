@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, Button, Flex, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactLink } from "@parallel/components/common/ContactLink";
@@ -46,7 +47,6 @@ import {
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useCreatePetition } from "@parallel/utils/useCreatePetition";
-import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Alert, AlertIcon, Box, Flex, Heading, Stack } from "@chakra-ui/core";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import {
@@ -6,15 +7,14 @@ import {
   RecipientSelectProps,
 } from "@parallel/components/common/RecipientSelect";
 import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   PetitionComposeMessageEditor_PetitionFragment,
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { gql } from "apollo-boost";
 import { memo, useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { omit } from "remeda";

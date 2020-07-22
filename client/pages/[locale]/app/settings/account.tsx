@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/react-hooks";
+import { gql, useMutation } from "@apollo/client";
 import {
   Box,
   Button,
@@ -22,7 +22,6 @@ import {
   useAccountQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
-import { gql } from "apollo-boost";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 

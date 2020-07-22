@@ -1,4 +1,4 @@
-import { useApolloClient } from "@apollo/react-hooks";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -54,7 +54,6 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { gql } from "apollo-boost";
 import axios, { CancelTokenSource } from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

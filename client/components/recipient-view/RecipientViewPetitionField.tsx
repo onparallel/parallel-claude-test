@@ -1,4 +1,5 @@
 /** @jsx jsx */
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -27,7 +28,6 @@ import {
 import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
-import { gql } from "apollo-boost";
 import { ReactNode, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";

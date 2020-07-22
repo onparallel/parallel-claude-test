@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Badge,
   Box,
@@ -19,7 +20,6 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import { gql } from "apollo-boost";
 import { usePreviousValue } from "beautiful-react-hooks";
 import {
   ChangeEvent,

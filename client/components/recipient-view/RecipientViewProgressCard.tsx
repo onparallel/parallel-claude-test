@@ -1,4 +1,5 @@
 /** @jsx jsx */
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -14,7 +15,6 @@ import {
   RecipientViewProgressCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
-import { gql } from "apollo-boost";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardProps } from "../common/Card";

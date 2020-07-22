@@ -1,7 +1,7 @@
+import { gql } from "@apollo/client";
 import { Box, BoxProps } from "@chakra-ui/core";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { gql } from "apollo-boost";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";

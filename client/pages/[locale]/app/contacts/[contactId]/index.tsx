@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -32,7 +33,6 @@ import {
 import { assertQuery } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { gql } from "apollo-boost";
 import { useRouter } from "next/router";
 import {
   forwardRef,

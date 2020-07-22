@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -19,16 +20,15 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
-import { noop } from "remeda";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";

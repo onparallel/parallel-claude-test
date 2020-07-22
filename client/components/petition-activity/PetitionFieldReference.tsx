@@ -1,8 +1,8 @@
-import { PetitionFieldReference_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/core";
-import { FormattedMessage } from "react-intl";
-import { gql } from "apollo-boost";
+import { PetitionFieldReference_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
+import { FormattedMessage } from "react-intl";
 
 export function PetitionFieldReference({
   field,

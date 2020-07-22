@@ -1,8 +1,8 @@
+import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCreatedEvent_PetitionCreatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon, TimelineItem } from "./helpers";
 

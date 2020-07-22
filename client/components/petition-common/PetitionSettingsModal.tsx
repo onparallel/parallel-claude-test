@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Flex,
@@ -21,12 +22,11 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { KeyboardEvent, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export type PetitionSettingsModalProps = Omit<IModal, "children"> & {
   petition: PetitionSettingsModal_PetitionFragment;

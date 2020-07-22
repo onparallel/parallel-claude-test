@@ -1,4 +1,4 @@
-import { useApolloClient } from "@apollo/react-hooks";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Avatar,
   Button,
@@ -7,17 +7,16 @@ import {
   MenuButton,
   MenuDivider,
   MenuItem,
+  MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  MenuItemOption,
 } from "@chakra-ui/core";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";
-import { gql } from "apollo-boost";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export interface UserMenuProps {
   isMobile?: boolean;

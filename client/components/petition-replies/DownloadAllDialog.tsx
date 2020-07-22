@@ -5,7 +5,7 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { DownloadAllDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
+import { gql } from "@apollo/client";
 import escapeStringRegexp from "escape-string-regexp";
 import { useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

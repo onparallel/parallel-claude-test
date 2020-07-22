@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   BoxProps,
   Flex,
@@ -15,7 +16,6 @@ import {
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { gql } from "apollo-boost";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";

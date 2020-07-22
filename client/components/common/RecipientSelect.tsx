@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   FormControl,
@@ -10,15 +11,14 @@ import {
 import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useId } from "@reach/auto-id";
-import { gql } from "apollo-boost";
 import {
   forwardRef,
   memo,
   ReactNode,
+  Ref,
   useCallback,
   useMemo,
   useState,
-  Ref,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, OptionProps } from "react-select";

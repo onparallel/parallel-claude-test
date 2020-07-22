@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -9,7 +10,6 @@ import { OnboardingKey, OnboardingStatus } from "@parallel/graphql/__types";
 import { NoSSR } from "@parallel/utils/NoSSR";
 import { theme } from "@parallel/utils/theme";
 import { useId } from "@reach/auto-id";
-import { gql } from "apollo-boost";
 import {
   ComponentType,
   createContext,

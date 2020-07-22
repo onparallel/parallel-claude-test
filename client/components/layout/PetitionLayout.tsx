@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Box, BoxProps } from "@chakra-ui/core";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
@@ -5,7 +6,6 @@ import {
   PetitionHeaderProps,
 } from "@parallel/components/layout/PetitionHeader";
 import { PetitionLayout_UserFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
 import { ReactNode } from "react";
 
 export type PetitionLayoutProps = BoxProps &

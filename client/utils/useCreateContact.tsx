@@ -1,9 +1,8 @@
-import { useMutation } from "@apollo/react-hooks";
+import { gql, useMutation } from "@apollo/client";
 import {
   useCreateContact_createContactMutation,
   useCreateContact_createContactMutationVariables,
 } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
 import { useCallback } from "react";
 import { useAskContactDetailsDialog } from "../components/common/AskContactDetailsDialog";
 

@@ -1,32 +1,32 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
   Flex,
+  IconButton,
   List,
   ListItem,
-  PseudoBox,
-  useColorMode,
-  IconButton,
-  MenuList,
   MenuItem,
-  Tooltip,
-  useTheme,
+  MenuList,
+  PseudoBox,
   Stack,
+  Tooltip,
+  useColorMode,
+  useTheme,
 } from "@chakra-ui/core";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
-import { gql } from "apollo-boost";
+import { resolveUrl } from "@parallel/utils/next";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
-import { useMemo, memo } from "react";
+import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { ButtonDropdown } from "../common/ButtonDropdown";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
-import { ButtonDropdown } from "../common/ButtonDropdown";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { resolveUrl } from "@parallel/utils/next";
 
 export type AppLayoutNavbarProps = BoxProps & {
   isMobile?: boolean;

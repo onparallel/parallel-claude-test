@@ -1,4 +1,4 @@
-import { useApolloClient } from "@apollo/react-hooks";
+import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text } from "@chakra-ui/core";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -51,7 +51,6 @@ import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { gql } from "apollo-boost";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";

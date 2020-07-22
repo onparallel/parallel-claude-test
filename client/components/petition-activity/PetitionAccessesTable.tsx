@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   Flex,
@@ -14,9 +15,8 @@ import {
   PetitionStatus,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { gql } from "apollo-boost";
 import { useCallback, useMemo, useState } from "react";
-import { FormattedMessage, useIntl, FormattedNumber } from "react-intl";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { Card, CardProps } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
