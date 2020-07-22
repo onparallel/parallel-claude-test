@@ -125,7 +125,7 @@ export type RichTextEditorProps = {
   isReadOnly?: boolean;
   value: RichTextEditorContent;
   onChange: (value: RichTextEditorContent) => void;
-} & EditablePluginsProps;
+} & Omit<EditablePluginsProps, "value" | "onChange">;
 
 export type RichTextEditorContent = Node[];
 
