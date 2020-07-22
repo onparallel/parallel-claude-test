@@ -1,14 +1,12 @@
 import {
-  toggleList,
   getRangeFromBlockStart,
   getText,
+  toggleList,
+  WithListOptions,
 } from "@udecode/slate-plugins";
 import { Editor, Range, Transforms } from "slate";
-import { nodeTypes } from "../../components/common/RichTextEditor";
 
-export function withAutolist(
-  options: Pick<typeof nodeTypes, "typeUl" | "typeOl" | "typeLi" | "typeP">
-) {
+export function withAutolist(options: WithListOptions) {
   return <T extends Editor>(editor: T) => {
     // https://github.com/udecode/slate-plugins/blob/78b7dc4e230ef09b84f963cc51937d19ce0cf9a9/packages/slate-plugins/src/handlers/autoformat/withAutoformat.ts
     const { insertText } = editor;
@@ -28,7 +26,7 @@ export function withAutolist(
           Transforms.select(editor, beforeAnchor!);
           Transforms.delete(editor);
 
-          toggleList(editor, { ...options, typeList: options.typeUl });
+          toggleList(editor, { ...options, typeList: options.ul!.type! });
           return;
         }
       }

@@ -4,6 +4,7 @@ import {
   PseudoBoxProps,
   Stack,
   useFormControl,
+  Text,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import {
@@ -35,8 +36,69 @@ import {
 } from "./IconButtonWithTooltip";
 import { useInputLikeStyles } from "../../utils/useInputLikeStyles";
 import { withAutolist } from "../../utils/slate/withAutolist";
+import { createElement } from "react";
 
-// https://github.com/udecode/slate-plugins/blob/5f774c4f5baf1e5fb8f66f28c4bf911fc4196f84/stories/config/initialValues.ts
+function TextComponent({ element, attributes, styles, ...props }: any) {
+  return createElement(Text, { ...props, ...attributes });
+}
+
+export const options = {
+  p: {
+    component: TextComponent,
+    type: "paragraph",
+    rootProps: {
+      as: "p",
+    },
+  },
+  bold: {
+    component: TextComponent,
+    type: MARK_BOLD,
+    hotkey: "mod+b",
+    rootProps: {
+      as: "strong",
+    },
+  },
+  italic: {
+    component: TextComponent,
+    type: MARK_ITALIC,
+    hotkey: "mod+i",
+    rootProps: {
+      as: "em",
+    },
+  },
+  underline: {
+    component: TextComponent,
+    type: MARK_UNDERLINE,
+    hotkey: "mod+u",
+    rootProps: {
+      as: "u",
+    },
+  },
+  ul: {
+    component: TextComponent,
+    type: "bulleted-list",
+    rootProps: {
+      as: "ul",
+      paddingLeft: 6,
+    },
+  },
+  ol: {
+    component: TextComponent,
+    type: "numbered-list",
+    rootProps: {
+      as: "ol",
+      paddingLeft: 6,
+    },
+  },
+  li: {
+    component: TextComponent,
+    type: "list-item",
+    rootProps: {
+      as: "li",
+    },
+  },
+};
+
 export const nodeTypes = {
   // elements
   typeP: "paragraph",
@@ -50,10 +112,10 @@ export const nodeTypes = {
 };
 
 const plugins = [
-  BoldPlugin(nodeTypes),
-  ItalicPlugin(nodeTypes),
-  UnderlinePlugin(nodeTypes),
-  ListPlugin(nodeTypes),
+  BoldPlugin(options),
+  ItalicPlugin(options),
+  UnderlinePlugin(options),
+  ListPlugin(options),
 ];
 
 export type RichTextEditorProps = {
@@ -89,8 +151,8 @@ export function RichTextEditor({
         createEditor(),
         withHistory,
         withReact,
-        withList(nodeTypes),
-        withAutolist(nodeTypes)
+        withList(options),
+        withAutolist(options)
       ),
     []
   );

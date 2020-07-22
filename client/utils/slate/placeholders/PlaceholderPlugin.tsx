@@ -1,6 +1,6 @@
 import { Box, BoxProps, PseudoBox } from "@chakra-ui/core";
 import {
-  getElementDeserializer,
+  getNodeDeserializer,
   getRenderElement,
   SlatePlugin,
 } from "@udecode/slate-plugins";
@@ -30,13 +30,16 @@ export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
           </PlaceholderToken>
         );
       },
+      rootProps: {},
     }),
     deserialize: {
-      element: getElementDeserializer("placeholder", {
-        createElement: (el) => ({
+      element: getNodeDeserializer({
+        type: "placeholder",
+        node: (el) => ({
           type: "placeholder",
           value: el.getAttribute("data-placeholder"),
         }),
+        rules: [{ className: "slate-placeholder" }],
       }),
     },
   };
@@ -57,6 +60,7 @@ const PlaceholderToken = function ({
   const focused = useFocused();
   return (
     <Box
+      className="slate-placeholder"
       contentEditable={false}
       data-placeholder={value}
       {...attributes}
