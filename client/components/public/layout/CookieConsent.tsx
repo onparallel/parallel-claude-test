@@ -42,7 +42,7 @@ export function CookieConsent({}: CookieConsentProps) {
           id="component.cookie-consent.text"
           defaultMessage="Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>."
           values={{
-            a: (...chunks: any[]) => (
+            a: (chunks: any[]) => (
               <Link
                 href="/legal/[doc]"
                 as="/legal/cookies"

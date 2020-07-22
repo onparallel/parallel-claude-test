@@ -24,7 +24,7 @@ export function ConfirmDeactivateAccessDialog({
           defaultMessage="Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
           values={{
             nameOrEmail,
-            b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+            b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           }}
         />
       }

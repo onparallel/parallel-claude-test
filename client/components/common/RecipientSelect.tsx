@@ -170,7 +170,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
                         defaultMessage="We could not find any exisiting contacts for <em>{search}</em>"
                         values={{
                           search,
-                          em: (...chunks: any[]) => <em>{chunks}</em>,
+                          em: (chunks: any[]) => <em>{chunks}</em>,
                         }}
                       />
                     </Text>
@@ -259,7 +259,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
               defaultMessage="Create new contact for: <b>{email}</b>"
               values={{
                 email: label,
-                b: (...chunks: any[]) => (
+                b: (chunks: any[]) => (
                   <Text as="strong" style={{ marginLeft: "4px" }}>
                     {chunks}
                   </Text>

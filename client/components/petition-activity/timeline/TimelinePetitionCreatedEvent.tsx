@@ -27,7 +27,7 @@ export function TimelinePetitionCreatedEvent({
         defaultMessage="{same, select, true {You} other {<b>{user}</b>}} created this petition {timeAgo}"
         values={{
           same: userId === user.id,
-          b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+          b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: user.fullName,
           timeAgo: (
             <Link>

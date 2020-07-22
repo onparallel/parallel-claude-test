@@ -70,7 +70,7 @@ function Invite() {
                   id="public.invite.tell-us-about-yourself"
                   defaultMessage="Tell us a bit about yourself, and we will send you a <a>free access</a>."
                   values={{
-                    a: (...chunks: any[]) => (
+                    a: (chunks: any[]) => (
                       <Text
                         as="em"
                         fontStyle="normal"
@@ -101,7 +101,7 @@ function Invite() {
                   id="public.invite.review-privacy"
                   defaultMessage="For more information, please review our <a>Privacy Policy</a>."
                   values={{
-                    a: (...chunks: any[]) => (
+                    a: (chunks: any[]) => (
                       <Link href="/legal/[doc]" as="/legal/privacy">
                         {chunks}
                       </Link>

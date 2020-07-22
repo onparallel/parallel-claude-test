@@ -328,7 +328,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
                     />
                   ),
                   more: rest.length,
-                  a: (...chunks: any[]) => (
+                  a: (chunks: any[]) => (
                     <Link
                       href="/app/petitions/[petitionId]/activity"
                       as={`/app/petitions/${row.id}/activity`}
@@ -432,7 +432,7 @@ function ConfirmDeletePetitionsDialog({
           values={{
             count,
             name,
-            b: (...chunks: any[]) => <b>{chunks}</b>,
+            b: (chunks: any[]) => <b>{chunks}</b>,
           }}
         />
       }

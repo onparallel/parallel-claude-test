@@ -71,7 +71,7 @@ function People() {
                       id="public.case.laura.time-spent"
                       defaultMessage="Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work."
                       values={{
-                        a: (...chunks: any[]) => (
+                        a: (chunks: any[]) => (
                           <Text as="em" fontStyle="normal" color="purple.500">
                             {chunks}
                           </Text>

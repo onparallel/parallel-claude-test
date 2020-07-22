@@ -35,7 +35,7 @@ export function TimelineMessageSentEvent({
             defaultMessage="A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
             values={{
               same: userId === message.sender!.id,
-              b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               user: message.sender!.fullName,
               subject: message.emailSubject,
               contact: message.access.contact ? (
@@ -60,7 +60,7 @@ export function TimelineMessageSentEvent({
             defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
             values={{
               same: userId === message.sender!.id,
-              b: (...chunks: any[]) => <Text as="strong">{chunks}</Text>,
+              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               user: message.sender!.fullName,
               subject: message.emailSubject,
               contact: message.access.contact ? (
