@@ -5,6 +5,7 @@ import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { CreateContact, User, Contact, PetitionAccess } from "../__types";
+import { unMaybeArray } from "../../util/arrays";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
@@ -116,16 +117,13 @@ export class ContactRepository extends BaseRepository {
           deleted_at: this.now(),
           deleted_by: `User:${user.id}`,
         })
-        .whereIn("id", Array.isArray(contactId) ? contactId : [contactId]);
+        .whereIn("id", unMaybeArray(contactId));
 
       await this.from("petition_access", t)
         .update({
           status: "INACTIVE",
         })
-        .whereIn(
-          "contact_id",
-          Array.isArray(contactId) ? contactId : [contactId]
-        );
+        .whereIn("contact_id", unMaybeArray(contactId));
     });
   }
 
