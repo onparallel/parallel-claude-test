@@ -1,4 +1,12 @@
-import { Box, BoxProps, Grid, Heading, Image, Text } from "@chakra-ui/core";
+import {
+  Box,
+  BoxProps,
+  Grid,
+  Heading,
+  Image,
+  Text,
+  Flex,
+} from "@chakra-ui/core";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
@@ -10,7 +18,6 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
       paddingY={20}
       wrapper={{
         textAlign: "center",
-        // backgroundColor: "gray.50",
       }}
     >
       <Heading as="h2" fontSize="3xl" fontWeight="bold">
@@ -19,24 +26,21 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           defaultMessage="Free your time and your mind"
         />
       </Heading>
-      <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
+      <Heading
+        as="h3"
+        fontSize="xl"
+        fontWeight="light"
+        marginTop={4}
+        marginBottom={8}
+      >
         <FormattedMessage
           id="public.home.hero-control"
           defaultMessage="Sending a Parallel gives you control over the progress of the documents and the information you need."
         />
       </Heading>
-      <Grid
-        marginTop={16}
-        justifyContent="space-evenly"
-        gridGap="24px"
-        templateColumns={{
-          base: "minmax(auto, 360px)",
-          md: "repeat(2, minmax(auto, 360px))",
-          lg: "repeat(3, minmax(auto, 360px))",
-        }}
-      >
+      <Flex justifyContent="center" flexWrap="wrap">
         <Feature
-          imagesrc="/static/images/folder_black.svg"
+          imageSrc="/static/images/undraw_folder.svg"
           header={
             <FormattedMessage
               id="public.claim.documents-organized"
@@ -46,12 +50,12 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           description={
             <FormattedMessage
               id="public.claim.forget-emails"
-              defaultMessage="Forget about unorganized emails, petitions in Parallel helps you find, review and work with the relevant documents quickly."
+              defaultMessage="Forget about unorganized emails. Parallel helps you find, review and work with the relevant documents quickly."
             />
           }
         />
         <Feature
-          imagesrc="/static/images/progress.svg"
+          imageSrc="/static/images/undraw_progress.svg"
           header={
             <FormattedMessage
               id="public.claim.speed"
@@ -66,7 +70,7 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           }
         />
         <Feature
-          imagesrc="/static/images/checklist.svg"
+          imageSrc="/static/images/undraw_checklist.svg"
           header={
             <FormattedMessage
               id="public.claim.focus"
@@ -80,24 +84,25 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
             />
           }
         />
-      </Grid>
+      </Flex>
     </PublicContainer>
   );
 }
 
 function Feature({
-  imagesrc,
+  imageSrc,
   header,
   description,
-  ...props
-}: BoxProps & {
-  imagesrc: string;
+}: {
+  imageSrc: string;
   header: ReactNode;
   description: ReactNode;
 }) {
   return (
-    <Box textAlign="left" {...props}>
-      <Image src={imagesrc} />
+    <Box flex="1" textAlign="left" maxWidth="360px" minWidth="300px" margin={4}>
+      <Flex justifyContent="center" alignItems="bottom" height="180px">
+        <Image src={imageSrc} maxWidth="80%" />
+      </Flex>
       <Heading as="h4" fontSize="md" marginY={4}>
         {header}
       </Heading>

@@ -2115,37 +2115,37 @@
     "term": "public.claim.documents-organized",
     "definition": "Documentos, organizados",
     "context": "Documents, organized",
-    "reference": "components/public/PublicHeroClaim.tsx#L41-L44"
+    "reference": "components/public/PublicHeroClaim.tsx#L45-L48"
   },
   {
     "term": "public.claim.focus",
     "definition": "Deja que el control te dé paz mental",
     "context": "Let control give you peace of mind",
-    "reference": "components/public/PublicHeroClaim.tsx#L71-L74"
+    "reference": "components/public/PublicHeroClaim.tsx#L75-L78"
   },
   {
     "term": "public.claim.follow-up",
     "definition": "Parallel facilita el seguimiento sobre el estado y las conversaciones alrededor de las transacciones para ti y tus destinatarios.",
     "context": "Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients.",
-    "reference": "components/public/PublicHeroClaim.tsx#L62-L65"
+    "reference": "components/public/PublicHeroClaim.tsx#L66-L69"
   },
   {
     "term": "public.claim.forget-emails",
-    "definition": "Olvídate de los correos desordenados, Parallel te ayuda a encontrar, revisar y trabajar con la información relevante rápidamente.",
-    "context": "Forget about unorganized emails, petitions in Parallel helps you find, review and work with the relevant documents quickly.",
-    "reference": "components/public/PublicHeroClaim.tsx#L47-L50"
+    "definition": "Olvídate de los correos desordenados. Parallel te ayuda a encontrar, revisar y trabajar con la información relevante rápidamente.",
+    "context": "Forget about unorganized emails. Parallel helps you find, review and work with the relevant documents quickly.",
+    "reference": "components/public/PublicHeroClaim.tsx#L51-L54"
   },
   {
     "term": "public.claim.multiple-recipients",
     "definition": "Con control puedes decidir y empezar a trabajar cuando sabes que puedes o lo necesitas, deja que el foco te mantenga productivo.",
     "context": "With control, you can decide and start working when you know you can or need to. Let focus help you stay productive.",
-    "reference": "components/public/PublicHeroClaim.tsx#L77-L80"
+    "reference": "components/public/PublicHeroClaim.tsx#L81-L84"
   },
   {
     "term": "public.claim.speed",
     "definition": "Conoce el estado, acelera las transacciones",
     "context": "Know the status, speed up transactions",
-    "reference": "components/public/PublicHeroClaim.tsx#L56-L59"
+    "reference": "components/public/PublicHeroClaim.tsx#L60-L63"
   },
   {
     "term": "public.contact-link",
@@ -2283,7 +2283,7 @@
     "term": "public.home.hero-claim",
     "definition": "Libera tu tiempo y tu mente",
     "context": "Free your time and your mind",
-    "reference": "components/public/PublicHeroClaim.tsx#L17-L20"
+    "reference": "components/public/PublicHeroClaim.tsx#L24-L27"
   },
   {
     "term": "public.home.hero-collect",
@@ -2295,7 +2295,7 @@
     "term": "public.home.hero-control",
     "definition": "Enviando un Parallel obtendrás control sobre el progreso de los documentos y la información que necesitas.",
     "context": "Sending a Parallel gives you control over the progress of the documents and the information you need.",
-    "reference": "components/public/PublicHeroClaim.tsx#L23-L26"
+    "reference": "components/public/PublicHeroClaim.tsx#L36-L39"
   },
   {
     "term": "public.home.hero-discover-use",
