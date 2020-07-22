@@ -94,9 +94,11 @@ export function withApolloData<P = {}>(
                   variables: options?.variables,
                 });
               } else {
-                // On the browser we fetch from cache and fire a request
+                // On the browser we fetch from cache and fire a request that
+                // will update the cache when it arrives
                 return await new Promise<ApolloQueryResult<T>>(
                   (resolve, reject) => {
+                    let resolved = false;
                     const subscription = apollo
                       .watchQuery<T, TVariables>({
                         query,
@@ -104,9 +106,9 @@ export function withApolloData<P = {}>(
                         fetchPolicy: "cache-and-network",
                       })
                       .subscribe((result) => {
-                        // stale is true when there was nothing on the cache
-                        if (!result.stale) {
+                        if (!resolved) {
                           resolve(result);
+                          resolved = true;
                         }
                         if (!result.loading) {
                           subscription.unsubscribe();

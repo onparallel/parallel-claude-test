@@ -64,8 +64,8 @@ Embeeding React
   id="marketing-cta"
   defaultMessage="Click <a>here</a> to get a <b>free prize</b>!"
   values={{
-    a: (...chunks: any[]) => <Link href="foo">{chunks}</Link>,
-    b: (...chunks: any[]) => <b>{chunks}</b>
+    a: (chunks: any[]) => <Link href="foo">{chunks}</Link>,
+    b: (chunks: any[]) => <b>{chunks}</b>
   }}
 />
 ```

@@ -91,7 +91,7 @@ const email: Email<PetitionReminderProps> = {
                 defaultMessage:
                   "If you already submitted all the information, click <b>Finalize</b> on the page.",
               },
-              { b: (...chunks) => chunks }
+              { b: (chunks: any[]) => chunks }
             )
       }
 
@@ -175,7 +175,7 @@ const email: Email<PetitionReminderProps> = {
                   id="reminder.click-finalize"
                   defaultMessage="If you already submitted all the information, click <b>Finalize</b> on the page."
                   values={{
-                    b: (...chunks: any[]) => <strong>{chunks}</strong>,
+                    b: (chunks: any[]) => <strong>{chunks}</strong>,
                   }}
                 />
               </MjmlText>
