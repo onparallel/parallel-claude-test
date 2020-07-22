@@ -170,7 +170,7 @@ export function commentsBelongsToPetition<
   };
 }
 
-export function accessesBelongToValidUsers<
+export function accessesBelongToValidContacts<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, string[]>
@@ -181,7 +181,7 @@ export function accessesBelongToValidUsers<
         args[argNameAccessIds],
         "PetitionAccess"
       );
-      return ctx.petitions.accessesBelongToValidUsers(accessIds);
+      return ctx.petitions.accessesBelongToValidContacts(accessIds);
     } catch {}
     return false;
   };

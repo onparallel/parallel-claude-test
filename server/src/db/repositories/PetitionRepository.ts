@@ -1591,7 +1591,7 @@ export class PetitionRepository extends BaseRepository {
     return comments;
   }
 
-  async accessesBelongToValidUsers(accessIds: number[]) {
+  async accessesBelongToValidContacts(accessIds: number[]) {
     const contactIds = (
       await this.from("petition_access")
         .whereIn("id", accessIds)
@@ -1600,8 +1600,9 @@ export class PetitionRepository extends BaseRepository {
 
     const contacts = await this.from("contact")
       .whereIn("id", contactIds)
-      .whereNull("deleted_at");
+      .whereNull("deleted_at")
+      .select("id");
 
-    return contacts.length > 0;
+    return contacts.length === accessIds.length;
   }
 }
