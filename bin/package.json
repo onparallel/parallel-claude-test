@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@formatjs/cli": "^1.10.7",
-    "aws-sdk": "^2.717.0",
+    "aws-sdk": "^2.718.0",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "intl-messageformat-parser": "^5.3.6",
