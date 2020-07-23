@@ -397,6 +397,7 @@ Login.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
           }
         }
         fragment Login_User on User {
+          id
           fullName
           email
         }
