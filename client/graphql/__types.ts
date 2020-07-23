@@ -1168,7 +1168,7 @@ export type PetitionHeader_PetitionFragment = {
 
 export type PetitionLayout_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> &
+} & Pick<Petition, "id" | "name"> &
   PetitionHeader_PetitionFragment;
 
 export type PetitionLayout_UserFragment = {
@@ -2417,7 +2417,7 @@ export type CurrentUserQuery = { __typename?: "Query" } & {
 
 export type Login_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "fullName" | "email"
+  "id" | "fullName" | "email"
 >;
 
 export type RecipientView_PublicPetitionFragment = {
@@ -2840,6 +2840,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
 export const PetitionLayout_PetitionFragmentDoc = gql`
   fragment PetitionLayout_Petition on Petition {
     id
+    name
     ...PetitionHeader_Petition
   }
   ${PetitionHeader_PetitionFragmentDoc}
@@ -3435,6 +3436,7 @@ export const Account_UserFragmentDoc = gql`
 `;
 export const Login_UserFragmentDoc = gql`
   fragment Login_User on User {
+    id
     fullName
     email
   }

@@ -64,6 +64,7 @@
     "winston-cloudwatch": "^2.3.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.17.4",
     "@graphql-codegen/fragment-matcher": "^1.17.3",
     "@graphql-codegen/typescript": "^1.17.3",
     "@graphql-codegen/typescript-operations": "^1.17.3",

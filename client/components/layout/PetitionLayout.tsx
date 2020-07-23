@@ -73,7 +73,7 @@ PetitionLayout.fragments = {
   Petition: gql`
     fragment PetitionLayout_Petition on Petition {
       id
-      title
+      name
       ...PetitionHeader_Petition
     }
     ${PetitionHeader.fragments.Petition}
