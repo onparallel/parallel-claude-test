@@ -1,13 +1,13 @@
 import { MjmlText } from "mjml-react";
 import React, { CSSProperties, Fragment } from "react";
 
-function render(node: any) {
+function render(node: any, index?: number) {
   if (Array.isArray(node.children)) {
     switch (node.type) {
       case "paragraph":
       case undefined:
         return (
-          <p style={{ margin: 0 }}>
+          <p style={{ margin: 0 }} key={index}>
             {paragraphIsEmpty(node) ? (
               <br />
             ) : (
@@ -19,16 +19,24 @@ function render(node: any) {
         );
       case "bulleted-list":
         return (
-          <ul style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}>
-            {node.children.map((child: any, index: number) => (
-              <li key={index} style={{ marginLeft: 0 }}>
-                {child.children.map((child: any, index: number) => (
-                  <Fragment key={index}>{render(child)}</Fragment>
-                ))}
-              </li>
-            ))}
+          <ul
+            style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}
+            key={index}
+          >
+            {node.children.map((child: any, index: number) =>
+              render(child, index)
+            )}
           </ul>
         );
+      case "list-item": {
+        return (
+          <li key={index} style={{ marginLeft: 0 }}>
+            {node.children.map((child: any, index: number) =>
+              render(child, index)
+            )}
+          </li>
+        );
+      }
     }
   } else if (typeof node.text === "string") {
     const style: CSSProperties = {};
@@ -41,7 +49,11 @@ function render(node: any) {
     if (node.underline) {
       style.textDecoration = "underline";
     }
-    return <span style={style}>{node.text}</span>;
+    return (
+      <span style={style} key={index}>
+        {node.text}
+      </span>
+    );
   }
   return null;
 }

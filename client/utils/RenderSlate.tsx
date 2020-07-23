@@ -3,7 +3,7 @@ import { Element, Text as Leaf } from "slate";
 import { memo } from "react";
 import { Box, Text, BoxProps } from "@chakra-ui/core";
 
-function render(node: Element | Leaf, index: number) {
+function render(node: Element | Leaf, index?: number) {
   if (Array.isArray(node.children)) {
     const props: BoxProps = { key: index };
     switch (node.type) {

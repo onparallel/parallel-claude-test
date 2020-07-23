@@ -8,11 +8,12 @@ export const validRichTextContent = jsonSchema({
         children: {
           type: "array",
           minItems: 1,
-          additionalItems: false,
-          items: [
-            { $ref: "#/definitions/paragraph" },
-            { $ref: "#/definitions/list" },
-          ],
+          items: {
+            anyOf: [
+              { $ref: "#/definitions/paragraph" },
+              { $ref: "#/definitions/list" },
+            ],
+          },
         },
         type: { enum: ["list-item"] },
       },
@@ -24,6 +25,7 @@ export const validRichTextContent = jsonSchema({
         type: { enum: ["bulleted-list", "numbered-list"] },
         children: {
           type: "array",
+          minItems: 1,
           items: {
             $ref: "#/definitions/list-item",
           },

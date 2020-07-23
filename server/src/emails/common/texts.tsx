@@ -37,7 +37,7 @@ export function petitionFieldList(
   return fields
     .map(
       ({ position, title }, index) =>
-        `${position + 1}. ${
+        `  ${position + 1}. ${
           title ||
           intl.formatMessage({
             id: "generic.untitled-field",
@@ -49,16 +49,27 @@ export function petitionFieldList(
 }
 
 export function renderSlateText(node: any) {
-  function render(node: any, index: number) {
+  function render(node: any) {
     if (Array.isArray(node.children)) {
       switch (node.type) {
         case "paragraph":
         case undefined:
           return `${node.children.map(render).join("")}`;
         case "bulleted-list":
-          return node.children.map(render).join("\n");
+          return node.children
+            .map((child: any) => render(child).replace(/^/gm, "  "))
+            .join("\n");
         case "list-item":
-          return `- ${node.children.map(render).join("")}`;
+          return node.children
+            .map((child: any, i: number) => {
+              switch (child.type) {
+                case "paragraph":
+                  return `${i === 0 ? "- " : "  "}${render(child)}`;
+                default:
+                  return render(child).replace(/^/gm, "  ");
+              }
+            })
+            .join("\n");
       }
     } else if (typeof node.text === "string") {
       return node.text;

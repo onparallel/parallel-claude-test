@@ -211,13 +211,13 @@ export const props: PetitionMessageProps = {
             {
               type: "paragraph",
               children: [{ text: "foto", bold: true, underline: true }],
-            },
-          ],
+                },
+              ],
           type: "list-item",
-        },
-        {
-          children: [
+            },
             {
+              children: [
+                {
               type: "paragraph",
               children: [{ text: "pasaporte", italic: true }],
             },
@@ -231,20 +231,20 @@ export const props: PetitionMessageProps = {
                       children: [{ text: "foto", bold: true, underline: true }],
                     },
                   ],
-                  type: "list-item",
+                      type: "list-item",
                 },
                 {
-                  children: [
-                    {
-                      type: "paragraph",
+                      children: [
+                        {
+                          type: "paragraph",
                       children: [{ text: "pasaporte", italic: true }],
+                            },
+                          ],
+                  type: "list-item",
+                        },
+                      ],
                     },
                   ],
-                  type: "list-item",
-                },
-              ],
-            },
-          ],
           type: "list-item",
         },
       ],
