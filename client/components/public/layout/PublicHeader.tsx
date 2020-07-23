@@ -68,7 +68,7 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         transition="min-height 300ms"
       >
         <Link href="/" {...logoColorProps("light")}>
-          <Logo width={152}></Logo>
+          <Logo width={152} />
         </Link>
         <Spacer />
         <PublicHeaderMenu
@@ -102,7 +102,7 @@ function PublicHeaderMenu(props: StackProps) {
             <FormattedMessage
               id="public.security-link"
               defaultMessage="Security"
-            ></FormattedMessage>
+            />
           </Button>
         </NakedLink>
       </Flex>
@@ -112,33 +112,24 @@ function PublicHeaderMenu(props: StackProps) {
             <FormattedMessage
               id="public.persons-link"
               defaultMessage="For whom"
-            ></FormattedMessage>
+            />
           </Button>
         </NakedLink>
       </Flex>
       <Flex>
         <NakedLink href="/about">
           <Button flex="1" as="a" variant="ghost">
-            <FormattedMessage
-              id="public.about-link"
-              defaultMessage="About"
-            ></FormattedMessage>
+            <FormattedMessage id="public.about-link" defaultMessage="About" />
           </Button>
         </NakedLink>
       </Flex>
       <Button as="a" variant="ghost" {...{ href: "/blog" }}>
-        <FormattedMessage
-          id="public.blog-link"
-          defaultMessage="Blog"
-        ></FormattedMessage>
+        <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
       </Button>
       <Flex>
         <NakedLink href="/login">
           <Button as="a" flex="1" variant="outline">
-            <FormattedMessage
-              id="public.login-button"
-              defaultMessage="Login"
-            ></FormattedMessage>
+            <FormattedMessage id="public.login-button" defaultMessage="Login" />
           </Button>
         </NakedLink>
       </Flex>
@@ -148,7 +139,7 @@ function PublicHeaderMenu(props: StackProps) {
             <FormattedMessage
               id="public.invite-button"
               defaultMessage="Try Parallel free"
-            ></FormattedMessage>
+            />
           </Button>
         </NakedLink>
       </Flex>

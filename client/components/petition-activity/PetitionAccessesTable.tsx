@@ -138,7 +138,7 @@ export function PetitionAccessesTable({
             <FormattedMessage
               id="generic.actions-button"
               defaultMessage="Actions"
-            ></FormattedMessage>
+            />
           </ButtonDropdown>
         ) : null}
         <Button

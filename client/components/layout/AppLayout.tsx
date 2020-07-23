@@ -16,12 +16,14 @@ import {
   OnboardingTourContext,
 } from "../common/OnboardingTour";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
+import Head from "next/head";
 
 export type AppLayoutProps = BoxProps & {
+  title: string;
   user: AppLayout_UserFragment;
 };
 
-export function AppLayout({ user, children, ...props }: AppLayoutProps) {
+export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   const router = useRouter();
   const createPetition = useCreatePetition();
   const handleOnCreate = useCallback(async function () {
@@ -58,6 +60,9 @@ export function AppLayout({ user, children, ...props }: AppLayoutProps) {
   const breakpoint = "sm";
   return (
     <>
+      <Head>
+        <title>{title} | Parallel</title>
+      </Head>
       <Flex
         alignItems="stretch"
         overflow="hidden"

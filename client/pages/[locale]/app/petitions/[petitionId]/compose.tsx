@@ -3,7 +3,6 @@ import { Box, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -300,96 +299,87 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   return (
-    <>
-      <Title>
-        {petition!.name ||
-          intl.formatMessage({
-            id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition",
-          })}
-      </Title>
-      <PetitionLayout
-        key={petition!.id}
-        user={me}
-        petition={petition!}
-        onUpdatePetition={handleUpdatePetition}
-        section="compose"
-        scrollBody
-        state={state}
-      >
-        <PaneWithFlyout
-          active={Boolean(activeField)}
-          alignWith={activeFieldElement}
-          flyout={
-            activeField && (
-              <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
-                <PetitionComposeFieldSettings
-                  key={activeField.id}
-                  field={activeField}
-                  onFieldEdit={handleFieldEdit}
-                  onClose={() => setActiveFieldId(null)}
-                />
-              </Box>
-            )
-          }
-        >
-          <Box padding={4}>
-            <PetitionComposeFieldList
-              showErrors={showErrors}
-              fields={petition!.fields}
-              active={activeFieldId}
-              onAddField={handleAddField}
-              onDeleteField={handleDeleteField}
-              onFieldFocus={handleFieldFocus}
-              onUpdateFieldPositions={handleUpdateFieldPositions}
-              onFieldEdit={handleFieldEdit}
-              onFieldSettingsClick={setActiveFieldId}
-            />
-            {petition!.status === "DRAFT" ? (
-              <PetitionComposeMessageEditor
-                marginTop={4}
-                petition={petition!}
-                showErrors={showErrors}
-                onCreateContact={handleCreateContact}
-                onSearchContacts={handleSearchContacts}
-                onUpdatePetition={handleUpdatePetition}
-                onSend={handleSend}
+    <PetitionLayout
+      key={petition!.id}
+      user={me}
+      petition={petition!}
+      onUpdatePetition={handleUpdatePetition}
+      section="compose"
+      scrollBody
+      state={state}
+    >
+      <PaneWithFlyout
+        active={Boolean(activeField)}
+        alignWith={activeFieldElement}
+        flyout={
+          activeField && (
+            <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
+              <PetitionComposeFieldSettings
+                key={activeField.id}
+                field={activeField}
+                onFieldEdit={handleFieldEdit}
+                onClose={() => setActiveFieldId(null)}
               />
-            ) : (
-              <Box
-                color="gray.500"
-                marginTop={12}
-                paddingX={4}
-                textAlign="center"
-              >
-                <Text>
-                  <FormattedMessage
-                    id="petition.already-sent"
-                    defaultMessage="This petition has already been sent."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="petition.send-from-activity"
-                    defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
-                    values={{
-                      a: (chunks: any[]) => (
-                        <Link
-                          href="/app/petitions/[petitionId]/activity"
-                          as={`/app/petitions/${petitionId}/activity`}
-                        >
-                          {chunks}
-                        </Link>
-                      ),
-                    }}
-                  />
-                </Text>
-              </Box>
-            )}
-          </Box>
-        </PaneWithFlyout>
-      </PetitionLayout>
-    </>
+            </Box>
+          )
+        }
+      >
+        <Box padding={4}>
+          <PetitionComposeFieldList
+            showErrors={showErrors}
+            fields={petition!.fields}
+            active={activeFieldId}
+            onAddField={handleAddField}
+            onDeleteField={handleDeleteField}
+            onFieldFocus={handleFieldFocus}
+            onUpdateFieldPositions={handleUpdateFieldPositions}
+            onFieldEdit={handleFieldEdit}
+            onFieldSettingsClick={setActiveFieldId}
+          />
+          {petition!.status === "DRAFT" ? (
+            <PetitionComposeMessageEditor
+              marginTop={4}
+              petition={petition!}
+              showErrors={showErrors}
+              onCreateContact={handleCreateContact}
+              onSearchContacts={handleSearchContacts}
+              onUpdatePetition={handleUpdatePetition}
+              onSend={handleSend}
+            />
+          ) : (
+            <Box
+              color="gray.500"
+              marginTop={12}
+              paddingX={4}
+              textAlign="center"
+            >
+              <Text>
+                <FormattedMessage
+                  id="petition.already-sent"
+                  defaultMessage="This petition has already been sent."
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="petition.send-from-activity"
+                  defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+                  values={{
+                    a: (chunks: any[]) => (
+                      <Link
+                        href="/app/petitions/[petitionId]/activity"
+                        as={`/app/petitions/${petitionId}/activity`}
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                  }}
+                />
+              </Text>
+            </Box>
+          )}
+        </Box>
+      </PaneWithFlyout>
+    </PetitionLayout>
   );
 }
 

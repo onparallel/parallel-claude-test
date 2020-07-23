@@ -67,7 +67,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.security-link"
                   defaultMessage="Security"
-                ></FormattedMessage>
+                />
               </Link>
             </ListItem>
           </List>
@@ -87,7 +87,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.support.support-center"
                   defaultMessage="Support center"
-                ></FormattedMessage>
+                />
               </NormalLink>
             </ListItem>
             <ListItem>
@@ -97,7 +97,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.support.faq"
                   defaultMessage="FAQ"
-                ></FormattedMessage>
+                />
               </NormalLink>
             </ListItem>
           </List>
@@ -117,15 +117,12 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.about-link"
                   defaultMessage="About"
-                ></FormattedMessage>
+                />
               </Link>
             </ListItem>
             <ListItem>
               <NormalLink href="/blog">
-                <FormattedMessage
-                  id="public.blog-link"
-                  defaultMessage="Blog"
-                ></FormattedMessage>
+                <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
               </NormalLink>
             </ListItem>
             <ListItem>
@@ -133,7 +130,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.contact-link"
                   defaultMessage="Contact"
-                ></FormattedMessage>
+                />
               </NormalLink>
             </ListItem>
           </List>
@@ -153,7 +150,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.terms.title"
                   defaultMessage="Terms & Conditions"
-                ></FormattedMessage>
+                />
               </Link>
             </ListItem>
             <ListItem>
@@ -161,7 +158,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.privacy.title"
                   defaultMessage="Privacy policy"
-                ></FormattedMessage>
+                />
               </Link>
             </ListItem>
             <ListItem>
@@ -169,7 +166,7 @@ export function PublicFooter(props: BoxProps) {
                 <FormattedMessage
                   id="public.cookies.title"
                   defaultMessage="Cookie policy"
-                ></FormattedMessage>
+                />
               </Link>
             </ListItem>
           </List>
@@ -199,7 +196,7 @@ export function PublicFooter(props: BoxProps) {
               id: "public.footer.twitter-profile",
               defaultMessage: "Twitter profile",
             })}
-          ></IconButton>
+          />
           <IconButton
             as={"a" as any}
             {...{
@@ -214,7 +211,7 @@ export function PublicFooter(props: BoxProps) {
               id: "public.footer.linkedin-profile",
               defaultMessage: "LinkedIn profile",
             })}
-          ></IconButton>
+          />
         </Box>
       </Flex>
     </PublicContainer>

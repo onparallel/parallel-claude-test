@@ -415,7 +415,7 @@ function _Row<TRow>({
         >
           <PseudoBox as="td" padding={0} {...{ colSpan: columns.length }}>
             <Collapse isOpen={isExpanded}>
-              <Box borderTop="1px solid" borderTopColor={colors.border}></Box>
+              <Box borderTop="1px solid" borderTopColor={colors.border} />
             </Collapse>
           </PseudoBox>
         </PseudoBox>

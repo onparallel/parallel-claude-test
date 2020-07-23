@@ -40,12 +40,12 @@ export function BurgerButton({ isOpen, ...props }: BurgerButtonProps) {
       <Box
         {...common}
         transform={isOpen ? "rotate(-45deg)" : "translateY(-7px)"}
-      ></Box>
-      <Box {...common} opacity={isOpen ? 0 : 1}></Box>
+      />
+      <Box {...common} opacity={isOpen ? 0 : 1} />
       <Box
         {...common}
         transform={isOpen ? "rotate(45deg)" : "translateY(7px)"}
-      ></Box>
+      />
     </Button>
   );
 }

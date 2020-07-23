@@ -1,6 +1,5 @@
 import { Box, Heading, Text } from "@chakra-ui/core";
 import { NormalLink } from "@parallel/components/common/Link";
-import { Title } from "@parallel/components/common/Title";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
@@ -30,67 +29,64 @@ function LegalDoc({ content, doc }: LegalDocProps) {
     }),
   };
   return (
-    <>
-      <Title>{titles[doc]}</Title>
-      <PublicLayout>
-        <PublicContainer marginTop={8}>
-          <Markdown
-            options={{
-              overrides: {
-                a: {
-                  component: NormalLink,
-                },
-                h1: {
-                  component: Heading,
-                  props: {
-                    as: "h2",
-                    fontSize: "3xl",
-                  },
-                },
-                h2: {
-                  component: Heading,
-                  props: {
-                    as: "h3",
-                    fontSize: "lg",
-                    marginTop: 4,
-                  },
-                },
-                ul: {
-                  component: Box,
-                  props: {
-                    as: "ul",
-                    paddingLeft: 8,
-                  },
-                },
-                ol: {
-                  component: Box,
-                  props: {
-                    as: "ol",
-                    paddingLeft: 8,
-                  },
-                },
-                li: {
-                  component: Text,
-                  props: {
-                    as: "li",
-                    marginTop: 2,
-                  },
-                },
-                p: {
-                  component: Text,
-                  props: {
-                    as: "div",
-                    marginTop: 2,
-                  },
+    <PublicLayout title={titles[doc]}>
+      <PublicContainer marginTop={8}>
+        <Markdown
+          options={{
+            overrides: {
+              a: {
+                component: NormalLink,
+              },
+              h1: {
+                component: Heading,
+                props: {
+                  as: "h2",
+                  fontSize: "3xl",
                 },
               },
-            }}
-          >
-            {content}
-          </Markdown>
-        </PublicContainer>
-      </PublicLayout>
-    </>
+              h2: {
+                component: Heading,
+                props: {
+                  as: "h3",
+                  fontSize: "lg",
+                  marginTop: 4,
+                },
+              },
+              ul: {
+                component: Box,
+                props: {
+                  as: "ul",
+                  paddingLeft: 8,
+                },
+              },
+              ol: {
+                component: Box,
+                props: {
+                  as: "ol",
+                  paddingLeft: 8,
+                },
+              },
+              li: {
+                component: Text,
+                props: {
+                  as: "li",
+                  marginTop: 2,
+                },
+              },
+              p: {
+                component: Text,
+                props: {
+                  as: "div",
+                  marginTop: 2,
+                },
+              },
+            },
+          }}
+        >
+          {content}
+        </Markdown>
+      </PublicContainer>
+    </PublicLayout>
   );
 }
 

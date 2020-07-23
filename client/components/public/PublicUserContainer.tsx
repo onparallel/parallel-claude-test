@@ -18,7 +18,7 @@ export function PublicUserFormContainer({
       alignItems="stretch"
       {...wrapper}
     >
-      <Box flex="1"></Box>
+      <Box flex="1" />
       <Box
         margin="0 auto"
         width="100%"
@@ -29,7 +29,7 @@ export function PublicUserFormContainer({
           {children}
         </Card>
       </Box>
-      <Box flex="3"></Box>
+      <Box flex="3" />
     </Flex>
   );
 }

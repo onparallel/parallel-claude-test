@@ -11,10 +11,11 @@ import { PublicFooter } from "./PublicFooter";
 import { PublicHeader } from "./PublicHeader";
 
 export interface PublicLayoutProps {
+  title: string;
   children?: ReactNode;
 }
 
-export function PublicLayout({ children }: PublicLayoutProps) {
+export function PublicLayout({ title, children }: PublicLayoutProps) {
   const { query, pathname } = useRouter();
   const intl = useIntl();
   let headerIsThin = false;
@@ -33,6 +34,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <>
       <Head>
+        <title>{title} | Parallel</title>
         <meta
           name="description"
           content={intl.formatMessage({
@@ -51,11 +53,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
         ))}
       </Head>
       <Flex direction="column" minHeight="100vh">
-        <PublicHeader
-          position="fixed"
-          zIndex={2}
-          isThin={headerIsThin}
-        ></PublicHeader>
+        <PublicHeader position="fixed" zIndex={2} isThin={headerIsThin} />
         <Flex
           as="main"
           marginTop={headerIsThin ? 16 : 20}
@@ -65,7 +63,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
         >
           {children}
         </Flex>
-        <PublicFooter marginTop={8}></PublicFooter>
+        <PublicFooter marginTop={8} />
         <CookieConsent />
       </Flex>
     </>

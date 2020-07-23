@@ -51,7 +51,7 @@ export const PasswordInput = forwardRef(function PasswordInput(
           size="sm"
           variant="ghost"
           onClick={handleClick}
-        ></IconButton>
+        />
       </InputRightElement>
     </InputGroup>
   );

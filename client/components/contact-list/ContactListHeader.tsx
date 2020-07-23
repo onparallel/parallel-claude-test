@@ -72,7 +72,7 @@ export function ContactListHeader({
             <FormattedMessage
               id="component.contact-list-header.actions-button"
               defaultMessage="Actions"
-            ></FormattedMessage>
+            />
           </ButtonDropdown>
         </Box>
       ) : null}

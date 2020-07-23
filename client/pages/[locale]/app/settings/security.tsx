@@ -73,7 +73,13 @@ function Security() {
   }
 
   return (
-    <AppLayout user={me}>
+    <AppLayout
+      title={intl.formatMessage({
+        id: "settings.security",
+        defaultMessage: "Security",
+      })}
+      user={me}
+    >
       <SettingsLayout
         header={
           <FormattedMessage id="settings.security" defaultMessage="Security" />
@@ -96,7 +102,7 @@ function Security() {
                 <FormattedMessage
                   id="generic.forms.old-password-label"
                   defaultMessage="Old password"
-                ></FormattedMessage>
+                />
               </FormLabel>
               <PasswordInput
                 id="password"
@@ -108,7 +114,7 @@ function Security() {
                   <FormattedMessage
                     id="generic.forms.required-old-password-error"
                     defaultMessage="Old password is required"
-                  ></FormattedMessage>
+                  />
                 </FormErrorMessage>
               )}
               {errors.password?.type === "validate" && (
@@ -116,7 +122,7 @@ function Security() {
                   <FormattedMessage
                     id="generic.forms.invalid-old-password-error"
                     defaultMessage="Old password is incorrect"
-                  ></FormattedMessage>
+                  />
                 </FormErrorMessage>
               )}
             </FormControl>
@@ -125,7 +131,7 @@ function Security() {
                 <FormattedMessage
                   id="generic.forms.new-password-label"
                   defaultMessage="New password"
-                ></FormattedMessage>
+                />
               </FormLabel>
               <PasswordInput
                 id="new-password"
@@ -140,7 +146,7 @@ function Security() {
                   <FormattedMessage
                     id="generic.forms.password-policy-error"
                     defaultMessage="The password must have a least 8 characters"
-                  ></FormattedMessage>
+                  />
                 </FormErrorMessage>
               )}
             </FormControl>
@@ -149,7 +155,7 @@ function Security() {
                 <FormattedMessage
                   id="generic.forms.confirm-password-label"
                   defaultMessage="Confirm password"
-                ></FormattedMessage>
+                />
               </FormLabel>
               <PasswordInput
                 id="new-password2"
@@ -164,7 +170,7 @@ function Security() {
                   <FormattedMessage
                     id="generic.forms.passwords-must-match"
                     defaultMessage="Passwords must match"
-                  ></FormattedMessage>
+                  />
                 </FormErrorMessage>
               )}
             </FormControl>

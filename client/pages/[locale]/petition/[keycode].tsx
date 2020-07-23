@@ -14,7 +14,6 @@ import {
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -63,6 +62,7 @@ import {
   CreateReply,
   RecipientViewPetitionField,
 } from "../../../components/recipient-view/RecipientViewPetitionField";
+import Head from "next/head";
 
 type PublicPetitionProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -277,7 +277,9 @@ function RecipientView({ keycode }: PublicPetitionProps) {
   const breakpoint = "md";
   return (
     <>
-      <Title />
+      <Head>
+        <title>Parallel</title>
+      </Head>
       <Box position="sticky" top={0} zIndex={2}>
         {showCompletedAlert && petition.status === "COMPLETED" ? (
           <Alert status="success" variant="subtle" zIndex={2}>

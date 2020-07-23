@@ -126,7 +126,7 @@ export function RecipientViewProgressCard({
             petition.status === "COMPLETED" ? "green.400" : "gray.200"
           }
           marginLeft={2}
-        ></Box>
+        />
       </Flex>
       {isStickyFooter ? null : (
         <Flex marginBottom={4}>

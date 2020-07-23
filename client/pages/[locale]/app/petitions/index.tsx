@@ -14,7 +14,6 @@ import { PetitionProgressBar } from "@parallel/components/common/PetitionProgres
 import { PetitionStatusIndicator } from "@parallel/components/common/PetitionStatusIndicator";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -206,75 +205,73 @@ function Petitions() {
   const columns = usePetitionsColumns();
 
   return (
-    <>
-      <Title>
-        {intl.formatMessage({
-          id: "petitions.title",
-          defaultMessage: "Petitions",
-        })}
-      </Title>
-      <AppLayout user={me}>
-        <Box
-          padding={4}
-          paddingBottom={{ base: 4, md: 24 }}
-          minWidth="containers.lg"
-        >
-          <TablePage
-            columns={columns}
-            rows={petitions.items}
-            rowKeyProp={"id"}
-            isSelectable
-            isHighlightable
-            loading={loading}
-            onRowClick={handleRowClick}
-            page={state.page}
-            pageSize={PAGE_SIZE}
-            totalCount={petitions.totalCount}
-            sort={state.sort}
-            onSelectionChange={setSelected}
-            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-            header={
-              <PetitionListHeader
-                search={state.search}
-                status={state.status}
-                showDelete={selected.length > 0}
-                showClone={selected.length === 1}
-                onSearchChange={handleSearchChange}
-                onStatusChange={handleStatusChange}
-                onDeleteClick={handleDeleteClick}
-                onCreateClick={handleCreateClick}
-                onReload={() => refetch()}
-                onCloneClick={handleCloneClick}
-              />
-            }
-            body={
-              petitions.totalCount === 0 && !loading ? (
-                state.search ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text color="gray.300" fontSize="lg">
-                      <FormattedMessage
-                        id="petitions.no-results"
-                        defaultMessage="There's no petitions matching your search"
-                      />
-                    </Text>
-                  </Flex>
-                ) : (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text fontSize="lg">
-                      <FormattedMessage
-                        id="petitions.no-petitions"
-                        defaultMessage="You have no petitions yet. Start by creating one now!"
-                      />
-                    </Text>
-                  </Flex>
-                )
-              ) : null
-            }
-          ></TablePage>
-        </Box>
-      </AppLayout>
-    </>
+    <AppLayout
+      title={intl.formatMessage({
+        id: "petitions.title",
+        defaultMessage: "Petitions",
+      })}
+      user={me}
+    >
+      <Box
+        padding={4}
+        paddingBottom={{ base: 4, md: 24 }}
+        minWidth="containers.lg"
+      >
+        <TablePage
+          columns={columns}
+          rows={petitions.items}
+          rowKeyProp={"id"}
+          isSelectable
+          isHighlightable
+          loading={loading}
+          onRowClick={handleRowClick}
+          page={state.page}
+          pageSize={PAGE_SIZE}
+          totalCount={petitions.totalCount}
+          sort={state.sort}
+          onSelectionChange={setSelected}
+          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          header={
+            <PetitionListHeader
+              search={state.search}
+              status={state.status}
+              showDelete={selected.length > 0}
+              showClone={selected.length === 1}
+              onSearchChange={handleSearchChange}
+              onStatusChange={handleStatusChange}
+              onDeleteClick={handleDeleteClick}
+              onCreateClick={handleCreateClick}
+              onReload={() => refetch()}
+              onCloneClick={handleCloneClick}
+            />
+          }
+          body={
+            petitions.totalCount === 0 && !loading ? (
+              state.search ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="petitions.no-results"
+                      defaultMessage="There's no petitions matching your search"
+                    />
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="petitions.no-petitions"
+                      defaultMessage="You have no petitions yet. Start by creating one now!"
+                    />
+                  </Text>
+                </Flex>
+              )
+            ) : null
+          }
+        />
+      </Box>
+    </AppLayout>
   );
 }
 

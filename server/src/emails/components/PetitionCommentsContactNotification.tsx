@@ -93,7 +93,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
                 values={{
                   name: <b>{authorName}</b>,
                 }}
-              ></FormattedMessage>
+              />
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

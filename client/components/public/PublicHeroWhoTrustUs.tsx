@@ -17,13 +17,13 @@ export function PublicHeroWhoTrustUs({ ...props }: PublicHeroProps) {
         <FormattedMessage
           id="public.home.hero-who-trust-us"
           defaultMessage="Who trust us"
-        ></FormattedMessage>
+        />
       </Heading>
       <Heading fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.home.hero-leading-digital-transformation"
           defaultMessage="Leading digital transformation in their companies"
-        ></FormattedMessage>
+        />
       </Heading>
       <Flex
         marginY={16}

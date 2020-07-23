@@ -39,7 +39,7 @@ class MyDocument extends Document<MyDocumentProps> {
         return renderPage({
           // eslint-disable-next-line @typescript-eslint/naming-convention
           enhanceApp: (App) => (props) => (
-            <App {...props} {...{ locale, messages: compiled }}></App>
+            <App {...props} {...{ locale, messages: compiled }} />
           ),
         });
       } catch (error) {

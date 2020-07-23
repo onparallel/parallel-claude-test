@@ -8,7 +8,6 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -134,71 +133,69 @@ function Contacts() {
   const columns = useContactsColumns();
 
   return (
-    <>
-      <Title>
-        {intl.formatMessage({
-          id: "contacts.title",
-          defaultMessage: "Contacts",
-        })}
-      </Title>
-      <AppLayout user={me}>
-        <Box
-          padding={4}
-          paddingBottom={{ base: 4, md: 24 }}
-          minWidth="containers.lg"
-        >
-          <TablePage
-            columns={columns}
-            rows={contacts.items}
-            rowKeyProp={"id"}
-            isSelectable
-            isHighlightable
-            loading={loading}
-            onRowClick={handleRowClick}
-            page={state.page}
-            pageSize={PAGE_SIZE}
-            totalCount={contacts.totalCount}
-            sort={state.sort}
-            onSelectionChange={setSelected}
-            onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-            onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
-            header={
-              <ContactListHeader
-                search={state.search}
-                showActions={Boolean(selected?.length)}
-                onSearchChange={handleSearchChange}
-                onReload={() => refetch()}
-                onCreateClick={handleCreateClick}
-                onDeleteClick={handleDeleteClick}
-              />
-            }
-            body={
-              contacts.totalCount === 0 && !loading ? (
-                state.search ? (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text color="gray.300" fontSize="lg">
-                      <FormattedMessage
-                        id="contacts.no-results"
-                        defaultMessage="There's no contacts matching your search"
-                      />
-                    </Text>
-                  </Flex>
-                ) : (
-                  <Flex flex="1" alignItems="center" justifyContent="center">
-                    <Text fontSize="lg">
-                      <FormattedMessage
-                        id="contacts.no-contacts"
-                        defaultMessage="You have no contacts yet. Start by creating one now!"
-                      />
-                    </Text>
-                  </Flex>
-                )
-              ) : null
-            }
-          ></TablePage>
-        </Box>
-      </AppLayout>
-    </>
+    <AppLayout
+      title={intl.formatMessage({
+        id: "contacts.title",
+        defaultMessage: "Contacts",
+      })}
+      user={me}
+    >
+      <Box
+        padding={4}
+        paddingBottom={{ base: 4, md: 24 }}
+        minWidth="containers.lg"
+      >
+        <TablePage
+          columns={columns}
+          rows={contacts.items}
+          rowKeyProp={"id"}
+          isSelectable
+          isHighlightable
+          loading={loading}
+          onRowClick={handleRowClick}
+          page={state.page}
+          pageSize={PAGE_SIZE}
+          totalCount={contacts.totalCount}
+          sort={state.sort}
+          onSelectionChange={setSelected}
+          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          header={
+            <ContactListHeader
+              search={state.search}
+              showActions={Boolean(selected?.length)}
+              onSearchChange={handleSearchChange}
+              onReload={() => refetch()}
+              onCreateClick={handleCreateClick}
+              onDeleteClick={handleDeleteClick}
+            />
+          }
+          body={
+            contacts.totalCount === 0 && !loading ? (
+              state.search ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="contacts.no-results"
+                      defaultMessage="There's no contacts matching your search"
+                    />
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="contacts.no-contacts"
+                      defaultMessage="You have no contacts yet. Start by creating one now!"
+                    />
+                  </Text>
+                </Flex>
+              )
+            ) : null
+          }
+        />
+      </Box>
+    </AppLayout>
   );
 }
 

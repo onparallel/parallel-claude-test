@@ -58,7 +58,7 @@ export const CopyToClipboardButton = memo(function CopyToClipboardButton({
         onClick={handleClick}
         onMouseOut={handleMouseOut}
         {...props}
-      ></IconButton>
+      />
     </Tooltip>
   );
 });

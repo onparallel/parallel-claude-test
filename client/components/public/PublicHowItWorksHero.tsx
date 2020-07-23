@@ -69,18 +69,18 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
         <FormattedMessage
           id="public.how-it-works-hero.title"
           defaultMessage="How it works"
-        ></FormattedMessage>
+        />
       </Heading>
       <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.how-it-works-hero.description-1"
           defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you."
-        ></FormattedMessage>
+        />
         <br />
         <FormattedMessage
           id="public.how-it-works-hero.description-2"
           defaultMessage="Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
-        ></FormattedMessage>
+        />
       </Heading>
       <Flex
         flexDirection={{ base: "column", lg: "row" }}
@@ -99,13 +99,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
               <FormattedMessage
                 id="public.how-it-works-hero.create-request"
                 defaultMessage="Create your request"
-              ></FormattedMessage>
+              />
             }
             description={
               <FormattedMessage
                 id="public.how-it-works-hero.user-friendly"
                 defaultMessage="Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you."
-              ></FormattedMessage>
+              />
             }
             isActive={index === 0}
             onClick={() => setIndex(0)}
@@ -116,13 +116,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
               <FormattedMessage
                 id="public.how-it-works-hero.set-date"
                 defaultMessage="Set a delivery deadline"
-              ></FormattedMessage>
+              />
             }
             description={
               <FormattedMessage
                 id="public.how-it-works-hero.client-timings"
                 defaultMessage="We automate the information request process. Your client will not know that it is not you who sends the emails."
-              ></FormattedMessage>
+              />
             }
             isActive={index === 1}
             onClick={() => setIndex(1)}
@@ -133,13 +133,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
               <FormattedMessage
                 id="public.how-it-works-hero.receive-inbox"
                 defaultMessage="Receive it on time in your inbox"
-              ></FormattedMessage>
+              />
             }
             description={
               <FormattedMessage
                 id="public.how-it-works-hero.focus-on-work"
                 defaultMessage="We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification."
-              ></FormattedMessage>
+              />
             }
             isActive={index === 2}
             onClick={() => setIndex(2)}
@@ -202,7 +202,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
             <FormattedMessage
               id="public.invite-button"
               defaultMessage="Try Parallel free"
-            ></FormattedMessage>
+            />
           </Button>
         </NakedLink>
       </Flex>

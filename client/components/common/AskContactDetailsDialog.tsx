@@ -82,7 +82,7 @@ export function AskContactDetailsDialog({
                 <FormattedMessage
                   id="generic.forms.invalid-email-error"
                   defaultMessage="Please, enter a valid email"
-                ></FormattedMessage>
+                />
               </FormErrorMessage>
             )}
           </FormControl>

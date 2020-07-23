@@ -93,7 +93,7 @@ export const SearchInput = forwardRef(function SearchInput(
             size="xs"
             variant="ghost"
             onClick={handleClearClick}
-          ></IconButton>
+          />
         </InputRightElement>
       ) : null}
     </InputGroup>

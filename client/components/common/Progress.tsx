@@ -14,12 +14,7 @@ export function ProgressIndicator({
 }: ProgressIndicatorProps) {
   const percent = valueToPercent(value, min, max);
   return (
-    <Box
-      height="100%"
-      transition="all 300ms"
-      width={percent + "%"}
-      {...rest}
-    ></Box>
+    <Box height="100%" transition="all 300ms" width={percent + "%"} {...rest} />
   );
 }
 

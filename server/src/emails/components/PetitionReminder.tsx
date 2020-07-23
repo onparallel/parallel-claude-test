@@ -136,7 +136,7 @@ const email: Email<PetitionReminderProps> = {
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
                 }}
-              ></FormattedMessage>
+              />
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
@@ -152,10 +152,7 @@ const email: Email<PetitionReminderProps> = {
                       values={{
                         deadline: (
                           <span style={{ textDecoration: "underline" }}>
-                            <DateTime
-                              value={deadline}
-                              format={FORMATS.LLL}
-                            ></DateTime>
+                            <DateTime value={deadline} format={FORMATS.LLL} />
                           </span>
                         ),
                       }}

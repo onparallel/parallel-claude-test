@@ -55,7 +55,7 @@ export function withApolloData<P = {}>(
     });
     return (
       <ApolloProvider client={client}>
-        <Component {...componentProps}></Component>
+        <Component {...componentProps} />
       </ApolloProvider>
     );
   };

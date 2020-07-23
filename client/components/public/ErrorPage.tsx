@@ -34,7 +34,7 @@ export function ErrorPage({
               },
             }}
           >
-            <Logo width={152}></Logo>
+            <Logo width={152} />
           </Box>
         </NextLink>
       </PublicContainer>

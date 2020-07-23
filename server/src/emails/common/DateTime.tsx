@@ -9,5 +9,5 @@ export type DateTimeProps = {
 
 export function DateTime({ value, format }: DateTimeProps) {
   const date = new Date(value);
-  return <FormattedDate value={date} {...format}></FormattedDate>;
+  return <FormattedDate value={date} {...format} />;
 }

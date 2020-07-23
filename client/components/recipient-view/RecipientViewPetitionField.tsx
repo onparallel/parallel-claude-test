@@ -281,7 +281,7 @@ function ReplyWrapper({
               generateCssStripe({ color: colors.gray[200] }),
               animatedStripe({}),
             ]}
-          ></Box>
+          />
           <Box
             position="relative"
             lineHeight="24px"
@@ -357,7 +357,7 @@ function TextReplyForm({
             <FormattedMessage
               id="generic.forms.required-field-error"
               defaultMessage="A value is required"
-            ></FormattedMessage>
+            />
           </FormErrorMessage>
         )}
       </FormControl>

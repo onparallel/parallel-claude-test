@@ -42,13 +42,13 @@ export function PetitionProgressBar({
               max={total!}
               value={validated!}
               backgroundColor="green.400"
-            ></ProgressIndicator>
+            />
             <ProgressIndicator
               min={0}
               max={total!}
               value={replied!}
               backgroundColor="yellow.400"
-            ></ProgressIndicator>
+            />
             <ProgressIndicator
               min={0}
               max={total!}
@@ -58,7 +58,7 @@ export function PetitionProgressBar({
                 color: theme.colors.gray[200],
                 size: "1rem",
               })}
-            ></ProgressIndicator>
+            />
           </ProgressTrack>
         </Box>
       </PopoverTrigger>

@@ -4,7 +4,6 @@ import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -249,119 +248,108 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   }
 
   return (
-    <>
-      <Title>
-        {petition!.name ||
-          intl.formatMessage({
-            id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition",
-          })}
-      </Title>
-      <PetitionLayout
-        key={petition!.id}
-        user={me}
-        petition={petition!}
-        onUpdatePetition={handleOnUpdatePetition}
-        section="replies"
-        scrollBody={false}
-        state={state}
-        display="flex"
-        flexDirection="column"
-        minHeight={0}
-        overflow="visible"
+    <PetitionLayout
+      key={petition!.id}
+      user={me}
+      petition={petition!}
+      onUpdatePetition={handleOnUpdatePetition}
+      section="replies"
+      scrollBody={false}
+      state={state}
+      display="flex"
+      flexDirection="column"
+      minHeight={0}
+      overflow="visible"
+    >
+      <Stack
+        direction="row"
+        paddingX={4}
+        paddingY={2}
+        backgroundColor={pendingComments ? "yellow.50" : "white"}
       >
-        <Stack
-          direction="row"
-          paddingX={4}
-          paddingY={2}
-          backgroundColor={pendingComments ? "yellow.50" : "white"}
-        >
-          <IconButtonWithTooltip
-            onClick={() => refetch()}
-            icon="repeat"
-            placement="bottom"
-            variant="outline"
-            label={intl.formatMessage({
-              id: "generic.reload-data",
-              defaultMessage: "Reload",
-            })}
-          />
-          <Spacer />
-          {pendingComments ? (
-            <Button
-              variantColor="yellow"
-              isDisabled={isSubmitting}
-              onClick={handleSubmitUnpublished}
-            >
-              <FormattedMessage
-                id="petition-replies.submit-comments"
-                defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-                values={{ commentCount: pendingComments }}
-              />
-            </Button>
-          ) : null}
-          {showDownloadAll ? (
-            <Button
-              variantColor="purple"
-              leftIcon="download"
-              onClick={handleDownloadAllClick}
-            >
-              <FormattedMessage
-                id="petition-replies.download-all"
-                defaultMessage="Download files"
-              />
-            </Button>
-          ) : null}
-        </Stack>
-        <Divider />
-        <Box flex="1" overflow="auto">
-          <PaneWithFlyout
-            active={Boolean(activeFieldId)}
-            alignWith={activeFieldElement}
-            flyout={
-              <Box padding={4} paddingLeft={{ md: 0 }}>
-                <PetitionRepliesFieldComments
-                  key={activeFieldId!}
-                  field={activeField!}
-                  userId={me.id}
-                  onClose={() => setActiveFieldId(null)}
-                  onAddComment={handleAddComment}
-                  onUpdateComment={handleUpdateComment}
-                  onDeleteComment={handleDeleteComment}
-                />
-              </Box>
-            }
+        <IconButtonWithTooltip
+          onClick={() => refetch()}
+          icon="repeat"
+          placement="bottom"
+          variant="outline"
+          label={intl.formatMessage({
+            id: "generic.reload-data",
+            defaultMessage: "Reload",
+          })}
+        />
+        <Spacer />
+        {pendingComments ? (
+          <Button
+            variantColor="yellow"
+            isDisabled={isSubmitting}
+            onClick={handleSubmitUnpublished}
           >
-            <Stack flex="2" spacing={4} padding={4} id="petition-replies">
-              {petition!.fields.map((field, index) => (
-                <PetitionRepliesField
-                  id={`field-${field.id}`}
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  highlighted={activeFieldId === field.id}
-                  onValidateToggle={() =>
-                    handleValidateToggle([field.id], !field.validated)
-                  }
-                  onAction={handleAction}
-                  isActive={activeFieldId === field.id}
-                  commentCount={index}
-                  newCommentCount={index > 1 ? index - 1 : 0}
-                  onToggleComments={() =>
-                    setActiveFieldId(
-                      activeFieldId === field.id ? null : field.id
-                    )
-                  }
-                  onUpdateReplyStatus={(replyId, status) =>
-                    handleUpdateRepliesStatus(field.id, [replyId], status)
-                  }
-                />
-              ))}
-            </Stack>
-          </PaneWithFlyout>
-        </Box>
-      </PetitionLayout>
-    </>
+            <FormattedMessage
+              id="petition-replies.submit-comments"
+              defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
+              values={{ commentCount: pendingComments }}
+            />
+          </Button>
+        ) : null}
+        {showDownloadAll ? (
+          <Button
+            variantColor="purple"
+            leftIcon="download"
+            onClick={handleDownloadAllClick}
+          >
+            <FormattedMessage
+              id="petition-replies.download-all"
+              defaultMessage="Download files"
+            />
+          </Button>
+        ) : null}
+      </Stack>
+      <Divider />
+      <Box flex="1" overflow="auto">
+        <PaneWithFlyout
+          active={Boolean(activeFieldId)}
+          alignWith={activeFieldElement}
+          flyout={
+            <Box padding={4} paddingLeft={{ md: 0 }}>
+              <PetitionRepliesFieldComments
+                key={activeFieldId!}
+                field={activeField!}
+                userId={me.id}
+                onClose={() => setActiveFieldId(null)}
+                onAddComment={handleAddComment}
+                onUpdateComment={handleUpdateComment}
+                onDeleteComment={handleDeleteComment}
+              />
+            </Box>
+          }
+        >
+          <Stack flex="2" spacing={4} padding={4} id="petition-replies">
+            {petition!.fields.map((field, index) => (
+              <PetitionRepliesField
+                id={`field-${field.id}`}
+                key={field.id}
+                field={field}
+                index={index}
+                highlighted={activeFieldId === field.id}
+                onValidateToggle={() =>
+                  handleValidateToggle([field.id], !field.validated)
+                }
+                onAction={handleAction}
+                isActive={activeFieldId === field.id}
+                commentCount={index}
+                newCommentCount={index > 1 ? index - 1 : 0}
+                onToggleComments={() =>
+                  setActiveFieldId(activeFieldId === field.id ? null : field.id)
+                }
+                onUpdateReplyStatus={(replyId, status) =>
+                  handleUpdateRepliesStatus(field.id, [replyId], status)
+                }
+              />
+            ))}
+          </Stack>
+        </PaneWithFlyout>
+      </Box>
+    </PetitionLayout>
   );
 }
 

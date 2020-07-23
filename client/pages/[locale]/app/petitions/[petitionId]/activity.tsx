@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, List, ListItem, Text, useToast } from "@chakra-ui/core";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -362,46 +361,37 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   }, [petition!.events.items]);
 
   return (
-    <>
-      <Title>
-        {petition!.name ||
-          intl.formatMessage({
-            id: "generic.untitled-petition",
-            defaultMessage: "Untitled petition",
-          })}
-      </Title>
-      <PetitionLayout
-        key={petition!.id}
-        user={me}
-        petition={petition!}
-        onUpdatePetition={handleOnUpdatePetition}
-        section="activity"
-        scrollBody
-        state={state}
-      >
-        <Box minWidth="containers.lg">
-          <PetitionAccessesTable
-            id="petition-accesses"
-            margin={4}
-            petition={petition!}
-            onSendMessage={handleSendMessage}
-            onSendReminders={handleSendReminders}
-            onAddPetitionAccess={handleAddPetitionAccess}
-            onReactivateAccess={handleReactivateAccess}
-            onDeactivateAccess={handleDeactivateAccess}
-            onConfigureReminders={handleConfigureReminders}
+    <PetitionLayout
+      key={petition!.id}
+      user={me}
+      petition={petition!}
+      onUpdatePetition={handleOnUpdatePetition}
+      section="activity"
+      scrollBody
+      state={state}
+    >
+      <Box minWidth="containers.lg">
+        <PetitionAccessesTable
+          id="petition-accesses"
+          margin={4}
+          petition={petition!}
+          onSendMessage={handleSendMessage}
+          onSendReminders={handleSendReminders}
+          onAddPetitionAccess={handleAddPetitionAccess}
+          onReactivateAccess={handleReactivateAccess}
+          onDeactivateAccess={handleDeactivateAccess}
+          onConfigureReminders={handleConfigureReminders}
+        />
+        <Box margin={4}>
+          <PetitionActivityTimeline
+            id="petition-activity-timeline"
+            userId={me.id}
+            events={events}
+            onCancelScheduledMessage={handleCancelScheduledMessage}
           />
-          <Box margin={4}>
-            <PetitionActivityTimeline
-              id="petition-activity-timeline"
-              userId={me.id}
-              events={events}
-              onCancelScheduledMessage={handleCancelScheduledMessage}
-            />
-          </Box>
         </Box>
-      </PetitionLayout>
-    </>
+      </Box>
+    </PetitionLayout>
   );
 }
 

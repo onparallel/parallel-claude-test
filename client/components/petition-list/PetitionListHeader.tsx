@@ -102,7 +102,7 @@ export function PetitionListHeader({
             <FormattedMessage
               id="generic.actions-button"
               defaultMessage="Actions"
-            ></FormattedMessage>
+            />
           </ButtonDropdown>
         </Box>
       ) : null}

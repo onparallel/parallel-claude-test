@@ -6,7 +6,8 @@ import {
   PetitionHeaderProps,
 } from "@parallel/components/layout/PetitionHeader";
 import { PetitionLayout_UserFragment } from "@parallel/graphql/__types";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
+import { useIntl } from "react-intl";
 
 export type PetitionLayoutProps = BoxProps &
   PetitionHeaderProps & {
@@ -25,8 +26,36 @@ export function PetitionLayout({
   children,
   ...props
 }: PetitionLayoutProps) {
+  const intl = useIntl();
+  const title = useMemo(
+    () =>
+      (({
+        compose: intl.formatMessage({
+          id: "petition.header.compose-tab",
+          defaultMessage: "Compose",
+        }),
+        replies: intl.formatMessage({
+          id: "petition.header.replies-tab",
+          defaultMessage: "Replies",
+        }),
+        activity: intl.formatMessage({
+          id: "petition.header.activity-tab",
+          defaultMessage: "Activity",
+        }),
+      } as Record<PetitionHeaderProps["section"], string>)[section]),
+    [section, intl.locale]
+  );
   return (
-    <AppLayout user={user}>
+    <AppLayout
+      title={`${
+        petition!.name ||
+        intl.formatMessage({
+          id: "generic.untitled-petition",
+          defaultMessage: "Untitled petition",
+        })
+      } - ${title}`}
+      user={user}
+    >
       <PetitionHeader
         petition={petition}
         onUpdatePetition={onUpdatePetition}
@@ -44,6 +73,7 @@ PetitionLayout.fragments = {
   Petition: gql`
     fragment PetitionLayout_Petition on Petition {
       id
+      title
       ...PetitionHeader_Petition
     }
     ${PetitionHeader.fragments.Petition}

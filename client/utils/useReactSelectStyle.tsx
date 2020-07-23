@@ -104,7 +104,7 @@ export function useReactSelectStyle<
             size="xs"
             variant="ghost"
             {...innerProps}
-          ></IconButton>
+          />
         )),
         DropdownIndicator: memo(({ isFocused }) => (
           <PseudoBox

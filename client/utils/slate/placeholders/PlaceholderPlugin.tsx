@@ -81,7 +81,7 @@ const PlaceholderToken = function ({
         as="span"
         data-placeholder-label={label}
         _before={{ content: `attr(data-placeholder-label)` }}
-      ></PseudoBox>
+      />
       <PseudoBox as="span" fontSize={0} aria-hidden>{`#${value}#`}</PseudoBox>
       {children}
     </Box>

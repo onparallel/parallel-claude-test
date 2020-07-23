@@ -38,7 +38,7 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
   }, [intl.locale]);
   return (
     <Menu>
-      <MenuButton as={Button} ref={ref} {...props}></MenuButton>
+      <MenuButton as={Button} ref={ref} {...props} />
       <MenuList>
         {FIELD_TYPES.map((type) => (
           <MenuItem

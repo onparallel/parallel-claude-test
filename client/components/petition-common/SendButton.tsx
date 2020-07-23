@@ -45,7 +45,7 @@ export function SendButton({
             </MenuItem>
           </MenuList>
         }
-      ></ButtonDropdown>
+      />
     </SplitButton>
   );
 }

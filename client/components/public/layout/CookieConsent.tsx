@@ -57,7 +57,7 @@ export function CookieConsent({}: CookieConsentProps) {
               </Link>
             ),
           }}
-        ></FormattedMessage>
+        />
       </Text>
       <Button
         marginX={4}
@@ -77,7 +77,7 @@ export function CookieConsent({}: CookieConsentProps) {
         <FormattedMessage
           id="component.cookie-consent.accept-button"
           defaultMessage="Accept"
-        ></FormattedMessage>
+        />
       </Button>
     </PublicContainer>
   ) : null;

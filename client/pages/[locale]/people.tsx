@@ -12,7 +12,6 @@ import {
   useTheme,
 } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
-import { Title } from "@parallel/components/common/Title";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
@@ -22,80 +21,52 @@ import { FormattedMessage, useIntl } from "react-intl";
 function People() {
   const intl = useIntl();
   return (
-    <>
-      <Title>
-        {intl.formatMessage({
-          id: "public.people.title",
-          defaultMessage: "For whom",
-        })}
-      </Title>
-      <PublicLayout>
-        <PublicContainer
-          textAlign="center"
-          wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
-        >
-          <Heading as="h1" fontSize="3xl" fontWeight="bold" color="purple.600">
-            <FormattedMessage
-              id="public.people.hero-title"
-              defaultMessage="Laura now has more time to focus on the important work"
-            ></FormattedMessage>
-          </Heading>
-          <Text marginTop={8} fontSize="lg">
-            <FormattedMessage
-              id="public.people.routine-change"
-              defaultMessage="Let us tell you how her routine has changed since she discovered Parallel."
-            ></FormattedMessage>
-          </Text>
-        </PublicContainer>
-        <PublicContainer maxWidth="containers.md">
-          <Flex display="column">
-            <Separator minHeight="60px" />
-            <OneColumnTimeline>
-              <Heading
-                as="h4"
-                fontSize="3xl"
-                fontWeight="light"
-                color="purple.500"
-              >
-                <FormattedMessage
-                  id="public.case.laura.without-parallel"
-                  defaultMessage="Without Parallel"
-                ></FormattedMessage>
-              </Heading>
-            </OneColumnTimeline>
-            <TwoColumnsTimeline
-              left={
-                <Flex direction="column">
-                  <Text>
-                    <FormattedMessage
-                      id="public.case.laura.time-spent"
-                      defaultMessage="Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work."
-                      values={{
-                        a: (chunks: any[]) => (
-                          <Text as="em" fontStyle="normal" color="purple.500">
-                            {chunks}
-                          </Text>
-                        ),
-                      }}
-                    ></FormattedMessage>
-                  </Text>
-                </Flex>
-              }
-              right={
-                <Image
-                  margin="auto"
-                  src="/static/images/undraw_working_remotely.svg"
-                  width="250px"
-                  role="presentation"
-                />
-              }
-            ></TwoColumnsTimeline>
-            <TwoColumnsTimeline
-              right={
+    <PublicLayout
+      title={intl.formatMessage({
+        id: "public.people.title",
+        defaultMessage: "For whom",
+      })}
+    >
+      <PublicContainer
+        textAlign="center"
+        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
+      >
+        <Heading as="h1" fontSize="3xl" fontWeight="bold" color="purple.600">
+          <FormattedMessage
+            id="public.people.hero-title"
+            defaultMessage="Laura now has more time to focus on the important work"
+          />
+        </Heading>
+        <Text marginTop={8} fontSize="lg">
+          <FormattedMessage
+            id="public.people.routine-change"
+            defaultMessage="Let us tell you how her routine has changed since she discovered Parallel."
+          />
+        </Text>
+      </PublicContainer>
+      <PublicContainer maxWidth="containers.md">
+        <Flex display="column">
+          <Separator minHeight="60px" />
+          <OneColumnTimeline>
+            <Heading
+              as="h4"
+              fontSize="3xl"
+              fontWeight="light"
+              color="purple.500"
+            >
+              <FormattedMessage
+                id="public.case.laura.without-parallel"
+                defaultMessage="Without Parallel"
+              />
+            </Heading>
+          </OneColumnTimeline>
+          <TwoColumnsTimeline
+            left={
+              <Flex direction="column">
                 <Text>
                   <FormattedMessage
-                    id="public.case.laura.non-billable"
-                    defaultMessage="All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients."
+                    id="public.case.laura.time-spent"
+                    defaultMessage="Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work."
                     values={{
                       a: (chunks: any[]) => (
                         <Text as="em" fontStyle="normal" color="purple.500">
@@ -103,29 +74,25 @@ function People() {
                         </Text>
                       ),
                     }}
-                  ></FormattedMessage>
+                  />
                 </Text>
-              }
-            ></TwoColumnsTimeline>
-            <OneColumnTimeline>
-              <Heading
-                as="h4"
-                fontSize="3xl"
-                fontWeight="light"
-                color="purple.500"
-              >
-                <FormattedMessage
-                  id="public.case.laura.with-parallel"
-                  defaultMessage="With Parallel"
-                ></FormattedMessage>
-              </Heading>
-            </OneColumnTimeline>
-            <Separator flex="1" minHeight="40px" />
-            <OneColumnTimeline>
+              </Flex>
+            }
+            right={
+              <Image
+                margin="auto"
+                src="/static/images/undraw_working_remotely.svg"
+                width="250px"
+                role="presentation"
+              />
+            }
+          />
+          <TwoColumnsTimeline
+            right={
               <Text>
                 <FormattedMessage
-                  id="public.case.laura.recently-discovered"
-                  defaultMessage="Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>."
+                  id="public.case.laura.non-billable"
+                  defaultMessage="All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients."
                   values={{
                     a: (chunks: any[]) => (
                       <Text as="em" fontStyle="normal" color="purple.500">
@@ -133,103 +100,132 @@ function People() {
                       </Text>
                     ),
                   }}
-                ></FormattedMessage>
+                />
               </Text>
-            </OneColumnTimeline>
-            <TwoColumnsTimeline
-              left={
-                <Image
-                  margin="auto"
-                  src="/static/images/undraw_freelancer.svg"
-                  width="250px"
-                  role="presentation"
-                />
-              }
-              right={
-                <Text>
-                  <FormattedMessage
-                    id="public.case.laura.increased-billing"
-                    defaultMessage="In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>."
-                    values={{
-                      a: (chunks: any[]) => (
-                        <Text as="em" fontStyle="normal" color="purple.500">
-                          {chunks}
-                        </Text>
-                      ),
-                    }}
-                  ></FormattedMessage>
-                </Text>
-              }
-            ></TwoColumnsTimeline>
-            <OneColumnTimeline>
-              <Text>
-                <FormattedMessage
-                  id="public.case.laura.now-has"
-                  defaultMessage="Laura now has:"
-                ></FormattedMessage>
-              </Text>
-            </OneColumnTimeline>
-            <Separator flex="1" minHeight="20px" />
-          </Flex>
-          <Box textAlign="left" maxWidth="520px" margin="auto" marginTop={4}>
-            <List stylePos="outside" spacing={4}>
-              <ListItem display="flex">
-                <ListIcon
-                  icon="check"
-                  color="purple.500"
-                  marginTop={1}
-                  marginRight={2}
-                />
-                <FormattedMessage
-                  id="public.case.laura.centralized-information"
-                  defaultMessage="All the information always available in a single place on the cloud."
-                ></FormattedMessage>
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  icon="check"
-                  color="purple.500"
-                  marginTop={1}
-                  marginRight={2}
-                />
-                <FormattedMessage
-                  id="public.case.laura.reminders"
-                  defaultMessage="The peace of mind about not having to chase clients, because Parallel does it for her."
-                ></FormattedMessage>
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  icon="check"
-                  color="purple.500"
-                  marginTop={1}
-                  marginRight={2}
-                />
-                <FormattedMessage
-                  id="public.case.laura.client-anywhere"
-                  defaultMessage="The convenience for her clients, who now can upload their files at any time and from any device."
-                ></FormattedMessage>
-              </ListItem>
-            </List>
-          </Box>
-          <Box textAlign="center" paddingY={20}>
+            }
+          />
+          <OneColumnTimeline>
+            <Heading
+              as="h4"
+              fontSize="3xl"
+              fontWeight="light"
+              color="purple.500"
+            >
+              <FormattedMessage
+                id="public.case.laura.with-parallel"
+                defaultMessage="With Parallel"
+              />
+            </Heading>
+          </OneColumnTimeline>
+          <Separator flex="1" minHeight="40px" />
+          <OneColumnTimeline>
             <Text>
               <FormattedMessage
-                id="public.case.laura.register"
-                defaultMessage="If you want to start using Parallel for free, register here."
-              ></FormattedMessage>
+                id="public.case.laura.recently-discovered"
+                defaultMessage="Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>."
+                values={{
+                  a: (chunks: any[]) => (
+                    <Text as="em" fontStyle="normal" color="purple.500">
+                      {chunks}
+                    </Text>
+                  ),
+                }}
+              />
             </Text>
-            <NakedLink href="/invite">
-              <Button as="a" variantColor="purple" marginTop={8}>
+          </OneColumnTimeline>
+          <TwoColumnsTimeline
+            left={
+              <Image
+                margin="auto"
+                src="/static/images/undraw_freelancer.svg"
+                width="250px"
+                role="presentation"
+              />
+            }
+            right={
+              <Text>
                 <FormattedMessage
-                  id="public.invite-button"
-                  defaultMessage="Try Parallel free"
-                ></FormattedMessage>
-              </Button>
-            </NakedLink>
-          </Box>
-        </PublicContainer>
-      </PublicLayout>
-    </>
+                  id="public.case.laura.increased-billing"
+                  defaultMessage="In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>."
+                  values={{
+                    a: (chunks: any[]) => (
+                      <Text as="em" fontStyle="normal" color="purple.500">
+                        {chunks}
+                      </Text>
+                    ),
+                  }}
+                />
+              </Text>
+            }
+          />
+          <OneColumnTimeline>
+            <Text>
+              <FormattedMessage
+                id="public.case.laura.now-has"
+                defaultMessage="Laura now has:"
+              />
+            </Text>
+          </OneColumnTimeline>
+          <Separator flex="1" minHeight="20px" />
+        </Flex>
+        <Box textAlign="left" maxWidth="520px" margin="auto" marginTop={4}>
+          <List stylePos="outside" spacing={4}>
+            <ListItem display="flex">
+              <ListIcon
+                icon="check"
+                color="purple.500"
+                marginTop={1}
+                marginRight={2}
+              />
+              <FormattedMessage
+                id="public.case.laura.centralized-information"
+                defaultMessage="All the information always available in a single place on the cloud."
+              />
+            </ListItem>
+            <ListItem display="flex">
+              <ListIcon
+                icon="check"
+                color="purple.500"
+                marginTop={1}
+                marginRight={2}
+              />
+              <FormattedMessage
+                id="public.case.laura.reminders"
+                defaultMessage="The peace of mind about not having to chase clients, because Parallel does it for her."
+              />
+            </ListItem>
+            <ListItem display="flex">
+              <ListIcon
+                icon="check"
+                color="purple.500"
+                marginTop={1}
+                marginRight={2}
+              />
+              <FormattedMessage
+                id="public.case.laura.client-anywhere"
+                defaultMessage="The convenience for her clients, who now can upload their files at any time and from any device."
+              />
+            </ListItem>
+          </List>
+        </Box>
+        <Box textAlign="center" paddingY={20}>
+          <Text>
+            <FormattedMessage
+              id="public.case.laura.register"
+              defaultMessage="If you want to start using Parallel for free, register here."
+            />
+          </Text>
+          <NakedLink href="/invite">
+            <Button as="a" variantColor="purple" marginTop={8}>
+              <FormattedMessage
+                id="public.invite-button"
+                defaultMessage="Try Parallel free"
+              />
+            </Button>
+          </NakedLink>
+        </Box>
+      </PublicContainer>
+    </PublicLayout>
   );
 }
 

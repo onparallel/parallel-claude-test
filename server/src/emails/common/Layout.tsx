@@ -37,7 +37,7 @@ export const Layout: FC<LayoutProps> = function Layout({
     <Mjml>
       <MjmlHead>
         <MjmlAttributes>
-          <MjmlAll fontSize="14px"></MjmlAll>
+          <MjmlAll fontSize="14px" />
           <MjmlClass
             name="button-primary"
             backgroundColor="#6059f7"
@@ -63,7 +63,7 @@ export const Layout: FC<LayoutProps> = function Layout({
         {/* Header */}
         <MjmlSection>
           <MjmlColumn>
-            <MjmlImage alt={logoAlt} width="200px" src={logoUrl}></MjmlImage>
+            <MjmlImage alt={logoAlt} width="200px" src={logoUrl} />
           </MjmlColumn>
         </MjmlSection>
 
@@ -76,11 +76,7 @@ export const Layout: FC<LayoutProps> = function Layout({
 
         {/* Footer */}
         <MjmlSection>
-          <MjmlDivider
-            borderWidth="1px"
-            borderColor="#A0AEC0"
-            width="80%"
-          ></MjmlDivider>
+          <MjmlDivider borderWidth="1px" borderColor="#A0AEC0" width="80%" />
         </MjmlSection>
         <MjmlSection padding="0">
           <MjmlColumn width="100%">
@@ -96,7 +92,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               alt="Parallel"
               src={`${assetsUrl}/static/emails/logo.png`}
               href="https://www.parallel.so"
-            ></MjmlImage>
+            />
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
                 name="linkedin-noshare"

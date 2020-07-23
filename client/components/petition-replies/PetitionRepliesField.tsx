@@ -136,7 +136,7 @@ export function PetitionRepliesField({
             <FormattedMessage
               id="petition-replies.validate-field-button"
               defaultMessage="Reviewed"
-            ></FormattedMessage>
+            />
           </Button>
           {/* This Flex element makes the reviewed buttons to be aligned */}
           <Flex width="66px">

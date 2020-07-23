@@ -33,19 +33,19 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             <FormattedMessage
               id="public.home.hero-collect"
               defaultMessage="Automate emails and collect documents efficiently"
-            ></FormattedMessage>
+            />
           </Heading>
           <Text marginTop={8}>
             <FormattedMessage
               id="public.home.hero-platform"
               defaultMessage="Parallel is a platform for busy professionals. We collect all the documentation from your client for you safely and quickly."
-            ></FormattedMessage>
+            />
           </Text>
           <Text marginTop={4}>
             <FormattedMessage
               id="public.home.hero-digital-transformation"
               defaultMessage="Begin your digital transformation!"
-            ></FormattedMessage>
+            />
           </Text>
           <Flex
             marginTop={8}
@@ -61,7 +61,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 <FormattedMessage
                   id="public.invite-button"
                   defaultMessage="Try Parallel free"
-                ></FormattedMessage>
+                />
               </Button>
             </NakedLink>
             <NakedLink href="/book-demo">
@@ -69,7 +69,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 <FormattedMessage
                   id="public.book-demo-button"
                   defaultMessage="Book a demo"
-                ></FormattedMessage>
+                />
               </Button>
             </NakedLink>
           </Flex>
@@ -77,7 +77,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             <FormattedMessage
               id="public.home.hero-try-now"
               defaultMessage="Try it now and let Parallel work for you"
-            ></FormattedMessage>
+            />
           </Text>
         </Box>
         <Box

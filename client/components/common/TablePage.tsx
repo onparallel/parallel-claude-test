@@ -82,7 +82,7 @@ export function TablePage<T>({
             borderTop="1px solid"
             borderTopColor={colors.border}
             marginTop="-1px"
-          ></Table>
+          />
         )}
       </Flex>
       <Stack

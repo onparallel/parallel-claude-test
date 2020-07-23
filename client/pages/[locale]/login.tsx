@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/core";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import { Title } from "@parallel/components/common/Title";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -101,38 +100,35 @@ function Login() {
   }
 
   return (
-    <>
-      <Title>
-        {intl.formatMessage({
-          id: "public.login.title",
-          defaultMessage: "Login",
-        })}
-      </Title>
-      <PublicLayout>
-        <PublicUserFormContainer>
-          {showContinueAs ? (
-            <AlreadyLoggedIn
-              me={data!.me}
-              onRelogin={() => setShowContinueAs(false)}
-              onContinueAs={() =>
-                router.push(
-                  "/[locale]/app/petitions",
-                  `/${router.query.locale}/app/petitions`
-                )
-              }
-            />
-          ) : passwordChange.required ? (
-            <PasswordChangeForm
-              onSubmit={onPasswordChangeSubmit}
-              onBackToLogin={() => setPasswordChange({ required: false })}
-              isSubmitting={isSubmitting}
-            />
-          ) : (
-            <LoginForm onSubmit={onLoginSubmit} isSubmitting={isSubmitting} />
-          )}
-        </PublicUserFormContainer>
-      </PublicLayout>
-    </>
+    <PublicLayout
+      title={intl.formatMessage({
+        id: "public.login.title",
+        defaultMessage: "Login",
+      })}
+    >
+      <PublicUserFormContainer>
+        {showContinueAs ? (
+          <AlreadyLoggedIn
+            me={data!.me}
+            onRelogin={() => setShowContinueAs(false)}
+            onContinueAs={() =>
+              router.push(
+                "/[locale]/app/petitions",
+                `/${router.query.locale}/app/petitions`
+              )
+            }
+          />
+        ) : passwordChange.required ? (
+          <PasswordChangeForm
+            onSubmit={onPasswordChangeSubmit}
+            onBackToLogin={() => setPasswordChange({ required: false })}
+            isSubmitting={isSubmitting}
+          />
+        ) : (
+          <LoginForm onSubmit={onLoginSubmit} isSubmitting={isSubmitting} />
+        )}
+      </PublicUserFormContainer>
+    </PublicLayout>
   );
 }
 
@@ -150,13 +146,13 @@ function AlreadyLoggedIn({
   return (
     <>
       <Box marginTop={4} textAlign="center">
-        <Avatar name={me.fullName ?? undefined} size="lg"></Avatar>
+        <Avatar name={me.fullName ?? undefined} size="lg" />
         <Text marginTop={4}>
           <FormattedMessage
             id="public.login.already-logged-in.explanation"
             defaultMessage="You are already logged in as {name}"
             values={{ name: <b>{me.fullName || me.email}</b> }}
-          ></FormattedMessage>
+          />
         </Text>
         {me.fullName ? <Text>({me.email})</Text> : null}
       </Box>
@@ -171,14 +167,14 @@ function AlreadyLoggedIn({
           id="public.login.already-logged-in.continue-button"
           defaultMessage="Continue as {name}"
           values={{ name: me.fullName || me.email }}
-        ></FormattedMessage>
+        />
       </Button>
       <Box marginTop={4} textAlign="center">
         <NormalLink role="button" onClick={onRelogin}>
           <FormattedMessage
             id="public.login.already-logged-in.relogin"
             defaultMessage="Login as someone else"
-          ></FormattedMessage>
+          />
         </NormalLink>
       </Box>
     </>
@@ -204,13 +200,13 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           <FormattedMessage
             id="public.login.header"
             defaultMessage="Enter Parallel"
-          ></FormattedMessage>
+          />
         </Heading>
         <Text>
           <FormattedMessage
             id="public.login.explanation"
             defaultMessage="Login using your email and password"
-          ></FormattedMessage>
+          />
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -219,7 +215,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             <FormattedMessage
               id="generic.forms.email-label"
               defaultMessage="Email"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <Input
             id="email"
@@ -235,7 +231,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               <FormattedMessage
                 id="generic.forms.invalid-email-error"
                 defaultMessage="Please, enter a valid email"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -244,7 +240,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             <FormattedMessage
               id="generic.forms.password-label"
               defaultMessage="Password"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <PasswordInput
             id="password"
@@ -256,7 +252,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               <FormattedMessage
                 id="generic.forms.required-password-error"
                 defaultMessage="Please, enter a password"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -267,10 +263,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           isLoading={isSubmitting}
           type="submit"
         >
-          <FormattedMessage
-            id="public.login-button"
-            defaultMessage="Login"
-          ></FormattedMessage>
+          <FormattedMessage id="public.login-button" defaultMessage="Login" />
         </Button>
       </form>
       <Box marginTop={4} textAlign="center">
@@ -278,7 +271,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           <FormattedMessage
             id="public.login.forgot-password-link"
             defaultMessage="I forgot my password"
-          ></FormattedMessage>
+          />
         </Link>
       </Box>
     </>
@@ -311,13 +304,13 @@ function PasswordChangeForm({
           <FormattedMessage
             id="public.login.password-update-header"
             defaultMessage="Update your password"
-          ></FormattedMessage>
+          />
         </Heading>
         <Text>
           <FormattedMessage
             id="public.login.password-update-explanation"
             defaultMessage="First time users need to update their password"
-          ></FormattedMessage>
+          />
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -326,7 +319,7 @@ function PasswordChangeForm({
             <FormattedMessage
               id="generic.forms.new-password-label"
               defaultMessage="New password"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <PasswordInput
             id="password"
@@ -341,7 +334,7 @@ function PasswordChangeForm({
               <FormattedMessage
                 id="generic.forms.password-policy-error"
                 defaultMessage="The password must have a least 8 characters"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -350,7 +343,7 @@ function PasswordChangeForm({
             <FormattedMessage
               id="generic.forms.password-label"
               defaultMessage="Password"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <PasswordInput
             id="password-confirm"
@@ -365,7 +358,7 @@ function PasswordChangeForm({
               <FormattedMessage
                 id="generic.forms.passwords-must-match"
                 defaultMessage="Passwords must match"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -379,7 +372,7 @@ function PasswordChangeForm({
           <FormattedMessage
             id="public.login.password-update-button"
             defaultMessage="Update password"
-          ></FormattedMessage>
+          />
         </Button>
       </form>
       <Box marginTop={4} textAlign="center">
@@ -387,7 +380,7 @@ function PasswordChangeForm({
           <FormattedMessage
             id="public.login.back-to-login-link"
             defaultMessage="Go back to login"
-          ></FormattedMessage>
+          />
         </NormalLink>
       </Box>
     </>

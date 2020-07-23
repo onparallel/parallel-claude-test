@@ -86,12 +86,6 @@ export function NakedLink({ href, as, children, ...props }: NakedLinkProps) {
 export const NormalLink = forwardRef<HTMLAnchorElement, ChakraLinkProps>(
   function NormalLink(props: ChakraLinkProps, ref) {
     const { colorMode } = useColorMode();
-    return (
-      <ChakraLink
-        {...linkColorProps(colorMode)}
-        {...props}
-        ref={ref}
-      ></ChakraLink>
-    );
+    return <ChakraLink {...linkColorProps(colorMode)} {...props} ref={ref} />;
   }
 );

@@ -52,7 +52,7 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
           paddingRight: 0,
         }}
       >
-        <Avatar name={user.fullName!} size="md"></Avatar>
+        <Avatar name={user.fullName!} size="md" />
       </MenuButton>
       <MenuList placement={isMobile ? "top-end" : "right-end"}>
         <NakedLink href="/app/settings/account">

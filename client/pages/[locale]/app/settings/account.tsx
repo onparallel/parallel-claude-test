@@ -23,7 +23,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 interface NameChangeFormData {
   firstName: string;
@@ -31,6 +31,7 @@ interface NameChangeFormData {
 }
 
 function Account() {
+  const intl = useIntl();
   const {
     data: { me },
   } = assertQuery(useAccountQuery());
@@ -47,7 +48,13 @@ function Account() {
   }
 
   return (
-    <AppLayout user={me}>
+    <AppLayout
+      title={intl.formatMessage({
+        id: "settings.account",
+        defaultMessage: "Account",
+      })}
+      user={me}
+    >
       <SettingsLayout
         header={
           <FormattedMessage id="settings.account" defaultMessage="Account" />
@@ -70,7 +77,7 @@ function Account() {
                 <FormattedMessage
                   id="generic.forms.first-name-label"
                   defaultMessage="First name"
-                ></FormattedMessage>
+                />
               </FormLabel>
               <Input
                 id="first-name"
@@ -83,7 +90,7 @@ function Account() {
                   <FormattedMessage
                     id="generic.forms.required-first-name-error"
                     defaultMessage="First name is required"
-                  ></FormattedMessage>
+                  />
                 </FormErrorMessage>
               )}
             </FormControl>
@@ -92,7 +99,7 @@ function Account() {
                 <FormattedMessage
                   id="generic.forms.last-name-label"
                   defaultMessage="Last name"
-                ></FormattedMessage>
+                />
               </FormLabel>
               <Input
                 id="last-name"
@@ -105,7 +112,7 @@ function Account() {
                   <FormattedMessage
                     id="generic.forms.required-last-name-error"
                     defaultMessage="Last name is required"
-                  ></FormattedMessage>
+                  />
                 </FormErrorMessage>
               )}
             </FormControl>

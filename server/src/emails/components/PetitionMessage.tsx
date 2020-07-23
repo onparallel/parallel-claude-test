@@ -130,7 +130,7 @@ const email: Email<PetitionMessageProps> = {
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
                 }}
-              ></FormattedMessage>
+              />
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
@@ -153,10 +153,7 @@ const email: Email<PetitionMessageProps> = {
                   values={{
                     deadline: (
                       <span style={{ textDecoration: "underline" }}>
-                        <DateTime
-                          value={deadline}
-                          format={FORMATS.LLL}
-                        ></DateTime>
+                        <DateTime value={deadline} format={FORMATS.LLL} />
                       </span>
                     ),
                   }}
@@ -174,7 +171,7 @@ const email: Email<PetitionMessageProps> = {
               <FormattedMessage
                 id="generic.complete-information-button"
                 defaultMessage="Complete the information here"
-              ></FormattedMessage>
+              />
             </Button>
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
@@ -211,13 +208,13 @@ export const props: PetitionMessageProps = {
             {
               type: "paragraph",
               children: [{ text: "foto", bold: true, underline: true }],
-                },
-              ],
-          type: "list-item",
             },
+          ],
+          type: "list-item",
+        },
+        {
+          children: [
             {
-              children: [
-                {
               type: "paragraph",
               children: [{ text: "pasaporte", italic: true }],
             },
@@ -231,20 +228,20 @@ export const props: PetitionMessageProps = {
                       children: [{ text: "foto", bold: true, underline: true }],
                     },
                   ],
-                      type: "list-item",
+                  type: "list-item",
                 },
                 {
-                      children: [
-                        {
-                          type: "paragraph",
+                  children: [
+                    {
+                      type: "paragraph",
                       children: [{ text: "pasaporte", italic: true }],
-                            },
-                          ],
-                  type: "list-item",
-                        },
-                      ],
                     },
                   ],
+                  type: "list-item",
+                },
+              ],
+            },
+          ],
           type: "list-item",
         },
       ],

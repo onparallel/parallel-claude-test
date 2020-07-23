@@ -11,7 +11,6 @@ export function withSingleLine<T extends Editor>(editor: T) {
         Transforms.mergeNodes(editor);
       }
     }
-
     return normalizeNode([node, path]);
   };
 

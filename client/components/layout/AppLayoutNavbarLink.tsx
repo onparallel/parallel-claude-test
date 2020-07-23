@@ -102,7 +102,7 @@ function AppLayoutNavbarLinkContent({
           name={icon as any}
           size="24px"
           transition="transform 150ms ease"
-        ></Icon>
+        />
       </Box>
       <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight={600}>
         {children}

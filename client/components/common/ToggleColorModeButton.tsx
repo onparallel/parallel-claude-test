@@ -28,7 +28,7 @@ export const ToggleColorModeButton = forwardRef(
         icon={colorMode === "dark" ? "sun" : "moon"}
         onClick={toggleColorMode}
         {...props}
-      ></IconButton>
+      />
     );
   }
 );

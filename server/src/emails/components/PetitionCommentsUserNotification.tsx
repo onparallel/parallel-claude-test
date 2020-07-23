@@ -99,7 +99,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
                   nameOrEmail: <b>{authorNameOrEmail}</b>,
                   petitionName: <b>{petitionName}</b>,
                 }}
-              ></FormattedMessage>
+              />
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

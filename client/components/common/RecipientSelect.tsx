@@ -228,7 +228,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
                   {data.fullName ? (
                     <Text as="span" verticalAlign="baseline">
                       <Text as="span">{data.fullName}</Text>
-                      <Text as="span" display="inline-block" width={2}></Text>
+                      <Text as="span" display="inline-block" width={2} />
                       <Text as="span" fontSize="sm" color="gray.500">
                         {data.email}
                       </Text>
@@ -265,7 +265,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
                   </Text>
                 ),
               }}
-            ></FormattedMessage>
+            />
           );
         },
       } as Partial<Props<Recipient>>),

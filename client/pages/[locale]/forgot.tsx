@@ -13,14 +13,13 @@ import { Link, NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
-import { Title } from "@parallel/components/common/Title";
 import languages from "@parallel/lang/languages.json";
 import { postJson } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useRouter } from "next/router";
 
 interface ForgotPasswordFormData {
   email: string;
@@ -93,31 +92,28 @@ function Forgot() {
   }
 
   return (
-    <>
-      <Title>
-        {intl.formatMessage({
-          id: "public.forgot.title",
-          defaultMessage: "Forgot password",
-        })}
-      </Title>
-      <PublicLayout>
-        <PublicUserFormContainer>
-          {verification.sent ? (
-            <PasswordResetForm
-              onSubmit={onPasswordResetSubmit}
-              onBackToForgotPassword={() => setVerification({ sent: false })}
-              verificationCodeError={!!verification.verificationCodeError}
-              isSubmitting={isSubmitting}
-            ></PasswordResetForm>
-          ) : (
-            <ForgotPasswordForm
-              onSubmit={onForgotPasswordSubmit}
-              isSubmitting={isSubmitting}
-            ></ForgotPasswordForm>
-          )}
-        </PublicUserFormContainer>
-      </PublicLayout>
-    </>
+    <PublicLayout
+      title={intl.formatMessage({
+        id: "public.forgot.title",
+        defaultMessage: "Forgot password",
+      })}
+    >
+      <PublicUserFormContainer>
+        {verification.sent ? (
+          <PasswordResetForm
+            onSubmit={onPasswordResetSubmit}
+            onBackToForgotPassword={() => setVerification({ sent: false })}
+            verificationCodeError={!!verification.verificationCodeError}
+            isSubmitting={isSubmitting}
+          />
+        ) : (
+          <ForgotPasswordForm
+            onSubmit={onForgotPasswordSubmit}
+            isSubmitting={isSubmitting}
+          />
+        )}
+      </PublicUserFormContainer>
+    </PublicLayout>
   );
 }
 
@@ -138,13 +134,13 @@ function ForgotPasswordForm({
           <FormattedMessage
             id="public.forgot-password.header"
             defaultMessage="Forgot password"
-          ></FormattedMessage>
+          />
         </Heading>
         <Text>
           <FormattedMessage
             id="public.forgot-password.explanation"
             defaultMessage="We will send you a message to reset your password."
-          ></FormattedMessage>
+          />
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -153,7 +149,7 @@ function ForgotPasswordForm({
             <FormattedMessage
               id="generic.forms.email-label"
               defaultMessage="Email"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <Input
             id="email"
@@ -169,7 +165,7 @@ function ForgotPasswordForm({
               <FormattedMessage
                 id="generic.forms.invalid-email-error"
                 defaultMessage="Please, enter a valid email"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -183,7 +179,7 @@ function ForgotPasswordForm({
           <FormattedMessage
             id="public.forgot-password.send-button"
             defaultMessage="Send verification code"
-          ></FormattedMessage>
+          />
         </Button>
       </form>
       <Box marginTop={4} textAlign="center">
@@ -191,7 +187,7 @@ function ForgotPasswordForm({
           <FormattedMessage
             id="public.forgot-password.login-link"
             defaultMessage="I remembered my password"
-          ></FormattedMessage>
+          />
         </Link>
       </Box>
     </>
@@ -239,13 +235,13 @@ function PasswordResetForm({
           <FormattedMessage
             id="public.forgot-password.reset-header"
             defaultMessage="Password reset"
-          ></FormattedMessage>
+          />
         </Heading>
         <Text>
           <FormattedMessage
             id="public.forgot-password.reset-explanation"
             defaultMessage="Use the verification code in the email you have received."
-          ></FormattedMessage>
+          />
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -254,7 +250,7 @@ function PasswordResetForm({
             <FormattedMessage
               id="generic.forms.verification-code-label"
               defaultMessage="Verification code"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <Input
             id="verification-code"
@@ -266,7 +262,7 @@ function PasswordResetForm({
               <FormattedMessage
                 id="generic.forms.invalid-verification-code"
                 defaultMessage="The verification code is invalid"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
           {errors.verificationCode?.type === "required" && (
@@ -274,7 +270,7 @@ function PasswordResetForm({
               <FormattedMessage
                 id="generic.forms.required-verification-code"
                 defaultMessage="The verification code is required"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -283,7 +279,7 @@ function PasswordResetForm({
             <FormattedMessage
               id="generic.forms.new-password-label"
               defaultMessage="New password"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <PasswordInput
             id="password"
@@ -298,7 +294,7 @@ function PasswordResetForm({
               <FormattedMessage
                 id="generic.forms.password-policy-error"
                 defaultMessage="The password must have a least 8 characters"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -307,7 +303,7 @@ function PasswordResetForm({
             <FormattedMessage
               id="generic.forms.confirm-password-label"
               defaultMessage="Confirm password"
-            ></FormattedMessage>
+            />
           </FormLabel>
           <PasswordInput
             id="password-confirm"
@@ -322,7 +318,7 @@ function PasswordResetForm({
               <FormattedMessage
                 id="generic.forms.passwords-must-match"
                 defaultMessage="Passwords must match"
-              ></FormattedMessage>
+              />
             </FormErrorMessage>
           )}
         </FormControl>
@@ -336,7 +332,7 @@ function PasswordResetForm({
           <FormattedMessage
             id="public.forgot-password.reset-button"
             defaultMessage="Reset password"
-          ></FormattedMessage>
+          />
         </Button>
       </form>
       <Box marginTop={4} textAlign="center">
@@ -344,7 +340,7 @@ function PasswordResetForm({
           <FormattedMessage
             id="public.login.back-to-forgot-link"
             defaultMessage="Go back to forgot password"
-          ></FormattedMessage>
+          />
         </NormalLink>
       </Box>
     </>

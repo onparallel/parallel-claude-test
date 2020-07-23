@@ -111,138 +111,132 @@ function Contact({ contactId }: ContactProps) {
   const columns = useContactPetitionAccessesColumns();
 
   return (
-    <>
-      <AppLayout user={me}>
-        <Flex flex="1" padding={4}>
-          <Box flex="2">
-            <Card
-              as={isEditing ? "form" : "div"}
-              onSubmit={isEditing ? handleContactSaveSubmit : undefined}
+    <AppLayout title={contact!.fullName ?? contact!.email} user={me}>
+      <Flex flex="1" padding={4}>
+        <Box flex="2">
+          <Card
+            as={isEditing ? "form" : "div"}
+            onSubmit={isEditing ? handleContactSaveSubmit : undefined}
+          >
+            <CardHeader headingAs="h2" headingFontSize="lg">
+              {`${contact!.fullName ?? ""} <${contact!.email}>`}
+            </CardHeader>
+            <Stack padding={4}>
+              <FormControl>
+                <FormLabel htmlFor="contact-first-name" fontWeight="bold">
+                  <FormattedMessage
+                    id="generic.forms.first-name-label"
+                    defaultMessage="First name"
+                  />
+                </FormLabel>
+                <ToggleInput
+                  isEditing={isEditing}
+                  id="contact-first-name"
+                  name="firstName"
+                  isDisabled={loading}
+                  ref={register()}
+                >
+                  {contact!.firstName}
+                </ToggleInput>
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="contact-last-name" fontWeight="bold">
+                  <FormattedMessage
+                    id="generic.forms.last-name-label"
+                    defaultMessage="Last name"
+                  />
+                </FormLabel>
+                <ToggleInput
+                  isEditing={isEditing}
+                  id="contact-last-name"
+                  name="lastName"
+                  isDisabled={loading}
+                  ref={register()}
+                >
+                  {contact!.lastName}
+                </ToggleInput>
+              </FormControl>
+            </Stack>
+            <Flex
+              padding={4}
+              paddingTop={0}
+              justifyContent={{ sm: "flex-end" }}
+              flexDirection={{ base: "column", sm: "row" }}
             >
-              <CardHeader headingAs="h2" headingFontSize="lg">
-                {`${contact?.fullName ?? ""} <${contact?.email}>`}
-              </CardHeader>
-              <Stack padding={4}>
-                <FormControl>
-                  <FormLabel htmlFor="contact-first-name" fontWeight="bold">
-                    <FormattedMessage
-                      id="generic.forms.first-name-label"
-                      defaultMessage="First name"
-                    />
-                  </FormLabel>
-                  <ToggleInput
-                    isEditing={isEditing}
-                    id="contact-first-name"
-                    name="firstName"
-                    isDisabled={loading}
-                    ref={register()}
-                  >
-                    {contact!.firstName}
-                  </ToggleInput>
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="contact-last-name" fontWeight="bold">
-                    <FormattedMessage
-                      id="generic.forms.last-name-label"
-                      defaultMessage="Last name"
-                    />
-                  </FormLabel>
-                  <ToggleInput
-                    isEditing={isEditing}
-                    id="contact-last-name"
-                    name="lastName"
-                    isDisabled={loading}
-                    ref={register()}
-                  >
-                    {contact!.lastName}
-                  </ToggleInput>
-                </FormControl>
-              </Stack>
-              <Flex
-                padding={4}
-                paddingTop={0}
-                justifyContent={{ sm: "flex-end" }}
-                flexDirection={{ base: "column", sm: "row" }}
-              >
-                {isEditing ? (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                      marginRight={{ base: 0, sm: 2 }}
-                      marginBottom={{ base: 2, sm: 0 }}
-                    >
-                      <FormattedMessage
-                        id="generic.cancel-save-changes"
-                        defaultMessage="Cancel"
-                      />
-                    </Button>
-                    <Button
-                      variantColor="purple"
-                      type="submit"
-                      isLoading={loading}
-                      loadingText={intl.formatMessage({
-                        id: "generic.saving-changes",
-                        defaultMessage: "Saving...",
-                      })}
-                    >
-                      <FormattedMessage
-                        id="generic.save-changes"
-                        defaultMessage="Save"
-                      />
-                    </Button>
-                  </>
-                ) : (
+              {isEditing ? (
+                <>
                   <Button
-                    leftIcon="edit"
-                    variantColor="gray"
-                    onClick={() => setIsEditing(true)}
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    marginRight={{ base: 0, sm: 2 }}
+                    marginBottom={{ base: 2, sm: 0 }}
                   >
                     <FormattedMessage
-                      id="contact.edit-details-button"
-                      defaultMessage="Edit"
+                      id="generic.cancel-save-changes"
+                      defaultMessage="Cancel"
                     />
                   </Button>
-                )}
-              </Flex>
-            </Card>
-            <Card marginTop={4}>
-              <CardHeader>
-                <FormattedMessage
-                  id="contact.petitions-header"
-                  defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
-                  values={{ name: contact?.firstName }}
-                />
-              </CardHeader>
-              {contact?.accesses.items.length ? (
-                <Table
-                  columns={columns}
-                  rows={contact?.accesses.items ?? []}
-                  rowKeyProp="id"
-                  onRowClick={handleRowClick}
-                  marginBottom={2}
-                />
-              ) : (
-                <Flex
-                  height="100px"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Text color="gray.300" fontSize="lg">
+                  <Button
+                    variantColor="purple"
+                    type="submit"
+                    isLoading={loading}
+                    loadingText={intl.formatMessage({
+                      id: "generic.saving-changes",
+                      defaultMessage: "Saving...",
+                    })}
+                  >
                     <FormattedMessage
-                      id="contact.no-petitions"
-                      defaultMessage="You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet"
-                      values={{ name: contact?.firstName }}
+                      id="generic.save-changes"
+                      defaultMessage="Save"
                     />
-                  </Text>
-                </Flex>
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  leftIcon="edit"
+                  variantColor="gray"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <FormattedMessage
+                    id="contact.edit-details-button"
+                    defaultMessage="Edit"
+                  />
+                </Button>
               )}
-            </Card>
-          </Box>
-          <Spacer flex="1" display={{ base: "none", md: "block" }} />
-        </Flex>
-      </AppLayout>
-    </>
+            </Flex>
+          </Card>
+          <Card marginTop={4}>
+            <CardHeader>
+              <FormattedMessage
+                id="contact.petitions-header"
+                defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
+                values={{ name: contact!.firstName }}
+              />
+            </CardHeader>
+            {contact!.accesses.items.length ? (
+              <Table
+                columns={columns}
+                rows={contact!.accesses.items ?? []}
+                rowKeyProp="id"
+                onRowClick={handleRowClick}
+                marginBottom={2}
+              />
+            ) : (
+              <Flex height="100px" alignItems="center" justifyContent="center">
+                <Text color="gray.300" fontSize="lg">
+                  <FormattedMessage
+                    id="contact.no-petitions"
+                    defaultMessage="You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet"
+                    values={{ name: contact!.firstName }}
+                  />
+                </Text>
+              </Flex>
+            )}
+          </Card>
+        </Box>
+        <Spacer flex="1" display={{ base: "none", md: "block" }} />
+      </Flex>
+    </AppLayout>
   );
 }
 
@@ -307,7 +301,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
             <PetitionProgressBar
               status={petition.status}
               {...petition.progress}
-            ></PetitionProgressBar>
+            />
           ) : null,
       },
       {
