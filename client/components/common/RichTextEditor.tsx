@@ -99,18 +99,6 @@ export const options = {
   },
 };
 
-export const nodeTypes = {
-  // elements
-  typeP: "paragraph",
-  typeUl: "bulleted-list",
-  typeOl: "numbered-list",
-  typeLi: "list-item",
-  // marks
-  typeBold: MARK_BOLD,
-  typeItalic: MARK_ITALIC,
-  typeUnderline: MARK_UNDERLINE,
-};
-
 const plugins = [
   BoldPlugin(options),
   ItalicPlugin(options),
@@ -259,7 +247,7 @@ function ListButton({
         event.preventDefault();
         toggleList(editor, {
           typeList: type,
-          ...pick(nodeTypes, ["typeP", "typeLi", "typeUl", "typeOl"]),
+          ...options,
         });
       }}
       {...props}
