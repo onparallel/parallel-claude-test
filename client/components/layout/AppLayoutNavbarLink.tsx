@@ -53,7 +53,7 @@ export function AppLayoutNavbarLink({
       </AppLayoutNavbarLinkContent>
     </Link>
   ) : (
-    <Tooltip label={label} aria-label={label} placement="right" showDelay={300}>
+    <Tooltip label={label} aria-label={label} placement="right">
       <Box
         opacity={0.5}
         cursor="default"

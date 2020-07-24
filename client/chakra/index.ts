@@ -33,6 +33,15 @@ export const theme = {
       900: "#282666",
     },
   },
+  components: {
+    ...base.components,
+    Tooltip: {
+      ...base.components.Tooltip,
+      defaultProps: {
+        openDelay: 300,
+      },
+    },
+  },
 };
 
 export type Theme = typeof theme;

@@ -142,7 +142,6 @@ export const AppLayoutNavbar = Object.assign(
             size="lg"
             isRound
             onClick={onCreate}
-            showDelay={300}
             label={intl.formatMessage({
               id: "navbar.new-button",
               defaultMessage: "Create a new petition",
@@ -193,7 +192,6 @@ export const AppLayoutNavbar = Object.assign(
               <Flex justifyContent="center">
                 <Tooltip
                   zIndex={theme.zIndices.tooltip}
-                  showDelay={300}
                   aria-label={intl.formatMessage({
                     id: "navbar.change-language",
                     defaultMessage: "Change language",
@@ -233,7 +231,6 @@ export const AppLayoutNavbar = Object.assign(
               </Flex>
               <Flex justifyContent="center">
                 <IconButtonWithTooltip
-                  showDelay={300}
                   label={intl.formatMessage({
                     id: "navbar.start-tour",
                     defaultMessage: "Guide me around",

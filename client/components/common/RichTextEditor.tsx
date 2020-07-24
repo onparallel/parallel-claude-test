@@ -240,7 +240,6 @@ function ListButton({
   return (
     <IconButtonWithTooltip
       placement="bottom"
-      showDelay={300}
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
       onMouseDown={(event) => {
@@ -266,7 +265,6 @@ function MarkButton({
   return (
     <IconButtonWithTooltip
       placement="bottom"
-      showDelay={300}
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
       onMouseDown={(event) => {

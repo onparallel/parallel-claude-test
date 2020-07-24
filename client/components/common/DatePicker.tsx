@@ -74,7 +74,6 @@ export function DatePicker({
             id: "component.date-picker.prev-month",
             defaultMessage: "Previous month",
           })}
-          showDelay={300}
           placement="bottom-start"
           onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
         />
@@ -93,7 +92,6 @@ export function DatePicker({
             id: "component.date-picker.next-month",
             defaultMessage: "Next month",
           })}
-          showDelay={300}
           placement="bottom-end"
           onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
         />

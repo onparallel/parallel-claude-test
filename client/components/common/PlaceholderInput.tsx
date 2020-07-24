@@ -165,13 +165,7 @@ export const PlaceholderInput = forwardRef<
             }
           />
         </Slate>
-        <Tooltip
-          label={hint}
-          aria-label={hint}
-          showDelay={300}
-          zIndex={1500}
-          placement="top"
-        >
+        <Tooltip label={hint} aria-label={hint} zIndex={1500} placement="top">
           <PseudoBox
             as="button"
             display="inline-block"

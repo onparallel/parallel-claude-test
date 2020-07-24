@@ -185,7 +185,6 @@ export function PetitionHeader({
                       ) : state === "SAVED" ? (
                         <Tooltip
                           zIndex={theme.zIndices.tooltip}
-                          showDelay={300}
                           aria-label={lastSavedTooltip}
                           label={lastSavedTooltip}
                         >

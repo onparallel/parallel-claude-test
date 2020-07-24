@@ -8,18 +8,12 @@ import {
 import { forwardRef } from "react";
 
 export type IconButtonWithTooltipProps = Omit<IconButtonProps, "aria-label"> &
-  Pick<TooltipProps, "placement" | "showDelay"> & {
+  Pick<TooltipProps, "placement"> & {
     label: string;
   };
 
 export const IconButtonWithTooltip = forwardRef(function (
-  {
-    label,
-    placement,
-    showDelay,
-    isDisabled,
-    ...props
-  }: IconButtonWithTooltipProps,
+  { label, placement, isDisabled, ...props }: IconButtonWithTooltipProps,
   ref
 ) {
   const { zIndices } = useTheme();
@@ -29,7 +23,6 @@ export const IconButtonWithTooltip = forwardRef(function (
     <Tooltip
       aria-label={label}
       label={label}
-      showDelay={showDelay}
       placement={placement}
       zIndex={zIndices.tooltip}
     >

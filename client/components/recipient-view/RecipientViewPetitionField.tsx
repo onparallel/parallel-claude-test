@@ -113,7 +113,6 @@ export function RecipientViewPetitionField({
             <Tooltip
               placement="right"
               zIndex={theme.zIndices.tooltip}
-              showDelay={300}
               aria-label={labels.required}
               label={labels.required}
             >
@@ -240,7 +239,6 @@ function ReplyWrapper({
     <Flex alignItems="center">
       <DisableableTooltip
         isDisabled={status === "PENDING"}
-        showDelay={300}
         placement="right"
         label={label}
         aria-label={label}

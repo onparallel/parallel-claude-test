@@ -12,7 +12,6 @@ export function ContactLink({
   return (
     <DisableableTooltip
       isDisabled={contact.fullName === null}
-      showDelay={300}
       label={contact.email}
       aria-label={contact.email}
     >

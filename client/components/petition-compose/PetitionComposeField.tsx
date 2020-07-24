@@ -152,7 +152,6 @@ export const PetitionComposeField = Object.assign(
               <Tooltip
                 placement="top"
                 zIndex={theme.zIndices.tooltip}
-                showDelay={300}
                 aria-label={labels.required}
                 label={labels.required}
               >

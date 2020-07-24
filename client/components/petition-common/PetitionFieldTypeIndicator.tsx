@@ -27,12 +27,7 @@ export function PetitionFieldTypeIndicator({
     }[type];
   }, [type, intl.locale]);
   return (
-    <Tooltip
-      label={label}
-      aria-label={label}
-      showDelay={300}
-      placement="bottom"
-    >
+    <Tooltip label={label} aria-label={label} placement="bottom">
       <Flex
         as="button"
         aria-label={label}

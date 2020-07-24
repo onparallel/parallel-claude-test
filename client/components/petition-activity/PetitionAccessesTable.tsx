@@ -291,7 +291,6 @@ function usePetitionAccessesColumns({
                   placement="bottom"
                   icon="email"
                   size="sm"
-                  showDelay={300}
                 />
               ) : null}
               {status === "ACTIVE" ? (
@@ -305,7 +304,6 @@ function usePetitionAccessesColumns({
                   placement="bottom"
                   icon="bell"
                   size="sm"
-                  showDelay={300}
                 />
               ) : null}
               {status === "ACTIVE" ? (
@@ -318,7 +316,6 @@ function usePetitionAccessesColumns({
                   placement="bottom"
                   icon={"user-x" as any}
                   size="sm"
-                  showDelay={300}
                 />
               ) : (
                 <IconButtonWithTooltip
@@ -330,7 +327,6 @@ function usePetitionAccessesColumns({
                   placement="left"
                   icon={"user-check" as any}
                   size="sm"
-                  showDelay={300}
                 />
               )}
             </Stack>
