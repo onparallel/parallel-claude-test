@@ -1989,7 +1989,7 @@
     "term": "public.book-demo-button",
     "definition": "Solicita una demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicMainHero.tsx#L69-L72"
+    "reference": "components/public/PublicMainHero.tsx#L106-L109"
   },
   {
     "term": "public.book-demo.basic-functions",
@@ -2286,12 +2286,6 @@
     "reference": "components/public/PublicHeroClaim.tsx#L24-L27"
   },
   {
-    "term": "public.home.hero-collect",
-    "definition": "Parallel consigue los documentos que necesitas, sin esfuerzo",
-    "context": "Parallel obtains the documents you need, without effort",
-    "reference": "components/public/PublicMainHero.tsx#L33-L36"
-  },
-  {
     "term": "public.home.hero-control",
     "definition": "Enviando un Parallel obtendrás control sobre el progreso de los documentos y la información que necesitas.",
     "context": "Sending a Parallel gives you control over the progress of the documents and the information you need.",
@@ -2316,12 +2310,6 @@
     "reference": "components/public/PublicHeroWhoTrustUs.tsx#L23-L26"
   },
   {
-    "term": "public.home.hero-platform",
-    "definition": "Controlando el estado de los documentos que pides, podrás mantener tu foco en las tareas importantes y ser más productivo.",
-    "context": "Controlling the status of the documents you request, you will keep your focus on tasks that matter and become more productive.",
-    "reference": "components/public/PublicMainHero.tsx#L39-L42"
-  },
-  {
     "term": "public.home.hero-popular-use-cases",
     "definition": "Casos de uso populares",
     "context": "Popular use cases",
@@ -2331,13 +2319,25 @@
     "term": "public.home.hero-process",
     "definition": "Convierte la recopilación de información en un proceso profesional y escalable.",
     "context": "Turn your document collection into a professional and scalable process.",
-    "reference": "components/public/PublicMainHero.tsx#L45-L48"
+    "reference": "components/public/PublicMainHero.tsx#L82-L85"
+  },
+  {
+    "term": "public.home.hero-subtitle",
+    "definition": "Parallel recopila y organiza la información que necesitas a tiempo para que puedas mantener el foco y ser productivo.",
+    "context": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive.",
+    "reference": "components/public/PublicMainHero.tsx#L76-L79"
+  },
+  {
+    "term": "public.home.hero-title",
+    "definition": "Mejor <a><b>comunicación</b><b>colaboración</b><b>seguimiento</b></a> con tus clientes",
+    "context": "Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients",
+    "reference": "components/public/PublicMainHero.tsx#L43-L73"
   },
   {
     "term": "public.home.hero-try-now",
     "definition": "Prueba nuestra solución segura y rápida para gestionar documentos.",
     "context": "Try our secure and fast solution to manage documents.",
-    "reference": "components/public/PublicMainHero.tsx#L77-L80"
+    "reference": "components/public/PublicMainHero.tsx#L114-L117"
   },
   {
     "term": "public.home.hero-who-trust-us",
@@ -2745,7 +2745,7 @@
     "term": "public.showcase-hero-alt",
     "definition": "Una profesional está pidiendo a su cliente unos documentos que necesita para un caso. Su cliente le responde \"¡Aquí los tienes!\".",
     "context": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
-    "reference": "components/public/PublicMainHero.tsx#L92-L96"
+    "reference": "components/public/PublicMainHero.tsx#L129-L133"
   },
   {
     "term": "public.support.faq",

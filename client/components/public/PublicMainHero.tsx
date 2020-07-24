@@ -1,3 +1,4 @@
+/** @jsx jsx */
 import {
   Box,
   BoxProps,
@@ -7,9 +8,11 @@ import {
   Image,
   Text,
 } from "@chakra-ui/core";
+import { css, jsx } from "@emotion/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Typical } from "../common/Typical";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export type PublicHeroProps = BoxProps;
@@ -29,16 +32,50 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
     >
       <Flex flexDirection={{ base: "column", [breakpoint]: "row" }}>
         <Box flex="1">
-          <Heading as="h1" fontFamily="hero" fontSize="5xl" fontWeight="light">
+          <Heading
+            as="h1"
+            fontFamily="hero"
+            fontSize="5xl"
+            fontWeight="light"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <FormattedMessage
-              id="public.home.hero-collect"
-              defaultMessage="Parallel obtains the documents you need, without effort"
+              id="public.home.hero-title"
+              defaultMessage="Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients"
+              values={{
+                a: (chunks: string[]) => {
+                  return (
+                    <>
+                      <Typical
+                        as="span"
+                        fontFamily="hero"
+                        args={chunks.flatMap((chunk) => [chunk, 3000])}
+                        css={css`
+                          &::after {
+                            content: "|";
+                            animation: blink 1s infinite step-start;
+                          }
+
+                          @keyframes blink {
+                            50% {
+                              opacity: 0;
+                            }
+                          }
+                        `}
+                      />
+                      <br />
+                    </>
+                  );
+                },
+                b: (chunks: any) => [chunks],
+              }}
             />
           </Heading>
           <Text marginTop={8}>
             <FormattedMessage
-              id="public.home.hero-platform"
-              defaultMessage="Controlling the status of the documents you request, you will keep your focus on tasks that matter and become more productive."
+              id="public.home.hero-subtitle"
+              defaultMessage="Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
             />
           </Text>
           <Text marginTop={4}>

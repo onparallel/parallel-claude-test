@@ -42,6 +42,7 @@ const plugins = [
   require("@next/bundle-analyzer")({
     enabled: process.env.ANALYZE === "true",
   }),
+  require("next-transpile-modules")(["@camwiegert/typical"]),
 ];
 
 module.exports = plugins.reduce((acc, curr) => curr(acc), config);
