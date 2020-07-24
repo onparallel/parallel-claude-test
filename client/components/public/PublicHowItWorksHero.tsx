@@ -198,7 +198,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       </Flex>
       <Flex marginTop={16} justifyContent="center">
         <NakedLink href="/invite">
-          <Button as="a" variantColor="purple">
+          <Button as="a" colorScheme="purple">
             <FormattedMessage
               id="public.invite-button"
               defaultMessage="Request an invite"

@@ -172,7 +172,7 @@ function ForgotPasswordForm({
         <Button
           mt={6}
           width="100%"
-          variantColor="purple"
+          colorScheme="purple"
           isLoading={isSubmitting}
           type="submit"
         >
@@ -325,7 +325,7 @@ function PasswordResetForm({
         <Button
           mt={6}
           width="100%"
-          variantColor="purple"
+          colorScheme="purple"
           isLoading={isSubmitting}
           type="submit"
         >

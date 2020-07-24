@@ -150,7 +150,7 @@ export function RecipientViewProgressCard({
         </Flex>
       )}
       <Button
-        variantColor="purple"
+        colorScheme="purple"
         size={isStickyFooter ? "sm" : "md"}
         isDisabled={petition.status === "COMPLETED"}
         onClick={onFinalize}

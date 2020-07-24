@@ -22,7 +22,7 @@ export function ConfirmSendReminderDialog({ ...props }: DialogProps<void>) {
         />
       }
       confirm={
-        <Button variantColor="purple" onClick={() => props.onResolve()}>
+        <Button colorScheme="purple" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="petition.confirm-send-reminder-message.confirm"
             defaultMessage="Yes, send"

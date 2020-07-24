@@ -142,7 +142,7 @@ export function PetitionAccessesTable({
           </ButtonDropdown>
         ) : null}
         <Button
-          variantColor="purple"
+          colorScheme="purple"
           leftIcon={"user-plus" as any}
           onClick={onAddPetitionAccess}
         >

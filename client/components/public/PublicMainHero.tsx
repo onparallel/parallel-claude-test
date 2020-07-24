@@ -89,7 +89,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             <NakedLink href="/invite">
               <Button
                 as="a"
-                variantColor="purple"
+                colorScheme="purple"
                 marginBottom={{ base: 2, [breakpoint]: 0 }}
                 marginRight={{ base: 0, [breakpoint]: 2 }}
               >

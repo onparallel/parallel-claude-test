@@ -177,7 +177,7 @@ function Contact({ contactId }: ContactProps) {
                     />
                   </Button>
                   <Button
-                    variantColor="purple"
+                    colorScheme="purple"
                     type="submit"
                     isLoading={loading}
                     loadingText={intl.formatMessage({
@@ -194,7 +194,7 @@ function Contact({ contactId }: ContactProps) {
               ) : (
                 <Button
                   leftIcon="edit"
-                  variantColor="gray"
+                  colorScheme="gray"
                   onClick={() => setIsEditing(true)}
                 >
                   <FormattedMessage

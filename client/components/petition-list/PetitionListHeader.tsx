@@ -106,7 +106,7 @@ export function PetitionListHeader({
           </ButtonDropdown>
         </Box>
       ) : null}
-      <Button variantColor="purple" onClick={onCreateClick}>
+      <Button colorScheme="purple" onClick={onCreateClick}>
         <FormattedMessage
           id="component.petition-list-header.create-petition-button"
           defaultMessage="Create petition"

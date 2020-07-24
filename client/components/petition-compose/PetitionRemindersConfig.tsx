@@ -71,7 +71,7 @@ export function PetitionRemindersConfig({
     <Box {...props}>
       <Flex alignItems="center">
         <Checkbox
-          variantColor="purple"
+          colorScheme="purple"
           size="lg"
           marginRight={2}
           isChecked={enabled}
@@ -142,7 +142,7 @@ export function PetitionRemindersConfig({
           <Flex alignItems="center" marginTop={2}>
             <Checkbox
               id="reminder-settings-weekdays"
-              variantColor="purple"
+              colorScheme="purple"
               size="md"
               marginRight={2}
               isChecked={value.weekdaysOnly}

@@ -24,7 +24,7 @@ export function ConfirmCancelScheduledMessageDialog({
         />
       }
       confirm={
-        <Button variantColor="red" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="petition.confirm-cancel-scheduled-message.confirm"
             defaultMessage="Yes, cancel message"

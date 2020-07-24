@@ -27,7 +27,7 @@ export function ErrorDialog({
       confirm={
         <Button
           ref={focusRef}
-          variantColor="purple"
+          colorScheme="purple"
           minWidth={24}
           onClick={() => props.onResolve()}
         >

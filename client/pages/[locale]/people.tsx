@@ -216,7 +216,7 @@ function People() {
             />
           </Text>
           <NakedLink href="/invite">
-            <Button as="a" variantColor="purple" marginTop={8}>
+            <Button as="a" colorScheme="purple" marginTop={8}>
               <FormattedMessage
                 id="public.invite-button"
                 defaultMessage="Request an invite"

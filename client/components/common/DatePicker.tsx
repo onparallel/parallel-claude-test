@@ -162,7 +162,7 @@ const Month = memo(function Month({
                     {...(selectedDate && isSameDay(date, selectedDate)
                       ? {
                           variant: "solid",
-                          variantColor: "purple",
+                          colorScheme: "purple",
                         }
                       : isToday(date)
                       ? {

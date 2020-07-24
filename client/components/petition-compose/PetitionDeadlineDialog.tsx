@@ -63,7 +63,7 @@ export function PetitionDeadlineDialog({ ...props }: DialogProps<Date>) {
       }
       confirm={
         <Button
-          variantColor="purple"
+          colorScheme="purple"
           isDisabled={!date || isPast(date)}
           onClick={() => props.onResolve(date)}
         >

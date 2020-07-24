@@ -29,7 +29,7 @@ export function ConfirmDeactivateAccessDialog({
         />
       }
       confirm={
-        <Button variantColor="red" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="petition.confirm-deactivate-access-message.confirm"
             defaultMessage="Yes, remove access"

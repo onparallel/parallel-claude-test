@@ -45,7 +45,7 @@ export function ConfigureRemindersDialog({
       }
       confirm={
         <Button
-          variantColor="purple"
+          colorScheme="purple"
           onClick={() =>
             props.onResolve({
               remindersConfig: reminderIsActive ? remindersConfig : null,

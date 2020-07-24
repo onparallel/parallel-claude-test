@@ -434,7 +434,7 @@ function ConfirmDeletePetitionsDialog({
         />
       }
       confirm={
-        <Button variantColor="red" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="generic.confirm-delete-button"
             defaultMessage="Yes, delete"

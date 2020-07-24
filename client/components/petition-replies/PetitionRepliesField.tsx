@@ -298,7 +298,7 @@ function PetitionRepliesFieldReply({
           })}
           size="xs"
           placement="bottom"
-          variantColor={reply.status === "APPROVED" ? "green" : "gray"}
+          colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
           role="switch"
           aria-checked={reply.status === "APPROVED"}
           onClick={() =>
@@ -314,7 +314,7 @@ function PetitionRepliesFieldReply({
           size="xs"
           placement="bottom"
           role="switch"
-          variantColor={reply.status === "REJECTED" ? "red" : "gray"}
+          colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
           aria-checked={reply.status === "REJECTED"}
           onClick={() =>
             onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")
@@ -343,7 +343,7 @@ function CommentsButton({
     "aria-pressed": isActive,
     size: "sm",
     variant: isActive ? "solid" : "ghost",
-    variantColor: isActive ? "purple" : "gray",
+    colorScheme: isActive ? "purple" : "gray",
     "aria-label": intl.formatMessage(
       {
         id: "generic.comments-button-label",

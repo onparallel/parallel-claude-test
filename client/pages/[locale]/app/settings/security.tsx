@@ -175,7 +175,7 @@ function Security() {
               )}
             </FormControl>
             <Box>
-              <Button type="submit" variantColor="purple" mt="2">
+              <Button type="submit" colorScheme="purple" mt="2">
                 <FormattedMessage
                   id="settings.account.change-password-button"
                   defaultMessage="Change password"

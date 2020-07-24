@@ -16,7 +16,7 @@ export function SendButton({
   return (
     <SplitButton dividerColor="purple.600" {...props}>
       <Button
-        variantColor="purple"
+        colorScheme="purple"
         leftIcon={"paper-plane" as any}
         onClick={onSendClick}
       >
@@ -27,7 +27,7 @@ export function SendButton({
       </Button>
       <ButtonDropdown
         as={IconButton}
-        variantColor="purple"
+        colorScheme="purple"
         icon="chevron-down"
         aria-label={intl.formatMessage({
           id: "component.send-button.options",

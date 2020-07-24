@@ -122,7 +122,7 @@ const TourStep = ({
           <Spacer />
           {index > 0 && <Button {...backProps}>{step.locale!.back}</Button>}
           {continuous && (
-            <Button {...primaryProps} variantColor="purple">
+            <Button {...primaryProps} colorScheme="purple">
               {continuous
                 ? isLastStep
                   ? step.locale!.last

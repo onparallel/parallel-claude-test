@@ -145,7 +145,7 @@ export function CreatePetitionDialog({
           </FormControl>
           <Box marginTop={1}>
             <Checkbox
-              variantColor="purple"
+              colorScheme="purple"
               isChecked={addDeadline}
               onChange={(event) => setAddDeadline(event.target.checked)}
             >
@@ -177,7 +177,7 @@ export function CreatePetitionDialog({
         </Stack>
       }
       confirm={
-        <Button type="submit" variantColor="purple" isDisabled={!isValid}>
+        <Button type="submit" colorScheme="purple" isDisabled={!isValid}>
           <FormattedMessage
             id="component.create-petition-dialog.continue-button"
             defaultMessage="Continue"

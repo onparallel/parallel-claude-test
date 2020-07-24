@@ -325,7 +325,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
                 />
               </Text>
               <Button
-                variantColor="yellow"
+                colorScheme="yellow"
                 size="sm"
                 marginLeft={4}
                 onClick={handleSubmitUnpublished}

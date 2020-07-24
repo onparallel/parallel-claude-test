@@ -129,7 +129,7 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
       </Grid>
       <Flex marginTop={16} justifyContent="center">
         <NakedLink href="/book-demo">
-          <Button as="a" variantColor="purple">
+          <Button as="a" colorScheme="purple">
             <FormattedMessage
               id="public.book-demo-button"
               defaultMessage="Book a demo"

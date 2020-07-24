@@ -180,7 +180,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               </Button>
               <Button
                 size="sm"
-                variantColor="purple"
+                colorScheme="purple"
                 isDisabled={draft.length === 0}
                 onClick={handleSubmitClick}
               >
@@ -284,7 +284,7 @@ function FieldComment({
               </Text>
             }
           >
-            <Badge variantColor="yellow" variant="outline" cursor="default">
+            <Badge colorScheme="yellow" variant="outline" cursor="default">
               <FormattedMessage
                 id="petition-replies.comment-pending.label"
                 defaultMessage="Pending"
@@ -339,7 +339,7 @@ function FieldComment({
             <Button size="sm" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button size="sm" variantColor="purple" onClick={handleSaveClick}>
+            <Button size="sm" colorScheme="purple" onClick={handleSaveClick}>
               <FormattedMessage id="generic.save" defaultMessage="Save" />
             </Button>
           </Stack>

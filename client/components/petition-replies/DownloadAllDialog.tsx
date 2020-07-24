@@ -176,7 +176,7 @@ export function DownloadAllDialog({
         </>
       }
       confirm={
-        <Button variantColor="purple" onClick={handleConfirmClick}>
+        <Button colorScheme="purple" onClick={handleConfirmClick}>
           <FormattedMessage
             id="component.download-all-dialog.download-button"
             defaultMessage="Download files"

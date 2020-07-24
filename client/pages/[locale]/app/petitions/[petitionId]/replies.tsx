@@ -280,7 +280,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         <Spacer />
         {pendingComments ? (
           <Button
-            variantColor="yellow"
+            colorScheme="yellow"
             isDisabled={isSubmitting}
             onClick={handleSubmitUnpublished}
           >
@@ -293,7 +293,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         ) : null}
         {showDownloadAll ? (
           <Button
-            variantColor="purple"
+            colorScheme="purple"
             leftIcon="download"
             onClick={handleDownloadAllClick}
           >

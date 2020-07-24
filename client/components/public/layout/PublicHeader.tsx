@@ -135,7 +135,7 @@ function PublicHeaderMenu(props: StackProps) {
       </Flex>
       <Flex>
         <NakedLink href="/invite">
-          <Button flex="1" as="a" variantColor="purple">
+          <Button flex="1" as="a" colorScheme="purple">
             <FormattedMessage
               id="public.invite-button"
               defaultMessage="Request an invite"

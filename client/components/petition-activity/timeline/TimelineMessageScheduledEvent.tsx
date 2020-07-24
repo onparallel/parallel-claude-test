@@ -61,7 +61,7 @@ export function TimelineMessageScheduledEvent({
           <Button
             size="sm"
             variant="outline"
-            variantColor="red"
+            colorScheme="red"
             marginLeft={4}
             onClick={onCancelScheduledMessage}
           >

@@ -209,7 +209,7 @@ function _Table<TRow>({
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
                 size="md"
-                variantColor="purple"
+                colorScheme="purple"
                 onChange={onToggleAll}
               />
             </Box>
@@ -234,7 +234,7 @@ function _Table<TRow>({
               <Checkbox
                 isChecked={isSelected}
                 size="md"
-                variantColor="purple"
+                colorScheme="purple"
                 onChange={function () {}}
               />
             </Flex>

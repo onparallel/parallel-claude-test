@@ -117,7 +117,7 @@ function Account() {
               )}
             </FormControl>
             <Box>
-              <Button type="submit" variantColor="purple">
+              <Button type="submit" colorScheme="purple">
                 <FormattedMessage
                   id="settings.account.update-name-button"
                   defaultMessage="Save changes"

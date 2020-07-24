@@ -240,7 +240,7 @@ export const PetitionComposeFieldList = Object.assign(
             <AddFieldPopover
               marginTop={8}
               marginBottom={6}
-              variantColor="purple"
+              colorScheme="purple"
               leftIcon="add"
               onSelectFieldType={onAddField}
             >

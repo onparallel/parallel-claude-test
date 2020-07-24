@@ -159,7 +159,7 @@ function AlreadyLoggedIn({
       <Button
         mt={6}
         width="100%"
-        variantColor="purple"
+        colorScheme="purple"
         type="submit"
         onClick={onContinueAs}
       >
@@ -259,7 +259,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         <Button
           mt={6}
           width="100%"
-          variantColor="purple"
+          colorScheme="purple"
           isLoading={isSubmitting}
           type="submit"
         >
@@ -365,7 +365,7 @@ function PasswordChangeForm({
         <Button
           mt={6}
           width="100%"
-          variantColor="purple"
+          colorScheme="purple"
           isLoading={isSubmitting}
           type="submit"
         >

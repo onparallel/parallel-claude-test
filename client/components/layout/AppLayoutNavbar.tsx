@@ -137,7 +137,7 @@ export const AppLayoutNavbar = Object.assign(
         <Flex justifyContent="center" alignItems="center">
           <IconButtonWithTooltip
             id="new-petition-button"
-            variantColor="purple"
+            colorScheme="purple"
             icon="add"
             size="lg"
             isRound

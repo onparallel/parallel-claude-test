@@ -191,7 +191,7 @@ export function PublicFooter(props: BoxProps) {
             }}
             icon={"twitter" as any}
             isRound
-            variantColor="purple"
+            colorScheme="purple"
             aria-label={intl.formatMessage({
               id: "public.footer.twitter-profile",
               defaultMessage: "Twitter profile",
@@ -205,7 +205,7 @@ export function PublicFooter(props: BoxProps) {
             }}
             icon={"linkedin" as any}
             isRound
-            variantColor="purple"
+            colorScheme="purple"
             marginLeft={2}
             aria-label={intl.formatMessage({
               id: "public.footer.linkedin-profile",

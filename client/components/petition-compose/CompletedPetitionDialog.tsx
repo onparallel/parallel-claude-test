@@ -29,7 +29,7 @@ export function CompletedPetitionDialog({ ...props }: DialogProps<void>) {
         />
       }
       confirm={
-        <Button variantColor="red" onClick={() => props.onResolve()}>
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="petition.completed-petition-dialog.confirm-button"
             defaultMessage="I understand"
