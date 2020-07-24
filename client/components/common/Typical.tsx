@@ -6,10 +6,10 @@ export type PublicHeroProps = BoxProps;
 
 export function Typical({ args, ...props }: { args: TypicalArg[] } & BoxProps) {
   const ref = useRef<HTMLElement>();
-  const alive = useRef(true);
   useEffect(() => {
+    let alive = true;
     async function check() {
-      if (!alive.current) {
+      if (!alive) {
         throw new Error();
       }
     }
@@ -19,8 +19,8 @@ export function Typical({ args, ...props }: { args: TypicalArg[] } & BoxProps) {
       type
     ).catch(() => {});
     return () => {
-      alive.current = false;
+      alive = false;
     };
-  }, []);
+  }, [JSON.stringify(args)]);
   return <Text {...props} ref={ref} />;
 }
