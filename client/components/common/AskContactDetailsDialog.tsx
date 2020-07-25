@@ -58,8 +58,8 @@ export function AskContactDetailsDialog({
       }
       body={
         <Stack>
-          <FormControl isInvalid={!!errors.email}>
-            <FormLabel htmlFor="contact-email">
+          <FormControl id="contact-email" isInvalid={!!errors.email}>
+            <FormLabel>
               <FormattedMessage
                 id="generic.forms.email-label"
                 defaultMessage="Email"
@@ -70,7 +70,6 @@ export function AskContactDetailsDialog({
                 emailRef,
                 register({ required: true, pattern: EMAIL_REGEX })
               )}
-              id="contact-email"
               name="email"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",
@@ -86,27 +85,23 @@ export function AskContactDetailsDialog({
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl>
-            <FormLabel htmlFor="contact-first-name">
+          <FormControl id="contact-first-name">
+            <FormLabel>
               <FormattedMessage
                 id="generic.forms.first-name-label"
                 defaultMessage="First name"
               />
             </FormLabel>
-            <Input
-              id="contact-first-name"
-              name="firstName"
-              ref={useMergeRefs(register(), nameRef)}
-            />
+            <Input name="firstName" ref={useMergeRefs(register(), nameRef)} />
           </FormControl>
-          <FormControl>
-            <FormLabel htmlFor="contact-last-name">
+          <FormControl id="contact-last-name">
+            <FormLabel>
               <FormattedMessage
                 id="generic.forms.last-name-label"
                 defaultMessage="Last name"
               />
             </FormLabel>
-            <Input id="contact-last-name" name="lastName" ref={register()} />
+            <Input name="lastName" ref={register()} />
           </FormControl>
         </Stack>
       }

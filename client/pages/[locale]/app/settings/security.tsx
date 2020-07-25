@@ -97,15 +97,14 @@ function Security() {
             maxWidth="container.xs"
             onSubmit={handleSubmit(onChangePassword)}
           >
-            <FormControl isInvalid={!!errors.password}>
-              <FormLabel htmlFor="password">
+            <FormControl id="password" isInvalid={!!errors.password}>
+              <FormLabel>
                 <FormattedMessage
                   id="generic.forms.old-password-label"
                   defaultMessage="Old password"
                 />
               </FormLabel>
               <PasswordInput
-                id="password"
                 name="password"
                 ref={register({ required: true })}
               />
@@ -126,15 +125,14 @@ function Security() {
                 </FormErrorMessage>
               )}
             </FormControl>
-            <FormControl isInvalid={!!errors.newPassword}>
-              <FormLabel htmlFor="new-password">
+            <FormControl id="new-password" isInvalid={!!errors.newPassword}>
+              <FormLabel>
                 <FormattedMessage
                   id="generic.forms.new-password-label"
                   defaultMessage="New password"
                 />
               </FormLabel>
               <PasswordInput
-                id="new-password"
                 name="newPassword"
                 ref={register({
                   required: true,
@@ -150,15 +148,14 @@ function Security() {
                 </FormErrorMessage>
               )}
             </FormControl>
-            <FormControl isInvalid={!!errors.newPassword2}>
-              <FormLabel htmlFor="new-password2">
+            <FormControl id="new-password2" isInvalid={!!errors.newPassword2}>
+              <FormLabel>
                 <FormattedMessage
                   id="generic.forms.confirm-password-label"
                   defaultMessage="Confirm password"
                 />
               </FormLabel>
               <PasswordInput
-                id="new-password2"
                 name="newPassword2"
                 ref={register({
                   required: true,

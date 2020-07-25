@@ -92,8 +92,8 @@ export const RecipientSelect = Object.assign(
     const reactSelectProps = useReactSelectProps({ hasError });
 
     return (
-      <FormControl isInvalid={hasError}>
-        <FormLabel htmlFor={inputId} paddingBottom={0}>
+      <FormControl id={inputId} isInvalid={hasError}>
+        <FormLabel paddingBottom={0}>
           <FormattedMessage
             id="component.recipient-select.label"
             defaultMessage="Recipients"

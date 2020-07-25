@@ -123,8 +123,8 @@ function Contact({ contactId }: ContactProps) {
               {`${contact!.fullName ?? ""} <${contact!.email}>`}
             </CardHeader>
             <Stack padding={4}>
-              <FormControl>
-                <FormLabel htmlFor="contact-first-name" fontWeight="bold">
+              <FormControl id="contact-first-name">
+                <FormLabel fontWeight="bold">
                   <FormattedMessage
                     id="generic.forms.first-name-label"
                     defaultMessage="First name"
@@ -132,7 +132,6 @@ function Contact({ contactId }: ContactProps) {
                 </FormLabel>
                 <ToggleInput
                   isEditing={isEditing}
-                  id="contact-first-name"
                   name="firstName"
                   isDisabled={loading}
                   ref={register()}
@@ -140,8 +139,8 @@ function Contact({ contactId }: ContactProps) {
                   {contact!.firstName}
                 </ToggleInput>
               </FormControl>
-              <FormControl>
-                <FormLabel htmlFor="contact-last-name" fontWeight="bold">
+              <FormControl id="contact-last-name">
+                <FormLabel fontWeight="bold">
                   <FormattedMessage
                     id="generic.forms.last-name-label"
                     defaultMessage="Last name"
@@ -149,7 +148,6 @@ function Contact({ contactId }: ContactProps) {
                 </FormLabel>
                 <ToggleInput
                   isEditing={isEditing}
-                  id="contact-last-name"
                   name="lastName"
                   isDisabled={loading}
                   ref={register()}

@@ -157,7 +157,7 @@ function AlreadyLoggedIn({
         {me.fullName ? <Text>({me.email})</Text> : null}
       </Box>
       <Button
-        mt={6}
+        marginTop={6}
         width="100%"
         colorScheme="purple"
         type="submit"
@@ -210,15 +210,14 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl isInvalid={!!errors.email}>
-          <FormLabel htmlFor="email">
+        <FormControl id="email" isInvalid={!!errors.email}>
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.email-label"
               defaultMessage="Email"
             />
           </FormLabel>
           <Input
-            id="email"
             name="email"
             type="email"
             ref={register({
@@ -235,18 +234,14 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             </FormErrorMessage>
           )}
         </FormControl>
-        <FormControl mt={2} isInvalid={!!errors.password}>
-          <FormLabel htmlFor="password">
+        <FormControl id="password" marginTop={2} isInvalid={!!errors.password}>
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.password-label"
               defaultMessage="Password"
             />
           </FormLabel>
-          <PasswordInput
-            id="password"
-            name="password"
-            ref={register({ required: true })}
-          />
+          <PasswordInput name="password" ref={register({ required: true })} />
           {errors.password && (
             <FormErrorMessage>
               <FormattedMessage
@@ -257,7 +252,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           )}
         </FormControl>
         <Button
-          mt={6}
+          marginTop={6}
           width="100%"
           colorScheme="purple"
           isLoading={isSubmitting}
@@ -314,15 +309,14 @@ function PasswordChangeForm({
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl isInvalid={!!errors.password1}>
-          <FormLabel htmlFor="password">
+        <FormControl id="password" isInvalid={!!errors.password1}>
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.new-password-label"
               defaultMessage="New password"
             />
           </FormLabel>
           <PasswordInput
-            id="password"
             name="password1"
             ref={register({
               required: true,
@@ -338,15 +332,18 @@ function PasswordChangeForm({
             </FormErrorMessage>
           )}
         </FormControl>
-        <FormControl mt={2} isInvalid={!!errors.password2}>
-          <FormLabel htmlFor="password-confirm">
+        <FormControl
+          marginTop={2}
+          id="password-confirm"
+          isInvalid={!!errors.password2}
+        >
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.password-label"
               defaultMessage="Password"
             />
           </FormLabel>
           <PasswordInput
-            id="password-confirm"
             name="password2"
             ref={register({
               required: true,
@@ -363,7 +360,7 @@ function PasswordChangeForm({
           )}
         </FormControl>
         <Button
-          mt={6}
+          marginTop={6}
           width="100%"
           colorScheme="purple"
           isLoading={isSubmitting}

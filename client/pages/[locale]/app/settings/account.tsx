@@ -72,15 +72,14 @@ function Account() {
             as="form"
             onSubmit={handleSubmit(onSaveName)}
           >
-            <FormControl isInvalid={!!errors.firstName}>
-              <FormLabel htmlFor="first-name">
+            <FormControl id="first-name" isInvalid={!!errors.firstName}>
+              <FormLabel>
                 <FormattedMessage
                   id="generic.forms.first-name-label"
                   defaultMessage="First name"
                 />
               </FormLabel>
               <Input
-                id="first-name"
                 name="firstName"
                 maxLength={255}
                 ref={register({ required: true })}
@@ -94,15 +93,14 @@ function Account() {
                 </FormErrorMessage>
               )}
             </FormControl>
-            <FormControl isInvalid={!!errors.lastName}>
-              <FormLabel htmlFor="last-name">
+            <FormControl id="last-name" isInvalid={!!errors.lastName}>
+              <FormLabel>
                 <FormattedMessage
                   id="generic.forms.last-name-label"
                   defaultMessage="Last name"
                 />
               </FormLabel>
               <Input
-                id="last-name"
                 name="lastName"
                 maxLength={255}
                 ref={register({ required: true })}

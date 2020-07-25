@@ -110,15 +110,14 @@ export function CreatePetitionDialog({
       }
       body={
         <Stack>
-          <FormControl isInvalid={!!errors.name}>
-            <FormLabel htmlFor="petition-name">
+          <FormControl id="petition-name" isInvalid={!!errors.name}>
+            <FormLabel>
               <FormattedMessage
                 id="component.create-petition-dialog.name-label"
                 defaultMessage="Give it an identifying name"
               />
             </FormLabel>
             <Input
-              id="petition-name"
               name="name"
               ref={inputRef}
               autoComplete="off"
@@ -128,14 +127,14 @@ export function CreatePetitionDialog({
               })}
             />
           </FormControl>
-          <FormControl>
-            <FormLabel htmlFor="petition-locale">
+          <FormControl id="petition-locale">
+            <FormLabel>
               <FormattedMessage
                 id="component.create-petition-dialog.locale-label"
                 defaultMessage="Language of the petition"
               />
             </FormLabel>
-            <Select id="petition-locale" name="locale" ref={register()}>
+            <Select name="locale" ref={register()}>
               {locales.map((locale) => (
                 <option key={locale.key} value={locale.key}>
                   {locale.localizedLabel}

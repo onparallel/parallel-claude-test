@@ -144,15 +144,14 @@ function ForgotPasswordForm({
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl isInvalid={!!errors.email}>
-          <FormLabel htmlFor="email">
+        <FormControl id="email" isInvalid={!!errors.email}>
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.email-label"
               defaultMessage="Email"
             />
           </FormLabel>
           <Input
-            id="email"
             name="email"
             type="email"
             ref={register({
@@ -170,7 +169,7 @@ function ForgotPasswordForm({
           )}
         </FormControl>
         <Button
-          mt={6}
+          marginTop={6}
           width="100%"
           colorScheme="purple"
           isLoading={isSubmitting}
@@ -245,18 +244,17 @@ function PasswordResetForm({
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl isInvalid={!!errors.verificationCode}>
-          <FormLabel htmlFor="verification-code">
+        <FormControl
+          id="verification-code"
+          isInvalid={!!errors.verificationCode}
+        >
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.verification-code-label"
               defaultMessage="Verification code"
             />
           </FormLabel>
-          <Input
-            id="verification-code"
-            name="verificationCode"
-            ref={register({ required: true })}
-          />
+          <Input name="verificationCode" ref={register({ required: true })} />
           {errors.verificationCode?.type === "validate" && (
             <FormErrorMessage>
               <FormattedMessage
@@ -274,15 +272,14 @@ function PasswordResetForm({
             </FormErrorMessage>
           )}
         </FormControl>
-        <FormControl isInvalid={!!errors.password1}>
-          <FormLabel htmlFor="password">
+        <FormControl id="password" isInvalid={!!errors.password1}>
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.new-password-label"
               defaultMessage="New password"
             />
           </FormLabel>
           <PasswordInput
-            id="password"
             name="password1"
             ref={register({
               required: true,
@@ -298,15 +295,18 @@ function PasswordResetForm({
             </FormErrorMessage>
           )}
         </FormControl>
-        <FormControl mt={2} isInvalid={!!errors.password2}>
-          <FormLabel htmlFor="password-confirm">
+        <FormControl
+          id="password-confirm"
+          marginTop={2}
+          isInvalid={!!errors.password2}
+        >
+          <FormLabel>
             <FormattedMessage
               id="generic.forms.confirm-password-label"
               defaultMessage="Confirm password"
             />
           </FormLabel>
           <PasswordInput
-            id="password-confirm"
             name="password2"
             ref={register({
               required: true,
@@ -323,7 +323,7 @@ function PasswordResetForm({
           )}
         </FormControl>
         <Button
-          mt={6}
+          marginTop={6}
           width="100%"
           colorScheme="purple"
           isLoading={isSubmitting}

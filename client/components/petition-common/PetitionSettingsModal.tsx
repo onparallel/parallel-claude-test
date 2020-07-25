@@ -64,15 +64,14 @@ export function PetitionSettingsModal({
         <ModalCloseButton />
         <ModalBody paddingBottom={6}>
           <Stack>
-            <FormControl>
-              <FormLabel htmlFor="petition-locale">
+            <FormControl id="petition-locale">
+              <FormLabel>
                 <FormattedMessage
                   id="component.create-petition-dialog.locale-label"
                   defaultMessage="Language of the petition"
                 />
               </FormLabel>
               <Select
-                id="petition-locale"
                 name="petition-locale"
                 value={petition.locale}
                 onChange={(event) => {
@@ -86,8 +85,8 @@ export function PetitionSettingsModal({
                 ))}
               </Select>
             </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="petition-deadline">
+            <FormControl id="petition-deadline">
+              <FormLabel>
                 <FormattedMessage
                   id="petition.deadline-label"
                   defaultMessage="Deadline"
@@ -96,7 +95,6 @@ export function PetitionSettingsModal({
               <Flex flexDirection={{ base: "column", sm: "row" }}>
                 <InputGroup size="md" flex="1">
                   <Input
-                    id="petition-deadline"
                     isReadOnly
                     placeholder={
                       petition.deadline

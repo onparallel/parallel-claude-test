@@ -32,15 +32,14 @@ export function MessageEmailEditor({
   const subjectId = `subject-${useId()}`;
   return (
     <>
-      <FormControl isInvalid={showErrors && !subject}>
-        <FormLabel htmlFor={subjectId} paddingBottom={0}>
+      <FormControl id={subjectId} isInvalid={showErrors && !subject}>
+        <FormLabel paddingBottom={0}>
           <FormattedMessage
             id="component.message-email-editor.subject-label"
             defaultMessage="Subject"
           />
         </FormLabel>
         <Input
-          id={subjectId}
           type="text"
           ref={subjectRef}
           value={subject}
