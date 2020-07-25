@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/core";
 import { useCallback, useState, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { animated, useTransition } from "react-spring";
+import { SwitchTransition, CSSTransition } from "react-transition-group";
 import { Card } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
@@ -22,7 +22,6 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
 
   const images = [
     {
-      id: 0,
       name: "how_it_works_1",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-1",
@@ -31,7 +30,6 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }),
     },
     {
-      id: 1,
       name: "how_it_works_2",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-2",
@@ -40,7 +38,6 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }),
     },
     {
-      id: 2,
       name: "how_it_works_3",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-3",
@@ -49,12 +46,6 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }),
     },
   ];
-
-  const transitions = useTransition(images[index], (i) => i.id, {
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-  });
 
   return (
     <PublicContainer
@@ -160,38 +151,57 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
               paddingTop={Math.round((520 / 720) * 10000) / 100 + "%"}
               position="relative"
             >
-              {transitions.map(({ item, props, key }) => {
-                return (
-                  <animated.div
-                    key={key}
-                    style={{
-                      ...props,
-                      display: "flex",
-                      alignItems: "center",
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      willChange: "opacity",
+              <SwitchTransition mode="out-in">
+                <CSSTransition
+                  key={index}
+                  timeout={{ enter: 300, exit: 200 }}
+                  addEndListener={(node, done) => {
+                    node.addEventListener("transitionend", done, false);
+                  }}
+                  classNames="fade"
+                >
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    position="absolute"
+                    top={0}
+                    left={0}
+                    width="100%"
+                    height="100%"
+                    willChange="opacity"
+                    __css={{
+                      "&.fade": {
+                        "&-enter": { opacity: 0 },
+                        "&-enter-active": {
+                          opacity: 1,
+                          transition: "opacity 300ms cubic-bezier(0,0,.2,1)",
+                        },
+                        "&-exit": {
+                          opacity: 1,
+                        },
+                        "&-exit-active": {
+                          opacity: 0,
+                          transition: "opacity 200ms cubic-bezier(.4,0,1,1)",
+                        },
+                      },
                     }}
                   >
                     <Card overflow="hidden">
                       <Image
-                        src={`/static/images/${item.name}.png`}
+                        src={`/static/images/${images[index].name}.png`}
                         {...{
                           srcSet: [2, 3]
                             .map(
                               (size) =>
-                                `/static/images/${item.name}@${size}x.png ${size}x`
+                                `/static/images/${images[index].name}@${size}x.png ${size}x`
                             )
                             .join(","),
                         }}
                       />
                     </Card>
-                  </animated.div>
-                );
-              })}
+                  </Box>
+                </CSSTransition>
+              </SwitchTransition>
             </Box>
           </Box>
         </Flex>
