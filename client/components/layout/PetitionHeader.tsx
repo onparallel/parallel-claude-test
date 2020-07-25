@@ -6,8 +6,6 @@ import {
   EditableInput,
   EditablePreview,
   Flex,
-  PseudoBox,
-  PseudoBoxProps,
   Stack,
   Text,
   Tooltip,
@@ -268,7 +266,7 @@ export function PetitionHeader({
   );
 }
 
-type PetitionHeaderTabProps = PseudoBoxProps & {
+type PetitionHeaderTabProps = BoxProps & {
   active?: boolean;
   isDisabled?: boolean;
   popoverContent?: ReactNode;
@@ -286,7 +284,7 @@ const PetitionHeaderTab = forwardRef(function (
   ref: Ref<any>
 ) {
   const link = (
-    <PseudoBox
+    <Box
       as="a"
       ref={ref}
       display="block"
@@ -311,7 +309,7 @@ const PetitionHeaderTab = forwardRef(function (
       {...props}
     >
       {children}
-    </PseudoBox>
+    </Box>
   );
   if (isDisabled) {
     return (

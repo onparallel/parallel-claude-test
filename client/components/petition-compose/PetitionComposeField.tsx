@@ -5,7 +5,6 @@ import {
   BoxProps,
   Icon,
   Input,
-  PseudoBox,
   Stack,
   Tooltip,
   useTheme,
@@ -97,7 +96,7 @@ export const PetitionComposeField = Object.assign(
         onFocus={onFocus}
         {...props}
       >
-        <PseudoBox
+        <Box
           ref={previewRef}
           display="flex"
           flexDirection="row"
@@ -128,7 +127,7 @@ export const PetitionComposeField = Object.assign(
             }
           `}
         >
-          <PseudoBox
+          <Box
             ref={dragRef}
             display="flex"
             flexDirection="column"
@@ -146,7 +145,7 @@ export const PetitionComposeField = Object.assign(
             })}
           >
             <Icon name="drag-handle" focusable={false} role="presentation" />
-          </PseudoBox>
+          </Box>
           {field.optional ? null : (
             <Box marginX={-2} position="relative">
               <Tooltip
@@ -289,7 +288,7 @@ export const PetitionComposeField = Object.assign(
               onClick={(event) => onDeleteClick(event)}
             />
           </Stack>
-        </PseudoBox>
+        </Box>
       </Box>
     );
   }),

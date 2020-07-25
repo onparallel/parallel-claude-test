@@ -1,11 +1,11 @@
-import { Icon, IconButton, PseudoBox, Text, useTheme } from "@chakra-ui/core";
+import { Box, Icon, IconButton, Text, useTheme } from "@chakra-ui/core";
 import { memo, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
+  components,
   OptionTypeBase,
   Props as SelectProps,
   Theme,
-  components,
 } from "react-select";
 
 export const SIZES = {
@@ -107,7 +107,7 @@ export function useReactSelectStyle<
           />
         )),
         DropdownIndicator: memo(({ isFocused }) => (
-          <PseudoBox
+          <Box
             paddingX={2}
             color={isFocused ? "gray.600" : "gray.300"}
             _hover={{
@@ -115,7 +115,7 @@ export function useReactSelectStyle<
             }}
           >
             <Icon display="block" name="chevron-down" />
-          </PseudoBox>
+          </Box>
         )),
         NoOptionsMessage: memo(() => (
           <Text

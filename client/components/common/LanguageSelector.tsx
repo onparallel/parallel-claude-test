@@ -1,18 +1,18 @@
 import {
+  Box,
+  BoxProps,
   Icon,
   InputGroup,
   InputLeftElement,
-  PseudoBox,
-  PseudoBoxProps,
   Select,
   SelectProps,
   useColorMode,
 } from "@chakra-ui/core";
-import { useIntl } from "react-intl";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { useIntl } from "react-intl";
 
 export type LanguageSelectorProp = Pick<SelectProps, "value" | "onChange"> &
-  PseudoBoxProps;
+  BoxProps;
 
 export function LanguageSelector({
   value,
@@ -23,7 +23,7 @@ export function LanguageSelector({
   const intl = useIntl();
   const locales = useSupportedLocales();
   return (
-    <PseudoBox {...props}>
+    <Box {...props}>
       <InputGroup size="sm" display="inline-flex">
         <InputLeftElement>
           <Icon
@@ -50,6 +50,6 @@ export function LanguageSelector({
           ))}
         </Select>
       </InputGroup>
-    </PseudoBox>
+    </Box>
   );
 }

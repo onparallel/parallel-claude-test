@@ -1,4 +1,4 @@
-import { PseudoBoxProps, useColorMode, useTheme } from "@chakra-ui/core";
+import { BoxProps, useColorMode, useTheme } from "@chakra-ui/core";
 import { css } from "@emotion/core";
 import { useMemo } from "react";
 import { get } from "styled-system";
@@ -56,6 +56,6 @@ export function useInputLikeStyles() {
           box-shadow: 0 0 0 1px ${_errorBorderColor};
         }
       `,
-    } as PseudoBoxProps;
+    } as BoxProps;
   }, []);
 }

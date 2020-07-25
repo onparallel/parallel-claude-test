@@ -1,7 +1,7 @@
-import { Box, Flex, Heading, Icon, Text, PseudoBox } from "@chakra-ui/core";
+import { Box, Flex, Heading, Icon, Text } from "@chakra-ui/core";
+import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { useRouter } from "next/router";
 import { NakedLink } from "../common/Link";
 
 export interface SettingsLayoutProps {
@@ -55,7 +55,7 @@ function SettingsLayoutMenuItem({
   const active = pathname === `/[locale]/app/settings/${section}`;
   return (
     <NakedLink href={`/app/settings/${section}`}>
-      <PseudoBox
+      <Box
         as="a"
         display="block"
         borderBottom="1px solid"
@@ -75,7 +75,7 @@ function SettingsLayoutMenuItem({
           </Box>
           <Icon name="chevron-right" size="6" marginRight={2} />
         </Flex>
-      </PseudoBox>
+      </Box>
     </NakedLink>
   );
 }

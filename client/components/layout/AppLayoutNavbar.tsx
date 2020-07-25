@@ -8,7 +8,6 @@ import {
   ListItem,
   MenuItem,
   MenuList,
-  PseudoBox,
   Stack,
   Tooltip,
   useColorMode,
@@ -116,7 +115,7 @@ export const AppLayoutNavbar = Object.assign(
           <Flex justifyContent="center" marginTop={6} marginBottom={6}>
             <NakedLink href="/app">
               <Box as="a" width="40px" height="40px" position="relative">
-                <PseudoBox
+                <Box
                   position="absolute"
                   cursor="pointer"
                   transition="transform 150ms"
@@ -129,7 +128,7 @@ export const AppLayoutNavbar = Object.assign(
                   }}
                 >
                   <Logo width={40} hideText={true} />
-                </PseudoBox>
+                </Box>
               </Box>
             </NakedLink>
           </Flex>

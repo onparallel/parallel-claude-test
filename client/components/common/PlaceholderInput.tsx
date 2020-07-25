@@ -1,10 +1,4 @@
-import {
-  Box,
-  PseudoBox,
-  PseudoBoxProps,
-  useTheme,
-  Tooltip,
-} from "@chakra-ui/core";
+import { Box, BoxProps, Tooltip, useTheme } from "@chakra-ui/core";
 import Popper, { PopperProps } from "@chakra-ui/core/dist/Popper";
 import {
   Placeholder,
@@ -18,7 +12,8 @@ import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceho
 import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
 import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import { forwardRef, useCallback, useMemo, useRef, MouseEvent } from "react";
+import { forwardRef, MouseEvent, useCallback, useMemo, useRef } from "react";
+import { useIntl } from "react-intl";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
@@ -28,14 +23,13 @@ import {
   withSingleLine,
 } from "../../utils/slate/withSingleLine";
 import { Card } from "./Card";
-import { useIntl } from "react-intl";
 
 export type PlaceholderInputProps = {
   placeholders: Placeholder[];
   value: string;
   isDisabled?: boolean;
   onChange: (value: string) => void;
-} & Omit<PseudoBoxProps, "onChange">;
+} & Omit<BoxProps, "onChange">;
 
 export type PlaceholderInputRef = {
   focus: () => void;
@@ -131,7 +125,7 @@ export const PlaceholderInput = forwardRef<
 
   return (
     <>
-      <PseudoBox
+      <Box
         ref={wrapper}
         role="combobox"
         aria-owns={placeholderMenuId}
@@ -166,7 +160,7 @@ export const PlaceholderInput = forwardRef<
           />
         </Slate>
         <Tooltip label={hint} aria-label={hint} zIndex={1500} placement="top">
-          <PseudoBox
+          <Box
             as="button"
             display="inline-block"
             border="1px solid"
@@ -192,9 +186,9 @@ export const PlaceholderInput = forwardRef<
             <Box as="span" aria-hidden="true">
               #
             </Box>
-          </PseudoBox>
+          </Box>
         </Tooltip>
-      </PseudoBox>
+      </Box>
       <PlaceholderMenu
         menuId={placeholderMenuId}
         itemIdPrefix={itemIdPrefix}
@@ -257,7 +251,7 @@ function PlaceholderMenu({
         {values.map((placeholder, index) => {
           const isSelected = index === selectedIndex;
           return (
-            <PseudoBox
+            <Box
               key={placeholder.value}
               id={`${itemIdPrefix}-${placeholder.value}`}
               role="option"
@@ -270,7 +264,7 @@ function PlaceholderMenu({
               onMouseEnter={() => onHighlightOption(index)}
             >
               {placeholder.label}
-            </PseudoBox>
+            </Box>
           );
         })}
       </Card>

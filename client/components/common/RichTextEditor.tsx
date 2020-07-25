@@ -1,11 +1,5 @@
 /** @jsx jsx */
-import {
-  PseudoBox,
-  PseudoBoxProps,
-  Stack,
-  useFormControl,
-  Text,
-} from "@chakra-ui/core";
+import { Box, BoxProps, Stack, Text, useFormControl } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import {
   BoldPlugin,
@@ -24,19 +18,17 @@ import {
   UnderlinePlugin,
   withList,
 } from "@udecode/slate-plugins";
-import { CSSProperties, memo, useMemo } from "react";
+import { createElement, CSSProperties, memo, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { pick } from "remeda";
 import { createEditor, Node } from "slate";
 import { withHistory } from "slate-history";
 import { Slate, useSlate, withReact } from "slate-react";
+import { withAutolist } from "../../utils/slate/withAutolist";
+import { useInputLikeStyles } from "../../utils/useInputLikeStyles";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
-import { useInputLikeStyles } from "../../utils/useInputLikeStyles";
-import { withAutolist } from "../../utils/slate/withAutolist";
-import { createElement } from "react";
 
 function TextComponent({ element, attributes, styles, ...props }: any) {
   return createElement(Text, { ...props, ...attributes });
@@ -156,30 +148,30 @@ export function RichTextEditor({
   );
 
   return (
-    <PseudoBox
+    <Box
       aria-disabled={formControl.isDisabled}
       aria-invalid={formControl.isInvalid}
       {...inputStyles}
     >
       <Slate editor={editor} value={value} onChange={onChange as any}>
         <Toolbar disabled={formControl.isDisabled || formControl.isReadOnly} />
-        <PseudoBox maxHeight="360px" overflow="auto">
+        <Box maxHeight="360px" overflow="auto">
           <EditablePlugins
             readOnly={formControl.isDisabled && formControl.isReadOnly}
             style={style}
             plugins={plugins}
             {...props}
           />
-        </PseudoBox>
+        </Box>
       </Slate>
-    </PseudoBox>
+    </Box>
   );
 }
 
 const Toolbar = memo(function _Toolbar({
   disabled,
   ...props
-}: PseudoBoxProps & { disabled?: boolean }) {
+}: BoxProps & { disabled?: boolean }) {
   const intl = useIntl();
   return (
     <Stack

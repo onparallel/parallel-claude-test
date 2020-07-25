@@ -6,7 +6,6 @@ import {
   ButtonProps,
   Flex,
   IconButton,
-  PseudoBoxProps,
   Stack,
   Switch,
   Text,
@@ -266,7 +265,7 @@ function PetitionRepliesFieldReply({
   actions: ReactNode;
   reply: PetitionRepliesField_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
-} & PseudoBoxProps) {
+} & BoxProps) {
   const intl = useIntl();
   return (
     <Flex {...props}>

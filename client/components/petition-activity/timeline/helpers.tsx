@@ -1,10 +1,9 @@
 import {
-  BoxProps,
-  PseudoBox,
-  Flex,
   Box,
-  IconProps,
+  BoxProps,
+  Flex,
   Icon,
+  IconProps,
   useTheme,
 } from "@chakra-ui/core";
 import { ReactNode } from "react";
@@ -19,7 +18,7 @@ export function TimelineItem({
 }) {
   const { colors } = useTheme();
   return (
-    <PseudoBox
+    <Box
       display="flex"
       position="relative"
       alignItems="stretch"
@@ -33,7 +32,7 @@ export function TimelineItem({
       <Flex flex="1" marginLeft={2} alignItems="center">
         <Box flex="1">{children}</Box>
       </Flex>
-    </PseudoBox>
+    </Box>
   );
 }
 

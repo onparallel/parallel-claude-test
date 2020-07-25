@@ -1,4 +1,4 @@
-import { Box, BoxProps, PseudoBox } from "@chakra-ui/core";
+import { Box, BoxProps } from "@chakra-ui/core";
 import {
   getNodeDeserializer,
   getRenderElement,
@@ -77,12 +77,12 @@ const PlaceholderToken = function ({
       position="relative"
       top="-1px"
     >
-      <PseudoBox
+      <Box
         as="span"
         data-placeholder-label={label}
         _before={{ content: `attr(data-placeholder-label)` }}
       />
-      <PseudoBox as="span" fontSize={0} aria-hidden>{`#${value}#`}</PseudoBox>
+      <Box as="span" fontSize={0} aria-hidden>{`#${value}#`}</Box>
       {children}
     </Box>
   );

@@ -1,22 +1,22 @@
 import {
+  Box,
+  BoxProps,
   Flex,
   Heading,
   HeadingProps,
   IconButton,
-  PseudoBox,
-  PseudoBoxProps,
   useColorMode,
 } from "@chakra-ui/core";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Divider } from "./Divider";
 
-export type CardProps = PseudoBoxProps;
+export type CardProps = BoxProps;
 
 export function Card({ children, ...props }: CardProps) {
   const { colorMode } = useColorMode();
   return (
-    <PseudoBox
+    <Box
       as="section"
       borderWidth="1px"
       backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
@@ -25,7 +25,7 @@ export function Card({ children, ...props }: CardProps) {
       {...props}
     >
       {children}
-    </PseudoBox>
+    </Box>
   );
 }
 

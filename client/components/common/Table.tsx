@@ -7,8 +7,6 @@ import {
   Flex,
   Icon,
   IconButton,
-  PseudoBox,
-  PseudoBoxProps,
   useColorMode,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
@@ -77,7 +75,7 @@ export type TableColumn<TRow> = {
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow>>;
   CellContent: ComponentType<TableCellProps<TRow>>;
-  cellProps?: PseudoBoxProps;
+  cellProps?: BoxProps;
 };
 
 function _Table<TRow>({
@@ -143,7 +141,7 @@ function _Table<TRow>({
       updated.unshift({
         key: "expand-toggle",
         header: "",
-        Header: () => <PseudoBox as="th" width="1px" />,
+        Header: () => <Box as="th" width="1px" />,
         cellProps: {
           paddingY: 0,
           paddingRight: 1,
@@ -154,7 +152,7 @@ function _Table<TRow>({
         CellContent: ({ isExpanded, onToggleExpand: toggleExpand }) => {
           const intl = useIntl();
           return (
-            <PseudoBox
+            <Box
               display="flex"
               justifyContent="center"
               alignItems="center"
@@ -186,7 +184,7 @@ function _Table<TRow>({
                 transform={isExpanded ? `rotate(90deg)` : null}
                 transition="transform 150ms ease"
               />
-            </PseudoBox>
+            </Box>
           );
         },
       });
@@ -196,7 +194,7 @@ function _Table<TRow>({
         key: "selection-checkbox",
         header: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
-          <PseudoBox
+          <Box
             as="th"
             width="1px"
             paddingLeft={5}
@@ -213,7 +211,7 @@ function _Table<TRow>({
                 onChange={onToggleAll}
               />
             </Box>
-          </PseudoBox>
+          </Box>
         ),
         cellProps: {
           paddingY: 0,
@@ -248,7 +246,7 @@ function _Table<TRow>({
   return (
     <Box as="table" style={{ tableLayout: "auto", width: "100%" }} {...props}>
       <Box as="thead">
-        <PseudoBox
+        <Box
           as="tr"
           backgroundColor={colors.header}
           borderBottom="1px solid"
@@ -277,7 +275,7 @@ function _Table<TRow>({
               />
             );
           })}
-        </PseudoBox>
+        </Box>
       </Box>
       <Box as="tbody">
         {rows.map((row) => {
@@ -370,7 +368,7 @@ function _Row<TRow>({
   ]);
   return (
     <>
-      <PseudoBox
+      <Box
         as="tr"
         backgroundColor={isSelected ? colors.rowSelected : colors.row}
         _hover={{
@@ -406,19 +404,15 @@ function _Row<TRow>({
             />
           );
         })}
-      </PseudoBox>
+      </Box>
       {isExpandable ? (
-        <PseudoBox
-          as="tr"
-          borderBottom="1px solid"
-          borderBottomColor={colors.border}
-        >
-          <PseudoBox as="td" padding={0} {...{ colSpan: columns.length }}>
+        <Box as="tr" borderBottom="1px solid" borderBottomColor={colors.border}>
+          <Box as="td" padding={0} {...{ colSpan: columns.length }}>
             <Collapse isOpen={isExpanded}>
               <Box borderTop="1px solid" borderTopColor={colors.border} />
             </Collapse>
-          </PseudoBox>
-        </PseudoBox>
+          </Box>
+        </Box>
       ) : null}
     </>
   );
@@ -427,7 +421,7 @@ const Row: typeof _Row = memo(_Row) as any;
 
 function _Cell<TRow>({ column, ...props }: TableCellProps<TRow>) {
   return (
-    <PseudoBox
+    <Box
       as="td"
       padding={2}
       _last={{ paddingRight: 5 }}
@@ -437,7 +431,7 @@ function _Cell<TRow>({ column, ...props }: TableCellProps<TRow>) {
       {...(column.cellProps ?? {})}
     >
       <column.CellContent column={column} {...props} />
-    </PseudoBox>
+    </Box>
   );
 }
 const Cell: typeof _Cell = memo(_Cell) as any;
@@ -449,7 +443,7 @@ export function DefaultHeader({
 }: TableHeaderProps<any>) {
   const intl = useIntl();
   return (
-    <PseudoBox
+    <Box
       key={column.key}
       as="th"
       paddingX={2}
@@ -523,6 +517,6 @@ export function DefaultHeader({
           />
         ) : null}
       </Flex>
-    </PseudoBox>
+    </Box>
   );
 }
