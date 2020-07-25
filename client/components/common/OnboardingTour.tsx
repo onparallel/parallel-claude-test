@@ -2,13 +2,13 @@ import { gql } from "@apollo/client";
 import {
   Box,
   Button,
+  ChakraProvider,
   CloseButton,
   Stack,
-  ThemeProvider,
 } from "@chakra-ui/core";
+import { theme } from "@parallel/chakra/theme";
 import { OnboardingKey, OnboardingStatus } from "@parallel/graphql/__types";
 import { NoSSR } from "@parallel/utils/NoSSR";
-import { theme } from "@parallel/utils/theme";
 import { useId } from "@reach/auto-id";
 import {
   ComponentType,
@@ -75,7 +75,7 @@ const TourStep = ({
   const headerId = `step-header-${useId()}`;
   const bodyId = `step-body-${useId()}`;
   return (
-    <ThemeProvider theme={theme}>
+    <ChakraProvider theme={theme}>
       <Box
         as="section"
         position="relative"
@@ -132,7 +132,7 @@ const TourStep = ({
           )}
         </Stack>
       </Box>
-    </ThemeProvider>
+    </ChakraProvider>
   );
 };
 

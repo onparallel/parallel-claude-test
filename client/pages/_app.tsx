@@ -1,4 +1,5 @@
 import { ChakraProvider, CSSReset } from "@chakra-ui/core";
+import { theme } from "@parallel/chakra/theme";
 import { DialogOpenerProvider } from "@parallel/components/common/DialogOpenerProvider";
 import {
   I18nProps,
@@ -7,7 +8,6 @@ import {
 import { GoogleAnalytics } from "@parallel/components/scripts/GoogleAnalytics";
 import { Hotjar } from "@parallel/components/scripts/Hotjar";
 import { Hubspot } from "@parallel/components/scripts/Hubspot";
-import { theme } from "@parallel/utils/theme";
 import { AppProps } from "next/app";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
