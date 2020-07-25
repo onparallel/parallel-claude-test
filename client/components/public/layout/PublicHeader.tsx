@@ -58,7 +58,7 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
       wrapper={{
         as: "header",
         backgroundColor: "white",
-        shadow: isThin || isOpen ? "md" : "none",
+        boxShadow: isThin || isOpen ? "md" : "none",
         ...props,
       }}
     >

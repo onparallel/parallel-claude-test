@@ -83,7 +83,7 @@ const TourStep = ({
         width="380px"
         maxWidth="100%"
         borderRadius="md"
-        shadow="0 7px 14px 0 rgba(0,0,0, 0.1), 0 3px 6px 0 rgba(0, 0, 0, .07)"
+        boxShadow="0 7px 14px 0 rgba(0,0,0, 0.1), 0 3px 6px 0 rgba(0, 0, 0, .07)"
         aria-labelledby={headerId}
         aria-describedby={bodyId}
         {...tooltipProps}

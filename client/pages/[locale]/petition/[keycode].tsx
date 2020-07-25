@@ -308,7 +308,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           </Alert>
         ) : null}
         {pendingComments ? (
-          <Box backgroundColor="yellow.100" shadow="sm">
+          <Box backgroundColor="yellow.100" boxShadow="sm">
             <Flex
               maxWidth="container.lg"
               alignItems="center"
