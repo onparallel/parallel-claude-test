@@ -42,7 +42,7 @@ export function TimelineIcon({
 }) {
   return (
     <Flex
-      rounded="100%"
+      borderRadius="full"
       color={color}
       backgroundColor={backgroundColor}
       alignItems="center"

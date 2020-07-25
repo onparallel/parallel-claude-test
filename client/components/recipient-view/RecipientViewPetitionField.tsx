@@ -259,7 +259,7 @@ function ReplyWrapper({
               : "gray.100"
           }
           paddingX={2}
-          rounded="sm"
+          borderRadius="sm"
           position="relative"
           {...(progress !== undefined
             ? {
@@ -276,7 +276,7 @@ function ReplyWrapper({
             left={0}
             top={0}
             height="100%"
-            rounded="sm"
+            borderRadius="sm"
             transition="width 100ms ease"
             willChange="width"
             width={`${Math.round((progress ?? 0) * 100)}%`}
@@ -430,7 +430,7 @@ function FileUploadReplyForm({
         isDragActive ? (isDragReject ? "red.500" : "gray.400") : "gray.300"
       }
       cursor="pointer"
-      rounded="md"
+      borderRadius="md"
       flexDirection="column"
       justifyContent="center"
       minHeight="100px"
@@ -544,7 +544,7 @@ function CommentsButton({
                   })}
               borderWidth="4px"
               transform="rotate(-45deg)"
-              rounded="9999px"
+              borderRadius="9999px"
               marginRight={2}
             />
           ) : null}

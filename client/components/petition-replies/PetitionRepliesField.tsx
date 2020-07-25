@@ -378,7 +378,7 @@ function CommentsButton({
                   })}
               borderWidth="4px"
               transform="rotate(-45deg)"
-              rounded="9999px"
+              borderRadius="full"
               marginRight={2}
             />
           ) : null}

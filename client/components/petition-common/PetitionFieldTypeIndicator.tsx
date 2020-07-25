@@ -42,7 +42,7 @@ export function PetitionFieldTypeIndicator({
         color="white"
         paddingX={1}
         paddingY="1px"
-        rounded="sm"
+        borderRadius="sm"
         alignItems="center"
         {...props}
       >

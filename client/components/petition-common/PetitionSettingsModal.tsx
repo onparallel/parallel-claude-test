@@ -54,7 +54,7 @@ export function PetitionSettingsModal({
   return (
     <Modal {...props} size="xl">
       <ModalOverlay />
-      <ModalContent rounded="md">
+      <ModalContent borderRadius="md">
         <ModalHeader>
           <FormattedMessage
             id="petition.settings-header"

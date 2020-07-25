@@ -32,7 +32,7 @@ export function useInputLikeStyles() {
     );
 
     return {
-      rounded: "md",
+      borderRadius: "md",
       border: "1px",
       borderColor: borderColor[colorMode],
       bg: bg[colorMode],

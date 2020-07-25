@@ -21,7 +21,7 @@ export function Card({ children, ...props }: CardProps) {
       borderWidth="1px"
       backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
       shadow="md"
-      rounded="md"
+      borderRadius="md"
       {...props}
     >
       {children}

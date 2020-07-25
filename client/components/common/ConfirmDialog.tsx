@@ -54,7 +54,7 @@ export function ConfirmDialog<T = void>({
     >
       <AlertDialogOverlay zIndex={1400 + position * 2} />
       <AlertDialogContent
-        rounded="md"
+        borderRadius="md"
         zIndex={1400 + position * 2 + 1}
         {...content}
       >

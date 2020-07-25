@@ -151,7 +151,7 @@ export function PetitionRepliesFieldComments({
           ref={textareaRef}
           height="20px"
           size="sm"
-          rounded="md"
+          borderRadius="md"
           paddingX={2}
           minHeight={0}
           {...{ rows: 1 }}
@@ -331,7 +331,7 @@ function FieldComment({
             ref={textareaRef}
             height="20px"
             size="sm"
-            rounded="md"
+            borderRadius="md"
             paddingX={2}
             minHeight={0}
             {...{ rows: 1 }}

@@ -105,7 +105,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent rounded="md" maxHeight="calc(100vh - 7.5rem)">
+      <ModalContent borderRadius="md" maxHeight="calc(100vh - 7.5rem)">
         <ModalHeader fontSize="lg" fontWeight="bold">
           {field.title || (
             <Text color="gray.400" fontWeight="normal" fontStyle="italic">
@@ -160,7 +160,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
             ref={textareaRef}
             height="20px"
             size="sm"
-            rounded="md"
+            borderRadius="md"
             paddingX={2}
             minHeight={0}
             {...{ rows: 1 }}
@@ -327,7 +327,7 @@ function FieldComment({
             ref={textareaRef}
             height="20px"
             size="sm"
-            rounded="md"
+            borderRadius="md"
             paddingX={2}
             minHeight={0}
             {...{ rows: 1 }}

@@ -17,9 +17,9 @@ export const SIZES = {
       baseUnit: 4,
     },
     paddingX: 4,
-    rounded: "md" as const,
+    borderRadius: "md" as const,
     multiValue: {
-      rounded: "sm" as const,
+      borderRadius: "sm" as const,
     },
   },
   md: {
@@ -29,9 +29,9 @@ export const SIZES = {
       baseUnit: 4,
     },
     paddingX: 4,
-    rounded: "md" as const,
+    borderRadius: "md" as const,
     multiValue: {
-      rounded: "sm" as const,
+      borderRadius: "sm" as const,
     },
   },
   sm: {
@@ -41,9 +41,9 @@ export const SIZES = {
       baseUnit: 4,
     },
     paddingX: 3,
-    rounded: "sm" as const,
+    borderRadius: "sm" as const,
     multiValue: {
-      rounded: "sm" as const,
+      borderRadius: "sm" as const,
     },
   },
 };
@@ -92,7 +92,7 @@ export function useReactSelectStyle<
             neutral80: colors.gray[800],
             neutral90: colors.gray[900],
           },
-          borderRadius: radii[SIZES[size].rounded] as any,
+          borderRadius: radii[SIZES[size].borderRadius] as any,
         } as Theme),
       components: {
         IndicatorSeparator: memo(() => <></>),
@@ -192,10 +192,10 @@ export function useReactSelectStyle<
         multiValue: (styles) => ({
           ...styles,
           backgroundColor: colors.gray[200],
-          borderRadius: radii[SIZES[size].multiValue.rounded],
+          borderRadius: radii[SIZES[size].multiValue.borderRadius],
         }),
         multiValueRemove: (styles, { theme }) => {
-          const radius = radii[SIZES[size].multiValue.rounded];
+          const radius = radii[SIZES[size].multiValue.borderRadius];
           return {
             ...styles,
             borderRadius: `0 ${radius} ${radius} 0`,

@@ -92,7 +92,7 @@ export function RecipientViewProgressCard({
           max={total}
           value={replied}
           flex="1"
-          rounded="1rem"
+          borderRadius="1rem"
         >
           <ProgressIndicator
             min={0}
@@ -112,7 +112,7 @@ export function RecipientViewProgressCard({
           />
         </ProgressTrack>
         <Box
-          rounded="100%"
+          borderRadius="full"
           width="1rem"
           height="1rem"
           backgroundColor={

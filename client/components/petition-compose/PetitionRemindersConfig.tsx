@@ -94,7 +94,7 @@ export function PetitionRemindersConfig({
           marginTop={2}
           border="1px solid"
           borderColor="gray.300"
-          rounded="md"
+          borderRadius="md"
         >
           <Flex alignItems="center">
             <FormattedMessage

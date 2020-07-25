@@ -46,7 +46,7 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
             id: "header.user-menu-button",
             defaultMessage: "User menu",
           }),
-          rounded: "100%",
+          borderRadius: "full",
           height: 12,
           paddingLeft: 0,
           paddingRight: 0,

@@ -162,7 +162,7 @@ function _Table<TRow>({
               justifyContent="center"
               alignItems="center"
               as="button"
-              rounded="100%"
+              borderRadius="full"
               width={8}
               height={8}
               color="gray.700"
