@@ -1,15 +1,8 @@
 /** @jsx jsx */
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Icon,
-  Text,
-  useTheme,
-} from "@chakra-ui/core";
+import { Box, Button, Flex, Heading, Text, useTheme } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
+import { SaveIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewProgressCard_PublicPetitionFragment,
   RecipientViewProgressCard_PublicUserFragment,
@@ -131,7 +124,7 @@ export function RecipientViewProgressCard({
       {isStickyFooter ? null : (
         <Flex marginBottom={4}>
           <Box marginRight={2}>
-            <Icon name="save" size="24px" />
+            <SaveIcon boxSize="24px" />
           </Box>
           <Box>
             <Text fontSize="sm">

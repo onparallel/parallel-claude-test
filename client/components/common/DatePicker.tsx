@@ -22,6 +22,7 @@ import { memo, useState, useCallback } from "react";
 import { FormattedDate, useIntl } from "react-intl";
 import { chunk } from "remeda";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
+import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 
 export function DatePicker({
   value,
@@ -68,7 +69,7 @@ export function DatePicker({
     <Flex direction="column">
       <Flex marginBottom={2}>
         <IconButtonWithTooltip
-          icon="chevron-left"
+          icon={<ChevronLeftIcon />}
           size="sm"
           label={intl.formatMessage({
             id: "component.date-picker.prev-month",
@@ -86,7 +87,7 @@ export function DatePicker({
           <FormattedDate value={currentMonth} month="long" year="numeric" />
         </Flex>
         <IconButtonWithTooltip
-          icon="chevron-right"
+          icon={<ChevronRightIcon />}
           size="sm"
           label={intl.formatMessage({
             id: "component.date-picker.next-month",

@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Link, Text, useTheme } from "@chakra-ui/core";
+import { CommentIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -83,7 +84,7 @@ export function TimelineCommentPublishedEvent({
       <TimelineItem
         icon={
           <TimelineIcon
-            icon="comment"
+            icon={<CommentIcon />}
             color="black"
             backgroundColor="gray.200"
           />

@@ -1,21 +1,21 @@
 /** @jsx jsx */
 import {
   Box,
-  Icon,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Stack,
   Text,
   useTheme,
-  Stack,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
+import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { generateCssStripe } from "../../utils/css";
-import { ProgressTrack, ProgressIndicator } from "./Progress";
+import { ProgressIndicator, ProgressTrack } from "./Progress";
 
 type PetitionProgressProps = PetitionProgress & { status: PetitionStatus };
 
@@ -76,7 +76,7 @@ export function PetitionProgressBar({
             </Box>
           ) : total === 0 ? (
             <Box textAlign="center" margin={2} fontSize="sm">
-              <Icon name="question" size="24px" color="gray.300" />
+              <QuestionIcon boxSize="24px" color="gray.300" />
               <Text fontStyle="italic" marginTop={2}>
                 <FormattedMessage
                   id="component.petition-progress-bar.no-fields"
@@ -86,7 +86,7 @@ export function PetitionProgressBar({
             </Box>
           ) : replied + validated === 0 ? (
             <Box textAlign="center" margin={2} fontSize="sm">
-              <Icon name="question" size="24px" color="gray.300" />
+              <QuestionIcon boxSize="24px" color="gray.300" />
               <Text marginTop={2}>
                 <FormattedMessage
                   id="component.petition-progress-bar.all-pending"
@@ -96,7 +96,7 @@ export function PetitionProgressBar({
             </Box>
           ) : total === validated ? (
             <Box textAlign="center" margin={2} fontSize="sm">
-              <Icon name="check" size="24px" color="green.500" />
+              <CheckIcon boxSize="24px" color="green.500" />
               <Text marginTop={2}>
                 <FormattedMessage
                   id="component.petition-progress-bar.completed"

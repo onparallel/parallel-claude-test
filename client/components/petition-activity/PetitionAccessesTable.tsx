@@ -3,12 +3,20 @@ import {
   Button,
   Flex,
   Heading,
-  Icon,
   MenuItem,
   MenuList,
   Stack,
   Text,
 } from "@chakra-ui/core";
+import {
+  BellIcon,
+  ChevronDownIcon,
+  EmailIcon,
+  SettingsIcon,
+  UserCheckIcon,
+  UserPlusIcon,
+  UserXIcon,
+} from "@parallel/chakra/icons";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,
@@ -93,14 +101,14 @@ export function PetitionAccessesTable({
         <Spacer />
         {showActions ? (
           <ButtonDropdown
-            rightIcon="chevron-down"
+            rightIcon={<ChevronDownIcon />}
             dropdown={
               <MenuList minWidth="160px">
                 <MenuItem
                   isDisabled={selected.some((a) => a.status === "INACTIVE")}
                   onClick={handleSendMessage}
                 >
-                  <Icon name="email" marginRight={2} />
+                  <EmailIcon marginRight={2} />
                   <FormattedMessage
                     id="petition-accesses.send-message"
                     defaultMessage="Send message"
@@ -113,7 +121,7 @@ export function PetitionAccessesTable({
                   }
                   onClick={handleSendReminders}
                 >
-                  <Icon name="bell" marginRight={2} />
+                  <BellIcon marginRight={2} />
                   <FormattedMessage
                     id="petition-accesses.send-reminder"
                     defaultMessage="Send reminder"
@@ -126,7 +134,7 @@ export function PetitionAccessesTable({
                   }
                   onClick={handleConfigureReminders}
                 >
-                  <Icon name="settings" marginRight={2} />
+                  <SettingsIcon marginRight={2} />
                   <FormattedMessage
                     id="petition-accesses.reminder-settings"
                     defaultMessage="Reminder settings"
@@ -143,7 +151,7 @@ export function PetitionAccessesTable({
         ) : null}
         <Button
           colorScheme="purple"
-          leftIcon={"user-plus" as any}
+          leftIcon={<UserPlusIcon />}
           onClick={onAddPetitionAccess}
         >
           {intl.formatMessage({
@@ -289,7 +297,7 @@ function usePetitionAccessesColumns({
                   })}
                   onClick={() => onSendMessage([id])}
                   placement="bottom"
-                  icon="email"
+                  icon={<EmailIcon />}
                   size="sm"
                 />
               ) : null}
@@ -302,7 +310,7 @@ function usePetitionAccessesColumns({
                   })}
                   onClick={() => onSendReminders([id])}
                   placement="bottom"
-                  icon="bell"
+                  icon={<BellIcon />}
                   size="sm"
                 />
               ) : null}
@@ -314,7 +322,7 @@ function usePetitionAccessesColumns({
                   })}
                   onClick={() => onDeactivateAccess(id)}
                   placement="bottom"
-                  icon={"user-x" as any}
+                  icon={<UserXIcon />}
                   size="sm"
                 />
               ) : (
@@ -325,7 +333,7 @@ function usePetitionAccessesColumns({
                   })}
                   onClick={() => onReactivateAccess(id)}
                   placement="left"
-                  icon={"user-check" as any}
+                  icon={<UserCheckIcon />}
                   size="sm"
                 />
               )}

@@ -1,11 +1,16 @@
-import { Box, Button, Stack, MenuList, MenuItem, Icon } from "@chakra-ui/core";
+import { Box, Button, MenuItem, MenuList, Stack } from "@chakra-ui/core";
+import {
+  ChevronDownIcon,
+  DeleteIcon,
+  RepeatIcon,
+} from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SearchInput } from "../common/SearchInput";
-import { Spacer } from "../common/Spacer";
 import { ButtonDropdown } from "../common/ButtonDropdown";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { SearchInput } from "../common/SearchInput";
+import { Spacer } from "../common/Spacer";
 
 export interface ContactListHeaderProps {
   search: string | null;
@@ -44,7 +49,7 @@ export function ContactListHeader({
       </Box>
       <IconButtonWithTooltip
         onClick={() => onReload()}
-        icon="repeat"
+        icon={<RepeatIcon />}
         placement="bottom"
         variant="outline"
         label={intl.formatMessage({
@@ -56,11 +61,11 @@ export function ContactListHeader({
       {showActions ? (
         <Box>
           <ButtonDropdown
-            rightIcon="chevron-down"
+            rightIcon={<ChevronDownIcon />}
             dropdown={
               <MenuList minWidth="160px">
                 <MenuItem onClick={onDeleteClick}>
-                  <Icon name="delete" marginRight={2} />
+                  <DeleteIcon marginRight={2} />
                   <FormattedMessage
                     id="component.contact-list-header.delete-label"
                     defaultMessage="Delete selected"

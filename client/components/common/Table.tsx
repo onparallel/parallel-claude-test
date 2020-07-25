@@ -5,11 +5,16 @@ import {
   Checkbox,
   Collapse,
   Flex,
-  Icon,
   IconButton,
   useColorMode,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
+import {
+  ArrowUpDownIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from "@parallel/chakra/icons";
 import {
   ComponentType,
   memo,
@@ -178,10 +183,9 @@ function _Table<TRow>({
               }
               onClick={() => toggleExpand?.(!isExpanded)}
             >
-              <Icon
-                name="chevron-right"
-                size="20px"
-                transform={isExpanded ? `rotate(90deg)` : null}
+              <ChevronRightIcon
+                boxSize="20px"
+                transform={isExpanded ? `rotate(90deg)` : undefined}
                 transition="transform 150ms ease"
               />
             </Box>
@@ -489,11 +493,15 @@ export function DefaultHeader({
             onClick={(event) => onSortByClick?.(column.key, event)}
             marginLeft={1}
             icon={
-              sort?.field === column.key
-                ? sort.direction === "ASC"
-                  ? "chevron-up"
-                  : "chevron-down"
-                : "arrow-up-down"
+              sort?.field === column.key ? (
+                sort.direction === "ASC" ? (
+                  <ChevronUpIcon />
+                ) : (
+                  <ChevronDownIcon />
+                )
+              ) : (
+                <ArrowUpDownIcon />
+              )
             }
             size="xs"
             variant="ghost"

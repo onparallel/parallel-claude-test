@@ -44,6 +44,7 @@ import {
 } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { EditIcon } from "@parallel/chakra/icons";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -193,7 +194,7 @@ function Contact({ contactId }: ContactProps) {
                 </>
               ) : (
                 <Button
-                  leftIcon="edit"
+                  leftIcon={<EditIcon />}
                   colorScheme="gray"
                   onClick={() => setIsEditing(true)}
                 >

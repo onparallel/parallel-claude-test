@@ -1,4 +1,5 @@
-import { Box, Flex, Heading, Icon, Text } from "@chakra-ui/core";
+import { Box, Flex, Heading, Text } from "@chakra-ui/core";
+import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
@@ -73,7 +74,7 @@ function SettingsLayoutMenuItem({
           <Box flex="1" padding={3}>
             <Text fontSize="md">{children}</Text>
           </Box>
-          <Icon name="chevron-right" size="6" marginRight={2} />
+          <ChevronRightIcon boxSize="6" marginRight={2} />
         </Flex>
       </Box>
     </NakedLink>

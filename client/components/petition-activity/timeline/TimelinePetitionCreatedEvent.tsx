@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
+import { ShinyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCreatedEvent_PetitionCreatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -18,7 +19,11 @@ export function TimelinePetitionCreatedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="shiny" color="white" backgroundColor="purple.500" />
+        <TimelineIcon
+          icon={<ShinyIcon />}
+          color="white"
+          backgroundColor="purple.500"
+        />
       }
       paddingTop={0}
     >

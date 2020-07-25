@@ -12,6 +12,7 @@ import {
   useDisclosure,
   useTheme,
 } from "@chakra-ui/core";
+import { SettingsIcon } from "@parallel/chakra/icons";
 import {
   PetitionHeader_PetitionFragment,
   UpdatePetitionInput,
@@ -215,7 +216,7 @@ export function PetitionHeader({
           <Stack direction="row">
             <IconButtonWithTooltip
               variant="ghost"
-              icon="settings"
+              icon={<SettingsIcon />}
               label={intl.formatMessage({
                 id: "petition.settings-button",
                 defaultMessage: "Petition settings",

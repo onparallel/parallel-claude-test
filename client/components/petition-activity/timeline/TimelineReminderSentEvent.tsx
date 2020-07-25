@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
+import { BellIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -20,7 +21,11 @@ export function TimelineReminderSentEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="bell" color="black" backgroundColor="gray.200" />
+        <TimelineIcon
+          icon={<BellIcon />}
+          color="black"
+          backgroundColor="gray.200"
+        />
       }
     >
       {reminder.type === "MANUAL" ? (

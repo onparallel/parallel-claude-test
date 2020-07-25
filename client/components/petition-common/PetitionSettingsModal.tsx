@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Button,
+  CloseButton,
   Flex,
   FormControl,
   FormLabel,
@@ -17,6 +18,7 @@ import {
   Select,
   Stack,
 } from "@chakra-ui/core";
+import { TimeIcon } from "@parallel/chakra/icons";
 import {
   PetitionSettingsModal_PetitionFragment,
   UpdatePetitionInput,
@@ -25,7 +27,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { KeyboardEvent, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 
 export type PetitionSettingsModalProps = Omit<IModal, "children"> & {
@@ -125,10 +126,8 @@ export function PetitionSettingsModal({
                   />
                   {petition.deadline ? (
                     <InputRightElement>
-                      <IconButtonWithTooltip
-                        variant="ghost"
+                      <CloseButton
                         size="sm"
-                        icon="close"
                         label={intl.formatMessage({
                           id: "petition.remove-deadline",
                           defaultMessage: "Remove deadline",
@@ -139,7 +138,7 @@ export function PetitionSettingsModal({
                   ) : null}
                 </InputGroup>
                 <Button
-                  leftIcon="time"
+                  leftIcon={<TimeIcon />}
                   marginLeft={{ base: 0, sm: 2 }}
                   marginTop={{ base: 2, sm: 0 }}
                   onClick={(event: MouseEvent) => {

@@ -1,5 +1,6 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text } from "@chakra-ui/core";
+import { DownloadIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -269,7 +270,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       >
         <IconButtonWithTooltip
           onClick={() => refetch()}
-          icon="repeat"
+          icon={<RepeatIcon />}
           placement="bottom"
           variant="outline"
           label={intl.formatMessage({
@@ -294,7 +295,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         {showDownloadAll ? (
           <Button
             colorScheme="purple"
-            leftIcon="download"
+            leftIcon={<DownloadIcon />}
             onClick={handleDownloadAllClick}
           >
             <FormattedMessage

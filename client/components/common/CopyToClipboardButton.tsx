@@ -4,6 +4,7 @@ import {
   Tooltip,
   TooltipProps,
 } from "@chakra-ui/core";
+import { ClipboardIcon } from "@parallel/chakra/icons";
 import copy from "clipboard-copy";
 import { memo, MouseEvent, useState } from "react";
 import { useIntl } from "react-intl";
@@ -33,13 +34,13 @@ export const CopyToClipboardButton = memo(function CopyToClipboardButton({
   };
   const [copied, setState] = useState(false);
 
-  function handleClick(event: MouseEvent<HTMLElement>) {
+  function handleClick(event: MouseEvent<HTMLButtonElement>) {
     copy(text);
     setState(true);
     onClick?.(event);
   }
 
-  function handleMouseOut(event: MouseEvent<HTMLElement>) {
+  function handleMouseOut(event: MouseEvent<HTMLButtonElement>) {
     onMouseOut?.(event);
     setTimeout(() => {
       setState(false);
@@ -54,7 +55,7 @@ export const CopyToClipboardButton = memo(function CopyToClipboardButton({
     >
       <IconButton
         aria-label={labels.copy}
-        icon={"clipboard" as any}
+        icon={<ClipboardIcon />}
         onClick={handleClick}
         onMouseOut={handleMouseOut}
         {...props}

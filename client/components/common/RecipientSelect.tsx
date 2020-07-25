@@ -4,10 +4,10 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Icon,
   Text,
   useToast,
 } from "@chakra-ui/core";
+import { UserPlusIcon } from "@parallel/chakra/icons";
 import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useId } from "@reach/auto-id";
@@ -156,12 +156,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
             const search = selectProps.inputValue;
             return (
               <Box textAlign="center" color="gray.400" padding={4}>
-                <Icon
-                  name={"user-plus" as any}
-                  role="presentation"
-                  focusable={false}
-                  size="30px"
-                />
+                <UserPlusIcon boxSize="30px" />
                 {search ? (
                   <>
                     <Text as="div" marginTop={2}>

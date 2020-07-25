@@ -1,7 +1,8 @@
-import { Icon, Flex, Text, Tooltip, BoxProps } from "@chakra-ui/core";
+import { BoxProps, Flex, Icon, Text, Tooltip } from "@chakra-ui/core";
+import { FieldFileUploadIcon, FieldTextIcon } from "@parallel/chakra/icons";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMemo } from "react";
-import { useIntl, FormattedNumber } from "react-intl";
+import { FormattedNumber, useIntl } from "react-intl";
 
 export type PetitionFieldTypeIndicatorProps = BoxProps & {
   type: PetitionFieldType;
@@ -26,6 +27,12 @@ export function PetitionFieldTypeIndicator({
       }),
     }[type];
   }, [type, intl.locale]);
+  const icon = useMemo(() => {
+    return {
+      FILE_UPLOAD: FieldFileUploadIcon,
+      TEXT: FieldTextIcon,
+    }[type];
+  }, [type]);
   return (
     <Tooltip label={label} aria-label={label} placement="bottom">
       <Flex
@@ -39,12 +46,7 @@ export function PetitionFieldTypeIndicator({
         alignItems="center"
         {...props}
       >
-        <Icon
-          size="16px"
-          name={`field.${type}` as any}
-          focusable={false}
-          role="presentation"
-        />
+        <Icon boxSize="16px" as={icon} focusable={false} role="presentation" />
         <Text as="span" fontSize="xs" marginLeft={2}>
           <FormattedNumber value={index + 1} />
         </Text>

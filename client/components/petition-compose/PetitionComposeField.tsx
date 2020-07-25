@@ -3,13 +3,17 @@ import { gql } from "@apollo/client";
 import {
   Box,
   BoxProps,
-  Icon,
   Input,
   Stack,
   Tooltip,
   useTheme,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
+import {
+  DeleteIcon,
+  DragHandleIcon,
+  SettingsIcon,
+} from "@parallel/chakra/icons";
 import {
   PetitionComposeField_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -144,7 +148,7 @@ export const PetitionComposeField = Object.assign(
               defaultMessage: "Drag to sort this petition fields",
             })}
           >
-            <Icon name="drag-handle" focusable={false} role="presentation" />
+            <DragHandleIcon focusable={false} role="presentation" />
           </Box>
           {field.optional ? null : (
             <Box marginX={-2} position="relative">
@@ -264,7 +268,7 @@ export const PetitionComposeField = Object.assign(
             padding={1}
           >
             <IconButtonWithTooltip
-              icon="settings"
+              icon={<SettingsIcon />}
               size="sm"
               variant="ghost"
               placement="bottom"
@@ -276,7 +280,7 @@ export const PetitionComposeField = Object.assign(
               onClick={(event) => onSettingsClick(event)}
             />
             <IconButtonWithTooltip
-              icon="delete"
+              icon={<DeleteIcon />}
               size="sm"
               variant="ghost"
               placement="bottom"

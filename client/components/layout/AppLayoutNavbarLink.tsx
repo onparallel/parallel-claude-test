@@ -1,14 +1,14 @@
 /** @jsx jsx */
-import { Box, Icon, Text, Tooltip } from "@chakra-ui/core";
-import { ReactNode } from "react";
+import { Box, Text, Tooltip } from "@chakra-ui/core";
+import { css, jsx } from "@emotion/core";
+import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "../common/Link";
-import { css, jsx } from "@emotion/core";
 
 export interface AppLayoutNavbarLinkProps {
   href: string;
   active: boolean;
-  icon: string;
+  icon: ReactElement;
   isAvailable: boolean;
   isMobile?: boolean;
   children: ReactNode;
@@ -75,7 +75,7 @@ function AppLayoutNavbarLinkContent({
   isMobile,
   children,
 }: {
-  icon: string;
+  icon: ReactElement;
   isDisabled?: boolean;
   isMobile?: boolean;
   children: ReactNode;
@@ -96,13 +96,11 @@ function AppLayoutNavbarLinkContent({
       }
     >
       <Box marginBottom={1}>
-        <Icon
-          aria-hidden="true"
-          focusable={false}
-          name={icon as any}
-          size="24px"
-          transition="transform 150ms ease"
-        />
+        {cloneElement(icon, {
+          "aria-hidden": "true",
+          boxSize: "24px",
+          transition: "transform 150ms ease",
+        })}
       </Box>
       <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight={600}>
         {children}

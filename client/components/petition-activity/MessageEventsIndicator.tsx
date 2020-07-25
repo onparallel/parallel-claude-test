@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Icon } from "@chakra-ui/core";
+import { Box, BoxProps } from "@chakra-ui/core";
+import { CheckIcon, CheckShortIcon } from "@parallel/chakra/icons";
 import { MessageEventsIndicator_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIntl } from "react-intl";
@@ -30,10 +31,9 @@ export function MessageEventsIndicator({
         })}
         {...props}
       >
-        <Icon name="check" color="red.500" position="relative" top="-1px" />
-        <Icon
+        <CheckIcon color="red.500" position="relative" top="-1px" />
+        <CheckShortIcon
           marginLeft="-7px"
-          name="check-short"
           color="red.500"
           position="relative"
           top="-1px"
@@ -67,8 +67,7 @@ export function MessageEventsIndicator({
                 })
           }
         >
-          <Icon
-            name="check"
+          <CheckIcon
             color={deliveredAt ? "green.500" : "gray.300"}
             position="relative"
             top="-1px"
@@ -98,8 +97,7 @@ export function MessageEventsIndicator({
                 })
           }
         >
-          <Icon
-            name="check-short"
+          <CheckShortIcon
             color={openedAt ? "green.500" : "gray.300"}
             position="relative"
             top="-1px"

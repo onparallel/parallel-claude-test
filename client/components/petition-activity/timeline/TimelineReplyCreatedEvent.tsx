@@ -8,6 +8,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
+import { PlusCircleIcon } from "@parallel/chakra/icons";
 
 export type TimelineReplyCreatedEventProps = {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
@@ -18,7 +19,9 @@ export function TimelineReplyCreatedEvent({
 }: TimelineReplyCreatedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon="plus-circle" color="gray.600" size="18px" />}
+      icon={
+        <TimelineIcon icon={<PlusCircleIcon />} color="gray.600" size="18px" />
+      }
       paddingY={2}
     >
       <FormattedMessage

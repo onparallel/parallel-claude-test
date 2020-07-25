@@ -1,4 +1,5 @@
 import { Button, Text } from "@chakra-ui/core";
+import { CheckIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import Cookie from "js-cookie";
 import { useEffect, useState } from "react";
@@ -71,7 +72,7 @@ export function CookieConsent({}: CookieConsentProps) {
           backgroundColor: "purple.600",
           color: "white",
         }}
-        rightIcon="check"
+        rightIcon={<CheckIcon />}
         onClick={handleConsentClick}
       >
         <FormattedMessage

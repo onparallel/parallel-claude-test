@@ -1,13 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  BoxProps,
-  Flex,
-  Icon,
-  Image,
-  Input,
-  Switch,
-  Text,
-} from "@chakra-ui/core";
+import { BoxProps, Flex, Image, Input, Switch, Text } from "@chakra-ui/core";
+import { QuestionIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -239,7 +232,7 @@ function SettingsRow({
         {...props}
       >
         <Text as="div">{label}</Text>
-        <Icon marginLeft={2} name="question" color="gray.200" />
+        <QuestionIcon marginLeft={2} color="gray.200" />
         <Spacer minWidth={4} />
         <Flex alignSelf="center">{children}</Flex>
       </Flex>

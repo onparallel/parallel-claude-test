@@ -13,6 +13,14 @@ import {
   useColorMode,
   useTheme,
 } from "@chakra-ui/core";
+import {
+  AddIcon,
+  GlobeIcon,
+  InfoOutlineIcon,
+  FileTextIcon,
+  PaperPlaneIcon,
+  UsersIcon,
+} from "@parallel/chakra/icons";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { resolveUrl } from "@parallel/utils/next";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -51,7 +59,7 @@ export const AppLayoutNavbar = Object.assign(
       () => [
         {
           section: "petitions",
-          icon: "paper-plane",
+          icon: <PaperPlaneIcon />,
           available: true,
           text: intl.formatMessage({
             id: "navbar.petitions-link",
@@ -60,7 +68,7 @@ export const AppLayoutNavbar = Object.assign(
         },
         {
           section: "templates",
-          icon: "file-text",
+          icon: <FileTextIcon />,
           available: false,
           text: intl.formatMessage({
             id: "navbar.templates-link",
@@ -69,7 +77,7 @@ export const AppLayoutNavbar = Object.assign(
         },
         {
           section: "contacts",
-          icon: "users",
+          icon: <UsersIcon />,
           available: true,
           text: intl.formatMessage({
             id: "navbar.contacts-link",
@@ -137,7 +145,7 @@ export const AppLayoutNavbar = Object.assign(
           <IconButtonWithTooltip
             id="new-petition-button"
             colorScheme="purple"
-            icon="add"
+            icon={<AddIcon />}
             size="lg"
             isRound
             onClick={onCreate}
@@ -206,7 +214,7 @@ export const AppLayoutNavbar = Object.assign(
                       id: "navbar.change-language",
                       defaultMessage: "Change language",
                     })}
-                    icon={"globe" as any}
+                    icon={<GlobeIcon />}
                     variant="ghost"
                     isRound
                     dropdown={
@@ -234,7 +242,7 @@ export const AppLayoutNavbar = Object.assign(
                     id: "navbar.start-tour",
                     defaultMessage: "Guide me around",
                   })}
-                  icon="info-outline"
+                  icon={<InfoOutlineIcon />}
                   variant="ghost"
                   isRound
                   onClick={onOnboardingClick}

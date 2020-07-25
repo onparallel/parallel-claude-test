@@ -5,13 +5,13 @@ import {
   Button,
   Collapse,
   Flex,
-  Icon,
   IconButton,
   MenuItem,
   MenuList,
   Stack,
   Text,
 } from "@chakra-ui/core";
+import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
@@ -140,7 +140,7 @@ export function PetitionRepliesFieldComments({
             alignItems="center"
             color="gray.200"
           >
-            <Icon name="comment" size="64px" />
+            <CommentIcon boxSize="64px" />
           </Flex>
         ) : null}
       </Box>
@@ -318,7 +318,7 @@ function FieldComment({
           }
           variant="ghost"
           size="xs"
-          icon={"more-vertical" as any}
+          icon={<MoreVerticalIcon />}
           aria-label={intl.formatMessage({
             id: "generic.more-options",
             defaultMessage: "More options...",

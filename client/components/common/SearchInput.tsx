@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import {
-  Icon,
-  IconButton,
+  CloseButton,
   Input,
   InputGroup,
   InputLeftElement,
@@ -9,12 +8,13 @@ import {
   InputRightElement,
   useColorMode,
 } from "@chakra-ui/core";
+import { css, jsx } from "@emotion/core";
+import { SearchIcon } from "@parallel/chakra/icons";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, Ref, useRef } from "react";
 import { useIntl } from "react-intl";
-import { jsx, css } from "@emotion/core";
 
 export type SearchInputProps = InputProps &
   Required<Pick<InputProps, "value" | "onChange">>;
@@ -44,8 +44,7 @@ export const SearchInput = forwardRef(function SearchInput(
   return (
     <InputGroup size="md">
       <InputLeftElement>
-        <Icon
-          name="search"
+        <SearchIcon
           color={
             isActive
               ? { light: "gray.800", dark: "whiteAlpha.900" }[colorMode]
@@ -85,13 +84,11 @@ export const SearchInput = forwardRef(function SearchInput(
       />
       {isActive ? (
         <InputRightElement>
-          <IconButton
+          <CloseButton
             tabIndex={-1}
             title={clearLabel}
             aria-label={clearLabel}
-            icon="close"
             size="xs"
-            variant="ghost"
             onClick={handleClearClick}
           />
         </InputRightElement>

@@ -5,7 +5,6 @@ import {
   Button,
   Collapse,
   Flex,
-  Icon,
   IconButton,
   MenuItem,
   MenuList,
@@ -19,6 +18,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/core";
+import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
@@ -144,7 +144,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               justifyContent="center"
               alignItems="center"
             >
-              <Icon color="gray.200" name="comment" size="64px" />
+              <CommentIcon color="gray.200" boxSize="64px" />
               <Text color="gray.400">
                 <FormattedMessage
                   id="recipient-view.field-comments.cta"
@@ -313,7 +313,7 @@ function FieldComment({
             }
             variant="ghost"
             size="xs"
-            icon={"more-vertical" as any}
+            icon={<MoreVerticalIcon />}
             aria-label={intl.formatMessage({
               id: "generic.more-options",
               defaultMessage: "More options...",

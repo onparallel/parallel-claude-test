@@ -8,6 +8,7 @@ import {
   ListItem,
   Text,
 } from "@chakra-ui/core";
+import { LinkedInIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
@@ -189,7 +190,7 @@ export function PublicFooter(props: BoxProps) {
               href: "https://twitter.com/Parallel_SO",
               target: "_blank",
             }}
-            icon={"twitter" as any}
+            icon={<TwitterIcon />}
             isRound
             colorScheme="purple"
             aria-label={intl.formatMessage({
@@ -203,7 +204,7 @@ export function PublicFooter(props: BoxProps) {
               href: "https://www.linkedin.com/company/parallel-so/",
               target: "_blank",
             }}
-            icon={"linkedin" as any}
+            icon={<LinkedInIcon />}
             isRound
             colorScheme="purple"
             marginLeft={2}

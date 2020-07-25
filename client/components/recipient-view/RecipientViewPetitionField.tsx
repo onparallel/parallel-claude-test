@@ -9,7 +9,6 @@ import {
   FormControl,
   FormErrorMessage,
   Heading,
-  Icon,
   Input,
   List,
   ListItem,
@@ -20,6 +19,12 @@ import {
   useTheme,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
+import {
+  CheckIcon,
+  CloseIcon,
+  CommentIcon,
+  DeleteIcon,
+} from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import {
   PetitionFieldReplyStatus,
@@ -289,9 +294,9 @@ function ReplyWrapper({
             {children}
           </Box>
           {status === "APPROVED" ? (
-            <Icon name="check" color="green.500" marginLeft={2} />
+            <CheckIcon color="green.500" marginLeft={2} />
           ) : status === "REJECTED" ? (
-            <Icon name="close" color="red.500" size="12px" marginLeft={2} />
+            <CloseIcon color="red.500" size="12px" marginLeft={2} />
           ) : null}
         </Flex>
       </DisableableTooltip>
@@ -299,7 +304,7 @@ function ReplyWrapper({
         <IconButtonWithTooltip
           onClick={onDeleteReply}
           variant="ghost"
-          icon="delete"
+          icon={<DeleteIcon />}
           size="xs"
           placement="bottom"
           label={intl.formatMessage({
@@ -524,7 +529,7 @@ function CommentsButton({
   return (
     <Box position="relative">
       {commentCount > 0 ? (
-        <Button rightIcon={"comment" as any} {...common}>
+        <Button rightIcon={<CommentIcon />} {...common}>
           {hasNewComments || hasUnpublishedComments ? (
             <Box
               {...(!hasNewComments

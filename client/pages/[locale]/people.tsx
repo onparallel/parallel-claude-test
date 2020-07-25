@@ -11,6 +11,7 @@ import {
   Text,
   useTheme,
 } from "@chakra-ui/core";
+import { CheckIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -172,7 +173,7 @@ function People() {
           <List stylePos="outside" spacing={4}>
             <ListItem display="flex">
               <ListIcon
-                icon="check"
+                as={CheckIcon}
                 color="purple.500"
                 marginTop={1}
                 marginRight={2}
@@ -184,7 +185,7 @@ function People() {
             </ListItem>
             <ListItem display="flex">
               <ListIcon
-                icon="check"
+                as={CheckIcon}
                 color="purple.500"
                 marginTop={1}
                 marginRight={2}
@@ -196,7 +197,7 @@ function People() {
             </ListItem>
             <ListItem display="flex">
               <ListIcon
-                icon="check"
+                as={CheckIcon}
                 color="purple.500"
                 marginTop={1}
                 marginRight={2}

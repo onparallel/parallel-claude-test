@@ -7,6 +7,7 @@ import { TimelineAccessActivatedEvent_AccessActivatedEventFragment } from "@para
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon, TimelineItem } from "./helpers";
+import { UserPlusIcon } from "@parallel/chakra/icons";
 
 export type TimelineAccessActivatedEventProps = {
   userId: string;
@@ -21,7 +22,7 @@ export function TimelineAccessActivatedEvent({
     <TimelineItem
       icon={
         <TimelineIcon
-          icon="user-plus"
+          icon={<UserPlusIcon />}
           color="white"
           backgroundColor="blue.500"
         />

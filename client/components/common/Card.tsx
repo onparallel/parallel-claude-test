@@ -4,8 +4,8 @@ import {
   Flex,
   Heading,
   HeadingProps,
-  IconButton,
   useColorMode,
+  CloseButton,
 } from "@chakra-ui/core";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
@@ -54,10 +54,8 @@ export function CardHeader({
           </Heading>
           {isCloseable ? (
             <Flex flex="1" height={5} marginLeft={1} justifyContent="flex-end">
-              <IconButton
-                variant="ghost"
+              <CloseButton
                 size="xs"
-                icon="close"
                 aria-label={intl.formatMessage({
                   id: "generic.close",
                   defaultMessage: "Close",

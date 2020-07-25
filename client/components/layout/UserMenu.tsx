@@ -2,7 +2,6 @@ import { gql, useApolloClient } from "@apollo/client";
 import {
   Avatar,
   Button,
-  Icon,
   Menu,
   MenuButton,
   MenuDivider,
@@ -11,6 +10,7 @@ import {
   MenuList,
   MenuOptionGroup,
 } from "@chakra-ui/core";
+import { LogOutIcon, UserIcon } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -57,7 +57,7 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
       <MenuList placement={isMobile ? "top-end" : "right-end"}>
         <NakedLink href="/app/settings/account">
           <MenuItem as="a">
-            <Icon name="user" marginRight={2} />
+            <UserIcon marginRight={2} />
             <FormattedMessage
               id="component.user-menu.my-account"
               defaultMessage="My Account"
@@ -83,7 +83,7 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
         ) : null}
         <MenuDivider />
         <MenuItem onClick={handleLogoutClick}>
-          <Icon name="log-out" marginRight={2} />
+          <LogOutIcon marginRight={2} />
           <FormattedMessage
             id="component.user-menu.log-out"
             defaultMessage="Log out"

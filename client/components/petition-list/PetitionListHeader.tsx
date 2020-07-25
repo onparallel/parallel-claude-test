@@ -1,12 +1,17 @@
 import {
   Box,
   Button,
-  Icon,
   MenuDivider,
   MenuItem,
   MenuList,
   Stack,
 } from "@chakra-ui/core";
+import {
+  ChevronDownIcon,
+  CopyIcon,
+  DeleteIcon,
+  RepeatIcon,
+} from "@parallel/chakra/icons";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -65,7 +70,7 @@ export function PetitionListHeader({
       </Box>
       <IconButtonWithTooltip
         onClick={() => onReload()}
-        icon="repeat"
+        icon={<RepeatIcon />}
         placement="bottom"
         variant="outline"
         label={intl.formatMessage({
@@ -78,11 +83,11 @@ export function PetitionListHeader({
       {showActions ? (
         <Box>
           <ButtonDropdown
-            rightIcon="chevron-down"
+            rightIcon={<ChevronDownIcon />}
             dropdown={
               <MenuList minWidth="160px">
                 <MenuItem onClick={onCloneClick} isDisabled={!showClone}>
-                  <Icon name="copy" marginRight={2} />
+                  <CopyIcon marginRight={2} />
                   <FormattedMessage
                     id="component.petition-list-header.clone-label"
                     defaultMessage="Clone petition"
@@ -90,7 +95,7 @@ export function PetitionListHeader({
                 </MenuItem>
                 <MenuDivider />
                 <MenuItem onClick={onDeleteClick} isDisabled={!showDelete}>
-                  <Icon name="delete" marginRight={2} />
+                  <DeleteIcon marginRight={2} />
                   <FormattedMessage
                     id="component.petition-list-header.delete-label"
                     defaultMessage="Delete selected"

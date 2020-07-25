@@ -1,13 +1,14 @@
 import {
-  IconButton,
   Input,
   InputGroup,
   InputProps,
   InputRightElement,
 } from "@chakra-ui/core";
+import { EyeIcon, EyeOffIcon } from "@parallel/chakra/icons";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, Ref, useRef, useState } from "react";
 import { useIntl } from "react-intl";
+import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
 export const PasswordInput = forwardRef(function PasswordInput(
   props: InputProps,
@@ -43,11 +44,11 @@ export const PasswordInput = forwardRef(function PasswordInput(
         {...props}
       />
       <InputRightElement>
-        <IconButton
+        <IconButtonWithTooltip
           tabIndex={-1}
-          title={show ? labels.hide : labels.show}
-          aria-label={show ? labels.hide : labels.show}
-          icon={show ? "view-off" : "view"}
+          icon={show ? <EyeOffIcon /> : <EyeIcon />}
+          label={show ? labels.hide : labels.show}
+          placement="bottom"
           size="sm"
           variant="ghost"
           onClick={handleClick}

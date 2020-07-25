@@ -28,6 +28,13 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
+import {
+  EyeIcon,
+  DownloadIcon,
+  CheckIcon,
+  CloseIcon,
+  CommentIcon,
+} from "@parallel/chakra/icons";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
@@ -180,7 +187,7 @@ export function PetitionRepliesField({
                   <Stack spacing={1}>
                     <IconButtonWithTooltip
                       size="xs"
-                      icon="download"
+                      icon={<DownloadIcon />}
                       label={intl.formatMessage({
                         id:
                           "petition-replies.petition-field-reply.file-download",
@@ -192,7 +199,7 @@ export function PetitionRepliesField({
                       <IconButtonWithTooltip
                         key="2"
                         size="xs"
-                        icon="view"
+                        icon={<EyeIcon />}
                         label={intl.formatMessage({
                           id:
                             "petition-replies.petition-field-reply.file-preview",
@@ -290,7 +297,7 @@ function PetitionRepliesFieldReply({
       </Flex>
       <Stack direction="row" spacing={1}>
         <IconButtonWithTooltip
-          icon="check"
+          icon={<CheckIcon />}
           label={intl.formatMessage({
             id: "petition-replies.petition-field-reply.approve",
             defaultMessage: "Approve",
@@ -305,7 +312,7 @@ function PetitionRepliesFieldReply({
           }
         />
         <IconButtonWithTooltip
-          icon="close"
+          icon={<CloseIcon />}
           label={intl.formatMessage({
             id: "petition-replies.petition-field-reply.reject",
             defaultMessage: "Reject",
@@ -356,7 +363,7 @@ function CommentsButton({
   return (
     <Box position="relative">
       {commentCount > 0 ? (
-        <Button rightIcon={"comment" as any} fontWeight="normal" {...common}>
+        <Button rightIcon={<CommentIcon />} fontWeight="normal" {...common}>
           {hasNewComments || hasUnpublishedComments ? (
             <Box
               {...(!hasNewComments
@@ -378,7 +385,7 @@ function CommentsButton({
           {intl.formatNumber(commentCount)}
         </Button>
       ) : (
-        <IconButton icon={"comment" as any} {...common} />
+        <IconButton icon={<CommentIcon />} {...common} />
       )}
     </Box>
   );

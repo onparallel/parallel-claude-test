@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, Link, Text } from "@chakra-ui/core";
+import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -22,7 +23,11 @@ export function TimelineMessageScheduledEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="time" color="black" backgroundColor="gray.200" />
+        <TimelineIcon
+          icon={<TimeIcon />}
+          color="black"
+          backgroundColor="gray.200"
+        />
       }
     >
       <Flex alignItems="center">

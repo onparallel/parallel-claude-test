@@ -7,6 +7,7 @@ import {
   MenuOptionGroup,
   MenuProps,
 } from "@chakra-ui/core";
+import { ChevronDownIcon, FilterIcon } from "@parallel/chakra/icons";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
@@ -53,8 +54,8 @@ export function PetitionStatusFilter({
         as={Button}
         {...{
           variant: "outline",
-          leftIcon: value === null ? null : "filter",
-          rightIcon: "chevron-down",
+          leftIcon: value === null ? null : <FilterIcon />,
+          rightIcon: <ChevronDownIcon />,
         }}
       >
         {filters[value ?? "ALL"]}

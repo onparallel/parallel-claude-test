@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Heading, Text } from "@chakra-ui/core";
+import { AddIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
@@ -213,7 +214,7 @@ export const PetitionComposeFieldList = Object.assign(
               <AddFieldPopover
                 ref={addFieldRef}
                 variant="ghost"
-                leftIcon="add"
+                leftIcon={<AddIcon />}
                 onSelectFieldType={onAddField}
               >
                 <FormattedMessage
@@ -241,7 +242,7 @@ export const PetitionComposeFieldList = Object.assign(
               marginTop={8}
               marginBottom={6}
               colorScheme="purple"
-              leftIcon="add"
+              leftIcon={<AddIcon />}
               onSelectFieldType={onAddField}
             >
               <FormattedMessage

@@ -7,8 +7,10 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   Text,
 } from "@chakra-ui/core";
+import { FieldFileUploadIcon, FieldTextIcon } from "@parallel/chakra/icons";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { forwardRef, Ref, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -36,38 +38,46 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
       }),
     };
   }, [intl.locale]);
+  const icon = useMemo(() => {
+    return {
+      FILE_UPLOAD: FieldFileUploadIcon,
+      TEXT: FieldTextIcon,
+    };
+  }, []);
   return (
     <Menu>
       <MenuButton as={Button} ref={ref} {...props} />
-      <MenuList>
-        {FIELD_TYPES.map((type) => (
-          <MenuItem
-            key={type}
-            paddingY={2}
-            onClick={() => onSelectFieldType(type)}
-          >
-            <Box
-              backgroundColor={`field.${type}`}
-              color="white"
-              rounded="md"
-              padding={1}
-              width="28px"
-              height="28px"
+      <Portal>
+        <MenuList>
+          {FIELD_TYPES.map((type) => (
+            <MenuItem
+              key={type}
+              paddingY={2}
+              onClick={() => onSelectFieldType(type)}
             >
-              <Icon
-                display="block"
-                size="20px"
-                name={`field.${type}` as any}
-                focusable={false}
-                role="presentation"
-              />
-            </Box>
-            <Text as="div" marginLeft={2}>
-              {labels[type]}
-            </Text>
-          </MenuItem>
-        ))}
-      </MenuList>
+              <Box
+                backgroundColor={`field.${type}`}
+                color="white"
+                borderRadius="md"
+                padding={1}
+                width="28px"
+                height="28px"
+              >
+                <Icon
+                  display="block"
+                  boxSize="20px"
+                  as={icon[type]}
+                  focusable={false}
+                  role="presentation"
+                />
+              </Box>
+              <Text as="div" marginLeft={2}>
+                {labels[type]}
+              </Text>
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Portal>
     </Menu>
   );
 });

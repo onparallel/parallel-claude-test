@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link } from "@chakra-ui/core";
+import { EyeIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -18,7 +19,11 @@ export function TimelineAccessOpenedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="view" color="white" backgroundColor="blue.500" />
+        <TimelineIcon
+          icon={<EyeIcon />}
+          color="white"
+          backgroundColor="blue.500"
+        />
       }
     >
       <FormattedMessage

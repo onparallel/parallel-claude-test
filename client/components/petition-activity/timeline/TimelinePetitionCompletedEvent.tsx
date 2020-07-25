@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link } from "@chakra-ui/core";
+import { CheckIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -18,7 +19,11 @@ export function TimelinePetitionCompletedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="check" color="white" backgroundColor="green.500" />
+        <TimelineIcon
+          icon={<CheckIcon />}
+          color="white"
+          backgroundColor="green.500"
+        />
       }
     >
       <FormattedMessage

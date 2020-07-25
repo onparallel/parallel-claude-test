@@ -2,6 +2,12 @@
 import { Box, BoxProps, Stack, Text, useFormControl } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import {
+  BoldIcon,
+  ItalicIcon,
+  ListIcon,
+  UnderlineIcon,
+} from "@parallel/chakra/icons";
+import {
   BoldPlugin,
   EditablePlugins,
   EditablePluginsProps,
@@ -183,7 +189,7 @@ const Toolbar = memo(function _Toolbar({
     >
       <MarkButton
         type="bold"
-        icon={"bold" as any}
+        icon={<BoldIcon />}
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.bold",
@@ -192,7 +198,7 @@ const Toolbar = memo(function _Toolbar({
       />
       <MarkButton
         type="italic"
-        icon={"italic" as any}
+        icon={<ItalicIcon />}
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.italic",
@@ -201,7 +207,7 @@ const Toolbar = memo(function _Toolbar({
       />
       <MarkButton
         type="underline"
-        icon={"underline" as any}
+        icon={<UnderlineIcon />}
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.underline",
@@ -210,7 +216,7 @@ const Toolbar = memo(function _Toolbar({
       />
       <ListButton
         type="bulleted-list"
-        icon={"list" as any}
+        icon={<ListIcon />}
         isDisabled={disabled}
         label={intl.formatMessage({
           id: "generic.richtext.list",

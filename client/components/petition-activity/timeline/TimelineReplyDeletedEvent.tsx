@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link } from "@chakra-ui/core";
+import { XCircleIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -18,7 +19,9 @@ export function TimelineReplyDeletedEvent({
 }: TimelineReplyDeletedEventProps) {
   return (
     <TimelineItem
-      icon={<TimelineIcon icon="x-circle" color="gray.600" size="18px" />}
+      icon={
+        <TimelineIcon icon={<XCircleIcon />} color="gray.600" size="18px" />
+      }
       paddingY={2}
     >
       <FormattedMessage

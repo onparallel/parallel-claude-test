@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link } from "@chakra-ui/core";
+import { CommentXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -22,7 +23,7 @@ export function TimelineCommentDeletedEvent({
     <TimelineItem
       icon={
         <TimelineIcon
-          icon="comment-x"
+          icon={<CommentXIcon />}
           color="gray.700"
           backgroundColor="gray.200"
         />

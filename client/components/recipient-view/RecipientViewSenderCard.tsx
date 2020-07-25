@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Grid, Icon, Image, Text } from "@chakra-ui/core";
+import { Box, Flex, Grid, Image, Text } from "@chakra-ui/core";
+import { BusinessIcon, EmailIcon, UserIcon } from "@parallel/chakra/icons";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewSenderCard_PublicUserFragment } from "@parallel/graphql/__types";
@@ -37,9 +38,8 @@ export function RecipientViewSenderCard({
           {sender.organization.identifier === "none" ? null : (
             <>
               <Flex as="dt" alignItems="center">
-                <Icon
-                  name="business"
-                  size="16px"
+                <BusinessIcon
+                  boxSize="16px"
                   aria-label={intl.formatMessage({
                     id: "recipient-view.organization",
                     defaultMessage: "Business",
@@ -52,9 +52,8 @@ export function RecipientViewSenderCard({
             </>
           )}
           <Flex as="dt" alignItems="center">
-            <Icon
-              name="user"
-              size="16px"
+            <UserIcon
+              boxSize="16px"
               aria-label={intl.formatMessage({
                 id: "recipient-view.sender",
                 defaultMessage: "Sender",
@@ -65,9 +64,8 @@ export function RecipientViewSenderCard({
             <Text as="span">{sender.fullName}</Text>
           </Box>
           <Flex as="dt" alignItems="center">
-            <Icon
-              name="email"
-              size="16px"
+            <EmailIcon
+              boxSize="16px"
               aria-label={intl.formatMessage({
                 id: "recipient-view.sender-email",
                 defaultMessage: "Sender email",

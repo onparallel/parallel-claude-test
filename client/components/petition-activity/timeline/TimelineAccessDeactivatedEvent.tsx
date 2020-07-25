@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
+import { UserXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -20,7 +21,11 @@ export function TimelineAccessDeactivatedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon icon="user-x" color="white" backgroundColor="red.500" />
+        <TimelineIcon
+          icon={<UserXIcon />}
+          color="white"
+          backgroundColor="red.500"
+        />
       }
     >
       <FormattedMessage

@@ -1,4 +1,5 @@
 import { BoxProps, Icon, Text, Tooltip, useTheme } from "@chakra-ui/core";
+import { CheckIcon, EditIcon, TimeIcon } from "@parallel/chakra/icons";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 
@@ -29,9 +30,9 @@ export function PetitionStatusIndicator({
     }),
   } as const)[status];
   const icon = ({
-    DRAFT: "edit",
-    PENDING: "time",
-    COMPLETED: "check",
+    DRAFT: EditIcon,
+    PENDING: TimeIcon,
+    COMPLETED: CheckIcon,
   } as const)[status];
   const color = ({
     DRAFT: "gray.500",
@@ -41,8 +42,8 @@ export function PetitionStatusIndicator({
   const content = (
     <>
       <Icon
-        name={icon}
-        size="18px"
+        as={icon}
+        boxSize="18px"
         verticalAlign={isJustIcon ? "initial" : "sub"}
       />
       {isJustIcon ? null : (

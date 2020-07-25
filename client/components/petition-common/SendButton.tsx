@@ -1,8 +1,13 @@
-import { SplitButton, SplitButtonProps } from "../common/SplitButton";
-import { Button, IconButton, MenuList, MenuItem, Icon } from "@chakra-ui/core";
-import { FormattedMessage, useIntl } from "react-intl";
+import { Button, IconButton, MenuItem, MenuList } from "@chakra-ui/core";
+import {
+  ChevronDownIcon,
+  TimeIcon,
+  PaperPlaneIcon,
+} from "@parallel/chakra/icons";
 import { MouseEvent } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { ButtonDropdown } from "../common/ButtonDropdown";
+import { SplitButton, SplitButtonProps } from "../common/SplitButton";
 
 export function SendButton({
   onSendClick,
@@ -17,7 +22,7 @@ export function SendButton({
     <SplitButton dividerColor="purple.600" {...props}>
       <Button
         colorScheme="purple"
-        leftIcon={"paper-plane" as any}
+        leftIcon={<PaperPlaneIcon />}
         onClick={onSendClick}
       >
         <FormattedMessage
@@ -28,7 +33,7 @@ export function SendButton({
       <ButtonDropdown
         as={IconButton}
         colorScheme="purple"
-        icon="chevron-down"
+        icon={<ChevronDownIcon />}
         aria-label={intl.formatMessage({
           id: "component.send-button.options",
           defaultMessage: "Options",
@@ -37,7 +42,7 @@ export function SendButton({
         dropdown={
           <MenuList minWidth={0} placement="top-end">
             <MenuItem onClick={onScheduleClick as any}>
-              <Icon name="time" marginRight={2} />
+              <TimeIcon marginRight={2} />
               <FormattedMessage
                 id="component.send-button.schedule"
                 defaultMessage="Schedule send"

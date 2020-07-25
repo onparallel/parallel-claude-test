@@ -1,12 +1,5 @@
-import {
-  Box,
-  BoxProps,
-  Flex,
-  Icon,
-  IconProps,
-  useTheme,
-} from "@chakra-ui/core";
-import { ReactNode } from "react";
+import { Box, BoxProps, Flex, useTheme } from "@chakra-ui/core";
+import { ReactElement, ReactNode } from "react";
 
 export function TimelineItem({
   icon,
@@ -42,7 +35,7 @@ export function TimelineIcon({
   backgroundColor = "gray.50",
   size = "36px",
 }: {
-  icon: IconProps["name"];
+  icon: ReactElement;
   color?: BoxProps["color"];
   backgroundColor?: BoxProps["backgroundColor"];
   size?: BoxProps["width"];
@@ -59,7 +52,7 @@ export function TimelineIcon({
       width={size}
       height={size}
     >
-      <Icon name={icon} size="14px" />
+      {icon}
     </Flex>
   );
 }

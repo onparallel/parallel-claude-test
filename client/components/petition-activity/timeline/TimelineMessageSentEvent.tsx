@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
+import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -22,7 +23,7 @@ export function TimelineMessageSentEvent({
     <TimelineItem
       icon={
         <TimelineIcon
-          icon="email-sent"
+          icon={<EmailSentIcon />}
           color="black"
           backgroundColor="gray.200"
         />

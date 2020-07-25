@@ -1,4 +1,5 @@
-import { Box, Icon, IconButton, Text, useTheme } from "@chakra-ui/core";
+import { Box, CloseButton, Text, useTheme } from "@chakra-ui/core";
+import { ChevronDownIcon, SmallCloseIcon } from "@parallel/chakra/icons";
 import { memo, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -96,13 +97,11 @@ export function useReactSelectStyle<
       components: {
         IndicatorSeparator: memo(() => <></>),
         ClearIndicator: memo(({ innerProps }) => (
-          <IconButton
+          <CloseButton
             tabIndex={-1}
             title={labels.clear}
             aria-label={labels.clear}
-            icon="close"
             size="xs"
-            variant="ghost"
             {...innerProps}
           />
         )),
@@ -114,7 +113,7 @@ export function useReactSelectStyle<
               color: "gray.600",
             }}
           >
-            <Icon display="block" name="chevron-down" />
+            <ChevronDownIcon display="block" />
           </Box>
         )),
         NoOptionsMessage: memo(() => (
@@ -133,7 +132,7 @@ export function useReactSelectStyle<
         )),
         MultiValueRemove: memo(({ innerProps }) => (
           <components.MultiValueRemove innerProps={innerProps}>
-            <Icon name="small-close" size="18px" />
+            <SmallCloseIcon boxSize="18px" />
           </components.MultiValueRemove>
         )),
         LoadingMessage: memo(() => (
