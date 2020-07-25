@@ -23,10 +23,6 @@ export function AppLayoutNavbarLink({
   children,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
-  const label = intl.formatMessage({
-    id: "navbar.coming-soon",
-    defaultMessage: "Coming soon",
-  });
   return isAvailable ? (
     <Link
       href={href}
@@ -53,7 +49,13 @@ export function AppLayoutNavbarLink({
       </AppLayoutNavbarLinkContent>
     </Link>
   ) : (
-    <Tooltip label={label} aria-label={label} placement="right">
+    <Tooltip
+      label={intl.formatMessage({
+        id: "navbar.coming-soon",
+        defaultMessage: "Coming soon",
+      })}
+      placement="right"
+    >
       <Box
         opacity={0.5}
         cursor="default"

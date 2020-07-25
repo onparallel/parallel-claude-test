@@ -9,7 +9,7 @@ import { forwardRef } from "react";
 
 export type IconButtonWithTooltipProps = {
   label: string;
-} & Omit<IconButtonProps, "aria-label"> &
+} & IconButtonProps &
   Pick<TooltipProps, "placement">;
 
 export const IconButtonWithTooltip = forwardRef<

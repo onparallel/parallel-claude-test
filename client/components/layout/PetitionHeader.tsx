@@ -50,15 +50,6 @@ export function PetitionHeader({
     onClose: onCloseSettings,
   } = useDisclosure();
 
-  const lastSavedTooltip = intl.formatMessage(
-    {
-      id: "petition.header.last-saved-on",
-      defaultMessage: "Last saved on: {date}",
-    },
-    {
-      date: intl.formatDate(petition.updatedAt, FORMATS.FULL),
-    }
-  );
   const sections = useMemo(
     () => [
       {
@@ -184,8 +175,18 @@ export function PetitionHeader({
                       ) : state === "SAVED" ? (
                         <Tooltip
                           zIndex={theme.zIndices.tooltip}
-                          aria-label={lastSavedTooltip}
-                          label={lastSavedTooltip}
+                          label={intl.formatMessage(
+                            {
+                              id: "petition.header.last-saved-on",
+                              defaultMessage: "Last saved on: {date}",
+                            },
+                            {
+                              date: intl.formatDate(
+                                petition.updatedAt,
+                                FORMATS.FULL
+                              ),
+                            }
+                          )}
                         >
                           <Text
                             color="gray.500"

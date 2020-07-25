@@ -78,7 +78,9 @@ export function PetitionListHeader({
           defaultMessage: "Reload",
         })}
       />
-      <PetitionStatusFilter value={status} onChange={onStatusChange} />
+      <Box>
+        <PetitionStatusFilter value={status} onChange={onStatusChange} />
+      </Box>
       <Spacer />
       {showActions ? (
         <Box>

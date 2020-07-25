@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { ContactLink_ContactFragment } from "@parallel/graphql/__types";
-import { DisableableTooltip } from "./DisableableTooltip";
 import { Link, LinkProps } from "./Link";
+import { Tooltip } from "@chakra-ui/core";
 
 export function ContactLink({
   contact,
@@ -10,11 +10,7 @@ export function ContactLink({
   contact: ContactLink_ContactFragment;
 } & Omit<LinkProps, "href" | "as">) {
   return (
-    <DisableableTooltip
-      isDisabled={contact.fullName === null}
-      label={contact.email}
-      aria-label={contact.email}
-    >
+    <Tooltip isDisabled={contact.fullName === null} label={contact.email}>
       <Link
         href="/app/contacts/[contactId]"
         as={`/app/contacts/${contact.id}`}
@@ -22,7 +18,7 @@ export function ContactLink({
       >
         {contact.fullName || contact.email}
       </Link>
-    </DisableableTooltip>
+    </Tooltip>
   );
 }
 

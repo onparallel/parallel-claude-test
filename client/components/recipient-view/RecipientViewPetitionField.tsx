@@ -39,7 +39,6 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
-import { DisableableTooltip } from "../common/DisableableTooltip";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
@@ -70,21 +69,6 @@ export function RecipientViewPetitionField({
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
   const theme = useTheme();
-
-  const labels = {
-    filesize: intl.formatMessage({
-      id: "generic.file-size",
-      defaultMessage: "File size",
-    }),
-    filename: intl.formatMessage({
-      id: "generic.file-name",
-      defaultMessage: "File name",
-    }),
-    required: intl.formatMessage({
-      id: "generic.required-field",
-      defaultMessage: "Required field",
-    }),
-  };
 
   return (
     <Card
@@ -118,15 +102,12 @@ export function RecipientViewPetitionField({
             <Tooltip
               placement="right"
               zIndex={theme.zIndices.tooltip}
-              aria-label={labels.required}
-              label={labels.required}
+              label={intl.formatMessage({
+                id: "generic.required-field",
+                defaultMessage: "Required field",
+              })}
             >
-              <Text
-                as="span"
-                userSelect="none"
-                marginLeft={1}
-                aria-label={labels.required}
-              >
+              <Text as="span" userSelect="none" marginLeft={1}>
                 *
               </Text>
             </Tooltip>
@@ -185,18 +166,11 @@ export function RecipientViewPetitionField({
                   />
                 ) : field.type === "FILE_UPLOAD" ? (
                   <>
-                    <Text as="span" aria-label={labels.filename}>
-                      {reply.content?.filename}
-                    </Text>
+                    <Text as="span">{reply.content?.filename}</Text>
                     <Text as="span" marginX={2}>
                       -
                     </Text>
-                    <Text
-                      as="span"
-                      aria-label={labels.filesize}
-                      fontSize="sm"
-                      color="gray.500"
-                    >
+                    <Text as="span" fontSize="sm" color="gray.500">
                       <FileSize value={reply.content?.size} />
                     </Text>
                   </>
@@ -242,11 +216,10 @@ function ReplyWrapper({
         });
   return (
     <Flex alignItems="center">
-      <DisableableTooltip
+      <Tooltip
         isDisabled={status === "PENDING"}
         placement="right"
         label={label}
-        aria-label={label}
       >
         <Flex
           alignItems="center"
@@ -299,7 +272,7 @@ function ReplyWrapper({
             <CloseIcon color="red.500" size="12px" marginLeft={2} />
           ) : null}
         </Flex>
-      </DisableableTooltip>
+      </Tooltip>
       {status !== "APPROVED" ? (
         <IconButtonWithTooltip
           onClick={onDeleteReply}

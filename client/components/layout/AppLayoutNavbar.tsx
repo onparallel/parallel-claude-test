@@ -198,11 +198,8 @@ export const AppLayoutNavbar = Object.assign(
             <Stack>
               <Flex justifyContent="center">
                 <Tooltip
+                  isOpen
                   zIndex={theme.zIndices.tooltip}
-                  aria-label={intl.formatMessage({
-                    id: "navbar.change-language",
-                    defaultMessage: "Change language",
-                  })}
                   label={intl.formatMessage({
                     id: "navbar.change-language",
                     defaultMessage: "Change language",

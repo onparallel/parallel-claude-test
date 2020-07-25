@@ -41,16 +41,14 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
     <Menu>
       <MenuButton
         as={Button}
-        {...{
-          "aria-label": intl.formatMessage({
-            id: "header.user-menu-button",
-            defaultMessage: "User menu",
-          }),
-          borderRadius: "full",
-          height: 12,
-          paddingLeft: 0,
-          paddingRight: 0,
-        }}
+        aria-label={intl.formatMessage({
+          id: "header.user-menu-button",
+          defaultMessage: "User menu",
+        })}
+        borderRadius="full"
+        height={12}
+        paddingLeft={0}
+        paddingRight={0}
       >
         <Avatar name={user.fullName!} size="md" />
       </MenuButton>
