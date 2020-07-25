@@ -56,13 +56,13 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
         backgroundColor: "white",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="bold">
+      <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage
           id="public.how-it-works-hero.title"
           defaultMessage="How it works"
         />
       </Heading>
-      <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
+      <Heading as="h3" size="md" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.how-it-works-hero.description-1"
           defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you."
@@ -239,7 +239,7 @@ function Step({
       textAlign="left"
       {...props}
     >
-      <Heading as="h4" fontSize="md" color="purple.500">
+      <Heading as="h4" size="sm">
         {header}
       </Heading>
       <Text marginTop={4} fontSize="sm">

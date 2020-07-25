@@ -130,7 +130,7 @@ function ForgotPasswordForm({
   return (
     <>
       <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} fontSize="lg">
+        <Heading marginTop={4} marginBottom={2} size="md">
           <FormattedMessage
             id="public.forgot-password.header"
             defaultMessage="Forgot password"
@@ -231,7 +231,7 @@ function PasswordResetForm({
   return (
     <>
       <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} fontSize="lg">
+        <Heading marginTop={4} marginBottom={2} size="md">
           <FormattedMessage
             id="public.forgot-password.reset-header"
             defaultMessage="Password reset"

@@ -284,7 +284,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         {showCompletedAlert && petition.status === "COMPLETED" ? (
           <Alert status="success" variant="subtle" zIndex={2}>
             <Flex
-              maxWidth="containers.lg"
+              maxWidth="container.lg"
               alignItems="center"
               marginX="auto"
               width="100%"
@@ -310,7 +310,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         {pendingComments ? (
           <Box backgroundColor="yellow.100" shadow="sm">
             <Flex
-              maxWidth="containers.lg"
+              maxWidth="container.lg"
               alignItems="center"
               marginX="auto"
               width="100%"
@@ -351,7 +351,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         <Flex
           flexDirection={{ base: "column", [breakpoint]: "row" }}
           width="100%"
-          maxWidth="containers.lg"
+          maxWidth="container.lg"
           paddingX={4}
           paddingTop={8}
           marginBottom={4}

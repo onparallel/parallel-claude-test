@@ -32,7 +32,7 @@ function People() {
         textAlign="center"
         wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
       >
-        <Heading as="h1" fontSize="3xl" fontWeight="bold" color="purple.600">
+        <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
           <FormattedMessage
             id="public.people.hero-title"
             defaultMessage="Laura now has more time to focus on the important work"
@@ -45,13 +45,13 @@ function People() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer maxWidth="containers.md">
+      <PublicContainer maxWidth="container.md">
         <Flex display="column">
           <Separator minHeight="60px" />
           <OneColumnTimeline>
             <Heading
               as="h4"
-              fontSize="3xl"
+              fontSize="md"
               fontWeight="light"
               color="purple.500"
             >
@@ -108,7 +108,7 @@ function People() {
           <OneColumnTimeline>
             <Heading
               as="h4"
-              fontSize="3xl"
+              fontSize="md"
               fontWeight="light"
               color="purple.500"
             >
@@ -174,9 +174,9 @@ function People() {
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
+                boxSize="30px"
                 color="purple.500"
                 marginTop={1}
-                marginRight={2}
               />
               <FormattedMessage
                 id="public.case.laura.centralized-information"
@@ -186,9 +186,9 @@ function People() {
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
+                boxSize="30px"
                 color="purple.500"
                 marginTop={1}
-                marginRight={2}
               />
               <FormattedMessage
                 id="public.case.laura.reminders"
@@ -198,9 +198,9 @@ function People() {
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
+                boxSize="30px"
                 color="purple.500"
                 marginTop={1}
-                marginRight={2}
               />
               <FormattedMessage
                 id="public.case.laura.client-anywhere"

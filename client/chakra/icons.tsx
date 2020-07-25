@@ -22,18 +22,6 @@ export const LinkedInIcon = createIcon({
   ),
 });
 
-export const LanguageIcon = createIcon({
-  displayName: "LanguageIcon",
-  viewBox: "0 0 24 24",
-  path: (
-    <g fill="none" stroke="currentColor">
-      <path d="M4.5 8.25v-3a1.5 1.5 0 0 1 3 0v3M4.5 6.75h3M16.5 10.5V12M13.5 12h6M18 12s-1.5 4.5-4.5 4.5M16.5 14.767a3.932 3.932 0 0 0 3 1.733"></path>
-      <path d="M11.25 18.75a1.5 1.5 0 0 1-1.5-1.5v-7.5a1.5 1.5 0 0 1 1.5-1.5h10.5a1.5 1.5 0 0 1 1.5 1.5v7.5a1.5 1.5 0 0 1-1.5 1.5h-1.5v4.5l-4.5-4.5z"></path>
-      <path d="M6.75 12.75l-3 3v-4.5h-1.5a1.5 1.5 0 0 1-1.5-1.5v-7.5a1.5 1.5 0 0 1 1.5-1.5h10.5a1.5 1.5 0 0 1 1.5 1.5v3"></path>
-    </g>
-  ),
-});
-
 export const BusinessIcon = createIcon({
   displayName: "BusinessIcon",
   viewBox: "0 0 24 24",

@@ -18,13 +18,13 @@ function About() {
         wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
       >
         <Box maxWidth="700px" marginX="auto">
-          <Heading as="h1" fontFamily="hero" fontSize="5xl" fontWeight="light">
+          <Heading as="h1" fontFamily="hero" size="3xl" fontWeight="light">
             <FormattedMessage
               id="public.about.mission"
               defaultMessage="Our mission is to make professionals work worthwhile"
             />
           </Heading>
-          <Text marginTop={12} fontSize={18}>
+          <Text marginTop={12} fontSize="lg">
             <FormattedMessage
               id="public.about.tech-company"
               defaultMessage="Parallel is a technology company that builds the next generation tools for professionals daily tasks."
@@ -38,7 +38,7 @@ function About() {
           textAlign: "center",
         }}
       >
-        <Heading fontSize="3xl" fontWeight="light" color="purple.600">
+        <Heading size="xl" fontWeight="light" color="purple.600">
           <FormattedMessage
             id="public.about.our-story"
             defaultMessage="Our story"

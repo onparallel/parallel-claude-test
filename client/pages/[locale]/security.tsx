@@ -26,7 +26,7 @@ function Security() {
         textAlign="center"
         wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
       >
-        <Heading as="h1" fontSize="3xl" fontWeight="bold" color="purple.600">
+        <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
           <FormattedMessage
             id="public.security.hero-title"
             defaultMessage="Your information is safe with Parallel"
@@ -45,10 +45,10 @@ function Security() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer paddingY={16} maxWidth="containers.md">
+      <PublicContainer paddingY={16} maxWidth="container.md">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
           <SecurityClaim image="/static/images/undraw_safe.svg">
-            <Heading as="h4" fontSize="xl" color="purple.500" marginBottom={4}>
+            <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
               <FormattedMessage
                 id="public.security.how-we-protect"
                 defaultMessage="How do we protect your data and information?"
@@ -71,7 +71,7 @@ function Security() {
             reverse
             image="/static/images/undraw_secure_server.svg"
           >
-            <Heading as="h4" fontSize="xl" color="purple.500" marginBottom={4}>
+            <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
               <FormattedMessage
                 id="public.security.your-connection"
                 defaultMessage="How do we protect your connection?"
@@ -85,7 +85,7 @@ function Security() {
             </Text>
           </SecurityClaim>
           <SecurityClaim image="/static/images/undraw_personal_information.svg">
-            <Heading as="h4" fontSize="xl" color="purple.500" marginBottom={4}>
+            <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
               <FormattedMessage
                 id="public.security.protect-your-customer"
                 defaultMessage="How do we protect your clients' information?"

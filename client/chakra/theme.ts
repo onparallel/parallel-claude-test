@@ -1,4 +1,5 @@
 import { default as base } from "@chakra-ui/theme";
+import { omit } from "remeda";
 
 export const theme = {
   ...base,
@@ -14,8 +15,18 @@ export const theme = {
       xs: "480px",
     },
   },
+  fontSizes: {
+    ...base.fontSizes,
+  },
   colors: {
-    ...base.colors,
+    ...omit(base.colors, [
+      "facebook",
+      "linkedin",
+      "messenger",
+      "telegram",
+      "twitter",
+      "whatsapp",
+    ]),
     gray: {
       ...base.colors.gray,
       50: "#fbfcfd",
@@ -35,6 +46,24 @@ export const theme = {
   },
   components: {
     ...base.components,
+    Heading: {
+      ...base.components.Heading,
+      sizes: {
+        ...base.components.Heading.sizes,
+        "3xl": {
+          heading: { fontSize: ["4xl", null, "5xl"] },
+        },
+        "2xl": {
+          heading: { fontSize: ["3xl", null, "4xl"] },
+        },
+        xl: {
+          heading: { fontSize: ["2xl", null, "3xl"] },
+        },
+        lg: {
+          heading: { fontSize: ["xl", null, "2xl"] },
+        },
+      },
+    },
     Tooltip: {
       ...base.components.Tooltip,
       defaultProps: {

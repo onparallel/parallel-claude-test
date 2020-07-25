@@ -7,6 +7,7 @@ import {
   Heading,
   Image,
   Text,
+  Stack,
 } from "@chakra-ui/core";
 import { css, jsx } from "@emotion/core";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -21,7 +22,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
   const intl = useIntl();
   const router = useRouter();
   const imageName = `/static/images/showcase_hero_${router.query.locale}`;
-  const breakpoint = "md";
+  const breakpoint = "lg";
   return (
     <PublicContainer
       {...props}
@@ -30,12 +31,12 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
         minHeight: { [breakpoint]: "400px" },
       }}
     >
-      <Flex flexDirection={{ base: "column", [breakpoint]: "row" }}>
+      <Stack spacing={12} direction={{ base: "column", [breakpoint]: "row" }}>
         <Box flex="1">
           <Heading
             as="h1"
             fontFamily="hero"
-            fontSize="5xl"
+            size="3xl"
             fontWeight="light"
             aria-live="polite"
             aria-atomic="true"
@@ -115,14 +116,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             />
           </Text>
         </Box>
-        <Box
-          flex="1"
-          marginX="auto"
-          marginLeft={{ base: "none", [breakpoint]: 12 }}
-          marginTop={{ base: 16, [breakpoint]: "auto" }}
-          marginBottom={{ base: 0, [breakpoint]: "auto" }}
-          display="flex"
-        >
+        <Flex flex="1" justifyContent="center">
           <Image
             alt={intl.formatMessage({
               id: "public.showcase-hero-alt",
@@ -133,8 +127,8 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             src={`${imageName}.png`}
             {...{ srcSet: `${imageName}@2x.png 2x` }}
           />
-        </Box>
-      </Flex>
+        </Flex>
+      </Stack>
     </PublicContainer>
   );
 }

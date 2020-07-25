@@ -23,7 +23,7 @@ export function PublicUserFormContainer({
         margin="0 auto"
         width="100%"
         paddingX={4}
-        maxWidth={{ xs: "containers.xs" }}
+        maxWidth={{ xs: "container.xs" }}
       >
         <Card padding={4} {...props}>
           {children}

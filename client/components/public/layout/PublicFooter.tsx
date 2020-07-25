@@ -6,6 +6,7 @@ import {
   IconButton,
   List,
   ListItem,
+  Select,
   Text,
 } from "@chakra-ui/core";
 import { LinkedInIcon, TwitterIcon } from "@parallel/chakra/icons";
@@ -14,9 +15,9 @@ import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { LanguageSelector } from "../../common/LanguageSelector";
 import { PublicContainer } from "./PublicContainer";
 import { PublicFooterBox } from "./PublicFooterBox";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export function PublicFooter(props: BoxProps) {
   const router = useRouter();
@@ -38,6 +39,8 @@ export function PublicFooter(props: BoxProps) {
       })
     );
   }
+
+  const locales = useSupportedLocales();
 
   return (
     <PublicContainer
@@ -177,11 +180,26 @@ export function PublicFooter(props: BoxProps) {
       <Flex wrap="wrap">
         <Box flex="1">
           <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
-          <LanguageSelector
-            value={router.query.locale}
-            onChange={handleLangChange}
-            marginTop={4}
-          />
+          <Flex>
+            <Select
+              size="sm"
+              width="auto"
+              minWidth="160px"
+              marginTop={4}
+              onChange={handleLangChange}
+              value={router.query.locale}
+              aria-label={intl.formatMessage({
+                id: "public.footer.language-select-label",
+                defaultMessage: "Change language",
+              })}
+            >
+              {locales.map(({ label, key }) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </Flex>
         </Box>
         <Box>
           <IconButton

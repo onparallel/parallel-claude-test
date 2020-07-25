@@ -20,7 +20,7 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
         textAlign: "center",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="bold">
+      <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage
           id="public.home.hero-claim"
           defaultMessage="Free your time and your mind"
@@ -28,7 +28,7 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
       </Heading>
       <Heading
         as="h3"
-        fontSize="xl"
+        size="md"
         fontWeight="light"
         marginTop={4}
         marginBottom={8}
@@ -99,11 +99,18 @@ function Feature({
   description: ReactNode;
 }) {
   return (
-    <Box flex="1" textAlign="left" maxWidth="360px" minWidth="300px" margin={4}>
+    <Box
+      as="section"
+      flex="1"
+      textAlign="left"
+      maxWidth="360px"
+      minWidth="300px"
+      margin={4}
+    >
       <Flex justifyContent="center" alignItems="bottom" height="180px">
         <Image src={imageSrc} maxWidth="80%" role="presentation" />
       </Flex>
-      <Heading as="h4" fontSize="md" marginY={4}>
+      <Heading as="h4" size="sm" marginY={4}>
         {header}
       </Heading>
       <Text fontSize="md">{description}</Text>

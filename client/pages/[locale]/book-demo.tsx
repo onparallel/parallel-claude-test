@@ -1,10 +1,10 @@
 import {
   Box,
-  Flex,
   Heading,
   Image,
   List,
   ListItem,
+  Stack,
   Text,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
@@ -43,22 +43,10 @@ function BookDemo() {
         defaultMessage: "Book a demo",
       })}
     >
-      <PublicContainer
-        paddingY={{ base: 8, md: 16 }}
-        wrapper={{
-          textAlign: "center",
-          // backgroundColor: "purple.50",
-          marginBottom: -8,
-        }}
-      >
-        <Flex flexDirection={{ base: "column", md: "row" }}>
-          <Box
-            flex="1"
-            textAlign="left"
-            padding={8}
-            paddingTop={{ base: 0, md: 8 }}
-          >
-            <Heading as="h1">
+      <PublicContainer paddingY={{ base: 8, md: 16 }}>
+        <Stack spacing={8} direction={{ base: "column", md: "row" }}>
+          <Box flex="1" textAlign="left">
+            <Heading as="h1" size="2xl">
               <FormattedMessage
                 id="public.book-demo.request-invite"
                 defaultMessage="Book a demo!"
@@ -168,7 +156,7 @@ function BookDemo() {
               padding={8}
             />
           </Box>
-        </Flex>
+        </Stack>
       </PublicContainer>
     </PublicLayout>
   );

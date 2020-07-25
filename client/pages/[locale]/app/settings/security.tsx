@@ -94,7 +94,7 @@ function Security() {
           </Heading>
           <Stack
             as="form"
-            maxWidth="containers.xs"
+            maxWidth="container.xs"
             onSubmit={handleSubmit(onChangePassword)}
           >
             <FormControl isInvalid={!!errors.password}>

@@ -68,7 +68,7 @@ function Account() {
             />
           </Heading>
           <Stack
-            maxWidth="containers.xs"
+            maxWidth="container.xs"
             as="form"
             onSubmit={handleSubmit(onSaveName)}
           >

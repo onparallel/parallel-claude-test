@@ -215,7 +215,7 @@ function Petitions() {
       <Box
         padding={4}
         paddingBottom={{ base: 4, md: 24 }}
-        minWidth="containers.lg"
+        minWidth="container.lg"
       >
         <TablePage
           columns={columns}

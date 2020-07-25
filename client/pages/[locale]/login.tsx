@@ -196,7 +196,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   return (
     <>
       <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} fontSize="lg">
+        <Heading marginTop={4} marginBottom={2} size="md">
           <FormattedMessage
             id="public.login.header"
             defaultMessage="Enter Parallel"
@@ -300,7 +300,7 @@ function PasswordChangeForm({
   return (
     <>
       <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} fontSize="lg">
+        <Heading marginTop={4} marginBottom={2} size="md">
           <FormattedMessage
             id="public.login.password-update-header"
             defaultMessage="Update your password"

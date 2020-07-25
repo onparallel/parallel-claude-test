@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Image, Text } from "@chakra-ui/core";
+import { Box, Stack, Heading, Image, Text } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { Link } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -41,21 +41,10 @@ function Invite() {
         defaultMessage: "Request an invite",
       })}
     >
-      <PublicContainer
-        paddingY={{ base: 8, md: 16 }}
-        wrapper={{
-          textAlign: "center",
-          marginBottom: -8,
-        }}
-      >
-        <Flex flexDirection={{ base: "column", md: "row" }}>
-          <Box
-            flex="1"
-            textAlign="left"
-            padding={8}
-            paddingTop={{ base: 0, md: 8 }}
-          >
-            <Heading as="h1">
+      <PublicContainer paddingY={{ base: 8, md: 16 }}>
+        <Stack spacing={8} direction={{ base: "column", md: "row" }}>
+          <Box flex="1" textAlign="left">
+            <Heading as="h1" size="2xl">
               <FormattedMessage
                 id="public.invite.request-invite"
                 defaultMessage="Request your invite!"
@@ -115,7 +104,7 @@ function Invite() {
               padding={8}
             />
           </Box>
-        </Flex>
+        </Stack>
       </PublicContainer>
     </PublicLayout>
   );

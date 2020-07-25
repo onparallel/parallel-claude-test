@@ -15,13 +15,13 @@ export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
         backgroundColor: "gray.50",
       }}
     >
-      <Heading as="h2" fontSize="3xl" fontWeight="bold">
+      <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage
           id="public.home.hero-popular-use-cases"
           defaultMessage="Popular use cases"
         />
       </Heading>
-      <Heading as="h3" fontSize="xl" fontWeight="light" marginTop={4}>
+      <Heading as="h3" size="md" fontWeight="light" marginTop={4}>
         <FormattedMessage
           id="public.home.hero-discover-use"
           defaultMessage="You can use Parallel if you work in a law firm, accounting firm or startup."
@@ -151,7 +151,7 @@ function Feature({
 }) {
   return (
     <Card padding={5} textAlign="left" {...props}>
-      <Heading as="h4" fontSize="md" color="purple.500">
+      <Heading as="h4" size="sm">
         {header}
       </Heading>
       <Text marginTop={4} fontSize="sm">
