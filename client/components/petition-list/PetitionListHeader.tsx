@@ -1,9 +1,12 @@
 import {
   Box,
   Button,
+  Menu,
+  MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
+  Portal,
   Stack,
 } from "@chakra-ui/core";
 import {
@@ -17,7 +20,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { identity } from "remeda";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionStatusFilter } from "../common/PetitionStatusFilter";
 import { SearchInput } from "../common/SearchInput";
@@ -84,9 +86,14 @@ export function PetitionListHeader({
       <Spacer />
       {showActions ? (
         <Box>
-          <ButtonDropdown
-            rightIcon={<ChevronDownIcon />}
-            dropdown={
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+              <FormattedMessage
+                id="generic.actions-button"
+                defaultMessage="Actions"
+              />
+            </MenuButton>
+            <Portal>
               <MenuList minWidth="160px">
                 <MenuItem onClick={onCloneClick} isDisabled={!showClone}>
                   <CopyIcon marginRight={2} />
@@ -104,13 +111,8 @@ export function PetitionListHeader({
                   />
                 </MenuItem>
               </MenuList>
-            }
-          >
-            <FormattedMessage
-              id="generic.actions-button"
-              defaultMessage="Actions"
-            />
-          </ButtonDropdown>
+            </Portal>
+          </Menu>
         </Box>
       ) : null}
       <Button colorScheme="purple" onClick={onCreateClick}>

@@ -1,4 +1,13 @@
-import { Box, Button, MenuItem, MenuList, Stack } from "@chakra-ui/core";
+import {
+  Box,
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+} from "@chakra-ui/core";
 import {
   ChevronDownIcon,
   DeleteIcon,
@@ -7,7 +16,6 @@ import {
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
@@ -60,9 +68,14 @@ export function ContactListHeader({
       <Spacer />
       {showActions ? (
         <Box>
-          <ButtonDropdown
-            rightIcon={<ChevronDownIcon />}
-            dropdown={
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+              <FormattedMessage
+                id="component.contact-list-header.actions-button"
+                defaultMessage="Actions"
+              />
+            </MenuButton>
+            <Portal>
               <MenuList minWidth="160px">
                 <MenuItem onClick={onDeleteClick}>
                   <DeleteIcon marginRight={2} />
@@ -72,13 +85,8 @@ export function ContactListHeader({
                   />
                 </MenuItem>
               </MenuList>
-            }
-          >
-            <FormattedMessage
-              id="component.contact-list-header.actions-button"
-              defaultMessage="Actions"
-            />
-          </ButtonDropdown>
+            </Portal>
+          </Menu>
         </Box>
       ) : null}
       <Button colorScheme="purple" onClick={onCreateClick}>

@@ -1,4 +1,11 @@
-import { Button, IconButton, MenuItem, MenuList } from "@chakra-ui/core";
+import {
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+} from "@chakra-ui/core";
 import {
   ChevronDownIcon,
   TimeIcon,
@@ -6,8 +13,8 @@ import {
 } from "@parallel/chakra/icons";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { SplitButton, SplitButtonProps } from "../common/SplitButton";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export function SendButton({
   onSendClick,
@@ -30,17 +37,21 @@ export function SendButton({
           defaultMessage="Send"
         />
       </Button>
-      <ButtonDropdown
-        as={IconButton}
-        colorScheme="purple"
-        icon={<ChevronDownIcon />}
-        aria-label={intl.formatMessage({
-          id: "component.send-button.options",
-          defaultMessage: "Options",
-        })}
-        minWidth={8}
-        dropdown={
-          <MenuList minWidth={0} placement="top-end">
+      <Menu placement="bottom-end">
+        <IconButtonWithTooltip
+          as={MenuButton}
+          colorScheme="purple"
+          icon={<ChevronDownIcon />}
+          label={intl.formatMessage({
+            id: "generic.more-options",
+            defaultMessage: "More options...",
+          })}
+          borderTopLeftRadius={0}
+          borderBottomLeftRadius={0}
+          minWidth={8}
+        />
+        <Portal>
+          <MenuList minWidth={0}>
             <MenuItem onClick={onScheduleClick as any}>
               <TimeIcon marginRight={2} />
               <FormattedMessage
@@ -49,8 +60,8 @@ export function SendButton({
               />
             </MenuItem>
           </MenuList>
-        }
-      />
+        </Portal>
+      </Menu>
     </SplitButton>
   );
 }

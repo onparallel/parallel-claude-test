@@ -100,7 +100,6 @@ export function PetitionHeader({
         backgroundColor="white"
         borderBottom="2px solid"
         borderBottomColor="gray.200"
-        zIndex={1}
         position="relative"
         height={{ base: 24, md: 16 }}
         {...props}

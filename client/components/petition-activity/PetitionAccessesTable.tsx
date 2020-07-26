@@ -3,8 +3,11 @@ import {
   Button,
   Flex,
   Heading,
+  Menu,
+  MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   Stack,
   Text,
 } from "@chakra-ui/core";
@@ -25,7 +28,6 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { Card, CardProps } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
@@ -100,9 +102,14 @@ export function PetitionAccessesTable({
         </Heading>
         <Spacer />
         {showActions ? (
-          <ButtonDropdown
-            rightIcon={<ChevronDownIcon />}
-            dropdown={
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+              <FormattedMessage
+                id="generic.actions-button"
+                defaultMessage="Actions"
+              />
+            </MenuButton>
+            <Portal>
               <MenuList minWidth="160px">
                 <MenuItem
                   isDisabled={selected.some((a) => a.status === "INACTIVE")}
@@ -141,13 +148,8 @@ export function PetitionAccessesTable({
                   />
                 </MenuItem>
               </MenuList>
-            }
-          >
-            <FormattedMessage
-              id="generic.actions-button"
-              defaultMessage="Actions"
-            />
-          </ButtonDropdown>
+            </Portal>
+          </Menu>
         ) : null}
         <Button
           colorScheme="purple"

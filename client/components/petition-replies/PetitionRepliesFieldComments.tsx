@@ -5,9 +5,11 @@ import {
   Button,
   Collapse,
   Flex,
-  IconButton,
+  Menu,
+  MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   Stack,
   Text,
 } from "@chakra-ui/core";
@@ -31,12 +33,12 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
@@ -62,7 +64,7 @@ export function PetitionRepliesFieldComments({
   const [draft, setDraft] = useState("");
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
-  const commentsRef = useRef<HTMLElement>(null);
+  const commentsRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Scroll to bttom when a comment is added
@@ -300,12 +302,21 @@ function FieldComment({
           </SmallPopover>
         )}
         <Spacer />
-        <ButtonDropdown
-          as={IconButton}
-          color="gray.400"
-          _hover={{ color: "gray.600", backgroundColor: "gray.100" }}
-          dropdown={
-            <MenuList minWidth="160px" placement="bottom-end">
+        <Menu placement="bottom-end">
+          <IconButtonWithTooltip
+            as={MenuButton}
+            variant="ghost"
+            size="xs"
+            icon={<MoreVerticalIcon />}
+            color="gray.400"
+            _hover={{ color: "gray.600", backgroundColor: "gray.100" }}
+            label={intl.formatMessage({
+              id: "generic.more-options",
+              defaultMessage: "More options...",
+            })}
+          />
+          <Portal>
+            <MenuList minWidth="160px">
               {author?.__typename === "User" && author?.id === userId ? (
                 <MenuItem onClick={handleEditClick}>
                   <FormattedMessage id="generic.edit" defaultMessage="Edit" />
@@ -315,15 +326,8 @@ function FieldComment({
                 <FormattedMessage id="generic.delete" defaultMessage="Delete" />
               </MenuItem>
             </MenuList>
-          }
-          variant="ghost"
-          size="xs"
-          icon={<MoreVerticalIcon />}
-          aria-label={intl.formatMessage({
-            id: "generic.more-options",
-            defaultMessage: "More options...",
-          })}
-        />
+          </Portal>
+        </Menu>
       </Box>
       {isEditing ? (
         <Box marginTop={1} marginX={-2}>

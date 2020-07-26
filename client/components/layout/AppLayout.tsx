@@ -73,10 +73,10 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       >
         <AppLayoutNavbar
           user={user}
-          zIndex={2}
           onCreate={handleOnCreate}
           onOnboardingClick={handleOnboardingClick}
           display={{ base: "none", [breakpoint]: "flex" }}
+          zIndex="1"
         />
         <Flex
           flex="1"
@@ -98,7 +98,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           <AppLayoutNavbar
             isMobile
             user={user}
-            zIndex={2}
             onCreate={handleOnCreate}
             display={{ base: "flex", [breakpoint]: "none" }}
             onOnboardingClick={handleOnboardingClick}

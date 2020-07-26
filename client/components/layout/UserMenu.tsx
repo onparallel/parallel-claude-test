@@ -9,6 +9,7 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
+  Portal,
 } from "@chakra-ui/core";
 import { LogOutIcon, UserIcon } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
@@ -38,7 +39,7 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
   const locales = useSupportedLocales();
 
   return (
-    <Menu>
+    <Menu placement={isMobile ? "top-end" : "right-end"}>
       <MenuButton
         as={Button}
         aria-label={intl.formatMessage({
@@ -52,42 +53,44 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
       >
         <Avatar name={user.fullName!} size="md" />
       </MenuButton>
-      <MenuList placement={isMobile ? "top-end" : "right-end"}>
-        <NakedLink href="/app/settings/account">
-          <MenuItem as="a">
-            <UserIcon marginRight={2} />
+      <Portal>
+        <MenuList>
+          <NakedLink href="/app/settings/account">
+            <MenuItem as="a">
+              <UserIcon marginRight={2} />
+              <FormattedMessage
+                id="component.user-menu.my-account"
+                defaultMessage="My Account"
+              />
+            </MenuItem>
+          </NakedLink>
+          {isMobile ? (
+            <MenuOptionGroup
+              value={router.query.locale}
+              title={intl.formatMessage({
+                id: "component.user-menu.ui-language",
+                defaultMessage: "Language",
+              })}
+              onChange={onLocaleChange as any}
+              type="radio"
+            >
+              {locales.map(({ key, localizedLabel }) => (
+                <MenuItemOption key={key} value={key}>
+                  {localizedLabel}
+                </MenuItemOption>
+              ))}
+            </MenuOptionGroup>
+          ) : null}
+          <MenuDivider />
+          <MenuItem onClick={handleLogoutClick}>
+            <LogOutIcon marginRight={2} />
             <FormattedMessage
-              id="component.user-menu.my-account"
-              defaultMessage="My Account"
+              id="component.user-menu.log-out"
+              defaultMessage="Log out"
             />
           </MenuItem>
-        </NakedLink>
-        {isMobile ? (
-          <MenuOptionGroup
-            value={router.query.locale}
-            title={intl.formatMessage({
-              id: "component.user-menu.ui-language",
-              defaultMessage: "Language",
-            })}
-            onChange={onLocaleChange as any}
-            type="radio"
-          >
-            {locales.map(({ key, localizedLabel }) => (
-              <MenuItemOption key={key} value={key}>
-                {localizedLabel}
-              </MenuItemOption>
-            ))}
-          </MenuOptionGroup>
-        ) : null}
-        <MenuDivider />
-        <MenuItem onClick={handleLogoutClick}>
-          <LogOutIcon marginRight={2} />
-          <FormattedMessage
-            id="component.user-menu.log-out"
-            defaultMessage="Log out"
-          />
-        </MenuItem>
-      </MenuList>
+        </MenuList>
+      </Portal>
     </Menu>
   );
 }

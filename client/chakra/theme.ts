@@ -67,9 +67,9 @@ export const theme = {
     Tooltip: {
       ...base.components.Tooltip,
       defaultProps: {
-        openDelay: 300,
+          openDelay: 300,
+        },
       },
-    },
   },
 };
 

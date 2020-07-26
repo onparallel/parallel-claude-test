@@ -6,18 +6,19 @@ import {
   IconButton,
   List,
   ListItem,
+  Menu,
+  MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   Stack,
-  Tooltip,
   useColorMode,
-  useTheme,
 } from "@chakra-ui/core";
 import {
   AddIcon,
+  FileTextIcon,
   GlobeIcon,
   InfoOutlineIcon,
-  FileTextIcon,
   PaperPlaneIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
@@ -27,7 +28,6 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { ButtonDropdown } from "../common/ButtonDropdown";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
@@ -53,7 +53,6 @@ export const AppLayoutNavbar = Object.assign(
     const { colorMode } = useColorMode();
     const { pathname } = useRouter();
     const intl = useIntl();
-    const theme = useTheme();
     const router = useRouter();
     const items = useMemo(
       () => [
@@ -153,6 +152,7 @@ export const AppLayoutNavbar = Object.assign(
               id: "navbar.new-button",
               defaultMessage: "Create a new petition",
             })}
+            placement={isMobile ? "top" : "right"}
           />
         </Flex>
         <List
@@ -197,41 +197,35 @@ export const AppLayoutNavbar = Object.assign(
             <Spacer />
             <Stack>
               <Flex justifyContent="center">
-                <Tooltip
-                  isOpen
-                  zIndex={theme.zIndices.tooltip}
-                  label={intl.formatMessage({
-                    id: "navbar.change-language",
-                    defaultMessage: "Change language",
-                  })}
-                >
-                  <ButtonDropdown
-                    as={IconButton}
-                    aria-label={intl.formatMessage({
+                <Menu placement="right">
+                  <IconButtonWithTooltip
+                    as={MenuButton}
+                    label={intl.formatMessage({
                       id: "navbar.change-language",
                       defaultMessage: "Change language",
                     })}
                     icon={<GlobeIcon />}
                     variant="ghost"
+                    placement="right"
                     isRound
-                    dropdown={
-                      <MenuList placement="right">
-                        {locales.map(({ key, localizedLabel }) => (
-                          <MenuItem
-                            as="button"
-                            key={key}
-                            onClick={() => handleLocaleChange(key)}
-                            fontWeight={
-                              router.query.locale === key ? "bold" : "normal"
-                            }
-                          >
-                            {localizedLabel}
-                          </MenuItem>
-                        ))}
-                      </MenuList>
-                    }
                   />
-                </Tooltip>
+                  <Portal>
+                    <MenuList>
+                      {locales.map(({ key, localizedLabel }) => (
+                        <MenuItem
+                          as="button"
+                          key={key}
+                          onClick={() => handleLocaleChange(key)}
+                          fontWeight={
+                            router.query.locale === key ? "bold" : "normal"
+                          }
+                        >
+                          {localizedLabel}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Portal>
+                </Menu>
               </Flex>
               <Flex justifyContent="center">
                 <IconButtonWithTooltip
@@ -241,6 +235,7 @@ export const AppLayoutNavbar = Object.assign(
                   })}
                   icon={<InfoOutlineIcon />}
                   variant="ghost"
+                  placement="right"
                   isRound
                   onClick={onOnboardingClick}
                 />
