@@ -1,13 +1,11 @@
 import { BoxProps, useColorMode, useTheme } from "@chakra-ui/core";
 import { css } from "@emotion/core";
 import { useMemo } from "react";
-import { get } from "styled-system";
+
 export function useInputLikeStyles() {
   const theme = useTheme();
   const { colorMode } = useColorMode();
   return useMemo(() => {
-    const focusBorderColor = "blue.500";
-    const errorBorderColor = "red.500";
     const bg = { light: "white", dark: "whiteAlpha.100" };
     const borderColor = { light: "inherit", dark: "whiteAlpha.50" };
     const hoverColor = { light: "gray.300", dark: "whiteAlpha.200" };
@@ -18,18 +16,10 @@ export function useInputLikeStyles() {
      * - key to get
      * - fallback value
      */
-    const _focusBorderColor = get(
-      theme.colors,
-      focusBorderColor,
-      focusBorderColor // If color doesn't exist in theme, use it's raw value
-    );
+    const _focusBorderColor = theme.colors["blue"]?.[500] ?? "blue.500";
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _errorBorderColor = get(
-      theme.colors,
-      errorBorderColor,
-      errorBorderColor
-    );
+    const _errorBorderColor = theme.colors["red"]?.[500] ?? "red.500";
 
     return {
       borderRadius: "md",
