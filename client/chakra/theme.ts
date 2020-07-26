@@ -51,25 +51,25 @@ export const theme = {
       sizes: {
         ...base.components.Heading.sizes,
         "3xl": {
-          heading: { fontSize: ["4xl", null, "5xl"] },
+          fontSize: ["4xl", null, "5xl"],
         },
         "2xl": {
-          heading: { fontSize: ["3xl", null, "4xl"] },
+          fontSize: ["3xl", null, "4xl"],
         },
         xl: {
-          heading: { fontSize: ["2xl", null, "3xl"] },
+          fontSize: ["2xl", null, "3xl"],
         },
         lg: {
-          heading: { fontSize: ["xl", null, "2xl"] },
+          fontSize: ["xl", null, "2xl"],
         },
       },
     },
     Tooltip: {
       ...base.components.Tooltip,
       defaultProps: {
-          openDelay: 300,
-        },
+        openDelay: 300,
       },
+    },
   },
 };
 
