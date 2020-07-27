@@ -119,7 +119,7 @@ function Contact({ contactId }: ContactProps) {
             as={isEditing ? "form" : "div"}
             onSubmit={isEditing ? handleContactSaveSubmit : undefined}
           >
-            <CardHeader headingAs="h2" headingFontSize="lg">
+            <CardHeader headingAs="h2" headingSize="md">
               {`${contact!.fullName ?? ""} <${contact!.email}>`}
             </CardHeader>
             <Stack padding={4}>
