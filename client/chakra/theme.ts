@@ -33,7 +33,7 @@ export const theme = {
       ...base.colors.gray,
       50: "#fbfcfd",
     },
-    primary: {
+    purple: {
       50: "#f8f8ff",
       100: "#d1cfff",
       200: "#b0acfb",
