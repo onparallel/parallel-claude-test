@@ -88,7 +88,7 @@ export const SearchInput = forwardRef(function SearchInput(
             tabIndex={-1}
             title={clearLabel}
             aria-label={clearLabel}
-            size="xs"
+            size="sm"
             onClick={handleClearClick}
           />
         </InputRightElement>

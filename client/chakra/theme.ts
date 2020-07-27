@@ -46,6 +46,26 @@ export const theme = {
   },
   components: {
     ...base.components,
+    Checkbox: {
+      ...base.components.Checkbox,
+      sizes: {
+        sm: {
+          control: { boxSize: 3 },
+          label: { fontSize: "sm" },
+          icon: { fontSize: "0.5rem" },
+        },
+        md: {
+          control: { boxSize: 4 },
+          label: { fontSize: "md" },
+          icon: { fontSize: "0.625rem" },
+        },
+        lg: {
+          control: { boxSize: 5 },
+          label: { fontSize: "lg" },
+          icon: { fontSize: "0.75rem" },
+        },
+      },
+    },
     Heading: {
       ...base.components.Heading,
       sizes: {

@@ -210,7 +210,6 @@ function _Table<TRow>({
               <Checkbox
                 isChecked={anySelected && allSelected}
                 isIndeterminate={anySelected && !allSelected}
-                size="md"
                 colorScheme="purple"
                 onChange={onToggleAll}
               />
@@ -235,7 +234,6 @@ function _Table<TRow>({
             >
               <Checkbox
                 isChecked={isSelected}
-                size="md"
                 colorScheme="purple"
                 onChange={function () {}}
               />

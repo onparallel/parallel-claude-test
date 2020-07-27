@@ -55,7 +55,7 @@ export function CardHeader({
           {isCloseable ? (
             <Flex flex="1" height={5} marginLeft={1} justifyContent="flex-end">
               <CloseButton
-                size="xs"
+                size="sm"
                 aria-label={intl.formatMessage({
                   id: "generic.close",
                   defaultMessage: "Close",

@@ -101,7 +101,7 @@ export function useReactSelectStyle<
             tabIndex={-1}
             title={labels.clear}
             aria-label={labels.clear}
-            size="xs"
+            size="sm"
             {...innerProps}
           />
         )),
