@@ -10,7 +10,6 @@ import {
   Text,
   Tooltip,
   useDisclosure,
-  useTheme,
 } from "@chakra-ui/core";
 import { SettingsIcon } from "@parallel/chakra/icons";
 import {
@@ -42,7 +41,6 @@ export function PetitionHeader({
   ...props
 }: PetitionHeaderProps) {
   const intl = useIntl();
-  const theme = useTheme();
   const [name, setName] = useState(petition.name ?? "");
   const {
     isOpen: isSettingsOpen,
@@ -173,7 +171,6 @@ export function PetitionHeader({
                         </Text>
                       ) : state === "SAVED" ? (
                         <Tooltip
-                          zIndex={theme.zIndices.tooltip}
                           label={intl.formatMessage(
                             {
                               id: "petition.header.last-saved-on",

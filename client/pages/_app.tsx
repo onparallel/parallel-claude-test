@@ -1,4 +1,10 @@
-import { ChakraProvider, CSSReset } from "@chakra-ui/core";
+import {
+  ColorModeProvider,
+  CSSReset,
+  GlobalStyle,
+  PortalManager,
+  ThemeProvider,
+} from "@chakra-ui/core";
 import { theme } from "@parallel/chakra/theme";
 import { DialogOpenerProvider } from "@parallel/components/common/DialogOpenerProvider";
 import {
@@ -26,15 +32,23 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         </>
       )}
       <I18nProvider {...props}>
-        <ChakraProvider theme={theme}>
-          {/* Force light mode until a fix is found for the server vs client discrepancies */}
-          <CSSReset />
-          <DndProvider backend={HTML5Backend}>
-            <DialogOpenerProvider>
-              <Component {...pageProps} />
-            </DialogOpenerProvider>
-          </DndProvider>
-        </ChakraProvider>
+        {/* Change for ChakraProvider when this gets merged https://github.com/chakra-ui/chakra-ui/issues/1394 */}
+        <ThemeProvider theme={theme}>
+          <ColorModeProvider
+            defaultValue={theme?.config?.initialColorMode}
+            useSystemColorMode={theme?.config?.useSystemColorMode}
+          >
+            <GlobalStyle />
+            <CSSReset />
+            <PortalManager zIndex={40}>
+              <DndProvider backend={HTML5Backend}>
+                <DialogOpenerProvider>
+                  <Component {...pageProps} />
+                </DialogOpenerProvider>
+              </DndProvider>
+            </PortalManager>
+          </ColorModeProvider>
+        </ThemeProvider>
       </I18nProvider>
     </>
   );

@@ -54,7 +54,7 @@ export function PetitionStatusIndicator({
     </>
   );
   return isJustIcon ? (
-    <Tooltip label={label} zIndex={theme.zIndices.tooltip}>
+    <Tooltip label={label}>
       <Text color={color} {...props}>
         {content}
       </Text>

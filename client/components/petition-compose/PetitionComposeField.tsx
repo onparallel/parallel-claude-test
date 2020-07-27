@@ -70,7 +70,6 @@ export const PetitionComposeField = Object.assign(
     ...props
   }: PetitionComposeFieldProps) {
     const intl = useIntl();
-    const theme = useTheme();
     const labels = {
       required: intl.formatMessage({
         id: "generic.required-field",
@@ -154,7 +153,6 @@ export const PetitionComposeField = Object.assign(
             <Box marginX={-2} position="relative">
               <Tooltip
                 placement="top"
-                zIndex={theme.zIndices.tooltip}
                 aria-label={labels.required}
                 label={labels.required}
               >

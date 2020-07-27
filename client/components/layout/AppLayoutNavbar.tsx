@@ -12,6 +12,7 @@ import {
   MenuList,
   Portal,
   Stack,
+  Tooltip,
   useColorMode,
 } from "@chakra-ui/core";
 import {
@@ -198,17 +199,25 @@ export const AppLayoutNavbar = Object.assign(
             <Stack>
               <Flex justifyContent="center">
                 <Menu placement="right">
-                  <IconButtonWithTooltip
-                    as={MenuButton}
+                  <Tooltip
                     label={intl.formatMessage({
                       id: "navbar.change-language",
                       defaultMessage: "Change language",
                     })}
-                    icon={<GlobeIcon />}
-                    variant="ghost"
                     placement="right"
-                    isRound
-                  />
+                  >
+                    <MenuButton
+                      as={IconButton}
+                      aria-label={intl.formatMessage({
+                        id: "navbar.change-language",
+                        defaultMessage: "Change language",
+                      })}
+                      icon={<GlobeIcon />}
+                      variant="ghost"
+                      placement="right"
+                      isRound
+                    />
+                  </Tooltip>
                   <Portal>
                     <MenuList>
                       {locales.map(({ key, localizedLabel }) => (

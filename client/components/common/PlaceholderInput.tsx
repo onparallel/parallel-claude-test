@@ -159,7 +159,7 @@ export const PlaceholderInput = forwardRef<
             }
           />
         </Slate>
-        <Tooltip label={hint} aria-label={hint} zIndex={1500} placement="top">
+        <Tooltip label={hint} placement="top">
           <Box
             as="button"
             display="inline-block"

@@ -16,7 +16,6 @@ import {
   Text,
   Textarea,
   Tooltip,
-  useTheme,
 } from "@chakra-ui/core";
 import { jsx } from "@emotion/core";
 import {
@@ -68,7 +67,6 @@ export function RecipientViewPetitionField({
   ...props
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
-  const theme = useTheme();
 
   return (
     <Card
@@ -101,7 +99,6 @@ export function RecipientViewPetitionField({
           ) : (
             <Tooltip
               placement="right"
-              zIndex={theme.zIndices.tooltip}
               label={intl.formatMessage({
                 id: "generic.required-field",
                 defaultMessage: "Required field",

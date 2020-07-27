@@ -38,7 +38,7 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
     };
   }, [intl.locale]);
   return (
-    <Menu>
+    <Menu placement="bottom">
       <MenuButton as={Button} ref={ref} {...props} />
       <Portal>
         <MenuList>
