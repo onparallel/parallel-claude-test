@@ -1,6 +1,4 @@
-/** @jsx jsx */
 import { Box, Text, Tooltip } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "../common/Link";
@@ -87,14 +85,14 @@ function AppLayoutNavbarLinkContent({
       textAlign="center"
       paddingY={isMobile ? 2 : 3}
       paddingX={isMobile ? 2 : undefined}
-      css={
+      sx={
         isDisabled
-          ? null
-          : css`
-              &:hover svg {
-                transform: scale(1.2);
-              }
-            `
+          ? {}
+          : {
+              "&:hover svg": {
+                transform: "scale(1.2)",
+              },
+            }
       }
     >
       <Box marginBottom={1}>

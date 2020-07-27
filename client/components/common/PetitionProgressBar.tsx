@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import {
   Box,
   Popover,
@@ -10,7 +9,6 @@ import {
   Text,
   useTheme,
 } from "@chakra-ui/core";
-import { jsx } from "@emotion/core";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
@@ -54,10 +52,7 @@ export function PetitionProgressBar({
               max={total!}
               value={optional!}
               backgroundColor="yellow.400"
-              css={generateCssStripe({
-                color: theme.colors.gray[200],
-                size: "1rem",
-              })}
+              sx={generateCssStripe({ color: "gray.200", size: "1rem" })}
             />
           </ProgressTrack>
         </Box>

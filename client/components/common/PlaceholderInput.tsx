@@ -1,5 +1,11 @@
-import { Box, BoxProps, Tooltip, useTheme } from "@chakra-ui/core";
-import Popper, { PopperProps } from "@chakra-ui/core/dist/Popper";
+import {
+  Box,
+  BoxProps,
+  Tooltip,
+  useTheme,
+  useMultiStyleConfig,
+} from "@chakra-ui/core";
+// import Popper, { PopperProps } from "@chakra-ui/core/dist/Popper";
 import {
   Placeholder,
   PlaceholderPlugin,
@@ -95,11 +101,16 @@ export const PlaceholderInput = forwardRef<
     [onChange, onChangePlaceholder, onChangeSelection]
   );
 
-  const wrapper = useRef<HTMLElement>();
+  const wrapper = useRef<HTMLDivElement>();
   const placeholderMenuId = `placeholder-menu-${useId()}`;
   const itemIdPrefix = `placeholder-menu-item-${useId()}`;
   const isOpen = Boolean(target && values.length > 0);
-  const styles = useInputLikeStyles();
+
+  const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
+  const inputStyles = {
+    ...inputStyleConfig,
+    _focusWithin: inputStyleConfig._focus,
+  };
 
   const slateValue = useMemo(
     () => [
@@ -132,12 +143,9 @@ export const PlaceholderInput = forwardRef<
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-disabled={isDisabled}
-        height={10}
         display="flex"
         alignItems="center"
-        paddingLeft={3}
-        paddingRight={2}
-        {...styles}
+        {...inputStyles}
         {...props}
       >
         <Slate editor={editor} value={slateValue} onChange={handleChange}>
@@ -189,7 +197,7 @@ export const PlaceholderInput = forwardRef<
           </Box>
         </Tooltip>
       </Box>
-      <PlaceholderMenu
+      {/* <PlaceholderMenu
         menuId={placeholderMenuId}
         itemIdPrefix={itemIdPrefix}
         values={values}
@@ -200,7 +208,7 @@ export const PlaceholderInput = forwardRef<
           onAddPlaceholder(editor, placeholder)
         }
         onHighlightOption={onHighlightOption}
-      />
+      /> */}
     </>
   );
 });
@@ -217,7 +225,7 @@ function PlaceholderMenu({
 }: {
   menuId: string;
   itemIdPrefix: string;
-  anchor: PopperProps["anchorEl"];
+  // anchor: PopperProps["anchorEl"];
   values: Placeholder[];
   selectedIndex: number;
   isOpen: boolean;
@@ -231,43 +239,44 @@ function PlaceholderMenu({
     };
     return { onCreate: setWidth, onUpdate: setWidth };
   }, []);
-  return (
-    <Popper
-      usePortal
-      isOpen={isOpen}
-      anchorEl={anchor}
-      placement="bottom-start"
-      popperOptions={popperOptions}
-      hasArrow={false}
-      zIndex={theme.zIndices.popover}
-    >
-      <Card
-        id={menuId}
-        role="listbox"
-        overflow="auto"
-        maxHeight="180px"
-        paddingY={1}
-      >
-        {values.map((placeholder, index) => {
-          const isSelected = index === selectedIndex;
-          return (
-            <Box
-              key={placeholder.value}
-              id={`${itemIdPrefix}-${placeholder.value}`}
-              role="option"
-              aria-selected={isSelected ? "true" : undefined}
-              backgroundColor={isSelected ? "gray.100" : "white"}
-              paddingX={4}
-              paddingY={1}
-              cursor="pointer"
-              onMouseDown={() => onAddPlaceholder(placeholder)}
-              onMouseEnter={() => onHighlightOption(index)}
-            >
-              {placeholder.label}
-            </Box>
-          );
-        })}
-      </Card>
-    </Popper>
-  );
+  return null;
+  // return (
+  //   <Popper
+  //     usePortal
+  //     isOpen={isOpen}
+  //     anchorEl={anchor}
+  //     placement="bottom-start"
+  //     popperOptions={popperOptions}
+  //     hasArrow={false}
+  //     zIndex={theme.zIndices.popover}
+  //   >
+  //     <Card
+  //       id={menuId}
+  //       role="listbox"
+  //       overflow="auto"
+  //       maxHeight="180px"
+  //       paddingY={1}
+  //     >
+  //       {values.map((placeholder, index) => {
+  //         const isSelected = index === selectedIndex;
+  //         return (
+  //           <Box
+  //             key={placeholder.value}
+  //             id={`${itemIdPrefix}-${placeholder.value}`}
+  //             role="option"
+  //             aria-selected={isSelected ? "true" : undefined}
+  //             backgroundColor={isSelected ? "gray.100" : "white"}
+  //             paddingX={4}
+  //             paddingY={1}
+  //             cursor="pointer"
+  //             onMouseDown={() => onAddPlaceholder(placeholder)}
+  //             onMouseEnter={() => onHighlightOption(index)}
+  //           >
+  //             {placeholder.label}
+  //           </Box>
+  //         );
+  //       })}
+  //     </Card>
+  //   </Popper>
+  // );
 }

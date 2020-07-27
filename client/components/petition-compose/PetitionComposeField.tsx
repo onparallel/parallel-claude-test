@@ -1,14 +1,5 @@
-/** @jsx jsx */
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Input,
-  Stack,
-  Tooltip,
-  useTheme,
-} from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
+import { Box, BoxProps, Input, Stack, Tooltip } from "@chakra-ui/core";
 import {
   DeleteIcon,
   DragHandleIcon,
@@ -76,7 +67,6 @@ export const PetitionComposeField = Object.assign(
         defaultMessage: "Required field",
       }),
     };
-    const { colors } = useTheme();
     const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
       field.id,
       index,
@@ -91,10 +81,10 @@ export const PetitionComposeField = Object.assign(
         borderColor="gray.200"
         marginTop="-1px"
         aria-current={active ? "true" : "false"}
-        css={
+        sx={
           isDragging
-            ? generateCssStripe({ size: "1rem", color: colors.gray[50] })
-            : null
+            ? generateCssStripe({ size: "1rem", color: "gray.50" })
+            : {}
         }
         onFocus={onFocus}
         {...props}
@@ -105,30 +95,25 @@ export const PetitionComposeField = Object.assign(
           flexDirection="row"
           opacity={isDragging ? 0 : 1}
           position="relative"
-          css={css`
-            & {
-              background-color: ${active ? colors.purple[50] : colors.white};
-              [draggable] {
-                opacity: 0;
-                transition: opacity 150ms;
-              }
-              .field-actions {
-                display: none;
-              }
-            }
-            &:hover {
-              [draggable] {
-                opacity: 1;
-              }
-            }
-            &:hover,
-            &:focus-within {
-              background-color: ${active ? colors.purple[50] : colors.gray[50]};
-              .field-actions {
-                display: block;
-              }
-            }
-          `}
+          backgroundColor={active ? "purple.50" : "white"}
+          sx={{
+            "[draggable]": {
+              opacity: 0,
+              transition: "opacity 150ms",
+            },
+            ".field-actions": {
+              display: "none",
+            },
+            "&:hover [draggable]": {
+              opacity: 1,
+            },
+            "&:hover, &:focus-within": {
+              backgroundColor: active ? "purple.50" : "gray.50",
+              ".field-actions": {
+                display: "block",
+              },
+            },
+          }}
         >
           <Box
             ref={dragRef}

@@ -1,6 +1,11 @@
-/** @jsx jsx */
-import { Box, BoxProps, Stack, Text, useFormControl } from "@chakra-ui/core";
-import { jsx } from "@emotion/core";
+import {
+  Box,
+  BoxProps,
+  Stack,
+  Text,
+  useFormControl,
+  useMultiStyleConfig,
+} from "@chakra-ui/core";
 import {
   BoldIcon,
   ItalicIcon,
@@ -30,11 +35,11 @@ import { createEditor, Node } from "slate";
 import { withHistory } from "slate-history";
 import { Slate, useSlate, withReact } from "slate-react";
 import { withAutolist } from "../../utils/slate/withAutolist";
-import { useInputLikeStyles } from "../../utils/useInputLikeStyles";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
+import { omit } from "remeda";
 
 function TextComponent({ element, attributes, styles, ...props }: any) {
   return createElement(Text, { ...props, ...attributes });
@@ -143,7 +148,19 @@ export function RichTextEditor({
     []
   );
 
-  const inputStyles = useInputLikeStyles();
+  const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
+  const inputStyles = {
+    ...omit(inputStyleConfig, [
+      "pl",
+      "pr",
+      "paddingRight",
+      "paddingLeft",
+      "paddingY",
+      "h",
+      "height",
+    ]),
+    _focusWithin: inputStyleConfig._focus,
+  };
   const style = useMemo(
     () =>
       ({

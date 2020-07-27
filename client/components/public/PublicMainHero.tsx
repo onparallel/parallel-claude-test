@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import {
   Box,
   BoxProps,
@@ -6,10 +5,10 @@ import {
   Flex,
   Heading,
   Image,
-  Text,
+  keyframes,
   Stack,
+  Text,
 } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -51,18 +50,10 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                       as="span"
                       fontFamily="hero"
                       args={chunks.flatMap((chunk) => [chunk, 3000])}
-                      css={css`
-                        &::after {
-                          content: "|";
-                          animation: blink 1s infinite step-start;
-                        }
-
-                        @keyframes blink {
-                          50% {
-                            opacity: 0;
-                          }
-                        }
-                      `}
+                      _after={{
+                        content: `"|"`,
+                        animation: `${keyframes`50% { opacity: 0; }`} 1s infinite step-start`,
+                      }}
                     />
                     <br />
                   </>

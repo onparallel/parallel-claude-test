@@ -1,7 +1,5 @@
-/** @jsx jsx */
 import { gql } from "@apollo/client";
 import { BoxProps, Flex } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
 import {
   AppLayout_UserFragment,
   OnboardingKey,
@@ -66,10 +64,8 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       <Flex
         alignItems="stretch"
         overflow="hidden"
-        css={css`
-          height: 100vh;
-          height: -webkit-fill-available;
-        `}
+        height="100vh"
+        style={{ height: "-webkit-fill-available" }}
       >
         <AppLayoutNavbar
           user={user}

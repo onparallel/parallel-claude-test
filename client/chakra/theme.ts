@@ -1,8 +1,10 @@
 import { default as base } from "@chakra-ui/theme";
+import { styles } from "./styles";
 import { omit } from "remeda";
 
 export const theme = {
   ...base,
+  styles,
   fonts: {
     body: "'IBM Plex Sans', sans-serif",
     heading: "'IBM Plex Sans', sans-serif",

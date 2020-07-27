@@ -1,5 +1,5 @@
 import { type, TypicalArg } from "@camwiegert/typical";
-import { BoxProps, Text } from "@chakra-ui/core";
+import { BoxProps, Box } from "@chakra-ui/core";
 import { useEffect, useRef } from "react";
 
 export type PublicHeroProps = BoxProps;
@@ -22,5 +22,5 @@ export function Typical({ args, ...props }: { args: TypicalArg[] } & BoxProps) {
       alive = false;
     };
   }, [JSON.stringify(args)]);
-  return <Text {...props} ref={ref} />;
+  return <Box {...props} ref={ref} />;
 }

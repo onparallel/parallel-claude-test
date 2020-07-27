@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import {
   Box,
   BoxProps,
@@ -8,7 +7,6 @@ import {
   IconButton,
   useColorMode,
 } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
 import {
   ArrowUpDownIcon,
   ChevronDownIcon,
@@ -468,20 +466,19 @@ export function DefaultHeader({
           : undefined
       }
       textAlign={column.align ?? "left"}
-      css={css`
-        .sort-by-button {
-          opacity: 0;
-        }
-        &.sort-active .sort-by-button {
-          opacity: 1;
-        }
-        &:hover,
-        &:focus-within {
-          .sort-by-button {
-            opacity: 1;
-          }
-        }
-      `}
+      sx={{
+        ".sort-by-button": {
+          opacity: 0,
+        },
+        "&.sort-active .sort-by-button": {
+          opacity: 1,
+        },
+        "&:hover, &:focus-within": {
+          ".sort-by-button": {
+            opacity: 1,
+          },
+        },
+      }}
     >
       <Flex alignItems="center">
         {column.header}

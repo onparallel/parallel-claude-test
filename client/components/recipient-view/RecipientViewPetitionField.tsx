@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import { gql } from "@apollo/client";
 import {
   Box,
@@ -17,7 +16,6 @@ import {
   Textarea,
   Tooltip,
 } from "@chakra-ui/core";
-import { jsx } from "@emotion/core";
 import {
   CheckIcon,
   CloseIcon,
@@ -29,7 +27,7 @@ import {
   PetitionFieldReplyStatus,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { animatedStripe, generateCssStripe } from "@parallel/utils/css";
+import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { ReactNode, useCallback } from "react";
@@ -200,7 +198,6 @@ function ReplyWrapper({
   children: ReactNode;
 }) {
   const intl = useIntl();
-  const { colors } = useTheme();
   const label =
     status === "APPROVED"
       ? intl.formatMessage({
@@ -250,10 +247,7 @@ function ReplyWrapper({
             transition="width 100ms ease"
             willChange="width"
             width={`${Math.round((progress ?? 0) * 100)}%`}
-            css={[
-              generateCssStripe({ color: colors.gray[200] }),
-              animatedStripe({}),
-            ]}
+            sx={generateCssStripe({ color: "gray.200", isAnimated: true })}
           />
           <Box
             position="relative"
@@ -389,7 +383,6 @@ function FileUploadReplyForm({
     isDragActive,
     isDragReject,
   } = useDropzone({ accept, onDrop, multiple: field.multiple, disabled });
-  const { colors } = useTheme();
   return (
     <Flex
       color={
@@ -412,13 +405,13 @@ function FileUploadReplyForm({
             cursor: "not-allowed",
           }
         : {})}
-      css={
+      sx={
         isDragActive
           ? generateCssStripe({
               size: "1rem",
-              color: isDragReject ? colors.red[50] : colors.gray[50],
+              color: isDragReject ? "red.50" : "gray.50",
             })
-          : null
+          : {}
       }
       {...props}
       {...getRootProps()}

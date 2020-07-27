@@ -169,7 +169,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                     width="100%"
                     height="100%"
                     willChange="opacity"
-                    __css={{
+                    sx={{
                       "&.fade": {
                         "&-enter": { opacity: 0 },
                         "&-enter-active": {

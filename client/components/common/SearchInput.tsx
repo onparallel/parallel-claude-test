@@ -1,4 +1,3 @@
-/** @jsx jsx */
 import {
   CloseButton,
   Input,
@@ -8,7 +7,6 @@ import {
   InputRightElement,
   useColorMode,
 } from "@chakra-ui/core";
-import { css, jsx } from "@emotion/core";
 import { SearchIcon } from "@parallel/chakra/icons";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
@@ -66,21 +64,17 @@ export const SearchInput = forwardRef(function SearchInput(
         }
         {...props}
         {...bind}
-        css={css`
-          &::-ms-clear,
-          &::-ms-reveal {
-            display: none;
-            width: 0;
-            height: 0;
-          }
-
-          &::-webkit-search-decoration,
-          &::-webkit-search-cancel-button,
-          &::-webkit-search-results-button,
-          &::-webkit-search-results-decoration {
-            display: none;
-          }
-        `}
+        sx={{
+          "::-ms-clear, ::-ms-reveal": {
+            display: "none",
+            width: 0,
+            height: 0,
+          },
+          "::-webkit-search-decoration": { display: "none" },
+          "::-webkit-search-cancel-button": { display: "none" },
+          "::-webkit-search-results-button": { display: "none" },
+          "::-webkit-search-results-decoration": { display: "none" },
+        }}
       />
       {isActive ? (
         <InputRightElement>

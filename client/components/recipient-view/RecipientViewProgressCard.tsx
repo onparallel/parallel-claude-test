@@ -1,7 +1,5 @@
-/** @jsx jsx */
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text, useTheme } from "@chakra-ui/core";
-import { jsx } from "@emotion/core";
 import { SaveIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewProgressCard_PublicPetitionFragment,
@@ -105,8 +103,8 @@ export function RecipientViewProgressCard({
             max={total}
             value={optional}
             backgroundColor={color}
-            css={generateCssStripe({
-              color: theme.colors.gray[200],
+            sx={generateCssStripe({
+              color: "gray.200",
               size: "1rem",
             })}
           />
