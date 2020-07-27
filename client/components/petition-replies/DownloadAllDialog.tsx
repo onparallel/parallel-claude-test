@@ -134,8 +134,7 @@ export function DownloadAllDialog({
           </Text>
           <RadioGroup
             marginTop={2}
-            onChange={(e) => {
-              const option = e.target.value as any;
+            onChange={(option) => {
               if (option === "RENAME") {
                 setTimeout(() => inputRef.current?.focus());
               }

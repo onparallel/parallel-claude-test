@@ -104,6 +104,13 @@ export const theme = {
         },
       },
     },
+    Switch: {
+      ...base.components.Switch,
+      defaultProps: {
+        size: "md",
+        colorScheme: "green",
+      },
+    },
     Tooltip: {
       ...base.components.Tooltip,
       defaultProps: {
