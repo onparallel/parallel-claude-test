@@ -1,0 +1,19 @@
+import { Icon, IconProps } from "@chakra-ui/core";
+import { FieldFileUploadIcon, FieldTextIcon } from "@parallel/chakra/icons";
+import { PetitionFieldType } from "@parallel/graphql/__types";
+import { forwardRef } from "react";
+
+export type PetitionFieldTypeIconProps = IconProps & {
+  type: PetitionFieldType;
+};
+
+export const PetitionFieldTypeIcon = forwardRef<
+  SVGElement,
+  PetitionFieldTypeIconProps
+>(function PetitionFieldTypeIcon({ type, ...props }, ref) {
+  const icon = {
+    FILE_UPLOAD: FieldFileUploadIcon,
+    TEXT: FieldTextIcon,
+  }[type];
+  return <Icon as={icon} {...props} ref={ref} />;
+});

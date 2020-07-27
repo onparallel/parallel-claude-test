@@ -43,9 +43,27 @@ export const theme = {
       800: "#332f80",
       900: "#282666",
     },
+    field: {
+      FILE_UPLOAD: base.colors.teal[400],
+      TEXT: base.colors.yellow[400],
+    },
   },
   components: {
     ...base.components,
+    Button: {
+      ...base.components.Button,
+      sizes: {
+        ...base.components.Button.sizes,
+        xxs: {
+          height: 5,
+          minWidth: 5,
+          fontSize: "xs",
+          fontWeight: "normal",
+          paddingX: 1,
+          borderRadius: "sm",
+        },
+      },
+    },
     Checkbox: {
       ...base.components.Checkbox,
       sizes: {

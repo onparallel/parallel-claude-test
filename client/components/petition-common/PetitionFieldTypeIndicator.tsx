@@ -1,10 +1,10 @@
-import { BoxProps, Flex, Icon, Text, Tooltip } from "@chakra-ui/core";
-import { FieldFileUploadIcon, FieldTextIcon } from "@parallel/chakra/icons";
+import { BoxProps, Button, Text, Tooltip } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
+import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
-export type PetitionFieldTypeIndicatorProps = BoxProps & {
+export type PetitionFieldTypeIndicatorProps = ButtonProps & {
   type: PetitionFieldType;
   index: number;
 };
@@ -27,30 +27,27 @@ export function PetitionFieldTypeIndicator({
       }),
     }[type];
   }, [type, intl.locale]);
-  const icon = useMemo(() => {
-    return {
-      FILE_UPLOAD: FieldFileUploadIcon,
-      TEXT: FieldTextIcon,
-    }[type];
-  }, [type]);
   return (
-    <Tooltip label={label} aria-label={label} placement="bottom">
-      <Flex
-        as="button"
+    <Tooltip label={label}>
+      <Button
+        size="xxs"
         aria-label={label}
         backgroundColor={`field.${type}`}
+        _hover={{ backgroundColor: `field.${type}` }}
         color="white"
-        paddingX={1}
-        paddingY="1px"
-        borderRadius="sm"
         alignItems="center"
         {...props}
       >
-        <Icon boxSize="16px" as={icon} focusable={false} role="presentation" />
+        <PetitionFieldTypeIcon
+          type={type}
+          boxSize="16px"
+          focusable={false}
+          role="presentation"
+        />
         <Text as="span" fontSize="xs" marginLeft={2}>
           <FormattedNumber value={index + 1} />
         </Text>
-      </Flex>
+      </Button>
     </Tooltip>
   );
 }

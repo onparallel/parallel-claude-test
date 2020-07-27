@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   ButtonProps,
-  Icon,
   Menu,
   MenuButton,
   MenuItem,
@@ -10,10 +9,10 @@ import {
   Portal,
   Text,
 } from "@chakra-ui/core";
-import { FieldFileUploadIcon, FieldTextIcon } from "@parallel/chakra/icons";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { forwardRef, Ref, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
 export type AddFieldPopoverProps = ButtonProps & {
   onSelectFieldType: (type: PetitionFieldType) => void;
@@ -38,12 +37,6 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
       }),
     };
   }, [intl.locale]);
-  const icon = useMemo(() => {
-    return {
-      FILE_UPLOAD: FieldFileUploadIcon,
-      TEXT: FieldTextIcon,
-    };
-  }, []);
   return (
     <Menu>
       <MenuButton as={Button} ref={ref} {...props} />
@@ -63,10 +56,10 @@ export const AddFieldPopover = forwardRef(function AddFieldPopover(
                 width="28px"
                 height="28px"
               >
-                <Icon
+                <PetitionFieldTypeIcon
+                  type={type}
                   display="block"
                   boxSize="20px"
-                  as={icon[type]}
                   focusable={false}
                   role="presentation"
                 />
