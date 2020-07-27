@@ -3,12 +3,13 @@ import {
   Popover,
   PopoverArrow,
   PopoverContent,
-  PopoverTrigger,
   PopoverProps,
+  PopoverTrigger,
+  Portal,
   useTheme,
 } from "@chakra-ui/core";
-import { cloneElement, ReactNode, useState } from "react";
 import { useId } from "@reach/auto-id";
+import { cloneElement, ReactNode, useState } from "react";
 
 export function SmallPopover({
   children,
@@ -25,7 +26,6 @@ export function SmallPopover({
   return (
     <Popover
       trigger="hover"
-      usePortal
       id={popoverId}
       placement={placement}
       onOpen={() => setIsOpen(true)}
@@ -36,12 +36,14 @@ export function SmallPopover({
           ...(isOpen ? { "aria-describedby": popoverId } : {}),
         })}
       </PopoverTrigger>
-      <PopoverContent zIndex={theme.zIndices.popover} maxWidth={240}>
-        <PopoverArrow />
-        <Box paddingY={2} paddingX={3} id={popoverId}>
-          {content}
-        </Box>
-      </PopoverContent>
+      <Portal>
+        <PopoverContent zIndex={theme.zIndices.popover} maxWidth={240}>
+          <PopoverArrow />
+          <Box paddingY={2} paddingX={3} id={popoverId}>
+            {content}
+          </Box>
+        </PopoverContent>
+      </Portal>
     </Popover>
   );
 }

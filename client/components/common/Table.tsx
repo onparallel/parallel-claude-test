@@ -467,6 +467,7 @@ export function DefaultHeader({
       }
       textAlign={column.align ?? "left"}
       sx={{
+        padding: 1,
         ".sort-by-button": {
           opacity: 0,
         },

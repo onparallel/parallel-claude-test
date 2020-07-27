@@ -1,11 +1,11 @@
 import {
   Box,
   BoxProps,
+  Portal,
   Tooltip,
-  useTheme,
   useMultiStyleConfig,
+  usePopper,
 } from "@chakra-ui/core";
-// import Popper, { PopperProps } from "@chakra-ui/core/dist/Popper";
 import {
   Placeholder,
   PlaceholderPlugin,
@@ -15,10 +15,17 @@ import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placehold
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
-import { useInputLikeStyles } from "@parallel/utils/useInputLikeStyles";
 import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import { forwardRef, MouseEvent, useCallback, useMemo, useRef } from "react";
+import {
+  forwardRef,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  CSSProperties,
+  useEffect,
+} from "react";
 import { useIntl } from "react-intl";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
@@ -129,15 +136,24 @@ export const PlaceholderInput = forwardRef<
     ReactEditor.focus(editor);
   }
 
-  const hint = intl.formatMessage({
-    id: "component.placeholder-input.hint",
-    defaultMessage: "Press # to add replaceable placeholders",
+  const { popper, reference } = usePopper({
+    forceUpdate: isOpen,
+    placement: "bottom",
+    offset: 0,
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      popper.ref.current!.style.width = `${
+        reference.ref.current!.offsetWidth
+      }px`;
+    }
+  }, [isOpen]);
 
   return (
     <>
       <Box
-        ref={wrapper}
+        ref={reference.ref}
         role="combobox"
         aria-owns={placeholderMenuId}
         aria-haspopup="listbox"
@@ -167,7 +183,13 @@ export const PlaceholderInput = forwardRef<
             }
           />
         </Slate>
-        <Tooltip label={hint} placement="top">
+        <Tooltip
+          label={intl.formatMessage({
+            id: "component.placeholder-input.hint",
+            defaultMessage: "Press # to add replaceable placeholders",
+          })}
+          placement="top"
+        >
           <Box
             as="button"
             display="inline-block"
@@ -197,86 +219,76 @@ export const PlaceholderInput = forwardRef<
           </Box>
         </Tooltip>
       </Box>
-      {/* <PlaceholderMenu
-        menuId={placeholderMenuId}
-        itemIdPrefix={itemIdPrefix}
-        values={values}
-        selectedIndex={selectedIndex}
-        isOpen={isOpen}
-        anchor={wrapper.current}
-        onAddPlaceholder={(placeholder) =>
-          onAddPlaceholder(editor, placeholder)
-        }
-        onHighlightOption={onHighlightOption}
-      /> */}
+      <Portal>
+        <PlaceholderMenu
+          menuId={placeholderMenuId}
+          itemIdPrefix={itemIdPrefix}
+          values={values}
+          selectedIndex={selectedIndex}
+          ref={popper.ref}
+          hidden={!isOpen}
+          style={popper.style}
+          onAddPlaceholder={(placeholder) =>
+            onAddPlaceholder(editor, placeholder)
+          }
+          onHighlightOption={onHighlightOption}
+        />
+      </Portal>
     </>
   );
 });
 
-function PlaceholderMenu({
-  menuId,
-  itemIdPrefix,
-  anchor,
-  values,
-  selectedIndex,
-  isOpen,
-  onAddPlaceholder,
-  onHighlightOption,
-}: {
-  menuId: string;
-  itemIdPrefix: string;
-  // anchor: PopperProps["anchorEl"];
-  values: Placeholder[];
-  selectedIndex: number;
-  isOpen: boolean;
-  onAddPlaceholder: (placeholder: Placeholder) => void;
-  onHighlightOption: (index: number) => void;
-}) {
-  const theme = useTheme();
-  const popperOptions = useMemo(() => {
-    const setWidth = ({ instance: { reference, popper } }: any) => {
-      popper.style.width = `${reference.offsetWidth}px`;
-    };
-    return { onCreate: setWidth, onUpdate: setWidth };
-  }, []);
-  return null;
-  // return (
-  //   <Popper
-  //     usePortal
-  //     isOpen={isOpen}
-  //     anchorEl={anchor}
-  //     placement="bottom-start"
-  //     popperOptions={popperOptions}
-  //     hasArrow={false}
-  //     zIndex={theme.zIndices.popover}
-  //   >
-  //     <Card
-  //       id={menuId}
-  //       role="listbox"
-  //       overflow="auto"
-  //       maxHeight="180px"
-  //       paddingY={1}
-  //     >
-  //       {values.map((placeholder, index) => {
-  //         const isSelected = index === selectedIndex;
-  //         return (
-  //           <Box
-  //             key={placeholder.value}
-  //             id={`${itemIdPrefix}-${placeholder.value}`}
-  //             role="option"
-  //             aria-selected={isSelected ? "true" : undefined}
-  //             backgroundColor={isSelected ? "gray.100" : "white"}
-  //             paddingX={4}
-  //             paddingY={1}
-  //             cursor="pointer"
-  //             onMouseDown={() => onAddPlaceholder(placeholder)}
-  //             onMouseEnter={() => onHighlightOption(index)}
-  //           >
-  //             {placeholder.label}
-  //           </Box>
-  //         );
-  //       })}
-  //     </Card>
-  //   </Popper>
-  // );
-}
+const PlaceholderMenu = forwardRef<
+  HTMLDivElement,
+  {
+    menuId: string;
+    itemIdPrefix: string;
+    values: Placeholder[];
+    selectedIndex: number;
+    onAddPlaceholder: (placeholder: Placeholder) => void;
+    onHighlightOption: (index: number) => void;
+  } & BoxProps
+>(function PlaceholderMenu(
+  {
+    menuId,
+    itemIdPrefix,
+    values,
+    selectedIndex,
+    onAddPlaceholder,
+    onHighlightOption,
+    ...props
+  },
+  ref
+) {
+  return (
+    <Card
+      ref={ref}
+      id={menuId}
+      role="listbox"
+      overflow="auto"
+      maxHeight="180px"
+      paddingY={1}
+      {...props}
+    >
+      {values.map((placeholder, index) => {
+        const isSelected = index === selectedIndex;
+        return (
+          <Box
+            key={placeholder.value}
+            id={`${itemIdPrefix}-${placeholder.value}`}
+            role="option"
+            aria-selected={isSelected ? "true" : undefined}
+            backgroundColor={isSelected ? "gray.100" : "white"}
+            paddingX={4}
+            paddingY={1}
+            cursor="pointer"
+            onMouseDown={() => onAddPlaceholder(placeholder)}
+            onMouseEnter={() => onHighlightOption(index)}
+          >
+            {placeholder.label}
+          </Box>
+        );
+      })}
+    </Card>
+  );
+});

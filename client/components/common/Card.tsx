@@ -1,22 +1,26 @@
 import {
   Box,
   BoxProps,
+  CloseButton,
   Flex,
   Heading,
   HeadingProps,
   useColorMode,
-  CloseButton,
 } from "@chakra-ui/core";
-import { ReactNode } from "react";
+import { forwardRef, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Divider } from "./Divider";
 
 export type CardProps = BoxProps;
 
-export function Card({ children, ...props }: CardProps) {
+export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
+  { children, ...props },
+  ref
+) {
   const { colorMode } = useColorMode();
   return (
     <Box
+      ref={ref}
       as="section"
       borderWidth="1px"
       backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
@@ -27,7 +31,7 @@ export function Card({ children, ...props }: CardProps) {
       {children}
     </Box>
   );
-}
+});
 
 export type CardHeaderProps = {
   children: ReactNode;
