@@ -5,6 +5,7 @@ import {
   Button,
   Collapse,
   Flex,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -19,6 +20,7 @@ import {
   Portal,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/core";
 import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import {
@@ -309,18 +311,23 @@ function FieldComment({
         <Spacer />
         {contactId === comment.author?.id ? (
           <Menu placement="bottom-end">
-            <IconButtonWithTooltip
-              as={MenuButton}
-              color="gray.400"
-              _hover={{ color: "gray.600", backgroundColor: "gray.100" }}
-              variant="ghost"
-              size="xs"
-              icon={<MoreVerticalIcon />}
+            <Tooltip
               label={intl.formatMessage({
                 id: "generic.more-options",
                 defaultMessage: "More options...",
               })}
-            />
+            >
+              <MenuButton
+                as={IconButton}
+                variant="ghost"
+                size="xs"
+                icon={<MoreVerticalIcon />}
+                aria-label={intl.formatMessage({
+                  id: "generic.more-options",
+                  defaultMessage: "More options...",
+                })}
+              />
+            </Tooltip>
             <Portal>
               <MenuList minWidth="160px">
                 <MenuItem onClick={handleEditClick}>

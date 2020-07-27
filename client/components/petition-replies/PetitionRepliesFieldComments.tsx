@@ -5,6 +5,7 @@ import {
   Button,
   Collapse,
   Flex,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -12,6 +13,7 @@ import {
   Portal,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/core";
 import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
@@ -38,7 +40,6 @@ import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
@@ -303,18 +304,23 @@ function FieldComment({
         )}
         <Spacer />
         <Menu placement="bottom-end">
-          <IconButtonWithTooltip
-            as={MenuButton}
-            variant="ghost"
-            size="xs"
-            icon={<MoreVerticalIcon />}
-            color="gray.400"
-            _hover={{ color: "gray.600", backgroundColor: "gray.100" }}
+          <Tooltip
             label={intl.formatMessage({
               id: "generic.more-options",
               defaultMessage: "More options...",
             })}
-          />
+          >
+            <MenuButton
+              as={IconButton}
+              variant="ghost"
+              size="xs"
+              icon={<MoreVerticalIcon />}
+              aria-label={intl.formatMessage({
+                id: "generic.more-options",
+                defaultMessage: "More options...",
+              })}
+            />
+          </Tooltip>
           <Portal>
             <MenuList minWidth="160px">
               {author?.__typename === "User" && author?.id === userId ? (

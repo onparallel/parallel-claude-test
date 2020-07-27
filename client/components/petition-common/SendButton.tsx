@@ -1,15 +1,17 @@
 import {
   Button,
+  IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Portal,
+  Tooltip,
 } from "@chakra-ui/core";
 import {
   ChevronDownIcon,
-  TimeIcon,
   PaperPlaneIcon,
+  TimeIcon,
 } from "@parallel/chakra/icons";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -38,18 +40,25 @@ export function SendButton({
         />
       </Button>
       <Menu placement="bottom-end">
-        <IconButtonWithTooltip
-          as={MenuButton}
-          colorScheme="purple"
-          icon={<ChevronDownIcon />}
+        <Tooltip
           label={intl.formatMessage({
             id: "generic.more-options",
             defaultMessage: "More options...",
           })}
-          borderTopLeftRadius={0}
-          borderBottomLeftRadius={0}
-          minWidth={8}
-        />
+        >
+          <MenuButton
+            as={IconButton}
+            colorScheme="purple"
+            icon={<ChevronDownIcon />}
+            aria-label={intl.formatMessage({
+              id: "generic.more-options",
+              defaultMessage: "More options...",
+            })}
+            borderTopLeftRadius={0}
+            borderBottomLeftRadius={0}
+            minWidth={8}
+          />
+        </Tooltip>
         <Portal>
           <MenuList minWidth={0}>
             <MenuItem onClick={onScheduleClick as any}>
