@@ -86,7 +86,7 @@ export function AddPetitionAccessDialog({
     <ConfirmDialog
       closeOnEsc={false}
       closeOnOverlayClick={false}
-      focusRef={recipientsRef}
+      initialFocusRef={recipientsRef}
       size="2xl"
       header={
         <FormattedMessage

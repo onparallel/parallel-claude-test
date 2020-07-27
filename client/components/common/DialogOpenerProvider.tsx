@@ -1,17 +1,16 @@
 import {
+  cloneElement,
   ComponentType,
   createContext,
   ReactNode,
   useCallback,
   useContext,
-  useState,
-  Fragment,
-  cloneElement,
   useMemo,
+  useState,
+  ReactElement,
 } from "react";
 
 export type DialogProps<T = void> = {
-  position: number;
   onResolve: (value?: T) => void;
   onReject: (reason?: any) => void;
 };
@@ -21,7 +20,9 @@ export type Dialog<TProps, TResult> = ComponentType<
 >;
 
 export type DialogOpener = <TResult>(
-  opener: (callbacks: DialogProps<TResult>) => ReactNode
+  opener: (
+    callbacks: DialogProps<TResult>
+  ) => ReactElement<DialogProps<TResult>>
 ) => Promise<TResult>;
 
 export const DialogOpenerContext = createContext<{
@@ -32,22 +33,21 @@ export const DialogOpenerContext = createContext<{
 export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
   const { opener } = useContext(DialogOpenerContext);
   return useCallback(
-    (props: Omit<TProps, keyof DialogProps<TResult>>) =>
+    (props: TProps) =>
       opener((callbacks: DialogProps<TResult>) => (
-        <Dialog {...({ ...callbacks, ...props } as any)} />
+        <Dialog {...callbacks} {...props} />
       )),
     [Dialog]
   );
 }
 
 export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
-  const [stack, setStack] = useState<ReactNode[]>([]);
+  const [stack, setStack] = useState<ReactElement[]>([]);
   const value = useMemo(
     () => ({
       opener: function (opener) {
         return new Promise((resolve, reject) => {
           const dialog = opener({
-            position: 0,
             onResolve: (result) => {
               setStack((stack) => stack.slice(0, -1));
               resolve(result as any);
@@ -66,12 +66,7 @@ export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   return (
     <DialogOpenerContext.Provider value={value}>
       {children}
-      {stack.map((dialog, index) => (
-        // as long as it's a stack, using index as key is ok
-        <Fragment key={index}>
-          {cloneElement(dialog as any, { position: index })}
-        </Fragment>
-      ))}
+      {stack.map((dialog, index) => cloneElement(dialog, { key: index }))}
     </DialogOpenerContext.Provider>
   );
 }

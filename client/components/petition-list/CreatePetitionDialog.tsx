@@ -99,7 +99,7 @@ export function CreatePetitionDialog({
           });
         }),
       }}
-      focusRef={focusRef}
+      initialFocusRef={focusRef}
       header={
         <Text as="label" {...{ htmlFor: "petition-name" }}>
           <FormattedMessage

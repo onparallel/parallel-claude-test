@@ -13,7 +13,7 @@ export function CompletedPetitionDialog({ ...props }: DialogProps<void>) {
   const router = useRouter();
   return (
     <ConfirmDialog
-      focusRef={focusRef}
+      initialFocusRef={focusRef}
       closeOnEsc={false}
       closeOnOverlayClick={false}
       header={

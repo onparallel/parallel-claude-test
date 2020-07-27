@@ -53,114 +53,115 @@ export function PetitionSettingsModal({
 
   return (
     <Modal {...props} size="xl">
-      <ModalOverlay />
-      <ModalContent borderRadius="md">
-        <ModalHeader>
-          <FormattedMessage
-            id="petition.settings-header"
-            defaultMessage="Petition settings"
-          />
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody paddingBottom={6}>
-          <Stack>
-            <FormControl id="petition-locale">
-              <FormLabel>
-                <FormattedMessage
-                  id="component.create-petition-dialog.locale-label"
-                  defaultMessage="Language of the petition"
-                />
-              </FormLabel>
-              <Select
-                name="petition-locale"
-                value={petition.locale}
-                onChange={(event) => {
-                  onUpdatePetition({ locale: event.target.value as any });
-                }}
-              >
-                {locales.map((locale) => (
-                  <option key={locale.key} value={locale.key}>
-                    {locale.localizedLabel}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl id="petition-deadline">
-              <FormLabel>
-                <FormattedMessage
-                  id="petition.deadline-label"
-                  defaultMessage="Deadline"
-                />
-              </FormLabel>
-              <Flex flexDirection={{ base: "column", sm: "row" }}>
-                <InputGroup size="md" flex="1">
-                  <Input
-                    isReadOnly
-                    placeholder={
-                      petition.deadline
-                        ? undefined
-                        : intl.formatMessage({
-                            id: "generic.no-deadline",
-                            defaultMessage: "No deadline",
-                          })
-                    }
-                    value={
-                      petition.deadline
-                        ? intl.formatDate(petition.deadline, {
-                            ...FORMATS.LLL,
-                            weekday: "long",
-                          })
-                        : ""
-                    }
-                    onChange={() => {}}
-                    onKeyUp={(event: KeyboardEvent) => {
-                      switch (event.key) {
-                        case " ":
-                        case "Enter":
-                          onChangeDeadline();
-                      }
-                    }}
-                    onClick={onChangeDeadline}
+      <ModalOverlay>
+        <ModalContent borderRadius="md">
+          <ModalHeader>
+            <FormattedMessage
+              id="petition.settings-header"
+              defaultMessage="Petition settings"
+            />
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody paddingBottom={6}>
+            <Stack>
+              <FormControl id="petition-locale">
+                <FormLabel>
+                  <FormattedMessage
+                    id="component.create-petition-dialog.locale-label"
+                    defaultMessage="Language of the petition"
                   />
-                  {petition.deadline ? (
-                    <InputRightElement>
-                      <CloseButton
-                        size="sm"
-                        label={intl.formatMessage({
-                          id: "petition.remove-deadline",
-                          defaultMessage: "Remove deadline",
-                        })}
-                        onClick={() => onUpdatePetition({ deadline: null })}
-                      />
-                    </InputRightElement>
-                  ) : null}
-                </InputGroup>
-                <Button
-                  leftIcon={<TimeIcon />}
-                  marginLeft={{ base: 0, sm: 2 }}
-                  marginTop={{ base: 2, sm: 0 }}
-                  onClick={(event: MouseEvent) => {
-                    event.stopPropagation();
-                    onChangeDeadline();
+                </FormLabel>
+                <Select
+                  name="petition-locale"
+                  value={petition.locale}
+                  onChange={(event) => {
+                    onUpdatePetition({ locale: event.target.value as any });
                   }}
                 >
-                  {petition.deadline ? (
-                    <FormattedMessage
-                      id="petition.change-deadline"
-                      defaultMessage="Change deadline"
+                  {locales.map((locale) => (
+                    <option key={locale.key} value={locale.key}>
+                      {locale.localizedLabel}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl id="petition-deadline">
+                <FormLabel>
+                  <FormattedMessage
+                    id="petition.deadline-label"
+                    defaultMessage="Deadline"
+                  />
+                </FormLabel>
+                <Flex flexDirection={{ base: "column", sm: "row" }}>
+                  <InputGroup size="md" flex="1">
+                    <Input
+                      isReadOnly
+                      placeholder={
+                        petition.deadline
+                          ? undefined
+                          : intl.formatMessage({
+                              id: "generic.no-deadline",
+                              defaultMessage: "No deadline",
+                            })
+                      }
+                      value={
+                        petition.deadline
+                          ? intl.formatDate(petition.deadline, {
+                              ...FORMATS.LLL,
+                              weekday: "long",
+                            })
+                          : ""
+                      }
+                      onChange={() => {}}
+                      onKeyUp={(event: KeyboardEvent) => {
+                        switch (event.key) {
+                          case " ":
+                          case "Enter":
+                            onChangeDeadline();
+                        }
+                      }}
+                      onClick={onChangeDeadline}
                     />
-                  ) : (
-                    <FormattedMessage
-                      id="petition.set-a-deadline"
-                      defaultMessage="Set a deadline"
-                    />
-                  )}
-                </Button>
-              </Flex>
-            </FormControl>
-          </Stack>
-        </ModalBody>
-      </ModalContent>
+                    {petition.deadline ? (
+                      <InputRightElement>
+                        <CloseButton
+                          size="sm"
+                          label={intl.formatMessage({
+                            id: "petition.remove-deadline",
+                            defaultMessage: "Remove deadline",
+                          })}
+                          onClick={() => onUpdatePetition({ deadline: null })}
+                        />
+                      </InputRightElement>
+                    ) : null}
+                  </InputGroup>
+                  <Button
+                    leftIcon={<TimeIcon />}
+                    marginLeft={{ base: 0, sm: 2 }}
+                    marginTop={{ base: 2, sm: 0 }}
+                    onClick={(event: MouseEvent) => {
+                      event.stopPropagation();
+                      onChangeDeadline();
+                    }}
+                  >
+                    {petition.deadline ? (
+                      <FormattedMessage
+                        id="petition.change-deadline"
+                        defaultMessage="Change deadline"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="petition.set-a-deadline"
+                        defaultMessage="Set a deadline"
+                      />
+                    )}
+                  </Button>
+                </Flex>
+              </FormControl>
+            </Stack>
+          </ModalBody>
+        </ModalContent>
+      </ModalOverlay>
     </Modal>
   );
 }

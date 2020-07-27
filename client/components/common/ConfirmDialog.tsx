@@ -1,13 +1,13 @@
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   BoxProps,
   Button,
-  IAlertDialog,
+  ModalProps,
   Stack,
 } from "@chakra-ui/core";
 import { ReactNode, RefObject, useRef } from "react";
@@ -19,56 +19,54 @@ export type ConfirmDialogProps<T> = {
   body: ReactNode;
   confirm: ReactNode;
   cancel?: ReactNode;
-  focusRef?: RefObject<HTMLElement>;
+  initialFocusRef?: RefObject<any>;
   content?: BoxProps;
 } & DialogProps<T> &
-  Omit<IAlertDialog, "children" | "isOpen" | "leastDestructiveRef" | "onClose">;
+  Omit<ModalProps, "children" | "isOpen" | "initialFocusRef" | "onClose">;
 
 export function ConfirmDialog<T = void>({
   header,
   body,
   confirm,
   cancel,
-  focusRef,
-  position,
+  initialFocusRef,
   onResolve,
   onReject,
   content,
   ...props
 }: ConfirmDialogProps<T>) {
-  const cancelRef = useRef<HTMLElement>(null);
-  cancel =
-    cancel === undefined ? (
-      <Button ref={cancelRef} onClick={() => onReject({ reason: "CANCEL" })}>
-        <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-      </Button>
-    ) : (
-      cancel
-    );
+  const cancelRef = useRef<HTMLButtonElement>(null);
   return (
-    <AlertDialog
+    <Modal
       isOpen={true}
-      leastDestructiveRef={focusRef || cancelRef}
+      initialFocusRef={initialFocusRef ?? cancelRef}
       onClose={() => onReject({ reason: "CLOSE" })}
       {...props}
     >
-      <AlertDialogOverlay zIndex={1400 + position * 2} />
-      <AlertDialogContent
-        borderRadius="md"
-        zIndex={1400 + position * 2 + 1}
-        {...content}
-      >
-        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-          {header}
-        </AlertDialogHeader>
-        <AlertDialogBody>{body}</AlertDialogBody>
-        <AlertDialogFooter>
-          <Stack direction="row">
-            {cancel}
-            {confirm}
-          </Stack>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      <ModalOverlay>
+        <ModalContent borderRadius="md" {...content}>
+          <ModalHeader fontSize="lg" fontWeight="bold">
+            {header}
+          </ModalHeader>
+          <ModalBody>{body}</ModalBody>
+          <ModalFooter>
+            <Stack direction="row">
+              {cancel ?? (
+                <Button
+                  ref={cancelRef}
+                  onClick={() => onReject({ reason: "CANCEL" })}
+                >
+                  <FormattedMessage
+                    id="generic.cancel"
+                    defaultMessage="Cancel"
+                  />
+                </Button>
+              )}
+              {confirm}
+            </Stack>
+          </ModalFooter>
+        </ModalContent>
+      </ModalOverlay>
+    </Modal>
   );
 }

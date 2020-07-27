@@ -106,92 +106,104 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   return (
     <Modal isOpen={true} onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent borderRadius="md" maxHeight="calc(100vh - 7.5rem)">
-        <ModalHeader fontSize="lg" fontWeight="bold">
-          {field.title || (
-            <Text color="gray.400" fontWeight="normal" fontStyle="italic">
-              <FormattedMessage
-                id="generic.untitled-field"
-                defaultMessage="Untitled field"
-              />
-            </Text>
-          )}
-        </ModalHeader>
-        <ModalCloseButton
-          aria-label={intl.formatMessage({
-            id: "generic.close",
-            defaultMessage: "Close",
-          })}
-        />
-        <Divider />
-        <ModalBody padding={0} overflow="auto" minHeight="0" ref={commentsRef}>
-          {field.comments.map((comment, i) => (
-            <Fragment key={comment.id}>
-              {i !== 0 ? <Divider /> : null}
-              <FieldComment
-                key={comment.id}
-                comment={comment}
-                contactId={contactId}
-                onEdit={(content) => onUpdateComment(comment.id, content)}
-                onDelete={() => onDeleteComment(comment.id)}
-              />
-            </Fragment>
-          ))}
-          {field.comments.length === 0 ? (
-            <Flex
-              flexDirection="column"
-              paddingX={4}
-              paddingY={8}
-              justifyContent="center"
-              alignItems="center"
-            >
-              <CommentIcon color="gray.200" boxSize="64px" />
-              <Text color="gray.400">
+      <ModalOverlay>
+        <ModalContent borderRadius="md" maxHeight="calc(100vh - 7.5rem)">
+          <ModalHeader fontSize="lg" fontWeight="bold">
+            {field.title || (
+              <Text color="gray.400" fontWeight="normal" fontStyle="italic">
                 <FormattedMessage
-                  id="recipient-view.field-comments.cta"
-                  defaultMessage="Have any questions? Ask here"
+                  id="generic.untitled-field"
+                  defaultMessage="Untitled field"
                 />
               </Text>
-            </Flex>
-          ) : null}
-        </ModalBody>
-        <Divider />
-        <ModalFooter display="block">
-          <GrowingTextarea
-            ref={textareaRef}
-            height="20px"
-            size="sm"
-            borderRadius="md"
-            paddingX={2}
-            minHeight={0}
-            {...{ rows: 1 }}
-            placeholder={intl.formatMessage({
-              id: "recipient-view.field-comments.placeholder",
-              defaultMessage: "Type a new comment",
+            )}
+          </ModalHeader>
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
             })}
-            value={draft}
-            onKeyDown={handleKeyDown as any}
-            onChange={handleDraftChange as any}
-            {...inputFocusBind}
           />
-          <Collapse isOpen={isExpanded} paddingTop={2}>
-            <Stack direction="row" justifyContent="flex-end">
-              <Button size="sm" onClick={handleCancelClick}>
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button
-                size="sm"
-                colorScheme="purple"
-                isDisabled={draft.length === 0}
-                onClick={handleSubmitClick}
+          <Divider />
+          <ModalBody
+            padding={0}
+            overflow="auto"
+            minHeight="0"
+            ref={commentsRef}
+          >
+            {field.comments.map((comment, i) => (
+              <Fragment key={comment.id}>
+                {i !== 0 ? <Divider /> : null}
+                <FieldComment
+                  key={comment.id}
+                  comment={comment}
+                  contactId={contactId}
+                  onEdit={(content) => onUpdateComment(comment.id, content)}
+                  onDelete={() => onDeleteComment(comment.id)}
+                />
+              </Fragment>
+            ))}
+            {field.comments.length === 0 ? (
+              <Flex
+                flexDirection="column"
+                paddingX={4}
+                paddingY={8}
+                justifyContent="center"
+                alignItems="center"
               >
-                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-              </Button>
-            </Stack>
-          </Collapse>
-        </ModalFooter>
-      </ModalContent>
+                <CommentIcon color="gray.200" boxSize="64px" />
+                <Text color="gray.400">
+                  <FormattedMessage
+                    id="recipient-view.field-comments.cta"
+                    defaultMessage="Have any questions? Ask here"
+                  />
+                </Text>
+              </Flex>
+            ) : null}
+          </ModalBody>
+          <Divider />
+          <ModalFooter display="block">
+            <GrowingTextarea
+              ref={textareaRef}
+              height="20px"
+              size="sm"
+              borderRadius="md"
+              paddingX={2}
+              minHeight={0}
+              {...{ rows: 1 }}
+              placeholder={intl.formatMessage({
+                id: "recipient-view.field-comments.placeholder",
+                defaultMessage: "Type a new comment",
+              })}
+              value={draft}
+              onKeyDown={handleKeyDown as any}
+              onChange={handleDraftChange as any}
+              {...inputFocusBind}
+            />
+            <Collapse isOpen={isExpanded} paddingTop={2}>
+              <Stack direction="row" justifyContent="flex-end">
+                <Button size="sm" onClick={handleCancelClick}>
+                  <FormattedMessage
+                    id="generic.cancel"
+                    defaultMessage="Cancel"
+                  />
+                </Button>
+                <Button
+                  size="sm"
+                  colorScheme="purple"
+                  isDisabled={draft.length === 0}
+                  onClick={handleSubmitClick}
+                >
+                  <FormattedMessage
+                    id="generic.submit"
+                    defaultMessage="Submit"
+                  />
+                </Button>
+              </Stack>
+            </Collapse>
+          </ModalFooter>
+        </ModalContent>
+      </ModalOverlay>
     </Modal>
   );
 }

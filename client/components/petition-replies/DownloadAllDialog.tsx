@@ -117,7 +117,7 @@ export function DownloadAllDialog({
 
   return (
     <ConfirmDialog
-      focusRef={inputRef as any}
+      initialFocusRef={inputRef as any}
       header={
         <FormattedMessage
           id="component.download-all-dialog.header"

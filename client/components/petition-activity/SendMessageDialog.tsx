@@ -49,7 +49,7 @@ export function SendMessageDialogDialog({
       closeOnEsc={false}
       closeOnOverlayClick={false}
       size="2xl"
-      focusRef={subjectRef}
+      initialFocusRef={subjectRef}
       header={
         <FormattedMessage
           id="petition.send-message-header.header"

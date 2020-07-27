@@ -45,7 +45,7 @@ export function AskContactDetailsDialog({
   return (
     <ConfirmDialog
       closeOnOverlayClick={false}
-      focusRef={defaultEmail ? nameRef : emailRef}
+      initialFocusRef={defaultEmail ? nameRef : emailRef}
       content={{
         as: "form",
         onSubmit: handleSubmit(onCreateContact),

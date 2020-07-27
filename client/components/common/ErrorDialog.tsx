@@ -14,7 +14,7 @@ export function ErrorDialog({
   const focusRef = useRef(null);
   return (
     <ConfirmDialog
-      focusRef={focusRef}
+      initialFocusRef={focusRef}
       closeOnEsc={true}
       closeOnOverlayClick={true}
       header={
