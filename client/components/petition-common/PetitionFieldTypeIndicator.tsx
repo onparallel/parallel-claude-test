@@ -1,10 +1,10 @@
-import { BoxProps, Button, Text, Tooltip } from "@chakra-ui/core";
+import { Button, ButtonProps, Text, Tooltip } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
 import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
-export type PetitionFieldTypeIndicatorProps = ButtonProps & {
+export type PetitionFieldTypeIndicatorProps = Omit<ButtonProps, "type"> & {
   type: PetitionFieldType;
   index: number;
 };

@@ -136,7 +136,7 @@ const Month = memo(function Month({
           <Box
             as="col"
             key={index}
-            backgroundColor={isWeekend(day) ? "gray.50" : null}
+            backgroundColor={isWeekend(day) ? "gray.50" : undefined}
           />
         ))}
       </Box>

@@ -106,11 +106,11 @@ export function PetitionRemindersConfig({
                     min={1}
                     max={99}
                     value={value.offset}
-                    onChange={(offset) =>
+                    onChange={(_, offset) =>
                       onChange({
                         ...value,
                         timezone,
-                        offset: offset as number,
+                        offset: offset ?? 0,
                       })
                     }
                     size="sm"

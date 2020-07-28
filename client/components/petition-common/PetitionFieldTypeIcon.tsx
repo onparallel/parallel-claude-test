@@ -8,7 +8,7 @@ export type PetitionFieldTypeIconProps = IconProps & {
 };
 
 export const PetitionFieldTypeIcon = forwardRef<
-  SVGElement,
+  SVGSVGElement,
   PetitionFieldTypeIconProps
 >(function PetitionFieldTypeIcon({ type, ...props }, ref) {
   const icon = {

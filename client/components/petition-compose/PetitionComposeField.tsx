@@ -230,7 +230,7 @@ export const PetitionComposeField = Object.assign(
               _focus={{
                 boxShadow: "none",
               }}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
                 setDescription(event.target.value ?? null)
               }
               onBlur={() => {

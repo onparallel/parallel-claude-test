@@ -5,7 +5,6 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  IModal,
   Input,
   InputGroup,
   InputRightElement,
@@ -15,6 +14,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  ModalProps,
   Select,
   Stack,
 } from "@chakra-ui/core";
@@ -29,7 +29,7 @@ import { KeyboardEvent, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 
-export type PetitionSettingsModalProps = Omit<IModal, "children"> & {
+export type PetitionSettingsModalProps = Omit<ModalProps, "children"> & {
   petition: PetitionSettingsModal_PetitionFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
 };
@@ -126,7 +126,7 @@ export function PetitionSettingsModal({
                       <InputRightElement>
                         <CloseButton
                           size="sm"
-                          label={intl.formatMessage({
+                          aria-label={intl.formatMessage({
                             id: "petition.remove-deadline",
                             defaultMessage: "Remove deadline",
                           })}

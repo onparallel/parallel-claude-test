@@ -150,7 +150,7 @@ export function RichTextEditor({
 
   const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
   const inputStyles = {
-    ...omit(inputStyleConfig, [
+    ...omit(inputStyleConfig as any, [
       "pl",
       "pr",
       "paddingRight",
@@ -159,8 +159,8 @@ export function RichTextEditor({
       "h",
       "height",
     ]),
-    _focusWithin: inputStyleConfig._focus,
-  };
+    _focusWithin: (inputStyleConfig as any)._focus,
+  } as any;
   const style = useMemo(
     () =>
       ({

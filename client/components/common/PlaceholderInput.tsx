@@ -17,15 +17,7 @@ import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlacehold
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
 import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import {
-  forwardRef,
-  MouseEvent,
-  useCallback,
-  useMemo,
-  useRef,
-  CSSProperties,
-  useEffect,
-} from "react";
+import { forwardRef, MouseEvent, useCallback, useMemo, useEffect } from "react";
 import { useIntl } from "react-intl";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
@@ -108,7 +100,6 @@ export const PlaceholderInput = forwardRef<
     [onChange, onChangePlaceholder, onChangeSelection]
   );
 
-  const wrapper = useRef<HTMLDivElement>();
   const placeholderMenuId = `placeholder-menu-${useId()}`;
   const itemIdPrefix = `placeholder-menu-item-${useId()}`;
   const isOpen = Boolean(target && values.length > 0);
@@ -116,8 +107,8 @@ export const PlaceholderInput = forwardRef<
   const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
   const inputStyles = {
     ...inputStyleConfig,
-    _focusWithin: inputStyleConfig._focus,
-  };
+    _focusWithin: (inputStyleConfig as any)._focus,
+  } as any;
 
   const slateValue = useMemo(
     () => [
@@ -153,7 +144,7 @@ export const PlaceholderInput = forwardRef<
   return (
     <>
       <Box
-        ref={reference.ref}
+        ref={reference.ref as any}
         role="combobox"
         aria-owns={placeholderMenuId}
         aria-haspopup="listbox"
@@ -227,7 +218,7 @@ export const PlaceholderInput = forwardRef<
           selectedIndex={selectedIndex}
           ref={popper.ref}
           hidden={!isOpen}
-          style={popper.style}
+          style={popper.style as any}
           onAddPlaceholder={(placeholder) =>
             onAddPlaceholder(editor, placeholder)
           }

@@ -18,8 +18,8 @@ export function PaneWithFlyout({
   children,
 }: PaneWithFlyoutProps) {
   const [flyoutOffset, setFlyoutOffset] = useState(0);
-  const flyoutRef = useRef<HTMLElement>(null);
-  const paneRef = useRef<HTMLElement>(null);
+  const flyoutRef = useRef<HTMLDivElement>(null);
+  const paneRef = useRef<HTMLDivElement>(null);
 
   useEffect(positionFlyout, [active, alignWith]);
   useEffect(scrollFlyoutIntoView, [active, alignWith]);

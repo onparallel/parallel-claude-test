@@ -260,7 +260,7 @@ function ReplyWrapper({
           {status === "APPROVED" ? (
             <CheckIcon color="green.500" marginLeft={2} />
           ) : status === "REJECTED" ? (
-            <CloseIcon color="red.500" size="12px" marginLeft={2} />
+            <CloseIcon color="red.500" boxSize="12px" marginLeft={2} />
           ) : null}
         </Flex>
       </Tooltip>

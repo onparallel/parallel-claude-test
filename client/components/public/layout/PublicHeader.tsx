@@ -3,7 +3,6 @@ import {
   Button,
   Collapse,
   Flex,
-  LinkProps as ChakraLinkProps,
   Stack,
   StackProps,
   useDisclosure,
@@ -14,36 +13,6 @@ import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
-
-function logoColorProps(colorMode: string) {
-  const theme: { [colorMode: string]: ChakraLinkProps } = {
-    light: {
-      color: "gray.700",
-      _hover: {
-        color: "gray.800",
-      },
-      _focus: {
-        color: "gray.800",
-      },
-      _active: {
-        color: "gray.900",
-      },
-    },
-    dark: {
-      color: "purple.50",
-      _hover: {
-        color: "purple.100",
-      },
-      _focus: {
-        color: "purple.100",
-      },
-      _active: {
-        color: "purple.200",
-      },
-    },
-  };
-  return theme[colorMode];
-}
 
 export type PublicHeaderProps = BoxProps & {
   isThin?: boolean;
@@ -67,7 +36,13 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         minHeight={isThin ? 16 : 20}
         transition="min-height 300ms"
       >
-        <Link href="/" {...logoColorProps("light")}>
+        <Link
+          href="/"
+          color="gray.700"
+          _hover={{ color: "gray.800" }}
+          _focus={{ color: "gray.800" }}
+          _active={{ color: "gray.900" }}
+        >
           <Logo width={152} />
         </Link>
         <Spacer />

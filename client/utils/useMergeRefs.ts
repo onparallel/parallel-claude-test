@@ -1,7 +1,7 @@
 import { Ref, useCallback } from "react";
 
 /**
- * Merges 2 refs. This useful for example when using `React.forwardRef` but
+ * Merges refs. This useful for example when using `React.forwardRef` but
  * still want to have a ref to use internally.
  */
 export function useMergeRefs<T>(...refs: Ref<T>[]) {

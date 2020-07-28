@@ -1,11 +1,15 @@
 import { type, TypicalArg } from "@camwiegert/typical";
 import { BoxProps, Box } from "@chakra-ui/core";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef } from "react";
+import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 
 export type PublicHeroProps = BoxProps;
 
-export function Typical({ args, ...props }: { args: TypicalArg[] } & BoxProps) {
-  const ref = useRef<HTMLElement>();
+export const Typical = forwardRef<
+  HTMLElement,
+  { args: TypicalArg[] } & BoxProps
+>(function ({ args, ...props }, ref) {
+  const elementRef = useRef<HTMLElement>();
   useEffect(() => {
     let alive = true;
     async function check() {
@@ -14,7 +18,7 @@ export function Typical({ args, ...props }: { args: TypicalArg[] } & BoxProps) {
       }
     }
     type(
-      ref.current!,
+      elementRef.current!,
       ...args.flatMap((arg) => [check, arg]),
       type
     ).catch(() => {});
@@ -22,5 +26,5 @@ export function Typical({ args, ...props }: { args: TypicalArg[] } & BoxProps) {
       alive = false;
     };
   }, [JSON.stringify(args)]);
-  return <Box {...props} ref={ref} />;
-}
+  return <Box {...props} ref={useMergeRefs(elementRef, ref)} />;
+});
