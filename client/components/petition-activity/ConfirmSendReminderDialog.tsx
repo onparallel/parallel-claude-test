@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmSendReminderDialog({ ...props }: DialogProps<void>) {
+export function ConfirmSendReminderDialog({ ...props }: DialogProps) {
   return (
     <ConfirmDialog
       header={

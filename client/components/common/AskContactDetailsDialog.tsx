@@ -23,12 +23,14 @@ export type ContactDetailsFormData = {
   lastName: string | null;
 };
 
+export type AskContactDetailsDialogResult = {
+  defaultEmail?: string;
+};
+
 export function AskContactDetailsDialog({
   defaultEmail,
   ...props
-}: {
-  defaultEmail?: string;
-} & DialogProps<ContactDetailsFormData>) {
+}: DialogProps<AskContactDetailsDialogResult, ContactDetailsFormData>) {
   const intl = useIntl();
   const { handleSubmit, register, errors } = useForm<ContactDetailsFormData>({
     defaultValues: { email: defaultEmail ?? "", firstName: "", lastName: "" },

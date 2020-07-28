@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmDeleteFieldDialog({ ...props }: DialogProps<void>) {
+export function ConfirmDeleteFieldDialog({ ...props }: DialogProps) {
   return (
     <ConfirmDialog
       header={

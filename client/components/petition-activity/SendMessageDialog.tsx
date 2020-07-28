@@ -11,13 +11,15 @@ import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
-export function SendMessageDialogDialog({
-  ...props
-}: DialogProps<{
+export type SendMessageDialogDialogResult = {
   subject: string;
   body: RichTextEditorContent;
   scheduledAt: Date | null;
-}>) {
+};
+
+export function SendMessageDialogDialog({
+  ...props
+}: DialogProps<{}, SendMessageDialogDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState<RichTextEditorContent>([

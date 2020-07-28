@@ -273,9 +273,9 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
 function ConfirmDeleteContacts({
   selected,
   ...props
-}: {
+}: DialogProps<{
   selected: ContactSelection[];
-} & DialogProps<void>) {
+}>) {
   const count = selected.length;
   const email = selected.length && selected[0].email;
   return (

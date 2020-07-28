@@ -40,11 +40,14 @@ export function CreatePetitionDialog({
   defaultName,
   defaultLocale,
   ...props
-}: { defaultName?: string; defaultLocale?: string } & DialogProps<{
-  name: string;
-  locale: PetitionLocale;
-  deadline: Date | null;
-}>) {
+}: DialogProps<
+  { defaultName?: string; defaultLocale?: string },
+  {
+    name: string;
+    locale: PetitionLocale;
+    deadline: Date | null;
+  }
+>) {
   const intl = useIntl();
   const {
     handleSubmit,

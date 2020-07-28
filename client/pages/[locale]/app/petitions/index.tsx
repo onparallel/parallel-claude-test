@@ -409,9 +409,12 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
 function ConfirmDeletePetitionsDialog({
   selected,
   ...props
-}: {
-  selected: PetitionSelection[];
-} & DialogProps<void>) {
+}: DialogProps<
+  {
+    selected: PetitionSelection[];
+  },
+  void
+>) {
   const count = selected.length;
   const name = selected.length && selected[0].name;
   return (

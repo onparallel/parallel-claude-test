@@ -16,7 +16,7 @@ import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTimePicker } from "../common/DateTimePicker";
 
-export function PetitionDeadlineDialog({ ...props }: DialogProps<Date>) {
+export function PetitionDeadlineDialog({ ...props }: DialogProps<{}, Date>) {
   // next friday at 18:00
   const defaultDeadline = parse(
     "18:00",

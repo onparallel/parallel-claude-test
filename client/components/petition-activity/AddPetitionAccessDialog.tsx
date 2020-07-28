@@ -4,38 +4,42 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { Maybe } from "@parallel/utils/types";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import {
   Recipient,
   RecipientSelect,
   RecipientSelectProps,
 } from "../common/RecipientSelect";
 import { RichTextEditorContent } from "../common/RichTextEditor";
-import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
-import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 import {
   PetitionRemindersConfig,
   RemindersConfig,
 } from "../petition-compose/PetitionRemindersConfig";
-import { Maybe } from "@parallel/utils/types";
+import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
-export function AddPetitionAccessDialog({
-  onSearchContacts,
-  onCreateContact,
-  ...props
-}: {
+export type AddPettionAccessDialogProps = {
   onSearchContacts: RecipientSelectProps["onSearchContacts"];
   onCreateContact: RecipientSelectProps["onCreateContact"];
-} & DialogProps<{
+};
+
+export type AddPettionAccessDialogResult = {
   recipientIds: string[];
   subject: string;
   body: RichTextEditorContent;
   remindersConfig: Maybe<RemindersConfig>;
   scheduledAt: Maybe<Date>;
-}>) {
+};
+
+export function AddPetitionAccessDialog({
+  onSearchContacts,
+  onCreateContact,
+  ...props
+}: DialogProps<AddPettionAccessDialogProps, AddPettionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [subject, setSubject] = useState("");

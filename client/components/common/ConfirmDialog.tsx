@@ -14,17 +14,17 @@ import { ReactNode, RefObject, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { DialogProps } from "./DialogOpenerProvider";
 
-export type ConfirmDialogProps<T> = {
+export type ConfirmDialogProps<TResult> = {
   header: ReactNode;
   body: ReactNode;
   confirm: ReactNode;
   cancel?: ReactNode;
   initialFocusRef?: RefObject<any>;
   content?: BoxProps;
-} & DialogProps<T> &
+} & DialogProps<{}, TResult> &
   Omit<ModalProps, "children" | "isOpen" | "initialFocusRef" | "onClose">;
 
-export function ConfirmDialog<T = void>({
+export function ConfirmDialog<TResult = void>({
   header,
   body,
   confirm,
@@ -34,7 +34,7 @@ export function ConfirmDialog<T = void>({
   onReject,
   content,
   ...props
-}: ConfirmDialogProps<T>) {
+}: ConfirmDialogProps<TResult>) {
   const cancelRef = useRef<HTMLButtonElement>(null);
   return (
     <Modal

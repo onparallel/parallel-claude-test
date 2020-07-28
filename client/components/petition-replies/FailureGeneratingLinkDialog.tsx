@@ -6,12 +6,14 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 
+export type FailureGeneratingLinkDialogProps = {
+  filename: string;
+};
+
 export function FailureGeneratingLinkDialog({
   filename,
   ...props
-}: {
-  filename: string;
-} & DialogProps<string>) {
+}: DialogProps<FailureGeneratingLinkDialogProps>) {
   return (
     <ConfirmDialog
       header={

@@ -20,7 +20,7 @@ import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTimePicker } from "../common/DateTimePicker";
 
-export function ScheduleMessageDialog({ ...props }: DialogProps<Date>) {
+export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
   const [date, setDate] = useState<Date>(
     roundToNearestMinutes(addHours(new Date(), 1), { nearestTo: 5 })
   );

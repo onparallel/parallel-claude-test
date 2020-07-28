@@ -9,7 +9,7 @@ import { FormattedMessage } from "react-intl";
 export function ConfirmDeactivateAccessDialog({
   nameOrEmail,
   ...props
-}: { nameOrEmail: string } & DialogProps<void>) {
+}: DialogProps<{ nameOrEmail: string }>) {
   return (
     <ConfirmDialog
       header={

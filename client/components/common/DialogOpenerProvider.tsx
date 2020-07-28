@@ -5,37 +5,37 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useMemo,
   useState,
   ReactElement,
 } from "react";
+import { omitThemingProps } from "@chakra-ui/core";
 
-export type DialogProps<T = void> = {
-  onResolve: (value?: T) => void;
+type DialogCallbacks<TResult = void> = {
+  onResolve: (value?: TResult) => void;
   onReject: (reason?: any) => void;
 };
 
-export type Dialog<TProps, TResult> = ComponentType<
-  TProps & DialogProps<TResult>
->;
+export type DialogProps<TProps = {}, TResult = void> = TProps &
+  DialogCallbacks<TResult>;
 
-export type DialogOpener = <TResult>(
+export type DialogOpener = <TProps = {}, TResult = void>(
   opener: (
-    callbacks: DialogProps<TResult>
-  ) => ReactElement<DialogProps<TResult>>
+    callbacks: DialogCallbacks<TResult>
+  ) => ReactElement<DialogProps<TProps, TResult>>
 ) => Promise<TResult>;
 
-export const DialogOpenerContext = createContext<{
-  opener: DialogOpener;
-}>(null as any);
+export const DialogOpenerContext = createContext<DialogOpener | null>(null);
+// export const DialogCallbacksContext = createContext<DialogCallbacks<any>>();
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
-  const { opener } = useContext(DialogOpenerContext);
+export function useDialog<TProps = {}, TResult = void>(
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Dialog: ComponentType<DialogProps<TProps, TResult>>
+): (props: Omit<TProps, keyof DialogCallbacks>) => Promise<TResult> {
+  const opener = useContext(DialogOpenerContext)!;
   return useCallback(
-    (props: TProps) =>
-      opener((callbacks: DialogProps<TResult>) => (
-        <Dialog {...callbacks} {...props} />
+    (props: Omit<TProps, keyof DialogCallbacks>) =>
+      opener((callbacks: DialogCallbacks<TResult>) => (
+        <Dialog {...callbacks} {...(props as any)} />
       )),
     [Dialog]
   );
@@ -43,28 +43,23 @@ export function useDialog<TProps, TResult>(Dialog: Dialog<TProps, TResult>) {
 
 export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   const [stack, setStack] = useState<ReactElement[]>([]);
-  const value = useMemo(
-    () => ({
-      opener: function (opener) {
-        return new Promise((resolve, reject) => {
-          const dialog = opener({
-            onResolve: (result) => {
-              setStack((stack) => stack.slice(0, -1));
-              resolve(result as any);
-            },
-            onReject: (reason?: any) => {
-              setStack((stack) => stack.slice(0, -1));
-              reject(reason);
-            },
-          });
-          setStack((stack) => [...stack, dialog]);
-        });
-      } as DialogOpener,
-    }),
-    []
-  );
+  const opener = useCallback<DialogOpener>(function (createDialog) {
+    return new Promise((resolve, reject) => {
+      const dialog = createDialog({
+        onResolve: (result) => {
+          setStack((stack) => stack.slice(0, -1));
+          resolve(result as any);
+        },
+        onReject: (reason?: any) => {
+          setStack((stack) => stack.slice(0, -1));
+          reject(reason);
+        },
+      });
+      setStack((stack) => [...stack, dialog]);
+    });
+  }, []);
   return (
-    <DialogOpenerContext.Provider value={value}>
+    <DialogOpenerContext.Provider value={opener}>
       {children}
       {stack.map((dialog, index) => cloneElement(dialog, { key: index }))}
     </DialogOpenerContext.Provider>

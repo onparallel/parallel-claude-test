@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
-export function CompletedPetitionDialog({ ...props }: DialogProps<void>) {
+export function CompletedPetitionDialog({ ...props }: DialogProps) {
   const focusRef = useRef(null);
   const router = useRouter();
   return (

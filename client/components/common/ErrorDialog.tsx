@@ -7,10 +7,14 @@ import {
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
+export type ErrorDialogProps = {
+  message: ReactNode;
+};
+
 export function ErrorDialog({
   message,
   ...props
-}: { message: ReactNode } & DialogProps<void>) {
+}: DialogProps<ErrorDialogProps>) {
   const focusRef = useRef(null);
   return (
     <ConfirmDialog

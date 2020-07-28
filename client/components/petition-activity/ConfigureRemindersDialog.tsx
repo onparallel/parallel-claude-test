@@ -9,16 +9,20 @@ import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersCo
 import { useState } from "react";
 import { RemindersConfig, Maybe } from "@parallel/graphql/__types";
 
+export type ConfigureRemindersDialogProps = {
+  defaultConfig: Maybe<RemindersConfig>;
+  enabled: boolean;
+};
+
+export type ConfigureRemindersDialogResult = {
+  remindersConfig: Maybe<RemindersConfig>;
+};
+
 export function ConfigureRemindersDialog({
   defaultConfig,
   enabled,
   ...props
-}: {
-  defaultConfig: Maybe<RemindersConfig>;
-  enabled: boolean;
-} & DialogProps<{
-  remindersConfig: Maybe<RemindersConfig>;
-}>) {
+}: DialogProps<ConfigureRemindersDialogProps, ConfigureRemindersDialogResult>) {
   const [reminderIsActive, setActive] = useState<boolean>(enabled);
   const [remindersConfig, setConfig] = useState<Maybe<RemindersConfig>>(
     defaultConfig

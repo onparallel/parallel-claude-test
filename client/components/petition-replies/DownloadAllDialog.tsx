@@ -15,14 +15,14 @@ import {
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
 
-export type DownloadAllDialogProps = DialogProps<string> & {
+export type DownloadAllDialogProps = {
   fields: DownloadAllDialog_PetitionFieldFragment[];
 };
 
 export function DownloadAllDialog({
   fields,
   ...props
-}: DownloadAllDialogProps) {
+}: DialogProps<DownloadAllDialogProps, string>) {
   const intl = useIntl();
   const [option, setOption] = useState<"ORIGINAL" | "RENAME">("RENAME");
   const [pattern, setPattern] = useState("#field-number#_#field-title#");
@@ -134,11 +134,11 @@ export function DownloadAllDialog({
           </Text>
           <RadioGroup
             marginTop={2}
-            onChange={(option) => {
+            onChange={(option: string) => {
               if (option === "RENAME") {
                 setTimeout(() => inputRef.current?.focus());
               }
-              setOption(option);
+              setOption(option as any);
             }}
             value={option}
           >

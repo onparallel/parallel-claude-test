@@ -6,9 +6,7 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import { FormattedMessage } from "react-intl";
 
-export function ConfirmCancelScheduledMessageDialog({
-  ...props
-}: DialogProps<void>) {
+export function ConfirmCancelScheduledMessageDialog({ ...props }: DialogProps) {
   return (
     <ConfirmDialog
       header={
