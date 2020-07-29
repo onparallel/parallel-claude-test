@@ -216,7 +216,7 @@ type Mutation {
   createPetition(
     deadline: DateTime
     locale: PetitionLocale!
-    name: String!
+    name: String
   ): Petition!
 
   """

@@ -259,7 +259,7 @@ export type MutationcreateContactArgs = {
 export type MutationcreatePetitionArgs = {
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
-  name: Scalars["String"];
+  name?: Maybe<Scalars["String"]>;
 };
 
 export type MutationcreatePetitionFieldArgs = {
@@ -2673,7 +2673,7 @@ export type useCreateContact_createContactMutation = {
 };
 
 export type useCreatePetition_createPetitionMutationVariables = Exact<{
-  name: Scalars["String"];
+  name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
 }>;
@@ -6894,7 +6894,7 @@ export type useCreateContact_createContactMutationOptions = ApolloReactCommon.Ba
 >;
 export const useCreatePetition_createPetitionDocument = gql`
   mutation useCreatePetition_createPetition(
-    $name: String!
+    $name: String
     $locale: PetitionLocale!
     $deadline: DateTime
   ) {

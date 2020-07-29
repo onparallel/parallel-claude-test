@@ -43,7 +43,7 @@ export const createPetition = mutationField("createPetition", {
   type: "Petition",
   authorize: authenticate(),
   args: {
-    name: stringArg({ required: true }),
+    name: stringArg(),
     locale: arg({ type: "PetitionLocale", required: true }),
     deadline: dateTimeArg({}),
   },
@@ -561,13 +561,11 @@ export const sendPetition = mutationField("sendPetition", {
         ctx.user!
       );
 
-      if (petition.status === "DRAFT") {
-        await ctx.petitions.updatePetition(
-          petitionId,
-          { status: "PENDING" },
-          ctx.user!
-        );
-      }
+      await ctx.petitions.updatePetition(
+        petitionId,
+        { name: petition.name ?? args.subject, status: "PENDING" },
+        ctx.user!
+      );
 
       if (!args.scheduledAt) {
         await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));

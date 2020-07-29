@@ -18,7 +18,7 @@ export function useCreatePetition() {
   >(
     gql`
       mutation useCreatePetition_createPetition(
-        $name: String!
+        $name: String
         $locale: PetitionLocale!
         $deadline: DateTime
       ) {
@@ -38,15 +38,19 @@ export function useCreatePetition() {
     }
   );
 
-  const showCreatePetitionDialog = useCreatePetitionDialog();
+  // const showCreatePetitionDialog = useCreatePetitionDialog();
 
   return useCallback(
     async function () {
-      const { name, locale, deadline } = await showCreatePetitionDialog({
-        defaultLocale: query.locale as PetitionLocale,
-      });
+      // const { name, locale, deadline } = await showCreatePetitionDialog({
+      //   defaultLocale: query.locale as PetitionLocale,
+      // });
       const { data, errors } = await createPetition({
-        variables: { name, locale, deadline: deadline?.toISOString() ?? null },
+        variables: {
+          name: null,
+          locale: query.locale as PetitionLocale,
+          deadline: null,
+        },
       });
       if (errors) {
         throw errors;

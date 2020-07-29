@@ -757,7 +757,7 @@ export interface NexusGenArgTypes {
       // args
       deadline?: Date | null; // DateTime
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-      name: string; // String!
+      name?: string | null; // String
     };
     createPetitionField: {
       // args

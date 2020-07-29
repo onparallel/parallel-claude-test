@@ -93,8 +93,6 @@ function Petitions() {
     })
   );
 
-  const createPetition = useCreatePetition();
-
   const [deletePetition] = usePetitions_deletePetitionsMutation({
     update(cache) {
       clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
@@ -102,7 +100,6 @@ function Petitions() {
     },
   });
 
-  const createPetitionDialog = useCreatePetitionDialog();
   const [clonePetition] = usePetitions_clonePetitionMutation({
     update(cache) {
       // clear caches where new item would appear
@@ -147,6 +144,7 @@ function Petitions() {
     [petitions, selected]
   );
 
+  const createPetitionDialog = useCreatePetitionDialog();
   const handleCloneClick = useCallback(
     async function () {
       try {
@@ -174,6 +172,7 @@ function Petitions() {
     [petitions, selected]
   );
 
+  const createPetition = useCreatePetition();
   const handleCreateClick = useCallback(async function () {
     try {
       const id = await createPetition();
