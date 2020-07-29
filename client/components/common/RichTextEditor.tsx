@@ -27,7 +27,6 @@ import {
   toggleList,
   toggleMark,
   UnderlinePlugin,
-  withList,
 } from "@udecode/slate-plugins";
 import { createElement, CSSProperties, memo, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -137,14 +136,7 @@ export function RichTextEditor({
     isReadOnly,
   });
   const editor = useMemo(
-    () =>
-      pipe(
-        createEditor(),
-        withHistory,
-        withReact,
-        withList(options),
-        withAutolist(options)
-      ),
+    () => pipe(createEditor(), withHistory, withReact, withAutolist(options)),
     []
   );
 

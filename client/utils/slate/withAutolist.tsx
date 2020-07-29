@@ -1,12 +1,12 @@
 import {
   getRangeFromBlockStart,
   getText,
+  ListPluginOptions,
   toggleList,
-  WithListOptions,
 } from "@udecode/slate-plugins";
 import { Editor, Range, Transforms } from "slate";
 
-export function withAutolist(options: WithListOptions) {
+export function withAutolist(options: ListPluginOptions) {
   return <T extends Editor>(editor: T) => {
     // https://github.com/udecode/slate-plugins/blob/78b7dc4e230ef09b84f963cc51937d19ce0cf9a9/packages/slate-plugins/src/handlers/autoformat/withAutoformat.ts
     const { insertText } = editor;
