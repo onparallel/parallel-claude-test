@@ -132,7 +132,7 @@ export const PetitionComposeField = Object.assign(
               defaultMessage: "Drag to sort this petition fields",
             })}
           >
-            <DragHandleIcon focusable={false} role="presentation" />
+            <DragHandleIcon role="presentation" />
           </Box>
           {field.optional ? null : (
             <Box marginX={-2} position="relative">

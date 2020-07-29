@@ -38,12 +38,7 @@ export function PetitionFieldTypeIndicator({
         alignItems="center"
         {...props}
       >
-        <PetitionFieldTypeIcon
-          type={type}
-          boxSize="16px"
-          focusable={false}
-          role="presentation"
-        />
+        <PetitionFieldTypeIcon type={type} boxSize="16px" role="presentation" />
         <Text as="span" fontSize="xs" marginLeft={2}>
           <FormattedNumber value={index + 1} />
         </Text>
