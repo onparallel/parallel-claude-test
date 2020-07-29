@@ -28,11 +28,6 @@ export const SearchInput = forwardRef(function SearchInput(
   const [focused, bind] = useFocus<HTMLInputElement>(props);
   const isActive = Boolean(props.value || focused);
 
-  const clearLabel = intl.formatMessage({
-    id: "component.input.clear-button",
-    defaultMessage: "Clear",
-  });
-
   function handleClearClick() {
     const input = inputRef.current!;
     setNativeValue(input, "");
@@ -80,8 +75,10 @@ export const SearchInput = forwardRef(function SearchInput(
         <InputRightElement>
           <CloseButton
             tabIndex={-1}
-            title={clearLabel}
-            aria-label={clearLabel}
+            aria-label={intl.formatMessage({
+              id: "generic.clear",
+              defaultMessage: "Clear",
+            })}
             size="sm"
             onClick={handleClearClick}
           />

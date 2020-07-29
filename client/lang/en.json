@@ -15,73 +15,73 @@
     "term": "component.contact-list-header.actions-button",
     "definition": "Actions",
     "context": "Actions",
-    "reference": "components/contact-list/ContactListHeader.tsx#L72-L75"
+    "reference": "components/contact-list/ContactListHeader.tsx#L73-L76"
   },
   {
     "term": "component.contact-list-header.create-contact-button",
     "definition": "Create contact",
     "context": "Create contact",
-    "reference": "components/contact-list/ContactListHeader.tsx#L80-L83"
+    "reference": "components/contact-list/ContactListHeader.tsx#L93-L96"
   },
   {
     "term": "component.contact-list-header.delete-label",
     "definition": "Delete selected",
     "context": "Delete selected",
-    "reference": "components/contact-list/ContactListHeader.tsx#L64-L67"
+    "reference": "components/contact-list/ContactListHeader.tsx#L82-L85"
   },
   {
     "term": "component.cookie-consent.accept-button",
     "definition": "Accept",
     "context": "Accept",
-    "reference": "components/public/layout/CookieConsent.tsx#L77-L80"
+    "reference": "components/public/layout/CookieConsent.tsx#L78-L81"
   },
   {
     "term": "component.cookie-consent.text",
     "definition": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>.",
     "context": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>.",
-    "reference": "components/public/layout/CookieConsent.tsx#L41-L60"
+    "reference": "components/public/layout/CookieConsent.tsx#L42-L61"
   },
   {
     "term": "component.copy-to-clipboard-button.copied-label",
     "definition": "Copied to clipboard!",
     "context": "Copied to clipboard!",
-    "reference": "components/common/CopyToClipboardButton.tsx#L29-L32"
+    "reference": "components/common/CopyToClipboardButton.tsx#L30-L33"
   },
   {
     "term": "component.copy-to-clipboard-button.copy-label",
     "definition": "Copy to clipboard",
     "context": "Copy to clipboard",
-    "reference": "components/common/CopyToClipboardButton.tsx#L25-L28"
+    "reference": "components/common/CopyToClipboardButton.tsx#L26-L29"
   },
   {
     "term": "component.create-petition-dialog.add-deadline",
     "definition": "Add a deadline",
     "context": "Add a deadline",
-    "reference": "components/petition-list/CreatePetitionDialog.tsx#L153-L156"
+    "reference": "components/petition-list/CreatePetitionDialog.tsx#L155-L158"
   },
   {
     "term": "component.create-petition-dialog.continue-button",
     "definition": "Continue",
     "context": "Continue",
-    "reference": "components/petition-list/CreatePetitionDialog.tsx#L181-L184"
+    "reference": "components/petition-list/CreatePetitionDialog.tsx#L183-L186"
   },
   {
     "term": "component.create-petition-dialog.header",
     "definition": "Creating petition",
     "context": "Creating petition",
-    "reference": "components/petition-list/CreatePetitionDialog.tsx#L105-L108"
+    "reference": "components/petition-list/CreatePetitionDialog.tsx#L108-L111"
   },
   {
     "term": "component.create-petition-dialog.locale-label",
     "definition": "Language of the petition",
     "context": "Language of the petition",
-    "reference": "components/petition-list/CreatePetitionDialog.tsx#L133-L136"
+    "reference": "components/petition-list/CreatePetitionDialog.tsx#L135-L138"
   },
   {
     "term": "component.create-petition-dialog.name-label",
     "definition": "Give it an identifying name",
     "context": "Give it an identifying name",
-    "reference": "components/petition-list/CreatePetitionDialog.tsx#L115-L118"
+    "reference": "components/petition-list/CreatePetitionDialog.tsx#L118-L121"
   },
   {
     "term": "component.date-picker.next-month",
@@ -93,7 +93,7 @@
     "term": "component.date-picker.prev-month",
     "definition": "Previous month",
     "context": "Previous month",
-    "reference": "components/common/DatePicker.tsx#L73-L76"
+    "reference": "components/common/DatePicker.tsx#L74-L77"
   },
   {
     "term": "component.date-time.a-moment-ago",
@@ -111,7 +111,7 @@
     "term": "component.download-all-dialog.download-button",
     "definition": "Download files",
     "context": "Download files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L180-L183"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L179-L182"
   },
   {
     "term": "component.download-all-dialog.header",
@@ -123,13 +123,13 @@
     "term": "component.download-all-dialog.keep-original",
     "definition": "Keep the original name",
     "context": "Keep the original name",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L170-L173"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L169-L172"
   },
   {
     "term": "component.download-all-dialog.rename",
     "definition": "Rename files",
     "context": "Rename files",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L147-L150"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L146-L149"
   },
   {
     "term": "component.download-dialog.placeholder-contact-first-name",
@@ -165,31 +165,25 @@
     "term": "component.error-dialog.header",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/common/ErrorDialog.tsx#L21-L24"
+    "reference": "components/common/ErrorDialog.tsx#L25-L28"
   },
   {
     "term": "component.error-dialog.ok-button",
     "definition": "OK",
     "context": "OK",
-    "reference": "components/common/ErrorDialog.tsx#L34-L37"
-  },
-  {
-    "term": "component.input.clear-button",
-    "definition": "Clear",
-    "context": "Clear",
-    "reference": "utils/useReactSelectStyle.tsx#L66-L69"
+    "reference": "components/common/ErrorDialog.tsx#L38-L41"
   },
   {
     "term": "component.message-email-editor.body-placeholder",
     "definition": "Write a message to include in the email",
     "context": "Write a message to include in the email",
-    "reference": "components/petition-common/MessageEmailEditor.tsx#L66-L69"
+    "reference": "components/petition-common/MessageEmailEditor.tsx#L65-L68"
   },
   {
     "term": "component.message-email-editor.body-required-error",
     "definition": "Customizing the initial message improves the response time of the recipients",
     "context": "Customizing the initial message improves the response time of the recipients",
-    "reference": "components/petition-common/MessageEmailEditor.tsx#L72-L75"
+    "reference": "components/petition-common/MessageEmailEditor.tsx#L71-L74"
   },
   {
     "term": "component.message-email-editor.subject-label",
@@ -201,19 +195,19 @@
     "term": "component.message-email-editor.subject-placeholder",
     "definition": "Enter the subject of the email",
     "context": "Enter the subject of the email",
-    "reference": "components/petition-common/MessageEmailEditor.tsx#L50-L53"
+    "reference": "components/petition-common/MessageEmailEditor.tsx#L49-L52"
   },
   {
     "term": "component.message-email-editor.subject-required-error",
     "definition": "A subject helps the recipient understand the context of your petition",
     "context": "A subject helps the recipient understand the context of your petition",
-    "reference": "components/petition-common/MessageEmailEditor.tsx#L56-L59"
+    "reference": "components/petition-common/MessageEmailEditor.tsx#L55-L58"
   },
   {
     "term": "component.message-events-indicator.bounced-explanation",
     "definition": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
     "context": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid.",
-    "reference": "components/petition-activity/MessageEventsIndicator.tsx#L26-L30"
+    "reference": "components/petition-activity/MessageEventsIndicator.tsx#L27-L31"
   },
   {
     "term": "component.message-events-indicator.delivered-explanation",
@@ -231,91 +225,91 @@
     "term": "component.message-events-indicator.not-opened-explanation",
     "definition": "We haven't confirmed that the email has been opened yet.",
     "context": "We haven't confirmed that the email has been opened yet.",
-    "reference": "components/petition-activity/MessageEventsIndicator.tsx#L93-L98"
+    "reference": "components/petition-activity/MessageEventsIndicator.tsx#L92-L97"
   },
   {
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}",
-    "reference": "components/petition-activity/MessageEventsIndicator.tsx#L82-L85"
+    "reference": "components/petition-activity/MessageEventsIndicator.tsx#L81-L84"
   },
   {
     "term": "component.password-input.hide",
     "definition": "Hide",
     "context": "Hide",
-    "reference": "components/common/PasswordInput.tsx#L22-L25"
+    "reference": "components/common/PasswordInput.tsx#L23-L26"
   },
   {
     "term": "component.password-input.show",
     "definition": "Show",
     "context": "Show",
-    "reference": "components/common/PasswordInput.tsx#L26-L29"
+    "reference": "components/common/PasswordInput.tsx#L27-L30"
   },
   {
     "term": "component.petition-list-header.clone-label",
     "definition": "Clone petition",
     "context": "Clone petition",
-    "reference": "components/petition-list/PetitionListHeader.tsx#L86-L89"
+    "reference": "components/petition-list/PetitionListHeader.tsx#L100-L103"
   },
   {
     "term": "component.petition-list-header.create-petition-button",
     "definition": "Create petition",
     "context": "Create petition",
-    "reference": "components/petition-list/PetitionListHeader.tsx#L110-L113"
+    "reference": "components/petition-list/PetitionListHeader.tsx#L119-L122"
   },
   {
     "term": "component.petition-list-header.delete-label",
     "definition": "Delete selected",
     "context": "Delete selected",
-    "reference": "components/petition-list/PetitionListHeader.tsx#L94-L97"
+    "reference": "components/petition-list/PetitionListHeader.tsx#L108-L111"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
     "definition": "The recipient has not replied to any of the fields.",
     "context": "The recipient has not replied to any of the fields.",
-    "reference": "components/common/PetitionProgressBar.tsx#L91-L94"
+    "reference": "components/common/PetitionProgressBar.tsx#L88-L91"
   },
   {
     "term": "component.petition-progress-bar.completed",
     "definition": "This petition is completed.",
     "context": "This petition is completed.",
-    "reference": "components/common/PetitionProgressBar.tsx#L101-L104"
+    "reference": "components/common/PetitionProgressBar.tsx#L98-L101"
   },
   {
     "term": "component.petition-progress-bar.no-fields",
     "definition": "This petition has no fields.",
     "context": "This petition has no fields.",
-    "reference": "components/common/PetitionProgressBar.tsx#L81-L84"
+    "reference": "components/common/PetitionProgressBar.tsx#L78-L81"
   },
   {
     "term": "component.petition-progress-bar.not-replied",
     "definition": "{count, plural, =1{# field has} other {# fields have}} not been replied.",
     "context": "{count, plural, =1{# field has} other {# fields have}} not been replied.",
-    "reference": "components/common/PetitionProgressBar.tsx#L144-L148"
+    "reference": "components/common/PetitionProgressBar.tsx#L141-L147"
   },
   {
     "term": "component.petition-progress-bar.not-sent",
     "definition": "You haven't send this petition to anyone yet.",
     "context": "You haven't send this petition to anyone yet.",
-    "reference": "components/common/PetitionProgressBar.tsx#L71-L74"
+    "reference": "components/common/PetitionProgressBar.tsx#L68-L71"
   },
   {
     "term": "component.petition-progress-bar.optional",
     "definition": "{count, plural, =1{# field has not been replied but it is optional.} other {# fields have not been replied but they are optional.}}",
     "context": "{count, plural, =1{# field has not been replied but it is optional.} other {# fields have not been replied but they are optional.}}",
-    "reference": "components/common/PetitionProgressBar.tsx#L135-L139"
+    "reference": "components/common/PetitionProgressBar.tsx#L132-L136"
   },
   {
     "term": "component.petition-progress-bar.pending",
     "definition": "{count, plural, =1{# field has been replied.} other {# fields have been replied.}}",
     "context": "{count, plural, =1{# field has been replied.} other {# fields have been replied.}}",
-    "reference": "components/common/PetitionProgressBar.tsx#L126-L130"
+    "reference": "components/common/PetitionProgressBar.tsx#L123-L127"
   },
   {
     "term": "component.petition-progress-bar.validated",
     "definition": "{count, plural, =1{# field has} other {# fields have}} been filled and reviewed.",
     "context": "{count, plural, =1{# field has} other {# fields have}} been filled and reviewed.",
-    "reference": "components/common/PetitionProgressBar.tsx#L117-L121"
+    "reference": "components/common/PetitionProgressBar.tsx#L114-L118"
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",
@@ -339,55 +333,55 @@
     "term": "component.petition-status-filter.all",
     "definition": "All petitions",
     "context": "All petitions",
-    "reference": "components/common/PetitionStatusFilter.tsx#L26-L29"
+    "reference": "components/common/PetitionStatusFilter.tsx#L27-L30"
   },
   {
     "term": "component.petition-status-filter.completed",
     "definition": "Completed",
     "context": "Completed",
-    "reference": "components/common/PetitionStatusFilter.tsx#L38-L41"
+    "reference": "components/common/PetitionStatusFilter.tsx#L39-L42"
   },
   {
     "term": "component.petition-status-filter.draft",
     "definition": "Draft",
     "context": "Draft",
-    "reference": "components/common/PetitionStatusFilter.tsx#L30-L33"
+    "reference": "components/common/PetitionStatusFilter.tsx#L31-L34"
   },
   {
     "term": "component.petition-status-filter.pending",
     "definition": "Pending",
     "context": "Pending",
-    "reference": "components/common/PetitionStatusFilter.tsx#L34-L37"
+    "reference": "components/common/PetitionStatusFilter.tsx#L35-L38"
   },
   {
     "term": "component.placeholder-input.hint",
     "definition": "Press # to add replaceable placeholders",
     "context": "Press # to add replaceable placeholders",
-    "reference": "components/common/PlaceholderInput.tsx#L127-L130"
+    "reference": "components/common/PlaceholderInput.tsx#L178-L181"
   },
   {
     "term": "component.react-select.loading",
     "definition": "Loading...",
     "context": "Loading...",
-    "reference": "utils/useReactSelectStyle.tsx#L141-L144"
+    "reference": "utils/useReactSelectStyle.tsx#L140-L143"
   },
   {
     "term": "component.react-select.no-options",
     "definition": "No options",
     "context": "No options",
-    "reference": "utils/useReactSelectStyle.tsx#L128-L131"
+    "reference": "utils/useReactSelectStyle.tsx#L127-L130"
   },
   {
     "term": "component.recipient-select.create-new-contact",
     "definition": "Create new contact for: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>",
-    "reference": "components/common/RecipientSelect.tsx#L257-L268"
+    "reference": "components/common/RecipientSelect.tsx#L252-L263"
   },
   {
     "term": "component.recipient-select.enter-email",
     "definition": "You can also enter a valid email.",
     "context": "You can also enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L178-L181"
+    "reference": "components/common/RecipientSelect.tsx#L173-L176"
   },
   {
     "term": "component.recipient-select.existing-contact.description",
@@ -411,7 +405,7 @@
     "term": "component.recipient-select.no-options",
     "definition": "We could not find any exisiting contacts for <em>{search}</em>",
     "context": "We could not find any exisiting contacts for <em>{search}</em>",
-    "reference": "components/common/RecipientSelect.tsx#L168-L175"
+    "reference": "components/common/RecipientSelect.tsx#L163-L170"
   },
   {
     "term": "component.recipient-select.placeholder",
@@ -429,37 +423,31 @@
     "term": "component.recipient-select.search-hint",
     "definition": "Search for exisiting contacts or enter a valid email.",
     "context": "Search for exisiting contacts or enter a valid email.",
-    "reference": "components/common/RecipientSelect.tsx#L186-L189"
+    "reference": "components/common/RecipientSelect.tsx#L181-L184"
   },
   {
     "term": "component.search-input.placeholder",
     "definition": "Search...",
     "context": "Search...",
-    "reference": "components/common/SearchInput.tsx#L63-L66"
-  },
-  {
-    "term": "component.send-button.options",
-    "definition": "Options",
-    "context": "Options",
-    "reference": "components/petition-common/SendButton.tsx#L32-L35"
+    "reference": "components/common/SearchInput.tsx#L55-L58"
   },
   {
     "term": "component.send-button.schedule",
     "definition": "Schedule send",
     "context": "Schedule send",
-    "reference": "components/petition-common/SendButton.tsx#L41-L44"
+    "reference": "components/petition-common/SendButton.tsx#L66-L69"
   },
   {
     "term": "component.send-button.send",
     "definition": "Send",
     "context": "Send",
-    "reference": "components/petition-common/SendButton.tsx#L23-L26"
+    "reference": "components/petition-common/SendButton.tsx#L37-L40"
   },
   {
     "term": "component.send-petition-dialog.same-petition-warning",
     "definition": "Recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "Recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition-activity/AddPetitionAccessDialog.tsx#L109-L112"
+    "reference": "components/petition-activity/AddPetitionAccessDialog.tsx#L113-L116"
   },
   {
     "term": "component.table.next-page-button",
@@ -486,18 +474,6 @@
     "reference": "components/common/TablePage.tsx#L99-L107"
   },
   {
-    "term": "component.toggle-color-mode-button.toggle-dark",
-    "definition": "Toggle dark mode",
-    "context": "Toggle dark mode",
-    "reference": "components/common/ToggleColorModeButton.tsx#L19-L22"
-  },
-  {
-    "term": "component.toggle-color-mode-button.toggle-light",
-    "definition": "Toggle light mode",
-    "context": "Toggle light mode",
-    "reference": "components/common/ToggleColorModeButton.tsx#L23-L26"
-  },
-  {
     "term": "component.user-menu.log-out",
     "definition": "Log out",
     "context": "Log out",
@@ -519,31 +495,31 @@
     "term": "components.table.change-sorting",
     "definition": "Change sorting for \"{column}\"",
     "context": "Change sorting for \"{column}\"",
-    "reference": "components/common/Table.tsx#L509-L512"
+    "reference": "components/common/Table.tsx#L507-L510"
   },
   {
     "term": "components.table.sort by",
     "definition": "Sort by \"{column}\"",
     "context": "Sort by \"{column}\"",
-    "reference": "components/common/Table.tsx#L516-L519"
+    "reference": "components/common/Table.tsx#L514-L517"
   },
   {
     "term": "contact.edit-details-button",
     "definition": "Edit",
     "context": "Edit",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L200-L203"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L199-L202"
   },
   {
     "term": "contact.no-petitions",
     "definition": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
     "context": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L227-L231"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L226-L230"
   },
   {
     "term": "contact.petitions-header",
     "definition": "Petitions sent{name, select, null {} other { to {name}}}",
     "context": "Petitions sent{name, select, null {} other { to {name}}}",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L210-L214"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L209-L213"
   },
   {
     "term": "contacts.confirm-delete.body",
@@ -561,13 +537,13 @@
     "term": "contacts.create-new-contact.continue-button",
     "definition": "Continue",
     "context": "Continue",
-    "reference": "components/common/AskContactDetailsDialog.tsx#L115-L118"
+    "reference": "components/common/AskContactDetailsDialog.tsx#L112-L115"
   },
   {
     "term": "contacts.create-new-contact.header",
     "definition": "Enter the contact details",
     "context": "Enter the contact details",
-    "reference": "components/common/AskContactDetailsDialog.tsx#L54-L57"
+    "reference": "components/common/AskContactDetailsDialog.tsx#L56-L59"
   },
   {
     "term": "contacts.header.created-at",
@@ -657,121 +633,127 @@
     "term": "field-settings.file-multiple-description",
     "definition": "Enabling this allows the recipient to upload multiple files to this field.",
     "context": "Enabling this allows the recipient to upload multiple files to this field.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L88-L91"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L81-L84"
   },
   {
     "term": "field-settings.file-multiple-label",
     "definition": "Allow multiple file uploads",
     "context": "Allow multiple file uploads",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L74-L77"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L67-L70"
   },
   {
     "term": "field-settings.multiple-description",
     "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L93-L96"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L86-L89"
   },
   {
     "term": "field-settings.multiple-label",
     "definition": "Allow multiple replies",
     "context": "Allow multiple replies",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L79-L82"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L72-L75"
   },
   {
     "term": "field-settings.required-description",
     "definition": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
     "context": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L52-L55"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L45-L48"
   },
   {
     "term": "field-settings.required-label",
     "definition": "Required",
     "context": "Required",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L45-L48"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L38-L41"
   },
   {
     "term": "field-settings.text-multiline-description",
     "definition": "Enabling this will display a multi-line input field instead of a single line.",
     "context": "Enabling this will display a multi-line input field instead of a single line.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L162-L165"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L155-L158"
   },
   {
     "term": "field-settings.text-multiline-label",
     "definition": "Multi-line",
     "context": "Multi-line",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L155-L158"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L148-L151"
   },
   {
     "term": "field-settings.text-placeholder-description",
     "definition": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty.",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L193-L196"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L186-L189"
   },
   {
     "term": "field-settings.text-placeholder-label",
     "definition": "Placeholder",
     "context": "Placeholder",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L185-L188"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L178-L181"
   },
   {
     "term": "generic.actions-button",
     "definition": "Actions",
     "context": "Actions",
-    "reference": "components/petition-list/PetitionListHeader.tsx#L102-L105"
+    "reference": "components/petition-list/PetitionListHeader.tsx#L91-L94"
   },
   {
     "term": "generic.can-be-changed-later",
     "definition": "You can change these settings later",
     "context": "You can change these settings later",
-    "reference": "components/petition-list/CreatePetitionDialog.tsx#L171-L174"
+    "reference": "components/petition-list/CreatePetitionDialog.tsx#L173-L176"
   },
   {
     "term": "generic.cancel",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L340"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L363"
   },
   {
     "term": "generic.cancel-save-changes",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L174-L177"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L173-L176"
   },
   {
     "term": "generic.changes-saved",
     "definition": "Saved",
     "context": "Saved",
-    "reference": "components/layout/PetitionHeader.tsx#L197-L200"
+    "reference": "components/layout/PetitionHeader.tsx#L192-L195"
+  },
+  {
+    "term": "generic.clear",
+    "definition": "Clear",
+    "context": "Clear",
+    "reference": "utils/useReactSelectStyle.tsx#L67-L70"
   },
   {
     "term": "generic.close",
     "definition": "Close",
     "context": "Close",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L120-L123"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L124-L127"
   },
   {
     "term": "generic.collapse",
     "definition": "Collapse",
     "context": "Collapse",
-    "reference": "components/common/Table.tsx#L172-L175"
+    "reference": "components/common/Table.tsx#L173-L176"
   },
   {
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L517-L521"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L483-L487"
   },
   {
     "term": "generic.confirm-delete-button",
     "definition": "Yes, delete",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L438-L441"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L441-L444"
   },
   {
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L307-L310"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L337-L340"
   },
   {
     "term": "generic.deleted-contact",
@@ -783,79 +765,79 @@
     "term": "generic.dropzone-allowed-types",
     "definition": "Only the following file types are allowed:",
     "context": "Only the following file types are allowed:",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L457-L460"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L423-L426"
   },
   {
     "term": "generic.dropzone-default",
     "definition": "Drag files here, or click to select them",
     "context": "Drag files here, or click to select them",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L490-L493"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L456-L459"
   },
   {
     "term": "generic.edit",
     "definition": "Edit",
     "context": "Edit",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L304"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L334"
   },
   {
     "term": "generic.edited-comment-indicator",
     "definition": "Edited",
     "context": "Edited",
-    "reference": "components/petition-replies/PetitionRepliesFieldComments.tsx#L269-L272"
+    "reference": "components/petition-replies/PetitionRepliesFieldComments.tsx#L272-L275"
   },
   {
     "term": "generic.expand",
     "definition": "Expand",
     "context": "Expand",
-    "reference": "components/common/Table.tsx#L176-L179"
+    "reference": "components/common/Table.tsx#L177-L180"
   },
   {
     "term": "generic.file-name",
     "definition": "File name",
     "context": "File name",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L74-L77"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L222-L225"
   },
   {
     "term": "generic.file-size",
     "definition": "File size",
     "context": "File size",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L70-L73"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L233-L236"
   },
   {
     "term": "generic.file-types.document",
     "definition": "Documents (.pdf, .doc, .docx)",
     "context": "Documents (.pdf, .doc, .docx)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L465-L468"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L431-L434"
   },
   {
     "term": "generic.file-types.image",
     "definition": "Images (.jpeg, .png, etc.)",
     "context": "Images (.jpeg, .png, etc.)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L470-L473"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L436-L439"
   },
   {
     "term": "generic.file-types.pdf",
     "definition": "PDF Documents",
     "context": "PDF Documents",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L480-L483"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L446-L449"
   },
   {
     "term": "generic.file-types.video",
     "definition": "Videos (.mp4, .avi, etc.)",
     "context": "Videos (.mp4, .avi, etc.)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L475-L478"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L441-L444"
   },
   {
     "term": "generic.for-example",
     "definition": "E.g. {example}",
     "context": "E.g. {example}",
-    "reference": "components/petition-replies/DownloadAllDialog.tsx#L162-L166"
+    "reference": "components/petition-replies/DownloadAllDialog.tsx#L161-L165"
   },
   {
     "term": "generic.forms.confirm-password-label",
     "definition": "Confirm password",
     "context": "Confirm password",
-    "reference": "pages/[locale]/forgot.tsx#L303-L306"
+    "reference": "pages/[locale]/forgot.tsx#L304-L307"
   },
   {
     "term": "generic.forms.email-label",
@@ -867,7 +849,7 @@
     "term": "generic.forms.email-placeholder",
     "definition": "name@example.com",
     "context": "name@example.com",
-    "reference": "components/common/AskContactDetailsDialog.tsx#L75-L78"
+    "reference": "components/common/AskContactDetailsDialog.tsx#L76-L79"
   },
   {
     "term": "generic.forms.first-name-label",
@@ -879,31 +861,31 @@
     "term": "generic.forms.invalid-email-error",
     "definition": "Please, enter a valid email",
     "context": "Please, enter a valid email",
-    "reference": "pages/[locale]/login.tsx#L231-L234"
+    "reference": "pages/[locale]/login.tsx#L230-L233"
   },
   {
     "term": "generic.forms.invalid-old-password-error",
     "definition": "Old password is incorrect",
     "context": "Old password is incorrect",
-    "reference": "pages/[locale]/app/settings/security.tsx#L122-L125"
+    "reference": "pages/[locale]/app/settings/security.tsx#L121-L124"
   },
   {
     "term": "generic.forms.invalid-verification-code",
     "definition": "The verification code is invalid",
     "context": "The verification code is invalid",
-    "reference": "pages/[locale]/forgot.tsx#L262-L265"
+    "reference": "pages/[locale]/forgot.tsx#L260-L263"
   },
   {
     "term": "generic.forms.last-name-label",
     "definition": "Last name",
     "context": "Last name",
-    "reference": "pages/[locale]/app/settings/account.tsx#L99-L102"
+    "reference": "pages/[locale]/app/settings/account.tsx#L98-L101"
   },
   {
     "term": "generic.forms.new-password-label",
     "definition": "New password",
     "context": "New password",
-    "reference": "pages/[locale]/login.tsx#L319-L322"
+    "reference": "pages/[locale]/login.tsx#L314-L317"
   },
   {
     "term": "generic.forms.old-password-label",
@@ -915,61 +897,61 @@
     "term": "generic.forms.password-label",
     "definition": "Password",
     "context": "Password",
-    "reference": "pages/[locale]/login.tsx#L343-L346"
+    "reference": "pages/[locale]/login.tsx#L341-L344"
   },
   {
     "term": "generic.forms.password-policy-error",
     "definition": "The password must have a least 8 characters",
     "context": "The password must have a least 8 characters",
-    "reference": "pages/[locale]/login.tsx#L334-L337"
+    "reference": "pages/[locale]/login.tsx#L328-L331"
   },
   {
     "term": "generic.forms.passwords-must-match",
     "definition": "Passwords must match",
     "context": "Passwords must match",
-    "reference": "pages/[locale]/login.tsx#L358-L361"
+    "reference": "pages/[locale]/login.tsx#L355-L358"
   },
   {
     "term": "generic.forms.required-field-error",
     "definition": "A value is required",
     "context": "A value is required",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L357-L360"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L324-L327"
   },
   {
     "term": "generic.forms.required-first-name-error",
     "definition": "First name is required",
     "context": "First name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L90-L93"
+    "reference": "pages/[locale]/app/settings/account.tsx#L89-L92"
   },
   {
     "term": "generic.forms.required-last-name-error",
     "definition": "Last name is required",
     "context": "Last name is required",
-    "reference": "pages/[locale]/app/settings/account.tsx#L112-L115"
+    "reference": "pages/[locale]/app/settings/account.tsx#L110-L113"
   },
   {
     "term": "generic.forms.required-old-password-error",
     "definition": "Old password is required",
     "context": "Old password is required",
-    "reference": "pages/[locale]/app/settings/security.tsx#L114-L117"
+    "reference": "pages/[locale]/app/settings/security.tsx#L113-L116"
   },
   {
     "term": "generic.forms.required-password-error",
     "definition": "Please, enter a password",
     "context": "Please, enter a password",
-    "reference": "pages/[locale]/login.tsx#L252-L255"
+    "reference": "pages/[locale]/login.tsx#L247-L250"
   },
   {
     "term": "generic.forms.required-verification-code",
     "definition": "The verification code is required",
     "context": "The verification code is required",
-    "reference": "pages/[locale]/forgot.tsx#L270-L273"
+    "reference": "pages/[locale]/forgot.tsx#L268-L271"
   },
   {
     "term": "generic.forms.verification-code-label",
     "definition": "Verification code",
     "context": "Verification code",
-    "reference": "pages/[locale]/forgot.tsx#L250-L253"
+    "reference": "pages/[locale]/forgot.tsx#L252-L255"
   },
   {
     "term": "generic.go-back-button",
@@ -981,7 +963,7 @@
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options...",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L317-L320"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L325-L328"
   },
   {
     "term": "generic.no-deadline",
@@ -993,7 +975,7 @@
     "term": "generic.no-description",
     "definition": "No description",
     "context": "No description",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L163-L166"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L169-L172"
   },
   {
     "term": "generic.not-specified",
@@ -1005,85 +987,85 @@
     "term": "generic.optional-field",
     "definition": "Optional",
     "context": "Optional",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L107-L110"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L92-L95"
   },
   {
     "term": "generic.petition-status.completed",
     "definition": "Completed",
     "context": "Completed",
-    "reference": "components/common/PetitionStatusIndicator.tsx#L26-L29"
+    "reference": "components/common/PetitionStatusIndicator.tsx#L27-L30"
   },
   {
     "term": "generic.petition-status.draft",
     "definition": "Draft",
     "context": "Draft",
-    "reference": "components/common/PetitionStatusIndicator.tsx#L18-L21"
+    "reference": "components/common/PetitionStatusIndicator.tsx#L19-L22"
   },
   {
     "term": "generic.petition-status.pending",
     "definition": "Pending",
     "context": "Pending",
-    "reference": "components/common/PetitionStatusIndicator.tsx#L22-L25"
+    "reference": "components/common/PetitionStatusIndicator.tsx#L23-L26"
   },
   {
     "term": "generic.reload-data",
     "definition": "Reload",
     "context": "Reload",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L275-L278"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L276-L279"
   },
   {
     "term": "generic.required-field",
     "definition": "Required field",
     "context": "Required field",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L78-L81"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L100-L103"
   },
   {
     "term": "generic.richtext.bold",
     "definition": "Bold",
     "context": "Bold",
-    "reference": "components/common/RichTextEditor.tsx#L196-L199"
+    "reference": "components/common/RichTextEditor.tsx#L211-L214"
   },
   {
     "term": "generic.richtext.italic",
     "definition": "Italic",
     "context": "Italic",
-    "reference": "components/common/RichTextEditor.tsx#L205-L208"
+    "reference": "components/common/RichTextEditor.tsx#L220-L223"
   },
   {
     "term": "generic.richtext.list",
     "definition": "Bullet list",
     "context": "Bullet list",
-    "reference": "components/common/RichTextEditor.tsx#L223-L226"
+    "reference": "components/common/RichTextEditor.tsx#L238-L241"
   },
   {
     "term": "generic.richtext.underline",
     "definition": "Underline",
     "context": "Underline",
-    "reference": "components/common/RichTextEditor.tsx#L214-L217"
+    "reference": "components/common/RichTextEditor.tsx#L229-L232"
   },
   {
     "term": "generic.save",
     "definition": "Save",
     "context": "Save",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L343"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L366"
   },
   {
     "term": "generic.save-changes",
     "definition": "Save",
     "context": "Save",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L188-L191"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L187-L190"
   },
   {
     "term": "generic.saving-changes",
     "definition": "Saving...",
     "context": "Saving...",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L183-L186"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L182-L185"
   },
   {
     "term": "generic.submit",
     "definition": "Submit",
     "context": "Submit",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L187"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L199-L202"
   },
   {
     "term": "generic.today-at",
@@ -1107,7 +1089,7 @@
     "term": "generic.untitled-field",
     "definition": "Untitled field",
     "context": "Untitled field",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L112-L115"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L116-L119"
   },
   {
     "term": "generic.untitled-petition",
@@ -1119,7 +1101,7 @@
     "term": "generic.you",
     "definition": "You",
     "context": "You",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L259"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L275"
   },
   {
     "term": "header.user-menu-button",
@@ -1131,241 +1113,241 @@
     "term": "navbar.change-language",
     "definition": "Change language",
     "context": "Change language",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L208-L211"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L211-L214"
   },
   {
     "term": "navbar.coming-soon",
     "definition": "Coming soon",
     "context": "Coming soon",
-    "reference": "components/layout/AppLayoutNavbarLink.tsx#L26-L29"
+    "reference": "components/layout/AppLayoutNavbarLink.tsx#L51-L54"
   },
   {
     "term": "navbar.contacts-link",
     "definition": "Contacts",
     "context": "Contacts",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L75-L78"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L82-L85"
   },
   {
     "term": "navbar.new-button",
     "definition": "Create a new petition",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L146-L149"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L152-L155"
   },
   {
     "term": "navbar.petitions-link",
     "definition": "Petitions",
     "context": "Petitions",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L57-L60"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L64-L67"
   },
   {
     "term": "navbar.start-tour",
     "definition": "Guide me around",
     "context": "Guide me around",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L237-L240"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L241-L244"
   },
   {
     "term": "navbar.templates-link",
     "definition": "Templates",
     "context": "Templates",
-    "reference": "components/layout/AppLayoutNavbar.tsx#L66-L69"
+    "reference": "components/layout/AppLayoutNavbar.tsx#L73-L76"
   },
   {
     "term": "petition-access.header",
     "definition": "Petition access control",
     "context": "Petition access control",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L88-L91"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L98-L101"
   },
   {
     "term": "petition-access.status-active",
     "definition": "Active",
     "context": "Active",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L201-L204"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L211-L214"
   },
   {
     "term": "petition-access.status-inactive",
     "definition": "Inactive",
     "context": "Inactive",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L208-L211"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L218-L221"
   },
   {
     "term": "petition-accesses.activate-access",
     "definition": "Reactivate access",
     "context": "Reactivate access",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L325-L328"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L332-L335"
   },
   {
     "term": "petition-accesses.contact-header",
     "definition": "Contact",
     "context": "Contact",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L185-L188"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L195-L198"
   },
   {
     "term": "petition-accesses.created-at-header",
     "definition": "Created at",
     "context": "Created at",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L265-L268"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L275-L278"
   },
   {
     "term": "petition-accesses.deactivate-access",
     "definition": "Remove access",
     "context": "Remove access",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L313-L316"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L321-L324"
   },
   {
     "term": "petition-accesses.deadline-header",
     "definition": "Deadline",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L272-L275"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L271-L274"
   },
   {
     "term": "petition-accesses.next-reminder-header",
     "definition": "Next reminder",
     "context": "Next reminder",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L218-L221"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L228-L231"
   },
   {
     "term": "petition-accesses.no-reminders-sent",
     "definition": "No reminders sent",
     "context": "No reminders sent",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L255-L258"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L265-L268"
   },
   {
     "term": "petition-accesses.progress-header",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L295-L298"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L294-L297"
   },
   {
     "term": "petition-accesses.reminder-settings",
     "definition": "Reminder settings",
     "context": "Reminder settings",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L130-L133"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L145-L148"
   },
   {
     "term": "petition-accesses.reminders-sent-header",
     "definition": "Reminders sent",
     "context": "Reminders sent",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L246-L249"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L256-L259"
   },
   {
     "term": "petition-accesses.send-message",
     "definition": "Send message",
     "context": "Send message",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L286-L289"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L296-L299"
   },
   {
     "term": "petition-accesses.send-reminder",
     "definition": "Send reminder",
     "context": "Send reminder",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L300-L303"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L309-L312"
   },
   {
     "term": "petition-accesses.status-header",
     "definition": "Status",
     "context": "Status",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L309-L312"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx#L308-L311"
   },
   {
     "term": "petition-replies.comment-pending.label",
     "definition": "Pending",
     "context": "Pending",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L288-L291"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L304-L307"
   },
   {
     "term": "petition-replies.download-all",
     "definition": "Download files",
     "context": "Download files",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L300-L303"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L301-L304"
   },
   {
     "term": "petition-replies.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment",
-    "reference": "components/petition-replies/PetitionRepliesFieldComments.tsx#L158-L161"
+    "reference": "components/petition-replies/PetitionRepliesFieldComments.tsx#L161-L164"
   },
   {
     "term": "petition-replies.pending-comment-popover",
     "definition": "Send all your pending comments at once to notify in a single email",
     "context": "Send all your pending comments at once to notify in a single email",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L280-L283"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L296-L299"
   },
   {
     "term": "petition-replies.petition-field-reply.approve",
     "definition": "Approve",
     "context": "Approve",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L295-L298"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L301-L304"
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
     "definition": "Download file",
     "context": "Download file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L185-L189"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L191-L195"
   },
   {
     "term": "petition-replies.petition-field-reply.file-preview",
     "definition": "Preview file",
     "context": "Preview file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L197-L201"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L203-L207"
   },
   {
     "term": "petition-replies.petition-field-reply.reject",
     "definition": "Reject",
     "context": "Reject",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L310-L313"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L316-L319"
   },
   {
     "term": "petition-replies.petition-field.no-replies",
     "definition": "There are no replies to this field yet",
     "context": "There are no replies to this field yet",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L244-L247"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L250-L253"
   },
   {
     "term": "petition-replies.submit-comments",
     "definition": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
     "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L287-L291"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L288-L292"
   },
   {
     "term": "petition-replies.validate-field-button",
     "definition": "Reviewed",
     "context": "Reviewed",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L136-L139"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L142-L145"
   },
   {
     "term": "petition-replies.validate-field-button.not-validated",
     "definition": "Not reviewed",
     "context": "Not reviewed",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L118-L121"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L124-L127"
   },
   {
     "term": "petition-replies.validate-field-button.validated",
     "definition": "Reviewed",
     "context": "Reviewed",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx#L114-L117"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx#L120-L123"
   },
   {
     "term": "petition.activity-not-available",
     "definition": "Once you send this petition, you will be able to see all the petition activity here.",
     "context": "Once you send this petition, you will be able to see all the petition activity here.",
-    "reference": "components/layout/PetitionHeader.tsx#L97-L100"
+    "reference": "components/layout/PetitionHeader.tsx#L85-L88"
   },
   {
     "term": "petition.add-another-field-button",
     "definition": "Add another field",
     "context": "Add another field",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L219-L222"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L220-L223"
   },
   {
     "term": "petition.add-contact-button",
     "definition": "Add contact",
     "context": "Add contact",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L149-L152"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L159-L162"
   },
   {
     "term": "petition.add-field-button",
     "definition": "Add field",
     "context": "Add field",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L247-L250"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L248-L251"
   },
   {
     "term": "petition.already-sent",
@@ -1377,7 +1359,7 @@
     "term": "petition.change-deadline",
     "definition": "Change deadline",
     "context": "Change deadline",
-    "reference": "components/petition-common/PetitionSettingsModal.tsx#L151-L154"
+    "reference": "components/petition-common/PetitionSettingsModal.tsx#L148-L151"
   },
   {
     "term": "petition.completed-petition-dialog.body",
@@ -1419,25 +1401,25 @@
     "term": "petition.confirm-cancel-scheduled-message.body",
     "definition": "Are you sure you want to cancel this message?",
     "context": "Are you sure you want to cancel this message?",
-    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L21-L24"
+    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L19-L22"
   },
   {
     "term": "petition.confirm-cancel-scheduled-message.cancel",
     "definition": "No, continue",
     "context": "No, continue",
-    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L36-L39"
+    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L34-L37"
   },
   {
     "term": "petition.confirm-cancel-scheduled-message.confirm",
     "definition": "Yes, cancel message",
     "context": "Yes, cancel message",
-    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L28-L31"
+    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L26-L29"
   },
   {
     "term": "petition.confirm-cancel-scheduled-message.header",
     "definition": "Cancel scheduled message",
     "context": "Cancel scheduled message",
-    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L15-L18"
+    "reference": "components/petition-activity/ConfirmCancelScheduledMessageDialog.tsx#L13-L16"
   },
   {
     "term": "petition.confirm-deactivate-access-message.body",
@@ -1497,73 +1479,73 @@
     "term": "petition.drag-to-sort-label",
     "definition": "Drag to sort this petition fields",
     "context": "Drag to sort this petition fields",
-    "reference": "components/petition-compose/PetitionComposeField.tsx#L143-L146"
+    "reference": "components/petition-compose/PetitionComposeField.tsx#L130-L133"
   },
   {
     "term": "petition.empty-header",
     "definition": "What information do you want us to collect?",
     "context": "What information do you want us to collect?",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L229-L232"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L230-L233"
   },
   {
     "term": "petition.empty-text",
     "definition": "Let's add our first field",
     "context": "Let's add our first field",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L235-L238"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L236-L239"
   },
   {
     "term": "petition.field-delete-button",
     "definition": "Delete field",
     "context": "Delete field",
-    "reference": "components/petition-compose/PetitionComposeField.tsx#L286-L289"
+    "reference": "components/petition-compose/PetitionComposeField.tsx#L271-L274"
   },
   {
     "term": "petition.field-description-label",
     "definition": "Field description",
     "context": "Field description",
-    "reference": "components/petition-compose/PetitionComposeField.tsx#L231-L234"
+    "reference": "components/petition-compose/PetitionComposeField.tsx#L216-L219"
   },
   {
     "term": "petition.field-description-placeholder",
     "definition": "Add a description...",
     "context": "Add a description...",
-    "reference": "components/petition-compose/PetitionComposeField.tsx#L227-L230"
+    "reference": "components/petition-compose/PetitionComposeField.tsx#L212-L215"
   },
   {
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings",
-    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L37-L40"
+    "reference": "components/petition-compose/PetitionComposeFieldSettings.tsx#L30-L33"
   },
   {
     "term": "petition.field-title-label",
     "definition": "Field title",
     "context": "Field title",
-    "reference": "components/petition-compose/PetitionComposeField.tsx#L194-L197"
+    "reference": "components/petition-compose/PetitionComposeField.tsx#L179-L182"
   },
   {
     "term": "petition.field-title-placeholder",
     "definition": "Enter a field title",
     "context": "Enter a field title",
-    "reference": "components/petition-compose/PetitionComposeField.tsx#L198-L201"
+    "reference": "components/petition-compose/PetitionComposeField.tsx#L183-L186"
   },
   {
     "term": "petition.field-type.file-upload",
     "definition": "File Upload",
     "context": "File Upload",
-    "reference": "components/petition-compose/AddFieldPopover.tsx#L29-L32"
+    "reference": "components/petition-compose/AddFieldPopover.tsx#L30-L33"
   },
   {
     "term": "petition.field-type.text",
     "definition": "Text field",
     "context": "Text field",
-    "reference": "components/petition-compose/AddFieldPopover.tsx#L33-L36"
+    "reference": "components/petition-compose/AddFieldPopover.tsx#L34-L37"
   },
   {
     "term": "petition.fields-header",
     "definition": "This is the information that you need",
     "context": "This is the information that you need",
-    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L190-L193"
+    "reference": "components/petition-compose/PetitionComposeFieldList.tsx#L191-L194"
   },
   {
     "term": "petition.header.activity-tab",
@@ -1581,7 +1563,7 @@
     "term": "petition.header.last-saved-on",
     "definition": "Last saved on: {date}",
     "context": "Last saved on: {date}",
-    "reference": "components/layout/PetitionHeader.tsx#L55-L58"
+    "reference": "components/layout/PetitionHeader.tsx#L175-L178"
   },
   {
     "term": "petition.header.replies-tab",
@@ -1617,19 +1599,19 @@
     "term": "petition.message-settings.header",
     "definition": "Who do you want to send it to?",
     "context": "Who do you want to send it to?",
-    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L91-L94"
+    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L92-L95"
   },
   {
     "term": "petition.message-settings.same-petition-warning",
     "definition": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively.",
-    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L110-L114"
+    "reference": "components/petition-compose/PetitionComposeMessageEditor.tsx#L111-L115"
   },
   {
     "term": "petition.name-label",
     "definition": "Petition name",
     "context": "Petition name",
-    "reference": "components/layout/PetitionHeader.tsx#L146-L149"
+    "reference": "components/layout/PetitionHeader.tsx#L133-L136"
   },
   {
     "term": "petition.no-fields-error",
@@ -1707,13 +1689,13 @@
     "term": "petition.reminder-settings-dialog.confirm",
     "definition": "Apply changes",
     "context": "Apply changes",
-    "reference": "components/petition-activity/ConfigureRemindersDialog.tsx#L55-L58"
+    "reference": "components/petition-activity/ConfigureRemindersDialog.tsx#L59-L62"
   },
   {
     "term": "petition.reminder-settings-dialog.header",
     "definition": "Configure automatic reminders",
     "context": "Configure automatic reminders",
-    "reference": "components/petition-activity/ConfigureRemindersDialog.tsx#L31-L34"
+    "reference": "components/petition-activity/ConfigureRemindersDialog.tsx#L35-L38"
   },
   {
     "term": "petition.reminder-settings-error.toast-body",
@@ -1755,25 +1737,25 @@
     "term": "petition.remove-deadline",
     "definition": "Remove deadline",
     "context": "Remove deadline",
-    "reference": "components/petition-common/PetitionSettingsModal.tsx#L132-L135"
+    "reference": "components/petition-common/PetitionSettingsModal.tsx#L129-L132"
   },
   {
     "term": "petition.replies-not-available",
     "definition": "Once you send this petition, you will be able to see all the replies here.",
     "context": "Once you send this petition, you will be able to see all the replies here.",
-    "reference": "components/layout/PetitionHeader.tsx#L81-L84"
+    "reference": "components/layout/PetitionHeader.tsx#L69-L72"
   },
   {
     "term": "petition.replies.download-file-error-dialog.body",
     "definition": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
     "context": "There was a problem generating the link for {filename}. This usually means that the upload from the user failed.",
-    "reference": "components/petition-replies/FailureGeneratingLinkDialog.tsx#L28-L34"
+    "reference": "components/petition-replies/FailureGeneratingLinkDialog.tsx#L30-L36"
   },
   {
     "term": "petition.replies.download-file-error-dialog.header",
     "definition": "Error downloading {filename}",
     "context": "Error downloading {filename}",
-    "reference": "components/petition-replies/FailureGeneratingLinkDialog.tsx#L18-L24"
+    "reference": "components/petition-replies/FailureGeneratingLinkDialog.tsx#L20-L26"
   },
   {
     "term": "petition.schedule-delivery.header",
@@ -1797,13 +1779,13 @@
     "term": "petition.send-message-header.header",
     "definition": "Send message",
     "context": "Send message",
-    "reference": "components/petition-activity/SendMessageDialog.tsx#L54-L57"
+    "reference": "components/petition-activity/SendMessageDialog.tsx#L56-L59"
   },
   {
     "term": "petition.set-a-deadline",
     "definition": "Set a deadline",
     "context": "Set a deadline",
-    "reference": "components/petition-common/PetitionSettingsModal.tsx#L156-L159"
+    "reference": "components/petition-common/PetitionSettingsModal.tsx#L153-L156"
   },
   {
     "term": "petition.set-deadline",
@@ -1815,31 +1797,31 @@
     "term": "petition.settings-button",
     "definition": "Petition settings",
     "context": "Petition settings",
-    "reference": "components/layout/PetitionHeader.tsx#L222-L225"
+    "reference": "components/layout/PetitionHeader.tsx#L217-L220"
   },
   {
     "term": "petition.settings-header",
     "definition": "Petition settings",
     "context": "Petition settings",
-    "reference": "components/petition-common/PetitionSettingsModal.tsx#L58-L61"
+    "reference": "components/petition-common/PetitionSettingsModal.tsx#L59-L62"
   },
   {
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error",
-    "reference": "components/layout/PetitionHeader.tsx#L205-L208"
+    "reference": "components/layout/PetitionHeader.tsx#L200-L203"
   },
   {
     "term": "petitions.confirm-delete.body",
     "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L426-L434"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L429-L437"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Delete petitions",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L420-L423"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L423-L426"
   },
   {
     "term": "petitions.header.created-at",
@@ -1887,7 +1869,7 @@
     "term": "petitions.no-reminders-left",
     "definition": "No reminders left",
     "context": "No reminders left",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L236-L239"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L246-L249"
   },
   {
     "term": "petitions.no-results",
@@ -1905,7 +1887,7 @@
     "term": "petitions.reminders-not-set",
     "definition": "Not set",
     "context": "Not set",
-    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L229-L232"
+    "reference": "components/petition-activity/PetitionAccessesTable.tsx#L239-L242"
   },
   {
     "term": "petitions.title",
@@ -1917,7 +1899,7 @@
     "term": "public.about-link",
     "definition": "About",
     "context": "About",
-    "reference": "components/public/layout/PublicHeader.tsx#L122"
+    "reference": "components/public/layout/PublicHeader.tsx#L97"
   },
   {
     "term": "public.about.mission",
@@ -1983,55 +1965,55 @@
     "term": "public.blog-link",
     "definition": "Blog",
     "context": "Blog",
-    "reference": "components/public/layout/PublicHeader.tsx#L127"
+    "reference": "components/public/layout/PublicHeader.tsx#L102"
   },
   {
     "term": "public.book-demo-button",
     "definition": "Book a demo",
     "context": "Book a demo",
-    "reference": "components/public/PublicMainHero.tsx#L106-L109"
+    "reference": "components/public/PublicMainHero.tsx#L96-L99"
   },
   {
     "term": "public.book-demo.basic-functions",
     "definition": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
     "context": "<b>Basic functions of our platform:</b> petitions, contacts and document management.",
-    "reference": "pages/[locale]/book-demo.tsx#L88-L94"
+    "reference": "pages/[locale]/book-demo.tsx#L76-L82"
   },
   {
     "term": "public.book-demo.checklist",
     "definition": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
     "context": "<b>How to send a checklist:</b> to several recipients, types of information fields.",
-    "reference": "pages/[locale]/book-demo.tsx#L97-L103"
+    "reference": "pages/[locale]/book-demo.tsx#L85-L91"
   },
   {
     "term": "public.book-demo.contact-soon",
     "definition": "Someone from our team will contact you as soon as possible.",
     "context": "Someone from our team will contact you as soon as possible.",
-    "reference": "pages/[locale]/book-demo.tsx#L68-L71"
+    "reference": "pages/[locale]/book-demo.tsx#L56-L59"
   },
   {
     "term": "public.book-demo.follow",
     "definition": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
     "context": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
-    "reference": "pages/[locale]/book-demo.tsx#L106-L112"
+    "reference": "pages/[locale]/book-demo.tsx#L94-L100"
   },
   {
     "term": "public.book-demo.other-functionalities",
     "definition": "<b>Other functionalities:</b> additional security layers, reminders.",
     "context": "<b>Other functionalities:</b> additional security layers, reminders.",
-    "reference": "pages/[locale]/book-demo.tsx#L124-L130"
+    "reference": "pages/[locale]/book-demo.tsx#L112-L118"
   },
   {
     "term": "public.book-demo.request-invite",
     "definition": "Book a demo!",
     "context": "Book a demo!",
-    "reference": "pages/[locale]/book-demo.tsx#L62-L65"
+    "reference": "pages/[locale]/book-demo.tsx#L50-L53"
   },
   {
     "term": "public.book-demo.review-and-download",
     "definition": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
     "context": "<b>Reviewing and downloading received information:</b> review completed checklists and download documents.",
-    "reference": "pages/[locale]/book-demo.tsx#L115-L121"
+    "reference": "pages/[locale]/book-demo.tsx#L103-L109"
   },
   {
     "term": "public.book-demo.title",
@@ -2043,73 +2025,73 @@
     "term": "public.book-demo.what-we-explain",
     "definition": "In this demo we will explain:",
     "context": "In this demo we will explain:",
-    "reference": "pages/[locale]/book-demo.tsx#L74-L77"
+    "reference": "pages/[locale]/book-demo.tsx#L62-L65"
   },
   {
     "term": "public.case.laura.centralized-information",
     "definition": "All the information always available in a single place on the cloud.",
     "context": "All the information always available in a single place on the cloud.",
-    "reference": "pages/[locale]/people.tsx#L180-L183"
+    "reference": "pages/[locale]/people.tsx#L181-L184"
   },
   {
     "term": "public.case.laura.client-anywhere",
     "definition": "The convenience for her clients, who now can upload their files at any time and from any device.",
     "context": "The convenience for her clients, who now can upload their files at any time and from any device.",
-    "reference": "pages/[locale]/people.tsx#L204-L207"
+    "reference": "pages/[locale]/people.tsx#L205-L208"
   },
   {
     "term": "public.case.laura.increased-billing",
     "definition": "In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>.",
     "context": "In just one month, Laura has managed to increase her billable hours and an <a>additional net income of € 1,500 per month</a>.",
-    "reference": "pages/[locale]/people.tsx#L147-L157"
+    "reference": "pages/[locale]/people.tsx#L148-L158"
   },
   {
     "term": "public.case.laura.non-billable",
     "definition": "All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients.",
     "context": "All these tasks add up to more than <a>20 hours a month</a> that Laura cannot bill to her clients.",
-    "reference": "pages/[locale]/people.tsx#L93-L103"
+    "reference": "pages/[locale]/people.tsx#L94-L104"
   },
   {
     "term": "public.case.laura.now-has",
     "definition": "Laura now has:",
     "context": "Laura now has:",
-    "reference": "pages/[locale]/people.tsx#L163-L166"
+    "reference": "pages/[locale]/people.tsx#L164-L167"
   },
   {
     "term": "public.case.laura.recently-discovered",
     "definition": "Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>.",
     "context": "Laura has recently discovered Parallel and is <a>regaining almost an hour a day</a>.",
-    "reference": "pages/[locale]/people.tsx#L123-L133"
+    "reference": "pages/[locale]/people.tsx#L124-L134"
   },
   {
     "term": "public.case.laura.register",
     "definition": "If you want to start using Parallel for free, register here.",
     "context": "If you want to start using Parallel for free, register here.",
-    "reference": "pages/[locale]/people.tsx#L213-L216"
+    "reference": "pages/[locale]/people.tsx#L214-L217"
   },
   {
     "term": "public.case.laura.reminders",
     "definition": "The peace of mind about not having to chase clients, because Parallel does it for her.",
     "context": "The peace of mind about not having to chase clients, because Parallel does it for her.",
-    "reference": "pages/[locale]/people.tsx#L192-L195"
+    "reference": "pages/[locale]/people.tsx#L193-L196"
   },
   {
     "term": "public.case.laura.time-spent",
     "definition": "Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work.",
     "context": "Laura spends <a>more than an hour everyday</a> requesting information and reviewing emails to make sure she has all the documents she needs to start her work.",
-    "reference": "pages/[locale]/people.tsx#L67-L77"
+    "reference": "pages/[locale]/people.tsx#L68-L78"
   },
   {
     "term": "public.case.laura.with-parallel",
     "definition": "With Parallel",
     "context": "With Parallel",
-    "reference": "pages/[locale]/people.tsx#L114-L117"
+    "reference": "pages/[locale]/people.tsx#L115-L118"
   },
   {
     "term": "public.case.laura.without-parallel",
     "definition": "Without Parallel",
     "context": "Without Parallel",
-    "reference": "pages/[locale]/people.tsx#L57-L60"
+    "reference": "pages/[locale]/people.tsx#L58-L61"
   },
   {
     "term": "public.claim.documents-organized",
@@ -2151,7 +2133,7 @@
     "term": "public.contact-link",
     "definition": "Contact",
     "context": "Contact",
-    "reference": "components/public/layout/PublicFooter.tsx#L130-L133"
+    "reference": "components/public/layout/PublicFooter.tsx#L134-L137"
   },
   {
     "term": "public.cookies.title",
@@ -2163,43 +2145,43 @@
     "term": "public.footer.company",
     "definition": "Company",
     "context": "Company",
-    "reference": "components/public/layout/PublicFooter.tsx#L109-L112"
+    "reference": "components/public/layout/PublicFooter.tsx#L113-L116"
   },
   {
     "term": "public.footer.language-select-label",
     "definition": "Change language",
     "context": "Change language",
-    "reference": "components/common/LanguageSelector.tsx#L41-L44"
+    "reference": "components/public/layout/PublicFooter.tsx#L191-L194"
   },
   {
     "term": "public.footer.legal-information",
     "definition": "Legal information",
     "context": "Legal information",
-    "reference": "components/public/layout/PublicFooter.tsx#L142-L145"
+    "reference": "components/public/layout/PublicFooter.tsx#L146-L149"
   },
   {
     "term": "public.footer.linkedin-profile",
     "definition": "LinkedIn profile",
     "context": "LinkedIn profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L210-L213"
+    "reference": "components/public/layout/PublicFooter.tsx#L229-L232"
   },
   {
     "term": "public.footer.product",
     "definition": "Product",
     "context": "Product",
-    "reference": "components/public/layout/PublicFooter.tsx#L59-L62"
+    "reference": "components/public/layout/PublicFooter.tsx#L63-L66"
   },
   {
     "term": "public.footer.support",
     "definition": "Support",
     "context": "Support",
-    "reference": "components/public/layout/PublicFooter.tsx#L79-L82"
+    "reference": "components/public/layout/PublicFooter.tsx#L83-L86"
   },
   {
     "term": "public.footer.twitter-profile",
     "definition": "Twitter profile",
     "context": "Twitter profile",
-    "reference": "components/public/layout/PublicFooter.tsx#L195-L198"
+    "reference": "components/public/layout/PublicFooter.tsx#L214-L217"
   },
   {
     "term": "public.forgot-password.explanation",
@@ -2217,7 +2199,7 @@
     "term": "public.forgot-password.login-link",
     "definition": "I remembered my password",
     "context": "I remembered my password",
-    "reference": "pages/[locale]/forgot.tsx#L187-L190"
+    "reference": "pages/[locale]/forgot.tsx#L186-L189"
   },
   {
     "term": "public.forgot-password.reset-button",
@@ -2229,13 +2211,13 @@
     "term": "public.forgot-password.reset-explanation",
     "definition": "Use the verification code in the email you have received.",
     "context": "Use the verification code in the email you have received.",
-    "reference": "pages/[locale]/forgot.tsx#L241-L244"
+    "reference": "pages/[locale]/forgot.tsx#L240-L243"
   },
   {
     "term": "public.forgot-password.reset-header",
     "definition": "Password reset",
     "context": "Password reset",
-    "reference": "pages/[locale]/forgot.tsx#L235-L238"
+    "reference": "pages/[locale]/forgot.tsx#L234-L237"
   },
   {
     "term": "public.forgot-password.reset-success-toast-description",
@@ -2253,7 +2235,7 @@
     "term": "public.forgot-password.send-button",
     "definition": "Send verification code",
     "context": "Send verification code",
-    "reference": "pages/[locale]/forgot.tsx#L179-L182"
+    "reference": "pages/[locale]/forgot.tsx#L178-L181"
   },
   {
     "term": "public.forgot-password.toast-description",
@@ -2319,25 +2301,25 @@
     "term": "public.home.hero-process",
     "definition": "Turn your document collection into a professional and scalable process.",
     "context": "Turn your document collection into a professional and scalable process.",
-    "reference": "components/public/PublicMainHero.tsx#L82-L85"
+    "reference": "components/public/PublicMainHero.tsx#L72-L75"
   },
   {
     "term": "public.home.hero-subtitle",
     "definition": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive.",
     "context": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive.",
-    "reference": "components/public/PublicMainHero.tsx#L76-L79"
+    "reference": "components/public/PublicMainHero.tsx#L66-L69"
   },
   {
     "term": "public.home.hero-title",
     "definition": "Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients",
     "context": "Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients",
-    "reference": "components/public/PublicMainHero.tsx#L43-L73"
+    "reference": "components/public/PublicMainHero.tsx#L43-L63"
   },
   {
     "term": "public.home.hero-try-now",
     "definition": "Try our secure and fast solution to manage documents.",
     "context": "Try our secure and fast solution to manage documents.",
-    "reference": "components/public/PublicMainHero.tsx#L114-L117"
+    "reference": "components/public/PublicMainHero.tsx#L104-L107"
   },
   {
     "term": "public.home.hero-who-trust-us",
@@ -2355,103 +2337,103 @@
     "term": "public.how-it-works-hero.client-timings",
     "definition": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
     "context": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L122-L125"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L113-L116"
   },
   {
     "term": "public.how-it-works-hero.create-request",
     "definition": "Create your request",
     "context": "Create your request",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L99-L102"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L90-L93"
   },
   {
     "term": "public.how-it-works-hero.description-1",
     "definition": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
     "context": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L75-L78"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L66-L69"
   },
   {
     "term": "public.how-it-works-hero.description-2",
     "definition": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
     "context": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L80-L83"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L71-L74"
   },
   {
     "term": "public.how-it-works-hero.focus-on-work",
     "definition": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
     "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L139-L142"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L130-L133"
   },
   {
     "term": "public.how-it-works-hero.receive-inbox",
     "definition": "Receive it on time in your inbox",
     "context": "Receive it on time in your inbox",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L133-L136"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L124-L127"
   },
   {
     "term": "public.how-it-works-hero.screenshot-1",
     "definition": "A screenshot of the app showing the creation of a petition.",
     "context": "A screenshot of the app showing the creation of a petition.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L27-L31"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L26-L30"
   },
   {
     "term": "public.how-it-works-hero.screenshot-2",
     "definition": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
     "context": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L36-L40"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L34-L38"
   },
   {
     "term": "public.how-it-works-hero.screenshot-3",
     "definition": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
     "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L45-L49"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L42-L46"
   },
   {
     "term": "public.how-it-works-hero.set-date",
     "definition": "Set a delivery deadline",
     "context": "Set a delivery deadline",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L116-L119"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L107-L110"
   },
   {
     "term": "public.how-it-works-hero.title",
     "definition": "How it works",
     "context": "How it works",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L69-L72"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L60-L63"
   },
   {
     "term": "public.how-it-works-hero.user-friendly",
     "definition": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
     "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
-    "reference": "components/public/PublicHowItWorksHero.tsx#L105-L108"
+    "reference": "components/public/PublicHowItWorksHero.tsx#L96-L99"
   },
   {
     "term": "public.invite-button",
     "definition": "Request an invite",
     "context": "Request an invite",
-    "reference": "pages/[locale]/people.tsx#L220-L223"
+    "reference": "pages/[locale]/people.tsx#L221-L224"
   },
   {
     "term": "public.invite.consent",
     "definition": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
-    "reference": "pages/[locale]/invite.tsx#L90-L93"
+    "reference": "pages/[locale]/invite.tsx#L79-L82"
   },
   {
     "term": "public.invite.request-invite",
     "definition": "Request your invite!",
     "context": "Request your invite!",
-    "reference": "pages/[locale]/invite.tsx#L59-L62"
+    "reference": "pages/[locale]/invite.tsx#L48-L51"
   },
   {
     "term": "public.invite.review-privacy",
     "definition": "For more information, please review our <a>Privacy Policy</a>.",
     "context": "For more information, please review our <a>Privacy Policy</a>.",
-    "reference": "pages/[locale]/invite.tsx#L96-L106"
+    "reference": "pages/[locale]/invite.tsx#L85-L95"
   },
   {
     "term": "public.invite.tell-us-about-yourself",
     "definition": "Leave us your email. We will send you the <a>invitation</a> as soon as possible.",
     "context": "Leave us your email. We will send you the <a>invitation</a> as soon as possible.",
-    "reference": "pages/[locale]/invite.tsx#L65-L80"
+    "reference": "pages/[locale]/invite.tsx#L54-L69"
   },
   {
     "term": "public.invite.title",
@@ -2463,7 +2445,7 @@
     "term": "public.login-button",
     "definition": "Login",
     "context": "Login",
-    "reference": "pages/[locale]/login.tsx#L266"
+    "reference": "pages/[locale]/login.tsx#L261"
   },
   {
     "term": "public.login.already-logged-in.continue-button",
@@ -2493,7 +2475,7 @@
     "term": "public.login.back-to-login-link",
     "definition": "Go back to login",
     "context": "Go back to login",
-    "reference": "pages/[locale]/login.tsx#L380-L383"
+    "reference": "pages/[locale]/login.tsx#L377-L380"
   },
   {
     "term": "public.login.explanation",
@@ -2505,7 +2487,7 @@
     "term": "public.login.forgot-password-link",
     "definition": "I forgot my password",
     "context": "I forgot my password",
-    "reference": "pages/[locale]/login.tsx#L271-L274"
+    "reference": "pages/[locale]/login.tsx#L266-L269"
   },
   {
     "term": "public.login.header",
@@ -2529,19 +2511,19 @@
     "term": "public.login.password-update-button",
     "definition": "Update password",
     "context": "Update password",
-    "reference": "pages/[locale]/login.tsx#L372-L375"
+    "reference": "pages/[locale]/login.tsx#L369-L372"
   },
   {
     "term": "public.login.password-update-explanation",
     "definition": "First time users need to update their password",
     "context": "First time users need to update their password",
-    "reference": "pages/[locale]/login.tsx#L310-L313"
+    "reference": "pages/[locale]/login.tsx#L305-L308"
   },
   {
     "term": "public.login.password-update-header",
     "definition": "Update your password",
     "context": "Update your password",
-    "reference": "pages/[locale]/login.tsx#L304-L307"
+    "reference": "pages/[locale]/login.tsx#L299-L302"
   },
   {
     "term": "public.login.title",
@@ -2559,25 +2541,25 @@
     "term": "public.people.hero-title",
     "definition": "Laura now has more time to focus on the important work",
     "context": "Laura now has more time to focus on the important work",
-    "reference": "pages/[locale]/people.tsx#L35-L38"
+    "reference": "pages/[locale]/people.tsx#L36-L39"
   },
   {
     "term": "public.people.routine-change",
     "definition": "Let us tell you how her routine has changed since she discovered Parallel.",
     "context": "Let us tell you how her routine has changed since she discovered Parallel.",
-    "reference": "pages/[locale]/people.tsx#L41-L44"
+    "reference": "pages/[locale]/people.tsx#L42-L45"
   },
   {
     "term": "public.people.title",
     "definition": "For whom",
     "context": "For whom",
-    "reference": "pages/[locale]/people.tsx#L25-L28"
+    "reference": "pages/[locale]/people.tsx#L26-L29"
   },
   {
     "term": "public.persons-link",
     "definition": "For whom",
     "context": "For whom",
-    "reference": "components/public/layout/PublicHeader.tsx#L112-L115"
+    "reference": "components/public/layout/PublicHeader.tsx#L87-L90"
   },
   {
     "term": "public.popular.accounting",
@@ -2661,7 +2643,7 @@
     "term": "public.security-link",
     "definition": "Security",
     "context": "Security",
-    "reference": "components/public/layout/PublicHeader.tsx#L102-L105"
+    "reference": "components/public/layout/PublicHeader.tsx#L77-L80"
   },
   {
     "term": "public.security.data-at-rest",
@@ -2745,7 +2727,7 @@
     "term": "public.showcase-hero-alt",
     "definition": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
     "context": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
-    "reference": "components/public/PublicMainHero.tsx#L129-L133"
+    "reference": "components/public/PublicMainHero.tsx#L112-L116"
   },
   {
     "term": "public.support.faq",
@@ -2769,19 +2751,19 @@
     "term": "recipient-view.approved-reply",
     "definition": "This reply has been approved",
     "context": "This reply has been approved",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L231-L234"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L203-L206"
   },
   {
     "term": "recipient-view.automatically-saved-text-1",
     "definition": "Your progress is automatically saved.",
     "context": "Your progress is automatically saved.",
-    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L138-L141"
+    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L129-L132"
   },
   {
     "term": "recipient-view.automatically-saved-text-2",
     "definition": "You can return at anytime to complete the petition.",
     "context": "You can return at anytime to complete the petition.",
-    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L144-L147"
+    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L135-L138"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
@@ -2799,25 +2781,25 @@
     "term": "recipient-view.field-comments.cta",
     "definition": "Have any questions? Ask here",
     "context": "Have any questions? Ask here",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L149-L152"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L158-L161"
   },
   {
     "term": "recipient-view.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment",
-    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L167-L170"
+    "reference": "components/recipient-view/RecipientViewPetitionFieldCommentsDialog.tsx#L176-L179"
   },
   {
     "term": "recipient-view.field-reply-submit",
     "definition": "Submit",
     "context": "Submit",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L371-L374"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L338-L341"
   },
   {
     "term": "recipient-view.files-uploaded",
     "definition": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L153-L157"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L133-L137"
   },
   {
     "term": "recipient-view.organization",
@@ -2841,31 +2823,31 @@
     "term": "recipient-view.progress",
     "definition": "Progress",
     "context": "Progress",
-    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L82-L85"
+    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L73-L76"
   },
   {
     "term": "recipient-view.questions-button",
     "definition": "Questions?",
     "context": "Questions?",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L552-L555"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L518-L521"
   },
   {
     "term": "recipient-view.rejected-reply",
     "definition": "This reply has been rejected",
     "context": "This reply has been rejected",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L235-L238"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L207-L210"
   },
   {
     "term": "recipient-view.remove-reply-label",
     "definition": "Remove reply",
     "context": "Remove reply",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L307-L310"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L274-L277"
   },
   {
     "term": "recipient-view.replies-submitted",
     "definition": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L147-L151"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L127-L131"
   },
   {
     "term": "recipient-view.security-link",
@@ -2877,25 +2859,25 @@
     "term": "recipient-view.sender",
     "definition": "Sender",
     "context": "Sender",
-    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L58-L61"
+    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L57-L60"
   },
   {
     "term": "recipient-view.sender-email",
     "definition": "Sender email",
     "context": "Sender email",
-    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L71-L74"
+    "reference": "components/recipient-view/RecipientViewSenderCard.tsx#L69-L72"
   },
   {
     "term": "recipient-view.submit-button",
     "definition": "Finalize and notify {name}",
     "context": "Finalize and notify {name}",
-    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L165-L169"
+    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L156-L160"
   },
   {
     "term": "recipient-view.submit-button-short",
     "definition": "Finalize",
     "context": "Finalize",
-    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L159-L163"
+    "reference": "components/recipient-view/RecipientViewProgressCard.tsx#L150-L154"
   },
   {
     "term": "recipient-view.submit-unpublished-comments-button",
@@ -2913,7 +2895,7 @@
     "term": "recipient-view.text-reply",
     "definition": "Reply added on {date}",
     "context": "Reply added on {date}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L170-L181"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx#L150-L161"
   },
   {
     "term": "settings.account",
@@ -2925,7 +2907,7 @@
     "term": "settings.account.change-password-button",
     "definition": "Change password",
     "context": "Change password",
-    "reference": "pages/[locale]/app/settings/security.tsx#L179-L182"
+    "reference": "pages/[locale]/app/settings/security.tsx#L176-L179"
   },
   {
     "term": "settings.account.name-header",
@@ -2937,13 +2919,13 @@
     "term": "settings.account.update-name-button",
     "definition": "Save changes",
     "context": "Save changes",
-    "reference": "pages/[locale]/app/settings/account.tsx#L121-L124"
+    "reference": "pages/[locale]/app/settings/account.tsx#L119-L122"
   },
   {
     "term": "settings.header",
     "definition": "Settings",
     "context": "Settings",
-    "reference": "components/layout/SettingsLayout.tsx#L23"
+    "reference": "components/layout/SettingsLayout.tsx#L24"
   },
   {
     "term": "settings.security",
@@ -2985,91 +2967,91 @@
     "term": "timeline.access-activated-description",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineAccessActivatedEvent.tsx#L30-L52"
+    "reference": "components/petition-activity/timeline/TimelineAccessActivatedEvent.tsx#L31-L53"
   },
   {
     "term": "timeline.access-deactivated-description",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} removed access to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} removed access to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineAccessDeactivatedEvent.tsx#L26-L48"
+    "reference": "components/petition-activity/timeline/TimelineAccessDeactivatedEvent.tsx#L31-L53"
   },
   {
     "term": "timeline.access-opened-description",
     "definition": "{contact} opened the petition {timeAgo}",
     "context": "{contact} opened the petition {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineAccessOpenedEvent.tsx#L24-L43"
+    "reference": "components/petition-activity/timeline/TimelineAccessOpenedEvent.tsx#L29-L48"
   },
   {
     "term": "timeline.comment-deleted",
     "definition": "{same, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
     "context": "{same, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineCommentDeletedEvent.tsx#L32-L60"
+    "reference": "components/petition-activity/timeline/TimelineCommentDeletedEvent.tsx#L33-L61"
   },
   {
     "term": "timeline.comment-published-deleted",
     "definition": "Someone wrote a (now deleted) comment on field {field} {timeAgo}",
     "context": "Someone wrote a (now deleted) comment on field {field} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineCommentPublishedEvent.tsx#L93-L99"
+    "reference": "components/petition-activity/timeline/TimelineCommentPublishedEvent.tsx#L94-L100"
   },
   {
     "term": "timeline.comment-published-description",
     "definition": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineCommentPublishedEvent.tsx#L47-L66"
+    "reference": "components/petition-activity/timeline/TimelineCommentPublishedEvent.tsx#L48-L67"
   },
   {
     "term": "timeline.message-cancelled-description",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageCancelledEvent.tsx#L30-L53"
+    "reference": "components/petition-activity/timeline/TimelineMessageCancelledEvent.tsx#L31-L54"
   },
   {
     "term": "timeline.message-scheduled-cancel",
     "definition": "Cancel",
     "context": "Cancel",
-    "reference": "components/petition-activity/timeline/TimelineMessageScheduledEvent.tsx#L68-L71"
+    "reference": "components/petition-activity/timeline/TimelineMessageScheduledEvent.tsx#L73-L76"
   },
   {
     "term": "timeline.message-scheduled-description",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageScheduledEvent.tsx#L30-L58"
+    "reference": "components/petition-activity/timeline/TimelineMessageScheduledEvent.tsx#L35-L63"
   },
   {
     "term": "timeline.message-sent-description-manual",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L58-L81"
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L59-L82"
   },
   {
     "term": "timeline.message-sent-description-scheduled",
     "definition": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
     "context": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L33-L56"
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx#L34-L57"
   },
   {
     "term": "timeline.petition-completed-description",
     "definition": "{contact} completed the petition {timeAgo}",
     "context": "{contact} completed the petition {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelinePetitionCompletedEvent.tsx#L24-L43"
+    "reference": "components/petition-activity/timeline/TimelinePetitionCompletedEvent.tsx#L29-L48"
   },
   {
     "term": "timeline.petition-created-description",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} created this petition {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} created this petition {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelinePetitionCreatedEvent.tsx#L25-L42"
+    "reference": "components/petition-activity/timeline/TimelinePetitionCreatedEvent.tsx#L30-L47"
   },
   {
     "term": "timeline.reminder-sent-description-automatic",
     "definition": "An automatic reminder was sent to {contact} {timeAgo}",
     "context": "An automatic reminder was sent to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineReminderSentEvent.tsx#L51-L70"
+    "reference": "components/petition-activity/timeline/TimelineReminderSentEvent.tsx#L56-L75"
   },
   {
     "term": "timeline.reminder-sent-description-manual",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineReminderSentEvent.tsx#L27-L49"
+    "reference": "components/petition-activity/timeline/TimelineReminderSentEvent.tsx#L32-L54"
   },
   {
     "term": "timeline.reply-created-deleted-field",
@@ -3081,13 +3063,13 @@
     "term": "timeline.reply-created-description",
     "definition": "{contact} replied to the field {field} {timeAgo}",
     "context": "{contact} replied to the field {field} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineReplyCreatedEvent.tsx#L24-L44"
+    "reference": "components/petition-activity/timeline/TimelineReplyCreatedEvent.tsx#L27-L47"
   },
   {
     "term": "timeline.reply-deleted-description",
     "definition": "{contact} deleted a reply to the field {field} {timeAgo}",
     "context": "{contact} deleted a reply to the field {field} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineReplyDeletedEvent.tsx#L24-L44"
+    "reference": "components/petition-activity/timeline/TimelineReplyDeletedEvent.tsx#L27-L47"
   },
   {
     "term": "tour.back",
@@ -3219,61 +3201,61 @@
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "On this page, you can see all the items that you requested to the recipients.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L757-L760"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L758-L761"
   },
   {
     "term": "tour.petition-replies.completed-items",
     "definition": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
     "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L774-L780"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L775-L781"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Replies",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L767-L770"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L768-L771"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Here you have your information on the requests",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L751-L754"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx#L752-L755"
   },
   {
     "term": "tour.petitions-list.create-petition",
     "definition": "Let's start by creating a petition!",
     "context": "Let's start by creating a petition!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L587-L590"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L590-L593"
   },
   {
     "term": "tour.petitions-list.show-around",
     "definition": "If this is your first time here, let us show you around!",
     "context": "If this is your first time here, let us show you around!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L575-L578"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L578-L581"
   },
   {
     "term": "tour.petitions-list.we-collect",
     "definition": "We are here to help you collect information from your clients.",
     "context": "We are here to help you collect information from your clients.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L569-L572"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L572-L575"
   },
   {
     "term": "tour.petitions-list.we-notify",
     "definition": "We will let you know when the recipients complete everything.",
     "context": "We will let you know when the recipients complete everything.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L601-L604"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L604-L607"
   },
   {
     "term": "tour.petitions-list.welcome",
     "definition": "Welcome to Parallel!",
     "context": "Welcome to Parallel!",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L561-L564"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L564-L567"
   },
   {
     "term": "tour.petitions-list.you-focus",
     "definition": "We want you to focus on what matters, so let us collect the information for you.",
     "context": "We want you to focus on what matters, so let us collect the information for you.",
-    "reference": "pages/[locale]/app/petitions/index.tsx#L595-L598"
+    "reference": "pages/[locale]/app/petitions/index.tsx#L598-L601"
   },
   {
     "term": "tour.skip",

@@ -65,7 +65,7 @@ export function useReactSelectStyle<
   const labels = useMemo(
     () => ({
       clear: intl.formatMessage({
-        id: "component.input.clear-button",
+        id: "generic.clear",
         defaultMessage: "Clear",
       }),
     }),

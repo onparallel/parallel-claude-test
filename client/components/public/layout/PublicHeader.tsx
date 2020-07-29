@@ -62,8 +62,8 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         isOpen={isOpen}
         display={{ base: "block", [breakpoint]: "none" }}
       >
-        <PublicHeaderMenu direction="column" spacing={2} paddingBottom={4} />
-      </Collapse>
+          <PublicHeaderMenu direction="column" spacing={2} paddingBottom={4} />
+        </Collapse>
     </PublicContainer>
   );
 }
