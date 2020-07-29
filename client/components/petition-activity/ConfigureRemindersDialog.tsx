@@ -42,7 +42,7 @@ export function ConfigureRemindersDialog({
           id="petition-reminders"
           value={remindersConfig}
           onChange={setConfig}
-          enabled={reminderIsActive}
+          isEnabled={reminderIsActive}
           onSwitched={setActive}
           marginTop={2}
         />

@@ -69,6 +69,7 @@ export const PetitionComposeMessageEditor = Object.assign(
     }, []);
 
     function handleRemindersChange(value: RemindersConfig | null) {
+      console.log(value);
       setRemindersConfig(value);
       updateRemindersConfig({
         remindersConfig: value ? omit(value, ["__typename"]) : value,
@@ -124,7 +125,7 @@ export const PetitionComposeMessageEditor = Object.assign(
           <PetitionRemindersConfig
             id="petition-reminders"
             value={remindersConfig}
-            enabled={enabledReminders}
+            isEnabled={enabledReminders}
             onSwitched={setEnableReminders}
             onChange={handleRemindersChange}
             marginTop={2}

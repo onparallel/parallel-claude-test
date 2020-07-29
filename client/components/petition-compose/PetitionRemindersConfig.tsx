@@ -37,13 +37,13 @@ export function PetitionRemindersConfig({
   value,
   onChange,
   onSwitched,
-  enabled,
+  isEnabled,
   ...props
 }: {
   value: Maybe<RemindersConfig>;
   onChange: (config: Maybe<RemindersConfig>) => void;
   onSwitched: (enabled: boolean) => void;
-  enabled: boolean;
+  isEnabled: boolean;
 } & Omit<BoxProps, "onChange">) {
   let day = addDays(startOfToday(), value?.offset ?? 2);
   if (value?.weekdaysOnly && isWeekend(day)) {
@@ -74,7 +74,7 @@ export function PetitionRemindersConfig({
           colorScheme="purple"
           size="lg"
           marginRight={2}
-          isChecked={enabled}
+          isChecked={isEnabled}
           onChange={handleEnableRemindersChange}
         >
           <Text fontSize="md" as="span">
@@ -85,7 +85,7 @@ export function PetitionRemindersConfig({
           </Text>
         </Checkbox>
       </Flex>
-      {value && enabled ? (
+      {value && isEnabled ? (
         <Box
           as="form"
           {...{ noValidate: true }}
@@ -110,7 +110,7 @@ export function PetitionRemindersConfig({
                       onChange({
                         ...value,
                         timezone,
-                        offset: offset ?? 0,
+                        offset: Number.isInteger(offset) ? offset : 0,
                       })
                     }
                     size="sm"

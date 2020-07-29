@@ -128,7 +128,7 @@ export function AddPetitionAccessDialog({
           <PetitionRemindersConfig
             marginTop={2}
             value={remindersConfig}
-            enabled={enabledReminders}
+            isEnabled={enabledReminders}
             onSwitched={setEnableReminders}
             onChange={setRemindersConfig}
           />
