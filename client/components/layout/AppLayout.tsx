@@ -65,7 +65,11 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         alignItems="stretch"
         overflow="hidden"
         height="100vh"
-        style={{ height: "-webkit-fill-available" }}
+        sx={{
+          "@supports (-webkit-touch-callout: none)": {
+            height: "-webkit-fill-available",
+          },
+        }}
       >
         <AppLayoutNavbar
           user={user}
