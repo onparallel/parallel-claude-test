@@ -64,11 +64,11 @@ async function loadLocaleData(dir, locale) {
 }
 function updateLocaleData(isDefault, data, terms) {
     const updated = new Map();
-    for (const term of terms) {
-        const entry = data.has(term.id)
-            ? data.get(term.id)
+    for (const [id, term] of Object.entries(terms)) {
+        const entry = data.has(id)
+            ? data.get(id)
             : {
-                term: term.id,
+                term: id,
                 definition: "",
                 context: "",
                 reference: "",
@@ -77,24 +77,21 @@ function updateLocaleData(isDefault, data, terms) {
             entry.definition = term.defaultMessage;
         }
         entry.context = term.description || term.defaultMessage;
-        const range = term.start.line !== term.end.line
-            ? `L${term.start.line}-L${term.end.line}`
-            : `L${term.start.line}`;
         const path = isWindows
             ? term.file.replace(/^\.\.\\[^\\]+\\/, "").replace(/\\/g, "/")
             : term.file.replace(/^\.\.\/[^/]+\//, "");
-        entry.reference = `${path}#${range}`;
+        entry.reference = `${path}:${term.line}:${term.col}`;
         updated.set(entry.term, entry);
     }
     return Array.from(updated.values()).sort((a, b) => a.term.localeCompare(b.term));
 }
 function logStats(terms, data) {
-    const set = new Set(terms.map((t) => t.id));
-    const added = terms.filter((t) => !data.has(t.id));
+    const set = new Set(Object.keys(terms));
+    const added = Object.keys(terms).filter((t) => !data.has(t));
     const removed = Array.from(data.values()).filter((t) => !set.has(t.term));
     console.log(chalk_1.default.green.bold(`Terms added (${added.length}):`));
     for (const term of added) {
-        console.log(`- ${term.id}`);
+        console.log(`- ${term}`);
     }
     console.log(chalk_1.default.red.bold(`Terms removed (${removed.length}):`));
     for (const term of removed) {

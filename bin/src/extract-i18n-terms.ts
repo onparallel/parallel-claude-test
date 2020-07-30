@@ -31,19 +31,14 @@ async function extract(locales: string[], input: string, output: string) {
   }
 }
 
-interface ExtractedTerm {
-  id: string;
-  defaultMessage: string;
+interface MessageDescriptor {
   description?: string;
+  defaultMessage: string;
   file: string;
-  start: {
-    line: number;
-    column: number;
-  };
-  end: {
-    line: number;
-    column: number;
-  };
+  start: number;
+  end: number;
+  line: number;
+  col: number;
 }
 
 async function extractTerms(input: string) {
@@ -58,7 +53,9 @@ async function extractTerms(input: string) {
        ${isWindows ? input.replace("/", "\\") : `'${input}'`}`,
       { encoding: "utf-8" }
     );
-    const terms = await readJson<ExtractedTerm[]>(tmpFileName);
+    const terms = await readJson<Record<string, MessageDescriptor>>(
+      tmpFileName
+    );
     await fs.unlink(tmpFileName);
     return terms;
   } catch (error) {
@@ -87,14 +84,14 @@ async function loadLocaleData(dir: string, locale: string) {
 function updateLocaleData(
   isDefault: boolean,
   data: Map<string, Term>,
-  terms: ExtractedTerm[]
+  terms: Record<string, MessageDescriptor>
 ) {
   const updated = new Map();
-  for (const term of terms) {
-    const entry = data.has(term.id)
-      ? data.get(term.id)
+  for (const [id, term] of Object.entries(terms)) {
+    const entry = data.has(id)
+      ? data.get(id)
       : {
-          term: term.id,
+          term: id,
           definition: "",
           context: "",
           reference: "",
@@ -103,14 +100,10 @@ function updateLocaleData(
       entry!.definition = term.defaultMessage;
     }
     entry!.context = term.description || term.defaultMessage;
-    const range =
-      term.start.line !== term.end.line
-        ? `L${term.start.line}-L${term.end.line}`
-        : `L${term.start.line}`;
     const path = isWindows
       ? term.file.replace(/^\.\.\\[^\\]+\\/, "").replace(/\\/g, "/")
       : term.file.replace(/^\.\.\/[^/]+\//, "");
-    entry!.reference = `${path}#${range}`;
+    entry!.reference = `${path}:${term.line}:${term.col}`;
     updated.set(entry!.term, entry);
   }
   return Array.from(updated.values()).sort((a, b) =>
@@ -118,13 +111,16 @@ function updateLocaleData(
   );
 }
 
-function logStats(terms: ExtractedTerm[], data: Map<string, Term>) {
-  const set = new Set(terms.map((t) => t.id));
-  const added = terms.filter((t) => !data.has(t.id));
+function logStats(
+  terms: Record<string, MessageDescriptor>,
+  data: Map<string, Term>
+) {
+  const set = new Set(Object.keys(terms));
+  const added = Object.keys(terms).filter((t) => !data.has(t));
   const removed = Array.from(data.values()).filter((t) => !set.has(t.term));
   console.log(chalk.green.bold(`Terms added (${added.length}):`));
   for (const term of added) {
-    console.log(`- ${term.id}`);
+    console.log(`- ${term}`);
   }
   console.log(chalk.red.bold(`Terms removed (${removed.length}):`));
   for (const term of removed) {
