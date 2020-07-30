@@ -158,7 +158,7 @@ export function PetitionAccessesTable({
         >
           {intl.formatMessage({
             id: "petition.add-contact-button",
-            defaultMessage: "Add contact",
+            defaultMessage: "Add access",
           })}
         </Button>
       </Stack>

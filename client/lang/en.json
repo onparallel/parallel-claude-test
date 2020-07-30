@@ -1339,8 +1339,8 @@
   },
   {
     "term": "petition.add-contact-button",
-    "definition": "Add contact",
-    "context": "Add contact",
+    "definition": "Add access",
+    "context": "Add access",
     "reference": "components/petition-activity/PetitionAccessesTable.tsx:159:30"
   },
   {
