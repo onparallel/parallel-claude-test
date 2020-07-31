@@ -15,6 +15,7 @@ import { GoogleAnalytics } from "@parallel/components/scripts/GoogleAnalytics";
 import { Hotjar } from "@parallel/components/scripts/Hotjar";
 import { Hubspot } from "@parallel/components/scripts/Hubspot";
 import { AppProps } from "next/app";
+import { useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -22,6 +23,13 @@ type MyAppProps = AppProps & I18nProps;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
+  useEffect(() => {
+    // some 3rd party is adding this which makes some stuff look bad on development
+    const element = document.querySelector('style[data-merge-styles="true"]');
+    if (element) {
+      element.parentElement?.removeChild(element);
+    }
+  }, []);
   return (
     <>
       {process.env.NODE_ENV === "development" ? null : (
