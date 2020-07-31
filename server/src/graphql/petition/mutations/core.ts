@@ -271,10 +271,20 @@ export const deletePetitionField = mutationField("deletePetitionField", {
   args: {
     petitionId: idArg({ required: true }),
     fieldId: idArg({ required: true }),
+    force: booleanArg({ default: false, required: false }),
   },
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
+
+    const replies = await ctx.petitions.loadRepliesForField(fieldId);
+    if (!args.force && replies.length > 0) {
+      throw new WhitelistedError(
+        "The petition field has replies.",
+        "FIELD_HAS_REPLIES"
+      );
+    }
+
     return await ctx.petitions.deletePetitionField(
       petitionId,
       fieldId,

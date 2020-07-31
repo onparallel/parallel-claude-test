@@ -797,6 +797,7 @@ export interface NexusGenArgTypes {
     deletePetitionField: {
       // args
       fieldId: string; // ID!
+      force?: boolean | null; // Boolean
       petitionId: string; // ID!
     };
     deletePetitionFieldComment: {

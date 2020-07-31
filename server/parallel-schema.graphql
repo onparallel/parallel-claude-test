@@ -265,7 +265,11 @@ type Mutation {
   """
   Delete petitions fields.
   """
-  deletePetitionField(fieldId: ID!, petitionId: ID!): Petition!
+  deletePetitionField(
+    fieldId: ID!
+    force: Boolean = false
+    petitionId: ID!
+  ): Petition!
 
   """
   Delete a petition field comment.
