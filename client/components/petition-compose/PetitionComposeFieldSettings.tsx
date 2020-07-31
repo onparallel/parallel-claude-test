@@ -15,6 +15,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
   UpdatePetitionFieldInput,
+  PetitionFieldType,
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
