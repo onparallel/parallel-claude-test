@@ -23,9 +23,7 @@ import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
   PetitionComposeUserQuery,
-  PetitionCompose_createPetitionField_PetitionFragment,
   PetitionCompose_PetitionFieldFragment,
-  PetitionCompose_updateFieldPositions_PetitionFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
@@ -50,7 +48,7 @@ import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit, pick } from "remeda";
+import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
 
@@ -97,12 +95,18 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, []);
 
   const confirmDelete = useConfirmDeleteFieldDialog();
+  const [
+    deletePetitionField,
+  ] = usePetitionCompose_deletePetitionFieldMutation();
 
   const [updatePetition] = usePetitionCompose_updatePetitionMutation();
   const [clonePetitionField] = usePetitionCompose_clonePetitionFieldMutation();
-  const updateFieldPositions = useUpdateFieldPositions();
-  const createPetitionField = useCreatePetitionField();
-  const deletePetitionField = useDeletePetitionField();
+  const [
+    updateFieldPositions,
+  ] = usePetitionCompose_updateFieldPositionsMutation();
+  const [
+    createPetitionField,
+  ] = usePetitionCompose_createPetitionFieldMutation();
   const [
     updatePetitionField,
   ] = usePetitionCompose_updatePetitionFieldMutation();
@@ -116,7 +120,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleUpdateFieldPositions = useCallback(
     wrapper(async function (fieldIds: string[]) {
-      await updateFieldPositions(petitionId, fieldIds);
+      await updateFieldPositions({ variables: { petitionId, fieldIds } });
     }),
     [petitionId]
   );
@@ -134,7 +138,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         if (activeFieldId === fieldId) {
           setActiveFieldId(null);
         }
-        await wrapper(deletePetitionField)(petitionId, fieldId);
+        await wrapper(deletePetitionField)({
+          variables: { petitionId, fieldId },
+        });
       } catch {}
     },
     [petitionId, activeFieldId]
@@ -167,7 +173,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType) {
-      const { data } = await createPetitionField(petitionId, type);
+      const { data } = await createPetitionField({
+        variables: { petitionId, type },
+      });
       const field = data!.createPetitionField.field;
       setTimeout(() => {
         const title = document.querySelector<HTMLElement>(
@@ -458,6 +466,9 @@ PetitionCompose.mutations = [
         }
         petition {
           ...PetitionLayout_Petition
+          fields {
+            id
+          }
         }
       }
     }
@@ -496,6 +507,9 @@ PetitionCompose.mutations = [
       deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
         id
         ...PetitionLayout_Petition
+        fields {
+          id
+        }
       }
     }
     ${PetitionLayout.fragments.Petition}
@@ -551,109 +565,6 @@ PetitionCompose.mutations = [
     }
   `,
 ];
-
-function useUpdateFieldPositions() {
-  const [mutate] = usePetitionCompose_updateFieldPositionsMutation();
-  return useCallback(
-    async function (petitionId: string, fieldIds: string[]) {
-      return await mutate({
-        variables: { petitionId, fieldIds },
-        update(client) {
-          const fragment = gql`
-            fragment PetitionCompose_updateFieldPositions_Petition on Petition {
-              fields {
-                id
-              }
-            }
-          `;
-          client.writeFragment<
-            PetitionCompose_updateFieldPositions_PetitionFragment
-          >({
-            id: petitionId,
-            fragment,
-            data: {
-              __typename: "Petition",
-              fields: fieldIds.map((id) => ({
-                __typename: "PetitionField",
-                id,
-              })),
-            },
-          });
-        },
-      });
-    },
-    [mutate]
-  );
-}
-
-function useCreatePetitionField() {
-  const [mutate] = usePetitionCompose_createPetitionFieldMutation();
-  return useCallback(
-    async function (petitionId: string, type: PetitionFieldType) {
-      return mutate({
-        variables: { petitionId, type },
-        update(client, { data }) {
-          const { field, petition } = data!.createPetitionField;
-          const fragment = gql`
-            fragment PetitionCompose_createPetitionField_Petition on Petition {
-              fields {
-                id
-              }
-            }
-          `;
-          const cached = client.readFragment<
-            PetitionCompose_createPetitionField_PetitionFragment
-          >({ id: petition.id, fragment });
-          client.writeFragment<
-            PetitionCompose_createPetitionField_PetitionFragment
-          >({
-            id: petition.id,
-            fragment,
-            data: {
-              __typename: "Petition",
-              fields: [...cached!.fields, pick(field, ["id", "__typename"])],
-            },
-          });
-        },
-      });
-    },
-    [mutate]
-  );
-}
-
-function useDeletePetitionField() {
-  const [mutate] = usePetitionCompose_deletePetitionFieldMutation();
-  return useCallback(
-    async function (petitionId: string, fieldId: string) {
-      return await mutate({
-        variables: { petitionId, fieldId },
-        update(client) {
-          const fragment = gql`
-            fragment PetitionCompose_deletePetitionField_Petition on Petition {
-              fields {
-                id
-              }
-            }
-          `;
-          const cached = client.readFragment<
-            PetitionCompose_createPetitionField_PetitionFragment
-          >({ id: petitionId, fragment });
-          client.writeFragment<
-            PetitionCompose_createPetitionField_PetitionFragment
-          >({
-            id: petitionId,
-            fragment,
-            data: {
-              __typename: "Petition",
-              fields: cached!.fields.filter(({ id }) => id !== fieldId),
-            },
-          });
-        },
-      });
-    },
-    [mutate]
-  );
-}
 
 PetitionCompose.getInitialProps = async ({
   query,
