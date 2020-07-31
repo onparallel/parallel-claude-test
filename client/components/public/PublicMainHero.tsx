@@ -116,7 +116,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             })}
             margin="auto"
             src={`${imageName}.png`}
-            {...{ srcSet: `${imageName}@2x.png 2x` }}
+            srcSet={`${imageName}@2x.png 2x`}
           />
         </Flex>
       </Stack>

@@ -130,7 +130,7 @@ export const PlaceholderInput = forwardRef<
   const { popper, reference } = usePopper({
     forceUpdate: isOpen,
     placement: "bottom",
-    offset: 0,
+    gutter: 2,
   });
 
   useEffect(() => {

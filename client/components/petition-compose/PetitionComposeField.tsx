@@ -226,7 +226,7 @@ export const PetitionComposeField = Object.assign(
               paddingX={2}
               paddingY={0}
               minHeight={0}
-              {...{ rows: 1 }}
+              rows={1}
               _focus={{
                 boxShadow: "none",
               }}

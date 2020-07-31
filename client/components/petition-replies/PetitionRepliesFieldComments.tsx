@@ -157,7 +157,7 @@ export function PetitionRepliesFieldComments({
           borderRadius="md"
           paddingX={2}
           minHeight={0}
-          {...{ rows: 1 }}
+          rows={1}
           placeholder={intl.formatMessage({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
@@ -344,7 +344,7 @@ function FieldComment({
             borderRadius="md"
             paddingX={2}
             minHeight={0}
-            {...{ rows: 1 }}
+            rows={1}
             value={content}
             onKeyDown={handleKeyDown as any}
             onChange={handleContentChange as any}

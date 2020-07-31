@@ -148,11 +148,7 @@ export function PetitionHeader({
                         textOverflow: "ellipsis",
                       }}
                     />
-                    <EditableInput
-                      paddingY={1}
-                      paddingX={2}
-                      {...{ maxLength: 255 }}
-                    />
+                    <EditableInput paddingY={1} paddingX={2} maxLength={255} />
                   </Flex>
                   {!isEditing && (
                     <Flex

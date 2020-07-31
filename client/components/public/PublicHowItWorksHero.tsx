@@ -189,14 +189,12 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                     <Card overflow="hidden">
                       <Image
                         src={`/static/images/${images[index].name}.png`}
-                        {...{
-                          srcSet: [2, 3]
-                            .map(
-                              (size) =>
-                                `/static/images/${images[index].name}@${size}x.png ${size}x`
-                            )
-                            .join(","),
-                        }}
+                        srcSet={[2, 3]
+                          .map(
+                            (size) =>
+                              `/static/images/${images[index].name}@${size}x.png ${size}x`
+                          )
+                          .join(",")}
                       />
                     </Card>
                   </Box>

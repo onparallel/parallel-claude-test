@@ -62,8 +62,8 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         isOpen={isOpen}
         display={{ base: "block", [breakpoint]: "none" }}
       >
-          <PublicHeaderMenu direction="column" spacing={2} paddingBottom={4} />
-        </Collapse>
+        <PublicHeaderMenu direction="column" spacing={2} paddingBottom={4} />
+      </Collapse>
     </PublicContainer>
   );
 }
@@ -98,7 +98,7 @@ function PublicHeaderMenu(props: StackProps) {
           </Button>
         </NakedLink>
       </Flex>
-      <Button as="a" variant="ghost" {...{ href: "/blog" }}>
+      <Button as="a" variant="ghost" href="/blog">
         <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
       </Button>
       <Flex>

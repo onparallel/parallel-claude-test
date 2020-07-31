@@ -88,7 +88,7 @@ export function PetitionRemindersConfig({
       {value && isEnabled ? (
         <Box
           as="form"
-          {...{ noValidate: true }}
+          noValidate={true}
           paddingX={4}
           paddingY={2}
           marginTop={2}
@@ -154,12 +154,12 @@ export function PetitionRemindersConfig({
                 })
               }
             />
-            <Text as="label" {...{ htmlFor: "reminder-settings-weekdays" }}>
+            <Box as="label" htmlFor="reminder-settings-weekdays">
               <FormattedMessage
                 id="component.petition-reminder-settings.only-weekdays"
                 defaultMessage="...only on weekdays"
               />
-            </Text>
+            </Box>
           </Flex>
 
           <Text fontSize="sm" fontStyle="italic" marginTop={1}>

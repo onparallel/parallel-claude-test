@@ -104,12 +104,12 @@ export function CreatePetitionDialog({
       }}
       initialFocusRef={focusRef}
       header={
-        <Text as="label" {...{ htmlFor: "petition-name" }}>
+        <Box as="label" htmlFor="petition-name">
           <FormattedMessage
             id="component.create-petition-dialog.header"
             defaultMessage="Creating petition"
           />
-        </Text>
+        </Box>
       }
       body={
         <Stack>

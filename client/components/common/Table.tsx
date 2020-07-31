@@ -407,7 +407,7 @@ function _Row<TRow>({
       </Box>
       {isExpandable ? (
         <Box as="tr" borderBottom="1px solid" borderBottomColor={colors.border}>
-          <Box as="td" padding={0} {...{ colSpan: columns.length }}>
+          <Box as="td" padding={0} colSpan={columns.length}>
             <Collapse isOpen={isExpanded}>
               <Box borderTop="1px solid" borderTopColor={colors.border} />
             </Collapse>
