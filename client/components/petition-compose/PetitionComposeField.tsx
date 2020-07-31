@@ -260,8 +260,8 @@ export const PetitionComposeField = Object.assign(
               placement="bottom"
               color="gray.600"
               label={intl.formatMessage({
-                id: "petition.field-copy",
-                defaultMessage: "Copy field",
+                id: "petition.field-clone",
+                defaultMessage: "Clone field",
               })}
               onClick={onCloneClick}
             />
