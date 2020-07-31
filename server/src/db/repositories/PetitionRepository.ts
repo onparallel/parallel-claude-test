@@ -651,14 +651,8 @@ export class PetitionRepository extends BaseRepository {
       const [field] = await this.insert(
         "petition_field",
         {
-          petition_id: petitionId,
+          ...omit(fieldToClone!, ["id", "created_at", "updated_at"]),
           position: lastPosition + 1,
-          title: fieldToClone!.title,
-          description: fieldToClone!.description,
-          type: fieldToClone!.type,
-          multiple: fieldToClone!.multiple,
-          optional: fieldToClone!.optional,
-          options: fieldToClone!.options,
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },
