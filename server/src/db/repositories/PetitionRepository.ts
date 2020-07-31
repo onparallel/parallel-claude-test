@@ -637,10 +637,6 @@ export class PetitionRepository extends BaseRepository {
       .orderBy("position", "asc")
       .select("*");
 
-    const lastPosition = fields.reduce(
-      (max, field) => (max < field.position ? field.position : max),
-      0
-    );
     const fieldToCloneIndex = fields.findIndex((f) => f.id === fieldId);
     if (fieldToCloneIndex === -1) {
       throw new Error("invalid fieldId: " + fieldId);
@@ -648,16 +644,13 @@ export class PetitionRepository extends BaseRepository {
     const fieldToClone = fields[fieldToCloneIndex];
 
     return this.knex.transaction(async (t) => {
-      const [field] = await this.insert(
-        "petition_field",
-        {
-          ...omit(fieldToClone!, ["id", "created_at", "updated_at"]),
-          position: lastPosition + 1,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-        },
+      const { field } = await this.createPetitionFieldQueryTransaction(
+        petitionId,
+        fieldToClone.type,
+        user,
+        omit(fieldToClone!, ["id", "created_at", "updated_at", "validated"]),
         t
-      ).select("*");
+      );
 
       const ids = fields.map((f) => f.id);
       ids.splice(fieldToCloneIndex + 1, 0, field.id);
@@ -672,45 +665,67 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
+  private async createPetitionFieldQueryTransaction(
+    petitionId: number,
+    type: PetitionFieldType,
+    user: User,
+    data: Partial<CreatePetitionField>,
+    t: Transaction<any, any>
+  ) {
+    const [{ max }] = await this.from("petition_field")
+      .where({
+        petition_id: petitionId,
+        deleted_at: null,
+      })
+      .max("position");
+
+    const [[field], [petition]] = await Promise.all([
+      this.insert(
+        "petition_field",
+        [
+          {
+            petition_id: petitionId,
+            type,
+            ...defaultFieldOptions(type),
+            ...data,
+            position: max === null ? 0 : max + 1,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          },
+        ],
+        t
+      ),
+      this.from("petition", t)
+        .where("id", petitionId)
+        .update(
+          {
+            status: this.knex.raw(
+              /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
+            ) as any,
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+          },
+          "*"
+        ),
+    ]);
+    return { field, petition };
+  }
+
   async createPetitionField(
     petitionId: number,
     type: PetitionFieldType,
     user: User
   ) {
-    return await this.knex.transaction(async (t) => {
-      const [{ max }] = await this.from("petition_field")
-        .where({
-          petition_id: petitionId,
-          deleted_at: null,
-        })
-        .max("position");
-
-      const [[field], [petition]] = await Promise.all([
-        this.insert("petition_field", [
-          {
-            petition_id: petitionId,
-            type,
-            ...defaultFieldOptions(type),
-            position: max === null ? 0 : max + 1,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          },
-        ]),
-        this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              status: this.knex.raw(
-                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-              ) as any,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          ),
-      ]);
-      return { field, petition };
-    });
+    return await this.knex.transaction(
+      async (t) =>
+        await this.createPetitionFieldQueryTransaction(
+          petitionId,
+          type,
+          user,
+          {},
+          t
+        )
+    );
   }
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
