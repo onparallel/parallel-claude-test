@@ -161,6 +161,8 @@ export type Mutation = {
   changePassword: ChangePasswordResult;
   /** Clone petition. */
   clonePetition: Petition;
+  /** Clones a petition field */
+  clonePetitionField: PetitionAndField;
   /** Create a contact. */
   createContact: Contact;
   /** Create petition. */
@@ -249,6 +251,11 @@ export type MutationclonePetitionArgs = {
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
+  petitionId: Scalars["ID"];
+};
+
+export type MutationclonePetitionFieldArgs = {
+  fieldId: Scalars["ID"];
   petitionId: Scalars["ID"];
 };
 
@@ -2016,6 +2023,26 @@ export type PetitionCompose_createPetitionFieldMutation = {
       PetitionComposeField_PetitionFieldFragment &
       PetitionComposeFieldSettings_PetitionFieldFragment;
     petition: { __typename?: "Petition" } & PetitionLayout_PetitionFragment;
+  };
+};
+
+export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  fieldId: Scalars["ID"];
+}>;
+
+export type PetitionCompose_clonePetitionFieldMutation = {
+  __typename?: "Mutation";
+} & {
+  clonePetitionField: { __typename?: "PetitionAndField" } & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
+      PetitionComposeField_PetitionFieldFragment &
+      PetitionComposeFieldSettings_PetitionFieldFragment;
+    petition: { __typename?: "Petition" } & {
+      fields: Array<
+        { __typename?: "PetitionField" } & Pick<PetitionField, "id">
+      >;
+    } & PetitionLayout_PetitionFragment;
   };
 };
 
@@ -4726,6 +4753,70 @@ export type PetitionCompose_createPetitionFieldMutationResult = ApolloReactCommo
 export type PetitionCompose_createPetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionCompose_createPetitionFieldMutation,
   PetitionCompose_createPetitionFieldMutationVariables
+>;
+export const PetitionCompose_clonePetitionFieldDocument = gql`
+  mutation PetitionCompose_clonePetitionField($petitionId: ID!, $fieldId: ID!) {
+    clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+      field {
+        id
+        ...PetitionComposeField_PetitionField
+        ...PetitionComposeFieldSettings_PetitionField
+      }
+      petition {
+        ...PetitionLayout_Petition
+        fields {
+          id
+        }
+      }
+    }
+  }
+  ${PetitionComposeField_PetitionFieldFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionLayout_PetitionFragmentDoc}
+`;
+export type PetitionCompose_clonePetitionFieldMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionCompose_clonePetitionFieldMutation,
+  PetitionCompose_clonePetitionFieldMutationVariables
+>;
+
+/**
+ * __usePetitionCompose_clonePetitionFieldMutation__
+ *
+ * To run a mutation, you first call `usePetitionCompose_clonePetitionFieldMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionCompose_clonePetitionFieldMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionComposeClonePetitionFieldMutation, { data, loading, error }] = usePetitionCompose_clonePetitionFieldMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      fieldId: // value for 'fieldId'
+ *   },
+ * });
+ */
+export function usePetitionCompose_clonePetitionFieldMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionCompose_clonePetitionFieldMutation,
+    PetitionCompose_clonePetitionFieldMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionCompose_clonePetitionFieldMutation,
+    PetitionCompose_clonePetitionFieldMutationVariables
+  >(PetitionCompose_clonePetitionFieldDocument, baseOptions);
+}
+export type PetitionCompose_clonePetitionFieldMutationHookResult = ReturnType<
+  typeof usePetitionCompose_clonePetitionFieldMutation
+>;
+export type PetitionCompose_clonePetitionFieldMutationResult = ApolloReactCommon.MutationResult<
+  PetitionCompose_clonePetitionFieldMutation
+>;
+export type PetitionCompose_clonePetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionCompose_clonePetitionFieldMutation,
+  PetitionCompose_clonePetitionFieldMutationVariables
 >;
 export const PetitionCompose_deletePetitionFieldDocument = gql`
   mutation PetitionCompose_deletePetitionField(

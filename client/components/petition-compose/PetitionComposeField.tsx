@@ -4,6 +4,7 @@ import {
   DeleteIcon,
   DragHandleIcon,
   SettingsIcon,
+  CopyIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionComposeField_PetitionFieldFragment,
@@ -33,6 +34,7 @@ export type PetitionComposeFieldProps = {
   onFocus: (event: FocusEvent) => void;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
+  onCloneClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -53,6 +55,7 @@ export const PetitionComposeField = Object.assign(
     showError,
     onMove,
     onFocus,
+    onCloneClick,
     onSettingsClick,
     onFieldEdit,
     onDeleteClick,
@@ -250,6 +253,18 @@ export const PetitionComposeField = Object.assign(
             direction="row"
             padding={1}
           >
+            <IconButtonWithTooltip
+              icon={<CopyIcon />}
+              size="sm"
+              variant="ghost"
+              placement="bottom"
+              color="gray.600"
+              label={intl.formatMessage({
+                id: "petition.field-copy",
+                defaultMessage: "Copy field",
+              })}
+              onClick={onCloneClick}
+            />
             <IconButtonWithTooltip
               icon={<SettingsIcon />}
               size="sm"

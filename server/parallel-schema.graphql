@@ -206,6 +206,11 @@ type Mutation {
   ): Petition!
 
   """
+  Clones a petition field
+  """
+  clonePetitionField(fieldId: ID!, petitionId: ID!): PetitionAndField!
+
+  """
   Create a contact.
   """
   createContact(data: CreateContactInput!): Contact!

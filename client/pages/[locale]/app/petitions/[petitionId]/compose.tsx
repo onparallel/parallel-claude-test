@@ -34,6 +34,7 @@ import {
   usePetitionCompose_createPetitionFieldMutation,
   usePetitionCompose_deletePetitionFieldMutation,
   usePetitionCompose_sendPetitionMutation,
+  usePetitionCompose_clonePetitionFieldMutation,
   usePetitionCompose_updateFieldPositionsMutation,
   usePetitionCompose_updatePetitionFieldMutation,
   usePetitionCompose_updatePetitionMutation,
@@ -98,6 +99,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const confirmDelete = useConfirmDeleteFieldDialog();
 
   const [updatePetition] = usePetitionCompose_updatePetitionMutation();
+  const [clonePetitionField] = usePetitionCompose_clonePetitionFieldMutation();
   const updateFieldPositions = useUpdateFieldPositions();
   const createPetitionField = useCreatePetitionField();
   const deletePetitionField = useDeletePetitionField();
@@ -119,6 +121,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const handleClonePetitionField = useCallback(
+    wrapper(async (fieldId: string) => {
+      return await clonePetitionField({ variables: { petitionId, fieldId } });
+    }),
+    [petitionId]
+  );
   const handleDeleteField = useCallback(
     async function (fieldId: string) {
       try {
@@ -330,6 +338,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             fields={petition!.fields}
             active={activeFieldId}
             onAddField={handleAddField}
+            onCopyFieldClick={handleClonePetitionField}
             onDeleteField={handleDeleteField}
             onFieldFocus={handleFieldFocus}
             onUpdateFieldPositions={handleUpdateFieldPositions}
@@ -449,6 +458,29 @@ PetitionCompose.mutations = [
         }
         petition {
           ...PetitionLayout_Petition
+        }
+      }
+    }
+    ${PetitionLayout.fragments.Petition}
+    ${PetitionComposeField.fragments.PetitionField}
+    ${PetitionComposeFieldSettings.fragments.PetitionField}
+  `,
+  gql`
+    mutation PetitionCompose_clonePetitionField(
+      $petitionId: ID!
+      $fieldId: ID!
+    ) {
+      clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+        field {
+          id
+          ...PetitionComposeField_PetitionField
+          ...PetitionComposeFieldSettings_PetitionField
+        }
+        petition {
+          ...PetitionLayout_Petition
+          fields {
+            id
+          }
         }
       }
     }

@@ -61,6 +61,7 @@ export type PetitionComposeFieldListProps = {
   fields: FieldSelection[];
   showErrors: boolean;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
+  onCopyFieldClick: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => void;
   onFieldFocus: (fieldId: string) => void;
@@ -74,6 +75,7 @@ export const PetitionComposeFieldList = Object.assign(
     fields,
     showErrors,
     onUpdateFieldPositions,
+    onCopyFieldClick,
     onFieldSettingsClick,
     onDeleteField,
     onFieldFocus,
@@ -125,6 +127,10 @@ export const PetitionComposeFieldList = Object.assign(
     const handleFocus = useMemoFactory(
       (fieldId: string) => () => onFieldFocus(fieldId),
       [onFieldFocus]
+    );
+    const handleCloneClick = useMemoFactory(
+      (fieldId: string) => () => onCopyFieldClick(fieldId),
+      [onCopyFieldClick]
     );
     const handleSettingsClick = useMemoFactory(
       (fieldId: string) => () => onFieldSettingsClick(fieldId),
@@ -203,6 +209,7 @@ export const PetitionComposeFieldList = Object.assign(
                 active={active === fieldId}
                 showError={showErrors}
                 onFocus={handleFocus(fieldId)}
+                onCloneClick={handleCloneClick(fieldId)}
                 onSettingsClick={handleSettingsClick(fieldId)}
                 onDeleteClick={handleDeleteClick(fieldId)}
                 onFieldEdit={handleFieldEdit(fieldId)}
