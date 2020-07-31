@@ -2063,6 +2063,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
 export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   fieldId: Scalars["ID"];
+  force?: Maybe<Scalars["Boolean"]>;
 }>;
 
 export type PetitionCompose_deletePetitionFieldMutation = {
@@ -4824,8 +4825,13 @@ export const PetitionCompose_deletePetitionFieldDocument = gql`
   mutation PetitionCompose_deletePetitionField(
     $petitionId: ID!
     $fieldId: ID!
+    $force: Boolean
   ) {
-    deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+    deletePetitionField(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      force: $force
+    ) {
       id
       ...PetitionLayout_Petition
       fields {
@@ -4855,6 +4861,7 @@ export type PetitionCompose_deletePetitionFieldMutationFn = ApolloReactCommon.Mu
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      fieldId: // value for 'fieldId'
+ *      force: // value for 'force'
  *   },
  * });
  */

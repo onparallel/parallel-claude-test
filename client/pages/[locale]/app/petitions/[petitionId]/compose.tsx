@@ -134,18 +134,24 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
   const handleDeleteField = useCallback(
-    async function (fieldId: string) {
+    wrapper(async function (fieldId: string) {
+      setActiveFieldId((activeFieldId) =>
+        activeFieldId === fieldId ? null : activeFieldId
+      );
       try {
-        await confirmDelete({});
-        if (activeFieldId === fieldId) {
-          setActiveFieldId(null);
-        }
-        await wrapper(deletePetitionField)({
+        await deletePetitionField({
           variables: { petitionId, fieldId },
         });
+        return;
       } catch {}
-    },
-    [petitionId, activeFieldId]
+      try {
+        await confirmDelete({});
+        await deletePetitionField({
+          variables: { petitionId, fieldId, force: true },
+        });
+      } catch {}
+    }),
+    [petitionId]
   );
 
   const handleFieldEdit = useCallback(
@@ -528,8 +534,13 @@ PetitionCompose.mutations = [
     mutation PetitionCompose_deletePetitionField(
       $petitionId: ID!
       $fieldId: ID!
+      $force: Boolean
     ) {
-      deletePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+      deletePetitionField(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        force: $force
+      ) {
         id
         ...PetitionLayout_Petition
         fields {

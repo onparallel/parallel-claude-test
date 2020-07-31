@@ -18,7 +18,7 @@ export function ConfirmDeleteFieldDialog({ ...props }: DialogProps) {
       body={
         <FormattedMessage
           id="petition.confirm-delete-field.body"
-          defaultMessage="This field might contain collected replies. If you delete this field you will those replies including uploaded files <b>forever</b>."
+          defaultMessage="This field contains collected replies. If you delete this field you will lose those replies including uploaded files <b>forever</b>."
           values={{
             b: (chunks: any[]) => <b>{chunks}</b>,
           }}
@@ -27,8 +27,8 @@ export function ConfirmDeleteFieldDialog({ ...props }: DialogProps) {
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="generic.confirm-delete-button"
-            defaultMessage="Yes, delete"
+            id="petition.confirm-delete-field.confirm"
+            defaultMessage="Delete field"
           />
         </Button>
       }
