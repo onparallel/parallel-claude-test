@@ -7,6 +7,8 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
+import { WhitelistedError } from "./../../helpers/errors";
+
 import { CreatePetition, CreatePetitionField } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
@@ -848,3 +850,46 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
     );
   },
 });
+
+export const changePetitionFieldType = mutationField(
+  "changePetitionFieldType",
+  {
+    description: "Changes the type of a petition Field",
+    type: "PetitionAndField",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetitions("petitionId"),
+        fieldsBelongsToPetition("petitionId", "fieldId")
+      )
+    ),
+    args: {
+      petitionId: idArg({ required: true }),
+      fieldId: idArg({ required: true }),
+      type: arg({
+        type: "PetitionFieldType",
+        required: true,
+      }),
+      force: booleanArg({ required: true }),
+    },
+    resolve: async (_, args, ctx) => {
+      const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+
+      const replies = await ctx.petitions.loadRepliesForField(fieldId);
+      if (!args.force && replies.length > 0) {
+        throw new WhitelistedError(
+          "The petition field has replies.",
+          "FIELD_HAS_REPLIES"
+        );
+      }
+
+      return await ctx.petitions.changePetitionFieldType(
+        petitionId,
+        fieldId,
+        args.type,
+        ctx.user!
+      );
+    },
+  }
+);

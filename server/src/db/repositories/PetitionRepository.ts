@@ -776,6 +776,45 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
+  private async updatePetitionFieldQueryTransaction(
+    petitionId: number,
+    fieldId: number,
+    data: Partial<CreatePetitionField>,
+    updatedBy: string,
+    t: Transaction<any, any>
+  ) {
+    const [[field], [petition]] = await Promise.all([
+      this.from("petition_field", t)
+        .where({
+          id: fieldId,
+          petition_id: petitionId,
+        })
+        .update(
+          {
+            ...data,
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          },
+          "*"
+        ),
+      this.from("petition", t)
+        .where({
+          id: petitionId,
+        })
+        .update(
+          {
+            status: this.knex.raw(
+              /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
+            ) as any,
+            updated_at: this.now(),
+            updated_by: updatedBy,
+          },
+          "*"
+        ),
+    ]);
+    return { field, petition };
+  }
+
   async updatePetitionField(
     petitionId: number,
     fieldId: number,
@@ -783,36 +822,13 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return this.knex.transaction(async (t) => {
-      const [[field], [petition]] = await Promise.all([
-        this.from("petition_field", t)
-          .where({
-            id: fieldId,
-            petition_id: petitionId,
-          })
-          .update(
-            {
-              ...data,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          ),
-        this.from("petition", t)
-          .where({
-            id: petitionId,
-          })
-          .update(
-            {
-              status: this.knex.raw(
-                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-              ) as any,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          ),
-      ]);
-      return { field, petition };
+      return await this.updatePetitionFieldQueryTransaction(
+        petitionId,
+        fieldId,
+        data,
+        `User:${user.id}`,
+        t
+      );
     });
   }
 
@@ -1680,5 +1696,35 @@ export class PetitionRepository extends BaseRepository {
       [...accessIds]
     );
     return count === new Set(accessIds).size;
+  }
+
+  async changePetitionFieldType(
+    petitionId: number,
+    fieldId: number,
+    type: PetitionFieldType,
+    user: User
+  ) {
+    return await this.knex.transaction(async (t) => {
+      await this.from("petition_field_reply", t)
+        .where({
+          petition_field_id: fieldId,
+        })
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        });
+
+      return await this.updatePetitionFieldQueryTransaction(
+        petitionId,
+        fieldId,
+        {
+          type,
+          validated: false,
+          ...defaultFieldOptions(type),
+        },
+        `User:${user.id}`,
+        t
+      );
+    });
   }
 }
