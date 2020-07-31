@@ -200,7 +200,7 @@ type Mutation {
   """
   changePetitionFieldType(
     fieldId: ID!
-    force: Boolean!
+    force: Boolean = false
     petitionId: ID!
     type: PetitionFieldType!
   ): PetitionAndField!

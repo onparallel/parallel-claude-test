@@ -747,7 +747,7 @@ export interface NexusGenArgTypes {
     changePetitionFieldType: {
       // args
       fieldId: string; // ID!
-      force: boolean; // Boolean!
+      force?: boolean | null; // Boolean
       petitionId: string; // ID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };

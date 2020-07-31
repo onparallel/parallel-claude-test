@@ -870,7 +870,7 @@ export const changePetitionFieldType = mutationField(
         type: "PetitionFieldType",
         required: true,
       }),
-      force: booleanArg({ required: true }),
+      force: booleanArg({ default: false, required: false }),
     },
     resolve: async (_, args, ctx) => {
       const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
