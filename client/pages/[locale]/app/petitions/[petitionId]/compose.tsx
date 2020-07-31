@@ -32,6 +32,7 @@ import {
   usePetitionCompose_createPetitionFieldMutation,
   usePetitionCompose_deletePetitionFieldMutation,
   usePetitionCompose_sendPetitionMutation,
+  usePetitionCompose_changePetitionFieldTypeMutation,
   usePetitionCompose_clonePetitionFieldMutation,
   usePetitionCompose_updateFieldPositionsMutation,
   usePetitionCompose_updatePetitionFieldMutation,
@@ -51,6 +52,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
+import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -169,6 +171,28 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       });
     }),
     [petitionId, petition!.fields]
+  );
+
+  const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
+  const [
+    changePetitionFieldType,
+  ] = usePetitionCompose_changePetitionFieldTypeMutation();
+  const handleFieldTypeChange = useCallback(
+    wrapper(async function (fieldId: string, type: PetitionFieldType) {
+      try {
+        await changePetitionFieldType({
+          variables: { petitionId, fieldId, type },
+        });
+        return;
+      } catch {}
+      try {
+        await confirmChangeFieldType({});
+        await changePetitionFieldType({
+          variables: { petitionId, fieldId, type, force: true },
+        });
+      } catch {}
+    }),
+    [petitionId]
   );
 
   const handleAddField = useCallback(
@@ -334,6 +358,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 key={activeField.id}
                 field={activeField}
                 onFieldEdit={handleFieldEdit}
+                onFieldTypeChange={handleFieldTypeChange}
                 onClose={() => setActiveFieldId(null)}
               />
             </Box>
@@ -529,6 +554,36 @@ PetitionCompose.mutations = [
           id
           ...PetitionComposeField_PetitionField
           ...PetitionComposeFieldSettings_PetitionField
+        }
+        petition {
+          id
+          updatedAt
+        }
+      }
+    }
+    ${PetitionComposeField.fragments.PetitionField}
+    ${PetitionComposeFieldSettings.fragments.PetitionField}
+  `,
+  gql`
+    mutation PetitionCompose_changePetitionFieldType(
+      $petitionId: ID!
+      $fieldId: ID!
+      $type: PetitionFieldType!
+      $force: Boolean
+    ) {
+      changePetitionFieldType(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        type: $type
+        force: $force
+      ) {
+        field {
+          id
+          ...PetitionComposeField_PetitionField
+          ...PetitionComposeFieldSettings_PetitionField
+          replies {
+            id
+          }
         }
         petition {
           id

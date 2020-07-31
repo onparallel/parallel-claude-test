@@ -159,6 +159,8 @@ export type Mutation = {
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
+  /** Changes the type of a petition Field */
+  changePetitionFieldType: PetitionAndField;
   /** Clone petition. */
   clonePetition: Petition;
   /** Clones a petition field */
@@ -247,6 +249,13 @@ export type MutationchangePasswordArgs = {
   password: Scalars["String"];
 };
 
+export type MutationchangePetitionFieldTypeArgs = {
+  fieldId: Scalars["ID"];
+  force?: Maybe<Scalars["Boolean"]>;
+  petitionId: Scalars["ID"];
+  type: PetitionFieldType;
+};
+
 export type MutationclonePetitionArgs = {
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
@@ -292,6 +301,7 @@ export type MutationdeleteContactsArgs = {
 
 export type MutationdeletePetitionFieldArgs = {
   fieldId: Scalars["ID"];
+  force?: Maybe<Scalars["Boolean"]>;
   petitionId: Scalars["ID"];
 };
 
@@ -2077,6 +2087,27 @@ export type PetitionCompose_updatePetitionFieldMutation = {
   updatePetitionField: { __typename?: "PetitionAndField" } & {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
       PetitionComposeField_PetitionFieldFragment &
+      PetitionComposeFieldSettings_PetitionFieldFragment;
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
+  };
+};
+
+export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  fieldId: Scalars["ID"];
+  type: PetitionFieldType;
+  force?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type PetitionCompose_changePetitionFieldTypeMutation = {
+  __typename?: "Mutation";
+} & {
+  changePetitionFieldType: { __typename?: "PetitionAndField" } & {
+    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> & {
+        replies: Array<
+          { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
+        >;
+      } & PetitionComposeField_PetitionFieldFragment &
       PetitionComposeFieldSettings_PetitionFieldFragment;
     petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
   };
@@ -4917,6 +4948,82 @@ export type PetitionCompose_updatePetitionFieldMutationResult = ApolloReactCommo
 export type PetitionCompose_updatePetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
   PetitionCompose_updatePetitionFieldMutation,
   PetitionCompose_updatePetitionFieldMutationVariables
+>;
+export const PetitionCompose_changePetitionFieldTypeDocument = gql`
+  mutation PetitionCompose_changePetitionFieldType(
+    $petitionId: ID!
+    $fieldId: ID!
+    $type: PetitionFieldType!
+    $force: Boolean
+  ) {
+    changePetitionFieldType(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      type: $type
+      force: $force
+    ) {
+      field {
+        id
+        ...PetitionComposeField_PetitionField
+        ...PetitionComposeFieldSettings_PetitionField
+        replies {
+          id
+        }
+      }
+      petition {
+        id
+        updatedAt
+      }
+    }
+  }
+  ${PetitionComposeField_PetitionFieldFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+`;
+export type PetitionCompose_changePetitionFieldTypeMutationFn = ApolloReactCommon.MutationFunction<
+  PetitionCompose_changePetitionFieldTypeMutation,
+  PetitionCompose_changePetitionFieldTypeMutationVariables
+>;
+
+/**
+ * __usePetitionCompose_changePetitionFieldTypeMutation__
+ *
+ * To run a mutation, you first call `usePetitionCompose_changePetitionFieldTypeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionCompose_changePetitionFieldTypeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionComposeChangePetitionFieldTypeMutation, { data, loading, error }] = usePetitionCompose_changePetitionFieldTypeMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      fieldId: // value for 'fieldId'
+ *      type: // value for 'type'
+ *      force: // value for 'force'
+ *   },
+ * });
+ */
+export function usePetitionCompose_changePetitionFieldTypeMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    PetitionCompose_changePetitionFieldTypeMutation,
+    PetitionCompose_changePetitionFieldTypeMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    PetitionCompose_changePetitionFieldTypeMutation,
+    PetitionCompose_changePetitionFieldTypeMutationVariables
+  >(PetitionCompose_changePetitionFieldTypeDocument, baseOptions);
+}
+export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
+  typeof usePetitionCompose_changePetitionFieldTypeMutation
+>;
+export type PetitionCompose_changePetitionFieldTypeMutationResult = ApolloReactCommon.MutationResult<
+  PetitionCompose_changePetitionFieldTypeMutation
+>;
+export type PetitionCompose_changePetitionFieldTypeMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  PetitionCompose_changePetitionFieldTypeMutation,
+  PetitionCompose_changePetitionFieldTypeMutationVariables
 >;
 export const PetitionCompose_sendPetitionDocument = gql`
   mutation PetitionCompose_sendPetition(

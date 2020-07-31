@@ -1,5 +1,14 @@
 import { gql } from "@apollo/client";
-import { BoxProps, Flex, Image, Input, Switch, Text } from "@chakra-ui/core";
+import {
+  Box,
+  BoxProps,
+  Flex,
+  Image,
+  Input,
+  Stack,
+  Switch,
+  Text,
+} from "@chakra-ui/core";
 import { QuestionIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -12,9 +21,11 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
+import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelect";
 
 export type PetitionComposeFieldSettingsProps = {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
+  onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
 };
@@ -22,6 +33,7 @@ export type PetitionComposeFieldSettingsProps = {
 export function PetitionComposeFieldSettings({
   field,
   onFieldEdit,
+  onFieldTypeChange,
   onClose,
 }: PetitionComposeFieldSettingsProps) {
   return (
@@ -32,7 +44,13 @@ export function PetitionComposeFieldSettings({
           defaultMessage="Field settings"
         />
       </CardHeader>
-      <Flex flexDirection="column" padding={4} marginBottom={-4}>
+      <Stack spacing={4} padding={4} direction="column">
+        <Box>
+          <PetitionFieldTypeSelect
+            type={field.type}
+            onChange={(type) => onFieldTypeChange(field.id, type)}
+          />
+        </Box>
         <SettingsRow
           label={
             <FormattedMessage
@@ -108,7 +126,7 @@ export function PetitionComposeFieldSettings({
         ) : field.type === "TEXT" ? (
           <TextSettings field={field} onFieldEdit={onFieldEdit} />
         ) : null}
-      </Flex>
+      </Stack>
     </Card>
   );
 }
@@ -142,7 +160,7 @@ function TextSettings({
   };
 
   return (
-    <Flex flexDirection="column">
+    <Stack spacing={4}>
       <SettingsRow
         label={
           <FormattedMessage
@@ -206,7 +224,7 @@ function TextSettings({
           onChange={handlePlaceholderChange}
         />
       </SettingsRow>
-    </Flex>
+    </Stack>
   );
 }
 
@@ -224,13 +242,7 @@ function SettingsRow({
 }) {
   return (
     <SmallPopover content={description} placement="left">
-      <Flex
-        as="label"
-        alignItems="center"
-        marginBottom={4}
-        {...{ htmlFor: controlId }}
-        {...props}
-      >
+      <Flex as="label" alignItems="center" htmlFor={controlId} {...props}>
         <Text as="div">{label}</Text>
         <QuestionIcon marginLeft={2} color="gray.200" />
         <Spacer minWidth={4} />

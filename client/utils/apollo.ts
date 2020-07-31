@@ -50,6 +50,18 @@ export function createApolloClient(
           possibleTypes.map((t) => t.name),
         ])
       ),
+      typePolicies: {
+        Petition: {
+          fields: {
+            fields: { merge: false },
+          },
+        },
+        PetitionField: {
+          fields: {
+            options: { merge: false },
+          },
+        },
+      },
     }).restore(initialState ?? {}),
     connectToDevTools:
       process.browser && process.env.NODE_ENV === "development",

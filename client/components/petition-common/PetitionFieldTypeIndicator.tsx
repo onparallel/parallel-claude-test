@@ -19,11 +19,11 @@ export function PetitionFieldTypeIndicator({
     return {
       FILE_UPLOAD: intl.formatMessage({
         id: "petition.field-type.file-upload",
-        defaultMessage: "File Upload",
+        defaultMessage: "File upload",
       }),
       TEXT: intl.formatMessage({
         id: "petition.field-type.text",
-        defaultMessage: "Text field",
+        defaultMessage: "Text input",
       }),
     }[type];
   }, [type, intl.locale]);
