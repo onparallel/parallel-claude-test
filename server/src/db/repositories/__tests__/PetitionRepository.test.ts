@@ -408,4 +408,80 @@ describe("repositories/PetitionRepository", () => {
       });
     });
   });
+
+  describe("clonePetitionField", () => {
+    let org: Organization;
+    let user: User;
+    let petition: Petition;
+    let fields: PetitionField[];
+
+    beforeAll(async () => {
+      await deleteAllData(knex);
+      [org] = await mocks.createRandomOrganizations(1);
+      [user] = await mocks.createRandomUsers(org.id, 1);
+      [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
+      fields = await mocks.createRandomPetitionFields(petition.id, 5);
+    });
+
+    test("should throw an error on invalid fieldId", async () => {
+      const invalidFieldId = 823098123;
+      await expect(
+        petitions.clonePetitionField(petition.id, invalidFieldId, user)
+      ).rejects.toThrow("invalid fieldId: " + invalidFieldId);
+    });
+
+    test("should clone second field", async () => {
+      const toCloneId = fields[1].id;
+      const { field: newField } = await petitions.clonePetitionField(
+        petition.id,
+        toCloneId,
+        user
+      );
+
+      const newFields = await petitions.loadFieldsForPetition(petition.id, {
+        refresh: true,
+      });
+
+      expect(newFields.map((f) => f.id)).toContain(newField.id);
+      expect(newFields[2].id).toBe(newField.id);
+    });
+
+    test("cloned field should have the same contents", async () => {
+      const toClone = fields[3];
+      const { field: newField } = await petitions.clonePetitionField(
+        petition.id,
+        toClone.id,
+        user
+      );
+
+      expect(toClone).toMatchObject({
+        petition_id: newField.petition_id,
+        description: newField.description,
+        multiple: newField.multiple,
+        optional: newField.optional,
+        options: newField.options,
+        title: newField.title,
+        type: newField.type,
+      });
+    });
+
+    test("validated field should be cloned invalidated", async () => {
+      const toClone = fields[3];
+      await petitions.validatePetitionFields(
+        petition.id,
+        [toClone.id],
+        true,
+        user
+      );
+      const { field: cloned } = await petitions.clonePetitionField(
+        petition.id,
+        toClone.id,
+        user
+      );
+
+      expect(cloned).toMatchObject({
+        validated: false,
+      });
+    });
+  });
 });

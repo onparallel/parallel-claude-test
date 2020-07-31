@@ -642,6 +642,9 @@ export class PetitionRepository extends BaseRepository {
       0
     );
     const fieldToCloneIndex = fields.findIndex((f) => f.id === fieldId);
+    if (fieldToCloneIndex === -1) {
+      throw new Error("invalid fieldId: " + fieldId);
+    }
     const fieldToClone = fields[fieldToCloneIndex];
 
     return this.knex.transaction(async (t) => {
