@@ -46,6 +46,7 @@ export function AskContactDetailsDialog({
   }
   return (
     <ConfirmDialog
+      id="pw-add-contact"
       closeOnOverlayClick={false}
       initialFocusRef={defaultEmail ? nameRef : emailRef}
       content={{
@@ -108,7 +109,7 @@ export function AskContactDetailsDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
+        <Button colorScheme="purple" type="submit" id="create-contact-submit">
           <FormattedMessage
             id="contacts.create-new-contact.continue-button"
             defaultMessage="Continue"

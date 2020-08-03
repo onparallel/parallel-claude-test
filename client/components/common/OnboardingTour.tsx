@@ -77,6 +77,7 @@ const TourStep = ({
   return (
     <ChakraProvider theme={theme}>
       <Box
+        id="pw-onboarding-dialog"
         as="section"
         position="relative"
         background="white"
@@ -122,7 +123,11 @@ const TourStep = ({
           <Spacer />
           {index > 0 && <Button {...backProps}>{step.locale!.back}</Button>}
           {continuous && (
-            <Button {...primaryProps} colorScheme="purple">
+            <Button
+              {...primaryProps}
+              colorScheme="purple"
+              id="pw-onboarding-next"
+            >
               {continuous
                 ? isLastStep
                   ? step.locale!.last

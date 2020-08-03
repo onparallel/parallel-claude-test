@@ -103,7 +103,7 @@ function PublicHeaderMenu(props: StackProps) {
       </Button>
       <Flex>
         <NakedLink href="/login">
-          <Button as="a" flex="1" variant="outline">
+          <Button as="a" flex="1" variant="outline" id="pw-public-login">
             <FormattedMessage id="public.login-button" defaultMessage="Login" />
           </Button>
         </NakedLink>

@@ -89,7 +89,7 @@ export function ContactListHeader({
           </Menu>
         </Box>
       ) : null}
-      <Button colorScheme="purple" onClick={onCreateClick}>
+      <Button colorScheme="purple" onClick={onCreateClick} id="pw-new-contact">
         <FormattedMessage
           id="component.contact-list-header.create-contact-button"
           defaultMessage="Create contact"

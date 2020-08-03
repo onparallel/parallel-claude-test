@@ -257,6 +257,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           colorScheme="purple"
           isLoading={isSubmitting}
           type="submit"
+          id="pw-login-submit"
         >
           <FormattedMessage id="public.login-button" defaultMessage="Login" />
         </Button>

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
+    "dev": "ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
+    "debug": "ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
     "build": "tsc --project tsconfig.prod.json",
     "migrate": "knex migrate:latest",
     "postmigrate": "yarn generate-db-types",

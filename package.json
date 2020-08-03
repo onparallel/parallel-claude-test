@@ -4,7 +4,8 @@
     "bin",
     "client",
     "emails",
-    "server"
+    "server",
+    "e2e"
   ],
   "scripts": {
     "lint": "eslint '*/**/*.{js,ts,tsx,json}'",

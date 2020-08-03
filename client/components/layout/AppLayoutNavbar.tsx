@@ -173,7 +173,7 @@ export const AppLayoutNavbar = Object.assign(
               })}
         >
           {items.map(({ section, available, icon, text }) => (
-            <ListItem key={section}>
+            <ListItem key={section} id={`pw-section-${section}`}>
               <AppLayoutNavbarLink
                 href={`/app/${section}`}
                 isAvailable={available}
