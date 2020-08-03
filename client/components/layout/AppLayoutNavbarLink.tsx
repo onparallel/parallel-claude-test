@@ -84,7 +84,7 @@ function AppLayoutNavbarLinkContent({
     <Box
       textAlign="center"
       paddingY={isMobile ? 2 : 3}
-      paddingX={isMobile ? 2 : undefined}
+      paddingX={isMobile ? "6px" : undefined}
       sx={
         isDisabled
           ? {}

@@ -109,18 +109,19 @@ export const AppLayoutNavbar = Object.assign(
               height: 16,
               boxShadow:
                 "0 -4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);",
-              paddingX: 1,
+              paddingX: 2,
             }
           : {
               flexDirection: "column",
               minWidth: 24,
-              paddingY: 4,
+              paddingTop: 6,
+              paddingBottom: 4,
               boxShadow: "md",
             })}
         {...props}
       >
         {isMobile ? null : (
-          <Flex justifyContent="center" marginTop={6} marginBottom={6}>
+          <Flex justifyContent="center" marginBottom={6}>
             <NakedLink href="/app">
               <Box as="a" width="40px" height="40px" position="relative">
                 <Box
@@ -164,7 +165,7 @@ export const AppLayoutNavbar = Object.assign(
                 flex: 1,
                 flexDirection: "row",
                 justifyContent: "center",
-                marginX: 1,
+                marginX: 2,
               }
             : {
                 flexDirection: "column",
