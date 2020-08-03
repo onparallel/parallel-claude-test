@@ -289,7 +289,8 @@ export const PetitionAccess = objectType({
     t.datetime("nextReminderAt", {
       description: "When the next reminder will be sent.",
       nullable: true,
-      resolve: (o) => (o.reminders_left === 0 ? null : o.next_reminder_at),
+      resolve: (o) =>
+        o.status === "ACTIVE" && o.reminders_active ? o.next_reminder_at : null,
     });
     t.int("remindersLeft", {
       description: "Number of reminders left.",

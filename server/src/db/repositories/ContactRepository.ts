@@ -122,6 +122,8 @@ export class ContactRepository extends BaseRepository {
       await this.from("petition_access", t)
         .update({
           status: "INACTIVE",
+          reminders_active: false,
+          next_reminder_at: null,
         })
         .whereIn("contact_id", unMaybeArray(contactId));
     });

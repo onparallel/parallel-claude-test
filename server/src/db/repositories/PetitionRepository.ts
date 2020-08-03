@@ -374,6 +374,8 @@ export class PetitionRepository extends BaseRepository {
         .where("status", "ACTIVE")
         .update(
           {
+            reminders_active: false,
+            next_reminder_at: null,
             status: "INACTIVE",
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
@@ -440,18 +442,11 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionAccessNextReminder(
     accessId: number,
-    nextReminderAt: Date | null,
-    remindersLeft: number
+    nextReminderAt: Date | null
   ) {
     const [row] = await this.from("petition_access")
       .where("id", accessId)
-      .update(
-        {
-          next_reminder_at: nextReminderAt,
-          reminders_left: remindersLeft,
-        },
-        "*"
-      );
+      .update({ next_reminder_at: nextReminderAt }, "*");
     return row;
   }
 
@@ -1006,7 +1001,8 @@ export class PetitionRepository extends BaseRepository {
       .where("status", "ACTIVE")
       .where("reminders_active", true)
       .whereNotNull("next_reminder_at")
-      .where("next_reminder_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"));
+      .where("next_reminder_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"))
+      .where("reminders_left", ">", 0);
   }
 
   async clonePetition(petitionId: number, user: User) {
@@ -1063,7 +1059,16 @@ export class PetitionRepository extends BaseRepository {
           "id",
           data.map((r) => r.petition_access_id)
         )
-        .update({ reminders_left: this.knex.raw("reminders_left - 1") });
+        .update({
+          reminders_left: this.knex.raw(`"reminders_left" - 1`),
+          // if only one reminder left, deactivate automatic reminders
+          next_reminder_at: this.knex.raw(/* sql */ `
+            case when "reminders_left" <= 1 then null else "reminders_left" end
+          `),
+          reminders_active: this.knex.raw(/* sql */ `
+            case when "reminders_left" <= 1 then false else "reminders_active" end
+          `),
+        });
       return await this.insert("petition_reminder", data, t).returning("*");
     });
     await this.createEvent(
@@ -1093,7 +1098,7 @@ export class PetitionRepository extends BaseRepository {
   async stopAccessReminders(accessIds: number[]) {
     return await this.from("petition_access")
       .whereIn("id", accessIds)
-      .update({ reminders_active: false }, "*");
+      .update({ reminders_active: false, next_reminder_at: null }, "*");
   }
 
   async startAccessReminders(

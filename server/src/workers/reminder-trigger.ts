@@ -7,7 +7,10 @@ createCronWorker("reminder-trigger", async (context) => {
   const accesses = await context.petitions.getRemindableAccesses();
   for (const batch of chunk(accesses, 10)) {
     await eachOf(batch, async (access) => {
-      const hasMore = access.reminders_left > 1;
+      await context.petitions.updatePetitionAccessNextReminder(
+        access.id,
+        calculateNextReminder(new Date(), access.reminders_config!)
+      );
       const reminders = await context.petitions.createReminders(
         access.petition_id,
         accesses.map((access) => ({
@@ -18,16 +21,6 @@ createCronWorker("reminder-trigger", async (context) => {
         }))
       );
       await context.aws.enqueueReminders(reminders.map((r) => r.id));
-      await context.petitions.updatePetitionAccessNextReminder(
-        access.id,
-        hasMore
-          ? calculateNextReminder(
-              access.next_reminder_at!,
-              access.reminders_config!
-            )
-          : null,
-        Math.max(access.reminders_left - 1, 0)
-      );
     });
   }
 });
