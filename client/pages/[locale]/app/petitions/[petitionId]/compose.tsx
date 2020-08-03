@@ -129,7 +129,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleClonePetitionField = useCallback(
     wrapper(async (fieldId: string) => {
-      return await clonePetitionField({ variables: { petitionId, fieldId } });
+      const { data } = await clonePetitionField({
+        variables: { petitionId, fieldId },
+      });
+      const field = data!.clonePetitionField.field;
+      focusField(field.id);
     }),
     [petitionId]
   );
@@ -207,12 +211,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, type },
       });
       const field = data!.createPetitionField.field;
-      setTimeout(() => {
-        const title = document.querySelector<HTMLElement>(
-          `#field-title-${field.id}`
-        );
-        title?.focus();
-      });
+      focusField(field.id);
     }),
     [petitionId]
   );
@@ -343,6 +342,15 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     },
     [petition]
   );
+
+  function focusField(fieldId: string) {
+    setTimeout(() => {
+      const title = document.querySelector<HTMLElement>(
+        `#field-title-${fieldId}`
+      );
+      title?.focus();
+    });
+  }
 
   return (
     <PetitionLayout
