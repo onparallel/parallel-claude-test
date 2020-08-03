@@ -42,6 +42,8 @@ export class OrganizationRepository extends BaseRepository {
         "cscorporateadvisors",
         "andersen",
         "meetmaps",
+        "treinta",
+        "iomed",
       ].includes(org.identifier)
     ) {
       return `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`;
