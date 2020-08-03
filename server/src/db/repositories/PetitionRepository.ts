@@ -1063,7 +1063,7 @@ export class PetitionRepository extends BaseRepository {
           reminders_left: this.knex.raw(`"reminders_left" - 1`),
           // if only one reminder left, deactivate automatic reminders
           next_reminder_at: this.knex.raw(/* sql */ `
-            case when "reminders_left" <= 1 then null else "reminders_left" end
+            case when "reminders_left" <= 1 then null else "next_reminder_at" end
           `),
           reminders_active: this.knex.raw(/* sql */ `
             case when "reminders_left" <= 1 then false else "reminders_active" end
