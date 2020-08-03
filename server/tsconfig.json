@@ -9,6 +9,5 @@
     "emitDecoratorMetadata": true,
     "sourceMap": true
   },
-  "exclude": ["node_modules"],
-  "include": ["src/types/index.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

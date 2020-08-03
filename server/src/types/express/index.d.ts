@@ -1,5 +1,5 @@
 declare namespace Express {
   export interface Request {
-    context: import("../context").ApiContext;
+    context: import("../../context").ApiContext;
   }
 }
