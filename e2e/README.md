@@ -7,7 +7,7 @@ In order to run the tests, first make sure that:
 - you have installed all required dependencies.
 - you have the client and server running on an accessible URL.
 
-Then just run `yarn test`.
+Then just run `yarn test:e2e`.
 
 ## Environment variables
 
