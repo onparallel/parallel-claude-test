@@ -307,10 +307,13 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           defaultMessage: "Recipient",
         }),
         CellContent: ({ row }) => {
-          if (row.recipients.length === 0) {
+          const recipients = row.accesses
+            .filter((a) => a.status === "ACTIVE")
+            .map((a) => a.contact);
+          if (recipients.length === 0) {
             return null;
           }
-          const [contact, ...rest] = row.recipients;
+          const [contact, ...rest] = recipients;
           if (contact) {
             return rest.length ? (
               <FormattedMessage
@@ -465,8 +468,11 @@ Petitions.fragments = {
           total
         }
         createdAt
-        recipients {
-          ...ContactLink_Contact
+        accesses {
+          status
+          contact {
+            ...ContactLink_Contact
+          }
         }
       }
       totalCount

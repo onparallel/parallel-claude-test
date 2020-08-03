@@ -457,7 +457,6 @@ export interface NexusGenFieldTypes {
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
-    recipients: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: Date; // DateTime!

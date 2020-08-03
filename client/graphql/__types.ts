@@ -545,8 +545,6 @@ export type Petition = Timestamps & {
   name?: Maybe<Scalars["String"]>;
   /** The progress of the petition. */
   progress: PetitionProgress;
-  /** The recipients for this petition */
-  recipients: Array<Maybe<Contact>>;
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
   /** The status of the petition. */
@@ -2368,8 +2366,15 @@ export type Petitions_PetitionsListFragment = {
             PetitionProgress,
             "validated" | "replied" | "optional" | "total"
           >;
-          recipients: Array<
-            Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
+          accesses: Array<
+            { __typename?: "PetitionAccess" } & Pick<
+              PetitionAccess,
+              "status"
+            > & {
+                contact?: Maybe<
+                  { __typename?: "Contact" } & ContactLink_ContactFragment
+                >;
+              }
           >;
         }
     >;
@@ -3439,8 +3444,11 @@ export const Petitions_PetitionsListFragmentDoc = gql`
         total
       }
       createdAt
-      recipients {
-        ...ContactLink_Contact
+      accesses {
+        status
+        contact {
+          ...ContactLink_Contact
+        }
       }
     }
     totalCount

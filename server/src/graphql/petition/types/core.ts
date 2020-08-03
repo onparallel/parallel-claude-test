@@ -114,20 +114,6 @@ export const Petition = objectType({
         return ctx.petitions.loadAccessesForPetition(root.id);
       },
     });
-    t.field("recipients", {
-      type: "Contact",
-      list: [false],
-      description: "The recipients for this petition",
-      resolve: async (root, _, ctx) => {
-        const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
-        const contactIds = accesses
-          .filter((a) => a.status === "ACTIVE")
-          .map((a) => a.contact_id);
-        return contactIds.length
-          ? await ctx.contacts.loadContact(contactIds)
-          : [];
-      },
-    });
     t.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminders configuration for the petition.",

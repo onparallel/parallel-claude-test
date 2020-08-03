@@ -670,11 +670,6 @@ type Petition implements Timestamps {
   progress: PetitionProgress!
 
   """
-  The recipients for this petition
-  """
-  recipients: [Contact]!
-
-  """
   The reminders configuration for the petition.
   """
   remindersConfig: RemindersConfig
