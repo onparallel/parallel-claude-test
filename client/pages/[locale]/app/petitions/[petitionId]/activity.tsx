@@ -114,6 +114,34 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     [petitionId]
   );
 
+  const showNoRemindersLeftToast = (petitionAccessId?: string) => {
+    const access = petition!.accesses.find((a) => a.id === petitionAccessId)!;
+    toast({
+      title: intl.formatMessage({
+        id: "petition.no-reminders-left.toast-header",
+        defaultMessage: "No reminders left",
+      }),
+      description: petitionAccessId
+        ? intl.formatMessage(
+            {
+              id: "petition.no-reminders-left.toast-description",
+              defaultMessage:
+                "You have sent the maximum number of reminders to {nameOrEmail}",
+            },
+            {
+              nameOrEmail: access.contact!.fullName || access.contact!.email,
+            }
+          )
+        : intl.formatMessage({
+            id: "petition.no-reminders-left-generic.toast-description",
+            defaultMessage:
+              "You have sent the maximum number of reminders to some of the selected contacts",
+          }),
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
   const confirmSendReminder = useConfirmSendReminderDialog();
   const [sendReminders] = usePetitionActivity_sendRemindersMutation();
   const handleSendReminders = useCallback(
@@ -131,29 +159,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         const extra = error?.graphQLErrors?.[0]?.extensions?.extra;
         switch (extra?.errorCode) {
           case "NO_REMINDERS_LEFT": {
-            const access = petition!.accesses.find(
-              (a) => a.id === extra.petitionAccessId
-            )!;
-            toast({
-              title: intl.formatMessage({
-                id: "petition.no-reminders-left.toast-header",
-                defaultMessage: "No reminders left",
-              }),
-              description: intl.formatMessage(
-                {
-                  id: "petition.no-reminders-left.toast-description",
-                  defaultMessage:
-                    "You have sent the maximum number of reminders to {nameOrEmail}",
-                },
-                {
-                  nameOrEmail:
-                    access.contact!.fullName || access.contact!.email,
-                }
-              ),
-              status: "error",
-              duration: 5000,
-              isClosable: true,
-            });
+            showNoRemindersLeftToast(extra.petitionAccessId);
             return;
           }
         }
@@ -312,21 +318,28 @@ function PetitionActivity({ petitionId }: PetitionProps) {
           status: "success",
         });
       } catch (e) {
+        const extra = e?.graphQLErrors?.[0]?.extensions?.extra;
         if (e && !["CLOSE", "CANCEL"].includes(e.reason)) {
-          toast({
-            title: intl.formatMessage({
-              id: "petition.reminder-settings-error.toast-header",
-              defaultMessage: "Error",
-            }),
-            description: intl.formatMessage({
-              id: "petition.reminder-settings-error.toast-body",
-              defaultMessage:
-                "There was an error setting the reminders. Please try again.",
-            }),
-            duration: 5000,
-            isClosable: true,
-            status: "error",
-          });
+          switch (extra?.errorCode) {
+            case "NO_REMINDERS_LEFT":
+              showNoRemindersLeftToast();
+              break;
+            default:
+              toast({
+                title: intl.formatMessage({
+                  id: "petition.reminder-settings-error.toast-header",
+                  defaultMessage: "Error",
+                }),
+                description: intl.formatMessage({
+                  id: "petition.reminder-settings-error.toast-body",
+                  defaultMessage:
+                    "There was an error setting the reminders. Please try again.",
+                }),
+                duration: 5000,
+                isClosable: true,
+                status: "error",
+              });
+          }
           return;
         }
       }
