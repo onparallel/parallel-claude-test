@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "lint": "eslint '*/**/*.{js,ts,tsx,json}'",
-    "update-deps": "ncu -u --packageFile bin/package.json && ncu -u --packageFile client/package.json && ncu -u --packageFile server/package.json"
+    "update-deps": "ncu -u --packageFile bin/package.json && ncu -u --packageFile client/package.json && ncu -u --packageFile server/package.json  && ncu -u --packageFile e2e/package.json"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.31.0",

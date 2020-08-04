@@ -1,8 +1,9 @@
-import { gql } from "@apollo/client";
-import * as ApolloReactCommon from "@apollo/react-common";
-import * as ApolloReactHooks from "@apollo/client";
+import * as Apollo from "@apollo/client";
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+const gql = Apollo.gql;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -3634,7 +3635,7 @@ export const AppLayout_updateOnboardingStatusDocument = gql`
     }
   }
 `;
-export type AppLayout_updateOnboardingStatusMutationFn = ApolloReactCommon.MutationFunction<
+export type AppLayout_updateOnboardingStatusMutationFn = Apollo.MutationFunction<
   AppLayout_updateOnboardingStatusMutation,
   AppLayout_updateOnboardingStatusMutationVariables
 >;
@@ -3658,12 +3659,12 @@ export type AppLayout_updateOnboardingStatusMutationFn = ApolloReactCommon.Mutat
  * });
  */
 export function useAppLayout_updateOnboardingStatusMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     AppLayout_updateOnboardingStatusMutation,
     AppLayout_updateOnboardingStatusMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     AppLayout_updateOnboardingStatusMutation,
     AppLayout_updateOnboardingStatusMutationVariables
   >(AppLayout_updateOnboardingStatusDocument, baseOptions);
@@ -3671,10 +3672,10 @@ export function useAppLayout_updateOnboardingStatusMutation(
 export type AppLayout_updateOnboardingStatusMutationHookResult = ReturnType<
   typeof useAppLayout_updateOnboardingStatusMutation
 >;
-export type AppLayout_updateOnboardingStatusMutationResult = ApolloReactCommon.MutationResult<
+export type AppLayout_updateOnboardingStatusMutationResult = Apollo.MutationResult<
   AppLayout_updateOnboardingStatusMutation
 >;
-export type AppLayout_updateOnboardingStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type AppLayout_updateOnboardingStatusMutationOptions = Apollo.BaseMutationOptions<
   AppLayout_updateOnboardingStatusMutation,
   AppLayout_updateOnboardingStatusMutationVariables
 >;
@@ -3686,7 +3687,7 @@ export const Contact_updateContactDocument = gql`
   }
   ${Contact_ContactFragmentDoc}
 `;
-export type Contact_updateContactMutationFn = ApolloReactCommon.MutationFunction<
+export type Contact_updateContactMutationFn = Apollo.MutationFunction<
   Contact_updateContactMutation,
   Contact_updateContactMutationVariables
 >;
@@ -3710,12 +3711,12 @@ export type Contact_updateContactMutationFn = ApolloReactCommon.MutationFunction
  * });
  */
 export function useContact_updateContactMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     Contact_updateContactMutation,
     Contact_updateContactMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     Contact_updateContactMutation,
     Contact_updateContactMutationVariables
   >(Contact_updateContactDocument, baseOptions);
@@ -3723,10 +3724,10 @@ export function useContact_updateContactMutation(
 export type Contact_updateContactMutationHookResult = ReturnType<
   typeof useContact_updateContactMutation
 >;
-export type Contact_updateContactMutationResult = ApolloReactCommon.MutationResult<
+export type Contact_updateContactMutationResult = Apollo.MutationResult<
   Contact_updateContactMutation
 >;
-export type Contact_updateContactMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type Contact_updateContactMutationOptions = Apollo.BaseMutationOptions<
   Contact_updateContactMutation,
   Contact_updateContactMutationVariables
 >;
@@ -3756,30 +3757,24 @@ export const ContactDocument = gql`
  * });
  */
 export function useContactQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    ContactQuery,
-    ContactQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
-  return ApolloReactHooks.useQuery<ContactQuery, ContactQueryVariables>(
+  return Apollo.useQuery<ContactQuery, ContactQueryVariables>(
     ContactDocument,
     baseOptions
   );
 }
 export function useContactLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    ContactQuery,
-    ContactQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
-  return ApolloReactHooks.useLazyQuery<ContactQuery, ContactQueryVariables>(
+  return Apollo.useLazyQuery<ContactQuery, ContactQueryVariables>(
     ContactDocument,
     baseOptions
   );
 }
 export type ContactQueryHookResult = ReturnType<typeof useContactQuery>;
 export type ContactLazyQueryHookResult = ReturnType<typeof useContactLazyQuery>;
-export type ContactQueryResult = ApolloReactCommon.QueryResult<
+export type ContactQueryResult = Apollo.QueryResult<
   ContactQuery,
   ContactQueryVariables
 >;
@@ -3808,32 +3803,32 @@ export const ContactUserDocument = gql`
  * });
  */
 export function useContactUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     ContactUserQuery,
     ContactUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<ContactUserQuery, ContactUserQueryVariables>(
+  return Apollo.useQuery<ContactUserQuery, ContactUserQueryVariables>(
     ContactUserDocument,
     baseOptions
   );
 }
 export function useContactUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     ContactUserQuery,
     ContactUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
-    ContactUserQuery,
-    ContactUserQueryVariables
-  >(ContactUserDocument, baseOptions);
+  return Apollo.useLazyQuery<ContactUserQuery, ContactUserQueryVariables>(
+    ContactUserDocument,
+    baseOptions
+  );
 }
 export type ContactUserQueryHookResult = ReturnType<typeof useContactUserQuery>;
 export type ContactUserLazyQueryHookResult = ReturnType<
   typeof useContactUserLazyQuery
 >;
-export type ContactUserQueryResult = ApolloReactCommon.QueryResult<
+export type ContactUserQueryResult = Apollo.QueryResult<
   ContactUserQuery,
   ContactUserQueryVariables
 >;
@@ -3842,7 +3837,7 @@ export const Contacts_deleteContactsDocument = gql`
     deleteContacts(ids: $ids)
   }
 `;
-export type Contacts_deleteContactsMutationFn = ApolloReactCommon.MutationFunction<
+export type Contacts_deleteContactsMutationFn = Apollo.MutationFunction<
   Contacts_deleteContactsMutation,
   Contacts_deleteContactsMutationVariables
 >;
@@ -3865,12 +3860,12 @@ export type Contacts_deleteContactsMutationFn = ApolloReactCommon.MutationFuncti
  * });
  */
 export function useContacts_deleteContactsMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     Contacts_deleteContactsMutation,
     Contacts_deleteContactsMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     Contacts_deleteContactsMutation,
     Contacts_deleteContactsMutationVariables
   >(Contacts_deleteContactsDocument, baseOptions);
@@ -3878,10 +3873,10 @@ export function useContacts_deleteContactsMutation(
 export type Contacts_deleteContactsMutationHookResult = ReturnType<
   typeof useContacts_deleteContactsMutation
 >;
-export type Contacts_deleteContactsMutationResult = ApolloReactCommon.MutationResult<
+export type Contacts_deleteContactsMutationResult = Apollo.MutationResult<
   Contacts_deleteContactsMutation
 >;
-export type Contacts_deleteContactsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type Contacts_deleteContactsMutationOptions = Apollo.BaseMutationOptions<
   Contacts_deleteContactsMutation,
   Contacts_deleteContactsMutationVariables
 >;
@@ -3919,23 +3914,20 @@ export const ContactsDocument = gql`
  * });
  */
 export function useContactsQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    ContactsQuery,
-    ContactsQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>
 ) {
-  return ApolloReactHooks.useQuery<ContactsQuery, ContactsQueryVariables>(
+  return Apollo.useQuery<ContactsQuery, ContactsQueryVariables>(
     ContactsDocument,
     baseOptions
   );
 }
 export function useContactsLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     ContactsQuery,
     ContactsQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<ContactsQuery, ContactsQueryVariables>(
+  return Apollo.useLazyQuery<ContactsQuery, ContactsQueryVariables>(
     ContactsDocument,
     baseOptions
   );
@@ -3944,7 +3936,7 @@ export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
 export type ContactsLazyQueryHookResult = ReturnType<
   typeof useContactsLazyQuery
 >;
-export type ContactsQueryResult = ApolloReactCommon.QueryResult<
+export type ContactsQueryResult = Apollo.QueryResult<
   ContactsQuery,
   ContactsQueryVariables
 >;
@@ -3973,26 +3965,26 @@ export const ContactsUserDocument = gql`
  * });
  */
 export function useContactsUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     ContactsUserQuery,
     ContactsUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
-    ContactsUserQuery,
-    ContactsUserQueryVariables
-  >(ContactsUserDocument, baseOptions);
+  return Apollo.useQuery<ContactsUserQuery, ContactsUserQueryVariables>(
+    ContactsUserDocument,
+    baseOptions
+  );
 }
 export function useContactsUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     ContactsUserQuery,
     ContactsUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
-    ContactsUserQuery,
-    ContactsUserQueryVariables
-  >(ContactsUserDocument, baseOptions);
+  return Apollo.useLazyQuery<ContactsUserQuery, ContactsUserQueryVariables>(
+    ContactsUserDocument,
+    baseOptions
+  );
 }
 export type ContactsUserQueryHookResult = ReturnType<
   typeof useContactsUserQuery
@@ -4000,7 +3992,7 @@ export type ContactsUserQueryHookResult = ReturnType<
 export type ContactsUserLazyQueryHookResult = ReturnType<
   typeof useContactsUserLazyQuery
 >;
-export type ContactsUserQueryResult = ApolloReactCommon.QueryResult<
+export type ContactsUserQueryResult = Apollo.QueryResult<
   ContactsUserQuery,
   ContactsUserQueryVariables
 >;
@@ -4015,7 +4007,7 @@ export const PetitionActivity_updatePetitionDocument = gql`
   }
   ${PetitionActivity_PetitionFragmentDoc}
 `;
-export type PetitionActivity_updatePetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_updatePetitionMutationFn = Apollo.MutationFunction<
   PetitionActivity_updatePetitionMutation,
   PetitionActivity_updatePetitionMutationVariables
 >;
@@ -4039,12 +4031,12 @@ export type PetitionActivity_updatePetitionMutationFn = ApolloReactCommon.Mutati
  * });
  */
 export function usePetitionActivity_updatePetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_updatePetitionMutation,
     PetitionActivity_updatePetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_updatePetitionMutation,
     PetitionActivity_updatePetitionMutationVariables
   >(PetitionActivity_updatePetitionDocument, baseOptions);
@@ -4052,10 +4044,10 @@ export function usePetitionActivity_updatePetitionMutation(
 export type PetitionActivity_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionActivity_updatePetitionMutation
 >;
-export type PetitionActivity_updatePetitionMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_updatePetitionMutationResult = Apollo.MutationResult<
   PetitionActivity_updatePetitionMutation
 >;
-export type PetitionActivity_updatePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_updatePetitionMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_updatePetitionMutation,
   PetitionActivity_updatePetitionMutationVariables
 >;
@@ -4076,7 +4068,7 @@ export const PetitionActivity_sendMessagesDocument = gql`
     )
   }
 `;
-export type PetitionActivity_sendMessagesMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_sendMessagesMutationFn = Apollo.MutationFunction<
   PetitionActivity_sendMessagesMutation,
   PetitionActivity_sendMessagesMutationVariables
 >;
@@ -4103,12 +4095,12 @@ export type PetitionActivity_sendMessagesMutationFn = ApolloReactCommon.Mutation
  * });
  */
 export function usePetitionActivity_sendMessagesMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_sendMessagesMutation,
     PetitionActivity_sendMessagesMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_sendMessagesMutation,
     PetitionActivity_sendMessagesMutationVariables
   >(PetitionActivity_sendMessagesDocument, baseOptions);
@@ -4116,10 +4108,10 @@ export function usePetitionActivity_sendMessagesMutation(
 export type PetitionActivity_sendMessagesMutationHookResult = ReturnType<
   typeof usePetitionActivity_sendMessagesMutation
 >;
-export type PetitionActivity_sendMessagesMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_sendMessagesMutationResult = Apollo.MutationResult<
   PetitionActivity_sendMessagesMutation
 >;
-export type PetitionActivity_sendMessagesMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_sendMessagesMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_sendMessagesMutation,
   PetitionActivity_sendMessagesMutationVariables
 >;
@@ -4131,7 +4123,7 @@ export const PetitionActivity_sendRemindersDocument = gql`
     sendReminders(petitionId: $petitionId, accessIds: $accessIds)
   }
 `;
-export type PetitionActivity_sendRemindersMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_sendRemindersMutationFn = Apollo.MutationFunction<
   PetitionActivity_sendRemindersMutation,
   PetitionActivity_sendRemindersMutationVariables
 >;
@@ -4155,12 +4147,12 @@ export type PetitionActivity_sendRemindersMutationFn = ApolloReactCommon.Mutatio
  * });
  */
 export function usePetitionActivity_sendRemindersMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_sendRemindersMutation,
     PetitionActivity_sendRemindersMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_sendRemindersMutation,
     PetitionActivity_sendRemindersMutationVariables
   >(PetitionActivity_sendRemindersDocument, baseOptions);
@@ -4168,10 +4160,10 @@ export function usePetitionActivity_sendRemindersMutation(
 export type PetitionActivity_sendRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_sendRemindersMutation
 >;
-export type PetitionActivity_sendRemindersMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_sendRemindersMutationResult = Apollo.MutationResult<
   PetitionActivity_sendRemindersMutation
 >;
-export type PetitionActivity_sendRemindersMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_sendRemindersMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_sendRemindersMutation,
   PetitionActivity_sendRemindersMutationVariables
 >;
@@ -4186,7 +4178,7 @@ export const PetitionActivity_deactivateAccessesDocument = gql`
     }
   }
 `;
-export type PetitionActivity_deactivateAccessesMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_deactivateAccessesMutationFn = Apollo.MutationFunction<
   PetitionActivity_deactivateAccessesMutation,
   PetitionActivity_deactivateAccessesMutationVariables
 >;
@@ -4210,12 +4202,12 @@ export type PetitionActivity_deactivateAccessesMutationFn = ApolloReactCommon.Mu
  * });
  */
 export function usePetitionActivity_deactivateAccessesMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_deactivateAccessesMutation,
     PetitionActivity_deactivateAccessesMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_deactivateAccessesMutation,
     PetitionActivity_deactivateAccessesMutationVariables
   >(PetitionActivity_deactivateAccessesDocument, baseOptions);
@@ -4223,10 +4215,10 @@ export function usePetitionActivity_deactivateAccessesMutation(
 export type PetitionActivity_deactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_deactivateAccessesMutation
 >;
-export type PetitionActivity_deactivateAccessesMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_deactivateAccessesMutationResult = Apollo.MutationResult<
   PetitionActivity_deactivateAccessesMutation
 >;
-export type PetitionActivity_deactivateAccessesMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_deactivateAccessesMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_deactivateAccessesMutation,
   PetitionActivity_deactivateAccessesMutationVariables
 >;
@@ -4241,7 +4233,7 @@ export const PetitionActivity_reactivateAccessesDocument = gql`
     }
   }
 `;
-export type PetitionActivity_reactivateAccessesMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_reactivateAccessesMutationFn = Apollo.MutationFunction<
   PetitionActivity_reactivateAccessesMutation,
   PetitionActivity_reactivateAccessesMutationVariables
 >;
@@ -4265,12 +4257,12 @@ export type PetitionActivity_reactivateAccessesMutationFn = ApolloReactCommon.Mu
  * });
  */
 export function usePetitionActivity_reactivateAccessesMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_reactivateAccessesMutation,
     PetitionActivity_reactivateAccessesMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_reactivateAccessesMutation,
     PetitionActivity_reactivateAccessesMutationVariables
   >(PetitionActivity_reactivateAccessesDocument, baseOptions);
@@ -4278,10 +4270,10 @@ export function usePetitionActivity_reactivateAccessesMutation(
 export type PetitionActivity_reactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_reactivateAccessesMutation
 >;
-export type PetitionActivity_reactivateAccessesMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_reactivateAccessesMutationResult = Apollo.MutationResult<
   PetitionActivity_reactivateAccessesMutation
 >;
-export type PetitionActivity_reactivateAccessesMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_reactivateAccessesMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_reactivateAccessesMutation,
   PetitionActivity_reactivateAccessesMutationVariables
 >;
@@ -4296,7 +4288,7 @@ export const PetitionActivity_cancelScheduledMessageDocument = gql`
     }
   }
 `;
-export type PetitionActivity_cancelScheduledMessageMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_cancelScheduledMessageMutationFn = Apollo.MutationFunction<
   PetitionActivity_cancelScheduledMessageMutation,
   PetitionActivity_cancelScheduledMessageMutationVariables
 >;
@@ -4320,12 +4312,12 @@ export type PetitionActivity_cancelScheduledMessageMutationFn = ApolloReactCommo
  * });
  */
 export function usePetitionActivity_cancelScheduledMessageMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_cancelScheduledMessageMutation,
     PetitionActivity_cancelScheduledMessageMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_cancelScheduledMessageMutation,
     PetitionActivity_cancelScheduledMessageMutationVariables
   >(PetitionActivity_cancelScheduledMessageDocument, baseOptions);
@@ -4333,10 +4325,10 @@ export function usePetitionActivity_cancelScheduledMessageMutation(
 export type PetitionActivity_cancelScheduledMessageMutationHookResult = ReturnType<
   typeof usePetitionActivity_cancelScheduledMessageMutation
 >;
-export type PetitionActivity_cancelScheduledMessageMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_cancelScheduledMessageMutationResult = Apollo.MutationResult<
   PetitionActivity_cancelScheduledMessageMutation
 >;
-export type PetitionActivity_cancelScheduledMessageMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_cancelScheduledMessageMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_cancelScheduledMessageMutation,
   PetitionActivity_cancelScheduledMessageMutationVariables
 >;
@@ -4361,7 +4353,7 @@ export const PetitionsActivity_sendPetitionDocument = gql`
     }
   }
 `;
-export type PetitionsActivity_sendPetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionsActivity_sendPetitionMutationFn = Apollo.MutationFunction<
   PetitionsActivity_sendPetitionMutation,
   PetitionsActivity_sendPetitionMutationVariables
 >;
@@ -4389,12 +4381,12 @@ export type PetitionsActivity_sendPetitionMutationFn = ApolloReactCommon.Mutatio
  * });
  */
 export function usePetitionsActivity_sendPetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionsActivity_sendPetitionMutation,
     PetitionsActivity_sendPetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionsActivity_sendPetitionMutation,
     PetitionsActivity_sendPetitionMutationVariables
   >(PetitionsActivity_sendPetitionDocument, baseOptions);
@@ -4402,10 +4394,10 @@ export function usePetitionsActivity_sendPetitionMutation(
 export type PetitionsActivity_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionsActivity_sendPetitionMutation
 >;
-export type PetitionsActivity_sendPetitionMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionsActivity_sendPetitionMutationResult = Apollo.MutationResult<
   PetitionsActivity_sendPetitionMutation
 >;
-export type PetitionsActivity_sendPetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionsActivity_sendPetitionMutationOptions = Apollo.BaseMutationOptions<
   PetitionsActivity_sendPetitionMutation,
   PetitionsActivity_sendPetitionMutationVariables
 >;
@@ -4426,7 +4418,7 @@ export const PetitionActivity_switchAutomaticRemindersDocument = gql`
     }
   }
 `;
-export type PetitionActivity_switchAutomaticRemindersMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionActivity_switchAutomaticRemindersMutationFn = Apollo.MutationFunction<
   PetitionActivity_switchAutomaticRemindersMutation,
   PetitionActivity_switchAutomaticRemindersMutationVariables
 >;
@@ -4452,12 +4444,12 @@ export type PetitionActivity_switchAutomaticRemindersMutationFn = ApolloReactCom
  * });
  */
 export function usePetitionActivity_switchAutomaticRemindersMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_switchAutomaticRemindersMutation,
     PetitionActivity_switchAutomaticRemindersMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionActivity_switchAutomaticRemindersMutation,
     PetitionActivity_switchAutomaticRemindersMutationVariables
   >(PetitionActivity_switchAutomaticRemindersDocument, baseOptions);
@@ -4465,10 +4457,10 @@ export function usePetitionActivity_switchAutomaticRemindersMutation(
 export type PetitionActivity_switchAutomaticRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_switchAutomaticRemindersMutation
 >;
-export type PetitionActivity_switchAutomaticRemindersMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionActivity_switchAutomaticRemindersMutationResult = Apollo.MutationResult<
   PetitionActivity_switchAutomaticRemindersMutation
 >;
-export type PetitionActivity_switchAutomaticRemindersMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionActivity_switchAutomaticRemindersMutationOptions = Apollo.BaseMutationOptions<
   PetitionActivity_switchAutomaticRemindersMutation,
   PetitionActivity_switchAutomaticRemindersMutationVariables
 >;
@@ -4498,23 +4490,23 @@ export const PetitionActivityDocument = gql`
  * });
  */
 export function usePetitionActivityQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionActivityQuery,
     PetitionActivityQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
-    PetitionActivityQuery,
-    PetitionActivityQueryVariables
-  >(PetitionActivityDocument, baseOptions);
+  return Apollo.useQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
+    PetitionActivityDocument,
+    baseOptions
+  );
 }
 export function usePetitionActivityLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionActivityQuery,
     PetitionActivityQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionActivityQuery,
     PetitionActivityQueryVariables
   >(PetitionActivityDocument, baseOptions);
@@ -4525,7 +4517,7 @@ export type PetitionActivityQueryHookResult = ReturnType<
 export type PetitionActivityLazyQueryHookResult = ReturnType<
   typeof usePetitionActivityLazyQuery
 >;
-export type PetitionActivityQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionActivityQueryResult = Apollo.QueryResult<
   PetitionActivityQuery,
   PetitionActivityQueryVariables
 >;
@@ -4554,23 +4546,23 @@ export const PetitionActivityUserDocument = gql`
  * });
  */
 export function usePetitionActivityUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionActivityUserQuery,
     PetitionActivityUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
+  return Apollo.useQuery<
     PetitionActivityUserQuery,
     PetitionActivityUserQueryVariables
   >(PetitionActivityUserDocument, baseOptions);
 }
 export function usePetitionActivityUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionActivityUserQuery,
     PetitionActivityUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionActivityUserQuery,
     PetitionActivityUserQueryVariables
   >(PetitionActivityUserDocument, baseOptions);
@@ -4581,7 +4573,7 @@ export type PetitionActivityUserQueryHookResult = ReturnType<
 export type PetitionActivityUserLazyQueryHookResult = ReturnType<
   typeof usePetitionActivityUserLazyQuery
 >;
-export type PetitionActivityUserQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionActivityUserQueryResult = Apollo.QueryResult<
   PetitionActivityUserQuery,
   PetitionActivityUserQueryVariables
 >;
@@ -4598,7 +4590,7 @@ export const PetitionCompose_updatePetitionDocument = gql`
   ${PetitionLayout_PetitionFragmentDoc}
   ${PetitionComposeMessageEditor_PetitionFragmentDoc}
 `;
-export type PetitionCompose_updatePetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_updatePetitionMutationFn = Apollo.MutationFunction<
   PetitionCompose_updatePetitionMutation,
   PetitionCompose_updatePetitionMutationVariables
 >;
@@ -4622,12 +4614,12 @@ export type PetitionCompose_updatePetitionMutationFn = ApolloReactCommon.Mutatio
  * });
  */
 export function usePetitionCompose_updatePetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_updatePetitionMutation,
     PetitionCompose_updatePetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_updatePetitionMutation,
     PetitionCompose_updatePetitionMutationVariables
   >(PetitionCompose_updatePetitionDocument, baseOptions);
@@ -4635,10 +4627,10 @@ export function usePetitionCompose_updatePetitionMutation(
 export type PetitionCompose_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionMutation
 >;
-export type PetitionCompose_updatePetitionMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_updatePetitionMutationResult = Apollo.MutationResult<
   PetitionCompose_updatePetitionMutation
 >;
-export type PetitionCompose_updatePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_updatePetitionMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_updatePetitionMutation,
   PetitionCompose_updatePetitionMutationVariables
 >;
@@ -4654,7 +4646,7 @@ export const PetitionCompose_updateFieldPositionsDocument = gql`
   }
   ${PetitionLayout_PetitionFragmentDoc}
 `;
-export type PetitionCompose_updateFieldPositionsMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_updateFieldPositionsMutationFn = Apollo.MutationFunction<
   PetitionCompose_updateFieldPositionsMutation,
   PetitionCompose_updateFieldPositionsMutationVariables
 >;
@@ -4678,12 +4670,12 @@ export type PetitionCompose_updateFieldPositionsMutationFn = ApolloReactCommon.M
  * });
  */
 export function usePetitionCompose_updateFieldPositionsMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_updateFieldPositionsMutation,
     PetitionCompose_updateFieldPositionsMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_updateFieldPositionsMutation,
     PetitionCompose_updateFieldPositionsMutationVariables
   >(PetitionCompose_updateFieldPositionsDocument, baseOptions);
@@ -4691,10 +4683,10 @@ export function usePetitionCompose_updateFieldPositionsMutation(
 export type PetitionCompose_updateFieldPositionsMutationHookResult = ReturnType<
   typeof usePetitionCompose_updateFieldPositionsMutation
 >;
-export type PetitionCompose_updateFieldPositionsMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_updateFieldPositionsMutationResult = Apollo.MutationResult<
   PetitionCompose_updateFieldPositionsMutation
 >;
-export type PetitionCompose_updateFieldPositionsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_updateFieldPositionsMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_updateFieldPositionsMutation,
   PetitionCompose_updateFieldPositionsMutationVariables
 >;
@@ -4721,7 +4713,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionFragmentDoc}
 `;
-export type PetitionCompose_createPetitionFieldMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_createPetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_createPetitionFieldMutation,
   PetitionCompose_createPetitionFieldMutationVariables
 >;
@@ -4745,12 +4737,12 @@ export type PetitionCompose_createPetitionFieldMutationFn = ApolloReactCommon.Mu
  * });
  */
 export function usePetitionCompose_createPetitionFieldMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_createPetitionFieldMutation,
     PetitionCompose_createPetitionFieldMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_createPetitionFieldMutation,
     PetitionCompose_createPetitionFieldMutationVariables
   >(PetitionCompose_createPetitionFieldDocument, baseOptions);
@@ -4758,10 +4750,10 @@ export function usePetitionCompose_createPetitionFieldMutation(
 export type PetitionCompose_createPetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_createPetitionFieldMutation
 >;
-export type PetitionCompose_createPetitionFieldMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_createPetitionFieldMutationResult = Apollo.MutationResult<
   PetitionCompose_createPetitionFieldMutation
 >;
-export type PetitionCompose_createPetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_createPetitionFieldMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_createPetitionFieldMutation,
   PetitionCompose_createPetitionFieldMutationVariables
 >;
@@ -4785,7 +4777,7 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionFragmentDoc}
 `;
-export type PetitionCompose_clonePetitionFieldMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_clonePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_clonePetitionFieldMutation,
   PetitionCompose_clonePetitionFieldMutationVariables
 >;
@@ -4809,12 +4801,12 @@ export type PetitionCompose_clonePetitionFieldMutationFn = ApolloReactCommon.Mut
  * });
  */
 export function usePetitionCompose_clonePetitionFieldMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_clonePetitionFieldMutation,
     PetitionCompose_clonePetitionFieldMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_clonePetitionFieldMutation,
     PetitionCompose_clonePetitionFieldMutationVariables
   >(PetitionCompose_clonePetitionFieldDocument, baseOptions);
@@ -4822,10 +4814,10 @@ export function usePetitionCompose_clonePetitionFieldMutation(
 export type PetitionCompose_clonePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_clonePetitionFieldMutation
 >;
-export type PetitionCompose_clonePetitionFieldMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_clonePetitionFieldMutationResult = Apollo.MutationResult<
   PetitionCompose_clonePetitionFieldMutation
 >;
-export type PetitionCompose_clonePetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_clonePetitionFieldMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_clonePetitionFieldMutation,
   PetitionCompose_clonePetitionFieldMutationVariables
 >;
@@ -4849,7 +4841,7 @@ export const PetitionCompose_deletePetitionFieldDocument = gql`
   }
   ${PetitionLayout_PetitionFragmentDoc}
 `;
-export type PetitionCompose_deletePetitionFieldMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_deletePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_deletePetitionFieldMutation,
   PetitionCompose_deletePetitionFieldMutationVariables
 >;
@@ -4874,12 +4866,12 @@ export type PetitionCompose_deletePetitionFieldMutationFn = ApolloReactCommon.Mu
  * });
  */
 export function usePetitionCompose_deletePetitionFieldMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_deletePetitionFieldMutation,
     PetitionCompose_deletePetitionFieldMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_deletePetitionFieldMutation,
     PetitionCompose_deletePetitionFieldMutationVariables
   >(PetitionCompose_deletePetitionFieldDocument, baseOptions);
@@ -4887,10 +4879,10 @@ export function usePetitionCompose_deletePetitionFieldMutation(
 export type PetitionCompose_deletePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_deletePetitionFieldMutation
 >;
-export type PetitionCompose_deletePetitionFieldMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_deletePetitionFieldMutationResult = Apollo.MutationResult<
   PetitionCompose_deletePetitionFieldMutation
 >;
-export type PetitionCompose_deletePetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_deletePetitionFieldMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_deletePetitionFieldMutation,
   PetitionCompose_deletePetitionFieldMutationVariables
 >;
@@ -4919,7 +4911,7 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
 `;
-export type PetitionCompose_updatePetitionFieldMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_updatePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_updatePetitionFieldMutation,
   PetitionCompose_updatePetitionFieldMutationVariables
 >;
@@ -4944,12 +4936,12 @@ export type PetitionCompose_updatePetitionFieldMutationFn = ApolloReactCommon.Mu
  * });
  */
 export function usePetitionCompose_updatePetitionFieldMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_updatePetitionFieldMutation,
     PetitionCompose_updatePetitionFieldMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_updatePetitionFieldMutation,
     PetitionCompose_updatePetitionFieldMutationVariables
   >(PetitionCompose_updatePetitionFieldDocument, baseOptions);
@@ -4957,10 +4949,10 @@ export function usePetitionCompose_updatePetitionFieldMutation(
 export type PetitionCompose_updatePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionFieldMutation
 >;
-export type PetitionCompose_updatePetitionFieldMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_updatePetitionFieldMutationResult = Apollo.MutationResult<
   PetitionCompose_updatePetitionFieldMutation
 >;
-export type PetitionCompose_updatePetitionFieldMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_updatePetitionFieldMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_updatePetitionFieldMutation,
   PetitionCompose_updatePetitionFieldMutationVariables
 >;
@@ -4994,7 +4986,7 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
 `;
-export type PetitionCompose_changePetitionFieldTypeMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_changePetitionFieldTypeMutationFn = Apollo.MutationFunction<
   PetitionCompose_changePetitionFieldTypeMutation,
   PetitionCompose_changePetitionFieldTypeMutationVariables
 >;
@@ -5020,12 +5012,12 @@ export type PetitionCompose_changePetitionFieldTypeMutationFn = ApolloReactCommo
  * });
  */
 export function usePetitionCompose_changePetitionFieldTypeMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_changePetitionFieldTypeMutation,
     PetitionCompose_changePetitionFieldTypeMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_changePetitionFieldTypeMutation,
     PetitionCompose_changePetitionFieldTypeMutationVariables
   >(PetitionCompose_changePetitionFieldTypeDocument, baseOptions);
@@ -5033,10 +5025,10 @@ export function usePetitionCompose_changePetitionFieldTypeMutation(
 export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
   typeof usePetitionCompose_changePetitionFieldTypeMutation
 >;
-export type PetitionCompose_changePetitionFieldTypeMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_changePetitionFieldTypeMutationResult = Apollo.MutationResult<
   PetitionCompose_changePetitionFieldTypeMutation
 >;
-export type PetitionCompose_changePetitionFieldTypeMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_changePetitionFieldTypeMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_changePetitionFieldTypeMutation,
   PetitionCompose_changePetitionFieldTypeMutationVariables
 >;
@@ -5065,7 +5057,7 @@ export const PetitionCompose_sendPetitionDocument = gql`
     }
   }
 `;
-export type PetitionCompose_sendPetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionCompose_sendPetitionMutationFn = Apollo.MutationFunction<
   PetitionCompose_sendPetitionMutation,
   PetitionCompose_sendPetitionMutationVariables
 >;
@@ -5093,12 +5085,12 @@ export type PetitionCompose_sendPetitionMutationFn = ApolloReactCommon.MutationF
  * });
  */
 export function usePetitionCompose_sendPetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_sendPetitionMutation,
     PetitionCompose_sendPetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionCompose_sendPetitionMutation,
     PetitionCompose_sendPetitionMutationVariables
   >(PetitionCompose_sendPetitionDocument, baseOptions);
@@ -5106,10 +5098,10 @@ export function usePetitionCompose_sendPetitionMutation(
 export type PetitionCompose_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_sendPetitionMutation
 >;
-export type PetitionCompose_sendPetitionMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionCompose_sendPetitionMutationResult = Apollo.MutationResult<
   PetitionCompose_sendPetitionMutation
 >;
-export type PetitionCompose_sendPetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionCompose_sendPetitionMutationOptions = Apollo.BaseMutationOptions<
   PetitionCompose_sendPetitionMutation,
   PetitionCompose_sendPetitionMutationVariables
 >;
@@ -5139,23 +5131,23 @@ export const PetitionComposeDocument = gql`
  * });
  */
 export function usePetitionComposeQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionComposeQuery,
     PetitionComposeQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >(PetitionComposeDocument, baseOptions);
+  return Apollo.useQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
+    PetitionComposeDocument,
+    baseOptions
+  );
 }
 export function usePetitionComposeLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionComposeQuery,
     PetitionComposeQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionComposeQuery,
     PetitionComposeQueryVariables
   >(PetitionComposeDocument, baseOptions);
@@ -5166,7 +5158,7 @@ export type PetitionComposeQueryHookResult = ReturnType<
 export type PetitionComposeLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeLazyQuery
 >;
-export type PetitionComposeQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionComposeQueryResult = Apollo.QueryResult<
   PetitionComposeQuery,
   PetitionComposeQueryVariables
 >;
@@ -5195,23 +5187,23 @@ export const PetitionComposeUserDocument = gql`
  * });
  */
 export function usePetitionComposeUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionComposeUserQuery,
     PetitionComposeUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
+  return Apollo.useQuery<
     PetitionComposeUserQuery,
     PetitionComposeUserQueryVariables
   >(PetitionComposeUserDocument, baseOptions);
 }
 export function usePetitionComposeUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionComposeUserQuery,
     PetitionComposeUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionComposeUserQuery,
     PetitionComposeUserQueryVariables
   >(PetitionComposeUserDocument, baseOptions);
@@ -5222,7 +5214,7 @@ export type PetitionComposeUserQueryHookResult = ReturnType<
 export type PetitionComposeUserLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeUserLazyQuery
 >;
-export type PetitionComposeUserQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionComposeUserQueryResult = Apollo.QueryResult<
   PetitionComposeUserQuery,
   PetitionComposeUserQueryVariables
 >;
@@ -5237,7 +5229,7 @@ export const PetitionReplies_updatePetitionDocument = gql`
   }
   ${PetitionReplies_PetitionFragmentDoc}
 `;
-export type PetitionReplies_updatePetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_updatePetitionMutationFn = Apollo.MutationFunction<
   PetitionReplies_updatePetitionMutation,
   PetitionReplies_updatePetitionMutationVariables
 >;
@@ -5261,12 +5253,12 @@ export type PetitionReplies_updatePetitionMutationFn = ApolloReactCommon.Mutatio
  * });
  */
 export function usePetitionReplies_updatePetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_updatePetitionMutation,
     PetitionReplies_updatePetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_updatePetitionMutation,
     PetitionReplies_updatePetitionMutationVariables
   >(PetitionReplies_updatePetitionDocument, baseOptions);
@@ -5274,10 +5266,10 @@ export function usePetitionReplies_updatePetitionMutation(
 export type PetitionReplies_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionMutation
 >;
-export type PetitionReplies_updatePetitionMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_updatePetitionMutationResult = Apollo.MutationResult<
   PetitionReplies_updatePetitionMutation
 >;
-export type PetitionReplies_updatePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_updatePetitionMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_updatePetitionMutation,
   PetitionReplies_updatePetitionMutationVariables
 >;
@@ -5301,7 +5293,7 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
     }
   }
 `;
-export type PetitionReplies_validatePetitionFieldsMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_validatePetitionFieldsMutationFn = Apollo.MutationFunction<
   PetitionReplies_validatePetitionFieldsMutation,
   PetitionReplies_validatePetitionFieldsMutationVariables
 >;
@@ -5326,12 +5318,12 @@ export type PetitionReplies_validatePetitionFieldsMutationFn = ApolloReactCommon
  * });
  */
 export function usePetitionReplies_validatePetitionFieldsMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_validatePetitionFieldsMutation,
     PetitionReplies_validatePetitionFieldsMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_validatePetitionFieldsMutation,
     PetitionReplies_validatePetitionFieldsMutationVariables
   >(PetitionReplies_validatePetitionFieldsDocument, baseOptions);
@@ -5339,10 +5331,10 @@ export function usePetitionReplies_validatePetitionFieldsMutation(
 export type PetitionReplies_validatePetitionFieldsMutationHookResult = ReturnType<
   typeof usePetitionReplies_validatePetitionFieldsMutation
 >;
-export type PetitionReplies_validatePetitionFieldsMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_validatePetitionFieldsMutationResult = Apollo.MutationResult<
   PetitionReplies_validatePetitionFieldsMutation
 >;
-export type PetitionReplies_validatePetitionFieldsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_validatePetitionFieldsMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_validatePetitionFieldsMutation,
   PetitionReplies_validatePetitionFieldsMutationVariables
 >;
@@ -5362,7 +5354,7 @@ export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
     }
   }
 `;
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationFn = Apollo.MutationFunction<
   PetitionReplies_fileUploadReplyDownloadLinkMutation,
   PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
 >;
@@ -5387,12 +5379,12 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationFn = ApolloReactC
  * });
  */
 export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_fileUploadReplyDownloadLinkMutation,
     PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_fileUploadReplyDownloadLinkMutation,
     PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
   >(PetitionReplies_fileUploadReplyDownloadLinkDocument, baseOptions);
@@ -5400,10 +5392,10 @@ export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation
 >;
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationResult = Apollo.MutationResult<
   PetitionReplies_fileUploadReplyDownloadLinkMutation
 >;
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_fileUploadReplyDownloadLinkMutation,
   PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
 >;
@@ -5425,7 +5417,7 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
-export type PetitionReplies_createPetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_createPetitionFieldCommentMutationFn = Apollo.MutationFunction<
   PetitionReplies_createPetitionFieldCommentMutation,
   PetitionReplies_createPetitionFieldCommentMutationVariables
 >;
@@ -5451,12 +5443,12 @@ export type PetitionReplies_createPetitionFieldCommentMutationFn = ApolloReactCo
  * });
  */
 export function usePetitionReplies_createPetitionFieldCommentMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_createPetitionFieldCommentMutation,
     PetitionReplies_createPetitionFieldCommentMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_createPetitionFieldCommentMutation,
     PetitionReplies_createPetitionFieldCommentMutationVariables
   >(PetitionReplies_createPetitionFieldCommentDocument, baseOptions);
@@ -5464,10 +5456,10 @@ export function usePetitionReplies_createPetitionFieldCommentMutation(
 export type PetitionReplies_createPetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_createPetitionFieldCommentMutation
 >;
-export type PetitionReplies_createPetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_createPetitionFieldCommentMutationResult = Apollo.MutationResult<
   PetitionReplies_createPetitionFieldCommentMutation
 >;
-export type PetitionReplies_createPetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_createPetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_createPetitionFieldCommentMutation,
   PetitionReplies_createPetitionFieldCommentMutationVariables
 >;
@@ -5489,7 +5481,7 @@ export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
-export type PetitionReplies_updatePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_updatePetitionFieldCommentMutationFn = Apollo.MutationFunction<
   PetitionReplies_updatePetitionFieldCommentMutation,
   PetitionReplies_updatePetitionFieldCommentMutationVariables
 >;
@@ -5515,12 +5507,12 @@ export type PetitionReplies_updatePetitionFieldCommentMutationFn = ApolloReactCo
  * });
  */
 export function usePetitionReplies_updatePetitionFieldCommentMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_updatePetitionFieldCommentMutation,
     PetitionReplies_updatePetitionFieldCommentMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_updatePetitionFieldCommentMutation,
     PetitionReplies_updatePetitionFieldCommentMutationVariables
   >(PetitionReplies_updatePetitionFieldCommentDocument, baseOptions);
@@ -5528,10 +5520,10 @@ export function usePetitionReplies_updatePetitionFieldCommentMutation(
 export type PetitionReplies_updatePetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionFieldCommentMutation
 >;
-export type PetitionReplies_updatePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_updatePetitionFieldCommentMutationResult = Apollo.MutationResult<
   PetitionReplies_updatePetitionFieldCommentMutation
 >;
-export type PetitionReplies_updatePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_updatePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_updatePetitionFieldCommentMutation,
   PetitionReplies_updatePetitionFieldCommentMutationVariables
 >;
@@ -5548,7 +5540,7 @@ export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
     )
   }
 `;
-export type PetitionReplies_deletePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_deletePetitionFieldCommentMutationFn = Apollo.MutationFunction<
   PetitionReplies_deletePetitionFieldCommentMutation,
   PetitionReplies_deletePetitionFieldCommentMutationVariables
 >;
@@ -5573,12 +5565,12 @@ export type PetitionReplies_deletePetitionFieldCommentMutationFn = ApolloReactCo
  * });
  */
 export function usePetitionReplies_deletePetitionFieldCommentMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_deletePetitionFieldCommentMutation,
     PetitionReplies_deletePetitionFieldCommentMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_deletePetitionFieldCommentMutation,
     PetitionReplies_deletePetitionFieldCommentMutationVariables
   >(PetitionReplies_deletePetitionFieldCommentDocument, baseOptions);
@@ -5586,10 +5578,10 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
 export type PetitionReplies_deletePetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_deletePetitionFieldCommentMutation
 >;
-export type PetitionReplies_deletePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_deletePetitionFieldCommentMutationResult = Apollo.MutationResult<
   PetitionReplies_deletePetitionFieldCommentMutation
 >;
-export type PetitionReplies_deletePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_deletePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_deletePetitionFieldCommentMutation,
   PetitionReplies_deletePetitionFieldCommentMutationVariables
 >;
@@ -5601,7 +5593,7 @@ export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
     }
   }
 `;
-export type PetitionReplies_submitUnpublishedCommentsMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_submitUnpublishedCommentsMutationFn = Apollo.MutationFunction<
   PetitionReplies_submitUnpublishedCommentsMutation,
   PetitionReplies_submitUnpublishedCommentsMutationVariables
 >;
@@ -5624,12 +5616,12 @@ export type PetitionReplies_submitUnpublishedCommentsMutationFn = ApolloReactCom
  * });
  */
 export function usePetitionReplies_submitUnpublishedCommentsMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_submitUnpublishedCommentsMutation,
     PetitionReplies_submitUnpublishedCommentsMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_submitUnpublishedCommentsMutation,
     PetitionReplies_submitUnpublishedCommentsMutationVariables
   >(PetitionReplies_submitUnpublishedCommentsDocument, baseOptions);
@@ -5637,10 +5629,10 @@ export function usePetitionReplies_submitUnpublishedCommentsMutation(
 export type PetitionReplies_submitUnpublishedCommentsMutationHookResult = ReturnType<
   typeof usePetitionReplies_submitUnpublishedCommentsMutation
 >;
-export type PetitionReplies_submitUnpublishedCommentsMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_submitUnpublishedCommentsMutationResult = Apollo.MutationResult<
   PetitionReplies_submitUnpublishedCommentsMutation
 >;
-export type PetitionReplies_submitUnpublishedCommentsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_submitUnpublishedCommentsMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_submitUnpublishedCommentsMutation,
   PetitionReplies_submitUnpublishedCommentsMutationVariables
 >;
@@ -5658,7 +5650,7 @@ export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
     }
   }
 `;
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationFn = Apollo.MutationFunction<
   PetitionReplies_markPetitionFieldCommentsAsReadMutation,
   PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
 >;
@@ -5682,12 +5674,12 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutationFn = ApolloRe
  * });
  */
 export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_markPetitionFieldCommentsAsReadMutation,
     PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_markPetitionFieldCommentsAsReadMutation,
     PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
   >(PetitionReplies_markPetitionFieldCommentsAsReadDocument, baseOptions);
@@ -5695,10 +5687,10 @@ export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
   typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation
 >;
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationResult = Apollo.MutationResult<
   PetitionReplies_markPetitionFieldCommentsAsReadMutation
 >;
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_markPetitionFieldCommentsAsReadMutation,
   PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
 >;
@@ -5726,7 +5718,7 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
     }
   }
 `;
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationFn = ApolloReactCommon.MutationFunction<
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationFn = Apollo.MutationFunction<
   PetitionReplies_updatePetitionFieldRepliesStatusMutation,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
 >;
@@ -5752,12 +5744,12 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutationFn = ApolloR
  * });
  */
 export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_updatePetitionFieldRepliesStatusMutation,
     PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     PetitionReplies_updatePetitionFieldRepliesStatusMutation,
     PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
   >(PetitionReplies_updatePetitionFieldRepliesStatusDocument, baseOptions);
@@ -5765,10 +5757,10 @@ export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
 >;
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationResult = ApolloReactCommon.MutationResult<
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationResult = Apollo.MutationResult<
   PetitionReplies_updatePetitionFieldRepliesStatusMutation
 >;
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_updatePetitionFieldRepliesStatusMutation,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
 >;
@@ -5798,23 +5790,23 @@ export const PetitionRepliesDocument = gql`
  * });
  */
 export function usePetitionRepliesQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionRepliesQuery,
     PetitionRepliesQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >(PetitionRepliesDocument, baseOptions);
+  return Apollo.useQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
+    PetitionRepliesDocument,
+    baseOptions
+  );
 }
 export function usePetitionRepliesLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionRepliesQuery,
     PetitionRepliesQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionRepliesQuery,
     PetitionRepliesQueryVariables
   >(PetitionRepliesDocument, baseOptions);
@@ -5825,7 +5817,7 @@ export type PetitionRepliesQueryHookResult = ReturnType<
 export type PetitionRepliesLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesLazyQuery
 >;
-export type PetitionRepliesQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionRepliesQueryResult = Apollo.QueryResult<
   PetitionRepliesQuery,
   PetitionRepliesQueryVariables
 >;
@@ -5854,23 +5846,23 @@ export const PetitionRepliesUserDocument = gql`
  * });
  */
 export function usePetitionRepliesUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionRepliesUserQuery,
     PetitionRepliesUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
+  return Apollo.useQuery<
     PetitionRepliesUserQuery,
     PetitionRepliesUserQueryVariables
   >(PetitionRepliesUserDocument, baseOptions);
 }
 export function usePetitionRepliesUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionRepliesUserQuery,
     PetitionRepliesUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionRepliesUserQuery,
     PetitionRepliesUserQueryVariables
   >(PetitionRepliesUserDocument, baseOptions);
@@ -5881,7 +5873,7 @@ export type PetitionRepliesUserQueryHookResult = ReturnType<
 export type PetitionRepliesUserLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserLazyQuery
 >;
-export type PetitionRepliesUserQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionRepliesUserQueryResult = Apollo.QueryResult<
   PetitionRepliesUserQuery,
   PetitionRepliesUserQueryVariables
 >;
@@ -5890,7 +5882,7 @@ export const Petitions_deletePetitionsDocument = gql`
     deletePetitions(ids: $ids)
   }
 `;
-export type Petitions_deletePetitionsMutationFn = ApolloReactCommon.MutationFunction<
+export type Petitions_deletePetitionsMutationFn = Apollo.MutationFunction<
   Petitions_deletePetitionsMutation,
   Petitions_deletePetitionsMutationVariables
 >;
@@ -5913,12 +5905,12 @@ export type Petitions_deletePetitionsMutationFn = ApolloReactCommon.MutationFunc
  * });
  */
 export function usePetitions_deletePetitionsMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     Petitions_deletePetitionsMutation,
     Petitions_deletePetitionsMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     Petitions_deletePetitionsMutation,
     Petitions_deletePetitionsMutationVariables
   >(Petitions_deletePetitionsDocument, baseOptions);
@@ -5926,10 +5918,10 @@ export function usePetitions_deletePetitionsMutation(
 export type Petitions_deletePetitionsMutationHookResult = ReturnType<
   typeof usePetitions_deletePetitionsMutation
 >;
-export type Petitions_deletePetitionsMutationResult = ApolloReactCommon.MutationResult<
+export type Petitions_deletePetitionsMutationResult = Apollo.MutationResult<
   Petitions_deletePetitionsMutation
 >;
-export type Petitions_deletePetitionsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type Petitions_deletePetitionsMutationOptions = Apollo.BaseMutationOptions<
   Petitions_deletePetitionsMutation,
   Petitions_deletePetitionsMutationVariables
 >;
@@ -5950,7 +5942,7 @@ export const Petitions_clonePetitionDocument = gql`
     }
   }
 `;
-export type Petitions_clonePetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type Petitions_clonePetitionMutationFn = Apollo.MutationFunction<
   Petitions_clonePetitionMutation,
   Petitions_clonePetitionMutationVariables
 >;
@@ -5976,12 +5968,12 @@ export type Petitions_clonePetitionMutationFn = ApolloReactCommon.MutationFuncti
  * });
  */
 export function usePetitions_clonePetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     Petitions_clonePetitionMutation,
     Petitions_clonePetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     Petitions_clonePetitionMutation,
     Petitions_clonePetitionMutationVariables
   >(Petitions_clonePetitionDocument, baseOptions);
@@ -5989,10 +5981,10 @@ export function usePetitions_clonePetitionMutation(
 export type Petitions_clonePetitionMutationHookResult = ReturnType<
   typeof usePetitions_clonePetitionMutation
 >;
-export type Petitions_clonePetitionMutationResult = ApolloReactCommon.MutationResult<
+export type Petitions_clonePetitionMutationResult = Apollo.MutationResult<
   Petitions_clonePetitionMutation
 >;
-export type Petitions_clonePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type Petitions_clonePetitionMutationOptions = Apollo.BaseMutationOptions<
   Petitions_clonePetitionMutation,
   Petitions_clonePetitionMutationVariables
 >;
@@ -6038,23 +6030,20 @@ export const PetitionsDocument = gql`
  * });
  */
 export function usePetitionsQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    PetitionsQuery,
-    PetitionsQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
 ) {
-  return ApolloReactHooks.useQuery<PetitionsQuery, PetitionsQueryVariables>(
+  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
     PetitionsDocument,
     baseOptions
   );
 }
 export function usePetitionsLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionsQuery,
     PetitionsQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
+  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
     PetitionsDocument,
     baseOptions
   );
@@ -6063,7 +6052,7 @@ export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
 export type PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionsLazyQuery
 >;
-export type PetitionsQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionsQueryResult = Apollo.QueryResult<
   PetitionsQuery,
   PetitionsQueryVariables
 >;
@@ -6092,26 +6081,26 @@ export const PetitionsUserDocument = gql`
  * });
  */
 export function usePetitionsUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionsUserQuery,
     PetitionsUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
-    PetitionsUserQuery,
-    PetitionsUserQueryVariables
-  >(PetitionsUserDocument, baseOptions);
+  return Apollo.useQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
+    PetitionsUserDocument,
+    baseOptions
+  );
 }
 export function usePetitionsUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionsUserQuery,
     PetitionsUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
-    PetitionsUserQuery,
-    PetitionsUserQueryVariables
-  >(PetitionsUserDocument, baseOptions);
+  return Apollo.useLazyQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
+    PetitionsUserDocument,
+    baseOptions
+  );
 }
 export type PetitionsUserQueryHookResult = ReturnType<
   typeof usePetitionsUserQuery
@@ -6119,7 +6108,7 @@ export type PetitionsUserQueryHookResult = ReturnType<
 export type PetitionsUserLazyQueryHookResult = ReturnType<
   typeof usePetitionsUserLazyQuery
 >;
-export type PetitionsUserQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionsUserQueryResult = Apollo.QueryResult<
   PetitionsUserQuery,
   PetitionsUserQueryVariables
 >;
@@ -6133,7 +6122,7 @@ export const Account_updateAccountDocument = gql`
     }
   }
 `;
-export type Account_updateAccountMutationFn = ApolloReactCommon.MutationFunction<
+export type Account_updateAccountMutationFn = Apollo.MutationFunction<
   Account_updateAccountMutation,
   Account_updateAccountMutationVariables
 >;
@@ -6157,12 +6146,12 @@ export type Account_updateAccountMutationFn = ApolloReactCommon.MutationFunction
  * });
  */
 export function useAccount_updateAccountMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     Account_updateAccountMutation,
     Account_updateAccountMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     Account_updateAccountMutation,
     Account_updateAccountMutationVariables
   >(Account_updateAccountDocument, baseOptions);
@@ -6170,10 +6159,10 @@ export function useAccount_updateAccountMutation(
 export type Account_updateAccountMutationHookResult = ReturnType<
   typeof useAccount_updateAccountMutation
 >;
-export type Account_updateAccountMutationResult = ApolloReactCommon.MutationResult<
+export type Account_updateAccountMutationResult = Apollo.MutationResult<
   Account_updateAccountMutation
 >;
-export type Account_updateAccountMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type Account_updateAccountMutationOptions = Apollo.BaseMutationOptions<
   Account_updateAccountMutation,
   Account_updateAccountMutationVariables
 >;
@@ -6203,30 +6192,24 @@ export const AccountDocument = gql`
  * });
  */
 export function useAccountQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    AccountQuery,
-    AccountQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
-  return ApolloReactHooks.useQuery<AccountQuery, AccountQueryVariables>(
+  return Apollo.useQuery<AccountQuery, AccountQueryVariables>(
     AccountDocument,
     baseOptions
   );
 }
 export function useAccountLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
-    AccountQuery,
-    AccountQueryVariables
-  >
+  baseOptions?: Apollo.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
-  return ApolloReactHooks.useLazyQuery<AccountQuery, AccountQueryVariables>(
+  return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(
     AccountDocument,
     baseOptions
   );
 }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
-export type AccountQueryResult = ApolloReactCommon.QueryResult<
+export type AccountQueryResult = Apollo.QueryResult<
   AccountQuery,
   AccountQueryVariables
 >;
@@ -6235,7 +6218,7 @@ export const Security_updatePasswordDocument = gql`
     changePassword(password: $password, newPassword: $newPassword)
   }
 `;
-export type Security_updatePasswordMutationFn = ApolloReactCommon.MutationFunction<
+export type Security_updatePasswordMutationFn = Apollo.MutationFunction<
   Security_updatePasswordMutation,
   Security_updatePasswordMutationVariables
 >;
@@ -6259,12 +6242,12 @@ export type Security_updatePasswordMutationFn = ApolloReactCommon.MutationFuncti
  * });
  */
 export function useSecurity_updatePasswordMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     Security_updatePasswordMutation,
     Security_updatePasswordMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     Security_updatePasswordMutation,
     Security_updatePasswordMutationVariables
   >(Security_updatePasswordDocument, baseOptions);
@@ -6272,10 +6255,10 @@ export function useSecurity_updatePasswordMutation(
 export type Security_updatePasswordMutationHookResult = ReturnType<
   typeof useSecurity_updatePasswordMutation
 >;
-export type Security_updatePasswordMutationResult = ApolloReactCommon.MutationResult<
+export type Security_updatePasswordMutationResult = Apollo.MutationResult<
   Security_updatePasswordMutation
 >;
-export type Security_updatePasswordMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type Security_updatePasswordMutationOptions = Apollo.BaseMutationOptions<
   Security_updatePasswordMutation,
   Security_updatePasswordMutationVariables
 >;
@@ -6305,23 +6288,20 @@ export const SecurityDocument = gql`
  * });
  */
 export function useSecurityQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
-    SecurityQuery,
-    SecurityQueryVariables
-  >
+  baseOptions?: Apollo.QueryHookOptions<SecurityQuery, SecurityQueryVariables>
 ) {
-  return ApolloReactHooks.useQuery<SecurityQuery, SecurityQueryVariables>(
+  return Apollo.useQuery<SecurityQuery, SecurityQueryVariables>(
     SecurityDocument,
     baseOptions
   );
 }
 export function useSecurityLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     SecurityQuery,
     SecurityQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<SecurityQuery, SecurityQueryVariables>(
+  return Apollo.useLazyQuery<SecurityQuery, SecurityQueryVariables>(
     SecurityDocument,
     baseOptions
   );
@@ -6330,7 +6310,7 @@ export type SecurityQueryHookResult = ReturnType<typeof useSecurityQuery>;
 export type SecurityLazyQueryHookResult = ReturnType<
   typeof useSecurityLazyQuery
 >;
-export type SecurityQueryResult = ApolloReactCommon.QueryResult<
+export type SecurityQueryResult = Apollo.QueryResult<
   SecurityQuery,
   SecurityQueryVariables
 >;
@@ -6359,32 +6339,32 @@ export const CurrentUserDocument = gql`
  * });
  */
 export function useCurrentUserQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     CurrentUserQuery,
     CurrentUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
     CurrentUserDocument,
     baseOptions
   );
 }
 export function useCurrentUserLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     CurrentUserQuery,
     CurrentUserQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >(CurrentUserDocument, baseOptions);
+  return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+    CurrentUserDocument,
+    baseOptions
+  );
 }
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<
   typeof useCurrentUserLazyQuery
 >;
-export type CurrentUserQueryResult = ApolloReactCommon.QueryResult<
+export type CurrentUserQueryResult = Apollo.QueryResult<
   CurrentUserQuery,
   CurrentUserQueryVariables
 >;
@@ -6396,7 +6376,7 @@ export const RecipientView_publicDeletePetitionReplyDocument = gql`
     publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
   }
 `;
-export type RecipientView_publicDeletePetitionReplyMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_publicDeletePetitionReplyMutationFn = Apollo.MutationFunction<
   RecipientView_publicDeletePetitionReplyMutation,
   RecipientView_publicDeletePetitionReplyMutationVariables
 >;
@@ -6420,12 +6400,12 @@ export type RecipientView_publicDeletePetitionReplyMutationFn = ApolloReactCommo
  * });
  */
 export function useRecipientView_publicDeletePetitionReplyMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_publicDeletePetitionReplyMutation,
     RecipientView_publicDeletePetitionReplyMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_publicDeletePetitionReplyMutation,
     RecipientView_publicDeletePetitionReplyMutationVariables
   >(RecipientView_publicDeletePetitionReplyDocument, baseOptions);
@@ -6433,10 +6413,10 @@ export function useRecipientView_publicDeletePetitionReplyMutation(
 export type RecipientView_publicDeletePetitionReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicDeletePetitionReplyMutation
 >;
-export type RecipientView_publicDeletePetitionReplyMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_publicDeletePetitionReplyMutationResult = Apollo.MutationResult<
   RecipientView_publicDeletePetitionReplyMutation
 >;
-export type RecipientView_publicDeletePetitionReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_publicDeletePetitionReplyMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_publicDeletePetitionReplyMutation,
   RecipientView_publicDeletePetitionReplyMutationVariables
 >;
@@ -6452,7 +6432,7 @@ export const RecipientView_publicCreateTextReplyDocument = gql`
   }
   ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
-export type RecipientView_publicCreateTextReplyMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_publicCreateTextReplyMutationFn = Apollo.MutationFunction<
   RecipientView_publicCreateTextReplyMutation,
   RecipientView_publicCreateTextReplyMutationVariables
 >;
@@ -6477,12 +6457,12 @@ export type RecipientView_publicCreateTextReplyMutationFn = ApolloReactCommon.Mu
  * });
  */
 export function useRecipientView_publicCreateTextReplyMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_publicCreateTextReplyMutation,
     RecipientView_publicCreateTextReplyMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_publicCreateTextReplyMutation,
     RecipientView_publicCreateTextReplyMutationVariables
   >(RecipientView_publicCreateTextReplyDocument, baseOptions);
@@ -6490,10 +6470,10 @@ export function useRecipientView_publicCreateTextReplyMutation(
 export type RecipientView_publicCreateTextReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicCreateTextReplyMutation
 >;
-export type RecipientView_publicCreateTextReplyMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_publicCreateTextReplyMutationResult = Apollo.MutationResult<
   RecipientView_publicCreateTextReplyMutation
 >;
-export type RecipientView_publicCreateTextReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_publicCreateTextReplyMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_publicCreateTextReplyMutation,
   RecipientView_publicCreateTextReplyMutationVariables
 >;
@@ -6516,7 +6496,7 @@ export const RecipientView_publicCreateFileUploadReplyDocument = gql`
   }
   ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
-export type RecipientView_publicCreateFileUploadReplyMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_publicCreateFileUploadReplyMutationFn = Apollo.MutationFunction<
   RecipientView_publicCreateFileUploadReplyMutation,
   RecipientView_publicCreateFileUploadReplyMutationVariables
 >;
@@ -6541,12 +6521,12 @@ export type RecipientView_publicCreateFileUploadReplyMutationFn = ApolloReactCom
  * });
  */
 export function useRecipientView_publicCreateFileUploadReplyMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_publicCreateFileUploadReplyMutation,
     RecipientView_publicCreateFileUploadReplyMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_publicCreateFileUploadReplyMutation,
     RecipientView_publicCreateFileUploadReplyMutationVariables
   >(RecipientView_publicCreateFileUploadReplyDocument, baseOptions);
@@ -6554,10 +6534,10 @@ export function useRecipientView_publicCreateFileUploadReplyMutation(
 export type RecipientView_publicCreateFileUploadReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicCreateFileUploadReplyMutation
 >;
-export type RecipientView_publicCreateFileUploadReplyMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_publicCreateFileUploadReplyMutationResult = Apollo.MutationResult<
   RecipientView_publicCreateFileUploadReplyMutation
 >;
-export type RecipientView_publicCreateFileUploadReplyMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_publicCreateFileUploadReplyMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_publicCreateFileUploadReplyMutation,
   RecipientView_publicCreateFileUploadReplyMutationVariables
 >;
@@ -6572,7 +6552,7 @@ export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
     }
   }
 `;
-export type RecipientView_publicFileUploadReplyCompleteMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_publicFileUploadReplyCompleteMutationFn = Apollo.MutationFunction<
   RecipientView_publicFileUploadReplyCompleteMutation,
   RecipientView_publicFileUploadReplyCompleteMutationVariables
 >;
@@ -6596,12 +6576,12 @@ export type RecipientView_publicFileUploadReplyCompleteMutationFn = ApolloReactC
  * });
  */
 export function useRecipientView_publicFileUploadReplyCompleteMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_publicFileUploadReplyCompleteMutation,
     RecipientView_publicFileUploadReplyCompleteMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_publicFileUploadReplyCompleteMutation,
     RecipientView_publicFileUploadReplyCompleteMutationVariables
   >(RecipientView_publicFileUploadReplyCompleteDocument, baseOptions);
@@ -6609,10 +6589,10 @@ export function useRecipientView_publicFileUploadReplyCompleteMutation(
 export type RecipientView_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
   typeof useRecipientView_publicFileUploadReplyCompleteMutation
 >;
-export type RecipientView_publicFileUploadReplyCompleteMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_publicFileUploadReplyCompleteMutationResult = Apollo.MutationResult<
   RecipientView_publicFileUploadReplyCompleteMutation
 >;
-export type RecipientView_publicFileUploadReplyCompleteMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_publicFileUploadReplyCompleteMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_publicFileUploadReplyCompleteMutation,
   RecipientView_publicFileUploadReplyCompleteMutationVariables
 >;
@@ -6624,7 +6604,7 @@ export const RecipientView_publicCompletePetitionDocument = gql`
     }
   }
 `;
-export type RecipientView_publicCompletePetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_publicCompletePetitionMutationFn = Apollo.MutationFunction<
   RecipientView_publicCompletePetitionMutation,
   RecipientView_publicCompletePetitionMutationVariables
 >;
@@ -6647,12 +6627,12 @@ export type RecipientView_publicCompletePetitionMutationFn = ApolloReactCommon.M
  * });
  */
 export function useRecipientView_publicCompletePetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_publicCompletePetitionMutation,
     RecipientView_publicCompletePetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_publicCompletePetitionMutation,
     RecipientView_publicCompletePetitionMutationVariables
   >(RecipientView_publicCompletePetitionDocument, baseOptions);
@@ -6660,10 +6640,10 @@ export function useRecipientView_publicCompletePetitionMutation(
 export type RecipientView_publicCompletePetitionMutationHookResult = ReturnType<
   typeof useRecipientView_publicCompletePetitionMutation
 >;
-export type RecipientView_publicCompletePetitionMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_publicCompletePetitionMutationResult = Apollo.MutationResult<
   RecipientView_publicCompletePetitionMutation
 >;
-export type RecipientView_publicCompletePetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_publicCompletePetitionMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_publicCompletePetitionMutation,
   RecipientView_publicCompletePetitionMutationVariables
 >;
@@ -6683,7 +6663,7 @@ export const RecipientView_createPetitionFieldCommentDocument = gql`
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-export type RecipientView_createPetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_createPetitionFieldCommentMutationFn = Apollo.MutationFunction<
   RecipientView_createPetitionFieldCommentMutation,
   RecipientView_createPetitionFieldCommentMutationVariables
 >;
@@ -6708,12 +6688,12 @@ export type RecipientView_createPetitionFieldCommentMutationFn = ApolloReactComm
  * });
  */
 export function useRecipientView_createPetitionFieldCommentMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_createPetitionFieldCommentMutation,
     RecipientView_createPetitionFieldCommentMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_createPetitionFieldCommentMutation,
     RecipientView_createPetitionFieldCommentMutationVariables
   >(RecipientView_createPetitionFieldCommentDocument, baseOptions);
@@ -6721,10 +6701,10 @@ export function useRecipientView_createPetitionFieldCommentMutation(
 export type RecipientView_createPetitionFieldCommentMutationHookResult = ReturnType<
   typeof useRecipientView_createPetitionFieldCommentMutation
 >;
-export type RecipientView_createPetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_createPetitionFieldCommentMutationResult = Apollo.MutationResult<
   RecipientView_createPetitionFieldCommentMutation
 >;
-export type RecipientView_createPetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_createPetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_createPetitionFieldCommentMutation,
   RecipientView_createPetitionFieldCommentMutationVariables
 >;
@@ -6746,7 +6726,7 @@ export const RecipientView_updatePetitionFieldCommentDocument = gql`
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-export type RecipientView_updatePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_updatePetitionFieldCommentMutationFn = Apollo.MutationFunction<
   RecipientView_updatePetitionFieldCommentMutation,
   RecipientView_updatePetitionFieldCommentMutationVariables
 >;
@@ -6772,12 +6752,12 @@ export type RecipientView_updatePetitionFieldCommentMutationFn = ApolloReactComm
  * });
  */
 export function useRecipientView_updatePetitionFieldCommentMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_updatePetitionFieldCommentMutation,
     RecipientView_updatePetitionFieldCommentMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_updatePetitionFieldCommentMutation,
     RecipientView_updatePetitionFieldCommentMutationVariables
   >(RecipientView_updatePetitionFieldCommentDocument, baseOptions);
@@ -6785,10 +6765,10 @@ export function useRecipientView_updatePetitionFieldCommentMutation(
 export type RecipientView_updatePetitionFieldCommentMutationHookResult = ReturnType<
   typeof useRecipientView_updatePetitionFieldCommentMutation
 >;
-export type RecipientView_updatePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_updatePetitionFieldCommentMutationResult = Apollo.MutationResult<
   RecipientView_updatePetitionFieldCommentMutation
 >;
-export type RecipientView_updatePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_updatePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_updatePetitionFieldCommentMutation,
   RecipientView_updatePetitionFieldCommentMutationVariables
 >;
@@ -6805,7 +6785,7 @@ export const RecipientView_deletePetitionFieldCommentDocument = gql`
     )
   }
 `;
-export type RecipientView_deletePetitionFieldCommentMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_deletePetitionFieldCommentMutationFn = Apollo.MutationFunction<
   RecipientView_deletePetitionFieldCommentMutation,
   RecipientView_deletePetitionFieldCommentMutationVariables
 >;
@@ -6830,12 +6810,12 @@ export type RecipientView_deletePetitionFieldCommentMutationFn = ApolloReactComm
  * });
  */
 export function useRecipientView_deletePetitionFieldCommentMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_deletePetitionFieldCommentMutation,
     RecipientView_deletePetitionFieldCommentMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_deletePetitionFieldCommentMutation,
     RecipientView_deletePetitionFieldCommentMutationVariables
   >(RecipientView_deletePetitionFieldCommentDocument, baseOptions);
@@ -6843,10 +6823,10 @@ export function useRecipientView_deletePetitionFieldCommentMutation(
 export type RecipientView_deletePetitionFieldCommentMutationHookResult = ReturnType<
   typeof useRecipientView_deletePetitionFieldCommentMutation
 >;
-export type RecipientView_deletePetitionFieldCommentMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_deletePetitionFieldCommentMutationResult = Apollo.MutationResult<
   RecipientView_deletePetitionFieldCommentMutation
 >;
-export type RecipientView_deletePetitionFieldCommentMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_deletePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_deletePetitionFieldCommentMutation,
   RecipientView_deletePetitionFieldCommentMutationVariables
 >;
@@ -6858,7 +6838,7 @@ export const RecipientView_submitUnpublishedCommentsDocument = gql`
     }
   }
 `;
-export type RecipientView_submitUnpublishedCommentsMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_submitUnpublishedCommentsMutationFn = Apollo.MutationFunction<
   RecipientView_submitUnpublishedCommentsMutation,
   RecipientView_submitUnpublishedCommentsMutationVariables
 >;
@@ -6881,12 +6861,12 @@ export type RecipientView_submitUnpublishedCommentsMutationFn = ApolloReactCommo
  * });
  */
 export function useRecipientView_submitUnpublishedCommentsMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_submitUnpublishedCommentsMutation,
     RecipientView_submitUnpublishedCommentsMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_submitUnpublishedCommentsMutation,
     RecipientView_submitUnpublishedCommentsMutationVariables
   >(RecipientView_submitUnpublishedCommentsDocument, baseOptions);
@@ -6894,10 +6874,10 @@ export function useRecipientView_submitUnpublishedCommentsMutation(
 export type RecipientView_submitUnpublishedCommentsMutationHookResult = ReturnType<
   typeof useRecipientView_submitUnpublishedCommentsMutation
 >;
-export type RecipientView_submitUnpublishedCommentsMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_submitUnpublishedCommentsMutationResult = Apollo.MutationResult<
   RecipientView_submitUnpublishedCommentsMutation
 >;
-export type RecipientView_submitUnpublishedCommentsMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_submitUnpublishedCommentsMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_submitUnpublishedCommentsMutation,
   RecipientView_submitUnpublishedCommentsMutationVariables
 >;
@@ -6915,7 +6895,7 @@ export const RecipientView_markPetitionFieldCommentsAsReadDocument = gql`
     }
   }
 `;
-export type RecipientView_markPetitionFieldCommentsAsReadMutationFn = ApolloReactCommon.MutationFunction<
+export type RecipientView_markPetitionFieldCommentsAsReadMutationFn = Apollo.MutationFunction<
   RecipientView_markPetitionFieldCommentsAsReadMutation,
   RecipientView_markPetitionFieldCommentsAsReadMutationVariables
 >;
@@ -6939,12 +6919,12 @@ export type RecipientView_markPetitionFieldCommentsAsReadMutationFn = ApolloReac
  * });
  */
 export function useRecipientView_markPetitionFieldCommentsAsReadMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     RecipientView_markPetitionFieldCommentsAsReadMutation,
     RecipientView_markPetitionFieldCommentsAsReadMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     RecipientView_markPetitionFieldCommentsAsReadMutation,
     RecipientView_markPetitionFieldCommentsAsReadMutationVariables
   >(RecipientView_markPetitionFieldCommentsAsReadDocument, baseOptions);
@@ -6952,10 +6932,10 @@ export function useRecipientView_markPetitionFieldCommentsAsReadMutation(
 export type RecipientView_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
   typeof useRecipientView_markPetitionFieldCommentsAsReadMutation
 >;
-export type RecipientView_markPetitionFieldCommentsAsReadMutationResult = ApolloReactCommon.MutationResult<
+export type RecipientView_markPetitionFieldCommentsAsReadMutationResult = Apollo.MutationResult<
   RecipientView_markPetitionFieldCommentsAsReadMutation
 >;
-export type RecipientView_markPetitionFieldCommentsAsReadMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type RecipientView_markPetitionFieldCommentsAsReadMutationOptions = Apollo.BaseMutationOptions<
   RecipientView_markPetitionFieldCommentsAsReadMutation,
   RecipientView_markPetitionFieldCommentsAsReadMutationVariables
 >;
@@ -6994,26 +6974,26 @@ export const PublicPetitionDocument = gql`
  * });
  */
 export function usePublicPetitionQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PublicPetitionQuery,
     PublicPetitionQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >(PublicPetitionDocument, baseOptions);
+  return Apollo.useQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
+    PublicPetitionDocument,
+    baseOptions
+  );
 }
 export function usePublicPetitionLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PublicPetitionQuery,
     PublicPetitionQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >(PublicPetitionDocument, baseOptions);
+  return Apollo.useLazyQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
+    PublicPetitionDocument,
+    baseOptions
+  );
 }
 export type PublicPetitionQueryHookResult = ReturnType<
   typeof usePublicPetitionQuery
@@ -7021,7 +7001,7 @@ export type PublicPetitionQueryHookResult = ReturnType<
 export type PublicPetitionLazyQueryHookResult = ReturnType<
   typeof usePublicPetitionLazyQuery
 >;
-export type PublicPetitionQueryResult = ApolloReactCommon.QueryResult<
+export type PublicPetitionQueryResult = Apollo.QueryResult<
   PublicPetitionQuery,
   PublicPetitionQueryVariables
 >;
@@ -7036,7 +7016,7 @@ export const useCreateContact_createContactDocument = gql`
     }
   }
 `;
-export type useCreateContact_createContactMutationFn = ApolloReactCommon.MutationFunction<
+export type useCreateContact_createContactMutationFn = Apollo.MutationFunction<
   useCreateContact_createContactMutation,
   useCreateContact_createContactMutationVariables
 >;
@@ -7059,12 +7039,12 @@ export type useCreateContact_createContactMutationFn = ApolloReactCommon.Mutatio
  * });
  */
 export function useuseCreateContact_createContactMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     useCreateContact_createContactMutation,
     useCreateContact_createContactMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     useCreateContact_createContactMutation,
     useCreateContact_createContactMutationVariables
   >(useCreateContact_createContactDocument, baseOptions);
@@ -7072,10 +7052,10 @@ export function useuseCreateContact_createContactMutation(
 export type useCreateContact_createContactMutationHookResult = ReturnType<
   typeof useuseCreateContact_createContactMutation
 >;
-export type useCreateContact_createContactMutationResult = ApolloReactCommon.MutationResult<
+export type useCreateContact_createContactMutationResult = Apollo.MutationResult<
   useCreateContact_createContactMutation
 >;
-export type useCreateContact_createContactMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type useCreateContact_createContactMutationOptions = Apollo.BaseMutationOptions<
   useCreateContact_createContactMutation,
   useCreateContact_createContactMutationVariables
 >;
@@ -7090,7 +7070,7 @@ export const useCreatePetition_createPetitionDocument = gql`
     }
   }
 `;
-export type useCreatePetition_createPetitionMutationFn = ApolloReactCommon.MutationFunction<
+export type useCreatePetition_createPetitionMutationFn = Apollo.MutationFunction<
   useCreatePetition_createPetitionMutation,
   useCreatePetition_createPetitionMutationVariables
 >;
@@ -7115,12 +7095,12 @@ export type useCreatePetition_createPetitionMutationFn = ApolloReactCommon.Mutat
  * });
  */
 export function useuseCreatePetition_createPetitionMutation(
-  baseOptions?: ApolloReactHooks.MutationHookOptions<
+  baseOptions?: Apollo.MutationHookOptions<
     useCreatePetition_createPetitionMutation,
     useCreatePetition_createPetitionMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
+  return Apollo.useMutation<
     useCreatePetition_createPetitionMutation,
     useCreatePetition_createPetitionMutationVariables
   >(useCreatePetition_createPetitionDocument, baseOptions);
@@ -7128,10 +7108,10 @@ export function useuseCreatePetition_createPetitionMutation(
 export type useCreatePetition_createPetitionMutationHookResult = ReturnType<
   typeof useuseCreatePetition_createPetitionMutation
 >;
-export type useCreatePetition_createPetitionMutationResult = ApolloReactCommon.MutationResult<
+export type useCreatePetition_createPetitionMutationResult = Apollo.MutationResult<
   useCreatePetition_createPetitionMutation
 >;
-export type useCreatePetition_createPetitionMutationOptions = ApolloReactCommon.BaseMutationOptions<
+export type useCreatePetition_createPetitionMutationOptions = Apollo.BaseMutationOptions<
   useCreatePetition_createPetitionMutation,
   useCreatePetition_createPetitionMutationVariables
 >;
@@ -7164,23 +7144,23 @@ export const PetitionComposeSearchContactsDocument = gql`
  * });
  */
 export function usePetitionComposeSearchContactsQuery(
-  baseOptions?: ApolloReactHooks.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     PetitionComposeSearchContactsQuery,
     PetitionComposeSearchContactsQueryVariables
   >
 ) {
-  return ApolloReactHooks.useQuery<
+  return Apollo.useQuery<
     PetitionComposeSearchContactsQuery,
     PetitionComposeSearchContactsQueryVariables
   >(PetitionComposeSearchContactsDocument, baseOptions);
 }
 export function usePetitionComposeSearchContactsLazyQuery(
-  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+  baseOptions?: Apollo.LazyQueryHookOptions<
     PetitionComposeSearchContactsQuery,
     PetitionComposeSearchContactsQueryVariables
   >
 ) {
-  return ApolloReactHooks.useLazyQuery<
+  return Apollo.useLazyQuery<
     PetitionComposeSearchContactsQuery,
     PetitionComposeSearchContactsQueryVariables
   >(PetitionComposeSearchContactsDocument, baseOptions);
@@ -7191,7 +7171,7 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
 >;
-export type PetitionComposeSearchContactsQueryResult = ApolloReactCommon.QueryResult<
+export type PetitionComposeSearchContactsQueryResult = Apollo.QueryResult<
   PetitionComposeSearchContactsQuery,
   PetitionComposeSearchContactsQueryVariables
 >;
