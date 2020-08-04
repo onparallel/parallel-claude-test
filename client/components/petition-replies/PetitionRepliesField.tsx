@@ -163,7 +163,7 @@ export function PetitionRepliesField({
       <Box marginBottom={2}>
         {field.description ? (
           <Text color="gray.600" fontSize="sm">
-            <BreakLines text={field.description!} />
+            <BreakLines text={field.description} />
           </Text>
         ) : (
           <Text color="gray.400" fontSize="sm" fontStyle="italic">
