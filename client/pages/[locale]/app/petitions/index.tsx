@@ -579,7 +579,7 @@ export default compose(
             <Text>
               <FormattedMessage
                 id="tour.petitions-list.we-collect"
-                defaultMessage="We are here to help you collect information from your clients."
+                defaultMessage="We are here to help you collect and organize the documents and information you need, keeping everything under control."
               />
             </Text>
             <Text marginTop={4}>

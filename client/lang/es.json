@@ -507,31 +507,31 @@
     "term": "contact.edit-details-button",
     "definition": "Editar",
     "context": "Edit",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:199:18"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:202:18"
   },
   {
     "term": "contact.no-petitions",
     "definition": "No has enviado peticiones a {name, select, null {este contacto} other {{name}}} todavía",
     "context": "You haven't sent any petitions to {name, select, null {this contact} other {{name}}} yet",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:226:18"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:229:18"
   },
   {
     "term": "contact.petitions-header",
     "definition": "Peticiones enviadas{name, select, null {} other { a {name}}}",
     "context": "Petitions sent{name, select, null {} other { to {name}}}",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:209:14"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:212:14"
   },
   {
     "term": "contacts.confirm-delete.body",
     "definition": "¿Está seguro de que desea eliminar {count, plural, =1 {<b>{email}</b>} other {los <b>#</b> contactos seleccionados}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{email}</b>} other {the <b>#</b> selected contacts}}?",
-    "reference": "pages/[locale]/app/contacts/index.tsx:289:12"
+    "reference": "pages/[locale]/app/contacts/index.tsx:291:12"
   },
   {
     "term": "contacts.confirm-delete.header",
     "definition": "Eliminar contactos",
     "context": "Delete contacts",
-    "reference": "pages/[locale]/app/contacts/index.tsx:283:14"
+    "reference": "pages/[locale]/app/contacts/index.tsx:285:14"
   },
   {
     "term": "contacts.create-new-contact.continue-button",
@@ -549,43 +549,43 @@
     "term": "contacts.header.created-at",
     "definition": "Fecha de creación",
     "context": "Created at",
-    "reference": "pages/[locale]/app/contacts/index.tsx:260:35"
+    "reference": "pages/[locale]/app/contacts/index.tsx:262:35"
   },
   {
     "term": "contacts.header.email",
     "definition": "Correo electrónico",
     "context": "Email",
-    "reference": "pages/[locale]/app/contacts/index.tsx:251:35"
+    "reference": "pages/[locale]/app/contacts/index.tsx:253:35"
   },
   {
     "term": "contacts.header.first-name",
     "definition": "Nombre",
     "context": "First name",
-    "reference": "pages/[locale]/app/contacts/index.tsx:211:35"
+    "reference": "pages/[locale]/app/contacts/index.tsx:213:35"
   },
   {
     "term": "contacts.header.last-name",
     "definition": "Apellidos",
     "context": "Last name",
-    "reference": "pages/[locale]/app/contacts/index.tsx:231:35"
+    "reference": "pages/[locale]/app/contacts/index.tsx:233:35"
   },
   {
     "term": "contacts.no-contacts",
     "definition": "No tienes contactos todavía. ¡Empieza por añadir uno!",
     "context": "You have no contacts yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/contacts/index.tsx:187:20"
+    "reference": "pages/[locale]/app/contacts/index.tsx:189:20"
   },
   {
     "term": "contacts.no-results",
     "definition": "No hemos encontrado contactos con esta búsqueda",
     "context": "There's no contacts matching your search",
-    "reference": "pages/[locale]/app/contacts/index.tsx:178:20"
+    "reference": "pages/[locale]/app/contacts/index.tsx:180:20"
   },
   {
     "term": "contacts.title",
     "definition": "Contactos",
     "context": "Contacts",
-    "reference": "pages/[locale]/app/contacts/index.tsx:137:32"
+    "reference": "pages/[locale]/app/contacts/index.tsx:139:32"
   },
   {
     "term": "error.404.header",
@@ -711,7 +711,7 @@
     "term": "generic.cancel-save-changes",
     "definition": "Cancelar",
     "context": "Cancel",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:173:20"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:176:20"
   },
   {
     "term": "generic.changes-saved",
@@ -795,13 +795,13 @@
     "term": "generic.file-name",
     "definition": "Nombre de archivo",
     "context": "File name",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:222:40"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:223:40"
   },
   {
     "term": "generic.file-size",
     "definition": "Tamaño de archivo",
     "context": "File size",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:233:51"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:234:51"
   },
   {
     "term": "generic.file-types.document",
@@ -975,13 +975,13 @@
     "term": "generic.no-description",
     "definition": "Sin descripción",
     "context": "No description",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:169:12"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:170:12"
   },
   {
     "term": "generic.not-specified",
     "definition": "Sin especificar",
     "context": "Not specified",
-    "reference": "pages/[locale]/app/contacts/index.tsx:239:16"
+    "reference": "pages/[locale]/app/contacts/index.tsx:241:16"
   },
   {
     "term": "generic.optional-field",
@@ -1053,13 +1053,13 @@
     "term": "generic.save-changes",
     "definition": "Guardar",
     "context": "Save",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:187:20"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:190:20"
   },
   {
     "term": "generic.saving-changes",
     "definition": "Guardando...",
     "context": "Saving...",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:182:52"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:185:52"
   },
   {
     "term": "generic.submit",
@@ -1197,7 +1197,7 @@
     "term": "petition-accesses.deadline-header",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:271:35"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:274:35"
   },
   {
     "term": "petition-accesses.next-reminder-header",
@@ -1215,7 +1215,7 @@
     "term": "petition-accesses.progress-header",
     "definition": "Progreso",
     "context": "Progress",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:294:35"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:297:35"
   },
   {
     "term": "petition-accesses.reminder-settings",
@@ -1245,7 +1245,7 @@
     "term": "petition-accesses.status-header",
     "definition": "Estado",
     "context": "Status",
-    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:308:35"
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:311:35"
   },
   {
     "term": "petition-replies.comment-pending.label",
@@ -1257,7 +1257,7 @@
     "term": "petition-replies.download-all",
     "definition": "Descargar archivos",
     "context": "Download files",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:301:12"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:302:12"
   },
   {
     "term": "petition-replies.field-comments.placeholder",
@@ -1275,31 +1275,31 @@
     "term": "petition-replies.petition-field-reply.approve",
     "definition": "Aprobar",
     "context": "Approve",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:301:36"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:302:36"
   },
   {
     "term": "petition-replies.petition-field-reply.file-download",
     "definition": "Descargar archivo",
     "context": "Download file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:191:48"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:192:48"
   },
   {
     "term": "petition-replies.petition-field-reply.file-preview",
     "definition": "Previsualizar",
     "context": "Preview file",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:203:50"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:204:50"
   },
   {
     "term": "petition-replies.petition-field-reply.reject",
     "definition": "Rechazar",
     "context": "Reject",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:316:36"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:317:36"
   },
   {
     "term": "petition-replies.petition-field.no-replies",
     "definition": "No hay respuestas a este campo todavía",
     "context": "There are no replies to this field yet",
-    "reference": "components/petition-replies/PetitionRepliesField.tsx:250:12"
+    "reference": "components/petition-replies/PetitionRepliesField.tsx:251:12"
   },
   {
     "term": "petition-replies.submit-comments",
@@ -2865,7 +2865,7 @@
     "term": "recipient-view.questions-button",
     "definition": "¿Preguntas?",
     "context": "Questions?",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:520:10"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:518:6"
   },
   {
     "term": "recipient-view.rejected-reply",
@@ -3114,6 +3114,72 @@
     "reference": "components/common/OnboardingTour.tsx:163:33"
   },
   {
+    "term": "tour.contact-details.essential",
+    "definition": "Toda la información esencial de tu contacto se muestra aquí: correo, nombre, y apellidos.",
+    "context": "All the essential information of your contact will be displayed here: email, first name, and last name.",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:471:14"
+  },
+  {
+    "term": "tour.contact-details.info",
+    "definition": "Puedes encontrar toda la información guardada en Parallel sobre un contacto en esta página.",
+    "context": "You can find all the information regarding a contact stored in Parallel on this page.",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:452:18"
+  },
+  {
+    "term": "tour.contact-details.name",
+    "definition": "Parallel usa el nombre mostrado aquí para cualquier mensaje que envíes a tu contacto. Asegúrate de que es correcto.",
+    "context": "Parallel will use the first name shown here for any messages you send to your contact. Make sure it is correct.",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:477:14"
+  },
+  {
+    "term": "tour.contact-details.page",
+    "definition": "Detalles del contacto",
+    "context": "Contact details",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:446:16"
+  },
+  {
+    "term": "tour.contact-details.personal-information",
+    "definition": "Información personal",
+    "context": "Personal information",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:462:16"
+  },
+  {
+    "term": "tour.contact-details.petitions",
+    "definition": "Peticiones enviadas a tu contacto",
+    "context": "Petitions sent to your contact",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:488:16"
+  },
+  {
+    "term": "tour.contact-details.petitions-list",
+    "definition": "Aquí encontrarás un listado con todas las peticiones que has enviado a tu contacto para ayudarte a encontrarlos más rápidamente.",
+    "context": "Here is a list of all the petitions you sent to your contact to help you find them faster.",
+    "reference": "pages/[locale]/app/contacts/[contactId]/index.tsx:494:18"
+  },
+  {
+    "term": "tour.contacts.add-contact",
+    "definition": "Aquí puedes crear un contacto antes de enviarle cualquier petición.",
+    "context": "Here you can create a contact before sending any petition to her.",
+    "reference": "pages/[locale]/app/contacts/index.tsx:416:18"
+  },
+  {
+    "term": "tour.contacts.add-contact-title",
+    "definition": "Añadir contacto",
+    "context": "Add contact",
+    "reference": "pages/[locale]/app/contacts/index.tsx:410:16"
+  },
+  {
+    "term": "tour.contacts.list",
+    "definition": "Aquí encontrarás un listado con cada contacto al que hayas enviado una petición o hayas creado desde esta misma página.",
+    "context": "Here you can find a list with every contact that you have sent a petition to or that you have created from this page.",
+    "reference": "pages/[locale]/app/contacts/index.tsx:400:18"
+  },
+  {
+    "term": "tour.contacts.page",
+    "definition": "Contactos",
+    "context": "Contacts",
+    "reference": "pages/[locale]/app/contacts/index.tsx:397:16"
+  },
+  {
     "term": "tour.last",
     "definition": "Vale. ¡Déjame probarlo!",
     "context": "Ok. Let me try it!",
@@ -3126,40 +3192,64 @@
     "reference": "components/common/OnboardingTour.tsx:159:33"
   },
   {
-    "term": "tour.petition-activity.monitor-requests",
-    "definition": "Monitoriza tus peticiones",
-    "context": "Monitor your requests",
+    "term": "tour.petition-activity.access-and-reminders",
+    "definition": "Acceso y recordatorios",
+    "context": "Access and reminders",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:596:16"
+  },
+  {
+    "term": "tour.petition-activity.change-reminder",
+    "definition": "Cambiar la <b>configuración de los recordatorios</b>.",
+    "context": "Change <b>reminders settings</b>.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:636:16"
+  },
+  {
+    "term": "tour.petition-activity.items",
+    "definition": "Aquí puedes ver y gestionar el acceso, los mensajes, los recordatorios y la historia de los eventos de tus peticiones.",
+    "context": "Here you can view and manage your petitions' access, messages, follow-ups, and event history.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:586:18"
+  },
+  {
+    "term": "tour.petition-activity.main",
+    "definition": "Actividad",
+    "context": "Activity",
     "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:580:16"
   },
   {
-    "term": "tour.petition-activity.next-reminder",
-    "definition": "Conoce cuándo se enviará el <b>próximo recordatorio</b>.",
-    "context": "See when will the <b>next reminder</b> be sent.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:620:16"
+    "term": "tour.petition-activity.monitor-requests",
+    "definition": "Monitoriza tus peticiones",
+    "context": "Monitor your requests",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:651:16"
   },
   {
-    "term": "tour.petition-activity.send-manual-reminder",
-    "definition": "<b>Envía recordatorios</b> manualmente a los destinatarios.",
-    "context": "<b>Send reminders</b> manually to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:629:16"
+    "term": "tour.petition-activity.open",
+    "definition": "¿Te gustaría saber si tus destinatarios han leído o abierto su página de respuestas?",
+    "context": "Are you wondering if your recipients read the emails or opened the recipient replies page?",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:660:14"
+  },
+  {
+    "term": "tour.petition-activity.overview",
+    "definition": "Consigue una mejor vista de lo que está ocurriendo con tu petición con la línea temporal de actividades.",
+    "context": "Have a better overview of what is happening around your petition with the activity timeline.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:666:14"
   },
   {
     "term": "tour.petition-activity.send-message",
-    "definition": "Envía un <b>mensaje de seguimiento</b> a los destinatarios.",
-    "context": "Send a <b>follow-up message</b> to recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:611:16"
+    "definition": "Envíar un <b>mensaje de seguimiento</b> a los destinatarios.",
+    "context": "Send an automatic or custom <b>reminder message</b> to your recipients.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:627:16"
   },
   {
     "term": "tour.petition-activity.track",
     "definition": "Gestionar quién tiene <b>acceso</b> a esta petición.",
     "context": "Manage who can <b>access</b> this petition.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:602:16"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:618:16"
   },
   {
     "term": "tour.petition-activity.you-can",
     "definition": "En esta sección podrás:",
     "context": "In this section, you will be able to:",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:589:14"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/activity.tsx:605:14"
   },
   {
     "term": "tour.petition-compose.add-petition-fields",
@@ -3237,25 +3327,79 @@
     "term": "tour.petition-replies.all-items-on-page",
     "definition": "En esta página puedes ver todos los elementos que has pedido a los destinatarios.",
     "context": "On this page, you can see all the items that you requested to the recipients.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:757:18"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:758:18"
   },
   {
     "term": "tour.petition-replies.completed-items",
-    "definition": "Si tus destinatarios han completado la información, podrás <b>descargar</b>, <b>copiar los textos</b> de las respuestas, o <b>marcarlos como revisados</b>.",
-    "context": "If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>.",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:775:12"
+    "definition": "Controla los documentos y las respuestas que ya has revisado utilizando los <b>botones de aprobar y rechazar</b>.",
+    "context": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:783:14"
+  },
+  {
+    "term": "tour.petition-replies.control",
+    "definition": "Aquí puedes controlar y verificar la información que te han enviado tus destinatarios.",
+    "context": "Here you can control and verify the information that your recipients have submitted.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:777:14"
+  },
+  {
+    "term": "tour.petition-replies.conversations",
+    "definition": "Conversaciones",
+    "context": "Conversations",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:806:16"
+  },
+  {
+    "term": "tour.petition-replies.conversations.keep",
+    "definition": "Evita correos de un lado a otro, mantén el hilo de las conversaciones alrededor de los documentos o la información aquí.",
+    "context": "Avoid back and forth emails, and keep track of the conversations around documents or information here.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:821:14"
+  },
+  {
+    "term": "tour.petition-replies.conversations.send",
+    "definition": "Tómate tu tiempo para incluir tus comentarios y envíales cuando estén listos.",
+    "context": "Take your time to include your comments and send them when they are ready.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:827:14"
+  },
+  {
+    "term": "tour.petition-replies.conversations.unclear",
+    "definition": "¿Hay algo que no está claro? ¿El documento subido es incorrecto?",
+    "context": "Is there anything not clear? Is the submitted document incorrect?",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:815:14"
+  },
+  {
+    "term": "tour.petition-replies.download",
+    "definition": "Si la información es correcta y la necesitas, puedes <b>descargar</b> los archivos, o <b>copiar los textos</b> de las contestaciones.",
+    "context": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:792:14"
+  },
+  {
+    "term": "tour.petition-replies.download.organize",
+    "definition": "Organiza tus descargas",
+    "context": "Organize your downloads",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:838:16"
+  },
+  {
+    "term": "tour.petition-replies.download.save-time",
+    "definition": "Ahorra tiempo descargando y renombrando todos los archivos desde aquí",
+    "context": "Save time downloading and renaming all the files from here.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:847:14"
+  },
+  {
+    "term": "tour.petition-replies.download.variables",
+    "definition": "Prueba a usar <b>parámetros</b> para indicar cómo quieres que aparezcan los nombres de tus archivos.",
+    "context": "Try using <b>variables</b> to set how you want your filenames to appear.",
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:853:14"
   },
   {
     "term": "tour.petition-replies.review-items",
     "definition": "Respuestas",
     "context": "Replies",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:767:16"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:768:16"
   },
   {
     "term": "tour.petition-replies.your-information",
     "definition": "Aquí tienes la información acerca de las peticiones",
     "context": "Here you have your information on the requests",
-    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:751:16"
+    "reference": "pages/[locale]/app/petitions/[petitionId]/replies.tsx:752:16"
   },
   {
     "term": "tour.petitions-list.create-petition",
@@ -3271,8 +3415,8 @@
   },
   {
     "term": "tour.petitions-list.we-collect",
-    "definition": "Estamos aquí para ayudarte a recopilar información de tus clientes.",
-    "context": "We are here to help you collect information from your clients.",
+    "definition": "Estamos aquí para ayudarte a obtener y ordenar los documentos e información que necesitas, para que tengas todo bajo control.",
+    "context": "We are here to help you collect and organize the documents and information you need, keeping everything under control.",
     "reference": "pages/[locale]/app/petitions/index.tsx:580:14"
   },
   {

@@ -297,6 +297,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             colorScheme="purple"
             leftIcon={<DownloadIcon />}
             onClick={handleDownloadAllClick}
+            id="download-all"
           >
             <FormattedMessage
               id="petition-replies.download-all"
@@ -771,18 +772,96 @@ export default compose(
           />
         ),
         content: (
-          <Text>
-            <FormattedMessage
-              id="tour.petition-replies.completed-items"
-              defaultMessage="If your recipients completed the information, you can <b>download</b> the files, <b>copy the text</b> replies, or <b>mark them as reviewed</b>."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
-            />
-          </Text>
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petition-replies.control"
+                defaultMessage="Here you can control and verify the information that your recipients have submitted."
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petition-replies.completed-items"
+                defaultMessage="Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
+                values={{
+                  b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+                }}
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petition-replies.download"
+                defaultMessage="If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
+                values={{
+                  b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+                }}
+              />
+            </Text>
+          </>
         ),
         placement: "right-start",
         target: "#petition-replies",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-replies.conversations"
+            defaultMessage="Conversations"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petition-replies.conversations.unclear"
+                defaultMessage="Is there anything not clear? Is the submitted document incorrect?"
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petition-replies.conversations.keep"
+                defaultMessage="Avoid back and forth emails, and keep track of the conversations around documents or information here."
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petition-replies.conversations.send"
+                defaultMessage="Take your time to include your comments and send them when they are ready."
+              />
+            </Text>
+          </>
+        ),
+        placement: "right-start",
+        target: "#comment-0",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-replies.download.organize"
+            defaultMessage="Organize your downloads"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petition-replies.download.save-time"
+                defaultMessage="Save time downloading and renaming all the files from here."
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petition-replies.download.variables"
+                defaultMessage="Try using <b>variables</b> to set how you want your filenames to appear."
+                values={{
+                  b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+                }}
+              />
+            </Text>
+          </>
+        ),
+        placement: "left-start",
+        target: "#download-all",
       },
     ],
   }),

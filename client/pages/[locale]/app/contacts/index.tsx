@@ -42,6 +42,8 @@ import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { compose } from "@parallel/utils/compose";
 
 const PAGE_SIZE = 10;
 
@@ -387,4 +389,40 @@ Contacts.getInitialProps = async ({
   ]);
 };
 
-export default withApolloData(Contacts);
+export default compose(
+  withOnboarding({
+    key: "CONTACT_LIST",
+    steps: [
+      {
+        title: (
+          <FormattedMessage id="tour.contacts.page" defaultMessage="Contacts" />
+        ),
+        content: (
+          <FormattedMessage
+            id="tour.contacts.list"
+            defaultMessage="Here you can find a list with every contact that you have sent a petition to or that you have created from this page."
+          />
+        ),
+        placement: "center",
+        target: "#__next",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.contacts.add-contact-title"
+            defaultMessage="Add contact"
+          />
+        ),
+        content: (
+          <FormattedMessage
+            id="tour.contacts.add-contact"
+            defaultMessage="Here you can create a contact before sending any petition to her."
+          />
+        ),
+        placement: "left",
+        target: "#pw-new-contact",
+      },
+    ],
+  }),
+  withApolloData
+)(Contacts);

@@ -121,6 +121,8 @@ export interface NexusGenEnums {
     | "INVALID_NEW_PASSWORD"
     | "SUCCESS";
   OnboardingKey:
+    | "CONTACT_DETAILS"
+    | "CONTACT_LIST"
     | "PETITION_ACTIVITY"
     | "PETITION_COMPOSE"
     | "PETITION_REVIEW"

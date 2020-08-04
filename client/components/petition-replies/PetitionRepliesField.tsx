@@ -19,7 +19,7 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { ReactNode } from "react";
+import { forwardRef, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -155,6 +155,7 @@ export function PetitionRepliesField({
                 (c) => !c.publishedAt
               )}
               onClick={onToggleComments}
+              id={`comment-${index}`}
             />
           </Flex>
         </Flex>
@@ -331,19 +332,18 @@ function PetitionRepliesFieldReply({
   );
 }
 
-function CommentsButton({
-  commentCount,
-  hasNewComments,
-  hasUnpublishedComments,
-  isActive,
-  onClick,
-}: {
-  commentCount: number;
-  hasNewComments: boolean;
-  hasUnpublishedComments: boolean;
-  isActive: boolean;
-  onClick: ButtonProps["onClick"];
-}) {
+const CommentsButton = forwardRef<
+  HTMLButtonElement,
+  {
+    commentCount: number;
+    hasNewComments: boolean;
+    hasUnpublishedComments: boolean;
+    isActive: boolean;
+  } & ButtonProps
+>(function CommentsButton(
+  { commentCount, hasNewComments, hasUnpublishedComments, isActive, ...props },
+  ref
+) {
   const intl = useIntl();
   const common = {
     "aria-pressed": isActive,
@@ -358,38 +358,39 @@ function CommentsButton({
       },
       { commentCount }
     ),
-    onClick,
+    ...props,
   } as const;
-  return (
-    <Box position="relative">
-      {commentCount > 0 ? (
-        <Button rightIcon={<CommentIcon />} fontWeight="normal" {...common}>
-          {hasNewComments || hasUnpublishedComments ? (
-            <Box
-              {...(!hasNewComments
-                ? { borderColor: "yellow.500" }
-                : !hasUnpublishedComments
-                ? { borderColor: isActive ? "white" : "purple.500" }
-                : {
-                    borderLeftColor: "yellow.500",
-                    borderTopColor: "yellow.500",
-                    borderRightColor: isActive ? "white" : "purple.500",
-                    borderBottomColor: isActive ? "white" : "purple.500",
-                  })}
-              borderWidth="4px"
-              transform="rotate(-45deg)"
-              borderRadius="full"
-              marginRight={2}
-            />
-          ) : null}
-          {intl.formatNumber(commentCount)}
-        </Button>
-      ) : (
-        <IconButton icon={<CommentIcon />} {...common} />
-      )}
-    </Box>
+  return commentCount > 0 ? (
+    <Button
+      rightIcon={<CommentIcon />}
+      fontWeight="normal"
+      {...common}
+      ref={ref}
+    >
+      {hasNewComments || hasUnpublishedComments ? (
+        <Box
+          {...(!hasNewComments
+            ? { borderColor: "yellow.500" }
+            : !hasUnpublishedComments
+            ? { borderColor: isActive ? "white" : "purple.500" }
+            : {
+                borderLeftColor: "yellow.500",
+                borderTopColor: "yellow.500",
+                borderRightColor: isActive ? "white" : "purple.500",
+                borderBottomColor: isActive ? "white" : "purple.500",
+              })}
+          borderWidth="4px"
+          transform="rotate(-45deg)"
+          borderRadius="full"
+          marginRight={2}
+        />
+      ) : null}
+      {intl.formatNumber(commentCount)}
+    </Button>
+  ) : (
+    <IconButton icon={<CommentIcon />} {...common} ref={ref} />
   );
-}
+});
 
 PetitionRepliesField.fragments = {
   PetitionField: gql`

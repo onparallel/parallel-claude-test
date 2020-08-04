@@ -579,8 +579,24 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-activity.monitor-requests"
-            defaultMessage="Monitor your requests"
+            id="tour.petition-activity.main"
+            defaultMessage="Activity"
+          />
+        ),
+        content: (
+          <FormattedMessage
+            id="tour.petition-activity.items"
+            defaultMessage="Here you can view and manage your petitions' access, messages, follow-ups, and event history."
+          />
+        ),
+        placement: "center",
+        target: "#__next",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-activity.access-and-reminders"
+            defaultMessage="Access and reminders"
           />
         ),
         content: (
@@ -610,7 +626,7 @@ export default compose(
               <ListItem>
                 <FormattedMessage
                   id="tour.petition-activity.send-message"
-                  defaultMessage="Send a <b>follow-up message</b> to recipients."
+                  defaultMessage="Send an automatic or custom <b>reminder message</b> to your recipients."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}
@@ -618,17 +634,8 @@ export default compose(
               </ListItem>
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-activity.next-reminder"
-                  defaultMessage="See when will the <b>next reminder</b> be sent."
-                  values={{
-                    b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                  }}
-                />
-              </ListItem>
-              <ListItem>
-                <FormattedMessage
-                  id="tour.petition-activity.send-manual-reminder"
-                  defaultMessage="<b>Send reminders</b> manually to the recipients."
+                  id="tour.petition-activity.change-reminder"
+                  defaultMessage="Change <b>reminders settings</b>."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}
@@ -639,6 +646,32 @@ export default compose(
         ),
         placement: "right",
         target: "#petition-accesses",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.petition-activity.monitor-requests"
+            defaultMessage="Monitor your requests"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.petition-activity.open"
+                defaultMessage="Are you wondering if your recipients read the emails or opened the recipient replies page?"
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.petition-activity.overview"
+                defaultMessage="Have a better overview of what is happening around your petition with the activity timeline."
+              />
+            </Text>
+          </>
+        ),
+        placement: "top-end",
+        target: "#petition-activity-timeline",
       },
     ],
   }),

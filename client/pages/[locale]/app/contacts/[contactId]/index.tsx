@@ -45,6 +45,8 @@ import {
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { EditIcon } from "@parallel/chakra/icons";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { compose } from "@parallel/utils/compose";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -118,6 +120,7 @@ function Contact({ contactId }: ContactProps) {
           <Card
             as={isEditing ? "form" : "div"}
             onSubmit={isEditing ? handleContactSaveSubmit : undefined}
+            id="contact-details"
           >
             <CardHeader headingAs="h2" headingSize="md">
               {`${contact!.fullName ?? ""} <${contact!.email}>`}
@@ -204,7 +207,7 @@ function Contact({ contactId }: ContactProps) {
               )}
             </Flex>
           </Card>
-          <Card marginTop={4}>
+          <Card marginTop={4} id="contact-petitions">
             <CardHeader>
               <FormattedMessage
                 id="contact.petitions-header"
@@ -435,4 +438,69 @@ Contact.getInitialProps = async ({
     contactId: query.contactId as string,
   };
 };
-export default withApolloData(Contact);
+export default compose(
+  withOnboarding({
+    key: "CONTACT_DETAILS",
+    steps: [
+      {
+        title: (
+          <FormattedMessage
+            id="tour.contact-details.page"
+            defaultMessage="Contact details"
+          />
+        ),
+        content: (
+          <FormattedMessage
+            id="tour.contact-details.info"
+            defaultMessage="You can find all the information regarding a contact stored in Parallel on this page."
+          />
+        ),
+        placement: "center",
+        target: "#__next",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.contact-details.personal-information"
+            defaultMessage="Personal information"
+          />
+        ),
+        content: (
+          <>
+            <Text>
+              <FormattedMessage
+                id="tour.contact-details.essential"
+                defaultMessage="All the essential information of your contact will be displayed here: email, first name, and last name."
+              />
+            </Text>
+            <Text marginTop={4}>
+              <FormattedMessage
+                id="tour.contact-details.name"
+                defaultMessage="Parallel will use the first name shown here for any messages you send to your contact. Make sure it is correct."
+              />
+            </Text>
+          </>
+        ),
+        placement: "right",
+        target: "#contact-details",
+      },
+      {
+        title: (
+          <FormattedMessage
+            id="tour.contact-details.petitions"
+            defaultMessage="Petitions sent to your contact"
+          />
+        ),
+        content: (
+          <FormattedMessage
+            id="tour.contact-details.petitions-list"
+            defaultMessage="Here is a list of all the petitions you sent to your contact to help you find them faster."
+          />
+        ),
+        placement: "right",
+        target: "#contact-petitions",
+      },
+    ],
+  }),
+  withApolloData
+)(Contact);

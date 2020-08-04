@@ -78,6 +78,8 @@ export const OnboardingKey = enumType({
     "PETITION_COMPOSE",
     "PETITION_REVIEW",
     "PETITION_ACTIVITY",
+    "CONTACT_LIST",
+    "CONTACT_DETAILS",
   ],
 });
 

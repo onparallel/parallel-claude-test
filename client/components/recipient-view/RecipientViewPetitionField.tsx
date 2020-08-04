@@ -30,7 +30,7 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
-import { ReactNode, useCallback } from "react";
+import { forwardRef, ReactNode, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -465,17 +465,17 @@ function FileUploadReplyForm({
   );
 }
 
-function CommentsButton({
-  commentCount,
-  hasNewComments,
-  hasUnpublishedComments,
-  onClick,
-}: {
-  commentCount: number;
-  hasNewComments: boolean;
-  hasUnpublishedComments: boolean;
-  onClick: ButtonProps["onClick"];
-}) {
+const CommentsButton = forwardRef<
+  HTMLButtonElement,
+  {
+    commentCount: number;
+    hasNewComments: boolean;
+    hasUnpublishedComments: boolean;
+  } & ButtonProps
+>(function CommentsButton(
+  { commentCount, hasNewComments, hasUnpublishedComments, ...props },
+  ref
+) {
   const intl = useIntl();
   const common = {
     size: "sm",
@@ -489,43 +489,39 @@ function CommentsButton({
       },
       { commentCount }
     ),
-    onClick,
+    ...props,
   } as const;
-  return (
-    <Box position="relative">
-      {commentCount > 0 ? (
-        <Button rightIcon={<CommentIcon />} {...common}>
-          {hasNewComments || hasUnpublishedComments ? (
-            <Box
-              {...(!hasNewComments
-                ? { borderColor: "yellow.500" }
-                : !hasUnpublishedComments
-                ? { borderColor: "purple.500" }
-                : {
-                    borderLeftColor: "yellow.500",
-                    borderTopColor: "yellow.500",
-                    borderRightColor: "purple.500",
-                    borderBottomColor: "purple.500",
-                  })}
-              borderWidth="4px"
-              transform="rotate(-45deg)"
-              borderRadius="9999px"
-              marginRight={2}
-            />
-          ) : null}
-          {intl.formatNumber(commentCount)}
-        </Button>
-      ) : (
-        <Button {...common}>
-          <FormattedMessage
-            id="recipient-view.questions-button"
-            defaultMessage="Questions?"
-          />
-        </Button>
-      )}
-    </Box>
+  return commentCount > 0 ? (
+    <Button rightIcon={<CommentIcon />} {...common}>
+      {hasNewComments || hasUnpublishedComments ? (
+        <Box
+          {...(!hasNewComments
+            ? { borderColor: "yellow.500" }
+            : !hasUnpublishedComments
+            ? { borderColor: "purple.500" }
+            : {
+                borderLeftColor: "yellow.500",
+                borderTopColor: "yellow.500",
+                borderRightColor: "purple.500",
+                borderBottomColor: "purple.500",
+              })}
+          borderWidth="4px"
+          transform="rotate(-45deg)"
+          borderRadius="9999px"
+          marginRight={2}
+        />
+      ) : null}
+      {intl.formatNumber(commentCount)}
+    </Button>
+  ) : (
+    <Button {...common}>
+      <FormattedMessage
+        id="recipient-view.questions-button"
+        defaultMessage="Questions?"
+      />
+    </Button>
   );
-}
+});
 
 RecipientViewPetitionField.fragments = {
   get PublicPetitionField() {
