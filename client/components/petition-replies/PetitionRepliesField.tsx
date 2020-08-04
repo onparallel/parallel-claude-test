@@ -161,7 +161,7 @@ export function PetitionRepliesField({
       </Flex>
       <Box marginBottom={2}>
         {field.description ? (
-          <Text color="gray.600" fontSize="sm">
+          <Text color="gray.600" fontSize="sm" sx={{ wordWrap: "anywhere" }}>
             <BreakLines text={field.description} />
           </Text>
         ) : (
