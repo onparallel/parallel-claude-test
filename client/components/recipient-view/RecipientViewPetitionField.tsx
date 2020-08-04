@@ -79,35 +79,37 @@ export function RecipientViewPetitionField({
       {...props}
     >
       <Flex alignItems="baseline">
-        <Heading flex="1" as="h2" fontSize="md">
-          {field.title}
-          {field.optional ? (
-            <Text
-              as="span"
-              marginLeft={2}
-              color="gray.400"
-              fontSize="sm"
-              fontWeight="normal"
-            >
-              <FormattedMessage
-                id="generic.optional-field"
-                defaultMessage="Optional"
-              />
-            </Text>
-          ) : (
-            <Tooltip
-              placement="right"
-              label={intl.formatMessage({
-                id: "generic.required-field",
-                defaultMessage: "Required field",
-              })}
-            >
-              <Text as="span" userSelect="none" marginLeft={1}>
-                *
+        <Box flex="1">
+          <Heading flex="1" as="h2" fontSize="md" sx={{ wordWrap: "anywhere" }}>
+            {field.title}
+            {field.optional ? (
+              <Text
+                as="span"
+                marginLeft={2}
+                color="gray.400"
+                fontSize="sm"
+                fontWeight="normal"
+              >
+                <FormattedMessage
+                  id="generic.optional-field"
+                  defaultMessage="Optional"
+                />
               </Text>
-            </Tooltip>
-          )}
-        </Heading>
+            ) : (
+              <Tooltip
+                placement="right"
+                label={intl.formatMessage({
+                  id: "generic.required-field",
+                  defaultMessage: "Required field",
+                })}
+              >
+                <Text as="span" userSelect="none" marginLeft={1}>
+                  *
+                </Text>
+              </Tooltip>
+            )}
+          </Heading>
+        </Box>
         <CommentsButton
           commentCount={field.comments.length}
           hasNewComments={field.comments.some((c) => c.isUnread)}

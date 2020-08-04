@@ -52,12 +52,16 @@ export function CardHeader({
   return (
     <>
       <Flex padding={4}>
-        <Flex flex="1" alignItems="center">
-          <Heading as={headingAs} size={headingSize}>
+        <Flex flex="1">
+          <Heading
+            as={headingAs}
+            size={headingSize}
+            sx={{ wordWrap: "anywhere" }}
+          >
             {children}
           </Heading>
           {isCloseable ? (
-            <Flex flex="1" height={5} marginLeft={1} justifyContent="flex-end">
+            <Flex flex="1" height={5} marginLeft={2} justifyContent="flex-end">
               <CloseButton
                 size="sm"
                 aria-label={intl.formatMessage({

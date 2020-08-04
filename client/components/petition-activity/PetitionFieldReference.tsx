@@ -3,6 +3,7 @@ import { Text } from "@chakra-ui/core";
 import { PetitionFieldReference_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";
+import { ellipsis } from "@parallel/utils/ellipsis";
 
 export function PetitionFieldReference({
   field,
@@ -13,7 +14,7 @@ export function PetitionFieldReference({
     <Text as="span" display="inline" marginX="2px">
       {field ? (
         field.title ? (
-          <Text as="strong">{field.title}</Text>
+          <Text as="strong">{ellipsis(field.title, 50)}</Text>
         ) : (
           <Text as="span" color="gray.400" fontStyle="italic">
             <FormattedMessage

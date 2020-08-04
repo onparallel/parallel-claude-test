@@ -81,16 +81,16 @@ export function PetitionRepliesField({
       paddingX={{ base: 4, md: 6 }}
       {...props}
     >
-      <Flex alignItems="center" flexWrap="wrap" justifyContent="space-between">
+      <Flex flexWrap="wrap" justifyContent="space-between">
         <Flex width={{ base: "100%", lg: "auto" }} flex="1">
           <PetitionFieldTypeIndicator
+            marginTop="2px"
             type={field.type}
             index={index}
-            as="div"
           />
-          <Box marginLeft={4}>
+          <Box marginLeft={4} flex="1">
             {field.title ? (
-              <Text as="h4" whiteSpace="nowrap">
+              <Text as="h4" sx={{ wordWrap: "anywhere" }}>
                 {field.title}
               </Text>
             ) : (
