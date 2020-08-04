@@ -53,6 +53,7 @@ import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ellipsis } from "@parallel/utils/ellipsis";
 
 const PAGE_SIZE = 10;
 
@@ -289,7 +290,9 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
         }),
         CellContent: ({ row }) => (
           <>
-            {row.name || (
+            {row.name ? (
+              ellipsis(row.name!, 50)
+            ) : (
               <Text as="span" color="gray.400" fontStyle="italic">
                 <FormattedMessage
                   id="generic.untitled-petition"

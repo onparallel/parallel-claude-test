@@ -43,6 +43,7 @@ export function MessageEmailEditor({
           type="text"
           ref={subjectRef}
           value={subject}
+          maxLength={255}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onSubjectChange(event.target.value)
           }

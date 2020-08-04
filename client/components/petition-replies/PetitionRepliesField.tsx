@@ -35,6 +35,7 @@ import {
   CloseIcon,
   CommentIcon,
 } from "@parallel/chakra/icons";
+import { ellipsis } from "@parallel/utils/ellipsis";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
@@ -91,7 +92,7 @@ export function PetitionRepliesField({
           <Box marginLeft={4}>
             {field.title ? (
               <Text as="h4" whiteSpace="nowrap">
-                {field.title}
+                {ellipsis(field.title, 50)}
               </Text>
             ) : (
               <Text
@@ -162,7 +163,7 @@ export function PetitionRepliesField({
       <Box marginBottom={2}>
         {field.description ? (
           <Text color="gray.600" fontSize="sm">
-            <BreakLines text={field.description} />
+            <BreakLines text={field.description!} />
           </Text>
         ) : (
           <Text color="gray.400" fontSize="sm" fontStyle="italic">
