@@ -92,7 +92,7 @@ export function PetitionRepliesField({
           <Box marginLeft={4}>
             {field.title ? (
               <Text as="h4" whiteSpace="nowrap">
-                {ellipsis(field.title, 50)}
+                {field.title}
               </Text>
             ) : (
               <Text
