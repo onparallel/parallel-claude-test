@@ -1,12 +1,17 @@
 import { PageView } from "./PageView";
 import { chromium, firefox, webkit } from "playwright";
 
-const { PLAYWRIGHT_BROWSERS: BROWSERS = "chrome,webkit,firefox" } = process.env;
-
-export const browsers: { [key: string]: PageView } = {
-  Chrome: BROWSERS.includes("chrome")
-    ? new PageView(chromium, ["--no-sandbox"])
-    : undefined,
-  Firefox: BROWSERS.includes("firefox") ? new PageView(firefox) : undefined,
-  Webkit: BROWSERS.includes("webkit") ? new PageView(webkit) : undefined,
-};
+export const browsers = Object.fromEntries(
+  (process.env.PLAYWRIGHT_BROWSERS ?? "chrome,webkit,firefox")
+    .split(",")
+    .map((name) => {
+      switch (name) {
+        case "chrome":
+          return ["Chrome", new PageView(chromium, ["--no-sandbox"])];
+        case "firefox":
+          return ["Firefox", new PageView(firefox)];
+        case "webkit":
+          return ["Webkit", new PageView(webkit)];
+      }
+    })
+);
