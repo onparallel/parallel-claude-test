@@ -177,13 +177,13 @@
     "term": "component.message-email-editor.body-placeholder",
     "definition": "Escribe un mensaje para incluir en el correo electrónico",
     "context": "Write a message to include in the email",
-    "reference": "components/petition-common/MessageEmailEditor.tsx:65:42"
+    "reference": "components/petition-common/MessageEmailEditor.tsx:66:42"
   },
   {
     "term": "component.message-email-editor.body-required-error",
     "definition": "Personalizar el mensaje inicial mejora el tiempo de respuesta de los destinatarios",
     "context": "Customizing the initial message improves the response time of the recipients",
-    "reference": "components/petition-common/MessageEmailEditor.tsx:71:10"
+    "reference": "components/petition-common/MessageEmailEditor.tsx:72:10"
   },
   {
     "term": "component.message-email-editor.subject-label",
@@ -195,13 +195,13 @@
     "term": "component.message-email-editor.subject-placeholder",
     "definition": "Asunto del correo electrónico",
     "context": "Enter the subject of the email",
-    "reference": "components/petition-common/MessageEmailEditor.tsx:49:42"
+    "reference": "components/petition-common/MessageEmailEditor.tsx:50:42"
   },
   {
     "term": "component.message-email-editor.subject-required-error",
     "definition": "El asunto ayuda al destinatario entender mejor el contexto de la petición",
     "context": "A subject helps the recipient understand the context of your petition",
-    "reference": "components/petition-common/MessageEmailEditor.tsx:55:10"
+    "reference": "components/petition-common/MessageEmailEditor.tsx:56:10"
   },
   {
     "term": "component.message-events-indicator.bounced-explanation",
@@ -537,13 +537,13 @@
     "term": "contacts.create-new-contact.continue-button",
     "definition": "Continuar",
     "context": "Continue",
-    "reference": "components/common/AskContactDetailsDialog.tsx:112:10"
+    "reference": "components/common/AskContactDetailsDialog.tsx:113:10"
   },
   {
     "term": "contacts.create-new-contact.header",
     "definition": "Introduce los datos del contacto",
     "context": "Enter the contact details",
-    "reference": "components/common/AskContactDetailsDialog.tsx:55:14"
+    "reference": "components/common/AskContactDetailsDialog.tsx:56:14"
   },
   {
     "term": "contacts.header.created-at",
@@ -741,13 +741,13 @@
     "term": "generic.comments-button-label",
     "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:482:37"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:484:37"
   },
   {
     "term": "generic.confirm-delete-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete",
-    "reference": "pages/[locale]/app/petitions/index.tsx:440:10"
+    "reference": "pages/[locale]/app/petitions/index.tsx:446:10"
   },
   {
     "term": "generic.delete",
@@ -765,13 +765,13 @@
     "term": "generic.dropzone-allowed-types",
     "definition": "Solo los siguientes tipos están permitidos:",
     "context": "Only the following file types are allowed:",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:423:12"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:425:12"
   },
   {
     "term": "generic.dropzone-default",
     "definition": "Arrastra archivos aquí o haz click para seleccionarlos",
     "context": "Drag files here, or click to select them",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:455:13"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:457:13"
   },
   {
     "term": "generic.edit",
@@ -807,25 +807,25 @@
     "term": "generic.file-types.document",
     "definition": "Documentos (.pdf, .doc, .docx)",
     "context": "Documents (.pdf, .doc, .docx)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:430:42"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:432:42"
   },
   {
     "term": "generic.file-types.image",
     "definition": "Imágenes (.jpeg, .png, etc.)",
     "context": "Images (.jpeg, .png, etc.)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:435:42"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:437:42"
   },
   {
     "term": "generic.file-types.pdf",
     "definition": "Documentos PDF",
     "context": "PDF Documents",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:445:40"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:447:40"
   },
   {
     "term": "generic.file-types.video",
     "definition": "Vídeos (.mp4, .avi, etc.)",
     "context": "Videos (.mp4, .avi, etc.)",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:440:42"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:442:42"
   },
   {
     "term": "generic.for-example",
@@ -849,7 +849,7 @@
     "term": "generic.forms.email-placeholder",
     "definition": "nombre@ejemplo.com",
     "context": "name@example.com",
-    "reference": "components/common/AskContactDetailsDialog.tsx:76:46"
+    "reference": "components/common/AskContactDetailsDialog.tsx:77:46"
   },
   {
     "term": "generic.forms.first-name-label",
@@ -885,7 +885,7 @@
     "term": "generic.forms.new-password-label",
     "definition": "Contraseña nueva",
     "context": "New password",
-    "reference": "pages/[locale]/login.tsx:314:12"
+    "reference": "pages/[locale]/login.tsx:315:12"
   },
   {
     "term": "generic.forms.old-password-label",
@@ -897,25 +897,25 @@
     "term": "generic.forms.password-label",
     "definition": "Contraseña",
     "context": "Password",
-    "reference": "pages/[locale]/login.tsx:341:12"
+    "reference": "pages/[locale]/login.tsx:342:12"
   },
   {
     "term": "generic.forms.password-policy-error",
     "definition": "La contraseña debe contener al menos 8 caracteres",
     "context": "The password must have a least 8 characters",
-    "reference": "pages/[locale]/login.tsx:328:14"
+    "reference": "pages/[locale]/login.tsx:329:14"
   },
   {
     "term": "generic.forms.passwords-must-match",
     "definition": "Las contraseñas deben coincidir",
     "context": "Passwords must match",
-    "reference": "pages/[locale]/login.tsx:355:14"
+    "reference": "pages/[locale]/login.tsx:356:14"
   },
   {
     "term": "generic.forms.required-field-error",
     "definition": "Se requiere un valor",
     "context": "A value is required",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:324:12"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:326:12"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -969,7 +969,7 @@
     "term": "generic.no-deadline",
     "definition": "Sin vencimiento",
     "context": "No deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx:365:14"
+    "reference": "pages/[locale]/app/petitions/index.tsx:371:14"
   },
   {
     "term": "generic.no-description",
@@ -987,7 +987,7 @@
     "term": "generic.optional-field",
     "definition": "Opcional",
     "context": "Optional",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:92:14"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:93:16"
   },
   {
     "term": "generic.petition-status.completed",
@@ -1017,7 +1017,7 @@
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:100:40"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:101:42"
   },
   {
     "term": "generic.richtext.bold",
@@ -1095,7 +1095,7 @@
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition",
-    "reference": "pages/[locale]/app/petitions/index.tsx:294:16"
+    "reference": "pages/[locale]/app/petitions/index.tsx:297:16"
   },
   {
     "term": "generic.you",
@@ -1113,7 +1113,7 @@
     "term": "navbar.change-language",
     "definition": "Cambiar idioma",
     "context": "Change language",
-    "reference": "components/layout/AppLayoutNavbar.tsx:211:53"
+    "reference": "components/layout/AppLayoutNavbar.tsx:212:53"
   },
   {
     "term": "navbar.coming-soon",
@@ -1131,7 +1131,7 @@
     "term": "navbar.new-button",
     "definition": "Nueva petición",
     "context": "Create a new petition",
-    "reference": "components/layout/AppLayoutNavbar.tsx:152:38"
+    "reference": "components/layout/AppLayoutNavbar.tsx:153:38"
   },
   {
     "term": "navbar.petitions-link",
@@ -1143,7 +1143,7 @@
     "term": "navbar.start-tour",
     "definition": "Guíame",
     "context": "Guide me around",
-    "reference": "components/layout/AppLayoutNavbar.tsx:241:44"
+    "reference": "components/layout/AppLayoutNavbar.tsx:242:44"
   },
   {
     "term": "navbar.templates-link",
@@ -1521,13 +1521,13 @@
     "term": "petition.field-clone",
     "definition": "Clonar campo",
     "context": "Clone field",
-    "reference": "components/petition-compose/PetitionComposeField.tsx:262:40"
+    "reference": "components/petition-compose/PetitionComposeField.tsx:263:40"
   },
   {
     "term": "petition.field-delete-button",
     "definition": "Eliminar campo",
     "context": "Delete field",
-    "reference": "components/petition-compose/PetitionComposeField.tsx:286:40"
+    "reference": "components/petition-compose/PetitionComposeField.tsx:287:40"
   },
   {
     "term": "petition.field-description-label",
@@ -1851,55 +1851,55 @@
     "term": "petitions.confirm-delete.body",
     "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
-    "reference": "pages/[locale]/app/petitions/index.tsx:427:12"
+    "reference": "pages/[locale]/app/petitions/index.tsx:433:12"
   },
   {
     "term": "petitions.confirm-delete.header",
     "definition": "Eliminar peticiones",
     "context": "Delete petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx:421:14"
+    "reference": "pages/[locale]/app/petitions/index.tsx:427:14"
   },
   {
     "term": "petitions.header.created-at",
     "definition": "Fecha de creación",
     "context": "Created at",
-    "reference": "pages/[locale]/app/petitions/index.tsx:395:35"
+    "reference": "pages/[locale]/app/petitions/index.tsx:401:35"
   },
   {
     "term": "petitions.header.deadline",
     "definition": "Vencimiento",
     "context": "Deadline",
-    "reference": "pages/[locale]/app/petitions/index.tsx:351:35"
+    "reference": "pages/[locale]/app/petitions/index.tsx:357:35"
   },
   {
     "term": "petitions.header.name",
     "definition": "Nombre de la petición",
     "context": "Petition name",
-    "reference": "pages/[locale]/app/petitions/index.tsx:286:35"
+    "reference": "pages/[locale]/app/petitions/index.tsx:287:35"
   },
   {
     "term": "petitions.header.progress",
     "definition": "Progreso",
     "context": "Progress",
-    "reference": "pages/[locale]/app/petitions/index.tsx:374:35"
+    "reference": "pages/[locale]/app/petitions/index.tsx:380:35"
   },
   {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient",
-    "reference": "pages/[locale]/app/petitions/index.tsx:305:35"
+    "reference": "pages/[locale]/app/petitions/index.tsx:308:35"
   },
   {
     "term": "petitions.header.status",
     "definition": "Estado",
     "context": "Status",
-    "reference": "pages/[locale]/app/petitions/index.tsx:384:35"
+    "reference": "pages/[locale]/app/petitions/index.tsx:390:35"
   },
   {
     "term": "petitions.no-petitions",
     "definition": "No tienes ninguna petición todavía. ¡Empieza creando una nueva!",
     "context": "You have no petitions yet. Start by creating one now!",
-    "reference": "pages/[locale]/app/petitions/index.tsx:262:20"
+    "reference": "pages/[locale]/app/petitions/index.tsx:263:20"
   },
   {
     "term": "petitions.no-reminders-left",
@@ -1911,13 +1911,13 @@
     "term": "petitions.no-results",
     "definition": "No encontramos peticiones con esta búsqueda",
     "context": "There's no petitions matching your search",
-    "reference": "pages/[locale]/app/petitions/index.tsx:253:20"
+    "reference": "pages/[locale]/app/petitions/index.tsx:254:20"
   },
   {
     "term": "petitions.recipients",
     "definition": "{contact} y <a>{more} más</a>",
     "context": "{contact} and <a>{more} more</a>",
-    "reference": "pages/[locale]/app/petitions/index.tsx:315:34"
+    "reference": "pages/[locale]/app/petitions/index.tsx:321:34"
   },
   {
     "term": "petitions.reminders-not-set",
@@ -1929,7 +1929,7 @@
     "term": "petitions.title",
     "definition": "Peticiones",
     "context": "Petitions",
-    "reference": "pages/[locale]/app/petitions/index.tsx:208:32"
+    "reference": "pages/[locale]/app/petitions/index.tsx:209:32"
   },
   {
     "term": "public.about-link",
@@ -2481,7 +2481,7 @@
     "term": "public.login-button",
     "definition": "Acceso",
     "context": "Login",
-    "reference": "pages/[locale]/login.tsx:261:10"
+    "reference": "pages/[locale]/login.tsx:262:10"
   },
   {
     "term": "public.login.already-logged-in.continue-button",
@@ -2511,7 +2511,7 @@
     "term": "public.login.back-to-login-link",
     "definition": "Volver atrás",
     "context": "Go back to login",
-    "reference": "pages/[locale]/login.tsx:377:10"
+    "reference": "pages/[locale]/login.tsx:378:10"
   },
   {
     "term": "public.login.explanation",
@@ -2523,7 +2523,7 @@
     "term": "public.login.forgot-password-link",
     "definition": "He olvidado mi contraseña",
     "context": "I forgot my password",
-    "reference": "pages/[locale]/login.tsx:266:10"
+    "reference": "pages/[locale]/login.tsx:267:10"
   },
   {
     "term": "public.login.header",
@@ -2547,19 +2547,19 @@
     "term": "public.login.password-update-button",
     "definition": "Cambiar contraseña",
     "context": "Update password",
-    "reference": "pages/[locale]/login.tsx:369:10"
+    "reference": "pages/[locale]/login.tsx:370:10"
   },
   {
     "term": "public.login.password-update-explanation",
     "definition": "Al acceder por primera vez, se debe cambiar la contraseña",
     "context": "First time users need to update their password",
-    "reference": "pages/[locale]/login.tsx:305:10"
+    "reference": "pages/[locale]/login.tsx:306:10"
   },
   {
     "term": "public.login.password-update-header",
     "definition": "Cambie su contraseña",
     "context": "Update your password",
-    "reference": "pages/[locale]/login.tsx:299:10"
+    "reference": "pages/[locale]/login.tsx:300:10"
   },
   {
     "term": "public.login.title",
@@ -2571,7 +2571,7 @@
     "term": "public.meta-description",
     "definition": "Parallel ayuda a profesionales a recopilar y organizar información de sus clientes mediante la automatización de emails y checklists, y un portal de cliente similar a formularios.",
     "context": "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal.",
-    "reference": "components/public/layout/PublicLayout.tsx:40:38"
+    "reference": "components/public/layout/PublicLayout.tsx:44:38"
   },
   {
     "term": "public.people.hero-title",
@@ -2787,7 +2787,7 @@
     "term": "recipient-view.approved-reply",
     "definition": "Esta respuesta ha sido aprobada",
     "context": "This reply has been approved",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:203:27"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:205:27"
   },
   {
     "term": "recipient-view.automatically-saved-text-1",
@@ -2829,13 +2829,13 @@
     "term": "recipient-view.field-reply-submit",
     "definition": "Enviar",
     "context": "Submit",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:338:8"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:340:8"
   },
   {
     "term": "recipient-view.files-uploaded",
     "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:132:44"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:134:44"
   },
   {
     "term": "recipient-view.organization",
@@ -2865,25 +2865,25 @@
     "term": "recipient-view.questions-button",
     "definition": "¿Preguntas?",
     "context": "Questions?",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:518:10"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:520:10"
   },
   {
     "term": "recipient-view.rejected-reply",
     "definition": "Esta respuesta ha sido rechazada",
     "context": "This reply has been rejected",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:207:27"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:209:27"
   },
   {
     "term": "recipient-view.remove-reply-label",
     "definition": "Eliminar respuesta",
     "context": "Remove reply",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:274:36"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:276:36"
   },
   {
     "term": "recipient-view.replies-submitted",
     "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviada} other {# respuestas enviadas}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:126:34"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:128:34"
   },
   {
     "term": "recipient-view.security-link",
@@ -2931,7 +2931,7 @@
     "term": "recipient-view.text-reply",
     "definition": "Respuesta añadida el {date}",
     "context": "Reply added on {date}",
-    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:149:42"
+    "reference": "components/recipient-view/RecipientViewPetitionField.tsx:151:42"
   },
   {
     "term": "settings.account",
@@ -3093,7 +3093,7 @@
     "term": "timeline.reply-created-deleted-field",
     "definition": "Campo eliminado",
     "context": "Deleted field",
-    "reference": "components/petition-activity/PetitionFieldReference.tsx:27:10"
+    "reference": "components/petition-activity/PetitionFieldReference.tsx:28:10"
   },
   {
     "term": "timeline.reply-created-description",
@@ -3111,19 +3111,19 @@
     "term": "tour.back",
     "definition": "Atrás",
     "context": "Back",
-    "reference": "components/common/OnboardingTour.tsx:158:33"
+    "reference": "components/common/OnboardingTour.tsx:163:33"
   },
   {
     "term": "tour.last",
     "definition": "Vale. ¡Déjame probarlo!",
     "context": "Ok. Let me try it!",
-    "reference": "components/common/OnboardingTour.tsx:150:33"
+    "reference": "components/common/OnboardingTour.tsx:155:33"
   },
   {
     "term": "tour.next",
     "definition": "Siguiente",
     "context": "Next",
-    "reference": "components/common/OnboardingTour.tsx:154:33"
+    "reference": "components/common/OnboardingTour.tsx:159:33"
   },
   {
     "term": "tour.petition-activity.monitor-requests",
@@ -3261,42 +3261,42 @@
     "term": "tour.petitions-list.create-petition",
     "definition": "¡Empecemos creando una petición!",
     "context": "Let's start by creating a petition!",
-    "reference": "pages/[locale]/app/petitions/index.tsx:588:16"
+    "reference": "pages/[locale]/app/petitions/index.tsx:597:16"
   },
   {
     "term": "tour.petitions-list.show-around",
     "definition": "Si esta es tu primera vez aquí, déjanos mostrarte cómo funciona.",
     "context": "If this is your first time here, let us show you around!",
-    "reference": "pages/[locale]/app/petitions/index.tsx:577:14"
+    "reference": "pages/[locale]/app/petitions/index.tsx:586:14"
   },
   {
     "term": "tour.petitions-list.we-collect",
     "definition": "Estamos aquí para ayudarte a recopilar información de tus clientes.",
     "context": "We are here to help you collect information from your clients.",
-    "reference": "pages/[locale]/app/petitions/index.tsx:571:14"
+    "reference": "pages/[locale]/app/petitions/index.tsx:580:14"
   },
   {
     "term": "tour.petitions-list.we-notify",
     "definition": "Te lo haremos saber cuando tus destinatarios hayan completado todo.",
     "context": "We will let you know when the recipients complete everything.",
-    "reference": "pages/[locale]/app/petitions/index.tsx:603:14"
+    "reference": "pages/[locale]/app/petitions/index.tsx:612:14"
   },
   {
     "term": "tour.petitions-list.welcome",
     "definition": "¡Bienvenidos a Parallel!",
     "context": "Welcome to Parallel!",
-    "reference": "pages/[locale]/app/petitions/index.tsx:562:16"
+    "reference": "pages/[locale]/app/petitions/index.tsx:571:16"
   },
   {
     "term": "tour.petitions-list.you-focus",
     "definition": "Queremos que te centres en aquello que es importante. Déjanos que recopilemos la información por ti.",
     "context": "We want you to focus on what matters, so let us collect the information for you.",
-    "reference": "pages/[locale]/app/petitions/index.tsx:597:14"
+    "reference": "pages/[locale]/app/petitions/index.tsx:606:14"
   },
   {
     "term": "tour.skip",
     "definition": "Saltar",
     "context": "Skip",
-    "reference": "components/common/OnboardingTour.tsx:162:33"
+    "reference": "components/common/OnboardingTour.tsx:167:33"
   }
 ]
