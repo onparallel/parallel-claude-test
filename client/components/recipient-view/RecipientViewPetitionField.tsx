@@ -79,7 +79,7 @@ export function RecipientViewPetitionField({
       {...props}
     >
       <Flex alignItems="baseline">
-        <Box flex="1">
+        <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
             {field.title}
             {field.optional ? (
