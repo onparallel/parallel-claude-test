@@ -90,7 +90,7 @@ export function PetitionRepliesField({
           />
           <Box marginLeft={4} flex="1">
             {field.title ? (
-              <Text as="h4" sx={{ wordWrap: "anywhere" }}>
+              <Text as="h4" overflowWrap="anywhere">
                 {field.title}
               </Text>
             ) : (
@@ -161,7 +161,7 @@ export function PetitionRepliesField({
       </Flex>
       <Box marginBottom={2}>
         {field.description ? (
-          <Text color="gray.600" fontSize="sm" sx={{ wordWrap: "anywhere" }}>
+          <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
             <BreakLines text={field.description} />
           </Text>
         ) : (

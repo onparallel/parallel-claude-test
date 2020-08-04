@@ -53,11 +53,7 @@ export function CardHeader({
     <>
       <Flex padding={4}>
         <Flex flex="1">
-          <Heading
-            as={headingAs}
-            size={headingSize}
-            sx={{ wordWrap: "anywhere" }}
-          >
+          <Heading as={headingAs} size={headingSize} overflowWrap="anywhere">
             {children}
           </Heading>
           {isCloseable ? (

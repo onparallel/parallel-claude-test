@@ -80,7 +80,7 @@ export function RecipientViewPetitionField({
     >
       <Flex alignItems="baseline">
         <Box flex="1">
-          <Heading flex="1" as="h2" fontSize="md" sx={{ wordWrap: "anywhere" }}>
+          <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
             {field.title}
             {field.optional ? (
               <Text
