@@ -4,6 +4,6 @@ export function ellipsis(
   prefix = "..."
 ): string {
   return text.length > maxLength
-    ? text.slice(0, maxLength).concat(prefix)
+    ? text.slice(0, maxLength - prefix.length).concat(prefix)
     : text;
 }
