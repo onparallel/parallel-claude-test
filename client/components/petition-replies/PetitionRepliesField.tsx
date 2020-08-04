@@ -35,7 +35,6 @@ import {
   CloseIcon,
   CommentIcon,
 } from "@parallel/chakra/icons";
-import { ellipsis } from "@parallel/utils/ellipsis";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
