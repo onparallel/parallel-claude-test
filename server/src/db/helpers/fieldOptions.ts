@@ -27,6 +27,10 @@ const SCHEMAS = {
       },
     },
   },
+  HEADING: {
+    type: "object",
+    required: [],
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -58,5 +62,7 @@ export function defaultFieldOptions(
           accepts: null,
         },
       };
+    default:
+      return {};
   }
 }

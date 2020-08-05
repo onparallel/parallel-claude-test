@@ -141,6 +141,7 @@ export const PetitionFieldType = enumType({
   members: [
     { name: "FILE_UPLOAD", description: "A file upload field." },
     { name: "TEXT", description: "A text field." },
+    { name: "HEADING", description: "A heading field." },
   ],
 });
 
@@ -356,6 +357,8 @@ export const PetitionFieldReply = objectType({
                 }
               : {};
           }
+          default:
+            return {};
         }
       },
     });

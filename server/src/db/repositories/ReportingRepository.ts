@@ -51,7 +51,7 @@ export class ReportingRepository extends BaseRepository {
             .groupBy("petition_id")
             .select(
               "petition_id",
-              ...["TEXT", "FILE_UPLOAD"].map((type) =>
+              ...["TEXT", "FILE_UPLOAD", "HEADING"].map((type) =>
                 this.knex.raw(
                   `sum((type = '${type}')::int)::int as ${type.toLowerCase()}_fields`
                 )

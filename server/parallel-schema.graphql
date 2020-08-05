@@ -989,6 +989,11 @@ enum PetitionFieldType {
   FILE_UPLOAD
 
   """
+  A heading field.
+  """
+  HEADING
+
+  """
   A text field.
   """
   TEXT

@@ -177,5 +177,7 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
         placeholder: faker.random.words(3),
       };
     }
+    default:
+      return {};
   }
 }

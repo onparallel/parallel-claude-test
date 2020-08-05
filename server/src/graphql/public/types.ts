@@ -220,6 +220,8 @@ export const PublicPetitionFieldReply = objectType({
                 }
               : {};
           }
+          default:
+            return {};
         }
       },
     });
