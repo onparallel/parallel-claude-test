@@ -179,6 +179,11 @@ export const PetitionField = objectType({
         "Determines if the content of this field has been validated.",
     });
 
+    t.boolean("isReadOnly", {
+      description: "Determines if the field is accepts replies",
+      resolve: ({ type }) => [""].includes(type),
+    });
+
     t.list.field("replies", {
       type: "PetitionFieldReply",
       description: "The replies to the petition field",

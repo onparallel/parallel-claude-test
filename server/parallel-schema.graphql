@@ -833,6 +833,11 @@ type PetitionField {
   id: ID!
 
   """
+  Determines if the field is accepts replies
+  """
+  isReadOnly: Boolean!
+
+  """
   Determines if this field allows multiple replies.
   """
   multiple: Boolean!
