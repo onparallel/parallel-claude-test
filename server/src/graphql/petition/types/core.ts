@@ -180,7 +180,7 @@ export const PetitionField = objectType({
     });
 
     t.boolean("isReadOnly", {
-      description: "Determines if the field is accepts replies",
+      description: "Determines if the field accepts replies",
       resolve: ({ type }) => [""].includes(type),
     });
 
