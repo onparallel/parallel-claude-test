@@ -6,7 +6,7 @@ import {
   OnboardingStatus,
   useAppLayout_updateOnboardingStatusMutation,
 } from "@parallel/graphql/__types";
-import { useCreatePetition } from "@parallel/utils/useCreatePetition";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useRouter } from "next/router";
 import { useCallback, useContext } from "react";
 import {

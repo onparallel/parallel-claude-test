@@ -45,7 +45,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { resolveUrl } from "@parallel/utils/next";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { useCreateContact } from "@parallel/utils/useCreateContact";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";

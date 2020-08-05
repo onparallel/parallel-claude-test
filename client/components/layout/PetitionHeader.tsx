@@ -6,20 +6,44 @@ import {
   EditableInput,
   EditablePreview,
   Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
   Text,
   Tooltip,
   useDisclosure,
+  MenuDivider,
 } from "@chakra-ui/core";
-import { SettingsIcon } from "@parallel/chakra/icons";
+import {
+  CopyIcon,
+  DeleteIcon,
+  MoreVerticalIcon,
+  SettingsIcon,
+} from "@parallel/chakra/icons";
+import {
+  ConfirmDeletePetitionsDialog,
+  useConfirmDeletePetitionsDialog,
+} from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
 import {
   PetitionHeader_PetitionFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { forwardRef, ReactNode, Ref, useMemo, useState } from "react";
+import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
+import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useRouter } from "next/router";
+import {
+  forwardRef,
+  ReactNode,
+  Ref,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { PetitionStatusIndicator } from "../common/PetitionStatusIndicator";
 import { SmallPopover } from "../common/SmallPopover";
@@ -41,12 +65,61 @@ export function PetitionHeader({
   ...props
 }: PetitionHeaderProps) {
   const intl = useIntl();
+  const router = useRouter();
   const [name, setName] = useState(petition.name ?? "");
   const {
     isOpen: isSettingsOpen,
     onOpen: onOpenSettings,
     onClose: onCloseSettings,
   } = useDisclosure();
+
+  const deletePetitions = useDeletePetitions();
+  const confirmDelete = useConfirmDeletePetitionsDialog();
+  const handleDeleteClick = useCallback(
+    async function () {
+      try {
+        await confirmDelete({
+          selected: [petition],
+        });
+        await deletePetitions({
+          variables: { ids: [petition.id]! },
+        });
+        router.push(
+          `/[locale]/app/petitions/`,
+          `/${router.query.locale}/app/petitions/`
+        );
+      } catch {}
+    },
+    [petition.id, petition.name]
+  );
+
+  const clonePetition = useClonePetition();
+  const handleCloneClick = useCallback(
+    async function () {
+      try {
+        const { data } = await clonePetition({
+          variables: {
+            petitionId: petition.id,
+            name: petition.name
+              ? `${petition.name} (${intl.formatMessage({
+                  id: "petition.copy",
+                  defaultMessage: "copy",
+                })})`
+              : "",
+            locale: petition.locale,
+            deadline: petition.deadline,
+          },
+        });
+        router.push(
+          `/[locale]/app/petitions/[petitionId]/compose`,
+          `/${router.query.locale}/app/petitions/${
+            data!.clonePetition.id
+          }/compose`
+        );
+      } catch {}
+    },
+    [petition.id, petition.name, petition.locale, petition.deadline]
+  );
 
   const sections = useMemo(
     () => [
@@ -207,15 +280,47 @@ export function PetitionHeader({
           </Flex>
           <Spacer minWidth={4} />
           <Stack direction="row">
-            <IconButtonWithTooltip
-              variant="ghost"
-              icon={<SettingsIcon />}
-              label={intl.formatMessage({
-                id: "petition.settings-button",
-                defaultMessage: "Petition settings",
-              })}
-              onClick={onOpenSettings}
-            />
+            <Box>
+              <Menu id="petition-more-options-menu">
+                <Tooltip
+                  placement="left"
+                  label={intl.formatMessage({
+                    id: "generic.more-options",
+                    defaultMessage: "More options...",
+                  })}
+                >
+                  <MenuButton
+                    as={IconButton}
+                    variant="ghost"
+                    icon={<MoreVerticalIcon />}
+                  />
+                </Tooltip>
+                <MenuList>
+                  <MenuItem onClick={handleCloneClick}>
+                    <CopyIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.clone-label"
+                      defaultMessage="Clone petition"
+                    />
+                  </MenuItem>
+                  <MenuItem color="red.500" onClick={handleDeleteClick}>
+                    <DeleteIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.delete-label"
+                      defaultMessage="Delete petition"
+                    />
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem onClick={onOpenSettings}>
+                    <SettingsIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.settings-button"
+                      defaultMessage="Petition settings"
+                    />
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
           </Stack>
         </Flex>
         <Flex
@@ -321,10 +426,13 @@ PetitionHeader.fragments = {
     fragment PetitionHeader_Petition on Petition {
       id
       name
+      locale
       status
       updatedAt
       ...PetitionSettingsModal_Petition
+      ...ConfirmDeletePetitionsDialog_Petition
     }
     ${PetitionSettingsModal.fragments.Petition}
+    ${ConfirmDeletePetitionsDialog.fragments.Petition}
   `,
 };

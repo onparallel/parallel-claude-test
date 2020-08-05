@@ -1,13 +1,8 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/core";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { Box, Flex, Text } from "@chakra-ui/core";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
@@ -19,6 +14,10 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import {
+  ConfirmDeletePetitionsDialog,
+  useConfirmDeletePetitionsDialog,
+} from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
 import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
@@ -26,20 +25,21 @@ import {
   PetitionsQueryVariables,
   PetitionStatus,
   PetitionsUserQuery,
-  Petitions_PetitionsListFragment,
+  Petitions_PetitionPaginationFragment,
   QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
-  usePetitions_clonePetitionMutation,
-  usePetitions_deletePetitionsMutation,
 } from "@parallel/graphql/__types";
 import {
   assertQuery,
-  clearCache,
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { ellipsis } from "@parallel/utils/ellipsis";
+import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   enums,
   integer,
@@ -49,11 +49,9 @@ import {
   useQueryState,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
-import { useCreatePetition } from "@parallel/utils/useCreatePetition";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ellipsis } from "@parallel/utils/ellipsis";
 
 const PAGE_SIZE = 10;
 
@@ -94,26 +92,12 @@ function Petitions() {
     })
   );
 
-  const [deletePetition] = usePetitions_deletePetitionsMutation({
-    update(cache) {
-      clearCache(cache, /\$ROOT_QUERY\.petitions\(/);
-      refetch();
-    },
-  });
+  const deletePetitions = useDeletePetitions();
 
-  const [clonePetition] = usePetitions_clonePetitionMutation({
-    update(cache) {
-      // clear caches where new item would appear
-      clearCache(
-        cache,
-        /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
-      );
-      refetch();
-    },
-  });
+  const clonePetition = useClonePetition();
 
   const [selected, setSelected] = useState<string[]>([]);
-  const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
+  const confirmDelete = useConfirmDeletePetitionsDialog();
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -137,9 +121,10 @@ function Petitions() {
         await confirmDelete({
           selected: petitions.items.filter((p) => selected!.includes(p.id)),
         });
-        await deletePetition({
+        await deletePetitions({
           variables: { ids: selected! },
         });
+        refetch();
       } catch {}
     },
     [petitions, selected]
@@ -275,7 +260,9 @@ function Petitions() {
   );
 }
 
-type PetitionSelection = UnwrapArray<Petitions_PetitionsListFragment["items"]>;
+type PetitionSelection = UnwrapArray<
+  Petitions_PetitionPaginationFragment["items"]
+>;
 
 function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
   const intl = useIntl();
@@ -411,53 +398,22 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
   );
 }
 
-function ConfirmDeletePetitionsDialog({
-  selected,
-  ...props
-}: DialogProps<
-  {
-    selected: PetitionSelection[];
-  },
-  void
->) {
-  const count = selected.length;
-  const name = selected.length && selected[0].name;
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="petitions.confirm-delete.header"
-          defaultMessage="Delete petitions"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="petitions.confirm-delete.body"
-          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
-          values={{
-            count,
-            name,
-            b: (chunks: any[]) => <b>{chunks}</b>,
-          }}
-        />
-      }
-      confirm={
-        <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="generic.confirm-delete-button"
-            defaultMessage="Yes, delete"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
 Petitions.fragments = {
-  Petitions: gql`
-    fragment Petitions_PetitionsList on PetitionPagination {
-      items {
+  get PetitionPagination() {
+    return gql`
+      fragment Petitions_PetitionPagination on PetitionPagination {
+        items {
+          ...Petitions_Petition
+        }
+        totalCount
+      }
+      ${this.Petition}
+      ${ContactLink.fragments.Contact}
+    `;
+  },
+  get Petition() {
+    return gql`
+      fragment Petitions_Petition on Petition {
         id
         locale
         customRef
@@ -477,43 +433,20 @@ Petitions.fragments = {
             ...ContactLink_Contact
           }
         }
+        ...ConfirmDeletePetitionsDialog_Petition
       }
-      totalCount
-    }
-    ${ContactLink.fragments.Contact}
-  `,
-  User: gql`
-    fragment Petitions_User on User {
-      ...AppLayout_User
-    }
-    ${AppLayout.fragments.User}
-  `,
+      ${ConfirmDeletePetitionsDialog.fragments.Petition}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment Petitions_User on User {
+        ...AppLayout_User
+      }
+      ${AppLayout.fragments.User}
+    `;
+  },
 };
-
-Petitions.mutations = [
-  gql`
-    mutation Petitions_deletePetitions($ids: [ID!]!) {
-      deletePetitions(ids: $ids)
-    }
-  `,
-  gql`
-    mutation Petitions_clonePetition(
-      $petitionId: ID!
-      $name: String
-      $locale: PetitionLocale!
-      $deadline: DateTime
-    ) {
-      clonePetition(
-        petitionId: $petitionId
-        name: $name
-        locale: $locale
-        deadline: $deadline
-      ) {
-        id
-      }
-    }
-  `,
-];
 
 Petitions.getInitialProps = async ({
   query,
@@ -537,10 +470,10 @@ Petitions.getInitialProps = async ({
             sortBy: $sortBy
             status: $status
           ) {
-            ...Petitions_PetitionsList
+            ...Petitions_PetitionPagination
           }
         }
-        ${Petitions.fragments.Petitions}
+        ${Petitions.fragments.PetitionPagination}
       `,
       {
         variables: {

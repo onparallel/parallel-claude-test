@@ -1,5 +1,6 @@
 schema: ../server/parallel-schema.graphql
-documents: "**/*.tsx"
+documents:
+  - "{pages,components,utils}/**/*.{tsx,ts}"
 generates:
   ./graphql/__fragment-matcher.ts:
     plugins:

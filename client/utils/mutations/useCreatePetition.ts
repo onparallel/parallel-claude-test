@@ -1,5 +1,4 @@
 import { gql, useMutation } from "@apollo/client";
-import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import {
   PetitionLocale,
   useCreatePetition_createPetitionMutation,
@@ -7,7 +6,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { clearCache } from "./apollo";
+import { clearCache } from "../apollo";
 
 export function useCreatePetition() {
   const { query } = useRouter();
@@ -38,23 +37,15 @@ export function useCreatePetition() {
     }
   );
 
-  // const showCreatePetitionDialog = useCreatePetitionDialog();
-
   return useCallback(
     async function () {
-      // const { name, locale, deadline } = await showCreatePetitionDialog({
-      //   defaultLocale: query.locale as PetitionLocale,
-      // });
-      const { data, errors } = await createPetition({
+      const { data } = await createPetition({
         variables: {
           name: null,
           locale: query.locale as PetitionLocale,
           deadline: null,
         },
       });
-      if (errors) {
-        throw errors;
-      }
       return data!.createPetition.id;
     },
     [query.locale]

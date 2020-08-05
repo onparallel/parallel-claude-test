@@ -38,7 +38,7 @@ import {
   useQueryState,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
-import { useCreateContact } from "@parallel/utils/useCreateContact";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

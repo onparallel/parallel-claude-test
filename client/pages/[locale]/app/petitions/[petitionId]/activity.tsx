@@ -35,7 +35,7 @@ import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
-import { useCreateContact } from "@parallel/utils/useCreateContact";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { differenceInMinutes } from "date-fns";

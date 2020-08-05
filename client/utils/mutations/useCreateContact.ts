@@ -4,7 +4,7 @@ import {
   useCreateContact_createContactMutationVariables,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { useAskContactDetailsDialog } from "../components/common/AskContactDetailsDialog";
+import { useAskContactDetailsDialog } from "../../components/common/AskContactDetailsDialog";
 
 export function useCreateContact() {
   const [createContact] = useMutation<

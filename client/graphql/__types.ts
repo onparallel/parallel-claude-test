@@ -649,6 +649,8 @@ export type PetitionField = {
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["ID"];
+  /** Determines if the field accepts replies */
+  isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */
   multiple: Scalars["Boolean"];
   /** Determines if this field is optional. */
@@ -1184,8 +1186,9 @@ export type AppLayoutNavbar_UserFragment = {
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name" | "status" | "updatedAt"> &
-  PetitionSettingsModal_PetitionFragment;
+} & Pick<Petition, "id" | "name" | "locale" | "status" | "updatedAt"> &
+  PetitionSettingsModal_PetitionFragment &
+  ConfirmDeletePetitionsDialog_PetitionFragment;
 
 export type PetitionLayout_PetitionFragment = {
   __typename?: "Petition";
@@ -1544,6 +1547,10 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
   };
+
+export type ConfirmDeletePetitionsDialog_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name">;
 
 export type PetitionSettingsModal_PetitionFragment = {
   __typename?: "Petition";
@@ -2355,60 +2362,32 @@ export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionReplies_UserFragment;
 };
 
-export type Petitions_PetitionsListFragment = {
+export type Petitions_PetitionPaginationFragment = {
   __typename?: "PetitionPagination";
 } & Pick<PetitionPagination, "totalCount"> & {
-    items: Array<
-      { __typename?: "Petition" } & Pick<
-        Petition,
-        | "id"
-        | "locale"
-        | "customRef"
-        | "name"
-        | "status"
-        | "deadline"
-        | "createdAt"
-      > & {
-          progress: { __typename?: "PetitionProgress" } & Pick<
-            PetitionProgress,
-            "validated" | "replied" | "optional" | "total"
-          >;
-          accesses: Array<
-            { __typename?: "PetitionAccess" } & Pick<
-              PetitionAccess,
-              "status"
-            > & {
-                contact?: Maybe<
-                  { __typename?: "Contact" } & ContactLink_ContactFragment
-                >;
-              }
+    items: Array<{ __typename?: "Petition" } & Petitions_PetitionFragment>;
+  };
+
+export type Petitions_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "locale" | "customRef" | "name" | "status" | "deadline" | "createdAt"
+> & {
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
+    >;
+    accesses: Array<
+      { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status"> & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
           >;
         }
     >;
-  };
+  } & ConfirmDeletePetitionsDialog_PetitionFragment;
 
 export type Petitions_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
-
-export type Petitions_deletePetitionsMutationVariables = Exact<{
-  ids: Array<Scalars["ID"]>;
-}>;
-
-export type Petitions_deletePetitionsMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deletePetitions">;
-
-export type Petitions_clonePetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  name?: Maybe<Scalars["String"]>;
-  locale: PetitionLocale;
-  deadline?: Maybe<Scalars["DateTime"]>;
-}>;
-
-export type Petitions_clonePetitionMutation = { __typename?: "Mutation" } & {
-  clonePetition: { __typename?: "Petition" } & Pick<Petition, "id">;
-};
 
 export type PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -2421,7 +2400,7 @@ export type PetitionsQueryVariables = Exact<{
 export type PetitionsQuery = { __typename?: "Query" } & {
   petitions: {
     __typename?: "PetitionPagination";
-  } & Petitions_PetitionsListFragment;
+  } & Petitions_PetitionPaginationFragment;
 };
 
 export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -2719,6 +2698,17 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
+export type useClonePetition_clonePetitionMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  name?: Maybe<Scalars["String"]>;
+  locale: PetitionLocale;
+  deadline?: Maybe<Scalars["DateTime"]>;
+}>;
+
+export type useClonePetition_clonePetitionMutation = {
+  __typename?: "Mutation";
+} & { clonePetition: { __typename?: "Petition" } & Pick<Petition, "id"> };
+
 export type useCreateContact_createContactMutationVariables = Exact<{
   data: CreateContactInput;
 }>;
@@ -2741,6 +2731,14 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
 export type useCreatePetition_createPetitionMutation = {
   __typename?: "Mutation";
 } & { createPetition: { __typename?: "Petition" } & Pick<Petition, "id"> };
+
+export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
+  ids: Array<Scalars["ID"]>;
+}>;
+
+export type useDeletePetitions_deletePetitionsMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "deletePetitions">;
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
@@ -2887,15 +2885,24 @@ export const PetitionSettingsModal_PetitionFragmentDoc = gql`
     deadline
   }
 `;
+export const ConfirmDeletePetitionsDialog_PetitionFragmentDoc = gql`
+  fragment ConfirmDeletePetitionsDialog_Petition on Petition {
+    id
+    name
+  }
+`;
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
     name
+    locale
     status
     updatedAt
     ...PetitionSettingsModal_Petition
+    ...ConfirmDeletePetitionsDialog_Petition
   }
   ${PetitionSettingsModal_PetitionFragmentDoc}
+  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
 `;
 export const PetitionLayout_PetitionFragmentDoc = gql`
   fragment PetitionLayout_Petition on Petition {
@@ -3435,32 +3442,40 @@ export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc
     }
   }
 `;
-export const Petitions_PetitionsListFragmentDoc = gql`
-  fragment Petitions_PetitionsList on PetitionPagination {
-    items {
-      id
-      locale
-      customRef
-      name
+export const Petitions_PetitionFragmentDoc = gql`
+  fragment Petitions_Petition on Petition {
+    id
+    locale
+    customRef
+    name
+    status
+    deadline
+    progress {
+      validated
+      replied
+      optional
+      total
+    }
+    createdAt
+    accesses {
       status
-      deadline
-      progress {
-        validated
-        replied
-        optional
-        total
+      contact {
+        ...ContactLink_Contact
       }
-      createdAt
-      accesses {
-        status
-        contact {
-          ...ContactLink_Contact
-        }
-      }
+    }
+    ...ConfirmDeletePetitionsDialog_Petition
+  }
+  ${ContactLink_ContactFragmentDoc}
+  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
+`;
+export const Petitions_PetitionPaginationFragmentDoc = gql`
+  fragment Petitions_PetitionPagination on PetitionPagination {
+    items {
+      ...Petitions_Petition
     }
     totalCount
   }
-  ${ContactLink_ContactFragmentDoc}
+  ${Petitions_PetitionFragmentDoc}
 `;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
@@ -5889,117 +5904,6 @@ export type PetitionRepliesUserQueryResult = Apollo.QueryResult<
   PetitionRepliesUserQuery,
   PetitionRepliesUserQueryVariables
 >;
-export const Petitions_deletePetitionsDocument = gql`
-  mutation Petitions_deletePetitions($ids: [ID!]!) {
-    deletePetitions(ids: $ids)
-  }
-`;
-export type Petitions_deletePetitionsMutationFn = Apollo.MutationFunction<
-  Petitions_deletePetitionsMutation,
-  Petitions_deletePetitionsMutationVariables
->;
-
-/**
- * __usePetitions_deletePetitionsMutation__
- *
- * To run a mutation, you first call `usePetitions_deletePetitionsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitions_deletePetitionsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionsDeletePetitionsMutation, { data, loading, error }] = usePetitions_deletePetitionsMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *   },
- * });
- */
-export function usePetitions_deletePetitionsMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    Petitions_deletePetitionsMutation,
-    Petitions_deletePetitionsMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    Petitions_deletePetitionsMutation,
-    Petitions_deletePetitionsMutationVariables
-  >(Petitions_deletePetitionsDocument, baseOptions);
-}
-export type Petitions_deletePetitionsMutationHookResult = ReturnType<
-  typeof usePetitions_deletePetitionsMutation
->;
-export type Petitions_deletePetitionsMutationResult = Apollo.MutationResult<
-  Petitions_deletePetitionsMutation
->;
-export type Petitions_deletePetitionsMutationOptions = Apollo.BaseMutationOptions<
-  Petitions_deletePetitionsMutation,
-  Petitions_deletePetitionsMutationVariables
->;
-export const Petitions_clonePetitionDocument = gql`
-  mutation Petitions_clonePetition(
-    $petitionId: ID!
-    $name: String
-    $locale: PetitionLocale!
-    $deadline: DateTime
-  ) {
-    clonePetition(
-      petitionId: $petitionId
-      name: $name
-      locale: $locale
-      deadline: $deadline
-    ) {
-      id
-    }
-  }
-`;
-export type Petitions_clonePetitionMutationFn = Apollo.MutationFunction<
-  Petitions_clonePetitionMutation,
-  Petitions_clonePetitionMutationVariables
->;
-
-/**
- * __usePetitions_clonePetitionMutation__
- *
- * To run a mutation, you first call `usePetitions_clonePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitions_clonePetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionsClonePetitionMutation, { data, loading, error }] = usePetitions_clonePetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      name: // value for 'name'
- *      locale: // value for 'locale'
- *      deadline: // value for 'deadline'
- *   },
- * });
- */
-export function usePetitions_clonePetitionMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    Petitions_clonePetitionMutation,
-    Petitions_clonePetitionMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    Petitions_clonePetitionMutation,
-    Petitions_clonePetitionMutationVariables
-  >(Petitions_clonePetitionDocument, baseOptions);
-}
-export type Petitions_clonePetitionMutationHookResult = ReturnType<
-  typeof usePetitions_clonePetitionMutation
->;
-export type Petitions_clonePetitionMutationResult = Apollo.MutationResult<
-  Petitions_clonePetitionMutation
->;
-export type Petitions_clonePetitionMutationOptions = Apollo.BaseMutationOptions<
-  Petitions_clonePetitionMutation,
-  Petitions_clonePetitionMutationVariables
->;
 export const PetitionsDocument = gql`
   query Petitions(
     $offset: Int!
@@ -6015,10 +5919,10 @@ export const PetitionsDocument = gql`
       sortBy: $sortBy
       status: $status
     ) {
-      ...Petitions_PetitionsList
+      ...Petitions_PetitionPagination
     }
   }
-  ${Petitions_PetitionsListFragmentDoc}
+  ${Petitions_PetitionPaginationFragmentDoc}
 `;
 
 /**
@@ -7017,6 +6921,69 @@ export type PublicPetitionQueryResult = Apollo.QueryResult<
   PublicPetitionQuery,
   PublicPetitionQueryVariables
 >;
+export const useClonePetition_clonePetitionDocument = gql`
+  mutation useClonePetition_clonePetition(
+    $petitionId: ID!
+    $name: String
+    $locale: PetitionLocale!
+    $deadline: DateTime
+  ) {
+    clonePetition(
+      petitionId: $petitionId
+      name: $name
+      locale: $locale
+      deadline: $deadline
+    ) {
+      id
+    }
+  }
+`;
+export type useClonePetition_clonePetitionMutationFn = Apollo.MutationFunction<
+  useClonePetition_clonePetitionMutation,
+  useClonePetition_clonePetitionMutationVariables
+>;
+
+/**
+ * __useuseClonePetition_clonePetitionMutation__
+ *
+ * To run a mutation, you first call `useuseClonePetition_clonePetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useuseClonePetition_clonePetitionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [useClonePetitionClonePetitionMutation, { data, loading, error }] = useuseClonePetition_clonePetitionMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      name: // value for 'name'
+ *      locale: // value for 'locale'
+ *      deadline: // value for 'deadline'
+ *   },
+ * });
+ */
+export function useuseClonePetition_clonePetitionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    useClonePetition_clonePetitionMutation,
+    useClonePetition_clonePetitionMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    useClonePetition_clonePetitionMutation,
+    useClonePetition_clonePetitionMutationVariables
+  >(useClonePetition_clonePetitionDocument, baseOptions);
+}
+export type useClonePetition_clonePetitionMutationHookResult = ReturnType<
+  typeof useuseClonePetition_clonePetitionMutation
+>;
+export type useClonePetition_clonePetitionMutationResult = Apollo.MutationResult<
+  useClonePetition_clonePetitionMutation
+>;
+export type useClonePetition_clonePetitionMutationOptions = Apollo.BaseMutationOptions<
+  useClonePetition_clonePetitionMutation,
+  useClonePetition_clonePetitionMutationVariables
+>;
 export const useCreateContact_createContactDocument = gql`
   mutation useCreateContact_createContact($data: CreateContactInput!) {
     createContact(data: $data) {
@@ -7126,6 +7093,54 @@ export type useCreatePetition_createPetitionMutationResult = Apollo.MutationResu
 export type useCreatePetition_createPetitionMutationOptions = Apollo.BaseMutationOptions<
   useCreatePetition_createPetitionMutation,
   useCreatePetition_createPetitionMutationVariables
+>;
+export const useDeletePetitions_deletePetitionsDocument = gql`
+  mutation useDeletePetitions_deletePetitions($ids: [ID!]!) {
+    deletePetitions(ids: $ids)
+  }
+`;
+export type useDeletePetitions_deletePetitionsMutationFn = Apollo.MutationFunction<
+  useDeletePetitions_deletePetitionsMutation,
+  useDeletePetitions_deletePetitionsMutationVariables
+>;
+
+/**
+ * __useuseDeletePetitions_deletePetitionsMutation__
+ *
+ * To run a mutation, you first call `useuseDeletePetitions_deletePetitionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useuseDeletePetitions_deletePetitionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [useDeletePetitionsDeletePetitionsMutation, { data, loading, error }] = useuseDeletePetitions_deletePetitionsMutation({
+ *   variables: {
+ *      ids: // value for 'ids'
+ *   },
+ * });
+ */
+export function useuseDeletePetitions_deletePetitionsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    useDeletePetitions_deletePetitionsMutation,
+    useDeletePetitions_deletePetitionsMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    useDeletePetitions_deletePetitionsMutation,
+    useDeletePetitions_deletePetitionsMutationVariables
+  >(useDeletePetitions_deletePetitionsDocument, baseOptions);
+}
+export type useDeletePetitions_deletePetitionsMutationHookResult = ReturnType<
+  typeof useuseDeletePetitions_deletePetitionsMutation
+>;
+export type useDeletePetitions_deletePetitionsMutationResult = Apollo.MutationResult<
+  useDeletePetitions_deletePetitionsMutation
+>;
+export type useDeletePetitions_deletePetitionsMutationOptions = Apollo.BaseMutationOptions<
+  useDeletePetitions_deletePetitionsMutation,
+  useDeletePetitions_deletePetitionsMutationVariables
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [ID!]) {
