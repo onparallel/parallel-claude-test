@@ -42,7 +42,11 @@ export const PetitionFieldTypeSelect = forwardRef<
   );
 });
 
-export const FIELD_TYPES: PetitionFieldType[] = ["TEXT", "FILE_UPLOAD"];
+export const FIELD_TYPES: PetitionFieldType[] = [
+  "TEXT",
+  "FILE_UPLOAD",
+  "HEADING",
+];
 
 export const PetitionFieldTypeLabel = forwardRef<
   HTMLDivElement,
@@ -58,6 +62,10 @@ export const PetitionFieldTypeLabel = forwardRef<
       TEXT: intl.formatMessage({
         id: "petition.field-type.text",
         defaultMessage: "Text input",
+      }),
+      HEADING: intl.formatMessage({
+        id: "petition.field-type.heading",
+        defaultMessage: "Heading",
       }),
     }[type];
   }, [intl.locale, type]);
