@@ -27,15 +27,17 @@ export function RecipientViewProgressCard({
   const theme = useTheme();
   const { replied, optional, total } = useMemo(
     () =>
-      petition.fields.reduce(
-        (acc, field) => ({
-          replied: acc.replied + (field.replies.length ? 1 : 0),
-          optional:
-            acc.optional + (field.optional && !field.replies.length ? 1 : 0),
-          total: acc.total + 1,
-        }),
-        { replied: 0, optional: 0, total: 0 }
-      ),
+      petition.fields
+        .filter((f) => !f.isReadOnly)
+        .reduce(
+          (acc, field) => ({
+            replied: acc.replied + (field.replies.length ? 1 : 0),
+            optional:
+              acc.optional + (field.optional && !field.replies.length ? 1 : 0),
+            total: acc.total + 1,
+          }),
+          { replied: 0, optional: 0, total: 0 }
+        ),
     [petition.fields]
   );
   const color =
@@ -176,6 +178,7 @@ RecipientViewProgressCard.fragments = {
       fields {
         id
         optional
+        isReadOnly
         replies {
           id
         }

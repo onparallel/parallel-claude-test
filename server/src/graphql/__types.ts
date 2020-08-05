@@ -615,6 +615,7 @@ export interface NexusGenFieldTypes {
     comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     description: string | null; // String
     id: string; // ID!
+    isReadOnly: boolean; // Boolean!
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: { [key: string]: any } | null; // JSONObject

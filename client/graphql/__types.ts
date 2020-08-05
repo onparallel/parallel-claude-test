@@ -724,6 +724,8 @@ export type PetitionFieldReplyStatus =
 export type PetitionFieldType =
   /** A file upload field. */
   | "FILE_UPLOAD"
+  /** A heading field. */
+  | "HEADING"
   /** A text field. */
   | "TEXT";
 
@@ -884,6 +886,8 @@ export type PublicPetitionField = {
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["ID"];
+  /** Determines if the field accepts replies */
+  isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */
   multiple: Scalars["Boolean"];
   /** Determines if this field is optional. */
@@ -1573,7 +1577,10 @@ export type PetitionComposeFieldList_PetitionFragment = {
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "optional" | "multiple" | "options">;
+} & Pick<
+  PetitionField,
+  "id" | "type" | "optional" | "multiple" | "options" | "isReadOnly"
+>;
 
 export type PetitionComposeMessageEditor_ContactFragment = {
   __typename?: "Contact";
@@ -1614,7 +1621,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "title" | "description" | "validated"
+  "id" | "type" | "title" | "description" | "validated" | "isReadOnly"
 > & {
     replies: Array<
       {
@@ -1680,6 +1687,7 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   | "optional"
   | "multiple"
   | "validated"
+  | "isReadOnly"
 > & {
     replies: Array<
       {
@@ -1733,7 +1741,7 @@ export type RecipientViewProgressCard_PublicPetitionFragment = {
     fields: Array<
       { __typename?: "PublicPetitionField" } & Pick<
         PublicPetitionField,
-        "id" | "optional"
+        "id" | "optional" | "isReadOnly"
       > & {
           replies: Array<
             { __typename?: "PublicPetitionFieldReply" } & Pick<
@@ -2790,6 +2798,7 @@ export const RecipientViewProgressCard_PublicPetitionFragmentDoc = gql`
     fields {
       id
       optional
+      isReadOnly
       replies {
         id
       }
@@ -3284,6 +3293,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     optional
     multiple
     options
+    isReadOnly
   }
 `;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
@@ -3340,6 +3350,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     title
     description
     validated
+    isReadOnly
     replies {
       ...PetitionRepliesField_PetitionFieldReply
     }
@@ -3517,6 +3528,7 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
     optional
     multiple
     validated
+    isReadOnly
     replies {
       ...RecipientViewPetitionField_PublicPetitionFieldReply
     }

@@ -236,6 +236,7 @@ export class PetitionRepository extends BaseRepository {
         )
         .whereIn("pf.petition_id", ids)
         .whereNull("pf.deleted_at")
+        .whereNotIn("pf.type", ["HEADING"])
         .groupBy("pf.id", "pf.petition_id", "pf.validated", "pf.optional")
         .select(
           "pf.id",

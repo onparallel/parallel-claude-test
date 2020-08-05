@@ -182,7 +182,7 @@ export const PetitionField = objectType({
 
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
-      resolve: ({ type }) => [""].includes(type),
+      resolve: ({ type }) => ["HEADING"].includes(type),
     });
 
     t.list.field("replies", {
