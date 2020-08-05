@@ -281,6 +281,7 @@ export type MutationcreatePetitionArgs = {
 
 export type MutationcreatePetitionFieldArgs = {
   petitionId: Scalars["ID"];
+  position?: Maybe<Scalars["Int"]>;
   type: PetitionFieldType;
 };
 
@@ -471,6 +472,8 @@ export type MutationvalidatePetitionFieldsArgs = {
 };
 
 export type OnboardingKey =
+  | "CONTACT_DETAILS"
+  | "CONTACT_LIST"
   | "PETITION_ACTIVITY"
   | "PETITION_COMPOSE"
   | "PETITION_REVIEW"
@@ -652,6 +655,8 @@ export type PetitionField = {
   optional: Scalars["Boolean"];
   /** The options of the petition. */
   options?: Maybe<Scalars["JSONObject"]>;
+  /** The position of the petition field. */
+  position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
   /** The title of the petition field. */
@@ -2022,6 +2027,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
 export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
   petitionId: Scalars["ID"];
   type: PetitionFieldType;
+  position?: Maybe<Scalars["Int"]>;
 }>;
 
 export type PetitionCompose_createPetitionFieldMutation = {
@@ -4694,8 +4700,13 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
   mutation PetitionCompose_createPetitionField(
     $petitionId: ID!
     $type: PetitionFieldType!
+    $position: Int
   ) {
-    createPetitionField(petitionId: $petitionId, type: $type) {
+    createPetitionField(
+      petitionId: $petitionId
+      type: $type
+      position: $position
+    ) {
       field {
         id
         ...PetitionComposeField_PetitionField
@@ -4733,6 +4744,7 @@ export type PetitionCompose_createPetitionFieldMutationFn = Apollo.MutationFunct
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      type: // value for 'type'
+ *      position: // value for 'position'
  *   },
  * });
  */

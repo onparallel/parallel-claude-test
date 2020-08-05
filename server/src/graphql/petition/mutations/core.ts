@@ -3,12 +3,12 @@ import {
   booleanArg,
   idArg,
   inputObjectType,
+  intArg,
   mutationField,
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { WhitelistedError } from "./../../helpers/errors";
-
+import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import { CreatePetition, CreatePetitionField } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
@@ -16,29 +16,30 @@ import { and, authenticate, chain } from "../../helpers/authorize";
 import { dateTimeArg } from "../../helpers/date";
 import { jsonArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
-import { validateAnd } from "../../helpers/validateArgs";
+import { validateAnd, validateOr } from "../../helpers/validateArgs";
+import { inRange } from "../../helpers/validators/inRange";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
+import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
+import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import {
   accessesBelongToPetition,
+  accessesBelongToValidContacts,
   fieldsBelongsToPetition,
   messageBelongToPetition,
   repliesBelongsToField,
   repliesBelongsToPetition,
   userHasAccessToPetitions,
-  accessesBelongToValidContacts,
 } from "../authorizers";
-import { validateOr } from "../../helpers/validateArgs";
-import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
-import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import {
   validateAccessesRemindersLeft,
   validateAccessesStatus,
   validatePetitionStatus,
 } from "../validations";
+import { WhitelistedError } from "./../../helpers/errors";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -222,12 +223,18 @@ export const createPetitionField = mutationField("createPetitionField", {
   args: {
     petitionId: idArg({ required: true }),
     type: arg({ type: "PetitionFieldType", required: true }),
+    position: intArg({ required: false }),
   },
+  validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
     const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    return await ctx.petitions.createPetitionField(
+    return await ctx.petitions.createPetitionFieldAtPosition(
       petitionId,
-      args.type,
+      {
+        type: args.type,
+        ...defaultFieldOptions(args.type),
+      },
+      args.position ?? -1,
       ctx.user!
     );
   },

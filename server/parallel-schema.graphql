@@ -239,6 +239,7 @@ type Mutation {
   """
   createPetitionField(
     petitionId: ID!
+    position: Int
     type: PetitionFieldType!
   ): PetitionAndField!
 

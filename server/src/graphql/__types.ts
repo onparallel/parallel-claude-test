@@ -778,6 +778,7 @@ export interface NexusGenArgTypes {
     createPetitionField: {
       // args
       petitionId: string; // ID!
+      position?: number | null; // Int
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
     createPetitionFieldComment: {

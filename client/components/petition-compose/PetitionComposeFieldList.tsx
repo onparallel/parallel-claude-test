@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, Text } from "@chakra-ui/core";
+import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
 import { AddIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
@@ -14,6 +14,7 @@ import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import {
   KeyboardEvent,
   memo,
+  ReactEventHandler,
   useCallback,
   useEffect,
   useReducer,
@@ -64,8 +65,8 @@ export type PetitionComposeFieldListProps = {
   onCopyFieldClick: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => void;
-  onFieldFocus: (fieldId: string) => void;
-  onAddField: (type: PetitionFieldType) => void;
+  onSelectField: (fieldId: string) => void;
+  onAddField: (type: PetitionFieldType, position?: number) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
 } & CardProps;
 
@@ -78,7 +79,7 @@ export const PetitionComposeFieldList = Object.assign(
     onCopyFieldClick,
     onFieldSettingsClick,
     onDeleteField,
-    onFieldFocus,
+    onSelectField,
     onAddField,
     onFieldEdit,
     ...props
@@ -125,19 +126,32 @@ export const PetitionComposeFieldList = Object.assign(
 
     // Memoize field callbacks
     const handleFocus = useMemoFactory(
-      (fieldId: string) => () => onFieldFocus(fieldId),
-      [onFieldFocus]
+      (fieldId: string) => () => onSelectField(fieldId),
+      [onSelectField]
+    );
+    const handleClick = useMemoFactory(
+      (fieldId: string) => () => onSelectField(fieldId),
+      [onSelectField]
     );
     const handleCloneClick = useMemoFactory(
-      (fieldId: string) => () => onCopyFieldClick(fieldId),
+      (fieldId: string): ReactEventHandler => (event) => {
+        event.stopPropagation();
+        onCopyFieldClick(fieldId);
+      },
       [onCopyFieldClick]
     );
     const handleSettingsClick = useMemoFactory(
-      (fieldId: string) => () => onFieldSettingsClick(fieldId),
+      (fieldId: string): ReactEventHandler => (event) => {
+        event.stopPropagation();
+        onFieldSettingsClick(fieldId);
+      },
       [onFieldSettingsClick]
     );
     const handleDeleteClick = useMemoFactory(
-      (fieldId: string) => () => onDeleteField(fieldId),
+      (fieldId: string): ReactEventHandler => (event) => {
+        event.stopPropagation();
+        onDeleteField(fieldId);
+      },
       [onDeleteField]
     );
     const handleFieldEdit = useMemoFactory(
@@ -146,7 +160,7 @@ export const PetitionComposeFieldList = Object.assign(
       [onFieldEdit]
     );
 
-    const handleTitleKeyDown = useMemoFactory(
+    const handleTitleKeyUp = useMemoFactory(
       (fieldId: string) => (event: KeyboardEvent<any>) => {
         const index = fieldIds.indexOf(fieldId);
         switch (event.key) {
@@ -159,14 +173,17 @@ export const PetitionComposeFieldList = Object.assign(
             }
             break;
           case "Enter":
-            addFieldRef.current!.click();
+            const addFieldButton = document.querySelector<HTMLButtonElement>(
+              ".add-field-after"
+            );
+            (addFieldButton ?? addFieldRef.current!).click();
             break;
         }
       },
       [fieldIds.toString()]
     );
 
-    const handleDescriptionKeyDown = useMemoFactory(
+    const handleDescriptionKeyUp = useMemoFactory(
       (fieldId: string) => (event: KeyboardEvent<HTMLTextAreaElement>) => {
         const textarea = event.target as HTMLTextAreaElement;
         const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
@@ -206,19 +223,23 @@ export const PetitionComposeFieldList = Object.assign(
                 key={fieldId}
                 field={fieldsById[fieldId]}
                 index={index}
-                active={active === fieldId}
+                isActive={active === fieldId}
+                isLast={index === fieldIds.length - 1}
                 showError={showErrors}
+                onAddField={onAddField}
+                onClick={handleClick(fieldId)}
                 onFocus={handleFocus(fieldId)}
                 onCloneClick={handleCloneClick(fieldId)}
                 onSettingsClick={handleSettingsClick(fieldId)}
                 onDeleteClick={handleDeleteClick(fieldId)}
                 onFieldEdit={handleFieldEdit(fieldId)}
-                onTitleKeyDown={handleTitleKeyDown(fieldId)}
-                onDescriptionKeyDown={handleDescriptionKeyDown(fieldId)}
+                onTitleKeyUp={handleTitleKeyUp(fieldId)}
+                onDescriptionKeyUp={handleDescriptionKeyUp(fieldId)}
               />
             ))}
             <Flex padding={2} justifyContent="center">
               <AddFieldPopover
+                as={Button}
                 ref={addFieldRef}
                 variant="ghost"
                 leftIcon={<AddIcon />}
@@ -248,6 +269,7 @@ export const PetitionComposeFieldList = Object.assign(
             <AddFieldPopover
               marginTop={8}
               marginBottom={6}
+              as={Button}
               colorScheme="purple"
               leftIcon={<AddIcon />}
               onSelectFieldType={onAddField}

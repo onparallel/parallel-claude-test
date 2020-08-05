@@ -10,6 +10,7 @@ import {
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
+import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
@@ -29,11 +30,11 @@ import {
   UpdatePetitionInput,
   usePetitionComposeQuery,
   usePetitionComposeUserQuery,
+  usePetitionCompose_changePetitionFieldTypeMutation,
+  usePetitionCompose_clonePetitionFieldMutation,
   usePetitionCompose_createPetitionFieldMutation,
   usePetitionCompose_deletePetitionFieldMutation,
   usePetitionCompose_sendPetitionMutation,
-  usePetitionCompose_changePetitionFieldTypeMutation,
-  usePetitionCompose_clonePetitionFieldMutation,
   usePetitionCompose_updateFieldPositionsMutation,
   usePetitionCompose_updatePetitionFieldMutation,
   usePetitionCompose_updatePetitionMutation,
@@ -47,18 +48,22 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
-import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
 >;
 
 type FieldSelection = PetitionCompose_PetitionFieldFragment;
+
+type PetitionComposeState = {
+  activeFieldId: Maybe<string>;
+  showSettings: boolean;
+};
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const router = useRouter();
@@ -71,10 +76,20 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     data: { petition },
   } = assertQuery(usePetitionComposeQuery({ variables: { id: petitionId } }));
 
-  const [state, wrapper] = usePetitionState();
+  const [petitionState, wrapper] = usePetitionState();
+  const [{ activeFieldId, showSettings }, dispatch] = useReducer(
+    function (
+      state: PetitionComposeState,
+      action: (prev: PetitionComposeState) => PetitionComposeState
+    ) {
+      return action(state);
+    },
+    {
+      activeFieldId: null,
+      showSettings: false,
+    }
+  );
 
-  // active here means settings are showing
-  const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
     if (activeFieldId) {
@@ -139,9 +154,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
-      setActiveFieldId((activeFieldId) =>
-        activeFieldId === fieldId ? null : activeFieldId
-      );
+      dispatch((state) => ({
+        ...state,
+        activeFieldId:
+          state.activeFieldId === fieldId ? null : state.activeFieldId,
+      }));
       try {
         await deletePetitionField({
           variables: { petitionId, fieldId },
@@ -155,6 +172,25 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
       } catch {}
     }),
+    [petitionId]
+  );
+
+  const handleSettingsClick = useCallback(
+    function (fieldId: string) {
+      dispatch((state) => ({
+        ...state,
+        activeFieldId: fieldId,
+        showSettings:
+          state.activeFieldId !== fieldId ? true : !state.showSettings,
+      }));
+    },
+    [petitionId]
+  );
+
+  const handleSettingsClose = useCallback(
+    function () {
+      dispatch((state) => ({ ...state, showSettings: false }));
+    },
     [petitionId]
   );
 
@@ -206,9 +242,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const handleAddField = useCallback(
-    wrapper(async function (type: PetitionFieldType) {
+    wrapper(async function (type: PetitionFieldType, position?: number) {
       const { data } = await createPetitionField({
-        variables: { petitionId, type },
+        variables: { petitionId, type, position },
       });
       const field = data!.createPetitionField.field;
       focusField(field.id);
@@ -216,9 +252,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const handleFieldFocus = useCallback(function (fieldId: string) {
-    //Set field as active only if settings were already showing for another field
-    setActiveFieldId((active) => active && fieldId);
+  const handleSelectField = useCallback(function (fieldId: string) {
+    // Show settings only if they were already showing for this field
+    dispatch((state) => ({
+      ...state,
+      activeFieldId: fieldId,
+      showSettings:
+        state.activeFieldId === fieldId ? state.showSettings : false,
+    }));
   }, []);
 
   const handleSearchContacts = useSearchContacts();
@@ -360,20 +401,21 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       onUpdatePetition={handleUpdatePetition}
       section="compose"
       scrollBody
-      state={state}
+      state={petitionState}
     >
       <PaneWithFlyout
         active={Boolean(activeField)}
         alignWith={activeFieldElement}
         flyout={
-          activeField && (
+          activeField &&
+          showSettings && (
             <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
               <PetitionComposeFieldSettings
                 key={activeField.id}
                 field={activeField}
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
-                onClose={() => setActiveFieldId(null)}
+                onClose={handleSettingsClose}
               />
             </Box>
           )
@@ -387,10 +429,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             onAddField={handleAddField}
             onCopyFieldClick={handleClonePetitionField}
             onDeleteField={handleDeleteField}
-            onFieldFocus={handleFieldFocus}
+            onSelectField={handleSelectField}
             onUpdateFieldPositions={handleUpdateFieldPositions}
             onFieldEdit={handleFieldEdit}
-            onFieldSettingsClick={setActiveFieldId}
+            onFieldSettingsClick={handleSettingsClick}
           />
           {petition!.status === "DRAFT" ? (
             <PetitionComposeMessageEditor
@@ -496,8 +538,13 @@ PetitionCompose.mutations = [
     mutation PetitionCompose_createPetitionField(
       $petitionId: ID!
       $type: PetitionFieldType!
+      $position: Int
     ) {
-      createPetitionField(petitionId: $petitionId, type: $type) {
+      createPetitionField(
+        petitionId: $petitionId
+        type: $type
+        position: $position
+      ) {
         field {
           id
           ...PetitionComposeField_PetitionField

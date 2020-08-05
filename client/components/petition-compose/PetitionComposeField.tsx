@@ -1,19 +1,30 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Input, Stack, Tooltip } from "@chakra-ui/core";
 import {
+  Box,
+  BoxProps,
+  ButtonProps,
+  IconButton,
+  Input,
+  Stack,
+  Tooltip,
+} from "@chakra-ui/core";
+import {
+  AddIcon,
+  CopyIcon,
   DeleteIcon,
   DragHandleIcon,
   SettingsIcon,
-  CopyIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionComposeField_PetitionFieldFragment,
+  PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import {
   ChangeEvent,
   FocusEvent,
+  forwardRef,
   KeyboardEvent,
   memo,
   MouseEvent,
@@ -25,20 +36,23 @@ import { useIntl } from "react-intl";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
+import { AddFieldPopover } from "./AddFieldPopover";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
   index: number;
-  active: boolean;
+  isActive: boolean;
+  isLast: boolean;
   showError: boolean;
   onFocus: (event: FocusEvent) => void;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
+  onAddField: (type: PetitionFieldType, position: number) => void;
   onCloneClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onTitleKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onDescriptionKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
+  onTitleKeyUp: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onDescriptionKeyUp: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 } & Omit<BoxProps, "onFocus">;
 
 interface DragItem {
@@ -51,16 +65,18 @@ export const PetitionComposeField = Object.assign(
   memo(function PetitionComposeField({
     field,
     index,
-    active,
+    isActive,
+    isLast,
     showError,
     onMove,
     onFocus,
+    onAddField,
     onCloneClick,
     onSettingsClick,
     onFieldEdit,
     onDeleteClick,
-    onTitleKeyDown,
-    onDescriptionKeyDown,
+    onTitleKeyUp,
+    onDescriptionKeyUp,
     ...props
   }: PetitionComposeFieldProps) {
     const intl = useIntl();
@@ -83,22 +99,33 @@ export const PetitionComposeField = Object.assign(
         borderY="1px solid"
         borderColor="gray.200"
         marginTop="-1px"
-        aria-current={active ? "true" : "false"}
-        sx={
-          isDragging
-            ? generateCssStripe({ size: "1rem", color: "gray.50" })
-            : {}
-        }
+        aria-current={isActive ? "true" : "false"}
+        position="relative"
+        sx={{
+          ...(isDragging &&
+            generateCssStripe({ size: "1rem", color: "gray.50" })),
+        }}
         onFocus={onFocus}
         {...props}
       >
+        {isActive ? (
+          <AddFieldButton
+            className="add-field-before"
+            position="absolute"
+            top="-1px"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            zIndex="1"
+            onSelectFieldType={(type) => onAddField(type, index)}
+          />
+        ) : null}
         <Box
           ref={previewRef}
           display="flex"
           flexDirection="row"
           opacity={isDragging ? 0 : 1}
           position="relative"
-          backgroundColor={active ? "purple.50" : "white"}
+          backgroundColor={isActive ? "purple.50" : "white"}
           sx={{
             "[draggable]": {
               opacity: 0,
@@ -111,7 +138,7 @@ export const PetitionComposeField = Object.assign(
               opacity: 1,
             },
             "&:hover, &:focus-within": {
-              backgroundColor: active ? "purple.50" : "gray.50",
+              backgroundColor: isActive ? "purple.50" : "gray.50",
               ".field-actions": {
                 display: "block",
               },
@@ -203,7 +230,7 @@ export const PetitionComposeField = Object.assign(
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setTitle(event.target.value ?? null)
               }
-              onKeyDown={onTitleKeyDown}
+              onKeyUp={onTitleKeyUp}
               onBlur={() => {
                 if (title !== field.title) {
                   onFieldEdit({ title });
@@ -242,8 +269,7 @@ export const PetitionComposeField = Object.assign(
                   onFieldEdit({ description });
                 }
               }}
-              // chakra typings are wrong
-              onKeyDown={onDescriptionKeyDown as any}
+              onKeyUp={onDescriptionKeyUp}
             />
           </Box>
           <Stack
@@ -292,6 +318,17 @@ export const PetitionComposeField = Object.assign(
             />
           </Stack>
         </Box>
+        {isActive && !isLast ? (
+          <AddFieldButton
+            className="add-field-after"
+            position="absolute"
+            bottom={0}
+            left="50%"
+            transform="translate(-50%, 50%)"
+            zIndex="1"
+            onSelectFieldType={(type) => onAddField(type, index + 1)}
+          />
+        ) : null}
       </Box>
     );
   }),
@@ -386,3 +423,37 @@ function useDragAndDrop(
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
 }
+
+const AddFieldButton = forwardRef<
+  HTMLButtonElement,
+  ButtonProps & {
+    onSelectFieldType: (type: PetitionFieldType) => void;
+  }
+>(function AddFieldButton(props, ref) {
+  const intl = useIntl();
+  return (
+    <AddFieldPopover
+      as={IconButton}
+      label={intl.formatMessage({
+        id: "petition.add-field-button",
+        defaultMessage: "Add field",
+      })}
+      icon={<AddIcon />}
+      size="xs"
+      variant="outline"
+      rounded="full"
+      backgroundColor="white"
+      borderColor="gray.200"
+      color="gray.500"
+      _hover={{
+        borderColor: "gray.300",
+        color: "gray.800",
+      }}
+      _active={{
+        backgroundColor: "gray.50",
+      }}
+      ref={ref as any}
+      {...props}
+    />
+  );
+});
