@@ -894,9 +894,13 @@ export const FieldTextIcon = createIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <polyline points="4 7 4 4 20 4 20 7"></polyline>
-      <line x1="9" y1="20" x2="15" y2="20"></line>
-      <line x1="12" y1="4" x2="12" y2="20"></line>
+      <path d="m 19,5 h 3 v 14 h -3" />
+      <path d="M 16,2 V 22" />
+      <path d="m 14,2 h 4" />
+      <path d="m 14,22 h 4" />
+      <path d="M 13,19 H 2 V 5 h 11" />
+      <path d="m 5,16 3,-8 3,8" />
+      <path d="m 6,14 h 4" />
     </g>
   ),
 });
