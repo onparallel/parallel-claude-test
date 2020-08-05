@@ -41,6 +41,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { differenceInMinutes } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { omit } from "remeda";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -293,10 +294,16 @@ function PetitionActivity({ petitionId }: PetitionProps) {
           defaultConfig: firstAccess!.remindersConfig || null,
         });
 
-        delete remindersConfig?.__typename;
         start = !!remindersConfig;
         await switchReminders({
-          variables: { start, accessIds, petitionId, remindersConfig },
+          variables: {
+            start,
+            accessIds,
+            petitionId,
+            remindersConfig: start
+              ? omit(remindersConfig!, ["__typename"])
+              : null,
+          },
         });
         await refetch();
         toast({
