@@ -63,8 +63,6 @@ export function defaultFieldOptions(
         },
       };
     default:
-      return {
-        optional: true,
-      };
+      return {};
   }
 }
