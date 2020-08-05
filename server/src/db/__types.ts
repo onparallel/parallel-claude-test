@@ -28,7 +28,7 @@ export type PetitionEventType =
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
 
-export type PetitionFieldType = "TEXT" | "FILE_UPLOAD";
+export type PetitionFieldType = "TEXT" | "FILE_UPLOAD" | "HEADING";
 
 export type PetitionMessageStatus =
   | "SCHEDULED"
