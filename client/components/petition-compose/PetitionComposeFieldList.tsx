@@ -160,49 +160,80 @@ export const PetitionComposeFieldList = Object.assign(
       [onFieldEdit]
     );
 
-    const handleTitleKeyUp = useMemoFactory(
-      (fieldId: string) => (event: KeyboardEvent<any>) => {
-        const index = fieldIds.indexOf(fieldId);
-        switch (event.key) {
-          case "ArrowDown":
-            setTimeout(() => focusDescription(fieldId));
-            break;
-          case "ArrowUp":
-            if (index > 0) {
-              setTimeout(() => focusDescription(fieldIds[index - 1]));
-            }
-            break;
-          case "Enter":
-            const addFieldButton = document.querySelector<HTMLButtonElement>(
-              ".add-field-after"
-            );
-            (addFieldButton ?? addFieldRef.current!).click();
-            break;
-        }
-      },
+    const titleFieldProps = useMemoFactory(
+      (fieldId: string) => ({
+        onKeyDown: (event: KeyboardEvent<any>) => {
+          const index = fieldIds.indexOf(fieldId);
+          switch (event.key) {
+            case "ArrowDown":
+              setTimeout(() => focusDescription(fieldId));
+              break;
+            case "ArrowUp":
+              if (index > 0) {
+                setTimeout(() => focusDescription(fieldIds[index - 1]));
+              }
+              break;
+          }
+        },
+        onKeyUp: (event: KeyboardEvent<any>) => {
+          switch (event.key) {
+            case "Enter":
+              const addFieldButton = document.querySelector<HTMLButtonElement>(
+                ".add-field-after"
+              );
+              (addFieldButton ?? addFieldRef.current!).click();
+              break;
+          }
+        },
+      }),
       [fieldIds.toString()]
     );
 
-    const handleDescriptionKeyUp = useMemoFactory(
-      (fieldId: string) => (event: KeyboardEvent<HTMLTextAreaElement>) => {
-        const textarea = event.target as HTMLTextAreaElement;
-        const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-        const beforeCursor = textarea.value.substr(0, textarea.selectionStart);
-        const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-        const index = fieldIds.indexOf(fieldId);
-        switch (event.key) {
-          case "ArrowDown":
-            if (index < fieldIds.length - 1 && currentLine === totalLines - 1) {
-              focusTitle(fieldIds[index + 1]);
-            }
-            break;
-          case "ArrowUp":
-            if (currentLine === 0) {
-              focusTitle(fieldId);
-            }
-            break;
-        }
-      },
+    const descriptionFieldProps = useMemoFactory(
+      (fieldId: string) => ({
+        onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => {
+          const textarea = event.target as HTMLTextAreaElement;
+          const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+          const beforeCursor = textarea.value.substr(
+            0,
+            textarea.selectionStart
+          );
+          const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+          const index = fieldIds.indexOf(fieldId);
+          switch (event.key) {
+            case "ArrowDown":
+              if (
+                index < fieldIds.length - 1 &&
+                currentLine === totalLines - 1
+              ) {
+                focusTitle(fieldIds[index + 1]);
+              }
+              break;
+            case "ArrowUp":
+              if (currentLine === 0) {
+                focusTitle(fieldId);
+              }
+              break;
+            case "Enter":
+              // if (!event.shiftKey) {
+              //   event.preventDefault();
+              // }
+              break;
+          }
+        },
+        onKeyUp: (event: KeyboardEvent<any>) => {
+          switch (event.key) {
+            case "Enter":
+              // if (!event.shiftKey) {
+              //   const addFieldButton = document.querySelector<
+              //     HTMLButtonElement
+              //   >(".add-field-after");
+              //   (addFieldButton ?? addFieldRef.current!).click();
+              // }
+              break;
+          }
+        },
+      }),
       [fieldIds.toString()]
     );
 
@@ -233,8 +264,8 @@ export const PetitionComposeFieldList = Object.assign(
                 onSettingsClick={handleSettingsClick(fieldId)}
                 onDeleteClick={handleDeleteClick(fieldId)}
                 onFieldEdit={handleFieldEdit(fieldId)}
-                onTitleKeyUp={handleTitleKeyUp(fieldId)}
-                onDescriptionKeyUp={handleDescriptionKeyUp(fieldId)}
+                titleFieldProps={titleFieldProps(fieldId)}
+                descriptionFieldProps={descriptionFieldProps(fieldId)}
               />
             ))}
             <Flex padding={2} justifyContent="center">

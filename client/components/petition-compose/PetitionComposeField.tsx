@@ -5,7 +5,9 @@ import {
   ButtonProps,
   IconButton,
   Input,
+  InputProps,
   Stack,
+  TextareaProps,
   Tooltip,
 } from "@chakra-ui/core";
 import {
@@ -25,7 +27,6 @@ import {
   ChangeEvent,
   FocusEvent,
   forwardRef,
-  KeyboardEvent,
   memo,
   MouseEvent,
   useRef,
@@ -44,6 +45,8 @@ export type PetitionComposeFieldProps = {
   isActive: boolean;
   isLast: boolean;
   showError: boolean;
+  titleFieldProps: InputProps;
+  descriptionFieldProps: TextareaProps;
   onFocus: (event: FocusEvent) => void;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
@@ -51,8 +54,6 @@ export type PetitionComposeFieldProps = {
   onCloneClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onTitleKeyUp: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onDescriptionKeyUp: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 } & Omit<BoxProps, "onFocus">;
 
 interface DragItem {
@@ -68,6 +69,8 @@ export const PetitionComposeField = Object.assign(
     isActive,
     isLast,
     showError,
+    titleFieldProps,
+    descriptionFieldProps,
     onMove,
     onFocus,
     onAddField,
@@ -75,8 +78,6 @@ export const PetitionComposeField = Object.assign(
     onSettingsClick,
     onFieldEdit,
     onDeleteClick,
-    onTitleKeyUp,
-    onDescriptionKeyUp,
     ...props
   }: PetitionComposeFieldProps) {
     const intl = useIntl();
@@ -230,12 +231,12 @@ export const PetitionComposeField = Object.assign(
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setTitle(event.target.value ?? null)
               }
-              onKeyUp={onTitleKeyUp}
               onBlur={() => {
                 if (title !== field.title) {
                   onFieldEdit({ title });
                 }
               }}
+              {...titleFieldProps}
             />
             <GrowingTextarea
               id={`field-description-${field.id}`}
@@ -269,7 +270,7 @@ export const PetitionComposeField = Object.assign(
                   onFieldEdit({ description });
                 }
               }}
-              onKeyUp={onDescriptionKeyUp}
+              {...descriptionFieldProps}
             />
           </Box>
           <Stack
@@ -432,28 +433,35 @@ const AddFieldButton = forwardRef<
 >(function AddFieldButton(props, ref) {
   const intl = useIntl();
   return (
-    <AddFieldPopover
-      as={IconButton}
+    <Tooltip
       label={intl.formatMessage({
         id: "petition.add-field-button",
         defaultMessage: "Add field",
       })}
-      icon={<AddIcon />}
-      size="xs"
-      variant="outline"
-      rounded="full"
-      backgroundColor="white"
-      borderColor="gray.200"
-      color="gray.500"
-      _hover={{
-        borderColor: "gray.300",
-        color: "gray.800",
-      }}
-      _active={{
-        backgroundColor: "gray.50",
-      }}
-      ref={ref as any}
-      {...props}
-    />
+    >
+      <AddFieldPopover
+        as={IconButton}
+        label={intl.formatMessage({
+          id: "petition.add-field-button",
+          defaultMessage: "Add field",
+        })}
+        icon={<AddIcon />}
+        size="xs"
+        variant="outline"
+        rounded="full"
+        backgroundColor="white"
+        borderColor="gray.200"
+        color="gray.500"
+        _hover={{
+          borderColor: "gray.300",
+          color: "gray.800",
+        }}
+        _active={{
+          backgroundColor: "gray.50",
+        }}
+        ref={ref as any}
+        {...props}
+      />
+    </Tooltip>
   );
 });
