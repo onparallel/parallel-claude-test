@@ -13,7 +13,7 @@ export function inRange<TypeName extends string, FieldName extends string>(
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
-    if (isDefined(value) && (value! < lowerLimit || value! > upperLimit)) {
+    if (isDefined(value) && (value < lowerLimit || value > upperLimit)) {
       throw new ArgValidationError(
         info,
         argName,

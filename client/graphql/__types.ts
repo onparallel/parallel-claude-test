@@ -657,8 +657,6 @@ export type PetitionField = {
   optional: Scalars["Boolean"];
   /** The options of the petition. */
   options?: Maybe<Scalars["JSONObject"]>;
-  /** The position of the petition field. */
-  position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
   /** The title of the petition field. */

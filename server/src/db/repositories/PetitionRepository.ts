@@ -1405,16 +1405,19 @@ export class PetitionRepository extends BaseRepository {
     petitionFieldCommentId: number,
     user: User
   ) {
+    const comment = await this.loadPetitionFieldComment(petitionFieldCommentId);
     await Promise.all([
       this.deletePetitionFieldComment(
         petitionFieldCommentId,
         `User:${user.id}`
       ),
-      this.createEvent(petitionId, "COMMENT_DELETED", {
+      comment?.published_at
+        ? this.createEvent(petitionId, "COMMENT_DELETED", {
         petition_field_id: petitionFieldId,
         petition_field_comment_id: petitionFieldCommentId,
         user_id: user.id,
-      }),
+          })
+        : null,
     ]);
   }
 
@@ -1424,16 +1427,19 @@ export class PetitionRepository extends BaseRepository {
     petitionFieldCommentId: number,
     access: PetitionAccess
   ) {
+    const comment = await this.loadPetitionFieldComment(petitionFieldCommentId);
     await Promise.all([
       this.deletePetitionFieldComment(
         petitionFieldCommentId,
         `PetitionAccess:${access.id}`
       ),
-      this.createEvent(petitionId, "COMMENT_DELETED", {
+      comment?.published_at
+        ? this.createEvent(petitionId, "COMMENT_DELETED", {
         petition_field_id: petitionFieldId,
         petition_field_comment_id: petitionFieldCommentId,
         petition_access_id: access.id,
-      }),
+          })
+        : null,
     ]);
   }
 

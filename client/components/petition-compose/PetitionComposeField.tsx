@@ -47,14 +47,13 @@ export type PetitionComposeFieldProps = {
   showError: boolean;
   titleFieldProps: InputProps;
   descriptionFieldProps: TextareaProps;
-  onFocus: (event: FocusEvent) => void;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onAddField: (type: PetitionFieldType, position: number) => void;
   onCloneClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
   onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
-} & Omit<BoxProps, "onFocus">;
+} & BoxProps;
 
 interface DragItem {
   index: number;

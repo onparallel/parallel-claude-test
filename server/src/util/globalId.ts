@@ -1,12 +1,13 @@
 import { decode, encode } from "./token";
+import { Maybe } from "./types";
 
 export function toGlobalId(type: string, id: number) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
 
-export function fromGlobalId(globalId: string, verifytype?: string) {
-  const [type, id] = decode(globalId).toString("utf8").split(":");
-  if (verifytype && verifytype !== type) {
+export function fromGlobalId<T extends string>(globalId: string, type: T) {
+  const [_type, id] = decode(globalId).toString("utf8").split(":");
+  if (_type !== type) {
     throw new Error("Invalid id");
   }
   if (!id || !id.match(/^[1-9]\d*$/)) {
@@ -18,9 +19,17 @@ export function fromGlobalId(globalId: string, verifytype?: string) {
   };
 }
 
-export function fromGlobalIds(globalIds: string[], verifytype: string) {
+export function fromGlobalIds<T extends string>(
+  globalIds: string[],
+  type: string
+): { type: T; ids: number[] };
+export function fromGlobalIds<T extends string>(
+  globalIds: Maybe<string>[],
+  type: string
+): { type: T; ids: Maybe<number>[] };
+export function fromGlobalIds(globalIds: Maybe<string>[], type: string) {
   return {
-    type: verifytype,
-    ids: globalIds.map((globalId) => fromGlobalId(globalId, verifytype).id),
+    type,
+    ids: globalIds.map((id) => (id ? fromGlobalId(id, type).id : null)),
   };
 }
