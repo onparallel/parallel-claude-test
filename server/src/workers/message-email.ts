@@ -64,7 +64,9 @@ createQueueWorker<MessageEmailWorkerPayload>(
         senderEmail: sender.email,
         subject: message.email_subject,
         body: message.email_body ? JSON.parse(message.email_body) : [],
-        fields: fields.map(pick(["id", "title", "position"])),
+        fields: fields
+          .filter((f) => f.type !== "HEADING")
+          .map(pick(["id", "title", "position"])),
         deadline: petition.deadline,
         keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,

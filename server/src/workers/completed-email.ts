@@ -57,7 +57,9 @@ createQueueWorker<CompletedEmailWorkerPayload>(
         petitionId: toGlobalId("Petition", access.petition_id),
         petitionName: petition!.name,
         contactNameOrEmail,
-        fields: fields.map(pick(["id", "title", "position"])),
+        fields: fields
+          .filter((f) => f.type !== "HEADING")
+          .map(pick(["id", "title", "position"])),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
         logoUrl:
