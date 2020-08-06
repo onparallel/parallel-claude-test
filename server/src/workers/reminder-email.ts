@@ -76,9 +76,7 @@ createQueueWorker(
           name: contact.first_name,
           senderName,
           senderEmail: granter.email,
-          fields: missing
-            .filter((m) => m.type !== "HEADING")
-            .map(pick(["id", "title", "position"])),
+          fields: missing.map(pick(["id", "title", "position", "type"])),
           deadline: petition.deadline,
           keycode: access.keycode,
           assetsUrl: context.config.misc.assetsUrl,

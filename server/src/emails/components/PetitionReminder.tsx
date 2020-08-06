@@ -201,9 +201,15 @@ export const props: PetitionReminderProps = {
   senderEmail: "derek@parallel.so",
   deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   fields: [
-    { position: 1, id: 235, title: "Escrituras" },
-    { position: 2, id: 345, title: "Certificado de rentas del trabajo" },
-    { position: 4, id: 6905, title: null },
+    { position: 0, id: 236, title: "Sección 1", type: "HEADING" },
+    { position: 1, id: 235, title: "Escrituras", type: "TEXT" },
+    {
+      position: 2,
+      id: 345,
+      title: "Certificado de rentas del trabajo",
+      type: "TEXT",
+    },
+    { position: 4, id: 6905, title: null, type: "TEXT" },
   ],
   keycode: "asdfghjkl",
   parallelUrl: "http://localhost",

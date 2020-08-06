@@ -6,31 +6,64 @@ export type PetitionField = {
   position: number;
   id: number;
   title: string | null;
+  type: string;
 };
 
 export type PetitionFieldListProps = {
   fields: PetitionField[];
 };
 
+type GroupedField = {
+  heading?: PetitionField;
+  children: PetitionField[];
+};
+
+function groupByTitle(
+  groups: GroupedField[],
+  field: PetitionField
+): GroupedField[] {
+  if (field.type === "HEADING") {
+    groups.push({
+      heading: field,
+      children: [],
+    });
+  } else {
+    if (!groups[groups.length - 1]) {
+      groups.push({ children: [] });
+    }
+    groups[groups.length - 1].children.push(field);
+  }
+  return groups;
+}
+
 export function PetitionFieldList({ fields }: PetitionFieldListProps) {
   return (
     <MjmlText paddingTop={0} paddingLeft="50px" lineHeight="24px">
-      <ol style={{ margin: 0, padding: 0 }}>
-        {fields.map(({ position, id, title }) => (
-          <li key={id} value={position + 1} style={{ margin: 0, padding: 0 }}>
-            {title ? (
-              <span>{title}</span>
-            ) : (
-              <span style={{ fontStyle: "italic" }}>
-                <FormattedMessage
-                  id="generic.untitled-field"
-                  defaultMessage="Untitled field"
-                />
-              </span>
-            )}
-          </li>
-        ))}
-      </ol>
+      {fields.reduce(groupByTitle, []).map(({ heading, children }, groupId) => (
+        <ul key={`group_${groupId}`} style={{ margin: 0, padding: 0 }}>
+          <b>{heading?.title}</b>
+          <ul>
+            {children.map(({ position, id, title }) => (
+              <li
+                key={`children_${id}`}
+                value={position + 1}
+                style={{ margin: 0, padding: 0 }}
+              >
+                {title ? (
+                  <span>{title}</span>
+                ) : (
+                  <span style={{ fontStyle: "italic" }}>
+                    <FormattedMessage
+                      id="generic.untitled-field"
+                      defaultMessage="Untitled field"
+                    />
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </ul>
+      ))}
     </MjmlText>
   );
 }
