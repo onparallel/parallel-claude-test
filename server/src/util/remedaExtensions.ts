@@ -34,12 +34,8 @@ export function removeKeys() {
   return purry(_removeKeys, arguments);
 }
 
-export function isDefined(value: any) {
+export function isDefined<T>(value: T): value is Exclude<T, null | undefined> {
   return value !== undefined && value !== null;
-}
-
-export function filterDefined<T>(values: T[]): Exclude<T, undefined | null>[] {
-  return values.filter(isDefined) as Exclude<T, undefined | null>[];
 }
 
 export function removeNotDefined<T extends {}>(

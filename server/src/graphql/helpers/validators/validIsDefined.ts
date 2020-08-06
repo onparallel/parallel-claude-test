@@ -1,6 +1,7 @@
 import { core } from "@nexus/schema";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
+import { isDefined } from "../../../util/remedaExtensions";
 
 export function validIsDefined<
   TypeName extends string,
@@ -11,7 +12,7 @@ export function validIsDefined<
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
-    if (value === null || value === undefined) {
+    if (!isDefined(value)) {
       throw new ArgValidationError(
         info,
         argName,

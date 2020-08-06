@@ -4,7 +4,7 @@ import PetitionCommentsContactNotification from "../emails/components/PetitionCo
 import PetitionCommentsUserNotification from "../emails/components/PetitionCommentsUserNotification";
 import { buildFrom } from "../emails/utils/buildFrom";
 import { toGlobalId } from "../util/globalId";
-import { filterDefined } from "../util/remedaExtensions";
+import { isDefined } from "../util/remedaExtensions";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type CommentsEmailWorkerPayload =
@@ -41,13 +41,15 @@ createQueueWorker<CommentsEmailWorkerPayload>(
         `Organization not found for petition.org_id ${petition.org_id}`
       );
     }
-    const comments = filterDefined(
+    const comments = (
       await context.petitions.loadPetitionFieldComment(
         payload.petition_field_comment_ids
       )
-    );
+    ).filter(isDefined);
     const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
-    const _fields = filterDefined(await context.petitions.loadField(fieldIds));
+    const _fields = (await context.petitions.loadField(fieldIds)).filter(
+      isDefined
+    );
     const commentsByField = groupBy(comments, (c) => c.petition_field_id);
     const fields = sortBy(_fields, (f) => f.position).map((f) => ({
       ...pick(f, ["id", "title", "position"]),
@@ -122,8 +124,8 @@ createQueueWorker<CommentsEmailWorkerPayload>(
         (contact.first_name && contact.last_name
           ? `${contact.first_name} ${contact.last_name}`
           : contact.first_name) || contact.email;
-      const users = filterDefined(
-        await context.users.loadUser(payload.user_ids)
+      const users = (await context.users.loadUser(payload.user_ids)).filter(
+        isDefined
       );
       for (const user of users) {
         const { html, text, subject, from } = await buildEmail(
