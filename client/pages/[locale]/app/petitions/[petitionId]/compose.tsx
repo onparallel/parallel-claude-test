@@ -158,6 +158,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         ...state,
         activeFieldId:
           state.activeFieldId === fieldId ? null : state.activeFieldId,
+        showSettings: state.activeFieldId === fieldId ? false : true,
       }));
       try {
         await deletePetitionField({
@@ -404,15 +405,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       state={petitionState}
     >
       <PaneWithFlyout
-        active={Boolean(activeField)}
+        isActive={showSettings}
         alignWith={activeFieldElement}
         flyout={
-          activeField &&
           showSettings && (
             <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
               <PetitionComposeFieldSettings
-                key={activeField.id}
-                field={activeField}
+                key={activeField!.id}
+                field={activeField!}
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
                 onClose={handleSettingsClose}

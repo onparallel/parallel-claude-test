@@ -309,7 +309,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       <Divider />
       <Box flex="1" overflow="auto">
         <PaneWithFlyout
-          active={Boolean(activeFieldId)}
+          isActive={Boolean(activeFieldId)}
           alignWith={activeFieldElement}
           flyout={
             <Box padding={4} paddingLeft={{ md: 0 }}>

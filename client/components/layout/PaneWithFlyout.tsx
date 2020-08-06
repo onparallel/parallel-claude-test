@@ -5,14 +5,14 @@ import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import ResizeObserver from "react-resize-observer";
 
 export type PaneWithFlyoutProps = {
-  active: boolean;
+  isActive: boolean;
   flyout: ReactNode;
   alignWith: Maybe<HTMLElement>;
   children: ReactNode;
 };
 
 export function PaneWithFlyout({
-  active,
+  isActive,
   flyout,
   alignWith,
   children,
@@ -21,11 +21,11 @@ export function PaneWithFlyout({
   const flyoutRef = useRef<HTMLDivElement>(null);
   const paneRef = useRef<HTMLDivElement>(null);
 
-  useEffect(positionFlyout, [active, alignWith]);
-  useEffect(scrollFlyoutIntoView, [active, alignWith]);
+  useEffect(positionFlyout, [isActive, alignWith]);
+  useEffect(scrollFlyoutIntoView, [isActive, alignWith]);
 
   function positionFlyout() {
-    if (!active || !alignWith || !flyoutRef.current) {
+    if (!isActive || !alignWith || !flyoutRef.current) {
       setFlyoutOffset(0);
       return;
     }
@@ -45,7 +45,7 @@ export function PaneWithFlyout({
   }
 
   function scrollFlyoutIntoView() {
-    if (active) {
+    if (isActive) {
       const timeout = setTimeout(() => {
         if (flyoutRef.current) {
           scrollIntoView(flyoutRef.current, {
@@ -60,11 +60,17 @@ export function PaneWithFlyout({
 
   return (
     <Flex ref={paneRef} minHeight="100%">
-      <Box flex="2" display={{ base: active ? "none" : "block", md: "block" }}>
+      <Box
+        flex="2"
+        display={{ base: isActive ? "none" : "block", md: "block" }}
+      >
         {children}
       </Box>
-      <Box flex="1" display={{ base: active ? "block" : "none", md: "block" }}>
-        {active ? (
+      <Box
+        flex="1"
+        display={{ base: isActive ? "block" : "none", md: "block" }}
+      >
+        {isActive ? (
           <Box
             ref={flyoutRef}
             marginTop={{ base: 0, md: `${flyoutOffset}px` }}
