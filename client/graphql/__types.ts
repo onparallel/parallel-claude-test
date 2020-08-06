@@ -1687,7 +1687,6 @@ export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   | "optional"
   | "multiple"
   | "validated"
-  | "isReadOnly"
 > & {
     replies: Array<
       {
@@ -2471,7 +2470,10 @@ export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "id" | "status" | "deadline"> & {
     fields: Array<
-      { __typename?: "PublicPetitionField" } & Pick<PublicPetitionField, "id"> &
+      { __typename?: "PublicPetitionField" } & Pick<
+        PublicPetitionField,
+        "id" | "isReadOnly"
+      > &
         RecipientViewPetitionField_PublicPetitionFieldFragment &
         RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment
     >;
@@ -3527,7 +3529,6 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
     optional
     multiple
     validated
-    isReadOnly
     replies {
       ...RecipientViewPetitionField_PublicPetitionFieldReply
     }
@@ -3573,6 +3574,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     deadline
     fields {
       id
+      isReadOnly
       ...RecipientViewPetitionField_PublicPetitionField
       ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
     }

@@ -20,7 +20,7 @@ import {
   PetitionRepliesField,
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
-import { PetitionRepliesHeadingField } from "@parallel/components/petition-replies/PetitionRepliesHeadingField";
+import { PetitionHeadingField } from "@parallel/components/common/PetitionHeadingField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import {
   PetitionFieldReply,
@@ -336,11 +336,16 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             {petition!.fields.map((field, index) => {
               switch (field.type) {
                 case "HEADING":
-                  return <PetitionRepliesHeadingField field={field} />;
+                  return (
+                    <PetitionHeadingField
+                      id={field.id}
+                      title={field.title}
+                      description={field.description}
+                    />
+                  );
                 default:
                   return (
                     <PetitionRepliesField
-                      marginLeft="1.2rem !important"
                       id={`field-${field.id}`}
                       key={field.id}
                       field={field}

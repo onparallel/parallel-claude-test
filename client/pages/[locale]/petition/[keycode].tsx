@@ -63,6 +63,7 @@ import {
   RecipientViewPetitionField,
 } from "../../../components/recipient-view/RecipientViewPetitionField";
 import Head from "next/head";
+import { PetitionHeadingField } from "@parallel/components/common/PetitionHeadingField";
 
 type PublicPetitionProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -376,25 +377,40 @@ function RecipientView({ keycode }: PublicPetitionProps) {
             </Box>
           </Box>
           <Stack flex="2" spacing={4}>
-            {petition.fields.map((field) => (
-              <RecipientViewPetitionField
-                key={field.id}
-                id={`field-${field.id}`}
-                field={field}
-                isInvalid={
-                  finalized && field.replies.length === 0 && !field.optional
-                }
-                uploadProgress={uploadProgress[field.id]}
-                contactId={contact.id}
-                onOpenCommentsClick={() => setSelectedFieldId(field.id)}
-                onCreateReply={(payload) =>
-                  handleCreateReply(field.id, payload)
-                }
-                onDeleteReply={(replyId) =>
-                  handleDeleteReply(field.id, replyId)
-                }
-              />
-            ))}
+            {petition.fields.map((field) => {
+              switch (field.type) {
+                case "HEADING":
+                  return (
+                    <PetitionHeadingField
+                      id={field.id}
+                      title={field.title}
+                      description={field.description}
+                    />
+                  );
+                default:
+                  return (
+                    <RecipientViewPetitionField
+                      key={field.id}
+                      id={`field-${field.id}`}
+                      field={field}
+                      isInvalid={
+                        finalized &&
+                        field.replies.length === 0 &&
+                        !field.optional
+                      }
+                      uploadProgress={uploadProgress[field.id]}
+                      contactId={contact.id}
+                      onOpenCommentsClick={() => setSelectedFieldId(field.id)}
+                      onCreateReply={(payload) =>
+                        handleCreateReply(field.id, payload)
+                      }
+                      onDeleteReply={(replyId) =>
+                        handleDeleteReply(field.id, replyId)
+                      }
+                    />
+                  );
+              }
+            })}
           </Stack>
         </Flex>
         <RecipientViewSideLinks
@@ -453,6 +469,7 @@ RecipientView.fragments = {
       deadline
       fields {
         id
+        isReadOnly
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }

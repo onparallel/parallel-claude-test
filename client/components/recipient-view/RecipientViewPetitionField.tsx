@@ -82,44 +82,40 @@ export function RecipientViewPetitionField({
         <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
             {field.title}
-            {!field.isReadOnly ? (
-              field.optional ? (
-                <Text
-                  as="span"
-                  marginLeft={2}
-                  color="gray.400"
-                  fontSize="sm"
-                  fontWeight="normal"
-                >
-                  <FormattedMessage
-                    id="generic.optional-field"
-                    defaultMessage="Optional"
-                  />
+            {field.optional ? (
+              <Text
+                as="span"
+                marginLeft={2}
+                color="gray.400"
+                fontSize="sm"
+                fontWeight="normal"
+              >
+                <FormattedMessage
+                  id="generic.optional-field"
+                  defaultMessage="Optional"
+                />
+              </Text>
+            ) : (
+              <Tooltip
+                placement="right"
+                label={intl.formatMessage({
+                  id: "generic.required-field",
+                  defaultMessage: "Required field",
+                })}
+              >
+                <Text as="span" userSelect="none" marginLeft={1}>
+                  *
                 </Text>
-              ) : (
-                <Tooltip
-                  placement="right"
-                  label={intl.formatMessage({
-                    id: "generic.required-field",
-                    defaultMessage: "Required field",
-                  })}
-                >
-                  <Text as="span" userSelect="none" marginLeft={1}>
-                    *
-                  </Text>
-                </Tooltip>
-              )
-            ) : null}
+              </Tooltip>
+            )}
           </Heading>
         </Box>
-        {!field.isReadOnly ? (
-          <CommentsButton
-            commentCount={field.comments.length}
-            hasNewComments={field.comments.some((c) => c.isUnread)}
-            hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
-            onClick={onOpenCommentsClick}
-          />
-        ) : null}
+        <CommentsButton
+          commentCount={field.comments.length}
+          hasNewComments={field.comments.some((c) => c.isUnread)}
+          hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
+          onClick={onOpenCommentsClick}
+        />
       </Flex>
       <Box>
         {field.description ? (
@@ -539,7 +535,6 @@ RecipientViewPetitionField.fragments = {
         optional
         multiple
         validated
-        isReadOnly
         replies {
           ...RecipientViewPetitionField_PublicPetitionFieldReply
         }
