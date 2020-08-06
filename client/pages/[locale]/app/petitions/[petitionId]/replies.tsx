@@ -20,6 +20,7 @@ import {
   PetitionRepliesField,
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
+import { PetitionRepliesHeadingField } from "@parallel/components/petition-replies/PetitionRepliesHeadingField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import {
   PetitionFieldReply,
@@ -248,6 +249,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     });
   }
 
+  function getFieldIndex(fieldId: string): number {
+    return petition!.fields
+      .filter((f) => !f.isReadOnly)
+      .findIndex((f) => f.id === fieldId);
+  }
+
   return (
     <PetitionLayout
       key={petition!.id}
@@ -326,28 +333,38 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           }
         >
           <Stack flex="2" spacing={4} padding={4} id="petition-replies">
-            {petition!.fields.map((field, index) => (
-              <PetitionRepliesField
-                id={`field-${field.id}`}
-                key={field.id}
-                field={field}
-                index={index}
-                highlighted={activeFieldId === field.id}
-                onValidateToggle={() =>
-                  handleValidateToggle([field.id], !field.validated)
-                }
-                onAction={handleAction}
-                isActive={activeFieldId === field.id}
-                commentCount={index}
-                newCommentCount={index > 1 ? index - 1 : 0}
-                onToggleComments={() =>
-                  setActiveFieldId(activeFieldId === field.id ? null : field.id)
-                }
-                onUpdateReplyStatus={(replyId, status) =>
-                  handleUpdateRepliesStatus(field.id, [replyId], status)
-                }
-              />
-            ))}
+            {petition!.fields.map((field, index) => {
+              switch (field.type) {
+                case "HEADING":
+                  return <PetitionRepliesHeadingField field={field} />;
+                default:
+                  return (
+                    <PetitionRepliesField
+                      marginLeft="1.2rem !important"
+                      id={`field-${field.id}`}
+                      key={field.id}
+                      field={field}
+                      index={getFieldIndex(field.id)}
+                      highlighted={activeFieldId === field.id}
+                      onValidateToggle={() =>
+                        handleValidateToggle([field.id], !field.validated)
+                      }
+                      onAction={handleAction}
+                      isActive={activeFieldId === field.id}
+                      commentCount={index}
+                      newCommentCount={index > 1 ? index - 1 : 0}
+                      onToggleComments={() =>
+                        setActiveFieldId(
+                          activeFieldId === field.id ? null : field.id
+                        )
+                      }
+                      onUpdateReplyStatus={(replyId, status) =>
+                        handleUpdateRepliesStatus(field.id, [replyId], status)
+                      }
+                    />
+                  );
+              }
+            })}
           </Stack>
         </PaneWithFlyout>
       </Box>
@@ -361,6 +378,7 @@ PetitionReplies.fragments = {
       id
       ...PetitionLayout_Petition
       fields {
+        isReadOnly
         ...PetitionRepliesField_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...DownloadAllDialog_PetitionField

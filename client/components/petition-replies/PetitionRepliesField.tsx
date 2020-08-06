@@ -108,60 +108,57 @@ export function PetitionRepliesField({
             )}
           </Box>
         </Flex>
-        {!field.isReadOnly ? (
-          <Flex width={{ base: "100%", lg: "auto" }}>
-            <Spacer />
-            <Button
+        <Flex width={{ base: "100%", lg: "auto" }}>
+          <Spacer />
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onValidateToggle}
+            aria-pressed={field.validated}
+            aria-label={
+              field.validated
+                ? intl.formatMessage({
+                    id: "petition-replies.validate-field-button.validated",
+                    defaultMessage: "Reviewed",
+                  })
+                : intl.formatMessage({
+                    id: "petition-replies.validate-field-button.not-validated",
+                    defaultMessage: "Not reviewed",
+                  })
+            }
+            marginRight={1}
+          >
+            <Switch
+              color="green"
+              isChecked={field.validated}
+              onChange={noop}
               size="sm"
-              variant="ghost"
-              onClick={onValidateToggle}
-              aria-pressed={field.validated}
-              aria-label={
-                field.validated
-                  ? intl.formatMessage({
-                      id: "petition-replies.validate-field-button.validated",
-                      defaultMessage: "Reviewed",
-                    })
-                  : intl.formatMessage({
-                      id:
-                        "petition-replies.validate-field-button.not-validated",
-                      defaultMessage: "Not reviewed",
-                    })
-              }
-              marginRight={1}
-            >
-              <Switch
-                color="green"
-                isChecked={field.validated}
-                onChange={noop}
-                size="sm"
-                pointerEvents="none"
-                marginRight={2}
-                position="relative"
-                top="1px"
-                aria-hidden={field.validated}
-              />
-              <FormattedMessage
-                id="petition-replies.validate-field-button"
-                defaultMessage="Reviewed"
-              />
-            </Button>
-            {/* This Flex element makes the reviewed buttons to be aligned */}
-            <Flex width="66px">
-              <Spacer />
-              <CommentsButton
-                isActive={isShowingComments}
-                commentCount={field.comments.length}
-                hasNewComments={field.comments.some((c) => c.isUnread)}
-                hasUnpublishedComments={field.comments.some(
-                  (c) => !c.publishedAt
-                )}
-                onClick={onToggleComments}
-                id={`comment-${index}`}
-              />
-            </Flex>
+              pointerEvents="none"
+              marginRight={2}
+              position="relative"
+              top="1px"
+              aria-hidden={field.validated}
+            />
+            <FormattedMessage
+              id="petition-replies.validate-field-button"
+              defaultMessage="Reviewed"
+            />
+          </Button>
+          {/* This Flex element makes the reviewed buttons to be aligned */}
+          <Flex width="66px">
+            <Spacer />
+            <CommentsButton
+              isActive={isShowingComments}
+              commentCount={field.comments.length}
+              hasNewComments={field.comments.some((c) => c.isUnread)}
+              hasUnpublishedComments={field.comments.some(
+                (c) => !c.publishedAt
+              )}
+              onClick={onToggleComments}
+              id={`comment-${index}`}
+            />
           </Flex>
-        ) : null}
+        </Flex>
       </Flex>
       <Box marginBottom={2}>
         {field.description ? (
@@ -177,7 +174,7 @@ export function PetitionRepliesField({
           </Text>
         )}
       </Box>
-      {!field.isReadOnly && field.replies.length ? (
+      {field.replies.length ? (
         <Stack spacing={4}>
           {field.replies.map((reply) => (
             <PetitionRepliesFieldReply
@@ -248,7 +245,7 @@ export function PetitionRepliesField({
             </PetitionRepliesFieldReply>
           ))}
         </Stack>
-      ) : !field.isReadOnly ? (
+      ) : (
         <Box paddingY={4}>
           <Text color="gray.400" fontStyle="italic" textAlign="center">
             <FormattedMessage
@@ -257,7 +254,7 @@ export function PetitionRepliesField({
             />
           </Text>
         </Box>
-      ) : null}
+      )}
     </Card>
   );
 }
@@ -403,7 +400,6 @@ PetitionRepliesField.fragments = {
       title
       description
       validated
-      isReadOnly
       replies {
         ...PetitionRepliesField_PetitionFieldReply
       }

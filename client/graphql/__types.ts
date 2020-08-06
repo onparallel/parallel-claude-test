@@ -1621,7 +1621,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "title" | "description" | "validated" | "isReadOnly"
+  "id" | "type" | "title" | "description" | "validated"
 > & {
     replies: Array<
       {
@@ -2177,9 +2177,8 @@ export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
     fields: Array<
-      {
-        __typename?: "PetitionField";
-      } & PetitionRepliesField_PetitionFieldFragment &
+      { __typename?: "PetitionField" } & Pick<PetitionField, "isReadOnly"> &
+        PetitionRepliesField_PetitionFieldFragment &
         PetitionRepliesFieldComments_PetitionFieldFragment &
         DownloadAllDialog_PetitionFieldFragment
     >;
@@ -3350,7 +3349,6 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     title
     description
     validated
-    isReadOnly
     replies {
       ...PetitionRepliesField_PetitionFieldReply
     }
@@ -3423,6 +3421,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     id
     ...PetitionLayout_Petition
     fields {
+      isReadOnly
       ...PetitionRepliesField_PetitionField
       ...PetitionRepliesFieldComments_PetitionField
       ...DownloadAllDialog_PetitionField
