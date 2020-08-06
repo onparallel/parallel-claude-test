@@ -5,7 +5,7 @@ import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
-import { count, isDefined } from "../../util/remedaExtensions";
+import { count } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
