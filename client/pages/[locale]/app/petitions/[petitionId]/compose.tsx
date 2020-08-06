@@ -530,6 +530,9 @@ PetitionCompose.mutations = [
       updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
         id
         ...PetitionLayout_Petition
+        fields {
+          id
+        }
       }
     }
     ${PetitionLayout.fragments.Petition}

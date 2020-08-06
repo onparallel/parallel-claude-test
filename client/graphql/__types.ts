@@ -2027,8 +2027,11 @@ export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
 export type PetitionCompose_updateFieldPositionsMutation = {
   __typename?: "Mutation";
 } & {
-  updateFieldPositions: { __typename?: "Petition" } & Pick<Petition, "id"> &
-    PetitionLayout_PetitionFragment;
+  updateFieldPositions: { __typename?: "Petition" } & Pick<Petition, "id"> & {
+      fields: Array<
+        { __typename?: "PetitionField" } & Pick<PetitionField, "id">
+      >;
+    } & PetitionLayout_PetitionFragment;
 };
 
 export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
@@ -4663,6 +4666,9 @@ export const PetitionCompose_updateFieldPositionsDocument = gql`
     updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
       id
       ...PetitionLayout_Petition
+      fields {
+        id
+      }
     }
   }
   ${PetitionLayout_PetitionFragmentDoc}
