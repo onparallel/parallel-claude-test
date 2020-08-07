@@ -875,10 +875,10 @@ export const FieldFileUploadIcon = createIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <polyline points="16 16 12 12 8 16"></polyline>
-      <line x1="12" y1="12" x2="12" y2="21"></line>
-      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
-      <polyline points="16 16 12 12 8 16"></polyline>
+      <path d="m15 11h3l4 4v5h-20v-5l4-4h3" />
+      <path d="m2 15h6l1 2h6l1-2h6" />
+      <path d="m12 12v-8" />
+      <path d="m15 8-3-4-3 4" />
     </g>
   ),
 });
@@ -910,11 +910,17 @@ export const FieldHeadingIcon = createIcon({
   viewBox: "0 0 24 24",
   path: (
     <g
-      fill="white"
+      fill="none"
       stroke="currentColor"
-      transform="translate(-89.764312,-81.899904)"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path d="m 96.214026,101.65874 h 1.225688 v -7.539138 h 8.626076 v 7.539138 h 1.24881 V 86.141063 h -1.24881 v 6.914733 h -8.626076 v -6.914733 h -1.225688 z" />
+      <path d="m2 20h20" />
+      <path d="m22 15h-7" />
+      <path d="m15 10h7" />
+      <path d="m3 15 4-11 4 11" />
+      <path d="m4 12h6" />
     </g>
   ),
 });

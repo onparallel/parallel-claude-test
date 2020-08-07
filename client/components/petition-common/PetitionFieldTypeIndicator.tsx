@@ -25,6 +25,10 @@ export function PetitionFieldTypeIndicator({
         id: "petition.field-type.text",
         defaultMessage: "Text input",
       }),
+      HEADING: intl.formatMessage({
+        id: "petition.field-type.heading",
+        defaultMessage: "Heading",
+      }),
     }[type];
   }, [type, intl.locale]);
   return (
