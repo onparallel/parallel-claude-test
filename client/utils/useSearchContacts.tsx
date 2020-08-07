@@ -28,6 +28,7 @@ export function useSearchContacts() {
           ${RecipientSelect.fragments.Contact}
         `,
         variables: { search, exclude },
+        fetchPolicy: "no-cache",
       });
       return data!.contacts.items;
     },
