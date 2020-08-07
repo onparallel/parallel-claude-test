@@ -1,13 +1,12 @@
 import { type, TypicalArg } from "@camwiegert/typical";
-import { BoxProps, Box } from "@chakra-ui/core";
+import { Box } from "@chakra-ui/core";
 import { useEffect, useRef, forwardRef } from "react";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-
-export type PublicHeroProps = BoxProps;
+import { ExtendChakra } from "@parallel/chakra/utils";
 
 export const Typical = forwardRef<
   HTMLElement,
-  { args: TypicalArg[] } & BoxProps
+  ExtendChakra<{ args: TypicalArg[] }>
 >(function ({ args, ...props }, ref) {
   const elementRef = useRef<HTMLElement>();
   useEffect(() => {

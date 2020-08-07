@@ -1,21 +1,13 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Flex,
-  Image,
-  Input,
-  Stack,
-  Switch,
-  Text,
-} from "@chakra-ui/core";
+import { Box, Flex, Image, Input, Stack, Switch, Text } from "@chakra-ui/core";
 import { QuestionIcon } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   PetitionComposeFieldSettings_PetitionFieldFragment,
-  UpdatePetitionFieldInput,
   PetitionFieldType,
+  UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -239,12 +231,12 @@ function SettingsRow({
   description,
   children,
   ...props
-}: BoxProps & {
+}: ExtendChakra<{
   label: ReactNode;
   controlId: string;
   children: ReactNode;
   description: ReactNode;
-}) {
+}>) {
   return (
     <SmallPopover content={description} placement="left">
       <Flex as="label" alignItems="center" htmlFor={controlId} {...props}>

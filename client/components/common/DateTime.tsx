@@ -1,20 +1,21 @@
-import { Text, BoxProps } from "@chakra-ui/core";
-import { DateTimeFormatOptions } from "@parallel/utils/dates";
+import { Text } from "@chakra-ui/core";
 import { selectUnit } from "@formatjs/intl-utils";
-import {
-  FormattedRelativeTime,
-  FormattedDate,
-  useIntl,
-  FormattedMessage,
-} from "react-intl";
-import { useEffect } from "react";
+import { ExtendChakra } from "@parallel/chakra/utils";
+import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
+import { useEffect } from "react";
+import {
+  FormattedDate,
+  FormattedMessage,
+  FormattedRelativeTime,
+  useIntl,
+} from "react-intl";
 
-export type DateTimeProps = BoxProps & {
+export type DateTimeProps = ExtendChakra<{
   value: Date | string | number;
   format: DateTimeFormatOptions;
   useRelativeTime?: boolean | "always";
-};
+}>;
 
 type Unit = ReturnType<typeof selectUnit>["unit"];
 

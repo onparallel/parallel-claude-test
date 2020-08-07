@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
 import { AddIcon } from "@parallel/chakra/icons";
-import { Card, CardHeader, CardProps } from "@parallel/components/common/Card";
+import { ExtendChakra } from "@parallel/chakra/utils";
+import { Card, CardHeader } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
@@ -57,7 +58,7 @@ function reset(
   };
 }
 
-export type PetitionComposeFieldListProps = {
+export type PetitionComposeFieldListProps = ExtendChakra<{
   active: Maybe<string>;
   fields: FieldSelection[];
   showErrors: boolean;
@@ -68,7 +69,7 @@ export type PetitionComposeFieldListProps = {
   onSelectField: (fieldId: string) => void;
   onAddField: (type: PetitionFieldType, position?: number) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
-} & CardProps;
+}>;
 
 export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({

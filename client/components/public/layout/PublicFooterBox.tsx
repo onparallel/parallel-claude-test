@@ -1,10 +1,11 @@
-import { Box, Flex, Heading, BoxProps } from "@chakra-ui/core";
+import { Box, Flex, Heading } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 
-export type PublicFooterBoxProps = BoxProps & {
+export type PublicFooterBoxProps = ExtendChakra<{
   heading?: ReactNode;
   children?: ReactNode;
-};
+}>;
 
 export function PublicFooterBox({
   heading,

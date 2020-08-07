@@ -20,4 +20,4 @@ generates:
 
 hooks:
   afterAllFileWrite:
-    - prettier --write
+    - yarn prettier --write

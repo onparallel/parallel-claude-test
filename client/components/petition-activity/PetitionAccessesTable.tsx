@@ -20,6 +20,7 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,
@@ -28,7 +29,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { Card, CardProps } from "../common/Card";
+import { Card } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
@@ -47,7 +48,7 @@ export function PetitionAccessesTable({
   onDeactivateAccess,
   onConfigureReminders,
   ...props
-}: {
+}: ExtendChakra<{
   petition: PetitionAccessTable_PetitionFragment;
   onAddPetitionAccess: () => void;
   onSendMessage: (accessIds: string[]) => void;
@@ -55,7 +56,7 @@ export function PetitionAccessesTable({
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
   onConfigureReminders: (accessIds: string[]) => void;
-} & CardProps) {
+}>) {
   const intl = useIntl();
   const [selection, setSelection] = useState<string[]>([]);
   const selected = useMemo(

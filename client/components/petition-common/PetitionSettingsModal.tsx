@@ -25,7 +25,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { KeyboardEvent, MouseEvent } from "react";
+import { ChangeEvent, KeyboardEvent, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 
@@ -74,7 +74,7 @@ export function PetitionSettingsModal({
                 <Select
                   name="petition-locale"
                   value={petition.locale}
-                  onChange={(event) => {
+                  onChange={(event: ChangeEvent<HTMLSelectElement>) => {
                     onUpdatePetition({ locale: event.target.value as any });
                   }}
                 >

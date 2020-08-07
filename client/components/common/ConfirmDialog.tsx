@@ -1,15 +1,15 @@
 import {
+  Button,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  BoxProps,
-  Button,
   ModalProps,
   Stack,
 } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { ReactNode, RefObject, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { DialogProps } from "./DialogOpenerProvider";
@@ -20,7 +20,7 @@ export type ConfirmDialogProps<TResult> = {
   confirm: ReactNode;
   cancel?: ReactNode;
   initialFocusRef?: RefObject<any>;
-  content?: BoxProps;
+  content?: ExtendChakra;
 } & DialogProps<{}, TResult> &
   Omit<ModalProps, "children" | "isOpen" | "initialFocusRef" | "onClose">;
 

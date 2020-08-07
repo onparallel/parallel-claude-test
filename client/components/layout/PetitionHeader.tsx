@@ -179,8 +179,6 @@ export function PetitionHeader({
           <Flex alignItems="center">
             <PetitionStatusIndicator
               marginRight={1}
-              as={Flex}
-              alignItems="center"
               status={petition.status}
               isJustIcon
             />

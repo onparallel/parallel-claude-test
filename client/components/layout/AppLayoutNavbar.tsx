@@ -215,7 +215,6 @@ export const AppLayoutNavbar = Object.assign(
                       })}
                       icon={<GlobeIcon />}
                       variant="ghost"
-                      placement="right"
                       isRound
                     />
                   </Tooltip>

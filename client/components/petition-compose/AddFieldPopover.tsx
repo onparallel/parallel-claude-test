@@ -1,11 +1,12 @@
-import { Menu, MenuButton, MenuButtonProps, Portal } from "@chakra-ui/core";
+import { Menu, MenuButton, Portal } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { FC, forwardRef } from "react";
 import { PetitionFieldTypeSelectDropdown } from "./PetitionFieldTypeSelect";
 
-export type AddFieldPopoverProps = MenuButtonProps & {
+export type AddFieldPopoverProps = ExtendChakra<{
   onSelectFieldType: (type: PetitionFieldType) => void;
-};
+}>;
 
 export const AddFieldPopover: FC<AddFieldPopoverProps> = forwardRef<
   HTMLButtonElement,

@@ -387,7 +387,9 @@ function _Row<TRow>({
               borderBottom: "1px solid",
               borderBottomColor: colors.border,
             })}
-        onClick={(event) => onRowClick?.(row, event as any)}
+        onClick={(event: MouseEvent<HTMLTableRowElement>) =>
+          onRowClick?.(row, event as any)
+        }
       >
         {columns.map((column) => {
           return (

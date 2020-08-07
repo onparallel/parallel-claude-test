@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text, useTheme } from "@chakra-ui/core";
 import { SaveIcon } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   RecipientViewProgressCard_PublicPetitionFragment,
   RecipientViewProgressCard_PublicUserFragment,
@@ -8,7 +9,7 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
-import { Card, CardProps } from "../common/Card";
+import { Card } from "../common/Card";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
 
@@ -18,12 +19,12 @@ export function RecipientViewProgressCard({
   petition,
   onFinalize,
   ...props
-}: Omit<CardProps, "children"> & {
+}: ExtendChakra<{
   isStickyFooter?: boolean;
   sender: RecipientViewProgressCard_PublicUserFragment;
   petition: RecipientViewProgressCard_PublicPetitionFragment;
   onFinalize: () => void;
-}) {
+}>) {
   const theme = useTheme();
   const { replied, optional, total } = useMemo(
     () =>

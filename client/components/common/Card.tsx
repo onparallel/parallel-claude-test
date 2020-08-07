@@ -1,6 +1,5 @@
 import {
   Box,
-  BoxProps,
   CloseButton,
   Flex,
   Heading,
@@ -11,9 +10,7 @@ import { forwardRef, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Divider } from "./Divider";
 
-export type CardProps = BoxProps;
-
-export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
+export const Card: typeof Box = forwardRef(function Card(
   { children, ...props },
   ref
 ) {

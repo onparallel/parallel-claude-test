@@ -34,14 +34,13 @@ export function linkColorProps(colorMode: string) {
 
 export type LinkProps = Pick<NextLinkProps, "href" | "as"> &
   Omit<ChakraLinkProps, "href" | "as"> & {
-    chakraAs?: ChakraLinkProps["as"];
     render?: (children?: ReactNode) => ReactNode;
     next?: Omit<NextLinkProps, "href" | "as">;
     children?: ReactNode;
   };
 
 export const Link = forwardRef(function Link(
-  { chakraAs, next, render, children, ...props }: LinkProps,
+  { next, render, children, ...props }: LinkProps,
   ref: Ref<HTMLAnchorElement>
 ) {
   const { colorMode } = useColorMode();
@@ -83,9 +82,10 @@ export function NakedLink({ href, as, children, ...props }: NakedLinkProps) {
   );
 }
 
-export const NormalLink = forwardRef<HTMLAnchorElement, ChakraLinkProps>(
-  function NormalLink(props: ChakraLinkProps, ref) {
-    const { colorMode } = useColorMode();
-    return <ChakraLink {...linkColorProps(colorMode)} {...props} ref={ref} />;
-  }
-);
+export const NormalLink: typeof ChakraLink = forwardRef(function NormalLink(
+  props: ChakraLinkProps,
+  ref
+) {
+  const { colorMode } = useColorMode();
+  return <ChakraLink {...linkColorProps(colorMode)} {...props} ref={ref} />;
+});

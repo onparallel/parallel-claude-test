@@ -1,12 +1,13 @@
-import { BoxProps, Icon, Text, Tooltip, useTheme } from "@chakra-ui/core";
+import { Icon, Text, Tooltip } from "@chakra-ui/core";
 import { CheckIcon, EditIcon, TimeIcon } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 
-export type PetitionStatusIndicator = {
+export type PetitionStatusIndicator = ExtendChakra<{
   status: PetitionStatus;
   isJustIcon?: boolean;
-} & BoxProps;
+}>;
 
 export function PetitionStatusIndicator({
   status,
@@ -14,7 +15,6 @@ export function PetitionStatusIndicator({
   ...props
 }: PetitionStatusIndicator) {
   const intl = useIntl();
-  const theme = useTheme();
   const label = ({
     DRAFT: intl.formatMessage({
       id: "generic.petition-status.draft",
@@ -39,29 +39,18 @@ export function PetitionStatusIndicator({
     PENDING: "yellow.600",
     COMPLETED: "green.500",
   } as const)[status];
-  const content = (
-    <>
-      <Icon
-        as={icon}
-        boxSize="18px"
-        verticalAlign={isJustIcon ? "initial" : "sub"}
-      />
-      {isJustIcon ? null : (
-        <Text as="span" marginLeft={1}>
-          {label}
+  return (
+    <Tooltip label={label} isDisabled={!isJustIcon}>
+      {isJustIcon ? (
+        <Icon as={icon} boxSize="18px" color={color} {...props} />
+      ) : (
+        <Text display="inline-flex" color={color} {...props}>
+          <Icon as={icon} boxSize="18px" verticalAlign="sub" />
+          <Text as="span" marginLeft={1}>
+            {label}
+          </Text>
         </Text>
       )}
-    </>
-  );
-  return isJustIcon ? (
-    <Tooltip label={label}>
-      <Text color={color} {...props}>
-        {content}
-      </Text>
     </Tooltip>
-  ) : (
-    <Text color={color} whiteSpace="nowrap" {...props}>
-      {content}
-    </Text>
   );
 }

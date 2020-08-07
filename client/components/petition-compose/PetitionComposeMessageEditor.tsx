@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Alert, AlertIcon, Box, Flex, Heading, Stack } from "@chakra-ui/core";
-import { Card, CardProps } from "@parallel/components/common/Card";
+import { ExtendChakra } from "@parallel/chakra/utils";
+import { Card } from "@parallel/components/common/Card";
 import {
   Recipient,
   RecipientSelect,
@@ -22,14 +23,14 @@ import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import { PetitionRemindersConfig } from "./PetitionRemindersConfig";
 
-export type PetitionComposeMessageEditorProps = {
+export type PetitionComposeMessageEditorProps = ExtendChakra<{
   petition: PetitionComposeMessageEditor_PetitionFragment;
   showErrors: boolean;
   onSearchContacts: RecipientSelectProps["onSearchContacts"];
   onCreateContact: RecipientSelectProps["onCreateContact"];
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   onSend: (data: { contactIds: string[]; schedule: boolean }) => void;
-} & CardProps;
+}>;
 
 export const PetitionComposeMessageEditor = Object.assign(
   memo(function PetitionComposeMessageEditor({

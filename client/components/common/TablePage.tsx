@@ -1,4 +1,4 @@
-import { Box, BoxProps, Button, Flex, Spinner, Stack } from "@chakra-ui/core";
+import { Box, Button, Flex, Spinner, Stack } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -8,16 +8,19 @@ import {
 } from "@parallel/components/common/Table";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
+import { ExtendChakra } from "@parallel/chakra/utils";
 
-export type TableCardProps<T> = TableProps<T> & {
-  loading: boolean;
-  header?: ReactNode;
-  body?: ReactNode;
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  onPageChange?: (page: number) => void;
-} & BoxProps;
+export type TableCardProps<T> = ExtendChakra<
+  TableProps<T> & {
+    loading: boolean;
+    header?: ReactNode;
+    body?: ReactNode;
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    onPageChange?: (page: number) => void;
+  }
+>;
 
 export function TablePage<T>({
   columns,

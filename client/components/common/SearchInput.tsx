@@ -8,14 +8,14 @@ import {
   useColorMode,
 } from "@chakra-ui/core";
 import { SearchIcon } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, Ref, useRef } from "react";
 import { useIntl } from "react-intl";
 
-export type SearchInputProps = InputProps &
-  Required<Pick<InputProps, "value" | "onChange">>;
+export type SearchInputProps = ExtendChakra<InputProps>;
 
 export const SearchInput = forwardRef(function SearchInput(
   { ...props }: SearchInputProps,

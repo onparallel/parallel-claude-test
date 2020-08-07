@@ -16,7 +16,6 @@ import {
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SplitButton, SplitButtonProps } from "../common/SplitButton";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
 export function SendButton({
   onSendClick,
