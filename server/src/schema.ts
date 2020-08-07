@@ -34,10 +34,6 @@ export const schema = makeSchema({
       { source: resolve("./context.ts"), alias: "ctx" },
     ],
     contextType: "ctx.ApiContext",
-    backingTypeMap: {
-      DateTime: "Date",
-      JSONObject: "{[key: string]: any}",
-    },
   },
   prettierConfig: path.join(__dirname, "../../.prettierrc"),
 });

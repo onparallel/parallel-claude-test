@@ -1,8 +1,12 @@
 import GraphQLJSON, { GraphQLJSONObject } from "graphql-type-json";
 import { arg, asNexusMethod, core } from "@nexus/schema";
 
-export const JSONObject = asNexusMethod(GraphQLJSONObject, "jsonObject");
-export const JSON = asNexusMethod(GraphQLJSON, "json");
+export const JSONObject = asNexusMethod(
+  GraphQLJSONObject,
+  "jsonObject",
+  "{[key: string]: any}"
+);
+export const JSON = asNexusMethod(GraphQLJSON, "json", "any");
 
 export function jsonObjectArg(
   opts: Omit<core.NexusArgConfig<"JSONObject">, "type">

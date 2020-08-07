@@ -4,7 +4,8 @@ import { GraphQLScalarType } from "graphql";
 
 export const DateTime = asNexusMethod(
   GraphQLDateTime as GraphQLScalarType,
-  "datetime"
+  "datetime",
+  "Date"
 );
 
 export function dateTimeArg(
