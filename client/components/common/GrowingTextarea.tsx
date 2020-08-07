@@ -20,4 +20,4 @@ export const GrowingTextarea: typeof Textarea = forwardRef(
       />
     );
   }
-);
+) as any; // TODO: Try after rc.1 is fixed

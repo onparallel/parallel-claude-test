@@ -1,3 +1,4 @@
-import { PropsWithAs, As, WithChakra } from "@chakra-ui/core";
+import { BoxProps } from "@chakra-ui/core";
 
-export type ExtendChakra<T = {}> = PropsWithAs<As, WithChakra<T>>;
+// export type ExtendChakra<T = {}> = PropsWithAs<As, WithChakra<T>>;
+export type ExtendChakra<P = {}, T = BoxProps> = P & T;
