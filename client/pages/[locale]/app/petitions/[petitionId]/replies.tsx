@@ -338,6 +338,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                 case "HEADING":
                   return (
                     <PetitionHeadingField
+                      key={field.id}
                       id={field.id}
                       title={field.title}
                       description={field.description}
