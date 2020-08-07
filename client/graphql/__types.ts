@@ -1151,6 +1151,21 @@ export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   "id" | "fullName" | "email"
 >;
 
+export type MessageSentEventModal_MessageSentEventFragment = {
+  __typename?: "MessageSentEvent";
+} & {
+  message: { __typename?: "PetitionMessage" } & Pick<
+    PetitionMessage,
+    "emailBody" | "emailSubject"
+  > & {
+      access: { __typename?: "PetitionAccess" } & {
+        contact?: Maybe<
+          { __typename?: "Contact" } & ContactLink_ContactFragment
+        >;
+      };
+    };
+};
+
 export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
   User,
   "onboardingStatus"
@@ -1483,7 +1498,7 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
 } & Pick<MessageSentEvent, "createdAt"> & {
     message: { __typename?: "PetitionMessage" } & Pick<
       PetitionMessage,
-      "emailSubject" | "scheduledAt"
+      "emailSubject" | "emailBody" | "scheduledAt"
     > & {
         sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
         access: { __typename?: "PetitionAccess" } & {
@@ -1492,7 +1507,7 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
           >;
         };
       } & MessageEventsIndicator_PetitionMessageFragment;
-  };
+  } & MessageSentEventModal_MessageSentEventFragment;
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
@@ -3074,6 +3089,20 @@ export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
     openedAt
   }
 `;
+export const MessageSentEventModal_MessageSentEventFragmentDoc = gql`
+  fragment MessageSentEventModal_MessageSentEvent on MessageSentEvent {
+    message {
+      emailBody
+      emailSubject
+      access {
+        contact {
+          ...ContactLink_Contact
+        }
+      }
+    }
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
   fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
     message {
@@ -3082,6 +3111,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
         fullName
       }
       emailSubject
+      emailBody
       scheduledAt
       access {
         contact {
@@ -3091,9 +3121,11 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
       ...MessageEventsIndicator_PetitionMessage
     }
     createdAt
+    ...MessageSentEventModal_MessageSentEvent
   }
   ${ContactLink_ContactFragmentDoc}
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
+  ${MessageSentEventModal_MessageSentEventFragmentDoc}
 `;
 export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {

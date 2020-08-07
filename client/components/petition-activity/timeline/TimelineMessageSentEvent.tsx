@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { Link, Text } from "@chakra-ui/core";
+import { Box, Link, Text, useDisclosure } from "@chakra-ui/core";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
+import { MessageSentEventModal } from "@parallel/components/common/MessageSentEventModal";
 import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -19,6 +20,12 @@ export function TimelineMessageSentEvent({
   event: { message, createdAt },
   userId,
 }: TimelineMessageSentEventProps) {
+  const {
+    isOpen: isEmailOpen,
+    onOpen: onOpenEmail,
+    onClose: onCloseEmail,
+  } = useDisclosure();
+
   return (
     <TimelineItem
       icon={
@@ -29,7 +36,7 @@ export function TimelineMessageSentEvent({
         />
       }
     >
-      <>
+      <Box onClick={onOpenEmail}>
         {message.scheduledAt ? (
           <FormattedMessage
             id="timeline.message-sent-description-scheduled"
@@ -82,7 +89,12 @@ export function TimelineMessageSentEvent({
           />
         )}
         <MessageEventsIndicator message={message} marginLeft={2} />
-      </>
+      </Box>
+      <MessageSentEventModal
+        message={message}
+        isOpen={isEmailOpen}
+        onClose={onCloseEmail}
+      />
     </TimelineItem>
   );
 }
@@ -96,6 +108,7 @@ TimelineMessageSentEvent.fragments = {
           fullName
         }
         emailSubject
+        emailBody
         scheduledAt
         access {
           contact {
@@ -105,8 +118,10 @@ TimelineMessageSentEvent.fragments = {
         ...MessageEventsIndicator_PetitionMessage
       }
       createdAt
+      ...MessageSentEventModal_MessageSentEvent
     }
     ${MessageEventsIndicator.fragments.PetitionMessage}
     ${ContactLink.fragments.Contact}
+    ${MessageSentEventModal.fragments.MessageSentEvent}
   `,
 };
