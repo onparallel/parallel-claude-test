@@ -5,7 +5,6 @@ import {
   Collapse,
   Flex,
   IconButton,
-  useColorMode,
 } from "@chakra-ui/core";
 import {
   ArrowUpDownIcon,
@@ -307,27 +306,15 @@ function _Table<TRow>({
 export const Table: typeof _Table = memo(_Table) as any;
 
 export function useTableColors() {
-  const { colorMode } = useColorMode();
   return useMemo(() => {
-    switch (colorMode) {
-      case "light":
-        return {
-          border: "gray.200",
-          header: "gray.50",
-          row: "white",
-          rowHover: "gray.50",
-          rowSelected: "purple.50",
-        };
-      case "dark":
-        return {
-          border: "gray.600",
-          header: "gray.700",
-          row: "gray.900",
-          rowHover: "gray.800",
-          rowSelected: "blue.900",
-        };
-    }
-  }, [colorMode]);
+    return {
+      border: "gray.200",
+      header: "gray.50",
+      row: "white",
+      rowHover: "gray.50",
+      rowSelected: "purple.50",
+    };
+  }, []);
 }
 
 function _Row<TRow>({

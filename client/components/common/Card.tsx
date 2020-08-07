@@ -1,11 +1,4 @@
-import {
-  Box,
-  CloseButton,
-  Flex,
-  Heading,
-  HeadingProps,
-  useColorMode,
-} from "@chakra-ui/core";
+import { Box, CloseButton, Flex, Heading, HeadingProps } from "@chakra-ui/core";
 import { forwardRef, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Divider } from "./Divider";
@@ -14,13 +7,12 @@ export const Card: typeof Box = forwardRef(function Card(
   { children, ...props },
   ref
 ) {
-  const { colorMode } = useColorMode();
   return (
     <Box
       ref={ref}
       as="section"
       borderWidth="1px"
-      backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
+      backgroundColor="white"
       boxShadow="md"
       borderRadius="md"
       {...props}

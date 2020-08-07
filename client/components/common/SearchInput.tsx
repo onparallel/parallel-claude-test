@@ -5,7 +5,6 @@ import {
   InputLeftElement,
   InputProps,
   InputRightElement,
-  useColorMode,
 } from "@chakra-ui/core";
 import { SearchIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
@@ -21,7 +20,6 @@ export const SearchInput = forwardRef(function SearchInput(
   { ...props }: SearchInputProps,
   ref: Ref<HTMLInputElement>
 ) {
-  const { colorMode } = useColorMode();
   const inputRef = useRef<HTMLInputElement>(null);
   const mergedRef = useMergeRefs(ref, inputRef);
   const intl = useIntl();
@@ -37,13 +35,7 @@ export const SearchInput = forwardRef(function SearchInput(
   return (
     <InputGroup size="md">
       <InputLeftElement>
-        <SearchIcon
-          color={
-            isActive
-              ? { light: "gray.800", dark: "whiteAlpha.900" }[colorMode]
-              : { light: "gray.400", dark: "whiteAlpha.400" }[colorMode]
-          }
-        />
+        <SearchIcon color={isActive ? "gray.800" : "gray.400"} />
       </InputLeftElement>
       <Input
         ref={mergedRef}

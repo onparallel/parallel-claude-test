@@ -13,7 +13,6 @@ import {
   Portal,
   Stack,
   Tooltip,
-  useColorMode,
 } from "@chakra-ui/core";
 import {
   AddIcon,
@@ -51,7 +50,6 @@ export const AppLayoutNavbar = Object.assign(
     onOnboardingClick,
     ...props
   }: AppLayoutNavbarProps) {
-    const { colorMode } = useColorMode();
     const { pathname } = useRouter();
     const intl = useIntl();
     const router = useRouter();
@@ -101,7 +99,7 @@ export const AppLayoutNavbar = Object.assign(
       <Flex
         alignItems="stretch"
         as="nav"
-        backgroundColor={{ light: "white", dark: "gray.900" }[colorMode]}
+        backgroundColor="white"
         {...(isMobile
           ? {
               flexDirection: "row",
@@ -129,10 +127,7 @@ export const AppLayoutNavbar = Object.assign(
                   cursor="pointer"
                   transition="transform 150ms"
                   _hover={{
-                    color: {
-                      light: "gray.900",
-                      dark: "purple.200",
-                    }[colorMode],
+                    color: "gray.900",
                     transform: "scale(1.1)",
                   }}
                 >
