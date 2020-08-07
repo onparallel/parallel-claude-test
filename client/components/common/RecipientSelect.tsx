@@ -21,7 +21,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, OptionProps } from "react-select";
+import { components, OptionProps, OptionsType } from "react-select";
 import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
 import { pick } from "remeda";
 import { useReactSelectStyle } from "../../utils/useReactSelectStyle";
@@ -244,8 +244,12 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
           }
         },
         getOptionValue: (option) => option.id,
-        isValidNewOption: (value: string) => {
-          return EMAIL_REGEX.test(value);
+        isValidNewOption: (
+          value: string,
+          _,
+          options: OptionsType<Recipient>
+        ) => {
+          return options.length === 0 && EMAIL_REGEX.test(value);
         },
         formatCreateLabel: (label: string) => {
           return (
