@@ -440,7 +440,7 @@ const AddFieldButton = forwardRef<
     >
       <AddFieldPopover
         as={IconButton}
-        aria-label={intl.formatMessage({
+        label={intl.formatMessage({
           id: "petition.add-field-button",
           defaultMessage: "Add field",
         })}

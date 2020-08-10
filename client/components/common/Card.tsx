@@ -5,7 +5,7 @@ import { Divider } from "./Divider";
 
 export const Card: typeof Box = forwardRef(function Card(
   { children, ...props },
-  ref: any
+  ref
 ) {
   return (
     <Box
@@ -20,7 +20,7 @@ export const Card: typeof Box = forwardRef(function Card(
       {children}
     </Box>
   );
-}) as any; // TODO: Try after rc.1 is fixed
+});
 
 export type CardHeaderProps = {
   children: ReactNode;

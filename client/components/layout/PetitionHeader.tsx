@@ -177,9 +177,11 @@ export function PetitionHeader({
       >
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
-            <Box marginRight={1}>
-              <PetitionStatusIndicator status={petition.status} isJustIcon />
-            </Box>
+            <PetitionStatusIndicator
+              marginRight={1}
+              status={petition.status}
+              isJustIcon
+            />
             <Editable
               display="flex"
               value={name}
