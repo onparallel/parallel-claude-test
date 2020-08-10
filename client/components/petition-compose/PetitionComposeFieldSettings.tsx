@@ -14,7 +14,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { SmallPopover } from "../common/SmallPopover";
-import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelect";
+import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
 
 export type PetitionComposeFieldSettingsProps = {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;

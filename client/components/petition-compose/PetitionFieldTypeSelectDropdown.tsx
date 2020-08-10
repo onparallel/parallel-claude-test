@@ -10,10 +10,12 @@ import {
   SelectProps,
   Text,
   useMenuContext,
+  Flex,
+  Heading,
 } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
-import { forwardRef, useEffect, useMemo, useRef } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
@@ -106,6 +108,7 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
   ref
 ) {
   const ownRef = useRef<HTMLDivElement>(null);
+  const [activeType, setActiveType] = useState("HEADING");
 
   // Until we can set the roles via props
   useEffect(() => {
@@ -131,16 +134,38 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
   }, [isOpen]);
 
   return (
-    <MenuList {...props} ref={useMergeRefs(ref, ownRef)}>
-      {FIELD_TYPES.map((type) => (
-        <MenuItem
-          key={type}
-          paddingY={2}
-          onClick={() => onSelectFieldType(type)}
-        >
-          <PetitionFieldTypeLabel type={type} />
-        </MenuItem>
-      ))}
+    <MenuList
+      as={Flex}
+      paddingY={0}
+      minWidth="360px"
+      {...props}
+      ref={useMergeRefs(ref, ownRef)}
+    >
+      <Box flex="1">
+        <Box paddingX={4} paddingY={2}>
+          <Heading size="sm">What do you need?</Heading>
+        </Box>
+        {FIELD_TYPES.map((type) => (
+          <MenuItem
+            key={type}
+            paddingY={2}
+            onClick={() => onSelectFieldType(type)}
+            onFocus={() => setActiveType(type)}
+            onHover={() => setActiveType(type)}
+          >
+            <PetitionFieldTypeLabel type={type} />
+          </MenuItem>
+        ))}
+      </Box>
+      <Box flex="1" backgroundColor="gray.100">
+        {activeType === "HEADING" ? (
+          <Box>I'm a heading</Box>
+        ) : activeType === "TEXT" ? (
+          <Box>I'm a text</Box>
+        ) : activeType === "FILE_UPLOAD" ? (
+          <Box>I'm a file upload</Box>
+        ) : null}
+      </Box>
     </MenuList>
   );
 });

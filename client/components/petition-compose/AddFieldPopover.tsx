@@ -2,7 +2,7 @@ import { Menu, MenuButton, Portal } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { FC, forwardRef } from "react";
-import { PetitionFieldTypeSelectDropdown } from "./PetitionFieldTypeSelect";
+import { PetitionFieldTypeSelectDropdown } from "./PetitionFieldTypeSelectDropdown";
 
 export type AddFieldPopoverProps = ExtendChakra<{
   onSelectFieldType: (type: PetitionFieldType) => void;
