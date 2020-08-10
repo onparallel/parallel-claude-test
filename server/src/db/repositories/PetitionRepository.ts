@@ -468,18 +468,44 @@ export class PetitionRepository extends BaseRepository {
     data: Omit<CreatePetition, "org_id" | "owner_id" | "status">,
     user: User
   ) {
-    const [row] = await this.insert("petition", {
-      org_id: user.org_id,
-      owner_id: user.id,
-      status: "DRAFT",
-      ...data,
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
+    return await this.knex.transaction(async (t) => {
+      const [row] = await this.insert(
+        "petition",
+        {
+          org_id: user.org_id,
+          owner_id: user.id,
+          status: "DRAFT",
+          ...data,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        },
+        t
+      );
+
+      const {
+        petition,
+      } = await this.createPetitionFieldAtPositionQueryTransaction(
+        row.id,
+        {
+          type: "HEADING",
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+          isFixed: true,
+        },
+        0,
+        user,
+        t
+      );
+      await this.createEvent(
+        row.id,
+        "PETITION_CREATED",
+        {
+          user_id: user.id,
+        },
+        t
+      );
+      return petition;
     });
-    await this.createEvent(row.id, "PETITION_CREATED", {
-      user_id: user.id,
-    });
-    return row;
   }
 
   /**
