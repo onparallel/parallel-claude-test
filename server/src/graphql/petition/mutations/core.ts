@@ -568,15 +568,19 @@ export const sendPetition = mutationField("sendPetition", {
       // Create necessary contacts
       const { ids: recipientIds } = fromGlobalIds(args.contactIds, "Contact");
       const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-      const [hasAccess, petition] = await Promise.all([
+      const [hasAccess, petition, fields] = await Promise.all([
         ctx.contacts.userHasAccessToContacts(ctx.user!.id, recipientIds),
         ctx.petitions.loadPetition(petitionId),
+        ctx.petitions.loadFieldsForPetition(petitionId),
       ]);
       if (!hasAccess) {
         throw new Error("No access to contacts");
       }
       if (!petition) {
         throw new Error("Petition not available");
+      }
+      if (fields.filter((f) => f.type !== "HEADING").length === 0) {
+        throw new Error("Petition has no repliable fields");
       }
       const accesses = await ctx.petitions.createAccesses(
         petitionId,
