@@ -834,6 +834,11 @@ type PetitionField {
   id: ID!
 
   """
+  Determines if the field can be moved or deleted.
+  """
+  isFixed: Boolean!
+
+  """
   Determines if the field accepts replies
   """
   isReadOnly: Boolean!
