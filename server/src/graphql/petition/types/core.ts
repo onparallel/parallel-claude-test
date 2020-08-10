@@ -171,6 +171,7 @@ export const PetitionField = objectType({
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
+      resolve: ({ optional, type }) => optional || type === "HEADING",
     });
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
