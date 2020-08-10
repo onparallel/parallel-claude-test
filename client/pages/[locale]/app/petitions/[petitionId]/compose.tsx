@@ -281,6 +281,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
               />
             ),
           });
+          const element = document.getElementById("menu-button-add-field");
+          element && element.click();
         } finally {
           return;
         }

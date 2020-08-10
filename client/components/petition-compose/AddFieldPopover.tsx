@@ -13,7 +13,7 @@ export const AddFieldPopover: FC<AddFieldPopoverProps> = forwardRef<
   AddFieldPopoverProps
 >(function AddFieldPopover({ onSelectFieldType, ...props }, ref) {
   return (
-    <Menu placement="bottom">
+    <Menu placement="bottom" id="add-field">
       <MenuButton ref={ref} {...props} />
       <Portal>
         <PetitionFieldTypeSelectDropdown
