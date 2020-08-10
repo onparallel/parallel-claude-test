@@ -271,13 +271,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
   const handleSend: PetitionComposeMessageEditorProps["onSend"] = useCallback(
     async ({ contactIds, schedule }) => {
-      if (petition!.fields.length === 0) {
+      if (petition!.fields.filter((f) => f.type !== "HEADING").length === 0) {
         try {
           await showErrorDialog({
             message: (
               <FormattedMessage
                 id="petition.no-fields-error"
-                defaultMessage="Please add at least one field to the petition."
+                defaultMessage="Please add at least one field with information you want to ask."
               />
             ),
           });
