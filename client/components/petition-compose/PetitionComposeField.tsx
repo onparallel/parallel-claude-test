@@ -109,7 +109,7 @@ export const PetitionComposeField = Object.assign(
         onFocus={onFocus}
         {...props}
       >
-        {isActive ? (
+        {isActive && !field.isFixed ? (
           <AddFieldButton
             className="add-field-before"
             position="absolute"
@@ -153,7 +153,7 @@ export const PetitionComposeField = Object.assign(
             justifyContent="center"
             padding={2}
             width="32px"
-            cursor="grab"
+            cursor={field.isFixed ? "unset" : "grab"}
             color="gray.400"
             _hover={{
               color: "gray.700",
@@ -163,7 +163,7 @@ export const PetitionComposeField = Object.assign(
               defaultMessage: "Drag to sort this petition fields",
             })}
           >
-            <DragHandleIcon role="presentation" />
+            {!field.isFixed ? <DragHandleIcon role="presentation" /> : null}
           </Box>
           {field.optional ? null : (
             <Box marginX={-2} position="relative">
@@ -193,7 +193,7 @@ export const PetitionComposeField = Object.assign(
             <PetitionFieldTypeIndicator
               type={field.type}
               index={index}
-              onClick={(event) => onSettingsClick(event)}
+              onClick={(event) => !field.isFixed && onSettingsClick(event)}
               marginTop="10px"
               alignSelf="flex-start"
             />
@@ -295,6 +295,7 @@ export const PetitionComposeField = Object.assign(
             />
             <IconButtonWithTooltip
               icon={<SettingsIcon />}
+              disabled={field.isFixed}
               size="sm"
               variant="ghost"
               placement="bottom"
@@ -307,6 +308,7 @@ export const PetitionComposeField = Object.assign(
             />
             <IconButtonWithTooltip
               icon={<DeleteIcon />}
+              disabled={field.isFixed}
               size="sm"
               variant="ghost"
               placement="bottom"
