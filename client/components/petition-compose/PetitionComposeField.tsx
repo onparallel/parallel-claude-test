@@ -89,7 +89,8 @@ export const PetitionComposeField = Object.assign(
     const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
       field.id,
       index,
-      onMove
+      onMove,
+      field.isFixed ? "FIXED_FIELD" : "FIELD"
     );
     const [title, setTitle] = useState(field.title);
     const [description, setDescription] = useState(field.description);
@@ -342,6 +343,7 @@ export const PetitionComposeField = Object.assign(
           description
           optional
           multiple
+          isFixed
         }
       `,
     },
@@ -351,7 +353,8 @@ export const PetitionComposeField = Object.assign(
 function useDragAndDrop(
   id: string,
   index: number,
-  onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void
+  onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void,
+  type = "FIELD"
 ) {
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -396,19 +399,22 @@ function useDragAndDrop(
         return;
       }
 
-      // Time to actually perform the action
-      onMove?.(dragIndex, hoverIndex);
+      if (type === "FIELD") {
+        // Time to actually perform the action
+        onMove?.(dragIndex, hoverIndex);
 
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      item.index = hoverIndex;
+        // Note: we're mutating the monitor item here!
+        // Generally it's better to avoid mutations,
+        // but it's good here for the sake of performance
+        // to avoid expensive index searches.
+        item.index = hoverIndex;
+      }
     },
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
-    item: { type: "FIELD", id, index },
+    item: { type, id, index },
+    canDrag: () => type === "FIELD",
     collect: (monitor: any) => {
       return {
         isDragging: monitor.isDragging(),

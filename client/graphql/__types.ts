@@ -649,6 +649,8 @@ export type PetitionField = {
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["ID"];
+  /** Determines if the field can be moved or deleted. */
+  isFixed: Scalars["Boolean"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */
@@ -1571,7 +1573,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "title" | "description" | "optional" | "multiple"
+  "id" | "type" | "title" | "description" | "optional" | "multiple" | "isFixed"
 >;
 
 export type PetitionComposeFieldList_PetitionFragment = {
@@ -2785,6 +2787,7 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     description
     optional
     multiple
+    isFixed
   }
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
