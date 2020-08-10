@@ -988,9 +988,9 @@ export class PetitionRepository extends BaseRepository {
     const repliesByFieldId = Object.fromEntries(
       fieldsIds.map((id, index) => [id, replies[index]])
     );
-    const canComplete = fields.every(
-      (f) => f.optional || repliesByFieldId[f.id].length > 0
-    );
+    const canComplete = fields
+      .filter((f) => f.type !== "HEADING")
+      .every((f) => f.optional || repliesByFieldId[f.id].length > 0);
     if (canComplete) {
       const petition = await this.knex.transaction(async (t) => {
         await this.from("petition_access", t)

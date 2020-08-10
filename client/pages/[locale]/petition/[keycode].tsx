@@ -162,7 +162,7 @@ function RecipientView({ keycode }: PublicPetitionProps) {
     async function () {
       setFinalized(true);
       const canFinalize = petition.fields.every(
-        (f) => f.optional || f.replies.length > 0
+        (f) => f.optional || f.replies.length > 0 || f.isReadOnly
       );
       if (canFinalize) {
         await completePetition({ variables: { keycode } });
