@@ -38,7 +38,7 @@ import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
-import { omit } from "remeda";
+import { omit, pick } from "remeda";
 
 function TextComponent({ element, attributes, styles, ...props }: any) {
   return createElement(Text, { ...props, ...attributes });
@@ -164,15 +164,19 @@ export function RichTextEditor({
 
   return (
     <Box
-      aria-disabled={formControl.isDisabled}
-      aria-invalid={formControl.isInvalid}
+      {...pick(formControl, [
+        "aria-invalid",
+        "aria-required",
+        "aria-readonly",
+        "aria-describedby",
+      ])}
       {...inputStyles}
     >
       <Slate editor={editor} value={value} onChange={onChange as any}>
-        <Toolbar disabled={formControl.isDisabled || formControl.isReadOnly} />
+        <Toolbar disabled={formControl.disabled || formControl.readOnly} />
         <Box maxHeight="360px" overflow="auto">
           <EditablePlugins
-            readOnly={formControl.isDisabled && formControl.isReadOnly}
+            readOnly={formControl.disabled || formControl.readOnly}
             style={style}
             plugins={plugins}
             {...props}
