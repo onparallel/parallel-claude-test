@@ -521,6 +521,7 @@ export interface NexusGenFieldTypes {
     comments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     description: string | null; // String
     id: string; // ID!
+    isFixed: boolean; // Boolean!
     isReadOnly: boolean; // Boolean!
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!

@@ -20,6 +20,24 @@ export function userHasAccessToPetitions<
   };
 }
 
+export function fieldIsNotFixed<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, string>
+>(argNameFIeldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const { id: fieldId } = fromGlobalId(
+        args[argNameFIeldId],
+        "PetitionField"
+      );
+      const field = await ctx.petitions.loadField(fieldId);
+      return !field!.isFixed;
+    } catch {}
+    return false;
+  };
+}
+
 export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,

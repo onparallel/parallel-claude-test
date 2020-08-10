@@ -33,6 +33,7 @@ import {
   repliesBelongsToField,
   repliesBelongsToPetition,
   userHasAccessToPetitions,
+  fieldIsNotFixed,
 } from "../authorizers";
 import {
   validateAccessesRemindersLeft,
@@ -272,7 +273,8 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     authenticate(),
     and(
       userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId")
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      fieldIsNotFixed("fieldId")
     )
   ),
   args: {

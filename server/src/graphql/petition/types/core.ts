@@ -179,7 +179,9 @@ export const PetitionField = objectType({
       description:
         "Determines if the content of this field has been validated.",
     });
-
+    t.boolean("isFixed", {
+      description: "Determines if the field can be moved or deleted.",
+    });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),

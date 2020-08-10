@@ -5,7 +5,7 @@ import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
-import { count, isDefined } from "../../util/remedaExtensions";
+import { count } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -568,10 +568,21 @@ export class PetitionRepository extends BaseRepository {
       const _ids = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
-        .select("id");
-      const ids = new Set(_ids.map((f) => f.id));
+        .select("id", "isFixed", "position")
+        .orderBy("position", "asc");
 
-      if (ids.size !== fieldIds.length || fieldIds.some((id) => !ids.has(id))) {
+      const ids = _ids.map((f) => f.id);
+      const fixedPositions = _ids.reduce<number[]>(
+        (positions, _id, index) =>
+          _id.isFixed ? positions.concat(index) : positions,
+        []
+      );
+
+      if (
+        ids.length !== fieldIds.length ||
+        fieldIds.some((id) => !ids.includes(id)) ||
+        fixedPositions.some((position) => ids[position] !== fieldIds[position]) // trying to reorder a fixed field
+      ) {
         throw new Error("Invalid petition field ids");
       }
 
@@ -625,10 +636,76 @@ export class PetitionRepository extends BaseRepository {
         "created_at",
         "updated_at",
         "validated",
+        "isFixed",
       ]),
       field.position + 1,
       user
     );
+  }
+
+  async createPetitionFieldAtPositionQueryTransaction(
+    petitionId: number,
+    data: Omit<CreatePetitionField, "petition_id" | "position">,
+    position: number,
+    user: User,
+    t: Transaction<any, any>
+  ) {
+    const [{ max }] = await this.from("petition_field")
+      .where({
+        petition_id: petitionId,
+        deleted_at: null,
+      })
+      .max("position");
+    if (max === null) {
+      position = 0;
+    } else {
+      position = position === -1 ? max + 1 : Math.min(max + 1, position);
+    }
+    const fieldIds = await this.from("petition_field", t)
+      .where("petition_id", petitionId)
+      .whereNull("deleted_at")
+      .where("position", ">=", position)
+      .update(
+        {
+          deleted_at: this.now(), // temporarily delete to avoid unique index constraint
+          position: this.knex.raw(`position + 1`),
+        },
+        "id"
+      );
+
+    const [[field], [petition]] = await Promise.all([
+      this.insert(
+        "petition_field",
+        {
+          petition_id: petitionId,
+          position,
+          ...data,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        },
+        t
+      ),
+      this.from("petition", t)
+        .where("id", petitionId)
+        .update(
+          {
+            status: this.knex.raw(
+              /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
+            ) as any,
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+          },
+          "*"
+        ),
+    ]);
+
+    if (fieldIds.length > 0) {
+      await this.from("petition_field", t)
+        .whereIn("id", fieldIds)
+        .update({ deleted_at: null });
+    }
+
+    return { field, petition };
   }
 
   async createPetitionFieldAtPosition(
@@ -638,62 +715,13 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return await this.knex.transaction(async (t) => {
-      const [{ max }] = await this.from("petition_field")
-        .where({
-          petition_id: petitionId,
-          deleted_at: null,
-        })
-        .max("position");
-      if (max === null) {
-        position = 0;
-      } else {
-        position = position === -1 ? max + 1 : Math.min(max + 1, position);
-      }
-      const fieldIds = await this.from("petition_field", t)
-        .where("petition_id", petitionId)
-        .whereNull("deleted_at")
-        .where("position", ">=", position)
-        .update(
-          {
-            deleted_at: this.now(), // temporarily delete to avoid unique index constraint
-            position: this.knex.raw(`position + 1`),
-          },
-          "id"
-        );
-
-      const [[field], [petition]] = await Promise.all([
-        this.insert(
-          "petition_field",
-          {
-            petition_id: petitionId,
-            position,
-            ...data,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          },
-          t
-        ),
-        this.from("petition", t)
-          .where("id", petitionId)
-          .update(
-            {
-              status: this.knex.raw(
-                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-              ) as any,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          ),
-      ]);
-
-      if (fieldIds.length > 0) {
-        await this.from("petition_field", t)
-          .whereIn("id", fieldIds)
-          .update({ deleted_at: null });
-      }
-
-      return { field, petition };
+      return await this.createPetitionFieldAtPositionQueryTransaction(
+        petitionId,
+        data,
+        position,
+        user,
+        t
+      );
     });
   }
 
@@ -711,6 +739,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petitionId,
           id: fieldId,
           deleted_at: null,
+          isFixed: false,
         });
 
       // TODO: delete replies
@@ -765,7 +794,13 @@ export class PetitionRepository extends BaseRepository {
             updated_by: updatedBy,
           },
           "*"
-        ),
+        )
+        .then(([updatedField]) => {
+          if (updatedField.isFixed && data.type !== undefined) {
+            throw new Error("can't update a fixed field type");
+          }
+          return [updatedField];
+        }),
       this.from("petition", t)
         .where({
           id: petitionId,
@@ -1107,7 +1142,8 @@ export class PetitionRepository extends BaseRepository {
   async createEvent<TType extends PetitionEventType>(
     petitionId: number,
     type: TType,
-    payload: MaybeArray<PetitionEventPayload<TType>>
+    payload: MaybeArray<PetitionEventPayload<TType>>,
+    t?: Transaction<any, any>
   ) {
     return await this.insert(
       "petition_event",
@@ -1115,7 +1151,8 @@ export class PetitionRepository extends BaseRepository {
         petition_id: petitionId,
         type,
         data,
-      }))
+      })),
+      t
     );
   }
 
@@ -1414,9 +1451,9 @@ export class PetitionRepository extends BaseRepository {
       ),
       comment?.published_at
         ? this.createEvent(petitionId, "COMMENT_DELETED", {
-        petition_field_id: petitionFieldId,
-        petition_field_comment_id: petitionFieldCommentId,
-        user_id: user.id,
+            petition_field_id: petitionFieldId,
+            petition_field_comment_id: petitionFieldCommentId,
+            user_id: user.id,
           })
         : null,
     ]);
@@ -1436,9 +1473,9 @@ export class PetitionRepository extends BaseRepository {
       ),
       comment?.published_at
         ? this.createEvent(petitionId, "COMMENT_DELETED", {
-        petition_field_id: petitionFieldId,
-        petition_field_comment_id: petitionFieldCommentId,
-        petition_access_id: access.id,
+            petition_field_id: petitionFieldId,
+            petition_field_comment_id: petitionFieldCommentId,
+            petition_access_id: access.id,
           })
         : null,
     ]);
