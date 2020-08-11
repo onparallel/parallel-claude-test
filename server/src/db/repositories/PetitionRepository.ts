@@ -468,7 +468,7 @@ export class PetitionRepository extends BaseRepository {
     data: Omit<CreatePetition, "org_id" | "owner_id" | "status">,
     user: User
   ) {
-    return await this.knex.transaction(async (t) => {
+    return await this.withTransaction(async (t) => {
       const [row] = await this.insert(
         "petition",
         {
@@ -482,9 +482,7 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      const {
-        petition,
-      } = await this.createPetitionFieldAtPositionQueryTransaction(
+      const { petition } = await this.createPetitionFieldAtPosition(
         row.id,
         {
           type: "HEADING",
@@ -590,7 +588,7 @@ export class PetitionRepository extends BaseRepository {
     fieldIds: number[],
     user: User
   ) {
-    return await this.knex.transaction(async (t) => {
+    return await this.withTransaction(async (t) => {
       const _ids = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
@@ -669,90 +667,75 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async createPetitionFieldAtPositionQueryTransaction(
-    petitionId: number,
-    data: Omit<CreatePetitionField, "petition_id" | "position">,
-    position: number,
-    user: User,
-    t: Transaction<any, any>
-  ) {
-    const [{ max }] = await this.from("petition_field")
-      .where({
-        petition_id: petitionId,
-        deleted_at: null,
-      })
-      .max("position");
-    if (max === null) {
-      position = 0;
-    } else {
-      position = position === -1 ? max + 1 : Math.min(max + 1, position);
-    }
-    const fieldIds = await this.from("petition_field", t)
-      .where("petition_id", petitionId)
-      .whereNull("deleted_at")
-      .where("position", ">=", position)
-      .update(
-        {
-          deleted_at: this.now(), // temporarily delete to avoid unique index constraint
-          position: this.knex.raw(`position + 1`),
-        },
-        "id"
-      );
-
-    const [[field], [petition]] = await Promise.all([
-      this.insert(
-        "petition_field",
-        {
-          petition_id: petitionId,
-          position,
-          ...data,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-        },
-        t
-      ),
-      this.from("petition", t)
-        .where("id", petitionId)
-        .update(
-          {
-            status: this.knex.raw(
-              /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-            ) as any,
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-          },
-          "*"
-        ),
-    ]);
-
-    if (fieldIds.length > 0) {
-      await this.from("petition_field", t)
-        .whereIn("id", fieldIds)
-        .update({ deleted_at: null });
-    }
-
-    return { field, petition };
-  }
-
   async createPetitionFieldAtPosition(
     petitionId: number,
     data: Omit<CreatePetitionField, "petition_id" | "position">,
     position: number,
-    user: User
+    user: User,
+    transaction?: Transaction<any, any>
   ) {
-    return await this.knex.transaction(async (t) => {
-      return await this.createPetitionFieldAtPositionQueryTransaction(
-        petitionId,
-        data,
-        position,
-        user,
-        t
-      );
-    });
+    return await this.withTransaction(async (t) => {
+      const [{ max }] = await this.from("petition_field")
+        .where({
+          petition_id: petitionId,
+          deleted_at: null,
+        })
+        .max("position");
+      if (max === null) {
+        position = 0;
+      } else {
+        position = position === -1 ? max + 1 : Math.min(max + 1, position);
+      }
+      const fieldIds = await this.from("petition_field", t)
+        .where("petition_id", petitionId)
+        .whereNull("deleted_at")
+        .where("position", ">=", position)
+        .update(
+          {
+            deleted_at: this.now(), // temporarily delete to avoid unique index constraint
+            position: this.knex.raw(`position + 1`),
+          },
+          "id"
+        );
+
+      const [[field], [petition]] = await Promise.all([
+        this.insert(
+          "petition_field",
+          {
+            petition_id: petitionId,
+            position,
+            ...data,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          },
+          t
+        ),
+        this.from("petition", t)
+          .where("id", petitionId)
+          .update(
+            {
+              status: this.knex.raw(
+                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
+              ) as any,
+              updated_at: this.now(),
+              updated_by: `User:${user.id}`,
+            },
+            "*"
+          ),
+      ]);
+
+      if (fieldIds.length > 0) {
+        await this.from("petition_field", t)
+          .whereIn("id", fieldIds)
+          .update({ deleted_at: null });
+      }
+
+      return { field, petition };
+    }, transaction);
   }
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
-    return await this.knex.transaction(async (t) => {
+    return await this.withTransaction(async (t) => {
       const [field] = await this.from("petition_field", t)
         .update(
           {
@@ -800,66 +783,51 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  private async updatePetitionFieldQueryTransaction(
-    petitionId: number,
-    fieldId: number,
-    data: Partial<CreatePetitionField>,
-    updatedBy: string,
-    t: Transaction<any, any>
-  ) {
-    const [[field], [petition]] = await Promise.all([
-      this.from("petition_field", t)
-        .where({
-          id: fieldId,
-          petition_id: petitionId,
-        })
-        .update(
-          {
-            ...data,
-            updated_at: this.now(),
-            updated_by: updatedBy,
-          },
-          "*"
-        )
-        .then(([updatedField]) => {
-          if (updatedField.is_fixed && data.type !== undefined) {
-            throw new Error("can't update a fixed field type");
-          }
-          return [updatedField];
-        }),
-      this.from("petition", t)
-        .where({
-          id: petitionId,
-        })
-        .update(
-          {
-            status: this.knex.raw(
-              /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-            ) as any,
-            updated_at: this.now(),
-            updated_by: updatedBy,
-          },
-          "*"
-        ),
-    ]);
-    return { field, petition };
-  }
-
   async updatePetitionField(
     petitionId: number,
     fieldId: number,
     data: Partial<CreatePetitionField>,
-    user: User
+    user: User,
+    transaction?: Transaction<any, any>
   ) {
-    return this.knex.transaction(async (t) => {
-      return await this.updatePetitionFieldQueryTransaction(
-        petitionId,
-        fieldId,
-        data,
-        `User:${user.id}`,
-        t
-      );
-    });
+    return this.withTransaction(async (t) => {
+      const [[field], [petition]] = await Promise.all([
+        this.from("petition_field", t)
+          .where({
+            id: fieldId,
+            petition_id: petitionId,
+          })
+          .update(
+            {
+              ...data,
+              updated_at: this.now(),
+              updated_by: `User:${user.id}`,
+            },
+            "*"
+          )
+          .then(([updatedField]) => {
+            if (updatedField.is_fixed && data.type !== undefined) {
+              throw new Error("can't update a fixed field type");
+            }
+            return [updatedField];
+          }),
+        this.from("petition", t)
+          .where({
+            id: petitionId,
+          })
+          .update(
+            {
+              status: this.knex.raw(
+                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
+              ) as any,
+              updated_at: this.now(),
+              updated_by: `User:${user.id}`,
+            },
+            "*"
+          ),
+      ]);
+      return { field, petition };
+    }, transaction);
   }
 
   async validateFieldData(
@@ -992,7 +960,7 @@ export class PetitionRepository extends BaseRepository {
       .filter((f) => f.type !== "HEADING")
       .every((f) => f.optional || repliesByFieldId[f.id].length > 0);
     if (canComplete) {
-      const petition = await this.knex.transaction(async (t) => {
+      const petition = await this.withTransaction(async (t) => {
         await this.from("petition_access", t)
           .where("petition_id", petitionId)
           .update(
@@ -1088,7 +1056,7 @@ export class PetitionRepository extends BaseRepository {
   );
 
   async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
-    const reminders = await this.knex.transaction(async (t) => {
+    const reminders = await this.withTransaction(async (t) => {
       await this.from("petition_access", t)
         .whereIn(
           "id",
@@ -1752,7 +1720,7 @@ export class PetitionRepository extends BaseRepository {
     type: PetitionFieldType,
     user: User
   ) {
-    return await this.knex.transaction(async (t) => {
+    return this.withTransaction(async (t) => {
       await this.from("petition_field_reply", t)
         .where({
           petition_field_id: fieldId,
@@ -1762,7 +1730,7 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: `User:${user.id}`,
         });
 
-      return await this.updatePetitionFieldQueryTransaction(
+      return await this.updatePetitionField(
         petitionId,
         fieldId,
         {
@@ -1770,7 +1738,7 @@ export class PetitionRepository extends BaseRepository {
           validated: false,
           ...defaultFieldOptions(type),
         },
-        `User:${user.id}`,
+        user,
         t
       );
     });

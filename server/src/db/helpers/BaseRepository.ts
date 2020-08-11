@@ -110,4 +110,12 @@ export class BaseRepository {
       };
     }
   }
+  protected async withTransaction<T>(
+    transactionScope: (t: Transaction) => Promise<T>,
+    transaction?: Transaction
+  ) {
+    return transaction
+      ? await transactionScope(transaction)
+      : await this.knex.transaction(transactionScope);
+  }
 }

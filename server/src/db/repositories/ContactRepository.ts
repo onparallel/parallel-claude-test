@@ -111,7 +111,7 @@ export class ContactRepository extends BaseRepository {
   }
 
   async deleteContactById(contactId: MaybeArray<number>, user: User) {
-    return await this.knex.transaction(async (t) => {
+    return await this.withTransaction(async (t) => {
       await this.from("contact", t)
         .update({
           deleted_at: this.now(),
