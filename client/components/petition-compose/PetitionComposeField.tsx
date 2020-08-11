@@ -197,7 +197,8 @@ export const PetitionComposeField = Object.assign(
             <PetitionFieldTypeIndicator
               type={field.type}
               index={index}
-              onClick={(event) => !field.isFixed && onSettingsClick(event)}
+              as={field.isFixed ? "div" : "button"}
+              onClick={field.isFixed ? undefined : (event) => onSettingsClick(event)}
               marginTop="10px"
               alignSelf="flex-start"
             />
