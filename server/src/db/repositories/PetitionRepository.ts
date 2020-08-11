@@ -884,8 +884,8 @@ export class PetitionRepository extends BaseRepository {
     const [[reply]] = await Promise.all([
       this.insert("petition_field_reply", {
         ...data,
-        updated_by: `Contact${contact.id}`,
-        created_by: `Contact${contact.id}`,
+        updated_by: `Contact:${contact.id}`,
+        created_by: `Contact:${contact.id}`,
       }),
       this.from("petition")
         .update({
