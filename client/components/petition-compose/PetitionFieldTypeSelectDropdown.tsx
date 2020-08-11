@@ -97,6 +97,8 @@ export const PetitionFieldTypeLabel = forwardRef<
 });
 
 export type PetitionFieldTypeSelectDropdownProps = MenuListProps & {
+  showHeader?: boolean;
+  showDescription?: boolean;
   onSelectFieldType: (type: PetitionFieldType) => void;
 };
 
@@ -104,7 +106,7 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
   HTMLDivElement,
   PetitionFieldTypeSelectDropdownProps
 >(function PetitionFieldTypeSelectDropdown(
-  { onSelectFieldType, role = "menu", ...props },
+  { onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
   ref
 ) {
   const ownRef = useRef<HTMLDivElement>(null);
@@ -137,85 +139,102 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
     <MenuList
       as={Flex}
       paddingY={0}
-      minWidth="500px"
+      minWidth={showDescription ? "500px" : "200px"}
+      overflow="hidden"
       {...props}
       ref={useMergeRefs(ref, ownRef)}
     >
-      <Box flex="1">
-        <Box paddingX={4} paddingY={2}>
-          <Heading size="sm">
-            <FormattedMessage
-              id="petition.add-field-button.question"
-              defaultMessage="What do you need?"
-            />
-          </Heading>
-        </Box>
-        {FIELD_TYPES.map((type) => (
-          <MenuItem
-            key={type}
-            paddingY={2}
-            onClick={() => onSelectFieldType(type)}
-            onFocus={() => setActiveType(type)}
-            onHover={() => setActiveType(type)}
-          >
-            <PetitionFieldTypeLabel type={type} />
-          </MenuItem>
-        ))}
-      </Box>
-      <Box flex="1" backgroundColor="gray.100" padding={4}>
-        {activeType === "HEADING" ? (
-          <Box>
-            <Heading as="h2" size="sm">
+      <Box flex="1" minWidth="200px">
+        {showHeader ? (
+          <Box paddingX={4} paddingY={3}>
+            <Heading size="sm">
               <FormattedMessage
-                id="petition.field-type.heading"
-                defaultMessage="Heading"
+                id="petition.add-field-button.question"
+                defaultMessage="What do you need?"
               />
             </Heading>
-            <Text paddingTop={2} fontSize="sm">
-              <FormattedMessage
-                id="petition.field-type.heading.description"
-                defaultMessage="Organize your petitions in sections or pages with a heading."
-              />
-            </Text>
-            <Text paddingTop={2} fontSize="sm">
-              <FormattedMessage
-                id="petition.field-type.heading.information-only"
-                defaultMessage="Headings are for information purposes only and do not collect information."
-              />
-            </Text>
-          </Box>
-        ) : activeType === "TEXT" ? (
-          <Box>
-            <Heading as="h2" size="sm">
-              <FormattedMessage
-                id="petition.field-type.text"
-                defaultMessage="Text input"
-              />
-            </Heading>
-            <Text paddingTop={2} fontSize="sm">
-              <FormattedMessage
-                id="petition.field-type.text.description"
-                defaultMessage="Obtain written information that is not stored in documents or other files."
-              />
-            </Text>
-          </Box>
-        ) : activeType === "FILE_UPLOAD" ? (
-          <Box>
-            <Heading as="h2" size="sm">
-              <FormattedMessage
-                id="petition.field-type.file-upload"
-                defaultMessage="File upload"
-              />
-            </Heading>
-            <Text paddingTop={2} fontSize="sm">
-              <FormattedMessage
-                id="petition.field-type.file-upload.description"
-                defaultMessage="Collect documents or other files in an organized way."
-              />
-            </Text>
           </Box>
         ) : null}
+        <Box>
+          <Box paddingBottom={2} paddingTop={showHeader ? 0 : 2}>
+            {FIELD_TYPES.map((type) => (
+              <MenuItem
+                key={type}
+                paddingY={2}
+                onClick={() => onSelectFieldType(type)}
+                onFocus={() => setActiveType(type)}
+                onHover={() => setActiveType(type)}
+              >
+                <PetitionFieldTypeLabel type={type} />
+              </MenuItem>
+            ))}
+          </Box>
+        </Box>
       </Box>
+      {showDescription ? (
+        <Box
+          flex="1"
+          minWidth="300px"
+          backgroundColor="gray.50"
+          borderLeft="1px solid"
+          borderLeftColor="gray.200"
+          paddingX={4}
+          paddingY={3}
+        >
+          {activeType === "HEADING" ? (
+            <Box>
+              <Heading as="h2" size="sm">
+                <FormattedMessage
+                  id="petition.field-type.heading"
+                  defaultMessage="Heading"
+                />
+              </Heading>
+              <Text paddingTop={2} fontSize="sm">
+                <FormattedMessage
+                  id="petition.field-type.heading.description"
+                  defaultMessage="Organize your petitions in sections or pages with a heading."
+                />
+              </Text>
+              <Text paddingTop={2} fontSize="sm">
+                <FormattedMessage
+                  id="petition.field-type.heading.information-only"
+                  defaultMessage="Headings are for information purposes only and do not collect information."
+                />
+              </Text>
+            </Box>
+          ) : activeType === "TEXT" ? (
+            <Box>
+              <Heading as="h2" size="sm">
+                <FormattedMessage
+                  id="petition.field-type.text"
+                  defaultMessage="Text input"
+                />
+              </Heading>
+              <Text paddingTop={2} fontSize="sm">
+                <FormattedMessage
+                  id="petition.field-type.text.description"
+                  defaultMessage="Obtain written information that is not stored in documents or other files."
+                />
+              </Text>
+            </Box>
+          ) : activeType === "FILE_UPLOAD" ? (
+            <Box>
+              <Heading as="h2" size="sm">
+                <FormattedMessage
+                  id="petition.field-type.file-upload"
+                  defaultMessage="File upload"
+                />
+              </Heading>
+              <Text paddingTop={2} fontSize="sm">
+                <FormattedMessage
+                  id="petition.field-type.file-upload.description"
+                  defaultMessage="Collect documents or other files in an organized way."
+                />
+              </Text>
+            </Box>
+          ) : null}
+        </Box>
+      ) : null}
     </MenuList>
   );
 });

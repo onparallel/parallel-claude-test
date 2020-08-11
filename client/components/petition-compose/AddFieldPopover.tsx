@@ -17,6 +17,8 @@ export const AddFieldPopover: FC<AddFieldPopoverProps> = forwardRef<
       <MenuButton ref={ref} {...props} />
       <Portal>
         <PetitionFieldTypeSelectDropdown
+          showDescription
+          showHeader
           onSelectFieldType={onSelectFieldType}
         />
       </Portal>
