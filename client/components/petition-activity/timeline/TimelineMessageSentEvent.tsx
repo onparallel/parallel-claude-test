@@ -36,7 +36,7 @@ export function TimelineMessageSentEvent({
         />
       }
     >
-      <Box onClick={onOpenEmail}>
+      <Box onClick={onOpenEmail} style={{ display: "inline-block" }}>
         {message.scheduledAt ? (
           <FormattedMessage
             id="timeline.message-sent-description-scheduled"
@@ -116,12 +116,12 @@ TimelineMessageSentEvent.fragments = {
           }
         }
         ...MessageEventsIndicator_PetitionMessage
+        ...MessageSentEventModal_MessageSentData
       }
       createdAt
-      ...MessageSentEventModal_MessageSentEvent
     }
     ${MessageEventsIndicator.fragments.PetitionMessage}
     ${ContactLink.fragments.Contact}
-    ${MessageSentEventModal.fragments.MessageSentEvent}
+    ${MessageSentEventModal.fragments.MessageSentData}
   `,
 };

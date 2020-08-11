@@ -11,21 +11,19 @@ import {
   ModalProps,
   Text,
 } from "@chakra-ui/core";
-import { MessageSentEventModal_MessageSentEventFragment } from "@parallel/graphql/__types";
+import { MessageSentEventModal_MessageSentDataFragment } from "@parallel/graphql/__types";
 import { RenderSlate } from "@parallel/utils/RenderSlate";
 import { FormattedMessage } from "react-intl";
 import { ContactLink } from "./ContactLink";
 
 export type MessageSentEventModalProps = Omit<ModalProps, "children"> & {
-  message: MessageSentEventModal_MessageSentEventFragment;
+  message: MessageSentEventModal_MessageSentDataFragment;
 };
 
 export function MessageSentEventModal({
   message,
   ...props
 }: MessageSentEventModalProps) {
-  console.log(message);
-
   return (
     <Modal {...props} size="xl" isCentered>
       <ModalOverlay>
@@ -36,7 +34,7 @@ export function MessageSentEventModal({
             <Text fontSize={14}></Text>
             <Text paddingBottom={2} fontSize={14}>
               <FormattedMessage id="generic.to" defaultMessage="to" />{" "}
-              <ContactLink contact={message.access.contact} />
+              <ContactLink contact={message.access.contact!} />
             </Text>
             <Divider />
             <Box paddingTop={2}>
@@ -50,15 +48,13 @@ export function MessageSentEventModal({
 }
 
 MessageSentEventModal.fragments = {
-  MessageSentEvent: gql`
-    fragment MessageSentEventModal_MessageSentEvent on MessageSentEvent {
-      message {
-        emailBody
-        emailSubject
-        access {
-          contact {
-            ...ContactLink_Contact
-          }
+  MessageSentData: gql`
+    fragment MessageSentEventModal_MessageSentData on PetitionMessage {
+      emailBody
+      emailSubject
+      access {
+        contact {
+          ...ContactLink_Contact
         }
       }
     }
