@@ -180,10 +180,7 @@ export function CreatePetitionDialog({
       }
       confirm={
         <Button type="submit" colorScheme="purple" isDisabled={!isValid}>
-          <FormattedMessage
-            id="component.create-petition-dialog.continue-button"
-            defaultMessage="Continue"
-          />
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
       {...props}

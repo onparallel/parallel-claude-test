@@ -1153,14 +1153,6 @@ export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   "id" | "fullName" | "email"
 >;
 
-export type MessageSentEventModal_PetitionMessageFragment = {
-  __typename?: "PetitionMessage";
-} & Pick<PetitionMessage, "emailBody" | "emailSubject"> & {
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
-  };
-
 export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
   User,
   "onboardingStatus"
@@ -1219,6 +1211,14 @@ export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
 } & Pick<PetitionMessage, "bouncedAt" | "deliveredAt" | "openedAt">;
+
+export type MessageSentEventModal_PetitionMessageFragment = {
+  __typename?: "PetitionMessage";
+} & Pick<PetitionMessage, "emailBody" | "emailSubject"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
 
 export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
@@ -1565,6 +1565,10 @@ export type ConfirmDeletePetitionsDialog_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name">;
 
+export type PetitionFieldsIndex_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "title" | "type" | "options">;
+
 export type PetitionSettingsModal_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "status" | "locale" | "deadline">;
@@ -1686,6 +1690,40 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
     >;
   };
 
+export type RecipientViewContentsCard_PublicUserFragment = {
+  __typename?: "PublicUser";
+} & Pick<PublicUser, "firstName">;
+
+export type RecipientViewContentsCard_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status"> & {
+    fields: Array<
+      {
+        __typename?: "PublicPetitionField";
+      } & RecipientViewContentsCard_PublicPetitionFieldFragment
+    >;
+  };
+
+export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<
+  PublicPetitionField,
+  "id" | "type" | "title" | "options" | "optional" | "isReadOnly"
+> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id"
+      >
+    >;
+    comments: Array<
+      { __typename?: "PublicPetitionFieldComment" } & Pick<
+        PublicPetitionFieldComment,
+        "id" | "isUnread" | "publishedAt"
+      >
+    >;
+  };
+
 export type RecipientViewPetitionField_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
 } & Pick<
@@ -1741,25 +1779,24 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentF
     >;
   };
 
-export type RecipientViewProgressCard_PublicUserFragment = {
-  __typename?: "PublicUser";
-} & Pick<PublicUser, "firstName">;
-
-export type RecipientViewProgressCard_PublicPetitionFragment = {
+export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status"> & {
     fields: Array<
-      { __typename?: "PublicPetitionField" } & Pick<
-        PublicPetitionField,
-        "id" | "optional" | "isReadOnly"
-      > & {
-          replies: Array<
-            { __typename?: "PublicPetitionFieldReply" } & Pick<
-              PublicPetitionFieldReply,
-              "id"
-            >
-          >;
-        }
+      {
+        __typename?: "PublicPetitionField";
+      } & RecipientViewProgressFooter_PublicPetitionFieldFragment
+    >;
+  };
+
+export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<PublicPetitionField, "id" | "optional" | "isReadOnly"> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id"
+      >
     >;
   };
 
@@ -2015,7 +2052,8 @@ export type PetitionCompose_PetitionFragment = {
 export type PetitionCompose_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & PetitionComposeField_PetitionFieldFragment &
-  PetitionComposeFieldSettings_PetitionFieldFragment;
+  PetitionComposeFieldSettings_PetitionFieldFragment &
+  PetitionFieldsIndex_PetitionFieldFragment;
 
 export type PetitionCompose_UserFragment = {
   __typename?: "User";
@@ -2187,12 +2225,17 @@ export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
     fields: Array<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "isReadOnly"> &
-        PetitionRepliesField_PetitionFieldFragment &
-        PetitionRepliesFieldComments_PetitionFieldFragment &
-        DownloadAllDialog_PetitionFieldFragment
+      { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionFragment;
+
+export type PetitionReplies_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "isReadOnly"> &
+  PetitionRepliesField_PetitionFieldFragment &
+  PetitionFieldsIndex_PetitionFieldFragment &
+  PetitionRepliesFieldComments_PetitionFieldFragment &
+  DownloadAllDialog_PetitionFieldFragment;
 
 export type PetitionReplies_UserFragment = {
   __typename?: "User";
@@ -2481,19 +2524,25 @@ export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "id" | "status" | "deadline"> & {
     fields: Array<
-      { __typename?: "PublicPetitionField" } & Pick<
-        PublicPetitionField,
-        "id" | "isReadOnly"
-      > &
-        RecipientViewPetitionField_PublicPetitionFieldFragment &
-        RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment
+      {
+        __typename?: "PublicPetitionField";
+      } & RecipientView_PublicPetitionFieldFragment
     >;
-  };
+  } & RecipientViewContentsCard_PublicPetitionFragment &
+  RecipientViewProgressFooter_PublicPetitionFragment;
+
+export type RecipientView_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<PublicPetitionField, "id"> &
+  RecipientViewPetitionField_PublicPetitionFieldFragment &
+  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment &
+  RecipientViewContentsCard_PublicPetitionFieldFragment &
+  RecipientViewProgressFooter_PublicPetitionFieldFragment;
 
 export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
 } & RecipientViewSenderCard_PublicUserFragment &
-  RecipientViewProgressCard_PublicUserFragment;
+  RecipientViewContentsCard_PublicUserFragment;
 
 export type RecipientView_publicDeletePetitionReplyMutationVariables = Exact<{
   replyId: Scalars["ID"];
@@ -2803,19 +2852,6 @@ export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
     id
     fullName
     email
-  }
-`;
-export const RecipientViewProgressCard_PublicPetitionFragmentDoc = gql`
-  fragment RecipientViewProgressCard_PublicPetition on PublicPetition {
-    status
-    fields {
-      id
-      optional
-      isReadOnly
-      replies {
-        id
-      }
-    }
   }
 `;
 export const Contact_PetitionAccessFragmentDoc = gql`
@@ -3324,13 +3360,23 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     isReadOnly
   }
 `;
+export const PetitionFieldsIndex_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldsIndex_PetitionField on PetitionField {
+    id
+    title
+    type
+    options
+  }
+`;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {
     ...PetitionComposeField_PetitionField
     ...PetitionComposeFieldSettings_PetitionField
+    ...PetitionFieldsIndex_PetitionField
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionComposeMessageEditor_Petition on Petition {
@@ -3445,21 +3491,29 @@ export const DownloadAllDialog_PetitionFieldFragmentDoc = gql`
     }
   }
 `;
+export const PetitionReplies_PetitionFieldFragmentDoc = gql`
+  fragment PetitionReplies_PetitionField on PetitionField {
+    isReadOnly
+    ...PetitionRepliesField_PetitionField
+    ...PetitionFieldsIndex_PetitionField
+    ...PetitionRepliesFieldComments_PetitionField
+    ...DownloadAllDialog_PetitionField
+  }
+  ${PetitionRepliesField_PetitionFieldFragmentDoc}
+  ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
+  ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
+  ${DownloadAllDialog_PetitionFieldFragmentDoc}
+`;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
     ...PetitionLayout_Petition
     fields {
-      isReadOnly
-      ...PetitionRepliesField_PetitionField
-      ...PetitionRepliesFieldComments_PetitionField
-      ...DownloadAllDialog_PetitionField
+      ...PetitionReplies_PetitionField
     }
   }
   ${PetitionLayout_PetitionFragmentDoc}
-  ${PetitionRepliesField_PetitionFieldFragmentDoc}
-  ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
-  ${DownloadAllDialog_PetitionFieldFragmentDoc}
+  ${PetitionReplies_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
@@ -3594,20 +3648,79 @@ export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmen
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
+export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewContentsCard_PublicPetitionField on PublicPetitionField {
+    id
+    type
+    title
+    options
+    optional
+    isReadOnly
+    replies {
+      id
+    }
+    comments {
+      id
+      isUnread
+      publishedAt
+    }
+  }
+`;
+export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
+    id
+    optional
+    isReadOnly
+    replies {
+      id
+    }
+  }
+`;
+export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
+  fragment RecipientView_PublicPetitionField on PublicPetitionField {
+    id
+    ...RecipientViewPetitionField_PublicPetitionField
+    ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
+    ...RecipientViewContentsCard_PublicPetitionField
+    ...RecipientViewProgressFooter_PublicPetitionField
+  }
+  ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
+  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
+  ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
+  ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
+`;
+export const RecipientViewContentsCard_PublicPetitionFragmentDoc = gql`
+  fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
+    status
+    fields {
+      ...RecipientViewContentsCard_PublicPetitionField
+    }
+  }
+  ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
+`;
+export const RecipientViewProgressFooter_PublicPetitionFragmentDoc = gql`
+  fragment RecipientViewProgressFooter_PublicPetition on PublicPetition {
+    status
+    fields {
+      ...RecipientViewProgressFooter_PublicPetitionField
+    }
+  }
+  ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
+`;
 export const RecipientView_PublicPetitionFragmentDoc = gql`
   fragment RecipientView_PublicPetition on PublicPetition {
     id
     status
     deadline
     fields {
-      id
-      isReadOnly
-      ...RecipientViewPetitionField_PublicPetitionField
-      ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
+      ...RecipientView_PublicPetitionField
     }
+    ...RecipientViewContentsCard_PublicPetition
+    ...RecipientViewProgressFooter_PublicPetition
   }
-  ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
-  ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragmentDoc}
+  ${RecipientView_PublicPetitionFieldFragmentDoc}
+  ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
+  ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 `;
 export const RecipientViewSenderCard_PublicUserFragmentDoc = gql`
   fragment RecipientViewSenderCard_PublicUser on PublicUser {
@@ -3622,18 +3735,18 @@ export const RecipientViewSenderCard_PublicUserFragmentDoc = gql`
     }
   }
 `;
-export const RecipientViewProgressCard_PublicUserFragmentDoc = gql`
-  fragment RecipientViewProgressCard_PublicUser on PublicUser {
+export const RecipientViewContentsCard_PublicUserFragmentDoc = gql`
+  fragment RecipientViewContentsCard_PublicUser on PublicUser {
     firstName
   }
 `;
 export const RecipientView_PublicUserFragmentDoc = gql`
   fragment RecipientView_PublicUser on PublicUser {
     ...RecipientViewSenderCard_PublicUser
-    ...RecipientViewProgressCard_PublicUser
+    ...RecipientViewContentsCard_PublicUser
   }
   ${RecipientViewSenderCard_PublicUserFragmentDoc}
-  ${RecipientViewProgressCard_PublicUserFragmentDoc}
+  ${RecipientViewContentsCard_PublicUserFragmentDoc}
 `;
 export const RecipientView_deletePetitionReply_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientView_deletePetitionReply_PublicPetitionField on PublicPetitionField {

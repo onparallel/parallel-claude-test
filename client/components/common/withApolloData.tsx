@@ -136,6 +136,9 @@ export function withApolloData<P = {}>(
           };
         }
       } catch (error) {
+        if (error instanceof RedirectError) {
+          return redirect(context, error.pathname, error.asHref);
+        }
         const code = error?.graphQLErrors?.[0]?.extensions?.code;
         if (code === "UNAUTHENTICATED") {
           redirect(
@@ -169,4 +172,10 @@ export function withApolloData<P = {}>(
       }
     },
   });
+}
+
+export class RedirectError extends Error {
+  constructor(public pathname: string, public asHref: string) {
+    super();
+  }
 }

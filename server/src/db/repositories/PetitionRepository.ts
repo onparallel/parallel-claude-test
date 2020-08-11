@@ -489,6 +489,7 @@ export class PetitionRepository extends BaseRepository {
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
           is_fixed: true,
+          ...defaultFieldOptions("HEADING"),
         },
         0,
         user,

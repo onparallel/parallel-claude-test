@@ -5,13 +5,9 @@ import {
   Flex,
   Heading,
   Image,
-  List,
-  ListIcon,
-  ListItem,
   Text,
   useTheme,
 } from "@chakra-ui/core";
-import { CheckIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";

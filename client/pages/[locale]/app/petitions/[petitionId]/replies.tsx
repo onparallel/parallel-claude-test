@@ -20,7 +20,6 @@ import {
   PetitionRepliesField,
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
-import { PetitionHeadingField } from "@parallel/components/common/PetitionHeadingField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import {
   PetitionFieldReply,
@@ -56,6 +55,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -249,11 +249,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     });
   }
 
-  function getFieldIndex(fieldId: string): number {
-    return petition!.fields
-      .filter((f) => !f.isReadOnly)
-      .findIndex((f) => f.id === fieldId);
-  }
+  const handleIndexFieldClick = useCallback((fieldId: string) => {
+    const fieldElement = document.querySelector(`#field-${fieldId}`);
+    if (fieldElement) {
+      scrollIntoView(fieldElement, { scrollMode: "if-needed" });
+    }
+  }, []);
 
   return (
     <PetitionLayout
@@ -316,61 +317,53 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       <Divider />
       <Box flex="1" overflow="auto">
         <PaneWithFlyout
-          isActive={Boolean(activeFieldId)}
+          isFlyoutActive={Boolean(activeFieldId)}
           alignWith={activeFieldElement}
           flyout={
             <Box padding={4} paddingLeft={{ md: 0 }}>
-              <PetitionRepliesFieldComments
-                key={activeFieldId!}
-                field={activeField!}
-                userId={me.id}
-                onClose={() => setActiveFieldId(null)}
-                onAddComment={handleAddComment}
-                onUpdateComment={handleUpdateComment}
-                onDeleteComment={handleDeleteComment}
-              />
+              {activeFieldId ? (
+                <PetitionRepliesFieldComments
+                  key={activeFieldId!}
+                  field={activeField!}
+                  userId={me.id}
+                  onClose={() => setActiveFieldId(null)}
+                  onAddComment={handleAddComment}
+                  onUpdateComment={handleUpdateComment}
+                  onDeleteComment={handleDeleteComment}
+                />
+              ) : (
+                <PetitionFieldsIndex
+                  fields={petition!.fields}
+                  onFieldClick={handleIndexFieldClick}
+                  maxHeight="calc(100vh - 10rem)"
+                />
+              )}
             </Box>
           }
         >
           <Stack flex="2" spacing={4} padding={4} id="petition-replies">
-            {petition!.fields.map((field, index) => {
-              switch (field.type) {
-                case "HEADING":
-                  return (
-                    <PetitionHeadingField
-                      key={field.id}
-                      id={field.id}
-                      title={field.title}
-                      description={field.description}
-                    />
-                  );
-                default:
-                  return (
-                    <PetitionRepliesField
-                      id={`field-${field.id}`}
-                      key={field.id}
-                      field={field}
-                      index={getFieldIndex(field.id)}
-                      highlighted={activeFieldId === field.id}
-                      onValidateToggle={() =>
-                        handleValidateToggle([field.id], !field.validated)
-                      }
-                      onAction={handleAction}
-                      isActive={activeFieldId === field.id}
-                      commentCount={index}
-                      newCommentCount={index > 1 ? index - 1 : 0}
-                      onToggleComments={() =>
-                        setActiveFieldId(
-                          activeFieldId === field.id ? null : field.id
-                        )
-                      }
-                      onUpdateReplyStatus={(replyId, status) =>
-                        handleUpdateRepliesStatus(field.id, [replyId], status)
-                      }
-                    />
-                  );
-              }
-            })}
+            {petition!.fields.map((field, index) => (
+              <PetitionRepliesField
+                id={`field-${field.id}`}
+                key={field.id}
+                field={field}
+                index={index}
+                highlighted={activeFieldId === field.id}
+                onValidateToggle={() =>
+                  handleValidateToggle([field.id], !field.validated)
+                }
+                onAction={handleAction}
+                isActive={activeFieldId === field.id}
+                commentCount={index}
+                newCommentCount={index > 1 ? index - 1 : 0}
+                onToggleComments={() =>
+                  setActiveFieldId(activeFieldId === field.id ? null : field.id)
+                }
+                onUpdateReplyStatus={(replyId, status) =>
+                  handleUpdateRepliesStatus(field.id, [replyId], status)
+                }
+              />
+            ))}
           </Stack>
         </PaneWithFlyout>
       </Box>
@@ -379,28 +372,42 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 }
 
 PetitionReplies.fragments = {
-  Petition: gql`
-    fragment PetitionReplies_Petition on Petition {
-      id
-      ...PetitionLayout_Petition
-      fields {
+  get Petition() {
+    return gql`
+      fragment PetitionReplies_Petition on Petition {
+        id
+        ...PetitionLayout_Petition
+        fields {
+          ...PetitionReplies_PetitionField
+        }
+      }
+      ${PetitionLayout.fragments.Petition}
+      ${this.PetitionField}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PetitionReplies_PetitionField on PetitionField {
         isReadOnly
         ...PetitionRepliesField_PetitionField
+        ...PetitionFieldsIndex_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...DownloadAllDialog_PetitionField
       }
-    }
-    ${PetitionLayout.fragments.Petition}
-    ${PetitionRepliesField.fragments.PetitionField}
-    ${PetitionRepliesFieldComments.fragments.PetitionField}
-    ${DownloadAllDialog.fragments.PetitionField}
-  `,
-  User: gql`
-    fragment PetitionReplies_User on User {
-      ...PetitionLayout_User
-    }
-    ${PetitionLayout.fragments.User}
-  `,
+      ${PetitionRepliesField.fragments.PetitionField}
+      ${PetitionRepliesFieldComments.fragments.PetitionField}
+      ${DownloadAllDialog.fragments.PetitionField}
+      ${PetitionFieldsIndex.fragments.PetitionField}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment PetitionReplies_User on User {
+        ...PetitionLayout_User
+      }
+      ${PetitionLayout.fragments.User}
+    `;
+  },
 };
 
 PetitionReplies.mutations = [

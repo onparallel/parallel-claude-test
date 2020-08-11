@@ -10,6 +10,7 @@ import {
   Switch,
   Text,
   VisuallyHidden,
+  Heading,
 } from "@chakra-ui/core";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -35,13 +36,14 @@ import {
   CloseIcon,
   CommentIcon,
 } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
   reply: PetitionRepliesField_PetitionFieldReplyFragment;
 };
 
-export type PetitionRepliesFieldProps = BoxProps & {
+export type PetitionRepliesFieldProps = ExtendChakra<{
   field: PetitionRepliesField_PetitionFieldFragment;
   index: number;
   highlighted: boolean;
@@ -55,7 +57,7 @@ export type PetitionRepliesFieldProps = BoxProps & {
     status: PetitionFieldReplyStatus
   ) => void;
   onValidateToggle: () => void;
-};
+}>;
 
 export function PetitionRepliesField({
   field,
@@ -71,13 +73,60 @@ export function PetitionRepliesField({
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
-  return (
+  return field.type === "HEADING" ? (
+    <Stack
+      spacing={1}
+      paddingX={{ base: 4, md: 6 }}
+      paddingY={2}
+      as="section"
+      {...props}
+    >
+      <Flex alignItems="center">
+        <PetitionFieldTypeIndicator
+          marginLeft="1px"
+          type={field.type}
+          index={index}
+        />
+        <Box flex="1" minWidth="0">
+          {field.title ? (
+            <Heading marginLeft={4} size="md" isTruncated>
+              {field.title}
+            </Heading>
+          ) : (
+            <Heading
+              marginLeft={4}
+              size="md"
+              color="gray.500"
+              fontWeight="normal"
+              fontStyle="italic"
+              isTruncated
+            >
+              <FormattedMessage
+                id="generic.empty-heading"
+                defaultMessage="Untitled heading"
+              />
+            </Heading>
+          )}
+        </Box>
+      </Flex>
+      {field.description ? (
+        <Text
+          color="gray.600"
+          height="1rem"
+          fontSize="sm"
+          overflowWrap="anywhere"
+        >
+          <BreakLines text={field.description} />
+        </Text>
+      ) : null}
+    </Stack>
+  ) : (
     <Card
       display="flex"
       flexDirection="column"
       position="relative"
       backgroundColor={highlighted ? "purple.50" : "white"}
-      paddingY={{ base: 4 }}
+      paddingY={4}
       paddingX={{ base: 4, md: 6 }}
       {...props}
     >
@@ -150,7 +199,7 @@ export function PetitionRepliesField({
             <CommentsButton
               isActive={isShowingComments}
               commentCount={field.comments.length}
-              hasNewComments={field.comments.some((c) => c.isUnread)}
+              hasUnreadComments={field.comments.some((c) => c.isUnread)}
               hasUnpublishedComments={field.comments.some(
                 (c) => !c.publishedAt
               )}
@@ -336,12 +385,18 @@ const CommentsButton = forwardRef<
   HTMLButtonElement,
   {
     commentCount: number;
-    hasNewComments: boolean;
+    hasUnreadComments: boolean;
     hasUnpublishedComments: boolean;
     isActive: boolean;
   } & ButtonProps
 >(function CommentsButton(
-  { commentCount, hasNewComments, hasUnpublishedComments, isActive, ...props },
+  {
+    commentCount,
+    hasUnreadComments,
+    hasUnpublishedComments,
+    isActive,
+    ...props
+  },
   ref
 ) {
   const intl = useIntl();
@@ -367,9 +422,9 @@ const CommentsButton = forwardRef<
       {...common}
       ref={ref}
     >
-      {hasNewComments || hasUnpublishedComments ? (
+      {hasUnreadComments || hasUnpublishedComments ? (
         <Box
-          {...(!hasNewComments
+          {...(!hasUnreadComments
             ? { borderColor: "yellow.500" }
             : !hasUnpublishedComments
             ? { borderColor: isActive ? "white" : "purple.500" }

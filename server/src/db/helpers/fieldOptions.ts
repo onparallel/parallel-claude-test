@@ -45,6 +45,13 @@ export function defaultFieldOptions(
   type: PetitionFieldType
 ): Partial<CreatePetitionField> {
   switch (type) {
+    case "HEADING": {
+      return {
+        options: {
+          hasPageBreak: false,
+        },
+      };
+    }
     case "TEXT":
       return {
         optional: false,

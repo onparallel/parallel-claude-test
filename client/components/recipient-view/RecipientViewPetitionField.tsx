@@ -38,6 +38,7 @@ import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
 export type CreateReply = CreateReplyText | CreateReplyFileUpload;
 
@@ -66,7 +67,35 @@ export function RecipientViewPetitionField({
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
 
-  return (
+  return field.type === "HEADING" ? (
+    <Stack spacing={1} {...props} paddingX={2} paddingY={2}>
+      {field.title ? (
+        <Heading size="md">{field.title}</Heading>
+      ) : (
+        <Heading
+          size="md"
+          color="gray.500"
+          fontWeight="normal"
+          fontStyle="italic"
+        >
+          <FormattedMessage
+            id="generic.empty-heading"
+            defaultMessage="Untitled heading"
+          />
+        </Heading>
+      )}
+      {field.description ? (
+        <Text
+          color="gray.600"
+          height="1rem"
+          fontSize="sm"
+          overflowWrap="anywhere"
+        >
+          <BreakLines text={field.description} />
+        </Text>
+      ) : null}
+    </Stack>
+  ) : (
     <Card
       padding={4}
       overflow="hidden"
@@ -81,7 +110,19 @@ export function RecipientViewPetitionField({
       <Flex alignItems="baseline">
         <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
-            {field.title}
+            {field.title || (
+              <Text
+                as="span"
+                color="gray.500"
+                fontWeight="normal"
+                fontStyle="italic"
+              >
+                <FormattedMessage
+                  id="generic.untitled-field"
+                  defaultMessage="Untitled field"
+                />
+              </Text>
+            )}
             {field.optional ? (
               <Text
                 as="span"
@@ -112,7 +153,7 @@ export function RecipientViewPetitionField({
         </Box>
         <CommentsButton
           commentCount={field.comments.length}
-          hasNewComments={field.comments.some((c) => c.isUnread)}
+          hasUnreadComments={field.comments.some((c) => c.isUnread)}
           hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
           onClick={onOpenCommentsClick}
         />
@@ -469,11 +510,11 @@ const CommentsButton = forwardRef<
   HTMLButtonElement,
   {
     commentCount: number;
-    hasNewComments: boolean;
+    hasUnreadComments: boolean;
     hasUnpublishedComments: boolean;
   } & ButtonProps
 >(function CommentsButton(
-  { commentCount, hasNewComments, hasUnpublishedComments, ...props },
+  { commentCount, hasUnreadComments, hasUnpublishedComments, ...props },
   ref
 ) {
   const intl = useIntl();
@@ -493,24 +534,11 @@ const CommentsButton = forwardRef<
   } as const;
   return commentCount > 0 ? (
     <Button rightIcon={<CommentIcon />} {...common}>
-      {hasNewComments || hasUnpublishedComments ? (
-        <Box
-          {...(!hasNewComments
-            ? { borderColor: "yellow.500" }
-            : !hasUnpublishedComments
-            ? { borderColor: "purple.500" }
-            : {
-                borderLeftColor: "yellow.500",
-                borderTopColor: "yellow.500",
-                borderRightColor: "purple.500",
-                borderBottomColor: "purple.500",
-              })}
-          borderWidth="4px"
-          transform="rotate(-45deg)"
-          borderRadius="9999px"
-          marginRight={2}
-        />
-      ) : null}
+      <RecipientViewCommentsBadge
+        hasUnreadComments={hasUnreadComments}
+        hasUnpublishedComments={hasUnpublishedComments}
+        marginRight={2}
+      />
       {intl.formatNumber(commentCount)}
     </Button>
   ) : (

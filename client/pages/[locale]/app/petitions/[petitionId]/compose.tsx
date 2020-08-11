@@ -53,6 +53,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
+import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -387,6 +388,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petition]
   );
 
+  const handleIndexFieldClick = useCallback((fieldId: string) => {
+    const fieldElement = document.querySelector(`#field-${fieldId}`);
+    if (fieldElement) {
+      scrollIntoView(fieldElement, { scrollMode: "if-needed" });
+      focusField(fieldId);
+    }
+  }, []);
+
   function focusField(fieldId: string) {
     setTimeout(() => {
       const title = document.querySelector<HTMLElement>(
@@ -407,11 +416,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       state={petitionState}
     >
       <PaneWithFlyout
-        isActive={showSettings}
-        alignWith={activeFieldElement}
+        isFlyoutActive={showSettings}
+        alignWith={showSettings ? activeFieldElement : null}
         flyout={
-          showSettings && (
-            <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
+          <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
+            {showSettings ? (
               <PetitionComposeFieldSettings
                 key={activeField!.id}
                 field={activeField!}
@@ -419,8 +428,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 onFieldTypeChange={handleFieldTypeChange}
                 onClose={handleSettingsClose}
               />
-            </Box>
-          )
+            ) : (
+              <PetitionFieldsIndex
+                fields={petition!.fields}
+                onFieldClick={handleIndexFieldClick}
+                maxHeight={`calc(100vh - 6rem)`}
+              />
+            )}
+          </Box>
         }
       >
         <Box padding={4}>
@@ -484,30 +499,41 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 }
 
 PetitionCompose.fragments = {
-  Petition: gql`
-    fragment PetitionCompose_Petition on Petition {
-      id
-      ...PetitionLayout_Petition
-      fields {
-        ...PetitionCompose_PetitionField
+  get Petition() {
+    return gql`
+      fragment PetitionCompose_Petition on Petition {
+        id
+        ...PetitionLayout_Petition
+        fields {
+          ...PetitionCompose_PetitionField
+        }
+        ...PetitionComposeMessageEditor_Petition
       }
-      ...PetitionComposeMessageEditor_Petition
-    }
-    fragment PetitionCompose_PetitionField on PetitionField {
-      ...PetitionComposeField_PetitionField
-      ...PetitionComposeFieldSettings_PetitionField
-    }
-    ${PetitionLayout.fragments.Petition}
-    ${PetitionComposeField.fragments.PetitionField}
-    ${PetitionComposeFieldSettings.fragments.PetitionField}
-    ${PetitionComposeMessageEditor.fragments.Petition}
-  `,
-  User: gql`
-    fragment PetitionCompose_User on User {
-      ...PetitionLayout_User
-    }
-    ${PetitionLayout.fragments.User}
-  `,
+      ${PetitionLayout.fragments.Petition}
+      ${PetitionComposeMessageEditor.fragments.Petition}
+      ${this.PetitionField}
+    `;
+  },
+  get PetitionField() {
+    return gql`
+      fragment PetitionCompose_PetitionField on PetitionField {
+        ...PetitionComposeField_PetitionField
+        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionFieldsIndex_PetitionField
+      }
+      ${PetitionComposeField.fragments.PetitionField}
+      ${PetitionComposeFieldSettings.fragments.PetitionField}
+      ${PetitionFieldsIndex.fragments.PetitionField}
+    `;
+  },
+  get User() {
+    return gql`
+      fragment PetitionCompose_User on User {
+        ...PetitionLayout_User
+      }
+      ${PetitionLayout.fragments.User}
+    `;
+  },
 };
 
 PetitionCompose.mutations = [

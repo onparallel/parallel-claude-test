@@ -10,14 +10,14 @@ import {
   Text,
   Stack,
 } from "@chakra-ui/core";
-import { MessageSentEventModal_MessageSentDataFragment } from "@parallel/graphql/__types";
+import { MessageSentEventModal_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { RenderSlate } from "@parallel/utils/RenderSlate";
 import { FormattedMessage } from "react-intl";
 import { ContactLink } from "../common/ContactLink";
 import { Divider } from "../common/Divider";
 
 export type MessageSentEventModalProps = Omit<ModalProps, "children"> & {
-  message: MessageSentEventModal_MessageSentDataFragment;
+  message: MessageSentEventModal_PetitionMessageFragment;
 };
 
 export function MessageSentEventModal({

@@ -118,7 +118,9 @@ export function PetitionComposeFieldSettings({
             </SettingsRow>
           </>
         ) : null}
-        {field.type === "FILE_UPLOAD" ? (
+        {field.type === "HEADING" ? (
+          <HeadingSettings field={field} onFieldEdit={onFieldEdit} />
+        ) : field.type === "FILE_UPLOAD" ? (
           <FileUploadSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "TEXT" ? (
           <TextSettings field={field} onFieldEdit={onFieldEdit} />
@@ -128,11 +130,50 @@ export function PetitionComposeFieldSettings({
   );
 }
 
+function HeadingSettings({
+  field,
+  onFieldEdit,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
+  const options = field.options as FieldOptions["HEADING"];
+  return (
+    <SettingsRow
+      label={
+        <FormattedMessage
+          id="field-settings.heading-page-break-label"
+          defaultMessage="Start new page"
+        />
+      }
+      description={
+        <Text fontSize="sm">
+          <FormattedMessage
+            id="field-settings.heading-page-break-description"
+            defaultMessage="Enabling this will create a new page and use this as the heading of the new page"
+          />
+        </Text>
+      }
+      controlId="heading-page-break"
+    >
+      <Switch
+        height="20px"
+        display="block"
+        id="heading-page-break"
+        color="green"
+        isChecked={options.hasPageBreak}
+        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          onFieldEdit(field.id, {
+            options: { ...field.options, hasPageBreak: event.target.checked },
+          })
+        }
+      />
+    </SettingsRow>
+  );
+}
+
 function FileUploadSettings({
   field,
   onFieldEdit,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
-  // const options: FieldOptions["FILE_UPLOAD"] = field.options as any;
+  // const options = field.options as FieldOptions["FILE_UPLOAD"];
   return <></>;
 }
 
@@ -140,7 +181,7 @@ function TextSettings({
   field,
   onFieldEdit: onFieldEdit,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
-  const options: FieldOptions["TEXT"] = field.options as any;
+  const options = field.options as FieldOptions["TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
   const handlePlaceholderChange = function (

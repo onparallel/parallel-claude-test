@@ -147,7 +147,7 @@ export const PetitionComposeField = Object.assign(
           }}
         >
           {field.isFixed ? (
-            <div style={{ width: "32px" }} />
+            <Box width="32px" />
           ) : (
             <Box
               ref={dragRef}
@@ -198,9 +198,7 @@ export const PetitionComposeField = Object.assign(
               type={field.type}
               index={index}
               as={field.isFixed ? "div" : "button"}
-              onClick={
-                field.isFixed ? undefined : (event) => onSettingsClick(event)
-              }
+              onClick={field.isFixed ? undefined : onSettingsClick}
               marginTop="10px"
               alignSelf="flex-start"
             />

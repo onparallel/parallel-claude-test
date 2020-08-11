@@ -10,18 +10,19 @@ import {
   Stack,
   Text,
   useToast,
+  useDisclosure,
 } from "@chakra-ui/core";
-import { NakedLink } from "@parallel/components/common/Link";
-import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
+  RedirectError,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
+import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
-import { RecipientViewProgressCard } from "@parallel/components/recipient-view/RecipientViewProgressCard";
+import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
-import RecipientViewSideLinks from "@parallel/components/recipient-view/RecipientViewSideLinks";
 import {
   CreateFileUploadReplyInput,
   CreateTextReplyInput,
@@ -38,6 +39,7 @@ import {
   RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFragment,
+  RecipientView_PublicPetitionFieldFragment,
   RecipientView_updatePetitionFieldCommentMutationVariables,
   usePublicPetitionQuery,
   useRecipientView_createPetitionFieldCommentMutation,
@@ -52,31 +54,43 @@ import {
   useRecipientView_updatePetitionFieldCommentMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
+import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import axios, { CancelTokenSource } from "axios";
-import { useCallback, useEffect, useState } from "react";
+import Head from "next/head";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   CreateReply,
   RecipientViewPetitionField,
-} from "../../../components/recipient-view/RecipientViewPetitionField";
-import Head from "next/head";
-import { PetitionHeadingField } from "@parallel/components/common/PetitionHeadingField";
+} from "../../../../components/recipient-view/RecipientViewPetitionField";
+import { useRouter } from "next/router";
+import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import ResizeObserver from "react-resize-observer";
+import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
+import { QuestionIcon } from "@parallel/chakra/icons";
 
 type PublicPetitionProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
 >;
 
-function RecipientView({ keycode }: PublicPetitionProps) {
+function RecipientView({
+  keycode,
+  currentPage,
+  pageCount,
+}: PublicPetitionProps) {
   const intl = useIntl();
+  const router = useRouter();
   const {
     data: { access },
   } = assertQuery(usePublicPetitionQuery({ variables: { keycode } }));
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
+
+  const fields = useGetPageFields(petition.fields, currentPage);
+
   const [showCompletedAlert, setShowCompletedAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
   const createTextReply = useCreateTextReply();
@@ -183,15 +197,22 @@ function RecipientView({ keycode }: PublicPetitionProps) {
           isClosable: true,
         });
       } else {
-        // Scroll to first field without replies
-        const field = petition.fields.find(
-          (f) => f.replies.length === 0 && !f.optional
-        )!;
-        const node = document.querySelector(`#field-${field.id}`)!;
-        scrollIntoView(node);
+        // go to first field without replies
+        let page = 1;
+        const field = petition.fields.find((f, index) => {
+          if (f.type === "HEADING" && f.options?.hasPageBreak) {
+            page += 1;
+          }
+          return f.replies.length === 0 && !f.optional;
+        })!;
+        const { keycode, locale } = router.query;
+        router.push(
+          "/[locale]/petition/[keycode]/[page]",
+          `/${locale}/petition/${keycode}/${page}#field-${field.id}`
+        );
       }
     },
-    [petition.fields, granter]
+    [petition.fields, granter, router.query]
   );
 
   const [selectedFieldId, setSelectedFieldId] = useState<Maybe<string>>(null);
@@ -275,73 +296,23 @@ function RecipientView({ keycode }: PublicPetitionProps) {
     }
   }, [selectedFieldId]);
 
+  const [sidebarTop, setSidebarTop] = useState(0);
+  const readjustHeight = useCallback(function (rect: DOMRect) {
+    setSidebarTop(rect.height + 16);
+  }, []);
+
+  const { onOpen: handleOpenHelp, ...helpModal } = useHelpModal();
+
   const breakpoint = "md";
   return (
     <>
       <Head>
-        <title>Parallel</title>
+        {fields[0]?.type === "HEADING" && fields[0].title ? (
+          <title>{fields[0].title} | Parallel</title>
+        ) : (
+          <title>Parallel</title>
+        )}
       </Head>
-      <Box position="sticky" top={0} zIndex={2}>
-        {showCompletedAlert && petition.status === "COMPLETED" ? (
-          <Alert status="success" variant="subtle" zIndex={2}>
-            <Flex
-              maxWidth="container.lg"
-              alignItems="center"
-              marginX="auto"
-              width="100%"
-              paddingLeft={4}
-              paddingRight={12}
-            >
-              <AlertIcon />
-              <AlertDescription>
-                <FormattedMessage
-                  id="recipient-view.petition-completed-alert"
-                  defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
-                />
-              </AlertDescription>
-            </Flex>
-            <CloseButton
-              position="absolute"
-              right="8px"
-              top="8px"
-              onClick={() => setShowCompletedAlert(false)}
-            />
-          </Alert>
-        ) : null}
-        {pendingComments ? (
-          <Box backgroundColor="yellow.100" boxShadow="sm">
-            <Flex
-              maxWidth="container.lg"
-              alignItems="center"
-              marginX="auto"
-              width="100%"
-              paddingX={4}
-              paddingY={2}
-            >
-              <Text flex="1" color="yellow.900">
-                <FormattedMessage
-                  id="recipient-view.submit-unpublished-comments-text"
-                  defaultMessage="You have some pending comments. Submit them at once to notify {sender} in a single email."
-                  values={{ sender: <b>{granter.fullName}</b> }}
-                />
-              </Text>
-              <Button
-                colorScheme="yellow"
-                size="sm"
-                marginLeft={4}
-                onClick={handleSubmitUnpublished}
-                isDisabled={isSubmitting}
-              >
-                <FormattedMessage
-                  id="recipient-view.submit-unpublished-comments-button"
-                  defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-                  values={{ commentCount: pendingComments }}
-                />
-              </Button>
-            </Flex>
-          </Box>
-        ) : null}
-      </Box>
       <Flex
         backgroundColor="gray.50"
         minHeight="100vh"
@@ -349,148 +320,198 @@ function RecipientView({ keycode }: PublicPetitionProps) {
         flexDirection="column"
         alignItems="center"
       >
+        <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
+          {showCompletedAlert && petition.status === "COMPLETED" ? (
+            <Alert status="success" variant="subtle" zIndex={2}>
+              <Flex
+                maxWidth="container.lg"
+                alignItems="center"
+                marginX="auto"
+                width="100%"
+                paddingLeft={4}
+                paddingRight={12}
+              >
+                <AlertIcon />
+                <AlertDescription>
+                  <FormattedMessage
+                    id="recipient-view.petition-completed-alert"
+                    defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
+                  />
+                </AlertDescription>
+              </Flex>
+              <CloseButton
+                position="absolute"
+                right="8px"
+                top="8px"
+                onClick={() => setShowCompletedAlert(false)}
+              />
+            </Alert>
+          ) : null}
+          {pendingComments ? (
+            <Box backgroundColor="yellow.100" boxShadow="sm">
+              <Flex
+                maxWidth="container.lg"
+                alignItems="center"
+                marginX="auto"
+                width="100%"
+                paddingX={4}
+                paddingY={2}
+              >
+                <Text flex="1" color="yellow.900">
+                  <FormattedMessage
+                    id="recipient-view.submit-unpublished-comments-text"
+                    defaultMessage="You have some pending comments. Submit them at once to notify {sender} in a single email."
+                    values={{ sender: <b>{granter.fullName}</b> }}
+                  />
+                </Text>
+                <Button
+                  colorScheme="yellow"
+                  size="sm"
+                  marginLeft={4}
+                  onClick={handleSubmitUnpublished}
+                  isDisabled={isSubmitting}
+                >
+                  <FormattedMessage
+                    id="recipient-view.submit-unpublished-comments-button"
+                    defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
+                    values={{ commentCount: pendingComments }}
+                  />
+                </Button>
+              </Flex>
+            </Box>
+          ) : null}
+          <ResizeObserver onResize={readjustHeight} />
+        </Box>
         <Flex
+          flex="1"
           flexDirection={{ base: "column", [breakpoint]: "row" }}
           width="100%"
           maxWidth="container.lg"
           paddingX={4}
-          paddingTop={8}
-          marginBottom={4}
         >
           <Box
             flex="1"
+            minWidth={0}
             marginRight={{ base: 0, [breakpoint]: 4 }}
             marginBottom={4}
           >
-            <Box position="sticky" top={8}>
-              <RecipientViewSenderCard sender={granter} marginBottom={4} />
-              <RecipientViewProgressCard
+            <Stack
+              spacing={4}
+              position={{ base: "relative", [breakpoint]: "sticky" }}
+              top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
+            >
+              <RecipientViewSenderCard sender={granter} />
+              <RecipientViewContentsCard
+                currentPage={currentPage}
                 sender={granter}
                 petition={petition}
                 onFinalize={handleFinalize}
                 display={{ base: "none", [breakpoint]: "flex" }}
-                marginBottom={4}
               />
-              <RecipientViewSideLinks
-                display={{ base: "none", [breakpoint]: "block" }}
-              />
-            </Box>
+              <Button variant="ghost" onClick={handleOpenHelp}>
+                <FormattedMessage
+                  id="recipient-view.need-help"
+                  defaultMessage="Help"
+                />
+              </Button>
+            </Stack>
           </Box>
-          <Stack flex="2" spacing={4}>
-            {petition.fields.map((field) => {
-              switch (field.type) {
-                case "HEADING":
-                  return (
-                    <PetitionHeadingField
-                      id={field.id}
-                      title={field.title}
-                      description={field.description}
-                    />
-                  );
-                default:
-                  return (
-                    <RecipientViewPetitionField
-                      key={field.id}
-                      id={`field-${field.id}`}
-                      field={field}
-                      isInvalid={
-                        finalized &&
-                        field.replies.length === 0 &&
-                        !field.optional
-                      }
-                      uploadProgress={uploadProgress[field.id]}
-                      contactId={contact.id}
-                      onOpenCommentsClick={() => setSelectedFieldId(field.id)}
-                      onCreateReply={(payload) =>
-                        handleCreateReply(field.id, payload)
-                      }
-                      onDeleteReply={(replyId) =>
-                        handleDeleteReply(field.id, replyId)
-                      }
-                    />
-                  );
-              }
-            })}
-          </Stack>
-        </Flex>
-        <RecipientViewSideLinks
-          textAlign="center"
-          display={{ base: "block", [breakpoint]: "none" }}
-        />
-        <Spacer />
-        <Flex
-          as="footer"
-          justifyContent="center"
-          paddingTop={4}
-          paddingBottom={8}
-        >
-          <Flex flexDirection="column" alignItems="center">
-            <Text as="span" fontSize="sm" marginBottom={2}>
-              <FormattedMessage
-                id="recipient-view.powered-by"
-                defaultMessage="Powered by"
-              />
-            </Text>
-            <NakedLink href="/" passHref>
-              <Box
-                as="a"
-                color="gray.700"
-                _hover={{ color: "gray.800" }}
-                _focus={{ color: "gray.800" }}
-                _active={{ color: "gray.900" }}
-              >
-                <Logo width="100px" />
-              </Box>
-            </NakedLink>
+          <Flex flexDirection="column" flex="2" minWidth={0}>
+            <Stack spacing={4}>
+              {fields.map((field) => (
+                <RecipientViewPetitionField
+                  key={field.id}
+                  id={`field-${field.id}`}
+                  field={field}
+                  isInvalid={
+                    finalized && field.replies.length === 0 && !field.optional
+                  }
+                  uploadProgress={uploadProgress[field.id]}
+                  contactId={contact.id}
+                  onOpenCommentsClick={() => setSelectedFieldId(field.id)}
+                  onCreateReply={(payload) =>
+                    handleCreateReply(field.id, payload)
+                  }
+                  onDeleteReply={(replyId) =>
+                    handleDeleteReply(field.id, replyId)
+                  }
+                />
+              ))}
+            </Stack>
+            <Spacer />
+            <RecipientViewPagination
+              marginTop={8}
+              currentPage={currentPage}
+              pageCount={pageCount}
+            />
+            <RecipientViewFooter marginTop={12} />
           </Flex>
         </Flex>
-        <RecipientViewProgressCard
-          width="100%"
-          sender={granter}
+        <Spacer />
+        <RecipientViewProgressFooter
           petition={petition}
           onFinalize={handleFinalize}
-          isStickyFooter
-          display={{ base: "flex", [breakpoint]: "none" }}
         />
       </Flex>
-      {selectedField ? (
+      {selectedField && (
         <RecipientViewPetitionFieldCommentsDialog
+          isOpen={Boolean(selectedField)}
+          onClose={() => setSelectedFieldId(null)}
           field={selectedField}
           contactId={contact.id}
-          onClose={() => setSelectedFieldId(null)}
           onAddComment={handleAddComment}
           onDeleteComment={handleDeleteComment}
           onUpdateComment={handleUpdateComment}
         />
-      ) : null}
+      )}
+      <RecipientViewHelpModal {...helpModal} />
     </>
   );
 }
 
 RecipientView.fragments = {
-  PublicPetition: gql`
-    fragment RecipientView_PublicPetition on PublicPetition {
-      id
-      status
-      deadline
-      fields {
+  get PublicPetition() {
+    return gql`
+      fragment RecipientView_PublicPetition on PublicPetition {
         id
-        isReadOnly
+        status
+        deadline
+        fields {
+          ...RecipientView_PublicPetitionField
+        }
+        ...RecipientViewContentsCard_PublicPetition
+        ...RecipientViewProgressFooter_PublicPetition
+      }
+      ${this.PublicPetitionField}
+      ${RecipientViewContentsCard.fragments.PublicPetition}
+      ${RecipientViewProgressFooter.fragments.PublicPetition}
+    `;
+  },
+  get PublicPetitionField() {
+    return gql`
+      fragment RecipientView_PublicPetitionField on PublicPetitionField {
+        id
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
+        ...RecipientViewContentsCard_PublicPetitionField
+        ...RecipientViewProgressFooter_PublicPetitionField
       }
-    }
-    ${RecipientViewPetitionField.fragments.PublicPetitionField}
-    ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
-  `,
-  PublicUser: gql`
-    fragment RecipientView_PublicUser on PublicUser {
-      ...RecipientViewSenderCard_PublicUser
-      ...RecipientViewProgressCard_PublicUser
-    }
-    ${RecipientViewSenderCard.fragments.PublicUser}
-    ${RecipientViewProgressCard.fragments.PublicUser}
-  `,
+      ${RecipientViewPetitionField.fragments.PublicPetitionField}
+      ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
+      ${RecipientViewContentsCard.fragments.PublicPetitionField}
+      ${RecipientViewProgressFooter.fragments.PublicPetitionField}
+    `;
+  },
+  get PublicUser() {
+    return gql`
+      fragment RecipientView_PublicUser on PublicUser {
+        ...RecipientViewSenderCard_PublicUser
+        ...RecipientViewContentsCard_PublicUser
+      }
+      ${RecipientViewSenderCard.fragments.PublicUser}
+      ${RecipientViewContentsCard.fragments.PublicUser}
+    `;
+  },
 };
 
 RecipientView.mutations = [
@@ -934,12 +955,58 @@ function useDeletePetitionFieldComment() {
   );
 }
 
+function useGetPageFields(
+  fields: RecipientView_PublicPetitionFieldFragment[],
+  page: number
+) {
+  return useMemo(() => {
+    const _fields: RecipientView_PublicPetitionFieldFragment[] = [];
+    for (const field of fields) {
+      if (field.type === "HEADING" && field.options!.hasPageBreak) {
+        page -= 1;
+      }
+      if (page === 0) {
+        break;
+      } else if (page === 1) {
+        _fields.push(field);
+      } else {
+        continue;
+      }
+    }
+    return _fields;
+  }, [fields, page]);
+}
+
+function useHelpModal() {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  useEffect(() => {
+    const key = "recipient-first-time-check";
+    if (!window.localStorage.getItem(key)) {
+      onOpen();
+      window.localStorage.setItem(key, "check");
+    }
+  }, []);
+  return { isOpen, onClose, onOpen };
+}
+
 RecipientView.getInitialProps = async ({
   query,
+  pathname,
   fetchQuery,
 }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
-  await fetchQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
+  const page = parseInt(query.page as string);
+  if (!Number.isInteger(page) || page <= 0) {
+    throw new RedirectError(
+      pathname,
+      resolveUrl(pathname, { ...query, page: "1" })
+    );
+  }
+
+  const result = await fetchQuery<
+    PublicPetitionQuery,
+    PublicPetitionQueryVariables
+  >(
     gql`
       query PublicPetition($keycode: ID!) {
         access(keycode: $keycode) {
@@ -961,7 +1028,20 @@ RecipientView.getInitialProps = async ({
       variables: { keycode },
     }
   );
-  return { keycode };
+  if (!result.data?.access?.petition) {
+    throw new Error();
+  }
+  const pageCount =
+    result.data.access.petition.fields.filter(
+      (f) => f.type === "HEADING" && f.options!.hasPageBreak
+    ).length + 1;
+  if (page > pageCount) {
+    throw new RedirectError(
+      pathname,
+      resolveUrl(pathname, { ...query, page: "1" })
+    );
+  }
+  return { keycode, currentPage: page, pageCount };
 };
 
 export default withApolloData(RecipientView);

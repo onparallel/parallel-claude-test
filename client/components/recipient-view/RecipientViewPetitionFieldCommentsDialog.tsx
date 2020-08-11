@@ -16,6 +16,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  ModalProps,
   ModalOverlay,
   Portal,
   Stack,
@@ -45,7 +46,6 @@ import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
@@ -55,15 +55,14 @@ export function RecipientViewPetitionFieldCommentsDialog({
   onAddComment,
   onDeleteComment,
   onUpdateComment,
-  onClose,
+  ...props
 }: {
   contactId: string;
   field: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
   onAddComment: (content: string) => void;
   onDeleteComment: (commentId: string) => void;
   onUpdateComment: (commentId: string, content: string) => void;
-  onClose: () => void;
-}) {
+} & ModalProps) {
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
@@ -107,7 +106,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   const isExpanded = Boolean(inputFocused || draft);
 
   return (
-    <Modal isOpen={true} onClose={onClose}>
+    <Modal {...props}>
       <ModalOverlay>
         <ModalContent borderRadius="md" maxHeight="calc(100vh - 7.5rem)">
           <ModalHeader fontSize="lg" fontWeight="bold">

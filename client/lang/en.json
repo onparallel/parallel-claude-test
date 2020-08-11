@@ -50,11 +50,6 @@
     "context": "Add a deadline"
   },
   {
-    "term": "component.create-petition-dialog.continue-button",
-    "definition": "Continue",
-    "context": "Continue"
-  },
-  {
     "term": "component.create-petition-dialog.header",
     "definition": "Creating petition",
     "context": "Creating petition"
@@ -460,11 +455,6 @@
     "context": "Delete contacts"
   },
   {
-    "term": "contacts.create-new-contact.continue-button",
-    "definition": "Continue",
-    "context": "Continue"
-  },
-  {
     "term": "contacts.create-new-contact.header",
     "definition": "Enter the contact details",
     "context": "Enter the contact details"
@@ -548,6 +538,16 @@
     "term": "field-settings.file-multiple-label",
     "definition": "Allow multiple file uploads",
     "context": "Allow multiple file uploads"
+  },
+  {
+    "term": "field-settings.heading-page-break-description",
+    "definition": "Enabling this will create a new page and use this as the heading of the new page",
+    "context": "Enabling this will create a new page and use this as the heading of the new page"
+  },
+  {
+    "term": "field-settings.heading-page-break-label",
+    "definition": "Start new page",
+    "context": "Start new page"
   },
   {
     "term": "field-settings.multiple-description",
@@ -640,6 +640,11 @@
     "context": "Yes, delete"
   },
   {
+    "term": "generic.continue",
+    "definition": "Continue",
+    "context": "Continue"
+  },
+  {
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete"
@@ -668,6 +673,11 @@
     "term": "generic.edited-comment-indicator",
     "definition": "Edited",
     "context": "Edited"
+  },
+  {
+    "term": "generic.empty-heading",
+    "definition": "Untitled heading",
+    "context": "Untitled heading"
   },
   {
     "term": "generic.expand",
@@ -815,9 +825,19 @@
     "context": "Go back"
   },
   {
+    "term": "generic.go-to-page",
+    "definition": "Go to page {page}",
+    "context": "Go to page {page}"
+  },
+  {
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options..."
+  },
+  {
+    "term": "generic.next-page",
+    "definition": "Next page",
+    "context": "Next page"
   },
   {
     "term": "generic.no-deadline",
@@ -840,6 +860,11 @@
     "context": "Optional"
   },
   {
+    "term": "generic.page-break",
+    "definition": "Page break",
+    "context": "Page break"
+  },
+  {
     "term": "generic.petition-status.completed",
     "definition": "Completed",
     "context": "Completed"
@@ -853,6 +878,11 @@
     "term": "generic.petition-status.pending",
     "definition": "Pending",
     "context": "Pending"
+  },
+  {
+    "term": "generic.previous-page",
+    "definition": "Previous page",
+    "context": "Previous page"
   },
   {
     "term": "generic.reload-data",
@@ -2510,16 +2540,6 @@
     "context": "This reply has been approved"
   },
   {
-    "term": "recipient-view.automatically-saved-text-1",
-    "definition": "Your progress is automatically saved.",
-    "context": "Your progress is automatically saved."
-  },
-  {
-    "term": "recipient-view.automatically-saved-text-2",
-    "definition": "You can return at anytime to complete the petition.",
-    "context": "You can return at anytime to complete the petition."
-  },
-  {
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "You have completed this petition and {name} will be notified",
     "context": "You have completed this petition and {name} will be notified"
@@ -2550,6 +2570,36 @@
     "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
   },
   {
+    "term": "recipient-view.first-time.claim-1",
+    "definition": "The information will be saved automatically as you add it.",
+    "context": "The information will be saved automatically as you add it."
+  },
+  {
+    "term": "recipient-view.first-time.claim-2",
+    "definition": "You can come back as many times as you want using the link you received in your email.",
+    "context": "You can come back as many times as you want using the link you received in your email."
+  },
+  {
+    "term": "recipient-view.first-time.claim-3",
+    "definition": "You can add any comments and questions you'd like. Submit them at once whenever you decide.",
+    "context": "You can add any comments and questions you'd like. Submit them at once whenever you decide."
+  },
+  {
+    "term": "recipient-view.first-time.into",
+    "definition": "Is this the first time you use Parallel?",
+    "context": "Is this the first time you use Parallel?"
+  },
+  {
+    "term": "recipient-view.first-time.see-more",
+    "definition": "See more frequently asked questions",
+    "context": "See more frequently asked questions"
+  },
+  {
+    "term": "recipient-view.need-help",
+    "definition": "Help",
+    "context": "Help"
+  },
+  {
     "term": "recipient-view.organization",
     "definition": "Business",
     "context": "Business"
@@ -2561,8 +2611,8 @@
   },
   {
     "term": "recipient-view.powered-by",
-    "definition": "Powered by",
-    "context": "Powered by"
+    "definition": "Powered by {parallel}",
+    "context": "Powered by {parallel}"
   },
   {
     "term": "recipient-view.progress",
@@ -2605,11 +2655,6 @@
     "context": "Sender email"
   },
   {
-    "term": "recipient-view.submit-button",
-    "definition": "Finalize and notify {name}",
-    "context": "Finalize and notify {name}"
-  },
-  {
     "term": "recipient-view.submit-button-short",
     "definition": "Finalize",
     "context": "Finalize"
@@ -2628,6 +2673,21 @@
     "term": "recipient-view.text-reply",
     "definition": "Reply added on {date}",
     "context": "Reply added on {date}"
+  },
+  {
+    "term": "recipient-view.unpublished-comments",
+    "definition": "There's unpublished comments",
+    "context": "There's unpublished comments"
+  },
+  {
+    "term": "recipient-view.unread-and-unpublished-comments",
+    "definition": "There's unread and unpublished comments",
+    "context": "There's unread and unpublished comments"
+  },
+  {
+    "term": "recipient-view.unread-comments",
+    "definition": "There's unread comments",
+    "context": "There's unread comments"
   },
   {
     "term": "settings.account",

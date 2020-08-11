@@ -1,22 +1,14 @@
-import {
-  Button,
-  ButtonProps,
-  Text,
-  Tooltip,
-  PropsWithAs,
-} from "@chakra-ui/core";
+import { Button, Text, Tooltip } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
 import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
+import { ExtendChakra } from "@parallel/chakra/utils";
 
-export type PetitionFieldTypeIndicatorProps = PropsWithAs<
-  "div" | "button",
-  Omit<ButtonProps, "type" | "as">
-> & {
+export type PetitionFieldTypeIndicatorProps = ExtendChakra<{
   type: PetitionFieldType;
   index: number;
-};
+}>;
 
 export function PetitionFieldTypeIndicator({
   type,
@@ -52,7 +44,13 @@ export function PetitionFieldTypeIndicator({
         {...props}
       >
         <PetitionFieldTypeIcon type={type} boxSize="16px" role="presentation" />
-        <Text as="span" fontSize="xs" marginLeft={2}>
+        <Text
+          width={4}
+          as="span"
+          fontSize="xs"
+          marginLeft={1}
+          textAlign="center"
+        >
           <FormattedNumber value={index + 1} />
         </Text>
       </Button>
