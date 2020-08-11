@@ -146,25 +146,29 @@ export const PetitionComposeField = Object.assign(
             },
           }}
         >
-          <Box
-            ref={dragRef}
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            padding={2}
-            width="32px"
-            cursor={field.isFixed ? "unset" : "grab"}
-            color="gray.400"
-            _hover={{
-              color: "gray.700",
-            }}
-            aria-label={intl.formatMessage({
-              id: "petition.drag-to-sort-label",
-              defaultMessage: "Drag to sort this petition fields",
-            })}
-          >
-            {!field.isFixed ? <DragHandleIcon role="presentation" /> : null}
-          </Box>
+          {field.isFixed ? (
+            <div style={{ width: "32px" }} />
+          ) : (
+            <Box
+              ref={dragRef}
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              padding={2}
+              width="32px"
+              cursor={field.isFixed ? "unset" : "grab"}
+              color="gray.400"
+              _hover={{
+                color: "gray.700",
+              }}
+              aria-label={intl.formatMessage({
+                id: "petition.drag-to-sort-label",
+                defaultMessage: "Drag to sort this petition fields",
+              })}
+            >
+              <DragHandleIcon role="presentation" />
+            </Box>
+          )}
           {field.optional ? null : (
             <Box marginX={-2} position="relative">
               <Tooltip
