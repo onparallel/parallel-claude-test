@@ -77,9 +77,7 @@ function updateLocaleData(isDefault, data, terms) {
             entry.definition = term.defaultMessage;
         }
         entry.context = term.description || term.defaultMessage;
-        const path = isWindows
-            ? term.file.replace(/^\.\.\\[^\\]+\\/, "").replace(/\\/g, "/")
-            : term.file.replace(/^\.\.\/[^/]+\//, "");
+        const path = term.file.replace(/^\.\.\/[^/]+\//, "");
         entry.reference = `${path}:${term.line}:${term.col}`;
         updated.set(entry.term, entry);
     }
