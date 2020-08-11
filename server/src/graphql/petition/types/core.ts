@@ -182,6 +182,7 @@ export const PetitionField = objectType({
     });
     t.boolean("isFixed", {
       description: "Determines if the field can be moved or deleted.",
+      resolve: (o) => o.is_fixed,
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",

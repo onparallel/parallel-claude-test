@@ -32,7 +32,7 @@ export function fieldIsNotFixed<
         "PetitionField"
       );
       const field = await ctx.petitions.loadField(fieldId);
-      return !field!.isFixed;
+      return !field!.is_fixed;
     } catch {}
     return false;
   };

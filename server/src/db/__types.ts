@@ -359,7 +359,7 @@ export interface PetitionField {
   updated_by: Maybe<string>;
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
-  isFixed: boolean;
+  is_fixed: boolean;
 }
 
 export interface CreatePetitionField {
@@ -378,7 +378,7 @@ export interface CreatePetitionField {
   updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
-  isFixed?: boolean;
+  is_fixed?: boolean;
 }
 
 export interface PetitionFieldComment {

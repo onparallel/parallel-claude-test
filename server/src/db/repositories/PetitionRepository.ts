@@ -490,7 +490,7 @@ export class PetitionRepository extends BaseRepository {
           type: "HEADING",
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
-          isFixed: true,
+          is_fixed: true,
         },
         0,
         user,
@@ -594,13 +594,13 @@ export class PetitionRepository extends BaseRepository {
       const _ids = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
-        .select("id", "isFixed", "position")
+        .select("id", "is_fixed", "position")
         .orderBy("position", "asc");
 
       const ids = _ids.map((f) => f.id);
       const fixedPositions = _ids.reduce<number[]>(
         (positions, _id, index) =>
-          _id.isFixed ? positions.concat(index) : positions,
+          _id.is_fixed ? positions.concat(index) : positions,
         []
       );
 
@@ -662,7 +662,7 @@ export class PetitionRepository extends BaseRepository {
         "created_at",
         "updated_at",
         "validated",
-        "isFixed",
+        "is_fixed",
       ]),
       field.position + 1,
       user
@@ -765,7 +765,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petitionId,
           id: fieldId,
           deleted_at: null,
-          isFixed: false,
+          is_fixed: false,
         });
 
       // TODO: delete replies
@@ -822,7 +822,7 @@ export class PetitionRepository extends BaseRepository {
           "*"
         )
         .then(([updatedField]) => {
-          if (updatedField.isFixed && data.type !== undefined) {
+          if (updatedField.is_fixed && data.type !== undefined) {
             throw new Error("can't update a fixed field type");
           }
           return [updatedField];
