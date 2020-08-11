@@ -1374,6 +1374,12 @@
     "reference": "components/petition-compose/PetitionComposeFieldList.tsx:309:14"
   },
   {
+    "term": "petition.add-field-button.question",
+    "definition": "What do you need?",
+    "context": "What do you need?",
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:147:12"
+  },
+  {
     "term": "petition.already-sent",
     "definition": "This petition has already been sent.",
     "context": "This petition has already been sent.",
@@ -1593,19 +1599,43 @@
     "term": "petition.field-type.file-upload",
     "definition": "File upload",
     "context": "File upload",
-    "reference": "components/petition-compose/PetitionFieldTypeSelect.tsx:58:38"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:205:14"
+  },
+  {
+    "term": "petition.field-type.file-upload.description",
+    "definition": "Collect documents or other files in an organized way.",
+    "context": "Collect documents or other files in an organized way.",
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:211:14"
   },
   {
     "term": "petition.field-type.heading",
     "definition": "Heading",
     "context": "Heading",
-    "reference": "components/petition-compose/PetitionFieldTypeSelect.tsx:66:34"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:169:14"
+  },
+  {
+    "term": "petition.field-type.heading.description",
+    "definition": "Organize your petitions in sections or pages with a heading.",
+    "context": "Organize your petitions in sections or pages with a heading.",
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:175:14"
+  },
+  {
+    "term": "petition.field-type.heading.information-only",
+    "definition": "Headings are for information purposes only and do not collect information.",
+    "context": "Headings are for information purposes only and do not collect information.",
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:181:14"
   },
   {
     "term": "petition.field-type.text",
     "definition": "Text input",
     "context": "Text input",
-    "reference": "components/petition-compose/PetitionFieldTypeSelect.tsx:62:31"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:190:14"
+  },
+  {
+    "term": "petition.field-type.text.description",
+    "definition": "Obtain written information that is not stored in documents or other files.",
+    "context": "Obtain written information that is not stored in documents or other files.",
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:196:14"
   },
   {
     "term": "petition.fields-header",

@@ -16,7 +16,7 @@ import {
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { useIntl } from "react-intl";
+import { useIntl, FormattedMessage } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
@@ -137,13 +137,18 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
     <MenuList
       as={Flex}
       paddingY={0}
-      minWidth="360px"
+      minWidth="500px"
       {...props}
       ref={useMergeRefs(ref, ownRef)}
     >
       <Box flex="1">
         <Box paddingX={4} paddingY={2}>
-          <Heading size="sm">What do you need?</Heading>
+          <Heading size="sm">
+            <FormattedMessage
+              id="petition.add-field-button.question"
+              defaultMessage="What do you need?"
+            />
+          </Heading>
         </Box>
         {FIELD_TYPES.map((type) => (
           <MenuItem
@@ -157,13 +162,58 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
           </MenuItem>
         ))}
       </Box>
-      <Box flex="1" backgroundColor="gray.100">
+      <Box flex="1" backgroundColor="gray.100" padding={4}>
         {activeType === "HEADING" ? (
-          <Box>I'm a heading</Box>
+          <Box>
+            <Heading as="h2" size="sm">
+              <FormattedMessage
+                id="petition.field-type.heading"
+                defaultMessage="Heading"
+              />
+            </Heading>
+            <Text paddingTop={2} fontSize="sm">
+              <FormattedMessage
+                id="petition.field-type.heading.description"
+                defaultMessage="Organize your petitions in sections or pages with a heading."
+              />
+            </Text>
+            <Text paddingTop={2} fontSize="sm">
+              <FormattedMessage
+                id="petition.field-type.heading.information-only"
+                defaultMessage="Headings are for information purposes only and do not collect information."
+              />
+            </Text>
+          </Box>
         ) : activeType === "TEXT" ? (
-          <Box>I'm a text</Box>
+          <Box>
+            <Heading as="h2" size="sm">
+              <FormattedMessage
+                id="petition.field-type.text"
+                defaultMessage="Text input"
+              />
+            </Heading>
+            <Text paddingTop={2} fontSize="sm">
+              <FormattedMessage
+                id="petition.field-type.text.description"
+                defaultMessage="Obtain written information that is not stored in documents or other files."
+              />
+            </Text>
+          </Box>
         ) : activeType === "FILE_UPLOAD" ? (
-          <Box>I'm a file upload</Box>
+          <Box>
+            <Heading as="h2" size="sm">
+              <FormattedMessage
+                id="petition.field-type.file-upload"
+                defaultMessage="File upload"
+              />
+            </Heading>
+            <Text paddingTop={2} fontSize="sm">
+              <FormattedMessage
+                id="petition.field-type.file-upload.description"
+                defaultMessage="Collect documents or other files in an organized way."
+              />
+            </Text>
+          </Box>
         ) : null}
       </Box>
     </MenuList>
