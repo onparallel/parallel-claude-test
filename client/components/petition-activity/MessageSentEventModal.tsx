@@ -1,20 +1,20 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Divider,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalHeader,
   ModalOverlay,
   ModalProps,
   Text,
+  Stack,
 } from "@chakra-ui/core";
 import { MessageSentEventModal_MessageSentDataFragment } from "@parallel/graphql/__types";
 import { RenderSlate } from "@parallel/utils/RenderSlate";
 import { FormattedMessage } from "react-intl";
-import { ContactLink } from "./ContactLink";
+import { ContactLink } from "../common/ContactLink";
+import { Divider } from "../common/Divider";
 
 export type MessageSentEventModalProps = Omit<ModalProps, "children"> & {
   message: MessageSentEventModal_MessageSentDataFragment;
@@ -25,21 +25,31 @@ export function MessageSentEventModal({
   ...props
 }: MessageSentEventModalProps) {
   return (
-    <Modal {...props} size="xl" isCentered>
+    <Modal {...props} size="xl">
       <ModalOverlay>
-        <ModalContent borderRadius="md">
-          <ModalHeader paddingBottom={2}>{message.emailSubject}</ModalHeader>
+        <ModalContent>
           <ModalCloseButton />
-          <ModalBody paddingBottom={6}>
-            <Text fontSize={14}></Text>
-            <Text paddingBottom={2} fontSize={14}>
-              <FormattedMessage id="generic.to" defaultMessage="to" />{" "}
-              <ContactLink contact={message.access.contact!} />
-            </Text>
-            <Divider />
-            <Box paddingTop={2}>
-              <RenderSlate value={message.emailBody} />
-            </Box>
+          <ModalBody paddingY={6}>
+            <Stack>
+              <Text fontSize="lg" fontWeight="bold">
+                {message.emailSubject}
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="generic.to"
+                  defaultMessage="To {recipient}"
+                  values={{
+                    recipient: (
+                      <ContactLink isFull contact={message.access.contact!} />
+                    ),
+                  }}
+                />
+              </Text>
+              <Divider />
+              <Box>
+                <RenderSlate value={message.emailBody} />
+              </Box>
+            </Stack>
           </ModalBody>
         </ModalContent>
       </ModalOverlay>
@@ -48,8 +58,8 @@ export function MessageSentEventModal({
 }
 
 MessageSentEventModal.fragments = {
-  MessageSentData: gql`
-    fragment MessageSentEventModal_MessageSentData on PetitionMessage {
+  PetitionMessage: gql`
+    fragment MessageSentEventModal_PetitionMessage on PetitionMessage {
       emailBody
       emailSubject
       access {

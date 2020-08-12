@@ -31,7 +31,7 @@ export function TimelineMessageScheduledEvent({
       }
     >
       <Flex alignItems="center">
-        <Box flex="1">
+        <Box>
           <FormattedMessage
             id="timeline.message-scheduled-description"
             defaultMessage="{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"

@@ -1153,7 +1153,7 @@ export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   "id" | "fullName" | "email"
 >;
 
-export type MessageSentEventModal_MessageSentDataFragment = {
+export type MessageSentEventModal_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
 } & Pick<PetitionMessage, "emailBody" | "emailSubject"> & {
     access: { __typename?: "PetitionAccess" } & {
@@ -1502,7 +1502,7 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
           >;
         };
       } & MessageEventsIndicator_PetitionMessageFragment &
-      MessageSentEventModal_MessageSentDataFragment;
+      MessageSentEventModal_PetitionMessageFragment;
   };
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
@@ -3086,8 +3086,8 @@ export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
     openedAt
   }
 `;
-export const MessageSentEventModal_MessageSentDataFragmentDoc = gql`
-  fragment MessageSentEventModal_MessageSentData on PetitionMessage {
+export const MessageSentEventModal_PetitionMessageFragmentDoc = gql`
+  fragment MessageSentEventModal_PetitionMessage on PetitionMessage {
     emailBody
     emailSubject
     access {
@@ -3114,13 +3114,13 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
         }
       }
       ...MessageEventsIndicator_PetitionMessage
-      ...MessageSentEventModal_MessageSentData
+      ...MessageSentEventModal_PetitionMessage
     }
     createdAt
   }
   ${ContactLink_ContactFragmentDoc}
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
-  ${MessageSentEventModal_MessageSentDataFragmentDoc}
+  ${MessageSentEventModal_PetitionMessageFragmentDoc}
 `;
 export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {

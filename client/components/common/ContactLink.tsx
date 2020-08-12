@@ -4,19 +4,22 @@ import { Link, LinkProps } from "./Link";
 import { Tooltip } from "@chakra-ui/core";
 
 export function ContactLink({
-  contact,
+  contact: { id, email, fullName },
+  isFull,
   ...props
 }: {
   contact: ContactLink_ContactFragment;
+  isFull?: boolean;
 } & Omit<LinkProps, "href" | "as">) {
   return (
-    <Tooltip isDisabled={contact.fullName === null} label={contact.email}>
+    <Tooltip isDisabled={!fullName && !isFull} label={email}>
       <Link
         href="/app/contacts/[contactId]"
-        as={`/app/contacts/${contact.id}`}
+        as={`/app/contacts/${id}`}
         {...props}
       >
-        {contact.fullName || contact.email}
+        {fullName || email}
+        {isFull && fullName ? `<${email}>` : null}
       </Link>
     </Tooltip>
   );

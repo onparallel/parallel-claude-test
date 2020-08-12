@@ -109,12 +109,17 @@ export const theme = {
       ...base.components.Link,
       baseStyle: {
         ...base.components.Link.baseStyle,
-        color: "purple.600",
-        _hover: {
-          color: "purple.700",
-        },
-        _active: {
-          color: "purple.800",
+        cursor: "default",
+        "&[href]": {
+          cursor: "pointer",
+          color: "purple.600",
+          _hover: {
+            color: "purple.700",
+            textDecoration: "none",
+          },
+          _active: {
+            color: "purple.800",
+          },
         },
       },
     },

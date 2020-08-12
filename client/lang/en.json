@@ -1087,9 +1087,9 @@
   },
   {
     "term": "generic.to",
-    "definition": "to",
-    "context": "to",
-    "reference": "components/common/MessageSentEventModal.tsx:36:14"
+    "definition": "To {recipient}",
+    "context": "To {recipient}",
+    "reference": "components/petition-activity/MessageSentEventModal.tsx:35:14"
   },
   {
     "term": "generic.today-at",
@@ -1377,7 +1377,7 @@
     "term": "petition.add-field-button.question",
     "definition": "What do you need?",
     "context": "What do you need?",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:147:12"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:175:12"
   },
   {
     "term": "petition.already-sent",
@@ -1599,43 +1599,43 @@
     "term": "petition.field-type.file-upload",
     "definition": "File upload",
     "context": "File upload",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:205:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:94:38"
   },
   {
     "term": "petition.field-type.file-upload.description",
     "definition": "Collect documents or other files in an organized way.",
     "context": "Collect documents or other files in an organized way.",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:211:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:244:18"
   },
   {
     "term": "petition.field-type.heading",
     "definition": "Heading",
     "context": "Heading",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:169:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:102:34"
   },
   {
     "term": "petition.field-type.heading.description",
     "definition": "Organize your petitions in sections or pages with a heading.",
     "context": "Organize your petitions in sections or pages with a heading.",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:175:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:220:18"
   },
   {
     "term": "petition.field-type.heading.information-only",
     "definition": "Headings are for information purposes only and do not collect information.",
     "context": "Headings are for information purposes only and do not collect information.",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:181:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:226:18"
   },
   {
     "term": "petition.field-type.text",
     "definition": "Text input",
     "context": "Text input",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:190:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:98:31"
   },
   {
     "term": "petition.field-type.text.description",
     "definition": "Obtain written information that is not stored in documents or other files.",
     "context": "Obtain written information that is not stored in documents or other files.",
-    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:196:14"
+    "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:235:18"
   },
   {
     "term": "petition.fields-header",
@@ -3117,13 +3117,19 @@
     "term": "timeline.message-sent-description-manual",
     "definition": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx:65:13"
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx:62:15"
   },
   {
     "term": "timeline.message-sent-description-scheduled",
     "definition": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
     "context": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
-    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx:40:32"
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx:37:34"
+  },
+  {
+    "term": "timeline.message-sent-see-message",
+    "definition": "See message",
+    "context": "See message",
+    "reference": "components/petition-activity/timeline/TimelineMessageSentEvent.tsx:91:10"
   },
   {
     "term": "timeline.petition-completed-description",
