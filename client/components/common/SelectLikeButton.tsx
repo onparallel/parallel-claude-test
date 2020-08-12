@@ -31,6 +31,7 @@ export const SelectLikeButton = forwardRef<HTMLDivElement, SelectProps>(
           sx={{
             ...styles.field,
             paddingBottom: 0,
+            paddingRight: 10,
             display: "flex",
             alignItems: "center",
           }}

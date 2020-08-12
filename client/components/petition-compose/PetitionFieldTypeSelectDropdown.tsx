@@ -12,6 +12,8 @@ import {
   useMenuContext,
   Flex,
   Heading,
+  Stack,
+  TextProps,
 } from "@chakra-ui/core";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
@@ -45,15 +47,47 @@ export const PetitionFieldTypeSelect = forwardRef<
 });
 
 export const FIELD_TYPES: PetitionFieldType[] = [
-  "TEXT",
   "FILE_UPLOAD",
+  "TEXT",
   "HEADING",
 ];
 
-export const PetitionFieldTypeLabel = forwardRef<
+const PetitionFieldTypeLabel = forwardRef<
   HTMLDivElement,
   { type: PetitionFieldType } & BoxProps
 >(function PetitionFieldTypeLabel({ type, ...props }, ref) {
+  return (
+    <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
+      <Box
+        backgroundColor={`field.${type}`}
+        color="white"
+        borderRadius="md"
+        padding={1}
+        width="28px"
+        height="28px"
+      >
+        <PetitionFieldTypeIcon
+          type={type}
+          display="block"
+          boxSize="20px"
+          role="presentation"
+        />
+      </Box>
+      <PetitionFieldTypeText
+        whiteSpace="nowrap"
+        type={type}
+        as={"div" as any}
+        flex="1"
+        marginLeft={2}
+      />
+    </Box>
+  );
+});
+
+function PetitionFieldTypeText({
+  type,
+  ...props
+}: { type: PetitionFieldType } & TextProps) {
   const intl = useIntl();
   const label = useMemo(() => {
     return {
@@ -72,29 +106,8 @@ export const PetitionFieldTypeLabel = forwardRef<
     }[type];
   }, [intl.locale, type]);
 
-  return (
-    <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
-      <Box
-        backgroundColor={`field.${type}`}
-        color="white"
-        borderRadius="md"
-        padding={1}
-        width="28px"
-        height="28px"
-      >
-        <PetitionFieldTypeIcon
-          type={type}
-          display="block"
-          boxSize="20px"
-          role="presentation"
-        />
-      </Box>
-      <Text as="div" flex="1" marginLeft={2}>
-        {label}
-      </Text>
-    </Box>
-  );
-});
+  return <Text {...props}>{label}</Text>;
+}
 
 export type PetitionFieldTypeSelectDropdownProps = MenuListProps & {
   showHeader?: boolean;
@@ -110,7 +123,7 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
   ref
 ) {
   const ownRef = useRef<HTMLDivElement>(null);
-  const [activeType, setActiveType] = useState("HEADING");
+  const [activeType, setActiveType] = useState<PetitionFieldType>("HEADING");
 
   // Until we can set the roles via props
   useEffect(() => {
@@ -135,32 +148,48 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
     }
   }, [isOpen]);
 
+  const fieldListWidth = 210;
+  const descriptionWidth = 270;
+
   return (
     <MenuList
       as={Flex}
       paddingY={0}
-      minWidth={showDescription ? "500px" : "200px"}
+      minWidth={{
+        base: `${fieldListWidth}px`,
+        sm: showDescription
+          ? `${fieldListWidth + descriptionWidth}px`
+          : `${fieldListWidth}px`,
+      }}
       overflow="hidden"
       {...props}
       ref={useMergeRefs(ref, ownRef)}
     >
-      <Box flex="1" minWidth="200px">
-        {showHeader ? (
-          <Box paddingX={4} paddingY={3}>
-            <Heading size="sm">
-              <FormattedMessage
-                id="petition.add-field-button.question"
-                defaultMessage="What do you need?"
-              />
-            </Heading>
-          </Box>
-        ) : null}
+      <Box flex="1" minWidth={`${fieldListWidth}px`}>
+        <Box
+          display={{ base: "none", sm: showHeader ? "block" : "none" }}
+          paddingX={4}
+          paddingY={3}
+        >
+          <Heading size="sm">
+            <FormattedMessage
+              id="petition.add-field-button.question"
+              defaultMessage="What do you need?"
+            />
+          </Heading>
+        </Box>
         <Box>
-          <Box paddingBottom={2} paddingTop={showHeader ? 0 : 2}>
+          <Box
+            paddingBottom={2}
+            paddingTop={{ base: 2, sm: showHeader ? 0 : 2 }}
+          >
             {FIELD_TYPES.map((type) => (
               <MenuItem
                 key={type}
                 paddingY={2}
+                aria-describedby={
+                  activeType === type ? `field-description-${type}` : undefined
+                }
                 onClick={() => onSelectFieldType(type)}
                 onFocus={() => setActiveType(type)}
                 onHover={() => setActiveType(type)}
@@ -171,70 +200,58 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
           </Box>
         </Box>
       </Box>
-      {showDescription ? (
-        <Box
-          flex="1"
-          minWidth="300px"
-          backgroundColor="gray.50"
-          borderLeft="1px solid"
-          borderLeftColor="gray.200"
-          paddingX={4}
-          paddingY={3}
-        >
-          {activeType === "HEADING" ? (
-            <Box>
-              <Heading as="h2" size="sm">
-                <FormattedMessage
-                  id="petition.field-type.heading"
-                  defaultMessage="Heading"
-                />
-              </Heading>
-              <Text paddingTop={2} fontSize="sm">
-                <FormattedMessage
-                  id="petition.field-type.heading.description"
-                  defaultMessage="Organize your petitions in sections or pages with a heading."
-                />
-              </Text>
-              <Text paddingTop={2} fontSize="sm">
-                <FormattedMessage
-                  id="petition.field-type.heading.information-only"
-                  defaultMessage="Headings are for information purposes only and do not collect information."
-                />
-              </Text>
-            </Box>
-          ) : activeType === "TEXT" ? (
-            <Box>
-              <Heading as="h2" size="sm">
-                <FormattedMessage
-                  id="petition.field-type.text"
-                  defaultMessage="Text input"
-                />
-              </Heading>
-              <Text paddingTop={2} fontSize="sm">
-                <FormattedMessage
-                  id="petition.field-type.text.description"
-                  defaultMessage="Obtain written information that is not stored in documents or other files."
-                />
-              </Text>
-            </Box>
-          ) : activeType === "FILE_UPLOAD" ? (
-            <Box>
-              <Heading as="h2" size="sm">
-                <FormattedMessage
-                  id="petition.field-type.file-upload"
-                  defaultMessage="File upload"
-                />
-              </Heading>
-              <Text paddingTop={2} fontSize="sm">
-                <FormattedMessage
-                  id="petition.field-type.file-upload.description"
-                  defaultMessage="Collect documents or other files in an organized way."
-                />
-              </Text>
-            </Box>
-          ) : null}
+      <Box
+        display={{ base: "none", sm: showDescription ? "block" : "none" }}
+        flex="1"
+        minWidth={`${descriptionWidth}px`}
+        backgroundColor="gray.50"
+        borderLeft="1px solid"
+        borderLeftColor="gray.200"
+        paddingX={4}
+        paddingY={3}
+      >
+        <Box>
+          <Heading as="h2" size="sm" marginBottom={2}>
+            <PetitionFieldTypeText as={"span" as any} type={activeType} />
+          </Heading>
+          <Box id={`field-description-${activeType}`}>
+            {activeType === "HEADING" ? (
+              <Stack>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="petition.field-type.heading.description"
+                    defaultMessage="Organize your petitions in sections or pages with a heading."
+                  />
+                </Text>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="petition.field-type.heading.information-only"
+                    defaultMessage="Headings are for information purposes only and do not collect information."
+                  />
+                </Text>
+              </Stack>
+            ) : activeType === "TEXT" ? (
+              <>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="petition.field-type.text.description"
+                    defaultMessage="Obtain written information that is not stored in documents or other files."
+                  />
+                </Text>
+              </>
+            ) : activeType === "FILE_UPLOAD" ? (
+              <>
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="petition.field-type.file-upload.description"
+                    defaultMessage="Collect documents or other files in an organized way."
+                  />
+                </Text>
+              </>
+            ) : null}
+          </Box>
         </Box>
-      ) : null}
+      </Box>
     </MenuList>
   );
 });

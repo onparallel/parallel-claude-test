@@ -1609,7 +1609,7 @@
   },
   {
     "term": "petition.field-type.heading",
-    "definition": "Título",
+    "definition": "Encabezado",
     "context": "Heading",
     "reference": "components/petition-compose/PetitionFieldTypeSelectDropdown.tsx:169:14"
   },
