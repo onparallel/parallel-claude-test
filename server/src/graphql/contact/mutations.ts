@@ -1,9 +1,8 @@
 import { idArg, inputObjectType, mutationField } from "@nexus/schema";
 import { CreateContact } from "../../db/__types";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { fromGlobalId } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
-import { RESULT } from "../helpers/result";
 import { WhitelistedError } from "../helpers/errors";
 
 export const createContact = mutationField("createContact", {
@@ -80,8 +79,12 @@ export const deleteContacts = mutationField("deleteContacts", {
     ids: idArg({ required: true, list: [true] }),
   },
   resolve: async (_, args, ctx) => {
-    const { ids } = fromGlobalIds(args.ids, "Contact");
-    await ctx.contacts.deleteContactById(ids, ctx.user!);
-    return RESULT.SUCCESS;
+    throw new WhitelistedError(
+      "Contact deletion is disabled.",
+      "DELETE_CONTACT_ERROR"
+    );
+    // const { ids } = fromGlobalIds(args.ids, "Contact");
+    // await ctx.contacts.deleteContactById(ids, ctx.user!);
+    // return RESULT.SUCCESS;
   },
 });

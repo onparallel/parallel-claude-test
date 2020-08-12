@@ -171,7 +171,8 @@ function Contacts() {
           header={
             <ContactListHeader
               search={state.search}
-              showActions={Boolean(selected?.length)}
+              // showActions={Boolean(selected?.length)}
+              showActions={false}
               onSearchChange={handleSearchChange}
               onReload={() => refetch()}
               onCreateClick={handleCreateClick}
