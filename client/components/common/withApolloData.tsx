@@ -88,35 +88,34 @@ export function withApolloData<P = {}>(
                 ignoreCache?: boolean;
               }
             ) {
-              if (!process.browser || options?.ignoreCache) {
-                return await apollo.query<T, TVariables>({
-                  query,
-                  variables: options?.variables,
-                });
-              } else {
-                // On the browser we fetch from cache and fire a request that
-                // will update the cache when it arrives
-                return await new Promise<ApolloQueryResult<T>>(
-                  (resolve, reject) => {
-                    let resolved = false;
-                    const subscription = apollo
-                      .watchQuery<T, TVariables>({
-                        query,
-                        variables: options?.variables,
-                        fetchPolicy: "cache-and-network",
-                      })
-                      .subscribe((result) => {
-                        if (!resolved) {
-                          resolve(result);
-                          resolved = true;
-                        }
-                        if (!result.loading) {
-                          subscription.unsubscribe();
-                        }
-                      }, reject);
-                  }
-                );
-              }
+              return await new Promise<ApolloQueryResult<T>>(
+                (resolve, reject) => {
+                  let resolved = false;
+                  // On the browser we fetch from cache and fire a request
+                  // that will update the cache when it arrives
+                  const fetchPolicy =
+                    process.browser && !options?.ignoreCache
+                      ? "cache-and-network"
+                      : "network-only";
+                  const subscription = apollo
+                    .watchQuery<T, TVariables>({
+                      query,
+                      variables: options?.variables,
+                      fetchPolicy,
+                    })
+                    .subscribe((result) => {
+                      if (!resolved) {
+                        resolve(result);
+                        resolved = true;
+                      }
+                      // if it's loading means we used cache-and-network and we
+                      // are waiting for the network response
+                      if (!result.loading) {
+                        subscription.unsubscribe();
+                      }
+                    }, reject);
+                }
+              );
             },
           })) ?? ({} as P);
 
