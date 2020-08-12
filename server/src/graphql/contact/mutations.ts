@@ -4,6 +4,7 @@ import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
 import { RESULT } from "../helpers/result";
+import { WhitelistedError } from "../helpers/errors";
 
 export const createContact = mutationField("createContact", {
   description: "Create a contact.",
@@ -31,8 +32,11 @@ export const createContact = mutationField("createContact", {
         ctx.user!
       );
     } catch (error) {
-      if (error?.constraint === "contact__owner_id__email") {
-        throw new Error("EXISTING_CONTACT");
+      if (error?.constraint === "contact__org_id__email") {
+        throw new WhitelistedError(
+          "Contact already exists.",
+          "EXISTING_CONTACT"
+        );
       } else {
         throw new Error("INTERNAL_ERROR");
       }

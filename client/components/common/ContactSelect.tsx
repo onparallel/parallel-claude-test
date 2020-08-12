@@ -5,7 +5,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Text,
-  useToast,
 } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
@@ -28,6 +27,7 @@ import {
   useReactSelectStyle,
   UserReactSelectStyleProps,
 } from "../../utils/useReactSelectStyle";
+import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 
 export type ContactSelection = ContactSelect_ContactFragment;
 
@@ -57,8 +57,9 @@ export const ContactSelect = Object.assign(
     ref: Ref<AsyncCreatableSelect<ContactSelection>>
   ) {
     const intl = useIntl();
+    const errorToast = useExistingContactToast();
+
     const [isCreating, setIsCreating] = useState(false);
-    const toast = useToast();
 
     const loadOptions = useCallback(
       async (search) => {
@@ -77,20 +78,8 @@ export const ContactSelect = Object.assign(
         const contact = await onCreateContact({ defaultEmail: email });
         onChange([...value, pick(contact, ["id", "email", "fullName"])]);
       } catch (error) {
-        if (error?.graphQLErrors?.[0]?.message === "EXISTING_CONTACT") {
-          toast({
-            title: intl.formatMessage({
-              id: "component.contact-select.existing-contact.title",
-              defaultMessage: "Existing contact",
-            }),
-            description: intl.formatMessage({
-              id: "component.contact-select.existing-contact.description",
-              defaultMessage: "This contact already exists.",
-            }),
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
+        if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
+          errorToast();
         }
       }
       setIsCreating(false);

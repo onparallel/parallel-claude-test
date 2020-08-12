@@ -44,6 +44,7 @@ import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { compose } from "@parallel/utils/compose";
+import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 
 const PAGE_SIZE = 10;
 
@@ -66,6 +67,7 @@ const QUERY_STATE = {
 
 function Contacts() {
   const intl = useIntl();
+  const errorToast = useExistingContactToast();
   const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
@@ -118,7 +120,11 @@ function Contacts() {
     try {
       await createContact({});
       refetch();
-    } catch {}
+    } catch (error) {
+      if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
+        errorToast();
+      }
+    }
   }
 
   async function handleDeleteClick() {
