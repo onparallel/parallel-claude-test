@@ -74,7 +74,6 @@ export class Mocks {
           const firstName = faker.name.firstName();
           const lastName = faker.name.lastName();
           return {
-            owner_id: ownerId,
             org_id: orgId,
             first_name: firstName,
             last_name: lastName,

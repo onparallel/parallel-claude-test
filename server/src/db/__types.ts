@@ -109,7 +109,6 @@ export interface Contact {
   first_name: Maybe<string>;
   last_name: Maybe<string>;
   org_id: number;
-  owner_id: number;
   created_at: Date;
   created_by: Maybe<string>;
   updated_at: Date;
@@ -123,7 +122,6 @@ export interface CreateContact {
   first_name?: Maybe<string>;
   last_name?: Maybe<string>;
   org_id: number;
-  owner_id: number;
   created_at?: Date;
   created_by?: Maybe<string>;
   updated_at?: Date;

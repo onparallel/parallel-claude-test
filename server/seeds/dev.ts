@@ -184,7 +184,6 @@ export async function seed(knex: Knex): Promise<any> {
   const contacts: CreateContact[] = [
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       email: "derek@parallel.so",
       first_name: "Derek",
       last_name: "Lou",
@@ -193,14 +192,12 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       email: "alex@parallel.so",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       first_name: "Santi",
       email: "santi@parallel.so",
       created_by: `User:${userIds[2]}`,
@@ -208,7 +205,6 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       last_name: "Lou",
       email: "dereklou00@gmail.com",
       created_by: `User:${userIds[2]}`,
@@ -216,7 +212,6 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       email: "santialbo@gmail.com",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,

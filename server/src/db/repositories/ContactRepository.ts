@@ -17,10 +17,10 @@ export class ContactRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async userHasAccessToContacts(userId: number, contactIds: number[]) {
+  async userHasAccessToContacts(user: User, contactIds: number[]) {
     const [{ count }] = await this.from("contact")
       .where({
-        owner_id: userId,
+        org_id: user.org_id,
         deleted_at: null,
       })
       .whereIn("id", contactIds)
@@ -29,7 +29,7 @@ export class ContactRepository extends BaseRepository {
   }
 
   async loadContactsForUser(
-    userId: number,
+    user: User,
     opts: {
       search?: string | null;
       sortBy?: {
@@ -42,7 +42,7 @@ export class ContactRepository extends BaseRepository {
     return await this.loadPageAndCount(
       this.from("contact")
         .where({
-          owner_id: userId,
+          org_id: user.org_id,
           deleted_at: null,
         })
         .mmodify((q) => {
@@ -78,14 +78,10 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async createContact(
-    data: Omit<CreateContact, "owner_id" | "org_id">,
-    user: User
-  ) {
+  async createContact(data: Omit<CreateContact, "org_id">, user: User) {
     const [row] = await this.insert("contact", {
       ...data,
       org_id: user.org_id,
-      owner_id: user.id,
       created_by: `User:${user.id}`,
       updated_by: `User:${user.id}`,
     });
@@ -127,26 +123,5 @@ export class ContactRepository extends BaseRepository {
         })
         .whereIn("contact_id", unMaybeArray(contactId));
     });
-  }
-
-  async getOrCreateContacts(emails: string[], user: User) {
-    await this.knex.raw(
-      /* sql */ `
-      insert into contact (email, org_id, owner_id, created_by)
-        values ${emails.map(() => `(?, ?, ?, ?)`).join(", ")}
-        on conflict do nothing;
-    `,
-      emails.flatMap((email) => [
-        email,
-        user.org_id,
-        user.id,
-        `User:${user.id}`,
-      ])
-    );
-    return await this.from("contact")
-      .where("owner_id", user.id)
-      .whereIn("email", emails)
-      .whereNull("deleted_at")
-      .select("*");
   }
 }

@@ -569,7 +569,7 @@ export const sendPetition = mutationField("sendPetition", {
       const { ids: recipientIds } = fromGlobalIds(args.contactIds, "Contact");
       const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
       const [hasAccess, petition, fields] = await Promise.all([
-        ctx.contacts.userHasAccessToContacts(ctx.user!.id, recipientIds),
+        ctx.contacts.userHasAccessToContacts(ctx.user!, recipientIds),
         ctx.petitions.loadPetition(petitionId),
         ctx.petitions.loadFieldsForPetition(petitionId),
       ]);
