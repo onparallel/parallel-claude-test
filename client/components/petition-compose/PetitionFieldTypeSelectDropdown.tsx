@@ -192,7 +192,6 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
                 }
                 onClick={() => onSelectFieldType(type)}
                 onFocus={() => setActiveType(type)}
-                onHover={() => setActiveType(type)}
               >
                 <PetitionFieldTypeLabel type={type} />
               </MenuItem>

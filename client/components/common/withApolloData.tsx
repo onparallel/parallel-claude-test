@@ -61,7 +61,7 @@ export function withApolloData<P = {}>(
   };
   const { getInitialProps, displayName, ...rest } = Component;
   return Object.assign(WithData, rest, {
-    displayName: `WithData(${displayName ?? Component.name})`,
+    displayName: `WithApolloData(${displayName ?? Component.name})`,
     getInitialProps: async (context: NextPageContext) => {
       const apollo = createApolloClient(
         {},

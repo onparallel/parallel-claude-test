@@ -56,7 +56,7 @@ export function withOnboarding(value: Onboarding) {
     };
     const { displayName, ...rest } = Component;
     return Object.assign(WithTourSteps, rest, {
-      displayName: `WithTourSteps(${displayName || Component.name})`,
+      displayName: `WithOnboarding(${displayName || Component.name})`,
     });
   };
 }
