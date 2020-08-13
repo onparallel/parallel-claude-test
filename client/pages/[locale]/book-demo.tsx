@@ -66,7 +66,7 @@ function BookDemo() {
             </Heading>
             <List
               as="ol"
-              styleType="decimal"
+              listStyleType="decimal"
               spacing={4}
               marginTop={8}
               marginLeft={5}

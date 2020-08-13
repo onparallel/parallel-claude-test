@@ -615,8 +615,8 @@ export default compose(
               />
             </Text>
             <List
-              styleType="disc"
-              stylePos="outside"
+              listStyleType="disc"
+              listStylePosition="outside"
               paddingLeft={5}
               marginTop={4}
               spacing={3}

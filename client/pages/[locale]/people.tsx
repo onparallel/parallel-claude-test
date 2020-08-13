@@ -170,7 +170,7 @@ function People() {
           <Separator flex="1" minHeight="20px" />
         </Flex>
         <Box textAlign="left" maxWidth="520px" margin="auto" marginTop={4}>
-          <List stylePos="outside" spacing={4}>
+          <List listStylePosition="outside" spacing={4}>
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
