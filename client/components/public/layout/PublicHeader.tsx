@@ -1,4 +1,5 @@
 import {
+  Box,
   BoxProps,
   Button,
   Collapse,
@@ -8,7 +9,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/core";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
-import { Link, NakedLink } from "@parallel/components/common/Link";
+import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { FormattedMessage } from "react-intl";
@@ -36,15 +37,17 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
         minHeight={isThin ? 16 : 20}
         transition="min-height 300ms"
       >
-        <Link
-          href="/"
-          color="gray.700"
-          _hover={{ color: "gray.800" }}
-          _focus={{ color: "gray.800" }}
-          _active={{ color: "gray.900" }}
-        >
-          <Logo width={152} />
-        </Link>
+        <NakedLink href="/">
+          <Box
+            as="a"
+            color="gray.700"
+            _hover={{ color: "gray.800" }}
+            _focus={{ color: "gray.800" }}
+            _active={{ color: "gray.900" }}
+          >
+            <Logo width="152px" />
+          </Box>
+        </NakedLink>
         <Spacer />
         <PublicHeaderMenu
           direction="row"

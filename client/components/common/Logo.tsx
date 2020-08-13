@@ -1,16 +1,16 @@
-import { VisuallyHidden } from "@chakra-ui/core";
+import { Box, VisuallyHidden } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 
-export interface LogoProps {
-  width?: number;
-  height?: number;
+export type LogoProps = ExtendChakra<{
   hideText?: boolean;
-}
+}>;
 
 export function Logo({ hideText, ...rest }: LogoProps) {
   return (
     <>
       <VisuallyHidden>Parallel</VisuallyHidden>
-      <svg
+      <Box
+        as="svg"
         {...rest}
         viewBox={hideText ? "0 3 24 25" : "0 0 152 30"}
         fill="none"
@@ -43,7 +43,7 @@ export function Logo({ hideText, ...rest }: LogoProps) {
             fill="#C4C4C4"
           />
         </mask>
-      </svg>
+      </Box>
     </>
   );
 }

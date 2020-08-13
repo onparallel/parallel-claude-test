@@ -21,20 +21,12 @@ export function ErrorPage({
         <NextLink href="/" as="/" passHref>
           <Box
             as="a"
-            {...{
-              color: "gray.700",
-              _hover: {
-                color: "gray.800",
-              },
-              _focus: {
-                color: "gray.800",
-              },
-              _active: {
-                color: "gray.900",
-              },
-            }}
+            color="gray.700"
+            _hover={{ color: "gray.800" }}
+            _focus={{ color: "gray.800" }}
+            _active={{ color: "gray.900" }}
           >
-            <Logo width={152} />
+            <Logo width="152px" />
           </Box>
         </NextLink>
       </PublicContainer>

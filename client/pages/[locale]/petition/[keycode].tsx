@@ -432,8 +432,14 @@ function RecipientView({ keycode }: PublicPetitionProps) {
               />
             </Text>
             <NakedLink href="/" passHref>
-              <Box as="a">
-                <Logo width={100} />
+              <Box
+                as="a"
+                color="gray.700"
+                _hover={{ color: "gray.800" }}
+                _focus={{ color: "gray.800" }}
+                _active={{ color: "gray.900" }}
+              >
+                <Logo width="100px" />
               </Box>
             </NakedLink>
           </Flex>

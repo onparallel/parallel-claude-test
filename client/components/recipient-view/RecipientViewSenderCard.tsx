@@ -25,7 +25,7 @@ export function RecipientViewSenderCard({
             width={200}
           />
         ) : (
-          <Logo width={156} />
+          <Logo width="152px" />
         )}
       </Flex>
       <Box marginTop={6}>
