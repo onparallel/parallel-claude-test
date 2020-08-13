@@ -18,6 +18,7 @@ import {
   fieldHastype,
   replyBelongsToAccess,
 } from "./authorizers";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -350,6 +351,10 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
       keycode: idArg({ required: true }),
       petitionFieldCommentIds: idArg({ required: true, list: [true] }),
     },
+    validateArgs: notEmptyArray(
+      prop("petitionFieldCommentIds"),
+      "petitionFieldCommentIds"
+    ),
     resolve: async (_, args, ctx) => {
       const petitionFieldCommentIds = fromGlobalIds(
         args.petitionFieldCommentIds,

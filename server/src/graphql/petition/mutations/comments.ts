@@ -14,6 +14,7 @@ import {
   userHasAccessToPetitions,
 } from "../authorizers";
 import { prop } from "remeda";
+import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -188,6 +189,10 @@ export const markPetitionFieldCommentsAsRead = mutationField(
       petitionId: idArg({ required: true }),
       petitionFieldCommentIds: idArg({ required: true, list: [true] }),
     },
+    validateArgs: notEmptyArray(
+      prop("petitionFieldCommentIds"),
+      "petitionFieldCommentIds"
+    ),
     resolve: async (_, args, ctx) => {
       const petitionFieldCommentIds = fromGlobalIds(
         args.petitionFieldCommentIds,

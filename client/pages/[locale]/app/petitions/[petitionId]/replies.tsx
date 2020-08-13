@@ -87,14 +87,14 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   useEffect(() => {
     if (activeFieldId) {
       const timeout = setTimeout(async () => {
-        await markPetitionFieldCommentsAsRead({
-          variables: {
-            petitionId,
-            petitionFieldCommentIds: activeField!.comments
-              .filter((c) => c.isUnread)
-              .map((c) => c.id),
-          },
-        });
+        const petitionFieldCommentIds = activeField!.comments
+          .filter((c) => c.isUnread)
+          .map((c) => c.id);
+        if (petitionFieldCommentIds.length > 0) {
+          await markPetitionFieldCommentsAsRead({
+            variables: { petitionId, petitionFieldCommentIds },
+          });
+        }
       }, 1000);
       return () => clearTimeout(timeout);
     }

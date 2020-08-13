@@ -11,7 +11,7 @@ export function notEmptyArray<
 ) {
   return ((_, args, ctx, info) => {
     const value = prop(args);
-    if (!value) {
+    if (value?.length === 0) {
       throw new ArgValidationError(info, argName, `Value can't be empty.`);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

@@ -262,14 +262,14 @@ function RecipientView({ keycode }: PublicPetitionProps) {
   useEffect(() => {
     if (selectedFieldId) {
       const timeout = setTimeout(async () => {
-        await markPetitionFieldCommentsAsRead({
-          variables: {
-            keycode,
-            petitionFieldCommentIds: selectedField!.comments
-              .filter((c) => c.isUnread)
-              .map((c) => c.id),
-          },
-        });
+        const petitionFieldCommentIds = selectedField!.comments
+          .filter((c) => c.isUnread)
+          .map((c) => c.id);
+        if (petitionFieldCommentIds.length > 0) {
+          await markPetitionFieldCommentsAsRead({
+            variables: { keycode, petitionFieldCommentIds },
+          });
+        }
       }, 1000);
       return () => clearTimeout(timeout);
     }
