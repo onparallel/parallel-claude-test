@@ -174,7 +174,7 @@ function People() {
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
-                boxSize="30px"
+                boxSize="20px"
                 color="purple.500"
                 marginTop={1}
               />
@@ -186,7 +186,7 @@ function People() {
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
-                boxSize="30px"
+                boxSize="20px"
                 color="purple.500"
                 marginTop={1}
               />
@@ -198,7 +198,7 @@ function People() {
             <ListItem display="flex">
               <ListIcon
                 as={CheckIcon}
-                boxSize="30px"
+                boxSize="20px"
                 color="purple.500"
                 marginTop={1}
               />
