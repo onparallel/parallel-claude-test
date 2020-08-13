@@ -368,7 +368,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
               new Date(event.createdAt),
               new Date(lastOpen.createdAt)
             );
-            if (difference <= 5) {
+            if (difference <= 30) {
               continue;
             }
           }
