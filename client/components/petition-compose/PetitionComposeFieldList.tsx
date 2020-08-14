@@ -240,79 +240,47 @@ export const PetitionComposeFieldList = Object.assign(
 
     return (
       <Card id="petition-fields" {...props}>
-        {fieldIds.length ? (
-          <>
-            <CardHeader headingAs="h2">
-              <FormattedMessage
-                id="petition.fields-header"
-                defaultMessage="This is the information that you need"
-              />
-            </CardHeader>
-            {fieldIds.map((fieldId, index) => (
-              <PetitionComposeField
-                id={`field-${fieldId}`}
-                onMove={handleFieldMove}
-                key={fieldId}
-                field={fieldsById[fieldId]}
-                index={index}
-                isActive={active === fieldId}
-                isLast={index === fieldIds.length - 1}
-                showError={showErrors}
-                onAddField={onAddField}
-                onClick={handleClick(fieldId)}
-                onFocus={handleFocus(fieldId)}
-                onCloneClick={handleCloneClick(fieldId)}
-                onSettingsClick={handleSettingsClick(fieldId)}
-                onDeleteClick={handleDeleteClick(fieldId)}
-                onFieldEdit={handleFieldEdit(fieldId)}
-                titleFieldProps={titleFieldProps(fieldId)}
-                descriptionFieldProps={descriptionFieldProps(fieldId)}
-              />
-            ))}
-            <Flex padding={2} justifyContent="center">
-              <AddFieldPopover
-                as={Button}
-                ref={addFieldRef}
-                variant="ghost"
-                leftIcon={<AddIcon />}
-                onSelectFieldType={onAddField}
-              >
-                <FormattedMessage
-                  id="petition.add-another-field-button"
-                  defaultMessage="Add another field"
-                />
-              </AddFieldPopover>
-            </Flex>
-          </>
-        ) : (
-          <Box textAlign="center" padding={4}>
-            <Heading as="h2" size="md" marginTop={8} marginBottom={2}>
-              <FormattedMessage
-                id="petition.empty-header"
-                defaultMessage="What information do you want us to collect?"
-              />
-            </Heading>
-            <Text fontSize="md">
-              <FormattedMessage
-                id="petition.empty-text"
-                defaultMessage="Let's add our first field"
-              />
-            </Text>
-            <AddFieldPopover
-              marginTop={8}
-              marginBottom={6}
-              as={Button}
-              colorScheme="purple"
-              leftIcon={<AddIcon />}
-              onSelectFieldType={onAddField}
-            >
-              <FormattedMessage
-                id="petition.add-field-button"
-                defaultMessage="Add field"
-              />
-            </AddFieldPopover>
-          </Box>
-        )}
+        <CardHeader headingAs="h2">
+          <FormattedMessage
+            id="petition.fields-header"
+            defaultMessage="This is the information that you need"
+          />
+        </CardHeader>
+        {fieldIds.map((fieldId, index) => (
+          <PetitionComposeField
+            id={`field-${fieldId}`}
+            onMove={handleFieldMove}
+            key={fieldId}
+            field={fieldsById[fieldId]}
+            index={index}
+            isActive={active === fieldId}
+            isLast={index === fieldIds.length - 1}
+            showError={showErrors}
+            onAddField={onAddField}
+            onClick={handleClick(fieldId)}
+            onFocus={handleFocus(fieldId)}
+            onCloneClick={handleCloneClick(fieldId)}
+            onSettingsClick={handleSettingsClick(fieldId)}
+            onDeleteClick={handleDeleteClick(fieldId)}
+            onFieldEdit={handleFieldEdit(fieldId)}
+            titleFieldProps={titleFieldProps(fieldId)}
+            descriptionFieldProps={descriptionFieldProps(fieldId)}
+          />
+        ))}
+        <Flex padding={2} justifyContent="center">
+          <AddFieldPopover
+            as={Button}
+            ref={addFieldRef}
+            variant="ghost"
+            leftIcon={<AddIcon />}
+            onSelectFieldType={onAddField}
+          >
+            <FormattedMessage
+              id="petition.add-another-field-button"
+              defaultMessage="Add another field"
+            />
+          </AddFieldPopover>
+        </Flex>
       </Card>
     );
   }),
