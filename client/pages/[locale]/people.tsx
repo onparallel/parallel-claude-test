@@ -18,6 +18,7 @@ import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ClaimsList } from "../../components/public/ClaimsList";
 
 function People() {
   const intl = useIntl();
@@ -170,44 +171,25 @@ function People() {
           <Separator flex="1" minHeight="20px" />
         </Flex>
         <Box textAlign="left" maxWidth="520px" margin="auto" marginTop={4}>
-          <List listStylePosition="outside" spacing={4}>
-            <ListItem display="flex">
-              <ListIcon
-                as={CheckIcon}
-                boxSize="20px"
-                color="purple.500"
-                marginTop={1}
-              />
-              <FormattedMessage
-                id="public.case.laura.centralized-information"
-                defaultMessage="All the information always available in a single place on the cloud."
-              />
-            </ListItem>
-            <ListItem display="flex">
-              <ListIcon
-                as={CheckIcon}
-                boxSize="20px"
-                color="purple.500"
-                marginTop={1}
-              />
-              <FormattedMessage
-                id="public.case.laura.reminders"
-                defaultMessage="The peace of mind about not having to chase clients, because Parallel does it for her."
-              />
-            </ListItem>
-            <ListItem display="flex">
-              <ListIcon
-                as={CheckIcon}
-                boxSize="20px"
-                color="purple.500"
-                marginTop={1}
-              />
-              <FormattedMessage
-                id="public.case.laura.client-anywhere"
-                defaultMessage="The convenience for her clients, who now can upload their files at any time and from any device."
-              />
-            </ListItem>
-          </List>
+          <ClaimsList
+            claims={[
+              intl.formatMessage({
+                id: "public.case.laura.centralized-information",
+                defaultMessage:
+                  "All the information always available in a single place on the cloud.",
+              }),
+              intl.formatMessage({
+                id: "public.case.laura.reminders",
+                defaultMessage:
+                  "The peace of mind about not having to chase clients, because Parallel does it for her.",
+              }),
+              intl.formatMessage({
+                id: "public.case.laura.client-anywhere",
+                defaultMessage:
+                  "The convenience for her clients, who now can upload their files at any time and from any device.",
+              }),
+            ]}
+          />
         </Box>
         <Box textAlign="center" paddingY={20}>
           <Text>

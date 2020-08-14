@@ -12,7 +12,7 @@ function About() {
         id: "public.about.title",
         defaultMessage: "About",
       })}
-      metaDescription={intl.formatMessage({
+      description={intl.formatMessage({
         id: "public.about.meta-description",
         defaultMessage: "Learn more about Parallel's mission and our story",
       })}

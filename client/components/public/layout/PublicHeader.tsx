@@ -89,8 +89,8 @@ function PublicHeaderMenu(props: StackProps) {
         </NakedLink>
       </Flex>
       <Flex>
-        <Menu>
-          <MenuButton as={Button} variant="ghost">
+        <Menu placement="bottom">
+          <MenuButton as={Button} variant="ghost" width="100%">
             <FormattedMessage
               id="public.persons-link"
               defaultMessage="For whom"

@@ -40,7 +40,7 @@ function Invite() {
         id: "public.invite.title",
         defaultMessage: "Request an invite",
       })}
-      metaDescription={intl.formatMessage({
+      description={intl.formatMessage({
         id: "public.invite.meta-description",
         defaultMessage: "Request an invite to start using Parallel",
       })}

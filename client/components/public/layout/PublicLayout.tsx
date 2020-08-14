@@ -12,13 +12,13 @@ import { PublicHeader } from "./PublicHeader";
 
 export interface PublicLayoutProps {
   title: string;
-  metaDescription?: string;
+  description?: string;
   children?: ReactNode;
 }
 
 export function PublicLayout({
   title,
-  metaDescription,
+  description,
   children,
 }: PublicLayoutProps) {
   const { query, pathname } = useRouter();
@@ -47,7 +47,7 @@ export function PublicLayout({
         <meta
           name="description"
           content={
-            metaDescription ||
+            description ||
             intl.formatMessage({
               id: "public.meta-description",
               defaultMessage:

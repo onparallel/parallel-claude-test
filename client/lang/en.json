@@ -2416,13 +2416,13 @@
   },
   {
     "term": "public.services.collaboration.anywhere",
-    "definition": "So they can work from a computer or mobile device.",
-    "context": "So they can work from a computer or mobile device."
+    "definition": "Work from a computer or a mobile device.",
+    "context": "Work from a computer or a mobile device."
   },
   {
     "term": "public.services.collaboration.avoid-repeated",
-    "definition": "Avoiding requesting the same information more than once.",
-    "context": "Avoiding requesting the same information more than once."
+    "definition": "Avoid requesting the same information more than once.",
+    "context": "Avoid requesting the same information more than once."
   },
   {
     "term": "public.services.collaboration.between-professionals",
@@ -2431,13 +2431,13 @@
   },
   {
     "term": "public.services.collaboration.centralize-conversations",
-    "definition": "Centralizing conversations in one place.",
-    "context": "Centralizing conversations in one place."
+    "definition": "Centralize conversations in a single place.",
+    "context": "Centralize conversations in a single place."
   },
   {
     "term": "public.services.collaboration.no-install",
-    "definition": "In a fast way, without downloads or installations.",
-    "context": "In a fast way, without downloads or installations."
+    "definition": "Always accessible, no downloads or installs needed.",
+    "context": "Always accessible, no downloads or installs needed."
   },
   {
     "term": "public.services.collaboration.see-reviewed",
@@ -2461,8 +2461,8 @@
   },
   {
     "term": "public.services.knowledge.scale",
-    "definition": "Standardize projects to scale the business.",
-    "context": "Standardize projects to scale the business."
+    "definition": "Standarize projects to scale the business.",
+    "context": "Standarize projects to scale the business."
   },
   {
     "term": "public.services.knowledge.share",

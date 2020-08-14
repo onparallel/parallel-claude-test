@@ -4,18 +4,15 @@ import {
   Flex,
   Heading,
   Image,
-  List,
-  ListIcon,
-  ListItem,
   Stack,
   Text,
 } from "@chakra-ui/core";
-import { CheckIcon } from "@parallel/chakra/icons";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ClaimsList } from "../../components/public/ClaimsList";
 
 function Services() {
   const intl = useIntl();
@@ -25,7 +22,7 @@ function Services() {
         id: "public.services.title",
         defaultMessage: "Professional Services",
       })}
-      metaDescription={intl.formatMessage({
+      description={intl.formatMessage({
         id: "public.services.meta-description",
         defaultMessage:
           "Increase your firm efficiency. Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues.",
@@ -65,61 +62,32 @@ function Services() {
       <PublicContainer paddingBottom={16} maxWidth="container.lg">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
           <BenefitClaim image="/static/images/undraw_product_iteration.svg">
-            <List listStylePosition="outside" spacing={4}>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.automation.templates"
-                  defaultMessage="Use templates to work fast and comfortably."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.automation.control"
-                  defaultMessage="Review the uploaded information automatically."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.automation.reminders"
-                  defaultMessage="Set up reminders or send them manually with one click."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.automation.activity"
-                  defaultMessage="Control deadlines and keep an audit log."
-                />
-              </ListItem>
-            </List>
+            <ClaimsList
+              claims={[
+                intl.formatMessage({
+                  id: "public.services.automation.templates",
+                  defaultMessage: "Use templates to work fast and comfortably.",
+                }),
+                intl.formatMessage({
+                  id: "public.services.automation.control",
+                  defaultMessage:
+                    "Review the uploaded information automatically.",
+                }),
+                intl.formatMessage({
+                  id: "public.services.automation.reminders",
+                  defaultMessage:
+                    "Set up reminders or send them manually with one click.",
+                }),
+                intl.formatMessage({
+                  id: "public.services.automation.activity",
+                  defaultMessage: "Control deadlines and keep an audit log.",
+                }),
+              ]}
+            />
           </BenefitClaim>
         </Stack>
       </PublicContainer>
       <PublicContainer
-        // {...props}
         paddingY={16}
         wrapper={{
           textAlign: "center",
@@ -139,89 +107,57 @@ function Services() {
             reverse
             image="/static/images/undraw_document_collaboration.svg"
           >
-            <List listStylePosition="outside" spacing={4}>
-              <ListItem display="flex">
-                <Text fontWeight="bold">
-                  <FormattedMessage
-                    id="public.services.collaboration.between-professionals"
-                    defaultMessage="Between your profesionals:"
-                  />
-                </Text>
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
+            <Stack spacing={4}>
+              <Text fontWeight="bold">
                 <FormattedMessage
-                  id="public.services.collaboration.avoid-repeated"
-                  defaultMessage="Avoiding requesting the same information more than once."
+                  id="public.services.collaboration.between-professionals"
+                  defaultMessage="Between your profesionals:"
                 />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
+              </Text>
+              <ClaimsList
+                claims={[
+                  intl.formatMessage({
+                    id: "public.services.collaboration.avoid-repeated",
+                    defaultMessage:
+                      "Avoid requesting the same information more than once.",
+                  }),
+                  intl.formatMessage({
+                    id: "public.services.collaboration.see-reviewed",
+                    defaultMessage:
+                      "Track what documents have already been reviewed.",
+                  }),
+                ]}
+              />
+              <Text fontWeight="bold">
                 <FormattedMessage
-                  id="public.services.collaboration.see-reviewed"
-                  defaultMessage="Track what documents have already been reviewed."
+                  id="public.services.collaboration.with-clients"
+                  defaultMessage="With your clients:"
                 />
-              </ListItem>
-              <ListItem display="flex">
-                <Text fontWeight="bold">
-                  <FormattedMessage
-                    id="public.services.collaboration.with-clients"
-                    defaultMessage="With your clients:"
-                  />
-                </Text>
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.collaboration.no-install"
-                  defaultMessage="In a fast way, without downloads or installations."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.collaboration.centralize-conversations"
-                  defaultMessage="Centralizing conversations in one place."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.collaboration.anywhere"
-                  defaultMessage="So they can work from a computer or mobile device."
-                />
-              </ListItem>
-            </List>
+              </Text>
+              <ClaimsList
+                claims={[
+                  intl.formatMessage({
+                    id: "public.services.collaboration.no-install",
+                    defaultMessage:
+                      "Always accessible, no downloads or installs needed.",
+                  }),
+                  intl.formatMessage({
+                    id:
+                      "public.services.collaboration.centralize-conversations",
+                    defaultMessage:
+                      "Centralize conversations in a single place.",
+                  }),
+                  intl.formatMessage({
+                    id: "public.services.collaboration.anywhere",
+                    defaultMessage: "Work from a computer or a mobile device.",
+                  }),
+                ]}
+              />
+            </Stack>
           </BenefitClaim>
         </Stack>
       </PublicContainer>
       <PublicContainer
-        // {...props}
         paddingY={16}
         wrapper={{
           textAlign: "center",
@@ -238,44 +174,24 @@ function Services() {
       <PublicContainer paddingBottom={16} maxWidth="container.lg">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
           <BenefitClaim image="/static/images/undraw_fast_loading.svg">
-            <List listStylePosition="outside" spacing={4}>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.knowledge.templates"
-                  defaultMessage="Transform your document and information checklists into reusable templates."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.knowledge.share"
-                  defaultMessage="Share and distribute templates with specific people, teams, or the entire organization."
-                />
-              </ListItem>
-              <ListItem display="flex">
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
-                <FormattedMessage
-                  id="public.services.knowledge.scale"
-                  defaultMessage="Standardize projects to scale the business."
-                />
-              </ListItem>
-            </List>
+            <ClaimsList
+              claims={[
+                intl.formatMessage({
+                  id: "public.services.knowledge.templates",
+                  defaultMessage:
+                    "Transform your document and information checklists into reusable templates.",
+                }),
+                intl.formatMessage({
+                  id: "public.services.knowledge.share",
+                  defaultMessage:
+                    "Share and distribute templates with specific people, teams, or the entire organization.",
+                }),
+                intl.formatMessage({
+                  id: "public.services.knowledge.scale",
+                  defaultMessage: "Standarize projects to scale the business.",
+                }),
+              ]}
+            />
           </BenefitClaim>
         </Stack>
       </PublicContainer>

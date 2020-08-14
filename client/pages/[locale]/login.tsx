@@ -105,7 +105,7 @@ function Login() {
         id: "public.login.title",
         defaultMessage: "Login",
       })}
-      metaDescription={intl.formatMessage({
+      description={intl.formatMessage({
         id: "public.login.meta-description",
         defaultMessage: "Login to your Parallel account",
       })}

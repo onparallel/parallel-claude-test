@@ -2416,13 +2416,13 @@
   },
   {
     "term": "public.services.collaboration.anywhere",
-    "definition": "Para que puedan trabajar desde ordenador o dispositivo móvil.",
-    "context": "So they can work from a computer or mobile device."
+    "definition": "Trabaja desde ordenador o dispositivo móvil.",
+    "context": "Work from a computer or a mobile device."
   },
   {
     "term": "public.services.collaboration.avoid-repeated",
-    "definition": "Evitando que pidan la misma información dos veces.",
-    "context": "Avoiding requesting the same information more than once."
+    "definition": "Evita pedir la misma información dos veces.",
+    "context": "Avoid requesting the same information more than once."
   },
   {
     "term": "public.services.collaboration.between-professionals",
@@ -2431,17 +2431,17 @@
   },
   {
     "term": "public.services.collaboration.centralize-conversations",
-    "definition": "Centralizando las conversaciones en un único lugar.",
-    "context": "Centralizing conversations in one place."
+    "definition": "Centraliza las conversaciones en un único lugar.",
+    "context": "Centralize conversations in a single place."
   },
   {
     "term": "public.services.collaboration.no-install",
-    "definition": "De una manera rápida, y sin descargas ni instalaciones.",
-    "context": "In a fast way, without downloads or installations."
+    "definition": "Siempre accesible, y sin descargas ni instalaciones.",
+    "context": "Always accessible, no downloads or installs needed."
   },
   {
     "term": "public.services.collaboration.see-reviewed",
-    "definition": "Mostrando qué documentos ya han sido revisados.",
+    "definition": "Muestra qué documentos ya han sido revisados.",
     "context": "Track what documents have already been reviewed."
   },
   {
@@ -2462,7 +2462,7 @@
   {
     "term": "public.services.knowledge.scale",
     "definition": "Estandariza los proyectos para escalar el negocio.",
-    "context": "Standardize projects to scale the business."
+    "context": "Standarize projects to scale the business."
   },
   {
     "term": "public.services.knowledge.share",
