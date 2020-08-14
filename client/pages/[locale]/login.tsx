@@ -105,6 +105,10 @@ function Login() {
         id: "public.login.title",
         defaultMessage: "Login",
       })}
+      metaDescription={intl.formatMessage({
+        id: "public.login.meta-description",
+        defaultMessage: "Login to your Parallel account",
+      })}
     >
       <PublicUserFormContainer>
         {showContinueAs ? (

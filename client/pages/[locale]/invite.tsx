@@ -40,6 +40,10 @@ function Invite() {
         id: "public.invite.title",
         defaultMessage: "Request an invite",
       })}
+      metaDescription={intl.formatMessage({
+        id: "public.invite.meta-description",
+        defaultMessage: "Request an invite to start using Parallel",
+      })}
     >
       <PublicContainer paddingY={{ base: 8, md: 16 }}>
         <Stack spacing={8} direction={{ base: "column", md: "row" }}>

@@ -12,10 +12,15 @@ import { PublicHeader } from "./PublicHeader";
 
 export interface PublicLayoutProps {
   title: string;
+  metaDescription?: string;
   children?: ReactNode;
 }
 
-export function PublicLayout({ title, children }: PublicLayoutProps) {
+export function PublicLayout({
+  title,
+  metaDescription,
+  children,
+}: PublicLayoutProps) {
   const { query, pathname } = useRouter();
   const intl = useIntl();
   let headerIsThin = false;
@@ -41,11 +46,14 @@ export function PublicLayout({ title, children }: PublicLayoutProps) {
         />
         <meta
           name="description"
-          content={intl.formatMessage({
-            id: "public.meta-description",
-            defaultMessage:
-              "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal.",
-          })}
+          content={
+            metaDescription ||
+            intl.formatMessage({
+              id: "public.meta-description",
+              defaultMessage:
+                "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal.",
+            })
+          }
         />
         {languages.map(({ locale }) => (
           <link

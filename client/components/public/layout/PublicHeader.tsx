@@ -7,6 +7,10 @@ import {
   Stack,
   StackProps,
   useDisclosure,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/core";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { NakedLink } from "@parallel/components/common/Link";
@@ -85,14 +89,32 @@ function PublicHeaderMenu(props: StackProps) {
         </NakedLink>
       </Flex>
       <Flex>
-        <NakedLink href="/people">
-          <Button flex="1" as="a" variant="ghost">
+        <Menu>
+          <MenuButton as={Button} variant="ghost">
             <FormattedMessage
               id="public.persons-link"
               defaultMessage="For whom"
-            />
-          </Button>
-        </NakedLink>
+            ></FormattedMessage>
+          </MenuButton>
+          <MenuList>
+            <NakedLink href="/services">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.for-whom.services"
+                  defaultMessage="Professional Services"
+                ></FormattedMessage>
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/people">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.for-whom.freelance"
+                  defaultMessage="Freelancers"
+                ></FormattedMessage>
+              </MenuItem>
+            </NakedLink>
+          </MenuList>
+        </Menu>
       </Flex>
       <Flex>
         <NakedLink href="/about">

@@ -1665,6 +1665,11 @@
     "context": "About"
   },
   {
+    "term": "public.about.meta-description",
+    "definition": "Conoce más acerca de la misión y la historia de Parallel",
+    "context": "Learn more about Parallel's mission and our story"
+  },
+  {
     "term": "public.about.mission",
     "definition": "Nuestra misión es hacer que el trabajo de los profesionales valga la pena",
     "context": "Our mission is to make professionals work worthwhile"
@@ -1900,6 +1905,16 @@
     "context": "Twitter profile"
   },
   {
+    "term": "public.for-whom.freelance",
+    "definition": "Freelancers",
+    "context": "Freelancers"
+  },
+  {
+    "term": "public.for-whom.services",
+    "definition": "Servicios Profesionales",
+    "context": "Professional Services"
+  },
+  {
     "term": "public.forgot-password.explanation",
     "definition": "Le enviaremos un mensaje para restablecer su contraseña",
     "context": "We will send you a message to reset your password."
@@ -2095,6 +2110,11 @@
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time."
   },
   {
+    "term": "public.invite.meta-description",
+    "definition": "Pide una invitación para empezar a utilizar Parallel",
+    "context": "Request an invite to start using Parallel"
+  },
+  {
     "term": "public.invite.request-invite",
     "definition": "¡Pide tu invitación!",
     "context": "Request your invite!"
@@ -2168,6 +2188,11 @@
     "term": "public.login.invalid-login.title",
     "definition": "Acceso inválido",
     "context": "Invalid login"
+  },
+  {
+    "term": "public.login.meta-description",
+    "definition": "Entre en tu cuenta de Parallel",
+    "context": "Login to your Parallel account"
   },
   {
     "term": "public.login.password-update-button",
@@ -2300,6 +2325,11 @@
     "context": "How do we protect your data and information?"
   },
   {
+    "term": "public.security.meta-description",
+    "definition": "Conoce más acerca de la seguridad en Parallel",
+    "context": "Learn more about security at Parallel"
+  },
+  {
     "term": "public.security.pass-storage",
     "definition": "Nunca almacenaremos tus contraseñas tal y como la escribes, únicamente podrás reestablecerla por medios que permitan que verifiquemos tus credenciales.",
     "context": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials."
@@ -2348,6 +2378,111 @@
     "term": "public.security.your-connection",
     "definition": "¿Cómo protegemos tu conexión?",
     "context": "How do we protect your connection?"
+  },
+  {
+    "term": "public.services.automate",
+    "definition": "Automatiza la recopilación de los listados de información",
+    "context": "Automate the collection of information checklists"
+  },
+  {
+    "term": "public.services.automation.activity",
+    "definition": "Controla las fechas de vencimiento y mantén una pista de auditoría.",
+    "context": "Control deadlines and keep an audit log."
+  },
+  {
+    "term": "public.services.automation.control",
+    "definition": "Revisa automáticamente la información subida.",
+    "context": "Review the uploaded information automatically."
+  },
+  {
+    "term": "public.services.automation.reminders",
+    "definition": "Programa recordatorios o envíalos manualmente con un click.",
+    "context": "Set up reminders or send them manually with one click."
+  },
+  {
+    "term": "public.services.automation.templates",
+    "definition": "Utiliza plantillas para trabajar rápida y cómodamente.",
+    "context": "Use templates to work fast and comfortably."
+  },
+  {
+    "term": "public.services.checklists-collaboration",
+    "definition": "Gestiona eficientemente los listados de documentos e información y mejora la colaboración con tus clientes y tus compañeros.",
+    "context": "Manage documents and information checklists efficiently and improve collaboration with your clients and between your colleagues."
+  },
+  {
+    "term": "public.services.collaboration",
+    "definition": "Potencia la colaboración",
+    "context": "Boost collaboration"
+  },
+  {
+    "term": "public.services.collaboration.anywhere",
+    "definition": "Para que puedan trabajar desde ordenador o dispositivo móvil.",
+    "context": "So they can work from a computer or mobile device."
+  },
+  {
+    "term": "public.services.collaboration.avoid-repeated",
+    "definition": "Evitando que pidan la misma información dos veces.",
+    "context": "Avoiding requesting the same information more than once."
+  },
+  {
+    "term": "public.services.collaboration.between-professionals",
+    "definition": "Entre tus profesionales:",
+    "context": "Between your profesionals:"
+  },
+  {
+    "term": "public.services.collaboration.centralize-conversations",
+    "definition": "Centralizando las conversaciones en un único lugar.",
+    "context": "Centralizing conversations in one place."
+  },
+  {
+    "term": "public.services.collaboration.no-install",
+    "definition": "De una manera rápida, y sin descargas ni instalaciones.",
+    "context": "In a fast way, without downloads or installations."
+  },
+  {
+    "term": "public.services.collaboration.see-reviewed",
+    "definition": "Mostrando qué documentos ya han sido revisados.",
+    "context": "Track what documents have already been reviewed."
+  },
+  {
+    "term": "public.services.collaboration.with-clients",
+    "definition": "Con tus clientes:",
+    "context": "With your clients:"
+  },
+  {
+    "term": "public.services.hero-title",
+    "definition": "Aumenta la eficiencia de tu firma con Parallel",
+    "context": "Increase the efficiency of your firm with Parallel"
+  },
+  {
+    "term": "public.services.knowledge",
+    "definition": "Reaprovecha el conocimiento",
+    "context": "Reuse knowledge"
+  },
+  {
+    "term": "public.services.knowledge.scale",
+    "definition": "Estandariza los proyectos para escalar el negocio.",
+    "context": "Standardize projects to scale the business."
+  },
+  {
+    "term": "public.services.knowledge.share",
+    "definition": "Comparte y distribuye las plantillas con personas concretas, equipos o con toda la organización.",
+    "context": "Share and distribute templates with specific people, teams, or the entire organization."
+  },
+  {
+    "term": "public.services.knowledge.templates",
+    "definition": "Transforma tus listados de documentos e información en plantillas reutilizables.",
+    "context": "Transform your document and information checklists into reusable templates."
+  },
+  {
+    "term": "public.services.meta-description",
+    "definition": "Incrementa la eficiencia de tu despacho. Mejora la gestión de los listados de documentos e información y la colaboración con clientes y entre profesionales.",
+    "context": "Increase your firm efficiency. Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues."
+  },
+  {
+    "term": "public.services.title",
+    "definition": "Servicios Profesionales",
+    "context": "Professional Services"
   },
   {
     "term": "public.showcase-hero-alt",
@@ -2606,7 +2741,7 @@
   },
   {
     "term": "timeline.message-sent-see-message",
-    "definition": "",
+    "definition": "Ver mensaje",
     "context": "See message"
   },
   {

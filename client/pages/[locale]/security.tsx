@@ -21,6 +21,10 @@ function Security() {
         id: "public.security.title",
         defaultMessage: "Security",
       })}
+      metaDescription={intl.formatMessage({
+        id: "public.security.meta-description",
+        defaultMessage: "Learn more about security at Parallel",
+      })}
     >
       <PublicContainer
         textAlign="center"

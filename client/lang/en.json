@@ -1665,6 +1665,11 @@
     "context": "About"
   },
   {
+    "term": "public.about.meta-description",
+    "definition": "Learn more about Parallel's mission and our story",
+    "context": "Learn more about Parallel's mission and our story"
+  },
+  {
     "term": "public.about.mission",
     "definition": "Our mission is to make professionals work worthwhile",
     "context": "Our mission is to make professionals work worthwhile"
@@ -1900,6 +1905,16 @@
     "context": "Twitter profile"
   },
   {
+    "term": "public.for-whom.freelance",
+    "definition": "Freelancers",
+    "context": "Freelancers"
+  },
+  {
+    "term": "public.for-whom.services",
+    "definition": "Professional Services",
+    "context": "Professional Services"
+  },
+  {
     "term": "public.forgot-password.explanation",
     "definition": "We will send you a message to reset your password.",
     "context": "We will send you a message to reset your password."
@@ -2095,6 +2110,11 @@
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time."
   },
   {
+    "term": "public.invite.meta-description",
+    "definition": "Request an invite to start using Parallel",
+    "context": "Request an invite to start using Parallel"
+  },
+  {
     "term": "public.invite.request-invite",
     "definition": "Request your invite!",
     "context": "Request your invite!"
@@ -2168,6 +2188,11 @@
     "term": "public.login.invalid-login.title",
     "definition": "Invalid login",
     "context": "Invalid login"
+  },
+  {
+    "term": "public.login.meta-description",
+    "definition": "Login to your Parallel account",
+    "context": "Login to your Parallel account"
   },
   {
     "term": "public.login.password-update-button",
@@ -2300,6 +2325,11 @@
     "context": "How do we protect your data and information?"
   },
   {
+    "term": "public.security.meta-description",
+    "definition": "Learn more about security at Parallel",
+    "context": "Learn more about security at Parallel"
+  },
+  {
     "term": "public.security.pass-storage",
     "definition": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials.",
     "context": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials."
@@ -2348,6 +2378,111 @@
     "term": "public.security.your-connection",
     "definition": "How do we protect your connection?",
     "context": "How do we protect your connection?"
+  },
+  {
+    "term": "public.services.automate",
+    "definition": "Automate the collection of information checklists",
+    "context": "Automate the collection of information checklists"
+  },
+  {
+    "term": "public.services.automation.activity",
+    "definition": "Control deadlines and keep an audit log.",
+    "context": "Control deadlines and keep an audit log."
+  },
+  {
+    "term": "public.services.automation.control",
+    "definition": "Review the uploaded information automatically.",
+    "context": "Review the uploaded information automatically."
+  },
+  {
+    "term": "public.services.automation.reminders",
+    "definition": "Set up reminders or send them manually with one click.",
+    "context": "Set up reminders or send them manually with one click."
+  },
+  {
+    "term": "public.services.automation.templates",
+    "definition": "Use templates to work fast and comfortably.",
+    "context": "Use templates to work fast and comfortably."
+  },
+  {
+    "term": "public.services.checklists-collaboration",
+    "definition": "Manage documents and information checklists efficiently and improve collaboration with your clients and between your colleagues.",
+    "context": "Manage documents and information checklists efficiently and improve collaboration with your clients and between your colleagues."
+  },
+  {
+    "term": "public.services.collaboration",
+    "definition": "Boost collaboration",
+    "context": "Boost collaboration"
+  },
+  {
+    "term": "public.services.collaboration.anywhere",
+    "definition": "So they can work from a computer or mobile device.",
+    "context": "So they can work from a computer or mobile device."
+  },
+  {
+    "term": "public.services.collaboration.avoid-repeated",
+    "definition": "Avoiding requesting the same information more than once.",
+    "context": "Avoiding requesting the same information more than once."
+  },
+  {
+    "term": "public.services.collaboration.between-professionals",
+    "definition": "Between your profesionals:",
+    "context": "Between your profesionals:"
+  },
+  {
+    "term": "public.services.collaboration.centralize-conversations",
+    "definition": "Centralizing conversations in one place.",
+    "context": "Centralizing conversations in one place."
+  },
+  {
+    "term": "public.services.collaboration.no-install",
+    "definition": "In a fast way, without downloads or installations.",
+    "context": "In a fast way, without downloads or installations."
+  },
+  {
+    "term": "public.services.collaboration.see-reviewed",
+    "definition": "Track what documents have already been reviewed.",
+    "context": "Track what documents have already been reviewed."
+  },
+  {
+    "term": "public.services.collaboration.with-clients",
+    "definition": "With your clients:",
+    "context": "With your clients:"
+  },
+  {
+    "term": "public.services.hero-title",
+    "definition": "Increase the efficiency of your firm with Parallel",
+    "context": "Increase the efficiency of your firm with Parallel"
+  },
+  {
+    "term": "public.services.knowledge",
+    "definition": "Reuse knowledge",
+    "context": "Reuse knowledge"
+  },
+  {
+    "term": "public.services.knowledge.scale",
+    "definition": "Standardize projects to scale the business.",
+    "context": "Standardize projects to scale the business."
+  },
+  {
+    "term": "public.services.knowledge.share",
+    "definition": "Share and distribute templates with specific people, teams, or the entire organization.",
+    "context": "Share and distribute templates with specific people, teams, or the entire organization."
+  },
+  {
+    "term": "public.services.knowledge.templates",
+    "definition": "Transform your document and information checklists into reusable templates.",
+    "context": "Transform your document and information checklists into reusable templates."
+  },
+  {
+    "term": "public.services.meta-description",
+    "definition": "Increase your firm efficiency. Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues.",
+    "context": "Increase your firm efficiency. Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues."
+  },
+  {
+    "term": "public.services.title",
+    "definition": "Professional Services",
+    "context": "Professional Services"
   },
   {
     "term": "public.showcase-hero-alt",
