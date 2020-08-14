@@ -36,7 +36,10 @@ export function RecipientViewContentsCard({
         marginBottom={2}
         alignItems="center"
       >
-        Contents
+        <FormattedMessage
+          id="recipient-view.contents-header"
+          defaultMessage="Contents"
+        />
       </Heading>
       <Stack as={List} spacing={1} marginBottom={4}>
         {pages.map(({ title, ...badge }, index) => (

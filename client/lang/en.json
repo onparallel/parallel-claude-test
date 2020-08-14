@@ -1315,16 +1315,6 @@
     "context": "Drag to sort this petition fields"
   },
   {
-    "term": "petition.empty-header",
-    "definition": "What information do you want us to collect?",
-    "context": "What information do you want us to collect?"
-  },
-  {
-    "term": "petition.empty-text",
-    "definition": "Let's add our first field",
-    "context": "Let's add our first field"
-  },
-  {
     "term": "petition.field-clone",
     "definition": "Clone field",
     "context": "Clone field"
@@ -2550,6 +2540,11 @@
     "context": "Petition completed!"
   },
   {
+    "term": "recipient-view.contents-header",
+    "definition": "Contents",
+    "context": "Contents"
+  },
+  {
     "term": "recipient-view.field-comments.cta",
     "definition": "Have any questions? Ask here",
     "context": "Have any questions? Ask here"
@@ -2576,8 +2571,8 @@
   },
   {
     "term": "recipient-view.first-time.claim-2",
-    "definition": "You can come back as many times as you want using the link you received in your email.",
-    "context": "You can come back as many times as you want using the link you received in your email."
+    "definition": "You can come back as many times as you'd like using the link you received in your email.",
+    "context": "You can come back as many times as you'd like using the link you received in your email."
   },
   {
     "term": "recipient-view.first-time.claim-3",
