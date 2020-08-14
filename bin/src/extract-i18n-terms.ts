@@ -12,7 +12,6 @@ export interface Term {
   term: string;
   definition: string;
   context: string;
-  reference: string;
 }
 
 async function extract(locales: string[], input: string, output: string) {
@@ -68,8 +67,8 @@ async function loadLocaleData(dir: string, locale: string) {
   try {
     const terms = await readJson<Term[]>(path.join(dir, `${locale}.json`));
     const data = new Map<string, Term>();
-    for (const term of terms) {
-      data.set(term.term, term);
+    for (const { term, definition, context } of terms) {
+      data.set(term, { term, definition, context });
     }
     return data;
   } catch (error) {
@@ -94,14 +93,11 @@ function updateLocaleData(
           term: id,
           definition: "",
           context: "",
-          reference: "",
         };
     if (isDefault) {
       entry!.definition = term.defaultMessage;
     }
     entry!.context = term.description || term.defaultMessage;
-    const path = term.file.replace(/^\.\.\/[^/]+\//, "");
-    entry!.reference = `${path}:${term.line}:${term.col}`;
     updated.set(entry!.term, entry);
   }
   return Array.from(updated.values()).sort((a, b) =>

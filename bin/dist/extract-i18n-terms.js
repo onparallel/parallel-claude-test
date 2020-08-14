@@ -48,8 +48,8 @@ async function loadLocaleData(dir, locale) {
     try {
         const terms = await json_1.readJson(path_1.default.join(dir, `${locale}.json`));
         const data = new Map();
-        for (const term of terms) {
-            data.set(term.term, term);
+        for (const { term, definition, context } of terms) {
+            data.set(term, { term, definition, context });
         }
         return data;
     }
@@ -71,14 +71,11 @@ function updateLocaleData(isDefault, data, terms) {
                 term: id,
                 definition: "",
                 context: "",
-                reference: "",
             };
         if (isDefault) {
             entry.definition = term.defaultMessage;
         }
         entry.context = term.description || term.defaultMessage;
-        const path = term.file.replace(/^\.\.\/[^/]+\//, "");
-        entry.reference = `${path}:${term.line}:${term.col}`;
         updated.set(entry.term, entry);
     }
     return Array.from(updated.values()).sort((a, b) => a.term.localeCompare(b.term));
