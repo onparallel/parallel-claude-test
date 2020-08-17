@@ -9,7 +9,12 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
-import { CreatePetition, CreatePetitionField } from "../../../db/__types";
+import {
+  CreatePetition,
+  CreatePetitionField,
+  PetitionUserPermissionType,
+  User,
+} from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import { and, authenticate, chain } from "../../helpers/authorize";
@@ -41,6 +46,7 @@ import {
   validatePetitionStatus,
 } from "../validations";
 import { WhitelistedError } from "./../../helpers/errors";
+import { groupBy } from "remeda";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -95,9 +101,39 @@ export const deletePetitions = mutationField("deletePetitions", {
   authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
   args: {
     ids: idArg({ required: true, list: [true] }),
+    force: booleanArg({ default: false, required: false }),
   },
   resolve: async (_, args, ctx) => {
     const { ids } = fromGlobalIds(args.ids, "Petition");
+
+    const petitionIsSharedByOwner = (userId: number) => {
+      return (
+        p: {
+          type: PetitionUserPermissionType;
+          user: User;
+          petitionId: number;
+        }[]
+      ) =>
+        p.length > 1 &&
+        p.find((u) => u.type === "OWNER" && u.user.id === userId);
+    };
+
+    const usersByPetitionId = groupBy(
+      await ctx.petitions.loadSubscribedUsersForPetitions(ids),
+      (u) => u.petitionId
+    );
+
+    if (
+      Object.values(usersByPetitionId).some(
+        petitionIsSharedByOwner(ctx.user!.id)
+      ) &&
+      !args.force
+    ) {
+      throw new WhitelistedError(
+        "Petition to delete is shared to another user",
+        "DELETE_SHARED_PETITION_ERROR"
+      );
+    }
     await ctx.petitions.deletePetitionById(ids, ctx.user!);
     return RESULT.SUCCESS;
   },

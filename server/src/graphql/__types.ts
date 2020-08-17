@@ -824,6 +824,7 @@ export interface NexusGenArgTypes {
     };
     deletePetitions: {
       // args
+      force?: boolean | null; // Boolean
       ids: string[]; // [ID!]!
     };
     fileUploadReplyDownloadLink: {
