@@ -20,7 +20,7 @@ function Career() {
     <PublicLayout
       title={intl.formatMessage({
         id: "public.careers.title",
-        defaultMessage: "Career",
+        defaultMessage: "Careers",
       })}
       description={intl.formatMessage({
         id: "public.careers.meta-description",

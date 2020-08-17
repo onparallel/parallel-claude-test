@@ -1160,6 +1160,11 @@
     "context": "Reviewed"
   },
   {
+    "term": "petition-sharing.header",
+    "definition": "",
+    "context": "Share with people"
+  },
+  {
     "term": "petition.activity-not-available",
     "definition": "Una vez envíes esta petición, podrás ver toda la actividad aquí",
     "context": "Once you send this petition, you will be able to see all the petition activity here."
@@ -1846,8 +1851,8 @@
   },
   {
     "term": "public.careers.title",
-    "definition": "Carreras",
-    "context": "Career"
+    "definition": "Trabaja con nosotros",
+    "context": "Careers"
   },
   {
     "term": "public.careers.we-want",
@@ -2080,11 +2085,6 @@
     "context": "Discover everything you can do with our platform."
   },
   {
-    "term": "public.home.hero-leading-digital-transformation",
-    "definition": "Liderando la transformación digital en sus compañías",
-    "context": "Leading digital transformation in their companies"
-  },
-  {
     "term": "public.home.hero-popular-use-cases",
     "definition": "Casos de uso populares",
     "context": "Popular use cases"
@@ -2108,11 +2108,6 @@
     "term": "public.home.hero-try-now",
     "definition": "Prueba nuestra solución segura y rápida para gestionar documentos.",
     "context": "Try our secure and fast solution to manage documents."
-  },
-  {
-    "term": "public.home.hero-who-trust-us",
-    "definition": "Confían en nosotros",
-    "context": "Who trust us"
   },
   {
     "term": "public.home.title",
