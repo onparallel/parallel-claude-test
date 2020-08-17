@@ -125,6 +125,14 @@ export function PublicFooter(props: BoxProps) {
               </Link>
             </ListItem>
             <ListItem>
+              <Link href="/careers" as="/careers">
+                <FormattedMessage
+                  id="public.careers"
+                  defaultMessage="Careers"
+                />
+              </Link>
+            </ListItem>
+            <ListItem>
               <NormalLink href="/blog">
                 <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
               </NormalLink>

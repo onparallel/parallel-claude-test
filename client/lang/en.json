@@ -1800,6 +1800,61 @@
     "context": "In this demo we will explain:"
   },
   {
+    "term": "public.careers",
+    "definition": "Careers",
+    "context": "Careers"
+  },
+  {
+    "term": "public.careers.apply-here",
+    "definition": "Apply here",
+    "context": "Apply here"
+  },
+  {
+    "term": "public.careers.disrupt",
+    "definition": "We are disrupting the way people exchange and work with documents or other information.",
+    "context": "We are disrupting the way people exchange and work with documents or other information."
+  },
+  {
+    "term": "public.careers.finish-studies",
+    "definition": "Have you finished or are you finishing your studies?",
+    "context": "Have you finished or are you finishing your studies?"
+  },
+  {
+    "term": "public.careers.hero-title",
+    "definition": "Join us in our mission to give professionals their time back",
+    "context": "Join us in our mission to give professionals their time back"
+  },
+  {
+    "term": "public.careers.internship",
+    "definition": "Are you looking for an internship?",
+    "context": "Are you looking for an internship?"
+  },
+  {
+    "term": "public.careers.join-us",
+    "definition": "Would you like to join our team?",
+    "context": "Would you like to join our team?"
+  },
+  {
+    "term": "public.careers.meta-description",
+    "definition": "Join our team at Parallel on our mission to give professionals their time back",
+    "context": "Join our team at Parallel on our mission to give professionals their time back"
+  },
+  {
+    "term": "public.careers.practice",
+    "definition": "Are you looking for a place to put into practice the knowledge you have acquired or learn even more?",
+    "context": "Are you looking for a place to put into practice the knowledge you have acquired or learn even more?"
+  },
+  {
+    "term": "public.careers.title",
+    "definition": "Career",
+    "context": "Career"
+  },
+  {
+    "term": "public.careers.we-want",
+    "definition": "We want to make life easier for our users so they have more time for the important things.",
+    "context": "We want to make life easier for our users so they have more time for the important things."
+  },
+  {
     "term": "public.case.laura.centralized-information",
     "definition": "All the information always available in a single place on the cloud.",
     "context": "All the information always available in a single place on the cloud."

@@ -1800,6 +1800,61 @@
     "context": "In this demo we will explain:"
   },
   {
+    "term": "public.careers",
+    "definition": "Trabaja con nosotros",
+    "context": "Careers"
+  },
+  {
+    "term": "public.careers.apply-here",
+    "definition": "Apúntate aquí",
+    "context": "Apply here"
+  },
+  {
+    "term": "public.careers.disrupt",
+    "definition": "Estamos irrumpiendo la manera en la que las personas intercambian y trabajan con documentos u otra información.",
+    "context": "We are disrupting the way people exchange and work with documents or other information."
+  },
+  {
+    "term": "public.careers.finish-studies",
+    "definition": "¿Has acabado o estás acabando tu formación?",
+    "context": "Have you finished or are you finishing your studies?"
+  },
+  {
+    "term": "public.careers.hero-title",
+    "definition": "Únete a nosotros en nuestra misión de devolverle el tiempo a los profesionales",
+    "context": "Join us in our mission to give professionals their time back"
+  },
+  {
+    "term": "public.careers.internship",
+    "definition": "¿Estás buscando unas prácticas?",
+    "context": "Are you looking for an internship?"
+  },
+  {
+    "term": "public.careers.join-us",
+    "definition": "¿Te gustaría formar parte de nuestro equipo?",
+    "context": "Would you like to join our team?"
+  },
+  {
+    "term": "public.careers.meta-description",
+    "definition": "Únete a nuestro equipo en Parallel en nuestra misión de devolverles el tiempo a los profesionales",
+    "context": "Join our team at Parallel on our mission to give professionals their time back"
+  },
+  {
+    "term": "public.careers.practice",
+    "definition": "¿Estás buscando un sitio donde poner en práctica los conocimientos que has adquirido o aprender más todavía?",
+    "context": "Are you looking for a place to put into practice the knowledge you have acquired or learn even more?"
+  },
+  {
+    "term": "public.careers.title",
+    "definition": "Carreras",
+    "context": "Career"
+  },
+  {
+    "term": "public.careers.we-want",
+    "definition": "Queremos hacerles la vida más fácil a nuestros usuarios para que tengan más tiempo para las cosas importantes.",
+    "context": "We want to make life easier for our users so they have more time for the important things."
+  },
+  {
     "term": "public.case.laura.centralized-information",
     "definition": "Toda la información siempre disponible en un único lugar en la nube.",
     "context": "All the information always available in a single place on the cloud."
