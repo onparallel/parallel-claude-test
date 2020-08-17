@@ -72,7 +72,7 @@ function replaceContactId(t: Knex.Transaction<any, any>) {
         .update({
           contact_id: contact.id,
         })
-        .whereIn("id", idsToReplace),
+        .whereIn("contact_id", idsToReplace),
       updateDoneBy(
         "petition_field_reply",
         `Contact:${contact.id}`,
