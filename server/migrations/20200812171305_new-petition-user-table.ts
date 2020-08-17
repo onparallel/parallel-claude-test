@@ -13,7 +13,7 @@ export async function up(knex: Knex): Promise<void> {
       .notNullable()
       .defaultTo("OWNER");
     t.boolean("is_subscribed").notNullable().defaultTo(true);
-    timestamps(t, { updated: false });
+    timestamps(t);
   });
 
   // only one owner per petition

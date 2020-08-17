@@ -486,6 +486,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: row.id,
           user_id: user.id,
           created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
         },
         t
       );
@@ -1101,6 +1102,7 @@ export class PetitionRepository extends BaseRepository {
           petition_id: cloned.id,
           user_id: user.id,
           created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
         },
         t
       );

@@ -500,6 +500,8 @@ export interface PetitionUser {
   is_subscribed: boolean;
   created_at: Date;
   created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
 }
@@ -511,6 +513,8 @@ export interface CreatePetitionUser {
   is_subscribed?: boolean;
   created_at?: Date;
   created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
 }
