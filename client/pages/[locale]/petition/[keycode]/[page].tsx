@@ -67,9 +67,8 @@ import {
 } from "../../../../components/recipient-view/RecipientViewPetitionField";
 import { useRouter } from "next/router";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
-import ResizeObserver from "react-resize-observer";
+import ResizeObserver, { DOMRect } from "react-resize-observer";
 import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
-import { QuestionIcon } from "@parallel/chakra/icons";
 
 type PublicPetitionProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
