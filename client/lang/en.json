@@ -375,11 +375,6 @@
     "context": "Schedule send"
   },
   {
-    "term": "component.send-button.send",
-    "definition": "Send",
-    "context": "Send"
-  },
-  {
     "term": "component.send-petition-dialog.same-petition-warning",
     "definition": "Recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "Recipients will receive a link to the same petition so they can fill it out collaboratively."
@@ -928,6 +923,11 @@
     "term": "generic.saving-changes",
     "definition": "Saving...",
     "context": "Saving..."
+  },
+  {
+    "term": "generic.send",
+    "definition": "Send",
+    "context": "Send"
   },
   {
     "term": "generic.submit",
@@ -2608,11 +2608,6 @@
     "term": "recipient-view.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment"
-  },
-  {
-    "term": "recipient-view.field-reply-submit",
-    "definition": "Submit",
-    "context": "Submit"
   },
   {
     "term": "recipient-view.files-uploaded",

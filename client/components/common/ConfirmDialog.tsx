@@ -45,25 +45,18 @@ export function ConfirmDialog<TResult = void>({
     >
       <ModalOverlay>
         <ModalContent borderRadius="md" {...content}>
-          <ModalHeader fontSize="lg" fontWeight="bold">
-            {header}
-          </ModalHeader>
+          <ModalHeader>{header}</ModalHeader>
           <ModalBody>{body}</ModalBody>
-          <ModalFooter>
-            <Stack direction="row">
-              {cancel ?? (
-                <Button
-                  ref={cancelRef}
-                  onClick={() => onReject({ reason: "CANCEL" })}
-                >
-                  <FormattedMessage
-                    id="generic.cancel"
-                    defaultMessage="Cancel"
-                  />
-                </Button>
-              )}
-              {confirm}
-            </Stack>
+          <ModalFooter as={Stack} direction="row">
+            {cancel ?? (
+              <Button
+                ref={cancelRef}
+                onClick={() => onReject({ reason: "CANCEL" })}
+              >
+                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+              </Button>
+            )}
+            {confirm}
           </ModalFooter>
         </ModalContent>
       </ModalOverlay>

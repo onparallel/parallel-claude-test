@@ -379,7 +379,7 @@ function TextReplyForm({
         marginLeft={{ base: 0, sm: 4 }}
       >
         <FormattedMessage
-          id="recipient-view.field-reply-submit"
+          id="generic.submit"
           defaultMessage="Submit"
         />
       </Button>

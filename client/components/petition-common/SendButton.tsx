@@ -33,10 +33,7 @@ export function SendButton({
         leftIcon={<PaperPlaneIcon />}
         onClick={onSendClick}
       >
-        <FormattedMessage
-          id="component.send-button.send"
-          defaultMessage="Send"
-        />
+        <FormattedMessage id="generic.send" defaultMessage="Send" />
       </Button>
       <Menu placement="bottom-end">
         <Tooltip
