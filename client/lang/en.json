@@ -1090,6 +1090,11 @@
     "context": "Status"
   },
   {
+    "term": "petition-fields-index.header",
+    "definition": "Contents",
+    "context": "Contents"
+  },
+  {
     "term": "petition-replies.comment-pending.label",
     "definition": "Pending",
     "context": "Pending"

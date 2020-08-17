@@ -20,7 +20,12 @@ export function PetitionFieldsIndex({
 }: PetitionFieldsIndexProps) {
   return (
     <Card display="flex" flexDirection="column" {...props}>
-      <CardHeader>Contents</CardHeader>
+      <CardHeader>
+        <FormattedMessage
+          id="petition-fields-index.header"
+          defaultMessage="Contents"
+        />
+      </CardHeader>
       <Box overflow="auto">
         <Stack as="ol" spacing={1} padding={4}>
           {fields.map((field, index) => (
