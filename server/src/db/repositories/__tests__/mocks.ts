@@ -15,6 +15,7 @@ import {
   CreatePetitionAccess,
   Contact,
   CreateContact,
+  PetitionUser,
 } from "../../__types";
 import { random } from "../../../util/token";
 
@@ -91,12 +92,11 @@ export class Mocks {
     amount: number,
     builder?: (index: number) => Partial<Petition>
   ) {
-    return await this.knex<Petition>("petition")
+    const petitions = await this.knex<Petition>("petition")
       .insert(
         range(0, amount).map<CreatePetition>((index) => {
           return {
             org_id: orgId,
-            owner_id: ownerId,
             is_template: false,
             status: randomPetitionStatus(),
             name: faker.random.words(),
@@ -106,6 +106,16 @@ export class Mocks {
         })
       )
       .returning("*");
+
+    await this.knex<PetitionUser>("petition_user").insert(
+      petitions.map(({ id }) => ({
+        created_by: `User:${ownerId}`,
+        petition_id: id,
+        user_id: ownerId,
+      }))
+    );
+
+    return petitions;
   }
 
   async createRandomPetitionFields(

@@ -35,11 +35,13 @@ import {
   User,
   PetitionUserNotification,
   PetitionContactNotification,
+  PetitionUserPermissionType,
 } from "../__types";
 import {
   PetitionAccessReminderConfig,
   calculateNextReminder,
 } from "../../util/reminderUtils";
+import { unMaybeArray } from "../../util/arrays";
 
 @injectable()
 export class PetitionRepository extends BaseRepository {
@@ -62,13 +64,9 @@ export class PetitionRepository extends BaseRepository {
   );
 
   async userHasAccessToPetitions(userId: number, petitionIds: number[]) {
-    const [{ count }] = await this.from("petition")
-      .where({
-        owner_id: userId,
-        is_template: false,
-        deleted_at: null,
-      })
-      .whereIn("id", petitionIds)
+    const [{ count }] = await this.from("petition_user")
+      .where({ user_id: userId })
+      .whereIn("petition_id", petitionIds)
       .select(this.count());
     return count === new Set(petitionIds).size;
   }
@@ -165,10 +163,11 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return await this.loadPageAndCount(
       this.from("petition")
+        .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
         .where({
-          owner_id: userId,
-          is_template: false,
-          deleted_at: null,
+          "petition_user.user_id": userId,
+          "petition.is_template": false,
+          "petition_user.deleted_at": null,
         })
         .mmodify((q) => {
           const { search, status } = opts;
@@ -178,9 +177,9 @@ export class PetitionRepository extends BaseRepository {
           if (status) {
             q.where("status", status);
           }
-          q.orderBy(opts.sortBy ?? ["id"]);
+          q.orderBy(opts.sortBy ?? ["petition.id"]);
         })
-        .select("*"),
+        .select("petition.*"),
       opts
     );
   }
@@ -465,7 +464,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async createPetition(
-    data: Omit<CreatePetition, "org_id" | "owner_id" | "status">,
+    data: Omit<CreatePetition, "org_id" | "status">,
     user: User
   ) {
     return await this.withTransaction(async (t) => {
@@ -473,11 +472,20 @@ export class PetitionRepository extends BaseRepository {
         "petition",
         {
           org_id: user.org_id,
-          owner_id: user.id,
           status: "DRAFT",
           ...data,
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
+        },
+        t
+      );
+
+      await this.insert(
+        "petition_user",
+        {
+          petition_id: row.id,
+          user_id: user.id,
+          created_by: `User:${user.id}`,
         },
         t
       );
@@ -511,59 +519,95 @@ export class PetitionRepository extends BaseRepository {
    * Delete petition, deactivate all accesses and cancel all scheduled messages
    */
   async deletePetitionById(petitionId: MaybeArray<number>, user: User) {
-    const petitionIds = Array.isArray(petitionId) ? petitionId : [petitionId];
-    const [accesses, messages] = await Promise.all([
-      this.from("petition_access")
+    const petitionIds = unMaybeArray(petitionId);
+    return await this.withTransaction(async (t) => {
+      const [accesses, messages] = await Promise.all([
+        this.from("petition_access", t)
+          .whereIn("petition_id", petitionIds)
+          .where("status", "ACTIVE")
+          .update(
+            {
+              status: "INACTIVE",
+              updated_at: this.now(),
+              updated_by: `User:${user.id}`,
+            },
+            "*"
+          ),
+        this.from("petition_message", t)
+          .whereIn("petition_id", petitionIds)
+          .where("status", "SCHEDULED")
+          .update(
+            {
+              status: "CANCELLED",
+            },
+            "*"
+          ),
+      ]);
+      for (const [, _accesses] of Object.entries(
+        groupBy(accesses, (a) => a.petition_id)
+      )) {
+        await this.createEvent(
+          _accesses[0].petition_id,
+          "ACCESS_DEACTIVATED",
+          _accesses.map((access) => ({
+            petition_access_id: access.id,
+            user_id: user.id,
+          })),
+          t
+        );
+      }
+      for (const [, _messages] of Object.entries(
+        groupBy(messages, (m) => m.petition_id)
+      )) {
+        await this.createEvent(
+          _messages[0].petition_id,
+          "MESSAGE_CANCELLED",
+          _messages.map((message) => ({
+            petition_message_id: message.id,
+            user_id: user.id,
+          })),
+          t
+        );
+      }
+
+      const petitionUsers = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
-        .where("status", "ACTIVE")
-        .update(
-          {
-            status: "INACTIVE",
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-          },
-          "*"
-        ),
-      this.from("petition_message")
-        .whereIn("petition_id", petitionIds)
-        .where("status", "SCHEDULED")
-        .update(
-          {
-            status: "CANCELLED",
-          },
-          "*"
-        ),
-    ]);
-    for (const [, _accesses] of Object.entries(
-      groupBy(accesses, (a) => a.petition_id)
-    )) {
-      await this.createEvent(
-        _accesses[0].petition_id,
-        "ACCESS_DEACTIVATED",
-        _accesses.map((access) => ({
-          petition_access_id: access.id,
-          user_id: user.id,
-        }))
+        .where({
+          deleted_at: null,
+        });
+
+      // petitions created by me
+      const ownedPetitions = petitionUsers.filter(
+        (pu) => pu.permission_type === "OWNER" && pu.user_id === user.id
       );
-    }
-    for (const [, _messages] of Object.entries(
-      groupBy(messages, (m) => m.petition_id)
-    )) {
-      await this.createEvent(
-        _messages[0].petition_id,
-        "MESSAGE_CANCELLED",
-        _messages.map((message) => ({
-          petition_message_id: message.id,
-          user_id: user.id,
-        }))
+
+      // petitions shared to me by another user
+      const sharedPetitions = petitionUsers.filter(
+        (pu) => pu.permission_type !== "OWNER"
       );
-    }
-    return await this.from("petition")
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${user.id}`,
-      })
-      .whereIn("id", petitionIds);
+
+      // remove shared & owned petitions from petition_user
+      await this.from("petition_user", t)
+        .whereIn("id", [
+          ...ownedPetitions.map((p) => p.id),
+          ...sharedPetitions.map((p) => p.id),
+        ])
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        });
+
+      // remove only owned petitions from petition table
+      await this.from("petition", t)
+        .whereIn(
+          "id",
+          ownedPetitions.map((p) => p.petition_id)
+        )
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        });
+    });
   }
 
   async updatePetition(
@@ -1012,35 +1056,56 @@ export class PetitionRepository extends BaseRepository {
   async clonePetition(petitionId: number, user: User) {
     const petition = await this.loadPetition(petitionId);
 
-    const [cloned] = await this.insert("petition", {
-      ...omit(petition!, ["id", "created_at", "updated_at"]),
-      org_id: user.org_id,
-      owner_id: user.id,
-      status: "DRAFT",
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
-    });
-    await this.createEvent(cloned.id, "PETITION_CREATED", {
-      user_id: user.id,
-    });
+    return await this.withTransaction(async (t) => {
+      const [cloned] = await this.insert(
+        "petition",
+        {
+          ...omit(petition!, ["id", "created_at", "updated_at"]),
+          org_id: user.org_id,
+          status: "DRAFT",
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        },
+        t
+      );
+      await this.createEvent(
+        cloned.id,
+        "PETITION_CREATED",
+        {
+          user_id: user.id,
+        },
+        t
+      );
 
-    const fields = await this.loadFieldsForPetition(petitionId);
-    await this.insert(
-      "petition_field",
-      fields.map((field) => ({
-        ...omit(field, [
-          "id",
-          "petition_id",
-          "created_at",
-          "updated_at",
-          "validated",
-        ]),
-        petition_id: cloned.id,
-        created_by: `User:${user.id}`,
-        updated_by: `User:${user.id}`,
-      }))
-    );
-    return cloned;
+      const fields = await this.loadFieldsForPetition(petitionId);
+      await this.insert(
+        "petition_field",
+        fields.map((field) => ({
+          ...omit(field, [
+            "id",
+            "petition_id",
+            "created_at",
+            "updated_at",
+            "validated",
+          ]),
+          petition_id: cloned.id,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        })),
+        t
+      );
+
+      await this.insert(
+        "petition_user",
+        {
+          petition_id: cloned.id,
+          user_id: user.id,
+          created_by: `User:${user.id}`,
+        },
+        t
+      );
+      return cloned;
+    });
   }
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
@@ -1598,48 +1663,57 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     access: PetitionAccess
   ) {
-    const comments = await this.from("petition_field_comment")
-      .where({
-        petition_id: petitionId,
-        petition_access_id: access.id,
-      })
-      .whereNull("published_at")
-      .whereNull("deleted_at")
-      .update(
-        {
-          published_at: this.now(),
-        },
-        "*"
+    return await this.withTransaction(async (t) => {
+      const comments = await this.from("petition_field_comment", t)
+        .where({
+          petition_id: petitionId,
+          petition_access_id: access.id,
+        })
+        .whereNull("published_at")
+        .whereNull("deleted_at")
+        .update(
+          {
+            published_at: this.now(),
+          },
+          "*"
+        );
+
+      // Create user notifications and events
+      const users = await this.from("petition_user", t)
+        .where({
+          petition_id: petitionId,
+          deleted_at: null,
+          is_subscribed: true,
+        })
+        .select<[{ id: number }]>("user_id as id");
+
+      await this.insert(
+        "petition_user_notification",
+        users.flatMap(({ id }) =>
+          comments.map((comment) => ({
+            type: "COMMENT_CREATED",
+            petition_id: comment.petition_id,
+            user_id: id,
+            data: {
+              petition_field_id: comment.petition_field_id,
+              petition_field_comment_id: comment.id,
+            },
+          }))
+        ),
+        t
       );
 
-    // Create user notifications and events
-    const petition = await this.loadPetition(petitionId);
-    // When petitions are shareable fetch users here.
-    const users = [{ id: petition!.owner_id }];
-    await this.insert(
-      "petition_user_notification",
-      users.flatMap((user) =>
+      await this.createEvent(
+        petitionId,
+        "COMMENT_PUBLISHED",
         comments.map((comment) => ({
-          type: "COMMENT_CREATED",
-          petition_id: comment.petition_id,
-          user_id: user.id,
-          data: {
-            petition_field_id: comment.petition_field_id,
-            petition_field_comment_id: comment.id,
-          },
-        }))
-      )
-    );
-
-    await this.createEvent(
-      petitionId,
-      "COMMENT_PUBLISHED",
-      comments.map((comment) => ({
-        petition_field_id: comment.petition_field_id,
-        petition_field_comment_id: comment.id,
-      }))
-    );
-    return { comments, users };
+          petition_field_id: comment.petition_field_id,
+          petition_field_comment_id: comment.id,
+        })),
+        t
+      );
+      return { comments, users };
+    });
   }
 
   async markPetitionFieldCommentsAsReadForUser(
@@ -1743,5 +1817,30 @@ export class PetitionRepository extends BaseRepository {
         t
       );
     });
+  }
+
+  async loadSubscribedUsersForPetitions(
+    petitionIds: MaybeArray<number>
+  ): Promise<
+    {
+      type: PetitionUserPermissionType;
+      petitionId: number;
+      user: User;
+    }[]
+  > {
+    const users = await this.from("petition_user")
+      .leftJoin("user", "petition_user.user_id", "user.id")
+      .whereIn("petition_user.petition_id", unMaybeArray(petitionIds))
+      .where({
+        "petition_user.is_subscribed": true,
+        "petition_user.deleted_at": null,
+      })
+      .select("user.*", "permission_type", "petition_user.petition_id");
+
+    return users.map((u) => ({
+      type: u.permission_type,
+      petitionId: u.petition_id,
+      user: u,
+    }));
   }
 }

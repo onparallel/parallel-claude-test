@@ -8,6 +8,7 @@ import {
   CreatePetitionAccess,
   CreatePetitionField,
   CreatePetitionFieldReply,
+  CreatePetitionUser,
   CreateUser,
   FileUpload,
   Organization,
@@ -16,6 +17,7 @@ import {
   PetitionField,
   PetitionFieldReply,
   User,
+  PetitionUser,
 } from "../src/db/__types";
 import { deleteAllData } from "../src/util/knexUtils";
 import { random } from "../src/util/token";
@@ -63,7 +65,6 @@ export async function seed(knex: Knex): Promise<any> {
   const petitions: CreatePetition[] = [
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       name: "Declaración renta",
       locale: "es",
       status: "PENDING",
@@ -72,7 +73,6 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       name: "Certificado de retenciones",
       locale: "es",
       status: "PENDING",
@@ -81,7 +81,6 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       name: "Documentos gotera",
       locale: "es",
       status: "DRAFT",
@@ -90,7 +89,6 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      owner_id: userIds[2],
       name: "Nóminas",
       locale: "es",
       status: "COMPLETED",
@@ -98,7 +96,17 @@ export async function seed(knex: Knex): Promise<any> {
       updated_by: `User:${userIds[2]}`,
     },
   ];
+
   const petitionIds = await knex<Petition>("petition").insert(petitions, "id");
+
+  const petitionUsers: CreatePetitionUser[] = petitionIds.map((id) => ({
+    petition_id: id,
+    user_id: userIds[2],
+    created_by: `User:${userIds[2]}`,
+  }));
+
+  await knex<PetitionUser>("petition_user").insert(petitionUsers);
+
   const fields: CreatePetitionField[] = [
     {
       petition_id: petitionIds[0],

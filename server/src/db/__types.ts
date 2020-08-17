@@ -44,6 +44,8 @@ export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
 
 export type PetitionUserNotificationType = "COMMENT_CREATED";
 
+export type PetitionUserPermissionType = "OWNER" | "WRITE" | "READ";
+
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
 export interface TableTypes {
@@ -61,6 +63,7 @@ export interface TableTypes {
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
   petition_reminder: PetitionReminder;
+  petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
   user: User;
 }
@@ -80,6 +83,7 @@ export interface TableCreateTypes {
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
   petition_reminder: CreatePetitionReminder;
+  petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
   user: CreateUser;
 }
@@ -99,6 +103,7 @@ export interface TablePrimaryKeys {
   petition_field_reply: "id";
   petition_message: "id";
   petition_reminder: "id";
+  petition_user: "id";
   petition_user_notification: "id";
   user: "id";
 }
@@ -233,7 +238,6 @@ export interface CreateOrganization {
 export interface Petition {
   id: number;
   org_id: number;
-  owner_id: number;
   name: Maybe<string>;
   custom_ref: Maybe<string>;
   locale: string;
@@ -254,7 +258,6 @@ export interface Petition {
 
 export interface CreatePetition {
   org_id: number;
-  owner_id: number;
   name?: Maybe<string>;
   custom_ref?: Maybe<string>;
   locale: string;
@@ -487,6 +490,29 @@ export interface CreatePetitionReminder {
   created_by?: Maybe<string>;
   sender_id?: Maybe<number>;
   petition_access_id: number;
+}
+
+export interface PetitionUser {
+  id: number;
+  petition_id: number;
+  user_id: number;
+  permission_type: PetitionUserPermissionType;
+  is_subscribed: boolean;
+  created_at: Date;
+  created_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export interface CreatePetitionUser {
+  petition_id: number;
+  user_id: number;
+  permission_type?: PetitionUserPermissionType;
+  is_subscribed?: boolean;
+  created_at?: Date;
+  created_by?: Maybe<string>;
+  deleted_at?: Maybe<Date>;
+  deleted_by?: Maybe<string>;
 }
 
 export interface PetitionUserNotification {

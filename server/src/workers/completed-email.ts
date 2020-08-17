@@ -16,9 +16,9 @@ createQueueWorker<CompletedEmailWorkerPayload>(
     if (!access) {
       throw new Error(`Access not found for id ${payload.petition_access_id}`);
     }
-    const [petition, granter, contact, fields] = await Promise.all([
+    const [petition, subscribedUsers, contact, fields] = await Promise.all([
       context.petitions.loadPetition(access.petition_id),
-      context.users.loadUser(access.granter_id),
+      context.petitions.loadSubscribedUsersForPetitions(access.petition_id),
       context.contacts.loadContact(access.contact_id),
       context.petitions.loadFieldsForPetition(access.petition_id),
     ]);
@@ -27,53 +27,55 @@ createQueueWorker<CompletedEmailWorkerPayload>(
         `Petition not found for petition_access.petition_id ${access.petition_id}`
       );
     }
-    if (!granter) {
-      throw new Error(
-        `User not found for petition_access.sender_id ${access.granter_id}`
-      );
+    if (!subscribedUsers || subscribedUsers.length === 0) {
+      throw new Error(`No subscribed users for petition ${access.petition_id}`);
     }
     if (!contact) {
       throw new Error(
         `Contact not found for petition_access.contact_id ${access.contact_id}`
       );
     }
+    const granter = subscribedUsers.find((u) => u.type === "OWNER");
     const [org, logoUrl] = await Promise.all([
-      context.organizations.loadOrg(granter.org_id),
-      context.organizations.getOrgLogoUrl(granter.org_id),
+      context.organizations.loadOrg(granter!.user.org_id),
+      context.organizations.getOrgLogoUrl(granter!.user.org_id),
     ]);
     if (!org) {
       throw new Error(
-        `Organization not found for granter.org_id ${granter.org_id}`
+        `Organization not found for granter.org_id ${granter!.user.org_id}`
       );
     }
-    const contactNameOrEmail =
-      (contact.first_name && contact.last_name
-        ? `${contact.first_name} ${contact.last_name}`
-        : contact.first_name) || contact.email;
-    const { html, text, subject, from } = await buildEmail(
-      PetitionCompleted,
-      {
-        name: granter.first_name,
-        petitionId: toGlobalId("Petition", access.petition_id),
-        petitionName: petition!.name,
-        contactNameOrEmail,
-        fields: fields.map(pick(["id", "title", "position", "type"])),
-        assetsUrl: context.config.misc.assetsUrl,
-        parallelUrl: context.config.misc.parallelUrl,
-        logoUrl:
-          logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-        logoAlt: logoUrl ? org.name : "Parallel",
-      },
-      { locale: petition.locale }
-    );
-    const email = await context.emails.createEmail({
-      from: buildFrom(from, context.config.misc.emailFrom),
-      to: granter.email,
-      subject,
-      text,
-      html,
-      created_from: `PetitionAccess:${payload.petition_access_id}`,
-    });
-    await context.aws.enqueueEmail(email.id);
+    for (const { user } of subscribedUsers) {
+      const contactNameOrEmail =
+        (contact.first_name && contact.last_name
+          ? `${contact.first_name} ${contact.last_name}`
+          : contact.first_name) || contact.email;
+      const { html, text, subject, from } = await buildEmail(
+        PetitionCompleted,
+        {
+          name: user.first_name,
+          petitionId: toGlobalId("Petition", access.petition_id),
+          petitionName: petition!.name,
+          contactNameOrEmail,
+          fields: fields.map(pick(["id", "title", "position", "type"])),
+          assetsUrl: context.config.misc.assetsUrl,
+          parallelUrl: context.config.misc.parallelUrl,
+          logoUrl:
+            logoUrl ??
+            `${context.config.misc.assetsUrl}/static/emails/logo.png`,
+          logoAlt: logoUrl ? org.name : "Parallel",
+        },
+        { locale: petition.locale }
+      );
+      const email = await context.emails.createEmail({
+        from: buildFrom(from, context.config.misc.emailFrom),
+        to: user.email,
+        subject,
+        text,
+        html,
+        created_from: `PetitionAccess:${payload.petition_access_id}`,
+      });
+      await context.aws.enqueueEmail(email.id);
+    }
   }
 );
