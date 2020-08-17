@@ -24,15 +24,15 @@ export async function up(knex: Knex): Promise<void> {
   `);
 
   await knex.raw(/* sql */ `
-    create unique index "petition_user__petition_id__user_id" 
-    on "petition_user" ("petition_id", "user_id") 
+    create unique index "petition_user__user_id__petition_id" 
+    on "petition_user" ("user_id", "petition_id") 
     where deleted_at is null;
   `);
 
   // move petition.owner_id to petition_user.user_id
   await knex.raw(/* sql */ `
-    insert into petition_user (petition_id, user_id, created_at, created_by, deleted_at, deleted_by)
-	    (select id, owner_id, created_at, created_by, deleted_at, deleted_by from petition)
+    insert into petition_user (petition_id, user_id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by)
+	    (select id, owner_id, created_at, created_by, created_at, created_by, deleted_at, deleted_by from petition)
   `);
 
   // delete petition.owner_id field
