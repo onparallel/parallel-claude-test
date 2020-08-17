@@ -15,6 +15,7 @@ async function getDuplicatedContacts(
   }>(/* sql */ `
     SELECT min(id) as id, email, org_id
     FROM contact
+    WHERE deleted_at IS NULL
     GROUP BY email, org_id
     HAVING count(id) > 1    
   `);
