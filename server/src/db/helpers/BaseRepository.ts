@@ -110,7 +110,7 @@ export class BaseRepository {
       };
     }
   }
-  protected async withTransaction<T>(
+  public async withTransaction<T>(
     transactionScope: (t: Transaction) => Promise<T>,
     transaction?: Transaction
   ) {

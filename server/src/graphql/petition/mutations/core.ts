@@ -12,8 +12,7 @@ import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import {
   CreatePetition,
   CreatePetitionField,
-  PetitionUserPermissionType,
-  User,
+  PetitionUser,
 } from "../../../db/__types";
 import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
@@ -46,7 +45,6 @@ import {
   validatePetitionStatus,
 } from "../validations";
 import { WhitelistedError } from "./../../helpers/errors";
-import { groupBy } from "remeda";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -106,35 +104,38 @@ export const deletePetitions = mutationField("deletePetitions", {
   resolve: async (_, args, ctx) => {
     const { ids } = fromGlobalIds(args.ids, "Petition");
 
-    const petitionIsSharedByOwner = (userId: number) => {
+    const petitionIsSharedByOwner = (p: PetitionUser[]) => {
       return (
-        p: {
-          type: PetitionUserPermissionType;
-          user: User;
-          petitionId: number;
-        }[]
-      ) =>
-        p.length > 1 &&
-        p.find((u) => u.type === "OWNER" && u.user.id === userId);
+        p &&
+        p.length > 1 && // the petition is being shared to another user
+        p.find(
+          (u) => u.permission_type === "OWNER" && u.user_id === ctx.user!.id // logged user is the owner
+        )
+      );
     };
 
-    const usersByPetitionId = groupBy(
-      await ctx.petitions.loadSubscribedUsersForPetitions(ids),
-      (u) => u.petitionId
-    );
+    // user permissions grouped by permission_id
+    const userPermissions = await ctx.petitions.loadUserPermissions(ids);
 
-    if (
-      Object.values(usersByPetitionId).some(
-        petitionIsSharedByOwner(ctx.user!.id)
-      ) &&
-      !args.force
-    ) {
+    if (userPermissions.some(petitionIsSharedByOwner) && !args.force) {
       throw new WhitelistedError(
         "Petition to delete is shared to another user",
         "DELETE_SHARED_PETITION_ERROR"
       );
     }
-    await ctx.petitions.deletePetitionById(ids, ctx.user!);
+
+    await ctx.petitions.withTransaction(async (t) => {
+      // delete all permissions to the petitions
+      const ownedPetitionIds = await ctx.petitions.deleteUserPermissions(
+        ids,
+        ctx.user!,
+        t
+      );
+
+      // delete only petitions OWNED by me
+      await ctx.petitions.deletePetitionById(ownedPetitionIds, ctx.user!, t);
+    });
+
     return RESULT.SUCCESS;
   },
 });

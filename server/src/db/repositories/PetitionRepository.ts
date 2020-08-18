@@ -35,7 +35,7 @@ import {
   User,
   PetitionUserNotification,
   PetitionContactNotification,
-  PetitionUserPermissionType,
+  PetitionUser,
 } from "../__types";
 import {
   PetitionAccessReminderConfig,
@@ -516,10 +516,39 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
+  async deleteUserPermissions(
+    petitionIds: number[],
+    user: User,
+    t?: Transaction
+  ) {
+    return await this.withTransaction(async (t) => {
+      await this.from("petition_user", t)
+        .whereIn("petition_id", petitionIds)
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        });
+
+      return (
+        await this.from("petition_user")
+          .whereIn("petition_id", petitionIds)
+          .where({
+            permission_type: "OWNER",
+            user_id: user.id,
+          })
+          .select("petition_id")
+      ).map((p) => p.petition_id);
+    }, t);
+  }
+
   /**
    * Delete petition, deactivate all accesses and cancel all scheduled messages
    */
-  async deletePetitionById(petitionId: MaybeArray<number>, user: User) {
+  async deletePetitionById(
+    petitionId: MaybeArray<number>,
+    user: User,
+    t?: Transaction
+  ) {
     const petitionIds = unMaybeArray(petitionId);
     return await this.withTransaction(async (t) => {
       const [accesses, messages] = await Promise.all([
@@ -571,44 +600,13 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      const petitionUsers = await this.from("petition_user", t)
-        .whereIn("petition_id", petitionIds)
-        .where({
-          deleted_at: null,
-        });
-
-      // petitions created by me
-      const ownedPetitions = petitionUsers.filter(
-        (pu) => pu.permission_type === "OWNER" && pu.user_id === user.id
-      );
-
-      // petitions shared to me by another user
-      const sharedPetitions = petitionUsers.filter(
-        (pu) => pu.permission_type !== "OWNER"
-      );
-
-      // remove shared & owned petitions from petition_user
-      await this.from("petition_user", t)
-        .whereIn("id", [
-          ...ownedPetitions.map((p) => p.id),
-          ...sharedPetitions.map((p) => p.id),
-        ])
+      return await this.from("petition", t)
+        .whereIn("id", petitionIds)
         .update({
           deleted_at: this.now(),
           deleted_by: `User:${user.id}`,
         });
-
-      // remove only owned petitions from petition table
-      await this.from("petition", t)
-        .whereIn(
-          "id",
-          ownedPetitions.map((p) => p.petition_id)
-        )
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        });
-    });
+    }, t);
   }
 
   async updatePetition(
@@ -1821,28 +1819,15 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async loadSubscribedUsersForPetitions(
-    petitionIds: MaybeArray<number>
-  ): Promise<
-    {
-      type: PetitionUserPermissionType;
-      petitionId: number;
-      user: User;
-    }[]
-  > {
-    const users = await this.from("petition_user")
-      .leftJoin("user", "petition_user.user_id", "user.id")
-      .whereIn("petition_user.petition_id", unMaybeArray(petitionIds))
-      .where({
-        "petition_user.is_subscribed": true,
-        "petition_user.deleted_at": null,
-      })
-      .select("user.*", "permission_type", "petition_user.petition_id");
+  readonly loadUserPermissions = fromDataLoader(
+    new DataLoader<number, PetitionUser[]>(async (ids) => {
+      const rows = await this.from("petition_user")
+        .whereIn("petition_id", ids)
+        .whereNull("deleted_at")
+        .select("*");
+      const byPetitionId = groupBy(rows, (r) => r.petition_id);
 
-    return users.map((u) => ({
-      type: u.permission_type,
-      petitionId: u.petition_id,
-      user: u,
-    }));
-  }
+      return ids.map((id) => byPetitionId[id]);
+    })
+  );
 }
