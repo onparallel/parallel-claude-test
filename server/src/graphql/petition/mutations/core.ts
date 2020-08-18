@@ -101,6 +101,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     ids: idArg({ required: true, list: [true] }),
     force: booleanArg({ default: false, required: false }),
   },
+  validateArgs: notEmptyArray((args) => args.ids, "ids"),
   resolve: async (_, args, ctx) => {
     const { ids } = fromGlobalIds(args.ids, "Petition");
 
@@ -116,6 +117,14 @@ export const deletePetitions = mutationField("deletePetitions", {
 
     // user permissions grouped by permission_id
     const userPermissions = await ctx.petitions.loadUserPermissions(ids);
+
+    // if userPermissions === [undefined], the petition is deleted
+    if (userPermissions.filter((p) => !!p).length === 0) {
+      throw new WhitelistedError(
+        "The requested petition was not found",
+        "PETITION_NOT_FOUND"
+      );
+    }
 
     if (userPermissions.some(petitionIsSharedByOwner) && !args.force) {
       throw new WhitelistedError(
