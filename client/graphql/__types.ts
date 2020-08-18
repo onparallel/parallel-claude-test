@@ -1158,7 +1158,7 @@ export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
   "onboardingStatus"
 >;
 
-export type RecipientSelect_ContactFragment = { __typename?: "Contact" } & Pick<
+export type ContactSelect_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
   "id" | "fullName" | "email"
 >;
@@ -2817,12 +2817,12 @@ export type PetitionComposeSearchContactsQueryVariables = Exact<{
 
 export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   contacts: { __typename?: "ContactPagination" } & {
-    items: Array<{ __typename?: "Contact" } & RecipientSelect_ContactFragment>;
+    items: Array<{ __typename?: "Contact" } & ContactSelect_ContactFragment>;
   };
 };
 
-export const RecipientSelect_ContactFragmentDoc = gql`
-  fragment RecipientSelect_Contact on Contact {
+export const ContactSelect_ContactFragmentDoc = gql`
+  fragment ContactSelect_Contact on Contact {
     id
     fullName
     email
@@ -7303,11 +7303,11 @@ export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [ID!]) {
     contacts(limit: 10, search: $search, exclude: $exclude) {
       items {
-        ...RecipientSelect_Contact
+        ...ContactSelect_Contact
       }
     }
   }
-  ${RecipientSelect_ContactFragmentDoc}
+  ${ContactSelect_ContactFragmentDoc}
 `;
 
 /**

@@ -8,7 +8,7 @@ import {
   useToast,
 } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
-import { RecipientSelect_ContactFragment } from "@parallel/graphql/__types";
+import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useId } from "@reach/auto-id";
 import {
@@ -24,29 +24,37 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { components, OptionProps, OptionsType } from "react-select";
 import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
 import { pick } from "remeda";
-import { useReactSelectStyle } from "../../utils/useReactSelectStyle";
+import {
+  useReactSelectStyle,
+  UserReactSelectStyleProps,
+} from "../../utils/useReactSelectStyle";
 
-export type Recipient = RecipientSelect_ContactFragment;
+export type ContactSelection = ContactSelect_ContactFragment;
 
-export type RecipientSelectProps = Pick<Props<Recipient>, "inputId"> & {
-  value: Recipient[];
-  showErrors: boolean;
-  onChange: (recipients: Recipient[]) => void;
-  onCreateContact: (data: { defaultEmail?: string }) => Promise<Recipient>;
-  onSearchContacts: (search: string, exclude: string[]) => Promise<Recipient[]>;
+export type ContactSelectProps = Pick<Props<ContactSelection>, "inputId"> & {
+  value: ContactSelection[];
+  isInvalid?: boolean;
+  onChange: (recipients: ContactSelection[]) => void;
+  onCreateContact: (data: {
+    defaultEmail?: string;
+  }) => Promise<ContactSelection>;
+  onSearchContacts: (
+    search: string,
+    exclude: string[]
+  ) => Promise<ContactSelection[]>;
 };
 
-export const RecipientSelect = Object.assign(
+export const ContactSelect = Object.assign(
   forwardRef(function (
     {
       value,
-      showErrors,
+      isInvalid,
       onSearchContacts,
       onCreateContact,
       onChange,
       ...props
-    }: RecipientSelectProps,
-    ref: Ref<AsyncCreatableSelect<Recipient>>
+    }: ContactSelectProps,
+    ref: Ref<AsyncCreatableSelect<ContactSelection>>
   ) {
     const intl = useIntl();
     const [isCreating, setIsCreating] = useState(false);
@@ -72,11 +80,11 @@ export const RecipientSelect = Object.assign(
         if (error?.graphQLErrors?.[0]?.message === "EXISTING_CONTACT") {
           toast({
             title: intl.formatMessage({
-              id: "component.recipient-select.existing-contact.title",
+              id: "component.contact-select.existing-contact.title",
               defaultMessage: "Existing contact",
             }),
             description: intl.formatMessage({
-              id: "component.recipient-select.existing-contact.description",
+              id: "component.contact-select.existing-contact.description",
               defaultMessage: "This contact already exists.",
             }),
             status: "error",
@@ -87,22 +95,21 @@ export const RecipientSelect = Object.assign(
       }
       setIsCreating(false);
     }
-    const inputId = `recipient-select-${useId()}`;
-    const hasError = showErrors && value.length === 0;
-    const reactSelectProps = useReactSelectProps({ hasError });
+    const inputId = `contact-select-${useId()}`;
+    const reactSelectProps = useReactSelectProps({ isInvalid });
 
     return (
-      <FormControl id={inputId} isInvalid={hasError}>
+      <FormControl id={inputId} isInvalid={isInvalid}>
         <FormLabel paddingBottom={0}>
           <FormattedMessage
-            id="component.recipient-select.label"
+            id="component.contact-select.label"
             defaultMessage="Recipients"
           />
         </FormLabel>
-        <AsyncCreatableSelect<Recipient>
+        <AsyncCreatableSelect<ContactSelection>
           inputId={inputId}
           placeholder={intl.formatMessage({
-            id: "component.recipient-select.placeholder",
+            id: "component.contact-select.placeholder",
             defaultMessage: "Enter recipients...",
           })}
           ref={ref}
@@ -117,7 +124,7 @@ export const RecipientSelect = Object.assign(
         />
         <FormErrorMessage>
           <FormattedMessage
-            id="component.recipient-select.required-error"
+            id="component.contact-select.required-error"
             defaultMessage="Please specify at least one recipient"
           />
         </FormErrorMessage>
@@ -127,7 +134,7 @@ export const RecipientSelect = Object.assign(
   {
     fragments: {
       Contact: gql`
-        fragment RecipientSelect_Contact on Contact {
+        fragment ContactSelect_Contact on Contact {
           id
           fullName
           email
@@ -137,8 +144,8 @@ export const RecipientSelect = Object.assign(
   }
 );
 
-function useReactSelectProps({ hasError }: { hasError: boolean }) {
-  const styleProps = useReactSelectStyle<Recipient>({ size: "md", hasError });
+function useReactSelectProps(props: UserReactSelectStyleProps) {
+  const styleProps = useReactSelectStyle<ContactSelection>(props);
   return useMemo(
     () =>
       ({
@@ -161,7 +168,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
                   <>
                     <Text as="div" marginTop={2}>
                       <FormattedMessage
-                        id="component.recipient-select.no-options"
+                        id="component.contact-select.no-options"
                         defaultMessage="We could not find any exisiting contacts for <em>{search}</em>"
                         values={{
                           search,
@@ -171,7 +178,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
                     </Text>
                     <Text as="div" marginTop={2}>
                       <FormattedMessage
-                        id="component.recipient-select.enter-email"
+                        id="component.contact-select.enter-email"
                         defaultMessage="You can also enter a valid email."
                       />
                     </Text>
@@ -179,7 +186,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
                 ) : (
                   <Text as="div" marginTop={2}>
                     <FormattedMessage
-                      id="component.recipient-select.search-hint"
+                      id="component.contact-select.search-hint"
                       defaultMessage="Search for exisiting contacts or enter a valid email."
                     />
                   </Text>
@@ -193,7 +200,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
               children,
               ...props
             }: {
-              data: Recipient;
+              data: ContactSelection;
               children: ReactNode;
             }) => {
               const { fullName, email } = data;
@@ -210,7 +217,9 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
             children,
             data,
             ...props
-          }: Omit<OptionProps<Recipient>, "data"> & { data: Recipient }) => {
+          }: Omit<OptionProps<ContactSelection>, "data"> & {
+            data: ContactSelection;
+          }) => {
             if ((data as any).__isNew__) {
               return (
                 <components.Option data={data} {...props}>
@@ -247,14 +256,14 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
         isValidNewOption: (
           value: string,
           _,
-          options: OptionsType<Recipient>
+          options: OptionsType<ContactSelection>
         ) => {
           return options.length === 0 && EMAIL_REGEX.test(value);
         },
         formatCreateLabel: (label: string) => {
           return (
             <FormattedMessage
-              id="component.recipient-select.create-new-contact"
+              id="component.contact-select.create-new-contact"
               defaultMessage="Create new contact for: <b>{email}</b>"
               values={{
                 email: label,
@@ -267,7 +276,7 @@ function useReactSelectProps({ hasError }: { hasError: boolean }) {
             />
           );
         },
-      } as Partial<Props<Recipient>>),
+      } as Partial<Props<ContactSelection>>),
     [styleProps]
   );
 }

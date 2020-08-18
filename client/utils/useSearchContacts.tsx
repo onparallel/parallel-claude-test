@@ -1,5 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { RecipientSelect } from "@parallel/components/common/RecipientSelect";
+import { ContactSelect } from "@parallel/components/common/ContactSelect";
 import {
   PetitionComposeSearchContactsQuery,
   PetitionComposeSearchContactsQueryVariables,
@@ -21,11 +21,11 @@ export function useSearchContacts() {
           ) {
             contacts(limit: 10, search: $search, exclude: $exclude) {
               items {
-                ...RecipientSelect_Contact
+                ...ContactSelect_Contact
               }
             }
           }
-          ${RecipientSelect.fragments.Contact}
+          ${ContactSelect.fragments.Contact}
         `,
         variables: { search, exclude },
         fetchPolicy: "no-cache",

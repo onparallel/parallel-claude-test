@@ -3,10 +3,10 @@ import { Alert, AlertIcon, Box, Flex, Heading, Stack } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import {
-  Recipient,
-  RecipientSelect,
-  RecipientSelectProps,
-} from "@parallel/components/common/RecipientSelect";
+  ContactSelection,
+  ContactSelect,
+  ContactSelectProps,
+} from "@parallel/components/common/ContactSelect";
 import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -26,8 +26,8 @@ import { PetitionRemindersConfig } from "./PetitionRemindersConfig";
 export type PetitionComposeMessageEditorProps = ExtendChakra<{
   petition: PetitionComposeMessageEditor_PetitionFragment;
   showErrors: boolean;
-  onSearchContacts: RecipientSelectProps["onSearchContacts"];
-  onCreateContact: RecipientSelectProps["onCreateContact"];
+  onSearchContacts: ContactSelectProps["onSearchContacts"];
+  onCreateContact: ContactSelectProps["onCreateContact"];
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   onSend: (data: { contactIds: string[]; schedule: boolean }) => void;
 }>;
@@ -42,7 +42,7 @@ export const PetitionComposeMessageEditor = Object.assign(
     onSend,
     ...props
   }: PetitionComposeMessageEditorProps) {
-    const [recipients, setRecipients] = useState<Recipient[]>([]);
+    const [recipients, setRecipients] = useState<ContactSelection[]>([]);
     const [subject, setSubject] = useState(petition.emailSubject ?? "");
     const [body, setBody] = useState<RichTextEditorContent>(
       petition.emailBody ?? [{ children: [{ text: "" }] }]
@@ -98,8 +98,8 @@ export const PetitionComposeMessageEditor = Object.assign(
         </Box>
         <Stack spacing={2} padding={4}>
           <Box id="petition-select-recipients">
-            <RecipientSelect
-              showErrors={showErrors}
+            <ContactSelect
+              isInvalid={showErrors && recipients.length === 0}
               onSearchContacts={onSearchContacts}
               onCreateContact={onCreateContact}
               value={recipients}

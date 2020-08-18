@@ -48,18 +48,16 @@ export const SIZES = {
   },
 };
 
+export type UserReactSelectStyleProps = {
+  size?: keyof typeof SIZES;
+  isInvalid?: boolean;
+};
 /**
  * Generates the props necessary for styling react-select as a chakra component
  */
 export function useReactSelectStyle<
   OptionType extends OptionTypeBase = { label: string; value: string }
->({
-  size = "md",
-  hasError = false,
-}: {
-  size: keyof typeof SIZES;
-  hasError: boolean;
-}) {
+>({ size = "md", isInvalid = false }: UserReactSelectStyleProps) {
   const { colors, radii, sizes } = useTheme();
   const intl = useIntl();
   const labels = useMemo(
@@ -130,11 +128,23 @@ export function useReactSelectStyle<
             />
           </Text>
         )),
-        MultiValueRemove: memo(({ innerProps }) => (
-          <components.MultiValueRemove innerProps={innerProps}>
-            <SmallCloseIcon boxSize="18px" />
-          </components.MultiValueRemove>
-        )),
+        MultiValueRemove: memo(({ innerProps, ...props }) => {
+          const intl = useIntl();
+          return (
+            <components.MultiValueRemove
+              innerProps={{
+                ...innerProps,
+                role: "button",
+                "aria-label": intl.formatMessage({
+                  id: "generic.remove",
+                  defaultMessage: "Remove",
+                }),
+              }}
+            >
+              <SmallCloseIcon boxSize="18px" />
+            </components.MultiValueRemove>
+          );
+        }),
         LoadingMessage: memo(() => (
           <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
             <FormattedMessage
@@ -150,18 +160,18 @@ export function useReactSelectStyle<
             ...styles,
             borderColor: isDisabled
               ? colors.gray[100]
-              : hasError
+              : isInvalid
               ? colors.red[500]
               : isFocused
               ? colors.blue[500]
               : "inherit",
-            boxShadow: hasError
+            boxShadow: isInvalid
               ? `0 0 0 1px ${colors.red[500]}`
               : isFocused
               ? `0 0 0 1px ${colors.blue[500]}`
               : undefined,
             "&:hover": {
-              borderColor: hasError
+              borderColor: isInvalid
                 ? colors.red[500]
                 : isFocused
                 ? theme.colors.primary
@@ -207,6 +217,6 @@ export function useReactSelectStyle<
         },
       },
     }),
-    [size, hasError]
+    [size, isInvalid]
   );
 }

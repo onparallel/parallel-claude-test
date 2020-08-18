@@ -9,10 +9,10 @@ import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import {
-  Recipient,
-  RecipientSelect,
-  RecipientSelectProps,
-} from "../common/RecipientSelect";
+  ContactSelection,
+  ContactSelect,
+  ContactSelectProps,
+} from "../common/ContactSelect";
 import { RichTextEditorContent } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
@@ -23,8 +23,8 @@ import {
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
 export type AddPettionAccessDialogProps = {
-  onSearchContacts: RecipientSelectProps["onSearchContacts"];
-  onCreateContact: RecipientSelectProps["onCreateContact"];
+  onSearchContacts: ContactSelectProps["onSearchContacts"];
+  onCreateContact: ContactSelectProps["onCreateContact"];
 };
 
 export type AddPettionAccessDialogResult = {
@@ -41,7 +41,7 @@ export function AddPetitionAccessDialog({
   ...props
 }: DialogProps<AddPettionAccessDialogProps, AddPettionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
-  const [recipients, setRecipients] = useState<Recipient[]>([]);
+  const [recipients, setRecipients] = useState<ContactSelection[]>([]);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState<RichTextEditorContent>([
     { children: [{ text: "" }] },
@@ -100,8 +100,8 @@ export function AddPetitionAccessDialog({
       }
       body={
         <>
-          <RecipientSelect
-            showErrors={showErrors}
+          <ContactSelect
+            isInvalid={showErrors && recipients.length === 0}
             onCreateContact={onCreateContact}
             onSearchContacts={onSearchContacts}
             value={recipients}

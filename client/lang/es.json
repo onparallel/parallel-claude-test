@@ -25,6 +25,51 @@
     "context": "Delete selected"
   },
   {
+    "term": "component.contact-select.create-new-contact",
+    "definition": "Crear nuevo contacto para: <b>{email}</b>",
+    "context": "Create new contact for: <b>{email}</b>"
+  },
+  {
+    "term": "component.contact-select.enter-email",
+    "definition": "También puedes introducir un correo electrónico válido.",
+    "context": "You can also enter a valid email."
+  },
+  {
+    "term": "component.contact-select.existing-contact.description",
+    "definition": "Este contacto ya existe.",
+    "context": "This contact already exists."
+  },
+  {
+    "term": "component.contact-select.existing-contact.title",
+    "definition": "Contacto existente",
+    "context": "Existing contact"
+  },
+  {
+    "term": "component.contact-select.label",
+    "definition": "Destinatarios",
+    "context": "Recipients"
+  },
+  {
+    "term": "component.contact-select.no-options",
+    "definition": "No pudimos encontrar ningún contacto con <em>{search}</em>",
+    "context": "We could not find any exisiting contacts for <em>{search}</em>"
+  },
+  {
+    "term": "component.contact-select.placeholder",
+    "definition": "Introduce destinatarios...",
+    "context": "Enter recipients..."
+  },
+  {
+    "term": "component.contact-select.required-error",
+    "definition": "Por favor, especifica al menos un destinatario",
+    "context": "Please specify at least one recipient"
+  },
+  {
+    "term": "component.contact-select.search-hint",
+    "definition": "Busca contactos existentes o introduce un correo electrónico válido",
+    "context": "Search for exisiting contacts or enter a valid email."
+  },
+  {
     "term": "component.cookie-consent.accept-button",
     "definition": "Aceptar",
     "context": "Accept"
@@ -318,51 +363,6 @@
     "term": "component.react-select.no-options",
     "definition": "Sin resultados",
     "context": "No options"
-  },
-  {
-    "term": "component.recipient-select.create-new-contact",
-    "definition": "Crear nuevo contacto para: <b>{email}</b>",
-    "context": "Create new contact for: <b>{email}</b>"
-  },
-  {
-    "term": "component.recipient-select.enter-email",
-    "definition": "También puedes introducir un correo electrónico válido.",
-    "context": "You can also enter a valid email."
-  },
-  {
-    "term": "component.recipient-select.existing-contact.description",
-    "definition": "Este contacto ya existe.",
-    "context": "This contact already exists."
-  },
-  {
-    "term": "component.recipient-select.existing-contact.title",
-    "definition": "Contacto existente",
-    "context": "Existing contact"
-  },
-  {
-    "term": "component.recipient-select.label",
-    "definition": "Destinatarios",
-    "context": "Recipients"
-  },
-  {
-    "term": "component.recipient-select.no-options",
-    "definition": "No pudimos encontrar ningún contacto con <em>{search}</em>",
-    "context": "We could not find any exisiting contacts for <em>{search}</em>"
-  },
-  {
-    "term": "component.recipient-select.placeholder",
-    "definition": "Introduce destinatarios...",
-    "context": "Enter recipients..."
-  },
-  {
-    "term": "component.recipient-select.required-error",
-    "definition": "Por favor, especifica al menos un destinatario",
-    "context": "Please specify at least one recipient"
-  },
-  {
-    "term": "component.recipient-select.search-hint",
-    "definition": "Busca contactos existentes o introduce un correo electrónico válido",
-    "context": "Search for exisiting contacts or enter a valid email."
   },
   {
     "term": "component.search-input.placeholder",
@@ -885,6 +885,11 @@
     "context": "Reload"
   },
   {
+    "term": "generic.remove",
+    "definition": "Quitar",
+    "context": "Remove"
+  },
+  {
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field"
@@ -1158,11 +1163,6 @@
     "term": "petition-replies.validate-field-button.validated",
     "definition": "Revisado",
     "context": "Reviewed"
-  },
-  {
-    "term": "petition-sharing.header",
-    "definition": "",
-    "context": "Share with people"
   },
   {
     "term": "petition.activity-not-available",

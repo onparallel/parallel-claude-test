@@ -25,6 +25,51 @@
     "context": "Delete selected"
   },
   {
+    "term": "component.contact-select.create-new-contact",
+    "definition": "Create new contact for: <b>{email}</b>",
+    "context": "Create new contact for: <b>{email}</b>"
+  },
+  {
+    "term": "component.contact-select.enter-email",
+    "definition": "You can also enter a valid email.",
+    "context": "You can also enter a valid email."
+  },
+  {
+    "term": "component.contact-select.existing-contact.description",
+    "definition": "This contact already exists.",
+    "context": "This contact already exists."
+  },
+  {
+    "term": "component.contact-select.existing-contact.title",
+    "definition": "Existing contact",
+    "context": "Existing contact"
+  },
+  {
+    "term": "component.contact-select.label",
+    "definition": "Recipients",
+    "context": "Recipients"
+  },
+  {
+    "term": "component.contact-select.no-options",
+    "definition": "We could not find any exisiting contacts for <em>{search}</em>",
+    "context": "We could not find any exisiting contacts for <em>{search}</em>"
+  },
+  {
+    "term": "component.contact-select.placeholder",
+    "definition": "Enter recipients...",
+    "context": "Enter recipients..."
+  },
+  {
+    "term": "component.contact-select.required-error",
+    "definition": "Please specify at least one recipient",
+    "context": "Please specify at least one recipient"
+  },
+  {
+    "term": "component.contact-select.search-hint",
+    "definition": "Search for exisiting contacts or enter a valid email.",
+    "context": "Search for exisiting contacts or enter a valid email."
+  },
+  {
     "term": "component.cookie-consent.accept-button",
     "definition": "Accept",
     "context": "Accept"
@@ -318,51 +363,6 @@
     "term": "component.react-select.no-options",
     "definition": "No options",
     "context": "No options"
-  },
-  {
-    "term": "component.recipient-select.create-new-contact",
-    "definition": "Create new contact for: <b>{email}</b>",
-    "context": "Create new contact for: <b>{email}</b>"
-  },
-  {
-    "term": "component.recipient-select.enter-email",
-    "definition": "You can also enter a valid email.",
-    "context": "You can also enter a valid email."
-  },
-  {
-    "term": "component.recipient-select.existing-contact.description",
-    "definition": "This contact already exists.",
-    "context": "This contact already exists."
-  },
-  {
-    "term": "component.recipient-select.existing-contact.title",
-    "definition": "Existing contact",
-    "context": "Existing contact"
-  },
-  {
-    "term": "component.recipient-select.label",
-    "definition": "Recipients",
-    "context": "Recipients"
-  },
-  {
-    "term": "component.recipient-select.no-options",
-    "definition": "We could not find any exisiting contacts for <em>{search}</em>",
-    "context": "We could not find any exisiting contacts for <em>{search}</em>"
-  },
-  {
-    "term": "component.recipient-select.placeholder",
-    "definition": "Enter recipients...",
-    "context": "Enter recipients..."
-  },
-  {
-    "term": "component.recipient-select.required-error",
-    "definition": "Please specify at least one recipient",
-    "context": "Please specify at least one recipient"
-  },
-  {
-    "term": "component.recipient-select.search-hint",
-    "definition": "Search for exisiting contacts or enter a valid email.",
-    "context": "Search for exisiting contacts or enter a valid email."
   },
   {
     "term": "component.search-input.placeholder",
@@ -885,6 +885,11 @@
     "context": "Reload"
   },
   {
+    "term": "generic.remove",
+    "definition": "Remove",
+    "context": "Remove"
+  },
+  {
     "term": "generic.required-field",
     "definition": "Required field",
     "context": "Required field"
@@ -1158,11 +1163,6 @@
     "term": "petition-replies.validate-field-button.validated",
     "definition": "Reviewed",
     "context": "Reviewed"
-  },
-  {
-    "term": "petition-sharing.header",
-    "definition": "Share with people",
-    "context": "Share with people"
   },
   {
     "term": "petition.activity-not-available",
