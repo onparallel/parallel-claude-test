@@ -102,11 +102,16 @@ export async function up(knex: Knex): Promise<void> {
     await t.schema.alterTable("contact", (t) => {
       // drop old index
       t.dropIndex(["email", "owner_id"], "contact__owner_id__email");
-      // add constraint on contact email,org_id
-      t.unique(["email", "org_id"], "contact__org_id__email");
       // remove column contact.owner_id
       t.dropColumn("owner_id");
     });
+
+    // add constraint on contact org_id,email
+    await t.raw(/* sql */ `
+      CREATE UNIQUE INDEX "contact__org_id__email" 
+      ON "contact" ("org_id", "email")
+      WHERE "deleted_at" IS NULL
+    `);
   });
 }
 
