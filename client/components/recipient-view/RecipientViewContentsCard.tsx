@@ -85,9 +85,9 @@ export function RecipientViewContentsCard({
                 {fields.map(({ field, ...badge }) => (
                   <ListItem key={field.id} position="relative">
                     <Text
-                      as="h3"
+                      as={field.type === "HEADING" ? "h3" : "div"}
                       position="relative"
-                      fontWeight="bold"
+                      fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                       paddingLeft={4}
                     >
                       <RecipientViewCommentsBadge
