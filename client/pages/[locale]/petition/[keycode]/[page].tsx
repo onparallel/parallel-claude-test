@@ -88,7 +88,7 @@ function RecipientView({
   const granter = access!.granter!;
   const contact = access!.contact!;
 
-  const fields = useGetPageFields(petition.fields, currentPage);
+  const { fields, pages } = useGetPageFields(petition.fields, currentPage);
 
   const [showCompletedAlert, setShowCompletedAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
@@ -438,11 +438,13 @@ function RecipientView({
               ))}
             </Stack>
             <Spacer />
-            <RecipientViewPagination
-              marginTop={8}
-              currentPage={currentPage}
-              pageCount={pageCount}
-            />
+            {pages > 1 ? (
+              <RecipientViewPagination
+                marginTop={8}
+                currentPage={currentPage}
+                pageCount={pageCount}
+              />
+            ) : null}
             <RecipientViewFooter marginTop={12} />
           </Flex>
         </Flex>
@@ -960,8 +962,10 @@ function useGetPageFields(
 ) {
   return useMemo(() => {
     const _fields: RecipientView_PublicPetitionFieldFragment[] = [];
+    let pages = 1;
     for (const field of fields) {
       if (field.type === "HEADING" && field.options!.hasPageBreak) {
+        pages += 1;
         page -= 1;
       }
       if (page === 0) {
@@ -972,7 +976,7 @@ function useGetPageFields(
         continue;
       }
     }
-    return _fields;
+    return { fields: _fields, pages };
   }, [fields, page]);
 }
 
