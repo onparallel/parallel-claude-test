@@ -1,11 +1,12 @@
 import { inject, injectable } from "inversify";
-import Knex from "knex";
-import { BaseRepository } from "../helpers/BaseRepository";
+import Knex, { QueryBuilder } from "knex";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateUser, User } from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import DataLoader from "dataloader";
 import { indexBy } from "remeda";
+import { escapeLike } from "../helpers/utils";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -60,5 +61,43 @@ export class UserRepository extends BaseRepository {
       .where("id", user.id)
       .returning("*");
     return rows[0];
+  }
+
+  async loadUsersForOrganization(
+    orgId: number,
+    opts: {
+      search?: string | null;
+      sortBy?: {
+        column: keyof User | QueryBuilder;
+        order?: "asc" | "desc";
+      }[];
+      excludeIds?: number[] | null;
+    } & PageOpts
+  ) {
+    return await this.loadPageAndCount(
+      this.from("user")
+        .where({
+          org_id: orgId,
+          deleted_at: null,
+        })
+        .mmodify((q) => {
+          const { search, excludeIds } = opts;
+          if (search) {
+            q.andWhere((q2) => {
+              q2.whereIlike(
+                this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
+                `%${escapeLike(search, "\\")}%`,
+                "\\"
+              ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");
+            });
+          }
+          if (excludeIds) {
+            q.whereNotIn("id", excludeIds);
+          }
+          q.orderBy(opts.sortBy ?? ["id"]);
+        })
+        .select("*"),
+      opts
+    );
   }
 }
