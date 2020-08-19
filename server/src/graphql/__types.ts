@@ -137,6 +137,7 @@ export interface NexusGenEnums {
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionReminderType: db.PetitionReminderType;
   PetitionStatus: db.PetitionStatus;
+  PetitionUserPermissionType: db.PetitionUserPermissionType;
   QueryContacts_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -235,6 +236,7 @@ export interface NexusGenRootTypes {
     validated: number; // Int!
   };
   PetitionReminder: db.PetitionReminder;
+  PetitionUserPermission: db.PetitionUser;
   PublicContact: db.Contact;
   PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
@@ -276,6 +278,7 @@ export interface NexusGenRootTypes {
     | NexusGenRootTypes["Petition"]
     | NexusGenRootTypes["PetitionAccess"]
     | NexusGenRootTypes["PetitionFieldReply"]
+    | NexusGenRootTypes["PetitionUserPermission"]
     | NexusGenRootTypes["PublicPetition"]
     | NexusGenRootTypes["PublicPetitionFieldReply"]
     | NexusGenRootTypes["User"];
@@ -308,6 +311,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PetitionMessageStatus: NexusGenEnums["PetitionMessageStatus"];
   PetitionReminderType: NexusGenEnums["PetitionReminderType"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
+  PetitionUserPermissionType: NexusGenEnums["PetitionUserPermissionType"];
   QueryContacts_OrderBy: NexusGenEnums["QueryContacts_OrderBy"];
   QueryPetitions_OrderBy: NexusGenEnums["QueryPetitions_OrderBy"];
   Result: NexusGenEnums["Result"];
@@ -473,6 +477,7 @@ export interface NexusGenFieldTypes {
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
   PetitionAccess: {
     // field return type
@@ -590,6 +595,16 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     sender: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionReminderType"]; // PetitionReminderType!
+  };
+  PetitionUserPermission: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: string; // ID!
+    isSubscribed: boolean; // Boolean!
+    permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    user: NexusGenRootTypes["User"]; // User!
   };
   PublicContact: {
     // field return type
@@ -1056,6 +1071,7 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "Petition"
     | "PetitionAccess"
     | "PetitionFieldReply"
+    | "PetitionUserPermission"
     | "PublicPetition"
     | "PublicPetitionFieldReply"
     | "User";
@@ -1093,6 +1109,7 @@ export type NexusGenObjectNames =
   | "PetitionPagination"
   | "PetitionProgress"
   | "PetitionReminder"
+  | "PetitionUserPermission"
   | "PublicContact"
   | "PublicOrganization"
   | "PublicPetition"
@@ -1133,6 +1150,7 @@ export type NexusGenEnumNames =
   | "PetitionMessageStatus"
   | "PetitionReminderType"
   | "PetitionStatus"
+  | "PetitionUserPermissionType"
   | "QueryContacts_OrderBy"
   | "QueryPetitions_OrderBy"
   | "Result";

@@ -686,6 +686,11 @@ type Petition implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+
+  """
+  The permissions linked to the petition
+  """
+  userPermissions: [PetitionUserPermission!]!
 }
 
 """
@@ -1195,6 +1200,51 @@ enum PetitionStatus {
   The petition has been sent and is awaiting completion.
   """
   PENDING
+}
+
+"""
+The permission for a petition and user
+"""
+type PetitionUserPermission implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  id: ID!
+
+  """
+  wether user is subscribed or not to emails and alerts of the petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionUserPermissionType!
+
+  """
+  The petition linked to the permission.
+  """
+  petition: Petition!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+
+  """
+  The user linked to the permission
+  """
+  user: User!
+}
+
+"""
+The type of permission for a petition user.
+"""
+enum PetitionUserPermissionType {
+  OWNER
+  READ
+  WRITE
 }
 
 """
