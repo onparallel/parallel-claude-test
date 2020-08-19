@@ -686,7 +686,6 @@ export interface NexusGenFieldTypes {
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
-    orgUsers: NexusGenRootTypes["UserPagination"]; // UserPagination!
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionPagination"]; // PetitionPagination!
   };
@@ -1016,6 +1015,7 @@ export interface NexusGenArgTypes {
       // args
       limit?: number | null; // Int
       offset?: number | null; // Int
+      search?: string | null; // String
     };
   };
   Petition: {
@@ -1045,14 +1045,6 @@ export interface NexusGenArgTypes {
     organization: {
       // args
       id: string; // ID!
-    };
-    orgUsers: {
-      // args
-      exclude?: string[] | null; // [ID!]
-      limit?: number | null; // Int
-      offset?: number | null; // Int
-      orgId: string; // ID!
-      search?: string | null; // String
     };
     petition: {
       // args

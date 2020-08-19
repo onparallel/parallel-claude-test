@@ -574,6 +574,11 @@ type Organization implements Timestamps {
     Number of elements to skip from the list.
     """
     offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
   ): UserPagination!
 }
 
@@ -1562,29 +1567,6 @@ type Query {
   ): ContactPagination!
   me: User!
   organization(id: ID!): Organization
-
-  """
-  The users of an organization
-  """
-  orgUsers(
-    exclude: [ID!]
-
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-    orgId: ID!
-
-    """
-    Optional text to search in the collection.
-    """
-    search: String
-  ): UserPagination!
   petition(id: ID!): Petition
 
   """
