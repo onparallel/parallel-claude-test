@@ -7,6 +7,7 @@ import { Organization, User } from "../../__types";
 import { OrganizationRepository } from "../OrganizationRepository";
 import { Mocks } from "./mocks";
 import { pick } from "remeda";
+import * as faker from "faker";
 
 describe("repositories/OrganizationRepository", () => {
   let container: Container;
@@ -28,12 +29,49 @@ describe("repositories/OrganizationRepository", () => {
   describe("loadOrgUsers", () => {
     let org1: Organization, org2: Organization, org3: Organization;
     let org1Users: User[], org2Users: User[];
+    const usersToSearch = [
+      {
+        first_name: "Joffrey",
+        last_name: "Baratheon",
+        email: "joffrey@kingslanding.com",
+      },
+      {
+        first_name: "Robert",
+        last_name: "Baratheon",
+        email: "robert.the.king@kingslanding.com",
+      },
+    ];
+
+    function setData(index: number) {
+      switch (index) {
+        case 5:
+          return {
+            first_name: usersToSearch[0].first_name,
+            last_name: usersToSearch[0].last_name,
+            email: usersToSearch[0].email,
+          };
+        case 7:
+          return {
+            first_name: usersToSearch[1].first_name,
+            last_name: usersToSearch[1].last_name,
+            email: usersToSearch[1].email,
+          };
+        default:
+          return {
+            first_name: faker.name.firstName(),
+            last_name: faker.name.lastName(),
+            email: faker.internet.email(),
+          };
+      }
+    }
 
     beforeAll(async () => {
       await deleteAllData(knex);
       [org1, org2, org3] = await mocks.createRandomOrganizations(3);
       org1Users = await mocks.createRandomUsers(org1.id, 42);
       org2Users = await mocks.createRandomUsers(org2.id, 10, (i) => ({
+        // sets info to search later
+        ...setData(i),
         // delete even i
         deleted_at: i % 2 === 0 ? new Date(2000, 1, 1) : null,
       }));
@@ -77,6 +115,36 @@ describe("repositories/OrganizationRepository", () => {
       const result = await organizations.loadOrgUsers(org3.id, { limit: 10 });
       expect(result.totalCount).toBe(0);
       expect(result.items).toHaveLength(0);
+    });
+
+    test("filters results by first name", async () => {
+      const result = await organizations.loadOrgUsers(org2.id, {
+        limit: 10,
+        search: "Joffr",
+      });
+
+      expect(result.totalCount).toBe(1);
+      expect(result.items).toMatchObject([usersToSearch[0]]);
+    });
+
+    test("filters results by full name", async () => {
+      const result = await organizations.loadOrgUsers(org2.id, {
+        limit: 10,
+        search: "Joffrey Barath",
+      });
+
+      expect(result.totalCount).toBe(1);
+      expect(result.items).toMatchObject([usersToSearch[0]]);
+    });
+
+    test("filters results by email", async () => {
+      const result = await organizations.loadOrgUsers(org2.id, {
+        limit: 10,
+        search: "kingslanding.com",
+      });
+
+      expect(result.totalCount).toBe(2);
+      expect(result.items).toMatchObject(usersToSearch);
     });
   });
 });
