@@ -407,6 +407,7 @@ export interface NexusGenFieldTypes {
   };
   Mutation: {
     // field return type
+    addOrChangePetitionUserPermission: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
@@ -439,6 +440,7 @@ export interface NexusGenFieldTypes {
     sendReminders: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    transferPetitionOwnership: NexusGenRootTypes["PetitionUserPermission"]; // PetitionUserPermission!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -765,6 +767,12 @@ export interface NexusGenArgTypes {
     };
   };
   Mutation: {
+    addOrChangePetitionUserPermission: {
+      // args
+      permissionType?: NexusGenEnums["PetitionUserPermissionType"] | null; // PetitionUserPermissionType
+      petitionIds: string[]; // [ID!]!
+      userIds: string[]; // [ID!]!
+    };
     cancelScheduledMessage: {
       // args
       messageId: string; // ID!
@@ -945,6 +953,11 @@ export interface NexusGenArgTypes {
       petitionId: string; // ID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       start: boolean; // Boolean!
+    };
+    transferPetitionOwnership: {
+      // args
+      petitionIds: string[]; // [ID!]!
+      userId: string; // ID!
     };
     updateContact: {
       // args

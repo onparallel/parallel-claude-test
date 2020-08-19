@@ -14,6 +14,9 @@ export function userHasAccessToPetitions<
         unMaybeArray(args[argName]),
         "Petition"
       );
+      if (petitionIds.length === 0) {
+        return true;
+      }
       return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, petitionIds);
     } catch {}
     return false;

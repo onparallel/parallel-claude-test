@@ -186,6 +186,15 @@ type MessageSentEvent implements PetitionEvent {
 
 type Mutation {
   """
+  Adds or edits permissions on given petitions and users
+  """
+  addOrChangePetitionUserPermission(
+    permissionType: PetitionUserPermissionType
+    petitionIds: [ID!]!
+    userIds: [ID!]!
+  ): [PetitionUserPermission!]!
+
+  """
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: ID!, petitionId: ID!): PetitionMessage
@@ -431,6 +440,14 @@ type Mutation {
     remindersConfig: RemindersConfigInput
     start: Boolean!
   ): [PetitionAccess!]!
+
+  """
+  Transfers petition ownership to a given user
+  """
+  transferPetitionOwnership(
+    petitionIds: [ID!]!
+    userId: ID!
+  ): PetitionUserPermission!
 
   """
   Updates a contact.

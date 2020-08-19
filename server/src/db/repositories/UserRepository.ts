@@ -26,6 +26,15 @@ export class UserRepository extends BaseRepository {
     })
   );
 
+  readonly loadUsers = fromDataLoader(
+    new DataLoader<number, User>(async (ids) => {
+      return await this.from("user")
+        .whereIn("id", ids)
+        .whereNull("deleted_at")
+        .returning("*");
+    })
+  );
+
   readonly loadUser = this.buildLoadById("user", "id", (q) =>
     q.whereNull("deleted_at")
   );

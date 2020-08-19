@@ -36,6 +36,8 @@ import {
   PetitionUserNotification,
   PetitionContactNotification,
   PetitionUser,
+  PetitionUserPermissionType,
+  CreatePetitionUser,
 } from "../__types";
 import {
   PetitionAccessReminderConfig,
@@ -1830,4 +1832,99 @@ export class PetitionRepository extends BaseRepository {
       return ids.map((id) => byPetitionId[id]);
     })
   );
+
+  async addOrChangePetitionUserPermissions(
+    petitionIds: number[],
+    userIds: number[],
+    permissionType: PetitionUserPermissionType,
+    user: User
+  ) {
+    const batch: CreatePetitionUser[] = [];
+    petitionIds.forEach((petitionId) => {
+      userIds.forEach((userId) => {
+        batch.push({
+          petition_id: petitionId,
+          user_id: userId,
+          permission_type: permissionType,
+          created_by: `User:${user.id}`,
+        });
+      });
+    });
+
+    const { rows } = await this.knex.raw<{ rows: PetitionUser[] }>(
+      /* sql */ `
+    ? ON CONFLICT (user_id, petition_id)
+        DO UPDATE SET
+        permission_type = ?,
+        updated_by = ?,
+        updated_at = ?
+      RETURNING *;`,
+      [
+        this.from("petition_user").insert(batch),
+        permissionType,
+        `User:${user.id}`,
+        this.now(),
+      ]
+    );
+    return rows;
+  }
+
+  async removePetitionUserPermissions(
+    petitionIds: number[],
+    userIds: number[],
+    user: User
+  ) {
+    return await this.from("petition_user")
+      .whereIn("petition_id", petitionIds)
+      .whereIn("user_id", userIds)
+      .whereNull("deleted_at")
+      .update({
+        deleted_at: this.now(),
+        deleted_by: `User:${user.id}`,
+      })
+      .returning("*");
+  }
+
+  async transferOwnership(petitionIds: number[], userId: number, user: User) {
+    return this.withTransaction(async (t) => {
+      await t
+        .from<PetitionUser>("petition_user")
+        .whereIn("petition_id", petitionIds)
+        .where({
+          user_id: user.id,
+          permission_type: "OWNER",
+        })
+        .update({
+          permission_type: "WRITE",
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        });
+
+      const insertBatch: CreatePetitionUser[] = petitionIds.map((pid) => ({
+        created_by: `User:${user.id}`,
+        permission_type: "OWNER",
+        user_id: userId,
+        petition_id: pid,
+      }));
+
+      const {
+        rows: [permission],
+      } = await t.raw<{ rows: PetitionUser[] }>(
+        /* sql */ `
+        ? ON CONFLICT (user_id, petition_id)
+          DO UPDATE SET
+          permission_type = ?,
+          updated_by = ?,
+          updated_at = ?
+        RETURNING *;`,
+        [
+          this.from("petition_user").insert(insertBatch),
+          "OWNER",
+          `User:${user.id}`,
+          this.now(),
+        ]
+      );
+      return permission;
+    });
+  }
 }
