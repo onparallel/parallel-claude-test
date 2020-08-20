@@ -8,12 +8,14 @@ export interface FromDataLoaderOptions {
 export interface Loader<K, V> {
   (id: K, opts?: FromDataLoaderOptions): Promise<V>;
   (ids: K[], opts?: FromDataLoaderOptions): Promise<Array<V>>;
+  dataloader: DataLoader<K, V>;
 }
 
 export function fromDataLoader<K, V, C = K>(
   dataloader: DataLoader<K, V, C>
 ): Loader<K, V> {
-  return async function (ids: K | K[], opts: FromDataLoaderOptions = {}) {
+  return Object.assign(
+    async function (ids: K | K[], opts: FromDataLoaderOptions = {}) {
     const { refresh, cache } = {
       refresh: false,
       cache: true,
@@ -33,5 +35,7 @@ export function fromDataLoader<K, V, C = K>(
       }
     }
     return result;
-  } as any;
+    } as any,
+    dataloader
+  );
 }

@@ -1868,6 +1868,9 @@ export class PetitionRepository extends BaseRepository {
         this.now(),
       ]
     );
+    for (const petitionId of petitionIds) {
+      this.loadUserPermissions.dataloader.clear(petitionId);
+    }
 
     return await this.from("petition")
       .whereNull("deleted_at")
