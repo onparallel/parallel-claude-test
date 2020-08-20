@@ -1,5 +1,5 @@
-import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../util/globalId";
+import { enumType, objectType, idArg } from "@nexus/schema";
+import { toGlobalId, fromGlobalIds } from "../../util/globalId";
 import { belongsToOrg } from "./authorizers";
 
 export const OrganizationStatus = enumType({
@@ -37,11 +37,19 @@ export const Organization = objectType({
       description: "The users in the organization.",
       searchable: true,
       authorize: belongsToOrg(),
-      resolve: async (root, { offset, limit, search }, ctx) => {
+      additionalArgs: {
+        exclude: idArg({
+          list: [true],
+          required: false,
+        }),
+      },
+      resolve: async (root, { offset, limit, search, exclude }, ctx) => {
+        const { ids: excludeIds } = fromGlobalIds(exclude ?? [], "User");
         return await ctx.organizations.loadOrgUsers(root.id, {
           offset,
           limit,
           search,
+          excludeIds,
         });
       },
     });

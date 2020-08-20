@@ -562,6 +562,8 @@ type Organization implements Timestamps {
   The users in the organization.
   """
   users(
+    exclude: [ID!]
+
     """
     Number of elements to take from the list.
     """

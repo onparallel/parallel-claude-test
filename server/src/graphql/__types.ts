@@ -1013,6 +1013,7 @@ export interface NexusGenArgTypes {
   Organization: {
     users: {
       // args
+      exclude?: string[] | null; // [ID!]
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
