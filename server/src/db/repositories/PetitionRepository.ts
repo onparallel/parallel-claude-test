@@ -1828,8 +1828,15 @@ export class PetitionRepository extends BaseRepository {
         .whereNull("deleted_at")
         .select("*");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
-
-      return ids.map((id) => byPetitionId[id]);
+      const order = ["OWNER", "WRITE", "READ"];
+      return ids.map((id) =>
+        byPetitionId[id].sort((a, b) =>
+          a.permission_type === b.permission_type
+            ? a.created_at.valueOf() - b.created_at.valueOf()
+            : order.indexOf(a.permission_type) -
+              order.indexOf(b.permission_type)
+        )
+      );
     })
   );
 
