@@ -1918,6 +1918,10 @@ export class PetitionRepository extends BaseRepository {
           updated_by: `User:${user.id}`,
         });
 
+      for (const petitionId of petitionIds) {
+        this.loadUserPermissions.dataloader.clear(petitionId);
+      }
+
       const insertBatch: CreatePetitionUser[] = petitionIds.map((pid) => ({
         created_by: `User:${user.id}`,
         permission_type: "OWNER",
