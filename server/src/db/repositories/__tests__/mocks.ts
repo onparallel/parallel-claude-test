@@ -158,6 +158,12 @@ export class Mocks {
       )
       .returning("*");
   }
+
+  async clearSharedPetitions() {
+    return await this.knex<PetitionUser>("petition_user")
+      .whereNot("permission_type", "OWNER")
+      .delete();
+  }
 }
 
 function randomPetitionStatus() {

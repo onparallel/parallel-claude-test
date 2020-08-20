@@ -484,4 +484,399 @@ describe("repositories/PetitionRepository", () => {
       });
     });
   });
+
+  describe("Petition Sharing", () => {
+    let org: Organization;
+    let users: User[];
+    let user0Petitions: Petition[];
+
+    beforeAll(async () => {
+      await deleteAllData(knex);
+      [org] = await mocks.createRandomOrganizations(1);
+      users = await mocks.createRandomUsers(org.id, 5);
+      user0Petitions = await mocks.createRandomPetitions(
+        org.id,
+        users[0].id,
+        3
+      );
+    });
+
+    describe("loadUserPermissions", () => {
+      test("should load current user permissions", async () => {
+        expect(
+          await petitions.loadUserPermissions(user0Petitions[0].id)
+        ).toMatchObject([
+          {
+            petition_id: user0Petitions[0].id,
+            user_id: users[0].id,
+            permission_type: "OWNER",
+          },
+        ]);
+      });
+
+      test("loading for multiple petitions should return permissions grouped by petition_id", async () => {
+        const petitionIds = user0Petitions.map((p) => p.id);
+        const groupedPermissions = await petitions.loadUserPermissions(
+          petitionIds
+        );
+        expect(groupedPermissions).toHaveLength(3);
+        for (let i = 0; i < 3; i++) {
+          expect(
+            groupedPermissions[i].every((p) => p.petition_id === petitionIds[i])
+          ).toBe(true);
+        }
+      });
+    });
+
+    describe("addPetitionUserPermissions", () => {
+      beforeEach(async () => {
+        await mocks.clearSharedPetitions();
+      });
+
+      test("should insert new permission for user without access to the petitions", async () => {
+        const { newPermissions } = await petitions.addPetitionUserPermissions(
+          [user0Petitions[0].id],
+          [users[1].id],
+          "READ",
+          users[0]
+        );
+
+        const permissions = await petitions.loadUserPermissions(
+          user0Petitions[0].id
+        );
+        permissions.sort((a, b) => a.id - b.id);
+
+        expect(newPermissions).toHaveLength(1);
+        expect(permissions).toHaveLength(2);
+        expect(permissions).toMatchObject([
+          {
+            petition_id: user0Petitions[0].id,
+            user_id: users[0].id,
+            permission_type: "OWNER",
+          },
+          {
+            petition_id: user0Petitions[0].id,
+            user_id: users[1].id,
+            permission_type: "READ",
+          },
+        ]);
+      });
+
+      test("should not set new permission for user with access to the petitions", async () => {
+        const {
+          newPermissions: firstPermissions,
+        } = await petitions.addPetitionUserPermissions(
+          [user0Petitions[0].id],
+          [users[2].id],
+          "WRITE",
+          users[0]
+        );
+
+        const { newPermissions } = await petitions.addPetitionUserPermissions(
+          [user0Petitions[0].id],
+          [users[2].id],
+          "READ",
+          users[0]
+        );
+        expect(firstPermissions).toHaveLength(1);
+        expect(newPermissions).toHaveLength(0);
+      });
+
+      test("should share multiple petitions with a single user", async () => {
+        const petitionIds = user0Petitions.map((u) => u.id);
+        const { newPermissions } = await petitions.addPetitionUserPermissions(
+          petitionIds,
+          [users[3].id],
+          "WRITE",
+          users[0]
+        );
+
+        expect(newPermissions).toHaveLength(3);
+        let groupedPermissions = await petitions.loadUserPermissions(
+          petitionIds
+        );
+
+        expect(groupedPermissions).toHaveLength(3);
+        for (let i = 0; i < 3; i++) {
+          expect(groupedPermissions[i]).toHaveLength(2);
+          groupedPermissions[i].sort((a, b) => a.id - b.id);
+          expect(groupedPermissions[i]).toMatchObject([
+            {
+              permission_type: "OWNER",
+              user_id: users[0].id,
+            },
+            {
+              permission_type: "WRITE",
+              user_id: users[3].id,
+            },
+          ]);
+        }
+      });
+
+      test("should share a single petition with multiple users", async () => {
+        const userIds = users.slice(1).map((u) => u.id);
+        const petitionId = user0Petitions[1].id;
+        const { newPermissions } = await petitions.addPetitionUserPermissions(
+          [petitionId],
+          userIds,
+          "READ",
+          users[0]
+        );
+
+        expect(newPermissions).toHaveLength(userIds.length);
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        expect(permissions).toHaveLength(userIds.length + 1);
+      });
+
+      test("should share multiple petitions with multiple users", async () => {
+        const userIds = users.slice(1).map((u) => u.id);
+        const petitionIds = user0Petitions.map((p) => p.id);
+        const { newPermissions } = await petitions.addPetitionUserPermissions(
+          petitionIds,
+          userIds,
+          "WRITE",
+          users[0]
+        );
+
+        // userIds.length * petitionIds.length === 12
+        expect(newPermissions).toHaveLength(12);
+      });
+    });
+
+    describe("editPetitionUserPermissions", () => {
+      let petitionId: number, userId: number;
+      beforeEach(async () => {
+        await mocks.clearSharedPetitions();
+        petitionId = user0Petitions[0].id;
+        userId = users[1].id;
+        await petitions.addPetitionUserPermissions(
+          [petitionId],
+          [userId],
+          "READ",
+          users[0]
+        );
+      });
+
+      test("should update permissions for users with shared petitions", async () => {
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        await petitions.editPetitionUserPermissions(
+          [petitionId],
+          [userId],
+          "WRITE",
+          users[0]
+        );
+        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        expect(permissions.length).toEqual(newPermissions.length);
+        permissions.sort((a, b) => a.id - b.id);
+        expect(newPermissions).toMatchObject([
+          {
+            permission_type: "OWNER",
+            user_id: users[0].id,
+            petition_id: petitionId,
+          },
+          {
+            permission_type: "WRITE",
+            user_id: userId,
+            petition_id: petitionId,
+          },
+        ]);
+      });
+
+      test("should not allow double ownership on a single petition", async () => {
+        // this test should assert 1 time on the catch block
+        expect.assertions(1);
+        try {
+          await petitions.editPetitionUserPermissions(
+            [petitionId],
+            [userId],
+            "OWNER",
+            users[0]
+          );
+        } catch (e) {
+          expect(e.constraint).toBe("petition_user__owner");
+        }
+      });
+
+      test("should not edit for user without permissions", async () => {
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        await petitions.editPetitionUserPermissions(
+          [petitionId],
+          [users[3].id],
+          "READ",
+          users[0]
+        );
+        const newPermissions = await petitions.loadUserPermissions(petitionId, {
+          cache: false,
+        });
+        expect(permissions).toMatchObject(newPermissions);
+      });
+    });
+
+    describe("removePetitionUserPermissions", () => {
+      let petitionId: number, userId: number;
+      beforeEach(async () => {
+        await mocks.clearSharedPetitions();
+        petitionId = user0Petitions[0].id;
+        userId = users[1].id;
+        await petitions.addPetitionUserPermissions(
+          [petitionId],
+          [userId],
+          "READ",
+          users[0]
+        );
+      });
+
+      test("should remove access to a single petition for a single user", async () => {
+        await petitions.removePetitionUserPermissions(
+          [petitionId],
+          [userId],
+          users[0]
+        );
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        expect(permissions).toHaveLength(1);
+        expect(permissions).toMatchObject([
+          {
+            permission_type: "OWNER",
+            user_id: users[0].id,
+            petition_id: petitionId,
+          },
+        ]);
+      });
+
+      test("should remove access to a single petition for multiple users", async () => {
+        await petitions.addPetitionUserPermissions(
+          [petitionId],
+          [users[2].id, users[3].id],
+          "READ",
+          users[0]
+        );
+
+        await petitions.removePetitionUserPermissions(
+          [petitionId],
+          [users[1].id, users[2].id],
+          users[0]
+        );
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        expect(permissions).toHaveLength(2);
+        permissions.sort((a, b) => a.id - b.id);
+        expect(permissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            user_id: users[0].id,
+            permission_type: "OWNER",
+          },
+          {
+            petition_id: petitionId,
+            user_id: users[3].id,
+            permission_type: "READ",
+          },
+        ]);
+      });
+
+      test("should remove access to multiple petitions for a single user", async () => {
+        await petitions.addPetitionUserPermissions(
+          [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
+          [users[1].id],
+          "WRITE",
+          users[0]
+        );
+
+        await petitions.removePetitionUserPermissions(
+          [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
+          [users[1].id],
+          users[0]
+        );
+
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        expect(permissions).toHaveLength(1);
+        expect(permissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            user_id: users[0].id,
+            permission_type: "OWNER",
+          },
+        ]);
+      });
+
+      test("should remove access to multiple petitions for multiple user", async () => {
+        await petitions.addPetitionUserPermissions(
+          [user0Petitions[0].id, user0Petitions[1].id],
+          [users[1].id, users[2].id, users[3].id],
+          "WRITE",
+          users[0]
+        );
+
+        await petitions.removePetitionUserPermissions(
+          [user0Petitions[0].id, user0Petitions[1].id],
+          [users[1].id, users[2].id, users[3].id],
+          users[0]
+        );
+
+        const permissions = (
+          await petitions.loadUserPermissions([
+            user0Petitions[0].id,
+            user0Petitions[1].id,
+          ])
+        ).flat();
+        expect(permissions).toHaveLength(2);
+      });
+    });
+
+    describe("transferOwnership", () => {
+      beforeEach(async () => {
+        await mocks.clearSharedPetitions();
+      });
+
+      test("should transfer ownership to a user without access to the petition", async () => {
+        const petitionId = user0Petitions[1].id;
+        const permissions = await petitions.loadUserPermissions(petitionId);
+        expect(permissions).toHaveLength(1);
+
+        await petitions.transferOwnership([petitionId], users[2].id, users[0]);
+        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        expect(newPermissions).toHaveLength(2);
+        newPermissions.sort((a, b) => (a.permission_type === "OWNER" ? -1 : 1));
+        expect(newPermissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            permission_type: "OWNER",
+            user_id: users[2].id,
+          },
+          {
+            petition_id: petitionId,
+            permission_type: "WRITE",
+            user_id: users[0].id,
+          },
+        ]);
+      });
+
+      test("should transfer ownership to a user with READ or WRITE access", async () => {
+        const petitionId = user0Petitions[2].id;
+        const userId = users[2].id;
+        await petitions.addPetitionUserPermissions(
+          [petitionId],
+          [userId],
+          "READ",
+          users[0]
+        );
+
+        await petitions.transferOwnership([petitionId], userId, users[0]);
+        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        expect(newPermissions).toHaveLength(2);
+        newPermissions.sort((a, b) => a.id - b.id);
+        expect(newPermissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            permission_type: "WRITE",
+            user_id: users[0].id,
+          },
+          {
+            petition_id: petitionId,
+            permission_type: "OWNER",
+            user_id: userId,
+          },
+        ]);
+      });
+    });
+  });
 });
