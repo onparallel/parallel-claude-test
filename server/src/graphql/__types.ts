@@ -407,7 +407,7 @@ export interface NexusGenFieldTypes {
   };
   Mutation: {
     // field return type
-    addOrChangePetitionUserPermission: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
+    addOrChangePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
@@ -440,7 +440,7 @@ export interface NexusGenFieldTypes {
     sendReminders: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
-    transferPetitionOwnership: NexusGenRootTypes["PetitionUserPermission"]; // PetitionUserPermission!
+    transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!

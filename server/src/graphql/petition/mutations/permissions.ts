@@ -14,7 +14,8 @@ export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
   {
     description: "Transfers petition ownership to a given user",
-    type: "PetitionUserPermission",
+    type: "Petition",
+    list: [true],
     authorize: chain(
       authenticate(),
       and(
@@ -47,7 +48,7 @@ export const addOrChangePetitionUserPermission = mutationField(
   "addOrChangePetitionUserPermission",
   {
     description: "Adds or edits permissions on given petitions and users",
-    type: "PetitionUserPermission",
+    type: "Petition",
     list: [true],
     authorize: chain(
       authenticate(),

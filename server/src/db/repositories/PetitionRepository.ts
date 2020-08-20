@@ -1851,13 +1851,15 @@ export class PetitionRepository extends BaseRepository {
       });
     });
 
-    const { rows } = await this.knex.raw<{ rows: PetitionUser[] }>(
+    await this.knex.raw<{ rows: PetitionUser[] }>(
       /* sql */ `
     ? ON CONFLICT (user_id, petition_id)
         DO UPDATE SET
         permission_type = ?,
         updated_by = ?,
-        updated_at = ?
+        updated_at = ?,
+        deleted_by = null,
+        deleted_at = null
       RETURNING *;`,
       [
         this.from("petition_user").insert(batch),
@@ -1866,7 +1868,11 @@ export class PetitionRepository extends BaseRepository {
         this.now(),
       ]
     );
-    return rows;
+
+    return await this.from("petition")
+      .whereNull("deleted_at")
+      .whereIn("id", petitionIds)
+      .returning("*");
   }
 
   async removePetitionUserPermissions(
@@ -1874,14 +1880,18 @@ export class PetitionRepository extends BaseRepository {
     userIds: number[],
     user: User
   ) {
-    return await this.from("petition_user")
+    await this.from("petition_user")
       .whereIn("petition_id", petitionIds)
       .whereIn("user_id", userIds)
       .whereNull("deleted_at")
       .update({
         deleted_at: this.now(),
         deleted_by: `User:${user.id}`,
-      })
+      });
+
+    return await this.from("petition")
+      .whereNull("deleted_at")
+      .whereIn("id", petitionIds)
       .returning("*");
   }
 
@@ -1892,6 +1902,7 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_id", petitionIds)
         .where({
           user_id: user.id,
+          deleted_at: null,
           permission_type: "OWNER",
         })
         .update({
@@ -1907,15 +1918,15 @@ export class PetitionRepository extends BaseRepository {
         petition_id: pid,
       }));
 
-      const {
-        rows: [permission],
-      } = await t.raw<{ rows: PetitionUser[] }>(
+      await t.raw(
         /* sql */ `
         ? ON CONFLICT (user_id, petition_id)
           DO UPDATE SET
           permission_type = ?,
           updated_by = ?,
-          updated_at = ?
+          updated_at = ?,
+          deleted_by = null,
+          deleted_at = null
         RETURNING *;`,
         [
           this.from("petition_user").insert(insertBatch),
@@ -1924,7 +1935,12 @@ export class PetitionRepository extends BaseRepository {
           this.now(),
         ]
       );
-      return permission;
+
+      return await t
+        .from<Petition>("petition")
+        .whereNull("deleted_at")
+        .whereIn("id", petitionIds)
+        .returning("*");
     });
   }
 }
