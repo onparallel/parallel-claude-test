@@ -156,6 +156,8 @@ export type MessageSentEvent = PetitionEvent & {
 
 export type Mutation = {
   __typename?: "Mutation";
+  /** Adds permissions on given petitions and users */
+  addPetitionUserPermission: Array<Petition>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   /** Changes the password for the current logged in user. */
@@ -184,6 +186,8 @@ export type Mutation = {
   deletePetitionFieldComment: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** Edits permissions on given petitions and users */
+  editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Marks the specified comments as read. */
@@ -210,6 +214,8 @@ export type Mutation = {
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Removes permissions on given petitions and users */
+  removePetitionUserPermission: Array<Petition>;
   /** Sends a petition message to the speicified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -220,6 +226,8 @@ export type Mutation = {
   submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
+  /** Transfers petition ownership to a given user */
+  transferPetitionOwnership: Array<Petition>;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -238,6 +246,12 @@ export type Mutation = {
   updateUser: User;
   /** Updates the validation of a petition field. */
   validatePetitionFields: Array<PetitionField>;
+};
+
+export type MutationaddPetitionUserPermissionArgs = {
+  permissionType: PetitionUserPermissionTypeRW;
+  petitionIds: Array<Scalars["ID"]>;
+  userIds: Array<Scalars["ID"]>;
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -314,7 +328,14 @@ export type MutationdeletePetitionFieldCommentArgs = {
 };
 
 export type MutationdeletePetitionsArgs = {
+  force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["ID"]>;
+};
+
+export type MutationeditPetitionUserPermissionArgs = {
+  permissionType: PetitionUserPermissionType;
+  petitionIds: Array<Scalars["ID"]>;
+  userIds: Array<Scalars["ID"]>;
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
@@ -387,6 +408,11 @@ export type MutationreactivateAccessesArgs = {
   petitionId: Scalars["ID"];
 };
 
+export type MutationremovePetitionUserPermissionArgs = {
+  petitionIds: Array<Scalars["ID"]>;
+  userIds: Array<Scalars["ID"]>;
+};
+
 export type MutationsendMessagesArgs = {
   accessIds: Array<Scalars["ID"]>;
   body: Scalars["JSON"];
@@ -418,6 +444,11 @@ export type MutationswitchAutomaticRemindersArgs = {
   petitionId: Scalars["ID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   start: Scalars["Boolean"];
+};
+
+export type MutationtransferPetitionOwnershipArgs = {
+  petitionIds: Array<Scalars["ID"]>;
+  userId: Scalars["ID"];
 };
 
 export type MutationupdateContactArgs = {
@@ -502,8 +533,10 @@ export type Organization = Timestamps & {
 
 /** An organization in the system. */
 export type OrganizationusersArgs = {
+  exclude?: Maybe<Array<Scalars["ID"]>>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
 };
 
 /** The roles of a user within an organization. */
@@ -555,6 +588,8 @@ export type Petition = Timestamps & {
   status: PetitionStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+  /** The permissions linked to the petition */
+  userPermissions: Array<PetitionUserPermission>;
 };
 
 /** An petition in the system. */
@@ -823,6 +858,30 @@ export type PetitionStatus =
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
+
+/** The permission for a petition and user */
+export type PetitionUserPermission = Timestamps & {
+  __typename?: "PetitionUserPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  /** wether user is subscribed or not to emails and alerts of the petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionUserPermissionType;
+  /** The petition linked to the permission. */
+  petition: Petition;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+  /** The user linked to the permission */
+  user: User;
+};
+
+/** The type of permission for a petition user. */
+export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
+
+/** The READ and WRITE permissions for a petition user. */
+export type PetitionUserPermissionTypeRW = "READ" | "WRITE";
 
 /** A public view of a contact */
 export type PublicContact = {
@@ -1153,13 +1212,23 @@ export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   "id" | "fullName" | "email"
 >;
 
+export type ContactSelect_ContactFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "fullName" | "email"
+>;
+
 export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
   User,
   "onboardingStatus"
 >;
 
-export type ContactSelect_ContactFragment = { __typename?: "Contact" } & Pick<
-  Contact,
+export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName"
+>;
+
+export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
+  User,
   "id" | "fullName" | "email"
 >;
 
@@ -1194,6 +1263,11 @@ export type PetitionHeader_PetitionFragment = {
   PetitionSettingsModal_PetitionFragment &
   ConfirmDeletePetitionsDialog_PetitionFragment;
 
+export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id"
+>;
+
 export type PetitionLayout_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name"> &
@@ -1201,7 +1275,8 @@ export type PetitionLayout_PetitionFragment = {
 
 export type PetitionLayout_UserFragment = {
   __typename?: "User";
-} & AppLayout_UserFragment;
+} & AppLayout_UserFragment &
+  PetitionHeader_UserFragment;
 
 export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -1572,6 +1647,90 @@ export type PetitionFieldsIndex_PetitionFieldFragment = {
 export type PetitionSettingsModal_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "status" | "locale" | "deadline">;
+
+export type PetitionSharingModal_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & PetitionSharingModal_UserFragment }
+    >;
+  };
+
+export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "email" | "fullName"
+> &
+  UserSelect_UserFragment;
+
+export type PetitionSharingModal_addPetitionUserPermissionMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  userIds: Array<Scalars["ID"]>;
+  permissionType: PetitionUserPermissionTypeRW;
+}>;
+
+export type PetitionSharingModal_addPetitionUserPermissionMutation = {
+  __typename?: "Mutation";
+} & {
+  addPetitionUserPermission: Array<
+    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+  >;
+};
+
+export type PetitionSharingModal_removePetitionUserPermissionMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  userId: Scalars["ID"];
+}>;
+
+export type PetitionSharingModal_removePetitionUserPermissionMutation = {
+  __typename?: "Mutation";
+} & {
+  removePetitionUserPermission: Array<
+    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+  >;
+};
+
+export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
+  petitionId: Scalars["ID"];
+  userId: Scalars["ID"];
+}>;
+
+export type PetitionSharingModal_transferPetitionOwnershipMutation = {
+  __typename?: "Mutation";
+} & {
+  transferPetitionOwnership: Array<
+    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+  >;
+};
+
+export type PetitionSharingModal_PetitionUserPermissionsQueryVariables = Exact<{
+  petitionId: Scalars["ID"];
+}>;
+
+export type PetitionSharingModal_PetitionUserPermissionsQuery = {
+  __typename?: "Query";
+} & {
+  petition?: Maybe<
+    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+  >;
+};
+
+export type PetitionSharingModal_searchUsersQueryVariables = Exact<{
+  search: Scalars["String"];
+  exclude: Array<Scalars["ID"]>;
+}>;
+
+export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & {
+    organization: { __typename?: "Organization" } & {
+      users: { __typename?: "UserPagination" } & {
+        items: Array<{ __typename?: "User" } & UserSelect_UserFragment>;
+      };
+    };
+  };
+};
 
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -2444,6 +2603,11 @@ export type Petitions_PetitionFragment = { __typename?: "Petition" } & Pick<
           >;
         }
     >;
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & {
+        user: { __typename?: "User" } & UserAvatarList_UserFragment;
+      }
+    >;
   } & ConfirmDeletePetitionsDialog_PetitionFragment;
 
 export type Petitions_UserFragment = {
@@ -2827,6 +2991,35 @@ export const ContactSelect_ContactFragmentDoc = gql`
     fullName
     email
   }
+`;
+export const UserSelect_UserFragmentDoc = gql`
+  fragment UserSelect_User on User {
+    id
+    fullName
+    email
+  }
+`;
+export const PetitionSharingModal_UserFragmentDoc = gql`
+  fragment PetitionSharingModal_User on User {
+    id
+    email
+    fullName
+    ...UserSelect_User
+  }
+  ${UserSelect_UserFragmentDoc}
+`;
+export const PetitionSharingModal_PetitionFragmentDoc = gql`
+  fragment PetitionSharingModal_Petition on Petition {
+    id
+    name
+    userPermissions {
+      permissionType
+      user {
+        ...PetitionSharingModal_User
+      }
+    }
+  }
+  ${PetitionSharingModal_UserFragmentDoc}
 `;
 export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeField_PetitionField on PetitionField {
@@ -3338,11 +3531,18 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
   ${PetitionAccessTable_PetitionFragmentDoc}
   ${PetitionActivityTimeline_PetitionFragmentDoc}
 `;
+export const PetitionHeader_UserFragmentDoc = gql`
+  fragment PetitionHeader_User on User {
+    id
+  }
+`;
 export const PetitionLayout_UserFragmentDoc = gql`
   fragment PetitionLayout_User on User {
     ...AppLayout_User
+    ...PetitionHeader_User
   }
   ${AppLayout_UserFragmentDoc}
+  ${PetitionHeader_UserFragmentDoc}
 `;
 export const PetitionActivity_UserFragmentDoc = gql`
   fragment PetitionActivity_User on User {
@@ -3536,6 +3736,12 @@ export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc
     }
   }
 `;
+export const UserAvatarList_UserFragmentDoc = gql`
+  fragment UserAvatarList_User on User {
+    id
+    fullName
+  }
+`;
 export const Petitions_PetitionFragmentDoc = gql`
   fragment Petitions_Petition on Petition {
     id
@@ -3557,9 +3763,15 @@ export const Petitions_PetitionFragmentDoc = gql`
         ...ContactLink_Contact
       }
     }
+    userPermissions {
+      user {
+        ...UserAvatarList_User
+      }
+    }
     ...ConfirmDeletePetitionsDialog_Petition
   }
   ${ContactLink_ContactFragmentDoc}
+  ${UserAvatarList_UserFragmentDoc}
   ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
 `;
 export const Petitions_PetitionPaginationFragmentDoc = gql`
@@ -3853,6 +4065,301 @@ export type AppLayout_updateOnboardingStatusMutationResult = Apollo.MutationResu
 export type AppLayout_updateOnboardingStatusMutationOptions = Apollo.BaseMutationOptions<
   AppLayout_updateOnboardingStatusMutation,
   AppLayout_updateOnboardingStatusMutationVariables
+>;
+export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
+  mutation PetitionSharingModal_addPetitionUserPermission(
+    $petitionId: ID!
+    $userIds: [ID!]!
+    $permissionType: PetitionUserPermissionTypeRW!
+  ) {
+    addPetitionUserPermission(
+      petitionIds: [$petitionId]
+      userIds: $userIds
+      permissionType: $permissionType
+    ) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+`;
+export type PetitionSharingModal_addPetitionUserPermissionMutationFn = Apollo.MutationFunction<
+  PetitionSharingModal_addPetitionUserPermissionMutation,
+  PetitionSharingModal_addPetitionUserPermissionMutationVariables
+>;
+
+/**
+ * __usePetitionSharingModal_addPetitionUserPermissionMutation__
+ *
+ * To run a mutation, you first call `usePetitionSharingModal_addPetitionUserPermissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSharingModal_addPetitionUserPermissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSharingModalAddPetitionUserPermissionMutation, { data, loading, error }] = usePetitionSharingModal_addPetitionUserPermissionMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      userIds: // value for 'userIds'
+ *      permissionType: // value for 'permissionType'
+ *   },
+ * });
+ */
+export function usePetitionSharingModal_addPetitionUserPermissionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSharingModal_addPetitionUserPermissionMutation,
+    PetitionSharingModal_addPetitionUserPermissionMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSharingModal_addPetitionUserPermissionMutation,
+    PetitionSharingModal_addPetitionUserPermissionMutationVariables
+  >(PetitionSharingModal_addPetitionUserPermissionDocument, baseOptions);
+}
+export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_addPetitionUserPermissionMutation
+>;
+export type PetitionSharingModal_addPetitionUserPermissionMutationResult = Apollo.MutationResult<
+  PetitionSharingModal_addPetitionUserPermissionMutation
+>;
+export type PetitionSharingModal_addPetitionUserPermissionMutationOptions = Apollo.BaseMutationOptions<
+  PetitionSharingModal_addPetitionUserPermissionMutation,
+  PetitionSharingModal_addPetitionUserPermissionMutationVariables
+>;
+export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
+  mutation PetitionSharingModal_removePetitionUserPermission(
+    $petitionId: ID!
+    $userId: ID!
+  ) {
+    removePetitionUserPermission(
+      petitionIds: [$petitionId]
+      userIds: [$userId]
+    ) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+`;
+export type PetitionSharingModal_removePetitionUserPermissionMutationFn = Apollo.MutationFunction<
+  PetitionSharingModal_removePetitionUserPermissionMutation,
+  PetitionSharingModal_removePetitionUserPermissionMutationVariables
+>;
+
+/**
+ * __usePetitionSharingModal_removePetitionUserPermissionMutation__
+ *
+ * To run a mutation, you first call `usePetitionSharingModal_removePetitionUserPermissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSharingModal_removePetitionUserPermissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSharingModalRemovePetitionUserPermissionMutation, { data, loading, error }] = usePetitionSharingModal_removePetitionUserPermissionMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function usePetitionSharingModal_removePetitionUserPermissionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSharingModal_removePetitionUserPermissionMutation,
+    PetitionSharingModal_removePetitionUserPermissionMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSharingModal_removePetitionUserPermissionMutation,
+    PetitionSharingModal_removePetitionUserPermissionMutationVariables
+  >(PetitionSharingModal_removePetitionUserPermissionDocument, baseOptions);
+}
+export type PetitionSharingModal_removePetitionUserPermissionMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_removePetitionUserPermissionMutation
+>;
+export type PetitionSharingModal_removePetitionUserPermissionMutationResult = Apollo.MutationResult<
+  PetitionSharingModal_removePetitionUserPermissionMutation
+>;
+export type PetitionSharingModal_removePetitionUserPermissionMutationOptions = Apollo.BaseMutationOptions<
+  PetitionSharingModal_removePetitionUserPermissionMutation,
+  PetitionSharingModal_removePetitionUserPermissionMutationVariables
+>;
+export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
+  mutation PetitionSharingModal_transferPetitionOwnership(
+    $petitionId: ID!
+    $userId: ID!
+  ) {
+    transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+`;
+export type PetitionSharingModal_transferPetitionOwnershipMutationFn = Apollo.MutationFunction<
+  PetitionSharingModal_transferPetitionOwnershipMutation,
+  PetitionSharingModal_transferPetitionOwnershipMutationVariables
+>;
+
+/**
+ * __usePetitionSharingModal_transferPetitionOwnershipMutation__
+ *
+ * To run a mutation, you first call `usePetitionSharingModal_transferPetitionOwnershipMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSharingModal_transferPetitionOwnershipMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSharingModalTransferPetitionOwnershipMutation, { data, loading, error }] = usePetitionSharingModal_transferPetitionOwnershipMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function usePetitionSharingModal_transferPetitionOwnershipMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSharingModal_transferPetitionOwnershipMutation,
+    PetitionSharingModal_transferPetitionOwnershipMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSharingModal_transferPetitionOwnershipMutation,
+    PetitionSharingModal_transferPetitionOwnershipMutationVariables
+  >(PetitionSharingModal_transferPetitionOwnershipDocument, baseOptions);
+}
+export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_transferPetitionOwnershipMutation
+>;
+export type PetitionSharingModal_transferPetitionOwnershipMutationResult = Apollo.MutationResult<
+  PetitionSharingModal_transferPetitionOwnershipMutation
+>;
+export type PetitionSharingModal_transferPetitionOwnershipMutationOptions = Apollo.BaseMutationOptions<
+  PetitionSharingModal_transferPetitionOwnershipMutation,
+  PetitionSharingModal_transferPetitionOwnershipMutationVariables
+>;
+export const PetitionSharingModal_PetitionUserPermissionsDocument = gql`
+  query PetitionSharingModal_PetitionUserPermissions($petitionId: ID!) {
+    petition(id: $petitionId) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+`;
+
+/**
+ * __usePetitionSharingModal_PetitionUserPermissionsQuery__
+ *
+ * To run a query within a React component, call `usePetitionSharingModal_PetitionUserPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSharingModal_PetitionUserPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionSharingModal_PetitionUserPermissionsQuery({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionSharingModal_PetitionUserPermissionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionSharingModal_PetitionUserPermissionsQuery,
+    PetitionSharingModal_PetitionUserPermissionsQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    PetitionSharingModal_PetitionUserPermissionsQuery,
+    PetitionSharingModal_PetitionUserPermissionsQueryVariables
+  >(PetitionSharingModal_PetitionUserPermissionsDocument, baseOptions);
+}
+export function usePetitionSharingModal_PetitionUserPermissionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionSharingModal_PetitionUserPermissionsQuery,
+    PetitionSharingModal_PetitionUserPermissionsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    PetitionSharingModal_PetitionUserPermissionsQuery,
+    PetitionSharingModal_PetitionUserPermissionsQueryVariables
+  >(PetitionSharingModal_PetitionUserPermissionsDocument, baseOptions);
+}
+export type PetitionSharingModal_PetitionUserPermissionsQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_PetitionUserPermissionsQuery
+>;
+export type PetitionSharingModal_PetitionUserPermissionsLazyQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_PetitionUserPermissionsLazyQuery
+>;
+export type PetitionSharingModal_PetitionUserPermissionsQueryResult = Apollo.QueryResult<
+  PetitionSharingModal_PetitionUserPermissionsQuery,
+  PetitionSharingModal_PetitionUserPermissionsQueryVariables
+>;
+export const PetitionSharingModal_searchUsersDocument = gql`
+  query PetitionSharingModal_searchUsers($search: String!, $exclude: [ID!]!) {
+    me {
+      organization {
+        users(search: $search, limit: 10, exclude: $exclude) {
+          items {
+            ...UserSelect_User
+          }
+        }
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+`;
+
+/**
+ * __usePetitionSharingModal_searchUsersQuery__
+ *
+ * To run a query within a React component, call `usePetitionSharingModal_searchUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSharingModal_searchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionSharingModal_searchUsersQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      exclude: // value for 'exclude'
+ *   },
+ * });
+ */
+export function usePetitionSharingModal_searchUsersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionSharingModal_searchUsersQuery,
+    PetitionSharingModal_searchUsersQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    PetitionSharingModal_searchUsersQuery,
+    PetitionSharingModal_searchUsersQueryVariables
+  >(PetitionSharingModal_searchUsersDocument, baseOptions);
+}
+export function usePetitionSharingModal_searchUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionSharingModal_searchUsersQuery,
+    PetitionSharingModal_searchUsersQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    PetitionSharingModal_searchUsersQuery,
+    PetitionSharingModal_searchUsersQueryVariables
+  >(PetitionSharingModal_searchUsersDocument, baseOptions);
+}
+export type PetitionSharingModal_searchUsersQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_searchUsersQuery
+>;
+export type PetitionSharingModal_searchUsersLazyQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_searchUsersLazyQuery
+>;
+export type PetitionSharingModal_searchUsersQueryResult = Apollo.QueryResult<
+  PetitionSharingModal_searchUsersQuery,
+  PetitionSharingModal_searchUsersQueryVariables
 >;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: ID!, $data: UpdateContactInput!) {

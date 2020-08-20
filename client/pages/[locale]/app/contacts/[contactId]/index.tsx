@@ -13,7 +13,7 @@ import {
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
-import { PetitionStatusIndicator } from "@parallel/components/common/PetitionStatusIndicator";
+import { PetitionStatusIcon } from "@parallel/components/common/PetitionStatusIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import {
@@ -293,28 +293,23 @@ function useContactPetitionAccessesColumns(): TableColumn<
           ),
       },
       {
-        key: "progress",
-        header: intl.formatMessage({
-          id: "petition-accesses.progress-header",
-          defaultMessage: "Progress",
-        }),
-        CellContent: ({ row: { petition } }) =>
-          petition ? (
-            <PetitionProgressBar
-              status={petition.status}
-              {...petition.progress}
-            />
-          ) : null,
-      },
-      {
         key: "status",
         header: intl.formatMessage({
           id: "petition-accesses.status-header",
           defaultMessage: "Status",
         }),
+        align: "center",
         CellContent: ({ row: { petition } }) =>
           petition ? (
-            <PetitionStatusIndicator status={petition.status} />
+            <Flex alignItems="center">
+              <PetitionProgressBar
+                status={petition.status}
+                {...petition.progress}
+                flex="1"
+                minWidth="80px"
+              />
+              <PetitionStatusIcon status={petition.status} marginLeft={2} />
+            </Flex>
           ) : null,
       },
     ],

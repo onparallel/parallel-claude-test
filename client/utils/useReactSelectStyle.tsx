@@ -1,5 +1,5 @@
 import { Box, CloseButton, Text, useTheme } from "@chakra-ui/core";
-import { ChevronDownIcon, SmallCloseIcon } from "@parallel/chakra/icons";
+import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { memo, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -141,7 +141,7 @@ export function useReactSelectStyle<
                 }),
               }}
             >
-              <SmallCloseIcon boxSize="18px" />
+              <CloseIcon boxSize="10px" marginX={1} />
             </components.MultiValueRemove>
           );
         }),
@@ -215,6 +215,11 @@ export function useReactSelectStyle<
             },
           };
         },
+        multiValueLabel: (styles) => ({
+          ...styles,
+          display: "inline-flex",
+          alignItems: "center",
+        }),
       },
     }),
     [size, isInvalid]

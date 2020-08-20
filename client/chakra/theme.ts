@@ -19,6 +19,7 @@ export const theme = {
   },
   fontSizes: {
     ...base.fontSizes,
+    "2xs": "0.6rem",
   },
   colors: {
     ...omit(base.colors, [
@@ -57,7 +58,7 @@ export const theme = {
       ...base.components.Button,
       sizes: {
         ...base.components.Button.sizes,
-        xxs: {
+        "2xs": {
           height: 5,
           minWidth: 5,
           fontSize: "xs",

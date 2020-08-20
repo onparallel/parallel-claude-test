@@ -21,7 +21,9 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, OptionProps, OptionsType } from "react-select";
-import AsyncCreatableSelect, { Props } from "react-select/async-creatable";
+import AsyncCreatableSelect, {
+  Props as AsyncCreatableSelectProps,
+} from "react-select/async-creatable";
 import { pick } from "remeda";
 import {
   useReactSelectStyle,
@@ -29,19 +31,22 @@ import {
 } from "../../utils/useReactSelectStyle";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 
-export type ContactSelection = ContactSelect_ContactFragment;
+export type ContactSelectSelection = ContactSelect_ContactFragment;
 
-export type ContactSelectProps = Pick<Props<ContactSelection>, "inputId"> & {
-  value: ContactSelection[];
+export type ContactSelectProps = Pick<
+  AsyncCreatableSelectProps<ContactSelectSelection>,
+  "inputId"
+> & {
+  value: ContactSelectSelection[];
   isInvalid?: boolean;
-  onChange: (recipients: ContactSelection[]) => void;
+  onChange: (recipients: ContactSelectSelection[]) => void;
   onCreateContact: (data: {
     defaultEmail?: string;
-  }) => Promise<ContactSelection>;
+  }) => Promise<ContactSelectSelection>;
   onSearchContacts: (
     search: string,
     exclude: string[]
-  ) => Promise<ContactSelection[]>;
+  ) => Promise<ContactSelectSelection[]>;
 };
 
 export const ContactSelect = Object.assign(
@@ -54,7 +59,7 @@ export const ContactSelect = Object.assign(
       onChange,
       ...props
     }: ContactSelectProps,
-    ref: Ref<AsyncCreatableSelect<ContactSelection>>
+    ref: Ref<AsyncCreatableSelect<ContactSelectSelection>>
   ) {
     const intl = useIntl();
     const errorToast = useExistingContactToast();
@@ -95,7 +100,7 @@ export const ContactSelect = Object.assign(
             defaultMessage="Recipients"
           />
         </FormLabel>
-        <AsyncCreatableSelect<ContactSelection>
+        <AsyncCreatableSelect<ContactSelectSelection>
           inputId={inputId}
           placeholder={intl.formatMessage({
             id: "component.contact-select.placeholder",
@@ -134,18 +139,10 @@ export const ContactSelect = Object.assign(
 );
 
 function useReactSelectProps(props: UserReactSelectStyleProps) {
-  const styleProps = useReactSelectStyle<ContactSelection>(props);
+  const styleProps = useReactSelectStyle<ContactSelectSelection>(props);
   return useMemo(
     () =>
       ({
-        styles: {
-          ...styleProps.styles,
-          multiValueLabel: (styles) => ({
-            ...styles,
-            display: "inline-flex",
-            alignItems: "center",
-          }),
-        },
         components: {
           ...styleProps.components,
           NoOptionsMessage: memo(({ selectProps }) => {
@@ -189,7 +186,7 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
               children,
               ...props
             }: {
-              data: ContactSelection;
+              data: ContactSelectSelection;
               children: ReactNode;
             }) => {
               const { fullName, email } = data;
@@ -206,8 +203,8 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
             children,
             data,
             ...props
-          }: Omit<OptionProps<ContactSelection>, "data"> & {
-            data: ContactSelection;
+          }: Omit<OptionProps<ContactSelectSelection>, "data"> & {
+            data: ContactSelectSelection;
           }) => {
             if ((data as any).__isNew__) {
               return (
@@ -245,7 +242,7 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
         isValidNewOption: (
           value: string,
           _,
-          options: OptionsType<ContactSelection>
+          options: OptionsType<ContactSelectSelection>
         ) => {
           return options.length === 0 && EMAIL_REGEX.test(value);
         },
@@ -265,7 +262,7 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
             />
           );
         },
-      } as Partial<Props<ContactSelection>>),
+      } as Partial<AsyncCreatableSelectProps<ContactSelectSelection>>),
     [styleProps]
   );
 }

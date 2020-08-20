@@ -454,7 +454,6 @@ export function DefaultHeader({
             : "none"
           : undefined
       }
-      textAlign={column.align ?? "left"}
       sx={{
         padding: 1,
         ".sort-by-button": {
@@ -470,7 +469,7 @@ export function DefaultHeader({
         },
       }}
     >
-      <Flex alignItems="center">
+      <Flex alignItems="center" justifyContent={column.align ?? "left"}>
         {column.header}
         {column.isSortable ? (
           <IconButton

@@ -249,6 +249,25 @@ export const UserPlusIcon = createIcon({
   ),
 });
 
+export const UserArrowIcon = createIcon({
+  displayName: "UserArrowIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle r="4" cy="7" cx="8.5" />
+      <line y2="11" x2="16" y1="11" x1="23" />
+      <path d="m 19,7 4,4 -4,4" />
+    </g>
+  ),
+});
+
 export const UserCheckIcon = createIcon({
   displayName: "UserCheckIcon",
   viewBox: "0 0 24 24",

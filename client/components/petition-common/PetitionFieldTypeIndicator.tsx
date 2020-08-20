@@ -35,7 +35,7 @@ export function PetitionFieldTypeIndicator({
   return (
     <Tooltip label={label}>
       <Button
-        size="xxs"
+        size="2xs"
         aria-label={label}
         backgroundColor={`field.${type}`}
         _hover={{ backgroundColor: `field.${type}` }}

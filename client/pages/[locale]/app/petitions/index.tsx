@@ -6,9 +6,10 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
-import { PetitionStatusIndicator } from "@parallel/components/common/PetitionStatusIndicator";
+import { PetitionStatusIcon } from "@parallel/components/common/PetitionStatusIcon";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -363,23 +364,35 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           ),
       },
       {
-        key: "progress",
-        header: intl.formatMessage({
-          id: "petitions.header.progress",
-          defaultMessage: "Progress",
-        }),
-        CellContent: ({ row }) => (
-          <PetitionProgressBar status={row.status} {...row.progress} />
-        ),
-      },
-      {
         key: "status",
         header: intl.formatMessage({
           id: "petitions.header.status",
           defaultMessage: "Status",
         }),
-        CellContent: ({ row }) => (
-          <PetitionStatusIndicator status={row.status} />
+        align: "center",
+        CellContent: ({ row, column }) => (
+          <Flex alignItems="center">
+            <PetitionProgressBar
+              status={row.status}
+              {...row.progress}
+              flex="1"
+              minWidth="80px"
+            />
+            <PetitionStatusIcon status={row.status} marginLeft={2} />
+          </Flex>
+        ),
+      },
+      {
+        key: "shared-with",
+        header: intl.formatMessage({
+          id: "petitions.header.shared-with",
+          defaultMessage: "Shared with",
+        }),
+        align: "center",
+        CellContent: ({ row: { userPermissions }, column }) => (
+          <Flex justifyContent={column.align}>
+            <UserAvatarList users={userPermissions.map((p) => p.user)} />
+          </Flex>
         ),
       },
       {
@@ -433,8 +446,14 @@ Petitions.fragments = {
             ...ContactLink_Contact
           }
         }
+        userPermissions {
+          user {
+            ...UserAvatarList_User
+          }
+        }
         ...ConfirmDeletePetitionsDialog_Petition
       }
+      ${UserAvatarList.fragments.User}
       ${ConfirmDeletePetitionsDialog.fragments.Petition}
     `;
   },

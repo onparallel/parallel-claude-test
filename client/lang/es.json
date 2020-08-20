@@ -35,16 +35,6 @@
     "context": "You can also enter a valid email."
   },
   {
-    "term": "component.contact-select.existing-contact.description",
-    "definition": "Este contacto ya existe.",
-    "context": "This contact already exists."
-  },
-  {
-    "term": "component.contact-select.existing-contact.title",
-    "definition": "Contacto existente",
-    "context": "Existing contact"
-  },
-  {
     "term": "component.contact-select.label",
     "definition": "Destinatarios",
     "context": "Recipients"
@@ -185,6 +175,16 @@
     "context": "OK"
   },
   {
+    "term": "component.existing-contact-toast.description",
+    "definition": "Este contacto ya existe.",
+    "context": "This contact already exists."
+  },
+  {
+    "term": "component.existing-contact-toast.title",
+    "definition": "Contacto existente",
+    "context": "Existing contact"
+  },
+  {
     "term": "component.message-email-editor.body-placeholder",
     "definition": "Escribe un mensaje para incluir en el correo electrónico",
     "context": "Write a message to include in the email"
@@ -258,6 +258,11 @@
     "term": "component.petition-header.settings-button",
     "definition": "Ajustes de la petición",
     "context": "Petition settings"
+  },
+  {
+    "term": "component.petition-header.share-label",
+    "definition": "Compartir petición",
+    "context": "Share petition"
   },
   {
     "term": "component.petition-list-header.clone-label",
@@ -413,6 +418,16 @@
     "term": "component.user-menu.ui-language",
     "definition": "Idioma",
     "context": "Language"
+  },
+  {
+    "term": "component.user-select.no-options",
+    "definition": "No pudimos encontrar ningún usuario con <em>{search}</em>",
+    "context": "We could not find any exisiting users for <em>{search}</em>"
+  },
+  {
+    "term": "component.user-select.search-hint",
+    "definition": "Busca usuarios existentes",
+    "context": "Search for exisiting users"
   },
   {
     "term": "components.table.change-sorting",
@@ -648,6 +663,11 @@
     "term": "generic.deleted-contact",
     "definition": "Contacto eliminado",
     "context": "Deleted contact"
+  },
+  {
+    "term": "generic.done",
+    "definition": "Listo",
+    "context": "Done"
   },
   {
     "term": "generic.dropzone-allowed-types",
@@ -955,6 +975,11 @@
     "context": "Tomorrow at {time}"
   },
   {
+    "term": "generic.transfer-ownership",
+    "definition": "Transferir propiedad",
+    "context": "Transfer ownership"
+  },
+  {
     "term": "generic.unexpected-error-happened",
     "definition": "Ocurrió un error inesperado. Por favor, refresca esta ventana y, si vuelve a ocurrir, contacta con soporte para que te podamos ayudar.",
     "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
@@ -1065,11 +1090,6 @@
     "context": "No reminders sent"
   },
   {
-    "term": "petition-accesses.progress-header",
-    "definition": "Progreso",
-    "context": "Progress"
-  },
-  {
     "term": "petition-accesses.reminder-settings",
     "definition": "Configurar recordatorios",
     "context": "Reminder settings"
@@ -1163,6 +1183,81 @@
     "term": "petition-replies.validate-field-button.validated",
     "definition": "Revisado",
     "context": "Reviewed"
+  },
+  {
+    "term": "petition-sharing.confirm-remove.confirm-button",
+    "definition": "Si, quitar",
+    "context": "Yes, remove"
+  },
+  {
+    "term": "petition-sharing.confirm-remove.header",
+    "definition": "Dejar de compartir",
+    "context": "Stop sharing"
+  },
+  {
+    "term": "petition-sharing.confirm-remove.message",
+    "definition": "¿Estás seguro de que quieres dejar de compartir esta petición con {name}?",
+    "context": "Are you sure you want to stop sharing this petition with {name}?"
+  },
+  {
+    "term": "petition-sharing.confirm-transfer-ownership.confirm-button",
+    "definition": "Si, transferir",
+    "context": "Yes, transfer"
+  },
+  {
+    "term": "petition-sharing.confirm-transfer-ownership.header",
+    "definition": "Transferir propiedad",
+    "context": "Transfer ownership"
+  },
+  {
+    "term": "petition-sharing.confirm-transfer-ownership.message",
+    "definition": "¿Estás seguro de que quieres transferir la propiedad de esta petición a {name}?",
+    "context": "Are you sure you want to transfer the ownership of this petition to {name}?"
+  },
+  {
+    "term": "petition-sharing.header",
+    "definition": "Compartir con gente",
+    "context": "Share with people"
+  },
+  {
+    "term": "petition-sharing.input-placeholder",
+    "definition": "Añadir usuarios de tu organización",
+    "context": "Add users from your organization"
+  },
+  {
+    "term": "petition-sharing.input-placeholder-not-owner",
+    "definition": "Solamente el propietario de la petición puede compartirla",
+    "context": "Only the petition owner can share it"
+  },
+  {
+    "term": "petition-sharing.message-placeholder",
+    "definition": "Mensaje",
+    "context": "Message"
+  },
+  {
+    "term": "petition-sharing.notify-checkbox",
+    "definition": "Notificar a los usuarios",
+    "context": "Notify users"
+  },
+  {
+    "term": "petition-sharing.owner",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
+    "term": "petition-sharing.read",
+    "definition": "Lector",
+    "context": "Can view"
+  },
+  {
+    "term": "petition-sharing.succes-title",
+    "definition": "Petición compartida",
+    "context": "Petition shared"
+  },
+  {
+    "term": "petition-sharing.write",
+    "definition": "Editor",
+    "context": "Can edit"
   },
   {
     "term": "petition.activity-not-available",
@@ -1645,14 +1740,14 @@
     "context": "Petition name"
   },
   {
-    "term": "petitions.header.progress",
-    "definition": "Progreso",
-    "context": "Progress"
-  },
-  {
     "term": "petitions.header.recipient",
     "definition": "Destinatario",
     "context": "Recipient"
+  },
+  {
+    "term": "petitions.header.shared-with",
+    "definition": "Compartida con",
+    "context": "Shared with"
   },
   {
     "term": "petitions.header.status",

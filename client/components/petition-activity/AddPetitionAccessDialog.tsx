@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import {
-  ContactSelection,
+  ContactSelectSelection,
   ContactSelect,
   ContactSelectProps,
 } from "../common/ContactSelect";
@@ -41,7 +41,7 @@ export function AddPetitionAccessDialog({
   ...props
 }: DialogProps<AddPettionAccessDialogProps, AddPettionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
-  const [recipients, setRecipients] = useState<ContactSelection[]>([]);
+  const [recipients, setRecipients] = useState<ContactSelectSelection[]>([]);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState<RichTextEditorContent>([
     { children: [{ text: "" }] },

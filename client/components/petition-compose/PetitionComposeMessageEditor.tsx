@@ -3,7 +3,7 @@ import { Alert, AlertIcon, Box, Flex, Heading, Stack } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import {
-  ContactSelection,
+  ContactSelectSelection,
   ContactSelect,
   ContactSelectProps,
 } from "@parallel/components/common/ContactSelect";
@@ -42,7 +42,7 @@ export const PetitionComposeMessageEditor = Object.assign(
     onSend,
     ...props
   }: PetitionComposeMessageEditorProps) {
-    const [recipients, setRecipients] = useState<ContactSelection[]>([]);
+    const [recipients, setRecipients] = useState<ContactSelectSelection[]>([]);
     const [subject, setSubject] = useState(petition.emailSubject ?? "");
     const [body, setBody] = useState<RichTextEditorContent>(
       petition.emailBody ?? [{ children: [{ text: "" }] }]

@@ -22,6 +22,7 @@ import {
   DeleteIcon,
   MoreVerticalIcon,
   SettingsIcon,
+  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
   ConfirmDeletePetitionsDialog,
@@ -29,6 +30,7 @@ import {
 } from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
 import {
   PetitionHeader_PetitionFragment,
+  PetitionHeader_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -45,23 +47,26 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
-import { PetitionStatusIndicator } from "../common/PetitionStatusIndicator";
+import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
+import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;
+  user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
 };
 
 export function PetitionHeader({
-  state,
   petition,
+  user,
   onUpdatePetition,
   section: current,
+  state,
   ...props
 }: PetitionHeaderProps) {
   const intl = useIntl();
@@ -121,6 +126,12 @@ export function PetitionHeader({
     [petition.id, petition.name, petition.locale, petition.deadline]
   );
 
+  const {
+    isOpen: isSharePetitionOpen,
+    onOpen: onOpenSharePetition,
+    onClose: onCloseSharePetition,
+  } = useDisclosure();
+
   const sections = useMemo(
     () => [
       {
@@ -177,11 +188,7 @@ export function PetitionHeader({
       >
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
-            <PetitionStatusIndicator
-              marginRight={1}
-              status={petition.status}
-              isJustIcon
-            />
+            <PetitionStatusIcon marginRight={1} status={petition.status} />
             <Editable
               display="flex"
               value={name}
@@ -294,6 +301,13 @@ export function PetitionHeader({
                   />
                 </Tooltip>
                 <MenuList>
+                  <MenuItem onClick={onOpenSharePetition}>
+                    <UserArrowIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.share-label"
+                      defaultMessage="Share petition"
+                    />
+                  </MenuItem>
                   <MenuItem onClick={handleCloneClick}>
                     <CopyIcon marginRight={2} />
                     <FormattedMessage
@@ -359,6 +373,14 @@ export function PetitionHeader({
         isOpen={isSettingsOpen}
         onClose={onCloseSettings}
       />
+      {isSharePetitionOpen ? (
+        <PetitionSharingModal
+          petitionId={petition.id}
+          userId={user.id}
+          isOpen={true}
+          onClose={onCloseSharePetition}
+        />
+      ) : null}
     </>
   );
 }
@@ -432,5 +454,10 @@ PetitionHeader.fragments = {
     }
     ${PetitionSettingsModal.fragments.Petition}
     ${ConfirmDeletePetitionsDialog.fragments.Petition}
+  `,
+  User: gql`
+    fragment PetitionHeader_User on User {
+      id
+    }
   `,
 };

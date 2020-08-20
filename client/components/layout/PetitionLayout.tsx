@@ -58,6 +58,7 @@ export function PetitionLayout({
     >
       <PetitionHeader
         petition={petition}
+        user={user}
         onUpdatePetition={onUpdatePetition}
         section={section}
         state={state}
@@ -81,7 +82,9 @@ PetitionLayout.fragments = {
   User: gql`
     fragment PetitionLayout_User on User {
       ...AppLayout_User
+      ...PetitionHeader_User
     }
     ${AppLayout.fragments.User}
+    ${PetitionHeader.fragments.User}
   `,
 };

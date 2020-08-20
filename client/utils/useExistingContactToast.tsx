@@ -7,11 +7,11 @@ export function useExistingContactToast() {
   return () => {
     toast({
       title: intl.formatMessage({
-        id: "component.recipient-select.existing-contact.title",
+        id: "component.existing-contact-toast.title",
         defaultMessage: "Existing contact",
       }),
       description: intl.formatMessage({
-        id: "component.recipient-select.existing-contact.description",
+        id: "component.existing-contact-toast.description",
         defaultMessage: "This contact already exists.",
       }),
       status: "error",

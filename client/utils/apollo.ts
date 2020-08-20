@@ -54,6 +54,7 @@ export function createApolloClient(
         Petition: {
           fields: {
             fields: { merge: false },
+            userPermissions: { merge: false },
           },
         },
         PetitionField: {

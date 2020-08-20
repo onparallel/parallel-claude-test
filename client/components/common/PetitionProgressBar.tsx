@@ -15,8 +15,7 @@ import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { generateCssStripe } from "../../utils/css";
 import { ProgressIndicator, ProgressTrack } from "./Progress";
-
-type PetitionProgressProps = PetitionProgress & { status: PetitionStatus };
+import { ExtendChakra } from "@parallel/chakra/utils";
 
 export function PetitionProgressBar({
   status,
@@ -24,12 +23,13 @@ export function PetitionProgressBar({
   replied,
   optional,
   total,
-}: PetitionProgressProps) {
+  ...props
+}: ExtendChakra<PetitionProgress & { status: PetitionStatus }>) {
   const theme = useTheme();
   return (
     <Popover trigger="hover" placement="left">
       <PopoverTrigger>
-        <Box>
+        <Box {...props}>
           <ProgressTrack
             size="md"
             min={0}
