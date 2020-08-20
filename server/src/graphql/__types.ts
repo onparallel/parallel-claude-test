@@ -138,6 +138,7 @@ export interface NexusGenEnums {
   PetitionReminderType: db.PetitionReminderType;
   PetitionStatus: db.PetitionStatus;
   PetitionUserPermissionType: db.PetitionUserPermissionType;
+  PetitionUserPermissionTypeRW: "READ" | "WRITE";
   QueryContacts_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -312,6 +313,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PetitionReminderType: NexusGenEnums["PetitionReminderType"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
   PetitionUserPermissionType: NexusGenEnums["PetitionUserPermissionType"];
+  PetitionUserPermissionTypeRW: NexusGenEnums["PetitionUserPermissionTypeRW"];
   QueryContacts_OrderBy: NexusGenEnums["QueryContacts_OrderBy"];
   QueryPetitions_OrderBy: NexusGenEnums["QueryPetitions_OrderBy"];
   Result: NexusGenEnums["Result"];
@@ -407,7 +409,7 @@ export interface NexusGenFieldTypes {
   };
   Mutation: {
     // field return type
-    addOrChangePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    addPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
@@ -422,6 +424,7 @@ export interface NexusGenFieldTypes {
     deletePetitionField: NexusGenRootTypes["Petition"]; // Petition!
     deletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
@@ -435,6 +438,7 @@ export interface NexusGenFieldTypes {
     publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendReminders: NexusGenEnums["Result"]; // Result!
@@ -766,9 +770,9 @@ export interface NexusGenArgTypes {
     };
   };
   Mutation: {
-    addOrChangePetitionUserPermission: {
+    addPetitionUserPermission: {
       // args
-      permissionType?: NexusGenEnums["PetitionUserPermissionType"] | null; // PetitionUserPermissionType
+      permissionType: NexusGenEnums["PetitionUserPermissionTypeRW"]; // PetitionUserPermissionTypeRW!
       petitionIds: string[]; // [ID!]!
       userIds: string[]; // [ID!]!
     };
@@ -850,6 +854,12 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       ids: string[]; // [ID!]!
     };
+    editPetitionUserPermission: {
+      // args
+      permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
+      petitionIds: string[]; // [ID!]!
+      userIds: string[]; // [ID!]!
+    };
     fileUploadReplyDownloadLink: {
       // args
       petitionId: string; // ID!
@@ -919,6 +929,11 @@ export interface NexusGenArgTypes {
       // args
       accessIds: string[]; // [ID!]!
       petitionId: string; // ID!
+    };
+    removePetitionUserPermission: {
+      // args
+      petitionIds: string[]; // [ID!]!
+      userIds: string[]; // [ID!]!
     };
     sendMessages: {
       // args
@@ -1166,6 +1181,7 @@ export type NexusGenEnumNames =
   | "PetitionReminderType"
   | "PetitionStatus"
   | "PetitionUserPermissionType"
+  | "PetitionUserPermissionTypeRW"
   | "QueryContacts_OrderBy"
   | "QueryPetitions_OrderBy"
   | "Result";

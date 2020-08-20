@@ -1,6 +1,12 @@
 import { enumType, objectType } from "@nexus/schema";
 import { toGlobalId } from "../../../util/globalId";
 
+export const PetitionUserPermissionTypeRW = enumType({
+  name: "PetitionUserPermissionTypeRW",
+  description: "The READ and WRITE permissions for a petition user.",
+  members: ["READ", "WRITE"],
+});
+
 export const PetitionUserPermissionType = enumType({
   name: "PetitionUserPermissionType",
   description: "The type of permission for a petition user.",

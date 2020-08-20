@@ -186,10 +186,10 @@ type MessageSentEvent implements PetitionEvent {
 
 type Mutation {
   """
-  Adds or edits permissions on given petitions and users
+  Adds permissions on given petitions and users
   """
-  addOrChangePetitionUserPermission(
-    permissionType: PetitionUserPermissionType
+  addPetitionUserPermission(
+    permissionType: PetitionUserPermissionTypeRW!
     petitionIds: [ID!]!
     userIds: [ID!]!
   ): [Petition!]!
@@ -296,6 +296,15 @@ type Mutation {
   deletePetitions(force: Boolean = false, ids: [ID!]!): Result!
 
   """
+  Edits permissions on given petitions and users
+  """
+  editPetitionUserPermission(
+    permissionType: PetitionUserPermissionType!
+    petitionIds: [ID!]!
+    userIds: [ID!]!
+  ): [Petition!]!
+
+  """
   Generates a download link for a file reply.
   """
   fileUploadReplyDownloadLink(
@@ -397,6 +406,14 @@ type Mutation {
   Reactivates the specified inactive petition accesses.
   """
   reactivateAccesses(accessIds: [ID!]!, petitionId: ID!): [PetitionAccess!]!
+
+  """
+  Removes permissions on given petitions and users
+  """
+  removePetitionUserPermission(
+    petitionIds: [ID!]!
+    userIds: [ID!]!
+  ): [Petition!]!
 
   """
   Sends a petition message to the speicified contacts.
@@ -1264,6 +1281,14 @@ The type of permission for a petition user.
 """
 enum PetitionUserPermissionType {
   OWNER
+  READ
+  WRITE
+}
+
+"""
+The READ and WRITE permissions for a petition user.
+"""
+enum PetitionUserPermissionTypeRW {
   READ
   WRITE
 }

@@ -1840,7 +1840,7 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  async addOrChangePetitionUserPermissions(
+  async addPetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
     permissionType: PetitionUserPermissionType,
@@ -1854,35 +1854,62 @@ export class PetitionRepository extends BaseRepository {
           user_id: userId,
           permission_type: permissionType,
           created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
         });
       });
     });
 
-    await this.knex.raw<{ rows: PetitionUser[] }>(
-      /* sql */ `
-    ? ON CONFLICT (user_id, petition_id)
-        DO UPDATE SET
-        permission_type = ?,
-        updated_by = ?,
-        updated_at = ?,
-        deleted_by = null,
-        deleted_at = null
-      RETURNING *;`,
-      [
-        this.from("petition_user").insert(batch),
-        permissionType,
-        `User:${user.id}`,
-        this.now(),
-      ]
-    );
-    for (const petitionId of petitionIds) {
-      this.loadUserPermissions.dataloader.clear(petitionId);
-    }
+    return this.withTransaction(async (t) => {
+      /* 
+        try to insert into petition_user.
+        if the relation <petition_id,user_id> already exists, do nothing on that.
+      */
+      const { rows: newPermissions } = await t.raw<{ rows: PetitionUser[] }>(
+        /* sql */ `
+      ? ON CONFLICT DO NOTHING
+        RETURNING *;`,
+        [this.from("petition_user").insert(batch)]
+      );
 
-    return await this.from("petition")
-      .whereNull("deleted_at")
-      .whereIn("id", petitionIds)
-      .returning("*");
+      for (const petitionId of petitionIds) {
+        this.loadUserPermissions.dataloader.clear(petitionId);
+      }
+
+      const petitions = await this.from("petition", t)
+        .whereNull("deleted_at")
+        .whereIn("id", petitionIds)
+        .returning("*");
+
+      return { petitions, newPermissions };
+    });
+  }
+
+  async editPetitionUserPermissions(
+    petitionIds: number[],
+    userIds: number[],
+    newPermission: PetitionUserPermissionType,
+    user: User
+  ) {
+    return this.withTransaction(async (t) => {
+      await this.from("petition_user", t)
+        .whereIn("petition_id", petitionIds)
+        .whereIn("user_id", userIds)
+        .whereNull("deleted_at")
+        .update({
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+          permission_type: newPermission,
+        });
+
+      for (const petitionId of petitionIds) {
+        this.loadUserPermissions.dataloader.clear(petitionId);
+      }
+
+      return await this.from("petition", t)
+        .whereNull("deleted_at")
+        .whereIn("id", petitionIds)
+        .returning("*");
+    });
   }
 
   async removePetitionUserPermissions(
@@ -1890,29 +1917,31 @@ export class PetitionRepository extends BaseRepository {
     userIds: number[],
     user: User
   ) {
-    await this.from("petition_user")
-      .whereIn("petition_id", petitionIds)
-      .whereIn("user_id", userIds)
-      .whereNull("deleted_at")
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${user.id}`,
-      });
+    return this.withTransaction(async (t) => {
+      await this.from("petition_user", t)
+        .whereIn("petition_id", petitionIds)
+        .whereIn("user_id", userIds)
+        .whereNull("deleted_at")
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        });
 
-    for (const petitionId of petitionIds) {
-      this.loadUserPermissions.dataloader.clear(petitionId);
-    }
+      for (const petitionId of petitionIds) {
+        this.loadUserPermissions.dataloader.clear(petitionId);
+      }
 
-    return await this.from("petition")
-      .whereNull("deleted_at")
-      .whereIn("id", petitionIds)
-      .returning("*");
+      return await this.from("petition", t)
+        .whereNull("deleted_at")
+        .whereIn("id", petitionIds)
+        .returning("*");
+    });
   }
 
   async transferOwnership(petitionIds: number[], userId: number, user: User) {
     return this.withTransaction(async (t) => {
-      await t
-        .from<PetitionUser>("petition_user")
+      // removes user ownership to avoid constraint failure
+      await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .where({
           user_id: user.id,
@@ -1938,7 +1967,7 @@ export class PetitionRepository extends BaseRepository {
 
       await t.raw(
         /* sql */ `
-        ? ON CONFLICT (user_id, petition_id)
+        ? ON CONFLICT (user_id, petition_id) WHERE deleted_at IS NULL
           DO UPDATE SET
           permission_type = ?,
           updated_by = ?,
@@ -1954,8 +1983,7 @@ export class PetitionRepository extends BaseRepository {
         ]
       );
 
-      return await t
-        .from<Petition>("petition")
+      return await this.from("petition", t)
         .whereNull("deleted_at")
         .whereIn("id", petitionIds)
         .returning("*");

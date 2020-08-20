@@ -44,10 +44,53 @@ export const transferPetitionOwnership = mutationField(
   }
 );
 
-export const addOrChangePetitionUserPermission = mutationField(
-  "addOrChangePetitionUserPermission",
+export const addPetitionUserPermission = mutationField(
+  "addPetitionUserPermission",
   {
-    description: "Adds or edits permissions on given petitions and users",
+    description: "Adds permissions on given petitions and users",
+    type: "Petition",
+    list: [true],
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetitions("petitionIds"),
+        userHasAccessToUsers("userIds"),
+        userHasPermissionOnPetitions("petitionIds", ["OWNER", "WRITE"])
+      )
+    ),
+    args: {
+      petitionIds: idArg({ required: true, list: [true] }),
+      userIds: idArg({ required: true, list: [true] }),
+      permissionType: arg({
+        type: "PetitionUserPermissionTypeRW",
+        required: true,
+      }),
+    },
+    validateArgs: validateAnd(
+      notEmptyArray((args) => args.petitionIds, "petitionIds"),
+      notEmptyArray((args) => args.userIds, "userIds"),
+      userIdNotIncludedInArray((args) => args.userIds, "userIds")
+    ),
+    resolve: async (_, args, ctx) => {
+      const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
+      const { ids: userIds } = fromGlobalIds(args.userIds, "User");
+
+      const { petitions } = await ctx.petitions.addPetitionUserPermissions(
+        petitionIds,
+        userIds,
+        args.permissionType,
+        ctx.user!
+      );
+
+      return petitions;
+    },
+  }
+);
+
+export const editPetitionUserPermission = mutationField(
+  "editPetitionUserPermission",
+  {
+    description: "Edits permissions on given petitions and users",
     type: "Petition",
     list: [true],
     authorize: chain(
@@ -63,7 +106,7 @@ export const addOrChangePetitionUserPermission = mutationField(
       userIds: idArg({ required: true, list: [true] }),
       permissionType: arg({
         type: "PetitionUserPermissionType",
-        required: false,
+        required: true,
       }),
     },
     validateArgs: validateAnd(
@@ -75,23 +118,48 @@ export const addOrChangePetitionUserPermission = mutationField(
       const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
       const { ids: userIds } = fromGlobalIds(args.userIds, "User");
 
-      if (args?.permissionType === "OWNER") {
-        throw new Error("permissionType has to be READ or WRITE");
-      }
-      if (args.permissionType) {
-        return await ctx.petitions.addOrChangePetitionUserPermissions(
-          petitionIds,
-          userIds,
-          args.permissionType,
-          ctx.user!
-        );
-      } else {
-        return await ctx.petitions.removePetitionUserPermissions(
-          petitionIds,
-          userIds,
-          ctx.user!
-        );
-      }
+      return await ctx.petitions.editPetitionUserPermissions(
+        petitionIds,
+        userIds,
+        args.permissionType,
+        ctx.user!
+      );
+    },
+  }
+);
+
+export const removePetitionUserPermission = mutationField(
+  "removePetitionUserPermission",
+  {
+    description: "Removes permissions on given petitions and users",
+    type: "Petition",
+    list: [true],
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetitions("petitionIds"),
+        userHasAccessToUsers("userIds"),
+        userHasPermissionOnPetitions("petitionIds", ["OWNER", "WRITE"])
+      )
+    ),
+    args: {
+      petitionIds: idArg({ required: true, list: [true] }),
+      userIds: idArg({ required: true, list: [true] }),
+    },
+    validateArgs: validateAnd(
+      notEmptyArray((args) => args.petitionIds, "petitionIds"),
+      notEmptyArray((args) => args.userIds, "userIds"),
+      userIdNotIncludedInArray((args) => args.userIds, "userIds")
+    ),
+    resolve: async (_, args, ctx) => {
+      const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
+      const { ids: userIds } = fromGlobalIds(args.userIds, "User");
+
+      return await ctx.petitions.removePetitionUserPermissions(
+        petitionIds,
+        userIds,
+        ctx.user!
+      );
     },
   }
 );
