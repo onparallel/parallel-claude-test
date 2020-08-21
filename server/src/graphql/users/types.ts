@@ -1,6 +1,6 @@
 import { enumType, objectType } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
-import { hasOrgRole } from "../helpers/authorize";
+import { rootIsContextUser } from "./authorizers";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
@@ -52,7 +52,7 @@ export const User = objectType({
       },
     });
     t.jsonObject("onboardingStatus", {
-      authorize: hasOrgRole("ADMIN"),
+      authorize: rootIsContextUser(),
       description: "The onboarding status for the different views of the app.",
       resolve: (o) => o.onboarding_status,
     });
