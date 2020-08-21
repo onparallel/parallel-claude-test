@@ -2,13 +2,13 @@ import { Arg } from "../../helpers/authorize";
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { fromGlobalIds } from "../../../util/globalId";
 import { unMaybeArray } from "../../../util/arrays";
-import { PetitionUserPermissionType } from "../../../db/__types";
 import { MaybeArray } from "../../../util/types";
+import { isDefined } from "../../../util/remedaExtensions";
 
 export function userHasAccessToUsers<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string | string[]>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<string>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -20,11 +20,9 @@ export function userHasAccessToUsers<
         return true;
       }
       // ids of users in my same organization
-      const orgUserIds = (await ctx.users.loadUsers(userIds))
-        .filter((u) => u.org_id === ctx.user!.org_id)
-        .map((u) => u.id);
-
-      return userIds.every((userId) => orgUserIds.includes(userId));
+      return (await ctx.users.loadUser(userIds)).every(
+        (u) => isDefined(u) && u.org_id === ctx.user!.org_id
+      );
     } catch {}
     return false;
   };
