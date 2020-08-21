@@ -49,9 +49,8 @@ export const addPetitionUserPermission = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetitions("petitionIds"),
-        userHasAccessToUsers("userIds"),
-        userHasPermissionOnPetitions("petitionIds", ["OWNER", "WRITE"])
+        userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+        userHasAccessToUsers("userIds")
       )
     ),
     args: {
@@ -92,9 +91,8 @@ export const editPetitionUserPermission = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetitions("petitionIds"),
-        userHasAccessToUsers("userIds"),
-        userHasPermissionOnPetitions("petitionIds", ["OWNER", "WRITE"])
+        userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+        userHasAccessToUsers("userIds")
       )
     ),
     args: {
@@ -133,9 +131,8 @@ export const removePetitionUserPermission = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetitions("petitionIds"),
-        userHasAccessToUsers("userIds"),
-        userHasPermissionOnPetitions("petitionIds", ["OWNER", "WRITE"])
+        userHasAccessToPetitions("petitionIds", ["OWNER", "WRITE"]),
+        userHasAccessToUsers("userIds")
       )
     ),
     args: {
