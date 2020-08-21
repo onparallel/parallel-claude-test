@@ -7,6 +7,7 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineMessageScheduledEvent_MessageScheduledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineMessageScheduledEventProps = {
@@ -34,11 +35,11 @@ export function TimelineMessageScheduledEvent({
         <Box>
           <FormattedMessage
             id="timeline.message-scheduled-description"
-            defaultMessage="{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+            defaultMessage="{same, select, true {You} other {{user}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
             values={{
               same: userId === message.sender!.id,
               b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              user: message.sender!.fullName,
+              user: <UserReference user={message.sender} />,
               subject: message.emailSubject,
               contact: message.access.contact ? (
                 <ContactLink contact={message.access.contact} />
@@ -86,8 +87,7 @@ TimelineMessageScheduledEvent.fragments = {
     fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
       message {
         sender {
-          id
-          fullName
+          ...UserReference_User
         }
         status
         scheduledAt
@@ -100,6 +100,7 @@ TimelineMessageScheduledEvent.fragments = {
       }
       createdAt
     }
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,
 };

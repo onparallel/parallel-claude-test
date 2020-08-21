@@ -38,6 +38,14 @@ export const PetitionEvent = interfaceType({
           return "CommentPublishedEvent";
         case "COMMENT_DELETED":
           return "CommentDeletedEvent";
+        case "USER_PERMISSION_ADDED":
+          return "UserPermissionAddedEvent";
+        case "USER_PERMISSION_REMOVED":
+          return "UserPermissionRemovedEvent";
+        case "USER_PERMISSION_EDITED":
+          return "UserPermissionEditedEvent";
+        case "OWNERSHIP_TRANSFERRED":
+          return "OwnershipTransferredEvent";
       }
     });
   },
@@ -63,8 +71,9 @@ export const PetitionCreatedEvent = createPetitionEvent(
   (t) => {
     t.field("user", {
       type: "User",
+      nullable: true,
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.data.user_id))!;
+        return await ctx.users.loadUser(root.data.user_id);
       },
     });
   }
@@ -93,8 +102,9 @@ export const AccessActivatedEvent = createPetitionEvent(
     });
     t.field("user", {
       type: "User",
+      nullable: true,
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.data.user_id))!;
+        return await ctx.users.loadUser(root.data.user_id);
       },
     });
   }
@@ -111,8 +121,9 @@ export const AccessDeactivatedEvent = createPetitionEvent(
     });
     t.field("user", {
       type: "User",
+      nullable: true,
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.data.user_id))!;
+        return await ctx.users.loadUser(root.data.user_id);
       },
     });
   }
@@ -157,8 +168,9 @@ export const MessagesCancelledEvent = createPetitionEvent(
     });
     t.field("user", {
       type: "User",
+      nullable: true,
       resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.data.user_id))!;
+        return await ctx.users.loadUser(root.data.user_id);
       },
     });
   }
@@ -280,6 +292,98 @@ export const CommentDeletedEvent = createPetitionEvent(
           return access && { __type: "PetitionAccess", ...access };
         }
         throw new Error(`Both "user_id" and "petition_access_id" are null`);
+      },
+    });
+  }
+);
+
+export const UserPermissionAddedEvent = createPetitionEvent(
+  "UserPermissionAddedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.field("permissionType", {
+      type: "PetitionUserPermissionType",
+      resolve: async (root, _, ctx) => {
+        return root.data.permission_type;
+      },
+    });
+    t.field("permissionUser", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.permission_user_id);
+      },
+    });
+  }
+);
+
+export const UserPermissionRemovedEvent = createPetitionEvent(
+  "UserPermissionRemovedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.field("permissionUser", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.permission_user_id);
+      },
+    });
+  }
+);
+
+export const UserPermissionEditedEvent = createPetitionEvent(
+  "UserPermissionEditedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.field("permissionType", {
+      type: "PetitionUserPermissionType",
+      resolve: async (root, _, ctx) => {
+        return root.data.permission_type;
+      },
+    });
+    t.field("permissionUser", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.permission_user_id);
+      },
+    });
+  }
+);
+
+export const OwnershipTransferredEvent = createPetitionEvent(
+  "OwnershipTransferredEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.field("owner", {
+      type: "User",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.owner_id);
       },
     });
   }

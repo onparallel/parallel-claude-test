@@ -24,7 +24,7 @@ export type AccessActivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type AccessDeactivatedEvent = PetitionEvent & {
@@ -32,7 +32,7 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type AccessOpenedEvent = PetitionEvent & {
@@ -137,7 +137,7 @@ export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
   message: PetitionMessage;
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type MessageScheduledEvent = PetitionEvent & {
@@ -553,6 +553,14 @@ export type OrganizationStatus =
   /** Used for development or testing purposes */
   | "DEV";
 
+export type OwnershipTransferredEvent = PetitionEvent & {
+  __typename?: "OwnershipTransferredEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  owner?: Maybe<User>;
+  user?: Maybe<User>;
+};
+
 /** An petition in the system. */
 export type Petition = Timestamps & {
   __typename?: "Petition";
@@ -659,7 +667,7 @@ export type PetitionCreatedEvent = PetitionEvent & {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["ID"];
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type PetitionEvent = {
@@ -1207,6 +1215,32 @@ export type UserPagination = {
   totalCount: Scalars["Int"];
 };
 
+export type UserPermissionAddedEvent = PetitionEvent & {
+  __typename?: "UserPermissionAddedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  permissionType: PetitionUserPermissionType;
+  permissionUser?: Maybe<User>;
+  user?: Maybe<User>;
+};
+
+export type UserPermissionEditedEvent = PetitionEvent & {
+  __typename?: "UserPermissionEditedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  permissionType: PetitionUserPermissionType;
+  permissionUser?: Maybe<User>;
+  user?: Maybe<User>;
+};
+
+export type UserPermissionRemovedEvent = PetitionEvent & {
+  __typename?: "UserPermissionRemovedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["ID"];
+  permissionUser?: Maybe<User>;
+  user?: Maybe<User>;
+};
+
 export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
   "id" | "fullName" | "email"
@@ -1359,6 +1393,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "MessageSentEvent";
         } & PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment)
       | ({
+          __typename?: "OwnershipTransferredEvent";
+        } & PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment)
+      | ({
           __typename?: "PetitionCompletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment)
       | ({
@@ -1373,6 +1410,15 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | ({
           __typename?: "ReplyDeletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment)
+      | ({
+          __typename?: "UserPermissionAddedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment)
+      | ({
+          __typename?: "UserPermissionEditedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment)
+      | ({
+          __typename?: "UserPermissionRemovedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment)
     >;
   };
 };
@@ -1418,6 +1464,11 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
 } & Pick<MessageSentEvent, "id"> &
   TimelineMessageSentEvent_MessageSentEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment = {
+  __typename?: "OwnershipTransferredEvent";
+} & Pick<OwnershipTransferredEvent, "id"> &
+  TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
   __typename?: "PetitionCompletedEvent";
 } & Pick<PetitionCompletedEvent, "id"> &
@@ -1443,6 +1494,21 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = 
 } & Pick<ReplyDeletedEvent, "id"> &
   TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment = {
+  __typename?: "UserPermissionAddedEvent";
+} & Pick<UserPermissionAddedEvent, "id"> &
+  TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment = {
+  __typename?: "UserPermissionEditedEvent";
+} & Pick<UserPermissionEditedEvent, "id"> &
+  TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
+  __typename?: "UserPermissionRemovedEvent";
+} & Pick<UserPermissionRemovedEvent, "id"> &
+  TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment
@@ -1452,20 +1518,29 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment;
+  | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment;
 
 export type PetitionFieldReference_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "title">;
 
+export type UserReference_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName"
+>;
+
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
 } & Pick<AccessActivatedEvent, "createdAt"> & {
-    user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
@@ -1474,7 +1549,7 @@ export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
 export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
 } & Pick<AccessDeactivatedEvent, "createdAt"> & {
-    user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
@@ -1502,7 +1577,7 @@ export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
             { __typename?: "Contact" } & ContactLink_ContactFragment
           >;
         })
-      | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
+      | ({ __typename?: "User" } & UserReference_UserFragment)
     >;
   };
 
@@ -1525,7 +1600,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
                   { __typename?: "Contact" } & ContactLink_ContactFragment
                 >;
               })
-            | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
+            | ({ __typename?: "User" } & UserReference_UserFragment)
           >;
         }
     >;
@@ -1544,7 +1619,7 @@ export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
           >;
         };
       };
-    user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
 export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
@@ -1554,7 +1629,7 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
       PetitionMessage,
       "status" | "scheduledAt" | "emailSubject"
     > & {
-        sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+        sender: { __typename?: "User" } & UserReference_UserFragment;
         access: { __typename?: "PetitionAccess" } & {
           contact?: Maybe<
             { __typename?: "Contact" } & ContactLink_ContactFragment
@@ -1570,7 +1645,7 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
       PetitionMessage,
       "emailSubject" | "emailBody" | "scheduledAt"
     > & {
-        sender: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+        sender: { __typename?: "User" } & UserReference_UserFragment;
         access: { __typename?: "PetitionAccess" } & {
           contact?: Maybe<
             { __typename?: "Contact" } & ContactLink_ContactFragment
@@ -1578,6 +1653,13 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
         };
       } & MessageEventsIndicator_PetitionMessageFragment &
       MessageSentEventModal_PetitionMessageFragment;
+  };
+
+export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment = {
+  __typename?: "OwnershipTransferredEvent";
+} & Pick<OwnershipTransferredEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
@@ -1591,7 +1673,7 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
 } & Pick<PetitionCreatedEvent, "createdAt"> & {
-    user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
@@ -1601,7 +1683,7 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
       PetitionReminder,
       "type"
     > & {
-        sender?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName">>;
+        sender?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
         access: { __typename?: "PetitionAccess" } & {
           contact?: Maybe<
             { __typename?: "Contact" } & ContactLink_ContactFragment
@@ -1634,6 +1716,33 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+  };
+
+export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
+  __typename?: "UserPermissionAddedEvent";
+} & Pick<UserPermissionAddedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
+
+export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment = {
+  __typename?: "UserPermissionEditedEvent";
+} & Pick<UserPermissionEditedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
+
+export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment = {
+  __typename?: "UserPermissionRemovedEvent";
+} & Pick<UserPermissionRemovedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
   };
 
 export type ConfirmDeletePetitionsDialog_PetitionFragment = {
@@ -3207,14 +3316,20 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
 `;
+export const UserReference_UserFragmentDoc = gql`
+  fragment UserReference_User on User {
+    id
+    fullName
+  }
+`;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
   fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
     user {
-      id
-      fullName
+      ...UserReference_User
     }
     createdAt
   }
+  ${UserReference_UserFragmentDoc}
 `;
 export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = gql`
   fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
@@ -3230,8 +3345,7 @@ export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = 
 export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
   fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
     user {
-      id
-      fullName
+      ...UserReference_User
     }
     access {
       contact {
@@ -3240,13 +3354,13 @@ export const TimelineAccessActivatedEvent_AccessActivatedEventFragmentDoc = gql`
     }
     createdAt
   }
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = gql`
   fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
     user {
-      id
-      fullName
+      ...UserReference_User
     }
     access {
       contact {
@@ -3255,6 +3369,7 @@ export const TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragmentDoc = 
     }
     createdAt
   }
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineAccessOpenedEvent_AccessOpenedEventFragmentDoc = gql`
@@ -3272,8 +3387,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
   fragment TimelineMessageScheduledEvent_MessageScheduledEvent on MessageScheduledEvent {
     message {
       sender {
-        id
-        fullName
+        ...UserReference_User
       }
       status
       scheduledAt
@@ -3286,6 +3400,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
     }
     createdAt
   }
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gql`
@@ -3301,12 +3416,12 @@ export const TimelineMessageCancelledEvent_MessageCancelledEventFragmentDoc = gq
       }
     }
     user {
-      id
-      fullName
+      ...UserReference_User
     }
     createdAt
   }
   ${ContactLink_ContactFragmentDoc}
+  ${UserReference_UserFragmentDoc}
 `;
 export const MessageEventsIndicator_PetitionMessageFragmentDoc = gql`
   fragment MessageEventsIndicator_PetitionMessage on PetitionMessage {
@@ -3331,8 +3446,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
   fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
     message {
       sender {
-        id
-        fullName
+        ...UserReference_User
       }
       emailSubject
       emailBody
@@ -3347,6 +3461,7 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
     }
     createdAt
   }
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
   ${MessageSentEventModal_PetitionMessageFragmentDoc}
@@ -3356,8 +3471,7 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
     reminder {
       type
       sender {
-        id
-        fullName
+        ...UserReference_User
       }
       access {
         contact {
@@ -3367,6 +3481,7 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
     }
     createdAt
   }
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
@@ -3412,8 +3527,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
     comment {
       author {
         ... on User {
-          id
-          fullName
+          ...UserReference_User
         }
         ... on PetitionAccess {
           contact {
@@ -3427,6 +3541,7 @@ export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gq
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
@@ -3436,8 +3551,7 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
     }
     deletedBy {
       ... on User {
-        id
-        fullName
+        ...UserReference_User
       }
       ... on PetitionAccess {
         contact {
@@ -3448,7 +3562,58 @@ export const TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc = gql`
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
+`;
+export const TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc = gql`
+  fragment TimelineUserPermissionAddedEvent_UserPermissionAddedEvent on UserPermissionAddedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionUser {
+      ...UserReference_User
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
+export const TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc = gql`
+  fragment TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent on UserPermissionRemovedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionUser {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
+export const TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc = gql`
+  fragment TimelineUserPermissionEditedEvent_UserPermissionEditedEvent on UserPermissionEditedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionUser {
+      ...UserReference_User
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
+export const TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc = gql`
+  fragment TimelineOwnershipTransferredEvent_OwnershipTransferredEvent on OwnershipTransferredEvent {
+    user {
+      ...UserReference_User
+    }
+    owner {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
@@ -3495,6 +3660,18 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on CommentDeletedEvent {
       ...TimelineCommentDeletedEvent_CommentDeletedEvent
     }
+    ... on UserPermissionAddedEvent {
+      ...TimelineUserPermissionAddedEvent_UserPermissionAddedEvent
+    }
+    ... on UserPermissionRemovedEvent {
+      ...TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent
+    }
+    ... on UserPermissionEditedEvent {
+      ...TimelineUserPermissionEditedEvent_UserPermissionEditedEvent
+    }
+    ... on OwnershipTransferredEvent {
+      ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -3509,10 +3686,14 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
   ${TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc}
   ${TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc}
+  ${TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragmentDoc}
+  ${TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc}
+  ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
+  ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
-    events(limit: 100) {
+    events(limit: 1000) {
       items {
         ...PetitionActivityTimeline_PetitionEvent
       }

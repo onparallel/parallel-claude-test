@@ -53,6 +53,9 @@ const result: IntrospectionResultData = {
             name: "MessageSentEvent",
           },
           {
+            name: "OwnershipTransferredEvent",
+          },
+          {
             name: "PetitionCompletedEvent",
           },
           {
@@ -66,6 +69,15 @@ const result: IntrospectionResultData = {
           },
           {
             name: "ReplyDeletedEvent",
+          },
+          {
+            name: "UserPermissionAddedEvent",
+          },
+          {
+            name: "UserPermissionEditedEvent",
+          },
+          {
+            name: "UserPermissionRemovedEvent",
           },
         ],
       },

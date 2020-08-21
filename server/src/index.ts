@@ -33,14 +33,23 @@ const server = new ApolloServer({
           }) {
             if (response.errors) {
               response.errors = response.errors.map((error) => {
-                if (error.extensions?.code === "INTERNAL_SERVER_ERROR") {
-                  context.logger.error(
-                    error.message,
-                    error.extensions?.exception
-                  );
-                  return new UnknownError("Internal server error");
-                } else {
-                  return error;
+                switch (error.extensions?.code) {
+                  case "INTERNAL_SERVER_ERROR": {
+                    context.logger.error(
+                      error.message,
+                      error.extensions?.exception
+                    );
+                    return new UnknownError("Internal server error");
+                  }
+                  case "GRAPHQL_VALIDATION_FAILED": {
+                    context.logger.error(
+                      error.message,
+                      error.extensions?.exception
+                    );
+                    return error;
+                  }
+                  default:
+                    return error;
                 }
               });
             }

@@ -1,46 +1,41 @@
 import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
-import { UserPlusIcon } from "@parallel/chakra/icons";
+import { UserXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { TimelineAccessActivatedEvent_AccessActivatedEventFragment } from "@parallel/graphql/__types";
+import { TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
-export type TimelineAccessActivatedEventProps = {
+export type TimelineUserPermissionRemovedEventProps = {
   userId: string;
-  event: TimelineAccessActivatedEvent_AccessActivatedEventFragment;
+  event: TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
 };
 
-export function TimelineAccessActivatedEvent({
+export function TimelineUserPermissionRemovedEvent({
   event,
   userId,
-}: TimelineAccessActivatedEventProps) {
+}: TimelineUserPermissionRemovedEventProps) {
   return (
     <TimelineItem
       icon={
         <TimelineIcon
-          icon={<UserPlusIcon />}
+          icon={<UserXIcon />}
           color="white"
-          backgroundColor="blue.500"
+          backgroundColor="red.500"
         />
       }
     >
       <FormattedMessage
-        id="timeline.access-activated-description"
-        defaultMessage="{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
+        id="timeline.remove-user-permission-description"
+        defaultMessage="{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
         values={{
-          same: userId === event.user.id,
+          same: userId === event.user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
-          contact: event.access.contact ? (
-            <ContactLink contact={event.access.contact} />
-          ) : (
-            <DeletedContact />
-          ),
+          other: <UserReference user={event.permissionUser} />,
           timeAgo: (
             <Link>
               <DateTime
@@ -56,16 +51,14 @@ export function TimelineAccessActivatedEvent({
   );
 }
 
-TimelineAccessActivatedEvent.fragments = {
-  AccessActivatedEvent: gql`
-    fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
+TimelineUserPermissionRemovedEvent.fragments = {
+  UserPermissionRemovedEvent: gql`
+    fragment TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent on UserPermissionRemovedEvent {
       user {
         ...UserReference_User
       }
-      access {
-        contact {
-          ...ContactLink_Contact
-        }
+      permissionUser {
+        ...UserReference_User
       }
       createdAt
     }

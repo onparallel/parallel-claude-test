@@ -1,46 +1,41 @@
 import { gql } from "@apollo/client";
 import { Link, Text } from "@chakra-ui/core";
-import { UserPlusIcon } from "@parallel/chakra/icons";
+import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { TimelineAccessActivatedEvent_AccessActivatedEventFragment } from "@parallel/graphql/__types";
+import { TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
-export type TimelineAccessActivatedEventProps = {
+export type TimelineOwnershipTransferredEventProps = {
   userId: string;
-  event: TimelineAccessActivatedEvent_AccessActivatedEventFragment;
+  event: TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 };
 
-export function TimelineAccessActivatedEvent({
+export function TimelineOwnershipTransferredEvent({
   event,
   userId,
-}: TimelineAccessActivatedEventProps) {
+}: TimelineOwnershipTransferredEventProps) {
   return (
     <TimelineItem
       icon={
         <TimelineIcon
-          icon={<UserPlusIcon />}
+          icon={<UserArrowIcon />}
           color="white"
-          backgroundColor="blue.500"
+          backgroundColor="purple.500"
         />
       }
     >
       <FormattedMessage
-        id="timeline.access-activated-description"
-        defaultMessage="{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
+        id="timeline.ownership-transferred-description"
+        defaultMessage="{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}"
         values={{
-          same: userId === event.user.id,
+          same: userId === event.user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
-          contact: event.access.contact ? (
-            <ContactLink contact={event.access.contact} />
-          ) : (
-            <DeletedContact />
-          ),
+          owner: <UserReference user={event.owner} />,
           timeAgo: (
             <Link>
               <DateTime
@@ -56,16 +51,14 @@ export function TimelineAccessActivatedEvent({
   );
 }
 
-TimelineAccessActivatedEvent.fragments = {
-  AccessActivatedEvent: gql`
-    fragment TimelineAccessActivatedEvent_AccessActivatedEvent on AccessActivatedEvent {
+TimelineOwnershipTransferredEvent.fragments = {
+  OwnershipTransferredEvent: gql`
+    fragment TimelineOwnershipTransferredEvent_OwnershipTransferredEvent on OwnershipTransferredEvent {
       user {
         ...UserReference_User
       }
-      access {
-        contact {
-          ...ContactLink_Contact
-        }
+      owner {
+        ...UserReference_User
       }
       createdAt
     }

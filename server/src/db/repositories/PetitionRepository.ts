@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
-import { groupBy, indexBy, omit, sortBy } from "remeda";
+import { groupBy, indexBy, omit, sortBy, pick } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -311,7 +311,7 @@ export class PetitionRepository extends BaseRepository {
         updated_by: `User:${user.id}`,
       }))
     );
-    await this.createEvent(
+    await this.createEvent_old(
       petitionId,
       "ACCESS_ACTIVATED",
       rows.map((a) => ({
@@ -343,7 +343,7 @@ export class PetitionRepository extends BaseRepository {
         created_by: `User:${user.id}`,
       }))
     );
-    await this.createEvent(
+    await this.createEvent_old(
       petitionId,
       scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
       rows.map((m) => ({
@@ -367,7 +367,7 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    await this.createEvent(petitionId, "MESSAGE_CANCELLED", {
+    await this.createEvent_old(petitionId, "MESSAGE_CANCELLED", {
       petition_message_id: messageId,
       user_id: user.id,
     });
@@ -403,7 +403,7 @@ export class PetitionRepository extends BaseRepository {
           "*"
         ),
     ]);
-    await this.createEvent(
+    await this.createEvent_old(
       petitionId,
       "ACCESS_DEACTIVATED",
       accesses.map((access) => ({
@@ -412,7 +412,7 @@ export class PetitionRepository extends BaseRepository {
       }))
     );
     if (messages.length > 0) {
-      await this.createEvent(
+      await this.createEvent_old(
         petitionId,
         "MESSAGE_CANCELLED",
         messages.map((message) => ({
@@ -440,7 +440,7 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    await this.createEvent(
+    await this.createEvent_old(
       petitionId,
       "ACCESS_ACTIVATED",
       accesses.map((access) => ({
@@ -515,7 +515,7 @@ export class PetitionRepository extends BaseRepository {
         user,
         t
       );
-      await this.createEvent(
+      await this.createEvent_old(
         row.id,
         "PETITION_CREATED",
         {
@@ -587,7 +587,7 @@ export class PetitionRepository extends BaseRepository {
       for (const [, _accesses] of Object.entries(
         groupBy(accesses, (a) => a.petition_id)
       )) {
-        await this.createEvent(
+        await this.createEvent_old(
           _accesses[0].petition_id,
           "ACCESS_DEACTIVATED",
           _accesses.map((access) => ({
@@ -600,7 +600,7 @@ export class PetitionRepository extends BaseRepository {
       for (const [, _messages] of Object.entries(
         groupBy(messages, (m) => m.petition_id)
       )) {
-        await this.createEvent(
+        await this.createEvent_old(
           _messages[0].petition_id,
           "MESSAGE_CANCELLED",
           _messages.map((message) => ({
@@ -950,7 +950,7 @@ export class PetitionRepository extends BaseRepository {
         })
         .where({ id: field?.petition_id, status: "COMPLETED" }),
     ]);
-    await this.createEvent(field.petition_id, "REPLY_CREATED", {
+    await this.createEvent_old(field.petition_id, "REPLY_CREATED", {
       petition_access_id: reply.petition_access_id,
       petition_field_id: reply.petition_field_id,
       petition_field_reply_id: reply.id,
@@ -981,7 +981,7 @@ export class PetitionRepository extends BaseRepository {
           updated_by: `Contact:${contact.id}`,
         })
         .where({ id: field.petition_id, status: "COMPLETED" }),
-      this.createEvent(field!.petition_id, "REPLY_DELETED", {
+      this.createEvent_old(field!.petition_id, "REPLY_DELETED", {
         petition_access_id: reply.petition_access_id,
         petition_field_id: reply.petition_field_id,
         petition_field_reply_id: reply.id,
@@ -1037,7 +1037,7 @@ export class PetitionRepository extends BaseRepository {
 
         return updated;
       });
-      await this.createEvent(petitionId, "PETITION_COMPLETED", {
+      await this.createEvent_old(petitionId, "PETITION_COMPLETED", {
         petition_access_id: accessId,
       });
       return petition;
@@ -1078,7 +1078,7 @@ export class PetitionRepository extends BaseRepository {
         },
         t
       );
-      await this.createEvent(
+      await this.createEvent_old(
         cloned.id,
         "PETITION_CREATED",
         {
@@ -1151,7 +1151,7 @@ export class PetitionRepository extends BaseRepository {
         });
       return await this.insert("petition_reminder", data, t).returning("*");
     });
-    await this.createEvent(
+    await this.createEvent_old(
       petitionId,
       "REMINDER_SENT",
       reminders.map((reminder) => ({
@@ -1210,7 +1210,10 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async createEvent<TType extends PetitionEventType>(
+  /**
+   * @deprecated Use `createEvent`
+   */
+  async createEvent_old<TType extends PetitionEventType>(
     petitionId: number,
     type: TType,
     payload: MaybeArray<PetitionEventPayload<TType>>,
@@ -1219,6 +1222,25 @@ export class PetitionRepository extends BaseRepository {
     return await this.insert(
       "petition_event",
       (Array.isArray(payload) ? payload : [payload]).map((data) => ({
+        petition_id: petitionId,
+        type,
+        data,
+      })),
+      t
+    );
+  }
+
+  async createEvent<TType extends PetitionEventType>(
+    events: MaybeArray<{
+      petitionId: number;
+      type: TType;
+      data: PetitionEventPayload<TType>;
+    }>,
+    t?: Transaction<any, any>
+  ) {
+    return await this.insert(
+      "petition_event",
+      unMaybeArray(events).map(({ petitionId, type, data }) => ({
         petition_id: petitionId,
         type,
         data,
@@ -1521,7 +1543,7 @@ export class PetitionRepository extends BaseRepository {
         `User:${user.id}`
       ),
       comment?.published_at
-        ? this.createEvent(petitionId, "COMMENT_DELETED", {
+        ? this.createEvent_old(petitionId, "COMMENT_DELETED", {
             petition_field_id: petitionFieldId,
             petition_field_comment_id: petitionFieldCommentId,
             user_id: user.id,
@@ -1543,7 +1565,7 @@ export class PetitionRepository extends BaseRepository {
         `PetitionAccess:${access.id}`
       ),
       comment?.published_at
-        ? this.createEvent(petitionId, "COMMENT_DELETED", {
+        ? this.createEvent_old(petitionId, "COMMENT_DELETED", {
             petition_field_id: petitionFieldId,
             petition_field_comment_id: petitionFieldCommentId,
             petition_access_id: access.id,
@@ -1659,7 +1681,7 @@ export class PetitionRepository extends BaseRepository {
         )
     );
 
-    await this.createEvent(
+    await this.createEvent_old(
       petitionId,
       "COMMENT_PUBLISHED",
       comments.map((comment) => ({
@@ -1714,7 +1736,7 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      await this.createEvent(
+      await this.createEvent_old(
         petitionId,
         "COMMENT_PUBLISHED",
         comments.map((comment) => ({
@@ -1855,18 +1877,15 @@ export class PetitionRepository extends BaseRepository {
     permissionType: PetitionUserPermissionType,
     user: User
   ) {
-    const batch: CreatePetitionUser[] = [];
-    petitionIds.forEach((petitionId) => {
-      userIds.forEach((userId) => {
-        batch.push({
+    const batch: CreatePetitionUser[] = petitionIds.flatMap((petitionId) =>
+      userIds.map((userId) => ({
         petition_id: petitionId,
         user_id: userId,
         permission_type: permissionType,
         created_by: `User:${user.id}`,
         updated_by: `User:${user.id}`,
-        });
-      });
-    });
+      }))
+    );
 
     return this.withTransaction(async (t) => {
       /* 
@@ -1878,6 +1897,19 @@ export class PetitionRepository extends BaseRepository {
       ? ON CONFLICT DO NOTHING
         RETURNING *;`,
         [this.from("petition_user").insert(batch)]
+      );
+
+      await this.createEvent(
+        newPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "USER_PERMISSION_ADDED",
+          data: {
+            user_id: user.id,
+            permission_type: p.permission_type,
+            permission_user_id: p.user_id,
+          },
+        })),
+        t
       );
 
       for (const petitionId of petitionIds) {
@@ -1900,19 +1932,35 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return this.withTransaction(async (t) => {
-      await this.from("petition_user", t)
+      const updatedPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .whereIn("user_id", userIds)
         .whereNull("deleted_at")
-        .update({
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-          permission_type: newPermission,
-        });
+        .update(
+          {
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+            permission_type: newPermission,
+          },
+          "*"
+        );
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
+
+      await this.createEvent(
+        updatedPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "USER_PERMISSION_EDITED",
+          data: {
+            user_id: user.id,
+            permission_type: p.permission_type,
+            permission_user_id: p.user_id,
+          },
+        })),
+        t
+      );
 
       return await this.from("petition", t)
         .whereNull("deleted_at")
@@ -1927,18 +1975,33 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return this.withTransaction(async (t) => {
-      await this.from("petition_user", t)
+      const removedPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .whereIn("user_id", userIds)
         .whereNull("deleted_at")
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        });
+        .update(
+          {
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`,
+          },
+          "*"
+        );
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
+
+      await this.createEvent(
+        removedPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "USER_PERMISSION_REMOVED",
+          data: {
+            user_id: user.id,
+            permission_user_id: p.user_id,
+          },
+        })),
+        t
+      );
 
       return await this.from("petition", t)
         .whereNull("deleted_at")
@@ -1957,11 +2020,13 @@ export class PetitionRepository extends BaseRepository {
           deleted_at: null,
           permission_type: "OWNER",
         })
-        .update({
-          permission_type: "WRITE",
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-        });
+        .update(
+          {
+            permission_type: "WRITE",
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+          } 
+        );
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
@@ -1974,7 +2039,7 @@ export class PetitionRepository extends BaseRepository {
         petition_id: pid,
       }));
 
-      await t.raw(
+      const { rows: newPermissions } = await t.raw<{ rows: PetitionUser[] }>(
         /* sql */ `
         ? ON CONFLICT (user_id, petition_id) WHERE deleted_at IS NULL
           DO UPDATE SET
@@ -1990,6 +2055,18 @@ export class PetitionRepository extends BaseRepository {
           `User:${user.id}`,
           this.now(),
         ]
+      );
+
+      await this.createEvent(
+        newPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "OWNERSHIP_TRANSFERRED",
+          data: {
+            user_id: user.id,
+            owner_id: p.user_id,
+          },
+        })),
+        t
       );
 
       return await this.from("petition", t)

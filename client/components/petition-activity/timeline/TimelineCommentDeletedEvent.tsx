@@ -8,6 +8,7 @@ import { TimelineCommentDeletedEvent_CommentDeletedEventFragment } from "@parall
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineCommentDeletedEventProps = {
@@ -43,7 +44,7 @@ export function TimelineCommentDeletedEvent({
                 <DeletedContact />
               )
             ) : deletedBy?.__typename === "User" ? (
-              deletedBy.fullName
+              <UserReference user={deletedBy} />
             ) : (
               <DeletedContact />
             ),
@@ -71,8 +72,7 @@ TimelineCommentDeletedEvent.fragments = {
       }
       deletedBy {
         ... on User {
-          id
-          fullName
+          ...UserReference_User
         }
         ... on PetitionAccess {
           contact {
@@ -83,6 +83,7 @@ TimelineCommentDeletedEvent.fragments = {
       createdAt
     }
     ${PetitionFieldReference.fragments.PetitionField}
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,
 };

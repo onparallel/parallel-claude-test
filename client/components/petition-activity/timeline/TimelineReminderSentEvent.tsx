@@ -7,6 +7,7 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineReminderSentEventProps = {
@@ -31,11 +32,11 @@ export function TimelineReminderSentEvent({
       {reminder.type === "MANUAL" ? (
         <FormattedMessage
           id="timeline.reminder-sent-description-manual"
-          defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}"
+          defaultMessage="{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
           values={{
             same: userId === reminder.sender!.id,
             b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            user: reminder.sender!.fullName,
+            user: <UserReference user={reminder.sender} />,
             contact: reminder.access.contact ? (
               <ContactLink contact={reminder.access.contact} />
             ) : (
@@ -84,8 +85,7 @@ TimelineReminderSentEvent.fragments = {
       reminder {
         type
         sender {
-          id
-          fullName
+          ...UserReference_User
         }
         access {
           contact {
@@ -95,6 +95,7 @@ TimelineReminderSentEvent.fragments = {
       }
       createdAt
     }
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,
 };

@@ -196,6 +196,7 @@ export interface NexusGenRootTypes {
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
   Organization: db.Organization;
+  OwnershipTransferredEvent: events.OwnershipTransferredEvent;
   Petition: db.Petition;
   PetitionAccess: db.PetitionAccess;
   PetitionAccessPagination: {
@@ -269,6 +270,9 @@ export interface NexusGenRootTypes {
     items: NexusGenRootTypes["User"][]; // [User!]!
     totalCount: number; // Int!
   };
+  UserPermissionAddedEvent: events.UserPermissionAddedEvent;
+  UserPermissionEditedEvent: events.UserPermissionEditedEvent;
+  UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
   CreatedAt:
     | NexusGenRootTypes["PetitionMessage"]
     | NexusGenRootTypes["PetitionReminder"];
@@ -333,14 +337,14 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: string; // ID!
-    user: NexusGenRootTypes["User"]; // User!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   AccessDeactivatedEvent: {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: string; // ID!
-    user: NexusGenRootTypes["User"]; // User!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   AccessOpenedEvent: {
     // field return type
@@ -393,7 +397,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: string; // ID!
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
-    user: NexusGenRootTypes["User"]; // User!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   MessageScheduledEvent: {
     // field return type
@@ -465,6 +469,13 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
   };
+  OwnershipTransferredEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: string; // ID!
+    owner: NexusGenRootTypes["User"] | null; // User
+    user: NexusGenRootTypes["User"] | null; // User
+  };
   Petition: {
     // field return type
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -520,7 +531,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: string; // ID!
-    user: NexusGenRootTypes["User"]; // User!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionEventPagination: {
     // field return type
@@ -744,6 +755,29 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["User"][]; // [User!]!
     totalCount: number; // Int!
+  };
+  UserPermissionAddedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: string; // ID!
+    permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
+    permissionUser: NexusGenRootTypes["User"] | null; // User
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  UserPermissionEditedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: string; // ID!
+    permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
+    permissionUser: NexusGenRootTypes["User"] | null; // User
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  UserPermissionRemovedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: string; // ID!
+    permissionUser: NexusGenRootTypes["User"] | null; // User
+    user: NexusGenRootTypes["User"] | null; // User
   };
   CreatedAt: {
     // field return type
@@ -1090,11 +1124,15 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "MessageCancelledEvent"
     | "MessageScheduledEvent"
     | "MessageSentEvent"
+    | "OwnershipTransferredEvent"
     | "PetitionCompletedEvent"
     | "PetitionCreatedEvent"
     | "ReminderSentEvent"
     | "ReplyCreatedEvent"
-    | "ReplyDeletedEvent";
+    | "ReplyDeletedEvent"
+    | "UserPermissionAddedEvent"
+    | "UserPermissionEditedEvent"
+    | "UserPermissionRemovedEvent";
   Timestamps:
     | "Contact"
     | "Organization"
@@ -1124,6 +1162,7 @@ export type NexusGenObjectNames =
   | "MessageSentEvent"
   | "Mutation"
   | "Organization"
+  | "OwnershipTransferredEvent"
   | "Petition"
   | "PetitionAccess"
   | "PetitionAccessPagination"
@@ -1155,7 +1194,10 @@ export type NexusGenObjectNames =
   | "ReplyDeletedEvent"
   | "SendPetitionResult"
   | "User"
-  | "UserPagination";
+  | "UserPagination"
+  | "UserPermissionAddedEvent"
+  | "UserPermissionEditedEvent"
+  | "UserPermissionRemovedEvent";
 
 export type NexusGenInputNames =
   | "CreateContactInput"

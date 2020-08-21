@@ -10,11 +10,15 @@ import { TimelineCommentPublishedEvent } from "./timeline/TimelineCommentPublish
 import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancelledEvent";
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
 import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
+import { TimelineOwnershipTransferredEvent } from "./timeline/TimelineOwnershipTransferredEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
+import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermissionAddedEvent";
+import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
+import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -69,6 +73,23 @@ export function PetitionActivityTimeline({
               <TimelineCommentPublishedEvent event={event} userId={userId} />
             ) : event.__typename === "CommentDeletedEvent" ? (
               <TimelineCommentDeletedEvent event={event} userId={userId} />
+            ) : event.__typename === "UserPermissionAddedEvent" ? (
+              <TimelineUserPermissionAddedEvent event={event} userId={userId} />
+            ) : event.__typename === "UserPermissionRemovedEvent" ? (
+              <TimelineUserPermissionRemovedEvent
+                event={event}
+                userId={userId}
+              />
+            ) : event.__typename === "UserPermissionEditedEvent" ? (
+              <TimelineUserPermissionEditedEvent
+                event={event}
+                userId={userId}
+              />
+            ) : event.__typename === "OwnershipTransferredEvent" ? (
+              <TimelineOwnershipTransferredEvent
+                event={event}
+                userId={userId}
+              />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -82,7 +103,7 @@ export function PetitionActivityTimeline({
 PetitionActivityTimeline.fragments = {
   Petition: gql`
     fragment PetitionActivityTimeline_Petition on Petition {
-      events(limit: 100) {
+      events(limit: 1000) {
         items {
           ...PetitionActivityTimeline_PetitionEvent
         }
@@ -132,6 +153,18 @@ PetitionActivityTimeline.fragments = {
       ... on CommentDeletedEvent {
         ...TimelineCommentDeletedEvent_CommentDeletedEvent
       }
+      ... on UserPermissionAddedEvent {
+        ...TimelineUserPermissionAddedEvent_UserPermissionAddedEvent
+      }
+      ... on UserPermissionRemovedEvent {
+        ...TimelineUserPermissionRemovedEvent_UserPermissionRemovedEvent
+      }
+      ... on UserPermissionEditedEvent {
+        ...TimelineUserPermissionEditedEvent_UserPermissionEditedEvent
+      }
+      ... on OwnershipTransferredEvent {
+        ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -146,5 +179,9 @@ PetitionActivityTimeline.fragments = {
     ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}
     ${TimelineCommentPublishedEvent.fragments.CommentPublishedEvent}
     ${TimelineCommentDeletedEvent.fragments.CommentDeletedEvent}
+    ${TimelineUserPermissionAddedEvent.fragments.UserPermissionAddedEvent}
+    ${TimelineUserPermissionRemovedEvent.fragments.UserPermissionRemovedEvent}
+    ${TimelineUserPermissionEditedEvent.fragments.UserPermissionEditedEvent}
+    ${TimelineOwnershipTransferredEvent.fragments.OwnershipTransferredEvent}
   `,
 };

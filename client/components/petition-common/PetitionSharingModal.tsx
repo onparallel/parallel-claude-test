@@ -39,7 +39,6 @@ import {
   usePetitionSharingModal_transferPetitionOwnershipMutation,
   PetitionSharingModal_searchUsersQuery,
   PetitionSharingModal_searchUsersQueryVariables,
-  PetitionUserPermissionType,
 } from "@parallel/graphql/__types";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -48,6 +47,7 @@ import { DialogProps, useDialog } from "../common/DialogOpenerProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { Spacer } from "../common/Spacer";
 import { UserSelect, UserSelectSelection } from "../common/UserSelect";
+import { UserPermissionType } from "./UserPermissionType";
 
 export type PetitionSharingModalProps = Omit<ModalProps, "children"> & {
   userId: string;
@@ -313,29 +313,6 @@ export function PetitionSharingModal({
       </ModalOverlay>
     </Modal>
   );
-}
-
-function UserPermissionType({ type }: { type: PetitionUserPermissionType }) {
-  switch (type) {
-    case "OWNER":
-      return (
-        <FormattedMessage id="petition-sharing.owner" defaultMessage="Owner" />
-      );
-    case "WRITE":
-      return (
-        <FormattedMessage
-          id="petition-sharing.write"
-          defaultMessage="Can edit"
-        />
-      );
-    case "READ":
-      return (
-        <FormattedMessage
-          id="petition-sharing.read"
-          defaultMessage="Can view"
-        />
-      );
-  }
 }
 
 PetitionSharingModal.fragments = {

@@ -4,11 +4,12 @@ import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
-import { MessageSentEventModal } from "@parallel/components/petition-activity/MessageSentEventModal";
 import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
+import { MessageSentEventModal } from "@parallel/components/petition-activity/MessageSentEventModal";
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineMessageSentEventProps = {
@@ -37,11 +38,11 @@ export function TimelineMessageSentEvent({
           {message.scheduledAt ? (
             <FormattedMessage
               id="timeline.message-sent-description-scheduled"
-              defaultMessage="A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+              defaultMessage="A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
               values={{
                 same: userId === message.sender!.id,
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-                user: message.sender!.fullName,
+                user: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
                 contact: message.access.contact ? (
                   <ContactLink contact={message.access.contact} />
@@ -62,7 +63,7 @@ export function TimelineMessageSentEvent({
           ) : (
             <FormattedMessage
               id="timeline.message-sent-description-manual"
-              defaultMessage="{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+              defaultMessage="{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
               values={{
                 same: userId === message.sender!.id,
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
@@ -108,8 +109,7 @@ TimelineMessageSentEvent.fragments = {
     fragment TimelineMessageSentEvent_MessageSentEvent on MessageSentEvent {
       message {
         sender {
-          id
-          fullName
+          ...UserReference_User
         }
         emailSubject
         emailBody
@@ -124,8 +124,9 @@ TimelineMessageSentEvent.fragments = {
       }
       createdAt
     }
-    ${MessageEventsIndicator.fragments.PetitionMessage}
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
+    ${MessageEventsIndicator.fragments.PetitionMessage}
     ${MessageSentEventModal.fragments.PetitionMessage}
   `,
 };

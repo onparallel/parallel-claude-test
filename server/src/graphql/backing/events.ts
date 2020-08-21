@@ -1,4 +1,7 @@
-import { PetitionEventType } from "../../db/__types";
+import {
+  PetitionEventType,
+  PetitionUserPermissionType,
+} from "../../db/__types";
 export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
   PETITION_COMPLETED: { petition_access_id: number };
@@ -29,6 +32,24 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     petition_access_id?: number;
     petition_field_comment_id: number;
   };
+  USER_PERMISSION_ADDED: {
+    user_id: number;
+    permission_user_id: number;
+    permission_type: PetitionUserPermissionType;
+  };
+  USER_PERMISSION_REMOVED: {
+    user_id: number;
+    permission_user_id: number;
+  };
+  USER_PERMISSION_EDITED: {
+    user_id: number;
+    permission_user_id: number;
+    permission_type: PetitionUserPermissionType;
+  };
+  OWNERSHIP_TRANSFERRED: {
+    user_id: number;
+    owner_id: number;
+  };
 }[TType];
 
 type GenericPetitionEvent<TType extends PetitionEventType> = {
@@ -51,7 +72,18 @@ export type ReplyCreatedEvent = GenericPetitionEvent<"REPLY_CREATED">;
 export type ReplyDeletedEvent = GenericPetitionEvent<"REPLY_DELETED">;
 export type CommentPublishedEvent = GenericPetitionEvent<"COMMENT_PUBLISHED">;
 export type CommentDeletedEvent = GenericPetitionEvent<"COMMENT_DELETED">;
-
+export type UserPermissionAddedEvent = GenericPetitionEvent<
+  "USER_PERMISSION_ADDED"
+>;
+export type UserPermissionRemovedEvent = GenericPetitionEvent<
+  "USER_PERMISSION_REMOVED"
+>;
+export type UserPermissionEditedEvent = GenericPetitionEvent<
+  "USER_PERMISSION_EDITED"
+>;
+export type OwnershipTransferredEvent = GenericPetitionEvent<
+  "OWNERSHIP_TRANSFERRED"
+>;
 export type PetitionEvent =
   | PetitionCreatedEvent
   | PetitionCompletedEvent
@@ -65,4 +97,8 @@ export type PetitionEvent =
   | ReplyCreatedEvent
   | ReplyDeletedEvent
   | CommentPublishedEvent
-  | CommentDeletedEvent;
+  | CommentDeletedEvent
+  | UserPermissionAddedEvent
+  | UserPermissionRemovedEvent
+  | UserPermissionEditedEvent
+  | OwnershipTransferredEvent;

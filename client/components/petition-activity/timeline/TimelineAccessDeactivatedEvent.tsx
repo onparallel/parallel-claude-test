@@ -7,6 +7,7 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineAccessDeactivatedEventProps = {
@@ -30,11 +31,11 @@ export function TimelineAccessDeactivatedEvent({
     >
       <FormattedMessage
         id="timeline.access-deactivated-description"
-        defaultMessage="{same, select, true {You} other {<b>{user}</b>}} removed access to {contact} {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
         values={{
           same: userId === event.user.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-          user: event.user.fullName,
+          user: <UserReference user={event.user} />,
           contact: event.access.contact ? (
             <ContactLink contact={event.access.contact} />
           ) : (
@@ -59,8 +60,7 @@ TimelineAccessDeactivatedEvent.fragments = {
   AccessDeactivatedEvent: gql`
     fragment TimelineAccessDeactivatedEvent_AccessDeactivatedEvent on AccessDeactivatedEvent {
       user {
-        id
-        fullName
+        ...UserReference_User
       }
       access {
         contact {
@@ -69,6 +69,7 @@ TimelineAccessDeactivatedEvent.fragments = {
       }
       createdAt
     }
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,
 };

@@ -665,6 +665,11 @@
     "context": "Deleted contact"
   },
   {
+    "term": "generic.deleted-user",
+    "definition": "Deleted user",
+    "context": "Deleted user"
+  },
+  {
     "term": "generic.done",
     "definition": "Done",
     "context": "Done"
@@ -1246,8 +1251,8 @@
   },
   {
     "term": "petition-sharing.read",
-    "definition": "Can view",
-    "context": "Can view"
+    "definition": "Reader",
+    "context": "Reader"
   },
   {
     "term": "petition-sharing.succes-title",
@@ -1256,8 +1261,8 @@
   },
   {
     "term": "petition-sharing.write",
-    "definition": "Can edit",
-    "context": "Can edit"
+    "definition": "Editor",
+    "context": "Editor"
   },
   {
     "term": "petition.activity-not-available",
@@ -2886,18 +2891,23 @@
   },
   {
     "term": "timeline.access-activated-description",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} gave access to {contact} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
   },
   {
     "term": "timeline.access-deactivated-description",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} removed access to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} removed access to {contact} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
   },
   {
     "term": "timeline.access-opened-description",
     "definition": "{contact} opened the petition {timeAgo}",
     "context": "{contact} opened the petition {timeAgo}"
+  },
+  {
+    "term": "timeline.add-user-permission-description",
+    "definition": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.comment-deleted",
@@ -2915,9 +2925,14 @@
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
   },
   {
+    "term": "timeline.edit-user-permission-description",
+    "definition": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
+  },
+  {
     "term": "timeline.message-cancelled-description",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-scheduled-cancel",
@@ -2926,23 +2941,28 @@
   },
   {
     "term": "timeline.message-scheduled-description",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} scheduled a message for {scheduledAt} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-description-manual",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} sent a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-description-scheduled",
-    "definition": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
-    "context": "A message scheduled by {same, select, true {you} other {<b>{user}</b>}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
+    "definition": "A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}",
+    "context": "A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
   },
   {
     "term": "timeline.message-sent-see-message",
     "definition": "See message",
     "context": "See message"
+  },
+  {
+    "term": "timeline.ownership-transferred-description",
+    "definition": "{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}"
   },
   {
     "term": "timeline.petition-completed-description",
@@ -2951,8 +2971,8 @@
   },
   {
     "term": "timeline.petition-created-description",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} created this petition {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} created this petition {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} created this petition {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"
   },
   {
     "term": "timeline.reminder-sent-description-automatic",
@@ -2961,8 +2981,13 @@
   },
   {
     "term": "timeline.reminder-sent-description-manual",
-    "definition": "{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}",
-    "context": "{same, select, true {You} other {<b>{user}</b>}} sent a manual reminder to {contact} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.remove-user-permission-description",
+    "definition": "{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
   },
   {
     "term": "timeline.reply-created-deleted-field",

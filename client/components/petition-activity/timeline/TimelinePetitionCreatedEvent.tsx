@@ -5,6 +5,7 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCreatedEvent_PetitionCreatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelinePetitionCreatedEventProps = {
@@ -29,11 +30,11 @@ export function TimelinePetitionCreatedEvent({
     >
       <FormattedMessage
         id="timeline.petition-created-description"
-        defaultMessage="{same, select, true {You} other {<b>{user}</b>}} created this petition {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{user}}} created this petition {timeAgo}"
         values={{
           same: userId === user.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-          user: user.fullName,
+          user: <UserReference user={user} />,
           timeAgo: (
             <Link>
               <DateTime
@@ -53,10 +54,10 @@ TimelinePetitionCreatedEvent.fragments = {
   PetitionCreatedEvent: gql`
     fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
       user {
-        id
-        fullName
+        ...UserReference_User
       }
       createdAt
     }
+    ${UserReference.fragments.User}
   `,
 };

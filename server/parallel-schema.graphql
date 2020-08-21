@@ -5,14 +5,14 @@ type AccessActivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: ID!
-  user: User!
+  user: User
 }
 
 type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: ID!
-  user: User!
+  user: User
 }
 
 type AccessOpenedEvent implements PetitionEvent {
@@ -169,7 +169,7 @@ type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
   id: ID!
   message: PetitionMessage!
-  user: User!
+  user: User
 }
 
 type MessageScheduledEvent implements PetitionEvent {
@@ -631,6 +631,13 @@ enum OrganizationStatus {
   DEV
 }
 
+type OwnershipTransferredEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: ID!
+  owner: User
+  user: User
+}
+
 """
 An petition in the system.
 """
@@ -837,7 +844,7 @@ type PetitionCompletedEvent implements PetitionEvent {
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: ID!
-  user: User!
+  user: User
 }
 
 interface PetitionEvent {
@@ -1829,4 +1836,27 @@ type UserPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type UserPermissionAddedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: ID!
+  permissionType: PetitionUserPermissionType!
+  permissionUser: User
+  user: User
+}
+
+type UserPermissionEditedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: ID!
+  permissionType: PetitionUserPermissionType!
+  permissionUser: User
+  user: User
+}
+
+type UserPermissionRemovedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: ID!
+  permissionUser: User
+  user: User
 }

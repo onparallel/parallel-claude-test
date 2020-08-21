@@ -7,6 +7,7 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineMessageCancelledEvent_MessageCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineMessageCancelledEventProps = {
@@ -30,11 +31,11 @@ export function TimelineMessageCancelledEvent({
     >
       <FormattedMessage
         id="timeline.message-cancelled-description"
-        defaultMessage="{same, select, true {You} other {<b>{user}</b>}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
         values={{
           same: userId === user!.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-          user: user!.fullName,
+          user: <UserReference user={user} />,
           subject: message.emailSubject,
           contact: message.access.contact ? (
             <ContactLink contact={message.access.contact} />
@@ -70,11 +71,11 @@ TimelineMessageCancelledEvent.fragments = {
         }
       }
       user {
-        id
-        fullName
+        ...UserReference_User
       }
       createdAt
     }
     ${ContactLink.fragments.Contact}
+    ${UserReference.fragments.User}
   `,
 };

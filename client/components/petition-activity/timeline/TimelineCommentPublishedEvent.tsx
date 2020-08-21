@@ -10,6 +10,7 @@ import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@pa
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineCommentPublishedEventProps = {
@@ -58,10 +59,8 @@ export function TimelineCommentPublishedEvent({
                     ) : (
                       <DeletedContact />
                     )
-                  ) : author?.__typename === "User" ? (
-                    author.fullName
                   ) : (
-                    <DeletedContact />
+                    <UserReference user={author} />
                   ),
               }}
             />
@@ -112,8 +111,7 @@ TimelineCommentPublishedEvent.fragments = {
       comment {
         author {
           ... on User {
-            id
-            fullName
+            ...UserReference_User
           }
           ... on PetitionAccess {
             contact {
@@ -127,6 +125,7 @@ TimelineCommentPublishedEvent.fragments = {
       createdAt
     }
     ${PetitionFieldReference.fragments.PetitionField}
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,
 };

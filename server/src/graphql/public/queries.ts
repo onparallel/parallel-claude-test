@@ -9,9 +9,13 @@ export const accessQuery = queryField("access", {
   nullable: true,
   authorize: fetchPetitionAccess("keycode"),
   resolve: async (root, args, ctx) => {
-    await ctx.petitions.createEvent(ctx.access!.petition_id, "ACCESS_OPENED", {
-      petition_access_id: ctx.access!.id,
-    });
+    await ctx.petitions.createEvent_old(
+      ctx.access!.petition_id,
+      "ACCESS_OPENED",
+      {
+        petition_access_id: ctx.access!.id,
+      }
+    );
     return ctx.access!;
   },
 });
