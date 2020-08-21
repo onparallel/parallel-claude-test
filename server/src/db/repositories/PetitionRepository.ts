@@ -65,10 +65,19 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at")
   );
 
-  async userHasAccessToPetitions(userId: number, petitionIds: number[]) {
+  async userHasAccessToPetitions(
+    userId: number,
+    petitionIds: number[],
+    permissionTypes?: PetitionUserPermissionType[]
+  ) {
     const [{ count }] = await this.from("petition_user")
       .where({ user_id: userId })
       .whereIn("petition_id", petitionIds)
+      .mmodify((q) => {
+        if (permissionTypes) {
+          q.whereIn("permission_type", permissionTypes);
+        }
+      })
       .select(this.count());
     return count === new Set(petitionIds).size;
   }
@@ -1850,11 +1859,11 @@ export class PetitionRepository extends BaseRepository {
     petitionIds.forEach((petitionId) => {
       userIds.forEach((userId) => {
         batch.push({
-          petition_id: petitionId,
-          user_id: userId,
-          permission_type: permissionType,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
+        petition_id: petitionId,
+        user_id: userId,
+        permission_type: permissionType,
+        created_by: `User:${user.id}`,
+        updated_by: `User:${user.id}`,
         });
       });
     });

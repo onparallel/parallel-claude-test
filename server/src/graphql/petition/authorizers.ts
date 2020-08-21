@@ -2,12 +2,16 @@ import { FieldAuthorizeResolver } from "@nexus/schema";
 import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { Arg } from "../helpers/authorize";
 import { unMaybeArray } from "../../util/arrays";
+import { PetitionUserPermissionType } from "../../db/__types";
 
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string | string[]>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argName: TArg,
+  permissionTypes?: PetitionUserPermissionType[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       const { ids: petitionIds } = fromGlobalIds(
@@ -17,7 +21,11 @@ export function userHasAccessToPetitions<
       if (petitionIds.length === 0) {
         return true;
       }
-      return ctx.petitions.userHasAccessToPetitions(ctx.user!.id, petitionIds);
+      return ctx.petitions.userHasAccessToPetitions(
+        ctx.user!.id,
+        petitionIds,
+        permissionTypes
+      );
     } catch {}
     return false;
   };

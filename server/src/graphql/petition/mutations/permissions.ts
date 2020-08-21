@@ -1,10 +1,7 @@
 import { mutationField, idArg, arg } from "@nexus/schema";
 import { chain, and, authenticate } from "../../helpers/authorize";
 import { userHasAccessToPetitions } from "../authorizers";
-import {
-  userHasAccessToUsers,
-  userHasPermissionOnPetitions,
-} from "./authorizers";
+import { userHasAccessToUsers } from "./authorizers";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validateAnd } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
@@ -19,9 +16,8 @@ export const transferPetitionOwnership = mutationField(
     authorize: chain(
       authenticate(),
       and(
-        userHasAccessToPetitions("petitionIds"),
-        userHasAccessToUsers("userId"),
-        userHasPermissionOnPetitions("petitionIds", ["OWNER"])
+        userHasAccessToPetitions("petitionIds", ["OWNER"]),
+        userHasAccessToUsers("userId")
       )
     ),
     args: {

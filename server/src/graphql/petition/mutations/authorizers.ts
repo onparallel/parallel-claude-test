@@ -29,29 +29,3 @@ export function userHasAccessToUsers<
     return false;
   };
 }
-
-export function userHasPermissionOnPetitions<
-  TypeName extends string,
-  FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string | string[]>
->(
-  argName: TArg1,
-  roles: MaybeArray<PetitionUserPermissionType>
-): FieldAuthorizeResolver<TypeName, FieldName> {
-  return async (_, args, ctx) => {
-    try {
-      const { ids: petitionIds } = fromGlobalIds(
-        unMaybeArray(args[argName]),
-        "Petition"
-      );
-      const myPermissions = (
-        await ctx.petitions.loadUserPermissions(petitionIds)
-      )
-        .flat()
-        .filter((p) => p.user_id === ctx.user!.id);
-
-      return myPermissions.every((p) => roles.includes(p.permission_type));
-    } catch {}
-    return false;
-  };
-}
