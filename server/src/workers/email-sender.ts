@@ -1,14 +1,12 @@
-import { createQueueWorker } from "./helpers/createQueueWorker";
-import { EmailSenderWorkerPayload, EmailType } from "./emails/types";
-import { build } from "./emails/builder";
 import { unMaybeArray } from "../util/arrays";
+import { EmailSenderWorkerPayload, build } from "./emails/builder";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
-createQueueWorker<EmailSenderWorkerPayload<EmailType>>(
+createQueueWorker<EmailSenderWorkerPayload>(
   "email-sender",
-  async ({ type, payload }, context) => {
-    const builtEmails = await build({ type, payload }, context);
-    const emails = unMaybeArray(builtEmails);
-    for (const email of emails) {
+  async (payload, context) => {
+    const emails = await build(payload, context);
+    for (const email of unMaybeArray(emails)) {
       if (email) {
         const result = await context.smtp.sendEmail({
           from: email.from,

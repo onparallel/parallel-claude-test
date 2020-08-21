@@ -1,16 +1,14 @@
-import { EmailPayload } from "./types";
-import { WorkerContext } from "../../context";
-import { EmailLog } from "../../db/__types";
-import { buildEmail } from "../../emails/buildEmail";
-import { toGlobalId } from "../../util/globalId";
 import { pick } from "remeda";
-import { buildFrom } from "../../emails/utils/buildFrom";
+import { WorkerContext } from "../../context";
+import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/components/PetitionCompleted";
+import { buildFrom } from "../../emails/utils/buildFrom";
+import { toGlobalId } from "../../util/globalId";
 
 export async function petitionCompleted(
-  payload: EmailPayload["petition-completed"],
+  payload: { petition_access_id: number },
   context: WorkerContext
-): Promise<EmailLog | undefined> {
+) {
   const access = await context.petitions.loadAccess(payload.petition_access_id);
   if (!access) {
     throw new Error(`Access not found for id ${payload.petition_access_id}`);

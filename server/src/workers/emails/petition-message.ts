@@ -1,15 +1,13 @@
-import { WorkerContext } from "../../context";
 import { pick } from "remeda";
-import { EmailPayload } from "./types";
+import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import { buildFrom } from "../../emails/utils/buildFrom";
 import PetitionMessage from "../../emails/components/PetitionMessage";
-import { EmailLog } from "../../db/__types";
+import { buildFrom } from "../../emails/utils/buildFrom";
 
 export async function petitionMessage(
-  payload: EmailPayload["petition-message"],
+  payload: { petition_message_id: number },
   context: WorkerContext
-): Promise<EmailLog | undefined> {
+) {
   const message = await context.petitions.loadMessage(
     payload.petition_message_id
   );

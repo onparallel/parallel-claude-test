@@ -1,19 +1,23 @@
+import { groupBy, pick, sortBy, uniq } from "remeda";
 import { WorkerContext } from "../../context";
-import { pick, uniq, groupBy, sortBy } from "remeda";
-import { EmailPayload } from "./types";
-import { buildEmail } from "../../emails/buildEmail";
-import { buildFrom } from "../../emails/utils/buildFrom";
-import PetitionCommentsContactNotification from "../../emails/components/PetitionCommentsContactNotification";
-import { isDefined } from "../../util/remedaExtensions";
 import { EmailLog } from "../../db/__types";
+import { buildEmail } from "../../emails/buildEmail";
+import PetitionCommentsContactNotification from "../../emails/components/PetitionCommentsContactNotification";
+import { buildFrom } from "../../emails/utils/buildFrom";
+import { isDefined } from "../../util/remedaExtensions";
 
 /*
   from user to petition contacts
 */
 export async function commentsContactNotification(
-  payload: EmailPayload["comments-contact-notification"],
+  payload: {
+    petition_id: number;
+    user_id: number;
+    petition_access_ids: number[];
+    petition_field_comment_ids: number[];
+  },
   context: WorkerContext
-): Promise<EmailLog[]> {
+) {
   const petition = await context.petitions.loadPetition(payload.petition_id);
   if (!petition) {
     throw new Error(
@@ -95,5 +99,5 @@ export async function commentsContactNotification(
     }
   }
 
-  return Promise.all(emails);
+  return emails;
 }

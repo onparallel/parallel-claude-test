@@ -1,15 +1,13 @@
-import { WorkerContext } from "../../context";
 import { pick } from "remeda";
-import { EmailPayload } from "./types";
+import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import { buildFrom } from "../../emails/utils/buildFrom";
 import PetitionReminder from "../../emails/components/PetitionReminder";
-import { EmailLog } from "../../db/__types";
+import { buildFrom } from "../../emails/utils/buildFrom";
 
 export async function petitionReminder(
-  payload: EmailPayload["petition-reminder"],
+  payload: { petition_reminder_id: number },
   context: WorkerContext
-): Promise<EmailLog | undefined> {
+) {
   const reminderId = payload.petition_reminder_id;
   const reminder = await context.petitions.loadReminder(reminderId);
   if (!reminder) {

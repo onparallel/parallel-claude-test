@@ -1,20 +1,24 @@
+import { groupBy, pick, sortBy, uniq } from "remeda";
 import { WorkerContext } from "../../context";
-import { pick, uniq, groupBy, sortBy } from "remeda";
-import { EmailPayload } from "./types";
-import { buildEmail } from "../../emails/buildEmail";
-import { toGlobalId } from "../../util/globalId";
-import { buildFrom } from "../../emails/utils/buildFrom";
-import PetitionCommentsUserNotification from "../../emails/components/PetitionCommentsUserNotification";
-import { isDefined } from "../../util/remedaExtensions";
 import { EmailLog } from "../../db/__types";
+import { buildEmail } from "../../emails/buildEmail";
+import PetitionCommentsUserNotification from "../../emails/components/PetitionCommentsUserNotification";
+import { buildFrom } from "../../emails/utils/buildFrom";
+import { toGlobalId } from "../../util/globalId";
+import { isDefined } from "../../util/remedaExtensions";
 
 /*
   from contact to all subscribed users
 */
 export async function commentsUserNotification(
-  payload: EmailPayload["comments-user-notification"],
+  payload: {
+    petition_id: number;
+    petition_access_id: number;
+    user_ids: number[];
+    petition_field_comment_ids: number[];
+  },
   context: WorkerContext
-): Promise<EmailLog[]> {
+) {
   const petition = await context.petitions.loadPetition(payload.petition_id);
   if (!petition) {
     throw new Error(
@@ -98,5 +102,5 @@ export async function commentsUserNotification(
     emails.push(email);
   }
 
-  return Promise.all(emails);
+  return emails;
 }
