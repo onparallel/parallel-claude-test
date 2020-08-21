@@ -44,18 +44,6 @@ export function buildConfig() {
       "email-sender": Object.freeze({
         endpoint: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
       }),
-      "message-email": Object.freeze({
-        endpoint: process.env.WORKERS_MESSAGE_EMAIL_ENDPOINT!,
-      }),
-      "reminder-email": Object.freeze({
-        endpoint: process.env.WORKERS_REMINDER_EMAIL_ENDPOINT!,
-      }),
-      "completed-email": Object.freeze({
-        endpoint: process.env.WORKERS_COMPLETED_EMAIL_ENDPOINT!,
-      }),
-      "comments-email": Object.freeze({
-        endpoint: process.env.WORKERS_COMMENTS_EMAIL_ENDPOINT!,
-      }),
       "email-events": Object.freeze({
         endpoint: process.env.WORKERS_EMAIL_EVENTS_ENDPOINT!,
       }),

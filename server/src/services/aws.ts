@@ -4,6 +4,9 @@ import AWS from "aws-sdk";
 import contentDisposition from "content-disposition";
 import { chunk } from "remeda";
 import { LOGGER, Logger } from "./logger";
+import { EmailPayload } from "../workers/emails/types";
+import { MaybeArray } from "../util/types";
+import { unMaybeArray } from "../util/arrays";
 
 @injectable()
 export class Aws {
@@ -135,39 +138,49 @@ export class Aws {
       .createReadStream();
   }
 
+  private async enqueueEmail<T extends keyof EmailPayload>(
+    type: T,
+    data: MaybeArray<EmailPayload[T] & { id: string }>
+  ) {
+    const payloads = unMaybeArray(data);
+    await this.enqueueMessages(
+      "email-sender",
+      payloads.map((p) => ({
+        id: p.id,
+        body: { type, payload: p },
+        groupId: p.id,
+      }))
+    );
+  }
+
+  private buildQueueId(prefix: string, ids: number[]) {
+    return `${prefix}-${ids.join("-")}`;
+  }
+
   async enqueuePetitionMessages(messageIds: number[]) {
-    return await this.enqueueMessages(
-      "message-email",
+    return await this.enqueueEmail(
+      "petition-message",
       messageIds.map((id) => ({
-        id: `PetitionMessage-${id}`,
-        body: { petition_message_id: id },
-        groupId: `PetitionMessage-${id}`,
+        id: this.buildQueueId("PetitionMessage", [id]),
+        petition_message_id: id,
       }))
     );
   }
 
   async enqueueReminders(ids: number[]) {
-    return await this.enqueueMessages(
-      "reminder-email",
+    return await this.enqueueEmail(
+      "petition-reminder",
       ids.map((id) => ({
-        id: `PetitionReminder-${id}`,
-        body: { petition_reminder_id: id },
-        groupId: `PetitionReminder-${id}`,
+        id: this.buildQueueId("PetitionReminder", [id]),
+        petition_reminder_id: id,
       }))
     );
   }
 
-  async enqueueEmail(id: number) {
-    await this.enqueueMessages("email-sender", {
-      body: { email_log_id: id },
-      groupId: `EmailLog-${id}`,
-    });
-  }
-
   async enqueuePetitionCompleted(accessId: number) {
-    await this.enqueueMessages("completed-email", {
-      body: { petition_access_id: accessId },
-      groupId: `PetitionAccess-${accessId}`,
+    return await this.enqueueEmail("petition-completed", {
+      id: this.buildQueueId("PetitionAccess", [accessId]),
+      petition_access_id: accessId,
     });
   }
 
@@ -177,15 +190,15 @@ export class Aws {
     accessIds: number[],
     commentIds: number[]
   ) {
-    await this.enqueueMessages("comments-email", {
-      body: {
-        type: "CONTACT_NOTIFICATION",
-        petition_id: petitionId,
-        user_id: userId,
-        petition_access_ids: accessIds,
-        petition_field_comment_ids: commentIds,
-      },
-      groupId: `PetitionFieldComment-${commentIds.join(",")}`,
+    return await this.enqueueEmail("comments-contact-notification", {
+      id: this.buildQueueId("PetitionFieldCommentContact", [
+        ...commentIds,
+        ...accessIds,
+      ]),
+      petition_id: petitionId,
+      user_id: userId,
+      petition_access_ids: accessIds,
+      petition_field_comment_ids: commentIds,
     });
   }
 
@@ -195,15 +208,15 @@ export class Aws {
     userIds: number[],
     commentIds: number[]
   ) {
-    await this.enqueueMessages("comments-email", {
-      body: {
-        type: "USER_NOTIFICATION",
-        petition_id: petitionId,
-        petition_access_id: accessId,
-        user_ids: userIds,
-        petition_field_comment_ids: commentIds,
-      },
-      groupId: `PetitionFieldComment-${commentIds.join(",")}`,
+    return await this.enqueueEmail("comments-user-notification", {
+      id: this.buildQueueId("PetitionFieldCommentUser", [
+        ...commentIds,
+        ...userIds,
+      ]),
+      petition_id: petitionId,
+      petition_access_id: accessId,
+      user_ids: userIds,
+      petition_field_comment_ids: commentIds,
     });
   }
 }
