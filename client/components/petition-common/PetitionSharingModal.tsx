@@ -1,4 +1,5 @@
-import { gql, useQuery, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, useQuery } from "@apollo/client";
+import { getOperationName } from "@apollo/client/utilities";
 import {
   Avatar,
   Box,
@@ -31,14 +32,15 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
+  PetitionActivityDocument,
   PetitionSharingModal_PetitionUserPermissionsQuery,
   PetitionSharingModal_PetitionUserPermissionsQueryVariables,
+  PetitionSharingModal_searchUsersQuery,
+  PetitionSharingModal_searchUsersQueryVariables,
   PetitionSharingModal_UserFragment,
   usePetitionSharingModal_addPetitionUserPermissionMutation,
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
-  PetitionSharingModal_searchUsersQuery,
-  PetitionSharingModal_searchUsersQueryVariables,
 } from "@parallel/graphql/__types";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -48,7 +50,6 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { Spacer } from "../common/Spacer";
 import { UserSelect, UserSelectSelection } from "../common/UserSelect";
 import { UserPermissionType } from "./UserPermissionType";
-import { PetitionActivityTimeline } from "../petition-activity/PetitionActivityTimeline";
 
 export type PetitionSharingModalProps = Omit<ModalProps, "children"> & {
   userId: string;
@@ -94,6 +95,7 @@ export function PetitionSharingModal({
           userIds: users.map((u) => u.id),
           permissionType: "WRITE",
         },
+        refetchQueries: [getOperationName(PetitionActivityDocument)!],
       });
       props.onClose();
       toast({
@@ -101,10 +103,6 @@ export function PetitionSharingModal({
           id: "petition-sharing.succes-title",
           defaultMessage: "Petition shared",
         }),
-        // description: intl.formatMessage({
-        //   id: "petition-sharing.succes-message",
-        //   defaultMessage: "Petition suc",
-        // }),
         status: "success",
         duration: 3000,
         isClosable: true,
@@ -327,10 +325,8 @@ PetitionSharingModal.fragments = {
             ...PetitionSharingModal_User
           }
         }
-        ...PetitionActivityTimeline_Petition
       }
       ${this.User}
-      ${PetitionActivityTimeline.fragments.Petition}
     `;
   },
   get User() {
@@ -456,6 +452,7 @@ function useRemoveUserPermission() {
         await confirmRemoveUserPermission({ user });
         await removePetitionUserPermission({
           variables: { petitionId, userId: user.id },
+          refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
       } catch {}
     },
@@ -512,6 +509,7 @@ function useTransferPetitionOwnership() {
         await confirmTransferPetitionOwnership({ user });
         await transferPetitionOwnership({
           variables: { petitionId, userId: user.id },
+          refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
       } catch {}
     },
