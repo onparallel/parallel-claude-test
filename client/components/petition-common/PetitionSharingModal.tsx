@@ -48,6 +48,7 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { Spacer } from "../common/Spacer";
 import { UserSelect, UserSelectSelection } from "../common/UserSelect";
 import { UserPermissionType } from "./UserPermissionType";
+import { PetitionActivityTimeline } from "../petition-activity/PetitionActivityTimeline";
 
 export type PetitionSharingModalProps = Omit<ModalProps, "children"> & {
   userId: string;
@@ -327,8 +328,10 @@ PetitionSharingModal.fragments = {
             ...PetitionSharingModal_User
           }
         }
+        ...PetitionActivityTimeline_Petition
       }
       ${this.User}
+      ${PetitionActivityTimeline.fragments.Petition}
     `;
   },
   get User() {

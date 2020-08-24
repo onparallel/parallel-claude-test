@@ -1766,7 +1766,7 @@ export type PetitionSharingModal_PetitionFragment = {
         "permissionType"
       > & { user: { __typename?: "User" } & PetitionSharingModal_UserFragment }
     >;
-  };
+  } & PetitionActivityTimeline_PetitionFragment;
 
 export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -3117,205 +3117,6 @@ export const PetitionSharingModal_UserFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 `;
-export const PetitionSharingModal_PetitionFragmentDoc = gql`
-  fragment PetitionSharingModal_Petition on Petition {
-    id
-    name
-    userPermissions {
-      permissionType
-      user {
-        ...PetitionSharingModal_User
-      }
-    }
-  }
-  ${PetitionSharingModal_UserFragmentDoc}
-`;
-export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeField_PetitionField on PetitionField {
-    id
-    type
-    title
-    description
-    optional
-    multiple
-    isFixed
-  }
-`;
-export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
-  fragment PetitionComposeFieldList_Petition on Petition {
-    fields {
-      ...PetitionComposeField_PetitionField
-    }
-  }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-`;
-export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
-  fragment PetitionComposeMessageEditor_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
-export const Contact_PetitionAccessFragmentDoc = gql`
-  fragment Contact_PetitionAccess on PetitionAccess {
-    id
-    petition {
-      id
-      name
-      status
-      deadline
-      progress {
-        validated
-        replied
-        optional
-        total
-      }
-    }
-  }
-`;
-export const Contact_ContactFragmentDoc = gql`
-  fragment Contact_Contact on Contact {
-    id
-    email
-    fullName
-    firstName
-    lastName
-    accesses(limit: 100) {
-      items {
-        ...Contact_PetitionAccess
-      }
-    }
-  }
-  ${Contact_PetitionAccessFragmentDoc}
-`;
-export const UserMenu_UserFragmentDoc = gql`
-  fragment UserMenu_User on User {
-    fullName
-  }
-`;
-export const AppLayoutNavbar_UserFragmentDoc = gql`
-  fragment AppLayoutNavbar_User on User {
-    ...UserMenu_User
-  }
-  ${UserMenu_UserFragmentDoc}
-`;
-export const OnboardingTour_UserFragmentDoc = gql`
-  fragment OnboardingTour_User on User {
-    onboardingStatus
-  }
-`;
-export const AppLayout_UserFragmentDoc = gql`
-  fragment AppLayout_User on User {
-    id
-    ...AppLayoutNavbar_User
-    ...OnboardingTour_User
-  }
-  ${AppLayoutNavbar_UserFragmentDoc}
-  ${OnboardingTour_UserFragmentDoc}
-`;
-export const Contact_UserFragmentDoc = gql`
-  fragment Contact_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-`;
-export const Contacts_ContactsListFragmentDoc = gql`
-  fragment Contacts_ContactsList on ContactPagination {
-    items {
-      id
-      fullName
-      firstName
-      lastName
-      email
-      createdAt
-    }
-    totalCount
-  }
-`;
-export const Contacts_UserFragmentDoc = gql`
-  fragment Contacts_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-`;
-export const PetitionSettingsModal_PetitionFragmentDoc = gql`
-  fragment PetitionSettingsModal_Petition on Petition {
-    id
-    status
-    locale
-    deadline
-  }
-`;
-export const ConfirmDeletePetitionsDialog_PetitionFragmentDoc = gql`
-  fragment ConfirmDeletePetitionsDialog_Petition on Petition {
-    id
-    name
-  }
-`;
-export const PetitionHeader_PetitionFragmentDoc = gql`
-  fragment PetitionHeader_Petition on Petition {
-    id
-    name
-    locale
-    status
-    updatedAt
-    ...PetitionSettingsModal_Petition
-    ...ConfirmDeletePetitionsDialog_Petition
-  }
-  ${PetitionSettingsModal_PetitionFragmentDoc}
-  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
-`;
-export const PetitionLayout_PetitionFragmentDoc = gql`
-  fragment PetitionLayout_Petition on Petition {
-    id
-    name
-    ...PetitionHeader_Petition
-  }
-  ${PetitionHeader_PetitionFragmentDoc}
-`;
-export const ContactLink_ContactFragmentDoc = gql`
-  fragment ContactLink_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
-export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
-  fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
-    offset
-    time
-    timezone
-    weekdaysOnly
-  }
-`;
-export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
-  fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
-    id
-    contact {
-      ...ContactLink_Contact
-    }
-    status
-    nextReminderAt
-    remindersLeft
-    reminderCount
-    remindersActive
-    remindersConfig {
-      ...PetitionAccessTable_PetitionAccessRemindersConfig
-    }
-    createdAt
-  }
-  ${ContactLink_ContactFragmentDoc}
-  ${PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc}
-`;
-export const PetitionAccessTable_PetitionFragmentDoc = gql`
-  fragment PetitionAccessTable_Petition on Petition {
-    status
-    accesses {
-      ...PetitionAccessTable_PetitionAccess
-    }
-  }
-  ${PetitionAccessTable_PetitionAccessFragmentDoc}
-`;
 export const UserReference_UserFragmentDoc = gql`
   fragment UserReference_User on User {
     id
@@ -3330,6 +3131,13 @@ export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
     createdAt
   }
   ${UserReference_UserFragmentDoc}
+`;
+export const ContactLink_ContactFragmentDoc = gql`
+  fragment ContactLink_Contact on Contact {
+    id
+    fullName
+    email
+  }
 `;
 export const TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc = gql`
   fragment TimelinePetitionCompletedEvent_PetitionCompletedEvent on PetitionCompletedEvent {
@@ -3700,6 +3508,200 @@ export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionActivityTimeline_PetitionEventFragmentDoc}
+`;
+export const PetitionSharingModal_PetitionFragmentDoc = gql`
+  fragment PetitionSharingModal_Petition on Petition {
+    id
+    name
+    userPermissions {
+      permissionType
+      user {
+        ...PetitionSharingModal_User
+      }
+    }
+    ...PetitionActivityTimeline_Petition
+  }
+  ${PetitionSharingModal_UserFragmentDoc}
+  ${PetitionActivityTimeline_PetitionFragmentDoc}
+`;
+export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
+  fragment PetitionComposeField_PetitionField on PetitionField {
+    id
+    type
+    title
+    description
+    optional
+    multiple
+    isFixed
+  }
+`;
+export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
+  fragment PetitionComposeFieldList_Petition on Petition {
+    fields {
+      ...PetitionComposeField_PetitionField
+    }
+  }
+  ${PetitionComposeField_PetitionFieldFragmentDoc}
+`;
+export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
+  fragment PetitionComposeMessageEditor_Contact on Contact {
+    id
+    fullName
+    email
+  }
+`;
+export const Contact_PetitionAccessFragmentDoc = gql`
+  fragment Contact_PetitionAccess on PetitionAccess {
+    id
+    petition {
+      id
+      name
+      status
+      deadline
+      progress {
+        validated
+        replied
+        optional
+        total
+      }
+    }
+  }
+`;
+export const Contact_ContactFragmentDoc = gql`
+  fragment Contact_Contact on Contact {
+    id
+    email
+    fullName
+    firstName
+    lastName
+    accesses(limit: 100) {
+      items {
+        ...Contact_PetitionAccess
+      }
+    }
+  }
+  ${Contact_PetitionAccessFragmentDoc}
+`;
+export const UserMenu_UserFragmentDoc = gql`
+  fragment UserMenu_User on User {
+    fullName
+  }
+`;
+export const AppLayoutNavbar_UserFragmentDoc = gql`
+  fragment AppLayoutNavbar_User on User {
+    ...UserMenu_User
+  }
+  ${UserMenu_UserFragmentDoc}
+`;
+export const OnboardingTour_UserFragmentDoc = gql`
+  fragment OnboardingTour_User on User {
+    onboardingStatus
+  }
+`;
+export const AppLayout_UserFragmentDoc = gql`
+  fragment AppLayout_User on User {
+    id
+    ...AppLayoutNavbar_User
+    ...OnboardingTour_User
+  }
+  ${AppLayoutNavbar_UserFragmentDoc}
+  ${OnboardingTour_UserFragmentDoc}
+`;
+export const Contact_UserFragmentDoc = gql`
+  fragment Contact_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+export const Contacts_ContactsListFragmentDoc = gql`
+  fragment Contacts_ContactsList on ContactPagination {
+    items {
+      id
+      fullName
+      firstName
+      lastName
+      email
+      createdAt
+    }
+    totalCount
+  }
+`;
+export const Contacts_UserFragmentDoc = gql`
+  fragment Contacts_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+export const PetitionSettingsModal_PetitionFragmentDoc = gql`
+  fragment PetitionSettingsModal_Petition on Petition {
+    id
+    status
+    locale
+    deadline
+  }
+`;
+export const ConfirmDeletePetitionsDialog_PetitionFragmentDoc = gql`
+  fragment ConfirmDeletePetitionsDialog_Petition on Petition {
+    id
+    name
+  }
+`;
+export const PetitionHeader_PetitionFragmentDoc = gql`
+  fragment PetitionHeader_Petition on Petition {
+    id
+    name
+    locale
+    status
+    updatedAt
+    ...PetitionSettingsModal_Petition
+    ...ConfirmDeletePetitionsDialog_Petition
+  }
+  ${PetitionSettingsModal_PetitionFragmentDoc}
+  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
+`;
+export const PetitionLayout_PetitionFragmentDoc = gql`
+  fragment PetitionLayout_Petition on Petition {
+    id
+    name
+    ...PetitionHeader_Petition
+  }
+  ${PetitionHeader_PetitionFragmentDoc}
+`;
+export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
+  fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
+    offset
+    time
+    timezone
+    weekdaysOnly
+  }
+`;
+export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
+  fragment PetitionAccessTable_PetitionAccess on PetitionAccess {
+    id
+    contact {
+      ...ContactLink_Contact
+    }
+    status
+    nextReminderAt
+    remindersLeft
+    reminderCount
+    remindersActive
+    remindersConfig {
+      ...PetitionAccessTable_PetitionAccessRemindersConfig
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+  ${PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc}
+`;
+export const PetitionAccessTable_PetitionFragmentDoc = gql`
+  fragment PetitionAccessTable_Petition on Petition {
+    status
+    accesses {
+      ...PetitionAccessTable_PetitionAccess
+    }
+  }
+  ${PetitionAccessTable_PetitionAccessFragmentDoc}
 `;
 export const PetitionActivity_PetitionFragmentDoc = gql`
   fragment PetitionActivity_Petition on Petition {
