@@ -33,7 +33,7 @@ export function TimelineMessageCancelledEvent({
         id="timeline.message-cancelled-description"
         defaultMessage="{same, select, true {You} other {{user}}} cancelled a scheduled a message {subject, select, null {without subject} other {with subject <b>{subject}</b>}} to {contact} {timeAgo}"
         values={{
-          same: userId === user!.id,
+          same: userId === user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={user} />,
           subject: message.emailSubject,

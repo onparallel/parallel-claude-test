@@ -40,7 +40,7 @@ export function TimelineMessageSentEvent({
               id="timeline.message-sent-description-scheduled"
               defaultMessage="A message scheduled by {same, select, true {you} other {{user}}} {subject, select, null {without subject} other {with subject <b>{subject}</b>}} was sent to {contact} {timeAgo}"
               values={{
-                same: userId === message.sender!.id,
+                same: userId === message.sender?.id,
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 user: <UserReference user={message.sender} />,
                 subject: message.emailSubject,

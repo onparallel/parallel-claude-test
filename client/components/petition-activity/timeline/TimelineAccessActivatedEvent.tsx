@@ -33,7 +33,7 @@ export function TimelineAccessActivatedEvent({
         id="timeline.access-activated-description"
         defaultMessage="{same, select, true {You} other {{user}}} gave access to {contact} {timeAgo}"
         values={{
-          same: userId === event.user.id,
+          same: userId === event.user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           contact: event.access.contact ? (

@@ -60,7 +60,7 @@ export function TimelineCommentPublishedEvent({
                       <DeletedContact />
                     )
                   ) : (
-                    <UserReference user={author} />
+                    <UserReference user={author as any} />
                   ),
               }}
             />
