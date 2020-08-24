@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
-import { groupBy, indexBy, omit, sortBy, pick } from "remeda";
+import { groupBy, indexBy, omit, sortBy } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -2020,13 +2020,11 @@ export class PetitionRepository extends BaseRepository {
           deleted_at: null,
           permission_type: "OWNER",
         })
-        .update(
-          {
-            permission_type: "WRITE",
-            updated_at: this.now(),
-            updated_by: `User:${user.id}`,
-          } 
-        );
+        .update({
+          permission_type: "WRITE",
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        });
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
