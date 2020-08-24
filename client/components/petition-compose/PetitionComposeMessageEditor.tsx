@@ -70,7 +70,6 @@ export const PetitionComposeMessageEditor = Object.assign(
     }, []);
 
     function handleRemindersChange(value: RemindersConfig | null) {
-      console.log(value);
       setRemindersConfig(value);
       updateRemindersConfig({
         remindersConfig: value ? omit(value, ["__typename"]) : value,

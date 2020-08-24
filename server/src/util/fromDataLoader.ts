@@ -7,7 +7,7 @@ export interface FromDataLoaderOptions {
 
 export interface Loader<K, V> {
   (id: K, opts?: FromDataLoaderOptions): Promise<V>;
-  (ids: K[], opts?: FromDataLoaderOptions): Promise<Array<V>>;
+  (ids: K[] | readonly K[], opts?: FromDataLoaderOptions): Promise<Array<V>>;
   dataloader: DataLoader<K, V>;
 }
 

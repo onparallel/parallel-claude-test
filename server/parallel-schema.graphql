@@ -189,6 +189,12 @@ type Mutation {
   Adds permissions on given petitions and users
   """
   addPetitionUserPermission(
+    message: String
+
+    """
+    Wether to notify the user via email or not.
+    """
+    notify: Boolean = false
     permissionType: PetitionUserPermissionTypeRW!
     petitionIds: [ID!]!
     userIds: [ID!]!

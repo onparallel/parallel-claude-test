@@ -2,241 +2,221 @@
   {
     "term": "closing.sender",
     "definition": "The Parallel team",
-    "context": "The Parallel team",
-    "reference": "src/emails/common/texts.tsx:12:25"
+    "context": "The Parallel team"
   },
   {
     "term": "closing.text",
     "definition": "Regards,",
-    "context": "Regards,",
-    "reference": "src/emails/common/texts.tsx:8:25"
+    "context": "Regards,"
   },
   {
     "term": "disclaimer",
     "definition": "This is an email sent via Parallel from the verified account {email}",
-    "context": "This is an email sent via Parallel from the verified account {email}",
-    "reference": "src/emails/common/texts.tsx:87:28"
+    "context": "This is an email sent via Parallel from the verified account {email}"
   },
   {
     "term": "footer.slogan",
     "definition": "Work better with",
-    "context": "Work better with",
-    "reference": "src/emails/common/Layout.tsx:84:14"
+    "context": "Work better with"
   },
   {
     "term": "forgot-password.click-to-reset",
     "definition": "Click on this link to reset your password:",
-    "context": "Click on this link to reset your password:",
-    "reference": "src/emails/components/ForgotPassword.tsx:48:14"
+    "context": "Click on this link to reset your password:"
   },
   {
     "term": "forgot-password.ignore-text",
     "definition": "If you didn't request to change your password please ignore this email.",
-    "context": "If you didn't request to change your password please ignore this email.",
-    "reference": "src/emails/components/ForgotPassword.tsx:60:14"
+    "context": "If you didn't request to change your password please ignore this email."
   },
   {
     "term": "forgot-password.reset-button",
     "definition": "Reset my password",
-    "context": "Reset my password",
-    "reference": "src/emails/components/ForgotPassword.tsx:54:14"
+    "context": "Reset my password"
   },
   {
     "term": "from.parallel-team",
     "definition": "Parallel team",
-    "context": "Parallel team",
-    "reference": "src/emails/components/Welcome.tsx:17:30"
+    "context": "Parallel team"
   },
   {
     "term": "from.via-parallel",
     "definition": "{senderName} (via Parallel)",
-    "context": "{senderName} (via Parallel)",
-    "reference": "src/emails/components/PetitionReminder.tsx:29:30"
+    "context": "{senderName} (via Parallel)"
   },
   {
     "term": "generic.complete-information-button",
     "definition": "Complete the information here",
-    "context": "Complete the information here",
-    "reference": "src/emails/components/PetitionReminder.tsx:182:14"
+    "context": "Complete the information here"
   },
   {
     "term": "generic.complete-information-click-link",
     "definition": "Please click the link below to complete the information.",
-    "context": "Please click the link below to complete the information.",
-    "reference": "src/emails/components/PetitionReminder.tsx:98:27"
+    "context": "Please click the link below to complete the information."
   },
   {
     "term": "generic.submit-text.with-deadline",
     "definition": "Please submit the following information before {deadline}:",
-    "context": "Please submit the following information before {deadline}:",
-    "reference": "src/emails/components/PetitionReminder.tsx:148:31"
+    "context": "Please submit the following information before {deadline}:"
   },
   {
     "term": "generic.submit-text.without-deadline",
     "definition": "Please submit the following information:",
-    "context": "Please submit the following information:",
-    "reference": "src/emails/components/PetitionReminder.tsx:160:23"
+    "context": "Please submit the following information:"
   },
   {
     "term": "generic.untitled-field",
     "definition": "Untitled field",
-    "context": "Untitled field",
-    "reference": "src/emails/common/texts.tsx:42:29"
+    "context": "Untitled field"
   },
   {
     "term": "generic.untitled-petition",
     "definition": "Untitled petition",
-    "context": "Untitled petition",
-    "reference": "src/emails/components/PetitionCompleted.tsx:117:18"
+    "context": "Untitled petition"
   },
   {
     "term": "greeting",
     "definition": "Hi{name, select, null {} other { {name}}},",
-    "context": "Hi{name, select, null {} other { {name}}},",
-    "reference": "src/emails/common/texts.tsx:20:28"
+    "context": "Hi{name, select, null {} other { {name}}},"
   },
   {
     "term": "invitation.details",
     "definition": "Your username is {email} and your temporary password is:",
-    "context": "Your username is {email} and your temporary password is:",
-    "reference": "src/emails/components/Invitation.tsx:52:14"
+    "context": "Your username is {email} and your temporary password is:"
   },
   {
     "term": "invitation.login-button",
     "definition": "Log in",
-    "context": "Log in",
-    "reference": "src/emails/components/Invitation.tsx:68:14"
+    "context": "Log in"
   },
   {
     "term": "invitation.website",
     "definition": "You can login through our website.",
-    "context": "You can login through our website.",
-    "reference": "src/emails/components/Invitation.tsx:62:14"
+    "context": "You can login through our website."
   },
   {
     "term": "layout.privacy-link",
     "definition": "Privacy",
-    "context": "Privacy",
-    "reference": "src/emails/common/Layout.tsx:127:16"
+    "context": "Privacy"
   },
   {
     "term": "layout.terms-and-conditions-link",
     "definition": "Terms and conditions",
-    "context": "Terms and conditions",
-    "reference": "src/emails/common/Layout.tsx:117:16"
+    "context": "Terms and conditions"
   },
   {
     "term": "new-petition.text",
     "definition": "{senderName} ({senderEmail}) sent you a petition:",
-    "context": "{senderName} ({senderEmail}) sent you a petition:",
-    "reference": "src/emails/components/PetitionMessage.tsx:126:14"
+    "context": "{senderName} ({senderEmail}) sent you a petition:"
   },
   {
     "term": "petition-comments-contact-notification.access-button",
     "definition": "See the comments here",
-    "context": "See the comments here",
-    "reference": "src/emails/components/PetitionCommentsContactNotification.tsx:105:14"
+    "context": "See the comments here"
   },
   {
     "term": "petition-comments-contact-notification.access-click-link",
     "definition": "Follow the link below link to read and reply to the comments.",
-    "context": "Follow the link below link to read and reply to the comments.",
-    "reference": "src/emails/components/PetitionCommentsContactNotification.tsx:58:27"
+    "context": "Follow the link below link to read and reply to the comments."
   },
   {
     "term": "petition-comments-contact-notification.intro-text",
     "definition": "{ name } commented on your petition:",
-    "context": "{ name } commented on your petition:",
-    "reference": "src/emails/components/PetitionCommentsContactNotification.tsx:90:14"
+    "context": "{ name } commented on your petition:"
   },
   {
     "term": "petition-comments-contact-notification.subject",
     "definition": "{ name } commented on your petition",
-    "context": "{ name } commented on your petition",
-    "reference": "src/emails/components/PetitionCommentsContactNotification.tsx:31:30"
+    "context": "{ name } commented on your petition"
   },
   {
     "term": "petition-comments-user-notification.access-button",
     "definition": "Reply to the comments here",
-    "context": "Reply to the comments here",
-    "reference": "src/emails/components/PetitionCommentsUserNotification.tsx:113:14"
+    "context": "Reply to the comments here"
   },
   {
     "term": "petition-comments-user-notification.access-click-link",
     "definition": "Follow the link below link to read and reply to the comments.",
-    "context": "Follow the link below link to read and reply to the comments.",
-    "reference": "src/emails/components/PetitionCommentsUserNotification.tsx:62:27"
+    "context": "Follow the link below link to read and reply to the comments."
   },
   {
     "term": "petition-comments-user-notification.intro-text",
     "definition": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}:",
-    "context": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}:",
-    "reference": "src/emails/components/PetitionCommentsUserNotification.tsx:95:14"
+    "context": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}:"
   },
   {
     "term": "petition-comments-user-notification.subject",
     "definition": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}",
-    "context": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}",
-    "reference": "src/emails/components/PetitionCommentsUserNotification.tsx:32:30"
+    "context": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}"
   },
   {
     "term": "petition-completed.access-button",
     "definition": "Access the information here",
-    "context": "Access the information here",
-    "reference": "src/emails/components/PetitionCompleted.tsx:128:14"
+    "context": "Access the information here"
   },
   {
     "term": "petition-completed.access-click-link",
     "definition": "Follow the link below link to access the information.",
-    "context": "Follow the link below link to access the information.",
-    "reference": "src/emails/components/PetitionCompleted.tsx:70:27"
+    "context": "Follow the link below link to access the information."
   },
   {
     "term": "petition-completed.subject",
     "definition": "Petition \"{petitionName}\" completed!",
-    "context": "Petition \"{petitionName}\" completed!",
-    "reference": "src/emails/components/PetitionCompleted.tsx:32:30"
+    "context": "Petition \"{petitionName}\" completed!"
   },
   {
     "term": "petition-completed.text",
     "definition": "{recipient} completed the petition you sent to him.",
-    "context": "{recipient} completed the petition you sent to him.",
-    "reference": "src/emails/components/PetitionCompleted.tsx:102:14"
+    "context": "{recipient} completed the petition you sent to him."
   },
   {
     "term": "petition-reminder.subject",
     "definition": "Remember that {senderName} sent you a petition",
-    "context": "Remember that {senderName} sent you a petition",
-    "reference": "src/emails/components/PetitionReminder.tsx:38:30"
+    "context": "Remember that {senderName} sent you a petition"
+  },
+  {
+    "term": "petition-sharing-notification.access-button",
+    "definition": "Access the petition here",
+    "context": "Access the petition here"
+  },
+  {
+    "term": "petition-sharing-notification.access-click-link",
+    "definition": "Follow the link below link to access it.",
+    "context": "Follow the link below link to access it."
+  },
+  {
+    "term": "petition-sharing-notification.subject",
+    "definition": "\"{petitionName}\" - Petition shared with you",
+    "context": "\"{petitionName}\" - Petition shared with you"
+  },
+  {
+    "term": "petition-sharing-notification.text",
+    "definition": "{ownerName} ({ownerEmail}) has shared the following petition with you.",
+    "context": "{ownerName} ({ownerEmail}) has shared the following petition with you."
   },
   {
     "term": "reminder.click-finalize",
     "definition": "If you already submitted all the information, click <b>Finalize</b> on the page.",
-    "context": "If you already submitted all the information, click <b>Finalize</b> on the page.",
-    "reference": "src/emails/components/PetitionReminder.tsx:171:16"
+    "context": "If you already submitted all the information, click <b>Finalize</b> on the page."
   },
   {
     "term": "reminder.text",
     "definition": "Remember that {senderName} ({senderEmail}) sent you a petition.",
-    "context": "Remember that {senderName} ({senderEmail}) sent you a petition.",
-    "reference": "src/emails/components/PetitionReminder.tsx:132:14"
+    "context": "Remember that {senderName} ({senderEmail}) sent you a petition."
   },
   {
     "term": "welcome.click-to-verify",
     "definition": "Please click the link below to verify your email address.",
-    "context": "Please click the link below to verify your email address.",
-    "reference": "src/emails/components/Welcome.tsx:65:14"
+    "context": "Please click the link below to verify your email address."
   },
   {
     "term": "welcome.greeting",
     "definition": "Welcome to Parallel!",
-    "context": "Welcome to Parallel!",
-    "reference": "src/emails/components/Welcome.tsx:59:14"
+    "context": "Welcome to Parallel!"
   },
   {
     "term": "welcome.verify-button",
     "definition": "Verify my email",
-    "context": "Verify my email",
-    "reference": "src/emails/components/Welcome.tsx:71:14"
+    "context": "Verify my email"
   }
 ]

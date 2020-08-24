@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
-import { UserSelect_ContactFragment } from "@parallel/graphql/__types";
+import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { forwardRef, memo, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { components, OptionProps } from "react-select";
@@ -11,7 +11,7 @@ import {
   UserReactSelectStyleProps,
 } from "../../utils/useReactSelectStyle";
 
-export type UserSelectSelection = UserSelect_ContactFragment;
+export type UserSelectSelection = UserSelect_UserFragment;
 
 export type UserSelectProps = Omit<
   AsyncSelectProps<UserSelectSelection>,
@@ -26,15 +26,17 @@ export type UserSelectProps = Omit<
   ) => Promise<UserSelectSelection[]>;
 };
 
+export type UserSelectInstance = AsyncSelect<UserSelectSelection>;
+
 export const UserSelect = Object.assign(
   forwardRef(function (
     { value, isInvalid, onSearchUsers, onChange, ...props }: UserSelectProps,
-    ref: Ref<AsyncSelect<UserSelectSelection>>
+    ref: Ref<UserSelectInstance>
   ) {
     const loadOptions = useCallback(
       async (search) => {
         const exclude = [];
-        for (const user of value) {
+        for (const user of value ?? []) {
           exclude.push(user.id);
         }
         return await onSearchUsers(search, exclude);

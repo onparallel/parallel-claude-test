@@ -1,9 +1,12 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { KNEX } from "../knex";
 import { Config, CONFIG } from "../../config";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import { Maybe } from "../../util/types";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
+import { KNEX } from "../knex";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
@@ -50,25 +53,26 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
-  async getOrgLogoUrl(orgId: number) {
-    const org = await this.loadOrg(orgId);
-    if (
-      org &&
-      [
-        "doctoralia",
-        "l4law",
-        "cecamagan",
-        "encomenda",
-        "cuatrecasas",
-        "cscorporateadvisors",
-        "andersen",
-        "meetmaps",
-        "treinta",
-        "iomed",
-      ].includes(org.identifier)
-    ) {
-      return `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`;
-    }
-    return null;
-  }
+  readonly getOrgLogoUrl = fromDataLoader(
+    new DataLoader<number, Maybe<string>>(async (orgIds) => {
+      const orgs = await this.loadOrg(orgIds);
+      return orgs.map((org) =>
+        org &&
+        [
+          "doctoralia",
+          "l4law",
+          "cecamagan",
+          "encomenda",
+          "cuatrecasas",
+          "cscorporateadvisors",
+          "andersen",
+          "meetmaps",
+          "treinta",
+          "iomed",
+        ].includes(org.identifier)
+          ? `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`
+          : null
+      );
+    })
+  );
 }

@@ -42,18 +42,29 @@ import {
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogOpenerProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { Spacer } from "../common/Spacer";
-import { UserSelect, UserSelectSelection } from "../common/UserSelect";
+import {
+  UserSelect,
+  UserSelectSelection,
+  UserSelectInstance,
+} from "../common/UserSelect";
 import { UserPermissionType } from "./UserPermissionType";
+import { useForm, Controller } from "react-hook-form";
 
 export type PetitionSharingModalProps = Omit<ModalProps, "children"> & {
   userId: string;
   petitionId: string;
+};
+
+type PetitionSharingModalData = {
+  users: UserSelectSelection[];
+  notify: boolean;
+  message: string;
 };
 
 export function PetitionSharingModal({
@@ -69,7 +80,18 @@ export function PetitionSharingModal({
     (up) => up.permissionType === "OWNER" && up.user.id === userId
   );
 
-  const [users, setUsers] = useState<UserSelectSelection[]>([]);
+  const { handleSubmit, register, control, getValues } = useForm<
+    PetitionSharingModalData
+  >({
+    mode: "onChange",
+    defaultValues: {
+      users: [],
+      notify: true,
+      message: "",
+    },
+  });
+  const [hasUsers, setHasUsers] = useState(false);
+
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, exclude: string[]) => {
@@ -87,33 +109,44 @@ export function PetitionSharingModal({
     addPetitionUserPermission,
   ] = usePetitionSharingModal_addPetitionUserPermissionMutation();
 
-  const handleAddUserPermissions = useCallback(async () => {
-    try {
-      await addPetitionUserPermission({
-        variables: {
-          petitionId,
-          userIds: users.map((u) => u.id),
-          permissionType: "WRITE",
-        },
-        refetchQueries: [getOperationName(PetitionActivityDocument)!],
-      });
-      props.onClose();
-      toast({
-        title: intl.formatMessage({
-          id: "petition-sharing.succes-title",
-          defaultMessage: "Petition shared",
-        }),
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch {}
-  }, [addPetitionUserPermission, users, props.onClose]);
+  const handleAddUserPermissions = useCallback(
+    handleSubmit(async ({ users, notify, message }) => {
+      try {
+        await addPetitionUserPermission({
+          variables: {
+            petitionId,
+            userIds: getValues("users").map((u) => u.id),
+            permissionType: "WRITE",
+            notify,
+            message: message || null,
+          },
+          refetchQueries: [getOperationName(PetitionActivityDocument)!],
+        });
+        props.onClose();
+        toast({
+          title: intl.formatMessage({
+            id: "petition-sharing.succes-title",
+            defaultMessage: "Petition shared",
+          }),
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch {}
+    }),
+    [addPetitionUserPermission, handleSubmit, getValues, props.onClose]
+  );
+
+  const usersRef = useRef<UserSelectInstance>(null);
 
   return (
-    <Modal {...props} size="xl">
+    <Modal {...props} size="xl" initialFocusRef={usersRef as any}>
       <ModalOverlay>
-        <ModalContent borderRadius="md">
+        <ModalContent
+          borderRadius="md"
+          as="form"
+          onSubmit={handleAddUserPermissions}
+        >
           <ModalHeader as={Stack} direction="row">
             <Circle
               role="presentation"
@@ -136,137 +169,148 @@ export function PetitionSharingModal({
               <ModalBody as={Stack}>
                 <Stack direction="row">
                   <Box flex="1">
-                    <UserSelect
-                      value={users}
-                      onChange={setUsers}
-                      onSearchUsers={handleSearchUsers}
-                      isDisabled={!isOwner}
-                      placeholder={
-                        isOwner
-                          ? intl.formatMessage({
-                              id: "petition-sharing.input-placeholder",
-                              defaultMessage:
-                                "Add users from your organization",
-                            })
-                          : intl.formatMessage({
-                              id:
-                                "petition-sharing.input-placeholder-not-owner",
-                              defaultMessage:
-                                "Only the petition owner can share it",
-                            })
-                      }
+                    <Controller
+                      name="users"
+                      control={control}
+                      rules={{ minLength: 1 }}
+                      render={({ onChange, onBlur, value }) => (
+                        <UserSelect
+                          ref={usersRef}
+                          value={value}
+                          onChange={(users: UserSelectSelection[]) => {
+                            onChange(users);
+                            setHasUsers(Boolean(users?.length));
+                          }}
+                          onBlur={onBlur}
+                          onSearchUsers={handleSearchUsers}
+                          isDisabled={!isOwner}
+                          placeholder={
+                            isOwner
+                              ? intl.formatMessage({
+                                  id: "petition-sharing.input-placeholder",
+                                  defaultMessage:
+                                    "Add users from your organization",
+                                })
+                              : intl.formatMessage({
+                                  id:
+                                    "petition-sharing.input-placeholder-not-owner",
+                                  defaultMessage:
+                                    "Only the petition owner can share it",
+                                })
+                          }
+                        />
+                      )}
                     />
                   </Box>
                   {/* PermissionTypeSelect */}
                 </Stack>
-                {users.length ? (
-                  <Stack>
-                    <Checkbox colorScheme="purple">
-                      <FormattedMessage
-                        id="petition-sharing.notify-checkbox"
-                        defaultMessage="Notify users"
-                      />
-                    </Checkbox>
-                    <GrowingTextarea
-                      maxHeight="30vh"
-                      aria-label={intl.formatMessage({
-                        id: "petition-sharing.message-placeholder",
-                        defaultMessage: "Message",
-                      })}
-                      placeholder={intl.formatMessage({
-                        id: "petition-sharing.message-placeholder",
-                        defaultMessage: "Message",
-                      })}
+                <Stack display={hasUsers ? "flex" : "none"}>
+                  <Checkbox name="notify" ref={register} colorScheme="purple">
+                    <FormattedMessage
+                      id="petition-sharing.notify-checkbox"
+                      defaultMessage="Notify users"
                     />
-                  </Stack>
-                ) : (
-                  <Stack paddingTop={2}>
-                    {userPermissions.map(({ user, permissionType }) => (
-                      <Flex key={user.id} alignItems="center">
-                        <Avatar
-                          role="presentation"
-                          name={user.fullName!}
-                          size="sm"
-                        />
-                        <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
-                          <Text isTruncated>
-                            {user.fullName}{" "}
-                            {userId === user.id ? (
-                              <Text as="span">
-                                {"("}
-                                <FormattedMessage
-                                  id="generic.you"
-                                  defaultMessage="You"
-                                />
-                                {")"}
-                              </Text>
-                            ) : null}
-                          </Text>
-                          <Text color="gray.500" isTruncated>
-                            {user.email}
-                          </Text>
+                  </Checkbox>
+                  <GrowingTextarea
+                    name="message"
+                    ref={register}
+                    maxHeight="30vh"
+                    aria-label={intl.formatMessage({
+                      id: "petition-sharing.message-placeholder",
+                      defaultMessage: "Message",
+                    })}
+                    placeholder={intl.formatMessage({
+                      id: "petition-sharing.message-placeholder",
+                      defaultMessage: "Message",
+                    })}
+                  />
+                </Stack>
+                <Stack display={hasUsers ? "none" : "flex"} paddingTop={2}>
+                  {userPermissions.map(({ user, permissionType }) => (
+                    <Flex key={user.id} alignItems="center">
+                      <Avatar
+                        role="presentation"
+                        name={user.fullName!}
+                        size="sm"
+                      />
+                      <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                        <Text isTruncated>
+                          {user.fullName}{" "}
+                          {userId === user.id ? (
+                            <Text as="span">
+                              {"("}
+                              <FormattedMessage
+                                id="generic.you"
+                                defaultMessage="You"
+                              />
+                              {")"}
+                            </Text>
+                          ) : null}
+                        </Text>
+                        <Text color="gray.500" isTruncated>
+                          {user.email}
+                        </Text>
+                      </Box>
+                      {permissionType === "OWNER" || !isOwner ? (
+                        <Box
+                          paddingX={3}
+                          fontWeight="bold"
+                          fontStyle="italic"
+                          fontSize="sm"
+                          color="gray.500"
+                          cursor="default"
+                        >
+                          <UserPermissionType type={permissionType} />
                         </Box>
-                        {permissionType === "OWNER" || !isOwner ? (
-                          <Box
-                            paddingX={3}
-                            fontWeight="bold"
-                            fontStyle="italic"
-                            fontSize="sm"
-                            color="gray.500"
-                            cursor="default"
+                      ) : (
+                        <Menu placement="bottom-end">
+                          <MenuButton
+                            as={Button}
+                            variant="ghost"
+                            size="sm"
+                            rightIcon={<ChevronDownIcon />}
                           >
-                            <UserPermissionType type={permissionType} />
-                          </Box>
-                        ) : (
-                          <Menu placement="bottom-end">
-                            <MenuButton
-                              as={Button}
-                              variant="ghost"
-                              size="sm"
-                              rightIcon={<ChevronDownIcon />}
-                            >
-                              <UserPermissionType type="WRITE" />
-                            </MenuButton>
-                            <Portal>
-                              <MenuList minWidth={40}>
-                                <MenuItem
-                                  onClick={() =>
-                                    handleTransferPetitionOwnership(
-                                      petitionId,
-                                      user
-                                    )
-                                  }
-                                >
-                                  <UserArrowIcon marginRight={2} />
-                                  <FormattedMessage
-                                    id="generic.transfer-ownership"
-                                    defaultMessage="Transfer ownership"
-                                  />
-                                </MenuItem>
-                                <MenuItem
-                                  color="red.500"
-                                  onClick={() =>
-                                    handleRemoveUserPermission(petitionId, user)
-                                  }
-                                >
-                                  <DeleteIcon marginRight={2} />
-                                  <FormattedMessage
-                                    id="generic.remove"
-                                    defaultMessage="Remove"
-                                  />
-                                </MenuItem>
-                              </MenuList>
-                            </Portal>
-                          </Menu>
-                        )}
-                      </Flex>
-                    ))}
-                  </Stack>
-                )}
+                            <UserPermissionType type="WRITE" />
+                          </MenuButton>
+                          <Portal>
+                            <MenuList minWidth={40}>
+                              <MenuItem
+                                onClick={() =>
+                                  handleTransferPetitionOwnership(
+                                    petitionId,
+                                    user
+                                  )
+                                }
+                              >
+                                <UserArrowIcon marginRight={2} />
+                                <FormattedMessage
+                                  id="generic.transfer-ownership"
+                                  defaultMessage="Transfer ownership"
+                                />
+                              </MenuItem>
+                              <MenuItem
+                                color="red.500"
+                                onClick={() =>
+                                  handleRemoveUserPermission(petitionId, user)
+                                }
+                              >
+                                <DeleteIcon marginRight={2} />
+                                <FormattedMessage
+                                  id="generic.remove"
+                                  defaultMessage="Remove"
+                                />
+                              </MenuItem>
+                            </MenuList>
+                          </Portal>
+                        </Menu>
+                      )}
+                    </Flex>
+                  ))}
+                </Stack>
               </ModalBody>
               <ModalFooter {...({ as: Stack, direction: "row" } as any)}>
                 <Spacer />
-                {users.length ? (
+                {hasUsers ? (
                   <>
                     <Button onClick={props.onClose}>
                       <FormattedMessage
@@ -274,11 +318,7 @@ export function PetitionSharingModal({
                         defaultMessage="Cancel"
                       />
                     </Button>
-                    <Button
-                      colorScheme="purple"
-                      variant="solid"
-                      onClick={handleAddUserPermissions}
-                    >
+                    <Button type="submit" colorScheme="purple" variant="solid">
                       <FormattedMessage
                         id="generic.send"
                         defaultMessage="Send"
@@ -348,11 +388,15 @@ PetitionSharingModal.mutations = [
       $petitionId: ID!
       $userIds: [ID!]!
       $permissionType: PetitionUserPermissionTypeRW!
+      $notify: Boolean
+      $message: String
     ) {
       addPetitionUserPermission(
         petitionIds: [$petitionId]
         userIds: $userIds
         permissionType: $permissionType
+        notify: $notify
+        message: $message
       ) {
         ...PetitionSharingModal_Petition
       }

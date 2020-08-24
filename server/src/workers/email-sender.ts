@@ -1,11 +1,39 @@
 import { unMaybeArray } from "../util/arrays";
-import { EmailSenderWorkerPayload, build } from "./emails/builder";
+import { commentsContactNotification } from "./emails/comments-contact-notification";
+import { commentsUserNotification } from "./emails/comments-user-notification";
+import { petitionCompleted } from "./emails/petition-completed";
+import { petitionMessage } from "./emails/petition-message";
+import { petitionReminder } from "./emails/petition-reminder";
+import { petitionSharingNotification } from "./emails/petition-sharing-notification";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+
+const builders = {
+  "petition-completed": petitionCompleted,
+  "comments-user-notification": commentsUserNotification,
+  "comments-contact-notification": commentsContactNotification,
+  "petition-message": petitionMessage,
+  "petition-reminder": petitionReminder,
+  "petition-sharing-notification": petitionSharingNotification,
+};
+
+export type EmailType = keyof typeof builders;
+
+export type EmailPayload = {
+  [K in EmailType]: Parameters<typeof builders[K]>[0];
+};
+
+type EmailSenderWorkerPayload = {
+  [K in EmailType]: {
+    type: K;
+    payload: EmailPayload[K];
+  };
+}[EmailType];
 
 createQueueWorker<EmailSenderWorkerPayload>(
   "email-sender",
   async (payload, context) => {
-    const emails = await build(payload, context);
+    const builder = builders[payload.type];
+    const emails = await builder(payload.payload as any, context);
     for (const email of unMaybeArray(emails)) {
       if (email) {
         const result = await context.smtp.sendEmail({

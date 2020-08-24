@@ -1852,6 +1852,10 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
+  readonly loadPetitionUser = this.buildLoadById("petition_user", "id", (q) =>
+    q.whereNull("deleted_at")
+  );
+
   readonly loadUserPermissions = fromDataLoader(
     new DataLoader<number, PetitionUser[]>(async (ids) => {
       const rows = await this.from("petition_user")

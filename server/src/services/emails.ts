@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
 import { unMaybeArray } from "../util/arrays";
-import { MaybeArray } from "../util/types";
+import { MaybeArray, Maybe } from "../util/types";
 import { Aws } from "./aws";
-import { EmailPayload } from "../workers/emails/builder";
+import { EmailPayload } from "../workers/email-sender";
 
 @injectable()
 export class EmailsService {
@@ -90,6 +90,19 @@ export class EmailsService {
       petition_access_id: accessId,
       user_ids: userIds,
       petition_field_comment_ids: commentIds,
+    });
+  }
+
+  async sendPetitionSharingNotificationEmail(
+    userId: number,
+    petitionUserIds: MaybeArray<number>,
+    message: Maybe<string>
+  ) {
+    return await this.enqueueEmail("petition-sharing-notification", {
+      id: this.buildQueueId("PetitionAccess", petitionUserIds),
+      user_id: userId,
+      petition_user_ids: unMaybeArray(petitionUserIds),
+      message,
     });
   }
 }

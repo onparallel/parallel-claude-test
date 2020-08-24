@@ -1,4 +1,10 @@
-import { mutationField, idArg, arg } from "@nexus/schema";
+import {
+  mutationField,
+  idArg,
+  arg,
+  booleanArg,
+  stringArg,
+} from "@nexus/schema";
 import { chain, and, authenticate } from "../../helpers/authorize";
 import { userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
@@ -6,6 +12,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validateAnd } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { fromGlobalIds, fromGlobalId } from "../../../util/globalId";
+import { maxLength } from "../../helpers/validators/maxLength";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -60,23 +67,41 @@ export const addPetitionUserPermission = mutationField(
         type: "PetitionUserPermissionTypeRW",
         required: true,
       }),
+      notify: booleanArg({
+        description: "Wether to notify the user via email or not.",
+        required: false,
+        default: false,
+      }),
+      message: stringArg({
+        required: false,
+      }),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
       notEmptyArray((args) => args.userIds, "userIds"),
-      userIdNotIncludedInArray((args) => args.userIds, "userIds")
+      userIdNotIncludedInArray((args) => args.userIds, "userIds"),
+      maxLength((args) => args.message, "message", 1000)
     ),
     resolve: async (_, args, ctx) => {
       const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
       const { ids: userIds } = fromGlobalIds(args.userIds, "User");
 
-      const { petitions } = await ctx.petitions.addPetitionUserPermissions(
+      const {
+        petitions,
+        newPermissions,
+      } = await ctx.petitions.addPetitionUserPermissions(
         petitionIds,
         userIds,
         args.permissionType,
         ctx.user!
       );
-
+      if (args.notify) {
+        ctx.emails.sendPetitionSharingNotificationEmail(
+          ctx.user!.id,
+          newPermissions.map((p) => p.id),
+          args.message ?? null
+        );
+      }
       return petitions;
     },
   }

@@ -806,6 +806,8 @@ export interface NexusGenArgTypes {
   Mutation: {
     addPetitionUserPermission: {
       // args
+      message?: string | null; // String
+      notify?: boolean | null; // Boolean
       permissionType: NexusGenEnums["PetitionUserPermissionTypeRW"]; // PetitionUserPermissionTypeRW!
       petitionIds: string[]; // [ID!]!
       userIds: string[]; // [ID!]!
