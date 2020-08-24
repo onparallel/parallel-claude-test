@@ -1,6 +1,7 @@
 import { enumType, objectType } from "@nexus/schema";
 import { toGlobalId } from "../../util/globalId";
 import { rootIsContextUser } from "./authorizers";
+import { fullName } from "../../util/fullName";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
@@ -37,13 +38,7 @@ export const User = objectType({
     t.string("fullName", {
       description: "The full name of the user.",
       nullable: true,
-      resolve: (o) => {
-        if (o.first_name) {
-          return o.last_name ? `${o.first_name} ${o.last_name}` : o.first_name;
-        } else {
-          return null;
-        }
-      },
+      resolve: (o) => fullName(o.first_name, o.last_name),
     });
     t.field("organization", {
       type: "Organization",

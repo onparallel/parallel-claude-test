@@ -1,4 +1,5 @@
 import { objectType } from "@nexus/schema";
+import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
 export const Contact = objectType({
@@ -26,13 +27,7 @@ export const Contact = objectType({
     t.string("fullName", {
       description: "The full name of the contact.",
       nullable: true,
-      resolve: (o) => {
-        if (o.first_name) {
-          return o.last_name ? `${o.first_name} ${o.last_name}` : o.first_name;
-        } else {
-          return null;
-        }
-      },
+      resolve: (o) => fullName(o.first_name, o.last_name),
     });
     t.paginationField("accesses", {
       type: "PetitionAccess",

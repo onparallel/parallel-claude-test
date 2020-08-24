@@ -1,4 +1,5 @@
-import { objectType, unionType, core } from "@nexus/schema";
+import { core, objectType, unionType } from "@nexus/schema";
+import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
 export const PublicPetitionAccess = objectType({
@@ -148,13 +149,7 @@ export const PublicUser = objectType({
     t.string("fullName", {
       description: "The full name of the user.",
       nullable: true,
-      resolve: (o) => {
-        if (o.first_name) {
-          return o.last_name ? `${o.first_name} ${o.last_name}` : o.first_name;
-        } else {
-          return null;
-        }
-      },
+      resolve: (o) => fullName(o.first_name, o.last_name),
     });
     t.field("organization", {
       description: "The organization of the user.",
@@ -257,13 +252,7 @@ export const PublicContact = objectType({
     t.string("fullName", {
       description: "The full name of the user.",
       nullable: true,
-      resolve: (o) => {
-        if (o.first_name) {
-          return o.last_name ? `${o.first_name} ${o.last_name}` : o.first_name;
-        } else {
-          return null;
-        }
-      },
+      resolve: (o) => fullName(o.first_name, o.last_name),
     });
   },
 });

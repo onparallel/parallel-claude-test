@@ -4,6 +4,7 @@ import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsUserNotification from "../../emails/components/PetitionCommentsUserNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 
@@ -65,10 +66,6 @@ export async function commentsUserNotification(
       `Contact not found for petition_access.contact_id ${access.contact_id}`
     );
   }
-  const authorNameOrEmail =
-    (contact.first_name && contact.last_name
-      ? `${contact.first_name} ${contact.last_name}`
-      : contact.first_name) || contact.email;
   const users = (await context.users.loadUser(payload.user_ids)).filter(
     isDefined
   );
@@ -77,7 +74,8 @@ export async function commentsUserNotification(
       PetitionCommentsUserNotification,
       {
         userName: user.first_name,
-        authorNameOrEmail,
+        authorNameOrEmail:
+          fullName(contact.first_name, contact.last_name) || contact.email,
         petitionId: toGlobalId("Petition", petition.id),
         petitionName: petition.name,
         fields,

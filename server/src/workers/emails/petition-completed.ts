@@ -3,6 +3,7 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/components/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
 export async function petitionCompleted(
@@ -45,17 +46,14 @@ export async function petitionCompleted(
   const subscribed = permissions.filter((p) => p && p.is_subscribed);
   for (const permission of subscribed) {
     const user = await context.users.loadUser(permission.user_id);
-    const contactNameOrEmail =
-      (contact.first_name && contact.last_name
-        ? `${contact.first_name} ${contact.last_name}`
-        : contact.first_name) || contact.email;
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
         name: user!.first_name,
         petitionId: toGlobalId("Petition", access.petition_id),
         petitionName: petition!.name,
-        contactNameOrEmail,
+        contactNameOrEmail:
+          fullName(contact.first_name, contact.last_name) || contact.email,
         fields: fields.map(pick(["id", "title", "position", "type"])),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,

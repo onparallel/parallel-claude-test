@@ -3,6 +3,7 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/components/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { fullName } from "../../util/fullName";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
@@ -52,14 +53,11 @@ export async function petitionMessage(
       `Contact not found for petition_access.contact_id ${access.contact_id}`
     );
   }
-  const senderName = sender.last_name
-    ? `${sender.first_name} ${sender.last_name}`
-    : sender.first_name!;
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
       name: contact.first_name,
-      senderName,
+      senderName: fullName(sender.first_name, sender.last_name)!,
       senderEmail: sender.email,
       subject: message.email_subject,
       body: message.email_body ? JSON.parse(message.email_body) : [],

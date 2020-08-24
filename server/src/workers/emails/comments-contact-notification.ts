@@ -4,6 +4,7 @@ import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCommentsContactNotification from "../../emails/components/PetitionCommentsContactNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { fullName } from "../../util/fullName";
 import { isDefined } from "../../util/remedaExtensions";
 
 /*
@@ -65,14 +66,10 @@ export async function commentsContactNotification(
       if (!contact) {
         continue; // Remove after making sure no active accesses with deleted contacts
       }
-      const authorName =
-        author.first_name && author.last_name
-          ? `${author.first_name} ${author.last_name}`
-          : author.first_name!;
       const { html, text, subject, from } = await buildEmail(
         PetitionCommentsContactNotification,
         {
-          authorName,
+          authorName: fullName(author.first_name, author.last_name),
           contactName: contact.first_name,
           keycode: access.keycode,
           fields,

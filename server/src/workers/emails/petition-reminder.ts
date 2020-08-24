@@ -3,6 +3,7 @@ import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/components/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { fullName } from "../../util/fullName";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -64,14 +65,11 @@ export async function petitionReminder(
       fields.map((f) => f.id)
     );
     const missing = fields.filter((f, index) => replies[index]?.length === 0);
-    const senderName = granter.last_name
-      ? `${granter.first_name} ${granter.last_name}`
-      : granter.first_name!;
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
         name: contact.first_name,
-        senderName,
+        senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
         fields: missing.map(pick(["id", "title", "position", "type"])),
         deadline: petition.deadline,
