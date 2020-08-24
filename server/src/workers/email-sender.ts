@@ -22,7 +22,7 @@ createQueueWorker<EmailSenderWorkerPayload>(
               ],
           },
         });
-        await context.emails.updateWithResponse(email.id, {
+        await context.emailLogs.updateWithResponse(email.id, {
           response: JSON.stringify(result),
           external_id: result.response.startsWith("250 Ok")
             ? result.response.replace(/^250 Ok /, "")

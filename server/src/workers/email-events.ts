@@ -11,7 +11,7 @@ createQueueWorker(
     if (!payload?.mail?.messageId) {
       return;
     }
-    const emailLogId = await context.emails.findInternalId(
+    const emailLogId = await context.emailLogs.findInternalId(
       payload.mail.messageId
     );
     if (!emailLogId) {
@@ -22,7 +22,7 @@ createQueueWorker(
       Bounce: "bounce",
       Open: "open",
     } as any)[payload.eventType];
-    await context.emails.createEmailEvent({
+    await context.emailLogs.createEmailEvent({
       email_log_id: emailLogId,
       event,
       payload: JSON.stringify((payload as any)[event]),

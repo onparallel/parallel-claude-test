@@ -1,15 +1,15 @@
 import { WorkerContext } from "../../context";
+import { commentsContactNotification } from "./comments-contact-notification";
+import { commentsUserNotification } from "./comments-user-notification";
 import { petitionCompleted } from "./petition-completed";
 import { petitionMessage } from "./petition-message";
 import { petitionReminder } from "./petition-reminder";
-import { commentsContactNotification } from "./comments-contact-notification";
-import { commentsUserNotification } from "./comments-user-notification";
 
 type GetPayload<F> = F extends (payload: infer P, context: WorkerContext) => any
   ? P
   : never;
 
-type EmailPayloads = {
+export type EmailPayload = {
   "petition-completed": GetPayload<typeof petitionCompleted>;
   "comments-user-notification": GetPayload<typeof commentsUserNotification>;
   "comments-contact-notification": GetPayload<
@@ -19,11 +19,11 @@ type EmailPayloads = {
   "petition-reminder": GetPayload<typeof petitionReminder>;
 };
 
-type EmailType = keyof EmailPayloads;
+type EmailType = keyof EmailPayload;
 
 type GenericEmailSenderWorkerPayload<T extends EmailType> = {
   type: T;
-  payload: EmailPayloads[T];
+  payload: EmailPayload[T];
 };
 
 export type EmailSenderWorkerPayload = {

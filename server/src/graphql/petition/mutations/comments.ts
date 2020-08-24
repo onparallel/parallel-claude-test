@@ -161,7 +161,7 @@ export const submitUnpublishedComments = mutationField(
         petitionId,
         ctx.user!
       );
-      await ctx.aws.enqueuePetitionCommentsContactNotification(
+      await ctx.emails.sendPetitionCommentsContactNotificationEmail(
         petitionId,
         ctx.user!.id,
         accesses.map(prop("id")),

@@ -192,7 +192,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       ctx.access!.petition_id,
       ctx.access!.id
     );
-    await ctx.aws.enqueuePetitionCompleted(ctx.access!.id);
+    await ctx.emails.sendPetitionCompletedEmail(ctx.access!.id);
     return petition;
   },
 });
@@ -326,7 +326,7 @@ export const publicSubmitUnpublishedComments = mutationField(
         ctx.access!.petition_id,
         ctx.access!
       );
-      await ctx.aws.enqueuePetitionCommentsUserNotification(
+      await ctx.emails.sendPetitionCommentsUserNotificationEmail(
         ctx.access!.petition_id,
         ctx.access!.id,
         users.map(prop("id")),

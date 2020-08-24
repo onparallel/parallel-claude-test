@@ -24,6 +24,6 @@ createCronWorker("reminder-trigger", async (context) => {
         created_by: `PetitionAccess:${access.id}`,
       }))
     );
-    await context.aws.enqueueReminders(reminders.map((r) => r.id));
+    await context.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
   }
 });

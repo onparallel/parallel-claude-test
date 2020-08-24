@@ -12,6 +12,7 @@ import { Contact, PetitionAccess, User } from "./db/__types";
 import { Auth } from "./services/auth";
 import { Aws } from "./services/aws";
 import { Cognito } from "./services/cognito";
+import { EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
 import { Smtp } from "./services/smtp";
 
@@ -27,9 +28,10 @@ export class ApiContext {
     public readonly auth: Auth,
     public readonly aws: Aws,
     public readonly cognito: Cognito,
+    public readonly emails: EmailsService,
     // Repositories
     public readonly contacts: ContactRepository,
-    public readonly emails: EmailLogRepository,
+    public readonly emailLogs: EmailLogRepository,
     public readonly files: FileUploadRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
@@ -45,9 +47,10 @@ export class WorkerContext {
     // Services
     public readonly aws: Aws,
     public readonly smtp: Smtp,
+    public readonly emails: EmailsService,
     // Repositories
     public readonly contacts: ContactRepository,
-    public readonly emails: EmailLogRepository,
+    public readonly emailLogs: EmailLogRepository,
     public readonly files: FileUploadRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,

@@ -664,7 +664,7 @@ export const sendPetition = mutationField("sendPetition", {
       );
 
       if (!args.scheduledAt) {
-        await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));
+        await ctx.emails.sendPetitionMessageEmail(messages.map((s) => s.id));
       }
       return {
         petition: await ctx.petitions.loadPetition(petitionId, {
@@ -726,7 +726,7 @@ export const sendMessages = mutationField("sendMessages", {
       );
 
       if (!args.scheduledAt) {
-        await ctx.aws.enqueuePetitionMessages(messages.map((s) => s.id));
+        await ctx.emails.sendPetitionMessageEmail(messages.map((s) => s.id));
       }
       return RESULT.SUCCESS;
     } catch (error) {
@@ -774,7 +774,7 @@ export const sendReminders = mutationField("sendReminders", {
           created_by: `User:${ctx.user!.id}`,
         }))
       );
-      await ctx.aws.enqueueReminders(reminders.map((r) => r.id));
+      await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
       return RESULT.SUCCESS;
     } catch (error) {
       return RESULT.FAILURE;

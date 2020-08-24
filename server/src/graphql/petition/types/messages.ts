@@ -72,7 +72,7 @@ export const PetitionMessage = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         if (root.email_log_id) {
-          const email = await ctx.emails.loadEmailLog(root.email_log_id);
+          const email = await ctx.emailLogs.loadEmailLog(root.email_log_id);
           return email!.sent_at;
         } else {
           return null;
@@ -86,7 +86,7 @@ export const PetitionMessage = objectType({
         if (!root.email_log_id) {
           return null;
         }
-        const events = await ctx.emails.loadEmailEvents(root.email_log_id);
+        const events = await ctx.emailLogs.loadEmailEvents(root.email_log_id);
         return events.find((e) => e.event === "delivery")?.created_at ?? null;
       },
     });
@@ -97,7 +97,7 @@ export const PetitionMessage = objectType({
         if (!root.email_log_id) {
           return null;
         }
-        const events = await ctx.emails.loadEmailEvents(root.email_log_id);
+        const events = await ctx.emailLogs.loadEmailEvents(root.email_log_id);
         return events.find((e) => e.event === "bounce")?.created_at ?? null;
       },
     });
@@ -108,7 +108,7 @@ export const PetitionMessage = objectType({
         if (!root.email_log_id) {
           return null;
         }
-        const events = await ctx.emails.loadEmailEvents(root.email_log_id);
+        const events = await ctx.emailLogs.loadEmailEvents(root.email_log_id);
         return events.find((e) => e.event === "open")?.created_at ?? null;
       },
     });

@@ -63,7 +63,7 @@ export async function petitionCompleted(
       },
       { locale: petition.locale }
     );
-    return await context.emails.createEmail({
+    return await context.emailLogs.createEmail({
       from: buildFrom(from, context.config.misc.emailFrom),
       to: user!.email,
       subject,

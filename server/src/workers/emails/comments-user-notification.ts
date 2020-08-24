@@ -87,7 +87,7 @@ export async function commentsUserNotification(
       },
       { locale: petition.locale }
     );
-    const email = await context.emails.createEmail({
+    const email = await context.emailLogs.createEmail({
       from: buildFrom(from, context.config.misc.emailFrom),
       to: user.email,
       subject,
