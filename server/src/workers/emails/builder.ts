@@ -1,6 +1,4 @@
-import { EmailLog } from "../../db/__types";
 import { WorkerContext } from "../../context";
-import { MaybeArray } from "../../util/types";
 import { petitionCompleted } from "./petition-completed";
 import { petitionMessage } from "./petition-message";
 import { petitionReminder } from "./petition-reminder";
