@@ -73,6 +73,7 @@ export class PetitionRepository extends BaseRepository {
     const [{ count }] = await this.from("petition_user")
       .where({ user_id: userId })
       .whereIn("petition_id", petitionIds)
+      .whereNull("deleted_at")
       .mmodify((q) => {
         if (permissionTypes) {
           q.whereIn("permission_type", permissionTypes);
