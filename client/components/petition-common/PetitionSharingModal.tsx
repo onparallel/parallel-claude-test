@@ -270,11 +270,10 @@ export function PetitionSharingModal({
                 <Spacer />
                 {users.length ? (
                   <>
-                    <Button>
+                    <Button onClick={props.onClose}>
                       <FormattedMessage
                         id="generic.cancel"
                         defaultMessage="Cancel"
-                        onClick={props.onClose}
                       />
                     </Button>
                     <Button
