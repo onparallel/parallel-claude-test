@@ -66,14 +66,21 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async loadAccessesForContact(contactId: number, opts: PageOpts) {
+  async loadAccessesForContact(
+    contactId: number,
+    userId: number,
+    opts: PageOpts
+  ) {
     return await this.loadPageAndCount(
       this.knex<PetitionAccess>("petition_access as pa")
+        .join("petition_user as pu", "pu.petition_id", "pa.petition_id")
         .join("petition as p", "p.id", "pa.petition_id")
         .where("pa.contact_id", contactId)
+        .where("pu.user_id", userId)
+        .whereNull("pu.deleted_at")
         .whereNull("p.deleted_at")
         .orderBy("pa.created_at", "desc")
-        .select<any, PetitionAccess[]>(this.knex.raw("pa.*")),
+        .select<any, PetitionAccess[]>("pa.*"),
       opts
     );
   }
