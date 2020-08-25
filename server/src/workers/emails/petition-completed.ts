@@ -1,5 +1,6 @@
 import { pick } from "remeda";
 import { WorkerContext } from "../../context";
+import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/components/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
@@ -43,6 +44,7 @@ export async function petitionCompleted(
       `Organization not found for granter.org_id ${petition!.org_id}`
     );
   }
+  const emails: EmailLog[] = [];
   const subscribed = permissions.filter((p) => p && p.is_subscribed);
   for (const permission of subscribed) {
     const user = await context.users.loadUser(permission.user_id);
@@ -63,13 +65,16 @@ export async function petitionCompleted(
       },
       { locale: petition.locale }
     );
-    return await context.emailLogs.createEmail({
-      from: buildFrom(from, context.config.misc.emailFrom),
-      to: user!.email,
-      subject,
-      text,
-      html,
-      created_from: `PetitionAccess:${payload.petition_access_id}`,
-    });
+    emails.push(
+      await context.emailLogs.createEmail({
+        from: buildFrom(from, context.config.misc.emailFrom),
+        to: user!.email,
+        subject,
+        text,
+        html,
+        created_from: `PetitionAccess:${payload.petition_access_id}`,
+      })
+    );
   }
+  return emails;
 }
