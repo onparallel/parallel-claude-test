@@ -30,6 +30,7 @@ import {
   QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
+  Petitions_PetitionFragment,
 } from "@parallel/graphql/__types";
 import {
   assertQuery,
@@ -53,6 +54,7 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 
 const PAGE_SIZE = 10;
 
@@ -116,16 +118,44 @@ function Petitions() {
     }));
   }
 
+  function petitionIsBeingSharedByMe(petition: Petitions_PetitionFragment) {
+    return (
+      petition.userPermissions.length > 1 &&
+      petition.userPermissions.find(
+        (up) => up.permissionType === "OWNER" && up.user.id === me.id
+      )
+    );
+  }
+
+  const showErrorDialog = useErrorDialog();
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        await confirmDelete({
-          selected: petitions.items.filter((p) => selected!.includes(p.id)),
-        });
-        await deletePetitions({
-          variables: { ids: selected! },
-        });
-        refetch();
+        const selectedPetitions = petitions.items.filter((p) =>
+          selected!.includes(p.id)
+        );
+
+        if (selectedPetitions.some(petitionIsBeingSharedByMe)) {
+          showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="petition.shared-delete-error"
+                defaultMessage="The petition{count, plural, =1 {} other {s}} you want to delete {count, plural, =1 {is} other {are}} being shared to other user. Please remove shared access first."
+                values={{
+                  count: selected.length,
+                }}
+              />
+            ),
+          });
+        } else {
+          await confirmDelete({
+            selected: selectedPetitions,
+          });
+          await deletePetitions({
+            variables: { ids: selected! },
+          });
+          refetch();
+        }
       } catch {}
     },
     [petitions, selected]
@@ -447,6 +477,7 @@ Petitions.fragments = {
           }
         }
         userPermissions {
+          permissionType
           user {
             ...UserAvatarList_User
           }

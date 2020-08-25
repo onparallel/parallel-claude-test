@@ -52,6 +52,7 @@ import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
+import { useErrorDialog } from "../common/ErrorDialog";
 
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;
@@ -80,19 +81,39 @@ export function PetitionHeader({
 
   const deletePetitions = useDeletePetitions();
   const confirmDelete = useConfirmDeletePetitionsDialog();
+  const showErrorDialog = useErrorDialog();
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        await confirmDelete({
-          selected: [petition],
-        });
-        await deletePetitions({
-          variables: { ids: [petition.id]! },
-        });
-        router.push(
-          `/[locale]/app/petitions/`,
-          `/${router.query.locale}/app/petitions/`
-        );
+        if (
+          petition.userPermissions.length > 1 &&
+          petition.userPermissions.find(
+            (up) => up.permissionType === "OWNER" && up.user.id === user.id
+          )
+        ) {
+          showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="petition.shared-delete-error"
+                defaultMessage="The petition{count, plural, =1 {} other {s}} you want to delete {count, plural, =1 {is} other {are}} being shared to other user. Please remove shared access first."
+                values={{
+                  count: 1,
+                }}
+              />
+            ),
+          });
+        } else {
+          await confirmDelete({
+            selected: [petition],
+          });
+          await deletePetitions({
+            variables: { ids: [petition.id]! },
+          });
+          router.push(
+            `/[locale]/app/petitions/`,
+            `/${router.query.locale}/app/petitions/`
+          );
+        }
       } catch {}
     },
     [petition.id, petition.name]
@@ -451,6 +472,12 @@ PetitionHeader.fragments = {
       updatedAt
       ...PetitionSettingsModal_Petition
       ...ConfirmDeletePetitionsDialog_Petition
+      userPermissions {
+        permissionType
+        user {
+          id
+        }
+      }
     }
     ${PetitionSettingsModal.fragments.Petition}
     ${ConfirmDeletePetitionsDialog.fragments.Petition}

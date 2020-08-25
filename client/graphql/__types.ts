@@ -1295,8 +1295,14 @@ export type AppLayoutNavbar_UserFragment = {
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name" | "locale" | "status" | "updatedAt"> &
-  PetitionSettingsModal_PetitionFragment &
+} & Pick<Petition, "id" | "name" | "locale" | "status" | "updatedAt"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & Pick<User, "id"> }
+    >;
+  } & PetitionSettingsModal_PetitionFragment &
   ConfirmDeletePetitionsDialog_PetitionFragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
@@ -2727,9 +2733,10 @@ export type Petitions_PetitionFragment = { __typename?: "Petition" } & Pick<
         }
     >;
     userPermissions: Array<
-      { __typename?: "PetitionUserPermission" } & {
-        user: { __typename?: "User" } & UserAvatarList_UserFragment;
-      }
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
     >;
   } & ConfirmDeletePetitionsDialog_PetitionFragment;
 
@@ -3275,6 +3282,12 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     updatedAt
     ...PetitionSettingsModal_Petition
     ...ConfirmDeletePetitionsDialog_Petition
+    userPermissions {
+      permissionType
+      user {
+        id
+      }
+    }
   }
   ${PetitionSettingsModal_PetitionFragmentDoc}
   ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
@@ -3959,6 +3972,7 @@ export const Petitions_PetitionFragmentDoc = gql`
       }
     }
     userPermissions {
+      permissionType
       user {
         ...UserAvatarList_User
       }
