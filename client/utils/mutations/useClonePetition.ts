@@ -12,7 +12,7 @@ export function useClonePetition() {
   >(
     gql`
       mutation useClonePetition_clonePetition(
-        $petitionId: ID!
+        $petitionId: GID!
         $name: String
         $locale: PetitionLocale!
         $deadline: DateTime

@@ -17,6 +17,7 @@ generates:
       scalars:
         DateTime: string
         JSONObject: "{ [key: string]: any }"
+        GID: string
 
 hooks:
   afterAllFileWrite:

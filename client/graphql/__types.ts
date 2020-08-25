@@ -13,6 +13,7 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: string;
+  GID: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -23,7 +24,7 @@ export type AccessActivatedEvent = PetitionEvent & {
   __typename?: "AccessActivatedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   user?: Maybe<User>;
 };
 
@@ -31,7 +32,7 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   __typename?: "AccessDeactivatedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   user?: Maybe<User>;
 };
 
@@ -39,7 +40,7 @@ export type AccessOpenedEvent = PetitionEvent & {
   __typename?: "AccessOpenedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type ChangePasswordResult =
@@ -52,7 +53,7 @@ export type CommentDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type CommentPublishedEvent = PetitionEvent & {
@@ -60,7 +61,7 @@ export type CommentPublishedEvent = PetitionEvent & {
   comment?: Maybe<PetitionFieldComment>;
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 /** A contact in the system. */
@@ -77,7 +78,7 @@ export type Contact = Timestamps & {
   /** The full name of the contact. */
   fullName?: Maybe<Scalars["String"]>;
   /** The ID of the contact. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The last name of the contact. */
   lastName?: Maybe<Scalars["String"]>;
   /** Time when the resource was last updated. */
@@ -135,7 +136,7 @@ export type FileUploadReplyDownloadLinkResult = {
 export type MessageCancelledEvent = PetitionEvent & {
   __typename?: "MessageCancelledEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   message: PetitionMessage;
   user?: Maybe<User>;
 };
@@ -143,14 +144,14 @@ export type MessageCancelledEvent = PetitionEvent & {
 export type MessageScheduledEvent = PetitionEvent & {
   __typename?: "MessageScheduledEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   message: PetitionMessage;
 };
 
 export type MessageSentEvent = PetitionEvent & {
   __typename?: "MessageSentEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   message: PetitionMessage;
 };
 
@@ -180,7 +181,7 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
-  /** Delete petitions fields. */
+  /** Deletes a petition field. */
   deletePetitionField: Petition;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: Result;
@@ -252,13 +253,13 @@ export type MutationaddPetitionUserPermissionArgs = {
   message?: Maybe<Scalars["String"]>;
   notify?: Maybe<Scalars["Boolean"]>;
   permissionType: PetitionUserPermissionTypeRW;
-  petitionIds: Array<Scalars["ID"]>;
-  userIds: Array<Scalars["ID"]>;
+  petitionIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationcancelScheduledMessageArgs = {
-  messageId: Scalars["ID"];
-  petitionId: Scalars["ID"];
+  messageId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationchangePasswordArgs = {
@@ -267,9 +268,9 @@ export type MutationchangePasswordArgs = {
 };
 
 export type MutationchangePetitionFieldTypeArgs = {
-  fieldId: Scalars["ID"];
+  fieldId: Scalars["GID"];
   force?: Maybe<Scalars["Boolean"]>;
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   type: PetitionFieldType;
 };
 
@@ -277,12 +278,12 @@ export type MutationclonePetitionArgs = {
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationclonePetitionFieldArgs = {
-  fieldId: Scalars["ID"];
-  petitionId: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationcreateContactArgs = {
@@ -296,59 +297,59 @@ export type MutationcreatePetitionArgs = {
 };
 
 export type MutationcreatePetitionFieldArgs = {
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   position?: Maybe<Scalars["Int"]>;
   type: PetitionFieldType;
 };
 
 export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldReplyId?: Maybe<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyId?: Maybe<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationdeactivateAccessesArgs = {
-  accessIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationdeleteContactsArgs = {
-  ids: Array<Scalars["ID"]>;
+  ids: Array<Scalars["GID"]>;
 };
 
 export type MutationdeletePetitionFieldArgs = {
-  fieldId: Scalars["ID"];
+  fieldId: Scalars["GID"];
   force?: Maybe<Scalars["Boolean"]>;
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationdeletePetitionFieldCommentArgs = {
-  petitionFieldCommentId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
-  ids: Array<Scalars["ID"]>;
+  ids: Array<Scalars["GID"]>;
 };
 
 export type MutationeditPetitionUserPermissionArgs = {
   permissionType: PetitionUserPermissionType;
-  petitionIds: Array<Scalars["ID"]>;
-  userIds: Array<Scalars["ID"]>;
+  petitionIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
-  replyId: Scalars["ID"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationmarkPetitionFieldCommentsAsReadArgs = {
-  petitionFieldCommentIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  petitionFieldCommentIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationpublicCompletePetitionArgs = {
@@ -357,41 +358,41 @@ export type MutationpublicCompletePetitionArgs = {
 
 export type MutationpublicCreateFileUploadReplyArgs = {
   data: CreateFileUploadReplyInput;
-  fieldId: Scalars["ID"];
+  fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
 };
 
 export type MutationpublicCreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
 };
 
 export type MutationpublicCreateTextReplyArgs = {
   data: CreateTextReplyInput;
-  fieldId: Scalars["ID"];
+  fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
 };
 
 export type MutationpublicDeletePetitionFieldCommentArgs = {
   keycode: Scalars["ID"];
-  petitionFieldCommentId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
 };
 
 export type MutationpublicDeletePetitionReplyArgs = {
   keycode: Scalars["ID"];
-  replyId: Scalars["ID"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationpublicFileUploadReplyCompleteArgs = {
   keycode: Scalars["ID"];
-  replyId: Scalars["ID"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
   keycode: Scalars["ID"];
-  petitionFieldCommentIds: Array<Scalars["ID"]>;
+  petitionFieldCommentIds: Array<Scalars["GID"]>;
 };
 
 export type MutationpublicSubmitUnpublishedCommentsArgs = {
@@ -401,66 +402,66 @@ export type MutationpublicSubmitUnpublishedCommentsArgs = {
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
-  petitionFieldCommentId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
 };
 
 export type MutationreactivateAccessesArgs = {
-  accessIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationremovePetitionUserPermissionArgs = {
-  petitionIds: Array<Scalars["ID"]>;
-  userIds: Array<Scalars["ID"]>;
+  petitionIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationsendMessagesArgs = {
-  accessIds: Array<Scalars["ID"]>;
+  accessIds: Array<Scalars["GID"]>;
   body: Scalars["JSON"];
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
 };
 
 export type MutationsendPetitionArgs = {
   body: Scalars["JSON"];
-  contactIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  contactIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
 };
 
 export type MutationsendRemindersArgs = {
-  accessIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationsubmitUnpublishedCommentsArgs = {
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationswitchAutomaticRemindersArgs = {
-  accessIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   start: Scalars["Boolean"];
 };
 
 export type MutationtransferPetitionOwnershipArgs = {
-  petitionIds: Array<Scalars["ID"]>;
-  userId: Scalars["ID"];
+  petitionIds: Array<Scalars["GID"]>;
+  userId: Scalars["GID"];
 };
 
 export type MutationupdateContactArgs = {
   data: UpdateContactInput;
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type MutationupdateFieldPositionsArgs = {
-  fieldIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  fieldIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
 };
 
 export type MutationupdateOnboardingStatusArgs = {
@@ -470,37 +471,37 @@ export type MutationupdateOnboardingStatusArgs = {
 
 export type MutationupdatePetitionArgs = {
   data: UpdatePetitionInput;
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionFieldArgs = {
   data: UpdatePetitionFieldInput;
-  fieldId: Scalars["ID"];
-  petitionId: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
-  petitionFieldCommentId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionId: Scalars["ID"];
+  petitionFieldCommentId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionFieldRepliesStatusArgs = {
-  petitionFieldId: Scalars["ID"];
-  petitionFieldReplyIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
 };
 
 export type MutationupdateUserArgs = {
   data: UpdateUserInput;
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type MutationvalidatePetitionFieldsArgs = {
-  fieldIds: Array<Scalars["ID"]>;
-  petitionId: Scalars["ID"];
+  fieldIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
   value: Scalars["Boolean"];
 };
 
@@ -520,7 +521,7 @@ export type Organization = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The ID of the organization. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The unique text identifier of the organization. */
   identifier: Scalars["String"];
   /** The name of the organization. */
@@ -535,7 +536,7 @@ export type Organization = Timestamps & {
 
 /** An organization in the system. */
 export type OrganizationusersArgs = {
-  exclude?: Maybe<Array<Scalars["ID"]>>;
+  exclude?: Maybe<Array<Scalars["GID"]>>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
@@ -558,7 +559,7 @@ export type OrganizationStatus =
 export type OwnershipTransferredEvent = PetitionEvent & {
   __typename?: "OwnershipTransferredEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   owner?: Maybe<User>;
   user?: Maybe<User>;
 };
@@ -585,7 +586,7 @@ export type Petition = Timestamps & {
   /** The field definition of the petition. */
   fields: Array<PetitionField>;
   /** The ID of the petition. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -619,7 +620,7 @@ export type PetitionAccess = Timestamps & {
   /** The user who granted the access. */
   granter?: Maybe<User>;
   /** The ID of the petition access. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** When the next reminder will be sent. */
   nextReminderAt?: Maybe<Scalars["DateTime"]>;
   /** The petition for this message access. */
@@ -663,19 +664,19 @@ export type PetitionCompletedEvent = PetitionEvent & {
   __typename?: "PetitionCompletedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type PetitionCreatedEvent = PetitionEvent & {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   user?: Maybe<User>;
 };
 
 export type PetitionEvent = {
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type PetitionEventPagination = {
@@ -694,7 +695,7 @@ export type PetitionField = {
   /** The description of the petition field. */
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"];
   /** Determines if the field accepts replies */
@@ -729,7 +730,7 @@ export type PetitionFieldComment = {
   /** The content of the comment. */
   content: Scalars["String"];
   /** The ID of the petition field comment. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** Whether the comment has been edited after being published. */
   isEdited: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
@@ -752,7 +753,7 @@ export type PetitionFieldReply = Timestamps & {
   /** The petition field for this reply. */
   field?: Maybe<PetitionField>;
   /** The ID of the petition field reply. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The status of the reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -796,7 +797,7 @@ export type PetitionMessage = CreatedAt & {
   /** The subject of the petition message. */
   emailSubject?: Maybe<Scalars["JSON"]>;
   /** The ID of the petition message. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** Tells when the email was opened for the first time. */
   openedAt?: Maybe<Scalars["DateTime"]>;
   /** Time at which the message will be sent. */
@@ -847,7 +848,7 @@ export type PetitionReminder = CreatedAt & {
   access: PetitionAccess;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The sender of this petition message. */
   sender?: Maybe<User>;
   /** The type of the reminder. */
@@ -875,7 +876,7 @@ export type PetitionUserPermission = Timestamps & {
   __typename?: "PetitionUserPermission";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
@@ -904,7 +905,7 @@ export type PublicContact = {
   /** The full name of the user. */
   fullName?: Maybe<Scalars["String"]>;
   /** The ID of the contact. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
 };
@@ -913,7 +914,7 @@ export type PublicContact = {
 export type PublicOrganization = {
   __typename?: "PublicOrganization";
   /** The ID of the organization. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The identifier of the organization. */
   identifier: Scalars["String"];
   /** The logo of the organization. */
@@ -932,7 +933,7 @@ export type PublicPetition = Timestamps & {
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
   /** The ID of the petition. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The status of the petition. */
@@ -957,7 +958,7 @@ export type PublicPetitionField = {
   /** The description of the petition field. */
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** Determines if the field accepts replies */
   isReadOnly: Scalars["Boolean"];
   /** Determines if this field allows multiple replies. */
@@ -984,7 +985,7 @@ export type PublicPetitionFieldComment = {
   /** The content of the comment. */
   content: Scalars["String"];
   /** The ID of the petition field comment. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
   /** Time when the comment was published. */
@@ -1001,7 +1002,7 @@ export type PublicPetitionFieldReply = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The ID of the petition field reply. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The status of the petition field reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -1018,7 +1019,7 @@ export type PublicUser = {
   /** The full name of the user. */
   fullName?: Maybe<Scalars["String"]>;
   /** The ID of the user. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
   /** The organization of the user. */
@@ -1045,11 +1046,11 @@ export type QueryaccessArgs = {
 };
 
 export type QuerycontactArgs = {
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type QuerycontactsArgs = {
-  exclude?: Maybe<Array<Scalars["ID"]>>;
+  exclude?: Maybe<Array<Scalars["GID"]>>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
@@ -1057,11 +1058,11 @@ export type QuerycontactsArgs = {
 };
 
 export type QueryorganizationArgs = {
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type QuerypetitionArgs = {
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 export type QuerypetitionsArgs = {
@@ -1120,7 +1121,7 @@ export type RemindersConfigInput = {
 export type ReminderSentEvent = PetitionEvent & {
   __typename?: "ReminderSentEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   reminder: PetitionReminder;
 };
 
@@ -1129,7 +1130,7 @@ export type ReplyCreatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
 };
 
@@ -1138,7 +1139,7 @@ export type ReplyDeletedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 };
 
 /** Represents the result of an operation. */
@@ -1197,7 +1198,7 @@ export type User = Timestamps & {
   /** The full name of the user. */
   fullName?: Maybe<Scalars["String"]>;
   /** The ID of the user. */
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
   /** The onboarding status for the different views of the app. */
@@ -1221,7 +1222,7 @@ export type UserPagination = {
 export type UserPermissionAddedEvent = PetitionEvent & {
   __typename?: "UserPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   permissionType: PetitionUserPermissionType;
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
@@ -1230,7 +1231,7 @@ export type UserPermissionAddedEvent = PetitionEvent & {
 export type UserPermissionEditedEvent = PetitionEvent & {
   __typename?: "UserPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   permissionType: PetitionUserPermissionType;
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
@@ -1239,7 +1240,7 @@ export type UserPermissionEditedEvent = PetitionEvent & {
 export type UserPermissionRemovedEvent = PetitionEvent & {
   __typename?: "UserPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
 };
@@ -1774,8 +1775,8 @@ export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
   UserSelect_UserFragment;
 
 export type PetitionSharingModal_addPetitionUserPermissionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  userIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
   permissionType: PetitionUserPermissionTypeRW;
   notify?: Maybe<Scalars["Boolean"]>;
   message?: Maybe<Scalars["String"]>;
@@ -1790,8 +1791,8 @@ export type PetitionSharingModal_addPetitionUserPermissionMutation = {
 };
 
 export type PetitionSharingModal_removePetitionUserPermissionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  userId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
 }>;
 
 export type PetitionSharingModal_removePetitionUserPermissionMutation = {
@@ -1803,8 +1804,8 @@ export type PetitionSharingModal_removePetitionUserPermissionMutation = {
 };
 
 export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  userId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
 }>;
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
@@ -1816,7 +1817,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
 };
 
 export type PetitionSharingModal_PetitionUserPermissionsQueryVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
 }>;
 
 export type PetitionSharingModal_PetitionUserPermissionsQuery = {
@@ -1829,7 +1830,7 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
 
 export type PetitionSharingModal_searchUsersQueryVariables = Exact<{
   search: Scalars["String"];
-  exclude: Array<Scalars["ID"]>;
+  exclude: Array<Scalars["GID"]>;
 }>;
 
 export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
@@ -2110,7 +2111,7 @@ export type Contact_UserFragment = {
 } & AppLayout_UserFragment;
 
 export type Contact_updateContactMutationVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   data: UpdateContactInput;
 }>;
 
@@ -2119,7 +2120,7 @@ export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
 };
 
 export type ContactQueryVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 }>;
 
 export type ContactQuery = { __typename?: "Query" } & {
@@ -2148,7 +2149,7 @@ export type Contacts_UserFragment = {
 } & AppLayout_UserFragment;
 
 export type Contacts_deleteContactsMutationVariables = Exact<{
-  ids: Array<Scalars["ID"]>;
+  ids: Array<Scalars["GID"]>;
 }>;
 
 export type Contacts_deleteContactsMutation = {
@@ -2186,7 +2187,7 @@ export type PetitionActivity_UserFragment = {
 } & PetitionLayout_UserFragment;
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
 }>;
 
@@ -2199,8 +2200,8 @@ export type PetitionActivity_updatePetitionMutation = {
 };
 
 export type PetitionActivity_sendMessagesMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]>;
   subject: Scalars["String"];
   body: Scalars["JSON"];
   scheduledAt?: Maybe<Scalars["DateTime"]>;
@@ -2211,8 +2212,8 @@ export type PetitionActivity_sendMessagesMutation = {
 } & Pick<Mutation, "sendMessages">;
 
 export type PetitionActivity_sendRemindersMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]>;
 }>;
 
 export type PetitionActivity_sendRemindersMutation = {
@@ -2220,8 +2221,8 @@ export type PetitionActivity_sendRemindersMutation = {
 } & Pick<Mutation, "sendReminders">;
 
 export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]>;
 }>;
 
 export type PetitionActivity_deactivateAccessesMutation = {
@@ -2233,8 +2234,8 @@ export type PetitionActivity_deactivateAccessesMutation = {
 };
 
 export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]>;
 }>;
 
 export type PetitionActivity_reactivateAccessesMutation = {
@@ -2246,8 +2247,8 @@ export type PetitionActivity_reactivateAccessesMutation = {
 };
 
 export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  messageId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  messageId: Scalars["GID"];
 }>;
 
 export type PetitionActivity_cancelScheduledMessageMutation = {
@@ -2259,8 +2260,8 @@ export type PetitionActivity_cancelScheduledMessageMutation = {
 };
 
 export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  contactIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  contactIds: Array<Scalars["GID"]>;
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -2278,8 +2279,8 @@ export type PetitionsActivity_sendPetitionMutation = {
 
 export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
   start: Scalars["Boolean"];
-  petitionId: Scalars["ID"];
-  accessIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  accessIds: Array<Scalars["GID"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
 }>;
 
@@ -2292,7 +2293,7 @@ export type PetitionActivity_switchAutomaticRemindersMutation = {
 };
 
 export type PetitionActivityQueryVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 }>;
 
 export type PetitionActivityQuery = { __typename?: "Query" } & {
@@ -2329,7 +2330,7 @@ export type PetitionCompose_UserFragment = {
 } & PetitionLayout_UserFragment;
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
 }>;
 
@@ -2343,8 +2344,8 @@ export type PetitionCompose_updatePetitionMutation = {
 };
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  fieldIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  fieldIds: Array<Scalars["GID"]>;
 }>;
 
 export type PetitionCompose_updateFieldPositionsMutation = {
@@ -2358,7 +2359,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
 };
 
 export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   type: PetitionFieldType;
   position?: Maybe<Scalars["Int"]>;
 }>;
@@ -2379,8 +2380,8 @@ export type PetitionCompose_createPetitionFieldMutation = {
 };
 
 export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  fieldId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
 }>;
 
 export type PetitionCompose_clonePetitionFieldMutation = {
@@ -2399,8 +2400,8 @@ export type PetitionCompose_clonePetitionFieldMutation = {
 };
 
 export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  fieldId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   force?: Maybe<Scalars["Boolean"]>;
 }>;
 
@@ -2415,8 +2416,8 @@ export type PetitionCompose_deletePetitionFieldMutation = {
 };
 
 export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  fieldId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   data: UpdatePetitionFieldInput;
 }>;
 
@@ -2432,8 +2433,8 @@ export type PetitionCompose_updatePetitionFieldMutation = {
 };
 
 export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  fieldId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   type: PetitionFieldType;
   force?: Maybe<Scalars["Boolean"]>;
 }>;
@@ -2453,8 +2454,8 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
 };
 
 export type PetitionCompose_sendPetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  contactIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  contactIds: Array<Scalars["GID"]>;
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -2475,7 +2476,7 @@ export type PetitionCompose_sendPetitionMutation = {
 };
 
 export type PetitionComposeQueryVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 }>;
 
 export type PetitionComposeQuery = { __typename?: "Query" } & {
@@ -2491,7 +2492,7 @@ export type PetitionComposeUserQuery = { __typename?: "Query" } & {
 };
 
 export type PetitionQueryVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 }>;
 
 export type PetitionQuery = { __typename?: "Query" } & {
@@ -2521,7 +2522,7 @@ export type PetitionReplies_UserFragment = {
 } & PetitionLayout_UserFragment;
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
 }>;
 
@@ -2534,8 +2535,8 @@ export type PetitionReplies_updatePetitionMutation = {
 };
 
 export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  fieldIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  fieldIds: Array<Scalars["GID"]>;
   value: Scalars["Boolean"];
 }>;
 
@@ -2558,8 +2559,8 @@ export type PetitionReplies_validatePetitionFieldsMutation = {
 };
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  replyId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
 }>;
 
@@ -2572,9 +2573,9 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
 };
 
 export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldReplyId?: Maybe<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   content: Scalars["String"];
 }>;
 
@@ -2587,9 +2588,9 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
 };
 
 export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldCommentId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
   content: Scalars["String"];
 }>;
 
@@ -2602,9 +2603,9 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
 };
 
 export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldCommentId: Scalars["ID"];
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
 }>;
 
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
@@ -2612,7 +2613,7 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
 } & Pick<Mutation, "deletePetitionFieldComment">;
 
 export type PetitionReplies_submitUnpublishedCommentsMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
 }>;
 
 export type PetitionReplies_submitUnpublishedCommentsMutation = {
@@ -2627,8 +2628,8 @@ export type PetitionReplies_submitUnpublishedCommentsMutation = {
 };
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  petitionFieldCommentIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  petitionFieldCommentIds: Array<Scalars["GID"]>;
 }>;
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
@@ -2643,9 +2644,9 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
 };
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldReplyIds: Array<Scalars["ID"]>;
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyIds: Array<Scalars["GID"]>;
   status: PetitionFieldReplyStatus;
 }>;
 
@@ -2687,7 +2688,7 @@ export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
 };
 
 export type PetitionRepliesQueryVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 }>;
 
 export type PetitionRepliesQuery = { __typename?: "Query" } & {
@@ -2762,7 +2763,7 @@ export type Account_UserFragment = { __typename?: "User" } & Pick<
   AppLayout_UserFragment;
 
 export type Account_updateAccountMutationVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
   data: UpdateUserInput;
 }>;
 
@@ -2830,7 +2831,7 @@ export type RecipientView_PublicUserFragment = {
   RecipientViewContentsCard_PublicUserFragment;
 
 export type RecipientView_publicDeletePetitionReplyMutationVariables = Exact<{
-  replyId: Scalars["ID"];
+  replyId: Scalars["GID"];
   keycode: Scalars["ID"];
 }>;
 
@@ -2840,7 +2841,7 @@ export type RecipientView_publicDeletePetitionReplyMutation = {
 
 export type RecipientView_publicCreateTextReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  fieldId: Scalars["ID"];
+  fieldId: Scalars["GID"];
   data: CreateTextReplyInput;
 }>;
 
@@ -2854,7 +2855,7 @@ export type RecipientView_publicCreateTextReplyMutation = {
 
 export type RecipientView_publicCreateFileUploadReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  fieldId: Scalars["ID"];
+  fieldId: Scalars["GID"];
   data: CreateFileUploadReplyInput;
 }>;
 
@@ -2873,7 +2874,7 @@ export type RecipientView_publicCreateFileUploadReplyMutation = {
 
 export type RecipientView_publicFileUploadReplyCompleteMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  replyId: Scalars["ID"];
+  replyId: Scalars["GID"];
 }>;
 
 export type RecipientView_publicFileUploadReplyCompleteMutation = {
@@ -2899,7 +2900,7 @@ export type RecipientView_publicCompletePetitionMutation = {
 
 export type RecipientView_createPetitionFieldCommentMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
   content: Scalars["String"];
 }>;
 
@@ -2913,8 +2914,8 @@ export type RecipientView_createPetitionFieldCommentMutation = {
 
 export type RecipientView_updatePetitionFieldCommentMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldCommentId: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
   content: Scalars["String"];
 }>;
 
@@ -2928,8 +2929,8 @@ export type RecipientView_updatePetitionFieldCommentMutation = {
 
 export type RecipientView_deletePetitionFieldCommentMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  petitionFieldId: Scalars["ID"];
-  petitionFieldCommentId: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
 }>;
 
 export type RecipientView_deletePetitionFieldCommentMutation = {
@@ -2953,7 +2954,7 @@ export type RecipientView_submitUnpublishedCommentsMutation = {
 
 export type RecipientView_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  petitionFieldCommentIds: Array<Scalars["ID"]>;
+  petitionFieldCommentIds: Array<Scalars["GID"]>;
 }>;
 
 export type RecipientView_markPetitionFieldCommentsAsReadMutation = {
@@ -3054,7 +3055,7 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
 };
 
 export type useClonePetition_clonePetitionMutationVariables = Exact<{
-  petitionId: Scalars["ID"];
+  petitionId: Scalars["GID"];
   name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
@@ -3088,7 +3089,7 @@ export type useCreatePetition_createPetitionMutation = {
 } & { createPetition: { __typename?: "Petition" } & Pick<Petition, "id"> };
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
-  ids: Array<Scalars["ID"]>;
+  ids: Array<Scalars["GID"]>;
 }>;
 
 export type useDeletePetitions_deletePetitionsMutation = {
@@ -3096,7 +3097,7 @@ export type useDeletePetitions_deletePetitionsMutation = {
 } & Pick<Mutation, "deletePetitions">;
 
 export type useDeletePetitions_PetitionQueryVariables = Exact<{
-  id: Scalars["ID"];
+  id: Scalars["GID"];
 }>;
 
 export type useDeletePetitions_PetitionQuery = { __typename?: "Query" } & {
@@ -3118,7 +3119,7 @@ export type ConfirmDeletePetitionsDialog_PetitionFragment = {
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
-  exclude?: Maybe<Array<Scalars["ID"]>>;
+  exclude?: Maybe<Array<Scalars["GID"]>>;
 }>;
 
 export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
@@ -4282,8 +4283,8 @@ export type AppLayout_updateOnboardingStatusMutationOptions = Apollo.BaseMutatio
 >;
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(
-    $petitionId: ID!
-    $userIds: [ID!]!
+    $petitionId: GID!
+    $userIds: [GID!]!
     $permissionType: PetitionUserPermissionTypeRW!
     $notify: Boolean
     $message: String
@@ -4349,8 +4350,8 @@ export type PetitionSharingModal_addPetitionUserPermissionMutationOptions = Apol
 >;
 export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_removePetitionUserPermission(
-    $petitionId: ID!
-    $userId: ID!
+    $petitionId: GID!
+    $userId: GID!
   ) {
     removePetitionUserPermission(
       petitionIds: [$petitionId]
@@ -4407,8 +4408,8 @@ export type PetitionSharingModal_removePetitionUserPermissionMutationOptions = A
 >;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership(
-    $petitionId: ID!
-    $userId: ID!
+    $petitionId: GID!
+    $userId: GID!
   ) {
     transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
       ...PetitionSharingModal_Petition
@@ -4461,7 +4462,7 @@ export type PetitionSharingModal_transferPetitionOwnershipMutationOptions = Apol
   PetitionSharingModal_transferPetitionOwnershipMutationVariables
 >;
 export const PetitionSharingModal_PetitionUserPermissionsDocument = gql`
-  query PetitionSharingModal_PetitionUserPermissions($petitionId: ID!) {
+  query PetitionSharingModal_PetitionUserPermissions($petitionId: GID!) {
     petition(id: $petitionId) {
       ...PetitionSharingModal_Petition
     }
@@ -4518,7 +4519,7 @@ export type PetitionSharingModal_PetitionUserPermissionsQueryResult = Apollo.Que
   PetitionSharingModal_PetitionUserPermissionsQueryVariables
 >;
 export const PetitionSharingModal_searchUsersDocument = gql`
-  query PetitionSharingModal_searchUsers($search: String!, $exclude: [ID!]!) {
+  query PetitionSharingModal_searchUsers($search: String!, $exclude: [GID!]!) {
     me {
       organization {
         users(search: $search, limit: 10, exclude: $exclude) {
@@ -4582,7 +4583,7 @@ export type PetitionSharingModal_searchUsersQueryResult = Apollo.QueryResult<
   PetitionSharingModal_searchUsersQueryVariables
 >;
 export const Contact_updateContactDocument = gql`
-  mutation Contact_updateContact($id: ID!, $data: UpdateContactInput!) {
+  mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
     updateContact(id: $id, data: $data) {
       ...Contact_Contact
     }
@@ -4634,7 +4635,7 @@ export type Contact_updateContactMutationOptions = Apollo.BaseMutationOptions<
   Contact_updateContactMutationVariables
 >;
 export const ContactDocument = gql`
-  query Contact($id: ID!) {
+  query Contact($id: GID!) {
     contact(id: $id) {
       ...Contact_Contact
     }
@@ -4735,7 +4736,7 @@ export type ContactUserQueryResult = Apollo.QueryResult<
   ContactUserQueryVariables
 >;
 export const Contacts_deleteContactsDocument = gql`
-  mutation Contacts_deleteContacts($ids: [ID!]!) {
+  mutation Contacts_deleteContacts($ids: [GID!]!) {
     deleteContacts(ids: $ids)
   }
 `;
@@ -4900,7 +4901,7 @@ export type ContactsUserQueryResult = Apollo.QueryResult<
 >;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition(
-    $petitionId: ID!
+    $petitionId: GID!
     $data: UpdatePetitionInput!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -4955,8 +4956,8 @@ export type PetitionActivity_updatePetitionMutationOptions = Apollo.BaseMutation
 >;
 export const PetitionActivity_sendMessagesDocument = gql`
   mutation PetitionActivity_sendMessages(
-    $petitionId: ID!
-    $accessIds: [ID!]!
+    $petitionId: GID!
+    $accessIds: [GID!]!
     $subject: String!
     $body: JSON!
     $scheduledAt: DateTime
@@ -5019,8 +5020,8 @@ export type PetitionActivity_sendMessagesMutationOptions = Apollo.BaseMutationOp
 >;
 export const PetitionActivity_sendRemindersDocument = gql`
   mutation PetitionActivity_sendReminders(
-    $petitionId: ID!
-    $accessIds: [ID!]!
+    $petitionId: GID!
+    $accessIds: [GID!]!
   ) {
     sendReminders(petitionId: $petitionId, accessIds: $accessIds)
   }
@@ -5071,8 +5072,8 @@ export type PetitionActivity_sendRemindersMutationOptions = Apollo.BaseMutationO
 >;
 export const PetitionActivity_deactivateAccessesDocument = gql`
   mutation PetitionActivity_deactivateAccesses(
-    $petitionId: ID!
-    $accessIds: [ID!]!
+    $petitionId: GID!
+    $accessIds: [GID!]!
   ) {
     deactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
       id
@@ -5126,8 +5127,8 @@ export type PetitionActivity_deactivateAccessesMutationOptions = Apollo.BaseMuta
 >;
 export const PetitionActivity_reactivateAccessesDocument = gql`
   mutation PetitionActivity_reactivateAccesses(
-    $petitionId: ID!
-    $accessIds: [ID!]!
+    $petitionId: GID!
+    $accessIds: [GID!]!
   ) {
     reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
       id
@@ -5181,8 +5182,8 @@ export type PetitionActivity_reactivateAccessesMutationOptions = Apollo.BaseMuta
 >;
 export const PetitionActivity_cancelScheduledMessageDocument = gql`
   mutation PetitionActivity_cancelScheduledMessage(
-    $petitionId: ID!
-    $messageId: ID!
+    $petitionId: GID!
+    $messageId: GID!
   ) {
     cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
       id
@@ -5236,8 +5237,8 @@ export type PetitionActivity_cancelScheduledMessageMutationOptions = Apollo.Base
 >;
 export const PetitionsActivity_sendPetitionDocument = gql`
   mutation PetitionsActivity_sendPetition(
-    $petitionId: ID!
-    $contactIds: [ID!]!
+    $petitionId: GID!
+    $contactIds: [GID!]!
     $subject: String!
     $body: JSON!
     $remindersConfig: RemindersConfigInput
@@ -5306,8 +5307,8 @@ export type PetitionsActivity_sendPetitionMutationOptions = Apollo.BaseMutationO
 export const PetitionActivity_switchAutomaticRemindersDocument = gql`
   mutation PetitionActivity_switchAutomaticReminders(
     $start: Boolean!
-    $petitionId: ID!
-    $accessIds: [ID!]!
+    $petitionId: GID!
+    $accessIds: [GID!]!
     $remindersConfig: RemindersConfigInput
   ) {
     switchAutomaticReminders(
@@ -5367,7 +5368,7 @@ export type PetitionActivity_switchAutomaticRemindersMutationOptions = Apollo.Ba
   PetitionActivity_switchAutomaticRemindersMutationVariables
 >;
 export const PetitionActivityDocument = gql`
-  query PetitionActivity($id: ID!) {
+  query PetitionActivity($id: GID!) {
     petition(id: $id) {
       ...PetitionActivity_Petition
     }
@@ -5481,7 +5482,7 @@ export type PetitionActivityUserQueryResult = Apollo.QueryResult<
 >;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition(
-    $petitionId: ID!
+    $petitionId: GID!
     $data: UpdatePetitionInput!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -5538,8 +5539,8 @@ export type PetitionCompose_updatePetitionMutationOptions = Apollo.BaseMutationO
 >;
 export const PetitionCompose_updateFieldPositionsDocument = gql`
   mutation PetitionCompose_updateFieldPositions(
-    $petitionId: ID!
-    $fieldIds: [ID!]!
+    $petitionId: GID!
+    $fieldIds: [GID!]!
   ) {
     updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
       id
@@ -5597,7 +5598,7 @@ export type PetitionCompose_updateFieldPositionsMutationOptions = Apollo.BaseMut
 >;
 export const PetitionCompose_createPetitionFieldDocument = gql`
   mutation PetitionCompose_createPetitionField(
-    $petitionId: ID!
+    $petitionId: GID!
     $type: PetitionFieldType!
     $position: Int
   ) {
@@ -5669,7 +5670,10 @@ export type PetitionCompose_createPetitionFieldMutationOptions = Apollo.BaseMuta
   PetitionCompose_createPetitionFieldMutationVariables
 >;
 export const PetitionCompose_clonePetitionFieldDocument = gql`
-  mutation PetitionCompose_clonePetitionField($petitionId: ID!, $fieldId: ID!) {
+  mutation PetitionCompose_clonePetitionField(
+    $petitionId: GID!
+    $fieldId: GID!
+  ) {
     clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
       field {
         id
@@ -5734,8 +5738,8 @@ export type PetitionCompose_clonePetitionFieldMutationOptions = Apollo.BaseMutat
 >;
 export const PetitionCompose_deletePetitionFieldDocument = gql`
   mutation PetitionCompose_deletePetitionField(
-    $petitionId: ID!
-    $fieldId: ID!
+    $petitionId: GID!
+    $fieldId: GID!
     $force: Boolean
   ) {
     deletePetitionField(
@@ -5799,8 +5803,8 @@ export type PetitionCompose_deletePetitionFieldMutationOptions = Apollo.BaseMuta
 >;
 export const PetitionCompose_updatePetitionFieldDocument = gql`
   mutation PetitionCompose_updatePetitionField(
-    $petitionId: ID!
-    $fieldId: ID!
+    $petitionId: GID!
+    $fieldId: GID!
     $data: UpdatePetitionFieldInput!
   ) {
     updatePetitionField(
@@ -5869,8 +5873,8 @@ export type PetitionCompose_updatePetitionFieldMutationOptions = Apollo.BaseMuta
 >;
 export const PetitionCompose_changePetitionFieldTypeDocument = gql`
   mutation PetitionCompose_changePetitionFieldType(
-    $petitionId: ID!
-    $fieldId: ID!
+    $petitionId: GID!
+    $fieldId: GID!
     $type: PetitionFieldType!
     $force: Boolean
   ) {
@@ -5945,8 +5949,8 @@ export type PetitionCompose_changePetitionFieldTypeMutationOptions = Apollo.Base
 >;
 export const PetitionCompose_sendPetitionDocument = gql`
   mutation PetitionCompose_sendPetition(
-    $petitionId: ID!
-    $contactIds: [ID!]!
+    $petitionId: GID!
+    $contactIds: [GID!]!
     $subject: String!
     $body: JSON!
     $remindersConfig: RemindersConfigInput
@@ -6017,7 +6021,7 @@ export type PetitionCompose_sendPetitionMutationOptions = Apollo.BaseMutationOpt
   PetitionCompose_sendPetitionMutationVariables
 >;
 export const PetitionComposeDocument = gql`
-  query PetitionCompose($id: ID!) {
+  query PetitionCompose($id: GID!) {
     petition(id: $id) {
       ...PetitionCompose_Petition
     }
@@ -6130,7 +6134,7 @@ export type PetitionComposeUserQueryResult = Apollo.QueryResult<
   PetitionComposeUserQueryVariables
 >;
 export const PetitionDocument = gql`
-  query Petition($id: ID!) {
+  query Petition($id: GID!) {
     petition(id: $id) {
       id
       status
@@ -6183,7 +6187,7 @@ export type PetitionQueryResult = Apollo.QueryResult<
 >;
 export const PetitionReplies_updatePetitionDocument = gql`
   mutation PetitionReplies_updatePetition(
-    $petitionId: ID!
+    $petitionId: GID!
     $data: UpdatePetitionInput!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
@@ -6238,8 +6242,8 @@ export type PetitionReplies_updatePetitionMutationOptions = Apollo.BaseMutationO
 >;
 export const PetitionReplies_validatePetitionFieldsDocument = gql`
   mutation PetitionReplies_validatePetitionFields(
-    $petitionId: ID!
-    $fieldIds: [ID!]!
+    $petitionId: GID!
+    $fieldIds: [GID!]!
     $value: Boolean!
   ) {
     validatePetitionFields(
@@ -6303,8 +6307,8 @@ export type PetitionReplies_validatePetitionFieldsMutationOptions = Apollo.BaseM
 >;
 export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
   mutation PetitionReplies_fileUploadReplyDownloadLink(
-    $petitionId: ID!
-    $replyId: ID!
+    $petitionId: GID!
+    $replyId: GID!
     $preview: Boolean
   ) {
     fileUploadReplyDownloadLink(
@@ -6364,9 +6368,9 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationOptions = Apollo.
 >;
 export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   mutation PetitionReplies_createPetitionFieldComment(
-    $petitionId: ID!
-    $petitionFieldId: ID!
-    $petitionFieldReplyId: ID
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $petitionFieldReplyId: GID
     $content: String!
   ) {
     createPetitionFieldComment(
@@ -6428,9 +6432,9 @@ export type PetitionReplies_createPetitionFieldCommentMutationOptions = Apollo.B
 >;
 export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_updatePetitionFieldComment(
-    $petitionId: ID!
-    $petitionFieldId: ID!
-    $petitionFieldCommentId: ID!
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $petitionFieldCommentId: GID!
     $content: String!
   ) {
     updatePetitionFieldComment(
@@ -6492,9 +6496,9 @@ export type PetitionReplies_updatePetitionFieldCommentMutationOptions = Apollo.B
 >;
 export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_deletePetitionFieldComment(
-    $petitionId: ID!
-    $petitionFieldId: ID!
-    $petitionFieldCommentId: ID!
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $petitionFieldCommentId: GID!
   ) {
     deletePetitionFieldComment(
       petitionId: $petitionId
@@ -6549,7 +6553,7 @@ export type PetitionReplies_deletePetitionFieldCommentMutationOptions = Apollo.B
   PetitionReplies_deletePetitionFieldCommentMutationVariables
 >;
 export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
-  mutation PetitionReplies_submitUnpublishedComments($petitionId: ID!) {
+  mutation PetitionReplies_submitUnpublishedComments($petitionId: GID!) {
     submitUnpublishedComments(petitionId: $petitionId) {
       id
       publishedAt
@@ -6601,8 +6605,8 @@ export type PetitionReplies_submitUnpublishedCommentsMutationOptions = Apollo.Ba
 >;
 export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
   mutation PetitionReplies_markPetitionFieldCommentsAsRead(
-    $petitionId: ID!
-    $petitionFieldCommentIds: [ID!]!
+    $petitionId: GID!
+    $petitionFieldCommentIds: [GID!]!
   ) {
     markPetitionFieldCommentsAsRead(
       petitionId: $petitionId
@@ -6659,9 +6663,9 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = Apo
 >;
 export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
   mutation PetitionReplies_updatePetitionFieldRepliesStatus(
-    $petitionId: ID!
-    $petitionFieldId: ID!
-    $petitionFieldReplyIds: [ID!]!
+    $petitionId: GID!
+    $petitionFieldId: GID!
+    $petitionFieldReplyIds: [GID!]!
     $status: PetitionFieldReplyStatus!
   ) {
     updatePetitionFieldRepliesStatus(
@@ -6728,7 +6732,7 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutationOptions = Ap
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
-  query PetitionReplies($id: ID!) {
+  query PetitionReplies($id: GID!) {
     petition(id: $id) {
       ...PetitionReplies_Petition
     }
@@ -6965,7 +6969,7 @@ export type PetitionsUserQueryResult = Apollo.QueryResult<
   PetitionsUserQueryVariables
 >;
 export const Account_updateAccountDocument = gql`
-  mutation Account_updateAccount($id: ID!, $data: UpdateUserInput!) {
+  mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
     updateUser(id: $id, data: $data) {
       id
       firstName
@@ -7222,7 +7226,7 @@ export type CurrentUserQueryResult = Apollo.QueryResult<
 >;
 export const RecipientView_publicDeletePetitionReplyDocument = gql`
   mutation RecipientView_publicDeletePetitionReply(
-    $replyId: ID!
+    $replyId: GID!
     $keycode: ID!
   ) {
     publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
@@ -7275,7 +7279,7 @@ export type RecipientView_publicDeletePetitionReplyMutationOptions = Apollo.Base
 export const RecipientView_publicCreateTextReplyDocument = gql`
   mutation RecipientView_publicCreateTextReply(
     $keycode: ID!
-    $fieldId: ID!
+    $fieldId: GID!
     $data: CreateTextReplyInput!
   ) {
     publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
@@ -7332,7 +7336,7 @@ export type RecipientView_publicCreateTextReplyMutationOptions = Apollo.BaseMuta
 export const RecipientView_publicCreateFileUploadReplyDocument = gql`
   mutation RecipientView_publicCreateFileUploadReply(
     $keycode: ID!
-    $fieldId: ID!
+    $fieldId: GID!
     $data: CreateFileUploadReplyInput!
   ) {
     publicCreateFileUploadReply(
@@ -7396,7 +7400,7 @@ export type RecipientView_publicCreateFileUploadReplyMutationOptions = Apollo.Ba
 export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
   mutation RecipientView_publicFileUploadReplyComplete(
     $keycode: ID!
-    $replyId: ID!
+    $replyId: GID!
   ) {
     publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
       id
@@ -7502,7 +7506,7 @@ export type RecipientView_publicCompletePetitionMutationOptions = Apollo.BaseMut
 export const RecipientView_createPetitionFieldCommentDocument = gql`
   mutation RecipientView_createPetitionFieldComment(
     $keycode: ID!
-    $petitionFieldId: ID!
+    $petitionFieldId: GID!
     $content: String!
   ) {
     publicCreatePetitionFieldComment(
@@ -7563,8 +7567,8 @@ export type RecipientView_createPetitionFieldCommentMutationOptions = Apollo.Bas
 export const RecipientView_updatePetitionFieldCommentDocument = gql`
   mutation RecipientView_updatePetitionFieldComment(
     $keycode: ID!
-    $petitionFieldId: ID!
-    $petitionFieldCommentId: ID!
+    $petitionFieldId: GID!
+    $petitionFieldCommentId: GID!
     $content: String!
   ) {
     publicUpdatePetitionFieldComment(
@@ -7627,8 +7631,8 @@ export type RecipientView_updatePetitionFieldCommentMutationOptions = Apollo.Bas
 export const RecipientView_deletePetitionFieldCommentDocument = gql`
   mutation RecipientView_deletePetitionFieldComment(
     $keycode: ID!
-    $petitionFieldId: ID!
-    $petitionFieldCommentId: ID!
+    $petitionFieldId: GID!
+    $petitionFieldCommentId: GID!
   ) {
     publicDeletePetitionFieldComment(
       keycode: $keycode
@@ -7736,7 +7740,7 @@ export type RecipientView_submitUnpublishedCommentsMutationOptions = Apollo.Base
 export const RecipientView_markPetitionFieldCommentsAsReadDocument = gql`
   mutation RecipientView_markPetitionFieldCommentsAsRead(
     $keycode: ID!
-    $petitionFieldCommentIds: [ID!]!
+    $petitionFieldCommentIds: [GID!]!
   ) {
     publicMarkPetitionFieldCommentsAsRead(
       keycode: $keycode
@@ -7859,7 +7863,7 @@ export type PublicPetitionQueryResult = Apollo.QueryResult<
 >;
 export const useClonePetition_clonePetitionDocument = gql`
   mutation useClonePetition_clonePetition(
-    $petitionId: ID!
+    $petitionId: GID!
     $name: String
     $locale: PetitionLocale!
     $deadline: DateTime
@@ -8031,7 +8035,7 @@ export type useCreatePetition_createPetitionMutationOptions = Apollo.BaseMutatio
   useCreatePetition_createPetitionMutationVariables
 >;
 export const useDeletePetitions_deletePetitionsDocument = gql`
-  mutation useDeletePetitions_deletePetitions($ids: [ID!]!) {
+  mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
     deletePetitions(ids: $ids)
   }
 `;
@@ -8079,7 +8083,7 @@ export type useDeletePetitions_deletePetitionsMutationOptions = Apollo.BaseMutat
   useDeletePetitions_deletePetitionsMutationVariables
 >;
 export const useDeletePetitions_PetitionDocument = gql`
-  query useDeletePetitions_Petition($id: ID!) {
+  query useDeletePetitions_Petition($id: GID!) {
     petition(id: $id) {
       userPermissions {
         permissionType
@@ -8142,7 +8146,7 @@ export type useDeletePetitions_PetitionQueryResult = Apollo.QueryResult<
   useDeletePetitions_PetitionQueryVariables
 >;
 export const PetitionComposeSearchContactsDocument = gql`
-  query PetitionComposeSearchContacts($search: String, $exclude: [ID!]) {
+  query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {
     contacts(limit: 10, search: $search, exclude: $exclude) {
       items {
         ...ContactSelect_Contact

@@ -438,7 +438,7 @@ PetitionActivity.fragments = {
 PetitionActivity.mutations = [
   gql`
     mutation PetitionActivity_updatePetition(
-      $petitionId: ID!
+      $petitionId: GID!
       $data: UpdatePetitionInput!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
@@ -449,8 +449,8 @@ PetitionActivity.mutations = [
   `,
   gql`
     mutation PetitionActivity_sendMessages(
-      $petitionId: ID!
-      $accessIds: [ID!]!
+      $petitionId: GID!
+      $accessIds: [GID!]!
       $subject: String!
       $body: JSON!
       $scheduledAt: DateTime
@@ -466,16 +466,16 @@ PetitionActivity.mutations = [
   `,
   gql`
     mutation PetitionActivity_sendReminders(
-      $petitionId: ID!
-      $accessIds: [ID!]!
+      $petitionId: GID!
+      $accessIds: [GID!]!
     ) {
       sendReminders(petitionId: $petitionId, accessIds: $accessIds)
     }
   `,
   gql`
     mutation PetitionActivity_deactivateAccesses(
-      $petitionId: ID!
-      $accessIds: [ID!]!
+      $petitionId: GID!
+      $accessIds: [GID!]!
     ) {
       deactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
         id
@@ -485,8 +485,8 @@ PetitionActivity.mutations = [
   `,
   gql`
     mutation PetitionActivity_reactivateAccesses(
-      $petitionId: ID!
-      $accessIds: [ID!]!
+      $petitionId: GID!
+      $accessIds: [GID!]!
     ) {
       reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
         id
@@ -496,8 +496,8 @@ PetitionActivity.mutations = [
   `,
   gql`
     mutation PetitionActivity_cancelScheduledMessage(
-      $petitionId: ID!
-      $messageId: ID!
+      $petitionId: GID!
+      $messageId: GID!
     ) {
       cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
         id
@@ -507,8 +507,8 @@ PetitionActivity.mutations = [
   `,
   gql`
     mutation PetitionsActivity_sendPetition(
-      $petitionId: ID!
-      $contactIds: [ID!]!
+      $petitionId: GID!
+      $contactIds: [GID!]!
       $subject: String!
       $body: JSON!
       $remindersConfig: RemindersConfigInput
@@ -529,8 +529,8 @@ PetitionActivity.mutations = [
   gql`
     mutation PetitionActivity_switchAutomaticReminders(
       $start: Boolean!
-      $petitionId: ID!
-      $accessIds: [ID!]!
+      $petitionId: GID!
+      $accessIds: [GID!]!
       $remindersConfig: RemindersConfigInput
     ) {
       switchAutomaticReminders(
@@ -552,7 +552,7 @@ PetitionActivity.getInitialProps = async ({
   await Promise.all([
     fetchQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
       gql`
-        query PetitionActivity($id: ID!) {
+        query PetitionActivity($id: GID!) {
           petition(id: $id) {
             ...PetitionActivity_Petition
           }

@@ -413,7 +413,7 @@ PetitionReplies.fragments = {
 PetitionReplies.mutations = [
   gql`
     mutation PetitionReplies_updatePetition(
-      $petitionId: ID!
+      $petitionId: GID!
       $data: UpdatePetitionInput!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
@@ -424,8 +424,8 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_validatePetitionFields(
-      $petitionId: ID!
-      $fieldIds: [ID!]!
+      $petitionId: GID!
+      $fieldIds: [GID!]!
       $value: Boolean!
     ) {
       validatePetitionFields(
@@ -444,8 +444,8 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_fileUploadReplyDownloadLink(
-      $petitionId: ID!
-      $replyId: ID!
+      $petitionId: GID!
+      $replyId: GID!
       $preview: Boolean
     ) {
       fileUploadReplyDownloadLink(
@@ -460,9 +460,9 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_createPetitionFieldComment(
-      $petitionId: ID!
-      $petitionFieldId: ID!
-      $petitionFieldReplyId: ID
+      $petitionId: GID!
+      $petitionFieldId: GID!
+      $petitionFieldReplyId: GID
       $content: String!
     ) {
       createPetitionFieldComment(
@@ -478,9 +478,9 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldComment(
-      $petitionId: ID!
-      $petitionFieldId: ID!
-      $petitionFieldCommentId: ID!
+      $petitionId: GID!
+      $petitionFieldId: GID!
+      $petitionFieldCommentId: GID!
       $content: String!
     ) {
       updatePetitionFieldComment(
@@ -496,9 +496,9 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_deletePetitionFieldComment(
-      $petitionId: ID!
-      $petitionFieldId: ID!
-      $petitionFieldCommentId: ID!
+      $petitionId: GID!
+      $petitionFieldId: GID!
+      $petitionFieldCommentId: GID!
     ) {
       deletePetitionFieldComment(
         petitionId: $petitionId
@@ -508,7 +508,7 @@ PetitionReplies.mutations = [
     }
   `,
   gql`
-    mutation PetitionReplies_submitUnpublishedComments($petitionId: ID!) {
+    mutation PetitionReplies_submitUnpublishedComments($petitionId: GID!) {
       submitUnpublishedComments(petitionId: $petitionId) {
         id
         publishedAt
@@ -517,8 +517,8 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_markPetitionFieldCommentsAsRead(
-      $petitionId: ID!
-      $petitionFieldCommentIds: [ID!]!
+      $petitionId: GID!
+      $petitionFieldCommentIds: [GID!]!
     ) {
       markPetitionFieldCommentsAsRead(
         petitionId: $petitionId
@@ -531,9 +531,9 @@ PetitionReplies.mutations = [
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldRepliesStatus(
-      $petitionId: ID!
-      $petitionFieldId: ID!
-      $petitionFieldReplyIds: [ID!]!
+      $petitionId: GID!
+      $petitionFieldId: GID!
+      $petitionFieldReplyIds: [GID!]!
       $status: PetitionFieldReplyStatus!
     ) {
       updatePetitionFieldRepliesStatus(
@@ -748,7 +748,7 @@ PetitionReplies.getInitialProps = async ({
   await Promise.all([
     fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
       gql`
-        query PetitionReplies($id: ID!) {
+        query PetitionReplies($id: GID!) {
           petition(id: $id) {
             ...PetitionReplies_Petition
           }

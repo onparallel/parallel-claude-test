@@ -145,7 +145,7 @@ function useUpdateAccount() {
     Account_updateAccountMutation,
     Account_updateAccountMutationVariables
   >(gql`
-    mutation Account_updateAccount($id: ID!, $data: UpdateUserInput!) {
+    mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
       updateUser(id: $id, data: $data) {
         id
         firstName

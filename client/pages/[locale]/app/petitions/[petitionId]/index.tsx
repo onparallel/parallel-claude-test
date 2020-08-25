@@ -21,7 +21,7 @@ Petition.getInitialProps = async ({
 }: WithApolloDataContext) => {
   const { data } = await apollo.query<PetitionQuery, PetitionQueryVariables>({
     query: gql`
-      query Petition($id: ID!) {
+      query Petition($id: GID!) {
         petition(id: $id) {
           id
           status

@@ -28,7 +28,7 @@ export function useDeletePetitions() {
     useDeletePetitions_deletePetitionsMutationVariables
   >(
     gql`
-      mutation useDeletePetitions_deletePetitions($ids: [ID!]!) {
+      mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
         deletePetitions(ids: $ids)
       }
     `,
@@ -90,7 +90,7 @@ function useFetchPetitionPermissions() {
       useDeletePetitions_PetitionQueryVariables
     >({
       query: gql`
-        query useDeletePetitions_Petition($id: ID!) {
+        query useDeletePetitions_Petition($id: GID!) {
           petition(id: $id) {
             userPermissions {
               permissionType

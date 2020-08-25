@@ -539,7 +539,7 @@ PetitionCompose.fragments = {
 PetitionCompose.mutations = [
   gql`
     mutation PetitionCompose_updatePetition(
-      $petitionId: ID!
+      $petitionId: GID!
       $data: UpdatePetitionInput!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
@@ -552,8 +552,8 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions(
-      $petitionId: ID!
-      $fieldIds: [ID!]!
+      $petitionId: GID!
+      $fieldIds: [GID!]!
     ) {
       updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
         id
@@ -567,7 +567,7 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_createPetitionField(
-      $petitionId: ID!
+      $petitionId: GID!
       $type: PetitionFieldType!
       $position: Int
     ) {
@@ -595,8 +595,8 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_clonePetitionField(
-      $petitionId: ID!
-      $fieldId: ID!
+      $petitionId: GID!
+      $fieldId: GID!
     ) {
       clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
         field {
@@ -618,8 +618,8 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_deletePetitionField(
-      $petitionId: ID!
-      $fieldId: ID!
+      $petitionId: GID!
+      $fieldId: GID!
       $force: Boolean
     ) {
       deletePetitionField(
@@ -638,8 +638,8 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_updatePetitionField(
-      $petitionId: ID!
-      $fieldId: ID!
+      $petitionId: GID!
+      $fieldId: GID!
       $data: UpdatePetitionFieldInput!
     ) {
       updatePetitionField(
@@ -663,8 +663,8 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_changePetitionFieldType(
-      $petitionId: ID!
-      $fieldId: ID!
+      $petitionId: GID!
+      $fieldId: GID!
       $type: PetitionFieldType!
       $force: Boolean
     ) {
@@ -693,8 +693,8 @@ PetitionCompose.mutations = [
   `,
   gql`
     mutation PetitionCompose_sendPetition(
-      $petitionId: ID!
-      $contactIds: [ID!]!
+      $petitionId: GID!
+      $contactIds: [GID!]!
       $subject: String!
       $body: JSON!
       $remindersConfig: RemindersConfigInput
@@ -725,7 +725,7 @@ PetitionCompose.getInitialProps = async ({
   await Promise.all([
     fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
       gql`
-        query PetitionCompose($id: ID!) {
+        query PetitionCompose($id: GID!) {
           petition(id: $id) {
             ...PetitionCompose_Petition
           }

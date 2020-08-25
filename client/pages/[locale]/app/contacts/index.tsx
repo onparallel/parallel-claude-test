@@ -343,7 +343,7 @@ Contacts.fragments = {
 
 Contacts.mutations = [
   gql`
-    mutation Contacts_deleteContacts($ids: [ID!]!) {
+    mutation Contacts_deleteContacts($ids: [GID!]!) {
       deleteContacts(ids: $ids)
     }
   `,

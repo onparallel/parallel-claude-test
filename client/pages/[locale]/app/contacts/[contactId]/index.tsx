@@ -357,7 +357,7 @@ Contact.fragments = {
 
 Contact.mutations = [
   gql`
-    mutation Contact_updateContact($id: ID!, $data: UpdateContactInput!) {
+    mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
       updateContact(id: $id, data: $data) {
         ...Contact_Contact
       }
@@ -409,7 +409,7 @@ Contact.getInitialProps = async ({
   await Promise.all([
     fetchQuery<ContactQuery, ContactQueryVariables>(
       gql`
-        query Contact($id: ID!) {
+        query Contact($id: GID!) {
           contact(id: $id) {
             ...Contact_Contact
           }

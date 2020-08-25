@@ -518,7 +518,7 @@ RecipientView.fragments = {
 RecipientView.mutations = [
   gql`
     mutation RecipientView_publicDeletePetitionReply(
-      $replyId: ID!
+      $replyId: GID!
       $keycode: ID!
     ) {
       publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
@@ -527,7 +527,7 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_publicCreateTextReply(
       $keycode: ID!
-      $fieldId: ID!
+      $fieldId: GID!
       $data: CreateTextReplyInput!
     ) {
       publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
@@ -539,7 +539,7 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_publicCreateFileUploadReply(
       $keycode: ID!
-      $fieldId: ID!
+      $fieldId: GID!
       $data: CreateFileUploadReplyInput!
     ) {
       publicCreateFileUploadReply(
@@ -558,7 +558,7 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_publicFileUploadReplyComplete(
       $keycode: ID!
-      $replyId: ID!
+      $replyId: GID!
     ) {
       publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
         id
@@ -577,7 +577,7 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_createPetitionFieldComment(
       $keycode: ID!
-      $petitionFieldId: ID!
+      $petitionFieldId: GID!
       $content: String!
     ) {
       publicCreatePetitionFieldComment(
@@ -594,8 +594,8 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_updatePetitionFieldComment(
       $keycode: ID!
-      $petitionFieldId: ID!
-      $petitionFieldCommentId: ID!
+      $petitionFieldId: GID!
+      $petitionFieldCommentId: GID!
       $content: String!
     ) {
       publicUpdatePetitionFieldComment(
@@ -613,8 +613,8 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_deletePetitionFieldComment(
       $keycode: ID!
-      $petitionFieldId: ID!
-      $petitionFieldCommentId: ID!
+      $petitionFieldId: GID!
+      $petitionFieldCommentId: GID!
     ) {
       publicDeletePetitionFieldComment(
         keycode: $keycode
@@ -634,7 +634,7 @@ RecipientView.mutations = [
   gql`
     mutation RecipientView_markPetitionFieldCommentsAsRead(
       $keycode: ID!
-      $petitionFieldCommentIds: [ID!]!
+      $petitionFieldCommentIds: [GID!]!
     ) {
       publicMarkPetitionFieldCommentsAsRead(
         keycode: $keycode

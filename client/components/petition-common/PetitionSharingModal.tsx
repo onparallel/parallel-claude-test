@@ -398,8 +398,8 @@ PetitionSharingModal.fragments = {
 PetitionSharingModal.mutations = [
   gql`
     mutation PetitionSharingModal_addPetitionUserPermission(
-      $petitionId: ID!
-      $userIds: [ID!]!
+      $petitionId: GID!
+      $userIds: [GID!]!
       $permissionType: PetitionUserPermissionTypeRW!
       $notify: Boolean
       $message: String
@@ -418,8 +418,8 @@ PetitionSharingModal.mutations = [
   `,
   gql`
     mutation PetitionSharingModal_removePetitionUserPermission(
-      $petitionId: ID!
-      $userId: ID!
+      $petitionId: GID!
+      $userId: GID!
     ) {
       removePetitionUserPermission(
         petitionIds: [$petitionId]
@@ -432,8 +432,8 @@ PetitionSharingModal.mutations = [
   `,
   gql`
     mutation PetitionSharingModal_transferPetitionOwnership(
-      $petitionId: ID!
-      $userId: ID!
+      $petitionId: GID!
+      $userId: GID!
     ) {
       transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
         ...PetitionSharingModal_Petition
@@ -451,7 +451,7 @@ function useGetUserPermissions(
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
   >(
     gql`
-      query PetitionSharingModal_PetitionUserPermissions($petitionId: ID!) {
+      query PetitionSharingModal_PetitionUserPermissions($petitionId: GID!) {
         petition(id: $petitionId) {
           ...PetitionSharingModal_Petition
         }
@@ -475,7 +475,7 @@ function useSearchUsers() {
       query: gql`
         query PetitionSharingModal_searchUsers(
           $search: String!
-          $exclude: [ID!]!
+          $exclude: [GID!]!
         ) {
           me {
             organization {
