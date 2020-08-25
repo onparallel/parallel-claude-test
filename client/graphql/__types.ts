@@ -590,6 +590,7 @@ export type Petition = Timestamps & {
   locale: PetitionLocale;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
+  owner: User;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -1296,12 +1297,7 @@ export type AppLayoutNavbar_UserFragment = {
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name" | "locale" | "status" | "updatedAt"> & {
-    userPermissions: Array<
-      { __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "permissionType"
-      > & { user: { __typename?: "User" } & Pick<User, "id"> }
-    >;
+    owner: { __typename?: "User" } & Pick<User, "id">;
   } & PetitionSettingsModal_PetitionFragment &
   ConfirmDeletePetitionsDialog_PetitionFragment;
 
@@ -3282,11 +3278,8 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     updatedAt
     ...PetitionSettingsModal_Petition
     ...ConfirmDeletePetitionsDialog_Petition
-    userPermissions {
-      permissionType
-      user {
-        id
-      }
+    owner {
+      id
     }
   }
   ${PetitionSettingsModal_PetitionFragmentDoc}

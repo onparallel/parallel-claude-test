@@ -490,6 +490,7 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
+    owner: NexusGenRootTypes["User"]; // User!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!

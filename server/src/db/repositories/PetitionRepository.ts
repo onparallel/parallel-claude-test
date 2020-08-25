@@ -1875,6 +1875,24 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  readonly loadPetitionOwners = fromDataLoader(
+    new DataLoader<number, User | null>(async (ids) => {
+      const rows = await this.from("petition_user")
+        .leftJoin("user", "petition_user.user_id", "user.id")
+        .whereIn("petition_id", ids)
+        .where("permission_type", "OWNER")
+        .whereNull("petition_user.deleted_at")
+        .whereNull("user.deleted_at")
+        .select("petition_user.petition_id", "user.*");
+      const rowsByPetitionId = indexBy(rows, (r) => r.petition_id);
+      return ids.map((id) =>
+        rowsByPetitionId[id]
+          ? (omit(rowsByPetitionId[id], ["petition_id"]) as User)
+          : null
+      );
+    })
+  );
+
   async addPetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],

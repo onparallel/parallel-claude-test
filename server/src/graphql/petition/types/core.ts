@@ -132,10 +132,15 @@ export const Petition = objectType({
         });
       },
     });
+    t.field("owner", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadPetitionOwners(root.id))!;
+      },
+    });
     t.list.field("userPermissions", {
       type: "PetitionUserPermission",
       description: "The permissions linked to the petition",
-      nullable: false,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadUserPermissions(root.id);
       },

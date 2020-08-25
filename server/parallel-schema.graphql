@@ -717,6 +717,7 @@ type Petition implements Timestamps {
   The name of the petition.
   """
   name: String
+  owner: User!
 
   """
   The progress of the petition.

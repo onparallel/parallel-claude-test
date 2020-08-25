@@ -140,7 +140,7 @@ function Petitions() {
             message: (
               <FormattedMessage
                 id="petition.shared-delete-error"
-                defaultMessage="The petition{count, plural, =1 {} other {s}} you want to delete {count, plural, =1 {is} other {are}} being shared to other user. Please remove shared access first."
+                defaultMessage="{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
                 values={{
                   count: selected.length,
                 }}

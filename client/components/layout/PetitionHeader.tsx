@@ -85,17 +85,12 @@ export function PetitionHeader({
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        if (
-          petition.userPermissions.length > 1 &&
-          petition.userPermissions.find(
-            (up) => up.permissionType === "OWNER" && up.user.id === user.id
-          )
-        ) {
+        if (petition.owner.id === user.id) {
           showErrorDialog({
             message: (
               <FormattedMessage
                 id="petition.shared-delete-error"
-                defaultMessage="The petition{count, plural, =1 {} other {s}} you want to delete {count, plural, =1 {is} other {are}} being shared to other user. Please remove shared access first."
+                defaultMessage="{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
                 values={{
                   count: 1,
                 }}
@@ -472,11 +467,8 @@ PetitionHeader.fragments = {
       updatedAt
       ...PetitionSettingsModal_Petition
       ...ConfirmDeletePetitionsDialog_Petition
-      userPermissions {
-        permissionType
-        user {
-          id
-        }
+      owner {
+        id
       }
     }
     ${PetitionSettingsModal.fragments.Petition}
