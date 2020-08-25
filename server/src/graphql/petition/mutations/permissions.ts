@@ -1,18 +1,12 @@
-import {
-  mutationField,
-  idArg,
-  arg,
-  booleanArg,
-  stringArg,
-} from "@nexus/schema";
+import { mutationField, arg, booleanArg, stringArg } from "@nexus/schema";
 import { chain, and, authenticate } from "../../helpers/authorize";
 import { userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { validateAnd } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
-import { fromGlobalIds, fromGlobalId } from "../../../util/globalId";
 import { maxLength } from "../../helpers/validators/maxLength";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -28,19 +22,16 @@ export const transferPetitionOwnership = mutationField(
       )
     ),
     args: {
-      petitionIds: idArg({ required: true, list: [true] }),
-      userId: idArg({ required: true }),
+      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
+      userId: globalIdArg("User", { required: true }),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds")
     ),
     resolve: async (_, args, ctx) => {
-      const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
-      const { id: userId } = fromGlobalId(args.userId, "User");
-
       return await ctx.petitions.transferOwnership(
-        petitionIds,
-        userId,
+        args.petitionIds,
+        args.userId,
         ctx.user!
       );
     },
@@ -61,8 +52,8 @@ export const addPetitionUserPermission = mutationField(
       )
     ),
     args: {
-      petitionIds: idArg({ required: true, list: [true] }),
-      userIds: idArg({ required: true, list: [true] }),
+      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
+      userIds: globalIdArg("User", { required: true, list: [true] }),
       permissionType: arg({
         type: "PetitionUserPermissionTypeRW",
         required: true,
@@ -83,15 +74,12 @@ export const addPetitionUserPermission = mutationField(
       maxLength((args) => args.message, "message", 1000)
     ),
     resolve: async (_, args, ctx) => {
-      const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
-      const { ids: userIds } = fromGlobalIds(args.userIds, "User");
-
       const {
         petitions,
         newPermissions,
       } = await ctx.petitions.addPetitionUserPermissions(
-        petitionIds,
-        userIds,
+        args.petitionIds,
+        args.userIds,
         args.permissionType,
         ctx.user!
       );
@@ -121,8 +109,8 @@ export const editPetitionUserPermission = mutationField(
       )
     ),
     args: {
-      petitionIds: idArg({ required: true, list: [true] }),
-      userIds: idArg({ required: true, list: [true] }),
+      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
+      userIds: globalIdArg("User", { required: true, list: [true] }),
       permissionType: arg({
         type: "PetitionUserPermissionType",
         required: true,
@@ -134,12 +122,9 @@ export const editPetitionUserPermission = mutationField(
       userIdNotIncludedInArray((args) => args.userIds, "userIds")
     ),
     resolve: async (_, args, ctx) => {
-      const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
-      const { ids: userIds } = fromGlobalIds(args.userIds, "User");
-
       return await ctx.petitions.editPetitionUserPermissions(
-        petitionIds,
-        userIds,
+        args.petitionIds,
+        args.userIds,
         args.permissionType,
         ctx.user!
       );
@@ -161,8 +146,8 @@ export const removePetitionUserPermission = mutationField(
       )
     ),
     args: {
-      petitionIds: idArg({ required: true, list: [true] }),
-      userIds: idArg({ required: true, list: [true] }),
+      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
+      userIds: globalIdArg("User", { required: true, list: [true] }),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
@@ -170,12 +155,9 @@ export const removePetitionUserPermission = mutationField(
       userIdNotIncludedInArray((args) => args.userIds, "userIds")
     ),
     resolve: async (_, args, ctx) => {
-      const { ids: petitionIds } = fromGlobalIds(args.petitionIds, "Petition");
-      const { ids: userIds } = fromGlobalIds(args.userIds, "User");
-
       return await ctx.petitions.removePetitionUserPermissions(
-        petitionIds,
-        userIds,
+        args.petitionIds,
+        args.userIds,
         ctx.user!
       );
     },

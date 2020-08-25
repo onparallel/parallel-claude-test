@@ -198,14 +198,14 @@ type Mutation {
     """
     notify: Boolean = false
     permissionType: PetitionUserPermissionTypeRW!
-    petitionIds: [ID!]!
-    userIds: [ID!]!
+    petitionIds: [GID!]!
+    userIds: [GID!]!
   ): [Petition!]!
 
   """
   Cancels a scheduled petition message.
   """
-  cancelScheduledMessage(messageId: ID!, petitionId: ID!): PetitionMessage
+  cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
 
   """
   Changes the password for the current logged in user.
@@ -216,9 +216,9 @@ type Mutation {
   Changes the type of a petition Field
   """
   changePetitionFieldType(
-    fieldId: ID!
+    fieldId: GID!
     force: Boolean = false
-    petitionId: ID!
+    petitionId: GID!
     type: PetitionFieldType!
   ): PetitionAndField!
 
@@ -229,13 +229,13 @@ type Mutation {
     deadline: DateTime
     locale: PetitionLocale!
     name: String
-    petitionId: ID!
+    petitionId: GID!
   ): Petition!
 
   """
   Clones a petition field
   """
-  clonePetitionField(fieldId: ID!, petitionId: ID!): PetitionAndField!
+  clonePetitionField(fieldId: GID!, petitionId: GID!): PetitionAndField!
 
   """
   Create a contact.
@@ -255,7 +255,7 @@ type Mutation {
   Creates a petition field
   """
   createPetitionField(
-    petitionId: ID!
+    petitionId: GID!
     position: Int
     type: PetitionFieldType!
   ): PetitionAndField!
@@ -273,7 +273,7 @@ type Mutation {
   """
   Deactivates the specified active petition accesses.
   """
-  deactivateAccesses(accessIds: [ID!]!, petitionId: ID!): [PetitionAccess!]!
+  deactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
   Delete contacts.
@@ -281,12 +281,12 @@ type Mutation {
   deleteContacts(ids: [GID!]!): Result!
 
   """
-  Delete petitions fields.
+  Deletes a petition field.
   """
   deletePetitionField(
-    fieldId: ID!
+    fieldId: GID!
     force: Boolean = false
-    petitionId: ID!
+    petitionId: GID!
   ): Petition!
 
   """
@@ -301,28 +301,28 @@ type Mutation {
   """
   Delete petitions.
   """
-  deletePetitions(force: Boolean = false, ids: [ID!]!): Result!
+  deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
 
   """
   Edits permissions on given petitions and users
   """
   editPetitionUserPermission(
     permissionType: PetitionUserPermissionType!
-    petitionIds: [ID!]!
-    userIds: [ID!]!
+    petitionIds: [GID!]!
+    userIds: [GID!]!
   ): [Petition!]!
 
   """
   Generates a download link for a file reply.
   """
   fileUploadReplyDownloadLink(
-    petitionId: ID!
+    petitionId: GID!
 
     """
     If true will use content-disposition inline instead of attachment
     """
     preview: Boolean
-    replyId: ID!
+    replyId: GID!
   ): FileUploadReplyDownloadLinkResult!
 
   """
@@ -343,7 +343,7 @@ type Mutation {
   """
   publicCreateFileUploadReply(
     data: CreateFileUploadReplyInput!
-    fieldId: ID!
+    fieldId: GID!
     keycode: ID!
   ): CreateFileUploadReply!
 
@@ -353,7 +353,7 @@ type Mutation {
   publicCreatePetitionFieldComment(
     content: String!
     keycode: ID!
-    petitionFieldId: ID!
+    petitionFieldId: GID!
   ): PublicPetitionFieldComment!
 
   """
@@ -361,7 +361,7 @@ type Mutation {
   """
   publicCreateTextReply(
     data: CreateTextReplyInput!
-    fieldId: ID!
+    fieldId: GID!
     keycode: ID!
   ): PublicPetitionFieldReply!
 
@@ -370,21 +370,21 @@ type Mutation {
   """
   publicDeletePetitionFieldComment(
     keycode: ID!
-    petitionFieldCommentId: ID!
-    petitionFieldId: ID!
+    petitionFieldCommentId: GID!
+    petitionFieldId: GID!
   ): Result!
 
   """
   Deletes a reply to a petition field.
   """
-  publicDeletePetitionReply(keycode: ID!, replyId: ID!): Result!
+  publicDeletePetitionReply(keycode: ID!, replyId: GID!): Result!
 
   """
   Notifies the backend that the upload is complete.
   """
   publicFileUploadReplyComplete(
     keycode: ID!
-    replyId: ID!
+    replyId: GID!
   ): PublicPetitionFieldReply!
 
   """
@@ -392,7 +392,7 @@ type Mutation {
   """
   publicMarkPetitionFieldCommentsAsRead(
     keycode: ID!
-    petitionFieldCommentIds: [ID!]!
+    petitionFieldCommentIds: [GID!]!
   ): [PublicPetitionFieldComment!]!
 
   """
@@ -406,30 +406,30 @@ type Mutation {
   publicUpdatePetitionFieldComment(
     content: String!
     keycode: ID!
-    petitionFieldCommentId: ID!
-    petitionFieldId: ID!
+    petitionFieldCommentId: GID!
+    petitionFieldId: GID!
   ): PublicPetitionFieldComment!
 
   """
   Reactivates the specified inactive petition accesses.
   """
-  reactivateAccesses(accessIds: [ID!]!, petitionId: ID!): [PetitionAccess!]!
+  reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
   Removes permissions on given petitions and users
   """
   removePetitionUserPermission(
-    petitionIds: [ID!]!
-    userIds: [ID!]!
+    petitionIds: [GID!]!
+    userIds: [GID!]!
   ): [Petition!]!
 
   """
   Sends a petition message to the speicified contacts.
   """
   sendMessages(
-    accessIds: [ID!]!
+    accessIds: [GID!]!
     body: JSON!
-    petitionId: ID!
+    petitionId: GID!
     scheduledAt: DateTime
     subject: String!
   ): Result!
@@ -439,8 +439,8 @@ type Mutation {
   """
   sendPetition(
     body: JSON!
-    contactIds: [ID!]!
-    petitionId: ID!
+    contactIds: [GID!]!
+    petitionId: GID!
     remindersConfig: RemindersConfigInput
     scheduledAt: DateTime
     subject: String!
@@ -449,7 +449,7 @@ type Mutation {
   """
   Sends a reminder for the specified petition accesses.
   """
-  sendReminders(accessIds: [ID!]!, petitionId: ID!): Result!
+  sendReminders(accessIds: [GID!]!, petitionId: GID!): Result!
 
   """
   Submits all unpublished comments.
@@ -460,8 +460,8 @@ type Mutation {
   Switches automatic reminders for the specified petition accesses.
   """
   switchAutomaticReminders(
-    accessIds: [ID!]!
-    petitionId: ID!
+    accessIds: [GID!]!
+    petitionId: GID!
     remindersConfig: RemindersConfigInput
     start: Boolean!
   ): [PetitionAccess!]!
@@ -469,7 +469,7 @@ type Mutation {
   """
   Transfers petition ownership to a given user
   """
-  transferPetitionOwnership(petitionIds: [ID!]!, userId: ID!): [Petition!]!
+  transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [Petition!]!
 
   """
   Updates a contact.
@@ -479,7 +479,7 @@ type Mutation {
   """
   Updates the positions of the petition fields
   """
-  updateFieldPositions(fieldIds: [ID!]!, petitionId: ID!): Petition!
+  updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): Petition!
 
   """
   Updates the onboarding status for one of the pages.
@@ -489,15 +489,15 @@ type Mutation {
   """
   Updates a petition.
   """
-  updatePetition(data: UpdatePetitionInput!, petitionId: ID!): Petition!
+  updatePetition(data: UpdatePetitionInput!, petitionId: GID!): Petition!
 
   """
   Updates a petition field.
   """
   updatePetitionField(
     data: UpdatePetitionFieldInput!
-    fieldId: ID!
-    petitionId: ID!
+    fieldId: GID!
+    petitionId: GID!
   ): PetitionAndField!
 
   """
@@ -514,23 +514,23 @@ type Mutation {
   Updates the status of a petition field reply.
   """
   updatePetitionFieldRepliesStatus(
-    petitionFieldId: ID!
-    petitionFieldReplyIds: [ID!]!
-    petitionId: ID!
+    petitionFieldId: GID!
+    petitionFieldReplyIds: [GID!]!
+    petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): PetitionFieldAndReplies!
 
   """
   Updates the user with the provided data.
   """
-  updateUser(data: UpdateUserInput!, id: ID!): User!
+  updateUser(data: UpdateUserInput!, id: GID!): User!
 
   """
   Updates the validation of a petition field.
   """
   validatePetitionFields(
-    fieldIds: [ID!]!
-    petitionId: ID!
+    fieldIds: [GID!]!
+    petitionId: GID!
     value: Boolean!
   ): [PetitionField!]!
 }
@@ -1813,7 +1813,7 @@ type User implements Timestamps {
   """
   The ID of the user.
   """
-  id: ID!
+  id: GID!
 
   """
   The last name of the user.

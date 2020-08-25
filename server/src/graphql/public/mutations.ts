@@ -6,7 +6,6 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { prop } from "remeda";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { random } from "../../util/token";
 import { and, chain } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
@@ -15,10 +14,12 @@ import {
   commentsBelongsToAccess,
   fetchPetitionAccess,
   fieldBelongsToAccess,
-  fieldHastype,
+  fieldHasType,
   replyBelongsToAccess,
 } from "./authorizers";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userIsCommentAuthor } from "../petition/mutations/authorizers";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -30,12 +31,11 @@ export const publicDeletePetitionReply = mutationField(
       replyBelongsToAccess("replyId")
     ),
     args: {
-      replyId: idArg({ required: true }),
+      replyId: globalIdArg("PetitionFieldReply", { required: true }),
       keycode: idArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
-      const reply = (await ctx.petitions.loadFieldReply(replyId))!;
+      const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
       if (reply.status === "APPROVED") {
         throw new WhitelistedError(
           "Can't delete an approved reply",
@@ -51,7 +51,7 @@ export const publicDeletePetitionReply = mutationField(
           ctx.aws.deleteFile(file!.path),
         ]);
       }
-      await ctx.petitions.deletePetitionFieldReply(replyId, ctx.contact!);
+      await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.contact!);
       return RESULT.SUCCESS;
     },
   }
@@ -64,15 +64,14 @@ export const publicFileUploadReplyComplete = mutationField(
     type: "PublicPetitionFieldReply",
     args: {
       keycode: idArg({ required: true }),
-      replyId: idArg({ required: true }),
+      replyId: globalIdArg("PetitionFieldReply", { required: true }),
     },
     authorize: chain(
       fetchPetitionAccess("keycode"),
       replyBelongsToAccess("replyId")
     ),
     resolve: async (_, args, ctx) => {
-      const { id: replyId } = fromGlobalId(args.replyId, "PetitionFieldReply");
-      const reply = await ctx.petitions.loadFieldReply(replyId);
+      const reply = await ctx.petitions.loadFieldReply(args.replyId);
       if (reply?.type !== "FILE_UPLOAD") {
         throw new Error("Invalid");
       }
@@ -102,7 +101,7 @@ export const publicCreateFileUploadReply = mutationField(
     }),
     args: {
       keycode: idArg({ required: true }),
-      fieldId: idArg({ required: true }),
+      fieldId: globalIdArg("PetitionField", { required: true }),
       data: inputObjectType({
         name: "CreateFileUploadReplyInput",
         definition(t) {
@@ -115,11 +114,10 @@ export const publicCreateFileUploadReply = mutationField(
     authorize: chain(
       fetchPetitionAccess("keycode"),
       fieldBelongsToAccess("fieldId"),
-      fieldHastype("fieldId", "FILE_UPLOAD")
+      fieldHasType("fieldId", "FILE_UPLOAD")
     ),
     resolve: async (_, args, ctx) => {
       const key = random(16);
-      const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
       const { filename, size, contentType } = args.data;
       const file = await ctx.files.createFileUpload(
         {
@@ -134,7 +132,7 @@ export const publicCreateFileUploadReply = mutationField(
         ctx.aws.getSignedUploadEndpoint(key, contentType),
         ctx.petitions.createPetitionFieldReply(
           {
-            petition_field_id: fieldId,
+            petition_field_id: args.fieldId,
             petition_access_id: ctx.access!.id,
             type: "FILE_UPLOAD",
             content: { file_upload_id: file.id },
@@ -152,7 +150,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   type: "PublicPetitionFieldReply",
   args: {
     keycode: idArg({ required: true }),
-    fieldId: idArg({ required: true }),
+    fieldId: globalIdArg("PetitionField", { required: true }),
     data: inputObjectType({
       name: "CreateTextReplyInput",
       definition(t) {
@@ -163,13 +161,12 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   authorize: chain(
     fetchPetitionAccess("keycode"),
     fieldBelongsToAccess("fieldId"),
-    fieldHastype("fieldId", "TEXT")
+    fieldHasType("fieldId", "TEXT")
   ),
   resolve: async (_, args, ctx) => {
-    const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
     const reply = await ctx.petitions.createPetitionFieldReply(
       {
-        petition_field_id: fieldId,
+        petition_field_id: args.fieldId,
         petition_access_id: ctx.access!.id,
         type: "TEXT",
         content: { text: args.data.text },
@@ -208,18 +205,14 @@ export const publicCreatePetitionFieldComment = mutationField(
     ),
     args: {
       keycode: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionFieldId = fromGlobalId(
-        args.petitionFieldId,
-        "PetitionField"
-      ).id;
       return await ctx.petitions.createPetitionFieldCommentFromAccess(
         {
           petitionId: ctx.access!.petition_id,
-          petitionFieldId,
+          petitionFieldId: args.petitionFieldId,
           petitionFieldReplyId: null,
           content: args.content,
         },
@@ -243,22 +236,16 @@ export const publicDeletePetitionFieldComment = mutationField(
     ),
     args: {
       keycode: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
-      petitionFieldCommentId: idArg({ required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
+      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
+        required: true,
+      }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionFieldId = fromGlobalId(
-        args.petitionFieldId,
-        "PetitionField"
-      ).id;
-      const petitionFieldCommentId = fromGlobalId(
-        args.petitionFieldCommentId,
-        "PetitionFieldComment"
-      ).id;
       await ctx.petitions.deletePetitionFieldCommentFromAccess(
         ctx.access!.petition_id,
-        petitionFieldId,
-        petitionFieldCommentId,
+        args.petitionFieldId,
+        args.petitionFieldCommentId,
         ctx.access!
       );
       return RESULT.SUCCESS;
@@ -276,31 +263,20 @@ export const publicUpdatePetitionFieldComment = mutationField(
       and(
         fieldBelongsToAccess("petitionFieldId"),
         commentsBelongsToAccess("petitionFieldCommentId"),
-        async function commentAuhtorIsContextContact(root, args, ctx, info) {
-          const petitionFieldCommentId = fromGlobalId(
-            args.petitionFieldCommentId,
-            "PetitionFieldComment"
-          ).id;
-          const comment = await ctx.petitions.loadPetitionFieldComment(
-            petitionFieldCommentId
-          );
-          return comment?.petition_access_id === ctx.access!.id ?? false;
-        }
+        userIsCommentAuthor("petitionFieldCommentId")
       )
     ),
     args: {
       keycode: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
-      petitionFieldCommentId: idArg({ required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
+      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
+        required: true,
+      }),
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionFieldCommentId = fromGlobalId(
-        args.petitionFieldCommentId,
-        "PetitionFieldComment"
-      ).id;
       return await ctx.petitions.updatePetitionFieldCommentFromContact(
-        petitionFieldCommentId,
+        args.petitionFieldCommentId,
         args.content,
         ctx.contact!
       );
@@ -349,19 +325,18 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
     ),
     args: {
       keycode: idArg({ required: true }),
-      petitionFieldCommentIds: idArg({ required: true, list: [true] }),
+      petitionFieldCommentIds: globalIdArg("PetitionFieldComment", {
+        required: true,
+        list: [true],
+      }),
     },
     validateArgs: notEmptyArray(
       prop("petitionFieldCommentIds"),
       "petitionFieldCommentIds"
     ),
     resolve: async (_, args, ctx) => {
-      const petitionFieldCommentIds = fromGlobalIds(
-        args.petitionFieldCommentIds,
-        "PetitionFieldComment"
-      ).ids;
       return await ctx.petitions.markPetitionFieldCommentsAsReadForAccess(
-        petitionFieldCommentIds,
+        args.petitionFieldCommentIds,
         ctx.access!.id
       );
     },

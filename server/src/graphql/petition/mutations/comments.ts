@@ -1,5 +1,4 @@
-import { idArg, mutationField, stringArg } from "@nexus/schema";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
+import { mutationField, stringArg } from "@nexus/schema";
 import {
   and,
   authenticate,
@@ -16,6 +15,7 @@ import {
 import { prop } from "remeda";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { userIsCommentAuthor } from "./authorizers";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -36,23 +36,17 @@ export const createPetitionFieldComment = mutationField(
     args: {
       petitionId: globalIdArg("Petition", { required: true }),
       petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldReplyId: globalIdArg(),
+      petitionFieldReplyId: globalIdArg("PetitionFieldReply", {
+        required: false,
+      }),
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
-      const petitionFieldId = fromGlobalId(
-        args.petitionFieldId,
-        "PetitionField"
-      ).id;
-      const petitionFieldReplyId = args.petitionFieldReplyId
-        ? fromGlobalId(args.petitionFieldReplyId, "PetitionFieldReply").id
-        : null;
       return await ctx.petitions.createPetitionFieldCommentFromUser(
         {
-          petitionId,
-          petitionFieldId,
-          petitionFieldReplyId,
+          petitionId: args.petitionId,
+          petitionFieldId: args.petitionFieldId,
+          petitionFieldReplyId: args.petitionFieldReplyId ?? null,
           content: args.content,
         },
         ctx.user!
@@ -82,19 +76,10 @@ export const deletePetitionFieldComment = mutationField(
       }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
-      const petitionFieldId = fromGlobalId(
-        args.petitionFieldId,
-        "PetitionField"
-      ).id;
-      const petitionFieldCommentId = fromGlobalId(
-        args.petitionFieldCommentId,
-        "PetitionFieldComment"
-      ).id;
       await ctx.petitions.deletePetitionFieldCommentFromUser(
-        petitionId,
-        petitionFieldId,
-        petitionFieldCommentId,
+        args.petitionId,
+        args.petitionFieldId,
+        args.petitionFieldCommentId,
         ctx.user!
       );
       return RESULT.SUCCESS;
@@ -113,16 +98,7 @@ export const updatePetitionFieldComment = mutationField(
         userHasAccessToPetitions("petitionId"),
         fieldsBelongsToPetition("petitionId", "petitionFieldId"),
         commentsBelongsToPetition("petitionId", "petitionFieldCommentId"),
-        async function commentAuhtorIsContextUser(root, args, ctx, info) {
-          const petitionFieldCommentId = fromGlobalId(
-            args.petitionFieldCommentId,
-            "PetitionFieldComment"
-          ).id;
-          const comment = await ctx.petitions.loadPetitionFieldComment(
-            petitionFieldCommentId
-          );
-          return (comment && comment.user_id === ctx.user!.id) ?? false;
-        }
+        userIsCommentAuthor("petitionFieldCommentId")
       )
     ),
     args: {
@@ -134,12 +110,8 @@ export const updatePetitionFieldComment = mutationField(
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionFieldCommentId = fromGlobalId(
-        args.petitionFieldCommentId,
-        "PetitionFieldComment"
-      ).id;
       return await ctx.petitions.updatePetitionFieldCommentFromUser(
-        petitionFieldCommentId,
+        args.petitionFieldCommentId,
         args.content,
         ctx.user!
       );
@@ -158,16 +130,15 @@ export const submitUnpublishedComments = mutationField(
       petitionId: globalIdArg("Petition", { required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petitionId = fromGlobalId(args.petitionId, "Petition").id;
       const {
         comments,
         accesses,
       } = await ctx.petitions.publishPetitionFieldCommentsForUser(
-        petitionId,
+        args.petitionId,
         ctx.user!
       );
       await ctx.emails.sendPetitionCommentsContactNotificationEmail(
-        petitionId,
+        args.petitionId,
         ctx.user!.id,
         accesses.map(prop("id")),
         comments.map(prop("id"))
@@ -202,12 +173,8 @@ export const markPetitionFieldCommentsAsRead = mutationField(
       "petitionFieldCommentIds"
     ),
     resolve: async (_, args, ctx) => {
-      const petitionFieldCommentIds = fromGlobalIds(
-        args.petitionFieldCommentIds,
-        "PetitionFieldComment"
-      ).ids;
       return await ctx.petitions.markPetitionFieldCommentsAsReadForUser(
-        petitionFieldCommentIds,
+        args.petitionFieldCommentIds,
         ctx.user!
       );
     },

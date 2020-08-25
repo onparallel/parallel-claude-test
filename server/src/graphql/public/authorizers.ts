@@ -1,6 +1,5 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { PetitionFieldType } from "../../db/__types";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { PublicPetitionNotAvailableError } from "../helpers/errors";
@@ -45,18 +44,17 @@ export function fetchPetitionAccess<
   };
 }
 
-export function fieldHastype<
+export function fieldHasType<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, number>
 >(
   argFieldId: TArg,
   fieldType: MaybeArray<PetitionFieldType>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const { id: fieldId } = fromGlobalId(args[argFieldId], "PetitionField");
-      const field = await ctx.petitions.loadField(fieldId);
+      const field = await ctx.petitions.loadField(args[argFieldId] as number);
       return Array.isArray(fieldType)
         ? fieldType.includes(field!.type)
         : fieldType === field!.type;
@@ -68,14 +66,13 @@ export function fieldHastype<
 export function fieldBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>
+  TArg1 extends Arg<TypeName, FieldName, number>
 >(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const { id: fieldId } = fromGlobalId(args[argFieldId], "PetitionField");
       return await ctx.petitions.fieldsBelongToPetition(
         ctx.access!.petition_id,
-        [fieldId]
+        [args[argFieldId]]
       );
     } catch {}
     return false;
@@ -85,17 +82,13 @@ export function fieldBelongsToAccess<
 export function replyBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>
+  TArg1 extends Arg<TypeName, FieldName, number>
 >(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const { id: replyId } = fromGlobalId(
-        args[argReplyId],
-        "PetitionFieldReply"
-      );
       return await ctx.petitions.repliesBelongsToPetition(
         ctx.access!.petition_id,
-        [replyId]
+        [args[argReplyId]]
       );
     } catch {}
     return false;
@@ -105,17 +98,13 @@ export function replyBelongsToAccess<
 export function commentsBelongsToAccess<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string | string[]>
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argCommentId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const { ids: commentIds } = fromGlobalIds(
-        unMaybeArray(args[argCommentId]),
-        "PetitionFieldComment"
-      );
       return await ctx.petitions.commentsBelongToPetition(
         ctx.access!.petition_id,
-        commentIds
+        unMaybeArray(args[argCommentId])
       );
     } catch {}
     return false;

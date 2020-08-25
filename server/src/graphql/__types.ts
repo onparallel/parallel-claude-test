@@ -753,7 +753,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     firstName: string | null; // String
     fullName: string | null; // String
-    id: string; // ID!
+    id: NexusGenScalars["GID"]; // GID!
     lastName: string | null; // String
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -818,13 +818,13 @@ export interface NexusGenArgTypes {
       message?: string | null; // String
       notify?: boolean | null; // Boolean
       permissionType: NexusGenEnums["PetitionUserPermissionTypeRW"]; // PetitionUserPermissionTypeRW!
-      petitionIds: string[]; // [ID!]!
-      userIds: string[]; // [ID!]!
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     cancelScheduledMessage: {
       // args
-      messageId: string; // ID!
-      petitionId: string; // ID!
+      messageId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     changePassword: {
       // args
@@ -833,9 +833,9 @@ export interface NexusGenArgTypes {
     };
     changePetitionFieldType: {
       // args
-      fieldId: string; // ID!
+      fieldId: NexusGenScalars["GID"]; // GID!
       force?: boolean | null; // Boolean
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
     clonePetition: {
@@ -843,12 +843,12 @@ export interface NexusGenArgTypes {
       deadline?: NexusGenScalars["DateTime"] | null; // DateTime
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name?: string | null; // String
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     clonePetitionField: {
       // args
-      fieldId: string; // ID!
-      petitionId: string; // ID!
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     createContact: {
       // args
@@ -862,7 +862,7 @@ export interface NexusGenArgTypes {
     };
     createPetitionField: {
       // args
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
       position?: number | null; // Int
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
@@ -875,8 +875,8 @@ export interface NexusGenArgTypes {
     };
     deactivateAccesses: {
       // args
-      accessIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     deleteContacts: {
       // args
@@ -884,9 +884,9 @@ export interface NexusGenArgTypes {
     };
     deletePetitionField: {
       // args
-      fieldId: string; // ID!
+      fieldId: NexusGenScalars["GID"]; // GID!
       force?: boolean | null; // Boolean
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     deletePetitionFieldComment: {
       // args
@@ -897,19 +897,19 @@ export interface NexusGenArgTypes {
     deletePetitions: {
       // args
       force?: boolean | null; // Boolean
-      ids: string[]; // [ID!]!
+      ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     editPetitionUserPermission: {
       // args
       permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
-      petitionIds: string[]; // [ID!]!
-      userIds: string[]; // [ID!]!
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     fileUploadReplyDownloadLink: {
       // args
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
       preview?: boolean | null; // Boolean
-      replyId: string; // ID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     markPetitionFieldCommentsAsRead: {
       // args
@@ -923,41 +923,41 @@ export interface NexusGenArgTypes {
     publicCreateFileUploadReply: {
       // args
       data: NexusGenInputs["CreateFileUploadReplyInput"]; // CreateFileUploadReplyInput!
-      fieldId: string; // ID!
+      fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
     };
     publicCreatePetitionFieldComment: {
       // args
       content: string; // String!
       keycode: string; // ID!
-      petitionFieldId: string; // ID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     publicCreateTextReply: {
       // args
       data: NexusGenInputs["CreateTextReplyInput"]; // CreateTextReplyInput!
-      fieldId: string; // ID!
+      fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
     };
     publicDeletePetitionFieldComment: {
       // args
       keycode: string; // ID!
-      petitionFieldCommentId: string; // ID!
-      petitionFieldId: string; // ID!
+      petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     publicDeletePetitionReply: {
       // args
       keycode: string; // ID!
-      replyId: string; // ID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     publicFileUploadReplyComplete: {
       // args
       keycode: string; // ID!
-      replyId: string; // ID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     publicMarkPetitionFieldCommentsAsRead: {
       // args
       keycode: string; // ID!
-      petitionFieldCommentIds: string[]; // [ID!]!
+      petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     publicSubmitUnpublishedComments: {
       // args
@@ -967,40 +967,40 @@ export interface NexusGenArgTypes {
       // args
       content: string; // String!
       keycode: string; // ID!
-      petitionFieldCommentId: string; // ID!
-      petitionFieldId: string; // ID!
+      petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     reactivateAccesses: {
       // args
-      accessIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     removePetitionUserPermission: {
       // args
-      petitionIds: string[]; // [ID!]!
-      userIds: string[]; // [ID!]!
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     sendMessages: {
       // args
-      accessIds: string[]; // [ID!]!
+      accessIds: NexusGenScalars["GID"][]; // [GID!]!
       body: NexusGenScalars["JSON"]; // JSON!
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
       subject: string; // String!
     };
     sendPetition: {
       // args
       body: NexusGenScalars["JSON"]; // JSON!
-      contactIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      contactIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
       subject: string; // String!
     };
     sendReminders: {
       // args
-      accessIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     submitUnpublishedComments: {
       // args
@@ -1008,15 +1008,15 @@ export interface NexusGenArgTypes {
     };
     switchAutomaticReminders: {
       // args
-      accessIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       start: boolean; // Boolean!
     };
     transferPetitionOwnership: {
       // args
-      petitionIds: string[]; // [ID!]!
-      userId: string; // ID!
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userId: NexusGenScalars["GID"]; // GID!
     };
     updateContact: {
       // args
@@ -1025,8 +1025,8 @@ export interface NexusGenArgTypes {
     };
     updateFieldPositions: {
       // args
-      fieldIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      fieldIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     updateOnboardingStatus: {
       // args
@@ -1036,13 +1036,13 @@ export interface NexusGenArgTypes {
     updatePetition: {
       // args
       data: NexusGenInputs["UpdatePetitionInput"]; // UpdatePetitionInput!
-      petitionId: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionField: {
       // args
       data: NexusGenInputs["UpdatePetitionFieldInput"]; // UpdatePetitionFieldInput!
-      fieldId: string; // ID!
-      petitionId: string; // ID!
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionFieldComment: {
       // args
@@ -1053,20 +1053,20 @@ export interface NexusGenArgTypes {
     };
     updatePetitionFieldRepliesStatus: {
       // args
-      petitionFieldId: string; // ID!
-      petitionFieldReplyIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
+      petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     };
     updateUser: {
       // args
       data: NexusGenInputs["UpdateUserInput"]; // UpdateUserInput!
-      id: string; // ID!
+      id: NexusGenScalars["GID"]; // GID!
     };
     validatePetitionFields: {
       // args
-      fieldIds: string[]; // [ID!]!
-      petitionId: string; // ID!
+      fieldIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
       value: boolean; // Boolean!
     };
   };

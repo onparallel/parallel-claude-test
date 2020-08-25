@@ -1,4 +1,4 @@
-import { queryField, idArg } from "@nexus/schema";
+import { queryField } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToContacts } from "./authorizers";

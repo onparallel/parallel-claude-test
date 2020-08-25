@@ -1,7 +1,6 @@
 import {
   arg,
   booleanArg,
-  idArg,
   inputObjectType,
   intArg,
   mutationField,
@@ -14,7 +13,6 @@ import {
   CreatePetitionField,
   PetitionUser,
 } from "../../../db/__types";
-import { fromGlobalId, fromGlobalIds } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import { and, authenticate, chain } from "../../helpers/authorize";
 import { dateTimeArg } from "../../helpers/date";
@@ -45,6 +43,7 @@ import {
   validatePetitionStatus,
 } from "../validations";
 import { WhitelistedError } from "./../../helpers/errors";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -69,14 +68,16 @@ export const clonePetition = mutationField("clonePetition", {
   type: "Petition",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
     name: stringArg({}),
     locale: arg({ type: "PetitionLocale", required: true }),
     deadline: dateTimeArg({}),
   },
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const petition = await ctx.petitions.clonePetition(petitionId, ctx.user!);
+    const petition = await ctx.petitions.clonePetition(
+      args.petitionId,
+      ctx.user!
+    );
     return await ctx.petitions.updatePetition(
       petition.id,
       {
@@ -98,13 +99,11 @@ export const deletePetitions = mutationField("deletePetitions", {
   type: "Result",
   authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
   args: {
-    ids: idArg({ required: true, list: [true] }),
+    ids: globalIdArg("Petition", { required: true, list: [true] }),
     force: booleanArg({ default: false, required: false }),
   },
   validateArgs: notEmptyArray((args) => args.ids, "ids"),
   resolve: async (_, args, ctx) => {
-    const { ids } = fromGlobalIds(args.ids, "Petition");
-
     const petitionIsSharedByOwner = (p: PetitionUser[]) => {
       return (
         p &&
@@ -116,7 +115,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     };
 
     // user permissions grouped by permission_id
-    const userPermissions = await ctx.petitions.loadUserPermissions(ids);
+    const userPermissions = await ctx.petitions.loadUserPermissions(args.ids);
 
     // if userPermissions === [undefined], the petition is deleted
     if (userPermissions.filter((p) => !!p).length === 0) {
@@ -136,7 +135,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     await ctx.petitions.withTransaction(async (t) => {
       // delete all permissions to the petitions
       const ownedPetitionIds = await ctx.petitions.deleteUserPermissions(
-        ids,
+        args.ids,
         ctx.user!,
         t
       );
@@ -154,18 +153,16 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   type: "Petition",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: idArg({ required: true }),
-    fieldIds: idArg({
+    petitionId: globalIdArg("Petition", { required: true }),
+    fieldIds: globalIdArg("PetitionField", {
       required: true,
       list: [true],
     }),
   },
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { ids: fieldIds } = fromGlobalIds(args.fieldIds, "PetitionField");
     return await ctx.petitions.updateFieldPositions(
-      petitionId,
-      fieldIds,
+      args.petitionId,
+      args.fieldIds,
       ctx.user!
     );
   },
@@ -199,7 +196,7 @@ export const updatePetition = mutationField("updatePetition", {
   type: "Petition",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
     data: inputObjectType({
       name: "UpdatePetitionInput",
       definition(t) {
@@ -225,7 +222,6 @@ export const updatePetition = mutationField("updatePetition", {
     )
   ),
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     const {
       name,
       locale,
@@ -259,7 +255,7 @@ export const updatePetition = mutationField("updatePetition", {
         data.reminders_active = true;
       }
     }
-    return await ctx.petitions.updatePetition(petitionId, data, ctx.user!);
+    return await ctx.petitions.updatePetition(args.petitionId, data, ctx.user!);
   },
 });
 
@@ -268,15 +264,14 @@ export const createPetitionField = mutationField("createPetitionField", {
   type: "PetitionAndField",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
     type: arg({ type: "PetitionFieldType", required: true }),
     position: intArg({ required: false }),
   },
   validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
     return await ctx.petitions.createPetitionFieldAtPosition(
-      petitionId,
+      args.petitionId,
       {
         type: args.type,
         ...defaultFieldOptions(args.type),
@@ -298,22 +293,20 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    fieldId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    fieldId: globalIdArg("PetitionField", { required: true }),
   },
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
     return await ctx.petitions.clonePetitionField(
-      petitionId,
-      fieldId,
+      args.petitionId,
+      args.fieldId,
       ctx.user!
     );
   },
 });
 
 export const deletePetitionField = mutationField("deletePetitionField", {
-  description: "Delete petitions fields.",
+  description: "Deletes a petition field.",
   type: "Petition",
   authorize: chain(
     authenticate(),
@@ -324,15 +317,12 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    fieldId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    fieldId: globalIdArg("PetitionField", { required: true }),
     force: booleanArg({ default: false, required: false }),
   },
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
-
-    const replies = await ctx.petitions.loadRepliesForField(fieldId);
+    const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
     if (!args.force && replies.length > 0) {
       throw new WhitelistedError(
         "The petition field has replies.",
@@ -341,8 +331,8 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     }
 
     return await ctx.petitions.deletePetitionField(
-      petitionId,
-      fieldId,
+      args.petitionId,
+      args.fieldId,
       ctx.user!
     );
   },
@@ -365,8 +355,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    fieldId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    fieldId: globalIdArg("PetitionField", { required: true }),
     data: inputObjectType({
       name: "UpdatePetitionFieldInput",
       definition(t) {
@@ -380,8 +370,6 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   },
   validateArgs: maxLength((args) => args.data.title, "data.title", 255),
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
     const { title, description, optional, multiple, options } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
@@ -397,12 +385,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       data.multiple = multiple;
     }
     if (options !== undefined && options !== null) {
-      await ctx.petitions.validateFieldData(fieldId, { options });
+      await ctx.petitions.validateFieldData(args.fieldId, { options });
       data.options = options;
     }
     return await ctx.petitions.updatePetitionField(
-      petitionId,
-      fieldId,
+      args.petitionId,
+      args.fieldId,
       data,
       ctx.user!
     );
@@ -421,22 +409,19 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    fieldIds: idArg({ required: true, list: [true] }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    fieldIds: globalIdArg("PetitionField", { required: true, list: [true] }),
     value: booleanArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { ids: fieldIds } = fromGlobalIds(args.fieldIds, "PetitionField");
-    const { value } = args;
     const fields = await ctx.petitions.validatePetitionFields(
-      petitionId,
-      fieldIds,
-      value,
+      args.petitionId,
+      args.fieldIds,
+      args.value,
       ctx.user!
     );
-    if (value) {
-      const replies = await ctx.petitions.loadRepliesForField(fieldIds, {
+    if (args.value) {
+      const replies = await ctx.petitions.loadRepliesForField(args.fieldIds, {
         cache: false,
       });
       await ctx.petitions.updatePetitionFieldRepliesStatus(
@@ -470,29 +455,22 @@ export const updatePetitionFieldRepliesStatus = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
-      petitionFieldReplyIds: idArg({ required: true, list: [true] }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
+      petitionFieldReplyIds: globalIdArg("PetitionFieldReply", {
+        required: true,
+        list: [true],
+      }),
       status: arg({ type: "PetitionFieldReplyStatus", required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-      const { id: petitionFieldId } = fromGlobalId(
-        args.petitionFieldId,
-        "PetitionField"
-      );
-      const { ids: petitionFieldReplyIds } = fromGlobalIds(
-        args.petitionFieldReplyIds,
-        "PetitionFieldReply"
-      );
-      const { status } = args;
       const replies = await ctx.petitions.updatePetitionFieldRepliesStatus(
-        petitionFieldReplyIds,
-        status
+        args.petitionFieldReplyIds,
+        args.status
       );
-      if (status === "APPROVED") {
+      if (args.status === "APPROVED") {
         const allReplies = await ctx.petitions.loadRepliesForField(
-          petitionFieldId
+          args.petitionFieldId
         );
         if (
           allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))
@@ -501,8 +479,8 @@ export const updatePetitionFieldRepliesStatus = mutationField(
             replies,
             field: (
               await ctx.petitions.validatePetitionFields(
-                petitionId,
-                [petitionFieldId],
+                args.petitionId,
+                [args.petitionFieldId],
                 true,
                 ctx.user!
               )
@@ -512,7 +490,7 @@ export const updatePetitionFieldRepliesStatus = mutationField(
       }
       return {
         replies,
-        field: (await ctx.petitions.loadField(petitionFieldId))!,
+        field: (await ctx.petitions.loadField(args.petitionFieldId))!,
       };
     },
   }
@@ -537,8 +515,8 @@ export const fileUploadReplyDownloadLink = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      replyId: idArg({ required: true }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      replyId: globalIdArg("PetitionFieldReply", { required: true }),
       preview: booleanArg({
         description:
           "If true will use content-disposition inline instead of attachment",
@@ -546,11 +524,7 @@ export const fileUploadReplyDownloadLink = mutationField(
     },
     resolve: async (_, args, ctx) => {
       try {
-        const { id: replyId } = fromGlobalId(
-          args.replyId,
-          "PetitionFieldReply"
-        );
-        const reply = await ctx.petitions.loadFieldReply(replyId);
+        const reply = await ctx.petitions.loadFieldReply(args.replyId);
         if (reply!.type !== "FILE_UPLOAD") {
           throw new Error("Invalid field type");
         }
@@ -595,8 +569,8 @@ export const sendPetition = mutationField("sendPetition", {
   }),
   authorize: chain(authenticate(), and(userHasAccessToPetitions("petitionId"))),
   args: {
-    petitionId: idArg({ required: true }),
-    contactIds: idArg({ list: [true], required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    contactIds: globalIdArg("Contact", { list: [true], required: true }),
     subject: stringArg({ required: true }),
     body: jsonArg({ required: true }),
     scheduledAt: dateTimeArg({}),
@@ -612,12 +586,10 @@ export const sendPetition = mutationField("sendPetition", {
   resolve: async (_, args, ctx) => {
     try {
       // Create necessary contacts
-      const { ids: recipientIds } = fromGlobalIds(args.contactIds, "Contact");
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
       const [hasAccess, petition, fields] = await Promise.all([
-        ctx.contacts.userHasAccessToContacts(ctx.user!, recipientIds),
-        ctx.petitions.loadPetition(petitionId),
-        ctx.petitions.loadFieldsForPetition(petitionId),
+        ctx.contacts.userHasAccessToContacts(ctx.user!, args.contactIds),
+        ctx.petitions.loadPetition(args.petitionId),
+        ctx.petitions.loadFieldsForPetition(args.petitionId),
       ]);
       if (!hasAccess) {
         throw new Error("No access to contacts");
@@ -629,9 +601,9 @@ export const sendPetition = mutationField("sendPetition", {
         throw new Error("Petition has no repliable fields");
       }
       const accesses = await ctx.petitions.createAccesses(
-        petitionId,
-        recipientIds.map((id) => ({
-          petition_id: petitionId,
+        args.petitionId,
+        args.contactIds.map((id) => ({
+          petition_id: args.petitionId,
           contact_id: id,
           reminders_left: 10,
           reminders_active: Boolean(args.remindersConfig),
@@ -646,7 +618,7 @@ export const sendPetition = mutationField("sendPetition", {
         ctx.user!
       );
       const messages = await ctx.petitions.createMessages(
-        petitionId,
+        args.petitionId,
         args.scheduledAt ?? null,
         accesses.map((access) => ({
           petition_access_id: access.id,
@@ -658,7 +630,7 @@ export const sendPetition = mutationField("sendPetition", {
       );
 
       await ctx.petitions.updatePetition(
-        petitionId,
+        args.petitionId,
         { name: petition.name ?? args.subject, status: "PENDING" },
         ctx.user!
       );
@@ -667,7 +639,7 @@ export const sendPetition = mutationField("sendPetition", {
         await ctx.emails.sendPetitionMessageEmail(messages.map((s) => s.id));
       }
       return {
-        petition: await ctx.petitions.loadPetition(petitionId, {
+        petition: await ctx.petitions.loadPetition(args.petitionId, {
           refresh: true,
         }),
         accesses,
@@ -693,8 +665,8 @@ export const sendMessages = mutationField("sendMessages", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    accessIds: idArg({ list: [true], required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
     subject: stringArg({ required: true }),
     body: jsonArg({ required: true }),
     scheduledAt: dateTimeArg({}),
@@ -708,15 +680,10 @@ export const sendMessages = mutationField("sendMessages", {
   resolve: async (_, args, ctx) => {
     try {
       // Create necessary contacts
-      const { ids: accessIds } = fromGlobalIds(
-        args.accessIds,
-        "PetitionAccess"
-      );
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
       const messages = await ctx.petitions.createMessages(
-        petitionId,
+        args.petitionId,
         args.scheduledAt ?? null,
-        accessIds.map((accessId) => ({
+        args.accessIds.map((accessId) => ({
           petition_access_id: accessId,
           status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
           email_subject: args.subject,
@@ -747,16 +714,13 @@ export const sendReminders = mutationField("sendReminders", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    accessIds: idArg({ list: [true], required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
   },
   resolve: async (_, args, ctx, info) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { ids: accessIds } = fromGlobalIds(args.accessIds, "PetitionAccess");
-
     const [petition, accesses] = await Promise.all([
-      ctx.petitions.loadPetition(petitionId),
-      ctx.petitions.loadAccess(accessIds),
+      ctx.petitions.loadPetition(args.petitionId),
+      ctx.petitions.loadAccess(args.accessIds),
     ]);
 
     validatePetitionStatus(petition, "PENDING", info);
@@ -765,8 +729,8 @@ export const sendReminders = mutationField("sendReminders", {
 
     try {
       const reminders = await ctx.petitions.createReminders(
-        petitionId,
-        accessIds.map((accessId) => ({
+        args.petitionId,
+        args.accessIds.map((accessId) => ({
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: accessId,
@@ -798,8 +762,11 @@ export const switchAutomaticReminders = mutationField(
     ),
     args: {
       start: booleanArg({ required: true }),
-      petitionId: idArg({ required: true }),
-      accessIds: idArg({ list: [true], required: true }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      accessIds: globalIdArg("PetitionAccess", {
+        list: [true],
+        required: true,
+      }),
       remindersConfig: arg({ type: "RemindersConfigInput", required: false }),
     },
     validateArgs: validateOr(
@@ -810,15 +777,9 @@ export const switchAutomaticReminders = mutationField(
       )
     ),
     resolve: async (_, args, ctx, info) => {
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-      const { ids: accessIds } = fromGlobalIds(
-        args.accessIds,
-        "PetitionAccess"
-      );
-
       const [petition, accesses] = await Promise.all([
-        ctx.petitions.loadPetition(petitionId),
-        ctx.petitions.loadAccess(accessIds),
+        ctx.petitions.loadPetition(args.petitionId),
+        ctx.petitions.loadAccess(args.accessIds),
       ]);
 
       validatePetitionStatus(petition, "PENDING", info);
@@ -835,7 +796,7 @@ export const switchAutomaticReminders = mutationField(
           args.remindersConfig!
         );
       } else {
-        return await ctx.petitions.stopAccessReminders(accessIds);
+        return await ctx.petitions.stopAccessReminders(args.accessIds);
       }
     },
   }
@@ -853,15 +814,13 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    accessIds: idArg({ list: [true], required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
   },
-  resolve: async (_, args, ctx, info) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { ids: accessIds } = fromGlobalIds(args.accessIds, "PetitionAccess");
+  resolve: async (_, args, ctx) => {
     return await ctx.petitions.deactivateAccesses(
-      petitionId,
-      accessIds,
+      args.petitionId,
+      args.accessIds,
       ctx.user!
     );
   },
@@ -880,15 +839,13 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    accessIds: idArg({ list: [true], required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
   },
   resolve: async (_, args, ctx, info) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { ids: accessIds } = fromGlobalIds(args.accessIds, "PetitionAccess");
     return await ctx.petitions.reactivateAccesses(
-      petitionId,
-      accessIds,
+      args.petitionId,
+      args.accessIds,
       ctx.user!
     );
   },
@@ -906,15 +863,13 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
     )
   ),
   args: {
-    petitionId: idArg({ required: true }),
-    messageId: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
+    messageId: globalIdArg("PetitionMessage", { required: true }),
   },
   resolve: async (_, args, ctx) => {
-    const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-    const { id: messageId } = fromGlobalId(args.messageId, "PetitionMessage");
     return await ctx.petitions.cancelScheduledMessage(
-      petitionId,
-      messageId,
+      args.petitionId,
+      args.messageId,
       ctx.user!
     );
   },
@@ -933,8 +888,8 @@ export const changePetitionFieldType = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      fieldId: idArg({ required: true }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      fieldId: globalIdArg("PetitionField", { required: true }),
       type: arg({
         type: "PetitionFieldType",
         required: true,
@@ -942,10 +897,7 @@ export const changePetitionFieldType = mutationField(
       force: booleanArg({ default: false, required: false }),
     },
     resolve: async (_, args, ctx) => {
-      const { id: fieldId } = fromGlobalId(args.fieldId, "PetitionField");
-      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
-
-      const replies = await ctx.petitions.loadRepliesForField(fieldId);
+      const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
       if (!args.force && replies.length > 0) {
         throw new WhitelistedError(
           "The petition field has replies.",
@@ -954,8 +906,8 @@ export const changePetitionFieldType = mutationField(
       }
 
       return await ctx.petitions.changePetitionFieldType(
-        petitionId,
-        fieldId,
+        args.petitionId,
+        args.fieldId,
         args.type,
         ctx.user!
       );

@@ -1,6 +1,5 @@
 import { Arg } from "../../helpers/authorize";
 import { FieldAuthorizeResolver } from "@nexus/schema";
-import { fromGlobalIds } from "../../../util/globalId";
 import { unMaybeArray } from "../../../util/arrays";
 import { MaybeArray } from "../../../util/types";
 import { isDefined } from "../../../util/remedaExtensions";
@@ -8,14 +7,11 @@ import { isDefined } from "../../../util/remedaExtensions";
 export function userHasAccessToUsers<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, MaybeArray<string>>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const { ids: userIds } = fromGlobalIds(
-        unMaybeArray(args[argName]),
-        "User"
-      );
+      const userIds = unMaybeArray(args[argName]);
       if (userIds.length === 0) {
         return true;
       }
@@ -25,5 +21,18 @@ export function userHasAccessToUsers<
       );
     } catch {}
     return false;
+  };
+}
+
+export function userIsCommentAuthor<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNameCommentId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const comment = await ctx.petitions.loadPetitionFieldComment(
+      args[argNameCommentId] as number
+    );
+    return (comment && comment.user_id === ctx.user!.id) ?? false;
   };
 }

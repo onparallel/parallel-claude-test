@@ -1,5 +1,4 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../util/globalId";
 import { rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
 
@@ -14,9 +13,8 @@ export const User = objectType({
   description: "A user in the system.",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the user.",
-      resolve: (o) => toGlobalId("User", o.id),
     });
     t.field("organizationRole", {
       type: "OrganizationRole",

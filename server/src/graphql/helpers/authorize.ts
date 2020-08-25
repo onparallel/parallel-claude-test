@@ -3,7 +3,6 @@ import { AuthenticationError } from "apollo-server-express";
 import { every, everySeries } from "async";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
-import { fromGlobalId } from "../../util/globalId";
 import { KeysOfType, MaybeArray } from "../../util/types";
 
 export function authenticate<
@@ -38,12 +37,11 @@ export type Arg<
 export function argIsContextUserId<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string>
+  TArg extends Arg<TypeName, FieldName, number>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id } = fromGlobalId(args[argName], "User");
-      return ctx.user!.id === id;
+      return ctx.user!.id === args[argName];
     } catch {}
     return false;
   };

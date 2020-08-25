@@ -1,13 +1,13 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { Arg } from "../helpers/authorize";
 import { unMaybeArray } from "../../util/arrays";
 import { PetitionUserPermissionType } from "../../db/__types";
+import { MaybeArray } from "../../util/types";
 
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number | number[]>
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argName: TArg,
   permissionTypes?: PetitionUserPermissionType[]
@@ -48,7 +48,7 @@ export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, number | number[]>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argNamePetitionId: TArg1,
   argNameFieldIds: TArg2
@@ -68,7 +68,7 @@ export function repliesBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, number | number[]>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argNamePetitionId: TArg1,
   argNameReplyIds: TArg2
@@ -88,7 +88,7 @@ export function repliesBelongsToField<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, number | number[]>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argNameFieldId: TArg1,
   argNameReplyIds: TArg2
@@ -108,16 +108,16 @@ export function accessesBelongToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, number[]>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argNamePetitionId: TArg1,
-  argNameaccessIds: TArg2
+  argNameAccessIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       return ctx.petitions.accesessBelongToPetition(
         args[argNamePetitionId],
-        args[argNameaccessIds]
+        unMaybeArray(args[argNameAccessIds])
       );
     } catch {}
     return false;
@@ -147,7 +147,7 @@ export function commentsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
-  TArg2 extends Arg<TypeName, FieldName, number | number[]>
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argNamePetitionId: TArg1,
   argNameCommentIds: TArg2
@@ -166,12 +166,12 @@ export function commentsBelongsToPetition<
 export function accessesBelongToValidContacts<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string[]>
+  TArg1 extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argNameAccessIds: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
       return ctx.petitions.accessesBelongToValidContacts(
-        args[argNameAccessIds]
+        unMaybeArray(args[argNameAccessIds])
       );
     } catch {}
     return false;

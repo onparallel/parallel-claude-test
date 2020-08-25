@@ -1,6 +1,5 @@
 import { core, objectType, unionType } from "@nexus/schema";
 import { fullName } from "../../util/fullName";
-import { toGlobalId } from "../../util/globalId";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",

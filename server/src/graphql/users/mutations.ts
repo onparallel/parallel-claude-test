@@ -1,23 +1,22 @@
 import {
   enumType,
-  idArg,
   inputObjectType,
   mutationField,
   stringArg,
   arg,
 } from "@nexus/schema";
-import { fromGlobalId } from "../../util/globalId";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { argIsContextUserId, authenticate, chain } from "../helpers/authorize";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
   description: "Updates the user with the provided data.",
   authorize: chain(authenticate(), argIsContextUserId("id")),
   args: {
-    id: idArg({ required: true }),
+    id: globalIdArg("User", { required: true }),
     data: inputObjectType({
       name: "UpdateUserInput",
       definition(t) {
@@ -31,10 +30,9 @@ export const updateUser = mutationField("updateUser", {
     maxLength((args) => args.data.lastName, "data.lastName", 255)
   ),
   resolve: async (o, args, ctx) => {
-    const { id } = fromGlobalId(args.id, "User");
     const { firstName, lastName } = args.data;
     return await ctx.users.updateUserById(
-      id,
+      args.id,
       removeNotDefined({
         first_name: firstName,
         last_name: lastName,
