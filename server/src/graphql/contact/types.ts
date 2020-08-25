@@ -7,9 +7,8 @@ export const Contact = objectType({
   description: "A contact in the system.",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the contact.",
-      resolve: (o) => toGlobalId("Contact", o.id),
     });
     t.string("email", {
       description: "The email of the contact.",

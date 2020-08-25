@@ -4,6 +4,7 @@ import path from "path";
 import { paginationPlugin } from "./graphql/helpers/paginationPlugin";
 import * as allTypes from "./graphql";
 import { validateArgsPlugin } from "./graphql/helpers/validateArgsPlugin";
+import { globalIdPlugin } from "./graphql/helpers/globalIdPlugin";
 
 function resolve(...paths: string[]) {
   return path.join(__dirname.replace(/\/dist$/, "/src"), ...paths);
@@ -16,6 +17,7 @@ export const schema = makeSchema({
     typegen: resolve("./graphql/__types.ts"),
   },
   plugins: [
+    globalIdPlugin(),
     fieldAuthorizePlugin({
       formatError: ({ error }) => {
         if (error.message === "Not authorized") {

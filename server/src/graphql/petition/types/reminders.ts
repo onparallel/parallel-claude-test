@@ -1,5 +1,4 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionReminderType = enumType({
   name: "PetitionReminderType",
@@ -21,9 +20,7 @@ export const PetitionReminder = objectType({
   name: "PetitionReminder",
   definition(t) {
     t.implements("CreatedAt");
-    t.id("id", {
-      resolve: (o) => toGlobalId("PetitionReminder", o.id),
-    });
+    t.globalId("id");
     t.field("type", {
       type: "PetitionReminderType",
       description: "The type of the reminder.",

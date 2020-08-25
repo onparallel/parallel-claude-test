@@ -1,9 +1,9 @@
-import { idArg, inputObjectType, mutationField } from "@nexus/schema";
+import { inputObjectType, mutationField } from "@nexus/schema";
 import { CreateContact } from "../../db/__types";
-import { fromGlobalId } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
-import { userHasAccessToContact, userHasAccessToContacts } from "./authorizers";
 import { WhitelistedError } from "../helpers/errors";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userHasAccessToContacts } from "./authorizers";
 
 export const createContact = mutationField("createContact", {
   description: "Create a contact.",
@@ -46,9 +46,9 @@ export const createContact = mutationField("createContact", {
 export const updateContact = mutationField("updateContact", {
   description: "Updates a contact.",
   type: "Contact",
-  authorize: chain(authenticate(), userHasAccessToContact("id")),
+  authorize: chain(authenticate(), userHasAccessToContacts("id")),
   args: {
-    id: idArg({ required: true }),
+    id: globalIdArg("Contact", { required: true }),
     data: inputObjectType({
       name: "UpdateContactInput",
       definition(t) {
@@ -58,7 +58,6 @@ export const updateContact = mutationField("updateContact", {
     }).asArg({ required: true }),
   },
   resolve: async (_, args, ctx) => {
-    const { id } = fromGlobalId(args.id, "Contact");
     const { firstName, lastName } = args.data;
     const data: Partial<CreateContact> = {};
     if (firstName !== undefined) {
@@ -67,7 +66,7 @@ export const updateContact = mutationField("updateContact", {
     if (lastName !== undefined) {
       data.last_name = lastName;
     }
-    return await ctx.contacts.updateContact(id, data, ctx.user!);
+    return await ctx.contacts.updateContact(args.id, data, ctx.user!);
   },
 });
 
@@ -76,15 +75,14 @@ export const deleteContacts = mutationField("deleteContacts", {
   type: "Result",
   authorize: chain(authenticate(), userHasAccessToContacts("ids")),
   args: {
-    ids: idArg({ required: true, list: [true] }),
+    ids: globalIdArg("Contact", { required: true, list: [true] }),
   },
   resolve: async (_, args, ctx) => {
     throw new WhitelistedError(
       "Contact deletion is disabled.",
       "DELETE_CONTACT_ERROR"
     );
-    // const { ids } = fromGlobalIds(args.ids, "Contact");
-    // await ctx.contacts.deleteContactById(ids, ctx.user!);
+    // await ctx.contacts.deleteContactById(args.ids, ctx.user!);
     // return RESULT.SUCCESS;
   },
 });

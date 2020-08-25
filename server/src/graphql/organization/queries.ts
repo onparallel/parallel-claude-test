@@ -1,12 +1,13 @@
 import { idArg, queryField } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate } from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 
 export const organizationQueries = queryField((t) => {
   t.field("organization", {
     type: "Organization",
     args: {
-      id: idArg({ required: true }),
+      id: globalIdArg({ required: true }),
     },
     authorize: authenticate(),
     nullable: true,

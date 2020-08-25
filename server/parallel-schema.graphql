@@ -4,21 +4,21 @@
 type AccessActivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   user: User
 }
 
 type AccessDeactivatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   user: User
 }
 
 type AccessOpenedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
-  id: ID!
+  id: GID!
 }
 
 enum ChangePasswordResult {
@@ -31,14 +31,14 @@ type CommentDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
   deletedBy: UserOrPetitionAccess
   field: PetitionField
-  id: ID!
+  id: GID!
 }
 
 type CommentPublishedEvent implements PetitionEvent {
   comment: PetitionFieldComment
   createdAt: DateTime!
   field: PetitionField
-  id: ID!
+  id: GID!
 }
 
 """
@@ -83,7 +83,7 @@ type Contact implements Timestamps {
   """
   The ID of the contact.
   """
-  id: ID!
+  id: GID!
 
   """
   The last name of the contact.
@@ -149,6 +149,8 @@ type FileUploadReplyDownloadLinkResult {
   url: String
 }
 
+scalar GID
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -167,20 +169,20 @@ scalar JSONObject
 
 type MessageCancelledEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   message: PetitionMessage!
   user: User
 }
 
 type MessageScheduledEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   message: PetitionMessage!
 }
 
 type MessageSentEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   message: PetitionMessage!
 }
 
@@ -263,9 +265,9 @@ type Mutation {
   """
   createPetitionFieldComment(
     content: String!
-    petitionFieldId: ID!
-    petitionFieldReplyId: ID
-    petitionId: ID!
+    petitionFieldId: GID!
+    petitionFieldReplyId: GID
+    petitionId: GID!
   ): PetitionFieldComment!
 
   """
@@ -276,7 +278,7 @@ type Mutation {
   """
   Delete contacts.
   """
-  deleteContacts(ids: [ID!]!): Result!
+  deleteContacts(ids: [GID!]!): Result!
 
   """
   Delete petitions fields.
@@ -291,9 +293,9 @@ type Mutation {
   Delete a petition field comment.
   """
   deletePetitionFieldComment(
-    petitionFieldCommentId: ID!
-    petitionFieldId: ID!
-    petitionId: ID!
+    petitionFieldCommentId: GID!
+    petitionFieldId: GID!
+    petitionId: GID!
   ): Result!
 
   """
@@ -327,8 +329,8 @@ type Mutation {
   Marks the specified comments as read.
   """
   markPetitionFieldCommentsAsRead(
-    petitionFieldCommentIds: [ID!]!
-    petitionId: ID!
+    petitionFieldCommentIds: [GID!]!
+    petitionId: GID!
   ): [PetitionFieldComment!]!
 
   """
@@ -452,7 +454,7 @@ type Mutation {
   """
   Submits all unpublished comments.
   """
-  submitUnpublishedComments(petitionId: ID!): [PetitionFieldComment!]!
+  submitUnpublishedComments(petitionId: GID!): [PetitionFieldComment!]!
 
   """
   Switches automatic reminders for the specified petition accesses.
@@ -472,7 +474,7 @@ type Mutation {
   """
   Updates a contact.
   """
-  updateContact(data: UpdateContactInput!, id: ID!): Contact!
+  updateContact(data: UpdateContactInput!, id: GID!): Contact!
 
   """
   Updates the positions of the petition fields
@@ -503,9 +505,9 @@ type Mutation {
   """
   updatePetitionFieldComment(
     content: String!
-    petitionFieldCommentId: ID!
-    petitionFieldId: ID!
-    petitionId: ID!
+    petitionFieldCommentId: GID!
+    petitionFieldId: GID!
+    petitionId: GID!
   ): PetitionFieldComment!
 
   """
@@ -559,7 +561,7 @@ type Organization implements Timestamps {
   """
   The ID of the organization.
   """
-  id: ID!
+  id: GID!
 
   """
   The unique text identifier of the organization.
@@ -585,7 +587,7 @@ type Organization implements Timestamps {
   The users in the organization.
   """
   users(
-    exclude: [ID!]
+    exclude: [GID!]
 
     """
     Number of elements to take from the list.
@@ -639,7 +641,7 @@ enum OrganizationStatus {
 
 type OwnershipTransferredEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   owner: User
   user: User
 }
@@ -706,7 +708,7 @@ type Petition implements Timestamps {
   """
   The ID of the petition.
   """
-  id: ID!
+  id: GID!
 
   """
   The locale of the petition.
@@ -767,7 +769,7 @@ type PetitionAccess implements Timestamps {
   """
   The ID of the petition access.
   """
-  id: ID!
+  id: GID!
 
   """
   When the next reminder will be sent.
@@ -845,18 +847,18 @@ type PetitionAndField {
 type PetitionCompletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
-  id: ID!
+  id: GID!
 }
 
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   user: User
 }
 
 interface PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
 }
 
 type PetitionEventPagination {
@@ -888,7 +890,7 @@ type PetitionField {
   """
   The ID of the petition field.
   """
-  id: ID!
+  id: GID!
 
   """
   Determines if the field can be moved or deleted.
@@ -958,7 +960,7 @@ type PetitionFieldComment {
   """
   The ID of the petition field comment.
   """
-  id: ID!
+  id: GID!
 
   """
   Whether the comment has been edited after being published.
@@ -1008,7 +1010,7 @@ type PetitionFieldReply implements Timestamps {
   """
   The ID of the petition field reply.
   """
-  id: ID!
+  id: GID!
 
   """
   The status of the reply.
@@ -1106,7 +1108,7 @@ type PetitionMessage implements CreatedAt {
   """
   The ID of the petition message.
   """
-  id: ID!
+  id: GID!
 
   """
   Tells when the email was opened for the first time.
@@ -1206,7 +1208,7 @@ type PetitionReminder implements CreatedAt {
   Time when the resource was created.
   """
   createdAt: DateTime!
-  id: ID!
+  id: GID!
 
   """
   The sender of this petition message.
@@ -1262,7 +1264,7 @@ type PetitionUserPermission implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
-  id: ID!
+  id: GID!
 
   """
   wether user is subscribed or not to emails and alerts of the petition
@@ -1329,7 +1331,7 @@ type PublicContact {
   """
   The ID of the contact.
   """
-  id: ID!
+  id: GID!
 
   """
   The last name of the user.
@@ -1344,7 +1346,7 @@ type PublicOrganization {
   """
   The ID of the organization.
   """
-  id: ID!
+  id: GID!
 
   """
   The identifier of the organization.
@@ -1384,7 +1386,7 @@ type PublicPetition implements Timestamps {
   """
   The ID of the petition.
   """
-  id: ID!
+  id: GID!
 
   """
   The locale of the petition.
@@ -1428,7 +1430,7 @@ type PublicPetitionField {
   """
   The ID of the petition field.
   """
-  id: ID!
+  id: GID!
 
   """
   Determines if the field accepts replies
@@ -1488,7 +1490,7 @@ type PublicPetitionFieldComment {
   """
   The ID of the petition field comment.
   """
-  id: ID!
+  id: GID!
 
   """
   Whether the comment has been read or not.
@@ -1523,7 +1525,7 @@ type PublicPetitionFieldReply implements Timestamps {
   """
   The ID of the petition field reply.
   """
-  id: ID!
+  id: GID!
 
   """
   The status of the petition field reply.
@@ -1558,7 +1560,7 @@ type PublicUser {
   """
   The ID of the user.
   """
-  id: ID!
+  id: GID!
 
   """
   The last name of the user.
@@ -1575,13 +1577,13 @@ union PublicUserOrContact = PublicContact | PublicUser
 
 type Query {
   access(keycode: ID!): PublicPetitionAccess
-  contact(id: ID!): Contact
+  contact(id: GID!): Contact
 
   """
   The contacts of the user
   """
   contacts(
-    exclude: [ID!]
+    exclude: [GID!]
 
     """
     Number of elements to take from the list.
@@ -1604,8 +1606,8 @@ type Query {
     sortBy: [QueryContacts_OrderBy!]
   ): ContactPagination!
   me: User!
-  organization(id: ID!): Organization
-  petition(id: ID!): Petition
+  organization(id: GID!): Organization
+  petition(id: GID!): Petition
 
   """
   The petitions of the user
@@ -1712,7 +1714,7 @@ input RemindersConfigInput {
 
 type ReminderSentEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   reminder: PetitionReminder!
 }
 
@@ -1720,7 +1722,7 @@ type ReplyCreatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   field: PetitionField
-  id: ID!
+  id: GID!
   reply: PetitionFieldReply
 }
 
@@ -1728,7 +1730,7 @@ type ReplyDeletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   field: PetitionField
-  id: ID!
+  id: GID!
 }
 
 """
@@ -1847,7 +1849,7 @@ type UserPagination {
 
 type UserPermissionAddedEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   permissionType: PetitionUserPermissionType!
   permissionUser: User
   user: User
@@ -1855,7 +1857,7 @@ type UserPermissionAddedEvent implements PetitionEvent {
 
 type UserPermissionEditedEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   permissionType: PetitionUserPermissionType!
   permissionUser: User
   user: User
@@ -1863,7 +1865,7 @@ type UserPermissionEditedEvent implements PetitionEvent {
 
 type UserPermissionRemovedEvent implements PetitionEvent {
   createdAt: DateTime!
-  id: ID!
+  id: GID!
   permissionUser: User
   user: User
 }

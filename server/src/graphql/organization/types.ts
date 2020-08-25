@@ -1,6 +1,7 @@
-import { enumType, objectType, idArg } from "@nexus/schema";
-import { toGlobalId, fromGlobalIds } from "../../util/globalId";
+import { enumType, idArg, objectType } from "@nexus/schema";
+import { fromGlobalIds } from "../../util/globalId";
 import { belongsToOrg } from "./authorizers";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -18,9 +19,8 @@ export const Organization = objectType({
   description: "An organization in the system.",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the organization.",
-      resolve: (o) => toGlobalId("Organization", o.id),
     });
     t.string("name", {
       description: "The name of the organization.",
@@ -38,7 +38,7 @@ export const Organization = objectType({
       searchable: true,
       authorize: belongsToOrg(),
       additionalArgs: {
-        exclude: idArg({
+        exclude: globalIdArg({
           list: [true],
           required: false,
         }),

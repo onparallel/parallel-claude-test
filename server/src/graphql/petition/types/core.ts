@@ -1,5 +1,4 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -44,9 +43,8 @@ export const Petition = objectType({
   description: "An petition in the system.",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition.",
-      resolve: (o) => toGlobalId("Petition", o.id),
     });
     t.string("name", {
       description: "The name of the petition.",
@@ -162,9 +160,8 @@ export const PetitionField = objectType({
   name: "PetitionField",
   description: "A field within a petition.",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition field.",
-      resolve: (o) => toGlobalId("PetitionField", o.id),
     });
     t.field("type", {
       type: "PetitionFieldType",
@@ -263,9 +260,8 @@ export const PetitionAccess = objectType({
   description: "A petition access",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition access.",
-      resolve: (o) => toGlobalId("PetitionAccess", o.id),
     });
     t.field("petition", {
       type: "Petition",
@@ -347,9 +343,8 @@ export const PetitionFieldReply = objectType({
   description: "A reply to a petition field",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition field reply.",
-      resolve: (o) => toGlobalId("PetitionFieldReply", o.id),
     });
     t.field("status", {
       type: "PetitionFieldReplyStatus",

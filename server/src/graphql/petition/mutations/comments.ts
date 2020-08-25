@@ -15,6 +15,7 @@ import {
 } from "../authorizers";
 import { prop } from "remeda";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -33,9 +34,9 @@ export const createPetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
-      petitionFieldReplyId: idArg(),
+      petitionId: globalIdArg("Petition", { required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
+      petitionFieldReplyId: globalIdArg(),
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
@@ -74,9 +75,11 @@ export const deletePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
-      petitionFieldCommentId: idArg({ required: true }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
+      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
+        required: true,
+      }),
     },
     resolve: async (_, args, ctx) => {
       const petitionId = fromGlobalId(args.petitionId, "Petition").id;
@@ -123,9 +126,11 @@ export const updatePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      petitionFieldId: idArg({ required: true }),
-      petitionFieldCommentId: idArg({ required: true }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      petitionFieldId: globalIdArg("PetitionField", { required: true }),
+      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
+        required: true,
+      }),
       content: stringArg({ required: true }),
     },
     resolve: async (_, args, ctx) => {
@@ -150,7 +155,7 @@ export const submitUnpublishedComments = mutationField(
     list: [true],
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     args: {
-      petitionId: idArg({ required: true }),
+      petitionId: globalIdArg("Petition", { required: true }),
     },
     resolve: async (_, args, ctx) => {
       const petitionId = fromGlobalId(args.petitionId, "Petition").id;
@@ -186,8 +191,11 @@ export const markPetitionFieldCommentsAsRead = mutationField(
       )
     ),
     args: {
-      petitionId: idArg({ required: true }),
-      petitionFieldCommentIds: idArg({ required: true, list: [true] }),
+      petitionId: globalIdArg("Petition", { required: true }),
+      petitionFieldCommentIds: globalIdArg("PetitionFieldComment", {
+        required: true,
+        list: [true],
+      }),
     },
     validateArgs: notEmptyArray(
       prop("petitionFieldCommentIds"),

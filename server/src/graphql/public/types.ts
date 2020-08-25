@@ -37,9 +37,9 @@ export const PublicPetition = objectType({
   description: "A public view of the petition",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition.",
-      resolve: (o) => toGlobalId("Petition", o.id),
+      prefixName: "Petition",
     });
     t.datetime("deadline", {
       description: "The deadline of the petition.",
@@ -69,9 +69,9 @@ export const PublicPetitionField = objectType({
   rootTyping: "db.PetitionField",
   description: "A field within a petition.",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition field.",
-      resolve: (o) => toGlobalId("PetitionField", o.id),
+      prefixName: "PetitionField",
     });
     t.field("type", {
       type: "PetitionFieldType",
@@ -129,9 +129,9 @@ export const PublicUser = objectType({
   rootTyping: "db.User",
   description: "A public view of a user",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the user.",
-      resolve: (o) => toGlobalId("User", o.id),
+      prefixName: "User",
     });
     t.string("email", {
       description: "The email of the user.",
@@ -166,9 +166,9 @@ export const PublicOrganization = objectType({
   rootTyping: "db.Organization",
   description: "A public view of an organization",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the organization.",
-      resolve: (o) => toGlobalId("Organization", o.id),
+      prefixName: "Organization",
     });
     t.string("name", {
       description: "The name of the organization.",
@@ -193,9 +193,9 @@ export const PublicPetitionFieldReply = objectType({
   description: "A reply to a petition field",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition field reply.",
-      resolve: (o) => toGlobalId("PetitionFieldReply", o.id),
+      prefixName: "PetitionFieldReply",
     });
     t.field("status", {
       description: "The status of the petition field reply.",
@@ -232,9 +232,9 @@ export const PublicContact = objectType({
   rootTyping: "db.Contact",
   description: "A public view of a contact",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the contact.",
-      resolve: (o) => toGlobalId("Contact", o.id),
+      prefixName: "Contact",
     });
     t.string("email", {
       description: "The email of the user.",
@@ -281,9 +281,9 @@ export const PublicPetitionFieldComment = objectType({
   rootTyping: "db.PetitionFieldComment",
   description: "A comment on a petition field",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition field comment.",
-      resolve: (o) => toGlobalId("PetitionFieldComment", o.id),
+      prefixName: "PetitionFieldComment",
     });
     t.field("author", {
       type: "PublicUserOrContact",

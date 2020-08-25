@@ -1,5 +1,4 @@
 import { objectType, unionType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
 
 export const UserOrPetitionAccess = unionType({
   name: "UserOrPetitionAccess",
@@ -22,9 +21,8 @@ export const PetitionFieldComment = objectType({
   name: "PetitionFieldComment",
   description: "A comment on a petition field",
   definition(t) {
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition field comment.",
-      resolve: (o) => toGlobalId("PetitionFieldComment", o.id),
     });
     t.field("author", {
       type: "UserOrPetitionAccess",

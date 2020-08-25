@@ -2,6 +2,7 @@ import { arg, idArg, queryField } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToPetitions } from "./authorizers";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -40,7 +41,7 @@ export const petitionsQuery = queryField((t) => {
 export const petitionQuery = queryField("petition", {
   type: "Petition",
   args: {
-    id: idArg({ required: true }),
+    id: globalIdArg({ required: true }),
   },
   authorize: chain(authenticate(), userHasAccessToPetitions("id")),
   nullable: true,

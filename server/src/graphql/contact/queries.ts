@@ -1,7 +1,7 @@
-import { idArg, queryField } from "@nexus/schema";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { queryField, idArg } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
-import { userHasAccessToContact } from "./authorizers";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { userHasAccessToContacts } from "./authorizers";
 
 export const contactQueries = queryField((t) => {
   t.paginationField("contacts", {
@@ -10,17 +10,16 @@ export const contactQueries = queryField((t) => {
     authorize: authenticate(),
     searchable: true,
     additionalArgs: {
-      exclude: idArg({
+      exclude: globalIdArg("Contact", {
         list: [true],
         required: false,
       }),
     },
     sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt"],
     resolve: async (_, { offset, limit, search, sortBy, exclude }, ctx) => {
-      const { ids: excludeIds } = fromGlobalIds(exclude ?? [], "Contact");
       return await ctx.contacts.loadContactsForUser(ctx.user!, {
         search,
-        excludeIds,
+        excludeIds: exclude,
         offset,
         limit,
         sortBy: (sortBy || ["firstName_ASC"]).flatMap((value): any => {
@@ -55,13 +54,12 @@ export const contactQueries = queryField((t) => {
   t.field("contact", {
     type: "Contact",
     args: {
-      id: idArg({ required: true }),
+      id: globalIdArg({ required: true }),
     },
-    authorize: chain(authenticate(), userHasAccessToContact("id")),
+    authorize: chain(authenticate(), userHasAccessToContacts("id")),
     nullable: true,
     resolve: async (root, args, ctx) => {
-      const { id } = fromGlobalId(args.id, "Contact");
-      return await ctx.contacts.loadContact(id);
+      return await ctx.contacts.loadContact(args.id);
     },
   });
 });

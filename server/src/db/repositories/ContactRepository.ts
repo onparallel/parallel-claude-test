@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder } from "knex";
-import { MaybeArray } from "../../util/types";
+import { MaybeArray, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";

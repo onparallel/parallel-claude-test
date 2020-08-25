@@ -7,17 +7,14 @@ import { PetitionUserPermissionType } from "../../db/__types";
 export function userHasAccessToPetitions<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, string | string[]>
+  TArg extends Arg<TypeName, FieldName, number | number[]>
 >(
   argName: TArg,
   permissionTypes?: PetitionUserPermissionType[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { ids: petitionIds } = fromGlobalIds(
-        unMaybeArray(args[argName]),
-        "Petition"
-      );
+      const petitionIds = unMaybeArray(args[argName]);
       if (petitionIds.length === 0) {
         return true;
       }
@@ -34,15 +31,13 @@ export function userHasAccessToPetitions<
 export function fieldIsNotFixed<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>
->(argNameFIeldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg1 extends Arg<TypeName, FieldName, number>
+>(argNameFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const { id: fieldId } = fromGlobalId(
-        args[argNameFIeldId],
-        "PetitionField"
+      const field = await ctx.petitions.loadField(
+        args[argNameFieldId] as number
       );
-      const field = await ctx.petitions.loadField(fieldId);
       return !field!.is_fixed;
     } catch {}
     return false;
@@ -52,23 +47,18 @@ export function fieldIsNotFixed<
 export function fieldsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string | string[]>
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number | number[]>
 >(
   argNamePetitionId: TArg1,
   argNameFieldIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id: petitionId } = fromGlobalId(
+      return ctx.petitions.fieldsBelongToPetition(
         args[argNamePetitionId],
-        "Petition"
+        unMaybeArray(args[argNameFieldIds])
       );
-      const { ids: fieldIds } = fromGlobalIds(
-        unMaybeArray(args[argNameFieldIds]),
-        "PetitionField"
-      );
-      return ctx.petitions.fieldsBelongToPetition(petitionId, fieldIds);
     } catch {}
     return false;
   };
@@ -77,23 +67,18 @@ export function fieldsBelongsToPetition<
 export function repliesBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string | string[]>
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number | number[]>
 >(
   argNamePetitionId: TArg1,
   argNameReplyIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id: petitionId } = fromGlobalId(
+      return ctx.petitions.repliesBelongsToPetition(
         args[argNamePetitionId],
-        "Petition"
+        unMaybeArray(args[argNameReplyIds])
       );
-      const { ids: replyIds } = fromGlobalIds(
-        unMaybeArray(args[argNameReplyIds]),
-        "PetitionFieldReply"
-      );
-      return ctx.petitions.repliesBelongsToPetition(petitionId, replyIds);
     } catch {}
     return false;
   };
@@ -102,23 +87,18 @@ export function repliesBelongsToPetition<
 export function repliesBelongsToField<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string | string[]>
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number | number[]>
 >(
   argNameFieldId: TArg1,
   argNameReplyIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id: petitionFieldId } = fromGlobalId(
+      return ctx.petitions.repliesBelongsToField(
         args[argNameFieldId],
-        "PetitionField"
+        unMaybeArray(args[argNameReplyIds])
       );
-      const { ids: replyIds } = fromGlobalIds(
-        unMaybeArray(args[argNameReplyIds]),
-        "PetitionFieldReply"
-      );
-      return ctx.petitions.repliesBelongsToField(petitionFieldId, replyIds);
     } catch {}
     return false;
   };
@@ -127,23 +107,18 @@ export function repliesBelongsToField<
 export function accessesBelongToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string[]>
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number[]>
 >(
   argNamePetitionId: TArg1,
   argNameaccessIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id: petitionId } = fromGlobalId(
+      return ctx.petitions.accesessBelongToPetition(
         args[argNamePetitionId],
-        "Petition"
+        args[argNameaccessIds]
       );
-      const { ids: accessIds } = fromGlobalIds(
-        args[argNameaccessIds],
-        "PetitionAccess"
-      );
-      return ctx.petitions.accesessBelongToPetition(petitionId, accessIds);
     } catch {}
     return false;
   };
@@ -152,23 +127,17 @@ export function accessesBelongToPetition<
 export function messageBelongToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string>
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number>
 >(
   argNamePetitionId: TArg1,
   argNameMessageId: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id: petitionId } = fromGlobalId(
-        args[argNamePetitionId],
-        "Petition"
-      );
-      const { id: messageId } = fromGlobalId(
+      return ctx.petitions.messagesBelongToPetition(args[argNamePetitionId], [
         args[argNameMessageId],
-        "PetitionMessage"
-      );
-      return ctx.petitions.messagesBelongToPetition(petitionId, [messageId]);
+      ]);
     } catch {}
     return false;
   };
@@ -177,23 +146,18 @@ export function messageBelongToPetition<
 export function commentsBelongsToPetition<
   TypeName extends string,
   FieldName extends string,
-  TArg1 extends Arg<TypeName, FieldName, string>,
-  TArg2 extends Arg<TypeName, FieldName, string | string[]>
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, number | number[]>
 >(
   argNamePetitionId: TArg1,
   argNameCommentIds: TArg2
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { id: petitionId } = fromGlobalId(
+      return ctx.petitions.commentsBelongToPetition(
         args[argNamePetitionId],
-        "Petition"
+        unMaybeArray(args[argNameCommentIds])
       );
-      const { ids: commentIds } = fromGlobalIds(
-        unMaybeArray(args[argNameCommentIds]),
-        "PetitionFieldComment"
-      );
-      return ctx.petitions.commentsBelongToPetition(petitionId, commentIds);
     } catch {}
     return false;
   };
@@ -206,11 +170,9 @@ export function accessesBelongToValidContacts<
 >(argNameAccessIds: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const { ids: accessIds } = fromGlobalIds(
-        args[argNameAccessIds],
-        "PetitionAccess"
+      return ctx.petitions.accessesBelongToValidContacts(
+        args[argNameAccessIds]
       );
-      return ctx.petitions.accessesBelongToValidContacts(accessIds);
     } catch {}
     return false;
   };

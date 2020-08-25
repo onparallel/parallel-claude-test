@@ -1,12 +1,9 @@
 import { core, interfaceType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionEvent = interfaceType({
   name: "PetitionEvent",
   definition(t) {
-    t.id("id", {
-      resolve: (o) => toGlobalId("PetitionEvent", o.id),
-    });
+    t.globalId("id");
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });

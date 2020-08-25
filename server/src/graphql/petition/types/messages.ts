@@ -1,5 +1,4 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionMessageStatus = enumType({
   name: "PetitionMessageStatus",
@@ -24,9 +23,8 @@ export const PetitionMessage = objectType({
   description: "A petition message",
   definition(t) {
     t.implements("CreatedAt");
-    t.id("id", {
+    t.globalId("id", {
       description: "The ID of the petition message.",
-      resolve: (o) => toGlobalId("PetitionMessage", o.id),
     });
     t.field("access", {
       type: "PetitionAccess",

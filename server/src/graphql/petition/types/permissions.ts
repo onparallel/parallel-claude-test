@@ -1,5 +1,4 @@
 import { enumType, objectType } from "@nexus/schema";
-import { toGlobalId } from "../../../util/globalId";
 
 export const PetitionUserPermissionTypeRW = enumType({
   name: "PetitionUserPermissionTypeRW",
@@ -19,9 +18,7 @@ export const PetitionUserPermission = objectType({
   description: "The permission for a petition and user",
   definition(t) {
     t.implements("Timestamps");
-    t.id("id", {
-      resolve: (o) => toGlobalId("PetitionUserPermission", o.id),
-    });
+    t.globalId("id");
     t.field("user", {
       type: "User",
       description: "The user linked to the permission",
