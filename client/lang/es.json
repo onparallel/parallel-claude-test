@@ -1715,6 +1715,11 @@
     "context": "Petition settings"
   },
   {
+    "term": "petition.shared-delete-error",
+    "definition": "La{count, plural, =1 { petición} other {s peticiones}} que qiueres eliminar está{count, plural, =1 {} other {n}} siendo compartida{count, plural, =1 {} other {s}} con otro usuario. Por favor, primero elimine el acceso compartido.",
+    "context": "The petition{count, plural, =1 {} other {s}} you want to delete {count, plural, =1 {is} other {are}} being shared to other user. Please remove shared access first."
+  },
+  {
     "term": "petition.status.error",
     "definition": "Error",
     "context": "Error"
