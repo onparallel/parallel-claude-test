@@ -534,22 +534,21 @@ export class PetitionRepository extends BaseRepository {
     t?: Transaction
   ) {
     return await this.withTransaction(async (t) => {
-      await this.from("petition_user", t)
+      const removedPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
+        .where({
+          deleted_at: null,
+          user_id: user.id,
+        })
         .update({
           deleted_at: this.now(),
           deleted_by: `User:${user.id}`,
-        });
+        })
+        .returning("*");
 
-      return (
-        await this.from("petition_user")
-          .whereIn("petition_id", petitionIds)
-          .where({
-            permission_type: "OWNER",
-            user_id: user.id,
-          })
-          .select("petition_id")
-      ).map((p) => p.petition_id);
+      return removedPermissions
+        .filter((p) => p.permission_type === "OWNER")
+        .map((p) => p.petition_id);
     }, t);
   }
 
