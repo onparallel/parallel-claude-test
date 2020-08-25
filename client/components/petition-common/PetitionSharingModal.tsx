@@ -42,7 +42,7 @@ import {
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, KeyboardEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogOpenerProvider";
@@ -177,6 +177,14 @@ export function PetitionSharingModal({
                         <UserSelect
                           ref={usersRef}
                           value={value}
+                          onKeyDown={(e: KeyboardEvent) => {
+                            if (
+                              e.key === "Enter" &&
+                              !(e.target as HTMLInputElement).value
+                            ) {
+                              e.preventDefault();
+                            }
+                          }}
                           onChange={(users: UserSelectSelection[]) => {
                             onChange(users);
                             setHasUsers(Boolean(users?.length));
@@ -205,7 +213,12 @@ export function PetitionSharingModal({
                   {/* PermissionTypeSelect */}
                 </Stack>
                 <Stack display={hasUsers ? "flex" : "none"}>
-                  <Checkbox name="notify" ref={register} colorScheme="purple">
+                  <Checkbox
+                    name="notify"
+                    ref={register}
+                    colorScheme="purple"
+                    defaultIsChecked
+                  >
                     <FormattedMessage
                       id="petition-sharing.notify-checkbox"
                       defaultMessage="Notify users"
