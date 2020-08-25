@@ -4,6 +4,7 @@ import AWS from "aws-sdk";
 import contentDisposition from "content-disposition";
 import { chunk } from "remeda";
 import { LOGGER, Logger } from "./logger";
+import { createHash } from "crypto";
 
 @injectable()
 export class Aws {
@@ -53,6 +54,10 @@ export class Aws {
     });
   }
 
+  private hash(value: string) {
+    return createHash("md5").update(value).digest("hex");
+  }
+
   async enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages:
@@ -66,9 +71,9 @@ export class Aws {
           .sendMessageBatch({
             QueueUrl: queueUrl,
             Entries: batch.map(({ id, body, groupId }) => ({
-              Id: id,
+              Id: this.hash(id),
               MessageBody: JSON.stringify(body),
-              MessageGroupId: groupId,
+              MessageGroupId: this.hash(groupId),
             })),
           })
           .promise();
