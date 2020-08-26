@@ -21,7 +21,7 @@ import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { identity } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { PetitionStatusFilter } from "../common/PetitionStatusFilter";
+import { PetitionListFilter } from "../common/PetitionListFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
@@ -81,7 +81,7 @@ export function PetitionListHeader({
         })}
       />
       <Box>
-        <PetitionStatusFilter value={status} onChange={onStatusChange} />
+        <PetitionListFilter value={status} onChange={onStatusChange} />
       </Box>
       <Spacer />
       {showActions ? (

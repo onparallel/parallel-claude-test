@@ -1,11 +1,11 @@
-import { arg, queryField } from "@nexus/schema";
+import { arg, queryField, enumType } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
 import { userHasAccessToPetitions } from "./authorizers";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
-    type: "Petition",
+    type: "PetitionBase",
     description: "The petitions of the user",
     authorize: authenticate(),
     additionalArgs: {
@@ -13,14 +13,25 @@ export const petitionsQuery = queryField((t) => {
         type: "PetitionStatus",
         nullable: true,
       }),
+      type: arg({
+        type: enumType({
+          name: "PetitionBaseType",
+          members: ["PETITION", "TEMPLATE"],
+        }),
+      }),
     },
     searchable: true,
     sortableBy: ["createdAt", "name"],
-    resolve: async (_, { offset, limit, search, sortBy, status }, ctx) => {
+    resolve: async (
+      _,
+      { offset, limit, search, sortBy, status, type },
+      ctx
+    ) => {
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
         status,
         search,
         offset,
+        type: type || "PETITION",
         sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
           const [field, order] = value.split("_");
           return {
@@ -38,9 +49,9 @@ export const petitionsQuery = queryField((t) => {
 });
 
 export const petitionQuery = queryField("petition", {
-  type: "Petition",
+  type: "PetitionBase",
   args: {
-    id: globalIdArg({ required: true }),
+    id: globalIdArg("Petition", { required: true }),
   },
   authorize: chain(authenticate(), userHasAccessToPetitions("id")),
   nullable: true,

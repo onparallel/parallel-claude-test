@@ -564,15 +564,13 @@ export type OwnershipTransferredEvent = PetitionEvent & {
   user?: Maybe<User>;
 };
 
-/** An petition in the system. */
-export type Petition = Timestamps & {
+/** A petition */
+export type Petition = PetitionBase & {
   __typename?: "Petition";
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  /** The custom ref of the petition. */
-  customRef?: Maybe<Scalars["String"]>;
   /** The deadline of the petition. */
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The body of the petition. */
@@ -583,9 +581,9 @@ export type Petition = Timestamps & {
   events: PetitionEventPagination;
   /** The number of fields in the petition. */
   fieldCount: Scalars["Int"];
-  /** The field definition of the petition. */
+  /** The definition of the petition fields. */
   fields: Array<PetitionField>;
-  /** The ID of the petition. */
+  /** The ID of the petition or template. */
   id: Scalars["GID"];
   /** The locale of the petition. */
   locale: PetitionLocale;
@@ -604,7 +602,7 @@ export type Petition = Timestamps & {
   userPermissions: Array<PetitionUserPermission>;
 };
 
-/** An petition in the system. */
+/** A petition */
 export type PetitioneventsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
@@ -660,6 +658,38 @@ export type PetitionAndField = {
   petition: Petition;
 };
 
+export type PetitionBase = {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** The body of the petition. */
+  emailBody?: Maybe<Scalars["JSON"]>;
+  /** The subject of the petition. */
+  emailSubject?: Maybe<Scalars["String"]>;
+  /** The number of fields in the petition. */
+  fieldCount: Scalars["Int"];
+  /** The ID of the petition or template. */
+  id: Scalars["GID"];
+  /** The locale of the petition. */
+  locale: PetitionLocale;
+  /** The name of the petition. */
+  name?: Maybe<Scalars["String"]>;
+  owner: User;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+  /** The permissions linked to the petition */
+  userPermissions: Array<PetitionUserPermission>;
+};
+
+export type PetitionBasePagination = {
+  __typename?: "PetitionBasePagination";
+  /** The requested slice of items. */
+  items: Array<PetitionBase>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
+export type PetitionBaseType = "PETITION" | "TEMPLATE";
+
 export type PetitionCompletedEvent = PetitionEvent & {
   __typename?: "PetitionCompletedEvent";
   access: PetitionAccess;
@@ -688,7 +718,7 @@ export type PetitionEventPagination = {
 };
 
 /** A field within a petition. */
-export type PetitionField = {
+export type PetitionField = PetitionFieldBase & {
   __typename?: "PetitionField";
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
@@ -720,6 +750,28 @@ export type PetitionFieldAndReplies = {
   __typename?: "PetitionFieldAndReplies";
   field: PetitionField;
   replies: Array<PetitionFieldReply>;
+};
+
+/** A field within a petition. */
+export type PetitionFieldBase = {
+  /** The description of the petition field. */
+  description?: Maybe<Scalars["String"]>;
+  /** The ID of the petition field. */
+  id: Scalars["GID"];
+  /** Determines if the field can be moved or deleted. */
+  isFixed: Scalars["Boolean"];
+  /** Determines if the field accepts replies */
+  isReadOnly: Scalars["Boolean"];
+  /** Determines if this field allows multiple replies. */
+  multiple: Scalars["Boolean"];
+  /** Determines if this field is optional. */
+  optional: Scalars["Boolean"];
+  /** The options of the petition. */
+  options?: Maybe<Scalars["JSONObject"]>;
+  /** The title of the petition field. */
+  title?: Maybe<Scalars["String"]>;
+  /** The type of the petition field. */
+  type: PetitionFieldType;
 };
 
 /** A comment on a petition field */
@@ -821,14 +873,6 @@ export type PetitionMessageStatus =
   /** The message has been scheduled to be sent at a specific time. */
   | "SCHEDULED";
 
-export type PetitionPagination = {
-  __typename?: "PetitionPagination";
-  /** The requested slice of items. */
-  items: Array<Petition>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
-};
-
 /** The progress of a petition. */
 export type PetitionProgress = {
   __typename?: "PetitionProgress";
@@ -870,6 +914,55 @@ export type PetitionStatus =
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
   | "PENDING";
+
+/** A petition template */
+export type PetitionTemplate = PetitionBase & {
+  __typename?: "PetitionTemplate";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** The body of the petition. */
+  emailBody?: Maybe<Scalars["JSON"]>;
+  /** The subject of the petition. */
+  emailSubject?: Maybe<Scalars["String"]>;
+  /** The number of fields in the petition. */
+  fieldCount: Scalars["Int"];
+  /** The definition of the petition template fields. */
+  fields: Array<PetitionTemplateField>;
+  /** The ID of the petition or template. */
+  id: Scalars["GID"];
+  /** The locale of the petition. */
+  locale: PetitionLocale;
+  /** The name of the petition. */
+  name?: Maybe<Scalars["String"]>;
+  owner: User;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+  /** The permissions linked to the petition */
+  userPermissions: Array<PetitionUserPermission>;
+};
+
+/** A field within a petition template. */
+export type PetitionTemplateField = PetitionFieldBase & {
+  __typename?: "PetitionTemplateField";
+  /** The description of the petition field. */
+  description?: Maybe<Scalars["String"]>;
+  /** The ID of the petition field. */
+  id: Scalars["GID"];
+  /** Determines if the field can be moved or deleted. */
+  isFixed: Scalars["Boolean"];
+  /** Determines if the field accepts replies */
+  isReadOnly: Scalars["Boolean"];
+  /** Determines if this field allows multiple replies. */
+  multiple: Scalars["Boolean"];
+  /** Determines if this field is optional. */
+  optional: Scalars["Boolean"];
+  /** The options of the petition. */
+  options?: Maybe<Scalars["JSONObject"]>;
+  /** The title of the petition field. */
+  title?: Maybe<Scalars["String"]>;
+  /** The type of the petition field. */
+  type: PetitionFieldType;
+};
 
 /** The permission for a petition and user */
 export type PetitionUserPermission = Timestamps & {
@@ -1036,9 +1129,9 @@ export type Query = {
   contacts: ContactPagination;
   me: User;
   organization?: Maybe<Organization>;
-  petition?: Maybe<Petition>;
+  petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
-  petitions: PetitionPagination;
+  petitions: PetitionBasePagination;
 };
 
 export type QueryaccessArgs = {
@@ -1071,6 +1164,7 @@ export type QuerypetitionsArgs = {
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
+  type?: Maybe<PetitionBaseType>;
 };
 
 /** Order to use on Query.contacts */
@@ -1295,26 +1389,59 @@ export type AppLayoutNavbar_UserFragment = {
   __typename?: "User";
 } & UserMenu_UserFragment;
 
+export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "name" | "updatedAt">;
+
+export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "name" | "updatedAt">;
+
+export type HeaderNameEditable_PetitionBaseFragment =
+  | HeaderNameEditable_PetitionBase_Petition_Fragment
+  | HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
+
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name" | "locale" | "status" | "updatedAt"> & {
+} & Pick<Petition, "id" | "locale" | "deadline" | "status"> & {
     owner: { __typename?: "User" } & Pick<User, "id">;
-  } & PetitionSettingsModal_PetitionFragment;
+  } & HeaderNameEditable_PetitionBase_Petition_Fragment &
+  PetitionSettingsModal_PetitionFragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id"
 >;
 
-export type PetitionLayout_PetitionFragment = {
+export type PetitionLayout_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name"> &
   PetitionHeader_PetitionFragment;
+
+export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name"> &
+  PetitionTemplateHeader_PetitionTemplateFragment;
+
+export type PetitionLayout_PetitionBaseFragment =
+  | PetitionLayout_PetitionBase_Petition_Fragment
+  | PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionLayout_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment &
   PetitionHeader_UserFragment;
+
+export type PetitionTemplateHeader_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "locale"> & {
+    owner: { __typename?: "User" } & Pick<User, "id">;
+  } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment &
+  ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionTemplateHeader_UserFragment = {
+  __typename?: "User";
+} & Pick<User, "id">;
 
 export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -1749,9 +1876,43 @@ export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmen
     >;
   };
 
-export type PetitionFieldsIndex_PetitionFieldFragment = {
+export type ClonePetitionAsTemplateDialog_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name"> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
+        organization: { __typename?: "Organization" } & Pick<
+          Organization,
+          "id" | "name"
+        >;
+      };
+  };
+
+export type ClonePetitionAsTemplateDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name"> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
+        organization: { __typename?: "Organization" } & Pick<
+          Organization,
+          "id" | "name"
+        >;
+      };
+  };
+
+export type ClonePetitionAsTemplateDialog_PetitionBaseFragment =
+  | ClonePetitionAsTemplateDialog_PetitionBase_Petition_Fragment
+  | ClonePetitionAsTemplateDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionFieldsIndex_PetitionFieldBase_PetitionField_Fragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "title" | "type" | "options">;
+
+export type PetitionFieldsIndex_PetitionFieldBase_PetitionTemplateField_Fragment = {
+  __typename?: "PetitionTemplateField";
+} & Pick<PetitionTemplateField, "id" | "title" | "type" | "options">;
+
+export type PetitionFieldsIndex_PetitionFieldBaseFragment =
+  | PetitionFieldsIndex_PetitionFieldBase_PetitionField_Fragment
+  | PetitionFieldsIndex_PetitionFieldBase_PetitionTemplateField_Fragment;
 
 export type PetitionSettingsModal_PetitionFragment = {
   __typename?: "Petition";
@@ -1824,7 +1985,8 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
   __typename?: "Query";
 } & {
   petition?: Maybe<
-    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+    | ({ __typename?: "Petition" } & PetitionSharingModal_PetitionFragment)
+    | { __typename?: "PetitionTemplate" }
   >;
 };
 
@@ -1843,12 +2005,23 @@ export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
   };
 };
 
-export type PetitionComposeField_PetitionFieldFragment = {
+export type PetitionComposeField_PetitionFieldBase_PetitionField_Fragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
   "id" | "type" | "title" | "description" | "optional" | "multiple" | "isFixed"
 >;
+
+export type PetitionComposeField_PetitionFieldBase_PetitionTemplateField_Fragment = {
+  __typename?: "PetitionTemplateField";
+} & Pick<
+  PetitionTemplateField,
+  "id" | "type" | "title" | "description" | "optional" | "multiple" | "isFixed"
+>;
+
+export type PetitionComposeField_PetitionFieldBaseFragment =
+  | PetitionComposeField_PetitionFieldBase_PetitionField_Fragment
+  | PetitionComposeField_PetitionFieldBase_PetitionTemplateField_Fragment;
 
 export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
@@ -1856,16 +2029,27 @@ export type PetitionComposeFieldList_PetitionFragment = {
   fields: Array<
     {
       __typename?: "PetitionField";
-    } & PetitionComposeField_PetitionFieldFragment
+    } & PetitionComposeField_PetitionFieldBase_PetitionField_Fragment
   >;
 };
 
-export type PetitionComposeFieldSettings_PetitionFieldFragment = {
+export type PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
   "id" | "type" | "optional" | "multiple" | "options" | "isReadOnly"
 >;
+
+export type PetitionComposeFieldSettings_PetitionFieldBase_PetitionTemplateField_Fragment = {
+  __typename?: "PetitionTemplateField";
+} & Pick<
+  PetitionTemplateField,
+  "id" | "type" | "optional" | "multiple" | "options" | "isReadOnly"
+>;
+
+export type PetitionComposeFieldSettings_PetitionFieldBaseFragment =
+  | PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment
+  | PetitionComposeFieldSettings_PetitionFieldBase_PetitionTemplateField_Fragment;
 
 export type PetitionComposeMessageEditor_ContactFragment = {
   __typename?: "Contact";
@@ -2178,7 +2362,7 @@ export type ContactsUserQuery = { __typename?: "Query" } & {
 export type PetitionActivity_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> &
-  PetitionLayout_PetitionFragment &
+  PetitionLayout_PetitionBase_Petition_Fragment &
   PetitionAccessTable_PetitionFragment &
   PetitionActivityTimeline_PetitionFragment;
 
@@ -2298,7 +2482,8 @@ export type PetitionActivityQueryVariables = Exact<{
 
 export type PetitionActivityQuery = { __typename?: "Query" } & {
   petition?: Maybe<
-    { __typename?: "Petition" } & PetitionActivity_PetitionFragment
+    | ({ __typename?: "Petition" } & PetitionActivity_PetitionFragment)
+    | { __typename?: "PetitionTemplate" }
   >;
 };
 
@@ -2310,20 +2495,46 @@ export type PetitionActivityUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionActivity_UserFragment;
 };
 
-export type PetitionCompose_PetitionFragment = {
+export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
     fields: Array<
-      { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
+      {
+        __typename?: "PetitionField";
+      } & PetitionCompose_PetitionFieldBase_PetitionField_Fragment
     >;
-  } & PetitionLayout_PetitionFragment &
+  } & PetitionLayout_PetitionBase_Petition_Fragment &
   PetitionComposeMessageEditor_PetitionFragment;
 
-export type PetitionCompose_PetitionFieldFragment = {
+export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id"> & {
+    fields: Array<
+      {
+        __typename?: "PetitionTemplateField";
+      } & PetitionCompose_PetitionFieldBase_PetitionTemplateField_Fragment
+    >;
+  } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionCompose_PetitionBaseFragment =
+  | PetitionCompose_PetitionBase_Petition_Fragment
+  | PetitionCompose_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionCompose_PetitionFieldBase_PetitionField_Fragment = {
   __typename?: "PetitionField";
-} & PetitionComposeField_PetitionFieldFragment &
-  PetitionComposeFieldSettings_PetitionFieldFragment &
-  PetitionFieldsIndex_PetitionFieldFragment;
+} & PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
+  PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment &
+  PetitionFieldsIndex_PetitionFieldBase_PetitionField_Fragment;
+
+export type PetitionCompose_PetitionFieldBase_PetitionTemplateField_Fragment = {
+  __typename?: "PetitionTemplateField";
+} & PetitionComposeField_PetitionFieldBase_PetitionTemplateField_Fragment &
+  PetitionComposeFieldSettings_PetitionFieldBase_PetitionTemplateField_Fragment &
+  PetitionFieldsIndex_PetitionFieldBase_PetitionTemplateField_Fragment;
+
+export type PetitionCompose_PetitionFieldBaseFragment =
+  | PetitionCompose_PetitionFieldBase_PetitionField_Fragment
+  | PetitionCompose_PetitionFieldBase_PetitionTemplateField_Fragment;
 
 export type PetitionCompose_UserFragment = {
   __typename?: "User";
@@ -2339,7 +2550,7 @@ export type PetitionCompose_updatePetitionMutation = {
 } & {
   updatePetition: {
     __typename?: "Petition";
-  } & PetitionLayout_PetitionFragment &
+  } & PetitionLayout_PetitionBase_Petition_Fragment &
     PetitionComposeMessageEditor_PetitionFragment;
 };
 
@@ -2355,7 +2566,7 @@ export type PetitionCompose_updateFieldPositionsMutation = {
       fields: Array<
         { __typename?: "PetitionField" } & Pick<PetitionField, "id">
       >;
-    } & PetitionLayout_PetitionFragment;
+    } & PetitionLayout_PetitionBase_Petition_Fragment;
 };
 
 export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
@@ -2369,13 +2580,13 @@ export type PetitionCompose_createPetitionFieldMutation = {
 } & {
   createPetitionField: { __typename?: "PetitionAndField" } & {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-      PetitionComposeField_PetitionFieldFragment &
-      PetitionComposeFieldSettings_PetitionFieldFragment;
+      PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
+      PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment;
     petition: { __typename?: "Petition" } & {
       fields: Array<
         { __typename?: "PetitionField" } & Pick<PetitionField, "id">
       >;
-    } & PetitionLayout_PetitionFragment;
+    } & PetitionLayout_PetitionBase_Petition_Fragment;
   };
 };
 
@@ -2389,13 +2600,13 @@ export type PetitionCompose_clonePetitionFieldMutation = {
 } & {
   clonePetitionField: { __typename?: "PetitionAndField" } & {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-      PetitionComposeField_PetitionFieldFragment &
-      PetitionComposeFieldSettings_PetitionFieldFragment;
+      PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
+      PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment;
     petition: { __typename?: "Petition" } & {
       fields: Array<
         { __typename?: "PetitionField" } & Pick<PetitionField, "id">
       >;
-    } & PetitionLayout_PetitionFragment;
+    } & PetitionLayout_PetitionBase_Petition_Fragment;
   };
 };
 
@@ -2412,7 +2623,7 @@ export type PetitionCompose_deletePetitionFieldMutation = {
       fields: Array<
         { __typename?: "PetitionField" } & Pick<PetitionField, "id">
       >;
-    } & PetitionLayout_PetitionFragment;
+    } & PetitionLayout_PetitionBase_Petition_Fragment;
 };
 
 export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
@@ -2426,8 +2637,8 @@ export type PetitionCompose_updatePetitionFieldMutation = {
 } & {
   updatePetitionField: { __typename?: "PetitionAndField" } & {
     field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-      PetitionComposeField_PetitionFieldFragment &
-      PetitionComposeFieldSettings_PetitionFieldFragment;
+      PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
+      PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment;
     petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
   };
 };
@@ -2447,8 +2658,8 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
         replies: Array<
           { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
         >;
-      } & PetitionComposeField_PetitionFieldFragment &
-      PetitionComposeFieldSettings_PetitionFieldFragment;
+      } & PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
+      PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment;
     petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
   };
 };
@@ -2481,7 +2692,12 @@ export type PetitionComposeQueryVariables = Exact<{
 
 export type PetitionComposeQuery = { __typename?: "Query" } & {
   petition?: Maybe<
-    { __typename?: "Petition" } & PetitionCompose_PetitionFragment
+    | ({
+        __typename?: "Petition";
+      } & PetitionCompose_PetitionBase_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & PetitionCompose_PetitionBase_PetitionTemplate_Fragment)
   >;
 };
 
@@ -2497,7 +2713,8 @@ export type PetitionQueryVariables = Exact<{
 
 export type PetitionQuery = { __typename?: "Query" } & {
   petition?: Maybe<
-    { __typename?: "Petition" } & Pick<Petition, "id" | "status">
+    | ({ __typename?: "Petition" } & Pick<Petition, "status" | "id">)
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
   >;
 };
 
@@ -2507,13 +2724,13 @@ export type PetitionReplies_PetitionFragment = {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
-  } & PetitionLayout_PetitionFragment;
+  } & PetitionLayout_PetitionBase_Petition_Fragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "isReadOnly"> &
   PetitionRepliesField_PetitionFieldFragment &
-  PetitionFieldsIndex_PetitionFieldFragment &
+  PetitionFieldsIndex_PetitionFieldBase_PetitionField_Fragment &
   PetitionRepliesFieldComments_PetitionFieldFragment &
   DownloadAllDialog_PetitionFieldFragment;
 
@@ -2693,7 +2910,8 @@ export type PetitionRepliesQueryVariables = Exact<{
 
 export type PetitionRepliesQuery = { __typename?: "Query" } & {
   petition?: Maybe<
-    { __typename?: "Petition" } & PetitionReplies_PetitionFragment
+    | ({ __typename?: "Petition" } & PetitionReplies_PetitionFragment)
+    | { __typename?: "PetitionTemplate" }
   >;
 };
 
@@ -2703,26 +2921,33 @@ export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionReplies_UserFragment;
 };
 
-export type Petitions_PetitionPaginationFragment = {
-  __typename?: "PetitionPagination";
-} & Pick<PetitionPagination, "totalCount"> & {
-    items: Array<{ __typename?: "Petition" } & Petitions_PetitionFragment>;
+export type Petitions_PetitionBasePaginationFragment = {
+  __typename?: "PetitionBasePagination";
+} & Pick<PetitionBasePagination, "totalCount"> & {
+    items: Array<
+      | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
+      | ({
+          __typename?: "PetitionTemplate";
+        } & Petitions_PetitionBase_PetitionTemplate_Fragment)
+    >;
   };
 
-export type Petitions_PetitionFragment = { __typename?: "Petition" } & Pick<
+export type Petitions_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<
   Petition,
-  "id" | "locale" | "customRef" | "name" | "status" | "deadline" | "createdAt"
+  "deadline" | "status" | "id" | "locale" | "name" | "createdAt"
 > & {
-    progress: { __typename?: "PetitionProgress" } & Pick<
-      PetitionProgress,
-      "validated" | "replied" | "optional" | "total"
-    >;
     accesses: Array<
       { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status"> & {
           contact?: Maybe<
             { __typename?: "Contact" } & ContactLink_ContactFragment
           >;
         }
+    >;
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
     >;
     userPermissions: Array<
       { __typename?: "PetitionUserPermission" } & Pick<
@@ -2731,6 +2956,21 @@ export type Petitions_PetitionFragment = { __typename?: "Petition" } & Pick<
       > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
     >;
   };
+
+export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "locale" | "name" | "createdAt"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
+    >;
+  };
+
+export type Petitions_PetitionBaseFragment =
+  | Petitions_PetitionBase_Petition_Fragment
+  | Petitions_PetitionBase_PetitionTemplate_Fragment;
 
 export type Petitions_UserFragment = {
   __typename?: "User";
@@ -2746,8 +2986,8 @@ export type PetitionsQueryVariables = Exact<{
 
 export type PetitionsQuery = { __typename?: "Query" } & {
   petitions: {
-    __typename?: "PetitionPagination";
-  } & Petitions_PetitionPaginationFragment;
+    __typename?: "PetitionBasePagination";
+  } & Petitions_PetitionBasePaginationFragment;
 };
 
 export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -3102,20 +3342,36 @@ export type useDeletePetitions_PetitionQueryVariables = Exact<{
 
 export type useDeletePetitions_PetitionQuery = { __typename?: "Query" } & {
   petition?: Maybe<
-    { __typename?: "Petition" } & {
-      userPermissions: Array<
-        { __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & { user: { __typename?: "User" } & Pick<User, "id"> }
-      >;
-    } & ConfirmDeletePetitionsDialog_PetitionFragment
+    | ({ __typename?: "Petition" } & {
+        userPermissions: Array<
+          { __typename?: "PetitionUserPermission" } & Pick<
+            PetitionUserPermission,
+            "permissionType"
+          > & { user: { __typename?: "User" } & Pick<User, "id"> }
+        >;
+      } & ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment)
+    | ({ __typename?: "PetitionTemplate" } & {
+        userPermissions: Array<
+          { __typename?: "PetitionUserPermission" } & Pick<
+            PetitionUserPermission,
+            "permissionType"
+          > & { user: { __typename?: "User" } & Pick<User, "id"> }
+        >;
+      } & ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment)
   >;
 };
 
-export type ConfirmDeletePetitionsDialog_PetitionFragment = {
+export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name">;
+
+export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name">;
+
+export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
+  | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
+  | ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
@@ -3133,6 +3389,25 @@ export const ContactSelect_ContactFragmentDoc = gql`
     id
     fullName
     email
+  }
+`;
+export const PetitionTemplateHeader_UserFragmentDoc = gql`
+  fragment PetitionTemplateHeader_User on User {
+    id
+  }
+`;
+export const ClonePetitionAsTemplateDialog_PetitionBaseFragmentDoc = gql`
+  fragment ClonePetitionAsTemplateDialog_PetitionBase on PetitionBase {
+    id
+    name
+    owner {
+      id
+      organization {
+        id
+        name
+      }
+      fullName
+    }
   }
 `;
 export const UserSelect_UserFragmentDoc = gql`
@@ -3164,8 +3439,8 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
   }
   ${PetitionSharingModal_UserFragmentDoc}
 `;
-export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeField_PetitionField on PetitionField {
+export const PetitionComposeField_PetitionFieldBaseFragmentDoc = gql`
+  fragment PetitionComposeField_PetitionFieldBase on PetitionFieldBase {
     id
     type
     title
@@ -3178,10 +3453,10 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
     fields {
-      ...PetitionComposeField_PetitionField
+      ...PetitionComposeField_PetitionFieldBase
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
+  ${PetitionComposeField_PetitionFieldBaseFragmentDoc}
 `;
 export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
   fragment PetitionComposeMessageEditor_Contact on Contact {
@@ -3272,6 +3547,12 @@ export const Contacts_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
+export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
+  fragment HeaderNameEditable_PetitionBase on PetitionBase {
+    name
+    updatedAt
+  }
+`;
 export const PetitionSettingsModal_PetitionFragmentDoc = gql`
   fragment PetitionSettingsModal_Petition on Petition {
     id
@@ -3283,24 +3564,50 @@ export const PetitionSettingsModal_PetitionFragmentDoc = gql`
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
-    name
     locale
+    deadline
     status
-    updatedAt
-    ...PetitionSettingsModal_Petition
     owner {
       id
     }
+    ...HeaderNameEditable_PetitionBase
+    ...PetitionSettingsModal_Petition
   }
+  ${HeaderNameEditable_PetitionBaseFragmentDoc}
   ${PetitionSettingsModal_PetitionFragmentDoc}
 `;
-export const PetitionLayout_PetitionFragmentDoc = gql`
-  fragment PetitionLayout_Petition on Petition {
+export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
+  fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
     name
-    ...PetitionHeader_Petition
+  }
+`;
+export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
+  fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
+    id
+    locale
+    owner {
+      id
+    }
+    ...HeaderNameEditable_PetitionBase
+    ...ConfirmDeletePetitionsDialog_PetitionBase
+  }
+  ${HeaderNameEditable_PetitionBaseFragmentDoc}
+  ${ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc}
+`;
+export const PetitionLayout_PetitionBaseFragmentDoc = gql`
+  fragment PetitionLayout_PetitionBase on PetitionBase {
+    id
+    name
+    ... on Petition {
+      ...PetitionHeader_Petition
+    }
+    ... on PetitionTemplate {
+      ...PetitionTemplateHeader_PetitionTemplate
+    }
   }
   ${PetitionHeader_PetitionFragmentDoc}
+  ${PetitionTemplateHeader_PetitionTemplateFragmentDoc}
 `;
 export const ContactLink_ContactFragmentDoc = gql`
   fragment ContactLink_Contact on Contact {
@@ -3733,11 +4040,11 @@ export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
 export const PetitionActivity_PetitionFragmentDoc = gql`
   fragment PetitionActivity_Petition on Petition {
     id
-    ...PetitionLayout_Petition
+    ...PetitionLayout_PetitionBase
     ...PetitionAccessTable_Petition
     ...PetitionActivityTimeline_Petition
   }
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionAccessTable_PetitionFragmentDoc}
   ${PetitionActivityTimeline_PetitionFragmentDoc}
 `;
@@ -3760,8 +4067,8 @@ export const PetitionActivity_UserFragmentDoc = gql`
   }
   ${PetitionLayout_UserFragmentDoc}
 `;
-export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
+export const PetitionComposeFieldSettings_PetitionFieldBaseFragmentDoc = gql`
+  fragment PetitionComposeFieldSettings_PetitionFieldBase on PetitionFieldBase {
     id
     type
     optional
@@ -3770,23 +4077,23 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     isReadOnly
   }
 `;
-export const PetitionFieldsIndex_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldsIndex_PetitionField on PetitionField {
+export const PetitionFieldsIndex_PetitionFieldBaseFragmentDoc = gql`
+  fragment PetitionFieldsIndex_PetitionFieldBase on PetitionFieldBase {
     id
     title
     type
     options
   }
 `;
-export const PetitionCompose_PetitionFieldFragmentDoc = gql`
-  fragment PetitionCompose_PetitionField on PetitionField {
-    ...PetitionComposeField_PetitionField
-    ...PetitionComposeFieldSettings_PetitionField
-    ...PetitionFieldsIndex_PetitionField
+export const PetitionCompose_PetitionFieldBaseFragmentDoc = gql`
+  fragment PetitionCompose_PetitionFieldBase on PetitionFieldBase {
+    ...PetitionComposeField_PetitionFieldBase
+    ...PetitionComposeFieldSettings_PetitionFieldBase
+    ...PetitionFieldsIndex_PetitionFieldBase
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
-  ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
+  ${PetitionComposeField_PetitionFieldBaseFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldBaseFragmentDoc}
+  ${PetitionFieldsIndex_PetitionFieldBaseFragmentDoc}
 `;
 export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionComposeMessageEditor_Petition on Petition {
@@ -3800,17 +4107,24 @@ export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
     }
   }
 `;
-export const PetitionCompose_PetitionFragmentDoc = gql`
-  fragment PetitionCompose_Petition on Petition {
+export const PetitionCompose_PetitionBaseFragmentDoc = gql`
+  fragment PetitionCompose_PetitionBase on PetitionBase {
     id
-    ...PetitionLayout_Petition
-    fields {
-      ...PetitionCompose_PetitionField
+    ...PetitionLayout_PetitionBase
+    ... on Petition {
+      fields {
+        ...PetitionCompose_PetitionFieldBase
+      }
+    }
+    ... on PetitionTemplate {
+      fields {
+        ...PetitionCompose_PetitionFieldBase
+      }
     }
     ...PetitionComposeMessageEditor_Petition
   }
-  ${PetitionLayout_PetitionFragmentDoc}
-  ${PetitionCompose_PetitionFieldFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
+  ${PetitionCompose_PetitionFieldBaseFragmentDoc}
   ${PetitionComposeMessageEditor_PetitionFragmentDoc}
 `;
 export const PetitionCompose_UserFragmentDoc = gql`
@@ -3905,24 +4219,24 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_PetitionField on PetitionField {
     isReadOnly
     ...PetitionRepliesField_PetitionField
-    ...PetitionFieldsIndex_PetitionField
+    ...PetitionFieldsIndex_PetitionFieldBase
     ...PetitionRepliesFieldComments_PetitionField
     ...DownloadAllDialog_PetitionField
   }
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
-  ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
+  ${PetitionFieldsIndex_PetitionFieldBaseFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${DownloadAllDialog_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
-    ...PetitionLayout_Petition
+    ...PetitionLayout_PetitionBase
     fields {
       ...PetitionReplies_PetitionField
     }
   }
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
@@ -3952,45 +4266,46 @@ export const UserAvatarList_UserFragmentDoc = gql`
     fullName
   }
 `;
-export const Petitions_PetitionFragmentDoc = gql`
-  fragment Petitions_Petition on Petition {
+export const Petitions_PetitionBaseFragmentDoc = gql`
+  fragment Petitions_PetitionBase on PetitionBase {
     id
     locale
-    customRef
     name
-    status
-    deadline
-    progress {
-      validated
-      replied
-      optional
-      total
-    }
     createdAt
-    accesses {
-      status
-      contact {
-        ...ContactLink_Contact
-      }
-    }
     userPermissions {
       permissionType
       user {
         ...UserAvatarList_User
       }
     }
+    ... on Petition {
+      accesses {
+        status
+        contact {
+          ...ContactLink_Contact
+        }
+      }
+      deadline
+      status
+      progress {
+        validated
+        replied
+        optional
+        total
+      }
+    }
   }
-  ${ContactLink_ContactFragmentDoc}
   ${UserAvatarList_UserFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
 `;
-export const Petitions_PetitionPaginationFragmentDoc = gql`
-  fragment Petitions_PetitionPagination on PetitionPagination {
+export const Petitions_PetitionBasePaginationFragmentDoc = gql`
+  fragment Petitions_PetitionBasePagination on PetitionBasePagination {
     items {
-      ...Petitions_Petition
+      ...Petitions_PetitionBase
     }
     totalCount
   }
-  ${Petitions_PetitionFragmentDoc}
+  ${Petitions_PetitionBaseFragmentDoc}
 `;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
@@ -4218,12 +4533,6 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     comments {
       id
     }
-  }
-`;
-export const ConfirmDeletePetitionsDialog_PetitionFragmentDoc = gql`
-  fragment ConfirmDeletePetitionsDialog_Petition on Petition {
-    id
-    name
   }
 `;
 export const AppLayout_updateOnboardingStatusDocument = gql`
@@ -5486,11 +5795,11 @@ export const PetitionCompose_updatePetitionDocument = gql`
     $data: UpdatePetitionInput!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
-      ...PetitionLayout_Petition
+      ...PetitionLayout_PetitionBase
       ...PetitionComposeMessageEditor_Petition
     }
   }
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionComposeMessageEditor_PetitionFragmentDoc}
 `;
 export type PetitionCompose_updatePetitionMutationFn = Apollo.MutationFunction<
@@ -5544,13 +5853,13 @@ export const PetitionCompose_updateFieldPositionsDocument = gql`
   ) {
     updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
       id
-      ...PetitionLayout_Petition
+      ...PetitionLayout_PetitionBase
       fields {
         id
       }
     }
   }
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 export type PetitionCompose_updateFieldPositionsMutationFn = Apollo.MutationFunction<
   PetitionCompose_updateFieldPositionsMutation,
@@ -5609,20 +5918,20 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
     ) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionComposeField_PetitionFieldBase
+        ...PetitionComposeFieldSettings_PetitionFieldBase
       }
       petition {
-        ...PetitionLayout_Petition
+        ...PetitionLayout_PetitionBase
         fields {
           id
         }
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionComposeField_PetitionFieldBaseFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldBaseFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 export type PetitionCompose_createPetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_createPetitionFieldMutation,
@@ -5677,20 +5986,20 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
     clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionComposeField_PetitionFieldBase
+        ...PetitionComposeFieldSettings_PetitionFieldBase
       }
       petition {
-        ...PetitionLayout_Petition
+        ...PetitionLayout_PetitionBase
         fields {
           id
         }
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionComposeField_PetitionFieldBaseFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldBaseFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 export type PetitionCompose_clonePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_clonePetitionFieldMutation,
@@ -5748,13 +6057,13 @@ export const PetitionCompose_deletePetitionFieldDocument = gql`
       force: $force
     ) {
       id
-      ...PetitionLayout_Petition
+      ...PetitionLayout_PetitionBase
       fields {
         id
       }
     }
   }
-  ${PetitionLayout_PetitionFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 export type PetitionCompose_deletePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_deletePetitionFieldMutation,
@@ -5814,8 +6123,8 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     ) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionComposeField_PetitionFieldBase
+        ...PetitionComposeFieldSettings_PetitionFieldBase
       }
       petition {
         id
@@ -5823,8 +6132,8 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionComposeField_PetitionFieldBaseFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldBaseFragmentDoc}
 `;
 export type PetitionCompose_updatePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_updatePetitionFieldMutation,
@@ -5886,8 +6195,8 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
     ) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionComposeField_PetitionFieldBase
+        ...PetitionComposeFieldSettings_PetitionFieldBase
         replies {
           id
         }
@@ -5898,8 +6207,8 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionComposeField_PetitionFieldBaseFragmentDoc}
+  ${PetitionComposeFieldSettings_PetitionFieldBaseFragmentDoc}
 `;
 export type PetitionCompose_changePetitionFieldTypeMutationFn = Apollo.MutationFunction<
   PetitionCompose_changePetitionFieldTypeMutation,
@@ -6023,10 +6332,10 @@ export type PetitionCompose_sendPetitionMutationOptions = Apollo.BaseMutationOpt
 export const PetitionComposeDocument = gql`
   query PetitionCompose($id: GID!) {
     petition(id: $id) {
-      ...PetitionCompose_Petition
+      ...PetitionCompose_PetitionBase
     }
   }
-  ${PetitionCompose_PetitionFragmentDoc}
+  ${PetitionCompose_PetitionBaseFragmentDoc}
 `;
 
 /**
@@ -6137,7 +6446,9 @@ export const PetitionDocument = gql`
   query Petition($id: GID!) {
     petition(id: $id) {
       id
-      status
+      ... on Petition {
+        status
+      }
     }
   }
 `;
@@ -6859,10 +7170,10 @@ export const PetitionsDocument = gql`
       sortBy: $sortBy
       status: $status
     ) {
-      ...Petitions_PetitionPagination
+      ...Petitions_PetitionBasePagination
     }
   }
-  ${Petitions_PetitionPaginationFragmentDoc}
+  ${Petitions_PetitionBasePaginationFragmentDoc}
 `;
 
 /**
@@ -8091,10 +8402,10 @@ export const useDeletePetitions_PetitionDocument = gql`
           id
         }
       }
-      ...ConfirmDeletePetitionsDialog_Petition
+      ...ConfirmDeletePetitionsDialog_PetitionBase
     }
   }
-  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
+  ${ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc}
 `;
 
 /**

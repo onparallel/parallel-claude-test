@@ -5,7 +5,7 @@ import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
-  PetitionComposeFieldSettings_PetitionFieldFragment,
+  PetitionComposeFieldSettings_PetitionFieldBaseFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -17,7 +17,7 @@ import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
 
 export type PetitionComposeFieldSettingsProps = {
-  field: PetitionComposeFieldSettings_PetitionFieldFragment;
+  field: PetitionComposeFieldSettings_PetitionFieldBaseFragment;
   onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
   onClose: () => void;
@@ -291,8 +291,8 @@ function SettingsRow({
 }
 
 PetitionComposeFieldSettings.fragments = {
-  PetitionField: gql`
-    fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
+  PetitionFieldBase: gql`
+    fragment PetitionComposeFieldSettings_PetitionFieldBase on PetitionFieldBase {
       id
       type
       optional

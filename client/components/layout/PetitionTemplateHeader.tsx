@@ -10,7 +10,6 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Text,
   Tooltip,
   useDisclosure,
 } from "@chakra-ui/core";
@@ -22,46 +21,38 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
-  PetitionHeader_PetitionFragment,
-  PetitionHeader_UserFragment,
+  ConfirmDeletePetitionsDialog,
+  useConfirmDeletePetitionsDialog,
+} from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
+import {
+  PetitionTemplateHeader_PetitionTemplateFragment,
+  PetitionTemplateHeader_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
-import {
-  forwardRef,
-  ReactNode,
-  Ref,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { NakedLink } from "../common/Link";
-import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
-import { SmallPopover } from "../common/SmallPopover";
+import { useErrorDialog } from "../common/ErrorDialog";
 import { Spacer } from "../common/Spacer";
-import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
-export type PetitionHeaderProps = BoxProps & {
-  petition: PetitionHeader_PetitionFragment;
-  user: PetitionHeader_UserFragment;
+export type PetitionTemplateHeaderProps = BoxProps & {
+  petition: PetitionTemplateHeader_PetitionTemplateFragment;
+  user: PetitionTemplateHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
 };
 
-export function PetitionHeader({
+export function PetitionTemplateHeader({
   petition,
   user,
   onUpdatePetition,
-  section: current,
   state,
   ...props
-}: PetitionHeaderProps) {
+}: PetitionTemplateHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
   const [name, setName] = useState(petition.name ?? "");
@@ -72,14 +63,35 @@ export function PetitionHeader({
   } = useDisclosure();
 
   const deletePetitions = useDeletePetitions();
+  const confirmDelete = useConfirmDeletePetitionsDialog();
+  const showErrorDialog = useErrorDialog();
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        await deletePetitions(user.id, [petition.id]);
-        router.push(
-          `/[locale]/app/petitions/`,
-          `/${router.query.locale}/app/petitions/`
-        );
+        if (petition.owner.id === user.id) {
+          showErrorDialog({
+            message: (
+              <FormattedMessage
+                id="petition.shared-delete-error"
+                defaultMessage="{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+                values={{
+                  count: 1,
+                }}
+              />
+            ),
+          });
+        } else {
+          await confirmDelete({
+            selected: [petition],
+          });
+          await deletePetitions({
+            variables: { ids: [petition.id]! },
+          });
+          router.push(
+            `/[locale]/app/petitions/`,
+            `/${router.query.locale}/app/petitions/`
+          );
+        }
       } catch {}
     },
     [petition.id, petition.name]
@@ -99,7 +111,6 @@ export function PetitionHeader({
                 })})`
               : "",
             locale: petition.locale,
-            deadline: petition.deadline,
           },
         });
         router.push(
@@ -110,7 +121,7 @@ export function PetitionHeader({
         );
       } catch {}
     },
-    [petition.id, petition.name, petition.locale, petition.deadline]
+    [petition.id, petition.name, petition.locale]
   );
 
   const {
@@ -118,51 +129,6 @@ export function PetitionHeader({
     onOpen: onOpenSharePetition,
     onClose: onCloseSharePetition,
   } = useDisclosure();
-
-  const sections = useMemo(
-    () => [
-      {
-        section: "compose",
-        label: intl.formatMessage({
-          id: "petition.header.compose-tab",
-          defaultMessage: "Compose",
-        }),
-      },
-      {
-        section: "replies",
-        label: intl.formatMessage({
-          id: "petition.header.replies-tab",
-          defaultMessage: "Replies",
-        }),
-        isDisabled: petition.status === "DRAFT",
-        popoverContent: (
-          <Text fontSize="sm">
-            <FormattedMessage
-              id="petition.replies-not-available"
-              defaultMessage="Once you send this petition, you will be able to see all the replies here."
-            />
-          </Text>
-        ),
-      },
-      {
-        section: "activity",
-        label: intl.formatMessage({
-          id: "petition.header.activity-tab",
-          defaultMessage: "Activity",
-        }),
-        isDisabled: petition.status === "DRAFT",
-        popoverContent: (
-          <Text fontSize="sm">
-            <FormattedMessage
-              id="petition.activity-not-available"
-              defaultMessage="Once you send this petition, you will be able to see all the petition activity here."
-            />
-          </Text>
-        ),
-      },
-    ],
-    [petition.status, intl.locale]
-  );
   return (
     <>
       <Box
@@ -170,32 +136,30 @@ export function PetitionHeader({
         borderBottom="2px solid"
         borderBottomColor="gray.200"
         position="relative"
-        height={{ base: 24, md: 16 }}
         {...props}
       >
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
-            <PetitionStatusIcon marginRight={1} status={petition.status} />
             <HeaderNameEditable
               petition={petition}
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
               maxWidth={{
-                base: `calc(100vw - ${16 + 18 + 16 + 40 + 16}px)`,
-                sm: `calc(100vw - ${96 + 16 + 18 + 16 + 40 + 16}px)`,
-                md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 18 + 16}px)`,
+                base: `calc(100vw - ${16 + 40 + 16}px)`,
+                sm: `calc(100vw - ${96 + 16 + 40 + 16}px)`,
+                md: `calc((100vw - ${96 + 307}px)/2 - ${16}px)`,
               }}
               placeholder={
                 name
                   ? ""
                   : intl.formatMessage({
-                      id: "generic.untitled-petition",
-                      defaultMessage: "Untitled petition",
+                      id: "generic.untitled-template",
+                      defaultMessage: "Untitled template",
                     })
               }
               aria-label={intl.formatMessage({
-                id: "petition.name-label",
-                defaultMessage: "Petition name",
+                id: "petition.template-name-label",
+                defaultMessage: "Template name",
               })}
             />
           </Flex>
@@ -255,44 +219,7 @@ export function PetitionHeader({
             </Box>
           </Stack>
         </Flex>
-        <Flex
-          position="absolute"
-          bottom="0"
-          left="50%"
-          transform="translateX(-50%)"
-          direction="row"
-          marginBottom="-2px"
-        >
-          {sections.map(({ section, label, isDisabled, popoverContent }) => {
-            return isDisabled ? (
-              <PetitionHeaderTab
-                key={section}
-                active={current === section}
-                isDisabled
-                popoverContent={popoverContent}
-              >
-                {label}
-              </PetitionHeaderTab>
-            ) : (
-              <NakedLink
-                key={section}
-                href={`/app/petitions/[petitionId]/${section}`}
-                as={`/app/petitions/${petition.id}/${section}`}
-              >
-                <PetitionHeaderTab active={current === section}>
-                  {label}
-                </PetitionHeaderTab>
-              </NakedLink>
-            );
-          })}
-        </Flex>
       </Box>
-      <PetitionSettingsModal
-        onUpdatePetition={onUpdatePetition}
-        petition={petition}
-        isOpen={isSettingsOpen}
-        onClose={onCloseSettings}
-      />
       {isSharePetitionOpen ? (
         <PetitionSharingModal
           petitionId={petition.id}
@@ -305,80 +232,22 @@ export function PetitionHeader({
   );
 }
 
-type PetitionHeaderTabProps = BoxProps & {
-  active?: boolean;
-  isDisabled?: boolean;
-  popoverContent?: ReactNode;
-  children: ReactNode;
-};
-
-const PetitionHeaderTab = forwardRef(function (
-  {
-    active,
-    isDisabled,
-    children,
-    popoverContent,
-    ...props
-  }: PetitionHeaderTabProps,
-  ref: Ref<any>
-) {
-  const link = (
-    <Box
-      as="a"
-      ref={ref}
-      display="block"
-      paddingY={3}
-      paddingX={4}
-      fontSize="sm"
-      textTransform="uppercase"
-      borderBottom="2px solid"
-      borderBottomColor={active ? "purple.500" : "transparent"}
-      fontWeight="bold"
-      cursor={isDisabled ? "not-allowed" : "pointer"}
-      opacity={isDisabled ? 0.4 : 1}
-      color={active ? "gray.900" : "gray.500"}
-      _hover={
-        isDisabled
-          ? {}
-          : {
-              color: "purple.700",
-            }
-      }
-      {...(active ? { "aria-current": "page" } : {})}
-      {...props}
-    >
-      {children}
-    </Box>
-  );
-  if (isDisabled) {
-    return (
-      <SmallPopover placement="right" content={popoverContent ?? null}>
-        {link}
-      </SmallPopover>
-    );
-  } else {
-    return link;
-  }
-});
-
-PetitionHeader.fragments = {
-  Petition: gql`
-    fragment PetitionHeader_Petition on Petition {
+PetitionTemplateHeader.fragments = {
+  PetitionTemplate: gql`
+    fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
       id
       locale
-      deadline
-      status
       owner {
         id
       }
       ...HeaderNameEditable_PetitionBase
-      ...PetitionSettingsModal_Petition
+      ...ConfirmDeletePetitionsDialog_PetitionBase
     }
-    ${PetitionSettingsModal.fragments.Petition}
+    ${ConfirmDeletePetitionsDialog.fragments.PetitionBase}
     ${HeaderNameEditable.fragments.PetitionBase}
   `,
   User: gql`
-    fragment PetitionHeader_User on User {
+    fragment PetitionTemplateHeader_User on User {
       id
     }
   `,

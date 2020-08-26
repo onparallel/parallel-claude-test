@@ -647,9 +647,9 @@ type OwnershipTransferredEvent implements PetitionEvent {
 }
 
 """
-An petition in the system.
+A petition
 """
-type Petition implements Timestamps {
+type Petition implements PetitionBase {
   """
   The accesses for this petition
   """
@@ -659,11 +659,6 @@ type Petition implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
-
-  """
-  The custom ref of the petition.
-  """
-  customRef: String
 
   """
   The deadline of the petition.
@@ -701,12 +696,12 @@ type Petition implements Timestamps {
   fieldCount: Int!
 
   """
-  The field definition of the petition.
+  The definition of the petition fields.
   """
   fields: [PetitionField!]!
 
   """
-  The ID of the petition.
+  The ID of the petition or template.
   """
   id: GID!
 
@@ -844,6 +839,71 @@ type PetitionAndField {
   petition: Petition!
 }
 
+interface PetitionBase {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The body of the petition.
+  """
+  emailBody: JSON
+
+  """
+  The subject of the petition.
+  """
+  emailSubject: String
+
+  """
+  The number of fields in the petition.
+  """
+  fieldCount: Int!
+
+  """
+  The ID of the petition or template.
+  """
+  id: GID!
+
+  """
+  The locale of the petition.
+  """
+  locale: PetitionLocale!
+
+  """
+  The name of the petition.
+  """
+  name: String
+  owner: User!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+
+  """
+  The permissions linked to the petition
+  """
+  userPermissions: [PetitionUserPermission!]!
+}
+
+type PetitionBasePagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionBase!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+enum PetitionBaseType {
+  PETITION
+  TEMPLATE
+}
+
 type PetitionCompletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
@@ -876,7 +936,7 @@ type PetitionEventPagination {
 """
 A field within a petition.
 """
-type PetitionField {
+type PetitionField implements PetitionFieldBase {
   """
   The comments for this field.
   """
@@ -941,6 +1001,56 @@ type PetitionField {
 type PetitionFieldAndReplies {
   field: PetitionField!
   replies: [PetitionFieldReply!]!
+}
+
+"""
+A field within a petition.
+"""
+interface PetitionFieldBase {
+  """
+  The description of the petition field.
+  """
+  description: String
+
+  """
+  The ID of the petition field.
+  """
+  id: GID!
+
+  """
+  Determines if the field can be moved or deleted.
+  """
+  isFixed: Boolean!
+
+  """
+  Determines if the field accepts replies
+  """
+  isReadOnly: Boolean!
+
+  """
+  Determines if this field allows multiple replies.
+  """
+  multiple: Boolean!
+
+  """
+  Determines if this field is optional.
+  """
+  optional: Boolean!
+
+  """
+  The options of the petition.
+  """
+  options: JSONObject
+
+  """
+  The title of the petition field.
+  """
+  title: String
+
+  """
+  The type of the petition field.
+  """
+  type: PetitionFieldType!
 }
 
 """
@@ -1161,18 +1271,6 @@ enum PetitionMessageStatus {
   SCHEDULED
 }
 
-type PetitionPagination {
-  """
-  The requested slice of items.
-  """
-  items: [Petition!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
-}
-
 """
 The progress of a petition.
 """
@@ -1254,6 +1352,112 @@ enum PetitionStatus {
   The petition has been sent and is awaiting completion.
   """
   PENDING
+}
+
+"""
+A petition template
+"""
+type PetitionTemplate implements PetitionBase {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The body of the petition.
+  """
+  emailBody: JSON
+
+  """
+  The subject of the petition.
+  """
+  emailSubject: String
+
+  """
+  The number of fields in the petition.
+  """
+  fieldCount: Int!
+
+  """
+  The definition of the petition template fields.
+  """
+  fields: [PetitionTemplateField!]!
+
+  """
+  The ID of the petition or template.
+  """
+  id: GID!
+
+  """
+  The locale of the petition.
+  """
+  locale: PetitionLocale!
+
+  """
+  The name of the petition.
+  """
+  name: String
+  owner: User!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+
+  """
+  The permissions linked to the petition
+  """
+  userPermissions: [PetitionUserPermission!]!
+}
+
+"""
+A field within a petition template.
+"""
+type PetitionTemplateField implements PetitionFieldBase {
+  """
+  The description of the petition field.
+  """
+  description: String
+
+  """
+  The ID of the petition field.
+  """
+  id: GID!
+
+  """
+  Determines if the field can be moved or deleted.
+  """
+  isFixed: Boolean!
+
+  """
+  Determines if the field accepts replies
+  """
+  isReadOnly: Boolean!
+
+  """
+  Determines if this field allows multiple replies.
+  """
+  multiple: Boolean!
+
+  """
+  Determines if this field is optional.
+  """
+  optional: Boolean!
+
+  """
+  The options of the petition.
+  """
+  options: JSONObject
+
+  """
+  The title of the petition field.
+  """
+  title: String
+
+  """
+  The type of the petition field.
+  """
+  type: PetitionFieldType!
 }
 
 """
@@ -1607,7 +1811,7 @@ type Query {
   ): ContactPagination!
   me: User!
   organization(id: GID!): Organization
-  petition(id: GID!): Petition
+  petition(id: GID!): PetitionBase
 
   """
   The petitions of the user
@@ -1633,7 +1837,8 @@ type Query {
     """
     sortBy: [QueryPetitions_OrderBy!]
     status: PetitionStatus
-  ): PetitionPagination!
+    type: PetitionBaseType
+  ): PetitionBasePagination!
 }
 
 """

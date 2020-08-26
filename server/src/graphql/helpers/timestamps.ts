@@ -13,6 +13,10 @@ export const Timestamps = interfaceType({
     });
     t.resolveType(() => null);
   },
+  rootTyping: `{
+    created_at: Date;
+    updated_at: Date;
+  }`,
 });
 
 export const CreatedAt = interfaceType({
@@ -24,4 +28,7 @@ export const CreatedAt = interfaceType({
     });
     t.resolveType(() => null);
   },
+  rootTyping: `{
+    created_at: Date;
+  }`,
 });

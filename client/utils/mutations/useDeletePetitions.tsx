@@ -6,7 +6,7 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import {
-  ConfirmDeletePetitionsDialog_PetitionFragment,
+  ConfirmDeletePetitionsDialog_PetitionBaseFragment,
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables,
   useDeletePetitions_PetitionQuery,
@@ -98,10 +98,10 @@ function useFetchPetitionPermissions() {
                 id
               }
             }
-            ...ConfirmDeletePetitionsDialog_Petition
+            ...ConfirmDeletePetitionsDialog_PetitionBase
           }
         }
-        ${ConfirmDeletePetitionsDialog.fragments.Petition}
+        ${ConfirmDeletePetitionsDialog.fragments.PetitionBase}
       `,
       fetchPolicy: "network-only",
       variables: { id: petitionId },
@@ -114,7 +114,7 @@ export function ConfirmDeletePetitionsDialog({
   ...props
 }: DialogProps<
   {
-    selected: ConfirmDeletePetitionsDialog_PetitionFragment[];
+    selected: ConfirmDeletePetitionsDialog_PetitionBaseFragment[];
   },
   void
 >) {
@@ -153,8 +153,8 @@ export function ConfirmDeletePetitionsDialog({
 }
 
 ConfirmDeletePetitionsDialog.fragments = {
-  Petition: gql`
-    fragment ConfirmDeletePetitionsDialog_Petition on Petition {
+  PetitionBase: gql`
+    fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
       id
       name
     }

@@ -376,12 +376,12 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_Petition on Petition {
         id
-        ...PetitionLayout_Petition
+        ...PetitionLayout_PetitionBase
         fields {
           ...PetitionReplies_PetitionField
         }
       }
-      ${PetitionLayout.fragments.Petition}
+      ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
     `;
   },
@@ -390,14 +390,14 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_PetitionField on PetitionField {
         isReadOnly
         ...PetitionRepliesField_PetitionField
-        ...PetitionFieldsIndex_PetitionField
+        ...PetitionFieldsIndex_PetitionFieldBase
         ...PetitionRepliesFieldComments_PetitionField
         ...DownloadAllDialog_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${DownloadAllDialog.fragments.PetitionField}
-      ${PetitionFieldsIndex.fragments.PetitionField}
+      ${PetitionFieldsIndex.fragments.PetitionFieldBase}
     `;
   },
   get User() {

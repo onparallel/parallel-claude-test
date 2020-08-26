@@ -6,39 +6,45 @@ import {
   MenuList,
   MenuOptionGroup,
   Portal,
+  MenuDivider,
 } from "@chakra-ui/core";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
-export type PetitionStatusFilterProps = {
-  value: PetitionStatus | null;
+export type PetitionListFilterProps = {
+  status: PetitionStatus | null;
+  type: "PETITION" | "TEMPLATE";
   onChange: (value: PetitionStatus | null) => void;
 };
 
-export function PetitionStatusFilter({
+export function PetitionListFilter({
   value,
   onChange,
   ...props
-}: PetitionStatusFilterProps) {
+}: PetitionListFilterProps) {
   const intl = useIntl();
   const filters = {
     ALL: intl.formatMessage({
-      id: "component.petition-status-filter.all",
+      id: "component.petition-list-filter.all",
       defaultMessage: "All petitions",
     }),
     DRAFT: intl.formatMessage({
-      id: "component.petition-status-filter.draft",
+      id: "component.petition-list-filter.draft",
       defaultMessage: "Draft",
     }),
     PENDING: intl.formatMessage({
-      id: "component.petition-status-filter.pending",
+      id: "component.petition-list-filter.pending",
       defaultMessage: "Pending",
     }),
     COMPLETED: intl.formatMessage({
-      id: "component.petition-status-filter.completed",
+      id: "component.petition-list-filter.completed",
       defaultMessage: "Completed",
+    }),
+    TEMPLATES: intl.formatMessage({
+      id: "component.petition-list-filter.template",
+      defaultMessage: "Templates",
     }),
   };
   const handleChange = useCallback(
@@ -65,6 +71,10 @@ export function PetitionStatusFilter({
             <MenuItemOption value="PENDING">{filters.PENDING}</MenuItemOption>
             <MenuItemOption value="COMPLETED">
               {filters.COMPLETED}
+            </MenuItemOption>
+            <MenuDivider />
+            <MenuItemOption value="TEMPLATES">
+              {filters.TEMPLATES}
             </MenuItemOption>
           </MenuOptionGroup>
         </MenuList>

@@ -24,13 +24,20 @@ Petition.getInitialProps = async ({
       query Petition($id: GID!) {
         petition(id: $id) {
           id
-          status
+          ... on Petition {
+            status
+          }
         }
       }
     `,
     variables: { id: query.petitionId as string },
   });
-  const section = data?.petition?.status === "DRAFT" ? "compose" : "replies";
+  const section =
+    data?.petition?.__typename === "Petition"
+      ? data?.petition?.status === "DRAFT"
+        ? "compose"
+        : "replies"
+      : "compose";
   if (process.browser) {
     Router.push(
       `/[locale]/app/petitions/[petitionId]/${section}`,

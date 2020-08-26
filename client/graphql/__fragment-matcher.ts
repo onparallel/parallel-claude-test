@@ -26,6 +26,18 @@ const result: IntrospectionResultData = {
       },
       {
         kind: "INTERFACE",
+        name: "PetitionBase",
+        possibleTypes: [
+          {
+            name: "Petition",
+          },
+          {
+            name: "PetitionTemplate",
+          },
+        ],
+      },
+      {
+        kind: "INTERFACE",
         name: "PetitionEvent",
         possibleTypes: [
           {
@@ -82,6 +94,18 @@ const result: IntrospectionResultData = {
         ],
       },
       {
+        kind: "INTERFACE",
+        name: "PetitionFieldBase",
+        possibleTypes: [
+          {
+            name: "PetitionField",
+          },
+          {
+            name: "PetitionTemplateField",
+          },
+        ],
+      },
+      {
         kind: "UNION",
         name: "PublicUserOrContact",
         possibleTypes: [
@@ -102,9 +126,6 @@ const result: IntrospectionResultData = {
           },
           {
             name: "Organization",
-          },
-          {
-            name: "Petition",
           },
           {
             name: "PetitionAccess",

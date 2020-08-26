@@ -171,6 +171,7 @@ export class PetitionRepository extends BaseRepository {
         order?: "asc" | "desc";
       }[];
       status?: PetitionStatus | null;
+      type: "PETITION" | "TEMPLATE";
     } & PageOpts
   ) {
     return await this.loadPageAndCount(
@@ -178,7 +179,7 @@ export class PetitionRepository extends BaseRepository {
         .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
         .where({
           "petition_user.user_id": userId,
-          "petition.is_template": false,
+          is_template: opts.type === "TEMPLATE",
           "petition_user.deleted_at": null,
         })
         .mmodify((q) => {
@@ -186,7 +187,7 @@ export class PetitionRepository extends BaseRepository {
           if (search) {
             q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
           }
-          if (status) {
+          if (status && opts.type === "PETITION") {
             q.where("status", status);
           }
           q.orderBy(opts.sortBy ?? ["petition.id"]);

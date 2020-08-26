@@ -335,22 +335,22 @@
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
   },
   {
-    "term": "component.petition-status-filter.all",
+    "term": "component.petition-list-filter.all",
     "definition": "Todas las peticiones",
     "context": "All petitions"
   },
   {
-    "term": "component.petition-status-filter.completed",
+    "term": "component.petition-list-filter.completed",
     "definition": "Completadas",
     "context": "Completed"
   },
   {
-    "term": "component.petition-status-filter.draft",
+    "term": "component.petition-list-filter.draft",
     "definition": "Borradores",
     "context": "Draft"
   },
   {
-    "term": "component.petition-status-filter.pending",
+    "term": "component.petition-list-filter.pending",
     "definition": "Pendientes",
     "context": "Pending"
   },

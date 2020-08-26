@@ -15,11 +15,14 @@ import { ArgValidationError } from "./errors";
 
 export type PaginationPluginConfig = {};
 
+type a = core.GetGen2<"fieldTypes", "PetitionBase">;
+
 type GetObjectType<
   Type extends
-    | core.GetGen<"allOutputTypes", string>
+    | core.GetGen<"objectNames">
+    | core.GetGen<"interfaceNames">
     | core.AllNexusOutputTypeDefs
-> = Type extends core.GetGen<"objectNames">
+> = Type extends core.GetGen<"objectNames"> | core.GetGen<"interfaceNames">
   ? core.GetGen2<"fieldTypes", Type>
   : Type extends core.NexusObjectTypeDef<infer TypeName>
   ? core.GetGen2<"fieldTypes", TypeName>

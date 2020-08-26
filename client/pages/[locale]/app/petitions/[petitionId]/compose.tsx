@@ -499,31 +499,38 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 }
 
 PetitionCompose.fragments = {
-  get Petition() {
+  get PetitionBase() {
     return gql`
-      fragment PetitionCompose_Petition on Petition {
+      fragment PetitionCompose_PetitionBase on PetitionBase {
         id
-        ...PetitionLayout_Petition
-        fields {
-          ...PetitionCompose_PetitionField
+        ...PetitionLayout_PetitionBase
+        ... on Petition {
+          fields {
+            ...PetitionCompose_PetitionFieldBase
+          }
+        }
+        ... on PetitionTemplate {
+          fields {
+            ...PetitionCompose_PetitionFieldBase
+          }
         }
         ...PetitionComposeMessageEditor_Petition
       }
-      ${PetitionLayout.fragments.Petition}
+      ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeMessageEditor.fragments.Petition}
-      ${this.PetitionField}
+      ${this.PetitionFieldBase}
     `;
   },
-  get PetitionField() {
+  get PetitionFieldBase() {
     return gql`
-      fragment PetitionCompose_PetitionField on PetitionField {
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
-        ...PetitionFieldsIndex_PetitionField
+      fragment PetitionCompose_PetitionFieldBase on PetitionFieldBase {
+        ...PetitionComposeField_PetitionFieldBase
+        ...PetitionComposeFieldSettings_PetitionFieldBase
+        ...PetitionFieldsIndex_PetitionFieldBase
       }
-      ${PetitionComposeField.fragments.PetitionField}
-      ${PetitionComposeFieldSettings.fragments.PetitionField}
-      ${PetitionFieldsIndex.fragments.PetitionField}
+      ${PetitionComposeField.fragments.PetitionFieldBase}
+      ${PetitionComposeFieldSettings.fragments.PetitionFieldBase}
+      ${PetitionFieldsIndex.fragments.PetitionFieldBase}
     `;
   },
   get User() {
@@ -543,11 +550,11 @@ PetitionCompose.mutations = [
       $data: UpdatePetitionInput!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
-        ...PetitionLayout_Petition
+        ...PetitionLayout_PetitionBase
         ...PetitionComposeMessageEditor_Petition
       }
     }
-    ${PetitionLayout.fragments.Petition}
+    ${PetitionLayout.fragments.PetitionBase}
     ${PetitionComposeMessageEditor.fragments.Petition}
   `,
   gql`
@@ -557,13 +564,13 @@ PetitionCompose.mutations = [
     ) {
       updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
         id
-        ...PetitionLayout_Petition
+        ...PetitionLayout_PetitionBase
         fields {
           id
         }
       }
     }
-    ${PetitionLayout.fragments.Petition}
+    ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionCompose_createPetitionField(
@@ -578,20 +585,20 @@ PetitionCompose.mutations = [
       ) {
         field {
           id
-          ...PetitionComposeField_PetitionField
-          ...PetitionComposeFieldSettings_PetitionField
+          ...PetitionComposeField_PetitionFieldBase
+          ...PetitionComposeFieldSettings_PetitionFieldBase
         }
         petition {
-          ...PetitionLayout_Petition
+          ...PetitionLayout_PetitionBase
           fields {
             id
           }
         }
       }
     }
-    ${PetitionLayout.fragments.Petition}
-    ${PetitionComposeField.fragments.PetitionField}
-    ${PetitionComposeFieldSettings.fragments.PetitionField}
+    ${PetitionLayout.fragments.PetitionBase}
+    ${PetitionComposeField.fragments.PetitionFieldBase}
+    ${PetitionComposeFieldSettings.fragments.PetitionFieldBase}
   `,
   gql`
     mutation PetitionCompose_clonePetitionField(
@@ -601,20 +608,20 @@ PetitionCompose.mutations = [
       clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
         field {
           id
-          ...PetitionComposeField_PetitionField
-          ...PetitionComposeFieldSettings_PetitionField
+          ...PetitionComposeField_PetitionFieldBase
+          ...PetitionComposeFieldSettings_PetitionFieldBase
         }
         petition {
-          ...PetitionLayout_Petition
+          ...PetitionLayout_PetitionBase
           fields {
             id
           }
         }
       }
     }
-    ${PetitionLayout.fragments.Petition}
-    ${PetitionComposeField.fragments.PetitionField}
-    ${PetitionComposeFieldSettings.fragments.PetitionField}
+    ${PetitionLayout.fragments.PetitionBase}
+    ${PetitionComposeField.fragments.PetitionFieldBase}
+    ${PetitionComposeFieldSettings.fragments.PetitionFieldBase}
   `,
   gql`
     mutation PetitionCompose_deletePetitionField(
@@ -628,13 +635,13 @@ PetitionCompose.mutations = [
         force: $force
       ) {
         id
-        ...PetitionLayout_Petition
+        ...PetitionLayout_PetitionBase
         fields {
           id
         }
       }
     }
-    ${PetitionLayout.fragments.Petition}
+    ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionCompose_updatePetitionField(
@@ -649,8 +656,8 @@ PetitionCompose.mutations = [
       ) {
         field {
           id
-          ...PetitionComposeField_PetitionField
-          ...PetitionComposeFieldSettings_PetitionField
+          ...PetitionComposeField_PetitionFieldBase
+          ...PetitionComposeFieldSettings_PetitionFieldBase
         }
         petition {
           id
@@ -658,8 +665,8 @@ PetitionCompose.mutations = [
         }
       }
     }
-    ${PetitionComposeField.fragments.PetitionField}
-    ${PetitionComposeFieldSettings.fragments.PetitionField}
+    ${PetitionComposeField.fragments.PetitionFieldBase}
+    ${PetitionComposeFieldSettings.fragments.PetitionFieldBase}
   `,
   gql`
     mutation PetitionCompose_changePetitionFieldType(
@@ -676,8 +683,8 @@ PetitionCompose.mutations = [
       ) {
         field {
           id
-          ...PetitionComposeField_PetitionField
-          ...PetitionComposeFieldSettings_PetitionField
+          ...PetitionComposeField_PetitionFieldBase
+          ...PetitionComposeFieldSettings_PetitionFieldBase
           replies {
             id
           }
@@ -688,8 +695,8 @@ PetitionCompose.mutations = [
         }
       }
     }
-    ${PetitionComposeField.fragments.PetitionField}
-    ${PetitionComposeFieldSettings.fragments.PetitionField}
+    ${PetitionComposeField.fragments.PetitionFieldBase}
+    ${PetitionComposeFieldSettings.fragments.PetitionFieldBase}
   `,
   gql`
     mutation PetitionCompose_sendPetition(
@@ -727,10 +734,10 @@ PetitionCompose.getInitialProps = async ({
       gql`
         query PetitionCompose($id: GID!) {
           petition(id: $id) {
-            ...PetitionCompose_Petition
+            ...PetitionCompose_PetitionBase
           }
         }
-        ${PetitionCompose.fragments.Petition}
+        ${PetitionCompose.fragments.PetitionBase}
       `,
       {
         variables: { id: query.petitionId as string },

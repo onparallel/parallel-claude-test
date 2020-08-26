@@ -1,4 +1,5 @@
-import { enumType, objectType } from "@nexus/schema";
+import { enumType, objectType, interfaceType } from "@nexus/schema";
+import { safeJsonParse } from "../../../util/safeJsonParse";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -38,42 +39,39 @@ export const PetitionProgress = objectType({
   },
 });
 
-export const Petition = objectType({
-  name: "Petition",
-  description: "An petition in the system.",
+export const PetitionBase = interfaceType({
+  name: "PetitionBase",
   definition(t) {
-    t.implements("Timestamps");
+    t.resolveType((p) => (p.is_template ? "PetitionTemplate" : "Petition"));
     t.globalId("id", {
-      description: "The ID of the petition.",
+      prefixName: "Petition",
+      description: "The ID of the petition or template.",
     });
     t.string("name", {
       description: "The name of the petition.",
       nullable: true,
     });
-    t.string("customRef", {
-      description: "The custom ref of the petition.",
-      nullable: true,
-      resolve: (o) => o.custom_ref,
-    });
-    t.datetime("deadline", {
-      description: "The deadline of the petition.",
-      nullable: true,
-      resolve: (o) => o.deadline,
-    });
     t.field("locale", {
       type: "PetitionLocale",
       description: "The locale of the petition.",
     });
-    t.field("status", {
-      type: "PetitionStatus",
-      description: "The status of the petition.",
-      resolve: (o) => o.status!,
-    });
-    t.list.field("fields", {
-      type: "PetitionField",
-      description: "The field definition of the petition.",
+    t.field("owner", {
+      type: "User",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadFieldsForPetition(root.id);
+        return (await ctx.petitions.loadPetitionOwners(root.id))!;
+      },
+    });
+    t.list.field("userPermissions", {
+      type: "PetitionUserPermission",
+      description: "The permissions linked to the petition",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadUserPermissions(root.id);
+      },
+    });
+    t.int("fieldCount", {
+      description: "The number of fields in the petition.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadFieldCountForPetition(root.id);
       },
     });
     t.string("emailSubject", {
@@ -84,18 +82,45 @@ export const Petition = objectType({
     t.json("emailBody", {
       description: "The body of the petition.",
       nullable: true,
-      resolve: (o) => {
-        try {
-          return o.email_body ? JSON.parse(o.email_body) : null;
-        } catch {
-          return null;
-        }
-      },
+      resolve: (o) => safeJsonParse(o.email_body),
     });
-    t.int("fieldCount", {
-      description: "The number of fields in the petition.",
+    // Until nexus allows interfaces to extend other interfaces
+    t.datetime("createdAt", {
+      description: "Time when the resource was created.",
+      resolve: (o) => o.created_at,
+    });
+    t.datetime("updatedAt", {
+      description: "Time when the resource was last updated.",
+      resolve: (o) => o.updated_at,
+    });
+  },
+  rootTyping: "db.Petition",
+});
+
+export const Petition = objectType({
+  name: "Petition",
+  description: "A petition",
+  definition(t) {
+    t.implements("PetitionBase");
+    t.string("name", {
+      description: "The name of the petition.",
+      nullable: true,
+    });
+    t.datetime("deadline", {
+      description: "The deadline of the petition.",
+      nullable: true,
+      resolve: (o) => o.deadline,
+    });
+    t.field("status", {
+      type: "PetitionStatus",
+      description: "The status of the petition.",
+      resolve: (o) => o.status!,
+    });
+    t.list.field("fields", {
+      type: "PetitionField",
+      description: "The definition of the petition fields.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadFieldCountForPetition(root.id);
+        return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
     t.field("progress", {
@@ -130,20 +155,24 @@ export const Petition = objectType({
         });
       },
     });
-    t.field("owner", {
-      type: "User",
+  },
+});
+
+export const PetitionTemplate = objectType({
+  name: "PetitionTemplate",
+  description: "A petition template",
+  definition(t) {
+    t.implements("PetitionBase");
+
+    t.list.field("fields", {
+      type: "PetitionTemplateField",
+      description: "The definition of the petition template fields.",
       resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadPetitionOwners(root.id))!;
-      },
-    });
-    t.list.field("userPermissions", {
-      type: "PetitionUserPermission",
-      description: "The permissions linked to the petition",
-      resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadUserPermissions(root.id);
+        return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
   },
+  rootTyping: "db.Petition",
 });
 
 export const PetitionFieldType = enumType({
@@ -156,11 +185,13 @@ export const PetitionFieldType = enumType({
   ],
 });
 
-export const PetitionField = objectType({
-  name: "PetitionField",
+export const PetitionFieldBase = interfaceType({
+  name: "PetitionFieldBase",
   description: "A field within a petition.",
   definition(t) {
+    t.resolveType(() => null);
     t.globalId("id", {
+      prefixName: "PetitionField",
       description: "The ID of the petition field.",
     });
     t.field("type", {
@@ -186,10 +217,6 @@ export const PetitionField = objectType({
     t.boolean("multiple", {
       description: "Determines if this field allows multiple replies.",
     });
-    t.boolean("validated", {
-      description:
-        "Determines if the content of this field has been validated.",
-    });
     t.boolean("isFixed", {
       description: "Determines if the field can be moved or deleted.",
       resolve: (o) => o.is_fixed,
@@ -198,7 +225,19 @@ export const PetitionField = objectType({
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
+  },
+  rootTyping: "db.PetitionField",
+});
 
+export const PetitionField = objectType({
+  name: "PetitionField",
+  description: "A field within a petition.",
+  definition(t) {
+    t.implements("PetitionFieldBase");
+    t.boolean("validated", {
+      description:
+        "Determines if the content of this field has been validated.",
+    });
     t.list.field("replies", {
       type: "PetitionFieldReply",
       description: "The replies to the petition field",
@@ -206,7 +245,6 @@ export const PetitionField = objectType({
         return await ctx.petitions.loadRepliesForField(root.id);
       },
     });
-
     t.list.field("comments", {
       type: "PetitionFieldComment",
       description: "The comments for this field.",
@@ -219,6 +257,15 @@ export const PetitionField = objectType({
       },
     });
   },
+});
+
+export const PetitionTemplateField = objectType({
+  name: "PetitionTemplateField",
+  description: "A field within a petition template.",
+  definition(t) {
+    t.implements("PetitionFieldBase");
+  },
+  rootTyping: "db.PetitionField",
 });
 
 export const RemindersConfig = objectType({

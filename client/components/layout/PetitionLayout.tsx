@@ -1,20 +1,25 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps } from "@chakra-ui/core";
+import { Box } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
   PetitionHeaderProps,
 } from "@parallel/components/layout/PetitionHeader";
-import { PetitionLayout_UserFragment } from "@parallel/graphql/__types";
-import { ReactNode, useMemo } from "react";
+import {
+  PetitionLayout_PetitionBaseFragment,
+  PetitionLayout_UserFragment,
+} from "@parallel/graphql/__types";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
+import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
-export type PetitionLayoutProps = BoxProps &
-  PetitionHeaderProps & {
-    scrollBody: boolean;
-    user: PetitionLayout_UserFragment;
-    children: ReactNode;
-  };
+export type PetitionLayoutProps = ExtendChakra<{
+  petition: PetitionLayout_PetitionBaseFragment;
+  user: PetitionLayout_UserFragment;
+  section?: PetitionHeaderProps["section"];
+  scrollBody: boolean;
+}>;
 
 export function PetitionLayout({
   user,
@@ -29,40 +34,58 @@ export function PetitionLayout({
   const intl = useIntl();
   const title = useMemo(
     () =>
-      (({
-        compose: intl.formatMessage({
-          id: "petition.header.compose-tab",
-          defaultMessage: "Compose",
-        }),
-        replies: intl.formatMessage({
-          id: "petition.header.replies-tab",
-          defaultMessage: "Replies",
-        }),
-        activity: intl.formatMessage({
-          id: "petition.header.activity-tab",
-          defaultMessage: "Activity",
-        }),
-      } as Record<PetitionHeaderProps["section"], string>)[section]),
+      petition.__typename === "Petition"
+        ? ({
+            compose: intl.formatMessage({
+              id: "petition.header.compose-tab",
+              defaultMessage: "Compose",
+            }),
+            replies: intl.formatMessage({
+              id: "petition.header.replies-tab",
+              defaultMessage: "Replies",
+            }),
+            activity: intl.formatMessage({
+              id: "petition.header.activity-tab",
+              defaultMessage: "Activity",
+            }),
+          } as Record<PetitionHeaderProps["section"], string>)[section!]
+        : intl.formatMessage({
+            id: "generic.template",
+            defaultMessage: "Template",
+          }),
     [section, intl.locale]
   );
   return (
     <AppLayout
       title={`${
-        petition!.name ||
-        intl.formatMessage({
-          id: "generic.untitled-petition",
-          defaultMessage: "Untitled petition",
-        })
+        petition!.name || petition.__typename === "Petition"
+          ? intl.formatMessage({
+              id: "generic.untitled-petition",
+              defaultMessage: "Untitled petition",
+            })
+          : intl.formatMessage({
+              id: "generic.untitled-template",
+              defaultMessage: "Untitled template",
+            })
       } - ${title}`}
       user={user}
     >
-      <PetitionHeader
-        petition={petition}
-        user={user}
-        onUpdatePetition={onUpdatePetition}
-        section={section}
-        state={state}
-      />
+      {petition.__typename === "Petition" ? (
+        <PetitionHeader
+          petition={petition}
+          user={user}
+          onUpdatePetition={onUpdatePetition}
+          section={section!}
+          state={state}
+        />
+      ) : petition.__typename === "PetitionTemplate" ? (
+        <PetitionTemplateHeader
+          petition={petition}
+          user={user}
+          onUpdatePetition={onUpdatePetition}
+          state={state}
+        />
+      ) : null}
       <Box flex="1" overflow="auto" {...props}>
         {children}
       </Box>
@@ -71,13 +94,19 @@ export function PetitionLayout({
 }
 
 PetitionLayout.fragments = {
-  Petition: gql`
-    fragment PetitionLayout_Petition on Petition {
+  PetitionBase: gql`
+    fragment PetitionLayout_PetitionBase on PetitionBase {
       id
       name
-      ...PetitionHeader_Petition
+      ... on Petition {
+        ...PetitionHeader_Petition
+      }
+      ... on PetitionTemplate {
+        ...PetitionTemplateHeader_PetitionTemplate
+      }
     }
     ${PetitionHeader.fragments.Petition}
+    ${PetitionTemplateHeader.fragments.PetitionTemplate}
   `,
   User: gql`
     fragment PetitionLayout_User on User {

@@ -6,7 +6,7 @@ import { Card, CardHeader } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
-  PetitionComposeField_PetitionFieldFragment,
+  PetitionComposeField_PetitionFieldBaseFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -24,7 +24,7 @@ import {
 import { FormattedMessage } from "react-intl";
 import { indexBy } from "remeda";
 
-type FieldSelection = PetitionComposeField_PetitionFieldFragment;
+type FieldSelection = PetitionComposeField_PetitionFieldBaseFragment;
 
 type FieldsReducerState = {
   fieldsById: { [id: string]: FieldSelection };
@@ -289,10 +289,10 @@ export const PetitionComposeFieldList = Object.assign(
       petition: gql`
         fragment PetitionComposeFieldList_Petition on Petition {
           fields {
-            ...PetitionComposeField_PetitionField
+            ...PetitionComposeField_PetitionFieldBase
           }
         }
-        ${PetitionComposeField.fragments.PetitionField}
+        ${PetitionComposeField.fragments.PetitionFieldBase}
       `,
     },
   }

@@ -419,11 +419,11 @@ PetitionActivity.fragments = {
   Petition: gql`
     fragment PetitionActivity_Petition on Petition {
       id
-      ...PetitionLayout_Petition
+      ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition
       ...PetitionActivityTimeline_Petition
     }
-    ${PetitionLayout.fragments.Petition}
+    ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
     ${PetitionActivityTimeline.fragments.Petition}
   `,
