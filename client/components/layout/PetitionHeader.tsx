@@ -314,6 +314,10 @@ export function PetitionHeader({
                     as={IconButton}
                     variant="ghost"
                     icon={<MoreVerticalIcon />}
+                    aria-label={intl.formatMessage({
+                      id: "generic.more-options",
+                      defaultMessage: "More options...",
+                    })}
                   />
                 </Tooltip>
                 <MenuList>
