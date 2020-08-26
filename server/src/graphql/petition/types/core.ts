@@ -102,10 +102,6 @@ export const Petition = objectType({
   description: "A petition",
   definition(t) {
     t.implements("PetitionBase");
-    t.string("name", {
-      description: "The name of the petition.",
-      nullable: true,
-    });
     t.datetime("deadline", {
       description: "The deadline of the petition.",
       nullable: true,
