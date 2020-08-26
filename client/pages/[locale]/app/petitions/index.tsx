@@ -18,6 +18,7 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
+  PetitionBaseType,
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
@@ -57,7 +58,7 @@ const SORTING = ["name", "createdAt"] as const;
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]),
-  status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]),
+  type: enums<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
   search: string(),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
@@ -83,6 +84,7 @@ function Petitions() {
         limit: PAGE_SIZE,
         search: state.search,
         status: state.status,
+        type: state.type,
         sortBy: [
           `${state.sort.field}_${state.sort.direction}` as QueryPetitions_OrderBy,
         ],
@@ -102,10 +104,14 @@ function Petitions() {
     }));
   }
 
-  function handleStatusChange(value: any) {
+  function handleFilterChange({
+    status,
+    type,
+  }: Pick<typeof state, "status" | "type">) {
     setQueryState((current) => ({
       ...current,
-      status: value === "ALL" ? null : value,
+      status,
+      type,
       page: 1,
     }));
   }
@@ -211,10 +217,11 @@ function Petitions() {
             <PetitionListHeader
               search={state.search}
               status={state.status}
+              type={state.type}
               showDelete={selected.length > 0}
               showClone={selected.length === 1}
               onSearchChange={handleSearchChange}
-              onStatusChange={handleStatusChange}
+              onFilterChange={handleFilterChange}
               onDeleteClick={handleDeleteClick}
               onCreateClick={handleCreateClick}
               onReload={() => refetch()}
@@ -467,7 +474,7 @@ Petitions.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  const { page, search, sort, status } = parseQuery(query, QUERY_STATE);
+  const { page, search, sort, status, type } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<PetitionsQuery, PetitionsQueryVariables>(
       gql`
@@ -477,12 +484,14 @@ Petitions.getInitialProps = async ({
           $search: String
           $sortBy: [QueryPetitions_OrderBy!]
           $status: PetitionStatus
+          $type: PetitionBaseType
         ) {
           petitions(
             offset: $offset
             limit: $limit
             search: $search
             sortBy: $sortBy
+            type: $type
             status: $status
           ) {
             ...Petitions_PetitionBasePagination
@@ -496,6 +505,7 @@ Petitions.getInitialProps = async ({
           limit: PAGE_SIZE,
           search,
           sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
+          type,
           status,
         },
       }

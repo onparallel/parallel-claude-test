@@ -19,36 +19,36 @@ import { PetitionStatus } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { identity } from "remeda";
+import { identity, pick } from "remeda";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { PetitionListFilter } from "../common/PetitionListFilter";
+import {
+  PetitionListFilter,
+  PetitionListFilterProps,
+} from "../common/PetitionListFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
-export interface PetitionListHeaderProps {
+export type PetitionListHeaderProps = PetitionListFilterProps & {
   search: string | null;
-  status: PetitionStatus | null;
   showClone: boolean;
   showDelete: boolean;
   onSearchChange: (value: string | null) => void;
-  onStatusChange: (value: PetitionStatus | null) => void;
   onDeleteClick: () => void;
   onCreateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
-}
+};
 
 export function PetitionListHeader({
   search: _search,
-  status,
   showClone,
   showDelete,
   onSearchChange,
-  onStatusChange,
   onDeleteClick,
   onCreateClick,
   onReload,
   onCloneClick,
+  ...props
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
@@ -81,7 +81,9 @@ export function PetitionListHeader({
         })}
       />
       <Box>
-        <PetitionListFilter value={status} onChange={onStatusChange} />
+        <PetitionListFilter
+          {...pick(props, ["status", "type", "onFilterChange"])}
+        />
       </Box>
       <Spacer />
       {showActions ? (

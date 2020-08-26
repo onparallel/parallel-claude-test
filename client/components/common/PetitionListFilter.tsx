@@ -9,20 +9,24 @@ import {
   MenuDivider,
 } from "@chakra-ui/core";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { PetitionStatus } from "@parallel/graphql/__types";
+import { PetitionStatus, PetitionBaseType } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
+import { Maybe } from "@parallel/utils/types";
 
 export type PetitionListFilterProps = {
-  status: PetitionStatus | null;
-  type: "PETITION" | "TEMPLATE";
-  onChange: (value: PetitionStatus | null) => void;
+  status: Maybe<PetitionStatus>;
+  type: Maybe<PetitionBaseType>;
+  onFilterChange: (value: {
+    type: PetitionBaseType;
+    status: Maybe<PetitionStatus>;
+  }) => void;
 };
 
 export function PetitionListFilter({
-  value,
-  onChange,
-  ...props
+  status,
+  type,
+  onFilterChange,
 }: PetitionListFilterProps) {
   const intl = useIntl();
   const filters = {
@@ -42,16 +46,22 @@ export function PetitionListFilter({
       id: "component.petition-list-filter.completed",
       defaultMessage: "Completed",
     }),
-    TEMPLATES: intl.formatMessage({
+    TEMPLATE: intl.formatMessage({
       id: "component.petition-list-filter.template",
       defaultMessage: "Templates",
     }),
   };
+  const value = type === "TEMPLATE" ? "TEMPLATE" : status ?? "ALL";
+
   const handleChange = useCallback(
-    (value) => {
-      onChange(value === "ALL" ? null : (value as PetitionStatus));
+    (val: typeof value) => {
+      onFilterChange(
+        val === "TEMPLATE"
+          ? { type: "TEMPLATE", status: null }
+          : { type: "PETITION", status: val === "ALL" ? null : val }
+      );
     },
-    [onChange]
+    [onFilterChange]
   );
 
   return (
@@ -62,8 +72,8 @@ export function PetitionListFilter({
       <Portal>
         <MenuList minWidth="200px">
           <MenuOptionGroup
-            value={value ?? "ALL"}
-            onChange={handleChange}
+            value={value}
+            onChange={handleChange as any}
             type="radio"
           >
             <MenuItemOption value="ALL">{filters.ALL}</MenuItemOption>
@@ -73,9 +83,7 @@ export function PetitionListFilter({
               {filters.COMPLETED}
             </MenuItemOption>
             <MenuDivider />
-            <MenuItemOption value="TEMPLATES">
-              {filters.TEMPLATES}
-            </MenuItemOption>
+            <MenuItemOption value="TEMPLATE">{filters.TEMPLATE}</MenuItemOption>
           </MenuOptionGroup>
         </MenuList>
       </Portal>

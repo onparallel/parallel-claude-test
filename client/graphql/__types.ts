@@ -2982,6 +2982,7 @@ export type PetitionsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
+  type?: Maybe<PetitionBaseType>;
 }>;
 
 export type PetitionsQuery = { __typename?: "Query" } & {
@@ -7162,12 +7163,14 @@ export const PetitionsDocument = gql`
     $search: String
     $sortBy: [QueryPetitions_OrderBy!]
     $status: PetitionStatus
+    $type: PetitionBaseType
   ) {
     petitions(
       offset: $offset
       limit: $limit
       search: $search
       sortBy: $sortBy
+      type: $type
       status: $status
     ) {
       ...Petitions_PetitionBasePagination
@@ -7193,6 +7196,7 @@ export const PetitionsDocument = gql`
  *      search: // value for 'search'
  *      sortBy: // value for 'sortBy'
  *      status: // value for 'status'
+ *      type: // value for 'type'
  *   },
  * });
  */
