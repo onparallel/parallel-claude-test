@@ -247,6 +247,11 @@ export interface NexusGenRootTypes {
   };
   PetitionReminder: db.PetitionReminder;
   PetitionTemplate: db.Petition;
+  PetitionTemplateAndField: {
+    // root type
+    field: NexusGenRootTypes["PetitionTemplateField"]; // PetitionTemplateField!
+    petition: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
+  };
   PetitionTemplateField: db.PetitionField;
   PetitionUserPermission: db.PetitionUser;
   PublicContact: db.Contact;
@@ -285,6 +290,10 @@ export interface NexusGenRootTypes {
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
   CreatedAt: {
     created_at: Date;
+  };
+  PetitionAndFieldBase: {
+    petition: db.Petition;
+    field: db.PetitionField;
   };
   PetitionBase: db.Petition;
   PetitionEvent: events.PetitionEvent;
@@ -461,7 +470,7 @@ export interface NexusGenFieldTypes {
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    updatePetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
+    updatePetitionField: NexusGenRootTypes["PetitionAndFieldBase"]; // PetitionAndFieldBase!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionFieldAndReplies"]; // PetitionFieldAndReplies!
     updateUser: NexusGenRootTypes["User"]; // User!
@@ -634,6 +643,11 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
+  };
+  PetitionTemplateAndField: {
+    // field return type
+    field: NexusGenRootTypes["PetitionTemplateField"]; // PetitionTemplateField!
+    petition: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
   };
   PetitionTemplateField: {
     // field return type
@@ -816,6 +830,11 @@ export interface NexusGenFieldTypes {
   CreatedAt: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PetitionAndFieldBase: {
+    // field return type
+    field: NexusGenRootTypes["PetitionFieldBase"]; // PetitionFieldBase!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
   };
   PetitionBase: {
     // field return type
@@ -1177,6 +1196,7 @@ export interface NexusGenAbstractResolveReturnTypes {
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
   CreatedAt: "PetitionMessage" | "PetitionReminder";
+  PetitionAndFieldBase: "PetitionAndField" | "PetitionTemplateAndField";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -1242,6 +1262,7 @@ export type NexusGenObjectNames =
   | "PetitionProgress"
   | "PetitionReminder"
   | "PetitionTemplate"
+  | "PetitionTemplateAndField"
   | "PetitionTemplateField"
   | "PetitionUserPermission"
   | "PublicContact"
@@ -1296,6 +1317,7 @@ export type NexusGenEnumNames =
 
 export type NexusGenInterfaceNames =
   | "CreatedAt"
+  | "PetitionAndFieldBase"
   | "PetitionBase"
   | "PetitionEvent"
   | "PetitionFieldBase"

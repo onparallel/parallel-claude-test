@@ -340,13 +340,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
 
 export const updatePetitionField = mutationField("updatePetitionField", {
   description: "Updates a petition field.",
-  type: objectType({
-    name: "PetitionAndField",
-    definition(t) {
-      t.field("petition", { type: "Petition" });
-      t.field("field", { type: "PetitionField" });
-    },
-  }),
+  type: "PetitionAndFieldBase",
   authorize: chain(
     authenticate(),
     and(

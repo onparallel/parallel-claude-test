@@ -24,7 +24,7 @@ import {
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
   PetitionComposeUserQuery,
-  PetitionCompose_PetitionFieldFragment,
+  PetitionCompose_PetitionFieldBaseFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
@@ -59,7 +59,7 @@ type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
 >;
 
-type FieldSelection = PetitionCompose_PetitionFieldFragment;
+type FieldSelection = PetitionCompose_PetitionFieldBaseFragment;
 
 type PetitionComposeState = {
   activeFieldId: Maybe<string>;
@@ -94,7 +94,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
     if (activeFieldId) {
-      return petition!.fields.find((f) => f.id === activeFieldId) ?? null;
+      return (
+        (petition!.fields as any[]).find((f) => f.id === activeFieldId) ?? null
+      );
     }
     return null;
   }, [activeFieldId, petition!.fields]);
@@ -107,7 +109,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   // When the petition is completed show a dialog to avoid unintended changes
   const completedDialog = useCompletedPetitionDialog();
   useEffect(() => {
-    if (petition?.status === "COMPLETED") {
+    if (
+      petition?.__typename === "Petition" &&
+      petition?.status === "COMPLETED"
+    ) {
       completedDialog({});
     }
   }, []);
@@ -198,7 +203,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleFieldEdit = useCallback(
     wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
-      const field = petition!.fields.find((f) => f.id === fieldId);
+      const field = (petition!.fields as any[]).find((f) => f.id === fieldId);
       await updatePetitionField({
         variables: { petitionId, fieldId, data },
         optimisticResponse: {
@@ -272,6 +277,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
   const handleSend: PetitionComposeMessageEditorProps["onSend"] = useCallback(
     async ({ contactIds, schedule }) => {
+      if (petition && petition.__typename !== "Petition") {
+        throw new Error("Can't send a template");
+      }
       if (petition!.fields.filter((f) => f.type !== "HEADING").length === 0) {
         try {
           await showErrorDialog({
@@ -451,47 +459,49 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             onFieldEdit={handleFieldEdit}
             onFieldSettingsClick={handleSettingsClick}
           />
-          {petition!.status === "DRAFT" ? (
-            <PetitionComposeMessageEditor
-              marginTop={4}
-              petition={petition!}
-              showErrors={showErrors}
-              onCreateContact={handleCreateContact}
-              onSearchContacts={handleSearchContacts}
-              onUpdatePetition={handleUpdatePetition}
-              onSend={handleSend}
-            />
-          ) : (
-            <Box
-              color="gray.500"
-              marginTop={12}
-              paddingX={4}
-              textAlign="center"
-            >
-              <Text>
-                <FormattedMessage
-                  id="petition.already-sent"
-                  defaultMessage="This petition has already been sent."
-                />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="petition.send-from-activity"
-                  defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
-                  values={{
-                    a: (chunks: any[]) => (
-                      <Link
-                        href="/app/petitions/[petitionId]/activity"
-                        as={`/app/petitions/${petitionId}/activity`}
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                  }}
-                />
-              </Text>
-            </Box>
-          )}
+          {petition && petition.__typename === "Petition" ? (
+            petition!.status === "DRAFT" ? (
+              <PetitionComposeMessageEditor
+                marginTop={4}
+                petition={petition!}
+                showErrors={showErrors}
+                onCreateContact={handleCreateContact}
+                onSearchContacts={handleSearchContacts}
+                onUpdatePetition={handleUpdatePetition}
+                onSend={handleSend}
+              />
+            ) : (
+              <Box
+                color="gray.500"
+                marginTop={12}
+                paddingX={4}
+                textAlign="center"
+              >
+                <Text>
+                  <FormattedMessage
+                    id="petition.already-sent"
+                    defaultMessage="This petition has already been sent."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition.send-from-activity"
+                    defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
+                    values={{
+                      a: (chunks: any[]) => (
+                        <Link
+                          href="/app/petitions/[petitionId]/activity"
+                          as={`/app/petitions/${petitionId}/activity`}
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                    }}
+                  />
+                </Text>
+              </Box>
+            )
+          ) : null}
         </Box>
       </PaneWithFlyout>
     </PetitionLayout>

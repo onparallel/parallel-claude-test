@@ -873,9 +873,14 @@ export class PetitionRepository extends BaseRepository {
           })
           .update(
             {
-              status: this.knex.raw(
-                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-              ) as any,
+              status: this.knex.raw(/* sql */ `
+                case is_template 
+                when false then 
+                  (case status when 'COMPLETED' then 'PENDING' else status end) 
+                else
+                  NULL
+                end
+              `) as any,
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },

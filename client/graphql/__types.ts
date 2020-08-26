@@ -236,9 +236,9 @@ export type Mutation = {
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
   /** Updates a petition. */
-  updatePetition: Petition;
+  updatePetition: PetitionBase;
   /** Updates a petition field. */
-  updatePetitionField: PetitionAndField;
+  updatePetitionField: PetitionAndFieldBase;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply. */
@@ -652,10 +652,15 @@ export type PetitionAccessStatus =
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
 
-export type PetitionAndField = {
+export type PetitionAndField = PetitionAndFieldBase & {
   __typename?: "PetitionAndField";
   field: PetitionField;
   petition: Petition;
+};
+
+export type PetitionAndFieldBase = {
+  field: PetitionFieldBase;
+  petition: PetitionBase;
 };
 
 export type PetitionBase = {
@@ -939,6 +944,12 @@ export type PetitionTemplate = PetitionBase & {
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
   userPermissions: Array<PetitionUserPermission>;
+};
+
+export type PetitionTemplateAndField = PetitionAndFieldBase & {
+  __typename?: "PetitionTemplateAndField";
+  field: PetitionTemplateField;
+  petition: PetitionTemplate;
 };
 
 /** A field within a petition template. */
@@ -2378,9 +2389,9 @@ export type PetitionActivity_updatePetitionMutationVariables = Exact<{
 export type PetitionActivity_updatePetitionMutation = {
   __typename?: "Mutation";
 } & {
-  updatePetition: {
-    __typename?: "Petition";
-  } & PetitionActivity_PetitionFragment;
+  updatePetition:
+    | ({ __typename?: "Petition" } & PetitionActivity_PetitionFragment)
+    | { __typename?: "PetitionTemplate" };
 };
 
 export type PetitionActivity_sendMessagesMutationVariables = Exact<{
@@ -2548,10 +2559,14 @@ export type PetitionCompose_updatePetitionMutationVariables = Exact<{
 export type PetitionCompose_updatePetitionMutation = {
   __typename?: "Mutation";
 } & {
-  updatePetition: {
-    __typename?: "Petition";
-  } & PetitionLayout_PetitionBase_Petition_Fragment &
-    PetitionComposeMessageEditor_PetitionFragment;
+  updatePetition:
+    | ({
+        __typename?: "Petition";
+      } & PetitionLayout_PetitionBase_Petition_Fragment &
+        PetitionComposeMessageEditor_PetitionFragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
 };
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
@@ -2635,12 +2650,28 @@ export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
 export type PetitionCompose_updatePetitionFieldMutation = {
   __typename?: "Mutation";
 } & {
-  updatePetitionField: { __typename?: "PetitionAndField" } & {
-    field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-      PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
-      PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment;
-    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "updatedAt">;
-  };
+  updatePetitionField:
+    | ({ __typename?: "PetitionAndField" } & {
+        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
+          PetitionComposeField_PetitionFieldBase_PetitionField_Fragment &
+          PetitionComposeFieldSettings_PetitionFieldBase_PetitionField_Fragment;
+        petition: { __typename?: "Petition" } & Pick<
+          Petition,
+          "id" | "updatedAt"
+        >;
+      })
+    | ({ __typename?: "PetitionTemplateAndField" } & {
+        field: { __typename?: "PetitionTemplateField" } & Pick<
+          PetitionTemplateField,
+          "id"
+        > &
+          PetitionComposeField_PetitionFieldBase_PetitionTemplateField_Fragment &
+          PetitionComposeFieldSettings_PetitionFieldBase_PetitionTemplateField_Fragment;
+        petition: { __typename?: "PetitionTemplate" } & Pick<
+          PetitionTemplate,
+          "id" | "updatedAt"
+        >;
+      });
 };
 
 export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
@@ -2746,9 +2777,9 @@ export type PetitionReplies_updatePetitionMutationVariables = Exact<{
 export type PetitionReplies_updatePetitionMutation = {
   __typename?: "Mutation";
 } & {
-  updatePetition: {
-    __typename?: "Petition";
-  } & PetitionReplies_PetitionFragment;
+  updatePetition:
+    | ({ __typename?: "Petition" } & PetitionReplies_PetitionFragment)
+    | { __typename?: "PetitionTemplate" };
 };
 
 export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{

@@ -498,7 +498,7 @@ type Mutation {
     data: UpdatePetitionFieldInput!
     fieldId: GID!
     petitionId: GID!
-  ): PetitionAndField!
+  ): PetitionAndFieldBase!
 
   """
   Update a petition field comment.
@@ -834,9 +834,14 @@ enum PetitionAccessStatus {
   INACTIVE
 }
 
-type PetitionAndField {
+type PetitionAndField implements PetitionAndFieldBase {
   field: PetitionField!
   petition: Petition!
+}
+
+interface PetitionAndFieldBase {
+  field: PetitionFieldBase!
+  petition: PetitionBase!
 }
 
 interface PetitionBase {
@@ -1408,6 +1413,11 @@ type PetitionTemplate implements PetitionBase {
   The permissions linked to the petition
   """
   userPermissions: [PetitionUserPermission!]!
+}
+
+type PetitionTemplateAndField implements PetitionAndFieldBase {
+  field: PetitionTemplateField!
+  petition: PetitionTemplate!
 }
 
 """

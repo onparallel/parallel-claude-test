@@ -26,6 +26,18 @@ const result: IntrospectionResultData = {
       },
       {
         kind: "INTERFACE",
+        name: "PetitionAndFieldBase",
+        possibleTypes: [
+          {
+            name: "PetitionAndField",
+          },
+          {
+            name: "PetitionTemplateAndField",
+          },
+        ],
+      },
+      {
+        kind: "INTERFACE",
         name: "PetitionBase",
         possibleTypes: [
           {

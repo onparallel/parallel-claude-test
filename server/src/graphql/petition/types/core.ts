@@ -181,6 +181,39 @@ export const PetitionFieldType = enumType({
   ],
 });
 
+export const PetitionAndFieldBase = interfaceType({
+  name: "PetitionAndFieldBase",
+  definition(t) {
+    t.resolveType((o) =>
+      o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField"
+    );
+    t.field("petition", { type: "PetitionBase" });
+    t.field("field", { type: "PetitionFieldBase" });
+  },
+  rootTyping: `{
+    petition: db.Petition;
+    field: db.PetitionField;
+  }`,
+});
+
+export const PetitionAndField = objectType({
+  name: "PetitionAndField",
+  definition(t) {
+    t.implements("PetitionAndFieldBase");
+    t.field("petition", { type: "Petition" });
+    t.field("field", { type: "PetitionField" });
+  },
+});
+
+export const PetitionTemplateAndField = objectType({
+  name: "PetitionTemplateAndField",
+  definition(t) {
+    t.implements("PetitionAndFieldBase");
+    t.field("petition", { type: "PetitionTemplate" });
+    t.field("field", { type: "PetitionTemplateField" });
+  },
+});
+
 export const PetitionFieldBase = interfaceType({
   name: "PetitionFieldBase",
   description: "A field within a petition.",
