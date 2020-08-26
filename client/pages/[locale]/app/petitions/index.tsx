@@ -242,10 +242,17 @@ function Petitions() {
               ) : (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text fontSize="lg">
-                    <FormattedMessage
-                      id="petitions.no-petitions"
-                      defaultMessage="You have no petitions yet. Start by creating one now!"
-                    />
+                    {state.type === "TEMPLATE" ? (
+                      <FormattedMessage
+                        id="petitions.no-templates"
+                        defaultMessage="You have no templates yet. Start by creating one now!"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="petitions.no-petitions"
+                        defaultMessage="You have no petitions yet. Start by creating one now!"
+                      />
+                    )}
                   </Text>
                 </Flex>
               )
