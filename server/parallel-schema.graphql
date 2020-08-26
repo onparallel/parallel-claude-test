@@ -489,7 +489,7 @@ type Mutation {
   """
   Updates a petition.
   """
-  updatePetition(data: UpdatePetitionInput!, petitionId: GID!): Petition!
+  updatePetition(data: UpdatePetitionInput!, petitionId: GID!): PetitionBase!
 
   """
   Updates a petition field.

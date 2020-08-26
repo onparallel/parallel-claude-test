@@ -460,7 +460,7 @@ export interface NexusGenFieldTypes {
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["Petition"]; // Petition!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
-    updatePetition: NexusGenRootTypes["Petition"]; // Petition!
+    updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionAndField"]; // PetitionAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionFieldAndReplies"]; // PetitionFieldAndReplies!

@@ -193,7 +193,7 @@ export const RemindersConfigInput = inputObjectType({
 
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
-  type: "Petition",
+  type: "PetitionBase",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: globalIdArg("Petition", { required: true }),
