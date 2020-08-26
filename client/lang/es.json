@@ -265,6 +265,31 @@
     "context": "Share petition"
   },
   {
+    "term": "component.petition-list-filter.all",
+    "definition": "Todas las peticiones",
+    "context": "All petitions"
+  },
+  {
+    "term": "component.petition-list-filter.completed",
+    "definition": "Completadas",
+    "context": "Completed"
+  },
+  {
+    "term": "component.petition-list-filter.draft",
+    "definition": "Borradores",
+    "context": "Draft"
+  },
+  {
+    "term": "component.petition-list-filter.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
+    "term": "component.petition-list-filter.template",
+    "definition": "Plantillas",
+    "context": "Templates"
+  },
+  {
     "term": "component.petition-list-header.clone-label",
     "definition": "Clonar petición",
     "context": "Clone petition"
@@ -333,26 +358,6 @@
     "term": "component.petition-reminder-settings.text",
     "definition": "Enviar recordatorios cada <days-input></days-input> días a las <time-input></time-input>",
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
-  },
-  {
-    "term": "component.petition-list-filter.all",
-    "definition": "Todas las peticiones",
-    "context": "All petitions"
-  },
-  {
-    "term": "component.petition-list-filter.completed",
-    "definition": "Completadas",
-    "context": "Completed"
-  },
-  {
-    "term": "component.petition-list-filter.draft",
-    "definition": "Borradores",
-    "context": "Draft"
-  },
-  {
-    "term": "component.petition-list-filter.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
   },
   {
     "term": "component.placeholder-input.hint",
@@ -970,6 +975,11 @@
     "context": "Submit"
   },
   {
+    "term": "generic.template",
+    "definition": "Plantilla",
+    "context": "Template"
+  },
+  {
     "term": "generic.to",
     "definition": "Para {recipient}",
     "context": "To {recipient}"
@@ -1003,6 +1013,11 @@
     "term": "generic.untitled-petition",
     "definition": "Petición sin título",
     "context": "Untitled petition"
+  },
+  {
+    "term": "generic.untitled-template",
+    "definition": "Plantilla sin título",
+    "context": "Untitled template"
   },
   {
     "term": "generic.you",
@@ -1730,6 +1745,11 @@
     "context": "Error"
   },
   {
+    "term": "petition.template-name-label",
+    "definition": "Nombre de la plantilla",
+    "context": "Template name"
+  },
+  {
     "term": "petitions.confirm-delete.body",
     "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
@@ -1783,6 +1803,11 @@
     "term": "petitions.no-results",
     "definition": "No encontramos peticiones con esta búsqueda",
     "context": "There's no petitions matching your search"
+  },
+  {
+    "term": "petitions.no-templates",
+    "definition": "No tienes ninguna plantilla todavía. ¡Empieza creando una nueva!",
+    "context": "You have no templates yet. Start by creating one now!"
   },
   {
     "term": "petitions.recipients",
