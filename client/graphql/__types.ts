@@ -1878,7 +1878,7 @@ export type PetitionSettingsModal_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "status" | "locale" | "deadline">;
 
-export type PetitionSharingModal_PetitionFragment = {
+export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name"> & {
     userPermissions: Array<
@@ -1888,6 +1888,21 @@ export type PetitionSharingModal_PetitionFragment = {
       > & { user: { __typename?: "User" } & PetitionSharingModal_UserFragment }
     >;
   };
+
+export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & { user: { __typename?: "User" } & PetitionSharingModal_UserFragment }
+    >;
+  };
+
+export type PetitionSharingModal_PetitionFragment =
+  | PetitionSharingModal_Petition_Petition_Fragment
+  | PetitionSharingModal_Petition_PetitionTemplate_Fragment;
 
 export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -1907,7 +1922,9 @@ export type PetitionSharingModal_addPetitionUserPermissionMutation = {
   __typename?: "Mutation";
 } & {
   addPetitionUserPermission: Array<
-    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+    {
+      __typename?: "Petition";
+    } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
@@ -1920,7 +1937,9 @@ export type PetitionSharingModal_removePetitionUserPermissionMutation = {
   __typename?: "Mutation";
 } & {
   removePetitionUserPermission: Array<
-    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+    {
+      __typename?: "Petition";
+    } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
@@ -1933,7 +1952,9 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   __typename?: "Mutation";
 } & {
   transferPetitionOwnership: Array<
-    { __typename?: "Petition" } & PetitionSharingModal_PetitionFragment
+    {
+      __typename?: "Petition";
+    } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
@@ -1945,8 +1966,12 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
   __typename?: "Query";
 } & {
   petition?: Maybe<
-    | ({ __typename?: "Petition" } & PetitionSharingModal_PetitionFragment)
-    | { __typename?: "PetitionTemplate" }
+    | ({
+        __typename?: "Petition";
+      } & PetitionSharingModal_Petition_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & PetitionSharingModal_Petition_PetitionTemplate_Fragment)
   >;
 };
 
@@ -3433,7 +3458,7 @@ export const PetitionSharingModal_UserFragmentDoc = gql`
   ${UserSelect_UserFragmentDoc}
 `;
 export const PetitionSharingModal_PetitionFragmentDoc = gql`
-  fragment PetitionSharingModal_Petition on Petition {
+  fragment PetitionSharingModal_Petition on PetitionBase {
     id
     name
     userPermissions {

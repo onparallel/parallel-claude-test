@@ -117,6 +117,7 @@ export const Petition = objectType({
     t.field("status", {
       type: "PetitionStatus",
       description: "The status of the petition.",
+      resolve: (o) => o.status!,
     });
     t.field("progress", {
       type: "PetitionProgress",

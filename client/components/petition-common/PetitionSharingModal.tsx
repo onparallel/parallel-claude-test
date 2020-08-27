@@ -369,7 +369,7 @@ export function PetitionSharingModal({
 PetitionSharingModal.fragments = {
   get Petition() {
     return gql`
-      fragment PetitionSharingModal_Petition on Petition {
+      fragment PetitionSharingModal_Petition on PetitionBase {
         id
         name
         userPermissions {
