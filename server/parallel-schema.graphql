@@ -271,6 +271,11 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Creates a template based on a given petition.
+  """
+  createTemplateFromPetition(petitionId: GID!): PetitionBase!
+
+  """
   Deactivates the specified active petition accesses.
   """
   deactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!

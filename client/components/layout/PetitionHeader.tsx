@@ -18,6 +18,7 @@ import {
   CopyIcon,
   DeleteIcon,
   MoreVerticalIcon,
+  SaveIcon,
   SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -28,6 +29,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
 import { useRouter } from "next/router";
 import { forwardRef, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -103,6 +105,26 @@ export function PetitionHeader({
       } catch {}
     },
     [petition.id, petition.name, petition.locale, petition.deadline]
+  );
+
+  const createTemplate = useCreateTemplateFromPetition();
+  const handleSaveAsTemplate = useCallback(
+    async function () {
+      try {
+        const { data } = await createTemplate({
+          variables: {
+            petitionId: petition.id,
+          },
+        });
+        router.push(
+          `/[locale]/app/petitions/[petitionId]/compose`,
+          `/${router.query.locale}/app/petitions/${
+            data!.createTemplateFromPetition.id
+          }/compose`
+        );
+      } catch {}
+    },
+    [petition.id]
   );
 
   const {
@@ -227,19 +249,26 @@ export function PetitionHeader({
                       defaultMessage="Clone petition"
                     />
                   </MenuItem>
-                  <MenuItem color="red.500" onClick={handleDeleteClick}>
-                    <DeleteIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.delete-label"
-                      defaultMessage="Delete petition"
-                    />
-                  </MenuItem>
-                  <MenuDivider />
                   <MenuItem onClick={onOpenSettings}>
                     <SettingsIcon marginRight={2} />
                     <FormattedMessage
                       id="component.petition-header.settings-button"
                       defaultMessage="Petition settings"
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={handleSaveAsTemplate}>
+                    <SaveIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.save-as-template-button"
+                      defaultMessage="Save as template"
+                    />
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem color="red.500" onClick={handleDeleteClick}>
+                    <DeleteIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.delete-label"
+                      defaultMessage="Delete petition"
                     />
                   </MenuItem>
                 </MenuList>
