@@ -729,7 +729,7 @@ type Petition implements PetitionBase {
   """
   The status of the petition.
   """
-  status: PetitionStatus
+  status: PetitionStatus!
 
   """
   Time when the resource was last updated.

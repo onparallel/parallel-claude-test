@@ -507,7 +507,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
-    status: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
+    status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
