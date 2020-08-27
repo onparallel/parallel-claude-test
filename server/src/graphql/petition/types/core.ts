@@ -68,6 +68,13 @@ export const PetitionBase = interfaceType({
         return await ctx.petitions.loadUserPermissions(root.id);
       },
     });
+    t.list.field("fields", {
+      type: "PetitionField",
+      description: "The definition of the petition fields.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadFieldsForPetition(root.id);
+      },
+    });
     t.int("fieldCount", {
       description: "The number of fields in the petition.",
       resolve: async (root, _, ctx) => {
@@ -113,13 +120,6 @@ export const Petition = objectType({
       nullable: true,
       resolve: (o) => (o.is_template ? null : o.status),
     });
-    t.list.field("fields", {
-      type: "PetitionField",
-      description: "The definition of the petition fields.",
-      resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadFieldsForPetition(root.id);
-      },
-    });
     t.field("progress", {
       type: "PetitionProgress",
       description: "The progress of the petition.",
@@ -160,14 +160,6 @@ export const PetitionTemplate = objectType({
   description: "A petition template",
   definition(t) {
     t.implements("PetitionBase");
-
-    t.list.field("fields", {
-      type: "PetitionTemplateField",
-      description: "The definition of the petition template fields.",
-      resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadFieldsForPetition(root.id);
-      },
-    });
   },
   rootTyping: "db.Petition",
 });
@@ -182,14 +174,14 @@ export const PetitionFieldType = enumType({
   ],
 });
 
-export const PetitionAndFieldBase = interfaceType({
-  name: "PetitionAndFieldBase",
+export const PetitionBaseAndField = interfaceType({
+  name: "PetitionBaseAndField",
   definition(t) {
     t.resolveType((o) =>
       o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField"
     );
     t.field("petition", { type: "PetitionBase" });
-    t.field("field", { type: "PetitionFieldBase" });
+    t.field("field", { type: "PetitionField" });
   },
   rootTyping: `{
     petition: db.Petition;
@@ -200,7 +192,7 @@ export const PetitionAndFieldBase = interfaceType({
 export const PetitionAndField = objectType({
   name: "PetitionAndField",
   definition(t) {
-    t.implements("PetitionAndFieldBase");
+    t.implements("PetitionBaseAndField");
     t.field("petition", { type: "Petition" });
     t.field("field", { type: "PetitionField" });
   },
@@ -209,17 +201,16 @@ export const PetitionAndField = objectType({
 export const PetitionTemplateAndField = objectType({
   name: "PetitionTemplateAndField",
   definition(t) {
-    t.implements("PetitionAndFieldBase");
+    t.implements("PetitionBaseAndField");
     t.field("petition", { type: "PetitionTemplate" });
-    t.field("field", { type: "PetitionTemplateField" });
+    t.field("field", { type: "PetitionField" });
   },
 });
 
-export const PetitionFieldBase = interfaceType({
-  name: "PetitionFieldBase",
+export const PetitionField = objectType({
+  name: "PetitionField",
   description: "A field within a petition.",
   definition(t) {
-    t.resolveType(() => null);
     t.globalId("id", {
       prefixName: "PetitionField",
       description: "The ID of the petition field.",
@@ -255,15 +246,6 @@ export const PetitionFieldBase = interfaceType({
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
-  },
-  rootTyping: "db.PetitionField",
-});
-
-export const PetitionField = objectType({
-  name: "PetitionField",
-  description: "A field within a petition.",
-  definition(t) {
-    t.implements("PetitionFieldBase");
     t.boolean("validated", {
       description:
         "Determines if the content of this field has been validated.",
@@ -286,14 +268,6 @@ export const PetitionField = objectType({
         });
       },
     });
-  },
-});
-
-export const PetitionTemplateField = objectType({
-  name: "PetitionTemplateField",
-  description: "A field within a petition template.",
-  definition(t) {
-    t.implements("PetitionFieldBase");
   },
   rootTyping: "db.PetitionField",
 });

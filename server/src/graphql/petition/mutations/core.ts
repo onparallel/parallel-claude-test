@@ -47,7 +47,7 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
-  type: "Petition",
+  type: "PetitionBase",
   authorize: authenticate(),
   args: {
     name: stringArg(),
@@ -65,7 +65,7 @@ export const createPetition = mutationField("createPetition", {
 
 export const clonePetition = mutationField("clonePetition", {
   description: "Clone petition.",
-  type: "Petition",
+  type: "PetitionBase",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: globalIdArg("Petition", { required: true }),
@@ -150,7 +150,7 @@ export const deletePetitions = mutationField("deletePetitions", {
 
 export const updateFieldPositions = mutationField("updateFieldPositions", {
   description: "Updates the positions of the petition fields",
-  type: "Petition",
+  type: "PetitionBase",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: globalIdArg("Petition", { required: true }),
@@ -261,7 +261,7 @@ export const updatePetition = mutationField("updatePetition", {
 
 export const createPetitionField = mutationField("createPetitionField", {
   description: "Creates a petition field",
-  type: "PetitionAndField",
+  type: "PetitionBaseAndField",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
     petitionId: globalIdArg("Petition", { required: true }),
@@ -284,7 +284,7 @@ export const createPetitionField = mutationField("createPetitionField", {
 
 export const clonePetitionField = mutationField("clonePetitionField", {
   description: "Clones a petition field",
-  type: "PetitionAndField",
+  type: "PetitionBaseAndField",
   authorize: chain(
     authenticate(),
     and(
@@ -307,7 +307,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
 
 export const deletePetitionField = mutationField("deletePetitionField", {
   description: "Deletes a petition field.",
-  type: "Petition",
+  type: "PetitionBase",
   authorize: chain(
     authenticate(),
     and(
@@ -340,7 +340,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
 
 export const updatePetitionField = mutationField("updatePetitionField", {
   description: "Updates a petition field.",
-  type: "PetitionAndFieldBase",
+  type: "PetitionBaseAndField",
   authorize: chain(
     authenticate(),
     and(
@@ -873,7 +873,7 @@ export const changePetitionFieldType = mutationField(
   "changePetitionFieldType",
   {
     description: "Changes the type of a petition Field",
-    type: "PetitionAndField",
+    type: "PetitionBaseAndField",
     authorize: chain(
       authenticate(),
       and(

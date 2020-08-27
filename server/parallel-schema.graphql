@@ -220,7 +220,7 @@ type Mutation {
     force: Boolean = false
     petitionId: GID!
     type: PetitionFieldType!
-  ): PetitionAndField!
+  ): PetitionBaseAndField!
 
   """
   Clone petition.
@@ -230,12 +230,12 @@ type Mutation {
     locale: PetitionLocale!
     name: String
     petitionId: GID!
-  ): Petition!
+  ): PetitionBase!
 
   """
   Clones a petition field
   """
-  clonePetitionField(fieldId: GID!, petitionId: GID!): PetitionAndField!
+  clonePetitionField(fieldId: GID!, petitionId: GID!): PetitionBaseAndField!
 
   """
   Create a contact.
@@ -249,7 +249,7 @@ type Mutation {
     deadline: DateTime
     locale: PetitionLocale!
     name: String
-  ): Petition!
+  ): PetitionBase!
 
   """
   Creates a petition field
@@ -258,7 +258,7 @@ type Mutation {
     petitionId: GID!
     position: Int
     type: PetitionFieldType!
-  ): PetitionAndField!
+  ): PetitionBaseAndField!
 
   """
   Create a petition field comment.
@@ -287,7 +287,7 @@ type Mutation {
     fieldId: GID!
     force: Boolean = false
     petitionId: GID!
-  ): Petition!
+  ): PetitionBase!
 
   """
   Delete a petition field comment.
@@ -479,7 +479,7 @@ type Mutation {
   """
   Updates the positions of the petition fields
   """
-  updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): Petition!
+  updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
 
   """
   Updates the onboarding status for one of the pages.
@@ -498,7 +498,7 @@ type Mutation {
     data: UpdatePetitionFieldInput!
     fieldId: GID!
     petitionId: GID!
-  ): PetitionAndFieldBase!
+  ): PetitionBaseAndField!
 
   """
   Update a petition field comment.
@@ -834,14 +834,9 @@ enum PetitionAccessStatus {
   INACTIVE
 }
 
-type PetitionAndField implements PetitionAndFieldBase {
+type PetitionAndField implements PetitionBaseAndField {
   field: PetitionField!
   petition: Petition!
-}
-
-interface PetitionAndFieldBase {
-  field: PetitionFieldBase!
-  petition: PetitionBase!
 }
 
 interface PetitionBase {
@@ -864,6 +859,11 @@ interface PetitionBase {
   The number of fields in the petition.
   """
   fieldCount: Int!
+
+  """
+  The definition of the petition fields.
+  """
+  fields: [PetitionField!]!
 
   """
   The ID of the petition or template.
@@ -890,6 +890,11 @@ interface PetitionBase {
   The permissions linked to the petition
   """
   userPermissions: [PetitionUserPermission!]!
+}
+
+interface PetitionBaseAndField {
+  field: PetitionField!
+  petition: PetitionBase!
 }
 
 type PetitionBasePagination {
@@ -941,7 +946,7 @@ type PetitionEventPagination {
 """
 A field within a petition.
 """
-type PetitionField implements PetitionFieldBase {
+type PetitionField {
   """
   The comments for this field.
   """
@@ -1006,56 +1011,6 @@ type PetitionField implements PetitionFieldBase {
 type PetitionFieldAndReplies {
   field: PetitionField!
   replies: [PetitionFieldReply!]!
-}
-
-"""
-A field within a petition.
-"""
-interface PetitionFieldBase {
-  """
-  The description of the petition field.
-  """
-  description: String
-
-  """
-  The ID of the petition field.
-  """
-  id: GID!
-
-  """
-  Determines if the field can be moved or deleted.
-  """
-  isFixed: Boolean!
-
-  """
-  Determines if the field accepts replies
-  """
-  isReadOnly: Boolean!
-
-  """
-  Determines if this field allows multiple replies.
-  """
-  multiple: Boolean!
-
-  """
-  Determines if this field is optional.
-  """
-  optional: Boolean!
-
-  """
-  The options of the petition.
-  """
-  options: JSONObject
-
-  """
-  The title of the petition field.
-  """
-  title: String
-
-  """
-  The type of the petition field.
-  """
-  type: PetitionFieldType!
 }
 
 """
@@ -1384,9 +1339,9 @@ type PetitionTemplate implements PetitionBase {
   fieldCount: Int!
 
   """
-  The definition of the petition template fields.
+  The definition of the petition fields.
   """
-  fields: [PetitionTemplateField!]!
+  fields: [PetitionField!]!
 
   """
   The ID of the petition or template.
@@ -1415,59 +1370,9 @@ type PetitionTemplate implements PetitionBase {
   userPermissions: [PetitionUserPermission!]!
 }
 
-type PetitionTemplateAndField implements PetitionAndFieldBase {
-  field: PetitionTemplateField!
+type PetitionTemplateAndField implements PetitionBaseAndField {
+  field: PetitionField!
   petition: PetitionTemplate!
-}
-
-"""
-A field within a petition template.
-"""
-type PetitionTemplateField implements PetitionFieldBase {
-  """
-  The description of the petition field.
-  """
-  description: String
-
-  """
-  The ID of the petition field.
-  """
-  id: GID!
-
-  """
-  Determines if the field can be moved or deleted.
-  """
-  isFixed: Boolean!
-
-  """
-  Determines if the field accepts replies
-  """
-  isReadOnly: Boolean!
-
-  """
-  Determines if this field allows multiple replies.
-  """
-  multiple: Boolean!
-
-  """
-  Determines if this field is optional.
-  """
-  optional: Boolean!
-
-  """
-  The options of the petition.
-  """
-  options: JSONObject
-
-  """
-  The title of the petition field.
-  """
-  title: String
-
-  """
-  The type of the petition field.
-  """
-  type: PetitionFieldType!
 }
 
 """
