@@ -29,14 +29,7 @@ import {
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
-import {
-  forwardRef,
-  ReactNode,
-  Ref,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { forwardRef, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
@@ -64,7 +57,6 @@ export function PetitionHeader({
 }: PetitionHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
-  const [name] = useState(petition.name ?? "");
   const {
     isOpen: isSettingsOpen,
     onOpen: onOpenSettings,
@@ -186,7 +178,7 @@ export function PetitionHeader({
                 md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 18 + 16}px)`,
               }}
               placeholder={
-                name
+                petition.name
                   ? ""
                   : intl.formatMessage({
                       id: "generic.untitled-petition",

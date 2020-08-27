@@ -8,14 +8,14 @@ import {
   Tooltip,
 } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
-import { PetitionTemplateHeader_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { PetitionState } from "@parallel/utils/usePetitionState";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type PetitionTemplateHeaderProps = ExtendChakra<{
-  petition: PetitionTemplateHeader_PetitionTemplateFragment;
+export type HeaderNameEditableProps = ExtendChakra<{
+  petition: HeaderNameEditable_PetitionBaseFragment;
   onNameChange: (value: string) => void;
   state: PetitionState;
 }>;
@@ -25,7 +25,7 @@ export function HeaderNameEditable({
   state,
   onNameChange,
   ...props
-}: PetitionTemplateHeaderProps) {
+}: HeaderNameEditableProps) {
   const intl = useIntl();
   const [name, setName] = useState(petition.name ?? "");
   return (
