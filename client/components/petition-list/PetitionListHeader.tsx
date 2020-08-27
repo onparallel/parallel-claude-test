@@ -14,6 +14,7 @@ import {
   CopyIcon,
   DeleteIcon,
   RepeatIcon,
+  SaveIcon,
 } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -31,9 +32,11 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
   search: string | null;
   showClone: boolean;
   showDelete: boolean;
+  showCreateTemplates: boolean;
   onSearchChange: (value: string | null) => void;
   onDeleteClick: () => void;
   onCreateClick: () => void;
+  onCreateTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
 };
@@ -42,9 +45,11 @@ export function PetitionListHeader({
   search: _search,
   showClone,
   showDelete,
+  showCreateTemplates,
   onSearchChange,
   onDeleteClick,
   onCreateClick,
+  onCreateTemplateClick,
   onReload,
   onCloneClick,
   ...props
@@ -62,7 +67,9 @@ export function PetitionListHeader({
     },
     [debouncedOnSearchChange]
   );
-  const showActions = [showDelete, showClone].some(identity);
+  const showActions = [showDelete, showClone, showCreateTemplates].some(
+    identity
+  );
 
   return (
     <Stack direction="row" padding={2}>
@@ -103,8 +110,22 @@ export function PetitionListHeader({
                     defaultMessage="Clone petition"
                   />
                 </MenuItem>
+                <MenuItem
+                  onClick={onCreateTemplateClick}
+                  isDisabled={!showCreateTemplates}
+                >
+                  <SaveIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.petition-list-header.save-as-template-label"
+                    defaultMessage="Save as template"
+                  />
+                </MenuItem>
                 <MenuDivider />
-                <MenuItem onClick={onDeleteClick} isDisabled={!showDelete}>
+                <MenuItem
+                  color="red.500"
+                  onClick={onDeleteClick}
+                  isDisabled={!showDelete}
+                >
                   <DeleteIcon marginRight={2} />
                   <FormattedMessage
                     id="component.petition-list-header.delete-label"

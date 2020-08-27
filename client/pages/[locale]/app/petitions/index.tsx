@@ -37,6 +37,8 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
+import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   enums,
   integer,
@@ -49,7 +51,6 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 
 const PAGE_SIZE = 10;
 
@@ -123,6 +124,26 @@ function Petitions() {
     } catch {}
     refetch();
   }, [intl.locale, petitions, selected]);
+
+  const createTemplate = useCreateTemplateFromPetition();
+  const handleCreateTemplate = useCallback(
+    async function () {
+      try {
+        const { data } = await createTemplate({
+          variables: {
+            petitionId: selected[0],
+          },
+        });
+        router.push(
+          `/[locale]/app/petitions/[petitionId]/compose`,
+          `/${router.query.locale}/app/petitions/${
+            data!.createTemplateFromPetition.id
+          }/compose`
+        );
+      } catch {}
+    },
+    [petitions, selected]
+  );
 
   const createPetitionDialog = useCreatePetitionDialog();
   const handleCloneClick = useCallback(
@@ -221,10 +242,12 @@ function Petitions() {
               type={state.type}
               showDelete={selected.length > 0}
               showClone={selected.length === 1}
+              showCreateTemplates={selected.length === 1}
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
               onDeleteClick={handleDeleteClick}
               onCreateClick={handleCreateClick}
+              onCreateTemplateClick={handleCreateTemplate}
               onReload={() => refetch()}
               onCloneClick={handleCloneClick}
             />
