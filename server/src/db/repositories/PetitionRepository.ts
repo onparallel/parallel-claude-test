@@ -1078,7 +1078,7 @@ export class PetitionRepository extends BaseRepository {
         {
           ...omit(petition!, ["id", "created_at", "updated_at"]),
           org_id: user.org_id,
-          status: "DRAFT",
+          status: petition?.is_template ? null : "DRAFT",
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
         },

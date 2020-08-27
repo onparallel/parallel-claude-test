@@ -147,6 +147,7 @@ function Petitions() {
             data!.clonePetition.id
           }/compose`
         );
+        refetch();
       } catch {}
     },
     [petitions, selected]
