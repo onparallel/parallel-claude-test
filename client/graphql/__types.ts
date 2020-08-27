@@ -2965,9 +2965,11 @@ export type Petitions_PetitionBasePaginationFragment = {
   __typename?: "PetitionBasePagination";
 } & Pick<PetitionBasePagination, "totalCount"> & {
     items: Array<
-      | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
-      | ({
-          __typename?: "PetitionTemplate";
+      | ({ __typename?: "Petition" } & {
+          owner: { __typename?: "User" } & Pick<User, "id">;
+        } & Petitions_PetitionBase_Petition_Fragment)
+      | ({ __typename?: "PetitionTemplate" } & {
+          owner: { __typename?: "User" } & Pick<User, "id">;
         } & Petitions_PetitionBase_PetitionTemplate_Fragment)
     >;
   };
@@ -4362,6 +4364,9 @@ export const Petitions_PetitionBasePaginationFragmentDoc = gql`
   fragment Petitions_PetitionBasePagination on PetitionBasePagination {
     items {
       ...Petitions_PetitionBase
+      owner {
+        id
+      }
     }
     totalCount
   }

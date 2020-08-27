@@ -451,6 +451,9 @@ Petitions.fragments = {
       fragment Petitions_PetitionBasePagination on PetitionBasePagination {
         items {
           ...Petitions_PetitionBase
+          owner {
+            id
+          }
         }
         totalCount
       }
