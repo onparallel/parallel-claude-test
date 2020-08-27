@@ -3039,6 +3039,16 @@ export type PetitionsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Petitions_UserFragment;
 };
 
+export type NewPetition_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type NewPetitionUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & NewPetition_UserFragment;
+};
+
 export type Account_UserFragment = { __typename?: "User" } & Pick<
   User,
   "firstName" | "lastName"
@@ -4374,6 +4384,12 @@ export const Petitions_PetitionBasePaginationFragmentDoc = gql`
 `;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+export const NewPetition_UserFragmentDoc = gql`
+  fragment NewPetition_User on User {
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
@@ -7346,6 +7362,62 @@ export type PetitionsUserLazyQueryHookResult = ReturnType<
 export type PetitionsUserQueryResult = Apollo.QueryResult<
   PetitionsUserQuery,
   PetitionsUserQueryVariables
+>;
+export const NewPetitionUserDocument = gql`
+  query NewPetitionUser {
+    me {
+      ...NewPetition_User
+    }
+  }
+  ${NewPetition_UserFragmentDoc}
+`;
+
+/**
+ * __useNewPetitionUserQuery__
+ *
+ * To run a query within a React component, call `useNewPetitionUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewPetitionUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewPetitionUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewPetitionUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    NewPetitionUserQuery,
+    NewPetitionUserQueryVariables
+  >
+) {
+  return Apollo.useQuery<NewPetitionUserQuery, NewPetitionUserQueryVariables>(
+    NewPetitionUserDocument,
+    baseOptions
+  );
+}
+export function useNewPetitionUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewPetitionUserQuery,
+    NewPetitionUserQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    NewPetitionUserQuery,
+    NewPetitionUserQueryVariables
+  >(NewPetitionUserDocument, baseOptions);
+}
+export type NewPetitionUserQueryHookResult = ReturnType<
+  typeof useNewPetitionUserQuery
+>;
+export type NewPetitionUserLazyQueryHookResult = ReturnType<
+  typeof useNewPetitionUserLazyQuery
+>;
+export type NewPetitionUserQueryResult = Apollo.QueryResult<
+  NewPetitionUserQuery,
+  NewPetitionUserQueryVariables
 >;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
