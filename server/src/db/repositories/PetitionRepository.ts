@@ -45,6 +45,7 @@ import {
 } from "../../util/reminderUtils";
 import { unMaybeArray } from "../../util/arrays";
 
+type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
 export class PetitionRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
@@ -171,15 +172,16 @@ export class PetitionRepository extends BaseRepository {
         order?: "asc" | "desc";
       }[];
       status?: PetitionStatus | null;
-      type: "PETITION" | "TEMPLATE";
+      type?: PetitionType;
     } & PageOpts
   ) {
+    const petitionType = opts.type || "PETITION";
     return await this.loadPageAndCount(
       this.from("petition")
         .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
         .where({
           "petition_user.user_id": userId,
-          is_template: opts.type === "TEMPLATE",
+          is_template: petitionType === "TEMPLATE",
           "petition_user.deleted_at": null,
         })
         .mmodify((q) => {
@@ -187,7 +189,7 @@ export class PetitionRepository extends BaseRepository {
           if (search) {
             q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
           }
-          if (status && opts.type === "PETITION") {
+          if (status && petitionType === "PETITION") {
             q.where("status", status);
           }
           q.orderBy(opts.sortBy ?? ["petition.id"]);
