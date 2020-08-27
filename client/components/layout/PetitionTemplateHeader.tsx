@@ -6,7 +6,6 @@ import {
   IconButton,
   Menu,
   MenuButton,
-  MenuDivider,
   MenuItem,
   MenuList,
   Stack,
@@ -17,7 +16,6 @@ import {
   CopyIcon,
   DeleteIcon,
   MoreVerticalIcon,
-  SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
@@ -55,12 +53,7 @@ export function PetitionTemplateHeader({
 }: PetitionTemplateHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
-  const [name, setName] = useState(petition.name ?? "");
-  const {
-    isOpen: isSettingsOpen,
-    onOpen: onOpenSettings,
-    onClose: onCloseSettings,
-  } = useDisclosure();
+  const [name] = useState(petition.name ?? "");
 
   const deletePetitions = useDeletePetitions();
   const confirmDelete = useConfirmDeletePetitionsDialog();
@@ -72,8 +65,8 @@ export function PetitionTemplateHeader({
           showErrorDialog({
             message: (
               <FormattedMessage
-                id="petition.shared-delete-error"
-                defaultMessage="{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+                id="template.shared-delete-error"
+                defaultMessage="{count, plural, =1 {The template} other {The templates}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
                 values={{
                   count: 1,
                 }}
@@ -188,30 +181,22 @@ export function PetitionTemplateHeader({
                   <MenuItem onClick={onOpenSharePetition}>
                     <UserArrowIcon marginRight={2} />
                     <FormattedMessage
-                      id="component.petition-header.share-label"
-                      defaultMessage="Share petition"
+                      id="component.template-header.share-label"
+                      defaultMessage="Share template"
                     />
                   </MenuItem>
                   <MenuItem onClick={handleCloneClick}>
                     <CopyIcon marginRight={2} />
                     <FormattedMessage
-                      id="component.petition-header.clone-label"
-                      defaultMessage="Clone petition"
+                      id="component.template-header.clone-label"
+                      defaultMessage="Clone template"
                     />
                   </MenuItem>
                   <MenuItem color="red.500" onClick={handleDeleteClick}>
                     <DeleteIcon marginRight={2} />
                     <FormattedMessage
-                      id="component.petition-header.delete-label"
-                      defaultMessage="Delete petition"
-                    />
-                  </MenuItem>
-                  <MenuDivider />
-                  <MenuItem onClick={onOpenSettings}>
-                    <SettingsIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.settings-button"
-                      defaultMessage="Petition settings"
+                      id="component.petition-template.delete-label"
+                      defaultMessage="Delete template"
                     />
                   </MenuItem>
                 </MenuList>
