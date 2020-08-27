@@ -1372,6 +1372,12 @@ export type HeaderNameEditable_PetitionBaseFragment =
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "locale" | "deadline" | "status"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "id"
+      >
+    >;
     owner: { __typename?: "User" } & Pick<User, "id">;
   } & HeaderNameEditable_PetitionBase_Petition_Fragment &
   PetitionSettingsModal_PetitionFragment;
@@ -1403,6 +1409,12 @@ export type PetitionLayout_UserFragment = {
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
 } & Pick<PetitionTemplate, "id" | "locale"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "id"
+      >
+    >;
     owner: { __typename?: "User" } & Pick<User, "id">;
   } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment &
   ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
@@ -3598,6 +3610,9 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     locale
     deadline
     status
+    userPermissions {
+      id
+    }
     owner {
       id
     }
@@ -3617,6 +3632,9 @@ export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
     id
     locale
+    userPermissions {
+      id
+    }
     owner {
       id
     }

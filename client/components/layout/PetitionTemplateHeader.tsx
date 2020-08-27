@@ -60,7 +60,10 @@ export function PetitionTemplateHeader({
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        if (petition.owner.id === user.id) {
+        if (
+          petition.owner.id === user.id &&
+          petition.userPermissions.length > 1
+        ) {
           showErrorDialog({
             message: (
               <FormattedMessage
@@ -221,6 +224,9 @@ PetitionTemplateHeader.fragments = {
     fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
       id
       locale
+      userPermissions {
+        id
+      }
       owner {
         id
       }

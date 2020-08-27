@@ -360,6 +360,9 @@ PetitionHeader.fragments = {
       locale
       deadline
       status
+      userPermissions {
+        id
+      }
       owner {
         id
       }
