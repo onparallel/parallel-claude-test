@@ -36,7 +36,7 @@ export function RecipientViewSenderCard({
           columnGap={2}
           rowGap={2}
         >
-          {sender.organization.identifier === "none" ? null : (
+          {sender.organization.identifier.match(/(^none$|.@.)/) ? null : (
             <>
               <Flex as="dt" alignItems="center">
                 <BusinessIcon
