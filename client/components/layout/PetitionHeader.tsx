@@ -195,8 +195,8 @@ export function PetitionHeader({
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
               maxWidth={{
-                base: `calc(100vw - ${16 + 18 + 16 + 40 + 16}px)`,
-                sm: `calc(100vw - ${96 + 16 + 18 + 16 + 40 + 16}px)`,
+                base: `calc(100vw - ${16 + 18 + 4 + 16 + 40 + 16}px)`,
+                sm: `calc(100vw - ${96 + 16 + 18 + 4 + 16 + 40 + 16}px)`,
                 md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 18 + 16}px)`,
               }}
               placeholder={

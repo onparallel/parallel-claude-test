@@ -11,6 +11,7 @@ import {
   Stack,
   Tooltip,
   useDisclosure,
+  Badge,
 } from "@chakra-ui/core";
 import {
   CopyIcon,
@@ -135,14 +136,20 @@ export function PetitionTemplateHeader({
       >
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
+            <Badge colorScheme="purple" marginRight={1}>
+              <FormattedMessage
+                id="generic.template"
+                defaultMessage="Template"
+              />
+            </Badge>
             <HeaderNameEditable
               petition={petition}
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
               maxWidth={{
-                base: `calc(100vw - ${16 + 40 + 16}px)`,
-                sm: `calc(100vw - ${96 + 16 + 40 + 16}px)`,
-                md: `calc((100vw - ${96 + 307}px)/2 - ${16}px)`,
+                base: `calc(100vw - ${16 + 72 + 4 + 16 + 40 + 16}px)`,
+                sm: `calc(100vw - ${96 + 16 + 72 + 4 + 16 + 40 + 16}px)`,
+                md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 72 + 16}px)`,
               }}
               placeholder={
                 petition.name
