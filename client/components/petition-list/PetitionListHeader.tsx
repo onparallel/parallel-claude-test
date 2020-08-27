@@ -15,7 +15,6 @@ import {
   DeleteIcon,
   RepeatIcon,
 } from "@parallel/chakra/icons";
-import { PetitionStatus } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

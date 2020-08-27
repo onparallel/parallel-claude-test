@@ -595,7 +595,7 @@ export type Petition = PetitionBase & {
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
   /** The status of the petition. */
-  status?: Maybe<PetitionStatus>;
+  status: PetitionStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */

@@ -378,10 +378,7 @@ function TextReplyForm({
         marginTop={{ base: 2, sm: 0 }}
         marginLeft={{ base: 0, sm: 4 }}
       >
-        <FormattedMessage
-          id="generic.submit"
-          defaultMessage="Submit"
-        />
+        <FormattedMessage id="generic.submit" defaultMessage="Submit" />
       </Button>
     </Flex>
   );

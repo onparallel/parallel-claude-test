@@ -8,7 +8,6 @@ import {
   useState,
   ReactElement,
 } from "react";
-import { omitThemingProps } from "@chakra-ui/core";
 
 type DialogCallbacks<TResult = void> = {
   onResolve: (value?: TResult) => void;

@@ -64,7 +64,7 @@ export function PetitionHeader({
 }: PetitionHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
-  const [name, setName] = useState(petition.name ?? "");
+  const [name] = useState(petition.name ?? "");
   const {
     isOpen: isSettingsOpen,
     onOpen: onOpenSettings,

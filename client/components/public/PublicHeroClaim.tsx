@@ -1,12 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  Grid,
-  Heading,
-  Image,
-  Text,
-  Flex,
-} from "@chakra-ui/core";
+import { Box, BoxProps, Heading, Image, Text, Flex } from "@chakra-ui/core";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
