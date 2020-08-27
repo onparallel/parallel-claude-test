@@ -1,12 +1,10 @@
 import {
-  AvatarGroup,
   Avatar,
   Tooltip,
   Stack,
   Flex,
   useMultiStyleConfig,
   Box,
-  Center,
   Popover,
   PopoverArrow,
   PopoverBody,

@@ -54,9 +54,12 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     data: { me },
   } = assertQuery(usePetitionActivityUserQuery());
   const {
-    data: { petition },
+    data: { petition: p },
     refetch,
   } = assertQuery(usePetitionActivityQuery({ variables: { id: petitionId } }));
+
+  // this avoids checking __typename everywhere, as this view only accept Petition type
+  const petition = p?.__typename === "Petition" ? p : null;
 
   const [state, wrapper] = usePetitionState();
 

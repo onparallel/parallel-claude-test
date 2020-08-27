@@ -466,6 +466,7 @@ Petitions.fragments = {
         }
       }
       ${UserAvatarList.fragments.User}
+      ${ContactLink.fragments.Contact}
     `;
   },
   get User() {

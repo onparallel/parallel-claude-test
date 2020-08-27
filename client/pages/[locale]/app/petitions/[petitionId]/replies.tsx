@@ -67,9 +67,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     data: { me },
   } = assertQuery(usePetitionRepliesUserQuery());
   const {
-    data: { petition },
+    data: { petition: p },
     refetch,
   } = assertQuery(usePetitionRepliesQuery({ variables: { id: petitionId } }));
+
+  // this avoids checking __typename everywhere, as this view only accept Petition type
+  const petition = p?.__typename === "Petition" ? p : null;
 
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
   const activeField = activeFieldId
