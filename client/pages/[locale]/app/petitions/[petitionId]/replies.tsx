@@ -390,14 +390,14 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_PetitionField on PetitionField {
         isReadOnly
         ...PetitionRepliesField_PetitionField
-        ...PetitionFieldsIndex_PetitionFieldBase
+        ...PetitionFieldsIndex_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...DownloadAllDialog_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${DownloadAllDialog.fragments.PetitionField}
-      ${PetitionFieldsIndex.fragments.PetitionFieldBase}
+      ${PetitionFieldsIndex.fragments.PetitionField}
     `;
   },
   get User() {

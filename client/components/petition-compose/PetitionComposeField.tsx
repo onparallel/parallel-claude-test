@@ -18,7 +18,7 @@ import {
   SettingsIcon,
 } from "@parallel/chakra/icons";
 import {
-  PetitionComposeField_PetitionFieldBaseFragment,
+  PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -40,7 +40,7 @@ import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldType
 import { AddFieldPopover } from "./AddFieldPopover";
 
 export type PetitionComposeFieldProps = {
-  field: PetitionComposeField_PetitionFieldBaseFragment;
+  field: PetitionComposeField_PetitionFieldFragment;
   index: number;
   isActive: boolean;
   isLast: boolean;
@@ -342,8 +342,8 @@ export const PetitionComposeField = Object.assign(
   }),
   {
     fragments: {
-      PetitionFieldBase: gql`
-        fragment PetitionComposeField_PetitionFieldBase on PetitionFieldBase {
+      PetitionField: gql`
+        fragment PetitionComposeField_PetitionField on PetitionField {
           id
           type
           title

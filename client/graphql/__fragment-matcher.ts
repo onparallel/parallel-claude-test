@@ -26,18 +26,6 @@ const result: IntrospectionResultData = {
       },
       {
         kind: "INTERFACE",
-        name: "PetitionAndFieldBase",
-        possibleTypes: [
-          {
-            name: "PetitionAndField",
-          },
-          {
-            name: "PetitionTemplateAndField",
-          },
-        ],
-      },
-      {
-        kind: "INTERFACE",
         name: "PetitionBase",
         possibleTypes: [
           {
@@ -45,6 +33,18 @@ const result: IntrospectionResultData = {
           },
           {
             name: "PetitionTemplate",
+          },
+        ],
+      },
+      {
+        kind: "INTERFACE",
+        name: "PetitionBaseAndField",
+        possibleTypes: [
+          {
+            name: "PetitionAndField",
+          },
+          {
+            name: "PetitionTemplateAndField",
           },
         ],
       },
@@ -102,18 +102,6 @@ const result: IntrospectionResultData = {
           },
           {
             name: "UserPermissionRemovedEvent",
-          },
-        ],
-      },
-      {
-        kind: "INTERFACE",
-        name: "PetitionFieldBase",
-        possibleTypes: [
-          {
-            name: "PetitionField",
-          },
-          {
-            name: "PetitionTemplateField",
           },
         ],
       },

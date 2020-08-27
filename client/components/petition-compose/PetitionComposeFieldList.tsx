@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
+import { Button, Flex } from "@chakra-ui/core";
 import { AddIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
-  PetitionComposeField_PetitionFieldBaseFragment,
+  PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
@@ -24,7 +24,7 @@ import {
 import { FormattedMessage } from "react-intl";
 import { indexBy } from "remeda";
 
-type FieldSelection = PetitionComposeField_PetitionFieldBaseFragment;
+type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
 type FieldsReducerState = {
   fieldsById: { [id: string]: FieldSelection };
@@ -289,10 +289,10 @@ export const PetitionComposeFieldList = Object.assign(
       petition: gql`
         fragment PetitionComposeFieldList_Petition on Petition {
           fields {
-            ...PetitionComposeField_PetitionFieldBase
+            ...PetitionComposeField_PetitionField
           }
         }
-        ${PetitionComposeField.fragments.PetitionFieldBase}
+        ${PetitionComposeField.fragments.PetitionField}
       `,
     },
   }

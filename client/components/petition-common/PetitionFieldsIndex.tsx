@@ -2,14 +2,14 @@ import { Card, CardHeader } from "../common/Card";
 import { Stack, Box, Button, Text } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { gql } from "@apollo/client";
-import { PetitionFieldsIndex_PetitionFieldBaseFragment } from "@parallel/graphql/__types";
+import { PetitionFieldsIndex_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 import { FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
 import { Fragment } from "react";
 
 export type PetitionFieldsIndexProps = ExtendChakra<{
-  fields: PetitionFieldsIndex_PetitionFieldBaseFragment[];
+  fields: PetitionFieldsIndex_PetitionFieldFragment[];
   onFieldClick: (fieldId: string) => void;
 }>;
 
@@ -108,8 +108,8 @@ export function PetitionFieldsIndex({
 }
 
 PetitionFieldsIndex.fragments = {
-  PetitionFieldBase: gql`
-    fragment PetitionFieldsIndex_PetitionFieldBase on PetitionFieldBase {
+  PetitionField: gql`
+    fragment PetitionFieldsIndex_PetitionField on PetitionField {
       id
       title
       type
