@@ -13,18 +13,10 @@ export const createTemplateFromPetition = mutationField(
       petitionId: globalIdArg("Petition", { required: true }),
     },
     resolve: async (_, args, ctx) => {
-      const petition = await ctx.petitions.clonePetition(
-        args.petitionId,
-        ctx.user!
-      );
-      return await ctx.petitions.updatePetition(
-        petition.id,
-        {
-          status: null,
-          is_template: true,
-        },
-        ctx.user!
-      );
+      return await ctx.petitions.clonePetition(args.petitionId, ctx.user!, {
+        status: null,
+        is_template: true,
+      });
     },
   }
 );

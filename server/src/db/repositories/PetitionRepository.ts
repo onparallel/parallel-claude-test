@@ -1071,7 +1071,11 @@ export class PetitionRepository extends BaseRepository {
       .where("reminders_left", ">", 0);
   }
 
-  async clonePetition(petitionId: number, user: User) {
+  async clonePetition(
+    petitionId: number,
+    user: User,
+    data?: Partial<CreatePetition>
+  ) {
     const petition = await this.loadPetition(petitionId);
 
     return await this.withTransaction(async (t) => {
@@ -1083,6 +1087,7 @@ export class PetitionRepository extends BaseRepository {
           status: petition?.is_template ? null : "DRAFT",
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
+          ...data,
         },
         t
       );
