@@ -37,7 +37,7 @@ export const Organization = objectType({
       searchable: true,
       authorize: belongsToOrg(),
       additionalArgs: {
-        exclude: globalIdArg({
+        exclude: globalIdArg("User", {
           list: [true],
           required: false,
         }),
