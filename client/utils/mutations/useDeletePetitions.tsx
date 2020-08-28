@@ -39,43 +39,47 @@ export function useDeletePetitions() {
     }
   );
 
-  return useCallback(async (userId: string, petitionIds: string[]) => {
-    const results = await Promise.all(
-      petitionIds.map(async (id) => await fetchPetitionPermissions(id))
-    );
-    if (results.some(({ data }) => !data?.petition)) {
-      await showErrorDialog({
-        message: intl.formatMessage({
-          id: "generic.unexpected-error-happened",
-          defaultMessage:
-            "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
-        }),
-      });
-    }
-    const userIsOwnerOfSharedPetition = results.some(({ data }) => {
-      const permissions = data!.petition!.userPermissions;
-      const owner = permissions.find((p) => p.permissionType === "OWNER")!.user;
-      return permissions.length > 1 && owner.id === userId;
-    });
-    if (userIsOwnerOfSharedPetition) {
-      await showErrorDialog({
-        message: intl.formatMessage(
-          {
-            id: "petition.shared-delete-error",
+  return useCallback(
+    async (userId: string, petitionIds: string[]) => {
+      const results = await Promise.all(
+        petitionIds.map(async (id) => await fetchPetitionPermissions(id))
+      );
+      if (results.some(({ data }) => !data?.petition)) {
+        await showErrorDialog({
+          message: intl.formatMessage({
+            id: "generic.unexpected-error-happened",
             defaultMessage:
-              "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
-          },
-          { count: petitionIds.length }
-        ),
+              "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+          }),
+        });
+      }
+      const userIsOwnerOfSharedPetition = results.some(({ data }) => {
+        const permissions = data!.petition!.userPermissions;
+        const owner = permissions.find((p) => p.permissionType === "OWNER")!
+          .user;
+        return permissions.length > 1 && owner.id === userId;
       });
-    }
-    await confirmDelete({
-      selected: results.map(({ data }) => data!.petition!),
-    });
-    await deletePetitions({
-      variables: { ids: petitionIds! },
-    });
-  }, []);
+      if (userIsOwnerOfSharedPetition) {
+        await showErrorDialog({
+          message: intl.formatMessage(
+            {
+              id: "petition.shared-delete-error",
+              defaultMessage:
+                "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
+            },
+            { count: petitionIds.length }
+          ),
+        });
+      }
+      await confirmDelete({
+        selected: results.map(({ data }) => data!.petition!),
+      });
+      await deletePetitions({
+        variables: { ids: petitionIds! },
+      });
+    },
+    [intl.locale]
+  );
 }
 
 function useFetchPetitionPermissions() {

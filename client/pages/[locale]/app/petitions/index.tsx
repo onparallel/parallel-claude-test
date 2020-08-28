@@ -115,7 +115,7 @@ function Petitions() {
       await deletePetitions(me.id, selected);
     } catch {}
     refetch();
-  }, [petitions, selected]);
+  }, [intl.locale, petitions, selected]);
 
   const createPetitionDialog = useCreatePetitionDialog();
   const handleCloneClick = useCallback(
