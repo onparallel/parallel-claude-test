@@ -46,6 +46,7 @@ import {
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
+  PetitionReplies_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -66,17 +67,14 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const {
     data: { me },
   } = assertQuery(usePetitionRepliesUserQuery());
-  const {
-    data: { petition: p },
-    refetch,
-  } = assertQuery(usePetitionRepliesQuery({ variables: { id: petitionId } }));
-
-  // this avoids checking __typename everywhere, as this view only accept Petition type
-  const petition = p?.__typename === "Petition" ? p : null;
+  const { data, refetch } = assertQuery(
+    usePetitionRepliesQuery({ variables: { id: petitionId } })
+  );
+  const petition = data!.petition as PetitionReplies_PetitionFragment;
 
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
   const activeField = activeFieldId
-    ? petition!.fields.find((f) => f.id === activeFieldId)
+    ? petition.fields.find((f) => f.id === activeFieldId)
     : null;
   const activeFieldElement = useMemo(() => {
     return activeFieldId
@@ -112,10 +110,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   async function handleValidateToggle(fieldIds: string[], value: boolean) {
     await validatePetitionFields({
-      variables: { petitionId: petition!.id, fieldIds, value },
+      variables: { petitionId: petition.id, fieldIds, value },
       optimisticResponse: {
         validatePetitionFields: fieldIds.map((id) => {
-          const field = petition!.fields.find((f) => f.id === id)!;
+          const field = petition.fields.find((f) => f.id === id)!;
           return {
             __typename: "PetitionField",
             id,
@@ -147,7 +145,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         input!.focus();
       }, 150);
     }
-    const field = petition!.fields.find((f) => f.id === petitionFieldId)!;
+    const field = petition.fields.find((f) => f.id === petitionFieldId)!;
     await updatePetitionFieldRepliesStatus(
       {
         petitionId,
@@ -190,7 +188,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const downloadAllDialog = useDownloadAllDialog();
   const handleDownloadAllClick = useCallback(async () => {
     try {
-      const pattern = await downloadAllDialog({ fields: petition!.fields });
+      const pattern = await downloadAllDialog({ fields: petition.fields });
       window.open(
         `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
           pattern
@@ -198,14 +196,14 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         "_blank"
       );
     } catch {}
-  }, [petitionId, petition!.fields]);
+  }, [petitionId, petition.fields]);
 
-  const showDownloadAll = petition!.fields.some(
+  const showDownloadAll = petition.fields.some(
     (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
   );
 
   let pendingComments = 0;
-  for (const field of petition!.fields) {
+  for (const field of petition.fields) {
     for (const comment of field.comments) {
       pendingComments += comment.publishedAt ? 0 : 1;
     }
@@ -261,9 +259,9 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   return (
     <PetitionLayout
-      key={petition!.id}
+      key={petition.id}
       user={me}
-      petition={petition!}
+      petition={petition}
       onUpdatePetition={handleOnUpdatePetition}
       section="replies"
       scrollBody={false}
@@ -336,7 +334,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                 />
               ) : (
                 <PetitionFieldsIndex
-                  fields={petition!.fields}
+                  fields={petition.fields}
                   onFieldClick={handleIndexFieldClick}
                   maxHeight="calc(100vh - 10rem)"
                 />
@@ -345,7 +343,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           }
         >
           <Stack flex="2" spacing={4} padding={4} id="petition-replies">
-            {petition!.fields.map((field, index) => (
+            {petition.fields.map((field, index) => (
               <PetitionRepliesField
                 id={`field-${field.id}`}
                 key={field.id}

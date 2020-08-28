@@ -30,6 +30,7 @@ import {
   usePetitionActivity_switchAutomaticRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
   usePetitionsActivity_sendPetitionMutation,
+  PetitionActivity_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
@@ -53,13 +54,10 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   const {
     data: { me },
   } = assertQuery(usePetitionActivityUserQuery());
-  const {
-    data: { petition: p },
-    refetch,
-  } = assertQuery(usePetitionActivityQuery({ variables: { id: petitionId } }));
-
-  // this avoids checking __typename everywhere, as this view only accept Petition type
-  const petition = p?.__typename === "Petition" ? p : null;
+  const { data, refetch } = assertQuery(
+    usePetitionActivityQuery({ variables: { id: petitionId } })
+  );
+  const petition = data!.petition as PetitionActivity_PetitionFragment;
 
   const [state, wrapper] = usePetitionState();
 
@@ -119,7 +117,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   );
 
   const showNoRemindersLeftToast = (petitionAccessId?: string) => {
-    const access = petition!.accesses.find((a) => a.id === petitionAccessId)!;
+    const access = petition.accesses.find((a) => a.id === petitionAccessId)!;
     toast({
       title: intl.formatMessage({
         id: "petition.no-reminders-left.toast-header",
@@ -183,7 +181,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       });
       await refetch();
     },
-    [petitionId, petition!.accesses]
+    [petitionId, petition.accesses]
   );
 
   const addPetitionAccessDialog = useAddPetitionAccessDialog();
@@ -192,7 +190,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   const [sendPetition] = usePetitionsActivity_sendPetitionMutation();
   const handleAddPetitionAccess = useCallback(async () => {
     try {
-      const currentRecipientIds = petition!.accesses
+      const currentRecipientIds = petition.accesses
         .filter((a) => a.contact)
         .map((a) => a.contact!.id);
       const {
@@ -222,7 +220,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       });
       await refetch();
     } catch {}
-  }, [petitionId, petition!.accesses]);
+  }, [petitionId, petition.accesses]);
 
   const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
   const [
@@ -245,7 +243,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
   const [reactivateAccess] = usePetitionActivity_reactivateAccessesMutation();
   const handleReactivateAccess = useCallback(
     async (accessId: string) => {
-      const { contact } = petition!.accesses.find((a) => a.id === accessId)!;
+      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
       try {
         await confirmRectivateAccess({
           nameOrEmail: contact?.fullName ?? contact?.email ?? "",
@@ -258,14 +256,14 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       });
       await refetch();
     },
-    [petitionId, petition!.accesses]
+    [petitionId, petition.accesses]
   );
 
   const confirmDeactivateAccess = useConfirmDeactivateAccessDialog();
   const [deactivateAccess] = usePetitionActivity_deactivateAccessesMutation();
   const handleDeactivateAccess = useCallback(
     async (accessId) => {
-      const { contact } = petition!.accesses.find((a) => a.id === accessId)!;
+      const { contact } = petition.accesses.find((a) => a.id === accessId)!;
       try {
         await confirmDeactivateAccess({
           nameOrEmail: contact?.fullName ?? contact?.email ?? "",
@@ -278,7 +276,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       });
       await refetch();
     },
-    [petitionId, petition!.accesses]
+    [petitionId, petition.accesses]
   );
 
   const [
@@ -289,7 +287,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
     async (accessIds: string[]) => {
       let start = false;
       try {
-        const firstAccess = petition!.accesses.find(
+        const firstAccess = petition.accesses.find(
           (a) => a.id === accessIds[0]
         );
         const { remindersConfig } = await configureRemindersDialog({
@@ -354,12 +352,12 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         }
       }
     },
-    [petitionId, petition!.accesses]
+    [petitionId, petition.accesses]
   );
 
   // process events
   const events = useMemo(() => {
-    const original = petition!.events.items;
+    const original = petition.events.items;
     const result: typeof original = [];
     let lastOpen: UnwrapArray<typeof original> | null = null;
     for (const event of original) {
@@ -381,13 +379,13 @@ function PetitionActivity({ petitionId }: PetitionProps) {
       result.push(event);
     }
     return result;
-  }, [petition!.events.items]);
+  }, [petition.events.items]);
 
   return (
     <PetitionLayout
-      key={petition!.id}
+      key={petition.id}
       user={me}
-      petition={petition!}
+      petition={petition}
       onUpdatePetition={handleOnUpdatePetition}
       section="activity"
       scrollBody
@@ -397,7 +395,7 @@ function PetitionActivity({ petitionId }: PetitionProps) {
         <PetitionAccessesTable
           id="petition-accesses"
           margin={4}
-          petition={petition!}
+          petition={petition}
           onSendMessage={handleSendMessage}
           onSendReminders={handleSendReminders}
           onAddPetitionAccess={handleAddPetitionAccess}
