@@ -159,6 +159,15 @@ export const PetitionTemplate = objectType({
   description: "A petition template",
   definition(t) {
     t.implements("PetitionBase");
+    t.boolean("isPublic", {
+      description: "Whether the template is publicly available or not",
+      resolve: (o) => o.template_public,
+    });
+    t.string("description", {
+      description: "Description of the template.",
+      nullable: true,
+      resolve: (o) => o.template_description,
+    });
   },
   rootTyping: "db.Petition",
 });

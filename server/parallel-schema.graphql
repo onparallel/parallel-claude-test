@@ -1329,6 +1329,11 @@ type PetitionTemplate implements PetitionBase {
   createdAt: DateTime!
 
   """
+  Description of the template.
+  """
+  description: String
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -1352,6 +1357,11 @@ type PetitionTemplate implements PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+
+  """
+  Whether the template is publicly available or not
+  """
+  isPublic: Boolean!
 
   """
   The locale of the petition.

@@ -632,11 +632,13 @@ export interface NexusGenFieldTypes {
   PetitionTemplate: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    description: string | null; // String
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isPublic: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     owner: NexusGenRootTypes["User"]; // User!

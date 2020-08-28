@@ -258,6 +258,8 @@ export interface Petition {
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
   reminders_config: Maybe<any>;
+  template_description: Maybe<string>;
+  template_public: boolean;
 }
 
 export interface CreatePetition {
@@ -278,6 +280,8 @@ export interface CreatePetition {
   deleted_at?: Maybe<Date>;
   deleted_by?: Maybe<string>;
   reminders_config?: Maybe<any>;
+  template_description?: Maybe<string>;
+  template_public?: boolean;
 }
 
 export interface PetitionAccess {
