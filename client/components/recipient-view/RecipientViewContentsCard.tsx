@@ -193,7 +193,7 @@ function getPagesAndFields(
       currentPage.hasUnreadComments || hasUnreadComments;
     currentPage.hasUnpublishedComments =
       currentPage.hasUnpublishedComments || hasUnpublishedComments;
-    if (page === 1) {
+    if (page === 0) {
       if (field.type !== "HEADING" || _fields.length !== 0) {
         _fields.push({ field, hasUnreadComments, hasUnpublishedComments });
       }
