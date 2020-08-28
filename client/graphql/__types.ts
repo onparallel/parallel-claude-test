@@ -1422,8 +1422,7 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
       >
     >;
     owner: { __typename?: "User" } & Pick<User, "id">;
-  } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment &
-  ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
+  } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionTemplateHeader_UserFragment = {
   __typename?: "User";
@@ -1861,32 +1860,6 @@ export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmen
       { __typename?: "User" } & UserReference_UserFragment
     >;
   };
-
-export type ClonePetitionAsTemplateDialog_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "id" | "name"> & {
-    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
-        organization: { __typename?: "Organization" } & Pick<
-          Organization,
-          "id" | "name"
-        >;
-      };
-  };
-
-export type ClonePetitionAsTemplateDialog_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "name"> & {
-    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
-        organization: { __typename?: "Organization" } & Pick<
-          Organization,
-          "id" | "name"
-        >;
-      };
-  };
-
-export type ClonePetitionAsTemplateDialog_PetitionBaseFragment =
-  | ClonePetitionAsTemplateDialog_PetitionBase_Petition_Fragment
-  | ClonePetitionAsTemplateDialog_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionFieldsIndex_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -3469,20 +3442,6 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
     id
   }
 `;
-export const ClonePetitionAsTemplateDialog_PetitionBaseFragmentDoc = gql`
-  fragment ClonePetitionAsTemplateDialog_PetitionBase on PetitionBase {
-    id
-    name
-    owner {
-      id
-      organization {
-        id
-        name
-      }
-      fullName
-    }
-  }
-`;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -3652,12 +3611,6 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
   ${PetitionSettingsModal_PetitionFragmentDoc}
 `;
-export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
-  fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
-    id
-    name
-  }
-`;
 export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
     id
@@ -3669,10 +3622,8 @@ export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
       id
     }
     ...HeaderNameEditable_PetitionBase
-    ...ConfirmDeletePetitionsDialog_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
-  ${ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc}
 `;
 export const PetitionLayout_PetitionBaseFragmentDoc = gql`
   fragment PetitionLayout_PetitionBase on PetitionBase {
@@ -4614,6 +4565,12 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     comments {
       id
     }
+  }
+`;
+export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
+  fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
+    id
+    name
   }
 `;
 export const AppLayout_updateOnboardingStatusDocument = gql`

@@ -22,14 +22,15 @@ import {
   SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionHeader_PetitionFragment,
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
-import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
+import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
 import { forwardRef, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -41,13 +42,13 @@ import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal"
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
-export type PetitionHeaderProps = BoxProps & {
+export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
-};
+}>;
 
 export function PetitionHeader({
   petition,

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import {
+  Badge,
   Box,
-  BoxProps,
   Flex,
   IconButton,
   Menu,
@@ -11,7 +11,6 @@ import {
   Stack,
   Tooltip,
   useDisclosure,
-  Badge,
 } from "@chakra-ui/core";
 import {
   CopyIcon,
@@ -19,10 +18,7 @@ import {
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import {
-  ConfirmDeletePetitionsDialog,
-  useConfirmDeletePetitionsDialog,
-} from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionTemplateHeader_PetitionTemplateFragment,
   PetitionTemplateHeader_UserFragment,
@@ -33,17 +29,16 @@ import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useErrorDialog } from "../common/ErrorDialog";
 import { Spacer } from "../common/Spacer";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
-export type PetitionTemplateHeaderProps = BoxProps & {
+export type PetitionTemplateHeaderProps = ExtendChakra<{
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
   user: PetitionTemplateHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   state: "SAVED" | "SAVING" | "ERROR";
-};
+}>;
 
 export function PetitionTemplateHeader({
   petition,
@@ -56,38 +51,14 @@ export function PetitionTemplateHeader({
   const router = useRouter();
 
   const deletePetitions = useDeletePetitions();
-  const confirmDelete = useConfirmDeletePetitionsDialog();
-  const showErrorDialog = useErrorDialog();
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        if (
-          petition.owner.id === user.id &&
-          petition.userPermissions.length > 1
-        ) {
-          showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="template.shared-delete-error"
-                defaultMessage="{count, plural, =1 {The template} other {The templates}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
-                values={{
-                  count: 1,
-                }}
-              />
-            ),
-          });
-        } else {
-          await confirmDelete({
-            selected: [petition],
-          });
-          await deletePetitions({
-            variables: { ids: [petition.id]! },
-          });
-          router.push(
-            `/[locale]/app/petitions/`,
-            `/${router.query.locale}/app/petitions/`
-          );
-        }
+        await deletePetitions(user.id, [petition.id]);
+        router.push(
+          `/[locale]/app/petitions/`,
+          `/${router.query.locale}/app/petitions/`
+        );
       } catch {}
     },
     [petition.id, petition.name]
@@ -238,9 +209,7 @@ PetitionTemplateHeader.fragments = {
         id
       }
       ...HeaderNameEditable_PetitionBase
-      ...ConfirmDeletePetitionsDialog_PetitionBase
     }
-    ${ConfirmDeletePetitionsDialog.fragments.PetitionBase}
     ${HeaderNameEditable.fragments.PetitionBase}
   `,
   User: gql`
