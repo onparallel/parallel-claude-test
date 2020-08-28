@@ -1298,8 +1298,7 @@ export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name" | "locale" | "status" | "updatedAt"> & {
     owner: { __typename?: "User" } & Pick<User, "id">;
-  } & PetitionSettingsModal_PetitionFragment &
-  ConfirmDeletePetitionsDialog_PetitionFragment;
+  } & PetitionSettingsModal_PetitionFragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -1748,10 +1747,6 @@ export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmen
       { __typename?: "User" } & UserReference_UserFragment
     >;
   };
-
-export type ConfirmDeletePetitionsDialog_PetitionFragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "id" | "name">;
 
 export type PetitionFieldsIndex_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -2734,7 +2729,7 @@ export type Petitions_PetitionFragment = { __typename?: "Petition" } & Pick<
         "permissionType"
       > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
     >;
-  } & ConfirmDeletePetitionsDialog_PetitionFragment;
+  };
 
 export type Petitions_UserFragment = {
   __typename?: "User";
@@ -3100,6 +3095,27 @@ export type useDeletePetitions_deletePetitionsMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deletePetitions">;
 
+export type useDeletePetitions_PetitionQueryVariables = Exact<{
+  id: Scalars["ID"];
+}>;
+
+export type useDeletePetitions_PetitionQuery = { __typename?: "Query" } & {
+  petition?: Maybe<
+    { __typename?: "Petition" } & {
+      userPermissions: Array<
+        { __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "permissionType"
+        > & { user: { __typename?: "User" } & Pick<User, "id"> }
+      >;
+    } & ConfirmDeletePetitionsDialog_PetitionFragment
+  >;
+};
+
+export type ConfirmDeletePetitionsDialog_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name">;
+
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
   exclude?: Maybe<Array<Scalars["ID"]>>;
@@ -3263,12 +3279,6 @@ export const PetitionSettingsModal_PetitionFragmentDoc = gql`
     deadline
   }
 `;
-export const ConfirmDeletePetitionsDialog_PetitionFragmentDoc = gql`
-  fragment ConfirmDeletePetitionsDialog_Petition on Petition {
-    id
-    name
-  }
-`;
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
@@ -3277,13 +3287,11 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     status
     updatedAt
     ...PetitionSettingsModal_Petition
-    ...ConfirmDeletePetitionsDialog_Petition
     owner {
       id
     }
   }
   ${PetitionSettingsModal_PetitionFragmentDoc}
-  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
 `;
 export const PetitionLayout_PetitionFragmentDoc = gql`
   fragment PetitionLayout_Petition on Petition {
@@ -3970,11 +3978,9 @@ export const Petitions_PetitionFragmentDoc = gql`
         ...UserAvatarList_User
       }
     }
-    ...ConfirmDeletePetitionsDialog_Petition
   }
   ${ContactLink_ContactFragmentDoc}
   ${UserAvatarList_UserFragmentDoc}
-  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
 `;
 export const Petitions_PetitionPaginationFragmentDoc = gql`
   fragment Petitions_PetitionPagination on PetitionPagination {
@@ -4211,6 +4217,12 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     comments {
       id
     }
+  }
+`;
+export const ConfirmDeletePetitionsDialog_PetitionFragmentDoc = gql`
+  fragment ConfirmDeletePetitionsDialog_Petition on Petition {
+    id
+    name
   }
 `;
 export const AppLayout_updateOnboardingStatusDocument = gql`
@@ -8065,6 +8077,69 @@ export type useDeletePetitions_deletePetitionsMutationResult = Apollo.MutationRe
 export type useDeletePetitions_deletePetitionsMutationOptions = Apollo.BaseMutationOptions<
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables
+>;
+export const useDeletePetitions_PetitionDocument = gql`
+  query useDeletePetitions_Petition($id: ID!) {
+    petition(id: $id) {
+      userPermissions {
+        permissionType
+        user {
+          id
+        }
+      }
+      ...ConfirmDeletePetitionsDialog_Petition
+    }
+  }
+  ${ConfirmDeletePetitionsDialog_PetitionFragmentDoc}
+`;
+
+/**
+ * __useuseDeletePetitions_PetitionQuery__
+ *
+ * To run a query within a React component, call `useuseDeletePetitions_PetitionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useuseDeletePetitions_PetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useuseDeletePetitions_PetitionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useuseDeletePetitions_PetitionQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    useDeletePetitions_PetitionQuery,
+    useDeletePetitions_PetitionQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    useDeletePetitions_PetitionQuery,
+    useDeletePetitions_PetitionQueryVariables
+  >(useDeletePetitions_PetitionDocument, baseOptions);
+}
+export function useuseDeletePetitions_PetitionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    useDeletePetitions_PetitionQuery,
+    useDeletePetitions_PetitionQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    useDeletePetitions_PetitionQuery,
+    useDeletePetitions_PetitionQueryVariables
+  >(useDeletePetitions_PetitionDocument, baseOptions);
+}
+export type useDeletePetitions_PetitionQueryHookResult = ReturnType<
+  typeof useuseDeletePetitions_PetitionQuery
+>;
+export type useDeletePetitions_PetitionLazyQueryHookResult = ReturnType<
+  typeof useuseDeletePetitions_PetitionLazyQuery
+>;
+export type useDeletePetitions_PetitionQueryResult = Apollo.QueryResult<
+  useDeletePetitions_PetitionQuery,
+  useDeletePetitions_PetitionQueryVariables
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [ID!]) {

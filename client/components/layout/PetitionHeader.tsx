@@ -9,13 +9,13 @@ import {
   IconButton,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Stack,
   Text,
   Tooltip,
   useDisclosure,
-  MenuDivider,
 } from "@chakra-ui/core";
 import {
   CopyIcon,
@@ -24,10 +24,6 @@ import {
   SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import {
-  ConfirmDeletePetitionsDialog,
-  useConfirmDeletePetitionsDialog,
-} from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
 import {
   PetitionHeader_PetitionFragment,
   PetitionHeader_UserFragment,
@@ -52,7 +48,6 @@ import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
-import { useErrorDialog } from "../common/ErrorDialog";
 
 export type PetitionHeaderProps = BoxProps & {
   petition: PetitionHeader_PetitionFragment;
@@ -80,35 +75,14 @@ export function PetitionHeader({
   } = useDisclosure();
 
   const deletePetitions = useDeletePetitions();
-  const confirmDelete = useConfirmDeletePetitionsDialog();
-  const showErrorDialog = useErrorDialog();
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        if (petition.owner.id === user.id) {
-          showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="petition.shared-delete-error"
-                defaultMessage="{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
-                values={{
-                  count: 1,
-                }}
-              />
-            ),
-          });
-        } else {
-          await confirmDelete({
-            selected: [petition],
-          });
-          await deletePetitions({
-            variables: { ids: [petition.id]! },
-          });
-          router.push(
-            `/[locale]/app/petitions/`,
-            `/${router.query.locale}/app/petitions/`
-          );
-        }
+        await deletePetitions(user.id, [petition.id]);
+        router.push(
+          `/[locale]/app/petitions/`,
+          `/${router.query.locale}/app/petitions/`
+        );
       } catch {}
     },
     [petition.id, petition.name]
@@ -470,13 +444,11 @@ PetitionHeader.fragments = {
       status
       updatedAt
       ...PetitionSettingsModal_Petition
-      ...ConfirmDeletePetitionsDialog_Petition
       owner {
         id
       }
     }
     ${PetitionSettingsModal.fragments.Petition}
-    ${ConfirmDeletePetitionsDialog.fragments.Petition}
   `,
   User: gql`
     fragment PetitionHeader_User on User {

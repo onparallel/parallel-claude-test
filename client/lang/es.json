@@ -1716,8 +1716,8 @@
   },
   {
     "term": "petition.shared-delete-error",
-    "definition": "{count, plural, =1 {La petición} other {Las peticiones}} que estás intentando eliminar {count, plural, =1 {está siendo compartida} other {están siendo compartidas}}. Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
-    "context": "{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+    "definition": "{count, plural, =1 {La petición} other {Al menos una de las peticiones}} que estás intentando eliminar {count, plural, =1 {está siendo compartida} other {están siendo compartidas}}. Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
+    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
   },
   {
     "term": "petition.status.error",

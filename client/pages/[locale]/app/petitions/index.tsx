@@ -15,10 +15,6 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import {
-  ConfirmDeletePetitionsDialog,
-  useConfirmDeletePetitionsDialog,
-} from "@parallel/components/petition-common/ConfirmDeletePetitionsDialog";
 import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
@@ -30,7 +26,6 @@ import {
   QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
-  Petitions_PetitionFragment,
 } from "@parallel/graphql/__types";
 import {
   assertQuery,
@@ -41,7 +36,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   enums,
   integer,
@@ -54,7 +48,7 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 
 const PAGE_SIZE = 10;
 
@@ -95,12 +89,9 @@ function Petitions() {
     })
   );
 
-  const deletePetitions = useDeletePetitions();
-
   const clonePetition = useClonePetition();
 
   const [selected, setSelected] = useState<string[]>([]);
-  const confirmDelete = useConfirmDeletePetitionsDialog();
 
   function handleSearchChange(value: string | null) {
     setQueryState((current) => ({
@@ -118,48 +109,13 @@ function Petitions() {
     }));
   }
 
-  function petitionIsBeingSharedByMe(petition: Petitions_PetitionFragment) {
-    return (
-      petition.userPermissions.length > 1 &&
-      petition.userPermissions.find(
-        (up) => up.permissionType === "OWNER" && up.user.id === me.id
-      )
-    );
-  }
-
-  const showErrorDialog = useErrorDialog();
-  const handleDeleteClick = useCallback(
-    async function () {
-      try {
-        const selectedPetitions = petitions.items.filter((p) =>
-          selected!.includes(p.id)
-        );
-
-        if (selectedPetitions.some(petitionIsBeingSharedByMe)) {
-          showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="petition.shared-delete-error"
-                defaultMessage="{count, plural, =1 {The petition} other {The petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
-                values={{
-                  count: selected.length,
-                }}
-              />
-            ),
-          });
-        } else {
-          await confirmDelete({
-            selected: selectedPetitions,
-          });
-          await deletePetitions({
-            variables: { ids: selected! },
-          });
-          refetch();
-        }
-      } catch {}
-    },
-    [petitions, selected]
-  );
+  const deletePetitions = useDeletePetitions();
+  const handleDeleteClick = useCallback(async () => {
+    try {
+      await deletePetitions(me.id, selected);
+    } catch {}
+    refetch();
+  }, [petitions, selected]);
 
   const createPetitionDialog = useCreatePetitionDialog();
   const handleCloneClick = useCallback(
@@ -482,10 +438,8 @@ Petitions.fragments = {
             ...UserAvatarList_User
           }
         }
-        ...ConfirmDeletePetitionsDialog_Petition
       }
       ${UserAvatarList.fragments.User}
-      ${ConfirmDeletePetitionsDialog.fragments.Petition}
     `;
   },
   get User() {
