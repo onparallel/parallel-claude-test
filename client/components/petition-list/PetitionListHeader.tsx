@@ -116,8 +116,8 @@ export function PetitionListHeader({
                 >
                   <SaveIcon marginRight={2} />
                   <FormattedMessage
-                    id="component.petition-list-header.save-as-template-label"
-                    defaultMessage="Save as template"
+                    id="component.petition-list-header.clone-as-template-label"
+                    defaultMessage="Clone as template"
                   />
                 </MenuItem>
                 <MenuDivider />

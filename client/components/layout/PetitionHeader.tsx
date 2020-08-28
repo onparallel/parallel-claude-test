@@ -249,18 +249,18 @@ export function PetitionHeader({
                       defaultMessage="Clone petition"
                     />
                   </MenuItem>
+                  <MenuItem onClick={handleSaveAsTemplate}>
+                    <SaveIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.clone-as-template-button"
+                      defaultMessage="Clone as template"
+                    />
+                  </MenuItem>
                   <MenuItem onClick={onOpenSettings}>
                     <SettingsIcon marginRight={2} />
                     <FormattedMessage
                       id="component.petition-header.settings-button"
                       defaultMessage="Petition settings"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleSaveAsTemplate}>
-                    <SaveIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.save-as-template-button"
-                      defaultMessage="Save as template"
                     />
                   </MenuItem>
                   <MenuDivider />
