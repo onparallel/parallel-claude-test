@@ -421,8 +421,13 @@
   },
   {
     "term": "component.user-select.no-options",
-    "definition": "We could not find any exisiting users for <em>{search}</em>",
-    "context": "We could not find any exisiting users for <em>{search}</em>"
+    "definition": "Can't find someone?",
+    "context": "Can't find someone?"
+  },
+  {
+    "term": "component.user-select.no-options-contact-us",
+    "definition": "Contact us via email on <a>support@parallel.so</a> or the support chat and we will create them an account",
+    "context": "Contact us via email on <a>support@parallel.so</a> or the support chat and we will create them an account"
   },
   {
     "term": "component.user-select.search-hint",

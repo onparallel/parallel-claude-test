@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/core";
-import { UserPlusIcon } from "@parallel/chakra/icons";
+import { Image, Link as ChakraLink, Stack, Text } from "@chakra-ui/core";
 import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import { forwardRef, memo, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
@@ -82,28 +81,43 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
           NoOptionsMessage: memo(({ selectProps }) => {
             const search = selectProps.inputValue;
             return (
-              <Box textAlign="center" color="gray.400" padding={4}>
-                <UserPlusIcon boxSize="30px" />
+              <Stack alignItems="center" textAlign="center" padding={4}>
                 {search ? (
-                  <Text as="div" marginTop={2}>
-                    <FormattedMessage
-                      id="component.user-select.no-options"
-                      defaultMessage="We could not find any exisiting users for <em>{search}</em>"
-                      values={{
-                        search,
-                        em: (chunks: any[]) => <em>{chunks}</em>,
-                      }}
+                  <>
+                    <Image
+                      width="120px"
+                      src="/static/images/undraw_void.svg"
+                      role="presentation"
                     />
-                  </Text>
+                    <Text as="strong">
+                      <FormattedMessage
+                        id="component.user-select.no-options"
+                        defaultMessage="Can't find someone?"
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="component.user-select.no-options-contact-us"
+                        defaultMessage="Contact us via email on <a>support@parallel.so</a> or the support chat and we will create them an account"
+                        values={{
+                          a: (chunks: any[]) => (
+                            <ChakraLink href={`mailto:${chunks[0]}`}>
+                              {chunks}
+                            </ChakraLink>
+                          ),
+                        }}
+                      />
+                    </Text>
+                  </>
                 ) : (
-                  <Text as="div" marginTop={2}>
+                  <Text as="div" color="gray.400">
                     <FormattedMessage
                       id="component.user-select.search-hint"
                       defaultMessage="Search for exisiting users"
                     />
                   </Text>
                 )}
-              </Box>
+              </Stack>
             );
           }),
           MultiValueLabel: memo(
