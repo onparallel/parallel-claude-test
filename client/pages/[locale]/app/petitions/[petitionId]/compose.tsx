@@ -19,6 +19,7 @@ import {
   PetitionComposeMessageEditor,
   PetitionComposeMessageEditorProps,
 } from "@parallel/components/petition-compose/PetitionComposeMessageEditor";
+import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/ScheduleMessageDialog";
 import {
   PetitionComposeQuery,
@@ -54,6 +55,7 @@ import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -459,6 +461,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             onFieldEdit={handleFieldEdit}
             onFieldSettingsClick={handleSettingsClick}
           />
+          {petition?.__typename === "PetitionTemplate" ? (
+            <PetitionTemplateDescriptionEdit
+              marginTop="4"
+              description={petition.description}
+              onUpdatePetition={handleUpdatePetition}
+            />
+          ) : null}
           {petition && petition.__typename === "Petition" ? (
             petition!.status === "DRAFT" ? (
               <PetitionComposeMessageEditor
@@ -501,6 +510,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 </Text>
               </Box>
             )
+          ) : petition?.__typename === "PetitionTemplate" ? (
+            <PetitionTemplateComposeMessageEditor
+              marginTop={4}
+              petition={petition!}
+              onUpdatePetition={handleUpdatePetition}
+            />
           ) : null}
         </Box>
       </PaneWithFlyout>
@@ -518,9 +533,11 @@ PetitionCompose.fragments = {
           ...PetitionCompose_PetitionField
         }
         ...PetitionComposeMessageEditor_Petition
+        ...PetitionTemplateComposeMessageEditor_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${PetitionComposeMessageEditor.fragments.Petition}
+      ${PetitionTemplateComposeMessageEditor.fragments.Petition}
       ${this.PetitionField}
     `;
   },

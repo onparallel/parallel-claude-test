@@ -20,7 +20,7 @@ import { useCallback } from "react";
 import { PetitionComposeField } from "../petition-compose/PetitionComposeField";
 import { TemplateDetailsDialog_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { CopyIcon } from "@parallel/chakra/icons";
+import { CopyIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
@@ -73,7 +73,11 @@ export function TemplateDetailsDialog({
     >
       <ModalOverlay>
         <ModalContent borderRadius="lg" padding="2">
-          <ModalHeader display="flex" justifyContent="space-between">
+          <ModalHeader
+            display="flex"
+            justifyContent="space-between"
+            paddingTop="4"
+          >
             <TemplateDetailsHeader
               petition={petition}
               handleCreatePetition={() =>
@@ -84,7 +88,7 @@ export function TemplateDetailsDialog({
               }}
             />
           </ModalHeader>
-          <ModalBody>
+          <ModalBody paddingBottom="4">
             <TemplateDetailsBody petition={petition} />
           </ModalBody>
         </ModalContent>
@@ -145,7 +149,7 @@ function TemplateDetailsHeader({
           colorScheme="purple"
           onClick={handleCreatePetition}
         >
-          <CopyIcon marginRight="2" />
+          <PaperPlaneIcon marginRight="2" />
           <FormattedMessage
             id="template.details.use-template"
             defaultMessage="Use template"
@@ -203,6 +207,7 @@ function TemplateDetailsBody({
           </Heading>
         ) : (
           <Text as="div" marginLeft="4" fontSize="sm" key={f.id}>
+            {"- "}
             {f.title ||
               intl.formatMessage({
                 id: "generic.untitled-field",

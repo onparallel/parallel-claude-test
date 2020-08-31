@@ -2044,6 +2044,10 @@ export type PetitionComposeMessageEditor_PetitionFragment = {
     >;
   };
 
+export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "emailSubject" | "emailBody" | "description">;
+
 export type DownloadAllDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "title" | "type"> & {
@@ -2488,7 +2492,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
-  } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
+  } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
+  PetitionTemplateComposeMessageEditor_PetitionFragment;
 
 export type PetitionCompose_PetitionBaseFragment =
   | PetitionCompose_PetitionBase_Petition_Fragment
@@ -4184,6 +4189,14 @@ export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
     }
   }
 `;
+export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
+  fragment PetitionTemplateComposeMessageEditor_Petition on PetitionTemplate {
+    id
+    emailSubject
+    emailBody
+    description
+  }
+`;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
     id
@@ -4192,10 +4205,12 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
       ...PetitionCompose_PetitionField
     }
     ...PetitionComposeMessageEditor_Petition
+    ...PetitionTemplateComposeMessageEditor_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionComposeMessageEditor_PetitionFragmentDoc}
+  ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
 `;
 export const PetitionCompose_UserFragmentDoc = gql`
   fragment PetitionCompose_User on User {
