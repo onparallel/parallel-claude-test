@@ -108,6 +108,7 @@ export interface NexusGenInputs {
   UpdatePetitionInput: {
     // input type
     deadline?: NexusGenScalars["DateTime"] | null; // DateTime
+    description?: string | null; // String
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
@@ -906,6 +907,7 @@ export interface NexusGenArgTypes {
       deadline?: NexusGenScalars["DateTime"] | null; // DateTime
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name?: string | null; // String
+      templateId?: NexusGenScalars["GID"] | null; // GID
     };
     createPetitionField: {
       // args

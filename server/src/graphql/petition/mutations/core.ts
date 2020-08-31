@@ -53,13 +53,20 @@ export const createPetition = mutationField("createPetition", {
     name: stringArg(),
     locale: arg({ type: "PetitionLocale", required: true }),
     deadline: dateTimeArg({}),
+    templateId: globalIdArg("Petition", { required: false }),
   },
-  resolve: async (_, { name, locale, deadline }, ctx) => {
-    const petition = await ctx.petitions.createPetition(
-      { name, locale, deadline: deadline ?? null, email_subject: name },
-      ctx.user!
-    );
-    return petition;
+  resolve: async (_, { name, locale, deadline, templateId }, ctx) => {
+    if (templateId) {
+      return await ctx.petitions.clonePetition(templateId, ctx.user!, {
+        is_template: false,
+        status: "DRAFT",
+      });
+    } else {
+      return await ctx.petitions.createPetition(
+        { name, locale, deadline: deadline ?? null, email_subject: name },
+        ctx.user!
+      );
+    }
   },
 });
 
@@ -209,12 +216,14 @@ export const updatePetition = mutationField("updatePetition", {
           type: "RemindersConfigInput",
           nullable: true,
         });
+        t.string("description", { nullable: true });
       },
     }).asArg({ required: true }),
   },
   validateArgs: validateAnd(
     maxLength((args) => args.data.name, "data.name", 255),
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
+    maxLength((args) => args.data.description, "data.description", 1000),
     validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
     validRemindersConfig(
       (args) => args.data.remindersConfig,
@@ -229,6 +238,7 @@ export const updatePetition = mutationField("updatePetition", {
       emailSubject,
       emailBody,
       remindersConfig,
+      description,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -254,6 +264,9 @@ export const updatePetition = mutationField("updatePetition", {
         data.reminders_config = remindersConfig;
         data.reminders_active = true;
       }
+    }
+    if (description !== undefined) {
+      data.template_description = description;
     }
     return await ctx.petitions.updatePetition(args.petitionId, data, ctx.user!);
   },

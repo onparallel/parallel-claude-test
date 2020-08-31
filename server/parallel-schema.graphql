@@ -249,6 +249,7 @@ type Mutation {
     deadline: DateTime
     locale: PetitionLocale!
     name: String
+    templateId: GID
   ): PetitionBase!
 
   """
@@ -1909,6 +1910,7 @@ input UpdatePetitionFieldInput {
 
 input UpdatePetitionInput {
   deadline: DateTime
+  description: String
   emailBody: JSON
   emailSubject: String
   locale: PetitionLocale
