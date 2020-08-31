@@ -296,6 +296,7 @@ export type MutationcreatePetitionArgs = {
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
+  templateId?: Maybe<Scalars["GID"]>;
 };
 
 export type MutationcreatePetitionFieldArgs = {
@@ -911,6 +912,8 @@ export type PetitionTemplate = PetitionBase & {
   __typename?: "PetitionTemplate";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Description of the template. */
+  description?: Maybe<Scalars["String"]>;
   /** The body of the petition. */
   emailBody?: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -921,6 +924,8 @@ export type PetitionTemplate = PetitionBase & {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Whether the template is publicly available or not */
+  isPublic: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1242,6 +1247,7 @@ export type UpdatePetitionFieldInput = {
 
 export type UpdatePetitionInput = {
   deadline?: Maybe<Scalars["DateTime"]>;
+  description?: Maybe<Scalars["String"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
@@ -1980,6 +1986,24 @@ export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
     };
   };
 };
+
+export type TemplateDetailsDialog_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<
+  PetitionTemplate,
+  "id" | "isPublic" | "description" | "name" | "updatedAt"
+> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "options"> &
+        PetitionComposeField_PetitionFieldFragment
+    >;
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
+        organization: { __typename?: "Organization" } & Pick<
+          Organization,
+          "name"
+        >;
+      };
+  };
 
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -3352,6 +3376,7 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
+  templateId?: Maybe<Scalars["GID"]>;
 }>;
 
 export type useCreatePetition_createPetitionMutation = {
@@ -3481,6 +3506,28 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     multiple
     isFixed
   }
+`;
+export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
+  fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {
+    id
+    isPublic
+    description
+    name
+    fields {
+      id
+      options
+      ...PetitionComposeField_PetitionField
+    }
+    owner {
+      id
+      organization {
+        name
+      }
+      fullName
+    }
+    updatedAt
+  }
+  ${PetitionComposeField_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
@@ -8391,8 +8438,14 @@ export const useCreatePetition_createPetitionDocument = gql`
     $name: String
     $locale: PetitionLocale!
     $deadline: DateTime
+    $templateId: GID
   ) {
-    createPetition(name: $name, locale: $locale, deadline: $deadline) {
+    createPetition(
+      name: $name
+      locale: $locale
+      deadline: $deadline
+      templateId: $templateId
+    ) {
       id
     }
   }
@@ -8418,6 +8471,7 @@ export type useCreatePetition_createPetitionMutationFn = Apollo.MutationFunction
  *      name: // value for 'name'
  *      locale: // value for 'locale'
  *      deadline: // value for 'deadline'
+ *      templateId: // value for 'templateId'
  *   },
  * });
  */

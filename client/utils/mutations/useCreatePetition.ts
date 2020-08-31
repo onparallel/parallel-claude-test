@@ -20,8 +20,14 @@ export function useCreatePetition() {
         $name: String
         $locale: PetitionLocale!
         $deadline: DateTime
+        $templateId: GID
       ) {
-        createPetition(name: $name, locale: $locale, deadline: $deadline) {
+        createPetition(
+          name: $name
+          locale: $locale
+          deadline: $deadline
+          templateId: $templateId
+        ) {
           id
         }
       }
@@ -38,12 +44,13 @@ export function useCreatePetition() {
   );
 
   return useCallback(
-    async function () {
+    async function (templateId?: string) {
       const { data } = await createPetition({
         variables: {
           name: null,
           locale: query.locale as PetitionLocale,
           deadline: null,
+          templateId,
         },
       });
       return data!.createPetition.id;

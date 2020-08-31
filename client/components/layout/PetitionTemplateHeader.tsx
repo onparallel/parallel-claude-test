@@ -32,6 +32,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Spacer } from "../common/Spacer";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 
 export type PetitionTemplateHeaderProps = ExtendChakra<{
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
@@ -65,27 +66,22 @@ export function PetitionTemplateHeader({
   );
 
   const clonePetition = useClonePetition();
+  const goToPetition = useGoToPetition();
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const { data } = await clonePetition({
-          variables: {
-            petitionId: petition.id,
-            name: petition.name
-              ? `${petition.name} (${intl.formatMessage({
-                  id: "petition.copy",
-                  defaultMessage: "copy",
-                })})`
-              : "",
-            locale: petition.locale,
-          },
+        const petitionId = await clonePetition({
+          petitionId: petition.id,
+          name: petition.name
+            ? `${petition.name} (${intl.formatMessage({
+                id: "petition.copy",
+                defaultMessage: "copy",
+              })})`
+            : "",
+          locale: petition.locale,
         });
-        router.push(
-          `/[locale]/app/petitions/[petitionId]/compose`,
-          `/${router.query.locale}/app/petitions/${
-            data!.clonePetition.id
-          }/compose`
-        );
+
+        goToPetition(petitionId, "compose");
       } catch {}
     },
     [petition.id, petition.name, petition.locale]
@@ -120,7 +116,7 @@ export function PetitionTemplateHeader({
               maxWidth={{
                 base: `calc(100vw - ${16 + 72 + 4 + 16 + 40 + 16}px)`,
                 sm: `calc(100vw - ${96 + 16 + 72 + 4 + 16 + 40 + 16}px)`,
-                md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 72 + 16}px)`,
+                md: `calc(100vw - ${96 + 307}px)`,
               }}
               placeholder={
                 petition.name
