@@ -41,6 +41,7 @@ import { Spacer } from "../common/Spacer";
 import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 
 export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
@@ -81,28 +82,23 @@ export function PetitionHeader({
   );
 
   const clonePetition = useClonePetition();
+  const goToPetition = useGoToPetition();
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const { data } = await clonePetition({
-          variables: {
-            petitionId: petition.id,
-            name: petition.name
-              ? `${petition.name} (${intl.formatMessage({
-                  id: "petition.copy",
-                  defaultMessage: "copy",
-                })})`
-              : "",
-            locale: petition.locale,
-            deadline: petition.deadline,
-          },
+        const name = petition.name
+          ? `${petition.name} (${intl.formatMessage({
+              id: "petition.copy",
+              defaultMessage: "copy",
+            })})`
+          : "";
+        const petitionId = await clonePetition({
+          petitionId: petition.id,
+          locale: petition.locale,
+          deadline: petition.deadline,
+          name,
         });
-        router.push(
-          `/[locale]/app/petitions/[petitionId]/compose`,
-          `/${router.query.locale}/app/petitions/${
-            data!.clonePetition.id
-          }/compose`
-        );
+        goToPetition(petitionId, "compose");
       } catch {}
     },
     [petition.id, petition.name, petition.locale, petition.deadline]

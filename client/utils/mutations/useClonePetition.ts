@@ -2,10 +2,14 @@ import { gql, useMutation } from "@apollo/client";
 import {
   useClonePetition_clonePetitionMutation,
   useClonePetition_clonePetitionMutationVariables,
+  PetitionLocale,
 } from "@parallel/graphql/__types";
 import { clearCache } from "../apollo";
+import { useRouter } from "next/router";
+import { useCallback } from "react";
 
 export function useClonePetition() {
+  const { query } = useRouter();
   const [clonePetition] = useMutation<
     useClonePetition_clonePetitionMutation,
     useClonePetition_clonePetitionMutationVariables
@@ -37,5 +41,29 @@ export function useClonePetition() {
       },
     }
   );
-  return clonePetition;
+
+  return useCallback(
+    async ({
+      petitionId,
+      locale,
+      name,
+      deadline,
+    }: {
+      petitionId: string;
+      locale?: PetitionLocale;
+      name?: string;
+      deadline?: string | null;
+    }) => {
+      const { data } = await clonePetition({
+        variables: {
+          petitionId,
+          locale: locale || (query.locale as PetitionLocale),
+          name,
+          deadline,
+        },
+      });
+      return data!.clonePetition!.id;
+    },
+    [query.locale]
+  );
 }

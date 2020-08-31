@@ -33,7 +33,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useRouter } from "next/router";
+
 import {
   forwardRef,
   ReactNode,
@@ -47,6 +47,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { EditIcon } from "@parallel/chakra/icons";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { compose } from "@parallel/utils/compose";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -57,7 +58,7 @@ type ContactDetailsFormData = {
 
 function Contact({ contactId }: ContactProps) {
   const intl = useIntl();
-  const router = useRouter();
+
   const {
     data: { me },
   } = assertQuery(useContactUserQuery());
@@ -73,16 +74,7 @@ function Contact({ contactId }: ContactProps) {
     },
   });
 
-  function goToPetition(
-    id: string,
-    section: "compose" | "replies" | "activity"
-  ) {
-    router.push(
-      `/[locale]/app/petitions/[petitionId]/${section}`,
-      `/${router.query.locale}/app/petitions/${id}/${section}`
-    );
-  }
-
+  const goToPetition = useGoToPetition();
   function handleRowClick(row: PetitionAccessSelection) {
     goToPetition(
       row.petition!.id,

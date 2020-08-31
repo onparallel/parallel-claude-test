@@ -51,6 +51,7 @@ import { UnwrapArray } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 
 const PAGE_SIZE = 10;
 
@@ -146,6 +147,8 @@ function Petitions() {
   );
 
   const createPetitionDialog = useCreatePetitionDialog();
+  const goToPetition = useGoToPetition();
+
   const handleCloneClick = useCallback(
     async function () {
       try {
@@ -154,20 +157,13 @@ function Petitions() {
           defaultName: petition.name ?? undefined,
           defaultLocale: petition.locale,
         });
-        const { data } = await clonePetition({
-          variables: {
-            petitionId: petition.id,
-            name,
-            locale,
-            deadline: deadline?.toISOString() ?? null,
-          },
+        const petitionId = await clonePetition({
+          petitionId: petition.id,
+          name,
+          locale,
+          deadline: deadline?.toISOString() ?? null,
         });
-        router.push(
-          `/[locale]/app/petitions/[petitionId]/compose`,
-          `/${router.query.locale}/app/petitions/${
-            data!.clonePetition.id
-          }/compose`
-        );
+        goToPetition(petitionId, "compose");
         refetch();
       } catch {}
     },
@@ -194,16 +190,6 @@ function Petitions() {
         : "compose"
     );
   }, []);
-
-  function goToPetition(
-    id: string,
-    section: "compose" | "replies" | "activity"
-  ) {
-    router.push(
-      `/[locale]/app/petitions/[petitionId]/${section}`,
-      `/${router.query.locale}/app/petitions/${id}/${section}`
-    );
-  }
 
   const columns = usePetitionsColumns();
 
