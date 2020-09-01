@@ -1167,6 +1167,7 @@ export interface NexusGenArgTypes {
     petitions: {
       // args
       limit?: number | null; // Int
+      locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       offset?: number | null; // Int
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]

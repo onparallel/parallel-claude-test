@@ -1752,6 +1752,7 @@ type Query {
     Number of elements to take from the list.
     """
     limit: Int
+    locale: PetitionLocale
 
     """
     Number of elements to skip from the list.

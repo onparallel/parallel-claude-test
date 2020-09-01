@@ -187,6 +187,7 @@ export class PetitionRepository extends BaseRepository {
       }[];
       status?: PetitionStatus | null;
       type?: PetitionType;
+      locale?: "en" | "es" | null;
     } & PageOpts
   ) {
     const petitionType = opts.type || "PETITION";
@@ -199,7 +200,10 @@ export class PetitionRepository extends BaseRepository {
           "petition_user.deleted_at": null,
         })
         .mmodify((q) => {
-          const { search, status } = opts;
+          const { search, status, locale } = opts;
+          if (locale) {
+            q.where("locale", locale);
+          }
           if (search) {
             q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
           }

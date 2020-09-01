@@ -19,18 +19,23 @@ export const petitionsQuery = queryField((t) => {
           members: ["PETITION", "TEMPLATE"],
         }),
       }),
+      locale: arg({
+        type: "PetitionLocale",
+        required: false,
+      }),
     },
     searchable: true,
     sortableBy: ["createdAt", "name"],
     resolve: async (
       _,
-      { offset, limit, search, sortBy, status, type },
+      { offset, limit, search, sortBy, status, type, locale },
       ctx
     ) => {
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
         status,
         search,
         offset,
+        locale,
         type: type || "PETITION",
         sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
           const [field, order] = value.split("_");
