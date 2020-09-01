@@ -28,6 +28,20 @@ export function userHasAccessToPetitions<
   };
 }
 
+export function petitionIsPublicTemplate<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const templateId = args[argName];
+      return ctx.petitions.isPublicTemplate(templateId);
+    } catch {}
+    return false;
+  };
+}
+
 export function fieldIsNotFixed<
   TypeName extends string,
   FieldName extends string,

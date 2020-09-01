@@ -19,6 +19,7 @@ import {
   authenticate,
   chain,
   ifArgDefined,
+  or,
 } from "../../helpers/authorize";
 import { dateTimeArg } from "../../helpers/date";
 import { jsonArg } from "../../helpers/json";
@@ -41,6 +42,7 @@ import {
   repliesBelongsToPetition,
   userHasAccessToPetitions,
   fieldIsNotFixed,
+  petitionIsPublicTemplate,
 } from "../authorizers";
 import {
   validateAccessesRemindersLeft,
@@ -55,7 +57,13 @@ export const createPetition = mutationField("createPetition", {
   type: "PetitionBase",
   authorize: chain(
     authenticate(),
-    ifArgDefined("templateId", userHasAccessToPetitions("templateId" as never))
+    ifArgDefined(
+      "templateId",
+      or(
+        userHasAccessToPetitions("templateId" as never),
+        petitionIsPublicTemplate("templateId" as never)
+      )
+    )
   ),
   args: {
     name: stringArg(),

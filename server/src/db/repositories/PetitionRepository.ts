@@ -71,31 +71,17 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     permissionTypes?: PetitionUserPermissionType[]
   ) {
-    const [
-      [{ count: userPetitions }],
-      [{ count: publicTemplates }],
-    ] = await Promise.all([
-      this.from("petition_user")
-        .where({ user_id: userId })
-        .whereIn("petition_id", petitionIds)
-        .whereNull("deleted_at")
-        .mmodify((q) => {
-          if (permissionTypes) {
-            q.whereIn("permission_type", permissionTypes);
-          }
-        })
-        .select(this.count()),
-      this.from("petition")
-        .where({
-          deleted_at: null,
-          is_template: true,
-          template_public: true,
-        })
-        .whereIn("id", petitionIds)
-        .select(this.count()),
-    ]);
-
-    return userPetitions + publicTemplates === new Set(petitionIds).size;
+    const [{ count }] = await this.from("petition_user")
+      .where({ user_id: userId })
+      .whereIn("petition_id", petitionIds)
+      .whereNull("deleted_at")
+      .mmodify((q) => {
+        if (permissionTypes) {
+          q.whereIn("permission_type", permissionTypes);
+        }
+      })
+      .select(this.count());
+    return count === new Set(petitionIds).size;
   }
 
   async fieldsBelongToPetition(petitionId: number, fieldIds: number[]) {
@@ -2125,5 +2111,18 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("id", petitionIds)
         .returning("*");
     });
+  }
+
+  async isPublicTemplate(templateId: number): Promise<boolean> {
+    const [{ count }] = await this.from("petition")
+      .where({
+        id: templateId,
+        deleted_at: null,
+        template_public: true,
+        is_template: true,
+      })
+      .select(this.count());
+
+    return count === 1;
   }
 }
