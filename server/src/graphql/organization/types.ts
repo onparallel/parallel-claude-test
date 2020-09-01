@@ -26,10 +26,12 @@ export const Organization = objectType({
     });
     t.string("identifier", {
       description: "The unique text identifier of the organization.",
+      authorize: belongsToOrg(),
     });
     t.field("status", {
       type: "OrganizationStatus",
       description: "The status of the organization.",
+      authorize: belongsToOrg(),
     });
     t.paginationField("users", {
       type: "User",
