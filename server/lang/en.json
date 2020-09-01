@@ -75,6 +75,11 @@
     "context": "Untitled petition"
   },
   {
+    "term": "generic.untitled-template",
+    "definition": "Untitled template",
+    "context": "Untitled template"
+  },
+  {
     "term": "greeting",
     "definition": "Hi{name, select, null {} other { {name}}},",
     "context": "Hi{name, select, null {} other { {name}}},"
@@ -203,6 +208,21 @@
     "term": "reminder.text",
     "definition": "Remember that {senderName} ({senderEmail}) sent you a petition.",
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition."
+  },
+  {
+    "term": "template-sharing-notification.access-button",
+    "definition": "Access the template here",
+    "context": "Access the template here"
+  },
+  {
+    "term": "template-sharing-notification.subject",
+    "definition": "\"{petitionName}\" - Template shared with you",
+    "context": "\"{petitionName}\" - Template shared with you"
+  },
+  {
+    "term": "template-sharing-notification.text",
+    "definition": "{ownerName} ({ownerEmail}) has shared the following template with you.",
+    "context": "{ownerName} ({ownerEmail}) has shared the following template with you."
   },
   {
     "term": "welcome.click-to-verify",

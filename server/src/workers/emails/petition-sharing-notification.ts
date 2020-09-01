@@ -2,6 +2,7 @@ import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionSharingNotification from "../../emails/components/PetitionSharingNotification";
+import TemplateSharingNotification from "../../emails/components/TemplateSharingNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -57,7 +58,9 @@ export async function petitionSharingNotification(
       const org = orgsById[petition.org_id];
       const logoUrl = logosByOrgId[petition.org_id];
       const { html, text, subject, from } = await buildEmail(
-        PetitionSharingNotification,
+        petition.is_template
+          ? TemplateSharingNotification
+          : PetitionSharingNotification,
         {
           petitionId: toGlobalId("Petition", petition.id),
           petitionName: petition.name,

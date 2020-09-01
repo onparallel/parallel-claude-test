@@ -75,6 +75,11 @@
     "context": "Untitled petition"
   },
   {
+    "term": "generic.untitled-template",
+    "definition": "Plantilla sin nombre",
+    "context": "Untitled template"
+  },
+  {
     "term": "greeting",
     "definition": "Hola{name, select, null {} other { {name}}}",
     "context": "Hi{name, select, null {} other { {name}}},"
@@ -203,6 +208,21 @@
     "term": "reminder.text",
     "definition": "Recuerda que {senderName} ({senderEmail}) te envió una petición.",
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition."
+  },
+  {
+    "term": "template-sharing-notification.access-button",
+    "definition": "Accede a la plantilla aquí",
+    "context": "Access the template here"
+  },
+  {
+    "term": "template-sharing-notification.subject",
+    "definition": "\"{petitionName}\" - Plantilla compartida contigo",
+    "context": "\"{petitionName}\" - Template shared with you"
+  },
+  {
+    "term": "template-sharing-notification.text",
+    "definition": "{ownerName} ({ownerEmail}) ha compartido la siguiente plantilla contigo.",
+    "context": "{ownerName} ({ownerEmail}) has shared the following template with you."
   },
   {
     "term": "welcome.click-to-verify",
