@@ -436,6 +436,7 @@ export function DefaultHeader({
       key={column.key}
       as="th"
       paddingX={2}
+      paddingY={1}
       _last={{ paddingRight: 5 }}
       _first={{ paddingLeft: 5 }}
       height="38px"
@@ -455,7 +456,6 @@ export function DefaultHeader({
           : undefined
       }
       sx={{
-        padding: 1,
         ".sort-by-button": {
           opacity: 0,
         },

@@ -2998,11 +2998,9 @@ export type Petitions_PetitionBasePaginationFragment = {
   __typename?: "PetitionBasePagination";
 } & Pick<PetitionBasePagination, "totalCount"> & {
     items: Array<
-      | ({ __typename?: "Petition" } & {
-          owner: { __typename?: "User" } & Pick<User, "id">;
-        } & Petitions_PetitionBase_Petition_Fragment)
-      | ({ __typename?: "PetitionTemplate" } & {
-          owner: { __typename?: "User" } & Pick<User, "id">;
+      | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
+      | ({
+          __typename?: "PetitionTemplate";
         } & Petitions_PetitionBase_PetitionTemplate_Fragment)
     >;
   };
@@ -3030,17 +3028,22 @@ export type Petitions_PetitionBase_Petition_Fragment = {
         "permissionType"
       > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
     >;
+    owner: { __typename?: "User" } & Pick<User, "id">;
   };
 
 export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale" | "name" | "createdAt"> & {
+} & Pick<
+  PetitionTemplate,
+  "description" | "id" | "locale" | "name" | "createdAt"
+> & {
     userPermissions: Array<
       { __typename?: "PetitionUserPermission" } & Pick<
         PetitionUserPermission,
         "permissionType"
       > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
     >;
+    owner: { __typename?: "User" } & Pick<User, "id">;
   };
 
 export type Petitions_PetitionBaseFragment =
@@ -4445,6 +4448,9 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
         ...UserAvatarList_User
       }
     }
+    owner {
+      id
+    }
     ... on Petition {
       accesses {
         status
@@ -4461,6 +4467,9 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
         total
       }
     }
+    ... on PetitionTemplate {
+      description
+    }
   }
   ${UserAvatarList_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
@@ -4469,9 +4478,6 @@ export const Petitions_PetitionBasePaginationFragmentDoc = gql`
   fragment Petitions_PetitionBasePagination on PetitionBasePagination {
     items {
       ...Petitions_PetitionBase
-      owner {
-        id
-      }
     }
     totalCount
   }

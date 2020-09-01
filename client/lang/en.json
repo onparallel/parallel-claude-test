@@ -1865,6 +1865,11 @@
     "context": "Deadline"
   },
   {
+    "term": "petitions.header.description",
+    "definition": "Description",
+    "context": "Description"
+  },
+  {
     "term": "petitions.header.name",
     "definition": "Petition name",
     "context": "Petition name"
@@ -1883,6 +1888,11 @@
     "term": "petitions.header.status",
     "definition": "Status",
     "context": "Status"
+  },
+  {
+    "term": "petitions.header.template-name",
+    "definition": "Template name",
+    "context": "Template name"
   },
   {
     "term": "petitions.no-petitions",

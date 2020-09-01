@@ -183,7 +183,7 @@ function Petitions() {
     );
   }, []);
 
-  const columns = usePetitionsColumns();
+  const columns = usePetitionsColumns(state.type);
 
   return (
     <AppLayout
@@ -269,23 +269,36 @@ type PetitionSelection = UnwrapArray<
   Petitions_PetitionBasePaginationFragment["items"]
 >;
 
-function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
+function usePetitionsColumns(
+  type: PetitionBaseType
+): TableColumn<PetitionSelection>[] {
   const intl = useIntl();
   return useMemo(
     () => [
       {
         key: "name",
         isSortable: true,
-        header: intl.formatMessage({
-          id: "petitions.header.name",
-          defaultMessage: "Petition name",
-        }),
+        header:
+          type === "PETITION"
+            ? intl.formatMessage({
+                id: "petitions.header.name",
+                defaultMessage: "Petition name",
+              })
+            : intl.formatMessage({
+                id: "petitions.header.template-name",
+                defaultMessage: "Template name",
+              }),
         CellContent: ({ row }) => (
           <>
             {row.name ? (
               ellipsis(row.name!, 50)
             ) : (
-              <Text as="span" color="gray.400" fontStyle="italic">
+              <Text
+                as="span"
+                color="gray.400"
+                fontStyle="italic"
+                whiteSpace="nowrap"
+              >
                 <FormattedMessage
                   id="generic.untitled-petition"
                   defaultMessage="Untitled petition"
@@ -295,104 +308,120 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           </>
         ),
       },
-      {
-        key: "recipient",
-        header: intl.formatMessage({
-          id: "petitions.header.recipient",
-          defaultMessage: "Recipient",
-        }),
-        CellContent: ({ row }) => {
-          if (row.__typename === "Petition") {
-            const recipients = row.accesses
-              .filter((a) => a.status === "ACTIVE")
-              .map((a) => a.contact);
-            if (recipients.length === 0) {
-              return null;
-            }
-            const [contact, ...rest] = recipients;
-            if (contact) {
-              return rest.length ? (
-                <FormattedMessage
-                  id="petitions.recipients"
-                  defaultMessage="{contact} and <a>{more} more</a>"
-                  values={{
-                    contact: (
+      ...(type === "PETITION"
+        ? ([
+            {
+              key: "recipient",
+              header: intl.formatMessage({
+                id: "petitions.header.recipient",
+                defaultMessage: "Recipient",
+              }),
+              CellContent: ({ row }) => {
+                if (row.__typename === "Petition") {
+                  const recipients = row.accesses
+                    .filter((a) => a.status === "ACTIVE")
+                    .map((a) => a.contact);
+                  if (recipients.length === 0) {
+                    return null;
+                  }
+                  const [contact, ...rest] = recipients;
+                  if (contact) {
+                    return rest.length ? (
+                      <FormattedMessage
+                        id="petitions.recipients"
+                        defaultMessage="{contact} and <a>{more} more</a>"
+                        values={{
+                          contact: (
+                            <ContactLink
+                              contact={contact}
+                              onClick={(e: MouseEvent) => e.stopPropagation()}
+                            />
+                          ),
+                          more: rest.length,
+                          a: (chunks: any[]) => (
+                            <Link
+                              href="/app/petitions/[petitionId]/activity"
+                              as={`/app/petitions/${row.id}/activity`}
+                              onClick={(e: MouseEvent) => e.stopPropagation()}
+                            >
+                              {chunks}
+                            </Link>
+                          ),
+                        }}
+                      />
+                    ) : (
                       <ContactLink
                         contact={contact}
                         onClick={(e: MouseEvent) => e.stopPropagation()}
                       />
-                    ),
-                    more: rest.length,
-                    a: (chunks: any[]) => (
-                      <Link
-                        href="/app/petitions/[petitionId]/activity"
-                        as={`/app/petitions/${row.id}/activity`}
-                        onClick={(e: MouseEvent) => e.stopPropagation()}
-                      >
-                        {chunks}
-                      </Link>
-                    ),
-                  }}
-                />
-              ) : (
-                <ContactLink
-                  contact={contact}
-                  onClick={(e: MouseEvent) => e.stopPropagation()}
-                />
-              );
-            } else {
-              return <DeletedContact />;
-            }
-          } else {
-            return null;
-          }
-        },
-      },
-      {
-        key: "deadline",
-        header: intl.formatMessage({
-          id: "petitions.header.deadline",
-          defaultMessage: "Deadline",
-        }),
-        CellContent: ({ row }) =>
-          row.__typename === "Petition" ? (
-            row.deadline ? (
-              <DateTime value={row.deadline} format={FORMATS.LLL} />
-            ) : (
-              <Text
-                as="span"
-                color="gray.400"
-                fontStyle="italic"
-                whiteSpace="nowrap"
-              >
-                <FormattedMessage
-                  id="generic.no-deadline"
-                  defaultMessage="No deadline"
-                />
-              </Text>
-            )
-          ) : null,
-      },
-      {
-        key: "status",
-        header: intl.formatMessage({
-          id: "petitions.header.status",
-          defaultMessage: "Status",
-        }),
-        align: "center",
-        CellContent: ({ row }) =>
-          row.__typename === "Petition" ? (
-            <Flex alignItems="center">
-              <PetitionProgressBar
-                status={row.status}
-                {...row.progress}
-                flex="1"
-                minWidth="80px"
-              />
-              <PetitionStatusIcon status={row.status} marginLeft={2} />
-            </Flex>
-          ) : null,
-      },
+                    );
+                  } else {
+                    return <DeletedContact />;
+                  }
+                } else {
+                  return null;
+                }
+              },
+            },
+            {
+              key: "deadline",
+              header: intl.formatMessage({
+                id: "petitions.header.deadline",
+                defaultMessage: "Deadline",
+              }),
+              CellContent: ({ row }) =>
+                row.__typename === "Petition" ? (
+                  row.deadline ? (
+                    <DateTime value={row.deadline} format={FORMATS.LLL} />
+                  ) : (
+                    <Text
+                      as="span"
+                      color="gray.400"
+                      fontStyle="italic"
+                      whiteSpace="nowrap"
+                    >
+                      <FormattedMessage
+                        id="generic.no-deadline"
+                        defaultMessage="No deadline"
+                      />
+                    </Text>
+                  )
+                ) : null,
+            },
+            {
+              key: "status",
+              header: intl.formatMessage({
+                id: "petitions.header.status",
+                defaultMessage: "Status",
+              }),
+              align: "center",
+              CellContent: ({ row }) =>
+                row.__typename === "Petition" ? (
+                  <Flex alignItems="center">
+                    <PetitionProgressBar
+                      status={row.status}
+                      {...row.progress}
+                      flex="1"
+                      minWidth="80px"
+                    />
+                    <PetitionStatusIcon status={row.status} marginLeft={2} />
+                  </Flex>
+                ) : null,
+            },
+          ] as TableColumn<PetitionSelection>[])
+        : ([
+            {
+              key: "description",
+              header: intl.formatMessage({
+                id: "petitions.header.description",
+                defaultMessage: "Description",
+              }),
+              align: "left",
+              CellContent: ({ row }) => (
+                <>{row.description && ellipsis(row.description!, 80)}</>
+              ),
+            },
+          ] as TableColumn<PetitionSelection>[])),
       {
         key: "shared-with",
         header: intl.formatMessage({
@@ -400,6 +429,7 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           defaultMessage: "Shared with",
         }),
         align: "center",
+        cellProps: { width: "1%" },
         CellContent: ({ row: { userPermissions }, column }) => (
           <Flex justifyContent={column.align}>
             <UserAvatarList users={userPermissions.map((p) => p.user)} />
@@ -413,12 +443,18 @@ function usePetitionsColumns(): TableColumn<PetitionSelection>[] {
           id: "petitions.header.created-at",
           defaultMessage: "Created at",
         }),
+        cellProps: { width: "1%" },
         CellContent: ({ row: { createdAt } }) => (
-          <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
+          <DateTime
+            value={createdAt}
+            format={FORMATS.LLL}
+            useRelativeTime
+            whiteSpace="nowrap"
+          />
         ),
       },
     ],
-    [intl.locale]
+    [intl.locale, type]
   );
 }
 
@@ -428,17 +464,14 @@ Petitions.fragments = {
       fragment Petitions_PetitionBasePagination on PetitionBasePagination {
         items {
           ...Petitions_PetitionBase
-          owner {
-            id
-          }
         }
         totalCount
       }
-      ${this.Petition}
+      ${this.PetitionBase}
       ${ContactLink.fragments.Contact}
     `;
   },
-  get Petition() {
+  get PetitionBase() {
     return gql`
       fragment Petitions_PetitionBase on PetitionBase {
         id
@@ -450,6 +483,9 @@ Petitions.fragments = {
           user {
             ...UserAvatarList_User
           }
+        }
+        owner {
+          id
         }
         ... on Petition {
           accesses {
@@ -466,6 +502,9 @@ Petitions.fragments = {
             optional
             total
           }
+        }
+        ... on PetitionTemplate {
+          description
         }
       }
       ${UserAvatarList.fragments.User}
