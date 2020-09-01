@@ -45,8 +45,8 @@ export function PetitionTemplateComposeMessageEditor({
       <Box padding={4} borderBottom="1px solid" borderBottomColor="gray.200">
         <Heading as="h2" size="sm">
           <FormattedMessage
-            id="petition.message-settings.header"
-            defaultMessage="Who do you want to send it to?"
+            id="template.message-settings.header"
+            defaultMessage="Email to send with the template"
           />
         </Heading>
       </Box>

@@ -327,7 +327,7 @@
   {
     "term": "component.petition-progress-bar.not-sent",
     "definition": "No has enviado esta petición a nadie todavía",
-    "context": "You haven't send this petition to anyone yet."
+    "context": "You haven't sent this petition to anyone yet."
   },
   {
     "term": "component.petition-progress-bar.optional",

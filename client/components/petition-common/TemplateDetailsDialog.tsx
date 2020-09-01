@@ -106,13 +106,19 @@ function TemplateDetailsHeader({
   handleCreatePetition: () => void;
   handleCloneTemplate: () => void;
 }) {
+  const intl = useIntl();
   const ownerName = petition.owner.fullName;
   const orgName = petition.owner.organization.name;
-
   return (
     <>
       <div>
-        <Heading size="md">{petition.name}</Heading>
+        <Heading size="md">
+          {petition.name ||
+            intl.formatMessage({
+              id: "generic.untitled-template",
+              defaultMessage: "Untitled template",
+            })}
+        </Heading>
         <Text as="span" fontSize="sm" fontWeight="normal">
           {ownerName && orgName ? (
             <FormattedMessage
@@ -187,7 +193,14 @@ function TemplateDetailsBody({
         />
       </Heading>
       <Text as="span" fontSize="sm">
-        {petition.description}
+        {petition.description || (
+          <i>
+            {intl.formatMessage({
+              id: "template.no-description-provided",
+              defaultMessage: "No description provided.",
+            })}
+          </i>
+        )}
       </Text>
       <Divider marginBottom="4" marginTop="4" />
       <Heading size="sm" marginBottom="3">
