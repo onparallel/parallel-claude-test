@@ -27,6 +27,7 @@ import {
 } from "../common/PetitionListFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
+import { NakedLink } from "../common/Link";
 
 export type PetitionListHeaderProps = PetitionListFilterProps & {
   search: string | null;
@@ -35,7 +36,6 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
   showCreateTemplates: boolean;
   onSearchChange: (value: string | null) => void;
   onDeleteClick: () => void;
-  onCreateClick: () => void;
   onCreateTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
@@ -48,7 +48,6 @@ export function PetitionListHeader({
   showCreateTemplates,
   onSearchChange,
   onDeleteClick,
-  onCreateClick,
   onCreateTemplateClick,
   onReload,
   onCloneClick,
@@ -137,12 +136,14 @@ export function PetitionListHeader({
           </Menu>
         </Box>
       ) : null}
-      <Button colorScheme="purple" onClick={onCreateClick}>
-        <FormattedMessage
-          id="component.petition-list-header.create-petition-button"
-          defaultMessage="Create petition"
-        />
-      </Button>
+      <NakedLink href="/app/petitions/new">
+        <Button colorScheme="purple" as="a">
+          <FormattedMessage
+            id="component.petition-list-header.create-petition-button"
+            defaultMessage="Create petition"
+          />
+        </Button>
+      </NakedLink>
     </Stack>
   );
 }

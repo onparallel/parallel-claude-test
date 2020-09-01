@@ -1,6 +1,9 @@
 import { arg, queryField, enumType } from "@nexus/schema";
-import { authenticate, chain } from "../helpers/authorize";
-import { userHasAccessToPetitions } from "./authorizers";
+import { authenticate, chain, or } from "../helpers/authorize";
+import {
+  userHasAccessToPetitions,
+  petitionIsPublicTemplate,
+} from "./authorizers";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 
 export const petitionsQuery = queryField((t) => {
@@ -58,7 +61,10 @@ export const petitionQuery = queryField("petition", {
   args: {
     id: globalIdArg("Petition", { required: true }),
   },
-  authorize: chain(authenticate(), userHasAccessToPetitions("id")),
+  authorize: chain(
+    authenticate(),
+    or(userHasAccessToPetitions("id"), petitionIsPublicTemplate("id"))
+  ),
   nullable: true,
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.loadPetition(args.id);

@@ -21,12 +21,14 @@ export function useCreatePetition() {
         $locale: PetitionLocale!
         $deadline: DateTime
         $petitionId: GID
+        $type: PetitionBaseType
       ) {
         createPetition(
           name: $name
           locale: $locale
           deadline: $deadline
           petitionId: $petitionId
+          type: $type
         ) {
           id
         }
@@ -44,14 +46,15 @@ export function useCreatePetition() {
   );
 
   return useCallback(
-    async function (petitionId?: string) {
+    async function ({
+      name = null,
+      locale = query.locale as PetitionLocale,
+      deadline = null,
+      petitionId = null,
+      type = null,
+    }: Partial<useCreatePetition_createPetitionMutationVariables> = {}) {
       const { data } = await createPetition({
-        variables: {
-          name: null,
-          locale: query.locale as PetitionLocale,
-          deadline: null,
-          petitionId,
-        },
+        variables: { name, locale, deadline, petitionId },
       });
       return data!.createPetition.id;
     },

@@ -11,7 +11,8 @@ export const Card: typeof Box = forwardRef(function Card(
     <Box
       ref={ref}
       as="section"
-      borderWidth="1px"
+      border="1px solid"
+      borderColor="gray.200"
       backgroundColor="white"
       boxShadow="md"
       borderRadius="md"

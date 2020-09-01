@@ -170,14 +170,6 @@ function Petitions() {
     [petitions, selected]
   );
 
-  const createPetition = useCreatePetition();
-  const handleCreateClick = useCallback(async function () {
-    try {
-      const id = await createPetition();
-      goToPetition(id, "compose");
-    } catch {}
-  }, []);
-
   const handleRowClick = useCallback(function (row: PetitionSelection) {
     goToPetition(
       row.id,
@@ -232,7 +224,6 @@ function Petitions() {
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
               onDeleteClick={handleDeleteClick}
-              onCreateClick={handleCreateClick}
               onCreateTemplateClick={handleCreateTemplate}
               onReload={() => refetch()}
               onCloneClick={handleCloneClick}

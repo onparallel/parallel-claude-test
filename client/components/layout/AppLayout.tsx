@@ -6,15 +6,13 @@ import {
   OnboardingStatus,
   useAppLayout_updateOnboardingStatusMutation,
 } from "@parallel/graphql/__types";
-import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useRouter } from "next/router";
+import Head from "next/head";
 import { useCallback, useContext } from "react";
 import {
   OnboardingTour,
   OnboardingTourContext,
 } from "../common/OnboardingTour";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
-import Head from "next/head";
 
 export type AppLayoutProps = BoxProps & {
   title: string;
@@ -22,18 +20,6 @@ export type AppLayoutProps = BoxProps & {
 };
 
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
-  const router = useRouter();
-  const createPetition = useCreatePetition();
-  const handleOnCreate = useCallback(async function () {
-    try {
-      const id = await createPetition();
-      router.push(
-        `/[locale]/app/petitions/[petitionId]/compose`,
-        `/${router.query.locale}/app/petitions/${id}/compose`
-      );
-    } catch {}
-  }, []);
-
   /* Onboarding tour callbacks */
   const [
     updateOnboardingStatus,
@@ -55,7 +41,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     },
     [isRunning, toggle]
   );
-  const breakpoint = "sm";
   return (
     <>
       <Head>
@@ -77,10 +62,8 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       >
         <AppLayoutNavbar
           user={user}
-          onCreate={handleOnCreate}
           onOnboardingClick={handleOnboardingClick}
-          display={{ base: "none", [breakpoint]: "flex" }}
-          zIndex="1"
+          zIndex="2"
         />
         <Flex
           flex="1"
@@ -102,8 +85,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           <AppLayoutNavbar
             isMobile
             user={user}
-            onCreate={handleOnCreate}
-            display={{ base: "flex", [breakpoint]: "none" }}
             onOnboardingClick={handleOnboardingClick}
           />
         </Flex>

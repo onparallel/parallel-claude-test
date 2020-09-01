@@ -38,7 +38,6 @@ import { UserMenu } from "./UserMenu";
 export type AppLayoutNavbarProps = BoxProps & {
   isMobile?: boolean;
   user: AppLayoutNavbar_UserFragment;
-  onCreate: () => void;
   onOnboardingClick: () => void;
 };
 
@@ -46,7 +45,6 @@ export const AppLayoutNavbar = Object.assign(
   memo(function AppLayoutNavbar({
     isMobile,
     user,
-    onCreate,
     onOnboardingClick,
     ...props
   }: AppLayoutNavbarProps) {
@@ -102,6 +100,7 @@ export const AppLayoutNavbar = Object.assign(
         backgroundColor="white"
         {...(isMobile
           ? {
+              display: { base: "flex", sm: "none" },
               flexDirection: "row",
               minHeight: 16,
               height: 16,
@@ -110,6 +109,7 @@ export const AppLayoutNavbar = Object.assign(
               paddingX: 2,
             }
           : {
+              display: { base: "none", sm: "flex" },
               flexDirection: "column",
               minWidth: 24,
               paddingTop: 6,
@@ -138,19 +138,21 @@ export const AppLayoutNavbar = Object.assign(
           </Flex>
         )}
         <Flex justifyContent="center" alignItems="center">
-          <IconButtonWithTooltip
-            id="new-petition-button"
-            colorScheme="purple"
-            icon={<AddIcon />}
-            size="lg"
-            isRound
-            onClick={onCreate}
-            label={intl.formatMessage({
-              id: "navbar.new-button",
-              defaultMessage: "Create a new petition",
-            })}
-            placement={isMobile ? "top" : "right"}
-          />
+          <NakedLink href="/app/petitions/new">
+            <IconButtonWithTooltip
+              id="new-petition-button"
+              as={"a" as any}
+              colorScheme="purple"
+              icon={<AddIcon />}
+              size="lg"
+              isRound
+              label={intl.formatMessage({
+                id: "navbar.new-button",
+                defaultMessage: "Create a new petition",
+              })}
+              placement={isMobile ? "top" : "right"}
+            />
+          </NakedLink>
         </Flex>
         <List
           as={Flex}

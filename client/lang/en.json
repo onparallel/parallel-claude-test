@@ -245,7 +245,7 @@
     "context": "Show"
   },
   {
-    "term": "component.petition-header.clone-as-template-label",
+    "term": "component.petition-header.clone-as-template-button",
     "definition": "Clone as template",
     "context": "Clone as template"
   },
@@ -293,6 +293,11 @@
     "term": "component.petition-list-filter.template",
     "definition": "Templates",
     "context": "Templates"
+  },
+  {
+    "term": "component.petition-list-header.clone-as-template-label",
+    "definition": "Clone as template",
+    "context": "Clone as template"
   },
   {
     "term": "component.petition-list-header.clone-label",
@@ -635,6 +640,16 @@
     "context": "Actions"
   },
   {
+    "term": "generic.all-languages",
+    "definition": "All languages",
+    "context": "All languages"
+  },
+  {
+    "term": "generic.by",
+    "definition": "by {name}",
+    "context": "by {name}"
+  },
+  {
     "term": "generic.can-be-changed-later",
     "definition": "You can change these settings later",
     "context": "You can change these settings later"
@@ -880,6 +895,11 @@
     "context": "Go to page {page}"
   },
   {
+    "term": "generic.load-more",
+    "definition": "Load more",
+    "context": "Load more"
+  },
+  {
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options..."
@@ -1083,6 +1103,56 @@
     "term": "navbar.templates-link",
     "definition": "Templates",
     "context": "Templates"
+  },
+  {
+    "term": "new-petition.create-new-template",
+    "definition": "Create new template",
+    "context": "Create new template"
+  },
+  {
+    "term": "new-petition.empty-petition-create",
+    "definition": "Create a petition from scratch",
+    "context": "Create a petition from scratch"
+  },
+  {
+    "term": "new-petition.empty-petition-header",
+    "definition": "Not finding what you're looking for?",
+    "context": "Not finding what you're looking for?"
+  },
+  {
+    "term": "new-petition.no-templates",
+    "definition": "You don't have any templates yet",
+    "context": "You don't have any templates yet"
+  },
+  {
+    "term": "new-petition.no-templates-found",
+    "definition": "We couldn't find any templates with that search",
+    "context": "We couldn't find any templates with that search"
+  },
+  {
+    "term": "new-petition.search-placeholder",
+    "definition": "What are you looking for?",
+    "context": "What are you looking for?"
+  },
+  {
+    "term": "new-petition.select-label",
+    "definition": "Language filter",
+    "context": "Language filter"
+  },
+  {
+    "term": "new-petition.suggested-searches",
+    "definition": "Suggested searches:",
+    "context": "Suggested searches:"
+  },
+  {
+    "term": "new-petition.suggestion-business",
+    "definition": "business",
+    "context": "business"
+  },
+  {
+    "term": "new-petition.suggestion-legal",
+    "definition": "legal",
+    "context": "legal"
   },
   {
     "term": "new-petition.title",
@@ -2950,6 +3020,41 @@
     "context": "Spanish"
   },
   {
+    "term": "template-details.about",
+    "definition": "About this template",
+    "context": "About this template"
+  },
+  {
+    "term": "template-details.clone-template",
+    "definition": "Clone template",
+    "context": "Clone template"
+  },
+  {
+    "term": "template-details.created-by",
+    "definition": "Created by {name} from {organization}.",
+    "context": "Created by {name} from {organization}."
+  },
+  {
+    "term": "template-details.fields-list",
+    "definition": "Information list",
+    "context": "Information list"
+  },
+  {
+    "term": "template-details.last-updated-on",
+    "definition": "Last updated on {date}.",
+    "context": "Last updated on {date}."
+  },
+  {
+    "term": "template-details.no-description-provided",
+    "definition": "No description provided.",
+    "context": "No description provided."
+  },
+  {
+    "term": "template-details.use-template",
+    "definition": "Use template",
+    "context": "Use template"
+  },
+  {
     "term": "template.description-edit.header",
     "definition": "A description of this template",
     "context": "A description of this template"
@@ -2960,44 +3065,9 @@
     "context": "Write a short description of this template."
   },
   {
-    "term": "template.details.about",
-    "definition": "About this template",
-    "context": "About this template"
-  },
-  {
-    "term": "template.details.clone-template",
-    "definition": "Clone template",
-    "context": "Clone template"
-  },
-  {
-    "term": "template.details.created-by",
-    "definition": "Created by {ownerName} @ {orgName}",
-    "context": "Created by {ownerName} @ {orgName}"
-  },
-  {
-    "term": "template.details.fields-list",
-    "definition": "Information list",
-    "context": "Information list"
-  },
-  {
-    "term": "template.details.last-updated-on",
-    "definition": "Last updated on {date}",
-    "context": "Last updated on {date}"
-  },
-  {
-    "term": "template.details.use-template",
-    "definition": "Use template",
-    "context": "Use template"
-  },
-  {
     "term": "template.message-settings.header",
     "definition": "Email to send with the template",
     "context": "Email to send with the template"
-  },
-  {
-    "term": "template.no-description-provided",
-    "definition": "No description provided.",
-    "context": "No description provided."
   },
   {
     "term": "timeline.access-activated-description",

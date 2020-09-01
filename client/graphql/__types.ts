@@ -2006,15 +2006,27 @@ export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
   };
 };
 
+export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
+  templateId: Scalars["GID"];
+}>;
+
+export type useTemplateDetailsDialogPetitionQuery = { __typename?: "Query" } & {
+  petition?: Maybe<
+    | { __typename?: "Petition" }
+    | ({
+        __typename?: "PetitionTemplate";
+      } & TemplateDetailsDialog_PetitionTemplateFragment)
+  >;
+};
+
 export type TemplateDetailsDialog_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-} & Pick<
-  PetitionTemplate,
-  "id" | "isPublic" | "description" | "name" | "updatedAt"
-> & {
+} & Pick<PetitionTemplate, "id" | "description" | "name" | "updatedAt"> & {
     fields: Array<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "options"> &
-        PetitionComposeField_PetitionFieldFragment
+      { __typename?: "PetitionField" } & Pick<
+        PetitionField,
+        "id" | "title" | "type" | "options"
+      >
     >;
     owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
         organization: { __typename?: "Organization" } & Pick<
@@ -3060,9 +3072,60 @@ export type PetitionsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Petitions_UserFragment;
 };
 
+export type NewPetition_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name" | "description" | "locale"> & {
+    owner: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+  };
+
 export type NewPetition_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
+
+export type NewPetitionPublicTemplatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  locale?: Maybe<PetitionLocale>;
+}>;
+
+export type NewPetitionPublicTemplatesQuery = { __typename?: "Query" } & {
+  publicTemplates: { __typename?: "PetitionTemplatePagination" } & Pick<
+    PetitionTemplatePagination,
+    "totalCount"
+  > & {
+      items: Array<
+        {
+          __typename?: "PetitionTemplate";
+        } & NewPetition_PetitionTemplateFragment
+      >;
+    };
+};
+
+export type NewPetitionTemplatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  locale?: Maybe<PetitionLocale>;
+}>;
+
+export type NewPetitionTemplatesQuery = { __typename?: "Query" } & {
+  templates: { __typename?: "PetitionBasePagination" } & Pick<
+    PetitionBasePagination,
+    "totalCount"
+  > & {
+      items: Array<
+        | { __typename?: "Petition" }
+        | ({
+            __typename?: "PetitionTemplate";
+          } & NewPetition_PetitionTemplateFragment)
+      >;
+    };
+  hasTemplates: { __typename?: "PetitionBasePagination" } & Pick<
+    PetitionBasePagination,
+    "totalCount"
+  >;
+};
 
 export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -3401,6 +3464,7 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
   petitionId?: Maybe<Scalars["GID"]>;
+  type?: Maybe<PetitionBaseType>;
 }>;
 
 export type useCreatePetition_createPetitionMutation = {
@@ -3520,27 +3584,16 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
   }
   ${PetitionSharingModal_UserFragmentDoc}
 `;
-export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
-  fragment PetitionComposeField_PetitionField on PetitionField {
-    id
-    type
-    title
-    description
-    optional
-    multiple
-    isFixed
-  }
-`;
 export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
   fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {
     id
-    isPublic
     description
     name
     fields {
       id
+      title
+      type
       options
-      ...PetitionComposeField_PetitionField
     }
     owner {
       id
@@ -3551,7 +3604,17 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
     }
     updatedAt
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
+`;
+export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
+  fragment PetitionComposeField_PetitionField on PetitionField {
+    id
+    type
+    title
+    description
+    optional
+    multiple
+    isFixed
+  }
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
@@ -4420,6 +4483,18 @@ export const Petitions_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
+export const NewPetition_PetitionTemplateFragmentDoc = gql`
+  fragment NewPetition_PetitionTemplate on PetitionTemplate {
+    id
+    name
+    description
+    locale
+    owner {
+      id
+      fullName
+    }
+  }
+`;
 export const NewPetition_UserFragmentDoc = gql`
   fragment NewPetition_User on User {
     ...AppLayout_User
@@ -5009,6 +5084,63 @@ export type PetitionSharingModal_searchUsersLazyQueryHookResult = ReturnType<
 export type PetitionSharingModal_searchUsersQueryResult = Apollo.QueryResult<
   PetitionSharingModal_searchUsersQuery,
   PetitionSharingModal_searchUsersQueryVariables
+>;
+export const useTemplateDetailsDialogPetitionDocument = gql`
+  query useTemplateDetailsDialogPetition($templateId: GID!) {
+    petition(id: $templateId) {
+      ...TemplateDetailsDialog_PetitionTemplate
+    }
+  }
+  ${TemplateDetailsDialog_PetitionTemplateFragmentDoc}
+`;
+
+/**
+ * __useuseTemplateDetailsDialogPetitionQuery__
+ *
+ * To run a query within a React component, call `useuseTemplateDetailsDialogPetitionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useuseTemplateDetailsDialogPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useuseTemplateDetailsDialogPetitionQuery({
+ *   variables: {
+ *      templateId: // value for 'templateId'
+ *   },
+ * });
+ */
+export function useuseTemplateDetailsDialogPetitionQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    useTemplateDetailsDialogPetitionQuery,
+    useTemplateDetailsDialogPetitionQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    useTemplateDetailsDialogPetitionQuery,
+    useTemplateDetailsDialogPetitionQueryVariables
+  >(useTemplateDetailsDialogPetitionDocument, baseOptions);
+}
+export function useuseTemplateDetailsDialogPetitionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    useTemplateDetailsDialogPetitionQuery,
+    useTemplateDetailsDialogPetitionQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    useTemplateDetailsDialogPetitionQuery,
+    useTemplateDetailsDialogPetitionQueryVariables
+  >(useTemplateDetailsDialogPetitionDocument, baseOptions);
+}
+export type useTemplateDetailsDialogPetitionQueryHookResult = ReturnType<
+  typeof useuseTemplateDetailsDialogPetitionQuery
+>;
+export type useTemplateDetailsDialogPetitionLazyQueryHookResult = ReturnType<
+  typeof useuseTemplateDetailsDialogPetitionLazyQuery
+>;
+export type useTemplateDetailsDialogPetitionQueryResult = Apollo.QueryResult<
+  useTemplateDetailsDialogPetitionQuery,
+  useTemplateDetailsDialogPetitionQueryVariables
 >;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
@@ -7401,6 +7533,156 @@ export type PetitionsUserQueryResult = Apollo.QueryResult<
   PetitionsUserQuery,
   PetitionsUserQueryVariables
 >;
+export const NewPetitionPublicTemplatesDocument = gql`
+  query NewPetitionPublicTemplates(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $locale: PetitionLocale
+  ) {
+    publicTemplates(
+      offset: $offset
+      limit: $limit
+      search: $search
+      locale: $locale
+    ) {
+      items {
+        ...NewPetition_PetitionTemplate
+      }
+      totalCount
+    }
+  }
+  ${NewPetition_PetitionTemplateFragmentDoc}
+`;
+
+/**
+ * __useNewPetitionPublicTemplatesQuery__
+ *
+ * To run a query within a React component, call `useNewPetitionPublicTemplatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewPetitionPublicTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewPetitionPublicTemplatesQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *      locale: // value for 'locale'
+ *   },
+ * });
+ */
+export function useNewPetitionPublicTemplatesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    NewPetitionPublicTemplatesQuery,
+    NewPetitionPublicTemplatesQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    NewPetitionPublicTemplatesQuery,
+    NewPetitionPublicTemplatesQueryVariables
+  >(NewPetitionPublicTemplatesDocument, baseOptions);
+}
+export function useNewPetitionPublicTemplatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewPetitionPublicTemplatesQuery,
+    NewPetitionPublicTemplatesQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    NewPetitionPublicTemplatesQuery,
+    NewPetitionPublicTemplatesQueryVariables
+  >(NewPetitionPublicTemplatesDocument, baseOptions);
+}
+export type NewPetitionPublicTemplatesQueryHookResult = ReturnType<
+  typeof useNewPetitionPublicTemplatesQuery
+>;
+export type NewPetitionPublicTemplatesLazyQueryHookResult = ReturnType<
+  typeof useNewPetitionPublicTemplatesLazyQuery
+>;
+export type NewPetitionPublicTemplatesQueryResult = Apollo.QueryResult<
+  NewPetitionPublicTemplatesQuery,
+  NewPetitionPublicTemplatesQueryVariables
+>;
+export const NewPetitionTemplatesDocument = gql`
+  query NewPetitionTemplates(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $locale: PetitionLocale
+  ) {
+    templates: petitions(
+      offset: $offset
+      limit: $limit
+      search: $search
+      locale: $locale
+      type: TEMPLATE
+    ) {
+      items {
+        ...NewPetition_PetitionTemplate
+      }
+      totalCount
+    }
+    hasTemplates: petitions(type: TEMPLATE) {
+      totalCount
+    }
+  }
+  ${NewPetition_PetitionTemplateFragmentDoc}
+`;
+
+/**
+ * __useNewPetitionTemplatesQuery__
+ *
+ * To run a query within a React component, call `useNewPetitionTemplatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNewPetitionTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewPetitionTemplatesQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *      locale: // value for 'locale'
+ *   },
+ * });
+ */
+export function useNewPetitionTemplatesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    NewPetitionTemplatesQuery,
+    NewPetitionTemplatesQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    NewPetitionTemplatesQuery,
+    NewPetitionTemplatesQueryVariables
+  >(NewPetitionTemplatesDocument, baseOptions);
+}
+export function useNewPetitionTemplatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    NewPetitionTemplatesQuery,
+    NewPetitionTemplatesQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    NewPetitionTemplatesQuery,
+    NewPetitionTemplatesQueryVariables
+  >(NewPetitionTemplatesDocument, baseOptions);
+}
+export type NewPetitionTemplatesQueryHookResult = ReturnType<
+  typeof useNewPetitionTemplatesQuery
+>;
+export type NewPetitionTemplatesLazyQueryHookResult = ReturnType<
+  typeof useNewPetitionTemplatesLazyQuery
+>;
+export type NewPetitionTemplatesQueryResult = Apollo.QueryResult<
+  NewPetitionTemplatesQuery,
+  NewPetitionTemplatesQueryVariables
+>;
 export const NewPetitionUserDocument = gql`
   query NewPetitionUser {
     me {
@@ -8473,12 +8755,14 @@ export const useCreatePetition_createPetitionDocument = gql`
     $locale: PetitionLocale!
     $deadline: DateTime
     $petitionId: GID
+    $type: PetitionBaseType
   ) {
     createPetition(
       name: $name
       locale: $locale
       deadline: $deadline
       petitionId: $petitionId
+      type: $type
     ) {
       id
     }
@@ -8506,6 +8790,7 @@ export type useCreatePetition_createPetitionMutationFn = Apollo.MutationFunction
  *      locale: // value for 'locale'
  *      deadline: // value for 'deadline'
  *      petitionId: // value for 'petitionId'
+ *      type: // value for 'type'
  *   },
  * });
  */

@@ -80,12 +80,9 @@ export function clearCache(cache: DataProxy, regex: RegExp) {
     }
   }
 }
-
-export function assertQuery<TData, TVariables>(
-  result: QueryResult<TData, TVariables>
-): Omit<QueryResult<TData, TVariables>, "data"> & {
-  data: Assert<QueryResult<TData, TVariables>["data"]>;
-} {
+export function assertQuery<T extends QueryResult>(
+  result: T
+): T extends QueryResult<infer TData> ? T & { data: TData } : never {
   const { data, ...rest } = result;
   if (!data) {
     throw new Error("Expected data to be present on the Apollo cache");
