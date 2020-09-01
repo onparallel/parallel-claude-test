@@ -245,6 +245,11 @@
     "context": "Show"
   },
   {
+    "term": "component.petition-header.clone-as-template-label",
+    "definition": "Clonar como plantilla",
+    "context": "Clone as template"
+  },
+  {
     "term": "component.petition-header.clone-label",
     "definition": "Clonar petición",
     "context": "Clone petition"
@@ -360,6 +365,11 @@
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
   },
   {
+    "term": "component.petition-template.delete-label",
+    "definition": "Eliminar plantilla",
+    "context": "Delete template"
+  },
+  {
     "term": "component.placeholder-input.hint",
     "definition": "Presiona # para añadir parámetros a sustituir",
     "context": "Press # to add replaceable placeholders"
@@ -408,6 +418,16 @@
     "term": "component.table.total-results",
     "definition": "Mostrando {start}-{end} de {total, plural, =1 {# resultado} other {# resultados}}",
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
+  },
+  {
+    "term": "component.template-header.clone-label",
+    "definition": "Clonar plantilla",
+    "context": "Clone template"
+  },
+  {
+    "term": "component.template-header.share-label",
+    "definition": "Compartir plantilla",
+    "context": "Share template"
   },
   {
     "term": "component.user-menu.log-out",
@@ -1063,6 +1083,11 @@
     "term": "navbar.templates-link",
     "definition": "Plantillas",
     "context": "Templates"
+  },
+  {
+    "term": "new-petition.title",
+    "definition": "Nueva petición",
+    "context": "New petition"
   },
   {
     "term": "petition-access.header",
@@ -2923,6 +2948,56 @@
     "term": "supported-locales.spanish",
     "definition": "Español",
     "context": "Spanish"
+  },
+  {
+    "term": "template.description-edit.header",
+    "definition": "Descripción de la plantilla",
+    "context": "A description of this template"
+  },
+  {
+    "term": "template.description-edit.placeholder",
+    "definition": "Escribe una descripción corta de esta plantilla.",
+    "context": "Write a short description of this template."
+  },
+  {
+    "term": "template.details.about",
+    "definition": "Acerca de esta plantilla",
+    "context": "About this template"
+  },
+  {
+    "term": "template.details.clone-template",
+    "definition": "Clonar plantilla",
+    "context": "Clone template"
+  },
+  {
+    "term": "template.details.created-by",
+    "definition": "Creada por {ownerName} @ {orgName}",
+    "context": "Created by {ownerName} @ {orgName}"
+  },
+  {
+    "term": "template.details.fields-list",
+    "definition": "Listado de información",
+    "context": "Information list"
+  },
+  {
+    "term": "template.details.last-updated-on",
+    "definition": "Última vez actualizado el {date}",
+    "context": "Last updated on {date}"
+  },
+  {
+    "term": "template.details.use-template",
+    "definition": "Usar plantilla",
+    "context": "Use template"
+  },
+  {
+    "term": "template.message-settings.header",
+    "definition": "Email a enviar junto con la plantilla",
+    "context": "Email to send with the template"
+  },
+  {
+    "term": "template.no-description-provided",
+    "definition": "Sin descripción.",
+    "context": "No description provided."
   },
   {
     "term": "timeline.access-activated-description",
