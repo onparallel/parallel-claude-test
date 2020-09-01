@@ -100,7 +100,7 @@ export function ifArgDefined<
   authorizer: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    if (args[argName] !== null) {
+    if (args[argName] !== null && args[argName] !== undefined) {
       await authorizer(root, args, ctx, info);
     }
     return true;

@@ -14,7 +14,12 @@ import {
   PetitionUser,
 } from "../../../db/__types";
 import { calculateNextReminder } from "../../../util/reminderUtils";
-import { and, authenticate, chain } from "../../helpers/authorize";
+import {
+  and,
+  authenticate,
+  chain,
+  ifArgDefined,
+} from "../../helpers/authorize";
 import { dateTimeArg } from "../../helpers/date";
 import { jsonArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
@@ -48,12 +53,17 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
   type: "PetitionBase",
-  authorize: authenticate(),
+  authorize: chain(
+    authenticate(),
+    ifArgDefined("templateId", userHasAccessToPetitions("templateId" as never))
+  ),
   args: {
     name: stringArg(),
     locale: arg({ type: "PetitionLocale", required: true }),
     deadline: dateTimeArg({}),
-    templateId: globalIdArg("Petition", { required: false }),
+    templateId: globalIdArg("Petition", {
+      required: false,
+    }),
   },
   resolve: async (_, { name, locale, deadline, templateId }, ctx) => {
     if (templateId) {
