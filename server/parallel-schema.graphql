@@ -249,7 +249,16 @@ type Mutation {
     deadline: DateTime
     locale: PetitionLocale!
     name: String
-    templateId: GID
+
+    """
+    GID of petition to base from
+    """
+    petitionId: GID
+
+    """
+    Type of petition to create
+    """
+    type: PetitionBaseType = PETITION
   ): PetitionBase!
 
   """

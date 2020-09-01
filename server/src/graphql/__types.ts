@@ -918,7 +918,8 @@ export interface NexusGenArgTypes {
       deadline?: NexusGenScalars["DateTime"] | null; // DateTime
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name?: string | null; // String
-      templateId?: NexusGenScalars["GID"] | null; // GID
+      petitionId?: NexusGenScalars["GID"] | null; // GID
+      type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
     createPetitionField: {
       // args

@@ -491,7 +491,7 @@ export class PetitionRepository extends BaseRepository {
         "petition",
         {
           org_id: user.org_id,
-          status: "DRAFT",
+          status: data.is_template ? null : "DRAFT",
           ...data,
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,

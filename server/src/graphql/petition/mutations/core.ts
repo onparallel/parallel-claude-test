@@ -58,10 +58,10 @@ export const createPetition = mutationField("createPetition", {
   authorize: chain(
     authenticate(),
     ifArgDefined(
-      "templateId",
+      "petitionId",
       or(
-        userHasAccessToPetitions("templateId" as never),
-        petitionIsPublicTemplate("templateId" as never)
+        userHasAccessToPetitions("petitionId" as never),
+        petitionIsPublicTemplate("petitionId" as never)
       )
     )
   ),
@@ -69,19 +69,33 @@ export const createPetition = mutationField("createPetition", {
     name: stringArg(),
     locale: arg({ type: "PetitionLocale", required: true }),
     deadline: dateTimeArg({}),
-    templateId: globalIdArg("Petition", {
+    petitionId: globalIdArg("Petition", {
+      description: "GID of petition to base from",
+      required: false,
+    }),
+    type: arg({
+      type: "PetitionBaseType",
+      description: "Type of petition to create",
+      default: "PETITION",
       required: false,
     }),
   },
-  resolve: async (_, { name, locale, deadline, templateId }, ctx) => {
-    if (templateId) {
-      return await ctx.petitions.clonePetition(templateId, ctx.user!, {
-        is_template: false,
-        status: "DRAFT",
+  resolve: async (_, { name, locale, deadline, petitionId, type }, ctx) => {
+    const isTemplate = type === "TEMPLATE";
+    if (petitionId) {
+      return await ctx.petitions.clonePetition(petitionId, ctx.user!, {
+        is_template: isTemplate,
+        status: isTemplate ? null : "DRAFT",
       });
     } else {
       return await ctx.petitions.createPetition(
-        { name, locale, deadline: deadline ?? null, email_subject: name },
+        {
+          name,
+          locale,
+          deadline: deadline ?? null,
+          email_subject: name,
+          is_template: isTemplate,
+        },
         ctx.user!
       );
     }
