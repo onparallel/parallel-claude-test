@@ -64,3 +64,26 @@ export const petitionQuery = queryField("petition", {
     return await ctx.petitions.loadPetition(args.id);
   },
 });
+
+export const publicTemplatesQuery = queryField((t) => {
+  t.paginationField("publicTemplates", {
+    type: "PetitionTemplate",
+    description: "The publicly available templates",
+    authorize: authenticate(),
+    additionalArgs: {
+      locale: arg({
+        type: "PetitionLocale",
+        required: false,
+      }),
+    },
+    searchable: true,
+    resolve: async (_, { limit, offset, locale, search }, ctx) => {
+      return await ctx.petitions.loadPublicTemplates({
+        search,
+        locale,
+        limit,
+        offset,
+      });
+    },
+  });
+});

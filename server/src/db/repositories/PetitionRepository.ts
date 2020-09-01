@@ -2125,4 +2125,38 @@ export class PetitionRepository extends BaseRepository {
 
     return count === 1;
   }
+
+  async loadPublicTemplates(
+    opts: {
+      search?: string | null;
+      locale?: "en" | "es" | null;
+    } & PageOpts
+  ) {
+    return await this.loadPageAndCount(
+      this.from("petition")
+        .where({
+          template_public: true,
+          deleted_at: null,
+          is_template: true,
+        })
+        .mmodify((q) => {
+          const { search, locale } = opts;
+          if (locale) {
+            q.where("locale", locale);
+          }
+          if (search) {
+            const escapedSearch = `%${escapeLike(search, "\\")}%`;
+            q.andWhere((q2) => {
+              q2.whereIlike("name", escapedSearch, "\\").or.whereIlike(
+                "template_description",
+                escapedSearch,
+                "\\"
+              );
+            });
+          }
+        })
+        .select("*"),
+      opts
+    );
+  }
 }

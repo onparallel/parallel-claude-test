@@ -253,6 +253,11 @@ export interface NexusGenRootTypes {
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petition: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
   };
+  PetitionTemplatePagination: {
+    // root type
+    items: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
+    totalCount: number; // Int!
+  };
   PetitionUserPermission: db.PetitionUser;
   PublicContact: db.Contact;
   PublicOrganization: db.Organization;
@@ -651,6 +656,11 @@ export interface NexusGenFieldTypes {
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petition: NexusGenRootTypes["PetitionTemplate"]; // PetitionTemplate!
   };
+  PetitionTemplatePagination: {
+    // field return type
+    items: NexusGenRootTypes["PetitionTemplate"][]; // [PetitionTemplate!]!
+    totalCount: number; // Int!
+  };
   PetitionUserPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -741,6 +751,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
+    publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
   };
   ReminderSentEvent: {
     // field return type
@@ -1174,6 +1185,13 @@ export interface NexusGenArgTypes {
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
+    publicTemplates: {
+      // args
+      limit?: number | null; // Int
+      locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+      offset?: number | null; // Int
+      search?: string | null; // String
+    };
   };
 }
 
@@ -1247,6 +1265,7 @@ export type NexusGenObjectNames =
   | "PetitionReminder"
   | "PetitionTemplate"
   | "PetitionTemplateAndField"
+  | "PetitionTemplatePagination"
   | "PetitionUserPermission"
   | "PublicContact"
   | "PublicOrganization"

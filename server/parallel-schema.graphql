@@ -1391,6 +1391,18 @@ type PetitionTemplateAndField implements PetitionBaseAndField {
   petition: PetitionTemplate!
 }
 
+type PetitionTemplatePagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionTemplate!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 """
 The permission for a petition and user
 """
@@ -1771,6 +1783,27 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
+
+  """
+  The publicly available templates
+  """
+  publicTemplates(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    locale: PetitionLocale
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+  ): PetitionTemplatePagination!
 }
 
 """
