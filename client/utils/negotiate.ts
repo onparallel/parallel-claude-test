@@ -18,7 +18,7 @@ export function negotiate(
       const locales = accepts.split(/\s*,\s*/).map((lang) => {
         const match = lang.match(/^(\*|[a-z-]+)(?:;q=(.*))?$/i);
         if (!match) {
-          throw new Error();
+          return { locale: defaults, quality: 0 };
         }
         const [, locale, quality] = match;
         return { locale, quality: quality ? parseFloat(quality) : 1 };
