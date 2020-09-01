@@ -1086,7 +1086,12 @@ export class PetitionRepository extends BaseRepository {
       const [cloned] = await this.insert(
         "petition",
         {
-          ...omit(petition!, ["id", "created_at", "updated_at"]),
+          ...omit(petition!, [
+            "id",
+            "created_at",
+            "updated_at",
+            "template_public",
+          ]),
           org_id: user.org_id,
           status: petition?.is_template ? null : "DRAFT",
           created_by: `User:${user.id}`,
