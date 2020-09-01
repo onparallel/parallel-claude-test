@@ -296,7 +296,8 @@ export type MutationcreatePetitionArgs = {
   deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
-  templateId?: Maybe<Scalars["GID"]>;
+  petitionId?: Maybe<Scalars["GID"]>;
+  type?: Maybe<PetitionBaseType>;
 };
 
 export type MutationcreatePetitionFieldArgs = {
@@ -943,6 +944,14 @@ export type PetitionTemplateAndField = PetitionBaseAndField & {
   petition: PetitionTemplate;
 };
 
+export type PetitionTemplatePagination = {
+  __typename?: "PetitionTemplatePagination";
+  /** The requested slice of items. */
+  items: Array<PetitionTemplate>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 /** The permission for a petition and user */
 export type PetitionUserPermission = Timestamps & {
   __typename?: "PetitionUserPermission";
@@ -1111,6 +1120,8 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
+  /** The publicly available templates */
+  publicTemplates: PetitionTemplatePagination;
 };
 
 export type QueryaccessArgs = {
@@ -1139,11 +1150,19 @@ export type QuerypetitionArgs = {
 
 export type QuerypetitionsArgs = {
   limit?: Maybe<Scalars["Int"]>;
+  locale?: Maybe<PetitionLocale>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
+};
+
+export type QuerypublicTemplatesArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  locale?: Maybe<PetitionLocale>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
 };
 
 /** Order to use on Query.contacts */
@@ -3381,7 +3400,7 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
   deadline?: Maybe<Scalars["DateTime"]>;
-  templateId?: Maybe<Scalars["GID"]>;
+  petitionId?: Maybe<Scalars["GID"]>;
 }>;
 
 export type useCreatePetition_createPetitionMutation = {
@@ -8453,13 +8472,13 @@ export const useCreatePetition_createPetitionDocument = gql`
     $name: String
     $locale: PetitionLocale!
     $deadline: DateTime
-    $templateId: GID
+    $petitionId: GID
   ) {
     createPetition(
       name: $name
       locale: $locale
       deadline: $deadline
-      templateId: $templateId
+      petitionId: $petitionId
     ) {
       id
     }
@@ -8486,7 +8505,7 @@ export type useCreatePetition_createPetitionMutationFn = Apollo.MutationFunction
  *      name: // value for 'name'
  *      locale: // value for 'locale'
  *      deadline: // value for 'deadline'
- *      templateId: // value for 'templateId'
+ *      petitionId: // value for 'petitionId'
  *   },
  * });
  */
