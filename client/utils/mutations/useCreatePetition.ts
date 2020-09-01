@@ -54,7 +54,7 @@ export function useCreatePetition() {
       type = null,
     }: Partial<useCreatePetition_createPetitionMutationVariables> = {}) {
       const { data } = await createPetition({
-        variables: { name, locale, deadline, petitionId },
+        variables: { name, locale, deadline, petitionId, type },
       });
       return data!.createPetition.id;
     },
