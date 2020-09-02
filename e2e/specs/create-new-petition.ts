@@ -36,6 +36,7 @@ Object.entries(browsers)
           async () => await browser.clickUntilHidden("#pw-onboarding-next")
         );
         await browser.clickAndNavigate("#new-petition-button");
+        await browser.clickAndNavigate("#empty-petition-card");
         expect(await browser.currentURL()).toMatch(
           /^\/app\/petitions\/[A-Za-z0-9]+\/compose$/
         );

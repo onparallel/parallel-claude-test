@@ -254,7 +254,10 @@ function NewPetition() {
           }}
           gap={4}
         >
-          <EmptyPetitionCard onClick={handleTemplateClick(null)} />
+          <EmptyPetitionCard
+            id="empty-petition-card"
+            onClick={handleTemplateClick(null)}
+          />
           {publicTemplates.map(
             (template: NewPetition_PetitionTemplateFragment) => (
               <TemplateCard
