@@ -15,7 +15,6 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { useCreatePetitionDialog } from "@parallel/components/petition-list/CreatePetitionDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
@@ -48,7 +47,6 @@ import {
   useQueryState,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
-import { useRouter } from "next/router";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
@@ -70,7 +68,7 @@ const QUERY_STATE = {
 
 function Petitions() {
   const intl = useIntl();
-  const router = useRouter();
+
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me },
@@ -143,12 +141,11 @@ function Petitions() {
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const petitions = await clonePetitions({
+        const petitionIds = await clonePetitions({
           petitionIds: selected,
-          name,
         });
-        if (petitions.length === 1) {
-          goToPetition(petitions[0].id, "compose");
+        if (petitionIds.length === 1) {
+          goToPetition(petitionIds[0], "compose");
         } else {
           refetch();
         }
