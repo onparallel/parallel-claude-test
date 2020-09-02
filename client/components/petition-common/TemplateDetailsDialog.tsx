@@ -183,7 +183,7 @@ export function TemplateDetailsDialog({
                     defaultMessage="Use template"
                   />
                 </Button>
-                <Menu>
+                <Menu placement="bottom-end">
                   <Tooltip
                     label={intl.formatMessage({
                       id: "generic.more-options",
