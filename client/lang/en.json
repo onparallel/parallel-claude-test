@@ -100,6 +100,11 @@
     "context": "Give it an identifying name"
   },
   {
+    "term": "component.create-template-dialog.locale-label",
+    "definition": "Language of the template",
+    "context": "Language of the template"
+  },
+  {
     "term": "component.date-picker.next-month",
     "definition": "Next month",
     "context": "Next month"
@@ -3093,6 +3098,11 @@
     "term": "template.message-settings.header",
     "definition": "Email to send with the template",
     "context": "Email to send with the template"
+  },
+  {
+    "term": "template.settings-header",
+    "definition": "Template settings",
+    "context": "Template settings"
   },
   {
     "term": "timeline.access-activated-description",

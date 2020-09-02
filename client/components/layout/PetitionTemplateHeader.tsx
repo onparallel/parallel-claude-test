@@ -180,7 +180,7 @@ export function PetitionTemplateHeader({
                   <MenuItem onClick={onOpenSettings}>
                     <SettingsIcon marginRight={2} />
                     <FormattedMessage
-                      id="component.template-header.settings-button"
+                      id="template.settings-header"
                       defaultMessage="Template settings"
                     />
                   </MenuItem>
