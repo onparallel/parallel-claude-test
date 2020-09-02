@@ -41,6 +41,9 @@ export function PetitionTemplateDescriptionEdit({
           onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
             handleUpdateDescription(event.target.value)
           }
+          onBlur={() => {
+            setDescription(templateDescription.trim());
+          }}
           placeholder={intl.formatMessage({
             id: "template.description-edit.placeholder",
             defaultMessage: "Write a short description of this template.",

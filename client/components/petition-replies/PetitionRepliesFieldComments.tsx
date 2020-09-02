@@ -92,7 +92,7 @@ export function PetitionRepliesFieldComments({
   }
 
   function handleSubmitClick() {
-    onAddComment(draft);
+    onAddComment(draft.trim());
     setNativeValue(textareaRef.current!, "");
   }
 
@@ -175,7 +175,7 @@ export function PetitionRepliesFieldComments({
             <Button
               size="sm"
               colorScheme="purple"
-              isDisabled={draft.length === 0}
+              isDisabled={draft.trim().length === 0}
               onClick={handleSubmitClick}
             >
               <FormattedMessage id="generic.submit" defaultMessage="Submit" />
@@ -226,7 +226,7 @@ function FieldComment({
 
   function handleSaveClick() {
     setIsEditing(false);
-    onEdit(content);
+    onEdit(content.trim());
   }
 
   function handleContentChange(event: ChangeEvent<HTMLTextAreaElement>) {
@@ -353,7 +353,12 @@ function FieldComment({
             <Button size="sm" onClick={handleCancelClick}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button size="sm" colorScheme="purple" onClick={handleSaveClick}>
+            <Button
+              size="sm"
+              colorScheme="purple"
+              onClick={handleSaveClick}
+              isDisabled={content.trim().length === 0}
+            >
               <FormattedMessage id="generic.save" defaultMessage="Save" />
             </Button>
           </Stack>

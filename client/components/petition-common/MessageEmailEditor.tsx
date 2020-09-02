@@ -47,6 +47,9 @@ export function MessageEmailEditor({
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onSubjectChange(event.target.value)
           }
+          onBlur={() => {
+            onSubjectChange(subject.trim());
+          }}
           placeholder={intl.formatMessage({
             id: "component.message-email-editor.subject-placeholder",
             defaultMessage: "Enter the subject of the email",

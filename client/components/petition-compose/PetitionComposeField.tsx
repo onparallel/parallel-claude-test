@@ -237,6 +237,7 @@ export const PetitionComposeField = Object.assign(
                 setTitle(event.target.value ?? null)
               }
               onBlur={() => {
+                setTitle(title?.trim());
                 if (title !== field.title) {
                   onFieldEdit({ title });
                 }
@@ -271,6 +272,7 @@ export const PetitionComposeField = Object.assign(
                 setDescription(event.target.value ?? null)
               }
               onBlur={() => {
+                setDescription(description?.trim());
                 if (description !== field.description) {
                   onFieldEdit({ description });
                 }

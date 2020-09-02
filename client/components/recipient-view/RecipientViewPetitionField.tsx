@@ -352,13 +352,19 @@ function TextReplyForm({
         {multiline ? (
           <Textarea
             name="content"
-            ref={register({ required: true })}
+            ref={register({
+              required: true,
+              validate: (val) => val.trim().length > 0,
+            })}
             placeholder={placeholder ?? ""}
           />
         ) : (
           <Input
             name="content"
-            ref={register({ required: true })}
+            ref={register({
+              required: true,
+              validate: (val) => val.trim().length > 0,
+            })}
             placeholder={placeholder ?? ""}
           />
         )}

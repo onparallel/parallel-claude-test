@@ -60,7 +60,7 @@ export function useDeletePetitions() {
         return permissions.length > 1 && owner.id === userId;
       });
       if (userIsOwnerOfSharedPetition) {
-        await showErrorDialog({
+        return await showErrorDialog({
           message: intl.formatMessage(
             {
               id: "petition.shared-delete-error",

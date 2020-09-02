@@ -35,6 +35,9 @@ export function HeaderNameEditable({
       value={name}
       onChange={setName}
       onSubmit={() => onNameChange(name)}
+      onBlur={() => {
+        setName(name.trim());
+      }}
       {...props}
     >
       {({ isEditing }: { isEditing: boolean }) => (

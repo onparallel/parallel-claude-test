@@ -274,7 +274,7 @@ export const updatePetition = mutationField("updatePetition", {
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
-      data.name = name;
+      data.name = name?.trim() || null;
     }
     if (locale !== undefined && locale !== null) {
       data.locale = locale;
@@ -283,7 +283,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.deadline = deadline;
     }
     if (emailSubject !== undefined) {
-      data.email_subject = emailSubject;
+      data.email_subject = emailSubject?.trim() || null;
     }
     if (emailBody !== undefined) {
       data.email_body = emailBody === null ? null : JSON.stringify(emailBody);
@@ -298,7 +298,7 @@ export const updatePetition = mutationField("updatePetition", {
       }
     }
     if (description !== undefined) {
-      data.template_description = description;
+      data.template_description = description?.trim() || null;
     }
     return await ctx.petitions.updatePetition(args.petitionId, data, ctx.user!);
   },
@@ -412,10 +412,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     const { title, description, optional, multiple, options } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
-      data.title = title;
+      data.title = title?.trim() || null;
     }
     if (description !== undefined) {
-      data.description = description;
+      data.description = description?.trim() || null;
     }
     if (optional !== undefined && optional !== null) {
       data.optional = optional;

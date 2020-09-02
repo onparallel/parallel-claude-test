@@ -95,7 +95,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   }
 
   function handleSubmitClick() {
-    onAddComment(draft);
+    onAddComment(draft.trim());
     setNativeValue(textareaRef.current!, "");
   }
 
@@ -192,7 +192,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
                 <Button
                   size="sm"
                   colorScheme="purple"
-                  isDisabled={draft.length === 0}
+                  isDisabled={draft.trim().length === 0}
                   onClick={handleSubmitClick}
                 >
                   <FormattedMessage
