@@ -16,7 +16,7 @@ import { Maybe } from "@parallel/utils/types";
 
 export type PetitionListFilterProps = {
   status: Maybe<PetitionStatus>;
-  type: Maybe<PetitionBaseType>;
+  type: PetitionBaseType;
   onFilterChange: (value: {
     type: PetitionBaseType;
     status: Maybe<PetitionStatus>;

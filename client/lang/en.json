@@ -305,9 +305,14 @@
     "context": "Clone as template"
   },
   {
-    "term": "component.petition-list-header.clone-label",
-    "definition": "Clone petition",
-    "context": "Clone petition"
+    "term": "component.petition-list-header.clone-petition-label",
+    "definition": "Clone {count, plural, =1{petition} other{petitions}}",
+    "context": "Clone {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.clone-template-label",
+    "definition": "Clone {count, plural, =1{template} other{templates}}",
+    "context": "Clone {count, plural, =1{template} other{templates}}"
   },
   {
     "term": "component.petition-list-header.create-petition-button",
@@ -315,9 +320,19 @@
     "context": "Create petition"
   },
   {
-    "term": "component.petition-list-header.delete-label",
-    "definition": "Delete selected",
-    "context": "Delete selected"
+    "term": "component.petition-list-header.create-template-button",
+    "definition": "Create template",
+    "context": "Create template"
+  },
+  {
+    "term": "component.petition-list-header.delete-petition-label",
+    "definition": "Delete {count, plural, =1{petition} other{petitions}}",
+    "context": "Delete {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.delete-template-label",
+    "definition": "Delete {count, plural, =1{template} other{templates}}",
+    "context": "Delete {count, plural, =1{template} other{templates}}"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -1545,11 +1560,6 @@
     "context": "Send reminders"
   },
   {
-    "term": "petition.copy",
-    "definition": "copy",
-    "context": "copy"
-  },
-  {
     "term": "petition.deadline-label",
     "definition": "Deadline",
     "context": "Deadline"
@@ -1948,6 +1958,11 @@
     "term": "petitions.title",
     "definition": "Petitions",
     "context": "Petitions"
+  },
+  {
+    "term": "petitions.title-templates",
+    "definition": "Templates",
+    "context": "Templates"
   },
   {
     "term": "public.about-link",

@@ -212,9 +212,7 @@ function Petitions() {
               search={state.search}
               status={state.status}
               type={state.type}
-              showDelete={selected.length > 0}
-              showClone={selected.length > 0}
-              showCreateTemplates={selected.length === 1}
+              selectedCount={selected.length}
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
               onDeleteClick={handleDeleteClick}

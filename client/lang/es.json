@@ -305,9 +305,14 @@
     "context": "Clone as template"
   },
   {
-    "term": "component.petition-list-header.clone-label",
-    "definition": "Clonar petición",
-    "context": "Clone petition"
+    "term": "component.petition-list-header.clone-petition-label",
+    "definition": "Clonar {count, plural, =1{petición} other{peticiones}}",
+    "context": "Clone {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.clone-template-label",
+    "definition": "Clonar {count, plural, =1{plantilla} other{plantillas}}",
+    "context": "Clone {count, plural, =1{template} other{templates}}"
   },
   {
     "term": "component.petition-list-header.create-petition-button",
@@ -315,9 +320,19 @@
     "context": "Create petition"
   },
   {
-    "term": "component.petition-list-header.delete-label",
-    "definition": "Eliminar seleccionadas",
-    "context": "Delete selected"
+    "term": "component.petition-list-header.create-template-button",
+    "definition": "Crear plantilla",
+    "context": "Create template"
+  },
+  {
+    "term": "component.petition-list-header.delete-petition-label",
+    "definition": "Borrar {count, plural, =1{petición} other{peticiones}}",
+    "context": "Delete {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.delete-template-label",
+    "definition": "Borrar {count, plural, =1{plantilla} other{plantillas}}",
+    "context": "Delete {count, plural, =1{template} other{templates}}"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -1545,11 +1560,6 @@
     "context": "Send reminders"
   },
   {
-    "term": "petition.copy",
-    "definition": "copia",
-    "context": "copy"
-  },
-  {
     "term": "petition.deadline-label",
     "definition": "Vencimiento:",
     "context": "Deadline"
@@ -1948,6 +1958,11 @@
     "term": "petitions.title",
     "definition": "Peticiones",
     "context": "Petitions"
+  },
+  {
+    "term": "petitions.title-templates",
+    "definition": "Plantillas",
+    "context": "Templates"
   },
   {
     "term": "public.about-link",

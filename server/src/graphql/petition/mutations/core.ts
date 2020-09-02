@@ -51,7 +51,7 @@ import {
 } from "../validations";
 import { WhitelistedError } from "./../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { mapSeries, mapSeries } from "async";
+import { mapSeries } from "async";
 import { unMaybeArray } from "../../../util/arrays";
 
 export const createPetition = mutationField("createPetition", {
