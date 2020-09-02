@@ -438,8 +438,8 @@ export interface NexusGenFieldTypes {
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
-    clonePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
+    clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -897,17 +897,14 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     };
-    clonePetition: {
-      // args
-      deadline?: NexusGenScalars["DateTime"] | null; // DateTime
-      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-      name?: string | null; // String
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
     clonePetitionField: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    clonePetitions: {
+      // args
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     createContact: {
       // args
@@ -915,7 +912,6 @@ export interface NexusGenArgTypes {
     };
     createPetition: {
       // args
-      deadline?: NexusGenScalars["DateTime"] | null; // DateTime
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name?: string | null; // String
       petitionId?: NexusGenScalars["GID"] | null; // GID

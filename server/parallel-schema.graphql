@@ -223,19 +223,14 @@ type Mutation {
   ): PetitionBaseAndField!
 
   """
-  Clone petition.
-  """
-  clonePetition(
-    deadline: DateTime
-    locale: PetitionLocale!
-    name: String
-    petitionId: GID!
-  ): PetitionBase!
-
-  """
   Clones a petition field
   """
   clonePetitionField(fieldId: GID!, petitionId: GID!): PetitionBaseAndField!
+
+  """
+  Clone petition.
+  """
+  clonePetitions(petitionIds: [GID!]!): [PetitionBase!]!
 
   """
   Create a contact.
@@ -246,7 +241,6 @@ type Mutation {
   Create petition.
   """
   createPetition(
-    deadline: DateTime
     locale: PetitionLocale!
     name: String
 

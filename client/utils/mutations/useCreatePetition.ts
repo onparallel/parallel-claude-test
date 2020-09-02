@@ -19,14 +19,12 @@ export function useCreatePetition() {
       mutation useCreatePetition_createPetition(
         $name: String
         $locale: PetitionLocale!
-        $deadline: DateTime
         $petitionId: GID
         $type: PetitionBaseType
       ) {
         createPetition(
           name: $name
           locale: $locale
-          deadline: $deadline
           petitionId: $petitionId
           type: $type
         ) {
@@ -53,7 +51,6 @@ export function useCreatePetition() {
     async function ({
       name = null,
       locale = query.locale as PetitionLocale,
-      deadline = null,
       petitionId = null,
       type = null,
     }: Partial<useCreatePetition_createPetitionMutationVariables> = {}) {

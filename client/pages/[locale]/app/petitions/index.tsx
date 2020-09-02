@@ -36,7 +36,7 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
-import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
+import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
@@ -94,8 +94,6 @@ function Petitions() {
     })
   );
 
-  const clonePetition = useClonePetition();
-
   const [selected, setSelected] = useState<string[]>([]);
 
   function handleSearchChange(value: string | null) {
@@ -126,45 +124,34 @@ function Petitions() {
     refetch();
   }, [intl.locale, petitions, selected]);
 
+  const goToPetition = useGoToPetition();
+
   const createTemplate = useCreateTemplateFromPetition();
   const handleCreateTemplate = useCallback(
     async function () {
       try {
-        const { data } = await createTemplate({
-          variables: {
-            petitionId: selected[0],
-          },
+        const templateId = await createTemplate({
+          petitionId: selected[0],
         });
-        router.push(
-          `/[locale]/app/petitions/[petitionId]/compose`,
-          `/${router.query.locale}/app/petitions/${
-            data!.createTemplateFromPetition.id
-          }/compose`
-        );
+        goToPetition(templateId, "compose");
       } catch {}
     },
     [petitions, selected]
   );
 
-  const createPetitionDialog = useCreatePetitionDialog();
-  const goToPetition = useGoToPetition();
-
+  const clonePetitions = useClonePetitions();
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const petition = petitions.items.find((p) => p.id === selected[0])!;
-        const { name, locale, deadline } = await createPetitionDialog({
-          defaultName: petition.name ?? undefined,
-          defaultLocale: petition.locale,
-        });
-        const petitionId = await clonePetition({
-          petitionId: petition.id,
+        const petitions = await clonePetitions({
+          petitionIds: selected,
           name,
-          locale,
-          deadline: deadline?.toISOString() ?? null,
         });
-        goToPetition(petitionId, "compose");
-        refetch();
+        if (petitions.length === 1) {
+          goToPetition(petitions[0].id, "compose");
+        } else {
+          refetch();
+        }
       } catch {}
     },
     [petitions, selected]
@@ -187,10 +174,17 @@ function Petitions() {
 
   return (
     <AppLayout
-      title={intl.formatMessage({
-        id: "petitions.title",
-        defaultMessage: "Petitions",
-      })}
+      title={
+        state.type === "PETITION"
+          ? intl.formatMessage({
+              id: "petitions.title",
+              defaultMessage: "Petitions",
+            })
+          : intl.formatMessage({
+              id: "petitions.title-templates",
+              defaultMessage: "Templates",
+            })
+      }
       user={me}
     >
       <Box
@@ -219,7 +213,7 @@ function Petitions() {
               status={state.status}
               type={state.type}
               showDelete={selected.length > 0}
-              showClone={selected.length === 1}
+              showClone={selected.length > 0}
               showCreateTemplates={selected.length === 1}
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}

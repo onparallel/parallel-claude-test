@@ -2,7 +2,7 @@ import { arg, queryField, enumType } from "@nexus/schema";
 import { authenticate, chain, or } from "../helpers/authorize";
 import {
   userHasAccessToPetitions,
-  petitionIsPublicTemplate,
+  petitionsArePublicTemplates,
 } from "./authorizers";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 
@@ -63,7 +63,7 @@ export const petitionQuery = queryField("petition", {
   },
   authorize: chain(
     authenticate(),
-    or(userHasAccessToPetitions("id"), petitionIsPublicTemplate("id"))
+    or(userHasAccessToPetitions("id"), petitionsArePublicTemplates("id"))
   ),
   nullable: true,
   resolve: async (_, args, ctx) => {

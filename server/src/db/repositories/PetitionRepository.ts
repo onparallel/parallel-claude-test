@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
-import { groupBy, indexBy, omit, sortBy } from "remeda";
+import { groupBy, indexBy, omit, sortBy, uniq } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -2118,17 +2118,17 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async isPublicTemplate(templateId: number): Promise<boolean> {
+  async arePublicTemplates(templateIds: MaybeArray<number>): Promise<boolean> {
     const [{ count }] = await this.from("petition")
+      .whereIn("id", unMaybeArray(templateIds))
       .where({
-        id: templateId,
         deleted_at: null,
         template_public: true,
         is_template: true,
       })
       .select(this.count());
 
-    return count === 1;
+    return count === uniq(unMaybeArray(templateIds)).length;
   }
 
   async loadPublicTemplates(

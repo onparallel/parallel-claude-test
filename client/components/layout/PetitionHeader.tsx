@@ -28,7 +28,7 @@ import {
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
+import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
@@ -78,50 +78,41 @@ export function PetitionHeader({
         );
       } catch {}
     },
-    [petition.id, petition.name]
+    [petition.id, petition.name, deletePetitions]
   );
 
-  const clonePetition = useClonePetition();
+  const clonePetitions = useClonePetitions();
   const goToPetition = useGoToPetition();
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const name = petition.name
-          ? `${petition.name} (${intl.formatMessage({
-              id: "petition.copy",
-              defaultMessage: "copy",
-            })})`
-          : "";
-        const petitionId = await clonePetition({
-          petitionId: petition.id,
-          locale: petition.locale,
-          deadline: petition.deadline,
-          name,
+        const [petitionId] = await clonePetitions({
+          petitionIds: [petition.id],
         });
         goToPetition(petitionId, "compose");
       } catch {}
     },
-    [petition.id, petition.name, petition.locale, petition.deadline]
+    [
+      petition.id,
+      petition.name,
+      petition.locale,
+      petition.deadline,
+      clonePetitions,
+      goToPetition,
+    ]
   );
 
   const createTemplate = useCreateTemplateFromPetition();
   const handleSaveAsTemplate = useCallback(
     async function () {
       try {
-        const { data } = await createTemplate({
-          variables: {
-            petitionId: petition.id,
-          },
+        const templateId = await createTemplate({
+          petitionId: petition.id,
         });
-        router.push(
-          `/[locale]/app/petitions/[petitionId]/compose`,
-          `/${router.query.locale}/app/petitions/${
-            data!.createTemplateFromPetition.id
-          }/compose`
-        );
+        goToPetition(templateId, "compose");
       } catch {}
     },
-    [petition.id]
+    [petition.id, createTemplate, goToPetition]
   );
 
   const {

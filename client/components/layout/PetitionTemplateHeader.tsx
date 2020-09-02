@@ -26,7 +26,7 @@ import {
   PetitionTemplateHeader_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
+import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
@@ -68,22 +68,14 @@ export function PetitionTemplateHeader({
     [petition.id, petition.name]
   );
 
-  const clonePetition = useClonePetition();
+  const clonePetitions = useClonePetitions();
   const goToPetition = useGoToPetition();
   const handleCloneClick = useCallback(
     async function () {
       try {
-        const petitionId = await clonePetition({
-          petitionId: petition.id,
-          name: petition.name
-            ? `${petition.name} (${intl.formatMessage({
-                id: "petition.copy",
-                defaultMessage: "copy",
-              })})`
-            : "",
-          locale: petition.locale,
+        const [petitionId] = await clonePetitions({
+          petitionIds: [petition.id],
         });
-
         goToPetition(petitionId, "compose");
       } catch {}
     },

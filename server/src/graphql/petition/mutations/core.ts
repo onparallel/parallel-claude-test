@@ -42,7 +42,7 @@ import {
   repliesBelongsToPetition,
   userHasAccessToPetitions,
   fieldIsNotFixed,
-  petitionIsPublicTemplate,
+  petitionsArePublicTemplates,
 } from "../authorizers";
 import {
   validateAccessesRemindersLeft,
@@ -51,6 +51,8 @@ import {
 } from "../validations";
 import { WhitelistedError } from "./../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { mapSeries, mapSeries } from "async";
+import { unMaybeArray } from "../../../util/arrays";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -61,14 +63,13 @@ export const createPetition = mutationField("createPetition", {
       "petitionId",
       or(
         userHasAccessToPetitions("petitionId" as never),
-        petitionIsPublicTemplate("petitionId" as never)
+        petitionsArePublicTemplates("petitionId" as never)
       )
     )
   ),
   args: {
     name: stringArg(),
     locale: arg({ type: "PetitionLocale", required: true }),
-    deadline: dateTimeArg({}),
     petitionId: globalIdArg("Petition", {
       description: "GID of petition to base from",
       required: false,
@@ -80,7 +81,7 @@ export const createPetition = mutationField("createPetition", {
       required: false,
     }),
   },
-  resolve: async (_, { name, locale, deadline, petitionId, type }, ctx) => {
+  resolve: async (_, { name, locale, petitionId, type }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     if (petitionId) {
       return await ctx.petitions.clonePetition(petitionId, ctx.user!, {
@@ -92,7 +93,6 @@ export const createPetition = mutationField("createPetition", {
         {
           name,
           locale,
-          deadline: deadline ?? null,
           email_subject: name,
           is_template: isTemplate,
         },
@@ -102,33 +102,35 @@ export const createPetition = mutationField("createPetition", {
   },
 });
 
-export const clonePetition = mutationField("clonePetition", {
+export const clonePetitions = mutationField("clonePetitions", {
   description: "Clone petition.",
   type: "PetitionBase",
-  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  list: [true],
+  authorize: chain(
+    authenticate(),
+    or(
+      userHasAccessToPetitions("petitionIds"),
+      petitionsArePublicTemplates("petitionIds")
+    )
+  ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    name: stringArg({}),
-    locale: arg({ type: "PetitionLocale", required: true }),
-    deadline: dateTimeArg({}),
+    petitionIds: globalIdArg("Petition", {
+      list: [true],
+      required: true,
+    }),
   },
   resolve: async (_, args, ctx) => {
-    const petition = await ctx.petitions.clonePetition(
-      args.petitionId,
-      ctx.user!
-    );
-    return await ctx.petitions.updatePetition(
-      petition.id,
-      {
-        name: args.name ?? null,
-        locale: args.locale,
-        email_subject:
-          petition.name === petition.email_subject
-            ? args.name
-            : petition.email_subject,
-        deadline: args.deadline ?? null,
-      },
-      ctx.user!
+    return await mapSeries(
+      unMaybeArray(args.petitionIds),
+      async (petitionId) => {
+        const { name, locale } = (await ctx.petitions.loadPetition(
+          petitionId
+        ))!;
+        const mark = `(${locale === "es" ? "copia" : "copy"})`;
+        return await ctx.petitions.clonePetition(petitionId, ctx.user!, {
+          name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
+        });
+      }
     );
   },
 });

@@ -165,10 +165,10 @@ export type Mutation = {
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
   changePetitionFieldType: PetitionBaseAndField;
-  /** Clone petition. */
-  clonePetition: PetitionBase;
   /** Clones a petition field */
   clonePetitionField: PetitionBaseAndField;
+  /** Clone petition. */
+  clonePetitions: Array<PetitionBase>;
   /** Create a contact. */
   createContact: Contact;
   /** Create petition. */
@@ -276,16 +276,13 @@ export type MutationchangePetitionFieldTypeArgs = {
   type: PetitionFieldType;
 };
 
-export type MutationclonePetitionArgs = {
-  deadline?: Maybe<Scalars["DateTime"]>;
-  locale: PetitionLocale;
-  name?: Maybe<Scalars["String"]>;
-  petitionId: Scalars["GID"];
-};
-
 export type MutationclonePetitionFieldArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationclonePetitionsArgs = {
+  petitionIds: Array<Scalars["GID"]>;
 };
 
 export type MutationcreateContactArgs = {
@@ -293,7 +290,6 @@ export type MutationcreateContactArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
-  deadline?: Maybe<Scalars["DateTime"]>;
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
@@ -3442,19 +3438,17 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type useClonePetition_clonePetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  name?: Maybe<Scalars["String"]>;
-  locale: PetitionLocale;
-  deadline?: Maybe<Scalars["DateTime"]>;
+export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]>;
 }>;
 
-export type useClonePetition_clonePetitionMutation = {
+export type useClonePetitions_clonePetitionsMutation = {
   __typename?: "Mutation";
 } & {
-  clonePetition:
+  clonePetitions: Array<
     | ({ __typename?: "Petition" } & Pick<Petition, "id">)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">);
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
+  >;
 };
 
 export type useCreateContact_createContactMutationVariables = Exact<{
@@ -3473,7 +3467,6 @@ export type useCreateContact_createContactMutation = {
 export type useCreatePetition_createPetitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   locale: PetitionLocale;
-  deadline?: Maybe<Scalars["DateTime"]>;
   petitionId?: Maybe<Scalars["GID"]>;
   type?: Maybe<PetitionBaseType>;
 }>;
@@ -8648,68 +8641,55 @@ export type PublicPetitionQueryResult = Apollo.QueryResult<
   PublicPetitionQuery,
   PublicPetitionQueryVariables
 >;
-export const useClonePetition_clonePetitionDocument = gql`
-  mutation useClonePetition_clonePetition(
-    $petitionId: GID!
-    $name: String
-    $locale: PetitionLocale!
-    $deadline: DateTime
-  ) {
-    clonePetition(
-      petitionId: $petitionId
-      name: $name
-      locale: $locale
-      deadline: $deadline
-    ) {
+export const useClonePetitions_clonePetitionsDocument = gql`
+  mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {
+    clonePetitions(petitionIds: $petitionIds) {
       id
     }
   }
 `;
-export type useClonePetition_clonePetitionMutationFn = Apollo.MutationFunction<
-  useClonePetition_clonePetitionMutation,
-  useClonePetition_clonePetitionMutationVariables
+export type useClonePetitions_clonePetitionsMutationFn = Apollo.MutationFunction<
+  useClonePetitions_clonePetitionsMutation,
+  useClonePetitions_clonePetitionsMutationVariables
 >;
 
 /**
- * __useuseClonePetition_clonePetitionMutation__
+ * __useuseClonePetitions_clonePetitionsMutation__
  *
- * To run a mutation, you first call `useuseClonePetition_clonePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useuseClonePetition_clonePetitionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useuseClonePetitions_clonePetitionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useuseClonePetitions_clonePetitionsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [useClonePetitionClonePetitionMutation, { data, loading, error }] = useuseClonePetition_clonePetitionMutation({
+ * const [useClonePetitionsClonePetitionsMutation, { data, loading, error }] = useuseClonePetitions_clonePetitionsMutation({
  *   variables: {
- *      petitionId: // value for 'petitionId'
- *      name: // value for 'name'
- *      locale: // value for 'locale'
- *      deadline: // value for 'deadline'
+ *      petitionIds: // value for 'petitionIds'
  *   },
  * });
  */
-export function useuseClonePetition_clonePetitionMutation(
+export function useuseClonePetitions_clonePetitionsMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    useClonePetition_clonePetitionMutation,
-    useClonePetition_clonePetitionMutationVariables
+    useClonePetitions_clonePetitionsMutation,
+    useClonePetitions_clonePetitionsMutationVariables
   >
 ) {
   return Apollo.useMutation<
-    useClonePetition_clonePetitionMutation,
-    useClonePetition_clonePetitionMutationVariables
-  >(useClonePetition_clonePetitionDocument, baseOptions);
+    useClonePetitions_clonePetitionsMutation,
+    useClonePetitions_clonePetitionsMutationVariables
+  >(useClonePetitions_clonePetitionsDocument, baseOptions);
 }
-export type useClonePetition_clonePetitionMutationHookResult = ReturnType<
-  typeof useuseClonePetition_clonePetitionMutation
+export type useClonePetitions_clonePetitionsMutationHookResult = ReturnType<
+  typeof useuseClonePetitions_clonePetitionsMutation
 >;
-export type useClonePetition_clonePetitionMutationResult = Apollo.MutationResult<
-  useClonePetition_clonePetitionMutation
+export type useClonePetitions_clonePetitionsMutationResult = Apollo.MutationResult<
+  useClonePetitions_clonePetitionsMutation
 >;
-export type useClonePetition_clonePetitionMutationOptions = Apollo.BaseMutationOptions<
-  useClonePetition_clonePetitionMutation,
-  useClonePetition_clonePetitionMutationVariables
+export type useClonePetitions_clonePetitionsMutationOptions = Apollo.BaseMutationOptions<
+  useClonePetitions_clonePetitionsMutation,
+  useClonePetitions_clonePetitionsMutationVariables
 >;
 export const useCreateContact_createContactDocument = gql`
   mutation useCreateContact_createContact($data: CreateContactInput!) {
@@ -8769,14 +8749,12 @@ export const useCreatePetition_createPetitionDocument = gql`
   mutation useCreatePetition_createPetition(
     $name: String
     $locale: PetitionLocale!
-    $deadline: DateTime
     $petitionId: GID
     $type: PetitionBaseType
   ) {
     createPetition(
       name: $name
       locale: $locale
-      deadline: $deadline
       petitionId: $petitionId
       type: $type
     ) {
@@ -8804,7 +8782,6 @@ export type useCreatePetition_createPetitionMutationFn = Apollo.MutationFunction
  *   variables: {
  *      name: // value for 'name'
  *      locale: // value for 'locale'
- *      deadline: // value for 'deadline'
  *      petitionId: // value for 'petitionId'
  *      type: // value for 'type'
  *   },

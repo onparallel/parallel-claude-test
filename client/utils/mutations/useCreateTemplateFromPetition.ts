@@ -3,6 +3,7 @@ import {
   useCreateTemplateFromPetition_createTemplateFromPetitionMutation,
   useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables,
 } from "@parallel/graphql/__types";
+import { useCallback } from "react";
 
 export function useCreateTemplateFromPetition() {
   const [createTemplate] = useMutation<
@@ -19,5 +20,13 @@ export function useCreateTemplateFromPetition() {
       }
     `
   );
-  return createTemplate;
+  return useCallback(
+    async (
+      variables: useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables
+    ) => {
+      const { data } = await createTemplate({ variables });
+      return data!.createTemplateFromPetition.id;
+    },
+    [createTemplate]
+  );
 }

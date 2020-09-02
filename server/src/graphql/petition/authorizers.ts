@@ -28,15 +28,15 @@ export function userHasAccessToPetitions<
   };
 }
 
-export function petitionIsPublicTemplate<
+export function petitionsArePublicTemplates<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
+  TArg extends Arg<TypeName, FieldName, number | number[]>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      const templateId = args[argName];
-      return ctx.petitions.isPublicTemplate(templateId);
+      const templateIds = args[argName];
+      return ctx.petitions.arePublicTemplates(templateIds);
     } catch {}
     return false;
   };
