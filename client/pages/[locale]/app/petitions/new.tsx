@@ -393,12 +393,24 @@ function NewPetitionHeader({
   const suggestions = useMemo(
     () => [
       intl.formatMessage({
-        id: "new-petition.suggestion-business",
-        defaultMessage: "business",
+        id: "new-petition.suggestion-kyc",
+        defaultMessage: "KYC",
       }),
       intl.formatMessage({
-        id: "new-petition.suggestion-legal",
-        defaultMessage: "legal",
+        id: "new-petition.suggestion-corporate",
+        defaultMessage: "corporate",
+      }),
+      intl.formatMessage({
+        id: "new-petition.suggestion-due",
+        defaultMessage: "due diligence",
+      }),
+      intl.formatMessage({
+        id: "new-petition.suggestion-sales",
+        defaultMessage: "sales",
+      }),
+      intl.formatMessage({
+        id: "new-petition.suggestion-tax",
+        defaultMessage: "tax",
       }),
     ],
     [intl.locale]

@@ -1145,14 +1145,29 @@
     "context": "Suggested searches:"
   },
   {
-    "term": "new-petition.suggestion-business",
-    "definition": "",
-    "context": "business"
+    "term": "new-petition.suggestion-corporate",
+    "definition": "mercantil",
+    "context": "corporate"
   },
   {
-    "term": "new-petition.suggestion-legal",
-    "definition": "",
-    "context": "legal"
+    "term": "new-petition.suggestion-due",
+    "definition": "due diligence",
+    "context": "due diligence"
+  },
+  {
+    "term": "new-petition.suggestion-kyc",
+    "definition": "KYC",
+    "context": "KYC"
+  },
+  {
+    "term": "new-petition.suggestion-sales",
+    "definition": "ventas",
+    "context": "sales"
+  },
+  {
+    "term": "new-petition.suggestion-tax",
+    "definition": "fiscal",
+    "context": "tax"
   },
   {
     "term": "new-petition.title",
