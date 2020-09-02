@@ -1411,7 +1411,7 @@ export type PetitionHeader_PetitionFragment = {
     >;
     owner: { __typename?: "User" } & Pick<User, "id">;
   } & HeaderNameEditable_PetitionBase_Petition_Fragment &
-  PetitionSettingsModal_PetitionFragment;
+  PetitionSettingsModal_PetitionBase_Petition_Fragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -1890,9 +1890,17 @@ export type PetitionFieldsIndex_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "title" | "type" | "options">;
 
-export type PetitionSettingsModal_PetitionFragment = {
+export type PetitionSettingsModal_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "status" | "locale" | "deadline">;
+} & Pick<Petition, "status" | "deadline" | "id" | "locale">;
+
+export type PetitionSettingsModal_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "locale">;
+
+export type PetitionSettingsModal_PetitionBaseFragment =
+  | PetitionSettingsModal_PetitionBase_Petition_Fragment
+  | PetitionSettingsModal_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
@@ -3722,12 +3730,14 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
     updatedAt
   }
 `;
-export const PetitionSettingsModal_PetitionFragmentDoc = gql`
-  fragment PetitionSettingsModal_Petition on Petition {
+export const PetitionSettingsModal_PetitionBaseFragmentDoc = gql`
+  fragment PetitionSettingsModal_PetitionBase on PetitionBase {
     id
-    status
     locale
-    deadline
+    ... on Petition {
+      status
+      deadline
+    }
   }
 `;
 export const PetitionHeader_PetitionFragmentDoc = gql`
@@ -3743,10 +3753,10 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
       id
     }
     ...HeaderNameEditable_PetitionBase
-    ...PetitionSettingsModal_Petition
+    ...PetitionSettingsModal_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
-  ${PetitionSettingsModal_PetitionFragmentDoc}
+  ${PetitionSettingsModal_PetitionBaseFragmentDoc}
 `;
 export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {

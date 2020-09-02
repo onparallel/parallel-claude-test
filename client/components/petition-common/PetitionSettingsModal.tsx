@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/core";
 import { TimeIcon } from "@parallel/chakra/icons";
 import {
-  PetitionSettingsModal_PetitionFragment,
+  PetitionSettingsModal_PetitionBaseFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -30,7 +30,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 
 export type PetitionSettingsModalProps = Omit<ModalProps, "children"> & {
-  petition: PetitionSettingsModal_PetitionFragment;
+  petition: PetitionSettingsModal_PetitionBaseFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
 };
 
@@ -56,20 +56,34 @@ export function PetitionSettingsModal({
       <ModalOverlay>
         <ModalContent borderRadius="md">
           <ModalHeader>
-            <FormattedMessage
-              id="petition.settings-header"
-              defaultMessage="Petition settings"
-            />
+            {petition.__typename === "Petition" ? (
+              <FormattedMessage
+                id="petition.settings-header"
+                defaultMessage="Petition settings"
+              />
+            ) : (
+              <FormattedMessage
+                id="template.settings-header"
+                defaultMessage="Template settings"
+              />
+            )}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody paddingBottom={6}>
             <Stack>
               <FormControl id="petition-locale">
                 <FormLabel>
-                  <FormattedMessage
-                    id="component.create-petition-dialog.locale-label"
-                    defaultMessage="Language of the petition"
-                  />
+                  {petition.__typename === "Petition" ? (
+                    <FormattedMessage
+                      id="component.create-petition-dialog.locale-label"
+                      defaultMessage="Language of the petition"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.create-template-dialog.locale-label"
+                      defaultMessage="Language of the template"
+                    />
+                  )}
                 </FormLabel>
                 <Select
                   name="petition-locale"
@@ -85,79 +99,81 @@ export function PetitionSettingsModal({
                   ))}
                 </Select>
               </FormControl>
-              <FormControl id="petition-deadline">
-                <FormLabel>
-                  <FormattedMessage
-                    id="petition.deadline-label"
-                    defaultMessage="Deadline"
-                  />
-                </FormLabel>
-                <Flex flexDirection={{ base: "column", sm: "row" }}>
-                  <InputGroup size="md" flex="1">
-                    <Input
-                      isReadOnly
-                      placeholder={
-                        petition.deadline
-                          ? undefined
-                          : intl.formatMessage({
-                              id: "generic.no-deadline",
-                              defaultMessage: "No deadline",
-                            })
-                      }
-                      value={
-                        petition.deadline
-                          ? intl.formatDate(petition.deadline, {
-                              ...FORMATS.LLL,
-                              weekday: "long",
-                            })
-                          : ""
-                      }
-                      onChange={() => {}}
-                      onKeyUp={(event: KeyboardEvent) => {
-                        switch (event.key) {
-                          case " ":
-                          case "Enter":
-                            onChangeDeadline();
-                        }
-                      }}
-                      onClick={onChangeDeadline}
+              {petition.__typename === "Petition" && (
+                <FormControl id="petition-deadline">
+                  <FormLabel>
+                    <FormattedMessage
+                      id="petition.deadline-label"
+                      defaultMessage="Deadline"
                     />
-                    {petition.deadline ? (
-                      <InputRightElement>
-                        <CloseButton
-                          size="sm"
-                          aria-label={intl.formatMessage({
-                            id: "petition.remove-deadline",
-                            defaultMessage: "Remove deadline",
-                          })}
-                          onClick={() => onUpdatePetition({ deadline: null })}
+                  </FormLabel>
+                  <Flex flexDirection={{ base: "column", sm: "row" }}>
+                    <InputGroup size="md" flex="1">
+                      <Input
+                        isReadOnly
+                        placeholder={
+                          petition.deadline
+                            ? undefined
+                            : intl.formatMessage({
+                                id: "generic.no-deadline",
+                                defaultMessage: "No deadline",
+                              })
+                        }
+                        value={
+                          petition.deadline
+                            ? intl.formatDate(petition.deadline, {
+                                ...FORMATS.LLL,
+                                weekday: "long",
+                              })
+                            : ""
+                        }
+                        onChange={() => {}}
+                        onKeyUp={(event: KeyboardEvent) => {
+                          switch (event.key) {
+                            case " ":
+                            case "Enter":
+                              onChangeDeadline();
+                          }
+                        }}
+                        onClick={onChangeDeadline}
+                      />
+                      {petition.deadline ? (
+                        <InputRightElement>
+                          <CloseButton
+                            size="sm"
+                            aria-label={intl.formatMessage({
+                              id: "petition.remove-deadline",
+                              defaultMessage: "Remove deadline",
+                            })}
+                            onClick={() => onUpdatePetition({ deadline: null })}
+                          />
+                        </InputRightElement>
+                      ) : null}
+                    </InputGroup>
+                    <Button
+                      leftIcon={<TimeIcon />}
+                      marginLeft={{ base: 0, sm: 2 }}
+                      marginTop={{ base: 2, sm: 0 }}
+                      onClick={(event: MouseEvent) => {
+                        event.stopPropagation();
+                        onChangeDeadline();
+                      }}
+                    >
+                      {petition.deadline ? (
+                        <FormattedMessage
+                          id="petition.change-deadline"
+                          defaultMessage="Change deadline"
                         />
-                      </InputRightElement>
-                    ) : null}
-                  </InputGroup>
-                  <Button
-                    leftIcon={<TimeIcon />}
-                    marginLeft={{ base: 0, sm: 2 }}
-                    marginTop={{ base: 2, sm: 0 }}
-                    onClick={(event: MouseEvent) => {
-                      event.stopPropagation();
-                      onChangeDeadline();
-                    }}
-                  >
-                    {petition.deadline ? (
-                      <FormattedMessage
-                        id="petition.change-deadline"
-                        defaultMessage="Change deadline"
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id="petition.set-a-deadline"
-                        defaultMessage="Set a deadline"
-                      />
-                    )}
-                  </Button>
-                </Flex>
-              </FormControl>
+                      ) : (
+                        <FormattedMessage
+                          id="petition.set-a-deadline"
+                          defaultMessage="Set a deadline"
+                        />
+                      )}
+                    </Button>
+                  </Flex>
+                </FormControl>
+              )}
             </Stack>
           </ModalBody>
         </ModalContent>
@@ -168,11 +184,13 @@ export function PetitionSettingsModal({
 
 PetitionSettingsModal.fragments = {
   Petition: gql`
-    fragment PetitionSettingsModal_Petition on Petition {
+    fragment PetitionSettingsModal_PetitionBase on PetitionBase {
       id
-      status
       locale
-      deadline
+      ... on Petition {
+        status
+        deadline
+      }
     }
   `,
 };

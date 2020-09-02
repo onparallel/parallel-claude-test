@@ -11,12 +11,14 @@ import {
   Stack,
   Tooltip,
   useDisclosure,
+  MenuDivider,
 } from "@chakra-ui/core";
 import {
   CopyIcon,
   DeleteIcon,
   MoreVerticalIcon,
   UserArrowIcon,
+  SettingsIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
@@ -33,6 +35,7 @@ import { Spacer } from "../common/Spacer";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 
 export type PetitionTemplateHeaderProps = ExtendChakra<{
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
@@ -86,6 +89,12 @@ export function PetitionTemplateHeader({
     },
     [petition.id, petition.name, petition.locale]
   );
+
+  const {
+    isOpen: isSettingsOpen,
+    onOpen: onOpenSettings,
+    onClose: onCloseSettings,
+  } = useDisclosure();
 
   const {
     isOpen: isSharePetitionOpen,
@@ -168,6 +177,14 @@ export function PetitionTemplateHeader({
                       defaultMessage="Clone template"
                     />
                   </MenuItem>
+                  <MenuItem onClick={onOpenSettings}>
+                    <SettingsIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.template-header.settings-button"
+                      defaultMessage="Template settings"
+                    />
+                  </MenuItem>
+                  <MenuDivider />
                   <MenuItem color="red.500" onClick={handleDeleteClick}>
                     <DeleteIcon marginRight={2} />
                     <FormattedMessage
@@ -181,6 +198,12 @@ export function PetitionTemplateHeader({
           </Stack>
         </Flex>
       </Box>
+      <PetitionSettingsModal
+        onUpdatePetition={onUpdatePetition}
+        petition={petition}
+        isOpen={isSettingsOpen}
+        onClose={onCloseSettings}
+      />
       {isSharePetitionOpen ? (
         <PetitionSharingModal
           petitionId={petition.id}

@@ -393,7 +393,7 @@ PetitionHeader.fragments = {
         id
       }
       ...HeaderNameEditable_PetitionBase
-      ...PetitionSettingsModal_Petition
+      ...PetitionSettingsModal_PetitionBase
     }
     ${PetitionSettingsModal.fragments.Petition}
     ${HeaderNameEditable.fragments.PetitionBase}
