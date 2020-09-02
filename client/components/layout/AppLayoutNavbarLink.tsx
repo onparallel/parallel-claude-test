@@ -5,7 +5,7 @@ import { Link } from "../common/Link";
 
 export interface AppLayoutNavbarLinkProps {
   href: string;
-  active: boolean;
+  isActive: boolean;
   icon: ReactElement;
   isAvailable: boolean;
   isMobile?: boolean;
@@ -14,7 +14,7 @@ export interface AppLayoutNavbarLinkProps {
 
 export function AppLayoutNavbarLink({
   href,
-  active,
+  isActive,
   icon,
   isAvailable,
   isMobile,
@@ -39,8 +39,8 @@ export function AppLayoutNavbarLink({
       _active={{
         textDecoration: "none",
       }}
-      borderTopColor={isMobile && active ? "purple.600" : "transparent"}
-      borderRightColor={!isMobile && active ? "purple.600" : "transparent"}
+      borderTopColor={isMobile && isActive ? "purple.600" : "transparent"}
+      borderRightColor={!isMobile && isActive ? "purple.600" : "transparent"}
     >
       <AppLayoutNavbarLinkContent icon={icon} isMobile={isMobile}>
         {children}

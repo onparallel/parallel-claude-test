@@ -48,15 +48,18 @@ export const AppLayoutNavbar = Object.assign(
     onOnboardingClick,
     ...props
   }: AppLayoutNavbarProps) {
-    const { pathname } = useRouter();
+    const { pathname, query } = useRouter();
     const intl = useIntl();
     const router = useRouter();
     const items = useMemo(
       () => [
         {
           section: "petitions",
+          href: "/app/petitions",
           icon: <PaperPlaneIcon />,
-          available: true,
+          isActive:
+            pathname.startsWith("/[locale]/app/petitions") &&
+            query.type !== "TEMPLATE",
           text: intl.formatMessage({
             id: "navbar.petitions-link",
             defaultMessage: "Petitions",
@@ -64,8 +67,10 @@ export const AppLayoutNavbar = Object.assign(
         },
         {
           section: "templates",
+          href: "/app/petitions?type=TEMPLATE",
           icon: <FileTextIcon />,
-          available: false,
+          isActive:
+            pathname === "/[locale]/app/petitions" && query.type === "TEMPLATE",
           text: intl.formatMessage({
             id: "navbar.templates-link",
             defaultMessage: "Templates",
@@ -73,15 +78,16 @@ export const AppLayoutNavbar = Object.assign(
         },
         {
           section: "contacts",
+          href: "/app/contacts",
           icon: <UsersIcon />,
-          available: true,
+          isActive: pathname.startsWith("/[locale]/app/contacts"),
           text: intl.formatMessage({
             id: "navbar.contacts-link",
             defaultMessage: "Contacts",
           }),
         },
       ],
-      [intl.locale]
+      [intl.locale, pathname, query]
     );
     const locales = useSupportedLocales();
     function handleLocaleChange(locale: string) {
@@ -169,12 +175,12 @@ export const AppLayoutNavbar = Object.assign(
                 marginY: 2,
               })}
         >
-          {items.map(({ section, available, icon, text }) => (
+          {items.map(({ section, href, isActive, icon, text }) => (
             <ListItem key={section} id={`pw-section-${section}`}>
               <AppLayoutNavbarLink
-                href={`/app/${section}`}
-                isAvailable={available}
-                active={pathname.startsWith(`/[locale]/app/${section}`)}
+                href={href}
+                isAvailable={true}
+                isActive={isActive}
                 icon={icon}
                 isMobile={isMobile}
               >
