@@ -73,13 +73,23 @@ export function createApolloClient(
 
 type DataProxy = Parameters<MutationUpdaterFn>[0];
 export function clearCache(cache: DataProxy, regex: RegExp) {
-  const data = (cache as any).data;
-  for (const key of Object.keys(data.data)) {
-    if (regex.test(key)) {
-      data.delete(key);
+  const store = (cache as any).data;
+  const data = store.data as any;
+  for (const key of Object.keys(data)) {
+    if (["ROOT_QUERY", "ROOT_MUTATION"].includes(key)) {
+      for (const subkey of Object.keys(data[key])) {
+        if (subkey !== "__typename" && regex.test(`$${key}.${subkey}`)) {
+          delete data[key][subkey];
+        }
+      }
+    } else {
+      if (regex.test(key)) {
+        store.delete(key);
+      }
     }
   }
 }
+
 export function assertQuery<T extends QueryResult>(
   result: T
 ): T extends QueryResult<infer TData> ? T & { data: TData } : never {
@@ -88,9 +98,9 @@ export function assertQuery<T extends QueryResult>(
     throw new Error("Expected data to be present on the Apollo cache");
   }
   return {
-    data: data!,
     ...rest,
-  };
+    data: data!,
+  } as any;
 }
 
 export function useAssertQueryOrPreviousData<TData, TVariables>(

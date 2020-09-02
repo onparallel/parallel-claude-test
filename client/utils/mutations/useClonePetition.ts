@@ -32,11 +32,15 @@ export function useClonePetition() {
       }
     `,
     {
-      update(cache) {
+      update(cache, { data }) {
+        const isTemplate =
+          data?.clonePetition.__typename === "PetitionTemplate";
         // clear caches where new item would appear
         clearCache(
           cache,
-          /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
+          isTemplate
+            ? /\$ROOT_QUERY\.petitions\(.*"type":"TEMPLATE"[,}]/
+            : /\$ROOT_QUERY\.petitions\(.*"status":(null|"DRAFT")[,}]/
         );
       },
     }
