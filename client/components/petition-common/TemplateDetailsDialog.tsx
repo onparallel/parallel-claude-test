@@ -8,8 +8,20 @@ import {
   ModalOverlay,
   Stack,
   Text,
+  Portal,
+  MenuList,
+  MenuItem,
+  Menu,
+  Tooltip,
+  MenuButton,
+  IconButton,
 } from "@chakra-ui/core";
-import { CopyIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
+import {
+  CopyIcon,
+  PaperPlaneIcon,
+  EditIcon,
+  ChevronDownIcon,
+} from "@parallel/chakra/icons";
 import {
   DialogProps,
   useDialog,
@@ -26,15 +38,15 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DateTime } from "../common/DateTime";
+import { SplitButton } from "../common/SplitButton";
 
 export function useTemplateDetailsDialog() {
-  const intl = useIntl();
   const apollo = useApolloClient();
   const showDialog = useDialog(TemplateDetailsDialog);
   const createPetition = useCreatePetition();
   const clonePetitions = useClonePetitions();
   const goToPetition = useGoToPetition();
-  return useCallback(async (templateId: string) => {
+  return useCallback(async (templateId: string, userId: string) => {
     try {
       const { data } = await apollo.query<
         useTemplateDetailsDialogPetitionQuery,
@@ -52,15 +64,27 @@ export function useTemplateDetailsDialog() {
       });
       const template = data!
         .petition! as TemplateDetailsDialog_PetitionTemplateFragment;
-      const action = await showDialog({ template });
-      if (action === "CREATE_PETITION") {
-        const petitionId = await createPetition({ petitionId: template.id });
-        goToPetition(petitionId, "compose");
-      } else {
-        const [petitionId] = await clonePetitions({
-          petitionIds: [template.id],
-        });
-        goToPetition(petitionId, "compose");
+
+      const action = await showDialog({ template, userId });
+      switch (action) {
+        case "CREATE_PETITION": {
+          const petitionId = await createPetition({ petitionId: template.id });
+          goToPetition(petitionId, "compose");
+          break;
+        }
+        case "CLONE_TEMPLATE": {
+          const [petitionId] = await clonePetitions({
+            petitionIds: [template.id],
+          });
+          goToPetition(petitionId, "compose");
+          break;
+        }
+        case "EDIT_TEMPLATE": {
+          goToPetition(template.id, "compose");
+          break;
+        }
+        default:
+          break;
       }
     } catch {}
   }, []);
@@ -68,12 +92,22 @@ export function useTemplateDetailsDialog() {
 
 export function TemplateDetailsDialog({
   template,
+  userId,
   ...props
 }: DialogProps<
-  { template: TemplateDetailsDialog_PetitionTemplateFragment },
-  "CREATE_PETITION" | "CLONE_TEMPLATE"
+  {
+    template: TemplateDetailsDialog_PetitionTemplateFragment;
+    userId: string;
+  },
+  "CREATE_PETITION" | "CLONE_TEMPLATE" | "EDIT_TEMPLATE"
 >) {
   const intl = useIntl();
+  const canEdit = template.userPermissions.some(
+    (permission) =>
+      permission.user.id === userId &&
+      ["OWNER", "WRITE"].includes(permission.permissionType)
+  );
+
   return (
     <Modal
       size="4xl"
@@ -136,36 +170,78 @@ export function TemplateDetailsDialog({
               </Text>
             </Stack>
             <Stack>
-              <Button
-                colorScheme="purple"
-                onClick={() => props.onResolve("CREATE_PETITION")}
-              >
-                <PaperPlaneIcon marginRight="2" />
-                <FormattedMessage
-                  id="template-details.use-template"
-                  defaultMessage="Use template"
-                />
-              </Button>
-              <Button
-                type="submit"
-                onClick={() => props.onResolve("CLONE_TEMPLATE")}
-              >
-                <CopyIcon marginRight="2" />
-                <FormattedMessage
-                  id="template-details.clone-template"
-                  defaultMessage="Clone template"
-                />
-              </Button>
+              <SplitButton dividerColor="purple.600">
+                <Button
+                  justifyContent="left"
+                  colorScheme="purple"
+                  leftIcon={<PaperPlaneIcon />}
+                  onClick={() => props.onResolve("CREATE_PETITION")}
+                >
+                  <FormattedMessage
+                    id="template-details.use-template"
+                    defaultMessage="Use template"
+                  />
+                </Button>
+                <Menu>
+                  <Tooltip
+                    label={intl.formatMessage({
+                      id: "generic.more-options",
+                      defaultMessage: "More options...",
+                    })}
+                  >
+                    <MenuButton
+                      as={IconButton}
+                      colorScheme="purple"
+                      icon={<ChevronDownIcon />}
+                      aria-label={intl.formatMessage({
+                        id: "generic.more-options",
+                        defaultMessage: "More options...",
+                      })}
+                      borderTopLeftRadius={0}
+                      borderBottomLeftRadius={0}
+                      minWidth={8}
+                    />
+                  </Tooltip>
+                  <Portal>
+                    <MenuList minWidth={0}>
+                      <MenuItem
+                        onClick={() => props.onResolve("CLONE_TEMPLATE")}
+                      >
+                        <CopyIcon marginRight={2} />
+                        <FormattedMessage
+                          id="template-details.clone-template"
+                          defaultMessage="Clone template"
+                        />
+                      </MenuItem>
+                      {canEdit && (
+                        <MenuItem
+                          justifyContent="left"
+                          type="submit"
+                          onClick={() => props.onResolve("EDIT_TEMPLATE")}
+                        >
+                          <EditIcon marginRight={2} />
+                          <FormattedMessage
+                            id="template-details.edit-template"
+                            defaultMessage="Edit template"
+                          />
+                        </MenuItem>
+                      )}
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              </SplitButton>
             </Stack>
           </Stack>
-          <Heading size="md" marginBottom={4}>
+          <Heading size="md" marginBottom={4} marginTop={4}>
             <FormattedMessage
               id="template-details.about"
               defaultMessage="About this template"
             />
           </Heading>
           {template.description ? (
-            <Text>{template.description}</Text>
+            <Text aria-label={template.description}>
+              {template.description}
+            </Text>
           ) : (
             <Text textAlign="center" fontStyle="italic" color="gray.400">
               <FormattedMessage
@@ -185,11 +261,19 @@ export function TemplateDetailsDialog({
               return field.type === "HEADING" ? (
                 <Text as="li" key={field.id} fontWeight="bold" marginBottom={2}>
                   {field.title ? (
-                    <Text as="span" fontWeight="bold">
+                    <Text as="span" fontWeight="bold" aria-label={field.title}>
                       {field.title}
                     </Text>
                   ) : (
-                    <Text as="span" color="gray.400" fontStyle="italic">
+                    <Text
+                      as="span"
+                      color="gray.400"
+                      fontStyle="italic"
+                      aria-label={intl.formatMessage({
+                        id: "generic.empty-heading",
+                        defaultMessage: "Untitled heading",
+                      })}
+                    >
                       <FormattedMessage
                         id="generic.empty-heading"
                         defaultMessage="Untitled heading"
@@ -200,9 +284,19 @@ export function TemplateDetailsDialog({
               ) : (
                 <Text as="li" key={field.id} marginLeft={4} marginBottom={2}>
                   {field.title ? (
-                    <Text as="span">{field.title}</Text>
+                    <Text as="span" aria-label={field.title}>
+                      {field.title}
+                    </Text>
                   ) : (
-                    <Text as="span" color="gray.400" fontStyle="italic">
+                    <Text
+                      as="span"
+                      color="gray.400"
+                      fontStyle="italic"
+                      aria-label={intl.formatMessage({
+                        id: "generic.untitled-field",
+                        defaultMessage: "Untitled field",
+                      })}
+                    >
                       <FormattedMessage
                         id="generic.untitled-field"
                         defaultMessage="Untitled field"
@@ -237,6 +331,13 @@ TemplateDetailsDialog.fragments = {
           name
         }
         fullName
+      }
+      userPermissions {
+        id
+        permissionType
+        user {
+          id
+        }
       }
       updatedAt
     }

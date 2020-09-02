@@ -3080,6 +3080,11 @@
     "context": "Created by {name} from {organization}."
   },
   {
+    "term": "template-details.edit-template",
+    "definition": "Editar plantilla",
+    "context": "Edit template"
+  },
+  {
     "term": "template-details.fields-list",
     "definition": "Lista de información",
     "context": "Information list"

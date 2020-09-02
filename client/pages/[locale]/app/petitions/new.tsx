@@ -201,7 +201,7 @@ function NewPetition() {
     (templateId: string | null) => async () => {
       try {
         if (templateId) {
-          await showTemplateDetails(templateId);
+          await showTemplateDetails(templateId, me.id);
         } else {
           const id = await createPetition();
           goToPetition(id, "compose");

@@ -2038,6 +2038,12 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
           "name"
         >;
       };
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "id" | "permissionType"
+      > & { user: { __typename?: "User" } & Pick<User, "id"> }
+    >;
   };
 
 export type PetitionComposeField_PetitionFieldFragment = {
@@ -3605,6 +3611,13 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
         name
       }
       fullName
+    }
+    userPermissions {
+      id
+      permissionType
+      user {
+        id
+      }
     }
     updatedAt
   }
