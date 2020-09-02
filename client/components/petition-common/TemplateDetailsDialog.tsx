@@ -3,24 +3,24 @@ import {
   Box,
   Button,
   Heading,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Modal,
   ModalContent,
   ModalOverlay,
+  Portal,
   Stack,
   Text,
-  Portal,
-  MenuList,
-  MenuItem,
-  Menu,
   Tooltip,
-  MenuButton,
-  IconButton,
 } from "@chakra-ui/core";
 import {
-  CopyIcon,
-  PaperPlaneIcon,
-  EditIcon,
   ChevronDownIcon,
+  CopyIcon,
+  EditIcon,
+  PaperPlaneIcon,
 } from "@parallel/chakra/icons";
 import {
   DialogProps,
@@ -111,7 +111,8 @@ export function TemplateDetailsDialog({
   return (
     <Modal
       size="4xl"
-      isOpen={true}
+      isOpen
+      autoFocus={false}
       onClose={() => props.onReject({ reason: "CLOSE" })}
       {...props}
     >
