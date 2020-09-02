@@ -27,6 +27,7 @@ import {
   QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
+  Petitions_PetitionBase_PetitionTemplate_Fragment,
 } from "@parallel/graphql/__types";
 import {
   assertQuery,
@@ -36,7 +37,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
-import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
@@ -299,10 +299,17 @@ function usePetitionsColumns(
                 fontStyle="italic"
                 whiteSpace="nowrap"
               >
-                <FormattedMessage
-                  id="generic.untitled-petition"
-                  defaultMessage="Untitled petition"
-                />
+                {type === "PETITION" ? (
+                  <FormattedMessage
+                    id="generic.untitled-petition"
+                    defaultMessage="Untitled petition"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.untitled-template"
+                    defaultMessage="Untitled template"
+                  />
+                )}
               </Text>
             )}
           </>
@@ -417,9 +424,15 @@ function usePetitionsColumns(
                 defaultMessage: "Description",
               }),
               align: "left",
-              CellContent: ({ row }) => (
-                <>{row.description && ellipsis(row.description!, 80)}</>
-              ),
+              CellContent: ({ row }) => {
+                const templateRow = row as Petitions_PetitionBase_PetitionTemplate_Fragment;
+                return (
+                  <>
+                    {templateRow.description &&
+                      ellipsis(templateRow.description!, 80)}
+                  </>
+                );
+              },
             },
           ] as TableColumn<PetitionSelection>[])),
       {
