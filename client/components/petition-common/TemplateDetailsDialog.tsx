@@ -21,7 +21,6 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { useClonePetition } from "@parallel/utils/mutations/useClonePetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -32,7 +31,6 @@ export function useTemplateDetailsDialog() {
   const apollo = useApolloClient();
   const showDialog = useDialog(TemplateDetailsDialog);
   const createPetition = useCreatePetition();
-  const clonePetition = useClonePetition();
   const goToPetition = useGoToPetition();
   return useCallback(async (templateId: string) => {
     try {
@@ -63,9 +61,10 @@ export function useTemplateDetailsDialog() {
               defaultMessage: "copy",
             })})`
           : "";
-        const petitionId = await clonePetition({
+        const petitionId = await createPetition({
           petitionId: template.id,
           name: petitionName,
+          type: "TEMPLATE",
         });
         goToPetition(petitionId, "compose");
       }
