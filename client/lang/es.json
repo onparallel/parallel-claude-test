@@ -916,7 +916,7 @@
   },
   {
     "term": "generic.load-more",
-    "definition": "Mostrás más",
+    "definition": "Mostrar más",
     "context": "Load more"
   },
   {
@@ -1138,6 +1138,11 @@
     "term": "new-petition.empty-petition-header",
     "definition": "¿No encuentras lo que buscas?",
     "context": "Not finding what you're looking for?"
+  },
+  {
+    "term": "new-petition.my-templates",
+    "definition": "Mis plantillas",
+    "context": "My templates"
   },
   {
     "term": "new-petition.no-templates",

@@ -1140,6 +1140,11 @@
     "context": "Not finding what you're looking for?"
   },
   {
+    "term": "new-petition.my-templates",
+    "definition": "My templates",
+    "context": "My templates"
+  },
+  {
     "term": "new-petition.no-templates",
     "definition": "You don't have any templates yet",
     "context": "You don't have any templates yet"

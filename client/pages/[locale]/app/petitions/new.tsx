@@ -283,7 +283,13 @@ function NewPetition() {
           </Button>
         </Stack>
       </NewPetitionSection>
-      <NewPetitionSection header={"My templates"} paddingBottom={2}>
+      <NewPetitionSection
+        header={intl.formatMessage({
+          id: "new-petition.my-templates",
+          defaultMessage: "My templates",
+        })}
+        paddingBottom={2}
+      >
         {templates.length === 0 ? (
           <Stack justifyContent="center" alignItems="center" minHeight="120px">
             <Text color="gray.500">
