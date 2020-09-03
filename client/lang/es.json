@@ -335,6 +335,11 @@
     "context": "Delete {count, plural, =1{template} other{templates}}"
   },
   {
+    "term": "component.petition-list-header.use-template-label",
+    "definition": "Usar plantilla",
+    "context": "Use template"
+  },
+  {
     "term": "component.petition-progress-bar.all-pending",
     "definition": "El destinatario no ha rellenado ninguno de los campos.",
     "context": "The recipient has not replied to any of the fields."
@@ -453,6 +458,11 @@
     "term": "component.template-header.share-label",
     "definition": "Compartir plantilla",
     "context": "Share template"
+  },
+  {
+    "term": "component.template-header.use-template",
+    "definition": "Usar esta plantilla",
+    "context": "Use this template"
   },
   {
     "term": "component.user-menu.log-out",
