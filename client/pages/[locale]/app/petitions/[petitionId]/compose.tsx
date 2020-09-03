@@ -279,10 +279,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
   const handleSend: PetitionComposeMessageEditorProps["onSend"] = useCallback(
     async ({ contactIds, schedule }) => {
-      if (petition && petition.__typename !== "Petition") {
+      if (petition?.__typename !== "Petition") {
         throw new Error("Can't send a template");
       }
-      if (petition!.fields.filter((f) => f.type !== "HEADING").length === 0) {
+      if (petition.fields.filter((f) => f.type !== "HEADING").length === 0) {
         try {
           await showErrorDialog({
             message: (
@@ -298,7 +298,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           return;
         }
       }
-      const fieldWithoutTitle = petition!.fields.find((f) => !f.title);
+      const fieldWithoutTitle = petition.fields.find((f) => !f.title);
       if (fieldWithoutTitle) {
         try {
           setShowErrors(true);
@@ -321,7 +321,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         contactIds.length === 0 ||
         !petition.emailSubject ||
         petition.emailBody === null ||
-        isEmptyContent(petition!.emailBody)
+        isEmptyContent(petition.emailBody)
       ) {
         setShowErrors(true);
         return;
@@ -336,7 +336,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       }
       const { data } = await sendPetition({
         variables: {
-          petitionId: petition!.id,
+          petitionId: petition.id,
           contactIds,
           subject: petition.emailSubject,
           body: petition.emailBody,
