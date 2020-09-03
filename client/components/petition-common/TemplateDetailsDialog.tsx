@@ -126,8 +126,8 @@ export function TemplateDetailsDialog({
           paddingX={{ base: 4, md: 6, lg: 8 }}
           paddingY={{ base: 4, md: 6 }}
         >
-          <Stack direction="row">
-            <Stack flex="1">
+          <Stack direction="row" spacing={4}>
+            <Stack flex="1" minWidth={0}>
               {template.name ? (
                 <Heading
                   size="lg"
