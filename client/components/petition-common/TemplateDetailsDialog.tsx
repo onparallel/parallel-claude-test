@@ -46,48 +46,53 @@ export function useTemplateDetailsDialog() {
   const createPetition = useCreatePetition();
   const clonePetitions = useClonePetitions();
   const goToPetition = useGoToPetition();
-  return useCallback(async (templateId: string, userId: string) => {
-    try {
-      const { data } = await apollo.query<
-        useTemplateDetailsDialogPetitionQuery,
-        useTemplateDetailsDialogPetitionQueryVariables
-      >({
-        query: gql`
-          query useTemplateDetailsDialogPetition($templateId: GID!) {
-            petition(id: $templateId) {
-              ...TemplateDetailsDialog_PetitionTemplate
+  return useCallback(
+    async (templateId: string, userId: string) => {
+      try {
+        const { data } = await apollo.query<
+          useTemplateDetailsDialogPetitionQuery,
+          useTemplateDetailsDialogPetitionQueryVariables
+        >({
+          query: gql`
+            query useTemplateDetailsDialogPetition($templateId: GID!) {
+              petition(id: $templateId) {
+                ...TemplateDetailsDialog_PetitionTemplate
+              }
             }
-          }
-          ${TemplateDetailsDialog.fragments.PetitionTemplate}
-        `,
-        variables: { templateId },
-      });
-      const template = data!
-        .petition! as TemplateDetailsDialog_PetitionTemplateFragment;
+            ${TemplateDetailsDialog.fragments.PetitionTemplate}
+          `,
+          variables: { templateId },
+        });
+        const template = data!
+          .petition! as TemplateDetailsDialog_PetitionTemplateFragment;
 
-      const action = await showDialog({ template, userId });
-      switch (action) {
-        case "CREATE_PETITION": {
-          const petitionId = await createPetition({ petitionId: template.id });
-          goToPetition(petitionId, "compose");
-          break;
+        const action = await showDialog({ template, userId });
+        switch (action) {
+          case "CREATE_PETITION": {
+            const petitionId = await createPetition({
+              petitionId: template.id,
+            });
+            goToPetition(petitionId, "compose");
+            break;
+          }
+          case "CLONE_TEMPLATE": {
+            const [petitionId] = await clonePetitions({
+              petitionIds: [template.id],
+            });
+            goToPetition(petitionId, "compose");
+            break;
+          }
+          case "EDIT_TEMPLATE": {
+            goToPetition(template.id, "compose");
+            break;
+          }
+          default:
+            break;
         }
-        case "CLONE_TEMPLATE": {
-          const [petitionId] = await clonePetitions({
-            petitionIds: [template.id],
-          });
-          goToPetition(petitionId, "compose");
-          break;
-        }
-        case "EDIT_TEMPLATE": {
-          goToPetition(template.id, "compose");
-          break;
-        }
-        default:
-          break;
-      }
-    } catch {}
-  }, []);
+      } catch {}
+    },
+    [showDialog, createPetition, clonePetitions, goToPetition]
+  );
 }
 
 export function TemplateDetailsDialog({
