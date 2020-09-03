@@ -15,25 +15,20 @@ import { ArgValidationError } from "./errors";
 
 export type PaginationPluginConfig = {};
 
-type a = core.GetGen2<"fieldTypes", "PetitionBase">;
+type ObjectOrInterfaceNames =
+  | core.GetGen<"objectNames">
+  | core.GetGen<"interfaceNames">;
 
-type GetObjectType<
-  Type extends
-    | core.GetGen<"objectNames">
-    | core.GetGen<"interfaceNames">
-    | core.AllNexusOutputTypeDefs
-> = Type extends core.GetGen<"objectNames"> | core.GetGen<"interfaceNames">
-  ? core.GetGen2<"fieldTypes", Type>
-  : Type extends core.NexusObjectTypeDef<infer TypeName>
-  ? core.GetGen2<"fieldTypes", TypeName>
-  : never;
+type ObjectOrInterfaceTypeDef<TypeName extends string> =
+  | core.NexusObjectTypeDef<TypeName>
+  | core.NexusInterfaceTypeDef<TypeName>;
+
+type SortableFieldTypes = string | number | Date | boolean | null | undefined;
 
 export type PaginationFieldConfig<
   TypeName extends string,
   FieldName extends string,
-  ItemType extends
-    | core.GetGen<"allOutputTypes", string>
-    | core.AllNexusOutputTypeDefs
+  ItemType extends core.GetGen<"allOutputTypes"> | core.AllNexusOutputTypeDefs
 > = {
   type: ItemType;
 
@@ -43,11 +38,13 @@ export type PaginationFieldConfig<
   searchable?: boolean;
   /**
    * Additional `search` argument that can be used for searching.
+   * Only available for object and interface types
    */
-  sortableBy?: KeysOfType<
-    GetObjectType<ItemType>,
-    string | number | Date | boolean | null | undefined
-  >[];
+  sortableBy?: ItemType extends ObjectOrInterfaceNames
+    ? KeysOfType<core.GetGen2<"fieldTypes", ItemType>, SortableFieldTypes>[]
+    : ItemType extends ObjectOrInterfaceTypeDef<infer TypeName>
+    ? KeysOfType<core.GetGen2<"fieldTypes", TypeName>, SortableFieldTypes>[]
+    : never;
   /**
    * Additional args to use for just this field
    */
