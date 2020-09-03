@@ -2,23 +2,23 @@ import { gql } from "@apollo/client";
 import {
   Badge,
   Box,
+  Button,
   Flex,
   IconButton,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
   Tooltip,
   useDisclosure,
-  MenuDivider,
 } from "@chakra-ui/core";
 import {
   CopyIcon,
   DeleteIcon,
   MoreVerticalIcon,
-  UserArrowIcon,
   SettingsIcon,
+  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
@@ -26,16 +26,17 @@ import {
   PetitionTemplateHeader_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Spacer } from "../common/Spacer";
+import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 
 export type PetitionTemplateHeaderProps = ExtendChakra<{
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
@@ -82,6 +83,19 @@ export function PetitionTemplateHeader({
     [petition.id, clonePetitions, goToPetition]
   );
 
+  const createPetition = useCreatePetition();
+  const handleUseTemplate = useCallback(
+    async function () {
+      try {
+        const petitionId = await createPetition({
+          petitionId: petition.id,
+        });
+        goToPetition(petitionId, "compose");
+      } catch {}
+    },
+    [petition.id, clonePetitions, goToPetition]
+  );
+
   const {
     isOpen: isSettingsOpen,
     onOpen: onOpenSettings,
@@ -103,91 +117,89 @@ export function PetitionTemplateHeader({
         {...props}
       >
         <Flex height={16} alignItems="center" paddingX={4}>
-          <Flex alignItems="center">
-            <Badge colorScheme="purple" marginRight={1}>
-              <FormattedMessage
-                id="generic.template"
-                defaultMessage="Template"
-              />
-            </Badge>
-            <HeaderNameEditable
-              petition={petition}
-              state={state}
-              onNameChange={(name) => onUpdatePetition({ name: name || null })}
-              maxWidth={{
-                base: `calc(100vw - ${16 + 72 + 4 + 16 + 40 + 16}px)`,
-                sm: `calc(100vw - ${96 + 16 + 72 + 4 + 16 + 40 + 16}px)`,
-                md: `calc(100vw - ${96 + 307}px)`,
-              }}
-              placeholder={
-                petition.name
-                  ? ""
-                  : intl.formatMessage({
-                      id: "generic.untitled-template",
-                      defaultMessage: "Untitled template",
-                    })
-              }
-              aria-label={intl.formatMessage({
-                id: "petition.template-name-label",
-                defaultMessage: "Template name",
-              })}
-            />
-          </Flex>
+          <Badge colorScheme="purple" marginRight={1}>
+            <FormattedMessage id="generic.template" defaultMessage="Template" />
+          </Badge>
+          <HeaderNameEditable
+            petition={petition}
+            state={state}
+            onNameChange={(name) => onUpdatePetition({ name: name || null })}
+            minWidth={0}
+            placeholder={
+              petition.name
+                ? ""
+                : intl.formatMessage({
+                    id: "generic.untitled-template",
+                    defaultMessage: "Untitled template",
+                  })
+            }
+            aria-label={intl.formatMessage({
+              id: "petition.template-name-label",
+              defaultMessage: "Template name",
+            })}
+          />
           <Spacer minWidth={4} />
-          <Stack direction="row">
-            <Box>
-              <Menu id="petition-more-options-menu">
-                <Tooltip
-                  placement="left"
-                  label={intl.formatMessage({
-                    id: "generic.more-options",
-                    defaultMessage: "More options...",
-                  })}
-                >
-                  <MenuButton
-                    as={IconButton}
-                    variant="ghost"
-                    icon={<MoreVerticalIcon />}
-                    aria-label={intl.formatMessage({
-                      id: "generic.more-options",
-                      defaultMessage: "More options...",
-                    })}
-                  />
-                </Tooltip>
-                <MenuList>
-                  <MenuItem onClick={onOpenSharePetition}>
-                    <UserArrowIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.template-header.share-label"
-                      defaultMessage="Share template"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleCloneClick}>
-                    <CopyIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.template-header.clone-label"
-                      defaultMessage="Clone template"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={onOpenSettings}>
-                    <SettingsIcon marginRight={2} />
-                    <FormattedMessage
-                      id="template.settings-header"
-                      defaultMessage="Template settings"
-                    />
-                  </MenuItem>
-                  <MenuDivider />
-                  <MenuItem color="red.500" onClick={handleDeleteClick}>
-                    <DeleteIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-template.delete-label"
-                      defaultMessage="Delete template"
-                    />
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </Box>
-          </Stack>
+          <Button
+            colorScheme="purple"
+            flexShrink={0}
+            onClick={handleUseTemplate}
+          >
+            <FormattedMessage
+              id="component.template-header.use-template"
+              defaultMessage="Use this template"
+            />
+          </Button>
+          <Menu id="petition-more-options-menu">
+            <Tooltip
+              placement="left"
+              label={intl.formatMessage({
+                id: "generic.more-options",
+                defaultMessage: "More options...",
+              })}
+            >
+              <MenuButton
+                as={IconButton}
+                variant="ghost"
+                icon={<MoreVerticalIcon />}
+                marginLeft={4}
+                aria-label={intl.formatMessage({
+                  id: "generic.more-options",
+                  defaultMessage: "More options...",
+                })}
+              />
+            </Tooltip>
+            <MenuList>
+              <MenuItem onClick={onOpenSharePetition}>
+                <UserArrowIcon marginRight={2} />
+                <FormattedMessage
+                  id="component.template-header.share-label"
+                  defaultMessage="Share template"
+                />
+              </MenuItem>
+              <MenuItem onClick={handleCloneClick}>
+                <CopyIcon marginRight={2} />
+                <FormattedMessage
+                  id="component.template-header.clone-label"
+                  defaultMessage="Clone template"
+                />
+              </MenuItem>
+              <MenuItem onClick={onOpenSettings}>
+                <SettingsIcon marginRight={2} />
+                <FormattedMessage
+                  id="template.settings-header"
+                  defaultMessage="Template settings"
+                />
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem color="red.500" onClick={handleDeleteClick}>
+                <DeleteIcon marginRight={2} />
+                <FormattedMessage
+                  id="component.petition-template.delete-label"
+                  defaultMessage="Delete template"
+                />
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
       </Box>
       <PetitionSettingsModal

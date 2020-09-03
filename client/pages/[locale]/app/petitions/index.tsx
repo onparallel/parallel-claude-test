@@ -141,6 +141,18 @@ function Petitions() {
     [petitions, selected]
   );
 
+  const handleUseTemplateClick = useCallback(
+    async function () {
+      try {
+        const petitionId = await createPetition({
+          petitionId: selected[0],
+        });
+        goToPetition(petitionId, "compose");
+      } catch {}
+    },
+    [petitions, selected]
+  );
+
   const handleCreatePetition = useCallback(async () => {
     try {
       if (state.type === "TEMPLATE") {
@@ -234,6 +246,7 @@ function Petitions() {
               onFilterChange={handleFilterChange}
               onDeleteClick={handleDeleteClick}
               onCloneAsTemplateClick={handleCloneAsTemplate}
+              onUseTemplateClick={handleUseTemplateClick}
               onReload={() => refetch()}
               onCloneClick={handleCloneClick}
               onCreatePetition={handleCreatePetition}

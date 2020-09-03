@@ -14,6 +14,7 @@ import {
   CopyIcon,
   DeleteIcon,
   RepeatIcon,
+  PaperPlaneIcon,
 } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -32,6 +33,7 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
   onSearchChange: (value: string | null) => void;
   onDeleteClick: () => void;
   onCloneAsTemplateClick: () => void;
+  onUseTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
   onCreatePetition: () => void;
@@ -45,6 +47,7 @@ export function PetitionListHeader({
   onSearchChange,
   onDeleteClick,
   onCloneAsTemplateClick,
+  onUseTemplateClick,
   onReload,
   onCloneClick,
   onFilterChange,
@@ -129,7 +132,18 @@ export function PetitionListHeader({
                       defaultMessage="Clone as template"
                     />
                   </MenuItem>
-                ) : null}
+                ) : (
+                  <MenuItem
+                    onClick={onUseTemplateClick}
+                    isDisabled={selectedCount !== 1}
+                  >
+                    <PaperPlaneIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-list-header.use-template-label"
+                      defaultMessage="Use template"
+                    />
+                  </MenuItem>
+                )}
                 <MenuDivider />
                 <MenuItem
                   color="red.500"
