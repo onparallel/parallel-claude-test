@@ -65,7 +65,7 @@ export function PetitionTemplateHeader({
         );
       } catch {}
     },
-    [petition.id, petition.name]
+    [petition.id, deletePetitions, router]
   );
 
   const clonePetitions = useClonePetitions();
@@ -79,7 +79,7 @@ export function PetitionTemplateHeader({
         goToPetition(petitionId, "compose");
       } catch {}
     },
-    [petition.id, petition.name, petition.locale]
+    [petition.id, clonePetitions, goToPetition]
   );
 
   const {
