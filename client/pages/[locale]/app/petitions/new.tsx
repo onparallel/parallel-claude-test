@@ -540,6 +540,7 @@ const TemplateCard = memo(function TemplateCard({
 }: ExtendChakra<{
   template: NewPetition_PetitionTemplateFragment;
 }>) {
+  const intl = useIntl();
   const locales = useSupportedLocales();
   const localeLabel = locales.find(({ key }) => key === template.locale)!
     .localizedLabel;
@@ -563,7 +564,13 @@ const TemplateCard = memo(function TemplateCard({
       }}
       {...props}
     >
-      <Heading size="xs">{template.name}</Heading>
+      <Heading size="xs">
+        {template.name ||
+          intl.formatMessage({
+            id: "generic.untitled-template",
+            defaultMessage: "Untitled template",
+          })}
+      </Heading>
       <Text
         fontSize="sm"
         sx={
@@ -576,7 +583,14 @@ const TemplateCard = memo(function TemplateCard({
           } as any
         }
       >
-        {template.description}
+        {template.description || (
+          <i>
+            <FormattedMessage
+              id="template-details.no-description-provided"
+              defaultMessage="No description provided."
+            />
+          </i>
+        )}
       </Text>
       <Spacer />
       <Flex alignItems="center" marginTop={2}>
