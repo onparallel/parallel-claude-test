@@ -128,7 +128,7 @@ function Petitions() {
 
   const createPetition = useCreatePetition();
 
-  const handleCreateTemplate = useCallback(
+  const handleCloneAsTemplate = useCallback(
     async function () {
       try {
         const templateId = await createPetition({
@@ -233,7 +233,7 @@ function Petitions() {
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
               onDeleteClick={handleDeleteClick}
-              onCreateTemplateClick={handleCreateTemplate}
+              onCloneAsTemplateClick={handleCloneAsTemplate}
               onReload={() => refetch()}
               onCloneClick={handleCloneClick}
               onCreatePetition={handleCreatePetition}

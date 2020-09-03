@@ -32,7 +32,7 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
   selectedCount: number;
   onSearchChange: (value: string | null) => void;
   onDeleteClick: () => void;
-  onCreateTemplateClick: () => void;
+  onCloneAsTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
   onCreatePetition: () => void;
@@ -45,7 +45,7 @@ export function PetitionListHeader({
   selectedCount,
   onSearchChange,
   onDeleteClick,
-  onCreateTemplateClick,
+  onCloneAsTemplateClick,
   onReload,
   onCloneClick,
   onFilterChange,
@@ -121,7 +121,7 @@ export function PetitionListHeader({
                 </MenuItem>
                 {type === "PETITION" ? (
                   <MenuItem
-                    onClick={onCreateTemplateClick}
+                    onClick={onCloneAsTemplateClick}
                     isDisabled={selectedCount !== 1}
                   >
                     <CopyIcon marginRight={2} />
