@@ -23,6 +23,7 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
+import { setNativeValue } from "@parallel/utils/setNativeValue";
 import {
   ChangeEvent,
   FocusEvent,
@@ -93,7 +94,9 @@ export const PetitionComposeField = Object.assign(
       field.isFixed ? "FIXED_FIELD" : "FIELD"
     );
     const [title, setTitle] = useState(field.title);
+    const titleRef = useRef<HTMLInputElement>(null);
     const [description, setDescription] = useState(field.description);
+    const descriptionRef = useRef<HTMLTextAreaElement>(null);
     return (
       <Box
         ref={elementRef}
@@ -212,6 +215,7 @@ export const PetitionComposeField = Object.assign(
           >
             <Input
               id={`field-title-${field.id}`}
+              ref={titleRef}
               aria-label={intl.formatMessage({
                 id: "petition.field-title-label",
                 defaultMessage: "Field title",
@@ -237,15 +241,17 @@ export const PetitionComposeField = Object.assign(
                 setTitle(event.target.value ?? null)
               }
               onBlur={() => {
-                setTitle(title?.trim());
-                if (title !== field.title) {
-                  onFieldEdit({ title });
+                const trimmed = title?.trim() ?? null;
+                setNativeValue(titleRef.current!, trimmed ?? "");
+                if (field.title !== trimmed) {
+                  onFieldEdit({ title: trimmed });
                 }
               }}
               {...titleFieldProps}
             />
             <GrowingTextarea
               id={`field-description-${field.id}`}
+              ref={descriptionRef}
               placeholder={intl.formatMessage({
                 id: "petition.field-description-placeholder",
                 defaultMessage: "Add a description...",
@@ -272,9 +278,10 @@ export const PetitionComposeField = Object.assign(
                 setDescription(event.target.value ?? null)
               }
               onBlur={() => {
-                setDescription(description?.trim());
-                if (description !== field.description) {
-                  onFieldEdit({ description });
+                const trimmed = description?.trim() ?? null;
+                setNativeValue(descriptionRef.current!, trimmed ?? "");
+                if (field.description !== trimmed) {
+                  onFieldEdit({ description: trimmed });
                 }
               }}
               {...descriptionFieldProps}

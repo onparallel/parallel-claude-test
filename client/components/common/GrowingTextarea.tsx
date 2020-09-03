@@ -11,7 +11,7 @@ export const GrowingTextarea: typeof Textarea = forwardRef(
       return () => {
         autosize.destroy(ref.current!);
       };
-    }, [props.value]);
+    }, []);
     return (
       <Textarea
         transition="height none"
