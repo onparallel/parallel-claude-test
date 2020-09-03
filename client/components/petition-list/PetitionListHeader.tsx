@@ -19,7 +19,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { NakedLink } from "../common/Link";
 import {
   PetitionListFilter,
   PetitionListFilterProps,
