@@ -35,7 +35,7 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
   onCreateTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
-  onNewBlankTemplate: () => void;
+  onCreatePetition: () => void;
 };
 
 export function PetitionListHeader({
@@ -49,7 +49,7 @@ export function PetitionListHeader({
   onReload,
   onCloneClick,
   onFilterChange,
-  onNewBlankTemplate,
+  onCreatePetition,
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
@@ -157,23 +157,19 @@ export function PetitionListHeader({
           </Menu>
         </Box>
       ) : null}
-      {type === "PETITION" ? (
-        <NakedLink href="/app/petitions/new">
-          <Button colorScheme="purple" as="a">
-            <FormattedMessage
-              id="component.petition-list-header.create-petition-button"
-              defaultMessage="Create petition"
-            />
-          </Button>
-        </NakedLink>
-      ) : (
-        <Button colorScheme="purple" onClick={onNewBlankTemplate}>
+      <Button colorScheme="purple" onClick={onCreatePetition}>
+        {type === "PETITION" ? (
+          <FormattedMessage
+            id="component.petition-list-header.create-petition-button"
+            defaultMessage="Create petition"
+          />
+        ) : (
           <FormattedMessage
             id="component.petition-list-header.create-template-button"
             defaultMessage="Create template"
           />
-        </Button>
-      )}
+        )}
+      </Button>
     </Stack>
   );
 }
