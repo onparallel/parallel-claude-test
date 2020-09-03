@@ -191,7 +191,16 @@ export class PetitionRepository extends BaseRepository {
             q.where("locale", locale);
           }
           if (search) {
-            q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
+            q.andWhere((q2) => {
+              q2.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
+              if (petitionType === "TEMPLATE") {
+                q2.or.whereIlike(
+                  "template_description",
+                  `%${escapeLike(search, "\\")}%`,
+                  "\\"
+                );
+              }
+            });
           }
           if (status && petitionType === "PETITION") {
             q.where("status", status);
