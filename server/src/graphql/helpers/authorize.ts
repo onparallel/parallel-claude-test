@@ -3,6 +3,7 @@ import { AuthenticationError } from "apollo-server-express";
 import { every, everySeries } from "async";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
+import { isDefined } from "../../util/remedaExtensions";
 import { KeysOfType, MaybeArray } from "../../util/types";
 
 export function authenticate<
@@ -100,7 +101,7 @@ export function ifArgDefined<
   authorizer: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    if (args[argName] !== null && args[argName] !== undefined) {
+    if (isDefined(args[argName])) {
       await authorizer(root, args, ctx, info);
     }
     return true;
