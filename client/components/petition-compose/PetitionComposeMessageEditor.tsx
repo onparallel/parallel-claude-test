@@ -51,23 +51,31 @@ export const PetitionComposeMessageEditor = Object.assign(
       remindersConfig,
       setRemindersConfig,
     ] = useState<RemindersConfig | null>(petition.remindersConfig ?? null);
-    const updateSubject = useDebouncedCallback(onUpdatePetition, 500, []);
-    const updateBody = useDebouncedCallback(onUpdatePetition, 500, []);
-    const updateRemindersConfig = useDebouncedCallback(
+    const updateSubject = useDebouncedCallback(onUpdatePetition, 500, [
       onUpdatePetition,
-      500,
-      []
+    ]);
+    const updateBody = useDebouncedCallback(onUpdatePetition, 500, [
+      onUpdatePetition,
+    ]);
+    const updateRemindersConfig = useDebouncedCallback(onUpdatePetition, 500, [
+      onUpdatePetition,
+    ]);
+
+    const handleSubjectChange = useCallback(
+      (value: string) => {
+        setSubject(value);
+        updateSubject({ emailSubject: value || null });
+      },
+      [updateSubject]
     );
 
-    const handleSubjectChange = useCallback((value: string) => {
-      setSubject(value);
-      updateSubject({ emailSubject: value || null });
-    }, []);
-
-    const handleBodyChange = useCallback((value: RichTextEditorContent) => {
-      setBody(value);
-      updateBody({ emailBody: isEmptyContent(value) ? null : value });
-    }, []);
+    const handleBodyChange = useCallback(
+      (value: RichTextEditorContent) => {
+        setBody(value);
+        updateBody({ emailBody: isEmptyContent(value) ? null : value });
+      },
+      [updateBody]
+    );
 
     function handleRemindersChange(value: RemindersConfig | null) {
       setRemindersConfig(value);

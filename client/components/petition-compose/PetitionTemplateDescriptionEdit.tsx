@@ -17,12 +17,17 @@ export function PetitionTemplateDescriptionEdit({
   ...props
 }: PetitionTemplateDescriptionEditProps) {
   const intl = useIntl();
-  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, []);
+  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [
+    onUpdatePetition,
+  ]);
   const [templateDescription, setDescription] = useState(description ?? "");
-  const handleUpdateDescription = useCallback((value: string) => {
-    setDescription(value);
-    updatePetition({ description: value || null });
-  }, []);
+  const handleUpdateDescription = useCallback(
+    (value: string) => {
+      setDescription(value);
+      updatePetition({ description: value || null });
+    },
+    [updatePetition]
+  );
 
   return (
     <Card id="petition-template-description-edit" {...props}>

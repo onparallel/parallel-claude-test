@@ -28,17 +28,25 @@ export function PetitionTemplateComposeMessageEditor({
     petition.emailBody ?? [{ children: [{ text: "" }] }]
   );
 
-  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, []);
+  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [
+    onUpdatePetition,
+  ]);
 
-  const handleSubjectChange = useCallback((value: string) => {
-    setSubject(value);
-    updatePetition({ emailSubject: value || null });
-  }, []);
+  const handleSubjectChange = useCallback(
+    (value: string) => {
+      setSubject(value);
+      updatePetition({ emailSubject: value || null });
+    },
+    [updatePetition]
+  );
 
-  const handleBodyChange = useCallback((value: RichTextEditorContent) => {
-    setBody(value);
-    updatePetition({ emailBody: isEmptyContent(value) ? null : value });
-  }, []);
+  const handleBodyChange = useCallback(
+    (value: RichTextEditorContent) => {
+      setBody(value);
+      updatePetition({ emailBody: isEmptyContent(value) ? null : value });
+    },
+    [updatePetition]
+  );
 
   return (
     <Card id="petition-template-message-compose" {...props}>
