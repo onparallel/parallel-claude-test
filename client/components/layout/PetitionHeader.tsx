@@ -18,7 +18,6 @@ import {
   CopyIcon,
   DeleteIcon,
   MoreVerticalIcon,
-  SaveIcon,
   SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -29,8 +28,8 @@ import {
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
-import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useRouter } from "next/router";
 import { forwardRef, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -102,17 +101,18 @@ export function PetitionHeader({
     ]
   );
 
-  const createTemplate = useCreateTemplateFromPetition();
+  const createPetition = useCreatePetition();
   const handleSaveAsTemplate = useCallback(
     async function () {
       try {
-        const templateId = await createTemplate({
+        const templateId = await createPetition({
           petitionId: petition.id,
+          type: "TEMPLATE",
         });
         goToPetition(templateId, "compose");
       } catch {}
     },
-    [petition.id, createTemplate, goToPetition]
+    [petition.id, createPetition, goToPetition]
   );
 
   const {
@@ -238,7 +238,7 @@ export function PetitionHeader({
                     />
                   </MenuItem>
                   <MenuItem onClick={handleSaveAsTemplate}>
-                    <SaveIcon marginRight={2} />
+                    <CopyIcon marginRight={2} />
                     <FormattedMessage
                       id="component.petition-header.clone-as-template-button"
                       defaultMessage="Clone as template"

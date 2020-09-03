@@ -177,8 +177,6 @@ export type Mutation = {
   createPetitionField: PetitionBaseAndField;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
-  /** Creates a template based on a given petition. */
-  createTemplateFromPetition: PetitionBase;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
@@ -306,10 +304,6 @@ export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-};
-
-export type MutationcreateTemplateFromPetitionArgs = {
   petitionId: Scalars["GID"];
 };
 
@@ -3481,18 +3475,6 @@ export type useCreatePetition_createPetitionMutation = {
   __typename?: "Mutation";
 } & {
   createPetition:
-    | ({ __typename?: "Petition" } & Pick<Petition, "id">)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">);
-};
-
-export type useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type useCreateTemplateFromPetition_createTemplateFromPetitionMutation = {
-  __typename?: "Mutation";
-} & {
-  createTemplateFromPetition:
     | ({ __typename?: "Petition" } & Pick<Petition, "id">)
     | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">);
 };
@@ -8820,61 +8802,6 @@ export type useCreatePetition_createPetitionMutationResult = Apollo.MutationResu
 export type useCreatePetition_createPetitionMutationOptions = Apollo.BaseMutationOptions<
   useCreatePetition_createPetitionMutation,
   useCreatePetition_createPetitionMutationVariables
->;
-export const useCreateTemplateFromPetition_createTemplateFromPetitionDocument = gql`
-  mutation useCreateTemplateFromPetition_createTemplateFromPetition(
-    $petitionId: GID!
-  ) {
-    createTemplateFromPetition(petitionId: $petitionId) {
-      id
-    }
-  }
-`;
-export type useCreateTemplateFromPetition_createTemplateFromPetitionMutationFn = Apollo.MutationFunction<
-  useCreateTemplateFromPetition_createTemplateFromPetitionMutation,
-  useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables
->;
-
-/**
- * __useuseCreateTemplateFromPetition_createTemplateFromPetitionMutation__
- *
- * To run a mutation, you first call `useuseCreateTemplateFromPetition_createTemplateFromPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useuseCreateTemplateFromPetition_createTemplateFromPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [useCreateTemplateFromPetitionCreateTemplateFromPetitionMutation, { data, loading, error }] = useuseCreateTemplateFromPetition_createTemplateFromPetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
-export function useuseCreateTemplateFromPetition_createTemplateFromPetitionMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    useCreateTemplateFromPetition_createTemplateFromPetitionMutation,
-    useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    useCreateTemplateFromPetition_createTemplateFromPetitionMutation,
-    useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables
-  >(
-    useCreateTemplateFromPetition_createTemplateFromPetitionDocument,
-    baseOptions
-  );
-}
-export type useCreateTemplateFromPetition_createTemplateFromPetitionMutationHookResult = ReturnType<
-  typeof useuseCreateTemplateFromPetition_createTemplateFromPetitionMutation
->;
-export type useCreateTemplateFromPetition_createTemplateFromPetitionMutationResult = Apollo.MutationResult<
-  useCreateTemplateFromPetition_createTemplateFromPetitionMutation
->;
-export type useCreateTemplateFromPetition_createTemplateFromPetitionMutationOptions = Apollo.BaseMutationOptions<
-  useCreateTemplateFromPetition_createTemplateFromPetitionMutation,
-  useCreateTemplateFromPetition_createTemplateFromPetitionMutationVariables
 >;
 export const useDeletePetitions_deletePetitionsDocument = gql`
   mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {

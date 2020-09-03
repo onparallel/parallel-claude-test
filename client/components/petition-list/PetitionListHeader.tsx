@@ -14,7 +14,6 @@ import {
   CopyIcon,
   DeleteIcon,
   RepeatIcon,
-  SaveIcon,
 } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -125,7 +124,7 @@ export function PetitionListHeader({
                     onClick={onCreateTemplateClick}
                     isDisabled={selectedCount !== 1}
                   >
-                    <SaveIcon marginRight={2} />
+                    <CopyIcon marginRight={2} />
                     <FormattedMessage
                       id="component.petition-list-header.clone-as-template-label"
                       defaultMessage="Clone as template"

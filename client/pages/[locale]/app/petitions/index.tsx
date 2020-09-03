@@ -36,7 +36,6 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
-import { useCreateTemplateFromPetition } from "@parallel/utils/mutations/useCreateTemplateFromPetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   enums,
@@ -125,12 +124,14 @@ function Petitions() {
 
   const goToPetition = useGoToPetition();
 
-  const createTemplate = useCreateTemplateFromPetition();
+  const createPetition = useCreatePetition();
+
   const handleCreateTemplate = useCallback(
     async function () {
       try {
-        const templateId = await createTemplate({
+        const templateId = await createPetition({
           petitionId: selected[0],
+          type: "TEMPLATE",
         });
         goToPetition(templateId, "compose");
       } catch {}
@@ -138,7 +139,6 @@ function Petitions() {
     [petitions, selected]
   );
 
-  const createPetition = useCreatePetition();
   const handleNewTemplate = useCallback(async () => {
     try {
       const templateId = await createPetition({
