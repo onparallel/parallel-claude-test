@@ -568,9 +568,10 @@ const TemplateCard = memo(function TemplateCard({
         boxShadow: "outline",
         borderColor: "gray.200",
       }}
+      minWidth={0}
       {...props}
     >
-      <Heading size="xs">
+      <Heading size="xs" isTruncated>
         {template.name ||
           intl.formatMessage({
             id: "generic.untitled-template",
