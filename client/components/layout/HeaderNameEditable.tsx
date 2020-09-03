@@ -34,7 +34,11 @@ export function HeaderNameEditable({
       fontSize="xl"
       value={name}
       onChange={setName}
-      onSubmit={() => onNameChange(name)}
+      onSubmit={() => {
+        const trimmed = name.trim();
+        setName(trimmed);
+        onNameChange(trimmed);
+      }}
       onBlur={() => {
         setName(name.trim());
       }}
