@@ -19,16 +19,22 @@ export function RecipientViewSenderCard({
     <Card padding={6} {...props}>
       <Flex justifyContent="center">
         {sender.organization.logoUrl ? (
-          <Image
-            src={sender.organization.logoUrl}
-            alt={sender.organization.name}
-            width={200}
+          <Box
+            role="img"
+            aria-label={sender.organization.name}
+            width="200px"
+            margin="auto"
+            height="60px"
+            backgroundImage={`url("${sender.organization.logoUrl}")`}
+            backgroundSize="contain"
+            backgroundPosition="center"
+            backgroundRepeat="no-repeat"
           />
         ) : (
           <Logo width="152px" />
         )}
       </Flex>
-      <Box marginTop={6}>
+      <Box marginTop={4}>
         <Grid
           as="dl"
           templateColumns="16px 1fr"
