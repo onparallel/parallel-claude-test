@@ -8,6 +8,7 @@ import { createTestClient } from "apollo-server-testing";
 import { Redis } from "../../services/redis";
 import { KNEX } from "../../db/knex";
 import Knex from "knex";
+import { deleteAllData } from "../../util/knexUtils";
 
 export const initServer = () => {
   const container = createContainer();
@@ -31,12 +32,14 @@ export const initServer = () => {
 
   const { query, mutate } = createTestClient(server);
 
+  const knex = container.get<Knex>(KNEX);
   return {
     query,
     mutate,
-    container,
+    knex,
     stop: async () => {
-      await container.get<Knex>(KNEX).destroy();
+      await deleteAllData(knex);
+      await knex.destroy();
       await server.stop();
     },
   };
