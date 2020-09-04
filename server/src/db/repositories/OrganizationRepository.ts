@@ -72,6 +72,7 @@ export class OrganizationRepository extends BaseRepository {
           "leica",
           "spin",
           "atadvocats",
+          "santalucia",
         ].includes(org.identifier)
           ? `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`
           : null
