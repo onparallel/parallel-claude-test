@@ -143,6 +143,7 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
   return useMemo(
     () =>
       ({
+        ...styleProps,
         components: {
           ...styleProps.components,
           NoOptionsMessage: memo(({ selectProps }) => {
