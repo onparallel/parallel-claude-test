@@ -1,6 +1,5 @@
 import {
   Box,
-  BoxProps,
   Stack,
   Text,
   useFormControl,
@@ -12,6 +11,7 @@ import {
   ListIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   BoldPlugin,
   EditablePlugins,
@@ -28,8 +28,9 @@ import {
   toggleMark,
   UnderlinePlugin,
 } from "@udecode/slate-plugins";
-import { createElement, CSSProperties, memo, useMemo } from "react";
+import { createElement, CSSProperties, memo, MouseEvent, useMemo } from "react";
 import { useIntl } from "react-intl";
+import { omit, pick } from "remeda";
 import { createEditor, Node } from "slate";
 import { withHistory } from "slate-history";
 import { Slate, useSlate, withReact } from "slate-react";
@@ -38,7 +39,6 @@ import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
-import { omit, pick } from "remeda";
 
 function TextComponent({ element, attributes, styles, ...props }: any) {
   return createElement(Text, { ...props, ...attributes });
@@ -190,7 +190,7 @@ export function RichTextEditor({
 const Toolbar = memo(function _Toolbar({
   disabled,
   ...props
-}: BoxProps & { disabled?: boolean }) {
+}: ExtendChakra<{ disabled?: boolean }>) {
   const intl = useIntl();
   return (
     <Stack
@@ -253,7 +253,7 @@ function ListButton({
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
-      onMouseDown={(event) => {
+      onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleList(editor, {
           typeList: type,
@@ -278,7 +278,7 @@ function MarkButton({
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
-      onMouseDown={(event) => {
+      onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleMark(editor, type);
       }}

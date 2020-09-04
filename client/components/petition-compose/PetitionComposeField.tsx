@@ -318,7 +318,7 @@ export const PetitionComposeField = Object.assign(
                 id: "petition.field-settings",
                 defaultMessage: "Field settings",
               })}
-              onClick={(event) => onSettingsClick(event)}
+              onClick={onSettingsClick}
             />
             <IconButtonWithTooltip
               icon={<DeleteIcon />}
@@ -331,7 +331,7 @@ export const PetitionComposeField = Object.assign(
                 id: "petition.field-delete-button",
                 defaultMessage: "Delete field",
               })}
-              onClick={(event) => onDeleteClick(event)}
+              onClick={onDeleteClick}
             />
           </Stack>
         </Box>

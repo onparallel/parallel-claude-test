@@ -1,17 +1,17 @@
 import {
   Box,
-  BoxProps,
   Button,
   Collapse,
   Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
   StackProps,
   useDisclosure,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
 } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
@@ -19,9 +19,9 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
 
-export type PublicHeaderProps = BoxProps & {
+export type PublicHeaderProps = ExtendChakra<{
   isThin?: boolean;
-};
+}>;
 
 export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
   const { isOpen, onToggle } = useDisclosure();

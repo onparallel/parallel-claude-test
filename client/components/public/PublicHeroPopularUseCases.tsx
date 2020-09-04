@@ -1,11 +1,12 @@
-import { BoxProps, Button, Flex, Grid, Heading, Text } from "@chakra-ui/core";
+import { Button, Flex, Grid, Heading, Text } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
 import { PublicContainer } from "./layout/PublicContainer";
 
-export function PublicHeroPopularUseCases({ ...props }: BoxProps) {
+export function PublicHeroPopularUseCases(props: ExtendChakra) {
   return (
     <PublicContainer
       {...props}
@@ -145,10 +146,10 @@ function Feature({
   header,
   description,
   ...props
-}: BoxProps & {
+}: ExtendChakra<{
   header: ReactNode;
   description: ReactNode;
-}) {
+}>) {
   return (
     <Card padding={5} textAlign="left" {...props}>
       <Heading as="h4" size="sm">

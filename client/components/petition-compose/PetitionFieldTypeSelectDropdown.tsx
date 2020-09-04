@@ -15,6 +15,7 @@ import {
   Stack,
   TextProps,
 } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMergeRefs } from "@parallel/utils/useMergeRefs";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
@@ -87,7 +88,7 @@ const PetitionFieldTypeLabel = forwardRef<
 function PetitionFieldTypeText({
   type,
   ...props
-}: { type: PetitionFieldType } & TextProps) {
+}: { type: PetitionFieldType } & ExtendChakra<TextProps>) {
   const intl = useIntl();
   const label = useMemo(() => {
     return {

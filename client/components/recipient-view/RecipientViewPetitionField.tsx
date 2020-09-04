@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  BoxProps,
   Button,
   ButtonProps,
   Flex,
@@ -22,6 +21,7 @@ import {
   CommentIcon,
   DeleteIcon,
 } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import {
   PetitionFieldReplyStatus,
@@ -45,7 +45,7 @@ export type CreateReply = CreateReplyText | CreateReplyFileUpload;
 type CreateReplyText = { type: "TEXT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
-export type PublicPetitionFieldProps = BoxProps & {
+export type PublicPetitionFieldProps = ExtendChakra<{
   contactId: string;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   isInvalid: boolean;
@@ -53,7 +53,7 @@ export type PublicPetitionFieldProps = BoxProps & {
   onOpenCommentsClick: () => void;
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (payload: CreateReply) => void;
-};
+}>;
 
 export function RecipientViewPetitionField({
   contactId,
@@ -329,10 +329,10 @@ function TextReplyForm({
   field,
   onCreateReply,
   ...props
-}: BoxProps & {
+}: ExtendChakra<{
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   onCreateReply: (payload: CreateReplyText) => void;
-}) {
+}>) {
   const { placeholder, multiline } = field.options as FieldOptions["TEXT"];
   const { handleSubmit, register, reset, errors } = useForm<{
     content: string;
@@ -394,10 +394,10 @@ function FileUploadReplyForm({
   field,
   onCreateReply,
   ...props
-}: BoxProps & {
+}: ExtendChakra<{
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   onCreateReply: (payload: CreateReplyFileUpload) => void;
-}) {
+}>) {
   const { accepts } = field.options as FieldOptions["FILE_UPLOAD"];
   const accept = accepts
     ? accepts.flatMap((type) => {

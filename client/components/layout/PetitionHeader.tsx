@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  BoxProps,
   Flex,
   IconButton,
   Menu,
@@ -314,12 +313,12 @@ export function PetitionHeader({
   );
 }
 
-type PetitionHeaderTabProps = BoxProps & {
+type PetitionHeaderTabProps = ExtendChakra<{
   active?: boolean;
   isDisabled?: boolean;
   popoverContent?: ReactNode;
   children: ReactNode;
-};
+}>;
 
 const PetitionHeaderTab = forwardRef(function (
   {

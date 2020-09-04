@@ -1,14 +1,15 @@
 import { Box, BoxProps, Flex, useTheme } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { ReactElement, ReactNode } from "react";
 
 export function TimelineItem({
   icon,
   children,
   ...props
-}: BoxProps & {
+}: ExtendChakra<{
   icon: ReactNode;
   children: ReactNode;
-}) {
+}>) {
   const { colors } = useTheme();
   return (
     <Box

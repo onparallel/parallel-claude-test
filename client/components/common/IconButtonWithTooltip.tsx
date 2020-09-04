@@ -4,11 +4,12 @@ import {
   IconButton,
   TooltipProps,
 } from "@chakra-ui/core";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { forwardRef } from "react";
 
 export type IconButtonWithTooltipProps = {
   label: string;
-} & Omit<IconButtonProps, "aria-label"> &
+} & ExtendChakra<Omit<IconButtonProps, "aria-label">> &
   Pick<TooltipProps, "placement">;
 
 export const IconButtonWithTooltip = forwardRef<

@@ -12,6 +12,7 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
 } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   ComponentType,
   memo,
@@ -36,7 +37,7 @@ function toggleSortingDirection(direction: SortingDirection): SortingDirection {
   return direction === "ASC" ? "DESC" : "ASC";
 }
 
-export type TableProps<TRow> = BoxProps & {
+export type TableProps<TRow> = ExtendChakra<{
   columns: TableColumn<TRow>[];
   rows: TRow[];
   rowKeyProp: keyof TRow;
@@ -48,7 +49,7 @@ export type TableProps<TRow> = BoxProps & {
   onRowClick?: (row: TRow, event: MouseEvent) => void;
   onSortChange?: (sort: Sorting<any>) => void;
   onAction?: (row: TRow, action: string, data?: any) => void;
-};
+}>;
 
 export type TableHeaderProps<TRow> = {
   column: TableColumn<TRow>;
@@ -77,7 +78,7 @@ export type TableColumn<TRow> = {
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow>>;
   CellContent: ComponentType<TableCellProps<TRow>>;
-  cellProps?: BoxProps;
+  cellProps?: ExtendChakra;
 };
 
 function _Table<TRow>({
