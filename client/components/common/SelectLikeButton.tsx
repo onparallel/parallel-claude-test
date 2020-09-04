@@ -15,8 +15,8 @@ export const SelectLikeButton = forwardRef<HTMLDivElement, SelectProps>(
 
     const { rootProps, color, ...rest } = omitThemingProps(props);
 
-    const layoutProps = pick(rest, layoutPropNames as string[]);
-    const otherProps = omit(rest, layoutPropNames as string[]);
+    const layoutProps = pick(rest, layoutPropNames as any);
+    const otherProps = omit(rest, layoutPropNames as any);
 
     const rootStyles = {
       width: "100%",
@@ -25,35 +25,31 @@ export const SelectLikeButton = forwardRef<HTMLDivElement, SelectProps>(
       color,
     };
     return (
-      <Box ref={ref} sx={rootStyles} {...layoutProps} {...rootProps}>
+      <Box ref={ref} sx={rootStyles} {...(layoutProps as any)} {...rootProps}>
         <Box
           tabIndex={0}
-          sx={{
-            ...styles.field,
-            paddingBottom: 0,
-            paddingRight: 10,
-            display: "flex",
-            alignItems: "center",
-          }}
-          {...otherProps}
+          paddingBottom={0}
+          paddingRight={10}
+          display="flex"
+          alignItems="center"
           aria-haspopup="listbox"
+          sx={styles.field}
+          {...otherProps}
         >
           {children}
         </Box>
         <Box
-          sx={{
-            ...styles.icon,
-            position: "absolute",
-            display: "inline-flex",
-            width: "1.5rem",
-            height: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            right: "0.5rem",
-            pointerEvents: "none",
-            top: "50%",
-            transform: "translateY(-50%)",
-          }}
+          position="absolute"
+          display="inline-flex"
+          width="1.5rem"
+          height="100%"
+          alignItems="center"
+          justifyContent="center"
+          right="0.5rem"
+          pointerEvents="none"
+          top="50%"
+          transform="translateY(-50%)"
+          sx={styles.icon}
         >
           <ChevronDownIcon />
         </Box>

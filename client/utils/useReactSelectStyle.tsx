@@ -155,7 +155,7 @@ export function useReactSelectStyle<
         )),
       },
       styles: {
-        control: (styles, { isDisabled, isFocused, theme }) => {
+        control: (styles, { isDisabled, isFocused, theme }: any) => {
           return {
             ...styles,
             borderColor: isDisabled
