@@ -6,7 +6,7 @@ type ObjectPredicate<K extends string | number | symbol, V> = (
 
 type ArrayPredicate<T> = (entry: T) => boolean;
 
-function _removeKeys<K extends string | number | symbol, V, R = Record<K, V>>(
+function _removeKeys<K extends string | number | symbol, V>(
   object: Record<K, V>,
   predicate: ObjectPredicate<K, V>
 ) {
@@ -23,12 +23,12 @@ export function removeKeys<
   K extends string | number | symbol,
   V,
   R = Record<K, V>
->(object: Record<K, V>, predicate: ObjectPredicate<K, V>): Record<K, V>;
+>(object: Record<K, V>, predicate: ObjectPredicate<K, V>): R;
 export function removeKeys<
   K extends string | number | symbol,
   V,
   R = Record<K, V>
->(predicate: ObjectPredicate<K, V>): (object: Record<K, V>) => Record<K, V>;
+>(predicate: ObjectPredicate<K, V>): (object: Record<K, V>) => R;
 export function removeKeys() {
   // eslint-disable-next-line prefer-rest-params
   return purry(_removeKeys, arguments);

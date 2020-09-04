@@ -37,9 +37,9 @@ async function main() {
       LoadBalancerArn: loadBalancerArn,
     })
     .promise();
-  const oldTargetGroupArn = result2.Listeners?.find(
+  const oldTargetGroupArn = result2.Listeners!.find(
     (l) => l.Protocol === "HTTPS"
-  )?.DefaultActions![0].TargetGroupArn!;
+  )!.DefaultActions![0].TargetGroupArn!;
 
   const result3 = await getTargetGroupInstances(oldTargetGroupArn);
   for (const instance of result3.Reservations!.flatMap((r) => r.Instances!)) {
@@ -66,7 +66,7 @@ async function main() {
   const result5 = await elbv2
     .describeListeners({ LoadBalancerArn: loadBalancerArn })
     .promise();
-  const listenerArn = result5.Listeners?.find((l) => l.Protocol === "HTTPS")!
+  const listenerArn = result5.Listeners!.find((l) => l.Protocol === "HTTPS")!
     .ListenerArn!;
   console.log(
     chalk`Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Grid, Image, Text } from "@chakra-ui/core";
+import { Box, Flex, Grid, Text } from "@chakra-ui/core";
 import { BusinessIcon, EmailIcon, UserIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";

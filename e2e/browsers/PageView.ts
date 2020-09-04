@@ -6,6 +6,7 @@ import {
   ChromiumBrowser,
   FirefoxBrowser,
   WebKitBrowser,
+  ElementHandle,
 } from "playwright";
 
 import { launchOptions, browserContextOptions } from "./config";
@@ -34,7 +35,10 @@ export class PageView {
     this.optArgs = optArgs;
   }
 
-  async onSelector(selector: string, callback: Function) {
+  async onSelector(
+    selector: string,
+    callback: (element: ElementHandle) => void
+  ) {
     try {
       const s = await this.page.waitForSelector(selector, {
         timeout: 2000,

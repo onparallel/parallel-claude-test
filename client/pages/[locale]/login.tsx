@@ -47,12 +47,12 @@ function Login() {
   async function onLoginSubmit({ email, password }: LoginFormData) {
     setIsSubmitting(true);
     try {
-      const { token } = await postJson("/api/auth/login", {
+      const res = await postJson<{ token: string }>("/api/auth/login", {
         email,
         password,
       });
       await client.clearStore();
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", res!.token);
       router.push(
         "/[locale]/app/petitions",
         `/${router.query.locale}/app/petitions`
@@ -85,12 +85,12 @@ function Login() {
     setIsSubmitting(true);
     try {
       const { email, password } = passwordChange;
-      const { token } = await postJson("/api/auth/new-password", {
+      const res = await postJson<{ token: string }>("/api/auth/new-password", {
         email,
         password,
         newPassword,
       });
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", res!.token);
       router.push(
         "/[locale]/app/petitions",
         `/${router.query.locale}/app/petitions`

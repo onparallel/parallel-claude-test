@@ -156,6 +156,7 @@ export function withApolloData<P = {}>(
             console.error(error?.graphQLErrors?.[0]?.extensions);
           }
           if (!process.browser) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const logger = require("@parallel/utils/logger").logger;
             if (
               ![

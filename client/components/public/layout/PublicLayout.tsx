@@ -24,9 +24,9 @@ export function PublicLayout({
   const { query, pathname } = useRouter();
   const intl = useIntl();
   let headerIsThin = false;
-  let setThinHeader: Function;
   if (process.browser) {
-    [headerIsThin, setThinHeader] = useState(false);
+    const [_headerIsThin, setThinHeader] = useState(false);
+    headerIsThin = _headerIsThin;
     useWindowScroll(() => {
       if (headerIsThin && window.scrollY <= 20) {
         setThinHeader(false);

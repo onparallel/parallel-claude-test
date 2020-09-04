@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require("dotenv").config({
   path: process.env.NODE_ENV === "test" ? ".test.env" : ".env",
 });
