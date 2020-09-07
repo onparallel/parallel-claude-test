@@ -25,7 +25,7 @@ export class QueryRunner {
   }) {
     return await this.client.query({
       query: gql`
-        query petitions($limit: Int, $type: PetitionBaseType) {
+        query($limit: Int, $type: PetitionBaseType) {
           petitions(limit: $limit, type: $type) {
             totalCount
             items {
@@ -42,7 +42,7 @@ export class QueryRunner {
   async petition({ petitionId }: { petitionId: string }) {
     return await this.client.query({
       query: gql`
-        query petition($petitionId: GID!) {
+        query($petitionId: GID!) {
           petition(id: $petitionId) {
             __typename
             name
@@ -72,13 +72,37 @@ export class QueryRunner {
   }) {
     return await this.client.query({
       query: gql`
-        query publicTemplates($limit: Int, $search: String) {
+        query($limit: Int, $search: String) {
           publicTemplates(limit: $limit, search: $search) {
             totalCount
           }
         }
       `,
       variables: { limit: limit || 100, search },
+    });
+  }
+
+  // query.publicTemplates
+  // organization identifier and users is private, only users from the same org can access
+  async publicTemplatesWithPrivateData() {
+    return await this.client.query({
+      query: gql`
+        query {
+          publicTemplates(limit: 100) {
+            totalCount
+            items {
+              owner {
+                organization {
+                  identifier
+                  users {
+                    totalCount
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
     });
   }
 
@@ -111,11 +135,7 @@ export class QueryRunner {
   }) {
     return await this.client.mutate({
       mutation: gql`
-        mutation updateUser(
-          $userId: GID!
-          $firstName: String
-          $lastName: String
-        ) {
+        mutation($userId: GID!, $firstName: String, $lastName: String) {
           updateUser(
             id: $userId
             data: { firstName: $firstName, lastName: $lastName }
@@ -126,6 +146,54 @@ export class QueryRunner {
         }
       `,
       variables: { userId, firstName, lastName },
+    });
+  }
+
+  async createPetition({
+    name,
+    locale,
+    petitionId,
+    type,
+  }: {
+    name?: string;
+    locale?: "en" | "es";
+    petitionId?: string;
+    type?: "PETITION" | "TEMPLATE";
+  }) {
+    return await this.client.mutate({
+      mutation: gql`
+        mutation(
+          $name: String
+          $locale: PetitionLocale!
+          $petitionId: GID
+          $type: PetitionBaseType
+        ) {
+          createPetition(
+            name: $name
+            locale: $locale
+            petitionId: $petitionId
+            type: $type
+          ) {
+            name
+            locale
+            ... on PetitionTemplate {
+              isPublic
+            }
+            fields {
+              id
+              isFixed
+              type
+            }
+            __typename
+          }
+        }
+      `,
+      variables: {
+        name: name || null,
+        locale: locale || "en",
+        petitionId,
+        type,
+      },
     });
   }
 }

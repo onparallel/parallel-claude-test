@@ -3,7 +3,6 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, User, Petition } from "../../db/__types";
 import { userCognitoId } from "./mocks";
 import { toGlobalId } from "../../util/globalId";
-import { each } from "async";
 import { QueryRunner, TestClient } from "./QueryRunner";
 
 const petitionsBuilder = (orgId: number) => (
@@ -85,10 +84,6 @@ describe("GraphQL/Petitions", () => {
       1
     );
 
-    await each(petitions, async (p) => {
-      await mocks.createRandomPetitionFields(p.id, 5);
-    });
-
     done();
   });
 
@@ -147,16 +142,6 @@ describe("GraphQL/Petitions", () => {
     expect(data!.petition.__typename).toBe("PetitionTemplate");
   });
 
-  it("sends error when trying to fetch a private petition from other user", async () => {
-    const { errors, data } = await queryRunner.petition({
-      petitionId: toGlobalId("Petition", otherPetition.id),
-    });
-
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
-    expect(data!.petition).toBeNull();
-  });
-
   it("fetches all public templates", async () => {
     const { errors, data } = await queryRunner.publicTemplates({});
 
@@ -180,5 +165,100 @@ describe("GraphQL/Petitions", () => {
 
     expect(errors).toBeUndefined();
     expect(data!.publicTemplates.totalCount).toBe(1);
+  });
+
+  it("sends error when trying to fetch a private petition from other user", async () => {
+    const { errors, data } = await queryRunner.petition({
+      petitionId: toGlobalId("Petition", otherPetition.id),
+    });
+
+    expect(errors).toBeDefined();
+    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+    expect(data!.petition).toBeNull();
+  });
+
+  it("sends error when trying to access private information through a public template", async () => {
+    const { errors, data } = await queryRunner.publicTemplatesWithPrivateData();
+    expect(errors).toBeDefined();
+    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+    expect(data).toBeNull();
+  });
+
+  it("creates a petition from scratch with given name", async () => {
+    const { errors, data } = await queryRunner.createPetition({
+      name: "New blank petition",
+      locale: "en",
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data!.createPetition).toMatchObject({
+      name: "New blank petition",
+      fields: [
+        {
+          type: "HEADING",
+          isFixed: true,
+        },
+      ],
+      locale: "en",
+      __typename: "Petition",
+    });
+  });
+
+  it("creates a template from scratch with given name", async () => {
+    const { errors, data } = await queryRunner.createPetition({
+      name: "nueva plantilla",
+      locale: "es",
+      type: "TEMPLATE",
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data!.createPetition).toMatchObject({
+      name: "nueva plantilla",
+      fields: [
+        {
+          type: "HEADING",
+          isFixed: true,
+        },
+      ],
+      locale: "es",
+      __typename: "PetitionTemplate",
+    });
+  });
+
+  it("creates a petition using another created by same user as reference", async () => {
+    const base = petitions[3];
+    const { errors, data } = await queryRunner.createPetition({
+      petitionId: toGlobalId("Petition", base.id),
+      type: "PETITION",
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data!.createPetition).toMatchObject({
+      name: base.name,
+    });
+  });
+
+  it("creates a template based on a public template from other organization", async () => {
+    const { errors, data } = await queryRunner.createPetition({
+      petitionId: toGlobalId("Petition", publicTemplate.id),
+      type: "TEMPLATE",
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data!.createPetition).toMatchObject({
+      name: publicTemplate.name,
+      isPublic: false,
+    });
+  });
+
+  it("sends error when trying to create a petition based on a private petition from other organization", async () => {
+    const { errors, data } = await queryRunner.createPetition({
+      petitionId: toGlobalId("Petition", otherPetition.id),
+      type: "PETITION",
+    });
+
+    expect(errors).toBeDefined();
+    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+    expect(data).toBeNull();
   });
 });
