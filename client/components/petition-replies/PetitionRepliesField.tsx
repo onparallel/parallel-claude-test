@@ -143,12 +143,7 @@ export function PetitionRepliesField({
                 {field.title}
               </Text>
             ) : (
-              <Text
-                as="h4"
-                color="gray.400"
-                fontStyle="italic"
-                whiteSpace="nowrap"
-              >
+              <Text as="h4" textStyle="hint" whiteSpace="nowrap">
                 <FormattedMessage
                   id="generic.untitled-field"
                   defaultMessage="Untitled field"
@@ -215,7 +210,7 @@ export function PetitionRepliesField({
             <BreakLines text={field.description} />
           </Text>
         ) : (
-          <Text color="gray.400" fontSize="sm" fontStyle="italic">
+          <Text fontSize="sm" textStyle="hint">
             <FormattedMessage
               id="generic.no-description"
               defaultMessage="No description"
@@ -296,7 +291,7 @@ export function PetitionRepliesField({
         </Stack>
       ) : (
         <Box paddingY={4}>
-          <Text color="gray.400" fontStyle="italic" textAlign="center">
+          <Text textStyle="hint" textAlign="center">
             <FormattedMessage
               id="petition-replies.petition-field.no-replies"
               defaultMessage="There are no replies to this field yet"

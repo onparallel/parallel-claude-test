@@ -251,7 +251,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
         CellContent: ({ row: { petition } }) => (
           <>
             {petition?.name || (
-              <Text as="span" color="gray.400" fontStyle="italic">
+              <Text as="span" textStyle="hint">
                 <FormattedMessage
                   id="generic.untitled-petition"
                   defaultMessage="Untitled petition"
@@ -271,12 +271,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
           petition?.deadline ? (
             <DateTime value={petition.deadline} format={FORMATS.LLL} />
           ) : (
-            <Text
-              as="span"
-              color="gray.400"
-              fontStyle="italic"
-              whiteSpace="nowrap"
-            >
+            <Text as="span" textStyle="hint" whiteSpace="nowrap">
               <FormattedMessage
                 id="generic.no-deadline"
                 defaultMessage="No deadline"
@@ -369,13 +364,7 @@ const ToggleInput = forwardRef(function ToggleInput(
   return isEditing ? (
     <Input ref={ref} {...props} />
   ) : children === null ? (
-    <Text
-      paddingLeft={4}
-      height="40px"
-      lineHeight="40px"
-      color="gray.400"
-      fontStyle="italic"
-    >
+    <Text paddingLeft={4} height="40px" lineHeight="40px" textStyle="hint">
       <FormattedMessage
         id="generic.not-specified"
         defaultMessage="Not specified"

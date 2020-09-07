@@ -236,14 +236,14 @@ function usePetitionAccessesColumns({
           return remindersActive && nextReminderAt ? (
             <DateTime value={nextReminderAt} format={FORMATS.LLL} />
           ) : remindersLeft ? (
-            <Text color="gray.400" fontStyle="italic">
+            <Text textStyle="hint">
               <FormattedMessage
                 id="petitions.reminders-not-set"
                 defaultMessage="Not set"
               />
             </Text>
           ) : (
-            <Text color="gray.400" fontStyle="italic">
+            <Text textStyle="hint">
               <FormattedMessage
                 id="petitions.no-reminders-left"
                 defaultMessage="No reminders left"
@@ -262,7 +262,7 @@ function usePetitionAccessesColumns({
           return reminderCount ? (
             <FormattedNumber value={reminderCount} />
           ) : (
-            <Text color="gray.400" fontStyle="italic">
+            <Text textStyle="hint">
               <FormattedMessage
                 id="petition-accesses.no-reminders-sent"
                 defaultMessage="No reminders sent"

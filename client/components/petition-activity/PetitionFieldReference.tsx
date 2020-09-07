@@ -16,7 +16,7 @@ export function PetitionFieldReference({
         field.title ? (
           <Text as="strong">{ellipsis(field.title, 50)}</Text>
         ) : (
-          <Text as="span" color="gray.400" fontStyle="italic">
+          <Text as="span" textStyle="hint">
             <FormattedMessage
               id="generic.untitled-field"
               defaultMessage="Untitled field"
@@ -24,7 +24,7 @@ export function PetitionFieldReference({
           </Text>
         )
       ) : (
-        <Text as="span" color="gray.400" fontStyle="italic">
+        <Text as="span" textStyle="hint">
           <FormattedMessage
             id="timeline.reply-created-deleted-field"
             defaultMessage="Deleted field"

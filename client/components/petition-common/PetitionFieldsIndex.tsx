@@ -77,7 +77,7 @@ export function PetitionFieldsIndex({
                       </Text>
                     </Text>
                   ) : (
-                    <Text as="div" flex="1" color="gray.400" fontStyle="italic">
+                    <Text as="div" flex="1" textStyle="hint">
                       {field.type === "HEADING" ? (
                         <FormattedMessage
                           id="generic.empty-heading"

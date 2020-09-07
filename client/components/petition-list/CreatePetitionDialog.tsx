@@ -169,7 +169,7 @@ export function CreatePetitionDialog({
             </Collapse>
           </Box>
           <Box>
-            <Text fontSize="sm" as="span" fontStyle="italic" color="gray.400">
+            <Text fontSize="sm" as="span" textStyle="hint">
               <FormattedMessage
                 id="generic.can-be-changed-later"
                 defaultMessage="You can change these settings later"

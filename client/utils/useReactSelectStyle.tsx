@@ -115,13 +115,7 @@ export function useReactSelectStyle<
           </Box>
         )),
         NoOptionsMessage: memo(() => (
-          <Text
-            as="div"
-            fontStyle="italic"
-            color="gray.400"
-            textAlign="center"
-            paddingY={2}
-          >
+          <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
             <FormattedMessage
               id="component.react-select.no-options"
               defaultMessage="No options"

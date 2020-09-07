@@ -579,18 +579,7 @@ const TemplateCard = memo(function TemplateCard({
             defaultMessage: "Untitled template",
           })}
       </Heading>
-      <Text
-        fontSize="sm"
-        sx={
-          {
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: "2",
-            WebkitBoxOrient: "vertical",
-          } as any
-        }
-      >
+      <Text fontSize="sm" textStyle="truncated2">
         {template.description ? (
           <BreakLines text={template.description} />
         ) : (

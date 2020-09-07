@@ -111,7 +111,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
         <ModalContent borderRadius="md" maxHeight="calc(100vh - 7.5rem)">
           <ModalHeader fontSize="lg" fontWeight="bold">
             {field.title || (
-              <Text color="gray.400" fontWeight="normal" fontStyle="italic">
+              <Text fontWeight="normal" textStyle="hint">
                 <FormattedMessage
                   id="generic.untitled-field"
                   defaultMessage="Untitled field"

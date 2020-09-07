@@ -316,12 +316,7 @@ function usePetitionsColumns(
             {row.name ? (
               ellipsis(row.name!, 50)
             ) : (
-              <Text
-                as="span"
-                color="gray.400"
-                fontStyle="italic"
-                whiteSpace="nowrap"
-              >
+              <Text as="span" textStyle="hint" whiteSpace="nowrap">
                 {type === "PETITION" ? (
                   <FormattedMessage
                     id="generic.untitled-petition"
@@ -404,12 +399,7 @@ function usePetitionsColumns(
                   row.deadline ? (
                     <DateTime value={row.deadline} format={FORMATS.LLL} />
                   ) : (
-                    <Text
-                      as="span"
-                      color="gray.400"
-                      fontStyle="italic"
-                      whiteSpace="nowrap"
-                    >
+                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
                       <FormattedMessage
                         id="generic.no-deadline"
                         defaultMessage="No deadline"

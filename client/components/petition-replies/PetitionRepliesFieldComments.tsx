@@ -106,7 +106,7 @@ export function PetitionRepliesFieldComments({
     <Card>
       <CardHeader isCloseable onClose={onClose}>
         {field.title || (
-          <Text color="gray.400" fontWeight="normal" fontStyle="italic">
+          <Text fontWeight="normal" textStyle="hint">
             <FormattedMessage
               id="generic.untitled-field"
               defaultMessage="Untitled field"

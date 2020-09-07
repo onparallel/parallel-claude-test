@@ -65,7 +65,7 @@ export function TimelineCommentPublishedEvent({
               }}
             />
             {isEdited ? (
-              <Text as="span" color="gray.400" marginLeft={2} fontSize="sm">
+              <Text as="span" textStyle="hint" marginLeft={2} fontSize="sm">
                 <FormattedMessage
                   id="generic.edited-comment-indicator"
                   defaultMessage="Edited"

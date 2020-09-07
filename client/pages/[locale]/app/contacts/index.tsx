@@ -224,7 +224,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         CellContent: ({ row }) => (
           <>
             {row.firstName || (
-              <Text as="span" color="gray.400" fontStyle="italic">
+              <Text as="span" textStyle="hint">
                 <FormattedMessage
                   id="generic.not-specified"
                   defaultMessage="Not specified"
@@ -244,7 +244,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         CellContent: ({ row }) => (
           <>
             {row.lastName || (
-              <Text as="span" color="gray.400" fontStyle="italic">
+              <Text as="span" textStyle="hint">
                 <FormattedMessage
                   id="generic.not-specified"
                   defaultMessage="Not specified"

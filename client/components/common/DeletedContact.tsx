@@ -3,7 +3,7 @@ import { FormattedMessage } from "react-intl";
 
 export function DeletedContact() {
   return (
-    <Text as="span" color="gray.400" fontStyle="italic">
+    <Text as="span" textStyle="hint">
       <FormattedMessage
         id="generic.deleted-contact"
         defaultMessage="Deleted contact"

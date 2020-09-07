@@ -130,18 +130,7 @@ export function TemplateDetailsDialog({
           <Stack direction="row" spacing={4}>
             <Stack flex="1" minWidth={0}>
               {template.name ? (
-                <Heading
-                  size="lg"
-                  sx={
-                    {
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "-webkit-box",
-                      WebkitLineClamp: "2",
-                      WebkitBoxOrient: "vertical",
-                    } as any
-                  }
-                >
+                <Heading size="lg" textStyle="truncated2">
                   {template.name}
                 </Heading>
               ) : (
@@ -250,7 +239,7 @@ export function TemplateDetailsDialog({
               <BreakLines text={template.description} />
             </Text>
           ) : (
-            <Text textAlign="center" fontStyle="italic" color="gray.400">
+            <Text textAlign="center" textStyle="hint">
               <FormattedMessage
                 id="template-details.no-description-provided"
                 defaultMessage="No description provided."
@@ -274,8 +263,7 @@ export function TemplateDetailsDialog({
                   ) : (
                     <Text
                       as="span"
-                      color="gray.400"
-                      fontStyle="italic"
+                      textStyle="hint"
                       aria-label={intl.formatMessage({
                         id: "generic.empty-heading",
                         defaultMessage: "Untitled heading",
@@ -297,8 +285,7 @@ export function TemplateDetailsDialog({
                   ) : (
                     <Text
                       as="span"
-                      color="gray.400"
-                      fontStyle="italic"
+                      textStyle="hint"
                       aria-label={intl.formatMessage({
                         id: "generic.untitled-field",
                         defaultMessage: "Untitled field",
