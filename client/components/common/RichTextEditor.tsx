@@ -13,6 +13,7 @@ import {
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
+  AutoformatRule,
   BoldPlugin,
   EditablePlugins,
   EditablePluginsProps,
@@ -27,14 +28,16 @@ import {
   toggleList,
   toggleMark,
   UnderlinePlugin,
+  unwrapList,
+  withAutoformat,
+  withList,
 } from "@udecode/slate-plugins";
 import { createElement, CSSProperties, memo, MouseEvent, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
-import { createEditor, Node } from "slate";
+import { createEditor, Editor, Node } from "slate";
 import { withHistory } from "slate-history";
 import { Slate, useSlate, withReact } from "slate-react";
-import { withAutolist } from "../../utils/slate/withAutolist";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
@@ -136,7 +139,25 @@ export function RichTextEditor({
     isReadOnly,
   });
   const editor = useMemo(
-    () => pipe(createEditor(), withHistory, withReact, withAutolist(options)),
+    () =>
+      pipe(
+        createEditor(),
+        withHistory,
+        withReact,
+        withList(options),
+        withAutoformat({
+          rules: [
+            {
+              type: options.li.type,
+              markup: ["*", "-"],
+              preFormat: (editor: Editor) => unwrapList(editor, options),
+              format: (editor) => {
+                toggleList(editor, { ...options, typeList: options.ul.type });
+              },
+            },
+          ] as AutoformatRule[],
+        })
+      ),
     []
   );
 

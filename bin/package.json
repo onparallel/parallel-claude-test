@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@formatjs/cli": "^2.9.0",
-    "aws-sdk": "^2.746.0",
+    "aws-sdk": "^2.747.0",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "intl-messageformat-parser": "^6.0.5",
-    "remeda": "^0.0.20",
+    "remeda": "^0.0.22",
     "yargs": "^15.4.1"
   },
   "devDependencies": {
