@@ -239,7 +239,7 @@ export function TemplateDetailsDialog({
               </SplitButton>
             </Stack>
           </Stack>
-          <Heading size="md" marginBottom={4} marginTop={4}>
+          <Heading size="md" marginBottom={4} marginTop={8}>
             <FormattedMessage
               id="template-details.about"
               defaultMessage="About this template"
