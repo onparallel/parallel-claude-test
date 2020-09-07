@@ -119,6 +119,7 @@ export const clonePetitions = mutationField("clonePetitions", {
       required: true,
     }),
   },
+  validateArgs: notEmptyArray((args) => args.petitionIds, "petitionIds"),
   resolve: async (_, args, ctx) => {
     return await mapSeries(
       unMaybeArray(args.petitionIds),

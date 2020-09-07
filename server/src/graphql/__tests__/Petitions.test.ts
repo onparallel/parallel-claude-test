@@ -14,6 +14,7 @@ const petitionsBuilder = (orgId: number) => (
   org_id: orgId,
   created_at: new Date(),
   created_by: "User:1",
+  locale: "en",
   name: index > 5 ? `Template ${index}` : `Petition ${index}`,
   template_description: index > 5 ? `Template description ${index}` : null,
 });
@@ -92,173 +93,280 @@ describe("GraphQL/Petitions", () => {
     done();
   });
 
-  it("fetches all user petitions", async () => {
-    const { errors, data } = await queryRunner.petitions({
-      type: "PETITION",
+  describe("Queries", () => {
+    it("fetches all user petitions", async () => {
+      const { errors, data } = await queryRunner.petitions({
+        type: "PETITION",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.petitions.totalCount).toBe(6);
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.petitions.totalCount).toBe(6);
-  });
-
-  it("fetches a limited amount of petitions", async () => {
-    const { errors, data } = await queryRunner.petitions({
-      limit: 2,
-      type: "PETITION",
-    });
-    expect(errors).toBeUndefined();
-    expect(data!.petitions.totalCount).toBe(6);
-    expect(data!.petitions.items).toHaveLength(2);
-  });
-
-  it("fetches only templates", async () => {
-    const { errors, data } = await queryRunner.petitions({
-      type: "TEMPLATE",
-    });
-    expect(errors).toBeUndefined();
-    expect(data!.petitions.totalCount).toBe(4);
-  });
-
-  it("fetches a single petition from logged user", async () => {
-    const { errors, data } = await queryRunner.petition({
-      petitionId: toGlobalId("Petition", petitions[0].id),
+    it("fetches a limited amount of petitions", async () => {
+      const { errors, data } = await queryRunner.petitions({
+        limit: 2,
+        type: "PETITION",
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.petitions.totalCount).toBe(6);
+      expect(data!.petitions.items).toHaveLength(2);
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.petition.owner.id).toBe(toGlobalId("User", sessionUser.id));
-    expect(data!.petition.__typename).toBe("Petition");
-  });
-
-  it("fetches a public template from another organization", async () => {
-    const { errors, data } = await queryRunner.petition({
-      petitionId: toGlobalId("Petition", publicTemplate.id),
+    it("fetches only templates", async () => {
+      const { errors, data } = await queryRunner.petitions({
+        type: "TEMPLATE",
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.petitions.totalCount).toBe(4);
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.petition.owner.organization.id).toBe(
-      toGlobalId("Organization", otherOrg.id)
-    );
-    expect(data!.petition.owner.id).toBe(toGlobalId("User", otherUser.id));
-    expect(data!.petition.__typename).toBe("PetitionTemplate");
-  });
+    it("fetches a single petition from logged user", async () => {
+      const { errors, data } = await queryRunner.petition({
+        petitionId: toGlobalId("Petition", petitions[0].id),
+      });
 
-  it("fetches all public templates", async () => {
-    const { errors, data } = await queryRunner.publicTemplates({});
-
-    expect(errors).toBeUndefined();
-    expect(data!.publicTemplates.totalCount).toBe(3);
-  });
-
-  it("fetches all public templates with name matching search query", async () => {
-    const { errors, data } = await queryRunner.publicTemplates({
-      search: "Know Your Client",
+      expect(errors).toBeUndefined();
+      expect(data!.petition.owner.id).toBe(toGlobalId("User", sessionUser.id));
+      expect(data!.petition.__typename).toBe("Petition");
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.publicTemplates.totalCount).toBe(1);
-  });
+    it("fetches a public template from another organization", async () => {
+      const { errors, data } = await queryRunner.petition({
+        petitionId: toGlobalId("Petition", publicTemplate.id),
+      });
 
-  it("fetches all public templates with descrpition matching search query", async () => {
-    const { errors, data } = await queryRunner.publicTemplates({
-      search: "description for kyc",
+      expect(errors).toBeUndefined();
+      expect(data!.petition.owner.organization.id).toBe(
+        toGlobalId("Organization", otherOrg.id)
+      );
+      expect(data!.petition.owner.id).toBe(toGlobalId("User", otherUser.id));
+      expect(data!.petition.__typename).toBe("PetitionTemplate");
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.publicTemplates.totalCount).toBe(1);
-  });
+    it("fetches all public templates", async () => {
+      const { errors, data } = await queryRunner.publicTemplates({});
 
-  it("sends error when trying to fetch a private petition from other user", async () => {
-    const { errors, data } = await queryRunner.petition({
-      petitionId: toGlobalId("Petition", otherPetition.id),
+      expect(errors).toBeUndefined();
+      expect(data!.publicTemplates.totalCount).toBe(3);
     });
 
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
-    expect(data!.petition).toBeNull();
-  });
+    it("fetches all public templates with name matching search query", async () => {
+      const { errors, data } = await queryRunner.publicTemplates({
+        search: "Know Your Client",
+      });
 
-  it("sends error when trying to access private information through a public template", async () => {
-    const { errors, data } = await queryRunner.publicTemplatesWithPrivateData();
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
-    expect(data).toBeNull();
-  });
-
-  it("creates a petition from scratch with given name", async () => {
-    const { errors, data } = await queryRunner.createPetition({
-      name: "New blank petition",
-      locale: "en",
+      expect(errors).toBeUndefined();
+      expect(data!.publicTemplates.totalCount).toBe(1);
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.createPetition).toMatchObject({
-      name: "New blank petition",
-      fields: [
+    it("fetches all public templates with descrpition matching search query", async () => {
+      const { errors, data } = await queryRunner.publicTemplates({
+        search: "description for kyc",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.publicTemplates.totalCount).toBe(1);
+    });
+
+    it("sends error when trying to fetch a private petition from other user", async () => {
+      const { errors, data } = await queryRunner.petition({
+        petitionId: toGlobalId("Petition", otherPetition.id),
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data!.petition).toBeNull();
+    });
+
+    it("sends error when trying to access private information through a public template", async () => {
+      const {
+        errors,
+        data,
+      } = await queryRunner.publicTemplatesWithPrivateData();
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("createPetition", () => {
+    it("creates a petition from scratch with given name", async () => {
+      const { errors, data } = await queryRunner.createPetition({
+        name: "New blank petition",
+        locale: "en",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetition).toMatchObject({
+        name: "New blank petition",
+        owner: { id: toGlobalId("User", sessionUser.id) },
+        fields: [
+          {
+            type: "HEADING",
+            isFixed: true,
+          },
+        ],
+        locale: "en",
+        __typename: "Petition",
+      });
+    });
+
+    it("creates a template from scratch with given name", async () => {
+      const { errors, data } = await queryRunner.createPetition({
+        name: "nueva plantilla",
+        locale: "es",
+        type: "TEMPLATE",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetition).toMatchObject({
+        name: "nueva plantilla",
+        owner: { id: toGlobalId("User", sessionUser.id) },
+        fields: [
+          {
+            type: "HEADING",
+            isFixed: true,
+          },
+        ],
+        locale: "es",
+        __typename: "PetitionTemplate",
+      });
+    });
+
+    it("creates a petition using another created by same user as reference", async () => {
+      const base = petitions[3];
+      const { errors, data } = await queryRunner.createPetition({
+        petitionId: toGlobalId("Petition", base.id),
+        type: "PETITION",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetition).toMatchObject({
+        name: base.name,
+        owner: { id: toGlobalId("User", sessionUser.id) },
+      });
+    });
+
+    it("creates a template based on a public template from other organization", async () => {
+      const { errors, data } = await queryRunner.createPetition({
+        petitionId: toGlobalId("Petition", publicTemplate.id),
+        type: "TEMPLATE",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetition).toMatchObject({
+        name: publicTemplate.name,
+        owner: { id: toGlobalId("User", sessionUser.id) },
+        isPublic: false,
+      });
+    });
+
+    it("creates a petition based on a public template", async () => {
+      const { errors, data } = await queryRunner.createPetition({
+        petitionId: toGlobalId("Petition", publicTemplate.id),
+        type: "PETITION",
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetition).toMatchObject({
+        name: publicTemplate.name,
+        status: "DRAFT",
+        owner: { id: toGlobalId("User", sessionUser.id) },
+        locale: publicTemplate.locale,
+        __typename: "Petition",
+      });
+    });
+
+    it("sends error when trying to create a petition based on a private petition from other organization", async () => {
+      const { errors, data } = await queryRunner.createPetition({
+        petitionId: toGlobalId("Petition", otherPetition.id),
+        type: "PETITION",
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("clonePetition", () => {
+    it("clones a single petition from a valid id", async () => {
+      const petition = petitions[3];
+      const petitionGID = toGlobalId("Petition", petition.id);
+      const { errors, data } = await queryRunner.clonePetitions({
+        petitionIds: [petitionGID],
+      });
+
+      expect(errors).toBeUndefined();
+      expect(Array.isArray(data!.clonePetitions)).toBe(true);
+      expect(data!.clonePetitions[0].id).not.toBe(petitionGID);
+      expect(data!.clonePetitions).toMatchObject([
         {
-          type: "HEADING",
-          isFixed: true,
+          name: petition.name!.concat(" (copy)"),
+          locale: petition.locale,
+          owner: { id: toGlobalId("User", sessionUser.id) },
+          status: "DRAFT",
+          __typename: "Petition",
         },
-      ],
-      locale: "en",
-      __typename: "Petition",
+      ]);
     });
-  });
-
-  it("creates a template from scratch with given name", async () => {
-    const { errors, data } = await queryRunner.createPetition({
-      name: "nueva plantilla",
-      locale: "es",
-      type: "TEMPLATE",
+    it("clones a valid list of petitions", async () => {
+      const { errors, data } = await queryRunner.clonePetitions({
+        petitionIds: petitions.map((p) => toGlobalId("Petition", p.id)),
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.clonePetitions).toHaveLength(petitions.length);
     });
 
-    expect(errors).toBeUndefined();
-    expect(data!.createPetition).toMatchObject({
-      name: "nueva plantilla",
-      fields: [
-        {
-          type: "HEADING",
-          isFixed: true,
-        },
-      ],
-      locale: "es",
-      __typename: "PetitionTemplate",
+    it("clones a public template and saves it as private", async () => {
+      const { errors, data } = await queryRunner.clonePetitions({
+        petitionIds: [toGlobalId("Petition", publicTemplate.id)],
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.clonePetitions[0]).toMatchObject({
+        isPublic: false,
+        name: publicTemplate.name?.concat(
+          publicTemplate.locale === "en" ? " (copy)" : " (copia)"
+        ),
+        __typename: "PetitionTemplate",
+      });
     });
-  });
+    it("inserts a new petition when cloning", async () => {
+      const { data } = await queryRunner.petitions({
+        type: "PETITION",
+      });
+      const availablePetitions = data!.petitions.totalCount;
 
-  it("creates a petition using another created by same user as reference", async () => {
-    const base = petitions[3];
-    const { errors, data } = await queryRunner.createPetition({
-      petitionId: toGlobalId("Petition", base.id),
-      type: "PETITION",
+      await queryRunner.clonePetitions({
+        petitionIds: [toGlobalId("Petition", petitions[0].id)],
+      });
+
+      const { data: newData } = await queryRunner.petitions({
+        type: "PETITION",
+      });
+      const newAvailablePetitions = newData!.petitions.totalCount;
+
+      expect(availablePetitions + 1).toBe(newAvailablePetitions);
     });
+    it("sends error when passing an empty array of ids", async () => {
+      const { errors, data } = await queryRunner.clonePetitions({
+        petitionIds: [],
+      });
 
-    expect(errors).toBeUndefined();
-    expect(data!.createPetition).toMatchObject({
-      name: base.name,
-    });
-  });
-
-  it("creates a template based on a public template from other organization", async () => {
-    const { errors, data } = await queryRunner.createPetition({
-      petitionId: toGlobalId("Petition", publicTemplate.id),
-      type: "TEMPLATE",
-    });
-
-    expect(errors).toBeUndefined();
-    expect(data!.createPetition).toMatchObject({
-      name: publicTemplate.name,
-      isPublic: false,
-    });
-  });
-
-  it("sends error when trying to create a petition based on a private petition from other organization", async () => {
-    const { errors, data } = await queryRunner.createPetition({
-      petitionId: toGlobalId("Petition", otherPetition.id),
-      type: "PETITION",
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
     });
 
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
-    expect(data).toBeNull();
+    it("sends error when an petition on the list is not accessible for session user", async () => {
+      const { errors, data } = await queryRunner.clonePetitions({
+        petitionIds: [toGlobalId("Petition", otherPetition.id)],
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 });

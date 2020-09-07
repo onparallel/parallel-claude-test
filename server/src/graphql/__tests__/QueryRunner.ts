@@ -176,6 +176,12 @@ export class QueryRunner {
           ) {
             name
             locale
+            owner {
+              id
+            }
+            ... on Petition {
+              status
+            }
             ... on PetitionTemplate {
               isPublic
             }
@@ -194,6 +200,31 @@ export class QueryRunner {
         petitionId,
         type,
       },
+    });
+  }
+
+  async clonePetitions({ petitionIds }: { petitionIds: string[] }) {
+    return await this.client.mutate({
+      mutation: gql`
+        mutation($petitionIds: [GID!]!) {
+          clonePetitions(petitionIds: $petitionIds) {
+            id
+            name
+            locale
+            owner {
+              id
+            }
+            ... on Petition {
+              status
+            }
+            ... on PetitionTemplate {
+              isPublic
+            }
+            __typename
+          }
+        }
+      `,
+      variables: { petitionIds },
     });
   }
 }
