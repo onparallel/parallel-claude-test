@@ -37,6 +37,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { SplitButton } from "../common/SplitButton";
 
@@ -245,8 +246,8 @@ export function TemplateDetailsDialog({
             />
           </Heading>
           {template.description ? (
-            <Text aria-label={template.description}>
-              {template.description}
+            <Text>
+              <BreakLines text={template.description} />
             </Text>
           ) : (
             <Text textAlign="center" fontStyle="italic" color="gray.400">

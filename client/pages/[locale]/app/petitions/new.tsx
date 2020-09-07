@@ -57,6 +57,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
+import { BreakLines } from "@parallel/components/common/BreakLines";
 
 function NewPetition() {
   const intl = useIntl();
@@ -590,13 +591,15 @@ const TemplateCard = memo(function TemplateCard({
           } as any
         }
       >
-        {template.description || (
-          <i>
+        {template.description ? (
+          <BreakLines text={template.description} />
+        ) : (
+          <Text fontStyle="italic">
             <FormattedMessage
               id="template-details.no-description-provided"
               defaultMessage="No description provided."
             />
-          </i>
+          </Text>
         )}
       </Text>
       <Spacer />
