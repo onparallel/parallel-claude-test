@@ -102,7 +102,7 @@ export function ifArgDefined<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     if (isDefined(args[argName])) {
-      await authorizer(root, args, ctx, info);
+      return await authorizer(root, args, ctx, info);
     }
     return true;
   };
