@@ -29,6 +29,7 @@ describe("GraphQL/Petitions", () => {
 
   let otherOrg: Organization;
   let otherUser: User;
+  let sameOrgUser: User;
   let otherPetition: Petition;
   let publicTemplate: Petition;
 
@@ -47,12 +48,16 @@ describe("GraphQL/Petitions", () => {
     [otherOrg] = await mocks.createRandomOrganizations(1);
 
     // logged user
-    [sessionUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: userCognitoId,
-      first_name: "Harvey",
-      last_name: "Specter",
-      org_id: organization.id,
-    }));
+    [sessionUser, sameOrgUser] = await mocks.createRandomUsers(
+      organization.id,
+      2,
+      (i) => ({
+        cognito_id: i === 0 ? userCognitoId : "123456",
+        first_name: i === 0 ? "Harvey" : undefined,
+        last_name: i === 0 ? "Specter" : undefined,
+        org_id: organization.id,
+      })
+    );
 
     [otherUser] = await mocks.createRandomUsers(otherOrg.id, 1);
 
@@ -63,6 +68,14 @@ describe("GraphQL/Petitions", () => {
       10,
       petitionsBuilder(organization.id)
     );
+
+    // petitions[0] and petitions[1] are shared to another user
+    await testClient.knex.raw(/* sql */ `
+      INSERT INTO petition_user(petition_id, user_id, permission_type)
+      VALUES 
+        (${petitions[0].id}, ${sameOrgUser.id}, 'WRITE'),
+        (${petitions[1].id}, ${sameOrgUser.id}, 'WRITE')
+    `);
 
     // a public template from secondary organization
     [publicTemplate] = await mocks.createRandomPetitions(
@@ -366,6 +379,57 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeDefined();
       expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("deletePetitions", () => {
+    it("deletes a user petition", async () => {
+      const { errors, data } = await queryRunner.deletePetitions({
+        ids: [toGlobalId("Petition", petitions[2].id)],
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitions).toBe("SUCCESS");
+    });
+
+    it("deletes an owned shared petition when passing the force flag", async () => {
+      const shared = petitions[0];
+      const { errors, data } = await queryRunner.deletePetitions({
+        ids: [toGlobalId("Petition", shared.id)],
+        force: true,
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitions).toBe("SUCCESS");
+    });
+
+    it("sends error when trying to delete a private petition", async () => {
+      const { errors, data } = await queryRunner.deletePetitions({
+        ids: [toGlobalId("Petition", otherPetition.id)],
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error if passing an empty array of ids", async () => {
+      const { errors, data } = await queryRunner.deletePetitions({
+        ids: [],
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to delete an owned shared petition without force flag", async () => {
+      const shared = petitions[1];
+      const { errors, data } = await queryRunner.deletePetitions({
+        ids: [toGlobalId("Petition", shared.id)],
+      });
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("DELETE_SHARED_PETITION_ERROR");
       expect(data).toBeNull();
     });
   });

@@ -227,4 +227,15 @@ export class QueryRunner {
       variables: { petitionIds },
     });
   }
+
+  async deletePetitions({ ids, force }: { ids: string[]; force?: boolean }) {
+    return await this.client.mutate({
+      mutation: gql`
+        mutation($ids: [GID!]!, $force: Boolean) {
+          deletePetitions(ids: $ids, force: $force)
+        }
+      `,
+      variables: { ids, force },
+    });
+  }
 }
