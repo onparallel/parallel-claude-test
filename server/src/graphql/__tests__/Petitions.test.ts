@@ -792,4 +792,265 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
   });
+
+  describe("updatePetition", () => {
+    it("updates the petition with given values", async () => {
+      const variables = {
+        name: "Petition4 new name",
+        locale: "en",
+        deadline: "2019-12-03T10:15:30.000Z",
+        emailSubject: "subject for the email",
+        emailBody: [{ children: [{ text: "new email body" }] }],
+      };
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $name: String
+            $locale: PetitionLocale
+            $deadline: DateTime
+            $emailSubject: String
+            $emailBody: JSON
+          ) {
+            updatePetition(
+              petitionId: $petitionId
+              data: {
+                name: $name
+                locale: $locale
+                deadline: $deadline
+                emailSubject: $emailSubject
+                emailBody: $emailBody
+              }
+            ) {
+              id
+              name
+              locale
+              emailSubject
+              emailBody
+              ... on Petition {
+                deadline
+              }
+              __typename
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[4].id),
+          ...variables,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetition).toEqual({
+        id: toGlobalId("Petition", petitions[4].id),
+        ...variables,
+        __typename: "Petition",
+      });
+    });
+
+    it("updates petition with valid remindersConfig", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $remindersConfig: RemindersConfigInput) {
+            updatePetition(
+              petitionId: $petitionId
+              data: { remindersConfig: $remindersConfig }
+            ) {
+              id
+              ... on Petition {
+                remindersConfig {
+                  offset
+                  time
+                  timezone
+                  weekdaysOnly
+                }
+              }
+              __typename
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[4].id),
+          remindersConfig: {
+            offset: 1,
+            time: "12:45",
+            timezone: "Europe/Madrid",
+            weekdaysOnly: false,
+          },
+          __typename: "Petition",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetition).toEqual({
+        id: toGlobalId("Petition", petitions[4].id),
+        remindersConfig: {
+          offset: 1,
+          time: "12:45",
+          timezone: "Europe/Madrid",
+          weekdaysOnly: false,
+        },
+        __typename: "Petition",
+      });
+    });
+
+    it("updates template description with given value", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $description: String) {
+            updatePetition(
+              petitionId: $petitionId
+              data: { description: $description }
+            ) {
+              id
+              ... on PetitionTemplate {
+                description
+              }
+              __typename
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[6].id),
+          description: "this is the description",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetition).toEqual({
+        id: toGlobalId("Petition", petitions[6].id),
+        description: "this is the description",
+        __typename: "PetitionTemplate",
+      });
+    });
+
+    it("trims name, description and emailSubject before updating petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $name: String
+            $description: String
+            $emailSubject: String
+          ) {
+            updatePetition(
+              petitionId: $petitionId
+              data: {
+                name: $name
+                description: $description
+                emailSubject: $emailSubject
+              }
+            ) {
+              id
+              name
+              emailSubject
+              ... on PetitionTemplate {
+                description
+              }
+              __typename
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[6].id),
+          name: "   petition  name",
+          description: `   petition description with spaces and newlines      
+          
+          
+          `,
+          emailSubject: "                  ",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetition).toEqual({
+        id: toGlobalId("Petition", petitions[6].id),
+        name: "petition  name",
+        description: "petition description with spaces and newlines",
+        emailSubject: null,
+        __typename: "PetitionTemplate",
+      });
+    });
+
+    it("sends error when trying to update petition with empty data", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!) {
+            updatePetition(petitionId: $petitionId, data: {}) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[6].id),
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update a private petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!) {
+            updatePetition(petitionId: $petitionId, data: { name: "foo" }) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", otherPetition.id),
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update a not owned public template", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!) {
+            updatePetition(petitionId: $petitionId, data: { name: "foo" }) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", publicTemplate.id),
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to update email body with invalid value", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $emailBody: JSON) {
+            updatePetition(
+              petitionId: $petitionId
+              data: { emailBody: $emailBody }
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petitions[5].id),
+          emailBody: { text: "invalid structure" },
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+  });
 });
