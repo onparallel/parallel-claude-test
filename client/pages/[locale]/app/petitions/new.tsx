@@ -581,7 +581,7 @@ const TemplateCard = memo(function TemplateCard({
             defaultMessage: "Untitled template",
           })}
       </Heading>
-      <Text fontSize="sm" textStyle="truncated2">
+      <Text fontSize="sm" noOfLines={2}>
         {template.description ? (
           <BreakLines text={template.description} />
         ) : (

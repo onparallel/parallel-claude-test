@@ -130,7 +130,7 @@ export function TemplateDetailsDialog({
           <Stack direction="row" spacing={4}>
             <Stack flex="1" minWidth={0}>
               {template.name ? (
-                <Heading size="lg" textStyle="truncated2">
+                <Heading size="lg" noOfLines={2}>
                   {template.name}
                 </Heading>
               ) : (

@@ -57,13 +57,6 @@ export const theme = {
       color: "gray.400",
       fontStyle: "italic",
     },
-    truncated2: {
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      display: "-webkit-box",
-      WebkitLineClamp: "2",
-      WebkitBoxOrient: "vertical",
-    },
   },
   components: {
     ...base.components,
