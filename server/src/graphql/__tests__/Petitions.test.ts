@@ -305,7 +305,6 @@ describe("GraphQL/Petitions", () => {
                 id
               }
               fields {
-                id
                 isFixed
                 type
               }
@@ -320,7 +319,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetition).toMatchObject({
+      expect(data!.createPetition).toEqual({
         name: "New blank petition",
         locale: "en",
         owner: { id: toGlobalId("User", sessionUser.id) },
@@ -349,7 +348,6 @@ describe("GraphQL/Petitions", () => {
                 id
               }
               fields {
-                id
                 isFixed
                 type
               }
@@ -365,10 +363,10 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetition).toMatchObject({
+      expect(data!.createPetition).toEqual({
         name: "nueva plantilla",
-        owner: { id: toGlobalId("User", sessionUser.id) },
         locale: "es",
+        owner: { id: toGlobalId("User", sessionUser.id) },
         fields: [
           {
             type: "HEADING",
@@ -409,7 +407,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetition).toMatchObject({
+      expect(data!.createPetition).toEqual({
         name: base.name,
         owner: { id: toGlobalId("User", sessionUser.id) },
         __typename: "Petition",
@@ -449,7 +447,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetition).toMatchObject({
+      expect(data!.createPetition).toEqual({
         name: publicTemplate.name,
         locale: "en",
         owner: { id: toGlobalId("User", sessionUser.id) },
@@ -493,11 +491,11 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetition).toMatchObject({
+      expect(data!.createPetition).toEqual({
         name: publicTemplate.name,
-        status: "DRAFT",
-        owner: { id: toGlobalId("User", sessionUser.id) },
         locale: publicTemplate.locale,
+        owner: { id: toGlobalId("User", sessionUser.id) },
+        status: "DRAFT",
         __typename: "Petition",
       });
     });
@@ -531,7 +529,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.createPetition).toMatchObject({
+      expect(data!.createPetition).toEqual({
         name: publicTemplate.name,
         locale: "en",
       });
@@ -575,7 +573,6 @@ describe("GraphQL/Petitions", () => {
         mutation: gql`
           mutation($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
-              id
               name
               locale
               owner {
@@ -594,7 +591,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(Array.isArray(data!.clonePetitions)).toBe(true);
       expect(data!.clonePetitions[0].id).not.toBe(petitionGID);
-      expect(data!.clonePetitions).toMatchObject([
+      expect(data!.clonePetitions).toEqual([
         {
           name: petition.name!.concat(" (copy)"),
           locale: petition.locale,
@@ -638,7 +635,7 @@ describe("GraphQL/Petitions", () => {
         variables: { petitionIds: [toGlobalId("Petition", publicTemplate.id)] },
       });
       expect(errors).toBeUndefined();
-      expect(data!.clonePetitions[0]).toMatchObject({
+      expect(data!.clonePetitions[0]).toEqual({
         name: publicTemplate.name?.concat(
           publicTemplate.locale === "en" ? " (copy)" : " (copia)"
         ),

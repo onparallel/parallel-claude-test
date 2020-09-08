@@ -50,7 +50,7 @@ describe("GraphQL/Users", () => {
       `,
     });
     expect(errors).toBeUndefined();
-    expect(data!.me).toMatchObject({
+    expect(data!.me).toEqual({
       id: userGID,
       fullName: "Harvey Specter",
       organization: {
@@ -76,7 +76,7 @@ describe("GraphQL/Users", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data!.updateUser).toMatchObject({
+    expect(data!.updateUser).toEqual({
       id: userGID,
       fullName: "Mike Ross",
     });
