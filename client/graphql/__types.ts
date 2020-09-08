@@ -2288,6 +2288,16 @@ export type RecipientViewSenderCard_PublicUserFragment = {
     >;
   };
 
+export type SupportMethods_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type SupportMethodsUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SupportMethodsUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & SupportMethods_UserFragment;
+};
+
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
   "id" | "email" | "fullName" | "firstName" | "lastName"
@@ -3626,6 +3636,37 @@ export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
     email
   }
 `;
+export const UserMenu_UserFragmentDoc = gql`
+  fragment UserMenu_User on User {
+    fullName
+  }
+`;
+export const AppLayoutNavbar_UserFragmentDoc = gql`
+  fragment AppLayoutNavbar_User on User {
+    ...UserMenu_User
+  }
+  ${UserMenu_UserFragmentDoc}
+`;
+export const OnboardingTour_UserFragmentDoc = gql`
+  fragment OnboardingTour_User on User {
+    onboardingStatus
+  }
+`;
+export const AppLayout_UserFragmentDoc = gql`
+  fragment AppLayout_User on User {
+    id
+    ...AppLayoutNavbar_User
+    ...OnboardingTour_User
+  }
+  ${AppLayoutNavbar_UserFragmentDoc}
+  ${OnboardingTour_UserFragmentDoc}
+`;
+export const SupportMethods_UserFragmentDoc = gql`
+  fragment SupportMethods_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
 export const Contact_PetitionAccessFragmentDoc = gql`
   fragment Contact_PetitionAccess on PetitionAccess {
     id
@@ -3657,31 +3698,6 @@ export const Contact_ContactFragmentDoc = gql`
     }
   }
   ${Contact_PetitionAccessFragmentDoc}
-`;
-export const UserMenu_UserFragmentDoc = gql`
-  fragment UserMenu_User on User {
-    fullName
-  }
-`;
-export const AppLayoutNavbar_UserFragmentDoc = gql`
-  fragment AppLayoutNavbar_User on User {
-    ...UserMenu_User
-  }
-  ${UserMenu_UserFragmentDoc}
-`;
-export const OnboardingTour_UserFragmentDoc = gql`
-  fragment OnboardingTour_User on User {
-    onboardingStatus
-  }
-`;
-export const AppLayout_UserFragmentDoc = gql`
-  fragment AppLayout_User on User {
-    id
-    ...AppLayoutNavbar_User
-    ...OnboardingTour_User
-  }
-  ${AppLayoutNavbar_UserFragmentDoc}
-  ${OnboardingTour_UserFragmentDoc}
 `;
 export const Contact_UserFragmentDoc = gql`
   fragment Contact_User on User {
@@ -5138,6 +5154,62 @@ export type useTemplateDetailsDialogPetitionLazyQueryHookResult = ReturnType<
 export type useTemplateDetailsDialogPetitionQueryResult = Apollo.QueryResult<
   useTemplateDetailsDialogPetitionQuery,
   useTemplateDetailsDialogPetitionQueryVariables
+>;
+export const SupportMethodsUserDocument = gql`
+  query SupportMethodsUser {
+    me {
+      ...SupportMethods_User
+    }
+  }
+  ${SupportMethods_UserFragmentDoc}
+`;
+
+/**
+ * __useSupportMethodsUserQuery__
+ *
+ * To run a query within a React component, call `useSupportMethodsUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSupportMethodsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSupportMethodsUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSupportMethodsUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    SupportMethodsUserQuery,
+    SupportMethodsUserQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    SupportMethodsUserQuery,
+    SupportMethodsUserQueryVariables
+  >(SupportMethodsUserDocument, baseOptions);
+}
+export function useSupportMethodsUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SupportMethodsUserQuery,
+    SupportMethodsUserQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    SupportMethodsUserQuery,
+    SupportMethodsUserQueryVariables
+  >(SupportMethodsUserDocument, baseOptions);
+}
+export type SupportMethodsUserQueryHookResult = ReturnType<
+  typeof useSupportMethodsUserQuery
+>;
+export type SupportMethodsUserLazyQueryHookResult = ReturnType<
+  typeof useSupportMethodsUserLazyQuery
+>;
+export type SupportMethodsUserQueryResult = Apollo.QueryResult<
+  SupportMethodsUserQuery,
+  SupportMethodsUserQueryVariables
 >;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
