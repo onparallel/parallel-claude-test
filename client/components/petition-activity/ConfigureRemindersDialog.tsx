@@ -4,10 +4,11 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { RemindersConfig } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
+import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
-import { useState } from "react";
-import { RemindersConfig, Maybe } from "@parallel/graphql/__types";
 
 export type ConfigureRemindersDialogProps = {
   defaultConfig: Maybe<RemindersConfig>;

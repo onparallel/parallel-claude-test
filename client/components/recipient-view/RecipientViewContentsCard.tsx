@@ -2,11 +2,11 @@ import { gql } from "@apollo/client";
 import { Box, Heading, List, ListItem, Stack, Text } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
-  Maybe,
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
   RecipientViewContentsCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";

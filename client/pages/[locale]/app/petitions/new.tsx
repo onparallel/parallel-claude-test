@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/core";
 import { AddIcon, ChevronDownIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
+import { BreakLines } from "@parallel/components/common/BreakLines";
 import { Card } from "@parallel/components/common/Card";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -24,41 +25,40 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
 import {
-  Maybe,
+  NewPetitionPublicTemplatesQuery,
+  NewPetitionPublicTemplatesQueryVariables,
+  NewPetitionTemplatesQuery,
+  NewPetitionTemplatesQueryVariables,
   NewPetition_PetitionTemplateFragment,
   PetitionLocale,
   PetitionsUserQuery,
   useNewPetitionPublicTemplatesQuery,
   useNewPetitionTemplatesQuery,
   useNewPetitionUserQuery,
-  NewPetitionPublicTemplatesQuery,
-  NewPetitionTemplatesQuery,
-  NewPetitionPublicTemplatesQueryVariables,
-  NewPetitionTemplatesQueryVariables,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
 import { compose } from "@parallel/utils/compose";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import {
   ChangeEvent,
   memo,
   ReactNode,
+  Ref,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  Ref,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
-import { BreakLines } from "@parallel/components/common/BreakLines";
-import { useRoleButton } from "@parallel/utils/useRoleButton";
 
 function NewPetition() {
   const intl = useIntl();
