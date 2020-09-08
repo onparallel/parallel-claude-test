@@ -574,7 +574,7 @@ const TemplateCard = memo(function TemplateCard({
       {...buttonProps}
       {...props}
     >
-      <Heading size="xs" isTruncated>
+      <Heading size="xs" noOfLines={2}>
         {template.name ||
           intl.formatMessage({
             id: "generic.untitled-template",
