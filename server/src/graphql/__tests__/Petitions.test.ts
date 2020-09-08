@@ -589,8 +589,6 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(Array.isArray(data!.clonePetitions)).toBe(true);
-      expect(data!.clonePetitions[0].id).not.toBe(petitionGID);
       expect(data!.clonePetitions).toEqual([
         {
           name: petition.name!.concat(" (copy)"),
