@@ -58,6 +58,7 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
 import { BreakLines } from "@parallel/components/common/BreakLines";
+import { useRoleButton } from "@parallel/utils/useRoleButton";
 
 function NewPetition() {
   const intl = useIntl();
@@ -257,14 +258,14 @@ function NewPetition() {
         >
           <EmptyPetitionCard
             id="empty-petition-card"
-            onClick={handleTemplateClick(null)}
+            onPress={handleTemplateClick(null)}
           />
           {publicTemplates.map(
             (template: NewPetition_PetitionTemplateFragment) => (
               <TemplateCard
                 key={template.id}
                 template={template}
-                onClick={handleTemplateClick(template.id)}
+                onPress={handleTemplateClick(template.id)}
               />
             )
           )}
@@ -331,7 +332,7 @@ function NewPetition() {
                 <TemplateCard
                   key={template.id}
                   template={template}
-                  onClick={handleTemplateClick(template.id)}
+                  onPress={handleTemplateClick(template.id)}
                 />
               ))}
             </Grid>
@@ -542,20 +543,20 @@ const NewPetitionSection = memo(function NewPetitionSection({
 
 const TemplateCard = memo(function TemplateCard({
   template,
-  onInfoClick,
+  onPress,
   ...props
 }: ExtendChakra<{
   template: NewPetition_PetitionTemplateFragment;
+  onPress: () => void;
 }>) {
   const intl = useIntl();
   const locales = useSupportedLocales();
   const localeLabel = locales.find(({ key }) => key === template.locale)!
     .localizedLabel;
+  const buttonProps = useRoleButton(onPress, [onPress]);
 
   return (
     <Card
-      role="button"
-      tabIndex="0"
       display="flex"
       flexDirection="column"
       padding={4}
@@ -570,6 +571,7 @@ const TemplateCard = memo(function TemplateCard({
         borderColor: "gray.200",
       }}
       minWidth={0}
+      {...buttonProps}
       {...props}
     >
       <Heading size="xs" isTruncated>
@@ -612,11 +614,13 @@ const TemplateCard = memo(function TemplateCard({
   );
 });
 
-const EmptyPetitionCard = memo(function EmptyPetitionCard(props: ExtendChakra) {
+const EmptyPetitionCard = memo(function EmptyPetitionCard({
+  onPress,
+  ...props
+}: ExtendChakra<{ onPress: () => void }>) {
+  const buttonProps = useRoleButton(onPress, [onPress]);
   return (
     <Card
-      role="button"
-      tabIndex="0"
       display="flex"
       flexDirection="column"
       justifyContent="center"
@@ -632,6 +636,7 @@ const EmptyPetitionCard = memo(function EmptyPetitionCard(props: ExtendChakra) {
         boxShadow: "outline",
         borderColor: "gray.200",
       }}
+      {...buttonProps}
       {...props}
     >
       <Heading size="xs" marginBottom={4}>
