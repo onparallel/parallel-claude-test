@@ -33,6 +33,7 @@ import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
+import { validObjectNotEmpty } from "../../helpers/validators/validObjectNotEmpty";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -256,6 +257,7 @@ export const updatePetition = mutationField("updatePetition", {
     }).asArg({ required: true }),
   },
   validateArgs: validateAnd(
+    validObjectNotEmpty((args) => args.data, "data"),
     maxLength((args) => args.data.name, "data.name", 255),
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
