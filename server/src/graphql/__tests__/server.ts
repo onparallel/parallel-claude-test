@@ -4,11 +4,21 @@ import { ApiContext } from "../../context";
 import { Auth } from "../../services/auth";
 import { MockAuth, MockRedis } from "./mocks";
 import { createContainer } from "../../container";
-import { createTestClient } from "apollo-server-testing";
+import {
+  ApolloServerTestClient,
+  createTestClient,
+} from "apollo-server-testing";
 import { Redis } from "../../services/redis";
 import { KNEX } from "../../db/knex";
 import Knex from "knex";
 import { deleteAllData } from "../../util/knexUtils";
+
+export type TestClient = {
+  query: ApolloServerTestClient["query"];
+  mutate: ApolloServerTestClient["mutate"];
+  stop: () => Promise<void>;
+  knex: Knex;
+};
 
 export const initServer = () => {
   const container = createContainer();

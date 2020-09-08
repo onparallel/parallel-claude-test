@@ -1,20 +1,18 @@
-import { initServer } from "./server";
+import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, User } from "../../db/__types";
 import { userCognitoId } from "./mocks";
 import { toGlobalId } from "../../util/globalId";
-import { TestClient, QueryRunner } from "./QueryRunner";
+import gql from "graphql-tag";
 
 describe("GraphQL/Users", () => {
   let testClient: TestClient;
-  let queryRunner: QueryRunner;
   let organization: Organization;
   let sessionUser: User;
   let userGID: string;
 
   beforeAll(async (done) => {
     testClient = initServer();
-    queryRunner = new QueryRunner(testClient);
     const mocks = new Mocks(testClient.knex);
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",
@@ -38,7 +36,19 @@ describe("GraphQL/Users", () => {
   });
 
   it("fetches session user", async () => {
-    const { errors, data } = await queryRunner.me();
+    const { errors, data } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            id
+            fullName
+            organization {
+              identifier
+            }
+          }
+        }
+      `,
+    });
     expect(errors).toBeUndefined();
     expect(data!.me).toMatchObject({
       id: userGID,
@@ -50,10 +60,19 @@ describe("GraphQL/Users", () => {
   });
 
   it("changes user name", async () => {
-    const { errors, data } = await queryRunner.updateUser({
-      userId: userGID,
-      firstName: "Mike",
-      lastName: "Ross",
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation($userId: GID!, $firstName: String, $lastName: String) {
+          updateUser(
+            id: $userId
+            data: { firstName: $firstName, lastName: $lastName }
+          ) {
+            id
+            fullName
+          }
+        }
+      `,
+      variables: { userId: userGID, firstName: "Mike", lastName: "Ross" },
     });
 
     expect(errors).toBeUndefined();
