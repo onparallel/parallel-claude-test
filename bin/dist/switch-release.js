@@ -15,7 +15,7 @@ aws_sdk_1.default.config.region = "eu-central-1";
 const ec2 = new aws_sdk_1.default.EC2();
 const elbv2 = new aws_sdk_1.default.ELBv2();
 async function main() {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d;
     const { commit: _commit, env } = yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
@@ -38,13 +38,13 @@ async function main() {
         LoadBalancerArn: loadBalancerArn,
     })
         .promise();
-    const oldTargetGroupArn = (_b = (_a = result2.Listeners) === null || _a === void 0 ? void 0 : _a.find((l) => l.Protocol === "HTTPS")) === null || _b === void 0 ? void 0 : _b.DefaultActions[0].TargetGroupArn;
+    const oldTargetGroupArn = result2.Listeners.find((l) => l.Protocol === "HTTPS").DefaultActions[0].TargetGroupArn;
     const result3 = await getTargetGroupInstances(oldTargetGroupArn);
     for (const instance of result3.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
-        console.log(chalk_1.default `Stopping workers on ${(_c = instance.Tags) === null || _c === void 0 ? void 0 : _c.find((t) => t.Key === "Name").Value}`);
+        console.log(chalk_1.default `Stopping workers on ${(_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value}`);
         child_process_1.execSync(`ssh ${ipAddress} /home/ec2-user/workers.sh stop`);
-        console.log(chalk_1.default `Workers stopped on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
+        console.log(chalk_1.default `Workers stopped on ${(_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value}`);
     }
     console.log("Getting new target group.");
     const targetGroupName = `${commit}-${env}`;
@@ -55,7 +55,8 @@ async function main() {
     const result5 = await elbv2
         .describeListeners({ LoadBalancerArn: loadBalancerArn })
         .promise();
-    const listenerArn = (_e = result5.Listeners) === null || _e === void 0 ? void 0 : _e.find((l) => l.Protocol === "HTTPS").ListenerArn;
+    const listenerArn = result5.Listeners.find((l) => l.Protocol === "HTTPS")
+        .ListenerArn;
     console.log(chalk_1.default `Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`);
     await elbv2
         .modifyListener({
@@ -71,9 +72,9 @@ async function main() {
     const result6 = await getTargetGroupInstances(targetGroupArn);
     for (const instance of result6.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
-        console.log(chalk_1.default `Starting workers on ${(_f = instance.Tags) === null || _f === void 0 ? void 0 : _f.find((t) => t.Key === "Name").Value}`);
+        console.log(chalk_1.default `Starting workers on ${(_c = instance.Tags) === null || _c === void 0 ? void 0 : _c.find((t) => t.Key === "Name").Value}`);
         child_process_1.execSync(`ssh ${ipAddress} /home/ec2-user/workers.sh start`);
-        console.log(chalk_1.default `Workers started on ${(_g = instance.Tags) === null || _g === void 0 ? void 0 : _g.find((t) => t.Key === "Name").Value}`);
+        console.log(chalk_1.default `Workers started on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
     }
 }
 run_1.run(main);

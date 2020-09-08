@@ -15,7 +15,7 @@ const INSTANCE_TYPES = {
   staging: "t2.small",
 };
 const KEY_NAME = "ops";
-const IMAGE_ID = "ami-0e66d197dc8662d25";
+const IMAGE_ID = "ami-042cce6c4703534cf";
 const SECURITY_GROUP_IDS = ["sg-0486098a6131eb458"];
 const VPC_ID = "vpc-5356ab39";
 const SUBNET_ID = "subnet-d3cc68b9";
