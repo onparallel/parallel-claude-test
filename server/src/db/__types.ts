@@ -260,6 +260,7 @@ export interface Petition {
   reminders_config: Maybe<any>;
   template_description: Maybe<string>;
   template_public: boolean;
+  from_template_id: Maybe<number>;
 }
 
 export interface CreatePetition {
@@ -282,6 +283,7 @@ export interface CreatePetition {
   reminders_config?: Maybe<any>;
   template_description?: Maybe<string>;
   template_public?: boolean;
+  from_template_id?: Maybe<number>;
 }
 
 export interface PetitionAccess {

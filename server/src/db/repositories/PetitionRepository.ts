@@ -5,7 +5,7 @@ import { groupBy, indexBy, omit, sortBy, uniq } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
-import { count } from "../../util/remedaExtensions";
+import { count, isDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -1092,6 +1092,13 @@ export class PetitionRepository extends BaseRepository {
     const petition = await this.loadPetition(petitionId);
 
     return await this.withTransaction(async (t) => {
+      const fromTemplateId =
+        isDefined(data?.is_template) &&
+        data?.is_template === false &&
+        petition?.is_template
+          ? petitionId
+          : null;
+
       const [cloned] = await this.insert(
         "petition",
         {
@@ -1100,11 +1107,13 @@ export class PetitionRepository extends BaseRepository {
             "created_at",
             "updated_at",
             "template_public",
+            "from_template_id",
           ]),
           org_id: user.org_id,
           status: petition?.is_template ? null : "DRAFT",
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
+          from_template_id: fromTemplateId,
           ...data,
         },
         t
