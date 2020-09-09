@@ -1610,6 +1610,16 @@
     "context": "Field settings"
   },
   {
+    "term": "petition.field-title-file-upload-placeholder",
+    "definition": "Describe the file(s) that you need...",
+    "context": "Describe the file(s) that you need..."
+  },
+  {
+    "term": "petition.field-title-heading-placeholder",
+    "definition": "Enter an introductory title for this section...",
+    "context": "Enter an introductory title for this section..."
+  },
+  {
     "term": "petition.field-title-label",
     "definition": "Field title",
     "context": "Field title"
@@ -1618,6 +1628,11 @@
     "term": "petition.field-title-placeholder",
     "definition": "Enter a field title",
     "context": "Enter a field title"
+  },
+  {
+    "term": "petition.field-title-text-placeholder",
+    "definition": "Ask for the information that you need...",
+    "context": "Ask for the information that you need..."
   },
   {
     "term": "petition.field-type.file-upload",

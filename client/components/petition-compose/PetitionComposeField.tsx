@@ -220,10 +220,29 @@ export const PetitionComposeField = Object.assign(
                 id: "petition.field-title-label",
                 defaultMessage: "Field title",
               })}
-              placeholder={intl.formatMessage({
-                id: "petition.field-title-placeholder",
-                defaultMessage: "Enter a field title",
-              })}
+              placeholder={
+                field.type === "HEADING"
+                  ? intl.formatMessage({
+                      id: "petition.field-title-heading-placeholder",
+                      defaultMessage:
+                        "Enter an introductory title for this section...",
+                    })
+                  : field.type === "FILE_UPLOAD"
+                  ? intl.formatMessage({
+                      id: "petition.field-title-file-upload-placeholder",
+                      defaultMessage: "Describe the file(s) that you need...",
+                    })
+                  : field.type === "TEXT"
+                  ? intl.formatMessage({
+                      id: "petition.field-title-text-placeholder",
+                      defaultMessage:
+                        "Ask for the information that you need...",
+                    })
+                  : intl.formatMessage({
+                      id: "petition.field-title-placeholder",
+                      defaultMessage: "Enter a field title",
+                    })
+              }
               value={title ?? ""}
               width="100%"
               maxLength={100}
