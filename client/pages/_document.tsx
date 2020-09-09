@@ -58,7 +58,7 @@ class MyDocument extends Document<MyDocumentProps> {
         <Head>
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,600|Playfair+Display&display=swap"
+            href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,500,600|Playfair+Display&display=swap"
           />
           <script
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(

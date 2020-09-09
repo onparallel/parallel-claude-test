@@ -66,7 +66,7 @@ export function PetitionFieldsIndex({
                   height="auto"
                   padding={2}
                   paddingLeft={field.type === "HEADING" ? 2 : 4}
-                  fontWeight="normal"
+                  fontWeight={field.type === "HEADING" ? "medium" : "normal"}
                   textAlign="left"
                   onClick={() => onFieldClick(field.id)}
                 >
