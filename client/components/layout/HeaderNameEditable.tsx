@@ -48,6 +48,7 @@ export function HeaderNameEditable({
         <>
           <Flex flex="1 1 auto" minWidth={0} padding={1}>
             <EditablePreview
+              color={name ? undefined : "gray.400"}
               paddingY={1}
               paddingX={2}
               display="block"
