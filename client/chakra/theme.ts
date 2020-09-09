@@ -1,9 +1,8 @@
 import { default as base } from "@chakra-ui/theme";
 import { styles } from "./styles";
-import { omit } from "remeda";
+import { extendTheme } from "@chakra-ui/core";
 
-export const theme = {
-  ...base,
+export const theme = extendTheme({
   styles,
   fonts: {
     body: "'IBM Plex Sans', sans-serif",
@@ -11,27 +10,15 @@ export const theme = {
     hero: "'Playfair Display', serif",
   },
   sizes: {
-    ...base.sizes,
     container: {
-      ...base.sizes.container,
       xs: "480px",
     },
   },
   fontSizes: {
-    ...base.fontSizes,
     "2xs": "0.6rem",
   },
   colors: {
-    ...omit(base.colors, [
-      "facebook",
-      "linkedin",
-      "messenger",
-      "telegram",
-      "twitter",
-      "whatsapp",
-    ]),
     gray: {
-      ...base.colors.gray,
       50: "#fbfcfd",
     },
     purple: {
@@ -59,11 +46,8 @@ export const theme = {
     },
   },
   components: {
-    ...base.components,
     Button: {
-      ...base.components.Button,
       sizes: {
-        ...base.components.Button.sizes,
         "2xs": {
           height: 5,
           minWidth: 5,
@@ -75,7 +59,6 @@ export const theme = {
       },
     },
     Checkbox: {
-      ...base.components.Checkbox,
       sizes: {
         sm: {
           control: { boxSize: 3 },
@@ -95,27 +78,15 @@ export const theme = {
       },
     },
     Heading: {
-      ...base.components.Heading,
       sizes: {
-        ...base.components.Heading.sizes,
-        "3xl": {
-          fontSize: ["4xl", null, "5xl"],
-        },
-        "2xl": {
-          fontSize: ["3xl", null, "4xl"],
-        },
-        xl: {
-          fontSize: ["2xl", null, "3xl"],
-        },
-        lg: {
-          fontSize: ["xl", null, "2xl"],
-        },
+        "3xl": { fontSize: ["4xl", null, "5xl"] },
+        "2xl": { fontSize: ["3xl", null, "4xl"] },
+        xl: { fontSize: ["2xl", null, "3xl"] },
+        lg: { fontSize: ["xl", null, "2xl"] },
       },
     },
     Link: {
-      ...base.components.Link,
       baseStyle: {
-        ...base.components.Link.baseStyle,
         cursor: "default",
         "&[href]": {
           cursor: "pointer",
@@ -131,19 +102,17 @@ export const theme = {
       },
     },
     Switch: {
-      ...base.components.Switch,
       defaultProps: {
         size: "md",
         colorScheme: "green",
       },
     },
     Tooltip: {
-      ...base.components.Tooltip,
       defaultProps: {
         openDelay: 300,
       },
     },
   },
-};
+});
 
 export type Theme = typeof theme;

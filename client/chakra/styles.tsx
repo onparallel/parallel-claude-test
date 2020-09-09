@@ -1,9 +1,23 @@
-import theme from "@chakra-ui/theme";
-import { Styles } from "@chakra-ui/theme-tools";
+import { mode, Styles } from "@chakra-ui/theme-tools";
 
 export const styles: Styles = {
   global: (props: any) => ({
-    ...(theme.styles?.global as any)?.(props),
+    // copy these until rc.4
+    body: {
+      fontFamily: "body",
+      color: mode("gray.800", "whiteAlpha.900")(props),
+      bg: mode("white", "gray.800")(props),
+      transition: "background-color 0.2s",
+      lineHeight: "base",
+    },
+    "*::placeholder": {
+      color: mode("gray.400", "whiteAlpha.400")(props),
+    },
+    "*, *::before, &::after": {
+      borderColor: mode("gray.200", "whiteAlpha.300")(props),
+      wordWrap: "break-word",
+    },
+
     // Hubspot stuff
     "div#hubspot-messages-iframe-container": {
       display: "none !important",
