@@ -10,6 +10,7 @@ import {
   MenuList,
   MenuOptionGroup,
   Portal,
+  UsePopperProps,
 } from "@chakra-ui/core";
 import { LogOutIcon, UserIcon } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
@@ -20,12 +21,12 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 
 export interface UserMenuProps {
-  isMobile?: boolean;
+  placement?: UsePopperProps["placement"];
   user: UserMenu_UserFragment;
   onLocaleChange?: (locale: string) => void;
 }
 
-export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
+export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
   const apollo = useApolloClient();
@@ -39,7 +40,7 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
   const locales = useSupportedLocales();
 
   return (
-    <Menu placement={isMobile ? "top-end" : "right-end"}>
+    <Menu placement={placement}>
       <MenuButton
         as={Button}
         aria-label={intl.formatMessage({
@@ -64,23 +65,21 @@ export function UserMenu({ isMobile, user, onLocaleChange }: UserMenuProps) {
               />
             </MenuItem>
           </NakedLink>
-          {isMobile ? (
-            <MenuOptionGroup
-              value={router.query.locale}
-              title={intl.formatMessage({
-                id: "component.user-menu.ui-language",
-                defaultMessage: "Language",
-              })}
-              onChange={onLocaleChange as any}
-              type="radio"
-            >
-              {locales.map(({ key, localizedLabel }) => (
-                <MenuItemOption key={key} value={key}>
-                  {localizedLabel}
-                </MenuItemOption>
-              ))}
-            </MenuOptionGroup>
-          ) : null}
+          <MenuOptionGroup
+            value={router.query.locale}
+            title={intl.formatMessage({
+              id: "component.user-menu.ui-language",
+              defaultMessage: "Language",
+            })}
+            onChange={onLocaleChange as any}
+            type="radio"
+          >
+            {locales.map(({ key, localizedLabel }) => (
+              <MenuItemOption key={key} value={key}>
+                {localizedLabel}
+              </MenuItemOption>
+            ))}
+          </MenuOptionGroup>
           <MenuDivider />
           <MenuItem onClick={handleLogoutClick}>
             <LogOutIcon marginRight={2} />

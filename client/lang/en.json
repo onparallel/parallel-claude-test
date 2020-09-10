@@ -1100,11 +1100,6 @@
     "context": "User menu"
   },
   {
-    "term": "navbar.change-language",
-    "definition": "Change language",
-    "context": "Change language"
-  },
-  {
     "term": "navbar.coming-soon",
     "definition": "Coming soon",
     "context": "Coming soon"

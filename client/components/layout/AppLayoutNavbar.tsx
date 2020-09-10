@@ -1,22 +1,8 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Flex,
-  IconButton,
-  List,
-  ListItem,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Tooltip,
-} from "@chakra-ui/core";
+import { Box, Flex, List, ListItem, Stack } from "@chakra-ui/core";
 import {
   AddIcon,
   FileTextIcon,
-  GlobeIcon,
   InfoOutlineIcon,
   PaperPlaneIcon,
   UsersIcon,
@@ -24,7 +10,6 @@ import {
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { resolveUrl } from "@parallel/utils/next";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { memo, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -89,7 +74,6 @@ export const AppLayoutNavbar = Object.assign(
       ],
       [intl.locale, pathname, query]
     );
-    const locales = useSupportedLocales();
     function handleLocaleChange(locale: string) {
       router.push(
         router.pathname,
@@ -193,7 +177,7 @@ export const AppLayoutNavbar = Object.assign(
           <Flex justifyContent="center" alignItems="center">
             <UserMenu
               user={user}
-              isMobile
+              placement="top-end"
               onLocaleChange={handleLocaleChange}
             />
           </Flex>
@@ -201,44 +185,6 @@ export const AppLayoutNavbar = Object.assign(
           <>
             <Spacer />
             <Stack>
-              <Flex justifyContent="center">
-                <Menu placement="right">
-                  <Tooltip
-                    label={intl.formatMessage({
-                      id: "navbar.change-language",
-                      defaultMessage: "Change language",
-                    })}
-                    placement="right"
-                  >
-                    <MenuButton
-                      as={IconButton}
-                      aria-label={intl.formatMessage({
-                        id: "navbar.change-language",
-                        defaultMessage: "Change language",
-                      })}
-                      icon={<GlobeIcon />}
-                      variant="ghost"
-                      isRound
-                    />
-                  </Tooltip>
-                  <Portal>
-                    <MenuList>
-                      {locales.map(({ key, localizedLabel }) => (
-                        <MenuItem
-                          as="button"
-                          key={key}
-                          onClick={() => handleLocaleChange(key)}
-                          fontWeight={
-                            router.query.locale === key ? "bold" : "normal"
-                          }
-                        >
-                          {localizedLabel}
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </Portal>
-                </Menu>
-              </Flex>
               <Flex justifyContent="center">
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
@@ -253,7 +199,11 @@ export const AppLayoutNavbar = Object.assign(
                 />
               </Flex>
               <Flex justifyContent="center" alignItems="center">
-                <UserMenu user={user} />
+                <UserMenu
+                  placement="right-end"
+                  user={user}
+                  onLocaleChange={handleLocaleChange}
+                />
               </Flex>
             </Stack>
           </>
