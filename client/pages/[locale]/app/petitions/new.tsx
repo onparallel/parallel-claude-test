@@ -562,9 +562,11 @@ const TemplateCard = memo(function TemplateCard({
       padding={4}
       minHeight="160px"
       outline="none"
+      transition="all 150ms ease"
       _hover={{
         borderColor: "gray.300",
         boxShadow: "lg",
+        transform: "scale(1.025)",
       }}
       _focus={{
         boxShadow: "outline",
@@ -628,9 +630,11 @@ const EmptyPetitionCard = memo(function EmptyPetitionCard({
       padding={4}
       minHeight="160px"
       outline="none"
+      transition="all 150ms ease"
       _hover={{
         borderColor: "gray.300",
         boxShadow: "lg",
+        transform: "scale(1.025)",
       }}
       _focus={{
         boxShadow: "outline",
