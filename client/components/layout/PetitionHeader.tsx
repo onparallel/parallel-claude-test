@@ -40,6 +40,7 @@ import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal"
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { LocaleBadge } from "../common/LocaleBadge";
 
 export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
@@ -177,6 +178,7 @@ export function PetitionHeader({
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
             <PetitionStatusIcon marginRight={1} status={petition.status} />
+            <LocaleBadge locale={petition.locale} marginLeft={1} />
             <HeaderNameEditable
               petition={petition}
               state={state}

@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import {
   Avatar,
-  Badge,
   Box,
   Button,
   Collapse,
@@ -11,13 +10,13 @@ import {
   Select,
   Stack,
   Text,
-  Tooltip,
   useDisclosure,
 } from "@chakra-ui/core";
 import { AddIcon, ChevronDownIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { BreakLines } from "@parallel/components/common/BreakLines";
 import { Card } from "@parallel/components/common/Card";
+import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -550,9 +549,6 @@ const TemplateCard = memo(function TemplateCard({
   onPress: () => void;
 }>) {
   const intl = useIntl();
-  const locales = useSupportedLocales();
-  const localeLabel = locales.find(({ key }) => key === template.locale)!
-    .localizedLabel;
   const buttonProps = useRoleButton(onPress, [onPress]);
 
   return (
@@ -597,11 +593,7 @@ const TemplateCard = memo(function TemplateCard({
       </Text>
       <Spacer />
       <Flex alignItems="center" marginTop={2}>
-        <Tooltip label={localeLabel}>
-          <Badge as="abbr" aria-label={localeLabel}>
-            {template.locale}
-          </Badge>
-        </Tooltip>
+        <LocaleBadge locale={template.locale} />
         <Spacer />
         <Avatar name={template.owner.fullName!} size="xs" role="presentation" />
         <Text fontSize="xs" marginLeft={2}>

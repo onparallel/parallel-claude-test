@@ -33,6 +33,7 @@ import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { LocaleBadge } from "../common/LocaleBadge";
 import { Spacer } from "../common/Spacer";
 import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
@@ -120,6 +121,7 @@ export function PetitionTemplateHeader({
           <Badge colorScheme="purple" marginRight={1}>
             <FormattedMessage id="generic.template" defaultMessage="Template" />
           </Badge>
+          <LocaleBadge locale={petition.locale} />
           <HeaderNameEditable
             petition={petition}
             state={state}
