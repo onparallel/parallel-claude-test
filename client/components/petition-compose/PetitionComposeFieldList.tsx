@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Button, Flex } from "@chakra-ui/core";
 import { AddIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
-import { Card, CardHeader } from "@parallel/components/common/Card";
+import { Card } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
@@ -240,14 +240,9 @@ export const PetitionComposeFieldList = Object.assign(
 
     return (
       <Card id="petition-fields" {...props}>
-        <CardHeader headingAs="h2">
-          <FormattedMessage
-            id="petition.fields-header"
-            defaultMessage="This is the information that you need"
-          />
-        </CardHeader>
         {fieldIds.map((fieldId, index) => (
           <PetitionComposeField
+            borderTopRadius={index === 0 ? "0.25rem" : "unset"}
             id={`field-${fieldId}`}
             onMove={handleFieldMove}
             key={fieldId}

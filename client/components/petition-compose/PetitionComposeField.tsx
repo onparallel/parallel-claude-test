@@ -130,6 +130,7 @@ export const PetitionComposeField = Object.assign(
           opacity={isDragging ? 0 : 1}
           position="relative"
           backgroundColor={isActive ? "purple.50" : "white"}
+          borderRadius="0.25rem"
           sx={{
             "[draggable]": {
               opacity: 0,

@@ -1665,11 +1665,6 @@
     "context": "Obtain written information that is not stored in documents or other files."
   },
   {
-    "term": "petition.fields-header",
-    "definition": "This is the information that you need",
-    "context": "This is the information that you need"
-  },
-  {
     "term": "petition.header.activity-tab",
     "definition": "Activity",
     "context": "Activity"
