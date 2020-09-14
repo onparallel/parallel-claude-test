@@ -1910,11 +1910,6 @@
     "context": "Created at"
   },
   {
-    "term": "petitions.header.deadline",
-    "definition": "Deadline",
-    "context": "Deadline"
-  },
-  {
     "term": "petitions.header.description",
     "definition": "Description",
     "context": "Description"

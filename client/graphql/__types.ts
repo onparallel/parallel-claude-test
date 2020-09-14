@@ -1,9 +1,9 @@
+import { gql } from "@apollo/client";
 import * as Apollo from "@apollo/client";
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
-const gql = Apollo.gql;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -3011,10 +3011,7 @@ export type Petitions_PetitionBasePaginationFragment = {
 
 export type Petitions_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<
-  Petition,
-  "deadline" | "status" | "id" | "locale" | "name" | "createdAt"
-> & {
+} & Pick<Petition, "status" | "id" | "locale" | "name" | "createdAt"> & {
     accesses: Array<
       { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status"> & {
           contact?: Maybe<
@@ -4456,7 +4453,6 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
           ...ContactLink_Contact
         }
       }
-      deadline
       status
       progress {
         validated

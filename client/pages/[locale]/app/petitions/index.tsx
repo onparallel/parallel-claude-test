@@ -389,26 +389,6 @@ function usePetitionsColumns(
               },
             },
             {
-              key: "deadline",
-              header: intl.formatMessage({
-                id: "petitions.header.deadline",
-                defaultMessage: "Deadline",
-              }),
-              CellContent: ({ row }) =>
-                row.__typename === "Petition" ? (
-                  row.deadline ? (
-                    <DateTime value={row.deadline} format={FORMATS.LLL} />
-                  ) : (
-                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                      <FormattedMessage
-                        id="generic.no-deadline"
-                        defaultMessage="No deadline"
-                      />
-                    </Text>
-                  )
-                ) : null,
-            },
-            {
               key: "status",
               header: intl.formatMessage({
                 id: "petitions.header.status",
@@ -520,7 +500,6 @@ Petitions.fragments = {
               ...ContactLink_Contact
             }
           }
-          deadline
           status
           progress {
             validated

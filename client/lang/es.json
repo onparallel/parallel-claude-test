@@ -1910,11 +1910,6 @@
     "context": "Created at"
   },
   {
-    "term": "petitions.header.deadline",
-    "definition": "Vencimiento",
-    "context": "Deadline"
-  },
-  {
     "term": "petitions.header.description",
     "definition": "Descripción",
     "context": "Description"
