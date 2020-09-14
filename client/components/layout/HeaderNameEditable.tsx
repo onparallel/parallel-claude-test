@@ -54,7 +54,12 @@ export function HeaderNameEditable({
               display="block"
               isTruncated
             />
-            <EditableInput paddingY={1} paddingX={2} maxLength={255} />
+            <EditableInput
+              paddingY={1}
+              paddingX={2}
+              maxLength={255}
+              width={props.maxWidth}
+            />
           </Flex>
           {!isEditing && (
             <Flex

@@ -126,7 +126,29 @@ export function PetitionTemplateHeader({
             petition={petition}
             state={state}
             onNameChange={(name) => onUpdatePetition({ name: name || null })}
-            minWidth={0}
+            maxWidth={{
+              base: `calc(100vw - ${
+                71 /* 'template' badge width */ +
+                24 /* locale badge width */ +
+                16 /* petition name padding l+r */ +
+                16 /* heading padding left */ +
+                164 /* use this template button width */ +
+                40 /* more options button width */ +
+                16 /* more options button margin left */ +
+                16 /* heading padding right */
+              }px)`,
+              sm: `calc(100vw - ${
+                96 /* left navbar width */ +
+                71 /* 'template' badge width */ +
+                24 /* locale badge width */ +
+                16 /* petition name padding l+r */ +
+                16 /* heading padding left */ +
+                164 /* use this template button width */ +
+                40 /* more options button width */ +
+                16 /* more options button margin left */ +
+                16 /* heading padding right */
+              }px)`,
+            }}
             placeholder={
               petition.name
                 ? ""

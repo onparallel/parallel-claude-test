@@ -184,9 +184,33 @@ export function PetitionHeader({
               state={state}
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
               maxWidth={{
-                base: `calc(100vw - ${16 + 18 + 4 + 16 + 40 + 16}px)`,
-                sm: `calc(100vw - ${96 + 16 + 18 + 4 + 16 + 40 + 16}px)`,
-                md: `calc((100vw - ${96 + 307}px)/2 - ${16 + 18 + 16}px)`,
+                base: `calc(100vw - ${
+                  16 /* heading padding left */ +
+                  18 /* petition status icon width */ +
+                  28 /* locale badge width + margins + padding */ +
+                  4 /* petition status icon margin right */ +
+                  16 /* petition name padding l+r */ +
+                  40 /* more options button width */ +
+                  16 /* heading padding right */
+                }px)`,
+                sm: `calc(100vw - ${
+                  96 /* left navbar width */ +
+                  16 /* heading padding left */ +
+                  18 /* petition status icon width */ +
+                  28 /* locale badge width + margins + padding */ +
+                  4 /* petition status icon margin right */ +
+                  16 /* petition name padding l+r */ +
+                  40 /* more options button width */ +
+                  16 /* heading padding right */
+                }px)`,
+                md: `calc((100vw - ${
+                  96 /* left navbar width */ + 307 /* tabs width */
+                }px)/2 - ${
+                  16 /* heading padding left */ +
+                  18 /* petition status icon width */ +
+                  28 /* locale badge width + margins + padding */ +
+                  16 /* heading padding right */
+                }px)`,
               }}
               placeholder={
                 petition.name
