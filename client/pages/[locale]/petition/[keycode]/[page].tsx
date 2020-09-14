@@ -196,13 +196,13 @@ function RecipientView({
           isClosable: true,
         });
       } else {
-        // go to first field without replies
+        // go to first repliable field without replies
         let page = 1;
-        const field = petition.fields.find((f, index) => {
+        const field = petition.fields.find((f) => {
           if (f.type === "HEADING" && f.options?.hasPageBreak) {
             page += 1;
           }
-          return f.replies.length === 0 && !f.optional;
+          return f.replies.length === 0 && !f.optional && !f.isReadOnly;
         })!;
         const { keycode, locale } = router.query;
         router.push(
