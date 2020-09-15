@@ -42,6 +42,7 @@ import { AddFieldPopover } from "./AddFieldPopover";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
+  fieldRelativeIndex: number | string;
   index: number;
   isActive: boolean;
   isLast: boolean;
@@ -65,6 +66,7 @@ interface DragItem {
 export const PetitionComposeField = Object.assign(
   memo(function PetitionComposeField({
     field,
+    fieldRelativeIndex,
     index,
     isActive,
     isLast,
@@ -200,7 +202,7 @@ export const PetitionComposeField = Object.assign(
           <Box marginLeft={3}>
             <PetitionFieldTypeIndicator
               type={field.type}
-              index={index}
+              relativeIndex={fieldRelativeIndex}
               as={field.isFixed ? "div" : "button"}
               onClick={field.isFixed ? undefined : onSettingsClick}
               marginTop="10px"

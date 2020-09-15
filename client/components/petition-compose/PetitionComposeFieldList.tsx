@@ -10,6 +10,7 @@ import {
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
+import { getFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import {
@@ -238,6 +239,8 @@ export const PetitionComposeFieldList = Object.assign(
       [fieldIds.toString()]
     );
 
+    const fieldIndexValues = getFieldIndexValues(fields);
+
     return (
       <Card id="petition-fields" {...props}>
         {fieldIds.map((fieldId, index) => (
@@ -247,6 +250,7 @@ export const PetitionComposeFieldList = Object.assign(
             onMove={handleFieldMove}
             key={fieldId}
             field={fieldsById[fieldId]}
+            fieldRelativeIndex={fieldIndexValues[index]}
             index={index}
             isActive={active === fieldId}
             isLast={index === fieldIds.length - 1}

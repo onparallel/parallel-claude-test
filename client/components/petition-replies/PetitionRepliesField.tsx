@@ -45,6 +45,7 @@ export type PetitionRepliesFieldAction = {
 
 export type PetitionRepliesFieldProps = ExtendChakra<{
   field: PetitionRepliesField_PetitionFieldFragment;
+  fieldRelativeIndex: number | string;
   index: number;
   highlighted: boolean;
   commentCount: number;
@@ -61,6 +62,7 @@ export type PetitionRepliesFieldProps = ExtendChakra<{
 
 export function PetitionRepliesField({
   field,
+  fieldRelativeIndex,
   index,
   highlighted,
   commentCount,
@@ -85,7 +87,7 @@ export function PetitionRepliesField({
         <PetitionFieldTypeIndicator
           marginLeft="1px"
           type={field.type}
-          index={index}
+          relativeIndex={fieldRelativeIndex}
         />
         <Box flex="1" minWidth="0">
           {field.title ? (
@@ -130,7 +132,7 @@ export function PetitionRepliesField({
           <PetitionFieldTypeIndicator
             marginTop="2px"
             type={field.type}
-            index={index}
+            relativeIndex={fieldRelativeIndex}
           />
           <Box marginLeft={4} flex="1">
             {field.title ? (

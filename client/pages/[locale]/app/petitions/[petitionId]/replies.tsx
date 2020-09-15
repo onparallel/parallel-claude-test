@@ -57,6 +57,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { getFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -257,6 +258,8 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     }
   }, []);
 
+  const fieldIndexValues = getFieldIndexValues(petition.fields);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -348,6 +351,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
                 id={`field-${field.id}`}
                 key={field.id}
                 field={field}
+                fieldRelativeIndex={fieldIndexValues[index]}
                 index={index}
                 highlighted={activeFieldId === field.id}
                 onValidateToggle={() =>

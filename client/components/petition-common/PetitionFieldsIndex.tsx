@@ -7,6 +7,7 @@ import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 import { FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
 import { Fragment } from "react";
+import { getFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 
 export type PetitionFieldsIndexProps = ExtendChakra<{
   fields: PetitionFieldsIndex_PetitionFieldFragment[];
@@ -18,6 +19,7 @@ export function PetitionFieldsIndex({
   onFieldClick,
   ...props
 }: PetitionFieldsIndexProps) {
+  const fieldIndexValues = getFieldIndexValues(fields);
   return (
     <Card display="flex" flexDirection="column" {...props}>
       <CardHeader>
@@ -94,7 +96,7 @@ export function PetitionFieldsIndex({
                   <PetitionFieldTypeIndicator
                     as="div"
                     type={field.type}
-                    index={index}
+                    relativeIndex={fieldIndexValues[index]}
                     marginLeft={2}
                   />
                 </Button>
