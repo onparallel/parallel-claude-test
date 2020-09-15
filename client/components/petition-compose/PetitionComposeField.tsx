@@ -30,6 +30,7 @@ import {
   forwardRef,
   memo,
   MouseEvent,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -47,6 +48,7 @@ export type PetitionComposeFieldProps = {
   isActive: boolean;
   isLast: boolean;
   showError: boolean;
+  descriptionEnabled: boolean;
   titleFieldProps: InputProps;
   descriptionFieldProps: TextareaProps;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
@@ -71,6 +73,7 @@ export const PetitionComposeField = Object.assign(
     isActive,
     isLast,
     showError,
+    descriptionEnabled,
     titleFieldProps,
     descriptionFieldProps,
     onMove,
@@ -99,6 +102,13 @@ export const PetitionComposeField = Object.assign(
     const titleRef = useRef<HTMLInputElement>(null);
     const [description, setDescription] = useState(field.description);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+    // to make sure 'description' is set to null on client
+    useEffect(() => {
+      if (!descriptionEnabled) {
+        setDescription(null);
+      }
+    }, [descriptionEnabled]);
     return (
       <Box
         ref={elementRef}
@@ -272,6 +282,7 @@ export const PetitionComposeField = Object.assign(
               {...titleFieldProps}
             />
             <GrowingTextarea
+              hidden={!descriptionEnabled}
               id={`field-description-${field.id}`}
               ref={descriptionRef}
               placeholder={intl.formatMessage({

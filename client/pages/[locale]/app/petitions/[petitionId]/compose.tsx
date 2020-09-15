@@ -93,6 +93,46 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   );
 
+  function toggleDescriptionReducer(
+    state: string[], // array with description-toggled fieldIds
+    action: { fieldId: string }
+  ): string[] {
+    if (state.includes(action.fieldId)) {
+      return state.filter((id) => id !== action.fieldId); // toggle off
+    }
+    return state.concat(action.fieldId); // toggle on
+  }
+
+  const initialState = petition!.fields
+    .map((f) => (f.description ? f.id : null))
+    .filter((id) => !!id) as string[];
+
+  const [toggledDescriptions, toggleDescription] = useReducer(
+    toggleDescriptionReducer,
+    initialState
+  );
+
+  const handleFieldDescriptionSwitch = useCallback(
+    (fieldId: string) => {
+      try {
+        const field = petition?.fields.find((f) => f.id === fieldId);
+
+        if (toggledDescriptions.includes(fieldId) && field?.description) {
+          // no need to await, description will be immediately hidden
+          updatePetitionField({
+            variables: {
+              petitionId,
+              fieldId,
+              data: { description: null },
+            },
+          });
+        }
+        toggleDescription({ fieldId });
+      } catch {}
+    },
+    [petitionId, toggledDescriptions, petition!.fields]
+  );
+
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
     if (activeFieldId) {
@@ -436,6 +476,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 field={activeField!}
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
+                onFieldDescriptionSwitch={handleFieldDescriptionSwitch}
+                toggledDescriptions={toggledDescriptions}
                 onClose={handleSettingsClose}
               />
             ) : (
@@ -452,6 +494,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <PetitionComposeFieldList
             showErrors={showErrors}
             fields={petition!.fields}
+            descriptionSwitchState={toggledDescriptions}
             active={activeFieldId}
             onAddField={handleAddField}
             onCopyFieldClick={handleClonePetitionField}

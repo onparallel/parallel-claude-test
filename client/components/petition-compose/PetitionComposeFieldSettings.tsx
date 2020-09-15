@@ -20,6 +20,8 @@ export type PetitionComposeFieldSettingsProps = {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
   onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldDescriptionSwitch: (fieldId: string) => void;
+  toggledDescriptions: string[];
   onClose: () => void;
 };
 
@@ -27,6 +29,8 @@ export function PetitionComposeFieldSettings({
   field,
   onFieldEdit,
   onFieldTypeChange,
+  onFieldDescriptionSwitch,
+  toggledDescriptions,
   onClose,
 }: PetitionComposeFieldSettingsProps) {
   return (
@@ -44,80 +48,108 @@ export function PetitionComposeFieldSettings({
             onChange={(type) => onFieldTypeChange(field.id, type)}
           />
         </Box>
-        {!field.isReadOnly ? (
-          <>
-            <SettingsRow
-              label={
-                <FormattedMessage
-                  id="field-settings.required-label"
-                  defaultMessage="Required"
-                />
-              }
-              description={
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="field-settings.required-description"
-                    defaultMessage="If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field."
-                  />
-                </Text>
-              }
-              controlId="field-required"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="field-required"
-                color="green"
-                isChecked={!field.optional}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  onFieldEdit(field.id, { optional: !event.target.checked })
-                }
+        {!field.isReadOnly && (
+          <SettingsRow
+            label={
+              <FormattedMessage
+                id="field-settings.required-label"
+                defaultMessage="Required"
               />
-            </SettingsRow>
-            <SettingsRow
-              label={
-                field.type === "FILE_UPLOAD" ? (
+            }
+            description={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="field-settings.required-description"
+                  defaultMessage="If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field."
+                />
+              </Text>
+            }
+            controlId="field-required"
+          >
+            <Switch
+              height="20px"
+              display="block"
+              id="field-required"
+              color="green"
+              isChecked={!field.optional}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                onFieldEdit(field.id, { optional: !event.target.checked })
+              }
+            />
+          </SettingsRow>
+        )}
+
+        <SettingsRow
+          label={
+            <FormattedMessage
+              id="field-settings.show-description-label"
+              defaultMessage="Description"
+            />
+          }
+          description={
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="field-settings.show-description-description"
+                defaultMessage="Enabling this allows you to write a description for the field."
+              />
+            </Text>
+          }
+          controlId="field-required"
+        >
+          <Switch
+            height="20px"
+            display="block"
+            id="field-required"
+            color="green"
+            isChecked={toggledDescriptions.includes(field.id)}
+            onChange={() => onFieldDescriptionSwitch(field.id)}
+          />
+        </SettingsRow>
+
+        {!field.isReadOnly && (
+          <SettingsRow
+            label={
+              field.type === "FILE_UPLOAD" ? (
+                <FormattedMessage
+                  id="field-settings.file-multiple-label"
+                  defaultMessage="Allow multiple file uploads"
+                />
+              ) : (
+                <FormattedMessage
+                  id="field-settings.multiple-label"
+                  defaultMessage="Allow multiple replies"
+                />
+              )
+            }
+            description={
+              <Text fontSize="sm">
+                {field.type === "FILE_UPLOAD" ? (
                   <FormattedMessage
-                    id="field-settings.file-multiple-label"
-                    defaultMessage="Allow multiple file uploads"
+                    id="field-settings.file-multiple-description"
+                    defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
                   />
                 ) : (
                   <FormattedMessage
-                    id="field-settings.multiple-label"
-                    defaultMessage="Allow multiple replies"
+                    id="field-settings.multiple-description"
+                    defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
                   />
-                )
+                )}
+              </Text>
+            }
+            controlId="field-multiple"
+          >
+            <Switch
+              height="20px"
+              display="block"
+              id="field-multiple"
+              color="green"
+              isChecked={field.multiple}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                onFieldEdit(field.id, { multiple: event.target.checked })
               }
-              description={
-                <Text fontSize="sm">
-                  {field.type === "FILE_UPLOAD" ? (
-                    <FormattedMessage
-                      id="field-settings.file-multiple-description"
-                      defaultMessage="Enabling this allows the recipient to upload multiple files to this field."
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="field-settings.multiple-description"
-                      defaultMessage="Enabling this allows the recipient to submit multiple answers to this field."
-                    />
-                  )}
-                </Text>
-              }
-              controlId="field-multiple"
-            >
-              <Switch
-                height="20px"
-                display="block"
-                id="field-multiple"
-                color="green"
-                isChecked={field.multiple}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  onFieldEdit(field.id, { multiple: event.target.checked })
-                }
-              />
-            </SettingsRow>
-          </>
-        ) : null}
+            />
+          </SettingsRow>
+        )}
         {field.type === "HEADING" ? (
           <HeadingSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "FILE_UPLOAD" ? (

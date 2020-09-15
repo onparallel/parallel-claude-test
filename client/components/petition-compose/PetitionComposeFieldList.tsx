@@ -62,6 +62,7 @@ function reset(
 export type PetitionComposeFieldListProps = ExtendChakra<{
   active: Maybe<string>;
   fields: FieldSelection[];
+  descriptionSwitchState: string[];
   showErrors: boolean;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
   onCopyFieldClick: (fieldId: string) => void;
@@ -76,6 +77,7 @@ export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({
     active,
     fields,
+    descriptionSwitchState,
     showErrors,
     onUpdateFieldPositions,
     onCopyFieldClick,
@@ -251,6 +253,7 @@ export const PetitionComposeFieldList = Object.assign(
               onMove={handleFieldMove}
               key={fieldId}
               field={fieldsById[fieldId]}
+              descriptionEnabled={descriptionSwitchState.includes(fieldId)}
               fieldRelativeIndex={fieldIndexValues[index]}
               index={index}
               isActive={active === fieldId}
