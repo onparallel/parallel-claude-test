@@ -650,8 +650,18 @@
     "context": "Required"
   },
   {
+    "term": "field-settings.show-description-description",
+    "definition": "Activar esta opción te permitirá escribir una descripción para el campo.",
+    "context": "Enabling this allows you to write a description for the field."
+  },
+  {
+    "term": "field-settings.show-description-label",
+    "definition": "Descripción",
+    "context": "Description"
+  },
+  {
     "term": "field-settings.text-multiline-description",
-    "definition": "Activar esta opción hara que el campo de texto para responder sea de múltiples lineas en lugar de una sola.",
+    "definition": "Activar esta opción hará que el campo de texto para responder sea de múltiples líneas en lugar de una sola.",
     "context": "Enabling this will display a multi-line input field instead of a single line."
   },
   {
@@ -661,7 +671,7 @@
   },
   {
     "term": "field-settings.text-placeholder-description",
-    "definition": "El placeholder es sutil texto descriptivo que aparece cuando el campo de texto está vacío.",
+    "definition": "El placeholder es un sutil texto descriptivo que aparece cuando el campo de texto está vacío.",
     "context": "The placeholder is the subtle descriptive text that shows when the input field is empty."
   },
   {

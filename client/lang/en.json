@@ -650,6 +650,16 @@
     "context": "Required"
   },
   {
+    "term": "field-settings.show-description-description",
+    "definition": "Enabling this allows you to write a description for the field.",
+    "context": "Enabling this allows you to write a description for the field."
+  },
+  {
+    "term": "field-settings.show-description-label",
+    "definition": "Description",
+    "context": "Description"
+  },
+  {
     "term": "field-settings.text-multiline-description",
     "definition": "Enabling this will display a multi-line input field instead of a single line.",
     "context": "Enabling this will display a multi-line input field instead of a single line."
