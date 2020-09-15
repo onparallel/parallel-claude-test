@@ -741,6 +741,7 @@ export type PetitionField = {
   optional: Scalars["Boolean"];
   /** The options of the petition. */
   options?: Maybe<Scalars["JSONObject"]>;
+  position: Scalars["Int"];
   /** The replies to the petition field */
   replies: Array<PetitionFieldReply>;
   /** The title of the petition field. */
@@ -2061,7 +2062,14 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "optional" | "multiple" | "options" | "isReadOnly"
+  | "id"
+  | "type"
+  | "optional"
+  | "multiple"
+  | "options"
+  | "isReadOnly"
+  | "isFixed"
+  | "position"
 >;
 
 export type PetitionComposeMessageEditor_ContactFragment = {
@@ -4237,6 +4245,8 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     multiple
     options
     isReadOnly
+    isFixed
+    position
   }
 `;
 export const PetitionFieldsIndex_PetitionFieldFragmentDoc = gql`

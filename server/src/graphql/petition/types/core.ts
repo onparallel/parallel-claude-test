@@ -276,6 +276,7 @@ export const PetitionField = objectType({
         });
       },
     });
+    t.int("position");
   },
   rootTyping: "db.PetitionField",
 });

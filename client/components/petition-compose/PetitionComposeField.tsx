@@ -342,7 +342,6 @@ export const PetitionComposeField = Object.assign(
             />
             <IconButtonWithTooltip
               icon={<SettingsIcon />}
-              disabled={field.isFixed}
               size="sm"
               variant="ghost"
               placement="bottom"

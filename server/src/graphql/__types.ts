@@ -574,6 +574,7 @@ export interface NexusGenFieldTypes {
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
     options: NexusGenScalars["JSONObject"] | null; // JSONObject
+    position: number; // Int!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!

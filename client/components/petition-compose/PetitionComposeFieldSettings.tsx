@@ -42,12 +42,14 @@ export function PetitionComposeFieldSettings({
         />
       </CardHeader>
       <Stack spacing={4} padding={4} direction="column">
-        <Box>
-          <PetitionFieldTypeSelect
-            type={field.type}
-            onChange={(type) => onFieldTypeChange(field.id, type)}
-          />
-        </Box>
+        {!field.isFixed && (
+          <Box>
+            <PetitionFieldTypeSelect
+              type={field.type}
+              onChange={(type) => onFieldTypeChange(field.id, type)}
+            />
+          </Box>
+        )}
         {!field.isReadOnly && (
           <SettingsRow
             label={
@@ -168,36 +170,39 @@ function HeadingSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
   const options = field.options as FieldOptions["HEADING"];
   return (
-    <SettingsRow
-      label={
-        <FormattedMessage
-          id="field-settings.heading-page-break-label"
-          defaultMessage="Start new page"
-        />
-      }
-      description={
-        <Text fontSize="sm">
+    // dont show switch for field is the first on the list
+    field.position > 0 ? (
+      <SettingsRow
+        label={
           <FormattedMessage
-            id="field-settings.heading-page-break-description"
-            defaultMessage="Enabling this will create a new page and use this as the heading of the new page"
+            id="field-settings.heading-page-break-label"
+            defaultMessage="Start new page"
           />
-        </Text>
-      }
-      controlId="heading-page-break"
-    >
-      <Switch
-        height="20px"
-        display="block"
-        id="heading-page-break"
-        color="green"
-        isChecked={options.hasPageBreak}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          onFieldEdit(field.id, {
-            options: { ...field.options, hasPageBreak: event.target.checked },
-          })
         }
-      />
-    </SettingsRow>
+        description={
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="field-settings.heading-page-break-description"
+              defaultMessage="Enabling this will create a new page and use this as the heading of the new page"
+            />
+          </Text>
+        }
+        controlId="heading-page-break"
+      >
+        <Switch
+          height="20px"
+          display="block"
+          id="heading-page-break"
+          color="green"
+          isChecked={options.hasPageBreak}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onFieldEdit(field.id, {
+              options: { ...field.options, hasPageBreak: event.target.checked },
+            })
+          }
+        />
+      </SettingsRow>
+    ) : null
   );
 }
 
@@ -331,6 +336,8 @@ PetitionComposeFieldSettings.fragments = {
       multiple
       options
       isReadOnly
+      isFixed
+      position
     }
   `,
 };

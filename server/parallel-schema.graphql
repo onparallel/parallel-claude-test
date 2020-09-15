@@ -990,6 +990,7 @@ type PetitionField {
   The options of the petition.
   """
   options: JSONObject
+  position: Int!
 
   """
   The replies to the petition field
