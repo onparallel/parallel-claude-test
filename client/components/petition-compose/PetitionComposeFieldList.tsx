@@ -170,11 +170,23 @@ export const PetitionComposeFieldList = Object.assign(
           const index = fieldIds.indexOf(fieldId);
           switch (event.key) {
             case "ArrowDown":
-              setTimeout(() => focusDescription(fieldId));
+              setTimeout(() => {
+                if (descriptionSwitchState.includes(fieldId)) {
+                  focusDescription(fieldId);
+                } else {
+                  focusTitle(fieldIds[index + 1]);
+                }
+              });
               break;
             case "ArrowUp":
               if (index > 0) {
-                setTimeout(() => focusDescription(fieldIds[index - 1]));
+                setTimeout(() => {
+                  if (descriptionSwitchState.includes(fieldIds[index - 1])) {
+                    focusDescription(fieldIds[index - 1]);
+                  } else {
+                    focusTitle(fieldIds[index - 1]);
+                  }
+                });
               }
               break;
           }
@@ -190,7 +202,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
       }),
-      [fieldIds.toString()]
+      [fieldIds.toString(), descriptionSwitchState.toString()]
     );
 
     const descriptionFieldProps = useMemoFactory(
