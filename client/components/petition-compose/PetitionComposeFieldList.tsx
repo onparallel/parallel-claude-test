@@ -242,7 +242,7 @@ export const PetitionComposeFieldList = Object.assign(
       <Card id="petition-fields" {...props}>
         {fieldIds.map((fieldId, index) => (
           <PetitionComposeField
-            borderTopRadius={index === 0 ? "0.25rem" : "unset"}
+            borderTopRadius={index === 0 ? "md" : "unset"}
             id={`field-${fieldId}`}
             onMove={handleFieldMove}
             key={fieldId}
