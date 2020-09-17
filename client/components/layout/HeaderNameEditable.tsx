@@ -7,7 +7,11 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/core";
-import { CloudOkIcon, CloudSyncIcon } from "@parallel/chakra/icons";
+import {
+  CloudErrorIcon,
+  CloudOkIcon,
+  CloudSyncIcon,
+} from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -111,7 +115,14 @@ export function HeaderNameEditable({
                   </Text>
                 </Tooltip>
               ) : state === "ERROR" ? (
-                <Text color="red.500" fontSize="xs" fontStyle="italic">
+                <Text
+                  color="red.500"
+                  fontSize="xs"
+                  fontStyle="italic"
+                  display="flex"
+                  alignItems="center"
+                >
+                  <CloudErrorIcon marginRight={1} fontSize="sm" />
                   <FormattedMessage
                     id="petition.status.error"
                     defaultMessage="Error"
