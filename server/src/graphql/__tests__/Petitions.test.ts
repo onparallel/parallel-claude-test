@@ -35,7 +35,7 @@ describe("GraphQL/Petitions", () => {
   jest;
 
   beforeAll(async (done) => {
-    testClient = initServer();
+    testClient = await initServer();
     const mocks = new Mocks(testClient.knex);
 
     // main organization

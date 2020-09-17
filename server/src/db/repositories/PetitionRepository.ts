@@ -678,7 +678,7 @@ export class PetitionRepository extends BaseRepository {
         fieldIds.some((id) => !ids.includes(id)) ||
         fixedPositions.some((position) => ids[position] !== fieldIds[position]) // trying to reorder a fixed field
       ) {
-        throw new Error("Invalid petition field ids");
+        throw new Error("INVALID_PETITION_FIELD_IDS");
       }
 
       await t.raw(
@@ -878,7 +878,7 @@ export class PetitionRepository extends BaseRepository {
           )
           .then(([updatedField]) => {
             if (updatedField.is_fixed && data.type !== undefined) {
-              throw new Error("can't update a fixed field type");
+              throw new Error("UPDATE_FIXED_FIELD");
             }
             return [updatedField];
           }),

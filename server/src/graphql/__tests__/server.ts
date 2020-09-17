@@ -20,7 +20,7 @@ export type TestClient = {
   knex: Knex;
 };
 
-export const initServer = () => {
+export const initServer = async () => {
   const container = createContainer();
   const server = new ApolloServer({
     schema,
@@ -43,12 +43,13 @@ export const initServer = () => {
   const { query, mutate } = createTestClient(server);
 
   const knex = container.get<Knex>(KNEX);
+  await deleteAllData(knex);
+
   return {
     query,
     mutate,
     knex,
     stop: async () => {
-      await deleteAllData(knex);
       await knex.destroy();
       await server.stop();
     },

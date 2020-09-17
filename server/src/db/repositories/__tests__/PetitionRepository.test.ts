@@ -163,14 +163,14 @@ describe("repositories/PetitionRepository", () => {
       ] = fields;
       await expect(
         petitions.updateFieldPositions(petition1.id, [id2, id5, id6], user)
-      ).rejects.toThrow("Invalid petition field ids");
+      ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
       await expect(
         petitions.updateFieldPositions(
           petition1.id,
           [id1, id2, id3, id4, id5, id6, id6],
           user
         )
-      ).rejects.toThrow("Invalid petition field ids");
+      ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
     test("fails if passed deleted field ids", async () => {
@@ -188,7 +188,7 @@ describe("repositories/PetitionRepository", () => {
           [id1, id2, id3, deleted[2].id, id5, id6, id6],
           user
         )
-      ).rejects.toThrow("Invalid petition field ids");
+      ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
     test("fails if passed fields ids from another petition", async () => {
@@ -206,7 +206,7 @@ describe("repositories/PetitionRepository", () => {
           [id1, id2, id3, foreignField.id, id5, id6, id6],
           user
         )
-      ).rejects.toThrow("Invalid petition field ids");
+      ).rejects.toThrow("INVALID_PETITION_FIELD_IDS");
     });
 
     test("updates the positions", async () => {

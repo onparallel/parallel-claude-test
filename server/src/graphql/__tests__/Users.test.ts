@@ -12,7 +12,7 @@ describe("GraphQL/Users", () => {
   let userGID: string;
 
   beforeAll(async (done) => {
-    testClient = initServer();
+    testClient = await initServer();
     const mocks = new Mocks(testClient.knex);
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",

@@ -33,7 +33,7 @@ import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
-import { validObjectNotEmpty } from "../../helpers/validators/validObjectNotEmpty";
+import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -50,7 +50,7 @@ import {
   validateAccessesStatus,
   validatePetitionStatus,
 } from "../validations";
-import { WhitelistedError } from "./../../helpers/errors";
+import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { mapSeries } from "async";
 import { unMaybeArray } from "../../../util/arrays";
@@ -203,11 +203,22 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
     }),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updateFieldPositions(
-      args.petitionId,
-      args.fieldIds,
-      ctx.user!
-    );
+    try {
+      return await ctx.petitions.updateFieldPositions(
+        args.petitionId,
+        args.fieldIds,
+        ctx.user!
+      );
+    } catch (e) {
+      if (e.message === "INVALID_PETITION_FIELD_IDS") {
+        throw new WhitelistedError(
+          "Invalid petition field ids",
+          "INVALID_PETITION_FIELD_IDS"
+        );
+      } else {
+        throw e;
+      }
+    }
   },
 });
 
@@ -257,7 +268,7 @@ export const updatePetition = mutationField("updatePetition", {
     }).asArg({ required: true }),
   },
   validateArgs: validateAnd(
-    validObjectNotEmpty((args) => args.data, "data"),
+    notEmptyObject((args) => args.data, "data"),
     maxLength((args) => args.data.name, "data.name", 255),
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
@@ -412,8 +423,11 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       },
     }).asArg({ required: true }),
   },
-  validateArgs: maxLength((args) => args.data.title, "data.title", 255),
-  resolve: async (_, args, ctx) => {
+  validateArgs: validateAnd(
+    notEmptyObject((args) => args.data, "data"),
+    maxLength((args) => args.data.title, "data.title", 255)
+  ),
+  resolve: async (_, args, ctx, info) => {
     const { title, description, optional, multiple, options } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
@@ -429,8 +443,12 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       data.multiple = multiple;
     }
     if (options !== undefined && options !== null) {
-      await ctx.petitions.validateFieldData(args.fieldId, { options });
-      data.options = options;
+      try {
+        await ctx.petitions.validateFieldData(args.fieldId, { options });
+        data.options = options;
+      } catch (e) {
+        throw new ArgValidationError(info, "data.options", e.toString());
+      }
     }
     return await ctx.petitions.updatePetitionField(
       args.petitionId,
@@ -941,20 +959,32 @@ export const changePetitionFieldType = mutationField(
       force: booleanArg({ default: false, required: false }),
     },
     resolve: async (_, args, ctx) => {
-      const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
+      const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
+        cache: false,
+      });
       if (!args.force && replies.length > 0) {
         throw new WhitelistedError(
           "The petition field has replies.",
           "FIELD_HAS_REPLIES"
         );
       }
-
-      return await ctx.petitions.changePetitionFieldType(
-        args.petitionId,
-        args.fieldId,
-        args.type,
-        ctx.user!
-      );
+      try {
+        return await ctx.petitions.changePetitionFieldType(
+          args.petitionId,
+          args.fieldId,
+          args.type,
+          ctx.user!
+        );
+      } catch (e) {
+        if (e.message === "UPDATE_FIXED_FIELD") {
+          throw new WhitelistedError(
+            "Can't change type of a fixed field",
+            "UPDATE_FIXED_FIELD"
+          );
+        } else {
+          throw e;
+        }
+      }
     },
   }
 );

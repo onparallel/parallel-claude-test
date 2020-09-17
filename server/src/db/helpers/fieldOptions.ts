@@ -5,6 +5,7 @@ const SCHEMAS = {
   TEXT: {
     type: "object",
     required: ["multiline", "placeholder"],
+    additionalProperties: false,
     properties: {
       multiline: {
         type: "boolean",
@@ -17,6 +18,7 @@ const SCHEMAS = {
   FILE_UPLOAD: {
     type: "object",
     required: ["accepts"],
+    additionalProperties: false,
     properties: {
       accepts: {
         type: ["array", "null"],
@@ -29,7 +31,13 @@ const SCHEMAS = {
   },
   HEADING: {
     type: "object",
-    required: [],
+    required: ["hasPageBreak"],
+    additionalProperties: false,
+    properties: {
+      hasPageBreak: {
+        type: "boolean",
+      },
+    },
   },
 };
 
@@ -47,6 +55,8 @@ export function defaultFieldOptions(
   switch (type) {
     case "HEADING": {
       return {
+        optional: true,
+        multiple: false,
         options: {
           hasPageBreak: false,
         },

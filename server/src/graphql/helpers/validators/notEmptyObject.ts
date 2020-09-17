@@ -2,7 +2,7 @@ import { core } from "@nexus/schema";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
-export function validObjectNotEmpty<
+export function notEmptyObject<
   TypeName extends string,
   FieldName extends string
 >(prop: (args: core.ArgsValue<TypeName, FieldName>) => any, argName: string) {
