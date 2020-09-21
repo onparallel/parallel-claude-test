@@ -85,12 +85,7 @@ export function RecipientViewPetitionField({
         </Heading>
       )}
       {field.description ? (
-        <Text
-          color="gray.600"
-          height="1rem"
-          fontSize="sm"
-          overflowWrap="anywhere"
-        >
+        <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
           <BreakLines text={field.description} />
         </Text>
       ) : null}
