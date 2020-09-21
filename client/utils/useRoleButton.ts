@@ -1,4 +1,3 @@
-import { ChakraProps, SystemCSSProperties, SystemProps } from "@chakra-ui/core";
 import {
   MouseEvent,
   KeyboardEvent,
