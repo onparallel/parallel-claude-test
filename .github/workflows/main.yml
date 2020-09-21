@@ -10,7 +10,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  - linter:
+  linter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
       - name: Run linter
         run: yarn lint
 
-  - server-test-suite:
+  server-test-suite:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
