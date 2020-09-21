@@ -15,6 +15,11 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
+import {
+  ArgumentInput,
+  ArgumentWithState,
+  getDefaultInputValue,
+} from "@parallel/components/admin-support/ArgumentInput";
 import { Card } from "@parallel/components/common/Card";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import {
@@ -34,7 +39,7 @@ import {
   IntrospectionObjectType,
   IntrospectionQuery,
 } from "graphql";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useReducer, useState } from "react";
 import { useIntl } from "react-intl";
 
 function SupportMethods() {
@@ -67,10 +72,20 @@ function SupportMethods() {
             .slice(prefix.length)
             .replace(/(?<=[a-z\b])[A-Z]/g, (a) => ` ${a}`),
           description: f.description ?? "",
+          args: f.args.map((arg, i) => ({
+            ...arg,
+            position: i,
+            required: arg.type.kind === "NON_NULL",
+          })),
         }))
         .sort((a, b) => a.name.localeCompare(b.name));
     }
   }, [data]);
+
+  const schemaTypes = useMemo(() => {
+    return data ? data!.__schema.types : [];
+  }, [data]);
+
   const [search, setSearch] = useState("");
   const filteredSupportMethods = useMemo(() => {
     return supportMethods.filter((m) => {
@@ -80,9 +95,76 @@ function SupportMethods() {
       );
     });
   }, [supportMethods, search]);
+
   const [selected, setSelected] = useState<
     Maybe<UnwrapArray<typeof supportMethods>>
   >(null);
+
+  const handleSelection = (
+    value: Maybe<UnwrapArray<typeof supportMethods>>
+  ) => {
+    setSelected(value);
+    dispatch({ type: "clear" });
+    value?.args.forEach((arg) => {
+      dispatch({
+        type: "set",
+        arg: {
+          ...arg,
+          inputValue: getDefaultInputValue(arg, schemaTypes),
+        },
+      });
+    });
+  };
+
+  const argsReducer = (
+    state: ArgumentWithState[],
+    action: {
+      type: "set" | "clear" | "error";
+      arg?: ArgumentWithState;
+    }
+  ) => {
+    switch (action.type) {
+      case "set":
+        return action.arg
+          ? state
+              .filter((a) => a.name !== action.arg!.name)
+              .concat({ ...action.arg, error: false })
+              .sort((a, b) => a.position - b.position)
+          : state;
+
+      case "error":
+        return action.arg
+          ? state
+              .filter((a) => a.name !== action.arg!.name)
+              .concat({ ...action.arg, error: true })
+              .sort((a, b) => a.position - b.position)
+          : state;
+
+      case "clear":
+        return [];
+      default:
+        return state;
+    }
+  };
+
+  const [selectedMethodArgs, dispatch] = useReducer(argsReducer, []);
+
+  const hasEmptyKeys = (value: any): boolean => {
+    return Object.values(value).some((v) => v === "");
+  };
+
+  const handleExecute = useCallback(() => {
+    const errors = selectedMethodArgs.filter(
+      (arg) =>
+        arg.required && (arg.inputValue === "" || hasEmptyKeys(arg.inputValue))
+    );
+    if (errors.length > 0) {
+      errors.forEach((arg) => dispatch({ type: "error", arg }));
+      return;
+    }
+    console.log(selected, selectedMethodArgs);
+  }, [selectedMethodArgs]);
+
   return (
     <AppLayout
       title={intl.formatMessage({
@@ -136,7 +218,7 @@ function SupportMethods() {
                 }}
                 role="button"
                 tabIndex={1}
-                onClick={() => setSelected(m)}
+                onClick={() => handleSelection(m)}
               >
                 <Box flex="1">
                   <Heading size="sm">{m.name}</Heading>
@@ -150,14 +232,34 @@ function SupportMethods() {
           </Stack>
         )}
         {selected && (
-          <Modal isOpen size="xl" onClose={() => setSelected(null)}>
+          <Modal isOpen size="xl" onClose={() => handleSelection(null)}>
             <ModalOverlay>
               <ModalContent>
-                <ModalHeader>{selected.name}</ModalHeader>
-                <ModalBody>lol</ModalBody>
+                <ModalHeader>
+                  {selected.name}
+                  <Text fontSize="sm" fontWeight="normal">
+                    {selected.description}
+                  </Text>
+                </ModalHeader>
+                <ModalBody>
+                  <Stack>
+                    {selectedMethodArgs.map((arg, i) => (
+                      <ArgumentInput
+                        key={i}
+                        argument={arg}
+                        schemaTypes={schemaTypes}
+                        onChange={(value: ArgumentWithState) => {
+                          dispatch({ type: "set", arg: value });
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                </ModalBody>
                 <ModalFooter as={Stack} direction="row">
-                  <Button onClick={() => setSelected(null)}>Cancel</Button>
-                  <Button colorScheme="purple">Execute</Button>
+                  <Button onClick={() => handleSelection(null)}>Cancel</Button>
+                  <Button colorScheme="purple" onClick={handleExecute}>
+                    Execute
+                  </Button>
                 </ModalFooter>
               </ModalContent>
             </ModalOverlay>
