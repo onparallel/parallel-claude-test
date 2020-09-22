@@ -294,9 +294,9 @@ function PasswordChangeForm({
   onBackToLogin,
   isSubmitting,
 }: PasswordChangeFormProps) {
-  const { handleSubmit, register, errors, getValues } = useForm<
-    PasswordChangeData
-  >({ mode: "onBlur" });
+  const { handleSubmit, register, errors } = useForm<PasswordChangeData>({
+    mode: "onBlur",
+  });
   return (
     <>
       <Box marginBottom={6} textAlign="center">
@@ -333,33 +333,6 @@ function PasswordChangeForm({
               <FormattedMessage
                 id="generic.forms.password-policy-error"
                 defaultMessage="The password must have a least 8 characters"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        <FormControl
-          marginTop={2}
-          id="password-confirm"
-          isInvalid={!!errors.password2}
-        >
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.password-label"
-              defaultMessage="Password"
-            />
-          </FormLabel>
-          <PasswordInput
-            name="password2"
-            ref={register({
-              required: true,
-              validate: (value) => value === getValues().password1,
-            })}
-          />
-          {errors.password2 && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.passwords-must-match"
-                defaultMessage="Passwords must match"
               />
             </FormErrorMessage>
           )}
