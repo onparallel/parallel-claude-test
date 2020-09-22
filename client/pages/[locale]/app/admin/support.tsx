@@ -50,6 +50,7 @@ function SupportMethods() {
         .filter((f) => f.name.startsWith(prefix))
         .map((f) => ({
           id: f.name,
+          type: f.type,
           name: f.name
             .slice(prefix.length)
             .replace(/(?<=[a-z\b])[A-Z]/g, (a) => ` ${a}`),
