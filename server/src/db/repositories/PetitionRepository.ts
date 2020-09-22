@@ -519,7 +519,7 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      const { petition } = await this.createPetitionFieldAtPosition(
+      await this.createPetitionFieldAtPosition(
         row.id,
         {
           type: "HEADING",
@@ -532,6 +532,33 @@ export class PetitionRepository extends BaseRepository {
         user,
         t
       );
+
+      await this.createPetitionFieldAtPosition(
+        row.id,
+        {
+          type: "TEXT",
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+          ...defaultFieldOptions("TEXT"),
+        },
+        1,
+        user,
+        t
+      );
+
+      const { petition } = await this.createPetitionFieldAtPosition(
+        row.id,
+        {
+          type: "FILE_UPLOAD",
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+          ...defaultFieldOptions("FILE_UPLOAD"),
+        },
+        2,
+        user,
+        t
+      );
+
       await this.createEvent_old(
         row.id,
         "PETITION_CREATED",
@@ -746,7 +773,7 @@ export class PetitionRepository extends BaseRepository {
     transaction?: Transaction<any, any>
   ) {
     return await this.withTransaction(async (t) => {
-      const [{ max }] = await this.from("petition_field")
+      const [{ max }] = await this.from("petition_field", t)
         .where({
           petition_id: petitionId,
           deleted_at: null,

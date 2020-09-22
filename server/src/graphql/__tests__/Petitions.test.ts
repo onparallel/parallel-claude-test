@@ -326,6 +326,14 @@ describe("GraphQL/Petitions", () => {
             type: "HEADING",
             isFixed: true,
           },
+          {
+            type: "TEXT",
+            isFixed: false,
+          },
+          {
+            type: "FILE_UPLOAD",
+            isFixed: false,
+          },
         ],
         __typename: "Petition",
       });
@@ -369,6 +377,14 @@ describe("GraphQL/Petitions", () => {
           {
             type: "HEADING",
             isFixed: true,
+          },
+          {
+            type: "TEXT",
+            isFixed: false,
+          },
+          {
+            type: "FILE_UPLOAD",
+            isFixed: false,
           },
         ],
         __typename: "PetitionTemplate",
