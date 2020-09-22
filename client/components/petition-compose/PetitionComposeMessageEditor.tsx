@@ -16,7 +16,7 @@ import {
 } from "@parallel/graphql/__types";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { omit } from "remeda";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
@@ -93,6 +93,16 @@ export const PetitionComposeMessageEditor = Object.assign(
       });
     }
 
+    const knownRecipients = useMemo(
+      () => recipients.filter((r) => !r.unknown),
+      [recipients]
+    );
+
+    const unknownRecipients = useMemo(
+      () => recipients.filter((r) => r.unknown),
+      [recipients]
+    );
+
     return (
       <Card id="petition-message-compose" {...props}>
         <Box padding={4} borderBottom="1px solid" borderBottomColor="gray.200">
@@ -106,20 +116,23 @@ export const PetitionComposeMessageEditor = Object.assign(
         <Stack spacing={2} padding={4}>
           <Box id="petition-select-recipients">
             <ContactSelect
-              isInvalid={showErrors && recipients.length === 0}
+              isInvalid={
+                (showErrors && recipients.length === 0) ||
+                unknownRecipients.length > 0
+              }
               onSearchContacts={onSearchContacts}
               onCreateContact={onCreateContact}
               value={recipients}
               onChange={setRecipients}
             />
           </Box>
-          {recipients.length >= 2 ? (
+          {knownRecipients.length >= 2 && unknownRecipients.length === 0 ? (
             <Alert status="info">
               <AlertIcon />
               <FormattedMessage
                 id="petition.message-settings.same-petition-warning"
                 defaultMessage="All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
-                values={{ recipientCount: recipients.length }}
+                values={{ recipientCount: knownRecipients.length }}
               />
             </Alert>
           ) : null}

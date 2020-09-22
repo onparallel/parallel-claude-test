@@ -193,18 +193,20 @@ export function useReactSelectStyle<
           ...styles,
           padding: "0.5rem 0",
         }),
-        multiValue: (styles) => ({
+        multiValue: (styles, { data }) => ({
           ...styles,
-          backgroundColor: colors.gray[200],
+          backgroundColor: data.unknown ? colors.red[200] : colors.gray[200],
           borderRadius: radii[SIZES[size].multiValue.borderRadius],
         }),
-        multiValueRemove: (styles, { theme }) => {
+        multiValueRemove: (styles, { data }) => {
           const radius = radii[SIZES[size].multiValue.borderRadius];
           return {
             ...styles,
             borderRadius: `0 ${radius} ${radius} 0`,
             ":hover": {
-              backgroundColor: colors.gray[300],
+              backgroundColor: data.unknown
+                ? colors.red[300]
+                : colors.gray[300],
               color: colors.gray[900],
             },
           };
