@@ -155,7 +155,12 @@ export function RecipientViewPetitionField({
       </Flex>
       <Box>
         {field.description ? (
-          <Text fontSize="sm" color="gray.600" overflowWrap="anywhere">
+          <Text
+            fontSize="sm"
+            color="gray.600"
+            overflowWrap="anywhere"
+            marginBottom={2}
+          >
             <BreakLines text={field.description} />
           </Text>
         ) : null}
