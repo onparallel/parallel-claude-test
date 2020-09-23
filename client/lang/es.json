@@ -1715,6 +1715,11 @@
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
   },
   {
+    "term": "petition.message-settings.unknown-recipients",
+    "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
+    "context": "We couldn't find {count, plural, =1 { {email}} other {some of the emails}} in your contacts list."
+  },
+  {
     "term": "petition.name-label",
     "definition": "Nombre de la petición",
     "context": "Petition name"
