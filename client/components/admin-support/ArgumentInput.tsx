@@ -12,6 +12,7 @@ export type ArgumentWithState = IntrospectionInputValue & {
   position: number;
   error?: boolean;
   required: boolean;
+  list?: boolean;
 };
 
 type ArgumentInputProps = {
@@ -56,7 +57,19 @@ function renderInputType(props: ArgumentInputProps): any {
     case "NON_NULL":
       return renderInputType({
         ...props,
-        argument: { ...props.argument, type: props.argument.type.ofType },
+        argument: {
+          ...props.argument,
+          type: props.argument.type.ofType,
+        },
+      });
+    case "LIST":
+      return renderInputType({
+        ...props,
+        argument: {
+          ...props.argument,
+          type: props.argument.type.ofType,
+          list: true,
+        },
       });
     case "SCALAR":
       return <ScalarInput {...props} />;
@@ -66,7 +79,7 @@ function renderInputType(props: ArgumentInputProps): any {
       return <ObjectInput {...props} />;
     default:
       console.error(
-        `Can't build input of type ${props.argument.type.kind}:`,
+        `Can't build input of type ${(props.argument.type as any).kind}:`,
         props.argument
       );
       return <Input disabled isInvalid />;
@@ -90,6 +103,15 @@ function ScalarInput(props: ArgumentInputProps) {
       ? "number"
       : "text";
 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { argument } = props;
+    props.onChange({
+      ...argument,
+      inputValue:
+        type === "number" ? parseInt(e.target.value, 10) : e.target.value,
+    });
+  };
+
   return (
     <Flex justifyContent="space-between" alignItems="center" width="100%">
       <Text marginRight={2} minWidth="100px">
@@ -100,13 +122,7 @@ function ScalarInput(props: ArgumentInputProps) {
         type={type}
         isInvalid={argument.error}
         value={argument.inputValue}
-        onChange={(e) =>
-          props.onChange({
-            ...argument,
-            inputValue:
-              type === "number" ? parseInt(e.target.value, 10) : e.target.value,
-          })
-        }
+        onChange={handleInputChange}
       />
     </Flex>
   );

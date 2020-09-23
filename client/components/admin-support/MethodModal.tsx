@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Modal,
   ModalOverlay,
@@ -10,12 +11,13 @@ import {
   Button,
 } from "@chakra-ui/core";
 import { Maybe } from "@parallel/graphql/__types";
+import { createApolloClient } from "@parallel/utils/apollo";
 import {
   IntrospectionInputTypeRef,
   IntrospectionOutputTypeRef,
   IntrospectionType,
 } from "graphql";
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 import {
   ArgumentInput,
@@ -49,6 +51,14 @@ export function MethodModal({
   schemaTypes,
   onClose,
 }: MethodModalProps) {
+  const apolloClient = createApolloClient(
+    {},
+    {
+      getToken() {
+        return localStorage.getItem("token")!;
+      },
+    }
+  );
   const argsReducer = (
     state: ArgumentWithState[],
     action: {
@@ -80,14 +90,7 @@ export function MethodModal({
     }
   };
 
-  const [methodArgs, dispatch] = useReducer(argsReducer, []);
-
-  const methodReturnTypeName =
-    method.type.kind === "NON_NULL"
-      ? (method.type.ofType as any).name
-      : (method.type as any).name;
-
-  console.log(method, methodReturnTypeName);
+  const [methodArgs, dispatchArg] = useReducer(argsReducer, []);
 
   const hasEmptyKeys = (value: any): boolean => {
     return Object.values(value).some((v) => v === "");
@@ -97,42 +100,58 @@ export function MethodModal({
     (method: Method, args: ArgumentWithState[]) => {
       const argToGraphQLParam = (arg: ArgumentWithState): string => {
         const quote =
-          arg.type.kind === "SCALAR" && arg.type.name !== "Int" ? '"' : "";
-        const inputValue =
+          !arg.list && arg.type.kind === "SCALAR" && arg.type.name !== "Int"
+            ? '"'
+            : "";
+        let inputValue =
           typeof arg.inputValue === "object"
             ? JSON.stringify(arg.inputValue).replace(/"([^"]+)":/g, "$1:")
             : arg.inputValue;
+
+        if (arg.list && typeof arg.inputValue === "string") {
+          inputValue = JSON.stringify(
+            inputValue.split(",").map((v: string) => v.trim())
+          );
+        }
+
         return `${arg.name}:${quote}${inputValue}${quote}`;
       };
 
-      return `${method.id}(${args
+      return `mutation { 
+        ${method.id}(${args
         .filter((arg) => arg.inputValue !== "")
         .map(argToGraphQLParam)
-        .join(",")})`;
+        .join(",")}) 
+      }`;
     },
     []
   );
 
-  const handleExecute = useCallback(() => {
-    debugger;
-    console.log(methodArgs);
-    const errors = methodArgs.filter(
+  const [status, setStatus] = useState<{ loading: boolean; data?: any }>({
+    loading: false,
+    data: null,
+  });
+
+  const handleExecute = useCallback(async () => {
+    const argErrors = methodArgs.filter(
       (arg) =>
         arg.required && (arg.inputValue === "" || hasEmptyKeys(arg.inputValue))
     );
-    if (errors.length > 0) {
-      errors.forEach((arg) => dispatch({ type: "error", arg }));
+    if (argErrors.length > 0) {
+      argErrors.forEach((arg) => dispatchArg({ type: "error", arg }));
       return;
     }
 
-    const query = buildGraphQLQuery(method, methodArgs);
-    console.log(query);
+    const mutation = gql(buildGraphQLQuery(method, methodArgs));
+    setStatus({ loading: true, data: null });
+    const { data } = await apolloClient.mutate({ mutation });
+    setStatus({ loading: false, data: data[method.id] });
   }, [methodArgs]);
 
   useEffect(() => {
-    dispatch({ type: "clear" });
+    dispatchArg({ type: "clear" });
     method.args.forEach((arg) => {
-      dispatch({
+      dispatchArg({
         type: "set",
         arg: {
           ...arg,
@@ -159,19 +178,41 @@ export function MethodModal({
                   key={i}
                   argument={arg}
                   schemaTypes={schemaTypes}
-                  onChange={(arg) => dispatch({ type: "set", arg })}
+                  onChange={(arg) => dispatchArg({ type: "set", arg })}
                 />
               ))}
             </Stack>
           </ModalBody>
-          <ModalFooter as={Stack} direction="row">
-            <Button onClick={() => onClose()}>Cancel</Button>
-            <Button colorScheme="purple" onClick={handleExecute}>
-              Execute
-            </Button>
+          <ModalFooter
+            as={Stack}
+            direction="row"
+            justifyContent="space-between"
+          >
+            <StatusTag status={status} />
+            <Stack direction="row">
+              <Button onClick={() => onClose()}>Cancel</Button>
+              <Button colorScheme="purple" onClick={handleExecute}>
+                Execute
+              </Button>
+            </Stack>
           </ModalFooter>
         </ModalContent>
       </ModalOverlay>
     </Modal>
+  );
+}
+
+function StatusTag({ status }: { status: { loading: boolean; data?: any } }) {
+  return status.loading ? (
+    <Text></Text>
+  ) : (
+    <Text
+      sx={{
+        fontWeight: "bold",
+        color: status.data === "SUCCESS" ? "green.500" : "red.500",
+      }}
+    >
+      {status.data}
+    </Text>
   );
 }
