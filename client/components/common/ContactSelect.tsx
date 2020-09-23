@@ -117,7 +117,7 @@ export const ContactSelect = Object.assign(
     const handleInputChange = useCallback(
       (newValue: string, meta: InputActionMeta) => {
         if (
-          EMAIL_REGEX.test(previousValue) &&
+          previousValue.trim() !== "" &&
           ["input-blur", "menu-close"].includes(meta.action)
         ) {
           const option = options.find((o) => o.email === previousValue) || {
