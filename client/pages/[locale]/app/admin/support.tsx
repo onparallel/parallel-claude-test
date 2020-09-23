@@ -42,22 +42,27 @@ function SupportMethods() {
         (t) => t.name === mutationTypeName
       )! as IntrospectionObjectType;
 
-      const prefix = "support";
       return mutation.fields
-        .filter((f) => f.name.startsWith(prefix))
-        .map((f) => ({
-          id: f.name,
-          type: f.type,
-          name: f.name
-            .slice(prefix.length)
-            .replace(/(?<=[a-z\b])[A-Z]/g, (a) => ` ${a}`),
-          description: f.description ?? "",
-          args: f.args.map((arg, i) => ({
-            ...arg,
-            position: i,
-            required: arg.type.kind === "NON_NULL",
-          })),
-        }))
+        .filter(
+          (f) =>
+            f.type.kind === "NON_NULL" &&
+            (f.type.ofType as any).name === "SupportMethodResponse"
+        )
+        .map((f) => {
+          let name = f.name.replace(/([A-Z])/g, " $1");
+          name = name.charAt(0).toUpperCase() + name.slice(1);
+          return {
+            id: f.name,
+            type: f.type,
+            name,
+            description: f.description ?? "",
+            args: f.args.map((arg, i) => ({
+              ...arg,
+              position: i,
+              required: arg.type.kind === "NON_NULL",
+            })),
+          };
+        })
         .sort((a, b) => a.name.localeCompare(b.name));
     }
   }, [data]);

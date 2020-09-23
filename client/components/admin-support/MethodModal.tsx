@@ -10,7 +10,7 @@ import {
   ModalFooter,
   Button,
 } from "@chakra-ui/core";
-import { Maybe } from "@parallel/graphql/__types";
+import { Maybe, SupportMethodResponse } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo";
 import {
   IntrospectionInputTypeRef,
@@ -121,13 +121,19 @@ export function MethodModal({
         ${method.id}(${args
         .filter((arg) => arg.inputValue !== "")
         .map(argToGraphQLParam)
-        .join(",")}) 
+        .join(",")}) { 
+          result
+          message 
+        }
       }`;
     },
     []
   );
 
-  const [status, setStatus] = useState<{ loading: boolean; data?: any }>({
+  const [status, setStatus] = useState<{
+    loading: boolean;
+    data?: Maybe<SupportMethodResponse>;
+  }>({
     loading: false,
     data: null,
   });
@@ -202,17 +208,21 @@ export function MethodModal({
   );
 }
 
-function StatusTag({ status }: { status: { loading: boolean; data?: any } }) {
-  return status.loading ? (
+function StatusTag({
+  status,
+}: {
+  status: { loading: boolean; data?: Maybe<SupportMethodResponse> };
+}) {
+  return status.loading || !status.data ? (
     <Text></Text>
   ) : (
     <Text
       sx={{
         fontWeight: "bold",
-        color: status.data === "SUCCESS" ? "green.500" : "red.500",
+        color: status.data.result === "SUCCESS" ? "green.500" : "red.500",
       }}
     >
-      {status.data}
+      {status.data.result} {status.data.message}
     </Text>
   );
 }

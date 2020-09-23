@@ -159,6 +159,8 @@ export type Mutation = {
   __typename?: "Mutation";
   /** Adds permissions on given petitions and users */
   addPetitionUserPermission: Array<Petition>;
+  /** Assigns any valid petition to a given user. */
+  assignPetitionToUser: SupportMethodResponse;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   /** Changes the password for the current logged in user. */
@@ -255,6 +257,11 @@ export type MutationaddPetitionUserPermissionArgs = {
   permissionType: PetitionUserPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationassignPetitionToUserArgs = {
+  petitionId: Scalars["Int"];
+  userId: Scalars["Int"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -1232,6 +1239,13 @@ export type SendPetitionResult = {
   __typename?: "SendPetitionResult";
   accesses?: Maybe<Array<PetitionAccess>>;
   petition?: Maybe<Petition>;
+  result: Result;
+};
+
+/** Return type for all support methods */
+export type SupportMethodResponse = {
+  __typename?: "SupportMethodResponse";
+  message?: Maybe<Scalars["String"]>;
   result: Result;
 };
 

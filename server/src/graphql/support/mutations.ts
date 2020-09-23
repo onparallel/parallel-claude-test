@@ -1,17 +1,22 @@
-import { idArg, mutationField } from "@nexus/schema";
+import { arg, mutationField } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
 import { userBelongsToOrg } from "./authorizers";
 
-export const supportTest = mutationField("supportTest", {
-  description:
-    "test mutation for support methods. Returns success only for id 0",
-  type: "Result",
+export const supportTest = mutationField("assignPetitionToUser", {
+  description: "Assigns any valid petition to a given user.",
+  type: "SupportMethodResponse",
   args: {
-    id: idArg({ required: true }),
+    petitionId: arg({ type: "Int", required: true }),
+    userId: arg({ type: "Int", required: true }),
   },
   authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
-  resolve: async (_, args) => {
-    return args.id === "0" ? RESULT.SUCCESS : RESULT.FAILURE;
+  resolve: async (_, args, ctx) => {
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    const user = await ctx.users.loadUser(args.userId);
+    console.log(petition, user);
+    return args.petitionId === 1
+      ? { result: RESULT.SUCCESS, message: "User assigned" }
+      : { result: RESULT.FAILURE, message: "an error happened" };
   },
 });

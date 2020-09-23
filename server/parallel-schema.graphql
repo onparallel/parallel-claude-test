@@ -203,6 +203,11 @@ type Mutation {
   ): [Petition!]!
 
   """
+  Assigns any valid petition to a given user.
+  """
+  assignPetitionToUser(petitionId: Int!, userId: Int!): SupportMethodResponse!
+
+  """
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
@@ -459,11 +464,6 @@ type Mutation {
   Submits all unpublished comments.
   """
   submitUnpublishedComments(petitionId: GID!): [PetitionFieldComment!]!
-
-  """
-  test mutation for support methods. Returns success only for id 0
-  """
-  supportTest(id: ID!): Result!
 
   """
   Switches automatic reminders for the specified petition accesses.
@@ -1917,6 +1917,14 @@ enum Result {
 type SendPetitionResult {
   accesses: [PetitionAccess!]
   petition: Petition
+  result: Result!
+}
+
+"""
+Return type for all support methods
+"""
+type SupportMethodResponse {
+  message: String
   result: Result!
 }
 

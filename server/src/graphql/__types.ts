@@ -284,6 +284,11 @@ export interface NexusGenRootTypes {
     petition?: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
+  SupportMethodResponse: {
+    // root type
+    message?: string | null; // String
+    result: NexusGenEnums["Result"]; // Result!
+  };
   User: db.User;
   UserPagination: {
     // root type
@@ -435,6 +440,7 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     addPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -468,7 +474,6 @@ export interface NexusGenFieldTypes {
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendReminders: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
-    supportTest: NexusGenEnums["Result"]; // Result!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
@@ -787,6 +792,11 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
+  SupportMethodResponse: {
+    // field return type
+    message: string | null; // String
+    result: NexusGenEnums["Result"]; // Result!
+  };
   User: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -879,6 +889,11 @@ export interface NexusGenArgTypes {
       permissionType: NexusGenEnums["PetitionUserPermissionTypeRW"]; // PetitionUserPermissionTypeRW!
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    assignPetitionToUser: {
+      // args
+      petitionId: number; // Int!
+      userId: number; // Int!
     };
     cancelScheduledMessage: {
       // args
@@ -1062,10 +1077,6 @@ export interface NexusGenArgTypes {
     submitUnpublishedComments: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    supportTest: {
-      // args
-      id: string; // ID!
     };
     switchAutomaticReminders: {
       // args
@@ -1278,6 +1289,7 @@ export type NexusGenObjectNames =
   | "ReplyCreatedEvent"
   | "ReplyDeletedEvent"
   | "SendPetitionResult"
+  | "SupportMethodResponse"
   | "User"
   | "UserPagination"
   | "UserPermissionAddedEvent"
