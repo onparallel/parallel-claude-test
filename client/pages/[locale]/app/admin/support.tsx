@@ -41,12 +41,9 @@ function SupportMethods() {
       const mutation = data.__schema.types.find(
         (t) => t.name === mutationTypeName
       )! as IntrospectionObjectType;
-      const queryTypeName = data.__schema.queryType!.name;
-      const query = data.__schema.types.find(
-        (t) => t.name === queryTypeName
-      )! as IntrospectionObjectType;
-      const prefix = "public";
-      return [...query.fields, ...mutation.fields]
+
+      const prefix = "support";
+      return mutation.fields
         .filter((f) => f.name.startsWith(prefix))
         .map((f) => ({
           id: f.name,

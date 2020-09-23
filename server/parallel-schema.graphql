@@ -461,6 +461,11 @@ type Mutation {
   submitUnpublishedComments(petitionId: GID!): [PetitionFieldComment!]!
 
   """
+  test mutation for support methods. Returns success only for id 0
+  """
+  supportTest(id: ID!): Result!
+
+  """
   Switches automatic reminders for the specified petition accesses.
   """
   switchAutomaticReminders(
