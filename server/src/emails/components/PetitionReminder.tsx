@@ -3,7 +3,7 @@ import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { Button } from "../common/Button";
+import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
@@ -144,6 +144,11 @@ const email: Email<PetitionReminderProps> = {
           <MjmlColumn>
             {fields.length > 0 ? (
               <>
+                {fields.length > 10 && (
+                  <CompleteInfoButton
+                    href={`${parallelUrl}/${locale}/petition/${keycode}`}
+                  />
+                )}
                 <MjmlText>
                   {deadline ? (
                     <FormattedMessage
@@ -178,12 +183,9 @@ const email: Email<PetitionReminderProps> = {
               </MjmlText>
             )}
             <MjmlSpacer height="10px" />
-            <Button href={`${parallelUrl}/${locale}/petition/${keycode}`}>
-              <FormattedMessage
-                id="generic.complete-information-button"
-                defaultMessage="Complete the information here"
-              />
-            </Button>
+            <CompleteInfoButton
+              href={`${parallelUrl}/${locale}/petition/${keycode}`}
+            />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
@@ -214,6 +216,6 @@ export const props: PetitionReminderProps = {
   keycode: "asdfghjkl",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "/static/emails/logo.png",
+  logoUrl: "http://localhost/static/emails/logo.png",
   logoAlt: "Parallel",
 };

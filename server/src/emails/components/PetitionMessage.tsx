@@ -3,7 +3,7 @@ import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { Button } from "../common/Button";
+import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { Greeting } from "../common/Greeting";
@@ -145,6 +145,11 @@ const email: Email<PetitionMessageProps> = {
         </MjmlSection>
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
+            {fields.length > 10 && (
+              <CompleteInfoButton
+                href={`${parallelUrl}/${locale}/petition/${keycode}`}
+              />
+            )}
             <MjmlText>
               {deadline ? (
                 <FormattedMessage
@@ -167,12 +172,9 @@ const email: Email<PetitionMessageProps> = {
             </MjmlText>
             <PetitionFieldList fields={fields} />
             <MjmlSpacer height="10px" />
-            <Button href={`${parallelUrl}/${locale}/petition/${keycode}`}>
-              <FormattedMessage
-                id="generic.complete-information-button"
-                defaultMessage="Complete the information here"
-              />
-            </Button>
+            <CompleteInfoButton
+              href={`${parallelUrl}/${locale}/petition/${keycode}`}
+            />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>
