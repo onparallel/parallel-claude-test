@@ -523,7 +523,6 @@ const CommentsButton = forwardRef<
   const intl = useIntl();
   const common = {
     size: "sm",
-    variant: "ghost",
     fontWeight: "normal",
     "aria-label": intl.formatMessage(
       {
