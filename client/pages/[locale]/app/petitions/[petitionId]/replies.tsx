@@ -189,7 +189,14 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const downloadAllDialog = useDownloadAllDialog();
   const handleDownloadAllClick = useCallback(async () => {
     try {
-      const pattern = await downloadAllDialog({ fields: petition.fields });
+      let pattern = "";
+      if (
+        petition.fields.some(
+          (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
+        )
+      ) {
+        pattern = await downloadAllDialog({ fields: petition.fields });
+      }
       window.open(
         `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
           pattern
@@ -200,7 +207,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   }, [petitionId, petition.fields]);
 
   const showDownloadAll = petition.fields.some(
-    (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
+    (f) => ["FILE_UPLOAD", "TEXT"].includes(f.type) && f.replies.length > 0
   );
 
   let pendingComments = 0;

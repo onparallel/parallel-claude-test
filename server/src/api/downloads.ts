@@ -8,6 +8,7 @@ import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { fromGlobalId } from "../util/globalId";
 import { zip } from "../util/remedaExtensions";
 import { authenticate } from "./helpers/authenticate";
+import { TextRepliesExcel } from "./helpers/TextRepliesExcel";
 
 /**
  * This code is a bit messy. It needs some cleanup and tests
@@ -40,7 +41,9 @@ export const downloads = Router()
         "content-disposition",
         contentDisposition(sanitize(`${name}.zip`), { type: "attachment" })
       );
-      const zipFile = createZipFile(getPetitionFiles(ctx, petitionId, pattern));
+      const zipFile = createZipFile(
+        getPetitionFiles(ctx, petitionId, pattern, petition?.locale)
+      );
       zipFile.pipe(res);
     } catch (error) {
       next(error);
@@ -58,7 +61,8 @@ const placeholders = [
 async function* getPetitionFiles(
   ctx: ApiContext,
   petitionId: number,
-  pattern: string
+  pattern: string,
+  locale = "en"
 ) {
   const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
   const fieldReplies = await ctx.petitions.loadRepliesForField(
@@ -88,6 +92,8 @@ async function* getPetitionFiles(
     contacts.filter((c) => c !== null),
     (c) => c!.id
   );
+
+  const textReplies = new TextRepliesExcel(locale);
   const seen = new Set<string>();
   for (const [field, replies] of zip(fields, fieldReplies)) {
     if (field.type === "FILE_UPLOAD") {
@@ -124,7 +130,35 @@ async function* getPetitionFiles(
           } as ZipFileInput;
         }
       }
+    } else if (field.type === "TEXT") {
+      if (replies.length > 0) {
+        textReplies.addRows(
+          replies.map((r, i) => ({
+            title:
+              field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
+            description: field.description?.slice(0, 200) || "",
+            answer: r.content.text,
+          }))
+        );
+      } else {
+        textReplies.addRows(
+          [
+            {
+              title: field.title || "",
+              description: field.description?.slice(0, 200) || "",
+              answer: textReplies.labels.noAnswer,
+            },
+          ],
+          {
+            fontColorARGB: "FFA6A6A6",
+          }
+        );
+      }
     }
+  }
+
+  if (textReplies.hasRows()) {
+    yield await textReplies.export();
   }
 }
 
