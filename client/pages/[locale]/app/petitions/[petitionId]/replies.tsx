@@ -320,7 +320,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           >
             <FormattedMessage
               id="petition-replies.download-all"
-              defaultMessage="Download files"
+              defaultMessage="Download replies"
             />
           </Button>
         ) : null}

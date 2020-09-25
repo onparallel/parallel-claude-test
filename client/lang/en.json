@@ -1306,8 +1306,8 @@
   },
   {
     "term": "petition-replies.download-all",
-    "definition": "Download files",
-    "context": "Download files"
+    "definition": "Download replies",
+    "context": "Download replies"
   },
   {
     "term": "petition-replies.field-comments.placeholder",
