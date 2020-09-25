@@ -32,7 +32,6 @@ describe("GraphQL/Petitions", () => {
   let otherPetition: Petition;
 
   let publicTemplate: Petition;
-  jest;
 
   beforeAll(async (done) => {
     testClient = await initServer();
@@ -111,13 +110,12 @@ describe("GraphQL/Petitions", () => {
     it("fetches all user petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($limit: Int, $type: PetitionBaseType) {
-            petitions(limit: $limit, type: $type) {
+          query($limit: Int) {
+            petitions(limit: $limit) {
               totalCount
             }
           }
         `,
-        variables: { type: "PETITION" },
       });
 
       expect(errors).toBeUndefined();

@@ -878,7 +878,7 @@ export class PetitionRepository extends BaseRepository {
           )
           .then(([updatedField]) => {
             if (updatedField.is_fixed && data.type !== undefined) {
-              throw new Error("UPDATE_FIXED_FIELD");
+              throw new Error("UPDATE_FIXED_FIELD_ERROR");
             }
             return [updatedField];
           }),

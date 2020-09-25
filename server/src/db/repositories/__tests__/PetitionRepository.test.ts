@@ -346,7 +346,7 @@ describe("repositories/PetitionRepository", () => {
       await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       [user] = await mocks.createRandomUsers(org.id, 1);
-      [contact] = await mocks.createRandomContacts(org.id, user.id, 1);
+      [contact] = await mocks.createRandomContacts(org.id, 1);
       [petition] = await mocks.createRandomPetitions(org.id, user.id, 1);
       [fields] = await mocks.createRandomPetitionFields(petition.id, 1);
       [petitionAccess] = await mocks.createPetitionAccess(

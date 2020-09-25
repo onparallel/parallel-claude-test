@@ -66,7 +66,6 @@ export class Mocks {
 
   async createRandomContacts(
     orgId: number,
-    ownerId: number,
     amount: number,
     builder?: (index: number) => Partial<Contact>
   ) {
@@ -79,7 +78,7 @@ export class Mocks {
             org_id: orgId,
             first_name: firstName,
             last_name: lastName,
-            email: faker.internet.email(firstName, lastName),
+            email: faker.internet.email(firstName, lastName).toLowerCase(),
             ...builder?.(index),
           };
         })

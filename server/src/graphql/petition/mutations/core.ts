@@ -387,7 +387,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     if (!args.force && replies.length > 0) {
       throw new WhitelistedError(
         "The petition field has replies.",
-        "FIELD_HAS_REPLIES"
+        "FIELD_HAS_REPLIES_ERROR"
       );
     }
 
@@ -965,7 +965,7 @@ export const changePetitionFieldType = mutationField(
       if (!args.force && replies.length > 0) {
         throw new WhitelistedError(
           "The petition field has replies.",
-          "FIELD_HAS_REPLIES"
+          "FIELD_HAS_REPLIES_ERROR"
         );
       }
       try {
@@ -976,10 +976,10 @@ export const changePetitionFieldType = mutationField(
           ctx.user!
         );
       } catch (e) {
-        if (e.message === "UPDATE_FIXED_FIELD") {
+        if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
           throw new WhitelistedError(
             "Can't change type of a fixed field",
-            "UPDATE_FIXED_FIELD"
+            "UPDATE_FIXED_FIELD_ERROR"
           );
         } else {
           throw e;

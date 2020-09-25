@@ -496,11 +496,7 @@ describe("GraphQL/Petition Fields", () => {
         })
       );
 
-      const [contact] = await mocks.createRandomContacts(
-        organization.id,
-        user.id,
-        1
-      );
+      const [contact] = await mocks.createRandomContacts(organization.id, 1);
 
       const [contactAccess] = await mocks.createPetitionAccess(
         userPetition.id,
@@ -673,7 +669,7 @@ describe("GraphQL/Petition Fields", () => {
       });
 
       expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FIELD_HAS_REPLIES");
+      expect(errors![0].extensions!.code).toBe("FIELD_HAS_REPLIES_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -1199,11 +1195,7 @@ describe("GraphQL/Petition Fields", () => {
         })
       );
 
-      const [contact] = await mocks.createRandomContacts(
-        organization.id,
-        user.id,
-        1
-      );
+      const [contact] = await mocks.createRandomContacts(organization.id, 1);
 
       const [access] = await mocks.createPetitionAccess(
         userPetition.id,
@@ -1528,7 +1520,7 @@ describe("GraphQL/Petition Fields", () => {
       });
 
       expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FIELD_HAS_REPLIES");
+      expect(errors![0].extensions!.code).toBe("FIELD_HAS_REPLIES_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1559,7 +1551,7 @@ describe("GraphQL/Petition Fields", () => {
       });
 
       expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("UPDATE_FIXED_FIELD");
+      expect(errors![0].extensions!.code).toBe("UPDATE_FIXED_FIELD_ERROR");
       expect(data).toBeNull();
     });
   });

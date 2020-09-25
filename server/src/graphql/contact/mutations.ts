@@ -3,6 +3,7 @@ import { CreateContact } from "../../db/__types";
 import { authenticate, chain } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { notEmptyObject } from "../helpers/validators/notEmptyObject";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const createContact = mutationField("createContact", {
@@ -57,6 +58,7 @@ export const updateContact = mutationField("updateContact", {
       },
     }).asArg({ required: true }),
   },
+  validateArgs: notEmptyObject((arg) => arg.data, "data"),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
     const data: Partial<CreateContact> = {};
