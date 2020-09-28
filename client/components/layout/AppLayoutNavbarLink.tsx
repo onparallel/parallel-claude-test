@@ -4,10 +4,10 @@ import { useIntl } from "react-intl";
 import { Link } from "../common/Link";
 
 export interface AppLayoutNavbarLinkProps {
-  href: string;
-  isActive: boolean;
+  href?: string;
+  isActive?: boolean;
   icon: ReactElement;
-  isAvailable: boolean;
+  isAvailable?: boolean;
   isMobile?: boolean;
   children: ReactNode;
 }
@@ -23,7 +23,7 @@ export function AppLayoutNavbarLink({
   const intl = useIntl();
   return isAvailable ? (
     <Link
-      href={href}
+      href={href!}
       borderX={!isMobile ? "4px solid" : undefined}
       borderY={isMobile ? "4px solid" : undefined}
       borderColor="transparent"
