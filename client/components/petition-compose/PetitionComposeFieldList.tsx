@@ -242,35 +242,36 @@ export const PetitionComposeFieldList = Object.assign(
     const fieldIndexValues = useFieldIndexValues(fields);
 
     return (
-      <Card id="petition-fields" {...props}>
-        {fieldIds.map((fieldId, index) => (
-          <PetitionComposeField
-            borderTopRadius={index === 0 ? "md" : "unset"}
-            id={`field-${fieldId}`}
-            onMove={handleFieldMove}
-            key={fieldId}
-            field={fieldsById[fieldId]}
-            fieldRelativeIndex={fieldIndexValues[index]}
-            index={index}
-            isActive={active === fieldId}
-            isLast={index === fieldIds.length - 1}
-            showError={showErrors}
-            onAddField={onAddField}
-            onClick={handleClick(fieldId)}
-            onFocus={handleFocus(fieldId)}
-            onCloneClick={handleCloneClick(fieldId)}
-            onSettingsClick={handleSettingsClick(fieldId)}
-            onDeleteClick={handleDeleteClick(fieldId)}
-            onFieldEdit={handleFieldEdit(fieldId)}
-            titleFieldProps={titleFieldProps(fieldId)}
-            descriptionFieldProps={descriptionFieldProps(fieldId)}
-          />
-        ))}
-        <Flex padding={2} justifyContent="center">
+      <>
+        <Card id="petition-fields" overflow="hidden" {...props}>
+          {fieldIds.map((fieldId, index) => (
+            <PetitionComposeField
+              borderTopRadius={index === 0 ? "md" : "unset"}
+              id={`field-${fieldId}`}
+              onMove={handleFieldMove}
+              key={fieldId}
+              field={fieldsById[fieldId]}
+              fieldRelativeIndex={fieldIndexValues[index]}
+              index={index}
+              isActive={active === fieldId}
+              isLast={index === fieldIds.length - 1}
+              showError={showErrors}
+              onAddField={onAddField}
+              onClick={handleClick(fieldId)}
+              onFocus={handleFocus(fieldId)}
+              onCloneClick={handleCloneClick(fieldId)}
+              onSettingsClick={handleSettingsClick(fieldId)}
+              onDeleteClick={handleDeleteClick(fieldId)}
+              onFieldEdit={handleFieldEdit(fieldId)}
+              titleFieldProps={titleFieldProps(fieldId)}
+              descriptionFieldProps={descriptionFieldProps(fieldId)}
+            />
+          ))}
+        </Card>
+        <Flex marginTop={4} justifyContent="center">
           <AddFieldPopover
             as={Button}
             ref={addFieldRef}
-            variant="ghost"
             leftIcon={<AddIcon />}
             onSelectFieldType={onAddField}
           >
@@ -280,7 +281,7 @@ export const PetitionComposeFieldList = Object.assign(
             />
           </AddFieldPopover>
         </Flex>
-      </Card>
+      </>
     );
   }),
   {

@@ -104,7 +104,7 @@ export const PetitionComposeField = Object.assign(
         ref={elementRef}
         borderY="1px solid"
         borderColor="gray.200"
-        marginTop="-1px"
+        marginY="-1px"
         aria-current={isActive ? "true" : "false"}
         position="relative"
         sx={{
@@ -132,7 +132,7 @@ export const PetitionComposeField = Object.assign(
           opacity={isDragging ? 0 : 1}
           position="relative"
           backgroundColor={isActive ? "purple.50" : "white"}
-          borderRadius="md"
+          // borderRadius="md"
           sx={{
             "[draggable]": {
               opacity: 0,
