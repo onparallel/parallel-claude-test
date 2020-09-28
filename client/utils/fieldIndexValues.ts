@@ -15,23 +15,37 @@ function numberToBase26(number: number, tail = ""): string {
   );
 }
 
+/**
+ * searches for the last string type value in the symbols array and returns the next one
+ * example: nextLetter(["A", 1, 2, "B", 3]) === "C"
+ */
 function nextLetter(symbols: Array<string | number>) {
   const index = symbols.filter((s) => typeof s === "string").length;
   return numberToBase26(index + 1);
 }
 
+/**
+ * searches for the last number type value in the symbols array and returns the next one
+ * example: nextNumber(["A", 1, 2, "B", 3]) === 4
+ */
 function nextNumber(symbols: Array<string | number>) {
   const index = symbols.filter((s) => typeof s === "number").length;
   return index + 1;
 }
 
-export function getFieldIndexValues(fields: Pick<PetitionField, "type">[]) {
+/**
+ * iterates every field and returns an array representing the index of each one in the same order
+ * @param fields fields to iterate.
+ */
+export function useFieldIndexValues(fields: Pick<PetitionField, "type">[]) {
   return useMemo(() => {
-    return fields.reduce<Array<string | number>>((partial, field) => {
+    return fields.reduce<Array<string | number>>((values, field) => {
       if (field.type === "HEADING") {
-        return partial.concat(nextLetter(partial));
+        // concat the next letter in alphabet that is not already included in the array
+        return values.concat(nextLetter(values));
       } else {
-        return partial.concat(nextNumber(partial));
+        // concat the next number that is not already included in the array
+        return values.concat(nextNumber(values));
       }
     }, []);
   }, [fields, nextLetter, nextNumber]);
