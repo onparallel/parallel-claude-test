@@ -30,7 +30,7 @@ import {
   useContactUserQuery,
   useContact_updateContactMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapPromise } from "@parallel/utils/types";
 

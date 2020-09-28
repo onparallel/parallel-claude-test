@@ -21,7 +21,7 @@ import {
   Account_updateAccountMutationVariables,
   useAccountQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 

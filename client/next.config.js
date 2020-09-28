@@ -28,10 +28,7 @@ const config = {
     };
     return config;
   },
-  exportPathMap: async function (
-    defaultPathMap,
-    { dev, dir, outDir, distDir, buildId }
-  ) {
+  exportPathMap: async function () {
     return {
       "/": { page: "/" },
     };
@@ -43,6 +40,7 @@ const plugins = [
     enabled: process.env.ANALYZE === "true",
   }),
   require("next-transpile-modules")(["@camwiegert/typical"]),
+  require("next-plugin-graphql"),
 ];
 
 module.exports = plugins.reduce((acc, curr) => curr(acc), config);

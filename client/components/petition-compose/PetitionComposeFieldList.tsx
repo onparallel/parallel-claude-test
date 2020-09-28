@@ -62,7 +62,6 @@ function reset(
 export type PetitionComposeFieldListProps = ExtendChakra<{
   active: Maybe<string>;
   fields: FieldSelection[];
-  descriptionSwitchState: string[];
   showErrors: boolean;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
   onCopyFieldClick: (fieldId: string) => void;
@@ -77,7 +76,6 @@ export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({
     active,
     fields,
-    descriptionSwitchState,
     showErrors,
     onUpdateFieldPositions,
     onCopyFieldClick,
@@ -167,24 +165,33 @@ export const PetitionComposeFieldList = Object.assign(
     const titleFieldProps = useMemoFactory(
       (fieldId: string) => ({
         onKeyDown: (event: KeyboardEvent<any>) => {
+          const field = fields.find((f) => f.id === fieldId)!;
           const index = fieldIds.indexOf(fieldId);
+          const prev =
+            index > 0
+              ? fields.find((f) => f.id === fieldIds[index - 1])!
+              : null;
+          const next =
+            index < fieldIds.length - 1
+              ? fields.find((f) => f.id === fieldIds[index + 1])!
+              : null;
           switch (event.key) {
             case "ArrowDown":
               setTimeout(() => {
-                if (descriptionSwitchState.includes(fieldId)) {
-                  focusDescription(fieldId);
-                } else {
-                  focusTitle(fieldIds[index + 1]);
+                if (field.isDescriptionShown) {
+                  focusDescription(field.id);
+                } else if (next) {
+                  focusTitle(next.id);
                 }
               });
               break;
             case "ArrowUp":
-              if (index > 0) {
+              if (prev) {
                 setTimeout(() => {
-                  if (descriptionSwitchState.includes(fieldIds[index - 1])) {
-                    focusDescription(fieldIds[index - 1]);
+                  if (prev.isDescriptionShown) {
+                    focusDescription(prev.id);
                   } else {
-                    focusTitle(fieldIds[index - 1]);
+                    focusTitle(prev.id);
                   }
                 });
               }
@@ -202,7 +209,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
       }),
-      [fieldIds.toString(), descriptionSwitchState.toString()]
+      [fields]
     );
 
     const descriptionFieldProps = useMemoFactory(
@@ -250,7 +257,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
       }),
-      [fieldIds.toString()]
+      [fields]
     );
 
     const fieldIndexValues = useFieldIndexValues(fields);
@@ -260,12 +267,10 @@ export const PetitionComposeFieldList = Object.assign(
         <Card id="petition-fields" overflow="hidden" {...props}>
           {fieldIds.map((fieldId, index) => (
             <PetitionComposeField
-              borderTopRadius={index === 0 ? "md" : "unset"}
               id={`field-${fieldId}`}
               onMove={handleFieldMove}
               key={fieldId}
               field={fieldsById[fieldId]}
-              descriptionEnabled={descriptionSwitchState.includes(fieldId)}
               fieldRelativeIndex={fieldIndexValues[index]}
               index={index}
               isActive={active === fieldId}

@@ -31,7 +31,7 @@ import {
 import {
   assertQuery,
   useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo";
+} from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";

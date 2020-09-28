@@ -24,11 +24,11 @@ import {
   useContactsUserQuery,
   useContacts_deleteContactsMutation,
 } from "@parallel/graphql/__types";
+import { clearCache } from "@parallel/utils/apollo/clearCache";
 import {
   assertQuery,
-  clearCache,
   useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo";
+} from "@parallel/utils/apollo/assertQuery";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,

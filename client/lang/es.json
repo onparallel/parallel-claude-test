@@ -656,8 +656,8 @@
   },
   {
     "term": "field-settings.show-description-label",
-    "definition": "Descripción",
-    "context": "Description"
+    "definition": "Mostrar descripción",
+    "context": "Show description"
   },
   {
     "term": "field-settings.text-multiline-description",

@@ -6,7 +6,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
-import { clearCache } from "../apollo";
+import { clearCache } from "../apollo/clearCache";
 
 export function useCreatePetition() {
   const { query } = useRouter();

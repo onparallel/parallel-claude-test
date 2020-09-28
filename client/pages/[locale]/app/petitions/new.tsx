@@ -37,7 +37,7 @@ import {
   useNewPetitionTemplatesQuery,
   useNewPetitionUserQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";

@@ -13,7 +13,7 @@ import {
   useDeletePetitions_PetitionQueryVariables,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { clearCache } from "../apollo";
+import { clearCache } from "../apollo/clearCache";
 import { useCallback } from "react";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 

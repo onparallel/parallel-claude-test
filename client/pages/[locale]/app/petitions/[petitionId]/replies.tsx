@@ -48,7 +48,7 @@ import {
   usePetitionReplies_validatePetitionFieldsMutation,
   PetitionReplies_PetitionFragment,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";

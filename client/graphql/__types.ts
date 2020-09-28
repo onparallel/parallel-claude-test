@@ -731,6 +731,7 @@ export type PetitionField = {
   description?: Maybe<Scalars["String"]>;
   /** The ID of the petition field. */
   id: Scalars["GID"];
+  isDescriptionShown: Scalars["Boolean"];
   /** Determines if the field can be moved or deleted. */
   isFixed: Scalars["Boolean"];
   /** Determines if the field accepts replies */
@@ -2045,7 +2046,14 @@ export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "title" | "description" | "optional" | "multiple" | "isFixed"
+  | "id"
+  | "type"
+  | "title"
+  | "description"
+  | "optional"
+  | "multiple"
+  | "isFixed"
+  | "isDescriptionShown"
 >;
 
 export type PetitionComposeFieldList_PetitionFragment = {
@@ -2064,6 +2072,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   PetitionField,
   | "id"
   | "type"
+  | "isDescriptionShown"
   | "optional"
   | "multiple"
   | "options"
@@ -2519,6 +2528,10 @@ export type PetitionActivityUserQueryVariables = Exact<{
 export type PetitionActivityUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & PetitionActivity_UserFragment;
 };
+
+export type updateIsDescriptionShown_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "isDescriptionShown">;
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -3618,6 +3631,7 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     optional
     multiple
     isFixed
+    isDescriptionShown @client
   }
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
@@ -4237,10 +4251,16 @@ export const PetitionActivity_UserFragmentDoc = gql`
   }
   ${PetitionLayout_UserFragmentDoc}
 `;
+export const updateIsDescriptionShown_PetitionFieldFragmentDoc = gql`
+  fragment updateIsDescriptionShown_PetitionField on PetitionField {
+    isDescriptionShown @client
+  }
+`;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
     id
     type
+    isDescriptionShown @client
     optional
     multiple
     options

@@ -5,7 +5,7 @@ import {
   DocumentNode,
   OperationVariables,
 } from "@apollo/client";
-import { createApolloClient } from "@parallel/utils/apollo";
+import { createApolloClient } from "@parallel/utils/apollo/client";
 import { parse as parseCookie } from "cookie";
 import { NextComponentType } from "next";
 import { NextPageContext } from "next/dist/next-server/lib/utils";

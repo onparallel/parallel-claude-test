@@ -20,8 +20,7 @@ export type PetitionComposeFieldSettingsProps = {
   field: PetitionComposeFieldSettings_PetitionFieldFragment;
   onFieldTypeChange: (fieldId: string, type: PetitionFieldType) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
-  onFieldDescriptionSwitch: (fieldId: string) => void;
-  toggledDescriptions: string[];
+  onIsDescriptionShownChange: (fieldId: string) => void;
   onClose: () => void;
 };
 
@@ -29,8 +28,7 @@ export function PetitionComposeFieldSettings({
   field,
   onFieldEdit,
   onFieldTypeChange,
-  onFieldDescriptionSwitch,
-  toggledDescriptions,
+  onIsDescriptionShownChange,
   onClose,
 }: PetitionComposeFieldSettingsProps) {
   return (
@@ -85,7 +83,7 @@ export function PetitionComposeFieldSettings({
           label={
             <FormattedMessage
               id="field-settings.show-description-label"
-              defaultMessage="Description"
+              defaultMessage="Show description"
             />
           }
           description={
@@ -103,8 +101,8 @@ export function PetitionComposeFieldSettings({
             display="block"
             id="field-required"
             color="green"
-            isChecked={toggledDescriptions.includes(field.id)}
-            onChange={() => onFieldDescriptionSwitch(field.id)}
+            isChecked={field.isDescriptionShown}
+            onChange={() => onIsDescriptionShownChange(field.id)}
           />
         </SettingsRow>
 
@@ -332,6 +330,7 @@ PetitionComposeFieldSettings.fragments = {
     fragment PetitionComposeFieldSettings_PetitionField on PetitionField {
       id
       type
+      isDescriptionShown @client
       optional
       multiple
       options

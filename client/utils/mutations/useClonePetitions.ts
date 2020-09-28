@@ -4,7 +4,7 @@ import {
   useClonePetitions_clonePetitionsMutationVariables,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { clearCache } from "../apollo";
+import { clearCache } from "../apollo/clearCache";
 
 export function useClonePetitions() {
   const [clonePetitions] = useMutation<

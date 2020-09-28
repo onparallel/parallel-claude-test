@@ -32,7 +32,7 @@ import {
   usePetitionsActivity_sendPetitionMutation,
   PetitionActivity_PetitionFragment,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";

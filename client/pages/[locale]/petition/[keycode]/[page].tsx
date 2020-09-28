@@ -53,7 +53,7 @@ import {
   useRecipientView_submitUnpublishedCommentsMutation,
   useRecipientView_updatePetitionFieldCommentMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import axios, { CancelTokenSource } from "axios";

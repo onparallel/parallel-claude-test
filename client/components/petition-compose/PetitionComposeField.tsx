@@ -48,7 +48,6 @@ export type PetitionComposeFieldProps = {
   isActive: boolean;
   isLast: boolean;
   showError: boolean;
-  descriptionEnabled: boolean;
   titleFieldProps: InputProps;
   descriptionFieldProps: TextareaProps;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
@@ -73,7 +72,6 @@ export const PetitionComposeField = Object.assign(
     isActive,
     isLast,
     showError,
-    descriptionEnabled,
     titleFieldProps,
     descriptionFieldProps,
     onMove,
@@ -105,10 +103,10 @@ export const PetitionComposeField = Object.assign(
 
     // to make sure 'description' is set to null on client
     useEffect(() => {
-      if (!descriptionEnabled) {
+      if (!field.isDescriptionShown) {
         setDescription(null);
       }
-    }, [descriptionEnabled]);
+    }, [field.isDescriptionShown]);
     return (
       <Box
         ref={elementRef}
@@ -142,7 +140,6 @@ export const PetitionComposeField = Object.assign(
           opacity={isDragging ? 0 : 1}
           position="relative"
           backgroundColor={isActive ? "purple.50" : "white"}
-          // borderRadius="md"
           sx={{
             "[draggable]": {
               opacity: 0,
@@ -262,6 +259,7 @@ export const PetitionComposeField = Object.assign(
               border="none"
               paddingX={2}
               height={6}
+              marginBottom={1}
               backgroundColor={showError && !title ? "red.100" : "transparent"}
               _focus={{
                 boxShadow: "none",
@@ -281,44 +279,46 @@ export const PetitionComposeField = Object.assign(
               }}
               {...titleFieldProps}
             />
-            <GrowingTextarea
-              hidden={!descriptionEnabled}
-              id={`field-description-${field.id}`}
-              ref={descriptionRef}
-              placeholder={intl.formatMessage({
-                id: "petition.field-description-placeholder",
-                defaultMessage: "Add a description...",
-              })}
-              aria-label={intl.formatMessage({
-                id: "petition.field-description-label",
-                defaultMessage: "Field description",
-              })}
-              marginTop={1}
-              fontSize="sm"
-              background="transparent"
-              value={description ?? ""}
-              maxLength={4000}
-              border="none"
-              height="20px"
-              paddingX={2}
-              paddingY={0}
-              minHeight={0}
-              rows={1}
-              _focus={{
-                boxShadow: "none",
-              }}
-              onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                setDescription(event.target.value ?? null)
-              }
-              onBlur={() => {
-                const trimmed = description?.trim() ?? null;
-                setNativeValue(descriptionRef.current!, trimmed ?? "");
-                if (field.description !== trimmed) {
-                  onFieldEdit({ description: trimmed });
+            {field.isDescriptionShown ? (
+              <GrowingTextarea
+                id={`field-description-${field.id}`}
+                ref={descriptionRef}
+                placeholder={intl.formatMessage({
+                  id: "petition.field-description-placeholder",
+                  defaultMessage: "Add a description...",
+                })}
+                aria-label={intl.formatMessage({
+                  id: "petition.field-description-label",
+                  defaultMessage: "Field description",
+                })}
+                fontSize="sm"
+                background="transparent"
+                value={description ?? ""}
+                maxLength={4000}
+                border="none"
+                height="20px"
+                paddingX={2}
+                paddingY={0}
+                minHeight={0}
+                rows={1}
+                _focus={{
+                  boxShadow: "none",
+                }}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  setDescription(event.target.value ?? null)
                 }
-              }}
-              {...descriptionFieldProps}
-            />
+                onBlur={() => {
+                  const trimmed = description?.trim() ?? null;
+                  setNativeValue(descriptionRef.current!, trimmed ?? "");
+                  if (field.description !== trimmed) {
+                    onFieldEdit({ description: trimmed });
+                  }
+                }}
+                {...descriptionFieldProps}
+              />
+            ) : (
+              <Box height={6} />
+            )}
           </Box>
           <Stack
             className="field-actions"
@@ -392,6 +392,7 @@ export const PetitionComposeField = Object.assign(
           optional
           multiple
           isFixed
+          isDescriptionShown @client
         }
       `,
     },

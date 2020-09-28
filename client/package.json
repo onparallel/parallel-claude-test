@@ -42,6 +42,7 @@
     "js-cookie": "^2.2.1",
     "markdown-to-jsx": "^7.0.0",
     "next": "^9.5.3",
+    "next-plugin-graphql": "^0.0.2",
     "next-transpile-modules": "^4.1.0",
     "react": "^16.13.1",
     "react-dnd": "^11.1.3",

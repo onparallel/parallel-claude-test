@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import { Box, Text, useToast } from "@chakra-ui/core";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
@@ -9,6 +9,7 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
@@ -20,6 +21,7 @@ import {
   PetitionComposeMessageEditorProps,
 } from "@parallel/components/petition-compose/PetitionComposeMessageEditor";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
+import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/ScheduleMessageDialog";
 import {
   PetitionComposeQuery,
@@ -27,6 +29,7 @@ import {
   PetitionComposeUserQuery,
   PetitionCompose_PetitionFieldFragment,
   PetitionFieldType,
+  updateIsDescriptionShown_PetitionFieldFragment,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
   usePetitionComposeQuery,
@@ -40,13 +43,13 @@ import {
   usePetitionCompose_updatePetitionFieldMutation,
   usePetitionCompose_updatePetitionMutation,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { resolveUrl } from "@parallel/utils/next";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
@@ -54,8 +57,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { useSearchContacts } from "../../../../../utils/useSearchContacts";
-import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
-import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>
@@ -93,44 +94,39 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   );
 
-  function toggleDescriptionReducer(
-    state: string[], // array with description-toggled fieldIds
-    action: { fieldId: string }
-  ): string[] {
-    if (state.includes(action.fieldId)) {
-      return state.filter((id) => id !== action.fieldId); // toggle off
-    }
-    return state.concat(action.fieldId); // toggle on
-  }
-
-  const initialState = petition!.fields
-    .map((f) => (f.description ? f.id : null))
-    .filter((id) => !!id) as string[];
-
-  const [toggledDescriptions, toggleDescription] = useReducer(
-    toggleDescriptionReducer,
-    initialState
-  );
-
-  const handleFieldDescriptionSwitch = useCallback(
-    (fieldId: string) => {
+  const client = useApolloClient();
+  const handleIsDescriptionShownChange = useCallback(
+    async (fieldId: string) => {
       try {
-        const field = petition?.fields.find((f) => f.id === fieldId);
-
-        if (toggledDescriptions.includes(fieldId) && field?.description) {
-          // no need to await, description will be immediately hidden
-          updatePetitionField({
+        const field = petition!.fields.find((f) => f.id === fieldId)!;
+        client.cache.writeFragment<
+          updateIsDescriptionShown_PetitionFieldFragment
+        >({
+          fragment: gql`
+            fragment updateIsDescriptionShown_PetitionField on PetitionField {
+              isDescriptionShown @client
+            }
+          `,
+          id: fieldId,
+          data: {
+            __typename: "PetitionField",
+            isDescriptionShown: !field.isDescriptionShown,
+          },
+        });
+        if (field.isDescriptionShown) {
+          await updatePetitionField({
             variables: {
               petitionId,
               fieldId,
               data: { description: null },
             },
           });
+        } else {
+          focusFieldDescription(fieldId);
         }
-        toggleDescription({ fieldId });
       } catch {}
     },
-    [petitionId, toggledDescriptions, petition!.fields]
+    [petitionId, petition!.fields]
   );
 
   const [showErrors, setShowErrors] = useState(false);
@@ -196,7 +192,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, fieldId },
       });
       const field = data!.clonePetitionField.field;
-      focusField(field.id);
+      focusFieldTitle(field.id);
     }),
     [petitionId]
   );
@@ -296,7 +292,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, type, position },
       });
       const field = data!.createPetitionField.field;
-      focusField(field.id);
+      focusFieldTitle(field.id);
     }),
     [petitionId]
   );
@@ -442,14 +438,23 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
     if (fieldElement) {
       scrollIntoView(fieldElement, { scrollMode: "if-needed" });
-      focusField(fieldId);
+      focusFieldTitle(fieldId);
     }
   }, []);
 
-  function focusField(fieldId: string) {
+  function focusFieldTitle(fieldId: string) {
     setTimeout(() => {
       const title = document.querySelector<HTMLElement>(
         `#field-title-${fieldId}`
+      );
+      title?.focus();
+    });
+  }
+
+  function focusFieldDescription(fieldId: string) {
+    setTimeout(() => {
+      const title = document.querySelector<HTMLElement>(
+        `#field-description-${fieldId}`
       );
       title?.focus();
     });
@@ -476,8 +481,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 field={activeField!}
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
-                onFieldDescriptionSwitch={handleFieldDescriptionSwitch}
-                toggledDescriptions={toggledDescriptions}
+                onIsDescriptionShownChange={handleIsDescriptionShownChange}
                 onClose={handleSettingsClose}
               />
             ) : (
@@ -494,7 +498,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <PetitionComposeFieldList
             showErrors={showErrors}
             fields={petition!.fields}
-            descriptionSwitchState={toggledDescriptions}
             active={activeFieldId}
             onAddField={handleAddField}
             onCopyFieldClick={handleClonePetitionField}
