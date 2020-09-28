@@ -10,7 +10,7 @@ import {
 import {
   CloudErrorIcon,
   CloudOkIcon,
-  CloudSyncIcon,
+  CloudUploadIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
@@ -82,7 +82,7 @@ export function HeaderNameEditable({
                   display="flex"
                   alignItems="center"
                 >
-                  <CloudSyncIcon marginRight={1} fontSize="sm" />
+                  <CloudUploadIcon marginRight={1} fontSize="sm" />
                   <FormattedMessage
                     id="generic.saving-changes"
                     defaultMessage="Saving..."
