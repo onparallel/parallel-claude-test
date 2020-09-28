@@ -25,6 +25,11 @@
     "context": "Delete selected"
   },
   {
+    "term": "component.contact-select.click-to-create",
+    "definition": "Haz click para crear el contacto",
+    "context": "Click to create contact"
+  },
+  {
     "term": "component.contact-select.create-new-contact",
     "definition": "Crear nuevo contacto para: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>"
@@ -1717,7 +1722,7 @@
   {
     "term": "petition.message-settings.unknown-recipients",
     "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
-    "context": "We couldn't find {count, plural, =1 { {email}} other {some of the emails}} in your contacts list."
+    "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
     "term": "petition.name-label",

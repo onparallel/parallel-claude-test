@@ -5,6 +5,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Text,
+  Tooltip,
 } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
@@ -37,7 +38,7 @@ import {
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
-  unknown?: boolean;
+  isInvalid?: boolean;
 };
 
 export type ContactSelectProps = Pick<
@@ -79,7 +80,7 @@ export const ContactSelect = Object.assign(
       async (search) => {
         const exclude = [];
         for (const recipient of value) {
-          if (!recipient.unknown) {
+          if (!recipient.isInvalid) {
             exclude.push(recipient.id);
           }
         }
@@ -124,7 +125,7 @@ export const ContactSelect = Object.assign(
             id: previousValue,
             email: previousValue,
             fullName: "",
-            unknown: true,
+            isInvalid: true,
           };
 
           onChange([...value, option]);
@@ -134,7 +135,7 @@ export const ContactSelect = Object.assign(
       [value, previousValue]
     );
 
-    const unknownRecipients = useMemo(() => value.filter((v) => v.unknown), [
+    const invalidRecipients = useMemo(() => value.filter((v) => v.isInvalid), [
       value,
     ]);
 
@@ -165,7 +166,7 @@ export const ContactSelect = Object.assign(
         />
 
         <FormErrorMessage>
-          {unknownRecipients.length === 0 ? (
+          {invalidRecipients.length === 0 ? (
             <FormattedMessage
               id="component.contact-select.required-error"
               defaultMessage="Please specify at least one recipient"
@@ -173,10 +174,10 @@ export const ContactSelect = Object.assign(
           ) : (
             <FormattedMessage
               id="petition.message-settings.unknown-recipients"
-              defaultMessage="We couldn't find {count, plural, =1 { {email}} other {some of the emails}} in your contacts list."
+              defaultMessage="We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
               values={{
-                count: unknownRecipients.length,
-                email: unknownRecipients[0].email,
+                count: invalidRecipients.length,
+                email: invalidRecipients[0].email,
               }}
             />
           )}
@@ -252,20 +253,28 @@ function useReactSelectProps(
               data: ContactSelectSelection;
               children: ReactNode;
             }) => {
-              const { fullName, email, unknown } = data;
+              const { fullName, email, isInvalid } = data;
+              const intl = useIntl();
               return (
-                <Box
-                  onClick={() => {
-                    if (unknown) handleCreateContact(data.email);
-                  }}
-                  style={{ cursor: unknown ? "pointer" : "default" }}
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "component.contact-select.click-to-create",
+                    defaultMessage: "Click to create contact",
+                  })}
                 >
-                  <components.MultiValueLabel {...props}>
-                    <Text as="span" marginLeft={1}>
-                      {fullName ? `${fullName} <${email}>` : email}
-                    </Text>
-                  </components.MultiValueLabel>
-                </Box>
+                  <Box
+                    onClick={() => {
+                      if (isInvalid) handleCreateContact(data.email);
+                    }}
+                    style={{ cursor: isInvalid ? "pointer" : "default" }}
+                  >
+                    <components.MultiValueLabel {...props}>
+                      <Text as="span" marginLeft={1}>
+                        {fullName ? `${fullName} <${email}>` : email}
+                      </Text>
+                    </components.MultiValueLabel>
+                  </Box>
+                </Tooltip>
               );
             }
           ),

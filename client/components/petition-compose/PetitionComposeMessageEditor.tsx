@@ -93,13 +93,13 @@ export const PetitionComposeMessageEditor = Object.assign(
       });
     }
 
-    const knownRecipients = useMemo(
-      () => recipients.filter((r) => !r.unknown),
+    const validRecipients = useMemo(
+      () => recipients.filter((r) => !r.isInvalid),
       [recipients]
     );
 
-    const unknownRecipients = useMemo(
-      () => recipients.filter((r) => r.unknown),
+    const invalidRecipients = useMemo(
+      () => recipients.filter((r) => r.isInvalid),
       [recipients]
     );
 
@@ -118,7 +118,7 @@ export const PetitionComposeMessageEditor = Object.assign(
             <ContactSelect
               isInvalid={
                 (showErrors && recipients.length === 0) ||
-                unknownRecipients.length > 0
+                invalidRecipients.length > 0
               }
               onSearchContacts={onSearchContacts}
               onCreateContact={onCreateContact}
@@ -126,13 +126,13 @@ export const PetitionComposeMessageEditor = Object.assign(
               onChange={setRecipients}
             />
           </Box>
-          {knownRecipients.length >= 2 && unknownRecipients.length === 0 ? (
+          {validRecipients.length >= 2 && invalidRecipients.length === 0 ? (
             <Alert status="info">
               <AlertIcon />
               <FormattedMessage
                 id="petition.message-settings.same-petition-warning"
                 defaultMessage="All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
-                values={{ recipientCount: knownRecipients.length }}
+                values={{ recipientCount: validRecipients.length }}
               />
             </Alert>
           ) : null}

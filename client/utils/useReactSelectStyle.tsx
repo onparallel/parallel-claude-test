@@ -195,7 +195,7 @@ export function useReactSelectStyle<
         }),
         multiValue: (styles, { data }) => ({
           ...styles,
-          backgroundColor: data.unknown ? colors.red[200] : colors.gray[200],
+          backgroundColor: data.isInvalid ? colors.red[200] : colors.gray[200],
           borderRadius: radii[SIZES[size].multiValue.borderRadius],
         }),
         multiValueRemove: (styles, { data }) => {
@@ -204,7 +204,7 @@ export function useReactSelectStyle<
             ...styles,
             borderRadius: `0 ${radius} ${radius} 0`,
             ":hover": {
-              backgroundColor: data.unknown
+              backgroundColor: data.isInvalid
                 ? colors.red[300]
                 : colors.gray[300],
               color: colors.gray[900],
