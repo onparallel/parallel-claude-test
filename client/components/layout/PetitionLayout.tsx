@@ -58,7 +58,8 @@ export function PetitionLayout({
   return (
     <AppLayout
       title={`${
-        petition!.name || petition.__typename === "Petition"
+        petition!.name ||
+        (petition.__typename === "Petition"
           ? intl.formatMessage({
               id: "generic.untitled-petition",
               defaultMessage: "Untitled petition",
@@ -66,7 +67,7 @@ export function PetitionLayout({
           : intl.formatMessage({
               id: "generic.untitled-template",
               defaultMessage: "Untitled template",
-            })
+            }))
       } - ${title}`}
       user={user}
     >
