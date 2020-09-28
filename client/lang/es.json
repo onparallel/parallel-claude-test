@@ -255,11 +255,6 @@
     "context": "Show"
   },
   {
-    "term": "component.petition-header.clone-as-template-button",
-    "definition": "Clonar como plantilla",
-    "context": "Clone as template"
-  },
-  {
     "term": "component.petition-header.clone-label",
     "definition": "Clonar petición",
     "context": "Clone petition"
@@ -268,6 +263,11 @@
     "term": "component.petition-header.delete-label",
     "definition": "Eliminar petición",
     "context": "Delete petition"
+  },
+  {
+    "term": "component.petition-header.save-as-template-button",
+    "definition": "Guardar como plantilla",
+    "context": "Save as template"
   },
   {
     "term": "component.petition-header.settings-button",
@@ -305,11 +305,6 @@
     "context": "Templates"
   },
   {
-    "term": "component.petition-list-header.clone-as-template-label",
-    "definition": "Clonar como plantilla",
-    "context": "Clone as template"
-  },
-  {
     "term": "component.petition-list-header.clone-petition-label",
     "definition": "Clonar {count, plural, =1{petición} other{peticiones}}",
     "context": "Clone {count, plural, =1{petition} other{petitions}}"
@@ -338,6 +333,11 @@
     "term": "component.petition-list-header.delete-template-label",
     "definition": "Borrar {count, plural, =1{plantilla} other{plantillas}}",
     "context": "Delete {count, plural, =1{template} other{templates}}"
+  },
+  {
+    "term": "component.petition-list-header.save-as-template-label",
+    "definition": "Guardar como plantilla",
+    "context": "Save as template"
   },
   {
     "term": "component.petition-list-header.use-template-label",
@@ -1636,8 +1636,8 @@
   },
   {
     "term": "petition.field-type.file-upload",
-    "definition": "Subida de archivos",
-    "context": "File upload"
+    "definition": "Documentos y archivos",
+    "context": "Documents and files"
   },
   {
     "term": "petition.field-type.file-upload.description",
@@ -1646,8 +1646,8 @@
   },
   {
     "term": "petition.field-type.heading",
-    "definition": "Encabezado",
-    "context": "Heading"
+    "definition": "Sección",
+    "context": "Section"
   },
   {
     "term": "petition.field-type.heading.description",
@@ -1656,13 +1656,13 @@
   },
   {
     "term": "petition.field-type.heading.information-only",
-    "definition": "Los encabezados únicamente son informativos y no permiten obtener información.",
-    "context": "Headings are for information purposes only and do not collect information."
+    "definition": "Las secciones únicamente son informativas y no permiten obtener información.",
+    "context": "Sections are for information purposes only and do not collect information."
   },
   {
     "term": "petition.field-type.text",
-    "definition": "Campo de texto",
-    "context": "Text input"
+    "definition": "Respuesta de texto",
+    "context": "Text reply"
   },
   {
     "term": "petition.field-type.text.description",

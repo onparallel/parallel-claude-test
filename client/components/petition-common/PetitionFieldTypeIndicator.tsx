@@ -20,15 +20,15 @@ export function PetitionFieldTypeIndicator({
     return {
       FILE_UPLOAD: intl.formatMessage({
         id: "petition.field-type.file-upload",
-        defaultMessage: "File upload",
+        defaultMessage: "Documents and files",
       }),
       TEXT: intl.formatMessage({
         id: "petition.field-type.text",
-        defaultMessage: "Text input",
+        defaultMessage: "Text reply",
       }),
       HEADING: intl.formatMessage({
         id: "petition.field-type.heading",
-        defaultMessage: "Heading",
+        defaultMessage: "Section",
       }),
     }[type];
   }, [type, intl.locale]);

@@ -94,15 +94,15 @@ function PetitionFieldTypeText({
     return {
       FILE_UPLOAD: intl.formatMessage({
         id: "petition.field-type.file-upload",
-        defaultMessage: "File upload",
+        defaultMessage: "Documents and files",
       }),
       TEXT: intl.formatMessage({
         id: "petition.field-type.text",
-        defaultMessage: "Text input",
+        defaultMessage: "Text reply",
       }),
       HEADING: intl.formatMessage({
         id: "petition.field-type.heading",
-        defaultMessage: "Heading",
+        defaultMessage: "Section",
       }),
     }[type];
   }, [intl.locale, type]);
@@ -149,7 +149,7 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
     }
   }, [isOpen]);
 
-  const fieldListWidth = 210;
+  const fieldListWidth = 230;
   const descriptionWidth = 270;
 
   return (
@@ -226,7 +226,7 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
                 <Text fontSize="sm">
                   <FormattedMessage
                     id="petition.field-type.heading.information-only"
-                    defaultMessage="Headings are for information purposes only and do not collect information."
+                    defaultMessage="Sections are for information purposes only and do not collect information."
                   />
                 </Text>
               </Stack>

@@ -265,8 +265,8 @@ export function PetitionHeader({
                   <MenuItem onClick={handleSaveAsTemplate}>
                     <CopyIcon marginRight={2} />
                     <FormattedMessage
-                      id="component.petition-header.clone-as-template-button"
-                      defaultMessage="Clone as template"
+                      id="component.petition-header.save-as-template-button"
+                      defaultMessage="Save as template"
                     />
                   </MenuItem>
                   <MenuItem onClick={onOpenSettings}>
