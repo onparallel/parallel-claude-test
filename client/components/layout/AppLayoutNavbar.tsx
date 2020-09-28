@@ -2,9 +2,9 @@ import { gql } from "@apollo/client";
 import { Box, Flex, List, ListItem, Stack } from "@chakra-ui/core";
 import {
   AddIcon,
-  FileTextIcon,
   InfoOutlineIcon,
   PaperPlaneIcon,
+  PaperPlanesIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
@@ -42,23 +42,20 @@ export const AppLayoutNavbar = Object.assign(
           section: "petitions",
           href: "/app/petitions",
           icon: <PaperPlaneIcon />,
-          isActive:
-            pathname.startsWith("/[locale]/app/petitions") &&
-            query.type !== "TEMPLATE",
+          isAvailable: true,
+          isActive: pathname.startsWith("/[locale]/app/petitions"),
           text: intl.formatMessage({
             id: "navbar.petitions-link",
             defaultMessage: "Petitions",
           }),
         },
         {
-          section: "templates",
-          href: "/app/petitions?type=TEMPLATE",
-          icon: <FileTextIcon />,
-          isActive:
-            pathname === "/[locale]/app/petitions" && query.type === "TEMPLATE",
+          section: "campaigns",
+          icon: <PaperPlanesIcon />,
+          isAvailable: false,
           text: intl.formatMessage({
-            id: "navbar.templates-link",
-            defaultMessage: "Templates",
+            id: "navbar.campaigns-link",
+            defaultMessage: "Campaigns",
           }),
         },
         {
@@ -66,6 +63,7 @@ export const AppLayoutNavbar = Object.assign(
           href: "/app/contacts",
           icon: <UsersIcon />,
           isActive: pathname.startsWith("/[locale]/app/contacts"),
+          isAvailable: true,
           text: intl.formatMessage({
             id: "navbar.contacts-link",
             defaultMessage: "Contacts",
@@ -159,11 +157,11 @@ export const AppLayoutNavbar = Object.assign(
                 marginY: 2,
               })}
         >
-          {items.map(({ section, href, isActive, icon, text }) => (
+          {items.map(({ section, href, isActive, isAvailable, icon, text }) => (
             <ListItem key={section} id={`pw-section-${section}`}>
               <AppLayoutNavbarLink
                 href={href}
-                isAvailable={true}
+                isAvailable={isAvailable}
                 isActive={isActive}
                 icon={icon}
                 isMobile={isMobile}

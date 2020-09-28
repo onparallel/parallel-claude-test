@@ -1105,6 +1105,11 @@
     "context": "User menu"
   },
   {
+    "term": "navbar.campaigns-link",
+    "definition": "Campañas",
+    "context": "Campaigns"
+  },
+  {
     "term": "navbar.coming-soon",
     "definition": "Próximamente",
     "context": "Coming soon"
@@ -1128,11 +1133,6 @@
     "term": "navbar.start-tour",
     "definition": "Guíame",
     "context": "Guide me around"
-  },
-  {
-    "term": "navbar.templates-link",
-    "definition": "Plantillas",
-    "context": "Templates"
   },
   {
     "term": "new-petition.create-new-template",

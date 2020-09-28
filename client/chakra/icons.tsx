@@ -98,6 +98,33 @@ export const PaperPlaneIcon = createIcon({
   ),
 });
 
+export const PaperPlanesIcon = createIcon({
+  displayName: "PaperPlanesIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <g transform="translate(0,-6)">
+        <path d="m 2,18 6,4 2,-8 z" />
+        <path d="M 4.5,19.666667 V 22 l 1,-1.666667" />
+      </g>
+      <g transform="translate(12,-12)">
+        <path d="m 2,18 6,4 2,-8 z" />
+        <path d="M 4.5,19.666667 V 22 l 1,-1.666667" />
+      </g>
+      <g transform="translate(9)">
+        <path d="m 2,18 6,4 2,-8 z" />
+        <path d="M 4.5,19.666667 V 22 l 1,-1.666667" />
+      </g>
+    </g>
+  ),
+});
+
 export const UsersIcon = createIcon({
   displayName: "UsersIcon",
   viewBox: "0 0 24 24",
