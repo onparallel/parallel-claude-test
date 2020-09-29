@@ -1,9 +1,12 @@
 import { arg, mutationField } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
+import { fileIsImage } from "../helpers/validators/fileIsImage";
 import { userBelongsToOrg } from "./authorizers";
+import { writeFile } from "./helpers";
+import { resolve as resolvePath } from "path";
 
-export const supportTest = mutationField("assignPetitionToUser", {
+export const assignPetitionToUser = mutationField("assignPetitionToUser", {
   description: "Assigns any valid petition to a given user.",
   type: "SupportMethodResponse",
   args: {
@@ -18,5 +21,23 @@ export const supportTest = mutationField("assignPetitionToUser", {
     return args.petitionId === 1
       ? { result: RESULT.SUCCESS, message: "User assigned" }
       : { result: RESULT.FAILURE, message: "an error happened" };
+  },
+});
+
+export const uploadOrgLogo = mutationField("uploadOrganizationLogo", {
+  description: "Uploads a logo for an organization.",
+  type: "SupportMethodResponse",
+  args: {
+    orgId: arg({ type: "Int", required: true }),
+    logo: arg({ type: "Upload", required: true }),
+  },
+  validateArgs: fileIsImage((args) => args.logo, "logo"),
+  authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
+  resolve: async (_, args, ctx) => {
+    const path = await writeFile(await args.logo);
+    return {
+      result: RESULT.SUCCESS,
+      message: `file written on ${resolvePath(path)}`,
+    };
   },
 });
