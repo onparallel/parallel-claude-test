@@ -93,7 +93,7 @@ function SupportMethods() {
       })}
       user={me}
     >
-      <Box marginX="auto" width="container.md">
+      <Box marginX="auto" width="100%" maxWidth="container.md" padding={2}>
         <Box paddingY={4} position="sticky" top={0}>
           <SearchInput
             isDisabled={loading}
