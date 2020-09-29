@@ -113,7 +113,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             isDescriptionShown: !field.isDescriptionShown,
           },
         });
-        if (field.isDescriptionShown) {
+        if (field.isDescriptionShown && !!field.description) {
           await updatePetitionField({
             variables: {
               petitionId,

@@ -317,7 +317,7 @@ export const PetitionComposeField = Object.assign(
                 {...descriptionFieldProps}
               />
             ) : (
-              <Box height={6} />
+              <Box height="26px" />
             )}
           </Box>
           <Stack
