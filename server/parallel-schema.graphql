@@ -1969,6 +1969,11 @@ input UpdateUserInput {
 }
 
 """
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+"""
 A user in the system.
 """
 type User implements Timestamps {

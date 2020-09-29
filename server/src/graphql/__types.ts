@@ -176,6 +176,7 @@ export interface NexusGenScalars {
   GID: number;
   JSON: any;
   JSONObject: { [key: string]: any };
+  Upload: any;
 }
 
 export interface NexusGenRootTypes {
@@ -355,6 +356,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   GID: NexusGenScalars["GID"];
   JSON: NexusGenScalars["JSON"];
   JSONObject: NexusGenScalars["JSONObject"];
+  Upload: NexusGenScalars["Upload"];
 }
 
 export interface NexusGenFieldTypes {
@@ -1342,7 +1344,8 @@ export type NexusGenScalarNames =
   | "Int"
   | "JSON"
   | "JSONObject"
-  | "String";
+  | "String"
+  | "Upload";
 
 export type NexusGenUnionNames = "PublicUserOrContact" | "UserOrPetitionAccess";
 

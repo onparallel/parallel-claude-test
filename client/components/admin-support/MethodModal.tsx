@@ -97,35 +97,35 @@ export function MethodModal({
   };
 
   const buildGraphQLQuery = useCallback(
-    (method: Method, args: ArgumentWithState[]) => {
-      const argToGraphQLParam = (arg: ArgumentWithState): string => {
-        const quote =
-          !arg.list && arg.type.kind === "SCALAR" && arg.type.name !== "Int"
-            ? '"'
-            : "";
-        let inputValue =
-          typeof arg.inputValue === "object"
-            ? JSON.stringify(arg.inputValue).replace(/"([^"]+)":/g, "$1:")
-            : arg.inputValue;
-
-        if (arg.list && typeof arg.inputValue === "string") {
-          inputValue = JSON.stringify(
-            inputValue.split(",").map((v: string) => v.trim())
-          );
-        }
-
-        return `${arg.name}:${quote}${inputValue}${quote}`;
+    (method: Method, _args: ArgumentWithState[]) => {
+      const args = _args.filter((arg) => arg.inputValue !== "");
+      const argsDef = (args: ArgumentWithState[]) => {
+        return args
+          .map(
+            (arg) =>
+              `$${arg.name}: ${(arg.type as any).name.concat(
+                arg.required ? "!" : ""
+              )}`
+          )
+          .join(", ");
       };
 
-      return `mutation { 
-        ${method.id}(${args
-        .filter((arg) => arg.inputValue !== "")
-        .map(argToGraphQLParam)
-        .join(",")}) { 
-          result
-          message 
-        }
-      }`;
+      const variables: { [key: string]: any } = {};
+      args.forEach((arg) => {
+        variables[arg.name] = arg.inputValue;
+      });
+
+      return {
+        query: `mutation(${argsDef(args)}) { 
+          ${method.id}(${args
+          .map((arg) => `${arg.name}: $${arg.name}`)
+          .join(", ")}) { 
+            result
+            message 
+          }
+        }`,
+        variables,
+      };
     },
     []
   );
@@ -148,9 +148,10 @@ export function MethodModal({
       return;
     }
 
-    const mutation = gql(buildGraphQLQuery(method, methodArgs));
+    const { query, variables } = buildGraphQLQuery(method, methodArgs);
+    const mutation = gql(query);
     setStatus({ loading: true, data: null });
-    const { data } = await apolloClient.mutate({ mutation });
+    const { data } = await apolloClient.mutate({ mutation, variables });
     setStatus({ loading: false, data: data[method.id] });
   }, [methodArgs]);
 

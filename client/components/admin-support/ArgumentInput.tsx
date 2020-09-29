@@ -72,7 +72,11 @@ function renderInputType(props: ArgumentInputProps): any {
         },
       });
     case "SCALAR":
-      return <ScalarInput {...props} />;
+      return props.argument.type.name === "Upload" ? (
+        <FileUploadInput {...props} />
+      ) : (
+        <ScalarInput {...props} />
+      );
     case "ENUM":
       return <EnumInput {...props} />;
     case "INPUT_OBJECT":
@@ -93,6 +97,34 @@ export function ArgumentInput(props: ArgumentInputProps) {
   }
 
   return renderInputType(props);
+}
+
+function FileUploadInput(props: ArgumentInputProps) {
+  const { argument } = props;
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { argument } = props;
+    if (e.target.files) {
+      props.onChange({
+        ...argument,
+        inputValue: e.target.files[0],
+      });
+    }
+  };
+
+  return (
+    <Flex justifyContent="space-between" alignItems="center" width="100%">
+      <Text marginRight={2} minWidth="100px">
+        {argument.name}
+      </Text>
+      <Input
+        width="100%"
+        type="file"
+        isInvalid={argument.error}
+        onChange={handleInputChange}
+      />
+    </Flex>
+  );
 }
 
 function ScalarInput(props: ArgumentInputProps) {
