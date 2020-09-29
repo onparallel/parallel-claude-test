@@ -151,8 +151,18 @@ export function MethodModal({
     const { query, variables } = buildGraphQLQuery(method, methodArgs);
     const mutation = gql(query);
     setStatus({ loading: true, data: null });
-    const { data } = await apolloClient.mutate({ mutation, variables });
-    setStatus({ loading: false, data: data[method.id] });
+    try {
+      const { data } = await apolloClient.mutate({ mutation, variables });
+      setStatus({ loading: false, data: data[method.id] });
+    } catch (e) {
+      setStatus({
+        loading: false,
+        data: {
+          result: "FAILURE",
+          message: e.message,
+        },
+      });
+    }
   }, [methodArgs]);
 
   useEffect(() => {
