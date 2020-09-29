@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Modal,
   ModalOverlay,
@@ -11,7 +11,6 @@ import {
   Button,
 } from "@chakra-ui/core";
 import { Maybe, SupportMethodResponse } from "@parallel/graphql/__types";
-import { createApolloClient } from "@parallel/utils/apollo";
 import {
   IntrospectionInputTypeRef,
   IntrospectionOutputTypeRef,
@@ -51,14 +50,8 @@ export function MethodModal({
   schemaTypes,
   onClose,
 }: MethodModalProps) {
-  const apolloClient = createApolloClient(
-    {},
-    {
-      getToken() {
-        return localStorage.getItem("token")!;
-      },
-    }
-  );
+  const apolloClient = useApolloClient();
+
   const argsReducer = (
     state: ArgumentWithState[],
     action: {
