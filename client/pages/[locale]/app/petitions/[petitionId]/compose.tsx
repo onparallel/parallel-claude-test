@@ -865,7 +865,7 @@ export default compose(
             />
           </Text>
         ),
-        placement: "bottom-end",
+        placement: "right-start",
         target: "#petition-fields",
       },
       {
