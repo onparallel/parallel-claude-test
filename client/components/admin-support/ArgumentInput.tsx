@@ -41,6 +41,11 @@ export function getDefaultInputValue(
   schemaTypes: readonly IntrospectionType[]
 ): any {
   switch (arg.type.kind) {
+    case "NON_NULL":
+      return getDefaultInputValue(
+        { ...arg, type: arg.type.ofType },
+        schemaTypes
+      );
     case "ENUM":
       return (schemaTypes.find(
         (type) => type.kind === arg.type.kind && type.name === arg.type.name
