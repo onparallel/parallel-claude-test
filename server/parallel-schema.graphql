@@ -260,6 +260,15 @@ type Mutation {
   createContact(data: CreateContactInput!): Contact!
 
   """
+  Creates a new organization.
+  """
+  createOrganization(
+    identifier: String!
+    name: String!
+    status: OrganizationStatus!
+  ): SupportMethodResponse!
+
+  """
   Create petition.
   """
   createPetition(

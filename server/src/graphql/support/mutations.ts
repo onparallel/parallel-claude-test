@@ -1,4 +1,4 @@
-import { idArg, intArg, mutationField } from "@nexus/schema";
+import { arg, idArg, intArg, mutationField, stringArg } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
@@ -67,6 +67,40 @@ export const deletePetition = mutationField("deletePetition", {
       return {
         result: RESULT.SUCCESS,
         message: `Petition ${args.petitionId} deleted.`,
+      };
+    } catch (e) {
+      return { result: RESULT.FAILURE, message: e.toString() };
+    }
+  },
+});
+
+export const createOrganization = mutationField("createOrganization", {
+  description: "Creates a new organization.",
+  type: "SupportMethodResponse",
+  args: {
+    name: stringArg({ required: true }),
+    identifier: stringArg({ required: true }),
+    status: arg({ type: "OrganizationStatus", required: true }),
+  },
+  authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
+  resolve: async (_, args, ctx) => {
+    try {
+      const identifier = args.identifier.trim().toLowerCase();
+      if (identifier.indexOf(" ") > -1) {
+        throw "Identifier must not contain spaces.";
+      }
+
+      const org = await ctx.organizations.createOrganization(
+        {
+          name: args.name.trim(),
+          identifier,
+          status: args.status,
+        },
+        ctx.user!
+      );
+      return {
+        result: RESULT.SUCCESS,
+        message: `Organization created with id ${org.id}`,
       };
     } catch (e) {
       return { result: RESULT.FAILURE, message: e.toString() };

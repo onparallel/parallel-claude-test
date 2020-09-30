@@ -7,6 +7,7 @@ import { Maybe } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
+import { CreateOrganization, User } from "../__types";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
@@ -83,4 +84,13 @@ export class OrganizationRepository extends BaseRepository {
       );
     })
   );
+
+  async createOrganization(data: CreateOrganization, user: User) {
+    const [org] = await this.insert("organization", {
+      ...data,
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`,
+    });
+    return org;
+  }
 }

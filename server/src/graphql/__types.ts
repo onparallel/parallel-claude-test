@@ -451,6 +451,7 @@ export interface NexusGenFieldTypes {
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
+    createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -931,6 +932,12 @@ export interface NexusGenArgTypes {
     createContact: {
       // args
       data: NexusGenInputs["CreateContactInput"]; // CreateContactInput!
+    };
+    createOrganization: {
+      // args
+      identifier: string; // String!
+      name: string; // String!
+      status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     };
     createPetition: {
       // args
