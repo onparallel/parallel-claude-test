@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
   Flex,
   IconButton,
   Menu,
@@ -172,7 +173,7 @@ export function PetitionHeader({
         borderBottom="2px solid"
         borderBottomColor="gray.200"
         position="relative"
-        height={{ base: 24, md: 16 }}
+        height={{ base: "102px", md: 16 }}
         {...props}
       >
         <Flex height={16} alignItems="center" paddingX={4}>
@@ -204,7 +205,8 @@ export function PetitionHeader({
                   16 /* heading padding right */
                 }px)`,
                 md: `calc((100vw - ${
-                  96 /* left navbar width */ + 307 /* tabs width */
+                  96 /* left navbar width */ +
+                  350 /* petition navigation tabs width */
                 }px)/2 - ${
                   16 /* heading padding left */ +
                   18 /* petition status icon width */ +
@@ -289,10 +291,12 @@ export function PetitionHeader({
             </Box>
           </Stack>
         </Flex>
-        <Flex
+        <Stack
+          alignItems="center"
           position="absolute"
           bottom="0"
           left="50%"
+          height={{ base: "56px", md: 16 }}
           transform="translateX(-50%)"
           direction="row"
           marginBottom="-2px"
@@ -301,7 +305,7 @@ export function PetitionHeader({
             return isDisabled ? (
               <PetitionHeaderTab
                 key={section}
-                active={current === section}
+                isActive={current === section}
                 isDisabled
                 popoverContent={popoverContent}
               >
@@ -313,13 +317,13 @@ export function PetitionHeader({
                 href={`/app/petitions/[petitionId]/${section}`}
                 as={`/app/petitions/${petition.id}/${section}`}
               >
-                <PetitionHeaderTab active={current === section}>
+                <PetitionHeaderTab isActive={current === section}>
                   {label}
                 </PetitionHeaderTab>
               </NakedLink>
             );
           })}
-        </Flex>
+        </Stack>
       </Box>
       <PetitionSettingsModal
         onUpdatePetition={onUpdatePetition}
@@ -339,50 +343,33 @@ export function PetitionHeader({
   );
 }
 
-type PetitionHeaderTabProps = ExtendChakra<{
-  active?: boolean;
-  isDisabled?: boolean;
-  popoverContent?: ReactNode;
-  children: ReactNode;
-}>;
-
 const PetitionHeaderTab = forwardRef(function (
   {
-    active,
+    isActive,
     isDisabled,
     children,
     popoverContent,
     ...props
-  }: PetitionHeaderTabProps,
+  }: ExtendChakra<{
+    isActive?: boolean;
+    isDisabled?: boolean;
+    popoverContent?: ReactNode;
+    children: ReactNode;
+  }>,
   ref: Ref<any>
 ) {
   const link = (
-    <Box
+    <Button
       as="a"
       ref={ref}
-      display="block"
-      paddingY={3}
-      paddingX={4}
-      fontSize="sm"
       textTransform="uppercase"
-      borderBottom="2px solid"
-      borderBottomColor={active ? "purple.500" : "transparent"}
-      fontWeight="bold"
-      cursor={isDisabled ? "not-allowed" : "pointer"}
-      opacity={isDisabled ? 0.4 : 1}
-      color={active ? "gray.900" : "gray.500"}
-      _hover={
-        isDisabled
-          ? {}
-          : {
-              color: "purple.700",
-            }
-      }
-      {...(active ? { "aria-current": "page" } : {})}
+      isDisabled={isDisabled}
+      variant={isActive ? "solid" : "ghost"}
+      {...(isActive ? { "aria-current": "page" } : {})}
       {...props}
     >
       {children}
-    </Box>
+    </Button>
   );
   if (isDisabled) {
     return (
