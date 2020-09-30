@@ -64,12 +64,17 @@ class MyDocument extends Document<MyDocumentProps> {
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
               [
                 "Object.fromEntries",
-                "Intl.PluralRules",
-                "Intl.PluralRules.~locale.es",
-                "Intl.PluralRules.~locale.en",
-                "Intl.RelativeTimeFormat",
-                "Intl.RelativeTimeFormat.~locale.es",
-                "Intl.RelativeTimeFormat.~locale.en",
+                ...[
+                  "Intl.NumberFormat",
+                  "Intl.DateTimeFormat",
+                  "Intl.PluralRules",
+                  "Intl.RelativeTimeFormat",
+                ].flatMap((polyfill) => [
+                  polyfill,
+                  ...languages.map(
+                    (lang) => `${polyfill}.~locale.${lang.locale}`
+                  ),
+                ]),
               ].join(",")
             )}`}
           />
