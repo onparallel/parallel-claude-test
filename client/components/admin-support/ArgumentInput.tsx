@@ -155,6 +155,7 @@ function ScalarInput(props: ArgumentInputProps) {
         {argument.name}
       </Text>
       <Input
+        placeholder={argument.description ?? ""}
         width="100%"
         type={type}
         isInvalid={argument.error}
