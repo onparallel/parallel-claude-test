@@ -17,7 +17,7 @@ import {
   SupportMethodsUserQuery,
   useSupportMethodsUserQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import {

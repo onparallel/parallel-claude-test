@@ -1,17 +1,18 @@
 import {
   ApolloClient,
-  createHttpLink,
   FieldMergeFunction,
   InMemoryCache,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
+import { createUploadLink } from "apollo-upload-client";
 import { indexBy } from "remeda";
 import typeDefs from "./client-schema.graphql";
 
 export interface CreateApolloClientOptions {
   getToken: () => string;
 }
+
 export function mergeArraysBy(path: string[]): FieldMergeFunction {
   return function merge(
     existing,
@@ -50,7 +51,7 @@ export function createApolloClient(
     return _cached;
   }
 
-  const httpLink = createHttpLink({
+  const uploadLink = createUploadLink({
     uri: process.browser ? "/graphql" : "http://localhost:4000/graphql",
   });
 
@@ -65,7 +66,7 @@ export function createApolloClient(
   });
 
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: authLink.concat(uploadLink as any),
     ssrMode: !process.browser,
     cache: new InMemoryCache({
       dataIdFromObject: (o) => o.id as string,
