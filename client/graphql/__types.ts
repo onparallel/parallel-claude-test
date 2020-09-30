@@ -18,6 +18,8 @@ export type Scalars = {
   JSON: any;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { [key: string]: any };
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type AccessActivatedEvent = PetitionEvent & {
@@ -159,7 +161,7 @@ export type Mutation = {
   __typename?: "Mutation";
   /** Adds permissions on given petitions and users */
   addPetitionUserPermission: Array<Petition>;
-  /** Assigns any valid petition to a given user. */
+  /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
@@ -260,8 +262,8 @@ export type MutationaddPetitionUserPermissionArgs = {
 };
 
 export type MutationassignPetitionToUserArgs = {
-  petitionId: Scalars["Int"];
-  userId: Scalars["Int"];
+  petitionId: Scalars["ID"];
+  userId: Scalars["ID"];
 };
 
 export type MutationcancelScheduledMessageArgs = {

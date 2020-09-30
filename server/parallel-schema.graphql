@@ -203,9 +203,19 @@ type Mutation {
   ): [Petition!]!
 
   """
-  Assigns any valid petition to a given user.
+  Clones the petition and assigns the given user as owner and creator.
   """
-  assignPetitionToUser(petitionId: Int!, userId: Int!): SupportMethodResponse!
+  assignPetitionToUser(
+    """
+    Global ID of the petition
+    """
+    petitionId: ID!
+
+    """
+    Global ID of the user
+    """
+    userId: ID!
+  ): SupportMethodResponse!
 
   """
   Cancels a scheduled petition message.

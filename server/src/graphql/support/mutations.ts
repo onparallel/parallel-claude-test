@@ -1,43 +1,68 @@
-import { arg, mutationField } from "@nexus/schema";
+import { idArg, mutationField } from "@nexus/schema";
+import { fromGlobalId } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
-import { fileIsImage } from "../helpers/validators/fileIsImage";
 import { userBelongsToOrg } from "./authorizers";
-import { writeFile } from "./helpers";
-import { resolve as resolvePath } from "path";
 
 export const assignPetitionToUser = mutationField("assignPetitionToUser", {
-  description: "Assigns any valid petition to a given user.",
+  description:
+    "Clones the petition and assigns the given user as owner and creator.",
   type: "SupportMethodResponse",
   args: {
-    petitionId: arg({ type: "Int", required: true }),
-    userId: arg({ type: "Int", required: true }),
+    petitionId: idArg({
+      required: true,
+      description: "Global ID of the petition",
+    }),
+    userId: idArg({
+      required: true,
+      description: "Global ID of the user",
+    }),
   },
   authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
   resolve: async (_, args, ctx) => {
-    const petition = await ctx.petitions.loadPetition(args.petitionId);
-    const user = await ctx.users.loadUser(args.userId);
-    console.log(petition, user);
-    return args.petitionId === 1
-      ? { result: RESULT.SUCCESS, message: "User assigned" }
-      : { result: RESULT.FAILURE, message: "an error happened" };
+    try {
+      const { id: petitionId } = fromGlobalId(args.petitionId);
+      const { id: userId } = fromGlobalId(args.userId, "User");
+      const petition = await ctx.petitions.loadPetition(petitionId);
+      if (!petition) {
+        throw `Petition ${args.petitionId} not found`;
+      }
+      const user = await ctx.users.loadUser(userId);
+      if (!user) {
+        throw `User ${args.userId} not found`;
+      }
+      await ctx.petitions.clonePetition(petitionId, user);
+
+      return { result: RESULT.SUCCESS };
+    } catch (e) {
+      return { result: RESULT.FAILURE, message: e.toString() };
+    }
   },
 });
 
-export const uploadOrgLogo = mutationField("uploadOrganizationLogo", {
-  description: "Uploads a logo for an organization.",
-  type: "SupportMethodResponse",
-  args: {
-    orgId: arg({ type: "Int", required: true }),
-    logo: arg({ type: "Upload", required: true }),
-  },
-  validateArgs: fileIsImage((args) => args.logo, "logo"),
-  authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
-  resolve: async (_, args, ctx) => {
-    const path = await writeFile(await args.logo);
-    return {
-      result: RESULT.SUCCESS,
-      message: `file written on ${resolvePath(path)}`,
-    };
-  },
-});
+// export const uploadOrgLogo = mutationField("uploadOrganizationLogo", {
+//   description: "Uploads a logo for an organization.",
+//   type: "SupportMethodResponse",
+//   args: {
+//     orgId: arg({ type: "Int", required: true }),
+//     logo: arg({ type: "Upload", required: true }),
+//   },
+//   validateArgs: fileIsImage((args) => args.logo, "logo"),
+//   authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
+//   resolve: async (_, args, ctx) => {
+//     const org = await ctx.organizations.loadOrg(args.orgId);
+//     if (!org) {
+//       throw new WhitelistedError(
+//         `Organization with id ${args.orgId} not found`,
+//         "ORGANIZATION_NOT_FOUND"
+//       );
+//     }
+
+//     const file = await (args.logo as Promise<UploadedFile>);
+//     console.log(file);
+
+//     return {
+//       result: RESULT.SUCCESS,
+//     };
+//   },
+// });

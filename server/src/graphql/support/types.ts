@@ -1,4 +1,12 @@
 import { objectType, scalarType } from "@nexus/schema";
+import { ReadStream } from "fs";
+
+export type UploadedFile = {
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: () => ReadStream;
+};
 
 export const SupportMethodResponse = objectType({
   name: "SupportMethodResponse",

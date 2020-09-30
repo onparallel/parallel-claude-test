@@ -894,8 +894,8 @@ export interface NexusGenArgTypes {
     };
     assignPetitionToUser: {
       // args
-      petitionId: number; // Int!
-      userId: number; // Int!
+      petitionId: string; // ID!
+      userId: string; // ID!
     };
     cancelScheduledMessage: {
       // args
