@@ -4,7 +4,7 @@ import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
 import { userBelongsToOrg } from "./authorizers";
 
-export const decodeGlobalId = queryField("decodeGlobalId", {
+export const globalIdDecode = queryField("globalIdDecode", {
   description: "Decodes the given Global ID into an entity in the database.",
   type: "SupportMethodResponse",
   args: {
@@ -16,13 +16,13 @@ export const decodeGlobalId = queryField("decodeGlobalId", {
       const { id, type } = fromGlobalId(args.id);
       return { result: RESULT.SUCCESS, message: `${type}:${id}` };
     } catch (e) {
-      return { result: RESULT.FAILURE, message: e.message };
+      return { result: RESULT.FAILURE, message: e.toString() };
     }
   },
 });
 
-export const encodeGlobalId = queryField("encodeGlobalId", {
-  description: "Encodes the given ID into a Global ID",
+export const globalIdEncode = queryField("globalIdEncode", {
+  description: "Encodes the given ID into a Global ID.",
   type: "SupportMethodResponse",
   args: {
     id: intArg({ required: true, description: "ID to encode" }),
@@ -42,7 +42,7 @@ export const encodeGlobalId = queryField("encodeGlobalId", {
         message: toGlobalId(args.type, args.id),
       };
     } catch (e) {
-      return { result: RESULT.FAILURE, message: e.message };
+      return { result: RESULT.FAILURE, message: e.toString() };
     }
   },
 });

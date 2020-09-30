@@ -219,9 +219,9 @@ type Mutation {
     petitionId: ID!
 
     """
-    Global ID of the user
+    ID of the user
     """
-    userId: ID!
+    userId: Int!
   ): SupportMethodResponse!
 
   """
@@ -305,6 +305,16 @@ type Mutation {
   Delete contacts.
   """
   deleteContacts(ids: [GID!]!): Result!
+
+  """
+  Soft-deletes any given petition on the database.
+  """
+  deletePetition(
+    """
+    Global ID of the petition
+    """
+    petitionId: ID!
+  ): SupportMethodResponse!
 
   """
   Deletes a petition field.
@@ -1776,7 +1786,7 @@ type Query {
   """
   Decodes the given Global ID into an entity in the database.
   """
-  decodeGlobalId(
+  globalIdDecode(
     """
     Global ID to decode
     """
@@ -1784,9 +1794,9 @@ type Query {
   ): SupportMethodResponse!
 
   """
-  Encodes the given ID into a Global ID
+  Encodes the given ID into a Global ID.
   """
-  encodeGlobalId(
+  globalIdEncode(
     """
     ID to encode
     """

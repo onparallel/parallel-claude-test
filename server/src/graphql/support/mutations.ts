@@ -1,4 +1,4 @@
-import { idArg, mutationField } from "@nexus/schema";
+import { idArg, intArg, mutationField } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
@@ -13,27 +13,61 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
       required: true,
       description: "Global ID of the petition",
     }),
-    userId: idArg({
+    userId: intArg({
       required: true,
-      description: "Global ID of the user",
+      description: "ID of the user",
     }),
   },
   authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
   resolve: async (_, args, ctx) => {
     try {
-      const { id: petitionId } = fromGlobalId(args.petitionId);
-      const { id: userId } = fromGlobalId(args.userId, "User");
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
       const petition = await ctx.petitions.loadPetition(petitionId);
       if (!petition) {
         throw `Petition ${args.petitionId} not found`;
       }
-      const user = await ctx.users.loadUser(userId);
+      const user = await ctx.users.loadUser(args.userId);
       if (!user) {
         throw `User ${args.userId} not found`;
       }
-      await ctx.petitions.clonePetition(petitionId, user);
+      const newPetition = await ctx.petitions.clonePetition(petitionId, user);
 
-      return { result: RESULT.SUCCESS };
+      return {
+        result: RESULT.SUCCESS,
+        message: `Petition successfully assigned to ${user.first_name} ${user.last_name}, new id: ${newPetition.id}`,
+      };
+    } catch (e) {
+      return { result: RESULT.FAILURE, message: e.toString() };
+    }
+  },
+});
+
+export const deletePetition = mutationField("deletePetition", {
+  description: "Soft-deletes any given petition on the database.",
+  type: "SupportMethodResponse",
+  args: {
+    petitionId: idArg({
+      required: true,
+      description: "Global ID of the petition",
+    }),
+  },
+  authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
+  resolve: async (_, args, ctx) => {
+    try {
+      const { id: petitionId } = fromGlobalId(args.petitionId, "Petition");
+      const petition = await ctx.petitions.loadPetition(petitionId);
+      if (!petition) {
+        throw `Petition ${args.petitionId} not found.`;
+      }
+
+      await ctx.petitions.withTransaction(async (t) => {
+        await ctx.petitions.deleteUserPermissions([petitionId], ctx.user!, t);
+        await ctx.petitions.deletePetitionById(petitionId, ctx.user!, t);
+      });
+      return {
+        result: RESULT.SUCCESS,
+        message: `Petition ${args.petitionId} deleted.`,
+      };
     } catch (e) {
       return { result: RESULT.FAILURE, message: e.toString() };
     }

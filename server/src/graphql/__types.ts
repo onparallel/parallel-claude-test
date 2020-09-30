@@ -456,6 +456,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
+    deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
@@ -756,8 +757,8 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
-    decodeGlobalId: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
-    encodeGlobalId: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
@@ -899,7 +900,7 @@ export interface NexusGenArgTypes {
     assignPetitionToUser: {
       // args
       petitionId: string; // ID!
-      userId: string; // ID!
+      userId: number; // Int!
     };
     cancelScheduledMessage: {
       // args
@@ -959,6 +960,10 @@ export interface NexusGenArgTypes {
     deleteContacts: {
       // args
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deletePetition: {
+      // args
+      petitionId: string; // ID!
     };
     deletePetitionField: {
       // args
@@ -1181,11 +1186,11 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryContacts_OrderBy"][] | null; // [QueryContacts_OrderBy!]
     };
-    decodeGlobalId: {
+    globalIdDecode: {
       // args
       id: string; // ID!
     };
-    encodeGlobalId: {
+    globalIdEncode: {
       // args
       id: number; // Int!
       type: NexusGenEnums["EntityList"]; // EntityList!
