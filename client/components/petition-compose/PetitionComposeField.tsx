@@ -179,7 +179,14 @@ export const PetitionComposeField = Object.assign(
                 defaultMessage: "Drag to sort this petition fields",
               })}
             >
-              <DragHandleIcon role="presentation" />
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "generic.drag-to-sort",
+                  defaultMessage: "Drag to sort",
+                })}
+              >
+                <DragHandleIcon role="presentation" />
+              </Tooltip>
             </Box>
           )}
           {field.optional ? null : (
