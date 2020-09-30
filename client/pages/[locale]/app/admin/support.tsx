@@ -14,6 +14,7 @@ import {
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionsUserQuery,
+  SupportMethodsUserQuery,
   useSupportMethodsUserQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo";
@@ -181,17 +182,31 @@ SupportMethods.fragments = {
 SupportMethods.getInitialProps = async ({
   query,
   fetchQuery,
+  res,
 }: WithApolloDataContext) => {
-  await Promise.all([
+  const [{ data }] = await Promise.all([
     fetchQuery<PetitionsUserQuery>(gql`
       query SupportMethodsUser {
         me {
           ...SupportMethods_User
+          organizationRole
+          organization {
+            identifier
+          }
         }
       }
       ${SupportMethods.fragments.User}
     `),
   ]);
+
+  const { me } = data as SupportMethodsUserQuery;
+  if (
+    !me ||
+    me.organization.identifier !== "parallel" ||
+    me.organizationRole !== "ADMIN"
+  ) {
+    res?.writeHead(403).end();
+  }
 };
 
 export default compose(withApolloData)(SupportMethods);

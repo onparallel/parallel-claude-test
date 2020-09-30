@@ -187,6 +187,8 @@ export type Mutation = {
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
   deleteContacts: Result;
+  /** Soft-deletes any given petition on the database. */
+  deletePetition: SupportMethodResponse;
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Delete a petition field comment. */
@@ -265,7 +267,7 @@ export type MutationaddPetitionUserPermissionArgs = {
 
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
-  userId: Scalars["ID"];
+  userId: Scalars["Int"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -325,6 +327,10 @@ export type MutationdeactivateAccessesArgs = {
 
 export type MutationdeleteContactsArgs = {
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdeletePetitionArgs = {
+  petitionId: Scalars["ID"];
 };
 
 export type MutationdeletePetitionFieldArgs = {
@@ -1118,9 +1124,9 @@ export type Query = {
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Decodes the given Global ID into an entity in the database. */
-  decodeGlobalId: SupportMethodResponse;
-  /** Encodes the given ID into a Global ID */
-  encodeGlobalId: SupportMethodResponse;
+  globalIdDecode: SupportMethodResponse;
+  /** Encodes the given ID into a Global ID. */
+  globalIdEncode: SupportMethodResponse;
   me: User;
   organization?: Maybe<Organization>;
   petition?: Maybe<PetitionBase>;
@@ -1146,11 +1152,11 @@ export type QuerycontactsArgs = {
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
 };
 
-export type QuerydecodeGlobalIdArgs = {
+export type QueryglobalIdDecodeArgs = {
   id: Scalars["ID"];
 };
 
-export type QueryencodeGlobalIdArgs = {
+export type QueryglobalIdEncodeArgs = {
   id: Scalars["Int"];
   type: EntityList;
 };
@@ -2326,7 +2332,12 @@ export type SupportMethods_UserFragment = {
 export type SupportMethodsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SupportMethodsUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & SupportMethods_UserFragment;
+  me: { __typename?: "User" } & Pick<User, "organizationRole"> & {
+      organization: { __typename?: "Organization" } & Pick<
+        Organization,
+        "identifier"
+      >;
+    } & SupportMethods_UserFragment;
 };
 
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
@@ -5190,6 +5201,10 @@ export const SupportMethodsUserDocument = gql`
   query SupportMethodsUser {
     me {
       ...SupportMethods_User
+      organizationRole
+      organization {
+        identifier
+      }
     }
   }
   ${SupportMethods_UserFragmentDoc}
