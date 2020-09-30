@@ -111,15 +111,15 @@ export const PaperPlanesIcon = createIcon({
     >
       <g transform="translate(0,-6)">
         <path d="m 2,18 6,4 2,-8 z" />
-        <path d="M 4.5,19.666667 V 22 l 1,-1.666667" />
+        <path d="M 5.5,20.333333 4.5,22 V 19.666667 L 6,19 Z" />
       </g>
       <g transform="translate(12,-12)">
         <path d="m 2,18 6,4 2,-8 z" />
-        <path d="M 4.5,19.666667 V 22 l 1,-1.666667" />
+        <path d="M 5.5,20.333333 4.5,22 V 19.666667 L 6,19 Z" />
       </g>
       <g transform="translate(9)">
         <path d="m 2,18 6,4 2,-8 z" />
-        <path d="M 4.5,19.666667 V 22 l 1,-1.666667" />
+        <path d="M 5.5,20.333333 4.5,22 V 19.666667 L 6,19 Z" />
       </g>
     </g>
   ),
