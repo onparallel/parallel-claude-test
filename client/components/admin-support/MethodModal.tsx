@@ -30,11 +30,12 @@ type MethodModalProps = {
   onClose: () => void;
 };
 
-type Method = {
+export type Method = {
   id: string;
   name: string;
   type: IntrospectionOutputTypeRef;
   description: string;
+  queryType: "query" | "mutation";
   args: {
     position: number;
     required: boolean;
@@ -92,14 +93,16 @@ export function MethodModal({
   const buildGraphQLQuery = useCallback(
     (method: Method, _args: ArgumentWithState[]) => {
       const args = _args.filter((arg) => arg.inputValue !== "");
+      const deepSearchArgType = (arg: ArgumentWithState): string => {
+        if (arg.type.kind === "NON_NULL") {
+          return deepSearchArgType({ ...arg, type: arg.type.ofType });
+        } else {
+          return (arg.type as any).name.concat(arg.required ? "!" : "");
+        }
+      };
       const argsDef = (args: ArgumentWithState[]) => {
         return args
-          .map(
-            (arg) =>
-              `$${arg.name}: ${(arg.type as any).name.concat(
-                arg.required ? "!" : ""
-              )}`
-          )
+          .map((arg) => `$${arg.name}: ${deepSearchArgType(arg)}`)
           .join(", ");
       };
 
@@ -109,7 +112,7 @@ export function MethodModal({
       });
 
       return {
-        query: `mutation(${argsDef(args)}) { 
+        query: `${method.queryType}(${argsDef(args)}) { 
           ${method.id}(${args
           .map((arg) => `${arg.name}: $${arg.name}`)
           .join(", ")}) { 
@@ -142,10 +145,24 @@ export function MethodModal({
     }
 
     const { query, variables } = buildGraphQLQuery(method, methodArgs);
-    const mutation = gql(query);
     setStatus({ loading: true, data: null });
     try {
-      const { data } = await apolloClient.mutate({ mutation, variables });
+      let data;
+      if (method.queryType === "mutation") {
+        data = (
+          await apolloClient.mutate({
+            mutation: gql(query),
+            variables,
+          })
+        ).data;
+      } else if (method.queryType === "query") {
+        data = (
+          await apolloClient.query({
+            query: gql(query),
+            variables,
+          })
+        ).data;
+      }
       setStatus({ loading: false, data: data[method.id] });
     } catch (e) {
       setStatus({

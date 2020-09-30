@@ -24,3 +24,4 @@ export * from "./public/mutations";
 
 export * from "./support/types";
 export * from "./support/mutations";
+export * from "./support/queries";

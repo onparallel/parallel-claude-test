@@ -5,16 +5,16 @@ export function toGlobalId(type: string, id: number) {
   return encode(Buffer.from(`${type}:${id}`, "utf8"));
 }
 
-export function fromGlobalId<T extends string>(globalId: string, type: T) {
+export function fromGlobalId<T extends string>(globalId: string, type?: T) {
   const [_type, id] = decode(globalId).toString("utf8").split(":");
-  if (_type !== type) {
-    throw new Error("Invalid id");
+  if (type && _type !== type) {
+    throw new Error(`${globalId} is not a ${type}`);
   }
   if (!id || !id.match(/^[1-9]\d*$/)) {
-    throw new Error("Invalid id");
+    throw new Error(`Invalid id ${globalId}`);
   }
   return {
-    type,
+    type: _type,
     id: parseInt(id, 10),
   };
 }

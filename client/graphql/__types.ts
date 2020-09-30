@@ -129,6 +129,8 @@ export type CreateTextReplyInput = {
   text: Scalars["String"];
 };
 
+export type EntityList = "Contact" | "Organization" | "Petition" | "User";
+
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
   result: Result;
@@ -1115,6 +1117,10 @@ export type Query = {
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
+  /** Decodes the given Global ID into an entity in the database. */
+  decodeGlobalId: SupportMethodResponse;
+  /** Encodes the given ID into a Global ID */
+  encodeGlobalId: SupportMethodResponse;
   me: User;
   organization?: Maybe<Organization>;
   petition?: Maybe<PetitionBase>;
@@ -1138,6 +1144,15 @@ export type QuerycontactsArgs = {
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
+};
+
+export type QuerydecodeGlobalIdArgs = {
+  id: Scalars["ID"];
+};
+
+export type QueryencodeGlobalIdArgs = {
+  id: Scalars["Int"];
+  type: EntityList;
 };
 
 export type QueryorganizationArgs = {

@@ -1,7 +1,10 @@
 import { gql, useQuery } from "@apollo/client";
 import { Box, Flex, Heading, Spinner, Stack, Text } from "@chakra-ui/core";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
-import { MethodModal } from "@parallel/components/admin-support/MethodModal";
+import {
+  Method,
+  MethodModal,
+} from "@parallel/components/admin-support/MethodModal";
 import { Card } from "@parallel/components/common/Card";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import {
@@ -42,7 +45,15 @@ function SupportMethods() {
         (t) => t.name === mutationTypeName
       )! as IntrospectionObjectType;
 
-      return mutation.fields
+      const queryTypeName = data.__schema.queryType!.name;
+      const query = data.__schema.types.find(
+        (t) => t.name === queryTypeName
+      )! as IntrospectionObjectType;
+
+      return [
+        ...mutation.fields.map((m) => ({ ...m, queryType: "mutation" })),
+        ...query.fields.map((m) => ({ ...m, queryType: "query" })),
+      ]
         .filter(
           (f) =>
             f.type.kind === "NON_NULL" &&
@@ -55,11 +66,13 @@ function SupportMethods() {
             id: f.name,
             type: f.type,
             name,
+            queryType: f.queryType,
             description: f.description ?? "",
             args: f.args.map((arg, i) => ({
               ...arg,
               position: i,
               required: arg.type.kind === "NON_NULL",
+              description: arg.description,
             })),
           };
         })
@@ -153,7 +166,7 @@ function SupportMethods() {
         )}
         {selected && (
           <MethodModal
-            method={selected}
+            method={selected as Method}
             schemaTypes={schemaTypes}
             onClose={() => setSelected(null)}
           />

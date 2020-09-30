@@ -127,6 +127,7 @@ export interface NexusGenEnums {
     | "INCORRECT_PASSWORD"
     | "INVALID_NEW_PASSWORD"
     | "SUCCESS";
+  EntityList: "Contact" | "Organization" | "Petition" | "User";
   OnboardingKey:
     | "CONTACT_DETAILS"
     | "CONTACT_LIST"
@@ -330,6 +331,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
+  EntityList: NexusGenEnums["EntityList"];
   OnboardingKey: NexusGenEnums["OnboardingKey"];
   OnboardingStatus: NexusGenEnums["OnboardingStatus"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
@@ -754,6 +756,8 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
+    decodeGlobalId: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    encodeGlobalId: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
@@ -1177,6 +1181,15 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryContacts_OrderBy"][] | null; // [QueryContacts_OrderBy!]
     };
+    decodeGlobalId: {
+      // args
+      id: string; // ID!
+    };
+    encodeGlobalId: {
+      // args
+      id: number; // Int!
+      type: NexusGenEnums["EntityList"]; // EntityList!
+    };
     organization: {
       // args
       id: NexusGenScalars["GID"]; // GID!
@@ -1310,6 +1323,7 @@ export type NexusGenInputNames =
 
 export type NexusGenEnumNames =
   | "ChangePasswordResult"
+  | "EntityList"
   | "OnboardingKey"
   | "OnboardingStatus"
   | "OrganizationRole"
