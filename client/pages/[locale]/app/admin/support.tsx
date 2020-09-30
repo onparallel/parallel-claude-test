@@ -25,11 +25,8 @@ import {
   IntrospectionQuery,
 } from "graphql";
 import { useMemo, useState } from "react";
-import { useIntl } from "react-intl";
 
 function SupportMethods() {
-  const intl = useIntl();
-
   const {
     data: { me },
   } = assertQuery(useSupportMethodsUserQuery());
@@ -99,13 +96,7 @@ function SupportMethods() {
   >(null);
 
   return (
-    <AppLayout
-      title={intl.formatMessage({
-        id: "support-methods.title",
-        defaultMessage: "Support methods",
-      })}
-      user={me}
-    >
+    <AppLayout title="Support methods" user={me}>
       <Box marginX="auto" width="100%" maxWidth="container.md" padding={2}>
         <Box paddingY={4} position="sticky" top={0}>
           <SearchInput
