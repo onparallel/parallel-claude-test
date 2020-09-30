@@ -197,6 +197,14 @@ export function MethodModal({
             <Text fontSize="sm" fontWeight="normal">
               {method.description}
             </Text>
+            <Text
+              fontSize="xs"
+              color={method.queryType === "mutation" ? "red.500" : ""}
+            >
+              {method.queryType === "query"
+                ? "This method has no impact on the database."
+                : "This method will write into the database."}
+            </Text>
           </ModalHeader>
           <ModalBody>
             <Stack>
