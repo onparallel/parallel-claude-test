@@ -32,6 +32,7 @@ import {
   useTemplateDetailsDialogPetitionQueryVariables,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -113,6 +114,8 @@ export function TemplateDetailsDialog({
       permission.user.id === userId &&
       ["OWNER", "WRITE"].includes(permission.permissionType)
   );
+
+  const fieldIndexValues = useFieldIndexValues(template.fields);
 
   return (
     <Modal
@@ -252,10 +255,11 @@ export function TemplateDetailsDialog({
               defaultMessage="Information list"
             />
           </Heading>
-          <Box as="ol" paddingLeft={8}>
-            {template.fields.map((field) => {
+          <Box paddingLeft={8}>
+            {template.fields.map((field, index) => {
               return field.type === "HEADING" ? (
-                <Text as="li" key={field.id} fontWeight="bold" marginBottom={2}>
+                <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                  {fieldIndexValues[index]}.{" "}
                   {field.title ? (
                     <Text as="span" fontWeight="bold" aria-label={field.title}>
                       {field.title}
@@ -277,7 +281,8 @@ export function TemplateDetailsDialog({
                   )}
                 </Text>
               ) : (
-                <Text as="li" key={field.id} marginLeft={4} marginBottom={2}>
+                <Text key={field.id} marginLeft={4} marginBottom={2}>
+                  {fieldIndexValues[index]}.{" "}
                   {field.title ? (
                     <Text as="span" aria-label={field.title}>
                       {field.title}
