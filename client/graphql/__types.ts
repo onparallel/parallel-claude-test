@@ -1745,7 +1745,7 @@ export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
 } & Pick<MessageScheduledEvent, "createdAt"> & {
     message: { __typename?: "PetitionMessage" } & Pick<
       PetitionMessage,
-      "status" | "scheduledAt" | "emailSubject"
+      "status" | "scheduledAt" | "emailSubject" | "emailBody"
     > & {
         sender: { __typename?: "User" } & UserReference_UserFragment;
         access: { __typename?: "PetitionAccess" } & {
@@ -3877,6 +3877,7 @@ export const TimelineMessageScheduledEvent_MessageScheduledEventFragmentDoc = gq
       status
       scheduledAt
       emailSubject
+      emailBody
       access {
         contact {
           ...ContactLink_Contact

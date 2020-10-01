@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Link, Text } from "@chakra-ui/core";
+import { Box, Button, Flex, Link, Text, useDisclosure } from "@chakra-ui/core";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -7,6 +7,7 @@ import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineMessageScheduledEvent_MessageScheduledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import { MessageSentEventModal } from "../MessageSentEventModal";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
@@ -21,6 +22,7 @@ export function TimelineMessageScheduledEvent({
   userId,
   onCancelScheduledMessage,
 }: TimelineMessageScheduledEventProps) {
+  const { isOpen, onClose, onOpen } = useDisclosure();
   return (
     <TimelineItem
       icon={
@@ -63,6 +65,12 @@ export function TimelineMessageScheduledEvent({
             }}
           />
         </Box>
+        <Button onClick={onOpen} size="sm" variant="outline" marginLeft={4}>
+          <FormattedMessage
+            id="timeline.message-sent-see-message"
+            defaultMessage="See message"
+          />
+        </Button>
         {message.status === "SCHEDULED" ? (
           <Button
             size="sm"
@@ -78,6 +86,11 @@ export function TimelineMessageScheduledEvent({
           </Button>
         ) : null}
       </Flex>
+      <MessageSentEventModal
+        message={message}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
     </TimelineItem>
   );
 }
@@ -92,6 +105,7 @@ TimelineMessageScheduledEvent.fragments = {
         status
         scheduledAt
         emailSubject
+        emailBody
         access {
           contact {
             ...ContactLink_Contact
