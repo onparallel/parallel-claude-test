@@ -246,9 +246,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         variables: { petitionId, fieldId, data },
         optimisticResponse: {
           updatePetitionField: {
-            __typename: "PetitionAndField",
+            __typename: `${petition!.__typename}AndField` as any,
             petition: {
-              __typename: "Petition",
+              __typename: petition!.__typename! as any,
               id: petitionId,
               updatedAt: new Date().toISOString(),
             },
