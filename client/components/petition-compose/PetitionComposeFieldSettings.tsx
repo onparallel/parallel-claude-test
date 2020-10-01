@@ -94,12 +94,12 @@ export function PetitionComposeFieldSettings({
               />
             </Text>
           }
-          controlId="field-required"
+          controlId="field-show-description"
         >
           <Switch
             height="20px"
             display="block"
-            id="field-required"
+            id="field-show-description"
             color="green"
             isChecked={field.isDescriptionShown}
             onChange={() => onIsDescriptionShownChange(field.id)}
