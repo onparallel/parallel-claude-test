@@ -179,7 +179,12 @@ export function PetitionHeader({
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
             <PetitionStatusIcon marginRight={1} status={petition.status} />
-            <LocaleBadge locale={petition.locale} marginLeft={1} />
+            <LocaleBadge
+              locale={petition.locale}
+              marginLeft={1}
+              cursor="pointer"
+              onClick={() => onOpenSettings()}
+            />
             <HeaderNameEditable
               petition={petition}
               state={state}

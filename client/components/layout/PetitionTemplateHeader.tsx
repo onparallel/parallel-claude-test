@@ -121,7 +121,13 @@ export function PetitionTemplateHeader({
           <Badge colorScheme="purple" marginRight={1}>
             <FormattedMessage id="generic.template" defaultMessage="Template" />
           </Badge>
-          <LocaleBadge locale={petition.locale} />
+
+          <LocaleBadge
+            locale={petition.locale}
+            marginLeft={1}
+            cursor="pointer"
+            onClick={() => onOpenSettings()}
+          />
           <HeaderNameEditable
             petition={petition}
             state={state}
