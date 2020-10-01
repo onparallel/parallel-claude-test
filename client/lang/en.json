@@ -2925,6 +2925,11 @@
     "context": "Have any questions? Ask here"
   },
   {
+    "term": "recipient-view.field-comments.cta-with-name",
+    "definition": "Have any questions? Ask {name} here",
+    "context": "Have any questions? Ask {name} here"
+  },
+  {
     "term": "recipient-view.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment"

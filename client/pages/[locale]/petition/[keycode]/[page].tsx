@@ -460,6 +460,7 @@ function RecipientView({
           onClose={() => setSelectedFieldId(null)}
           field={selectedField}
           contactId={contact.id}
+          granterName={granter.firstName}
           onAddComment={handleAddComment}
           onDeleteComment={handleDeleteComment}
           onUpdateComment={handleUpdateComment}

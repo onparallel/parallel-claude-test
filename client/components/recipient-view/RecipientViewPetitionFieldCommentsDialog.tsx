@@ -25,6 +25,7 @@ import {
 } from "@chakra-ui/core";
 import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import {
+  Maybe,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
@@ -50,6 +51,7 @@ import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
 export function RecipientViewPetitionFieldCommentsDialog({
+  granterName,
   contactId,
   field,
   onAddComment,
@@ -57,6 +59,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   onUpdateComment,
   ...props
 }: {
+  granterName?: Maybe<string>;
   contactId: string;
   field: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
   onAddComment: (content: string) => void;
@@ -152,12 +155,20 @@ export function RecipientViewPetitionFieldCommentsDialog({
                 justifyContent="center"
                 alignItems="center"
               >
-                <CommentIcon color="gray.200" boxSize="64px" />
-                <Text color="gray.400">
-                  <FormattedMessage
-                    id="recipient-view.field-comments.cta"
-                    defaultMessage="Have any questions? Ask here"
-                  />
+                <CommentIcon color="gray.300" boxSize="64px" />
+                <Text color="gray.500">
+                  {granterName ? (
+                    <FormattedMessage
+                      id="recipient-view.field-comments.cta-with-name"
+                      defaultMessage="Have any questions? Ask {name} here"
+                      values={{ name: granterName }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="recipient-view.field-comments.cta"
+                      defaultMessage="Have any questions? Ask here"
+                    />
+                  )}
                 </Text>
               </Flex>
             ) : null}
