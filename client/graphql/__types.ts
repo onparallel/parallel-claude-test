@@ -2607,8 +2607,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
   createPetitionField:
     | ({ __typename?: "PetitionAndField" } & {
         field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "Petition" } & {
           fields: Array<
             { __typename?: "PetitionField" } & Pick<PetitionField, "id">
@@ -2617,8 +2616,7 @@ export type PetitionCompose_createPetitionFieldMutation = {
       })
     | ({ __typename?: "PetitionTemplateAndField" } & {
         field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "PetitionTemplate" } & {
           fields: Array<
             { __typename?: "PetitionField" } & Pick<PetitionField, "id">
@@ -2638,8 +2636,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
   clonePetitionField:
     | ({ __typename?: "PetitionAndField" } & {
         field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "Petition" } & {
           fields: Array<
             { __typename?: "PetitionField" } & Pick<PetitionField, "id">
@@ -2648,8 +2645,7 @@ export type PetitionCompose_clonePetitionFieldMutation = {
       })
     | ({ __typename?: "PetitionTemplateAndField" } & {
         field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "PetitionTemplate" } & {
           fields: Array<
             { __typename?: "PetitionField" } & Pick<PetitionField, "id">
@@ -2692,8 +2688,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
   updatePetitionField:
     | ({ __typename?: "PetitionAndField" } & {
         field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "Petition" } & Pick<
           Petition,
           "id" | "updatedAt"
@@ -2701,8 +2696,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
       })
     | ({ __typename?: "PetitionTemplateAndField" } & {
         field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "PetitionTemplate" } & Pick<
           PetitionTemplate,
           "id" | "updatedAt"
@@ -2722,30 +2716,16 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
 } & {
   changePetitionFieldType:
     | ({ __typename?: "PetitionAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> & {
-            replies: Array<
-              { __typename?: "PetitionFieldReply" } & Pick<
-                PetitionFieldReply,
-                "id"
-              >
-            >;
-          } & PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "Petition" } & Pick<
           Petition,
           "id" | "updatedAt"
         >;
       })
     | ({ __typename?: "PetitionTemplateAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> & {
-            replies: Array<
-              { __typename?: "PetitionFieldReply" } & Pick<
-                PetitionFieldReply,
-                "id"
-              >
-            >;
-          } & PetitionComposeField_PetitionFieldFragment &
-          PetitionComposeFieldSettings_PetitionFieldFragment;
+        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
+          PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "PetitionTemplate" } & Pick<
           PetitionTemplate,
           "id" | "updatedAt"
@@ -6185,8 +6165,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
     ) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionCompose_PetitionField
       }
       petition {
         ...PetitionLayout_PetitionBase
@@ -6196,8 +6175,7 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 export type PetitionCompose_createPetitionFieldMutationFn = Apollo.MutationFunction<
@@ -6253,8 +6231,7 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
     clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionCompose_PetitionField
       }
       petition {
         ...PetitionLayout_PetitionBase
@@ -6264,8 +6241,7 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 export type PetitionCompose_clonePetitionFieldMutationFn = Apollo.MutationFunction<
@@ -6390,8 +6366,7 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
     ) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
+        ...PetitionCompose_PetitionField
       }
       petition {
         id
@@ -6399,8 +6374,7 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
 export type PetitionCompose_updatePetitionFieldMutationFn = Apollo.MutationFunction<
   PetitionCompose_updatePetitionFieldMutation,
@@ -6462,11 +6436,7 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
     ) {
       field {
         id
-        ...PetitionComposeField_PetitionField
-        ...PetitionComposeFieldSettings_PetitionField
-        replies {
-          id
-        }
+        ...PetitionCompose_PetitionField
       }
       petition {
         id
@@ -6474,8 +6444,7 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
       }
     }
   }
-  ${PetitionComposeField_PetitionFieldFragmentDoc}
-  ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
+  ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
 export type PetitionCompose_changePetitionFieldTypeMutationFn = Apollo.MutationFunction<
   PetitionCompose_changePetitionFieldTypeMutation,

@@ -78,7 +78,9 @@ export function createApolloClient(
       typePolicies: {
         Petition: {
           fields: {
-            fields: { merge: false },
+            fields: {
+              merge: mergeArraysBy(["id"]),
+            },
             userPermissions: {
               merge: mergeArraysBy(["user", "id"]),
             },
