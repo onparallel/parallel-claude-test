@@ -327,7 +327,6 @@ TemplateDetailsDialog.fragments = {
         fullName
       }
       userPermissions {
-        id
         permissionType
         user {
           id

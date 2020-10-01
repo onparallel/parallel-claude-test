@@ -1,10 +1,42 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
-import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
+import {
+  ApolloClient,
+  createHttpLink,
+  FieldMergeFunction,
+  InMemoryCache,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
+import { indexBy } from "remeda";
 import typeDefs from "./client-schema.graphql";
 
 export interface CreateApolloClientOptions {
   getToken: () => string;
+}
+export function mergeArraysBy(path: string[]): FieldMergeFunction {
+  return function merge(
+    existing,
+    incoming,
+    { readField, mergeObjects, fieldName }
+  ) {
+    const getKey = (value: any) => {
+      return path.reduce((acc, curr) => {
+        const next = readField(curr, acc as any);
+        if (!next) {
+          throw new Error(
+            `Please include ${path.join(".")} when fetching ${fieldName}`
+          );
+        }
+        return next;
+      }, value);
+    };
+    const existingByKey = indexBy(existing || [], getKey);
+    return incoming.map((value: any) => {
+      const key = getKey(value);
+      return existingByKey[key]
+        ? mergeObjects(existingByKey[key], value)
+        : value;
+    });
+  };
 }
 
 let _cached: ApolloClient<any>;
@@ -47,7 +79,9 @@ export function createApolloClient(
         Petition: {
           fields: {
             fields: { merge: false },
-            userPermissions: { merge: false },
+            userPermissions: {
+              merge: mergeArraysBy(["user", "id"]),
+            },
           },
         },
         PetitionField: {

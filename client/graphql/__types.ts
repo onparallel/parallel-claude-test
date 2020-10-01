@@ -949,7 +949,6 @@ export type PetitionUserPermission = Timestamps & {
   __typename?: "PetitionUserPermission";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
@@ -1394,15 +1393,8 @@ export type HeaderNameEditable_PetitionBaseFragment =
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "locale" | "deadline" | "status"> & {
-    userPermissions: Array<
-      { __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "id"
-      >
-    >;
-    owner: { __typename?: "User" } & Pick<User, "id">;
-  } & HeaderNameEditable_PetitionBase_Petition_Fragment &
+} & Pick<Petition, "id" | "locale" | "deadline" | "status"> &
+  HeaderNameEditable_PetitionBase_Petition_Fragment &
   PetitionSettingsModal_PetitionBase_Petition_Fragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
@@ -1431,15 +1423,8 @@ export type PetitionLayout_UserFragment = {
 
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale"> & {
-    userPermissions: Array<
-      { __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "id"
-      >
-    >;
-    owner: { __typename?: "User" } & Pick<User, "id">;
-  } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
+} & Pick<PetitionTemplate, "id" | "locale"> &
+  HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionTemplateHeader_UserFragment = {
   __typename?: "User";
@@ -1901,7 +1886,10 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
       { __typename?: "PetitionUserPermission" } & Pick<
         PetitionUserPermission,
         "permissionType"
-      > & { user: { __typename?: "User" } & PetitionSharingModal_UserFragment }
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            PetitionSharingModal_UserFragment;
+        }
     >;
   };
 
@@ -1912,7 +1900,10 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
       { __typename?: "PetitionUserPermission" } & Pick<
         PetitionUserPermission,
         "permissionType"
-      > & { user: { __typename?: "User" } & PetitionSharingModal_UserFragment }
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            PetitionSharingModal_UserFragment;
+        }
     >;
   };
 
@@ -2037,7 +2028,7 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
     userPermissions: Array<
       { __typename?: "PetitionUserPermission" } & Pick<
         PetitionUserPermission,
-        "id" | "permissionType"
+        "permissionType"
       > & { user: { __typename?: "User" } & Pick<User, "id"> }
     >;
   };
@@ -3048,7 +3039,10 @@ export type Petitions_PetitionBase_Petition_Fragment = {
       { __typename?: "PetitionUserPermission" } & Pick<
         PetitionUserPermission,
         "permissionType"
-      > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            UserAvatarList_UserFragment;
+        }
     >;
     owner: { __typename?: "User" } & Pick<User, "id">;
   };
@@ -3063,7 +3057,10 @@ export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
       { __typename?: "PetitionUserPermission" } & Pick<
         PetitionUserPermission,
         "permissionType"
-      > & { user: { __typename?: "User" } & UserAvatarList_UserFragment }
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            UserAvatarList_UserFragment;
+        }
     >;
     owner: { __typename?: "User" } & Pick<User, "id">;
   };
@@ -3588,6 +3585,7 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
     userPermissions {
       permissionType
       user {
+        id
         ...PetitionSharingModal_User
       }
     }
@@ -3613,7 +3611,6 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
       fullName
     }
     userPermissions {
-      id
       permissionType
       user {
         id
@@ -3753,12 +3750,6 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     locale
     deadline
     status
-    userPermissions {
-      id
-    }
-    owner {
-      id
-    }
     ...HeaderNameEditable_PetitionBase
     ...PetitionSettingsModal_PetitionBase
   }
@@ -3769,12 +3760,6 @@ export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
     id
     locale
-    userPermissions {
-      id
-    }
-    owner {
-      id
-    }
     ...HeaderNameEditable_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
@@ -4470,6 +4455,7 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
     userPermissions {
       permissionType
       user {
+        id
         ...UserAvatarList_User
       }
     }

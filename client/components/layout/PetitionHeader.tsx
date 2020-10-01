@@ -394,12 +394,6 @@ PetitionHeader.fragments = {
       locale
       deadline
       status
-      userPermissions {
-        id
-      }
-      owner {
-        id
-      }
       ...HeaderNameEditable_PetitionBase
       ...PetitionSettingsModal_PetitionBase
     }

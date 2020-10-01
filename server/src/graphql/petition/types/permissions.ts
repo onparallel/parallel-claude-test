@@ -18,7 +18,6 @@ export const PetitionUserPermission = objectType({
   description: "The permission for a petition and user",
   definition(t) {
     t.implements("Timestamps");
-    t.globalId("id");
     t.field("user", {
       type: "User",
       description: "The user linked to the permission",

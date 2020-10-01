@@ -487,6 +487,7 @@ Petitions.fragments = {
         userPermissions {
           permissionType
           user {
+            id
             ...UserAvatarList_User
           }
         }

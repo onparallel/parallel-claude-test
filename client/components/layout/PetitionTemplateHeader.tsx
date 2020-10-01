@@ -255,12 +255,6 @@ PetitionTemplateHeader.fragments = {
     fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
       id
       locale
-      userPermissions {
-        id
-      }
-      owner {
-        id
-      }
       ...HeaderNameEditable_PetitionBase
     }
     ${HeaderNameEditable.fragments.PetitionBase}

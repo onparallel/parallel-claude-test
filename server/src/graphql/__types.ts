@@ -664,7 +664,6 @@ export interface NexusGenFieldTypes {
   PetitionUserPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    id: NexusGenScalars["GID"]; // GID!
     isSubscribed: boolean; // Boolean!
     permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
     petition: NexusGenRootTypes["Petition"]; // Petition!

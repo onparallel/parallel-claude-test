@@ -375,6 +375,7 @@ PetitionSharingModal.fragments = {
         userPermissions {
           permissionType
           user {
+            id
             ...PetitionSharingModal_User
           }
         }

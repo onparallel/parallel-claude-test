@@ -1410,7 +1410,6 @@ type PetitionUserPermission implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
-  id: GID!
 
   """
   wether user is subscribed or not to emails and alerts of the petition
