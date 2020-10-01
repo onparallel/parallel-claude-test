@@ -195,6 +195,11 @@
     "context": "Existing contact"
   },
   {
+    "term": "component.header-name-editable.change-name",
+    "definition": "Change name",
+    "context": "Change name"
+  },
+  {
     "term": "component.message-email-editor.body-placeholder",
     "definition": "Write a message to include in the email",
     "context": "Write a message to include in the email"

@@ -52,13 +52,21 @@ export function HeaderNameEditable({
       {({ isEditing }: { isEditing: boolean }) => (
         <>
           <Flex flex="1 1 auto" minWidth={0} padding={1}>
-            <EditablePreview
-              color={name ? undefined : "gray.400"}
-              paddingY={1}
-              paddingX={2}
-              display="block"
-              isTruncated
-            />
+            <Tooltip
+              placement="bottom"
+              label={intl.formatMessage({
+                id: "component.header-name-editable.change-name",
+                defaultMessage: "Change name",
+              })}
+            >
+              <EditablePreview
+                color={name ? undefined : "gray.400"}
+                paddingY={1}
+                paddingX={2}
+                display="block"
+                isTruncated
+              />
+            </Tooltip>
             <EditableInput
               paddingY={1}
               paddingX={2}
@@ -74,61 +82,61 @@ export function HeaderNameEditable({
               display={{ base: "flex", md: "none", lg: "flex" }}
               top="3px"
             >
-              {state === "SAVING" ? (
+              <Tooltip
+                label={intl.formatMessage(
+                  {
+                    id: "petition.header.last-saved-on",
+                    defaultMessage: "Last saved on: {date}",
+                  },
+                  {
+                    date: intl.formatDate(petition.updatedAt, FORMATS.FULL),
+                  }
+                )}
+                isDisabled={state !== "SAVED"}
+              >
                 <Text
-                  color="gray.500"
+                  color={
+                    state === "SAVING"
+                      ? "gray.500"
+                      : state === "SAVED"
+                      ? "green.500"
+                      : state === "ERROR"
+                      ? "red.500"
+                      : undefined
+                  }
                   fontSize="xs"
                   fontStyle="italic"
                   display="flex"
                   alignItems="center"
+                  cursor="default"
                 >
-                  <CloudUploadIcon marginRight={1} fontSize="sm" />
-                  <FormattedMessage
-                    id="generic.saving-changes"
-                    defaultMessage="Saving..."
-                  />
+                  {state === "SAVING" ? (
+                    <>
+                      <CloudUploadIcon marginRight={1} fontSize="sm" />
+                      <FormattedMessage
+                        id="generic.saving-changes"
+                        defaultMessage="Saving..."
+                      />
+                    </>
+                  ) : state === "SAVED" ? (
+                    <>
+                      <CloudOkIcon marginRight={1} fontSize="sm" />
+                      <FormattedMessage
+                        id="generic.changes-saved"
+                        defaultMessage="Saved"
+                      />
+                    </>
+                  ) : state === "ERROR" ? (
+                    <>
+                      <CloudErrorIcon marginRight={1} fontSize="sm" />
+                      <FormattedMessage
+                        id="petition.status.error"
+                        defaultMessage="Error"
+                      />
+                    </>
+                  ) : null}
                 </Text>
-              ) : state === "SAVED" ? (
-                <Tooltip
-                  label={intl.formatMessage(
-                    {
-                      id: "petition.header.last-saved-on",
-                      defaultMessage: "Last saved on: {date}",
-                    },
-                    {
-                      date: intl.formatDate(petition.updatedAt, FORMATS.FULL),
-                    }
-                  )}
-                >
-                  <Text
-                    color="green.500"
-                    fontSize="xs"
-                    fontStyle="italic"
-                    display="flex"
-                    alignItems="center"
-                  >
-                    <CloudOkIcon marginRight={1} fontSize="sm" />
-                    <FormattedMessage
-                      id="generic.changes-saved"
-                      defaultMessage="Saved"
-                    />
-                  </Text>
-                </Tooltip>
-              ) : state === "ERROR" ? (
-                <Text
-                  color="red.500"
-                  fontSize="xs"
-                  fontStyle="italic"
-                  display="flex"
-                  alignItems="center"
-                >
-                  <CloudErrorIcon marginRight={1} fontSize="sm" />
-                  <FormattedMessage
-                    id="petition.status.error"
-                    defaultMessage="Error"
-                  />
-                </Text>
-              ) : null}
+              </Tooltip>
             </Flex>
           )}
         </>

@@ -11,7 +11,7 @@ export function LocaleBadge({
   const localeLabel = locales.find(({ key }) => key === locale)!.localizedLabel;
   return (
     <Tooltip label={localeLabel}>
-      <Badge as="abbr" aria-label={localeLabel} {...props}>
+      <Badge as="abbr" aria-label={localeLabel} cursor="default" {...props}>
         {locale}
       </Badge>
     </Tooltip>
