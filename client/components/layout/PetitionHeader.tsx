@@ -182,6 +182,7 @@ export function PetitionHeader({
             <LocaleBadge
               locale={petition.locale}
               marginLeft={1}
+              as="button"
               cursor="pointer"
               onClick={() => onOpenSettings()}
             />
