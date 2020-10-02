@@ -14,7 +14,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<Aws>(Aws).toSelf().inSingletonScope();
   bind<Cognito>(Cognito).toSelf();
   bind<EmailsService>(EmailsService).toSelf();
-  bind<AnalyticsService>(AnalyticsService).toSelf();
+  bind<AnalyticsService>(AnalyticsService).toSelf().inSingletonScope();
   bind<Redis>(Redis).toSelf().inSingletonScope();
   bind<Smtp>(Smtp).toSelf().inSingletonScope();
 });
