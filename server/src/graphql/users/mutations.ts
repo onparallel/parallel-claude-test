@@ -29,9 +29,9 @@ export const updateUser = mutationField("updateUser", {
     maxLength((args) => args.data.firstName, "data.firstName", 255),
     maxLength((args) => args.data.lastName, "data.lastName", 255)
   ),
-  resolve: async (o, args, ctx) => {
+  resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
-    return await ctx.users.updateUserById(
+    const user = await ctx.users.updateUserById(
       args.id,
       removeNotDefined({
         first_name: firstName,
@@ -39,6 +39,10 @@ export const updateUser = mutationField("updateUser", {
       }),
       ctx.user!
     );
+
+    // each time user data is updated, we need to re-identify it
+    ctx.analytics.identifyUser(user);
+    return user;
   },
 });
 

@@ -15,6 +15,7 @@ import { Cognito } from "./services/cognito";
 import { EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
 import { Smtp } from "./services/smtp";
+import { AnalyticsService } from "./services/analytics";
 
 @injectable()
 export class ApiContext {
@@ -29,6 +30,7 @@ export class ApiContext {
     public readonly aws: Aws,
     public readonly cognito: Cognito,
     public readonly emails: EmailsService,
+    public readonly analytics: AnalyticsService,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

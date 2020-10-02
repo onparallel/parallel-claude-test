@@ -40,6 +40,9 @@ export function buildConfig() {
         noTracking: process.env.SES_CONFIGURATION_SET_NO_TRACKING!,
       }),
     }),
+    analytics: Object.freeze({
+      writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY!,
+    }),
     queueWorkers: Object.freeze({
       "email-sender": Object.freeze({
         endpoint: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
