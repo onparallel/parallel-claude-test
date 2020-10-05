@@ -81,8 +81,8 @@
   },
   {
     "term": "greeting",
-    "definition": "Hi{name, select, null {} other { {name}}},",
-    "context": "Hi{name, select, null {} other { {name}}},"
+    "definition": "Hi{name, select, null {,} other { {name},}}",
+    "context": "Hi{name, select, null {,} other { {name},}}"
   },
   {
     "term": "invitation.details",
@@ -178,6 +178,11 @@
     "term": "petition-reminder.subject",
     "definition": "Remember that {senderName} sent you a petition",
     "context": "Remember that {senderName} sent you a petition"
+  },
+  {
+    "term": "petition-reviewed.text",
+    "definition": "{senderName} ({senderEmail}) has confirmed receipt of the information.",
+    "context": "{senderName} ({senderEmail}) has confirmed receipt of the information."
   },
   {
     "term": "petition-sharing-notification.access-button",

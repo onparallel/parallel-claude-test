@@ -81,8 +81,8 @@
   },
   {
     "term": "greeting",
-    "definition": "Hola{name, select, null {} other { {name}}}",
-    "context": "Hi{name, select, null {} other { {name}}},"
+    "definition": "Hola{name, select, null {,} other {{name},}}",
+    "context": "Hi{name, select, null {,} other { {name},}}"
   },
   {
     "term": "invitation.details",
@@ -178,6 +178,11 @@
     "term": "petition-reminder.subject",
     "definition": "Recuerda que {senderName} te envió una petición",
     "context": "Remember that {senderName} sent you a petition"
+  },
+  {
+    "term": "petition-reviewed.text",
+    "definition": "{senderName} ({senderEmail}) ha confirmado la recepción de la información.",
+    "context": "{senderName} ({senderEmail}) has confirmed receipt of the information."
   },
   {
     "term": "petition-sharing-notification.access-button",
