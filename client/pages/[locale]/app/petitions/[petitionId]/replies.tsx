@@ -1,10 +1,14 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Stack, Text } from "@chakra-ui/core";
-import { DownloadIcon, RepeatIcon } from "@parallel/chakra/icons";
+import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
+import {
+  CheckIcon,
+  DownloadIcon,
+  RepeatIcon,
+  ThumbUpIcon,
+} from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { Spacer } from "@parallel/components/common/Spacer";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -58,6 +62,8 @@ import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { useMarkAsReviewedDialog } from "@parallel/components/petition-replies/MarkAsReviewedDialog";
+import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -276,6 +282,47 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
 
+  const markAsReviewedDialog = useMarkAsReviewedDialog();
+  const handleMarkAsReviewed = useCallback(async () => {
+    try {
+      const option = await markAsReviewedDialog({});
+      const fieldIds = petition.fields
+        .filter((f) => !f.validated && !f.isReadOnly)
+        .map((f) => f.id);
+
+      switch (option) {
+        case "APPROVE":
+          await handleValidateToggle(fieldIds, true);
+          await handleConfirmPetitionCompleted();
+          break;
+        case "REJECT":
+          await handleValidateToggle(fieldIds, false);
+          break;
+        default:
+          break;
+      }
+    } catch {}
+  }, [petition, intl.locale]);
+
+  const toast = useToast();
+  const confirmPetitionDialog = useConfirmPetitionCompletedDialog();
+  const handleConfirmPetitionCompleted = useCallback(async () => {
+    await confirmPetitionDialog({});
+    toast({
+      title: intl.formatMessage({
+        id: "petition.message-sent.toast-header",
+        defaultMessage: "Message sent",
+      }),
+      description: intl.formatMessage({
+        id: "petition.message-sent.toast-description",
+        defaultMessage: "The message is on it's way",
+      }),
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  }, [petition, intl.locale]);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -306,7 +353,20 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             defaultMessage: "Reload",
           })}
         />
-        <Spacer />
+        <Button
+          colorScheme="green"
+          leftIcon={<CheckIcon />}
+          onClick={() => handleMarkAsReviewed()}
+        >
+          Marcar todo como revisado
+        </Button>
+        <Button
+          colorScheme="blue"
+          leftIcon={<ThumbUpIcon fontSize="lg" display="flex" />}
+          onClick={() => handleConfirmPetitionCompleted()}
+        >
+          Notificar que está correcto
+        </Button>
         {pendingComments ? (
           <Button
             colorScheme="yellow"
