@@ -750,6 +750,11 @@
     "context": "Yes, delete"
   },
   {
+    "term": "generic.confirm-later",
+    "definition": "Confirm later",
+    "context": "Confirm later"
+  },
+  {
     "term": "generic.continue",
     "definition": "Continue",
     "context": "Continue"
@@ -953,6 +958,16 @@
     "term": "generic.go-to-page",
     "definition": "Go to page {page}",
     "context": "Go to page {page}"
+  },
+  {
+    "term": "generic.greetings",
+    "definition": "Greetings.",
+    "context": "Greetings."
+  },
+  {
+    "term": "generic.hi",
+    "definition": "Hi",
+    "context": "Hi"
   },
   {
     "term": "generic.load-more",
@@ -1320,6 +1335,31 @@
     "context": "Pending"
   },
   {
+    "term": "petition-replies.confirm-reviewed-default-body.text-1",
+    "definition": "We have reviewed all the information.",
+    "context": "We have reviewed all the information."
+  },
+  {
+    "term": "petition-replies.confirm-reviewed-default-body.text-2",
+    "definition": "We confirm that everything is correct.",
+    "context": "We confirm that everything is correct."
+  },
+  {
+    "term": "petition-replies.confirm-reviewed-default-body.text-3",
+    "definition": "We will get to work and if we have any questions or need any more information we will let you know.",
+    "context": "We will get to work and if we have any questions or need any more information we will let you know."
+  },
+  {
+    "term": "petition-replies.confirm-reviewed.dialog-heading",
+    "definition": "Confirm that you have all the information",
+    "context": "Confirm that you have all the information"
+  },
+  {
+    "term": "petition-replies.confirm-reviewed.dialog-subheading",
+    "definition": "If everything is correct, notify the recipient for peace of mind",
+    "context": "If everything is correct, notify the recipient for peace of mind"
+  },
+  {
     "term": "petition-replies.download-all",
     "definition": "Download replies",
     "context": "Download replies"
@@ -1328,6 +1368,41 @@
     "term": "petition-replies.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment"
+  },
+  {
+    "term": "petition-replies.mark-all-as-reviewed.button",
+    "definition": "Mark all as reviewed",
+    "context": "Mark all as reviewed"
+  },
+  {
+    "term": "petition-replies.mark-all-as-reviewed.dialog-approve",
+    "definition": "Approve unreviewed responses",
+    "context": "Approve unreviewed responses"
+  },
+  {
+    "term": "petition-replies.mark-all-as-reviewed.dialog-heading",
+    "definition": "There are answers without approval or rejection...",
+    "context": "There are answers without approval or rejection..."
+  },
+  {
+    "term": "petition-replies.mark-all-as-reviewed.dialog-manual-review",
+    "definition": "Manual review",
+    "context": "Manual review"
+  },
+  {
+    "term": "petition-replies.mark-all-as-reviewed.dialog-reject",
+    "definition": "Reject unreviewed responses",
+    "context": "Reject unreviewed responses"
+  },
+  {
+    "term": "petition-replies.mark-all-as-reviewed.dialog-subheading",
+    "definition": "What do you want to do with them?",
+    "context": "What do you want to do with them?"
+  },
+  {
+    "term": "petition-replies.notify-petition-reviewed.button",
+    "definition": "Notify that it is correct",
+    "context": "Notify that it is correct"
   },
   {
     "term": "petition-replies.pending-comment-popover",

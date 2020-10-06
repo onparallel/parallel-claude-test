@@ -323,6 +323,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     });
   }, [petition, intl.locale]);
 
+  const petitionHasUnreviewedFields = useMemo(() => {
+    return petition.fields.some((field) => !field.validated);
+  }, [petition]);
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -354,18 +358,26 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           })}
         />
         <Button
+          hidden={!petitionHasUnreviewedFields}
           colorScheme="green"
           leftIcon={<CheckIcon />}
           onClick={() => handleMarkAsReviewed()}
         >
-          Marcar todo como revisado
+          <FormattedMessage
+            id="petition-replies.mark-all-as-reviewed.button"
+            defaultMessage="Mark all as reviewed"
+          />
         </Button>
         <Button
+          hidden={petitionHasUnreviewedFields}
           colorScheme="blue"
           leftIcon={<ThumbUpIcon fontSize="lg" display="flex" />}
           onClick={() => handleConfirmPetitionCompleted()}
         >
-          Notificar que está correcto
+          <FormattedMessage
+            id="petition-replies.notify-petition-reviewed.button"
+            defaultMessage="Notify that it is correct"
+          />
         </Button>
         {pendingComments ? (
           <Button

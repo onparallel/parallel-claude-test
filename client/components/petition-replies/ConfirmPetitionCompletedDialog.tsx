@@ -6,7 +6,7 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { useState } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
   RichTextEditor,
   RichTextEditorContent,
@@ -17,15 +17,13 @@ export function ConfirmPetitionCompletedDialog({
 }: DialogProps<{}, RichTextEditorContent>) {
   const intl = useIntl();
   const [body, setBody] = useState<RichTextEditorContent>([
-    { children: [{ text: "Hola," }] },
-    { children: [{ text: "" }] },
     {
       children: [
         {
-          text: "Ya hemos revisado toda la información. ",
-        },
-        {
-          text: "Te confirmamos que está todo correcto.",
+          text: `${intl.formatMessage({
+            id: "generic.hi",
+            defaultMessage: "Hi",
+          })},`,
         },
       ],
     },
@@ -33,13 +31,42 @@ export function ConfirmPetitionCompletedDialog({
     {
       children: [
         {
-          text:
-            " Vamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.",
+          text: `${intl.formatMessage({
+            id: "petition-replies.confirm-reviewed-default-body.text-1",
+            defaultMessage: "We have reviewed all the information.",
+          })} `,
+        },
+        {
+          text: intl.formatMessage({
+            id: "petition-replies.confirm-reviewed-default-body.text-2",
+            defaultMessage: "We confirm that everything is correct.",
+          }),
         },
       ],
     },
     { children: [{ text: "" }] },
-    { children: [{ text: "Un saludo." }] },
+    {
+      children: [
+        {
+          text: intl.formatMessage({
+            id: "petition-replies.confirm-reviewed-default-body.text-3",
+            defaultMessage:
+              "We will get to work and if we have any questions or need any more information we will let you know.",
+          }),
+        },
+      ],
+    },
+    { children: [{ text: "" }] },
+    {
+      children: [
+        {
+          text: intl.formatMessage({
+            id: "generic.greetings",
+            defaultMessage: "Greetings.",
+          }),
+        },
+      ],
+    },
   ]);
 
   return (
@@ -60,11 +87,16 @@ export function ConfirmPetitionCompletedDialog({
             >
               <ThumbUpIcon color="white" />
             </Box>
-            Confirmar que ya tienes toda la información
+            <FormattedMessage
+              id="petition-replies.confirm-reviewed.dialog-heading"
+              defaultMessage="Confirm that you have all the information"
+            />
           </Flex>
           <Text fontWeight="normal" fontSize="md" marginTop={1}>
-            Si está todo correcto, notifica al destinatario para que esté
-            tranquilo.
+            <FormattedMessage
+              id="petition-replies.confirm-reviewed.dialog-subheading"
+              defaultMessage="If everything is correct, notify the recipient for peace of mind"
+            />
           </Text>
         </>
       }
@@ -80,12 +112,15 @@ export function ConfirmPetitionCompletedDialog({
       }
       cancel={
         <Button onClick={() => props.onReject({ reason: "CLOSE" })}>
-          Confirmar más tarde
+          <FormattedMessage
+            id="generic.confirm-later"
+            defaultMessage="Confirm later"
+          />
         </Button>
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve(body)}>
-          Enviar
+          <FormattedMessage id="generic.send" defaultMessage="Send" />
         </Button>
       }
       {...props}

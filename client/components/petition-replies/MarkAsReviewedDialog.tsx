@@ -16,6 +16,7 @@ import {
   DialogProps,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { ReactNode } from "react";
+import { FormattedMessage } from "react-intl";
 
 export function MarkAsReviewedDialog({
   onResolve,
@@ -31,9 +32,16 @@ export function MarkAsReviewedDialog({
       <ModalOverlay>
         <ModalContent borderRadius="md">
           <ModalHeader>
-            Hay respuestas sin aprobar o rechazar...
+            <FormattedMessage
+              id="petition-replies.mark-all-as-reviewed.dialog-heading"
+              defaultMessage="There are answers without approval or rejection..."
+            />
+
             <Text fontWeight="normal" fontSize="sm">
-              ¿Qué quieres hacer con ellos?
+              <FormattedMessage
+                id="petition-replies.mark-all-as-reviewed.dialog-subheading"
+                defaultMessage="What do you want to do with them?"
+              />
             </Text>
           </ModalHeader>
           <ModalBody>
@@ -55,7 +63,10 @@ export function MarkAsReviewedDialog({
                 >
                   <CheckIcon fontSize="sm" color="white" />
                 </Box>
-                Aprobar las respuestas sin revisar
+                <FormattedMessage
+                  id="petition-replies.mark-all-as-reviewed.dialog-approve"
+                  defaultMessage="Approve unreviewed responses"
+                />
               </Option>
               <Option onClick={() => onResolve("REJECT")}>
                 <Box
@@ -69,7 +80,10 @@ export function MarkAsReviewedDialog({
                 >
                   <CloseIcon fontSize="sm" color="white" />
                 </Box>
-                Rechazar las respuestas sin revisar
+                <FormattedMessage
+                  id="petition-replies.mark-all-as-reviewed.dialog-reject"
+                  defaultMessage="Reject unreviewed responses"
+                />
               </Option>
               <Option
                 backgroundColor="auto"
@@ -77,7 +91,10 @@ export function MarkAsReviewedDialog({
                 justifyContent="center"
                 onClick={() => onResolve("MANUAL")}
               >
-                Revisar manualmente
+                <FormattedMessage
+                  id="petition-replies.mark-all-as-reviewed.dialog-manual-review"
+                  defaultMessage="Manual review"
+                />
               </Option>
             </Stack>
           </ModalBody>
