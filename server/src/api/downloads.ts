@@ -95,8 +95,11 @@ async function* getPetitionFiles(
 
   const textReplies = new TextRepliesExcel(locale);
   const seen = new Set<string>();
+  let headingCount = 0;
   for (const [field, replies] of zip(fields, fieldReplies)) {
-    if (field.type === "FILE_UPLOAD") {
+    if (field.type === "HEADING") {
+      headingCount++;
+    } else if (field.type === "FILE_UPLOAD") {
       for (const reply of replies) {
         const file = filesById[reply.content["file_upload_id"]];
         const contact =
@@ -106,7 +109,7 @@ async function* getPetitionFiles(
           const name = rename(pattern, placeholders, (placeholder) => {
             switch (placeholder) {
               case "field-number":
-                return `${field.position + 1}`;
+                return `${field.position + 1 - headingCount}`;
               case "field-title":
                 return field.title ?? "";
               case "file-name":
