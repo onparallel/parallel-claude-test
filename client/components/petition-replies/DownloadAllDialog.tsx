@@ -14,6 +14,7 @@ import {
   PlaceholderInput,
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
+import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 
 export type DownloadAllDialogProps = {
   fields: DownloadAllDialog_PetitionFieldFragment[];
@@ -66,11 +67,13 @@ export function DownloadAllDialog({
     ],
     [intl.locale]
   );
+
+  const fieldIndexValues = useFieldIndexValues(fields);
   const example = useMemo(() => {
     const field = fields.find(
       (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
     )!;
-    const position = fields.indexOf(field);
+    const position = fieldIndexValues[fields.indexOf(field)];
     const reply = field.replies[0];
     const extension =
       (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
@@ -88,7 +91,7 @@ export function DownloadAllDialog({
           const value = part.slice(1, -1);
           switch (value) {
             case "field-number":
-              return `${position + 1}`;
+              return position;
             case "field-title":
               return field.title ?? "";
             case "file-name":
@@ -104,7 +107,7 @@ export function DownloadAllDialog({
       })
       .join("");
     return sanitize(`${name}${extension ?? ""}`);
-  }, [pattern, fields]);
+  }, [pattern, fields, fieldIndexValues]);
 
   const inputRef = useRef<PlaceholderInputRef>(null);
   const handleConfirmClick = () => {

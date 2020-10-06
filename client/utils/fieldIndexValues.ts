@@ -37,7 +37,9 @@ function nextNumber(symbols: Array<string | number>) {
  * iterates every field and returns an array representing the index of each one in the same order
  * @param fields fields to iterate.
  */
-export function useFieldIndexValues(fields: Pick<PetitionField, "type">[]) {
+export function useFieldIndexValues(
+  fields: Pick<PetitionField, "type">[]
+): Array<number | string> {
   return useMemo(() => {
     return fields.reduce<Array<string | number>>((values, field) => {
       if (field.type === "HEADING") {
