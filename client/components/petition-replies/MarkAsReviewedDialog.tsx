@@ -1,13 +1,12 @@
 import {
-  Box,
   Button,
   ButtonProps,
+  Flex,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Stack,
   Text,
 } from "@chakra-ui/core";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
@@ -15,7 +14,7 @@ import {
   useDialog,
   DialogProps,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
 export function MarkAsReviewedDialog({
@@ -26,6 +25,7 @@ export function MarkAsReviewedDialog({
   return (
     <Modal
       {...props}
+      size="sm"
       isOpen={true}
       onClose={() => onReject({ reason: "CLOSE" })}
     >
@@ -45,41 +45,44 @@ export function MarkAsReviewedDialog({
             </Text>
           </ModalHeader>
           <ModalBody>
-            <Stack
-              alignItems="center"
-              width="fit-content"
-              margin="auto"
-              marginBottom={1}
-            >
-              <Option onClick={() => onResolve("APPROVE")}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  backgroundColor="green.500"
-                  borderRadius="md"
-                  margin={1}
-                  padding={1}
-                >
-                  <CheckIcon fontSize="sm" color="white" />
-                </Box>
+            <Flex direction="column" alignItems="center" marginBottom={3}>
+              <Option
+                leftIcon={
+                  <Flex
+                    justifyContent="center"
+                    alignItems="center"
+                    backgroundColor="green.500"
+                    borderRadius="md"
+                    margin={1}
+                    height="24px"
+                    width="24px"
+                  >
+                    <CheckIcon fontSize="sm" color="white" />
+                  </Flex>
+                }
+                onClick={() => onResolve("APPROVE")}
+              >
                 <FormattedMessage
                   id="petition-replies.mark-all-as-reviewed.dialog-approve"
                   defaultMessage="Approve unreviewed responses"
                 />
               </Option>
-              <Option onClick={() => onResolve("REJECT")}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  backgroundColor="red.500"
-                  borderRadius="md"
-                  margin={1}
-                  padding={1}
-                >
-                  <CloseIcon fontSize="sm" color="white" />
-                </Box>
+              <Option
+                leftIcon={
+                  <Flex
+                    justifyContent="center"
+                    alignItems="center"
+                    backgroundColor="red.500"
+                    borderRadius="md"
+                    margin={1}
+                    height="24px"
+                    width="24px"
+                  >
+                    <CloseIcon fontSize="xs" color="white" />
+                  </Flex>
+                }
+                onClick={() => onResolve("REJECT")}
+              >
                 <FormattedMessage
                   id="petition-replies.mark-all-as-reviewed.dialog-reject"
                   defaultMessage="Reject unreviewed responses"
@@ -96,7 +99,7 @@ export function MarkAsReviewedDialog({
                   defaultMessage="Manual review"
                 />
               </Option>
-            </Stack>
+            </Flex>
           </ModalBody>
         </ModalContent>
       </ModalOverlay>
@@ -105,12 +108,15 @@ export function MarkAsReviewedDialog({
 }
 function Option({
   children,
+  leftIcon,
   ...props
 }: ButtonProps & {
   children?: ReactNode;
+  leftIcon?: ReactElement;
 }) {
   return (
     <Button
+      leftIcon={leftIcon}
       margin={1}
       padding={1}
       height="46px"
@@ -119,6 +125,8 @@ function Option({
       backgroundColor="white"
       border="1px solid"
       borderColor="gray.200"
+      display="flex"
+      justifyContent="flex-start"
       {...props}
     >
       {children}
