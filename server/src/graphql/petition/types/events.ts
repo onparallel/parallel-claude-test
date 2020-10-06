@@ -43,6 +43,8 @@ export const PetitionEvent = interfaceType({
           return "UserPermissionEditedEvent";
         case "OWNERSHIP_TRANSFERRED":
           return "OwnershipTransferredEvent";
+        case "PETITION_REVIEWED":
+          return "PetitionReviewedEvent";
       }
     });
   },
@@ -381,6 +383,22 @@ export const OwnershipTransferredEvent = createPetitionEvent(
       nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.owner_id);
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when the user marks the petition as reviewed.
+ */
+export const PetitionReviewedEvent = createPetitionEvent(
+  "PetitionReviewedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
       },
     });
   }

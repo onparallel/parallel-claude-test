@@ -50,6 +50,10 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     owner_id: number;
   };
+  PETITION_REVIEWED: {
+    user_id: number;
+    petition_message_ids: number[];
+  };
 }[TType];
 
 type GenericPetitionEvent<TType extends PetitionEventType> = {
@@ -84,6 +88,8 @@ export type UserPermissionEditedEvent = GenericPetitionEvent<
 export type OwnershipTransferredEvent = GenericPetitionEvent<
   "OWNERSHIP_TRANSFERRED"
 >;
+export type PetitionReviewedEvent = GenericPetitionEvent<"PETITION_REVIEWED">;
+
 export type PetitionEvent =
   | PetitionCreatedEvent
   | PetitionCompletedEvent
@@ -101,4 +107,5 @@ export type PetitionEvent =
   | UserPermissionAddedEvent
   | UserPermissionRemovedEvent
   | UserPermissionEditedEvent
-  | OwnershipTransferredEvent;
+  | OwnershipTransferredEvent
+  | PetitionReviewedEvent;

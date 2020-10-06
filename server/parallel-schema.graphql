@@ -1377,6 +1377,12 @@ enum PetitionReminderType {
   MANUAL
 }
 
+type PetitionReviewedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  user: User
+}
+
 """
 The status of a petition.
 """
