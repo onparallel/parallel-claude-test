@@ -963,7 +963,7 @@ export class PetitionRepository extends BaseRepository {
     value: boolean,
     user: User
   ) {
-    return await this.from("petition_field")
+    const fields = await this.from("petition_field")
       .whereIn("id", fieldIds)
       .where("petition_id", petitionId)
       .update(
@@ -974,6 +974,20 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
+
+    // if every field is validated, update the petition status to REVIEWED
+    const petitionFields = await this.loadFieldsForPetition(petitionId);
+
+    await this.from("petition")
+      .where("id", petitionId)
+      .update({
+        status: petitionFields.every((f) => f.validated)
+          ? "REVIEWED"
+          : "COMPLETED",
+      })
+      .select("*");
+
+    return fields;
   }
 
   async createPetitionFieldReply(

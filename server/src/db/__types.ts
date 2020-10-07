@@ -45,7 +45,7 @@ export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
-export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED";
+export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "REVIEWED";
 
 export type PetitionUserNotificationType = "COMMENT_CREATED";
 

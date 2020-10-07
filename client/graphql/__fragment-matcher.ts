@@ -86,6 +86,9 @@ const result: IntrospectionResultData = {
             name: "PetitionCreatedEvent",
           },
           {
+            name: "PetitionReviewedEvent",
+          },
+          {
             name: "ReminderSentEvent",
           },
           {

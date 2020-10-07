@@ -608,13 +608,13 @@ type Mutation {
   updateUser(data: UpdateUserInput!, id: GID!): User!
 
   """
-  Updates the validation of a petition field.
+  Updates the validation of a field ands sets the petition as reviewed if all fields are validated.
   """
   validatePetitionFields(
     fieldIds: [GID!]!
     petitionId: GID!
     value: Boolean!
-  ): [PetitionField!]!
+  ): PetitionAndPartialFields!
 }
 
 enum OnboardingKey {
@@ -918,6 +918,14 @@ enum PetitionAccessStatus {
 
 type PetitionAndField implements PetitionBaseAndField {
   field: PetitionField!
+  petition: Petition!
+}
+
+"""
+The petition and a subset of some of its fields.
+"""
+type PetitionAndPartialFields {
+  fields: [PetitionField!]!
   petition: Petition!
 }
 
@@ -1401,6 +1409,11 @@ enum PetitionStatus {
   The petition has been sent and is awaiting completion.
   """
   PENDING
+
+  """
+  The petition has been reviewed by a user.
+  """
+  REVIEWED
 }
 
 """

@@ -257,8 +257,8 @@ export type Mutation = {
   updatePetitionFieldRepliesStatus: PetitionFieldAndReplies;
   /** Updates the user with the provided data. */
   updateUser: User;
-  /** Updates the validation of a petition field. */
-  validatePetitionFields: Array<PetitionField>;
+  /** Updates the validation of a field ands sets the petition as reviewed if all fields are validated. */
+  validatePetitionFields: PetitionAndPartialFields;
 };
 
 export type MutationaddPetitionUserPermissionArgs = {
@@ -691,6 +691,13 @@ export type PetitionAndField = PetitionBaseAndField & {
   petition: Petition;
 };
 
+/** The petition and a subset of some of its fields. */
+export type PetitionAndPartialFields = {
+  __typename?: "PetitionAndPartialFields";
+  fields: Array<PetitionField>;
+  petition: Petition;
+};
+
 export type PetitionBase = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -926,6 +933,13 @@ export type PetitionReminderType =
   /** The reminder has been sent manually by a user. */
   | "MANUAL";
 
+export type PetitionReviewedEvent = PetitionEvent & {
+  __typename?: "PetitionReviewedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user?: Maybe<User>;
+};
+
 /** The status of a petition. */
 export type PetitionStatus =
   /** The petition has been completed. */
@@ -933,7 +947,9 @@ export type PetitionStatus =
   /** The petition has not been sent yet. */
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
-  | "PENDING";
+  | "PENDING"
+  /** The petition has been reviewed by a user. */
+  | "REVIEWED";
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {
@@ -1580,6 +1596,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment)
       | ({
+          __typename?: "PetitionReviewedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment)
+      | ({
           __typename?: "ReminderSentEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment)
       | ({
@@ -1657,6 +1676,10 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
 } & Pick<PetitionCreatedEvent, "id"> &
   TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment = {
+  __typename?: "PetitionReviewedEvent";
+} & Pick<PetitionReviewedEvent, "id">;
+
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
 } & Pick<ReminderSentEvent, "id"> &
@@ -1699,6 +1722,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
@@ -2866,6 +2890,10 @@ export type PetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
+export type PetitionReplies_PetitionStatusFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "status">;
+
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
@@ -2908,19 +2936,22 @@ export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
 export type PetitionReplies_validatePetitionFieldsMutation = {
   __typename?: "Mutation";
 } & {
-  validatePetitionFields: Array<
-    { __typename?: "PetitionField" } & Pick<
-      PetitionField,
-      "id" | "validated"
-    > & {
-        replies: Array<
-          { __typename?: "PetitionFieldReply" } & Pick<
-            PetitionFieldReply,
-            "id" | "status"
-          >
-        >;
-      }
-  >;
+  validatePetitionFields: { __typename?: "PetitionAndPartialFields" } & {
+    petition: { __typename?: "Petition" } & Pick<Petition, "status">;
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<
+        PetitionField,
+        "id" | "validated"
+      > & {
+          replies: Array<
+            { __typename?: "PetitionFieldReply" } & Pick<
+              PetitionFieldReply,
+              "id" | "status"
+            >
+          >;
+        }
+    >;
+  };
 };
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
@@ -4389,6 +4420,11 @@ export const PetitionCompose_UserFragmentDoc = gql`
     ...PetitionLayout_User
   }
   ${PetitionLayout_UserFragmentDoc}
+`;
+export const PetitionReplies_PetitionStatusFragmentDoc = gql`
+  fragment PetitionReplies_PetitionStatus on Petition {
+    status
+  }
 `;
 export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
@@ -6955,11 +6991,16 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
       fieldIds: $fieldIds
       value: $value
     ) {
-      id
-      validated
-      replies {
-        id
+      petition {
         status
+      }
+      fields {
+        id
+        validated
+        replies {
+          id
+          status
+        }
       }
     }
   }

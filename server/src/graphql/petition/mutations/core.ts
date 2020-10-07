@@ -460,9 +460,9 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 });
 
 export const validatePetitionFields = mutationField("validatePetitionFields", {
-  description: "Updates the validation of a petition field.",
-  type: "PetitionField",
-  list: [true],
+  description:
+    "Updates the validation of a field ands sets the petition as reviewed if all fields are validated.",
+  type: "PetitionAndPartialFields",
   authorize: chain(
     authenticate(),
     and(
@@ -493,7 +493,9 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
         "APPROVED"
       );
     }
-    return fields;
+
+    const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
+    return { petition, fields };
   },
 });
 

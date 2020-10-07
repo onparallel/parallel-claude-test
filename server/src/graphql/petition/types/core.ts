@@ -17,6 +17,10 @@ export const PetitionStatus = enumType({
       description: "The petition has been sent and is awaiting completion.",
     },
     { name: "COMPLETED", description: "The petition has been completed." },
+    {
+      name: "REVIEWED",
+      description: "The petition has been reviewed by a user.",
+    },
   ],
 });
 
@@ -279,6 +283,15 @@ export const PetitionField = objectType({
     t.int("position");
   },
   rootTyping: "db.PetitionField",
+});
+
+export const PetitionAndUpdatedFields = objectType({
+  name: "PetitionAndPartialFields",
+  description: "The petition and a subset of some of its fields.",
+  definition(t) {
+    t.field("petition", { type: "Petition" });
+    t.field("fields", { type: "PetitionField", list: [true] });
+  },
 });
 
 export const RemindersConfig = objectType({

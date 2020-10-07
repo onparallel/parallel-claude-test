@@ -36,6 +36,7 @@ import {
   PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
+  PetitionReplies_PetitionStatusFragment,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
   UpdatePetitionInput,
@@ -128,19 +129,48 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     await validatePetitionFields({
       variables: { petitionId: petition.id, fieldIds, value },
       optimisticResponse: {
-        validatePetitionFields: fieldIds.map((id) => {
-          const field = petition.fields.find((f) => f.id === id)!;
-          return {
-            __typename: "PetitionField",
-            id,
-            validated: value,
-            replies: field.replies.map((reply) => ({
-              ...pick(reply, ["__typename", "id"]),
-              status:
-                value && reply.status === "PENDING" ? "APPROVED" : reply.status,
-            })),
-          };
-        }),
+        validatePetitionFields: {
+          __typename: "PetitionAndPartialFields",
+          petition: {
+            status: "REVIEWED", // TODO calculate actual status
+            __typename: "Petition",
+          },
+          fields: fieldIds.map((id) => {
+            const field = petition.fields.find((f) => f.id === id)!;
+            return {
+              __typename: "PetitionField",
+              id,
+              validated: value,
+              replies: field.replies.map((reply) => ({
+                ...pick(reply, ["__typename", "id"]),
+                status:
+                  value && reply.status === "PENDING"
+                    ? "APPROVED"
+                    : reply.status,
+              })),
+            };
+          }),
+        },
+      },
+      // based on the response, we need to update the petition status on cache
+      update(cache, { data }) {
+        const petitionFragment = gql`
+          fragment PetitionReplies_PetitionStatus on Petition {
+            status
+          }
+        `;
+        const cachedPetition = cache.readFragment<
+          PetitionReplies_PetitionStatusFragment
+        >({ id: petitionId, fragment: petitionFragment });
+        cache.writeFragment<PetitionReplies_PetitionStatusFragment>({
+          id: petitionId,
+          fragment: petitionFragment,
+          data: {
+            status:
+              data?.validatePetitionFields.petition.status ||
+              cachedPetition!.status,
+          },
+        });
       },
     });
   }
@@ -526,11 +556,16 @@ PetitionReplies.mutations = [
         fieldIds: $fieldIds
         value: $value
       ) {
-        id
-        validated
-        replies {
-          id
+        petition {
           status
+        }
+        fields {
+          id
+          validated
+          replies {
+            id
+            status
+          }
         }
       }
     }

@@ -220,6 +220,11 @@ export interface NexusGenRootTypes {
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
+  PetitionAndPartialFields: {
+    // root type
+    fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+  };
   PetitionBasePagination: {
     // root type
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
@@ -492,7 +497,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionFieldAndReplies"]; // PetitionFieldAndReplies!
     updateUser: NexusGenRootTypes["User"]; // User!
-    validatePetitionFields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
   };
   Organization: {
     // field return type
@@ -554,6 +559,11 @@ export interface NexusGenFieldTypes {
   PetitionAndField: {
     // field return type
     field: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+  };
+  PetitionAndPartialFields: {
+    // field return type
+    fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   PetitionBasePagination: {
@@ -1304,6 +1314,7 @@ export type NexusGenObjectNames =
   | "PetitionAccess"
   | "PetitionAccessPagination"
   | "PetitionAndField"
+  | "PetitionAndPartialFields"
   | "PetitionBasePagination"
   | "PetitionCompletedEvent"
   | "PetitionCreatedEvent"
