@@ -975,17 +975,20 @@ export class PetitionRepository extends BaseRepository {
         "*"
       );
 
-    // if every field is validated, update the petition status to REVIEWED
+    // if every field is validated, update the petition status
     const petitionFields = await this.loadFieldsForPetition(petitionId);
+    const petition = await this.loadPetition(petitionId);
+    const newStatus = petitionFields
+      .filter((f) => f.type !== "HEADING")
+      .every((f) => f.validated)
+      ? "REVIEWED"
+      : petition!.status === "REVIEWED"
+      ? "COMPLETED"
+      : petition!.status;
 
     await this.from("petition")
       .where("id", petitionId)
-      .update({
-        status: petitionFields.every((f) => f.validated)
-          ? "REVIEWED"
-          : "COMPLETED",
-      })
-      .select("*");
+      .update({ status: newStatus });
 
     return fields;
   }

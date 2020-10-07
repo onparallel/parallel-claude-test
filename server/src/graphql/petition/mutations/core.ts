@@ -494,7 +494,9 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       );
     }
 
-    const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
+    const petition = (await ctx.petitions.loadPetition(args.petitionId, {
+      cache: false,
+    }))!;
     return { petition, fields };
   },
 });
