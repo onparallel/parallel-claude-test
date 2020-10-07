@@ -46,6 +46,10 @@ export function PetitionListFilter({
       id: "component.petition-list-filter.completed",
       defaultMessage: "Completed",
     }),
+    REVIEWED: intl.formatMessage({
+      id: "component.petition-list-filter.reviewed",
+      defaultMessage: "Reviewed",
+    }),
     TEMPLATE: intl.formatMessage({
       id: "component.petition-list-filter.template",
       defaultMessage: "Templates",

@@ -194,6 +194,7 @@ function Petitions() {
             DRAFT: "compose",
             PENDING: "replies",
             COMPLETED: "replies",
+            REVIEWED: "replies",
           } as const)[row.status]
         : "compose"
     );

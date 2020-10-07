@@ -132,7 +132,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         validatePetitionFields: {
           __typename: "PetitionAndPartialFields",
           petition: {
-            status: "REVIEWED", // TODO calculate actual status
+            status: petition.status, // TODO predict correct status
             __typename: "Petition",
           },
           fields: fieldIds.map((id) => {
@@ -354,7 +354,9 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   }, [petition, intl.locale]);
 
   const petitionHasUnreviewedFields = useMemo(() => {
-    return petition.fields.some((field) => !field.validated);
+    return petition.fields
+      .filter((f) => f.type !== "HEADING")
+      .some((field) => !field.validated);
   }, [petition]);
 
   return (

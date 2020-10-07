@@ -82,6 +82,7 @@ function Contact({ contactId }: ContactProps) {
         DRAFT: "compose",
         PENDING: "replies",
         COMPLETED: "replies",
+        REVIEWED: "replies",
       } as const)[row.petition!.status]
     );
   }

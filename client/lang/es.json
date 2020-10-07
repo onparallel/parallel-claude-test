@@ -305,6 +305,11 @@
     "context": "Pending"
   },
   {
+    "term": "component.petition-list-filter.reviewed",
+    "definition": "Revisado",
+    "context": "Reviewed"
+  },
+  {
     "term": "component.petition-list-filter.template",
     "definition": "Plantillas",
     "context": "Templates"
@@ -1023,6 +1028,11 @@
     "term": "generic.petition-status.pending",
     "definition": "Pendiente",
     "context": "Pending"
+  },
+  {
+    "term": "generic.petition-status.reviewed",
+    "definition": "Revisado",
+    "context": "Reviewed"
   },
   {
     "term": "generic.previous-page",

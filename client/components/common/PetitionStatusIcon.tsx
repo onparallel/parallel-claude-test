@@ -1,5 +1,10 @@
 import { Icon, Tooltip } from "@chakra-ui/core";
-import { CheckIcon, EditIcon, TimeIcon } from "@parallel/chakra/icons";
+import {
+  CheckIcon,
+  DoubleCheckIcon,
+  EditIcon,
+  TimeIcon,
+} from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionStatus } from "@parallel/graphql/__types";
 import { useMemo } from "react";
@@ -27,16 +32,22 @@ export function PetitionStatusIcon({
           id: "generic.petition-status.completed",
           defaultMessage: "Completed",
         }),
+        REVIEWED: intl.formatMessage({
+          id: "generic.petition-status.reviewed",
+          defaultMessage: "Reviewed",
+        }),
       }[status],
       icon: {
         DRAFT: EditIcon,
         PENDING: TimeIcon,
         COMPLETED: CheckIcon,
+        REVIEWED: DoubleCheckIcon,
       }[status],
       color: {
         DRAFT: "gray.500",
         PENDING: "yellow.600",
         COMPLETED: "green.500",
+        REVIEWED: "green.500",
       }[status],
     }),
     [status, intl.locale]
