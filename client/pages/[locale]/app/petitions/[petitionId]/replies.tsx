@@ -189,6 +189,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         petitionFieldReplyIds,
         status,
       },
+      petition.status,
       // field is automatically validated if there are no pending replies
       status === "APPROVED"
         ? field.validated ||
@@ -836,6 +837,7 @@ function useUpdatePetitionFieldRepliesStatus() {
   return useCallback(
     async (
       variables: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
+      petitionStatus: PetitionStatus,
       optimisticValidated: boolean
     ) =>
       await updatePetitionFieldRepliesStatus({
@@ -848,7 +850,7 @@ function useUpdatePetitionFieldRepliesStatus() {
           updatePetitionFieldRepliesStatus: {
             __typename: "PetitionWithFieldAndReplies",
             petition: {
-              status: "COMPLETED",
+              status: petitionStatus, // TODO predict correct status
               __typename: "Petition",
             },
             field: {
