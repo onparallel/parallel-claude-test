@@ -253,11 +253,11 @@ export type Mutation = {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
-  /** Updates the status of a petition field reply. */
-  updatePetitionFieldRepliesStatus: PetitionFieldAndReplies;
+  /** Updates the status of a petition field reply and sets the petition as reviewed if all fields are validated. */
+  updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the user with the provided data. */
   updateUser: User;
-  /** Updates the validation of a field ands sets the petition as reviewed if all fields are validated. */
+  /** Updates the validation of a field and sets the petition as reviewed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
 };
 
@@ -795,12 +795,6 @@ export type PetitionField = {
   validated: Scalars["Boolean"];
 };
 
-export type PetitionFieldAndReplies = {
-  __typename?: "PetitionFieldAndReplies";
-  field: PetitionField;
-  replies: Array<PetitionFieldReply>;
-};
-
 /** A comment on a petition field */
 export type PetitionFieldComment = {
   __typename?: "PetitionFieldComment";
@@ -1017,6 +1011,13 @@ export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
 
 /** The READ and WRITE permissions for a petition user. */
 export type PetitionUserPermissionTypeRW = "READ" | "WRITE";
+
+export type PetitionWithFieldAndReplies = {
+  __typename?: "PetitionWithFieldAndReplies";
+  field: PetitionField;
+  petition: Petition;
+  replies: Array<PetitionFieldReply>;
+};
 
 /** A public view of a contact */
 export type PublicContact = {
@@ -2890,10 +2891,6 @@ export type PetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type PetitionReplies_PetitionStatusFragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "status">;
-
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
@@ -3050,8 +3047,9 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   __typename?: "Mutation";
 } & {
   updatePetitionFieldRepliesStatus: {
-    __typename?: "PetitionFieldAndReplies";
+    __typename?: "PetitionWithFieldAndReplies";
   } & {
+    petition: { __typename?: "Petition" } & Pick<Petition, "status">;
     field: { __typename?: "PetitionField" } & Pick<
       PetitionField,
       "id" | "validated"
@@ -3082,6 +3080,10 @@ export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
     { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
   >;
 };
+
+export type PetitionReplies_PetitionStatusFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "status">;
 
 export type PetitionRepliesQueryVariables = Exact<{
   id: Scalars["GID"];
@@ -4421,11 +4423,6 @@ export const PetitionCompose_UserFragmentDoc = gql`
   }
   ${PetitionLayout_UserFragmentDoc}
 `;
-export const PetitionReplies_PetitionStatusFragmentDoc = gql`
-  fragment PetitionReplies_PetitionStatus on Petition {
-    status
-  }
-`;
 export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
     id
@@ -4551,6 +4548,11 @@ export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc
     comments {
       id
     }
+  }
+`;
+export const PetitionReplies_PetitionStatusFragmentDoc = gql`
+  fragment PetitionReplies_PetitionStatus on Petition {
+    status
   }
 `;
 export const UserAvatarList_UserFragmentDoc = gql`
@@ -7419,6 +7421,9 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
       petitionFieldReplyIds: $petitionFieldReplyIds
       status: $status
     ) {
+      petition {
+        status
+      }
       field {
         id
         validated

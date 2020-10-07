@@ -461,7 +461,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
 export const validatePetitionFields = mutationField("validatePetitionFields", {
   description:
-    "Updates the validation of a field ands sets the petition as reviewed if all fields are validated.",
+    "Updates the validation of a field and sets the petition as reviewed if all fields are validated.",
   type: "PetitionAndPartialFields",
   authorize: chain(
     authenticate(),
@@ -504,10 +504,12 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
 export const updatePetitionFieldRepliesStatus = mutationField(
   "updatePetitionFieldRepliesStatus",
   {
-    description: "Updates the status of a petition field reply.",
+    description:
+      "Updates the status of a petition field reply and sets the petition as reviewed if all fields are validated.",
     type: objectType({
-      name: "PetitionFieldAndReplies",
+      name: "PetitionWithFieldAndReplies",
       definition(t) {
+        t.field("petition", { type: "Petition" });
         t.field("field", { type: "PetitionField" });
         t.field("replies", { type: "PetitionFieldReply", list: [true] });
       },
@@ -541,20 +543,25 @@ export const updatePetitionFieldRepliesStatus = mutationField(
         if (
           allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))
         ) {
+          const field = (
+            await ctx.petitions.validatePetitionFields(
+              args.petitionId,
+              [args.petitionFieldId],
+              true,
+              ctx.user!
+            )
+          )[0];
           return {
+            petition: (await ctx.petitions.loadPetition(args.petitionId, {
+              cache: false,
+            }))!,
             replies,
-            field: (
-              await ctx.petitions.validatePetitionFields(
-                args.petitionId,
-                [args.petitionFieldId],
-                true,
-                ctx.user!
-              )
-            )[0],
+            field,
           };
         }
       }
       return {
+        petition: (await ctx.petitions.loadPetition(args.petitionId))!,
         replies,
         field: (await ctx.petitions.loadField(args.petitionFieldId))!,
       };

@@ -593,14 +593,14 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
-  Updates the status of a petition field reply.
+  Updates the status of a petition field reply and sets the petition as reviewed if all fields are validated.
   """
   updatePetitionFieldRepliesStatus(
     petitionFieldId: GID!
     petitionFieldReplyIds: [GID!]!
     petitionId: GID!
     status: PetitionFieldReplyStatus!
-  ): PetitionFieldAndReplies!
+  ): PetitionWithFieldAndReplies!
 
   """
   Updates the user with the provided data.
@@ -608,7 +608,7 @@ type Mutation {
   updateUser(data: UpdateUserInput!, id: GID!): User!
 
   """
-  Updates the validation of a field ands sets the petition as reviewed if all fields are validated.
+  Updates the validation of a field and sets the petition as reviewed if all fields are validated.
   """
   validatePetitionFields(
     fieldIds: [GID!]!
@@ -1099,11 +1099,6 @@ type PetitionField {
   validated: Boolean!
 }
 
-type PetitionFieldAndReplies {
-  field: PetitionField!
-  replies: [PetitionFieldReply!]!
-}
-
 """
 A comment on a petition field
 """
@@ -1549,6 +1544,12 @@ The READ and WRITE permissions for a petition user.
 enum PetitionUserPermissionTypeRW {
   READ
   WRITE
+}
+
+type PetitionWithFieldAndReplies {
+  field: PetitionField!
+  petition: Petition!
+  replies: [PetitionFieldReply!]!
 }
 
 """

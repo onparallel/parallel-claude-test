@@ -238,11 +238,6 @@ export interface NexusGenRootTypes {
     totalCount: number; // Int!
   };
   PetitionField: db.PetitionField;
-  PetitionFieldAndReplies: {
-    // root type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
-  };
   PetitionFieldComment: db.PetitionFieldComment;
   PetitionFieldReply: db.PetitionFieldReply;
   PetitionMessage: db.PetitionMessage;
@@ -267,6 +262,12 @@ export interface NexusGenRootTypes {
     totalCount: number; // Int!
   };
   PetitionUserPermission: db.PetitionUser;
+  PetitionWithFieldAndReplies: {
+    // root type
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
+  };
   PublicContact: db.Contact;
   PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
@@ -495,7 +496,7 @@ export interface NexusGenFieldTypes {
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
-    updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionFieldAndReplies"]; // PetitionFieldAndReplies!
+    updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updateUser: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
   };
@@ -604,11 +605,6 @@ export interface NexusGenFieldTypes {
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     validated: boolean; // Boolean!
   };
-  PetitionFieldAndReplies: {
-    // field return type
-    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
-    replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
-  };
   PetitionFieldComment: {
     // field return type
     author: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
@@ -699,6 +695,12 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     user: NexusGenRootTypes["User"]; // User!
+  };
+  PetitionWithFieldAndReplies: {
+    // field return type
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
   };
   PublicContact: {
     // field return type
@@ -1320,7 +1322,6 @@ export type NexusGenObjectNames =
   | "PetitionCreatedEvent"
   | "PetitionEventPagination"
   | "PetitionField"
-  | "PetitionFieldAndReplies"
   | "PetitionFieldComment"
   | "PetitionFieldReply"
   | "PetitionMessage"
@@ -1331,6 +1332,7 @@ export type NexusGenObjectNames =
   | "PetitionTemplateAndField"
   | "PetitionTemplatePagination"
   | "PetitionUserPermission"
+  | "PetitionWithFieldAndReplies"
   | "PublicContact"
   | "PublicOrganization"
   | "PublicPetition"

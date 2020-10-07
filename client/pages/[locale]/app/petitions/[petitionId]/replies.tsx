@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { ApolloCache, gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
 import {
   CheckIcon,
@@ -52,6 +52,9 @@ import {
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
   PetitionReplies_PetitionFragment,
+  PetitionStatus,
+  PetitionReplies_updatePetitionFieldRepliesStatusMutation,
+  PetitionReplies_validatePetitionFieldsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -154,23 +157,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       },
       // based on the response, we need to update the petition status on cache
       update(cache, { data }) {
-        const petitionFragment = gql`
-          fragment PetitionReplies_PetitionStatus on Petition {
-            status
-          }
-        `;
-        const cachedPetition = cache.readFragment<
-          PetitionReplies_PetitionStatusFragment
-        >({ id: petitionId, fragment: petitionFragment });
-        cache.writeFragment<PetitionReplies_PetitionStatusFragment>({
-          id: petitionId,
-          fragment: petitionFragment,
-          data: {
-            status:
-              data?.validatePetitionFields.petition.status ||
-              cachedPetition!.status,
-          },
-        });
+        const newStatus = data?.validatePetitionFields.petition.status;
+        writeCachePetitionStatus<
+          PetitionReplies_validatePetitionFieldsMutation
+        >(cache, petitionId, newStatus);
       },
     });
   }
@@ -672,6 +662,9 @@ PetitionReplies.mutations = [
         petitionFieldReplyIds: $petitionFieldReplyIds
         status: $status
       ) {
+        petition {
+          status
+        }
         field {
           id
           validated
@@ -853,7 +846,11 @@ function useUpdatePetitionFieldRepliesStatus() {
           status,
         }: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables) => ({
           updatePetitionFieldRepliesStatus: {
-            __typename: "PetitionFieldAndReplies",
+            __typename: "PetitionWithFieldAndReplies",
+            petition: {
+              status: "COMPLETED",
+              __typename: "Petition",
+            },
             field: {
               __typename: "PetitionField",
               id: petitionFieldId,
@@ -866,9 +863,38 @@ function useUpdatePetitionFieldRepliesStatus() {
             })),
           },
         })) as any,
+        update(cache, { data }) {
+          const newStatus =
+            data?.updatePetitionFieldRepliesStatus.petition.status;
+          writeCachePetitionStatus<
+            PetitionReplies_updatePetitionFieldRepliesStatusMutation
+          >(cache, variables.petitionId, newStatus);
+        },
       }),
     [updatePetitionFieldRepliesStatus]
   );
+}
+
+function writeCachePetitionStatus<T>(
+  cache: ApolloCache<T>,
+  petitionId: string,
+  status?: PetitionStatus
+) {
+  const petitionFragment = gql`
+    fragment PetitionReplies_PetitionStatus on Petition {
+      status
+    }
+  `;
+  const cachedPetition = cache.readFragment<
+    PetitionReplies_PetitionStatusFragment
+  >({ id: petitionId, fragment: petitionFragment });
+  cache.writeFragment<PetitionReplies_PetitionStatusFragment>({
+    id: petitionId,
+    fragment: petitionFragment,
+    data: {
+      status: status || cachedPetition!.status,
+    },
+  });
 }
 
 PetitionReplies.getInitialProps = async ({
