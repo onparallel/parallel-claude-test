@@ -1679,8 +1679,10 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment = {
-  __typename?: "PetitionReviewedEvent";
-} & Pick<PetitionReviewedEvent, "id">;
+  __typename: "PetitionReviewedEvent";
+} & Pick<PetitionReviewedEvent, "createdAt" | "id"> & {
+    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName">>;
+  };
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
@@ -1877,6 +1879,12 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
 } & Pick<PetitionCreatedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
+
+export type TimelinePetitionReviewedEvent_PetitionReviewedEventFragment = {
+  __typename?: "PetitionReviewedEvent";
+} & Pick<PetitionReviewedEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
@@ -3656,6 +3664,21 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
     id
   }
 `;
+export const UserReference_UserFragmentDoc = gql`
+  fragment UserReference_User on User {
+    id
+    fullName
+  }
+`;
+export const TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc = gql`
+  fragment TimelinePetitionReviewedEvent_PetitionReviewedEvent on PetitionReviewedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -3924,12 +3947,6 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
-`;
-export const UserReference_UserFragmentDoc = gql`
-  fragment UserReference_User on User {
-    id
-    fullName
-  }
 `;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
   fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
@@ -4281,6 +4298,15 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     }
     ... on OwnershipTransferredEvent {
       ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
+    }
+    ... on PetitionReviewedEvent {
+      createdAt
+      id
+      user {
+        id
+        fullName
+      }
+      __typename
     }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}

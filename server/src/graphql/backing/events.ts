@@ -52,7 +52,6 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   PETITION_REVIEWED: {
     user_id: number;
-    petition_message_ids: number[];
   };
 }[TType];
 

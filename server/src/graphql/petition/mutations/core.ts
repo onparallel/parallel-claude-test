@@ -501,6 +501,20 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     const petition = (await ctx.petitions.loadPetition(args.petitionId, {
       cache: false,
     }))!;
+
+    if (
+      args.validateRepliesWith &&
+      args.validateRepliesWith !== "PENDING" &&
+      petition.status === "REVIEWED"
+    ) {
+      ctx.petitions.createEvent({
+        type: "PETITION_REVIEWED",
+        petitionId: petition.id,
+        data: {
+          user_id: ctx.user!.id,
+        },
+      });
+    }
     return { petition, fields };
   },
 });

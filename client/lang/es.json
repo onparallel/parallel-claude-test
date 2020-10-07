@@ -3410,6 +3410,11 @@
     "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"
   },
   {
+    "term": "timeline.petition-reviewed-description",
+    "definition": "{same, select, true {Revisaste} other {{user} revisó}} la petición {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} reviewed the petition {timeAgo}"
+  },
+  {
     "term": "timeline.reminder-sent-description-automatic",
     "definition": "Se envió un recordatorio automático a {contact} {timeAgo}",
     "context": "An automatic reminder was sent to {contact} {timeAgo}"
