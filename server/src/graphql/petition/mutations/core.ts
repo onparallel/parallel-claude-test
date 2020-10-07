@@ -474,6 +474,10 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     petitionId: globalIdArg("Petition", { required: true }),
     fieldIds: globalIdArg("PetitionField", { required: true, list: [true] }),
     value: booleanArg({ required: true }),
+    validateRepliesWith: arg({
+      type: "PetitionFieldReplyStatus",
+      required: false,
+    }),
   },
   resolve: async (_, args, ctx) => {
     const fields = await ctx.petitions.validatePetitionFields(
@@ -482,7 +486,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       args.value,
       ctx.user!
     );
-    if (args.value) {
+    if (args.value || args.validateRepliesWith) {
       const replies = await ctx.petitions.loadRepliesForField(args.fieldIds, {
         cache: false,
       });
@@ -490,7 +494,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
         replies.flatMap((r) =>
           r.filter((r) => r.status === "PENDING").map((r) => r.id)
         ),
-        "APPROVED"
+        args.validateRepliesWith || "APPROVED"
       );
     }
 

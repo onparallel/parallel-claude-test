@@ -613,6 +613,7 @@ type Mutation {
   validatePetitionFields(
     fieldIds: [GID!]!
     petitionId: GID!
+    validateRepliesWith: PetitionFieldReplyStatus
     value: Boolean!
   ): PetitionAndPartialFields!
 }

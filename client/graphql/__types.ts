@@ -535,6 +535,7 @@ export type MutationupdateUserArgs = {
 export type MutationvalidatePetitionFieldsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+  validateRepliesWith?: Maybe<PetitionFieldReplyStatus>;
   value: Scalars["Boolean"];
 };
 
@@ -2928,6 +2929,7 @@ export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   fieldIds: Array<Scalars["GID"]>;
   value: Scalars["Boolean"];
+  validateRepliesWith?: Maybe<PetitionFieldReplyStatus>;
 }>;
 
 export type PetitionReplies_validatePetitionFieldsMutation = {
@@ -6987,11 +6989,13 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
     $petitionId: GID!
     $fieldIds: [GID!]!
     $value: Boolean!
+    $validateRepliesWith: PetitionFieldReplyStatus
   ) {
     validatePetitionFields(
       petitionId: $petitionId
       fieldIds: $fieldIds
       value: $value
+      validateRepliesWith: $validateRepliesWith
     ) {
       petition {
         status
@@ -7028,6 +7032,7 @@ export type PetitionReplies_validatePetitionFieldsMutationFn = Apollo.MutationFu
  *      petitionId: // value for 'petitionId'
  *      fieldIds: // value for 'fieldIds'
  *      value: // value for 'value'
+ *      validateRepliesWith: // value for 'validateRepliesWith'
  *   },
  * });
  */

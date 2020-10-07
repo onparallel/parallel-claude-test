@@ -1185,6 +1185,7 @@ export interface NexusGenArgTypes {
       // args
       fieldIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
+      validateRepliesWith?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       value: boolean; // Boolean!
     };
   };

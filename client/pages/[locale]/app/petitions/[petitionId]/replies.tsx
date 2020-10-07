@@ -128,9 +128,18 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   ] = usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
-  async function handleValidateToggle(fieldIds: string[], value: boolean) {
+  async function handleValidateToggle(
+    fieldIds: string[],
+    value: boolean,
+    validateRepliesWith?: PetitionFieldReplyStatus
+  ) {
     await validatePetitionFields({
-      variables: { petitionId: petition.id, fieldIds, value },
+      variables: {
+        petitionId: petition.id,
+        fieldIds,
+        value,
+        validateRepliesWith,
+      },
       optimisticResponse: {
         validatePetitionFields: {
           __typename: "PetitionAndPartialFields",
@@ -147,9 +156,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
               replies: field.replies.map((reply) => ({
                 ...pick(reply, ["__typename", "id"]),
                 status:
-                  value && reply.status === "PENDING"
+                  validateRepliesWith ||
+                  (value && reply.status === "PENDING"
                     ? "APPROVED"
-                    : reply.status,
+                    : reply.status),
               })),
             };
           }),
@@ -306,18 +316,26 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const markAsReviewedDialog = useMarkAsReviewedDialog();
   const handleMarkAsReviewed = useCallback(async () => {
     try {
-      const option = await markAsReviewedDialog({});
+      const fieldsWithPendingReplies = petition.fields.filter((field) =>
+        field.replies.some((fieldReply) => fieldReply.status === "PENDING")
+      );
+
       const fieldIds = petition.fields
         .filter((f) => !f.validated && !f.isReadOnly)
         .map((f) => f.id);
 
+      let option = "APPROVE";
+      if (fieldsWithPendingReplies.length > 0) {
+        option = await markAsReviewedDialog({});
+      }
+
       switch (option) {
         case "APPROVE":
-          await handleValidateToggle(fieldIds, true);
+          await handleValidateToggle(fieldIds, true, "APPROVED");
           await handleConfirmPetitionCompleted();
           break;
         case "REJECT":
-          await handleValidateToggle(fieldIds, false);
+          await handleValidateToggle(fieldIds, true, "REJECTED");
           break;
         default:
           break;
@@ -543,11 +561,13 @@ PetitionReplies.mutations = [
       $petitionId: GID!
       $fieldIds: [GID!]!
       $value: Boolean!
+      $validateRepliesWith: PetitionFieldReplyStatus
     ) {
       validatePetitionFields(
         petitionId: $petitionId
         fieldIds: $fieldIds
         value: $value
+        validateRepliesWith: $validateRepliesWith
       ) {
         petition {
           status
