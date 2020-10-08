@@ -75,6 +75,7 @@ export function PublicLayout({
         >
           {children}
         </Flex>
+        
         <PublicFooter marginTop={8} />
         <CookieConsent />
       </Flex>

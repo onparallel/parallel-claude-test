@@ -18,7 +18,7 @@ import { PublicContainer } from "./layout/PublicContainer";
 export function PublicHowItWorksHero({ ...props }: BoxProps) {
   const intl = useIntl();
   const [index, setIndex] = useState(0);
-  const onClick = useCallback(() => setIndex((state) => (state + 1) % 3), []);
+  const onClick = useCallback(() => setIndex((state) => (state + 1) % 4), []);
 
   const images = [
     {
@@ -45,6 +45,14 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
       }),
     },
+    {
+      name: "how_it_works_4",
+      alt: intl.formatMessage({
+        id: "public.how-it-works-hero.screenshot-3",
+        defaultMessage:
+          "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
+      }),
+    },
   ];
 
   return (
@@ -64,13 +72,8 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       </Heading>
       <Heading as="h3" size="md" fontWeight="light" marginTop={4}>
         <FormattedMessage
-          id="public.how-it-works-hero.description-1"
-          defaultMessage="In 3 easy steps you can create a request with the documentation you need your client to send you."
-        />
-        <br />
-        <FormattedMessage
-          id="public.how-it-works-hero.description-2"
-          defaultMessage="Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
+          id="public.how-it-works-hero.description"
+          defaultMessage="Designed to make work easier for you, your team, and your clients."
         />
       </Heading>
       <Flex
@@ -88,15 +91,25 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.how-it-works-hero.create-request"
-                defaultMessage="Create your request"
+                id="public.how-it-works-hero.send-parallel"
+                defaultMessage="Send a Parallel"
               />
             }
             description={
-              <FormattedMessage
-                id="public.how-it-works-hero.user-friendly"
-                defaultMessage="Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you."
-              />
+              <>
+                <Text>
+                  <FormattedMessage
+                    id="public.how-it-works-hero.start-petition-1"
+                    defaultMessage="Start with a template or do it from scratch."
+                  />
+                </Text>
+                <Text marginTop={2}>
+                  <FormattedMessage
+                    id="public.how-it-works-hero.start-petition-2"
+                    defaultMessage="As simple as creating a form."
+                  />
+                </Text>
+              </>
             }
             isActive={index === 0}
             onClick={() => setIndex(0)}
@@ -105,15 +118,25 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           <Step
             header={
               <FormattedMessage
-                id="public.how-it-works-hero.set-date"
-                defaultMessage="Set a delivery deadline"
+                id="public.how-it-works-hero.let-client-complete"
+                defaultMessage="Let them complete at their own peace"
               />
             }
             description={
-              <FormattedMessage
-                id="public.how-it-works-hero.client-timings"
-                defaultMessage="We automate the information request process. Your client will not know that it is not you who sends the emails."
-              />
+              <>
+                <Text>
+                  <FormattedMessage
+                    id="public.how-it-works-hero.client-timings-1"
+                    defaultMessage="Your recipients can return as many times as they need to complete it."
+                  />
+                </Text>
+                <Text marginTop={2}>
+                  <FormattedMessage
+                    id="public.how-it-works-hero.client-timings-2"
+                    defaultMessage="In the meantime, easily track or automate."
+                  />
+                </Text>
+              </>
             }
             isActive={index === 1}
             onClick={() => setIndex(1)}
@@ -123,17 +146,34 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
             header={
               <FormattedMessage
                 id="public.how-it-works-hero.receive-inbox"
-                defaultMessage="Receive it on time in your inbox"
+                defaultMessage="Receive all the information on time"
               />
             }
             description={
               <FormattedMessage
-                id="public.how-it-works-hero.focus-on-work"
-                defaultMessage="We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification."
+                id="public.how-it-works-hero.review"
+                defaultMessage="Review, approve or reject, and communicate within Parallel if necessary."
               />
             }
             isActive={index === 2}
             onClick={() => setIndex(2)}
+          />
+          <Spacer minHeight={6} minWidth={6} />
+          <Step
+            header={
+              <FormattedMessage
+                id="public.how-it-works-hero.share"
+                defaultMessage="Share it with your team"
+              />
+            }
+            description={
+              <FormattedMessage
+                id="public.how-it-works-hero.keep-working"
+                defaultMessage="Share the Parallel to keep working with your team."
+              />
+            }
+            isActive={index === 3}
+            onClick={() => setIndex(3)}
           />
         </Flex>
         <Flex
@@ -195,6 +235,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                               `/static/images/${images[index].name}@${size}x.png ${size}x`
                           )
                           .join(",")}
+                        alt={`${images[index].alt}`}
                       />
                     </Card>
                   </Box>

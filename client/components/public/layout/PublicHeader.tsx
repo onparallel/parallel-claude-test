@@ -97,19 +97,27 @@ function PublicHeaderMenu(props: StackProps) {
             ></FormattedMessage>
           </MenuButton>
           <MenuList>
-            <NakedLink href="/services">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.for-whom.services"
-                  defaultMessage="Professional Services"
-                ></FormattedMessage>
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/people">
+            <NakedLink href="/for-whom/people">
               <MenuItem as="a">
                 <FormattedMessage
                   id="public.for-whom.freelance"
                   defaultMessage="Freelancers"
+                ></FormattedMessage>
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/for-whom/legal-industry">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.for-whom.legal"
+                  defaultMessage="Legal"
+                ></FormattedMessage>
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/for-whom/services">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.for-whom.services"
+                  defaultMessage="Professional Services"
                 ></FormattedMessage>
               </MenuItem>
             </NakedLink>

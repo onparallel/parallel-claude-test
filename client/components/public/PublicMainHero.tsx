@@ -5,14 +5,12 @@ import {
   Flex,
   Heading,
   Image,
-  keyframes,
   Stack,
   Text,
 } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Typical } from "../common/Typical";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export type PublicHeroProps = BoxProps;
@@ -42,6 +40,10 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           >
             <FormattedMessage
               id="public.home.hero-title"
+              defaultMessage="Say goodbye to email threads to obtain information"
+            />
+            {/* <FormattedMessage
+              id="public.home.hero-title"
               defaultMessage="Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients"
               values={{
                 a: (chunks: string[]) => (
@@ -60,19 +62,15 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 ),
                 b: (chunks: any) => [chunks],
               }}
-            />
+            /> */}
           </Heading>
           <Text marginTop={8}>
-            <FormattedMessage
-              id="public.home.hero-subtitle"
-              defaultMessage="Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
-            />
-          </Text>
-          <Text marginTop={4}>
-            <FormattedMessage
-              id="public.home.hero-process"
-              defaultMessage="Turn your document collection into a professional and scalable process."
-            />
+            <Heading as="h2" size="md" fontWeight="light">
+              <FormattedMessage
+                id="public.home.hero-subtitle"
+                defaultMessage="Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
+              />
+            </Heading>
           </Text>
           <Flex
             marginTop={8}
@@ -100,12 +98,6 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
               </Button>
             </NakedLink>
           </Flex>
-          <Text marginTop={8}>
-            <FormattedMessage
-              id="public.home.hero-try-now"
-              defaultMessage="Try our secure and fast solution to manage documents."
-            />
-          </Text>
         </Box>
         <Flex flex="1" justifyContent="center">
           <Image

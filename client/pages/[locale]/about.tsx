@@ -25,7 +25,7 @@ function About() {
           <Heading as="h1" fontFamily="hero" size="3xl" fontWeight="light">
             <FormattedMessage
               id="public.about.mission"
-              defaultMessage="Our mission is to make professionals work worthwhile"
+              defaultMessage="Our mission is to free the time and minds of professionals"
             />
           </Heading>
           <Text marginTop={12} fontSize="lg">

@@ -7,15 +7,15 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
   return (
     <PublicContainer
       {...props}
-      paddingY={20}
       wrapper={{
+        marginY: { base: 8, md: 12, lg: 20 },
         textAlign: "center",
       }}
     >
       <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage
-          id="public.home.hero-claim"
-          defaultMessage="Free your time and your mind"
+          id="public.benefits.title"
+          defaultMessage="A powerful and flexible tool for your workflows"
         />
       </Heading>
       <Heading
@@ -26,8 +26,8 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
         marginBottom={8}
       >
         <FormattedMessage
-          id="public.home.hero-control"
-          defaultMessage="Sending a Parallel gives you control over the progress of the documents and the information you need."
+          id="public.benefits.description"
+          defaultMessage="Obtain the information you need and focus on what really matters."
         />
       </Heading>
       <Flex justifyContent="center" flexWrap="wrap">
@@ -35,14 +35,14 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           imageSrc="/static/images/undraw_folder.svg"
           header={
             <FormattedMessage
-              id="public.claim.documents-organized"
-              defaultMessage="Documents, organized"
+              id="public.claim.productivity"
+              defaultMessage="Increase productivity"
             />
           }
           description={
             <FormattedMessage
-              id="public.claim.forget-emails"
-              defaultMessage="Forget about unorganized emails. Parallel helps you find, review and work with the relevant documents quickly."
+              id="public.claim.obtain-organized-information"
+              defaultMessage="Obtain the information organized to optimize your work."
             />
           }
         />
@@ -51,13 +51,13 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           header={
             <FormattedMessage
               id="public.claim.speed"
-              defaultMessage="Know the status, speed up transactions"
+              defaultMessage="Speed up processes"
             />
           }
           description={
             <FormattedMessage
-              id="public.claim.follow-up"
-              defaultMessage="Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients."
+              id="public.claim.processes"
+              defaultMessage="Use a tool that scales to work better and make your processes flow."
             />
           }
         />
@@ -65,14 +65,14 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           imageSrc="/static/images/undraw_checklist.svg"
           header={
             <FormattedMessage
-              id="public.claim.focus"
-              defaultMessage="Let control give you peace of mind"
+              id="public.claim.client-experience"
+              defaultMessage="Improve your clients' experience"
             />
           }
           description={
             <FormattedMessage
-              id="public.claim.multiple-recipients"
-              defaultMessage="With control, you can decide and start working when you know you can or need to. Let focus help you stay productive."
+              id="public.claim.help-your-recipients"
+              defaultMessage="Help your recipients complete the information more easily."
             />
           }
         />

@@ -2026,8 +2026,8 @@
   },
   {
     "term": "public.about.mission",
-    "definition": "Our mission is to make professionals work worthwhile",
-    "context": "Our mission is to make professionals work worthwhile"
+    "definition": "Our mission is to free the time and minds of professionals",
+    "context": "Our mission is to free the time and minds of professionals"
   },
   {
     "term": "public.about.our-story",
@@ -2073,6 +2073,16 @@
     "term": "public.about.title",
     "definition": "About",
     "context": "About"
+  },
+  {
+    "term": "public.benefits.description",
+    "definition": "Obtain the information you need and focus on what really matters.",
+    "context": "Obtain the information you need and focus on what really matters."
+  },
+  {
+    "term": "public.benefits.title",
+    "definition": "A powerful and flexible tool for your workflows",
+    "context": "A powerful and flexible tool for your workflows"
   },
   {
     "term": "public.blog-link",
@@ -2240,34 +2250,34 @@
     "context": "Without Parallel"
   },
   {
-    "term": "public.claim.documents-organized",
-    "definition": "Documents, organized",
-    "context": "Documents, organized"
+    "term": "public.claim.client-experience",
+    "definition": "Improve your clients' experience",
+    "context": "Improve your clients' experience"
   },
   {
-    "term": "public.claim.focus",
-    "definition": "Let control give you peace of mind",
-    "context": "Let control give you peace of mind"
+    "term": "public.claim.help-your-recipients",
+    "definition": "Help your recipients complete the information more easily.",
+    "context": "Help your recipients complete the information more easily."
   },
   {
-    "term": "public.claim.follow-up",
-    "definition": "Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients.",
-    "context": "Parallel makes it simple to follow up on the status and the conversations around the transactions for you and your recipients."
+    "term": "public.claim.obtain-organized-information",
+    "definition": "Obtain the information organized to optimize your work.",
+    "context": "Obtain the information organized to optimize your work."
   },
   {
-    "term": "public.claim.forget-emails",
-    "definition": "Forget about unorganized emails. Parallel helps you find, review and work with the relevant documents quickly.",
-    "context": "Forget about unorganized emails. Parallel helps you find, review and work with the relevant documents quickly."
+    "term": "public.claim.processes",
+    "definition": "Use a tool that scales to work better and make your processes flow.",
+    "context": "Use a tool that scales to work better and make your processes flow."
   },
   {
-    "term": "public.claim.multiple-recipients",
-    "definition": "With control, you can decide and start working when you know you can or need to. Let focus help you stay productive.",
-    "context": "With control, you can decide and start working when you know you can or need to. Let focus help you stay productive."
+    "term": "public.claim.productivity",
+    "definition": "Increase productivity",
+    "context": "Increase productivity"
   },
   {
     "term": "public.claim.speed",
-    "definition": "Know the status, speed up transactions",
-    "context": "Know the status, speed up transactions"
+    "definition": "Speed up processes",
+    "context": "Speed up processes"
   },
   {
     "term": "public.contact-link",
@@ -2315,9 +2325,44 @@
     "context": "Twitter profile"
   },
   {
+    "term": "public.for-legal.checklists",
+    "definition": "Documents checklists to work more effectively",
+    "context": "Documents checklists to work more effectively"
+  },
+  {
+    "term": "public.for-legal.hero-title",
+    "definition": "Made by lawyers for lawyers",
+    "context": "Made by lawyers for lawyers"
+  },
+  {
+    "term": "public.for-legal.knowledge",
+    "definition": "Manage better the knowledge for your organization",
+    "context": "Manage better the knowledge for your organization"
+  },
+  {
+    "term": "public.for-legal.meta-description",
+    "definition": "Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues.",
+    "context": "Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues."
+  },
+  {
+    "term": "public.for-legal.obtain-documents",
+    "definition": "Efficiently obtain the documents from your clients, from the beginning of the relationship.",
+    "context": "Efficiently obtain the documents from your clients, from the beginning of the relationship."
+  },
+  {
+    "term": "public.for-legal.title",
+    "definition": "Legal industry",
+    "context": "Legal industry"
+  },
+  {
     "term": "public.for-whom.freelance",
     "definition": "Freelancers",
     "context": "Freelancers"
+  },
+  {
+    "term": "public.for-whom.legal",
+    "definition": "Legal",
+    "context": "Legal"
   },
   {
     "term": "public.for-whom.services",
@@ -2390,16 +2435,6 @@
     "context": "Home"
   },
   {
-    "term": "public.home.hero-claim",
-    "definition": "Free your time and your mind",
-    "context": "Free your time and your mind"
-  },
-  {
-    "term": "public.home.hero-control",
-    "definition": "Sending a Parallel gives you control over the progress of the documents and the information you need.",
-    "context": "Sending a Parallel gives you control over the progress of the documents and the information you need."
-  },
-  {
     "term": "public.home.hero-discover-use",
     "definition": "You can use Parallel if you work in a law firm, accounting firm or startup.",
     "context": "You can use Parallel if you work in a law firm, accounting firm or startup."
@@ -2415,24 +2450,19 @@
     "context": "Popular use cases"
   },
   {
-    "term": "public.home.hero-process",
-    "definition": "Turn your document collection into a professional and scalable process.",
-    "context": "Turn your document collection into a professional and scalable process."
-  },
-  {
     "term": "public.home.hero-subtitle",
     "definition": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive.",
     "context": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
   },
   {
     "term": "public.home.hero-title",
-    "definition": "Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients",
-    "context": "Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients"
+    "definition": "Say goodbye to email threads to obtain information",
+    "context": "Say goodbye to email threads to obtain information"
   },
   {
-    "term": "public.home.hero-try-now",
-    "definition": "Try our secure and fast solution to manage documents.",
-    "context": "Try our secure and fast solution to manage documents."
+    "term": "public.home.press",
+    "definition": "You may also remember us from...",
+    "context": "You may also remember us from..."
   },
   {
     "term": "public.home.title",
@@ -2440,34 +2470,39 @@
     "context": "Collect information efficiently"
   },
   {
-    "term": "public.how-it-works-hero.client-timings",
-    "definition": "We automate the information request process. Your client will not know that it is not you who sends the emails.",
-    "context": "We automate the information request process. Your client will not know that it is not you who sends the emails."
+    "term": "public.how-it-works-hero.client-timings-1",
+    "definition": "Your recipients can return as many times as they need to complete it.",
+    "context": "Your recipients can return as many times as they need to complete it."
   },
   {
-    "term": "public.how-it-works-hero.create-request",
-    "definition": "Create your request",
-    "context": "Create your request"
+    "term": "public.how-it-works-hero.client-timings-2",
+    "definition": "In the meantime, easily track or automate.",
+    "context": "In the meantime, easily track or automate."
   },
   {
-    "term": "public.how-it-works-hero.description-1",
-    "definition": "In 3 easy steps you can create a request with the documentation you need your client to send you.",
-    "context": "In 3 easy steps you can create a request with the documentation you need your client to send you."
+    "term": "public.how-it-works-hero.description",
+    "definition": "Designed to make work easier for you, your team, and your clients.",
+    "context": "Designed to make work easier for you, your team, and your clients."
   },
   {
-    "term": "public.how-it-works-hero.description-2",
-    "definition": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything.",
-    "context": "Our platform is secure, so you can focus on what's important until we notify you that your client has already sent everything."
+    "term": "public.how-it-works-hero.keep-working",
+    "definition": "Share the Parallel to keep working with your team.",
+    "context": "Share the Parallel to keep working with your team."
   },
   {
-    "term": "public.how-it-works-hero.focus-on-work",
-    "definition": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification.",
-    "context": "We will send reminders to your client so you don't have to worry about a thing. When everything is ready, you will receive a notification."
+    "term": "public.how-it-works-hero.let-client-complete",
+    "definition": "Let them complete at their own peace",
+    "context": "Let them complete at their own peace"
   },
   {
     "term": "public.how-it-works-hero.receive-inbox",
-    "definition": "Receive it on time in your inbox",
-    "context": "Receive it on time in your inbox"
+    "definition": "Receive all the information on time",
+    "context": "Receive all the information on time"
+  },
+  {
+    "term": "public.how-it-works-hero.review",
+    "definition": "Review, approve or reject, and communicate within Parallel if necessary.",
+    "context": "Review, approve or reject, and communicate within Parallel if necessary."
   },
   {
     "term": "public.how-it-works-hero.screenshot-1",
@@ -2485,19 +2520,29 @@
     "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status."
   },
   {
-    "term": "public.how-it-works-hero.set-date",
-    "definition": "Set a delivery deadline",
-    "context": "Set a delivery deadline"
+    "term": "public.how-it-works-hero.send-parallel",
+    "definition": "Send a Parallel",
+    "context": "Send a Parallel"
+  },
+  {
+    "term": "public.how-it-works-hero.share",
+    "definition": "Share it with your team",
+    "context": "Share it with your team"
+  },
+  {
+    "term": "public.how-it-works-hero.start-petition-1",
+    "definition": "Start with a template or do it from scratch.",
+    "context": "Start with a template or do it from scratch."
+  },
+  {
+    "term": "public.how-it-works-hero.start-petition-2",
+    "definition": "As simple as creating a form.",
+    "context": "As simple as creating a form."
   },
   {
     "term": "public.how-it-works-hero.title",
     "definition": "How it works",
     "context": "How it works"
-  },
-  {
-    "term": "public.how-it-works-hero.user-friendly",
-    "definition": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you.",
-    "context": "Use our friendly and easy to use interface. Tell us what documentation you need and who has to send it to you."
   },
   {
     "term": "public.invite-button",
@@ -2903,6 +2948,16 @@
     "term": "public.terms.title",
     "definition": "Terms & Conditions",
     "context": "Terms & Conditions"
+  },
+  {
+    "term": "public.trust.cuatrecasas",
+    "definition": "Cuatrecasas Acelera",
+    "context": "Cuatrecasas Acelera"
+  },
+  {
+    "term": "public.who-trust-us.title",
+    "definition": "Who trust us",
+    "context": "Who trust us"
   },
   {
     "term": "recipient-view.approved-reply",

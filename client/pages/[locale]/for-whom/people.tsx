@@ -14,7 +14,7 @@ import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ClaimsList } from "../../components/public/ClaimsList";
+import { ClaimsList } from "../../../components/public/ClaimsList";
 
 function People() {
   const intl = useIntl();
