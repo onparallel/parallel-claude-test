@@ -911,6 +911,7 @@ export class PetitionRepository extends BaseRepository {
           .update(
             {
               ...data,
+              validated: false,
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },

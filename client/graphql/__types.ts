@@ -1679,10 +1679,9 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment = {
-  __typename: "PetitionReviewedEvent";
-} & Pick<PetitionReviewedEvent, "createdAt" | "id"> & {
-    user?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "fullName">>;
-  };
+  __typename?: "PetitionReviewedEvent";
+} & Pick<PetitionReviewedEvent, "id"> &
+  TimelinePetitionReviewedEvent_PetitionReviewedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
@@ -2804,7 +2803,7 @@ export type PetitionCompose_updatePetitionFieldMutation = {
           PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "Petition" } & Pick<
           Petition,
-          "id" | "updatedAt"
+          "status" | "id" | "updatedAt"
         >;
       })
     | ({ __typename?: "PetitionTemplateAndField" } & {
@@ -3664,21 +3663,6 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
     id
   }
 `;
-export const UserReference_UserFragmentDoc = gql`
-  fragment UserReference_User on User {
-    id
-    fullName
-  }
-`;
-export const TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc = gql`
-  fragment TimelinePetitionReviewedEvent_PetitionReviewedEvent on PetitionReviewedEvent {
-    user {
-      ...UserReference_User
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-`;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -3947,6 +3931,12 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
+`;
+export const UserReference_UserFragmentDoc = gql`
+  fragment UserReference_User on User {
+    id
+    fullName
+  }
 `;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
   fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {
@@ -4242,6 +4232,15 @@ export const TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment
   }
   ${UserReference_UserFragmentDoc}
 `;
+export const TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc = gql`
+  fragment TimelinePetitionReviewedEvent_PetitionReviewedEvent on PetitionReviewedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -4300,13 +4299,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
       ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
     }
     ... on PetitionReviewedEvent {
-      createdAt
-      id
-      user {
-        id
-        fullName
-      }
-      __typename
+      ...TimelinePetitionReviewedEvent_PetitionReviewedEvent
     }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
@@ -4326,6 +4319,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc}
   ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
   ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
+  ${TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -6594,6 +6588,9 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
       petition {
         id
         updatedAt
+        ... on Petition {
+          status
+        }
       }
     }
   }

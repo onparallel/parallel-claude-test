@@ -744,6 +744,9 @@ PetitionCompose.mutations = [
         petition {
           id
           updatedAt
+          ... on Petition {
+            status
+          }
         }
       }
     }

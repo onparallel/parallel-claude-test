@@ -902,6 +902,7 @@ describe("GraphQL/Petition Fields", () => {
             | "TEXT"
             | "FILE_UPLOAD",
           is_fixed: index === 0,
+          validated: true,
         })
       );
 
@@ -994,6 +995,49 @@ describe("GraphQL/Petition Fields", () => {
         field: {
           title: "new title",
           description: "this is the new description",
+        },
+      });
+    });
+
+    it("invalidates the field when updating it", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              field {
+                options
+                validated
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[1],
+          data: {
+            options: {
+              placeholder: "new placeholder",
+              multiline: true,
+            },
+          },
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionField).toEqual({
+        field: {
+          options: {
+            placeholder: "new placeholder",
+            multiline: true,
+          },
+          validated: false,
         },
       });
     });
