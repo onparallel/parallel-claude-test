@@ -34,7 +34,7 @@ async function extractTerms(input) {
        --extract-from-format-message-call \
        --throws \
        --out-file ${tmpFileName} \
-       ${isWindows ? input.replace("/", "\\") : `'${input}'`}`, { encoding: "utf-8" });
+      ${isWindows ? input : `'${input}'`}`, { encoding: "utf-8" });
         const terms = await json_1.readJson(tmpFileName);
         await fs_1.promises.unlink(tmpFileName);
         return terms;

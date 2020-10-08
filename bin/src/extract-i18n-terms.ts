@@ -49,7 +49,7 @@ async function extractTerms(input: string) {
        --extract-from-format-message-call \
        --throws \
        --out-file ${tmpFileName} \
-       ${isWindows ? input.replace("/", "\\") : `'${input}'`}`,
+      ${isWindows ? input : `'${input}'`}`,
       { encoding: "utf-8" }
     );
     const terms = await readJson<Record<string, MessageDescriptor>>(
