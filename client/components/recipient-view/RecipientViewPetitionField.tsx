@@ -187,6 +187,7 @@ export function RecipientViewPetitionField({
               <ReplyWrapper
                 status={reply.status}
                 progress={uploadProgress?.[reply.id]}
+                canDeleteReply={!field.validated}
                 onDeleteReply={() => onDeleteReply(reply.id)}
               >
                 {field.type === "TEXT" ? (
@@ -220,9 +221,17 @@ export function RecipientViewPetitionField({
       ) : null}
       <Box marginTop={2}>
         {field.type === "TEXT" ? (
-          <TextReplyForm field={field} onCreateReply={onCreateReply} />
+          <TextReplyForm
+            canReply={!field.validated}
+            field={field}
+            onCreateReply={onCreateReply}
+          />
         ) : field.type === "FILE_UPLOAD" ? (
-          <FileUploadReplyForm field={field} onCreateReply={onCreateReply} />
+          <FileUploadReplyForm
+            canReply={!field.validated}
+            field={field}
+            onCreateReply={onCreateReply}
+          />
         ) : null}
       </Box>
     </Card>
@@ -233,10 +242,12 @@ function ReplyWrapper({
   status,
   progress,
   children,
+  canDeleteReply,
   onDeleteReply,
 }: {
   status: PetitionFieldReplyStatus;
   progress?: number;
+  canDeleteReply: boolean;
   onDeleteReply: () => void;
   children: ReactNode;
 }) {
@@ -307,7 +318,7 @@ function ReplyWrapper({
           ) : null}
         </Flex>
       </Tooltip>
-      {status !== "APPROVED" ? (
+      {status !== "APPROVED" && canDeleteReply ? (
         <IconButtonWithTooltip
           onClick={onDeleteReply}
           variant="ghost"
@@ -327,10 +338,12 @@ function ReplyWrapper({
 
 function TextReplyForm({
   field,
+  canReply,
   onCreateReply,
   ...props
 }: ExtendChakra<{
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
+  canReply: boolean;
   onCreateReply: (payload: CreateReplyText) => void;
 }>) {
   const { placeholder, multiline } = field.options as FieldOptions["TEXT"];
@@ -351,6 +364,7 @@ function TextReplyForm({
       <FormControl flex="1" isInvalid={!!errors.content} isDisabled={disabled}>
         {multiline ? (
           <Textarea
+            disabled={!canReply}
             name="content"
             ref={register({
               required: true,
@@ -361,6 +375,7 @@ function TextReplyForm({
         ) : (
           <Input
             name="content"
+            disabled={!canReply}
             ref={register({
               required: true,
               validate: (val) => val.trim().length > 0,
@@ -380,7 +395,7 @@ function TextReplyForm({
       <Button
         type="submit"
         variant="outline"
-        isDisabled={disabled}
+        isDisabled={disabled || !canReply}
         marginTop={{ base: 2, sm: 0 }}
         marginLeft={{ base: 0, sm: 4 }}
       >
@@ -392,9 +407,11 @@ function TextReplyForm({
 
 function FileUploadReplyForm({
   field,
+  canReply,
   onCreateReply,
   ...props
 }: ExtendChakra<{
+  canReply: boolean;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   onCreateReply: (payload: CreateReplyFileUpload) => void;
 }>) {
@@ -445,7 +462,7 @@ function FileUploadReplyForm({
       minHeight="100px"
       padding={4}
       textAlign="center"
-      {...(disabled
+      {...(disabled || !canReply
         ? {
             opacity: 0.4,
             cursor: "not-allowed",
@@ -462,7 +479,7 @@ function FileUploadReplyForm({
       {...props}
       {...getRootProps()}
     >
-      <input {...getInputProps()} />
+      <input disabled={!canReply} {...getInputProps()} />
       <Box pointerEvents="none">
         {isDragActive && isDragReject ? (
           <>
