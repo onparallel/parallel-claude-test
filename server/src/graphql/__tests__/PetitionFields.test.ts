@@ -1,8 +1,16 @@
 import gql from "graphql-tag";
-import { type } from "os";
+import faker from "faker";
 import { pick } from "remeda";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PetitionField, User } from "../../db/__types";
+import {
+  Contact,
+  Organization,
+  Petition,
+  PetitionAccess,
+  PetitionField,
+  PetitionFieldReply,
+  User,
+} from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { userCognitoId } from "./mocks";
 import { initServer, TestClient } from "./server";
@@ -326,6 +334,42 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
+    it("sets petition status to pending when creating a field", async () => {
+      const [reviewedPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({
+          status: "REVIEWED",
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $type: PetitionFieldType!) {
+            createPetitionField(petitionId: $petitionId, type: $type) {
+              petition {
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", reviewedPetition.id),
+          type: "TEXT",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.createPetitionField).toEqual({
+        petition: {
+          status: "PENDING",
+        },
+      });
+    });
+
     it("sends error when position argument is less than zero", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -493,6 +537,7 @@ describe("GraphQL/Petition Fields", () => {
         (index) => ({
           type: index === 0 ? "HEADING" : "TEXT",
           is_fixed: index === 0,
+          validated: index < 4,
         })
       );
 
@@ -572,6 +617,34 @@ describe("GraphQL/Petition Fields", () => {
           { id: gIds[3], replies: [] },
           { id: gIds[4], replies: [] },
         ],
+      });
+    });
+
+    it("sets petition status to reviewed when deleting a field and other fields are validated", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
+            deletePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              force: $force
+            ) {
+              ... on Petition {
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[4].id),
+          force: true,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitionField).toEqual({
+        status: "REVIEWED",
       });
     });
 
@@ -1552,6 +1625,654 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeDefined();
       expect(errors![0].extensions!.code).toBe("UPDATE_FIXED_FIELD_ERROR");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("validatePetitionFields", () => {
+    let contact: Contact;
+    let access: PetitionAccess;
+    let petition: Petition;
+    let fields: PetitionField[];
+    let field2Reply: PetitionFieldReply;
+
+    beforeEach(async (done) => {
+      [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1
+      );
+
+      [contact] = await mocks.createRandomContacts(organization.id, 1);
+      [access] = await mocks.createPetitionAccess(petition.id, user.id, [
+        contact.id,
+      ]);
+
+      fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
+        type: "TEXT",
+        options: {
+          multiline: faker.random.boolean(),
+          placeholder: faker.random.words(3),
+        },
+        validated: false,
+      }));
+
+      [field2Reply] = await mocks.createRandomTextReply(
+        fields[2].id,
+        access.id,
+        1,
+        () => ({ status: "PENDING" })
+      );
+      done();
+    });
+
+    it("validates a field without a reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              fields {
+                validated
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [toGlobalId("PetitionField", fields[0].id)],
+          value: true,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        fields: [{ validated: true }],
+      });
+    });
+
+    it("approves pending replies when validating field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              fields {
+                id
+                validated
+                replies {
+                  id
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [toGlobalId("PetitionField", fields[2].id)],
+          value: true,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        fields: [
+          {
+            id: toGlobalId("PetitionField", fields[2].id),
+            validated: true,
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", field2Reply.id),
+                status: "APPROVED",
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("does not update reply status when invalidating a field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              fields {
+                id
+                validated
+                replies {
+                  id
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [toGlobalId("PetitionField", fields[2].id)],
+          value: false,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        fields: [
+          {
+            id: toGlobalId("PetitionField", fields[2].id),
+            validated: false,
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", field2Reply.id),
+                status: "PENDING",
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("validates every pending field reply when passing validateRepliesWith", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldIds: [GID!]!
+            $value: Boolean!
+            $validateRepliesWith: PetitionFieldReplyStatus
+          ) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+              validateRepliesWith: $validateRepliesWith
+            ) {
+              fields {
+                id
+                validated
+                replies {
+                  id
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [toGlobalId("PetitionField", fields[2].id)],
+          value: true,
+          validateRepliesWith: "REJECTED",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        fields: [
+          {
+            id: toGlobalId("PetitionField", fields[2].id),
+            validated: true,
+            replies: [
+              {
+                id: toGlobalId("PetitionFieldReply", field2Reply.id),
+                status: "REJECTED",
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it("sets petition status to reviewed when all fields are validated", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              petition {
+                ... on Petition {
+                  status
+                }
+              }
+              fields {
+                validated
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: fields.map((f) => toGlobalId("PetitionField", f.id)),
+          value: true,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        petition: { status: "REVIEWED" },
+        fields: fields.map((f) => ({ validated: true })),
+      });
+    });
+
+    it("creates petition reviewed event when reviewing all fields and replies", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldIds: [GID!]!
+            $value: Boolean!
+            $validateRepliesWith: PetitionFieldReplyStatus
+          ) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+              validateRepliesWith: $validateRepliesWith
+            ) {
+              petition {
+                ... on Petition {
+                  status
+                  events(limit: 100) {
+                    items {
+                      __typename
+                    }
+                  }
+                }
+              }
+              fields {
+                validated
+                replies {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: fields.map((f) => toGlobalId("PetitionField", f.id)),
+          value: true,
+          validateRepliesWith: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        petition: {
+          status: "REVIEWED",
+          events: { items: [{ __typename: "PetitionReviewedEvent" }] },
+        },
+        fields: [
+          { validated: true, replies: [] },
+          { validated: true, replies: [] },
+          {
+            validated: true,
+            replies: [{ status: "APPROVED" }],
+          },
+        ],
+      });
+    });
+
+    it("petition status go back to pending when petition is reviewed and a field is invalidated", async () => {
+      // first validate all fields and set petition to REVIEWED
+      await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              petition {
+                ... on Petition {
+                  status
+                }
+              }
+              fields {
+                validated
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: fields.map((f) => toGlobalId("PetitionField", f.id)),
+          value: true,
+        },
+      });
+
+      // then, invalid any field and petition should move to PENDING
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              petition {
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [toGlobalId("PetitionField", fields[1].id)],
+          value: false,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.validatePetitionFields).toEqual({
+        petition: { status: "PENDING" },
+      });
+    });
+
+    it("sends error when passing an invalid petitionId", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", privatePetition.id),
+          fieldIds: [toGlobalId("PetitionField", fields[1].id)],
+          value: true,
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid fieldIds", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldIds: [toGlobalId("PetitionField", 1)],
+          value: true,
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updatePetitionFieldRepliesStatus", () => {
+    let petition: Petition;
+    let contact: Contact;
+    let access: PetitionAccess;
+    let fields: PetitionField[];
+    let field2Replies: PetitionFieldReply[];
+
+    beforeEach(async (done) => {
+      [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1
+      );
+
+      [contact] = await mocks.createRandomContacts(organization.id, 1);
+      [access] = await mocks.createPetitionAccess(petition.id, user.id, [
+        contact.id,
+      ]);
+
+      fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
+        type: "TEXT",
+        options: {
+          multiline: faker.random.boolean(),
+          placeholder: faker.random.words(3),
+        },
+        validated: false,
+      }));
+
+      field2Replies = await mocks.createRandomTextReply(
+        fields[2].id,
+        access.id,
+        2,
+        () => ({ status: "PENDING" })
+      );
+      done();
+    });
+
+    it("updates status of a petition field reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              replies {
+                id
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fields[2].id),
+          petitionFieldReplyIds: [
+            toGlobalId("PetitionFieldReply", field2Replies[0].id),
+          ],
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionFieldRepliesStatus).toEqual({
+        replies: [
+          {
+            id: toGlobalId("PetitionFieldReply", field2Replies[0].id),
+            status: "APPROVED",
+          },
+        ],
+      });
+    });
+
+    it("validates field when all replies are approved", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              field {
+                id
+                validated
+              }
+              replies {
+                id
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", fields[2].id),
+          petitionFieldReplyIds: field2Replies.map((r) =>
+            toGlobalId("PetitionFieldReply", r.id)
+          ),
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionFieldRepliesStatus).toEqual({
+        field: {
+          id: toGlobalId("PetitionField", fields[2].id),
+          validated: true,
+        },
+        replies: field2Replies.map((r) => ({
+          id: toGlobalId("PetitionFieldReply", r.id),
+          status: "APPROVED",
+        })),
+      });
+    });
+
+    it("sends error when passing invalid petitionId", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", privatePetition.id),
+          petitionFieldId: toGlobalId("PetitionField", fields[2].id),
+          petitionFieldReplyIds: field2Replies.map((r) =>
+            toGlobalId("PetitionFieldReply", r.id)
+          ),
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid petitionFieldId", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          petitionFieldId: toGlobalId("PetitionField", 123123),
+          petitionFieldReplyIds: field2Replies.map((r) =>
+            toGlobalId("PetitionFieldReply", r.id)
+          ),
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when passing invalid petitionFieldReplyIds", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $petitionFieldId: GID!
+            $petitionFieldReplyIds: [GID!]!
+            $status: PetitionFieldReplyStatus!
+          ) {
+            updatePetitionFieldRepliesStatus(
+              petitionId: $petitionId
+              petitionFieldId: $petitionFieldId
+              petitionFieldReplyIds: $petitionFieldReplyIds
+              status: $status
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", privatePetition.id),
+          petitionFieldId: toGlobalId("PetitionField", fields[2].id),
+          petitionFieldReplyIds: field2Replies.map((r) =>
+            toGlobalId("PetitionFieldReply", r.id + 1000)
+          ),
+          status: "APPROVED",
+        },
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
       expect(data).toBeNull();
     });
   });

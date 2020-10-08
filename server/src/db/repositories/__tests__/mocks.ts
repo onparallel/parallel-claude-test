@@ -17,6 +17,7 @@ import {
   CreateContact,
   PetitionUser,
   PetitionFieldReply,
+  CreatePetitionFieldReply,
 } from "../../__types";
 import { random } from "../../../util/token";
 
@@ -140,13 +141,25 @@ export class Mocks {
       .returning("*");
   }
 
-  async createRandomTextReply(textFieldId: number, access_id: number) {
-    return await this.knex<PetitionFieldReply>("petition_field_reply").insert({
-      petition_field_id: textFieldId,
-      content: { text: "random text reply" },
-      type: "TEXT",
-      petition_access_id: access_id,
-    });
+  async createRandomTextReply(
+    textFieldId: number,
+    access_id: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>
+  ) {
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: textFieldId,
+            content: { text: faker.lorem.words(10) },
+            type: "TEXT",
+            petition_access_id: access_id,
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
   }
 
   async createPetitionAccess(

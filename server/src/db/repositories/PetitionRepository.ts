@@ -812,9 +812,12 @@ export class PetitionRepository extends BaseRepository {
           .where("id", petitionId)
           .update(
             {
-              status: this.knex.raw(
-                /* sql */ `case status when 'COMPLETED' then 'PENDING' else status end`
-              ) as any,
+              status: this.knex.raw(/* sql */ `
+                case status 
+                  when 'COMPLETED' then 'PENDING'
+                  when 'REVIEWED' then 'PENDING'
+                  else status
+                end`) as any,
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
             },
@@ -855,6 +858,15 @@ export class PetitionRepository extends BaseRepository {
         throw new Error("Invalid petition field id");
       }
 
+      const fields = await this.from("petition_field").where({
+        petition_id: petitionId,
+        deleted_at: null,
+      });
+
+      const otherFieldsAreValidated = fields
+        .filter((f) => f.type !== "HEADING" && f.id !== fieldId)
+        .every((f) => f.validated);
+
       const [[petition]] = await Promise.all([
         this.from("petition", t)
           .where("id", petitionId)
@@ -862,6 +874,7 @@ export class PetitionRepository extends BaseRepository {
             {
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
+              status: otherFieldsAreValidated ? "REVIEWED" : "PENDING",
             },
             "*"
           ),
@@ -918,7 +931,11 @@ export class PetitionRepository extends BaseRepository {
               status: this.knex.raw(/* sql */ `
                 case is_template 
                 when false then 
-                  (case status when 'COMPLETED' then 'PENDING' else status end) 
+                  (case status 
+                    when 'COMPLETED' then 'PENDING'
+                    when 'REVIEWED' then 'PENDING'
+                    else status
+                  end) 
                 else
                   NULL
                 end
@@ -983,7 +1000,7 @@ export class PetitionRepository extends BaseRepository {
       .every((f) => f.validated)
       ? "REVIEWED"
       : petition!.status === "REVIEWED"
-      ? "COMPLETED"
+      ? "PENDING"
       : petition!.status;
 
     await this.from("petition")
@@ -1000,6 +1017,9 @@ export class PetitionRepository extends BaseRepository {
     const field = await this.loadField(data.petition_field_id);
     if (!field) {
       throw new Error("Petition field not found");
+    }
+    if (field.validated) {
+      throw new Error("Petition field is already validated.");
     }
     const [[reply]] = await Promise.all([
       this.insert("petition_field_reply", {
@@ -1028,6 +1048,9 @@ export class PetitionRepository extends BaseRepository {
     const field = await this.loadField(reply!.petition_field_id);
     if (!field) {
       throw new Error("Petition field not found");
+    }
+    if (field.validated) {
+      throw new Error("Petition field is already validated.");
     }
     if (!reply) {
       throw new Error("Petition field reply not found");

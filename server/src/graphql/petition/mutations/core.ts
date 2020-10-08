@@ -479,6 +479,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       required: false,
     }),
   },
+  validateArgs: notEmptyArray((args) => args.fieldIds, "fieldIds"),
   resolve: async (_, args, ctx) => {
     const fields = await ctx.petitions.validatePetitionFields(
       args.petitionId,
@@ -507,7 +508,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       args.validateRepliesWith !== "PENDING" &&
       petition.status === "REVIEWED"
     ) {
-      ctx.petitions.createEvent({
+      await ctx.petitions.createEvent({
         type: "PETITION_REVIEWED",
         petitionId: petition.id,
         data: {
@@ -549,6 +550,10 @@ export const updatePetitionFieldRepliesStatus = mutationField(
       }),
       status: arg({ type: "PetitionFieldReplyStatus", required: true }),
     },
+    validateArgs: notEmptyArray(
+      (args) => args.petitionFieldReplyIds,
+      "petitionFieldReplyIds"
+    ),
     resolve: async (_, args, ctx) => {
       const replies = await ctx.petitions.updatePetitionFieldRepliesStatus(
         args.petitionFieldReplyIds,
