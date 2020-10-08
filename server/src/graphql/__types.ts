@@ -231,6 +231,7 @@ export interface NexusGenRootTypes {
     totalCount: number; // Int!
   };
   PetitionCompletedEvent: events.PetitionCompletedEvent;
+  PetitionCorrectNotifiedEvent: events.PetitionCorrectNotifiedEvent;
   PetitionCreatedEvent: events.PetitionCreatedEvent;
   PetitionEventPagination: {
     // root type
@@ -472,6 +473,7 @@ export interface NexusGenFieldTypes {
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
+    notifyPetitionIsCorrect: NexusGenRootTypes["Petition"] | null; // Petition
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
@@ -577,6 +579,13 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+  };
+  PetitionCorrectNotifiedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    notifiedAccesses: Array<NexusGenRootTypes["PetitionAccess"] | null> | null; // [PetitionAccess]
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionCreatedEvent: {
     // field return type
@@ -1034,6 +1043,11 @@ export interface NexusGenArgTypes {
       petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    notifyPetitionIsCorrect: {
+      // args
+      emailBody: NexusGenScalars["JSON"]; // JSON!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     publicCompletePetition: {
       // args
       keycode: string; // ID!
@@ -1276,6 +1290,7 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "MessageSentEvent"
     | "OwnershipTransferredEvent"
     | "PetitionCompletedEvent"
+    | "PetitionCorrectNotifiedEvent"
     | "PetitionCreatedEvent"
     | "PetitionReviewedEvent"
     | "ReminderSentEvent"
@@ -1320,6 +1335,7 @@ export type NexusGenObjectNames =
   | "PetitionAndPartialFields"
   | "PetitionBasePagination"
   | "PetitionCompletedEvent"
+  | "PetitionCorrectNotifiedEvent"
   | "PetitionCreatedEvent"
   | "PetitionEventPagination"
   | "PetitionField"

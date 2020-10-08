@@ -205,6 +205,8 @@ export type Mutation = {
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
+  /** Sends an email to all contacts of the petition and creates an event */
+  notifyPetitionIsCorrect?: Maybe<Petition>;
   /** Marks a filled petition as ready for review. */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
@@ -382,6 +384,11 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
 
 export type MutationmarkPetitionFieldCommentsAsReadArgs = {
   petitionFieldCommentIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+};
+
+export type MutationnotifyPetitionIsCorrectArgs = {
+  emailBody: Scalars["JSON"];
   petitionId: Scalars["GID"];
 };
 
@@ -743,6 +750,14 @@ export type PetitionCompletedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+};
+
+export type PetitionCorrectNotifiedEvent = PetitionEvent & {
+  __typename?: "PetitionCorrectNotifiedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  notifiedAccesses?: Maybe<Array<Maybe<PetitionAccess>>>;
+  user?: Maybe<User>;
 };
 
 export type PetitionCreatedEvent = PetitionEvent & {
@@ -1595,6 +1610,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionCompletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment)
       | ({
+          __typename?: "PetitionCorrectNotifiedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionCorrectNotifiedEvent_Fragment)
+      | ({
           __typename?: "PetitionCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment)
       | ({
@@ -1673,6 +1691,11 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragme
 } & Pick<PetitionCompletedEvent, "id"> &
   TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionCorrectNotifiedEvent_Fragment = {
+  __typename?: "PetitionCorrectNotifiedEvent";
+} & Pick<PetitionCorrectNotifiedEvent, "id"> &
+  TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
   __typename?: "PetitionCreatedEvent";
 } & Pick<PetitionCreatedEvent, "id"> &
@@ -1724,6 +1747,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionCorrectNotifiedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
@@ -1873,6 +1897,23 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+  };
+
+export type TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragment = {
+  __typename?: "PetitionCorrectNotifiedEvent";
+} & Pick<PetitionCorrectNotifiedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    notifiedAccesses?: Maybe<
+      Array<
+        Maybe<
+          { __typename?: "PetitionAccess" } & {
+            contact?: Maybe<
+              { __typename?: "Contact" } & ContactLink_ContactFragment
+            >;
+          }
+        >
+      >
+    >;
   };
 
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
@@ -3072,6 +3113,19 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   };
 };
 
+export type PetitionReplies_notifyPetitionIsCorrectMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  emailBody: Scalars["JSON"];
+}>;
+
+export type PetitionReplies_notifyPetitionIsCorrectMutation = {
+  __typename?: "Mutation";
+} & {
+  notifyPetitionIsCorrect?: Maybe<
+    { __typename?: "Petition" } & Pick<Petition, "id">
+  >;
+};
+
 export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & {
@@ -4241,6 +4295,21 @@ export const TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc = gq
   }
   ${UserReference_UserFragmentDoc}
 `;
+export const TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragmentDoc = gql`
+  fragment TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEvent on PetitionCorrectNotifiedEvent {
+    user {
+      ...UserReference_User
+    }
+    notifiedAccesses {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -4301,6 +4370,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionReviewedEvent {
       ...TimelinePetitionReviewedEvent_PetitionReviewedEvent
     }
+    ... on PetitionCorrectNotifiedEvent {
+      ...TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -4320,6 +4392,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
   ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
   ${TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc}
+  ${TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -7508,6 +7581,60 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutationResult = Apo
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_updatePetitionFieldRepliesStatusMutation,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
+>;
+export const PetitionReplies_notifyPetitionIsCorrectDocument = gql`
+  mutation PetitionReplies_notifyPetitionIsCorrect(
+    $petitionId: GID!
+    $emailBody: JSON!
+  ) {
+    notifyPetitionIsCorrect(petitionId: $petitionId, emailBody: $emailBody) {
+      id
+    }
+  }
+`;
+export type PetitionReplies_notifyPetitionIsCorrectMutationFn = Apollo.MutationFunction<
+  PetitionReplies_notifyPetitionIsCorrectMutation,
+  PetitionReplies_notifyPetitionIsCorrectMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_notifyPetitionIsCorrectMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_notifyPetitionIsCorrectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_notifyPetitionIsCorrectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesNotifyPetitionIsCorrectMutation, { data, loading, error }] = usePetitionReplies_notifyPetitionIsCorrectMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      emailBody: // value for 'emailBody'
+ *   },
+ * });
+ */
+export function usePetitionReplies_notifyPetitionIsCorrectMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionReplies_notifyPetitionIsCorrectMutation,
+    PetitionReplies_notifyPetitionIsCorrectMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionReplies_notifyPetitionIsCorrectMutation,
+    PetitionReplies_notifyPetitionIsCorrectMutationVariables
+  >(PetitionReplies_notifyPetitionIsCorrectDocument, baseOptions);
+}
+export type PetitionReplies_notifyPetitionIsCorrectMutationHookResult = ReturnType<
+  typeof usePetitionReplies_notifyPetitionIsCorrectMutation
+>;
+export type PetitionReplies_notifyPetitionIsCorrectMutationResult = Apollo.MutationResult<
+  PetitionReplies_notifyPetitionIsCorrectMutation
+>;
+export type PetitionReplies_notifyPetitionIsCorrectMutationOptions = Apollo.BaseMutationOptions<
+  PetitionReplies_notifyPetitionIsCorrectMutation,
+  PetitionReplies_notifyPetitionIsCorrectMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: GID!) {

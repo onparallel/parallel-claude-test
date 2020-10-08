@@ -416,6 +416,11 @@ type Mutation {
   ): [PetitionFieldComment!]!
 
   """
+  Sends an email to all contacts of the petition and creates an event
+  """
+  notifyPetitionIsCorrect(emailBody: JSON!, petitionId: GID!): Petition
+
+  """
   Marks a filled petition as ready for review.
   """
   publicCompletePetition(keycode: ID!): PublicPetition!
@@ -1009,6 +1014,13 @@ type PetitionCompletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+}
+
+type PetitionCorrectNotifiedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  notifiedAccesses: [PetitionAccess]
+  user: User
 }
 
 type PetitionCreatedEvent implements PetitionEvent {

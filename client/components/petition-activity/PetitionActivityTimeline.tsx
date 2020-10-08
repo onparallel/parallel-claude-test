@@ -12,6 +12,7 @@ import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageSchedul
 import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
 import { TimelineOwnershipTransferredEvent } from "./timeline/TimelineOwnershipTransferredEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
+import { TimelinePetitionCorrectNotifiedEvent } from "./timeline/TimelinePetitionCorrectNotifiedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
 import { TimelinePetitionReviewedEvent } from "./timeline/TimelinePetitionReviewedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
@@ -93,6 +94,11 @@ export function PetitionActivityTimeline({
               />
             ) : event.__typename === "PetitionReviewedEvent" ? (
               <TimelinePetitionReviewedEvent event={event} userId={userId} />
+            ) : event.__typename === "PetitionCorrectNotifiedEvent" ? (
+              <TimelinePetitionCorrectNotifiedEvent
+                event={event}
+                userId={userId}
+              />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -171,6 +177,9 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionReviewedEvent {
         ...TimelinePetitionReviewedEvent_PetitionReviewedEvent
       }
+      ... on PetitionCorrectNotifiedEvent {
+        ...TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -190,5 +199,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineUserPermissionEditedEvent.fragments.UserPermissionEditedEvent}
     ${TimelineOwnershipTransferredEvent.fragments.OwnershipTransferredEvent}
     ${TimelinePetitionReviewedEvent.fragments.PetitionReviewedEvent}
+    ${TimelinePetitionCorrectNotifiedEvent.fragments
+      .PetitionCorrectNotifiedEvent}
   `,
 };

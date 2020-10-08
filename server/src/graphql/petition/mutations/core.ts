@@ -592,6 +592,35 @@ export const updatePetitionFieldRepliesStatus = mutationField(
   }
 );
 
+export const notifyPetitionIsCorrect = mutationField(
+  "notifyPetitionIsCorrect",
+  {
+    description:
+      "Sends an email to all contacts of the petition and creates an event",
+    type: "Petition",
+    args: {
+      petitionId: globalIdArg("Petition", { required: true }),
+      emailBody: jsonArg({ required: true }),
+    },
+    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+    nullable: true,
+    resolve: async (_, args, ctx) => {
+      const accesses = await ctx.petitions.loadAccessesForPetition(
+        args.petitionId
+      );
+      await ctx.petitions.createEvent({
+        type: "PETITION_CORRECT_NOTIFIED",
+        petitionId: args.petitionId,
+        data: {
+          user_id: ctx.user!.id,
+          notified_access_ids: accesses.map((a) => a.id),
+        },
+      });
+      return null;
+    },
+  }
+);
+
 export const fileUploadReplyDownloadLink = mutationField(
   "fileUploadReplyDownloadLink",
   {

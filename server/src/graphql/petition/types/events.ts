@@ -45,6 +45,8 @@ export const PetitionEvent = interfaceType({
           return "OwnershipTransferredEvent";
         case "PETITION_REVIEWED":
           return "PetitionReviewedEvent";
+        case "PETITION_CORRECT_NOTIFIED":
+          return "PetitionCorrectNotifiedEvent";
       }
     });
   },
@@ -399,6 +401,30 @@ export const PetitionReviewedEvent = createPetitionEvent(
       nullable: true,
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when user notifies the contacts that the petition is correct.
+ */
+export const PetitionCorrectNotifiedEvent = createPetitionEvent(
+  "PetitionCorrectNotifiedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.field("notifiedAccesses", {
+      type: "PetitionAccess",
+      list: [false],
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.petitions.loadAccess(data.notified_access_ids);
       },
     });
   }
