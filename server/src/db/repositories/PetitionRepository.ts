@@ -902,28 +902,32 @@ export class PetitionRepository extends BaseRepository {
     transaction?: Transaction<any, any>
   ) {
     return this.withTransaction(async (t) => {
-      const [[field], [petition]] = await Promise.all([
-        this.from("petition_field", t)
-          .where({
-            id: fieldId,
-            petition_id: petitionId,
-          })
-          .update(
-            {
-              ...data,
-              validated: false,
-              updated_at: this.now(),
-              updated_by: `User:${user.id}`,
-            },
-            "*"
-          )
-          .then(([updatedField]) => {
-            if (updatedField.is_fixed && data.type !== undefined) {
-              throw new Error("UPDATE_FIXED_FIELD_ERROR");
-            }
-            return [updatedField];
-          }),
-        this.from("petition", t)
+      const [field] = await this.from("petition_field", t)
+        .where({
+          id: fieldId,
+          petition_id: petitionId,
+        })
+        .update(
+          {
+            ...data,
+            validated: this.knex.raw(
+              `case type when 'HEADING' then true else false end`
+            ),
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+          },
+          "*"
+        )
+        .then(([updatedField]) => {
+          if (updatedField.is_fixed && data.type !== undefined) {
+            throw new Error("UPDATE_FIXED_FIELD_ERROR");
+          }
+          return [updatedField];
+        });
+
+      let petition: Petition;
+      if (field.type !== "HEADING") {
+        [petition] = await this.from("petition", t)
           .where({
             id: petitionId,
           })
@@ -945,8 +949,13 @@ export class PetitionRepository extends BaseRepository {
               updated_by: `User:${user.id}`,
             },
             "*"
-          ),
-      ]);
+          );
+      } else {
+        [petition] = await this.from("petition", t).where({
+          id: petitionId,
+        });
+      }
+
       return { field, petition };
     }, transaction);
   }

@@ -19,7 +19,6 @@ export function TimelinePetitionCorrectNotifiedEvent({
   event,
   userId,
 }: TimelinePetitionCorrectNotifiedEventProps) {
-  console.log(event);
   return (
     <TimelineItem
       icon={

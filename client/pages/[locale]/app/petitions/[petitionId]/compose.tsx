@@ -271,6 +271,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             petition: {
               __typename: petition!.__typename! as any,
               id: petitionId,
+              status: (petition as any).status,
               updatedAt: new Date().toISOString(),
             },
             field: {

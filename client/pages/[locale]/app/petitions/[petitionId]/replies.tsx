@@ -55,6 +55,7 @@ import {
   PetitionStatus,
   PetitionReplies_updatePetitionFieldRepliesStatusMutation,
   PetitionReplies_validatePetitionFieldsMutation,
+  usePetitionReplies_notifyPetitionIsCorrectMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -321,7 +322,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       );
 
       const fieldIds = petition.fields
-        .filter((f) => !f.validated && !f.isReadOnly)
+        .filter((f) => !f.validated)
         .map((f) => f.id);
 
       let option = "APPROVE";
@@ -329,37 +330,46 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         option = await markAsReviewedDialog({});
       }
 
-      switch (option) {
-        case "APPROVE":
-          await handleValidateToggle(fieldIds, true, "APPROVED");
-          await handleConfirmPetitionCompleted();
-          break;
-        case "REJECT":
-          await handleValidateToggle(fieldIds, true, "REJECTED");
-          break;
-        default:
-          break;
+      if (["APPROVE", "REJECT"].includes(option)) {
+        await handleValidateToggle(
+          fieldIds,
+          true,
+          option === "APPROVE" ? "APPROVED" : "REJECTED"
+        );
+        await handleConfirmPetitionCompleted();
       }
     } catch {}
   }, [petition, intl.locale]);
 
   const toast = useToast();
   const confirmPetitionDialog = useConfirmPetitionCompletedDialog();
+  const [
+    notifyPetitionIsCorrect,
+  ] = usePetitionReplies_notifyPetitionIsCorrectMutation();
   const handleConfirmPetitionCompleted = useCallback(async () => {
-    await confirmPetitionDialog({});
-    toast({
-      title: intl.formatMessage({
-        id: "petition.message-sent.toast-header",
-        defaultMessage: "Message sent",
-      }),
-      description: intl.formatMessage({
-        id: "petition.message-sent.toast-description",
-        defaultMessage: "The message is on it's way",
-      }),
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+    try {
+      const emailBody = await confirmPetitionDialog({});
+      await notifyPetitionIsCorrect({
+        variables: {
+          petitionId: petition.id,
+          emailBody,
+        },
+      });
+
+      toast({
+        title: intl.formatMessage({
+          id: "petition.message-sent.toast-header",
+          defaultMessage: "Message sent",
+        }),
+        description: intl.formatMessage({
+          id: "petition.message-sent.toast-description",
+          defaultMessage: "The message is on it's way",
+        }),
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch {}
   }, [petition, intl.locale]);
 
   const petitionHasUnreviewedFields = useMemo(() => {
@@ -694,6 +704,16 @@ PetitionReplies.mutations = [
           id
           status
         }
+      }
+    }
+  `,
+  gql`
+    mutation PetitionReplies_notifyPetitionIsCorrect(
+      $petitionId: GID!
+      $emailBody: JSON!
+    ) {
+      notifyPetitionIsCorrect(petitionId: $petitionId, emailBody: $emailBody) {
+        id
       }
     }
   `,
