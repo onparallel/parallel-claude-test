@@ -592,25 +592,6 @@ export const updatePetitionFieldRepliesStatus = mutationField(
   }
 );
 
-export const notifyPetitionIsCorrect = mutationField(
-  "notifyPetitionIsCorrect",
-  {
-    description:
-      "Sends an email to all contacts of the petition and creates an event",
-    type: "Petition",
-    args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      emailBody: jsonArg({ required: true }),
-    },
-    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
-    nullable: true,
-    resolve: async (_, args, ctx) => {
-      console.log(args);
-      return null;
-    },
-  }
-);
-
 export const fileUploadReplyDownloadLink = mutationField(
   "fileUploadReplyDownloadLink",
   {
@@ -1038,6 +1019,46 @@ export const changePetitionFieldType = mutationField(
           throw e;
         }
       }
+    },
+  }
+);
+
+export const sendPetitionClosedNotification = mutationField(
+  "sendPetitionClosedNotification",
+  {
+    description:
+      "Sends an email to all contacts of the petition confirming the replies are ok",
+    type: "Result",
+    args: {
+      petitionId: globalIdArg("Petition", { required: true }),
+      emailBody: jsonArg({ required: true }),
+    },
+    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+    validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
+    resolve: async (_, args, ctx) => {
+      try {
+        const accesses = await ctx.petitions.loadAccessesForPetition(
+          args.petitionId
+        );
+        const messages = await ctx.petitions.createMessages(
+          args.petitionId,
+          null,
+          accesses.map((access) => ({
+            petition_access_id: access.id,
+            status: "PROCESSING",
+            email_body: JSON.stringify(args.emailBody),
+          })),
+          ctx.user!
+        );
+
+        await ctx.emails.sendPetitionClosedEmail(
+          args.petitionId,
+          ctx.user!.id,
+          messages.map((m) => m.id)
+        );
+        return RESULT.SUCCESS;
+      } catch {}
+      return RESULT.FAILURE;
     },
   }
 );

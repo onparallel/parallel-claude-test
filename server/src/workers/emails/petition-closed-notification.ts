@@ -1,12 +1,12 @@
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
-import PetitionReviewed from "../../emails/components/PetitionReviewed";
+import PetitionClosedNotification from "../../emails/components/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { eachLimit } from "async";
 import { EmailLog } from "../../db/__types";
 
-export async function petitionReviewed(
+export async function petitionClosedNotification(
   payload: {
     user_id: number;
     petition_id: number;
@@ -39,11 +39,10 @@ export async function petitionReviewed(
     );
     const contact = await context.contacts.loadContact(access!.contact_id);
     const { html, text, subject, from } = await buildEmail(
-      PetitionReviewed,
+      PetitionClosedNotification,
       {
         senderName: fullName(sender.first_name, sender.last_name)!,
         senderEmail: sender.email,
-        subject: message!.email_subject,
         body: message!.email_body ? JSON.parse(message!.email_body) : [],
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
@@ -61,7 +60,7 @@ export async function petitionReviewed(
       html,
       reply_to: sender.email,
       track_opens: true,
-      created_from: `PetitionReviewed:${messageId}`,
+      created_from: `PetitionClosedNotification:${messageId}`,
     });
 
     emails.push(email);

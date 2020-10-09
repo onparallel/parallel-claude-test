@@ -11,14 +11,13 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { RenderSlate } from "../common/RenderSlate";
 import { disclaimer, greeting, renderSlateText } from "../common/texts";
 
-export type PetitionReviewedProps = {
+export type PetitionClosedNotificationProps = {
   senderName: string;
   senderEmail: string;
-  subject: string | null;
   body: any | null;
 } & LayoutProps;
 
-const email: Email<PetitionReviewedProps> = {
+const email: Email<PetitionClosedNotificationProps> = {
   from({ senderName }, intl) {
     return intl.formatMessage(
       {
@@ -28,15 +27,21 @@ const email: Email<PetitionReviewedProps> = {
       { senderName }
     );
   },
-  subject({ subject }) {
-    return subject || "";
+  subject({ senderName }, intl) {
+    return intl.formatMessage(
+      {
+        id: "petition-closed-notification.subject",
+        defaultMessage: "{senderName} confirmed receipt of the information.",
+      },
+      { senderName }
+    );
   },
   text({ senderName, senderEmail, body }, intl) {
     return outdent`
       ${greeting({ name: null }, intl)}
       ${intl.formatMessage(
         {
-          id: "petition-reviewed.text",
+          id: "petition-closed-notification.text",
           defaultMessage:
             "{senderName} ({senderEmail}) has confirmed receipt of the information.",
         },
@@ -57,7 +62,7 @@ const email: Email<PetitionReviewedProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
-  }: PetitionReviewedProps) {
+  }: PetitionClosedNotificationProps) {
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -70,7 +75,7 @@ const email: Email<PetitionReviewedProps> = {
             <Greeting name={null} />
             <MjmlText>
               <FormattedMessage
-                id="petition-reviewed.text"
+                id="petition-closed-notification.text"
                 defaultMessage="{senderName} ({senderEmail}) has confirmed receipt of the information."
                 values={{
                   senderName: <b>{senderName}</b>,
@@ -99,10 +104,9 @@ const email: Email<PetitionReviewedProps> = {
 };
 export default email;
 
-export const props: PetitionReviewedProps = {
+export const props: PetitionClosedNotificationProps = {
   senderName: "Santi",
   senderEmail: "santi@parallel.so",
-  subject: "KYC",
   body: [
     { children: [{ text: "Hola," }] },
     { children: [{ text: "" }] },

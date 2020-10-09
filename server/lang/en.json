@@ -115,6 +115,16 @@
     "context": "{senderName} ({senderEmail}) sent you a petition:"
   },
   {
+    "term": "petition-closed-notification.subject",
+    "definition": "{senderName} confirmed receipt of the information.",
+    "context": "{senderName} confirmed receipt of the information."
+  },
+  {
+    "term": "petition-closed-notification.text",
+    "definition": "{senderName} ({senderEmail}) has confirmed receipt of the information.",
+    "context": "{senderName} ({senderEmail}) has confirmed receipt of the information."
+  },
+  {
     "term": "petition-comments-contact-notification.access-button",
     "definition": "See the comments here",
     "context": "See the comments here"
@@ -178,11 +188,6 @@
     "term": "petition-reminder.subject",
     "definition": "Remember that {senderName} sent you a petition",
     "context": "Remember that {senderName} sent you a petition"
-  },
-  {
-    "term": "petition-reviewed.text",
-    "definition": "{senderName} ({senderEmail}) has confirmed receipt of the information.",
-    "context": "{senderName} ({senderEmail}) has confirmed receipt of the information."
   },
   {
     "term": "petition-sharing-notification.access-button",

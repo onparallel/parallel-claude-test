@@ -50,7 +50,7 @@ import {
   PetitionStatus,
   PetitionReplies_updatePetitionFieldRepliesStatusMutation,
   PetitionReplies_validatePetitionFieldsMutation,
-  usePetitionReplies_notifyPetitionIsCorrectMutation,
+  usePetitionReplies_sendPetitionClosedNotificationMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -343,12 +343,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const toast = useToast();
   const confirmPetitionDialog = useConfirmPetitionCompletedDialog();
   const [
-    notifyPetitionIsCorrect,
-  ] = usePetitionReplies_notifyPetitionIsCorrectMutation();
+    sendPetitionClosedNotification,
+  ] = usePetitionReplies_sendPetitionClosedNotificationMutation();
   const handleConfirmPetitionCompleted = useCallback(async () => {
     try {
       const emailBody = await confirmPetitionDialog({});
-      await notifyPetitionIsCorrect({
+      await sendPetitionClosedNotification({
         variables: {
           petitionId: petition.id,
           emailBody,
@@ -694,13 +694,14 @@ PetitionReplies.mutations = [
     }
   `,
   gql`
-    mutation PetitionReplies_notifyPetitionIsCorrect(
+    mutation PetitionReplies_sendPetitionClosedNotification(
       $petitionId: GID!
       $emailBody: JSON!
     ) {
-      notifyPetitionIsCorrect(petitionId: $petitionId, emailBody: $emailBody) {
-        id
-      }
+      sendPetitionClosedNotification(
+        petitionId: $petitionId
+        emailBody: $emailBody
+      )
     }
   `,
 ];

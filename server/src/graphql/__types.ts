@@ -472,7 +472,6 @@ export interface NexusGenFieldTypes {
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
-    notifyPetitionIsCorrect: NexusGenRootTypes["Petition"] | null; // Petition
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
@@ -488,6 +487,7 @@ export interface NexusGenFieldTypes {
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
+    sendPetitionClosedNotification: NexusGenEnums["Result"]; // Result!
     sendReminders: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -1036,11 +1036,6 @@ export interface NexusGenArgTypes {
       petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    notifyPetitionIsCorrect: {
-      // args
-      emailBody: NexusGenScalars["JSON"]; // JSON!
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
     publicCompletePetition: {
       // args
       keycode: string; // ID!
@@ -1125,6 +1120,11 @@ export interface NexusGenArgTypes {
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
       subject: string; // String!
+    };
+    sendPetitionClosedNotification: {
+      // args
+      emailBody: NexusGenScalars["JSON"]; // JSON!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     sendReminders: {
       // args
