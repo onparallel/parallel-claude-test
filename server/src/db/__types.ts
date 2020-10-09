@@ -29,8 +29,7 @@ export type PetitionEventType =
   | "USER_PERMISSION_REMOVED"
   | "USER_PERMISSION_EDITED"
   | "OWNERSHIP_TRANSFERRED"
-  | "PETITION_REVIEWED"
-  | "PETITION_CORRECT_NOTIFIED";
+  | "PETITION_CLOSED";
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
 

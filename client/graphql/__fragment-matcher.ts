@@ -80,16 +80,13 @@ const result: IntrospectionResultData = {
             name: "OwnershipTransferredEvent",
           },
           {
+            name: "PetitionClosedEvent",
+          },
+          {
             name: "PetitionCompletedEvent",
           },
           {
-            name: "PetitionCorrectNotifiedEvent",
-          },
-          {
             name: "PetitionCreatedEvent",
-          },
-          {
-            name: "PetitionReviewedEvent",
           },
           {
             name: "ReminderSentEvent",

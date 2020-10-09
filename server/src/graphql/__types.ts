@@ -230,8 +230,8 @@ export interface NexusGenRootTypes {
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     totalCount: number; // Int!
   };
+  PetitionClosedEvent: events.PetitionClosedEvent;
   PetitionCompletedEvent: events.PetitionCompletedEvent;
-  PetitionCorrectNotifiedEvent: events.PetitionCorrectNotifiedEvent;
   PetitionCreatedEvent: events.PetitionCreatedEvent;
   PetitionEventPagination: {
     // root type
@@ -250,7 +250,6 @@ export interface NexusGenRootTypes {
     validated: number; // Int!
   };
   PetitionReminder: db.PetitionReminder;
-  PetitionReviewedEvent: events.PetitionReviewedEvent;
   PetitionTemplate: db.Petition;
   PetitionTemplateAndField: {
     // root type
@@ -574,18 +573,17 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     totalCount: number; // Int!
   };
+  PetitionClosedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
   PetitionCompletedEvent: {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-  };
-  PetitionCorrectNotifiedEvent: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    id: NexusGenScalars["GID"]; // GID!
-    notifiedAccesses: Array<NexusGenRootTypes["PetitionAccess"] | null> | null; // [PetitionAccess]
-    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionCreatedEvent: {
     // field return type
@@ -663,12 +661,6 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     sender: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionReminderType"]; // PetitionReminderType!
-  };
-  PetitionReviewedEvent: {
-    // field return type
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    id: NexusGenScalars["GID"]; // GID!
-    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionTemplate: {
     // field return type
@@ -1289,10 +1281,9 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "MessageScheduledEvent"
     | "MessageSentEvent"
     | "OwnershipTransferredEvent"
+    | "PetitionClosedEvent"
     | "PetitionCompletedEvent"
-    | "PetitionCorrectNotifiedEvent"
     | "PetitionCreatedEvent"
-    | "PetitionReviewedEvent"
     | "ReminderSentEvent"
     | "ReplyCreatedEvent"
     | "ReplyDeletedEvent"
@@ -1334,8 +1325,8 @@ export type NexusGenObjectNames =
   | "PetitionAndField"
   | "PetitionAndPartialFields"
   | "PetitionBasePagination"
+  | "PetitionClosedEvent"
   | "PetitionCompletedEvent"
-  | "PetitionCorrectNotifiedEvent"
   | "PetitionCreatedEvent"
   | "PetitionEventPagination"
   | "PetitionField"
@@ -1344,7 +1335,6 @@ export type NexusGenObjectNames =
   | "PetitionMessage"
   | "PetitionProgress"
   | "PetitionReminder"
-  | "PetitionReviewedEvent"
   | "PetitionTemplate"
   | "PetitionTemplateAndField"
   | "PetitionTemplatePagination"

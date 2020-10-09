@@ -745,19 +745,18 @@ export type PetitionBasePagination = {
 
 export type PetitionBaseType = "PETITION" | "TEMPLATE";
 
+export type PetitionClosedEvent = PetitionEvent & {
+  __typename?: "PetitionClosedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user?: Maybe<User>;
+};
+
 export type PetitionCompletedEvent = PetitionEvent & {
   __typename?: "PetitionCompletedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-};
-
-export type PetitionCorrectNotifiedEvent = PetitionEvent & {
-  __typename?: "PetitionCorrectNotifiedEvent";
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  notifiedAccesses?: Maybe<Array<Maybe<PetitionAccess>>>;
-  user?: Maybe<User>;
 };
 
 export type PetitionCreatedEvent = PetitionEvent & {
@@ -942,13 +941,6 @@ export type PetitionReminderType =
   | "AUTOMATIC"
   /** The reminder has been sent manually by a user. */
   | "MANUAL";
-
-export type PetitionReviewedEvent = PetitionEvent & {
-  __typename?: "PetitionReviewedEvent";
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  user?: Maybe<User>;
-};
 
 /** The status of a petition. */
 export type PetitionStatus =
@@ -1607,17 +1599,14 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "OwnershipTransferredEvent";
         } & PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment)
       | ({
+          __typename?: "PetitionClosedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment)
+      | ({
           __typename?: "PetitionCompletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment)
       | ({
-          __typename?: "PetitionCorrectNotifiedEvent";
-        } & PetitionActivityTimeline_PetitionEvent_PetitionCorrectNotifiedEvent_Fragment)
-      | ({
           __typename?: "PetitionCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment)
-      | ({
-          __typename?: "PetitionReviewedEvent";
-        } & PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment)
       | ({
           __typename?: "ReminderSentEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment)
@@ -1686,25 +1675,20 @@ export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fra
 } & Pick<OwnershipTransferredEvent, "id"> &
   TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment = {
+  __typename?: "PetitionClosedEvent";
+} & Pick<PetitionClosedEvent, "id"> &
+  TimelinePetitionClosedEvent_PetitionClosedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
   __typename?: "PetitionCompletedEvent";
 } & Pick<PetitionCompletedEvent, "id"> &
   TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionCorrectNotifiedEvent_Fragment = {
-  __typename?: "PetitionCorrectNotifiedEvent";
-} & Pick<PetitionCorrectNotifiedEvent, "id"> &
-  TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragment;
-
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
   __typename?: "PetitionCreatedEvent";
 } & Pick<PetitionCreatedEvent, "id"> &
   TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
-
-export type PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment = {
-  __typename?: "PetitionReviewedEvent";
-} & Pick<PetitionReviewedEvent, "id"> &
-  TimelinePetitionReviewedEvent_PetitionReviewedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
@@ -1746,10 +1730,9 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_PetitionCorrectNotifiedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_PetitionReviewedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
@@ -1891,6 +1874,12 @@ export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment 
     owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
+export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
+  __typename?: "PetitionClosedEvent";
+} & Pick<PetitionClosedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
+
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
 } & Pick<PetitionCompletedEvent, "createdAt"> & {
@@ -1899,32 +1888,9 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
     };
   };
 
-export type TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragment = {
-  __typename?: "PetitionCorrectNotifiedEvent";
-} & Pick<PetitionCorrectNotifiedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    notifiedAccesses?: Maybe<
-      Array<
-        Maybe<
-          { __typename?: "PetitionAccess" } & {
-            contact?: Maybe<
-              { __typename?: "Contact" } & ContactLink_ContactFragment
-            >;
-          }
-        >
-      >
-    >;
-  };
-
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
 } & Pick<PetitionCreatedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-  };
-
-export type TimelinePetitionReviewedEvent_PetitionReviewedEventFragment = {
-  __typename?: "PetitionReviewedEvent";
-} & Pick<PetitionReviewedEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
@@ -4286,29 +4252,14 @@ export const TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment
   }
   ${UserReference_UserFragmentDoc}
 `;
-export const TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc = gql`
-  fragment TimelinePetitionReviewedEvent_PetitionReviewedEvent on PetitionReviewedEvent {
+export const TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc = gql`
+  fragment TimelinePetitionClosedEvent_PetitionClosedEvent on PetitionClosedEvent {
     user {
       ...UserReference_User
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
-`;
-export const TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragmentDoc = gql`
-  fragment TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEvent on PetitionCorrectNotifiedEvent {
-    user {
-      ...UserReference_User
-    }
-    notifiedAccesses {
-      contact {
-        ...ContactLink_Contact
-      }
-    }
-    createdAt
-  }
-  ${UserReference_UserFragmentDoc}
-  ${ContactLink_ContactFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
@@ -4367,11 +4318,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on OwnershipTransferredEvent {
       ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
     }
-    ... on PetitionReviewedEvent {
-      ...TimelinePetitionReviewedEvent_PetitionReviewedEvent
-    }
-    ... on PetitionCorrectNotifiedEvent {
-      ...TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEvent
+    ... on PetitionClosedEvent {
+      ...TimelinePetitionClosedEvent_PetitionClosedEvent
     }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
@@ -4391,8 +4339,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmentDoc}
   ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
   ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
-  ${TimelinePetitionReviewedEvent_PetitionReviewedEventFragmentDoc}
-  ${TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEventFragmentDoc}
+  ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

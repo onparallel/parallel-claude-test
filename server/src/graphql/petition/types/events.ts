@@ -43,10 +43,8 @@ export const PetitionEvent = interfaceType({
           return "UserPermissionEditedEvent";
         case "OWNERSHIP_TRANSFERRED":
           return "OwnershipTransferredEvent";
-        case "PETITION_REVIEWED":
-          return "PetitionReviewedEvent";
-        case "PETITION_CORRECT_NOTIFIED":
-          return "PetitionCorrectNotifiedEvent";
+        case "PETITION_CLOSED":
+          return "PetitionClosedEvent";
       }
     });
   },
@@ -391,40 +389,16 @@ export const OwnershipTransferredEvent = createPetitionEvent(
 );
 
 /**
- * Triggered when the user marks the petition as reviewed.
+ * Triggered when the user marks the petition as closed.
  */
-export const PetitionReviewedEvent = createPetitionEvent(
-  "PetitionReviewedEvent",
+export const PetitionClosedEvent = createPetitionEvent(
+  "PetitionClosedEvent",
   (t) => {
     t.field("user", {
       type: "User",
       nullable: true,
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
-      },
-    });
-  }
-);
-
-/**
- * Triggered when user notifies the contacts that the petition is correct.
- */
-export const PetitionCorrectNotifiedEvent = createPetitionEvent(
-  "PetitionCorrectNotifiedEvent",
-  (t) => {
-    t.field("user", {
-      type: "User",
-      nullable: true,
-      resolve: async ({ data }, _, ctx) => {
-        return await ctx.users.loadUser(data.user_id);
-      },
-    });
-    t.field("notifiedAccesses", {
-      type: "PetitionAccess",
-      list: [false],
-      nullable: true,
-      resolve: async ({ data }, _, ctx) => {
-        return await ctx.petitions.loadAccess(data.notified_access_ids);
       },
     });
   }

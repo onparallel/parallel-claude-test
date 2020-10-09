@@ -4,21 +4,21 @@ import { DoubleCheckIcon } from "@parallel/chakra/icons";
 
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { TimelinePetitionReviewedEvent_PetitionReviewedEventFragment } from "@parallel/graphql/__types";
+import { TimelinePetitionClosedEvent_PetitionClosedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
-export type TimelinePetitionReviewedEventProps = {
+export type TimelinePetitionClosedEventProps = {
   userId: string;
-  event: TimelinePetitionReviewedEvent_PetitionReviewedEventFragment;
+  event: TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 };
 
-export function TimelinePetitionReviewedEvent({
+export function TimelinePetitionClosedEvent({
   event,
   userId,
-}: TimelinePetitionReviewedEventProps) {
+}: TimelinePetitionClosedEventProps) {
   return (
     <TimelineItem
       icon={
@@ -30,8 +30,8 @@ export function TimelinePetitionReviewedEvent({
       }
     >
       <FormattedMessage
-        id="timeline.petition-reviewed-description"
-        defaultMessage="{same, select, true {You} other {{user}}} reviewed the petition {timeAgo}"
+        id="timeline.petition-closed-description"
+        defaultMessage="{same, select, true {You} other {{user}}} closed the petition {timeAgo}"
         values={{
           same: userId === event.user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
@@ -51,9 +51,9 @@ export function TimelinePetitionReviewedEvent({
   );
 }
 
-TimelinePetitionReviewedEvent.fragments = {
-  PetitionReviewedEvent: gql`
-    fragment TimelinePetitionReviewedEvent_PetitionReviewedEvent on PetitionReviewedEvent {
+TimelinePetitionClosedEvent.fragments = {
+  PetitionClosedEvent: gql`
+    fragment TimelinePetitionClosedEvent_PetitionClosedEvent on PetitionClosedEvent {
       user {
         ...UserReference_User
       }

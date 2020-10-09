@@ -1010,17 +1010,16 @@ enum PetitionBaseType {
   TEMPLATE
 }
 
+type PetitionClosedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  user: User
+}
+
 type PetitionCompletedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
-}
-
-type PetitionCorrectNotifiedEvent implements PetitionEvent {
-  createdAt: DateTime!
-  id: GID!
-  notifiedAccesses: [PetitionAccess]
-  user: User
 }
 
 type PetitionCreatedEvent implements PetitionEvent {
@@ -1391,12 +1390,6 @@ enum PetitionReminderType {
   The reminder has been sent manually by a user.
   """
   MANUAL
-}
-
-type PetitionReviewedEvent implements PetitionEvent {
-  createdAt: DateTime!
-  id: GID!
-  user: User
 }
 
 """

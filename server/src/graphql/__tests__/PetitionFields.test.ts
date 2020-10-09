@@ -1957,7 +1957,7 @@ describe("GraphQL/Petition Fields", () => {
       expect(data!.validatePetitionFields).toEqual({
         petition: {
           status: "REVIEWED",
-          events: { items: [{ __typename: "PetitionReviewedEvent" }] },
+          events: { items: [{ __typename: "PetitionClosedEvent" }] },
         },
         fields: [
           { validated: true, replies: [] },

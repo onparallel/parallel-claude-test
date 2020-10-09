@@ -509,7 +509,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
       petition.status === "REVIEWED"
     ) {
       await ctx.petitions.createEvent({
-        type: "PETITION_REVIEWED",
+        type: "PETITION_CLOSED",
         petitionId: petition.id,
         data: {
           user_id: ctx.user!.id,
@@ -605,17 +605,7 @@ export const notifyPetitionIsCorrect = mutationField(
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     nullable: true,
     resolve: async (_, args, ctx) => {
-      const accesses = await ctx.petitions.loadAccessesForPetition(
-        args.petitionId
-      );
-      await ctx.petitions.createEvent({
-        type: "PETITION_CORRECT_NOTIFIED",
-        petitionId: args.petitionId,
-        data: {
-          user_id: ctx.user!.id,
-          notified_access_ids: accesses.map((a) => a.id),
-        },
-      });
+      console.log(args);
       return null;
     },
   }

@@ -3400,24 +3400,19 @@
     "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}"
   },
   {
+    "term": "timeline.petition-closed-description",
+    "definition": "{same, select, true {You} other {{user}}} closed the petition {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} closed the petition {timeAgo}"
+  },
+  {
     "term": "timeline.petition-completed-description",
     "definition": "{contact} completed the petition {timeAgo}",
     "context": "{contact} completed the petition {timeAgo}"
   },
   {
-    "term": "timeline.petition-correct-notified-description",
-    "definition": "{same, select, true {You} other {{user}}} notified {count, plural, =1{{contact}} other{# contacts} } that the petition is correct {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} notified {count, plural, =1{{contact}} other{# contacts} } that the petition is correct {timeAgo}"
-  },
-  {
     "term": "timeline.petition-created-description",
     "definition": "{same, select, true {You} other {{user}}} created this petition {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"
-  },
-  {
-    "term": "timeline.petition-reviewed-description",
-    "definition": "{same, select, true {You} other {{user}}} reviewed the petition {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} reviewed the petition {timeAgo}"
   },
   {
     "term": "timeline.reminder-sent-description-automatic",

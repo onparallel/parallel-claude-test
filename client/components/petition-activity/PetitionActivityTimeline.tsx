@@ -12,9 +12,8 @@ import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageSchedul
 import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
 import { TimelineOwnershipTransferredEvent } from "./timeline/TimelineOwnershipTransferredEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
-import { TimelinePetitionCorrectNotifiedEvent } from "./timeline/TimelinePetitionCorrectNotifiedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
-import { TimelinePetitionReviewedEvent } from "./timeline/TimelinePetitionReviewedEvent";
+import { TimelinePetitionClosedEvent } from "./timeline/TimelinePetitionClosedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
@@ -92,13 +91,8 @@ export function PetitionActivityTimeline({
                 event={event}
                 userId={userId}
               />
-            ) : event.__typename === "PetitionReviewedEvent" ? (
-              <TimelinePetitionReviewedEvent event={event} userId={userId} />
-            ) : event.__typename === "PetitionCorrectNotifiedEvent" ? (
-              <TimelinePetitionCorrectNotifiedEvent
-                event={event}
-                userId={userId}
-              />
+            ) : event.__typename === "PetitionClosedEvent" ? (
+              <TimelinePetitionClosedEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -174,11 +168,8 @@ PetitionActivityTimeline.fragments = {
       ... on OwnershipTransferredEvent {
         ...TimelineOwnershipTransferredEvent_OwnershipTransferredEvent
       }
-      ... on PetitionReviewedEvent {
-        ...TimelinePetitionReviewedEvent_PetitionReviewedEvent
-      }
-      ... on PetitionCorrectNotifiedEvent {
-        ...TimelinePetitionCorrectNotifiedEvent_PetitionCorrectNotifiedEvent
+      ... on PetitionClosedEvent {
+        ...TimelinePetitionClosedEvent_PetitionClosedEvent
       }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
@@ -198,8 +189,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelineUserPermissionRemovedEvent.fragments.UserPermissionRemovedEvent}
     ${TimelineUserPermissionEditedEvent.fragments.UserPermissionEditedEvent}
     ${TimelineOwnershipTransferredEvent.fragments.OwnershipTransferredEvent}
-    ${TimelinePetitionReviewedEvent.fragments.PetitionReviewedEvent}
-    ${TimelinePetitionCorrectNotifiedEvent.fragments
-      .PetitionCorrectNotifiedEvent}
+    ${TimelinePetitionClosedEvent.fragments.PetitionClosedEvent}
   `,
 };
