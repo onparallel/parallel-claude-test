@@ -270,6 +270,11 @@
     "context": "Delete petition"
   },
   {
+    "term": "component.petition-header.reopen-button",
+    "definition": "Reopen petition",
+    "context": "Reopen petition"
+  },
+  {
     "term": "component.petition-header.save-as-template-button",
     "definition": "Save as template",
     "context": "Save as template"
@@ -1448,11 +1453,6 @@
     "term": "petition-replies.petition-field.no-replies",
     "definition": "There are no replies to this field yet",
     "context": "There are no replies to this field yet"
-  },
-  {
-    "term": "petition-replies.reopen-petition.button",
-    "definition": "Reopen petition",
-    "context": "Reopen petition"
   },
   {
     "term": "petition-replies.submit-comments",

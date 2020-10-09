@@ -17,6 +17,7 @@ import {
 import {
   CopyIcon,
   DeleteIcon,
+  EditIcon,
   MoreVerticalIcon,
   SettingsIcon,
   UserArrowIcon,
@@ -291,7 +292,7 @@ export function PetitionHeader({
                     onClick={handleReopenPetition}
                     hidden={petition.status !== "CLOSED"}
                   >
-                    <SettingsIcon marginRight={2} />
+                    <EditIcon marginRight={2} />
                     <FormattedMessage
                       id="component.petition-header.reopen-button"
                       defaultMessage="Reopen petition"

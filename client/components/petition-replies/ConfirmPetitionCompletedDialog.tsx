@@ -5,7 +5,7 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   RichTextEditor,
@@ -69,6 +69,15 @@ export function ConfirmPetitionCompletedDialog({
     },
   ]);
 
+  const isInvalidBody = useMemo(() => {
+    return (
+      body.length === 1 &&
+      body[0].children &&
+      (body[0].children as any[]).length === 1 &&
+      (body[0].children as any[])[0].text === ""
+    );
+  }, [body]);
+
   return (
     <ConfirmDialog
       size="xl"
@@ -102,6 +111,7 @@ export function ConfirmPetitionCompletedDialog({
       }
       body={
         <RichTextEditor
+          isInvalid={isInvalidBody}
           value={body}
           onChange={setBody}
           placeholder={intl.formatMessage({
@@ -119,7 +129,11 @@ export function ConfirmPetitionCompletedDialog({
         </Button>
       }
       confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve(body)}>
+        <Button
+          colorScheme="purple"
+          onClick={() => props.onResolve(body)}
+          disabled={isInvalidBody}
+        >
           <FormattedMessage id="generic.send" defaultMessage="Send" />
         </Button>
       }
