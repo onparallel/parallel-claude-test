@@ -1340,6 +1340,41 @@
     "context": "Contents"
   },
   {
+    "term": "petition-replies.close-petition-without-notify.button",
+    "definition": "Close petition without notification",
+    "context": "Close petition without notification"
+  },
+  {
+    "term": "petition-replies.close-petition.button",
+    "definition": "Close petition and notify",
+    "context": "Close petition and notify"
+  },
+  {
+    "term": "petition-replies.close-petition.dialog-approve",
+    "definition": "Approve unreviewed responses",
+    "context": "Approve unreviewed responses"
+  },
+  {
+    "term": "petition-replies.close-petition.dialog-heading",
+    "definition": "There are answers without approval or rejection...",
+    "context": "There are answers without approval or rejection..."
+  },
+  {
+    "term": "petition-replies.close-petition.dialog-manual-review",
+    "definition": "Manual review",
+    "context": "Manual review"
+  },
+  {
+    "term": "petition-replies.close-petition.dialog-reject",
+    "definition": "Reject unreviewed responses",
+    "context": "Reject unreviewed responses"
+  },
+  {
+    "term": "petition-replies.close-petition.dialog-subheading",
+    "definition": "What do you want to do with them?",
+    "context": "What do you want to do with them?"
+  },
+  {
     "term": "petition-replies.comment-pending.label",
     "definition": "Pending",
     "context": "Pending"
@@ -1378,36 +1413,6 @@
     "term": "petition-replies.field-comments.placeholder",
     "definition": "Type a new comment",
     "context": "Type a new comment"
-  },
-  {
-    "term": "petition-replies.mark-all-as-reviewed.button",
-    "definition": "Mark all as reviewed",
-    "context": "Mark all as reviewed"
-  },
-  {
-    "term": "petition-replies.mark-all-as-reviewed.dialog-approve",
-    "definition": "Approve unreviewed responses",
-    "context": "Approve unreviewed responses"
-  },
-  {
-    "term": "petition-replies.mark-all-as-reviewed.dialog-heading",
-    "definition": "There are answers without approval or rejection...",
-    "context": "There are answers without approval or rejection..."
-  },
-  {
-    "term": "petition-replies.mark-all-as-reviewed.dialog-manual-review",
-    "definition": "Manual review",
-    "context": "Manual review"
-  },
-  {
-    "term": "petition-replies.mark-all-as-reviewed.dialog-reject",
-    "definition": "Reject unreviewed responses",
-    "context": "Reject unreviewed responses"
-  },
-  {
-    "term": "petition-replies.mark-all-as-reviewed.dialog-subheading",
-    "definition": "What do you want to do with them?",
-    "context": "What do you want to do with them?"
   },
   {
     "term": "petition-replies.notify-petition-reviewed.button",

@@ -17,7 +17,7 @@ import {
 import { ReactElement, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
-export function MarkAsReviewedDialog({
+export function ClosePetitionDialog({
   onResolve,
   onReject,
   ...props
@@ -33,13 +33,13 @@ export function MarkAsReviewedDialog({
         <ModalContent borderRadius="md">
           <ModalHeader>
             <FormattedMessage
-              id="petition-replies.mark-all-as-reviewed.dialog-heading"
+              id="petition-replies.close-petition.dialog-heading"
               defaultMessage="There are answers without approval or rejection..."
             />
 
             <Text fontWeight="normal" fontSize="sm">
               <FormattedMessage
-                id="petition-replies.mark-all-as-reviewed.dialog-subheading"
+                id="petition-replies.close-petition.dialog-subheading"
                 defaultMessage="What do you want to do with them?"
               />
             </Text>
@@ -63,7 +63,7 @@ export function MarkAsReviewedDialog({
                 onClick={() => onResolve("APPROVE")}
               >
                 <FormattedMessage
-                  id="petition-replies.mark-all-as-reviewed.dialog-approve"
+                  id="petition-replies.close-petition.dialog-approve"
                   defaultMessage="Approve unreviewed responses"
                 />
               </Option>
@@ -84,7 +84,7 @@ export function MarkAsReviewedDialog({
                 onClick={() => onResolve("REJECT")}
               >
                 <FormattedMessage
-                  id="petition-replies.mark-all-as-reviewed.dialog-reject"
+                  id="petition-replies.close-petition.dialog-reject"
                   defaultMessage="Reject unreviewed responses"
                 />
               </Option>
@@ -95,7 +95,7 @@ export function MarkAsReviewedDialog({
                 onClick={() => onResolve("MANUAL")}
               >
                 <FormattedMessage
-                  id="petition-replies.mark-all-as-reviewed.dialog-manual-review"
+                  id="petition-replies.close-petition.dialog-manual-review"
                   defaultMessage="Manual review"
                 />
               </Option>
@@ -134,6 +134,6 @@ function Option({
   );
 }
 
-export function useMarkAsReviewedDialog() {
-  return useDialog(MarkAsReviewedDialog);
+export function useClosePetitionDialog() {
+  return useDialog(ClosePetitionDialog);
 }

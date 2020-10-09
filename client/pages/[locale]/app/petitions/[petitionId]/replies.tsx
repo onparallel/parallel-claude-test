@@ -1,7 +1,21 @@
 import { ApolloCache, gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
+import {
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Text,
+  Tooltip,
+  useToast,
+} from "@chakra-ui/core";
 import {
   CheckIcon,
+  ChevronDownIcon,
   DownloadIcon,
   RepeatIcon,
   ThumbUpIcon,
@@ -67,8 +81,9 @@ import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { useMarkAsReviewedDialog } from "@parallel/components/petition-replies/MarkAsReviewedDialog";
+import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
+import { SplitButton } from "@parallel/components/common/SplitButton";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -314,32 +329,37 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
 
-  const markAsReviewedDialog = useMarkAsReviewedDialog();
-  const handleMarkAsReviewed = useCallback(async () => {
-    try {
-      const fieldsWithPendingReplies = petition.fields.filter((field) =>
-        field.replies.some((fieldReply) => fieldReply.status === "PENDING")
-      );
-
-      const fieldIds = petition.fields
-        .filter((f) => !f.validated)
-        .map((f) => f.id);
-
-      let option = "APPROVE";
-      if (fieldsWithPendingReplies.length > 0) {
-        option = await markAsReviewedDialog({});
-      }
-
-      if (["APPROVE", "REJECT"].includes(option)) {
-        await handleValidateToggle(
-          fieldIds,
-          true,
-          option === "APPROVE" ? "APPROVED" : "REJECTED"
+  const closePetitionDialog = useClosePetitionDialog();
+  const handleClosePetition = useCallback(
+    async (sendNotification: boolean) => {
+      try {
+        const fieldsWithPendingReplies = petition.fields.filter((field) =>
+          field.replies.some((fieldReply) => fieldReply.status === "PENDING")
         );
-        await handleConfirmPetitionCompleted();
-      }
-    } catch {}
-  }, [petition, intl.locale]);
+
+        const fieldIds = petition.fields
+          .filter((f) => !f.validated)
+          .map((f) => f.id);
+
+        let option = "APPROVE";
+        if (fieldsWithPendingReplies.length > 0) {
+          option = await closePetitionDialog({});
+        }
+
+        if (["APPROVE", "REJECT"].includes(option)) {
+          await handleValidateToggle(
+            fieldIds,
+            true,
+            option === "APPROVE" ? "APPROVED" : "REJECTED"
+          );
+          if (sendNotification) {
+            await handleConfirmPetitionCompleted();
+          }
+        }
+      } catch {}
+    },
+    [petition, intl.locale]
+  );
 
   const toast = useToast();
   const confirmPetitionDialog = useConfirmPetitionCompletedDialog();
@@ -408,17 +428,52 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             defaultMessage: "Reload",
           })}
         />
-        <Button
+        <SplitButton
+          dividerColor="green.600"
           hidden={!petitionHasUnreviewedFields}
-          colorScheme="green"
-          leftIcon={<CheckIcon />}
-          onClick={() => handleMarkAsReviewed()}
         >
-          <FormattedMessage
-            id="petition-replies.mark-all-as-reviewed.button"
-            defaultMessage="Mark all as reviewed"
-          />
-        </Button>
+          <Button
+            colorScheme="green"
+            leftIcon={<CheckIcon />}
+            onClick={() => handleClosePetition(true)}
+          >
+            <FormattedMessage
+              id="petition-replies.close-petition.button"
+              defaultMessage="Close petition and notify"
+            />
+          </Button>
+          <Menu placement="bottom-end">
+            <Tooltip
+              label={intl.formatMessage({
+                id: "generic.more-options",
+                defaultMessage: "More options...",
+              })}
+            >
+              <MenuButton
+                as={IconButton}
+                colorScheme="green"
+                icon={<ChevronDownIcon />}
+                aria-label={intl.formatMessage({
+                  id: "generic.more-options",
+                  defaultMessage: "More options...",
+                })}
+                borderTopLeftRadius={0}
+                borderBottomLeftRadius={0}
+                minWidth={8}
+              />
+            </Tooltip>
+            <Portal>
+              <MenuList minWidth={0}>
+                <MenuItem onClick={() => handleClosePetition(false)}>
+                  <FormattedMessage
+                    id="petition-replies.close-petition-without-notify.button"
+                    defaultMessage="Close petition without notification"
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </SplitButton>
         <Button
           hidden={petitionHasUnreviewedFields}
           colorScheme="blue"
