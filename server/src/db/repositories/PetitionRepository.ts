@@ -1104,6 +1104,9 @@ export class PetitionRepository extends BaseRepository {
     if (!petition || !fields) {
       throw new Error();
     }
+    if (petition.status === "CLOSED") {
+      throw new Error("Can't complete a closed petition");
+    }
     const fieldsIds = fields.map((f) => f.id);
     const replies = await this.loadRepliesForField(fieldsIds);
     const repliesByFieldId = Object.fromEntries(

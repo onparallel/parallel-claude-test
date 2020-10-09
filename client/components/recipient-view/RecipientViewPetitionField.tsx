@@ -46,6 +46,7 @@ type CreateReplyText = { type: "TEXT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
 export type PublicPetitionFieldProps = ExtendChakra<{
+  canReply: boolean;
   contactId: string;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   isInvalid: boolean;
@@ -56,6 +57,7 @@ export type PublicPetitionFieldProps = ExtendChakra<{
 }>;
 
 export function RecipientViewPetitionField({
+  canReply,
   contactId,
   field,
   isInvalid,
@@ -222,13 +224,13 @@ export function RecipientViewPetitionField({
       <Box marginTop={2}>
         {field.type === "TEXT" ? (
           <TextReplyForm
-            canReply={!field.validated}
+            canReply={canReply}
             field={field}
             onCreateReply={onCreateReply}
           />
         ) : field.type === "FILE_UPLOAD" ? (
           <FileUploadReplyForm
-            canReply={!field.validated}
+            canReply={canReply}
             field={field}
             onCreateReply={onCreateReply}
           />

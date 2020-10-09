@@ -3125,6 +3125,11 @@
     "context": "Business"
   },
   {
+    "term": "recipient-view.petition-closed-alert",
+    "definition": "This petition has been closed. If you want to make any changes ask {name} to reopen it.",
+    "context": "This petition has been closed. If you want to make any changes ask {name} to reopen it."
+  },
+  {
     "term": "recipient-view.petition-completed-alert",
     "definition": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
     "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again."

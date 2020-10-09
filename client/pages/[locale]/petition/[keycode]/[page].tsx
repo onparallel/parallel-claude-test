@@ -90,7 +90,7 @@ function RecipientView({
 
   const { fields, pages } = useGetPageFields(petition.fields, currentPage);
 
-  const [showCompletedAlert, setShowCompletedAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
   const createTextReply = useCreateTextReply();
   const createFileUploadReply = useCreateFileUploadReply();
@@ -320,11 +320,12 @@ function RecipientView({
         alignItems="center"
       >
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
-          {showCompletedAlert && petition.status === "COMPLETED" ? (
+          {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
             <Alert status="success" variant="subtle" zIndex={2}>
               <Flex
                 maxWidth="container.lg"
                 alignItems="center"
+                justifyContent="center"
                 marginX="auto"
                 width="100%"
                 paddingLeft={4}
@@ -332,17 +333,27 @@ function RecipientView({
               >
                 <AlertIcon />
                 <AlertDescription>
-                  <FormattedMessage
-                    id="recipient-view.petition-completed-alert"
-                    defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
-                  />
+                  {petition.status === "COMPLETED" ? (
+                    <FormattedMessage
+                      id="recipient-view.petition-completed-alert"
+                      defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="recipient-view.petition-closed-alert"
+                      defaultMessage="This petition has been closed. If you want to make any changes ask {name} to reopen it."
+                      values={{
+                        name: granter.firstName,
+                      }}
+                    />
+                  )}
                 </AlertDescription>
               </Flex>
               <CloseButton
                 position="absolute"
                 right="8px"
                 top="8px"
-                onClick={() => setShowCompletedAlert(false)}
+                onClick={() => setShowAlert(false)}
               />
             </Alert>
           ) : null}
@@ -419,6 +430,7 @@ function RecipientView({
             <Stack spacing={4}>
               {fields.map((field) => (
                 <RecipientViewPetitionField
+                  canReply={!field.validated && petition.status !== "CLOSED"}
                   key={field.id}
                   id={`field-${field.id}`}
                   field={field}
@@ -449,10 +461,12 @@ function RecipientView({
           </Flex>
         </Flex>
         <Spacer />
-        <RecipientViewProgressFooter
-          petition={petition}
-          onFinalize={handleFinalize}
-        />
+        {petition.status !== "CLOSED" && (
+          <RecipientViewProgressFooter
+            petition={petition}
+            onFinalize={handleFinalize}
+          />
+        )}
       </Flex>
       {selectedField && (
         <RecipientViewPetitionFieldCommentsDialog
