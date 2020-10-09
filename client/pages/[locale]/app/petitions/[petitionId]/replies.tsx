@@ -318,9 +318,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           field.replies.some((fieldReply) => fieldReply.status === "PENDING")
         );
 
-        const fieldIds = petition.fields
-          .filter((f) => !f.validated)
-          .map((f) => f.id);
+        const fieldIds = petition.fields.map((f) => f.id);
 
         let option = "APPROVE";
         if (fieldsWithPendingReplies.length > 0) {

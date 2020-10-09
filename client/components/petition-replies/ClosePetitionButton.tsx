@@ -55,6 +55,7 @@ export function ClosePetitionButton({
         <Portal>
           <MenuList minWidth={0}>
             <MenuItem onClick={() => onClosePetition(false)}>
+              <CheckIcon marginRight={2} />
               <FormattedMessage
                 id="petition-replies.close-petition-without-notify.button"
                 defaultMessage="Close petition without notification"
