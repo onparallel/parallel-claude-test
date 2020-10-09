@@ -1,25 +1,6 @@
 import { ApolloCache, gql, useApolloClient } from "@apollo/client";
-import {
-  Box,
-  Button,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-  Text,
-  Tooltip,
-  useToast,
-} from "@chakra-ui/core";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  DownloadIcon,
-  RepeatIcon,
-  ThumbUpIcon,
-} from "@parallel/chakra/icons";
+import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
+import { DownloadIcon, RepeatIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -83,7 +64,7 @@ import { PetitionFieldsIndex } from "@parallel/components/petition-common/Petiti
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
-import { SplitButton } from "@parallel/components/common/SplitButton";
+import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -392,12 +373,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     } catch {}
   }, [petition, intl.locale]);
 
-  const petitionHasUnreviewedFields = useMemo(() => {
-    return petition.fields
-      .filter((f) => f.type !== "HEADING")
-      .some((field) => !field.validated);
-  }, [petition]);
-
   return (
     <PetitionLayout
       key={petition.id}
@@ -428,54 +403,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             defaultMessage: "Reload",
           })}
         />
-        <SplitButton
-          dividerColor="green.600"
-          hidden={!petitionHasUnreviewedFields}
-        >
-          <Button
-            colorScheme="green"
-            leftIcon={<CheckIcon />}
-            onClick={() => handleClosePetition(true)}
-          >
-            <FormattedMessage
-              id="petition-replies.close-petition.button"
-              defaultMessage="Close petition and notify"
-            />
-          </Button>
-          <Menu placement="bottom-end">
-            <Tooltip
-              label={intl.formatMessage({
-                id: "generic.more-options",
-                defaultMessage: "More options...",
-              })}
-            >
-              <MenuButton
-                as={IconButton}
-                colorScheme="green"
-                icon={<ChevronDownIcon />}
-                aria-label={intl.formatMessage({
-                  id: "generic.more-options",
-                  defaultMessage: "More options...",
-                })}
-                borderTopLeftRadius={0}
-                borderBottomLeftRadius={0}
-                minWidth={8}
-              />
-            </Tooltip>
-            <Portal>
-              <MenuList minWidth={0}>
-                <MenuItem onClick={() => handleClosePetition(false)}>
-                  <FormattedMessage
-                    id="petition-replies.close-petition-without-notify.button"
-                    defaultMessage="Close petition without notification"
-                  />
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        </SplitButton>
+        <ClosePetitionButton
+          hidden={petition.status === "CLOSED"}
+          onClosePetition={handleClosePetition}
+        />
         <Button
-          hidden={petitionHasUnreviewedFields}
+          hidden={petition.status !== "CLOSED"}
           colorScheme="blue"
           leftIcon={<ThumbUpIcon fontSize="lg" display="flex" />}
           onClick={() => handleConfirmPetitionCompleted()}
