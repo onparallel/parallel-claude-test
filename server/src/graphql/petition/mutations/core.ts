@@ -461,7 +461,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
 
 export const validatePetitionFields = mutationField("validatePetitionFields", {
   description:
-    "Updates the validation of a field and sets the petition as reviewed if all fields are validated.",
+    "Updates the validation of a field and sets the petition as closed if all fields are validated.",
   type: "PetitionAndPartialFields",
   authorize: chain(
     authenticate(),
@@ -506,7 +506,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     if (
       args.validateRepliesWith &&
       args.validateRepliesWith !== "PENDING" &&
-      petition.status === "REVIEWED"
+      petition.status === "CLOSED"
     ) {
       await ctx.petitions.createEvent({
         type: "PETITION_CLOSED",
@@ -524,7 +524,7 @@ export const updatePetitionFieldRepliesStatus = mutationField(
   "updatePetitionFieldRepliesStatus",
   {
     description:
-      "Updates the status of a petition field reply and sets the petition as reviewed if all fields are validated.",
+      "Updates the status of a petition field reply and sets the petition as closed if all fields are validated.",
     type: objectType({
       name: "PetitionWithFieldAndReplies",
       definition(t) {

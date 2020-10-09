@@ -255,11 +255,11 @@ export type Mutation = {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionFieldComment;
-  /** Updates the status of a petition field reply and sets the petition as reviewed if all fields are validated. */
+  /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the user with the provided data. */
   updateUser: User;
-  /** Updates the validation of a field and sets the petition as reviewed if all fields are validated. */
+  /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
 };
 
@@ -944,14 +944,14 @@ export type PetitionReminderType =
 
 /** The status of a petition. */
 export type PetitionStatus =
+  /** The petition has been closed by a user. */
+  | "CLOSED"
   /** The petition has been completed. */
   | "COMPLETED"
   /** The petition has not been sent yet. */
   | "DRAFT"
   /** The petition has been sent and is awaiting completion. */
-  | "PENDING"
-  /** The petition has been reviewed by a user. */
-  | "REVIEWED";
+  | "PENDING";
 
 /** A petition template */
 export type PetitionTemplate = PetitionBase & {

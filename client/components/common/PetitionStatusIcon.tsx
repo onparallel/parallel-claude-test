@@ -32,22 +32,22 @@ export function PetitionStatusIcon({
           id: "generic.petition-status.completed",
           defaultMessage: "Completed",
         }),
-        REVIEWED: intl.formatMessage({
-          id: "generic.petition-status.reviewed",
-          defaultMessage: "Reviewed",
+        CLOSED: intl.formatMessage({
+          id: "generic.petition-status.closed",
+          defaultMessage: "Closed",
         }),
       }[status],
       icon: {
         DRAFT: EditIcon,
         PENDING: TimeIcon,
         COMPLETED: CheckIcon,
-        REVIEWED: DoubleCheckIcon,
+        CLOSED: DoubleCheckIcon,
       }[status],
       color: {
         DRAFT: "gray.500",
         PENDING: "yellow.600",
         COMPLETED: "green.500",
-        REVIEWED: "green.500",
+        CLOSED: "green.500",
       }[status],
     }),
     [status, intl.locale]

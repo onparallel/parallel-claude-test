@@ -815,7 +815,7 @@ export class PetitionRepository extends BaseRepository {
               status: this.knex.raw(/* sql */ `
                 case status 
                   when 'COMPLETED' then 'PENDING'
-                  when 'REVIEWED' then 'PENDING'
+                  when 'CLOSED' then 'PENDING'
                   else status
                 end`) as any,
               updated_at: this.now(),
@@ -874,7 +874,7 @@ export class PetitionRepository extends BaseRepository {
             {
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
-              status: otherFieldsAreValidated ? "REVIEWED" : "PENDING",
+              status: otherFieldsAreValidated ? "CLOSED" : "PENDING",
             },
             "*"
           ),
@@ -938,7 +938,7 @@ export class PetitionRepository extends BaseRepository {
                 when false then 
                   (case status 
                     when 'COMPLETED' then 'PENDING'
-                    when 'REVIEWED' then 'PENDING'
+                    when 'CLOSED' then 'PENDING'
                     else status
                   end) 
                 else
@@ -1008,8 +1008,8 @@ export class PetitionRepository extends BaseRepository {
     const newStatus = petitionFields
       .filter((f) => f.type !== "HEADING")
       .every((f) => f.validated)
-      ? "REVIEWED"
-      : petition!.status === "REVIEWED"
+      ? "CLOSED"
+      : petition!.status === "CLOSED"
       ? "PENDING"
       : petition!.status;
 

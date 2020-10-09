@@ -598,7 +598,7 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
-  Updates the status of a petition field reply and sets the petition as reviewed if all fields are validated.
+  Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
   """
   updatePetitionFieldRepliesStatus(
     petitionFieldId: GID!
@@ -613,7 +613,7 @@ type Mutation {
   updateUser(data: UpdateUserInput!, id: GID!): User!
 
   """
-  Updates the validation of a field and sets the petition as reviewed if all fields are validated.
+  Updates the validation of a field and sets the petition as closed if all fields are validated.
   """
   validatePetitionFields(
     fieldIds: [GID!]!
@@ -1397,6 +1397,11 @@ The status of a petition.
 """
 enum PetitionStatus {
   """
+  The petition has been closed by a user.
+  """
+  CLOSED
+
+  """
   The petition has been completed.
   """
   COMPLETED
@@ -1410,11 +1415,6 @@ enum PetitionStatus {
   The petition has been sent and is awaiting completion.
   """
   PENDING
-
-  """
-  The petition has been reviewed by a user.
-  """
-  REVIEWED
 }
 
 """

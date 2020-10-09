@@ -290,6 +290,11 @@
     "context": "All petitions"
   },
   {
+    "term": "component.petition-list-filter.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
     "term": "component.petition-list-filter.completed",
     "definition": "Completed",
     "context": "Completed"
@@ -303,11 +308,6 @@
     "term": "component.petition-list-filter.pending",
     "definition": "Pending",
     "context": "Pending"
-  },
-  {
-    "term": "component.petition-list-filter.reviewed",
-    "definition": "Reviewed",
-    "context": "Reviewed"
   },
   {
     "term": "component.petition-list-filter.template",
@@ -1015,6 +1015,11 @@
     "context": "Page break"
   },
   {
+    "term": "generic.petition-status.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
     "term": "generic.petition-status.completed",
     "definition": "Completed",
     "context": "Completed"
@@ -1028,11 +1033,6 @@
     "term": "generic.petition-status.pending",
     "definition": "Pending",
     "context": "Pending"
-  },
-  {
-    "term": "generic.petition-status.reviewed",
-    "definition": "Reviewed",
-    "context": "Reviewed"
   },
   {
     "term": "generic.previous-page",

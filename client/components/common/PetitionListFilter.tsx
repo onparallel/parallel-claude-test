@@ -46,9 +46,9 @@ export function PetitionListFilter({
       id: "component.petition-list-filter.completed",
       defaultMessage: "Completed",
     }),
-    REVIEWED: intl.formatMessage({
-      id: "component.petition-list-filter.reviewed",
-      defaultMessage: "Reviewed",
+    CLOSED: intl.formatMessage({
+      id: "component.petition-list-filter.closed",
+      defaultMessage: "Closed",
     }),
     TEMPLATE: intl.formatMessage({
       id: "component.petition-list-filter.template",
@@ -86,6 +86,7 @@ export function PetitionListFilter({
             <MenuItemOption value="COMPLETED">
               {filters.COMPLETED}
             </MenuItemOption>
+            <MenuItemOption value="CLOSED">{filters.CLOSED}</MenuItemOption>
             <MenuDivider />
             <MenuItemOption value="TEMPLATE">{filters.TEMPLATE}</MenuItemOption>
           </MenuOptionGroup>

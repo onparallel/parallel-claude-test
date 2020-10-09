@@ -18,8 +18,8 @@ export const PetitionStatus = enumType({
     },
     { name: "COMPLETED", description: "The petition has been completed." },
     {
-      name: "REVIEWED",
-      description: "The petition has been reviewed by a user.",
+      name: "CLOSED",
+      description: "The petition has been closed by a user.",
     },
   ],
 });

@@ -335,12 +335,12 @@ describe("GraphQL/Petition Fields", () => {
     });
 
     it("sets petition status to pending when creating a field", async () => {
-      const [reviewedPetition] = await mocks.createRandomPetitions(
+      const [closedPetition] = await mocks.createRandomPetitions(
         organization.id,
         user.id,
         1,
         () => ({
-          status: "REVIEWED",
+          status: "CLOSED",
         })
       );
 
@@ -357,7 +357,7 @@ describe("GraphQL/Petition Fields", () => {
           }
         `,
         variables: {
-          petitionId: toGlobalId("Petition", reviewedPetition.id),
+          petitionId: toGlobalId("Petition", closedPetition.id),
           type: "TEXT",
         },
       });
@@ -620,7 +620,7 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("sets petition status to reviewed when deleting a field and other fields are validated", async () => {
+    it("sets petition status to closed when deleting a field and other fields are validated", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
@@ -644,7 +644,7 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.deletePetitionField).toEqual({
-        status: "REVIEWED",
+        status: "CLOSED",
       });
     });
 
@@ -1877,7 +1877,7 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("sets petition status to reviewed when all fields are validated", async () => {
+    it("sets petition status to closed when all fields are validated", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
@@ -1906,12 +1906,12 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.validatePetitionFields).toEqual({
-        petition: { status: "REVIEWED" },
+        petition: { status: "CLOSED" },
         fields: fields.map((f) => ({ validated: true })),
       });
     });
 
-    it("creates petition reviewed event when reviewing all fields and replies", async () => {
+    it("creates petition closed event when reviewing all fields and replies", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation(
@@ -1956,7 +1956,7 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toBeUndefined();
       expect(data!.validatePetitionFields).toEqual({
         petition: {
-          status: "REVIEWED",
+          status: "CLOSED",
           events: { items: [{ __typename: "PetitionClosedEvent" }] },
         },
         fields: [
@@ -1970,8 +1970,8 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("petition status go back to pending when petition is reviewed and a field is invalidated", async () => {
-      // first validate all fields and set petition to REVIEWED
+    it("petition status go back to pending when petition is closed and a field is invalidated", async () => {
+      // first validate all fields and set petition to closed
       await testClient.mutate({
         mutation: gql`
           mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {

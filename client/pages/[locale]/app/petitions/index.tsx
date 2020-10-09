@@ -58,7 +58,7 @@ const SORTING = ["name", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
-  status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED"]),
+  status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
   type: enums<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
   search: string(),
   sort: sorting(SORTING).orDefault({
@@ -194,7 +194,7 @@ function Petitions() {
             DRAFT: "compose",
             PENDING: "replies",
             COMPLETED: "replies",
-            REVIEWED: "replies",
+            CLOSED: "replies",
           } as const)[row.status]
         : "compose"
     );
