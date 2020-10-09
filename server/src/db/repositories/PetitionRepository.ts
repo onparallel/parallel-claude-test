@@ -2262,4 +2262,19 @@ export class PetitionRepository extends BaseRepository {
       opts
     );
   }
+
+  async updatePetitionStatus(
+    petitionId: number,
+    status: PetitionStatus,
+    user: User
+  ) {
+    return await this.from("petition")
+      .where("id", petitionId)
+      .update({
+        status,
+        updated_at: this.now(),
+        updated_by: `User:${user.id}`,
+      })
+      .returning("*");
+  }
 }

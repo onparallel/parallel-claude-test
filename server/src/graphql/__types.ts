@@ -485,6 +485,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendReminders: NexusGenEnums["Result"]; // Result!
@@ -1103,6 +1104,10 @@ export interface NexusGenArgTypes {
       // args
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    reopenPetition: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     sendMessages: {
       // args

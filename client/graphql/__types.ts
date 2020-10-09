@@ -231,6 +231,8 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
   removePetitionUserPermission: Array<Petition>;
+  /** Reopens the petition */
+  reopenPetition: Petition;
   /** Sends a petition message to the speicified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -454,6 +456,10 @@ export type MutationreactivateAccessesArgs = {
 export type MutationremovePetitionUserPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationreopenPetitionArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type MutationsendMessagesArgs = {
@@ -1481,6 +1487,16 @@ export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id"
 >;
+
+export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionHeader_reopenPetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  reopenPetition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
+};
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -4956,6 +4972,57 @@ export type AppLayout_updateOnboardingStatusMutationResult = Apollo.MutationResu
 export type AppLayout_updateOnboardingStatusMutationOptions = Apollo.BaseMutationOptions<
   AppLayout_updateOnboardingStatusMutation,
   AppLayout_updateOnboardingStatusMutationVariables
+>;
+export const PetitionHeader_reopenPetitionDocument = gql`
+  mutation PetitionHeader_reopenPetition($petitionId: GID!) {
+    reopenPetition(petitionId: $petitionId) {
+      id
+      status
+    }
+  }
+`;
+export type PetitionHeader_reopenPetitionMutationFn = Apollo.MutationFunction<
+  PetitionHeader_reopenPetitionMutation,
+  PetitionHeader_reopenPetitionMutationVariables
+>;
+
+/**
+ * __usePetitionHeader_reopenPetitionMutation__
+ *
+ * To run a mutation, you first call `usePetitionHeader_reopenPetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionHeader_reopenPetitionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionHeaderReopenPetitionMutation, { data, loading, error }] = usePetitionHeader_reopenPetitionMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionHeader_reopenPetitionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionHeader_reopenPetitionMutation,
+    PetitionHeader_reopenPetitionMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionHeader_reopenPetitionMutation,
+    PetitionHeader_reopenPetitionMutationVariables
+  >(PetitionHeader_reopenPetitionDocument, baseOptions);
+}
+export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
+  typeof usePetitionHeader_reopenPetitionMutation
+>;
+export type PetitionHeader_reopenPetitionMutationResult = Apollo.MutationResult<
+  PetitionHeader_reopenPetitionMutation
+>;
+export type PetitionHeader_reopenPetitionMutationOptions = Apollo.BaseMutationOptions<
+  PetitionHeader_reopenPetitionMutation,
+  PetitionHeader_reopenPetitionMutationVariables
 >;
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(

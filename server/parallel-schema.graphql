@@ -511,6 +511,11 @@ type Mutation {
   ): [Petition!]!
 
   """
+  Reopens the petition
+  """
+  reopenPetition(petitionId: GID!): Petition!
+
+  """
   Sends a petition message to the speicified contacts.
   """
   sendMessages(

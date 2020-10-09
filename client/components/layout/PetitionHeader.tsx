@@ -26,6 +26,7 @@ import {
   PetitionHeader_PetitionFragment,
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
+  usePetitionHeader_reopenPetitionMutation,
 } from "@parallel/graphql/__types";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
@@ -166,6 +167,15 @@ export function PetitionHeader({
     ],
     [petition.status, intl.locale]
   );
+
+  const [reopenPetition] = usePetitionHeader_reopenPetitionMutation();
+  const handleReopenPetition = useCallback(async () => {
+    await reopenPetition({
+      variables: {
+        petitionId: petition.id,
+      },
+    });
+  }, [petition.id]);
   return (
     <>
       <Box
@@ -275,6 +285,16 @@ export function PetitionHeader({
                     <FormattedMessage
                       id="component.petition-header.save-as-template-button"
                       defaultMessage="Save as template"
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    onClick={handleReopenPetition}
+                    hidden={petition.status !== "CLOSED"}
+                  >
+                    <SettingsIcon marginRight={2} />
+                    <FormattedMessage
+                      id="component.petition-header.reopen-button"
+                      defaultMessage="Reopen petition"
                     />
                   </MenuItem>
                   <MenuItem onClick={onOpenSettings}>
@@ -407,3 +427,14 @@ PetitionHeader.fragments = {
     }
   `,
 };
+
+PetitionHeader.mutations = [
+  gql`
+    mutation PetitionHeader_reopenPetition($petitionId: GID!) {
+      reopenPetition(petitionId: $petitionId) {
+        id
+        status
+      }
+    }
+  `,
+];

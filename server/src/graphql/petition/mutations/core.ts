@@ -1041,3 +1041,20 @@ export const changePetitionFieldType = mutationField(
     },
   }
 );
+
+export const reopenPetition = mutationField("reopenPetition", {
+  description: "Reopens the petition",
+  type: "Petition",
+  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  args: {
+    petitionId: globalIdArg("Petition", { required: true }),
+  },
+  resolve: async (_, args, ctx) => {
+    const [petition] = await ctx.petitions.updatePetitionStatus(
+      args.petitionId,
+      "PENDING",
+      ctx.user!
+    );
+    return petition;
+  },
+});

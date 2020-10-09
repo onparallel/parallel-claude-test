@@ -1450,6 +1450,11 @@
     "context": "There are no replies to this field yet"
   },
   {
+    "term": "petition-replies.reopen-petition.button",
+    "definition": "Reopen petition",
+    "context": "Reopen petition"
+  },
+  {
     "term": "petition-replies.submit-comments",
     "definition": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
     "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}"
