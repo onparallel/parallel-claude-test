@@ -129,7 +129,7 @@ export type CreateTextReplyInput = {
   text: Scalars["String"];
 };
 
-export type EntityList = "Contact" | "Organization" | "Petition" | "User";
+export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
@@ -177,6 +177,8 @@ export type Mutation = {
   clonePetitions: Array<PetitionBase>;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a new organization. */
+  createOrganization: SupportMethodResponse;
   /** Create petition. */
   createPetition: PetitionBase;
   /** Creates a petition field */
@@ -298,6 +300,12 @@ export type MutationclonePetitionsArgs = {
 
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
+};
+
+export type MutationcreateOrganizationArgs = {
+  identifier: Scalars["String"];
+  name: Scalars["String"];
+  status: OrganizationStatus;
 };
 
 export type MutationcreatePetitionArgs = {
@@ -1158,7 +1166,7 @@ export type QueryglobalIdDecodeArgs = {
 
 export type QueryglobalIdEncodeArgs = {
   id: Scalars["Int"];
-  type: EntityList;
+  type: EntityType;
 };
 
 export type QueryorganizationArgs = {
@@ -5200,11 +5208,11 @@ export type useTemplateDetailsDialogPetitionQueryResult = Apollo.QueryResult<
 export const SupportMethodsUserDocument = gql`
   query SupportMethodsUser {
     me {
-      ...SupportMethods_User
       organizationRole
       organization {
         identifier
       }
+      ...SupportMethods_User
     }
   }
   ${SupportMethods_UserFragmentDoc}

@@ -1,131 +1,60 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Text,
-  Stack,
-  ModalFooter,
   Button,
+  Grid,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
 } from "@chakra-ui/core";
 import { Maybe, SupportMethodResponse } from "@parallel/graphql/__types";
+import { unCamelCase } from "@parallel/utils/strings";
 import {
+  IntrospectionField,
   IntrospectionInputTypeRef,
-  IntrospectionOutputTypeRef,
   IntrospectionType,
 } from "graphql";
-import { useCallback, useEffect, useReducer, useState } from "react";
-
-import {
-  ArgumentInput,
-  ArgumentWithState,
-  getDefaultInputValue,
-} from "./ArgumentInput";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { SupportMethodArgumentInput } from "./ArgumentInput";
+import { getDefaultInputTypeValue } from "./helpers";
 
 type MethodModalProps = {
-  method: Method;
+  field: IntrospectionField;
+  queryType: "query" | "mutation";
   schemaTypes: readonly IntrospectionType[];
   onClose: () => void;
 };
 
-export type Method = {
-  id: string;
-  name: string;
-  type: IntrospectionOutputTypeRef;
-  description: string;
-  queryType: "query" | "mutation";
-  args: {
-    position: number;
-    required: boolean;
-    name: string;
-    type: IntrospectionInputTypeRef;
-    description?: Maybe<string>;
-    defaultValue?: Maybe<any>;
-  }[];
-};
+function reset(
+  field: IntrospectionField,
+  schemaTypes: readonly IntrospectionType[]
+) {
+  return () =>
+    Object.fromEntries(
+      field.args.map((arg) => [
+        arg.name,
+        {
+          value:
+            arg.defaultValue ?? getDefaultInputTypeValue(arg.type, schemaTypes),
+          isInvalid: false,
+        },
+      ])
+    );
+}
 
-export function MethodModal({
-  method,
+export function SupportMethodModal({
+  field,
+  queryType,
   schemaTypes,
   onClose,
 }: MethodModalProps) {
   const apolloClient = useApolloClient();
 
-  const argsReducer = (
-    state: ArgumentWithState[],
-    action: {
-      type: "set" | "clear" | "error";
-      arg?: ArgumentWithState;
-    }
-  ) => {
-    switch (action.type) {
-      case "set":
-        return action.arg
-          ? state
-              .filter((a) => a.name !== action.arg!.name)
-              .concat({ ...action.arg, error: false })
-              .sort((a, b) => a.position - b.position)
-          : state;
-
-      case "error":
-        return action.arg
-          ? state
-              .filter((a) => a.name !== action.arg!.name)
-              .concat({ ...action.arg, error: true })
-              .sort((a, b) => a.position - b.position)
-          : state;
-
-      case "clear":
-        return [];
-      default:
-        return state;
-    }
-  };
-
-  const [methodArgs, dispatchArg] = useReducer(argsReducer, []);
-
-  const hasEmptyKeys = (value: any): boolean => {
-    return Object.values(value).some((v) => v === "");
-  };
-
-  const buildGraphQLQuery = useCallback(
-    (method: Method, _args: ArgumentWithState[]) => {
-      const args = _args.filter((arg) => arg.inputValue !== "");
-      const deepSearchArgType = (arg: ArgumentWithState): string => {
-        if (arg.type.kind === "NON_NULL") {
-          return deepSearchArgType({ ...arg, type: arg.type.ofType });
-        } else {
-          return (arg.type as any).name.concat(arg.required ? "!" : "");
-        }
-      };
-      const argsDef = (args: ArgumentWithState[]) => {
-        return args
-          .map((arg) => `$${arg.name}: ${deepSearchArgType(arg)}`)
-          .join(", ");
-      };
-
-      const variables: { [key: string]: any } = {};
-      args.forEach((arg) => {
-        variables[arg.name] = arg.inputValue;
-      });
-
-      return {
-        query: `${method.queryType}(${argsDef(args)}) { 
-          ${method.id}(${args
-          .map((arg) => `${arg.name}: $${arg.name}`)
-          .join(", ")}) { 
-            result
-            message 
-          }
-        }`,
-        variables,
-      };
-    },
-    []
-  );
-
+  const [values, setValues] = useState(reset(field, schemaTypes));
   const [status, setStatus] = useState<{
     loading: boolean;
     data?: Maybe<SupportMethodResponse>;
@@ -133,37 +62,70 @@ export function MethodModal({
     loading: false,
     data: null,
   });
+  const graphQLQuery = useMemo(() => {
+    const getArgType = (type: IntrospectionInputTypeRef): string => {
+      switch (type.kind) {
+        case "NON_NULL":
+          return `${getArgType(type.ofType)}!`;
+        case "LIST":
+          return `[${getArgType(type.ofType)}]`;
+        default:
+          return type.name;
+      }
+    };
+    const argsDef = field.args
+      .map((arg) => `$${arg.name}: ${getArgType(arg.type)}`)
+      .join(", ");
+    const argsAssignment = field.args
+      .map((arg) => `${arg.name}: $${arg.name}`)
+      .join(", ");
+
+    const query = `
+      ${queryType}(${argsDef}) {
+        ${field.name}(${argsAssignment}) {
+          result
+          message
+        }
+      }
+    `;
+    return gql(query);
+  }, [queryType, field]);
 
   const handleExecute = useCallback(async () => {
-    const argErrors = methodArgs.filter(
-      (arg) =>
-        arg.required && (arg.inputValue === "" || hasEmptyKeys(arg.inputValue))
+    // Validate missing values
+    const invalidFields = field.args.filter(
+      (f) => f.type.kind === "NON_NULL" && values[f.name] === null
     );
-    if (argErrors.length > 0) {
-      argErrors.forEach((arg) => dispatchArg({ type: "error", arg }));
+    setValues({
+      ...Object.fromEntries(
+        field.args.map((arg) => [
+          arg.name,
+          {
+            ...values[arg.name],
+            isInvalid: invalidFields.some((a) => a.name === arg.name),
+          },
+        ])
+      ),
+    });
+    if (invalidFields.length > 0) {
       return;
     }
-
-    const { query, variables } = buildGraphQLQuery(method, methodArgs);
     setStatus({ loading: true, data: null });
     try {
-      let data;
-      if (method.queryType === "mutation") {
-        data = (
-          await apolloClient.mutate({
-            mutation: gql(query),
-            variables,
-          })
-        ).data;
-      } else if (method.queryType === "query") {
-        data = (
-          await apolloClient.query({
-            query: gql(query),
-            variables,
-          })
-        ).data;
-      }
-      setStatus({ loading: false, data: data[method.id] });
+      const variables = Object.fromEntries(
+        field.args.map((arg) => [arg.name, values[arg.name].value])
+      );
+      const { data } =
+        queryType === "query"
+          ? await apolloClient.query({
+              query: graphQLQuery,
+              variables,
+            })
+          : await apolloClient.mutate({
+              mutation: graphQLQuery,
+              variables,
+            });
+      setStatus({ loading: false, data: data[field.name] });
     } catch (e) {
       setStatus({
         loading: false,
@@ -173,50 +135,51 @@ export function MethodModal({
         },
       });
     }
-  }, [methodArgs]);
+  }, [graphQLQuery, queryType, values]);
 
-  useEffect(() => {
-    dispatchArg({ type: "clear" });
-    method.args.forEach((arg) => {
-      dispatchArg({
-        type: "set",
-        arg: {
-          ...arg,
-          inputValue: getDefaultInputValue(arg, schemaTypes),
-        },
-      });
-    });
-  }, [method.id]);
+  // reset when changing fields
+  useEffect(() => setValues(reset(field, schemaTypes)), [field, schemaTypes]);
 
   return (
     <Modal isOpen size="xl" onClose={() => onClose()}>
       <ModalOverlay>
         <ModalContent>
           <ModalHeader>
-            {method.name}
+            {unCamelCase(field.name)}
             <Text fontSize="sm" fontWeight="normal">
-              {method.description}
+              {field.description}
             </Text>
             <Text
               fontSize="xs"
-              color={method.queryType === "mutation" ? "red.500" : ""}
+              color={queryType === "mutation" ? "red.500" : ""}
             >
-              {method.queryType === "query"
+              {queryType === "query"
                 ? "This method has no impact on the database."
                 : "This method will write into the database."}
             </Text>
           </ModalHeader>
           <ModalBody>
-            <Stack>
-              {methodArgs.map((arg, i) => (
-                <ArgumentInput
-                  key={i}
-                  argument={arg}
+            <Grid
+              templateColumns="minmax(100px, auto) 1fr"
+              rowGap={2}
+              columnGap={2}
+            >
+              {field.args.map((arg) => (
+                <SupportMethodArgumentInput
+                  key={arg.name}
+                  arg={arg}
                   schemaTypes={schemaTypes}
-                  onChange={(arg) => dispatchArg({ type: "set", arg })}
+                  value={values[arg.name].value}
+                  isInvalid={values[arg.name].isInvalid}
+                  onValue={(value) =>
+                    setValues((state) => ({
+                      ...state,
+                      [arg.name]: { value, isInvalid: false },
+                    }))
+                  }
                 />
               ))}
-            </Stack>
+            </Grid>
           </ModalBody>
           <ModalFooter
             as={Stack}

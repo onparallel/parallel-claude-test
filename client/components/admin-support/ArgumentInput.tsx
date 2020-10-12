@@ -1,259 +1,182 @@
-import { Text, Input, Select, Stack, Flex } from "@chakra-ui/core";
+import {
+  Grid,
+  Input,
+  NumberInput,
+  NumberInputField,
+  Select,
+  Text,
+} from "@chakra-ui/core";
+import { unCamelCase } from "@parallel/utils/strings";
 import {
   IntrospectionEnumType,
   IntrospectionInputObjectType,
   IntrospectionInputValue,
+  IntrospectionNamedTypeRef,
   IntrospectionType,
 } from "graphql";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { findNamedTypeRef } from "./helpers";
 
-export type ArgumentWithState = IntrospectionInputValue & {
-  inputValue: any;
-  position: number;
-  error?: boolean;
-  required: boolean;
-  list?: boolean;
-};
-
-type ArgumentInputProps = {
-  argument: ArgumentWithState;
+type SupportMethodArgumentInputProps = {
+  arg: IntrospectionInputValue;
+  isInvalid?: boolean;
   schemaTypes: readonly IntrospectionType[];
-  onChange: (value: ArgumentWithState) => void;
+  value: any;
+  onValue: (value: any) => void;
 };
 
-function getDefaultObjectValues(
-  arg: IntrospectionInputValue,
-  schemaTypes: readonly IntrospectionType[]
+export function SupportMethodArgumentInput(
+  props: SupportMethodArgumentInputProps
 ) {
-  const { inputFields } = schemaTypes.find(
-    (type) => type.kind === arg.type.kind && type.name === arg.type.name
-  ) as IntrospectionInputObjectType;
-
-  const data: { [key: string]: any } = {};
-  inputFields.forEach((field) => {
-    data[field.name] = getDefaultInputValue(field, schemaTypes);
-  });
-  return data;
-}
-
-export function getDefaultInputValue(
-  arg: IntrospectionInputValue,
-  schemaTypes: readonly IntrospectionType[]
-): any {
-  switch (arg.type.kind) {
-    case "NON_NULL":
-      return getDefaultInputValue(
-        { ...arg, type: arg.type.ofType },
-        schemaTypes
-      );
-    case "ENUM":
-      return (schemaTypes.find(
-        (type) => type.kind === arg.type.kind && type.name === arg.type.name
-      ) as IntrospectionEnumType).enumValues[0].name;
-    case "INPUT_OBJECT":
-      return getDefaultObjectValues(arg, schemaTypes);
-    default:
-      return "";
-  }
-}
-
-function renderInputType(props: ArgumentInputProps): any {
-  switch (props.argument.type.kind) {
-    case "NON_NULL":
-      return renderInputType({
-        ...props,
-        argument: {
-          ...props.argument,
-          type: props.argument.type.ofType,
-        },
-      });
-    case "LIST":
-      return renderInputType({
-        ...props,
-        argument: {
-          ...props.argument,
-          type: props.argument.type.ofType,
-          list: true,
-        },
-      });
+  const type =
+    props.arg.type.kind === "NON_NULL" ? props.arg.type.ofType : props.arg.type;
+  switch (type.kind) {
     case "SCALAR":
-      return props.argument.type.name === "Upload" ? (
-        <FileUploadInput {...props} />
-      ) : (
-        <ScalarInput {...props} />
+      return (
+        <>
+          <Text as="label" lineHeight={10}>
+            {unCamelCase(props.arg.name)}
+          </Text>
+          {type.name === "Upload" ? (
+            <FileUploadInput {...props} />
+          ) : (
+            <ScalarInput {...props} />
+          )}
+        </>
       );
     case "ENUM":
-      return <EnumInput {...props} />;
-    case "INPUT_OBJECT":
-      return <ObjectInput {...props} />;
-    default:
-      console.error(
-        `Can't build input of type ${(props.argument.type as any).kind}:`,
-        props.argument
+      return (
+        <>
+          <Text as="label" lineHeight={10}>
+            {unCamelCase(props.arg.name)}
+          </Text>
+          <EnumInput {...props} />
+        </>
       );
+    case "INPUT_OBJECT":
+      return (
+        <>
+          <Text as="label" lineHeight={10} gridColumn="1/3">
+            {unCamelCase(props.arg.name)}
+          </Text>
+          <ObjectInput {...props} />
+        </>
+      );
+    default:
+      console.error(`Can't build input of type ${type.kind}:`, props.arg);
       return <Input disabled isInvalid />;
   }
 }
 
-export function ArgumentInput(props: ArgumentInputProps) {
-  const { argument } = props;
-  if (!argument.inputValue) {
-    argument.inputValue = getDefaultInputValue(argument, props.schemaTypes);
-  }
-
-  return renderInputType(props);
-}
-
-function FileUploadInput(props: ArgumentInputProps) {
-  const { argument } = props;
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { argument } = props;
-    if (e.target.files) {
-      props.onChange({
-        ...argument,
-        inputValue: e.target.files[0],
-      });
-    }
-  };
-
+function FileUploadInput({
+  arg,
+  value,
+  isInvalid,
+  onValue,
+}: SupportMethodArgumentInputProps) {
   return (
-    <Flex justifyContent="space-between" alignItems="center" width="100%">
-      <Text marginRight={2} minWidth="100px">
-        {argument.name}
-      </Text>
-      <Input
-        width="100%"
-        type="file"
-        isInvalid={argument.error}
-        onChange={handleInputChange}
-      />
-    </Flex>
+    <Input
+      width="100%"
+      type="file"
+      isInvalid={isInvalid}
+      onChange={(e) => e.target.files && onValue(e.target.files[0])}
+    />
   );
 }
 
-function ScalarInput(props: ArgumentInputProps) {
-  const { argument } = props;
-
+function ScalarInput({
+  arg,
+  value,
+  isInvalid,
+  onValue,
+}: SupportMethodArgumentInputProps) {
   const type =
-    argument.type.kind === "SCALAR" && argument.type.name === "Int"
-      ? "number"
-      : "text";
+    arg.type.kind === "NON_NULL"
+      ? (arg.type.ofType as IntrospectionNamedTypeRef)
+      : (arg.type as IntrospectionNamedTypeRef);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { argument } = props;
-    props.onChange({
-      ...argument,
-      inputValue:
-        type === "number" ? parseInt(e.target.value, 10) : e.target.value,
-    });
-  };
-
-  return (
-    <Flex justifyContent="space-between" alignItems="center" width="100%">
-      <Text marginRight={2} minWidth="100px">
-        {argument.name}
-      </Text>
-      <Input
-        placeholder={argument.description ?? ""}
-        width="100%"
-        type={type}
-        isInvalid={argument.error}
-        value={argument.inputValue}
-        onChange={handleInputChange}
-      />
-    </Flex>
+  return type.name === "String" || type.name === "ID" ? (
+    <Input
+      placeholder={arg.description ?? ""}
+      width="100%"
+      isInvalid={isInvalid}
+      value={value}
+      onChange={(e) => onValue(e.target.value || null)}
+    />
+  ) : (
+    <NumberInput
+      placeholder={arg.description ?? ""}
+      width="100%"
+      isInvalid={isInvalid}
+      value={value}
+      onChange={(_, value) => (Number.isNaN(value) ? null : onValue(value))}
+    >
+      <NumberInputField />
+    </NumberInput>
   );
 }
 
-function EnumInput(props: ArgumentInputProps) {
-  const { argument, schemaTypes } = props;
-  const { enumValues } = schemaTypes.find(
-    (type) =>
-      type.kind === argument.type.kind && type.name === argument.type.name
-  ) as IntrospectionEnumType;
-
-  const options = enumValues.map((value) => value.name);
-
-  const handleChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      props.onChange({ ...argument, inputValue: e.currentTarget.value });
-    },
-    [argument]
+function EnumInput({
+  arg,
+  value,
+  isInvalid,
+  schemaTypes,
+  onValue,
+}: SupportMethodArgumentInputProps) {
+  const { enumValues } = findNamedTypeRef(
+    arg.type.kind === "NON_NULL"
+      ? (arg.type.ofType as IntrospectionNamedTypeRef<IntrospectionEnumType>)
+      : (arg.type as IntrospectionNamedTypeRef<IntrospectionEnumType>),
+    schemaTypes
   );
 
   return (
-    <Flex justifyContent="space-between" alignItems="center">
-      <Text marginRight={2} minWidth="100px">
-        {argument.name}
-      </Text>
-      <Select onChange={handleChange}>
-        {options.map((option, i) => (
-          <option key={i} value={option}>
-            {option}
-          </option>
-        ))}
-      </Select>
-    </Flex>
-  );
-}
-
-function ObjectInput(props: ArgumentInputProps) {
-  const { argument, schemaTypes } = props;
-  const { inputFields } = schemaTypes.find(
-    (type) =>
-      type.kind === argument.type.kind && type.name === argument.type.name
-  ) as IntrospectionInputObjectType;
-
-  const objectArgs: ArgumentWithState[] = useMemo(
-    () =>
-      inputFields.map((field, i) => ({
-        ...field,
-        inputValue: argument.inputValue[field.name],
-        position: i,
-        required: field.type.kind === "NON_NULL",
-      })),
-    [argument]
-  );
-
-  const [args, setArgs] = useState(objectArgs);
-
-  const handleChange = useCallback(
-    (value: ArgumentWithState) => {
-      const newArgs = args
-        .filter((arg) => arg.name !== value.name)
-        .concat(value)
-        .sort((a, b) => a.position - b.position);
-
-      setArgs(newArgs);
-
-      const newInputValue: { [key: string]: any } = {};
-      newArgs.forEach((arg) => {
-        newInputValue[arg.name] = arg.inputValue;
-      });
-      newInputValue[value.name] = value.inputValue;
-      props.onChange({
-        ...argument,
-        inputValue: newInputValue,
-      });
-    },
-    [args, setArgs]
-  );
-
-  return (
-    <Stack>
-      {args.map((arg, i) => (
-        <Flex key={i} alignItems="center">
-          <Text marginRight={2} minWidth="100px">
-            {argument.name}.
-          </Text>
-          <ArgumentInput
-            {...props}
-            argument={{ ...arg, error: argument.error }}
-            onChange={handleChange}
-          />
-        </Flex>
+    <Select
+      isInvalid={isInvalid}
+      value={value}
+      onChange={(e) => onValue(e.currentTarget.value)}
+    >
+      {enumValues.map(({ name }) => (
+        <option key={name} value={name}>
+          {name}
+        </option>
       ))}
-    </Stack>
+    </Select>
+  );
+}
+
+function ObjectInput({
+  arg,
+  value,
+  isInvalid,
+  schemaTypes,
+  onValue,
+}: SupportMethodArgumentInputProps) {
+  const { inputFields } = findNamedTypeRef(
+    arg.type.kind === "NON_NULL"
+      ? (arg.type.ofType as IntrospectionNamedTypeRef<
+          IntrospectionInputObjectType
+        >)
+      : (arg.type as IntrospectionNamedTypeRef<IntrospectionInputObjectType>),
+    schemaTypes
+  );
+  return (
+    <Grid
+      templateColumns="84px 1fr"
+      gridColumn="1/3"
+      rowGap={2}
+      columnGap={2}
+      marginLeft={4}
+    >
+      {inputFields.map((field) => (
+        <SupportMethodArgumentInput
+          key={field.name}
+          arg={field}
+          schemaTypes={schemaTypes}
+          value={value[field.name]}
+          isInvalid={false}
+          onValue={(v) => onValue({ ...value, [field.name]: v })}
+        />
+      ))}
+    </Grid>
   );
 }

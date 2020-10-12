@@ -28,7 +28,7 @@ export const globalIdEncode = queryField("globalIdEncode", {
     id: intArg({ required: true, description: "ID to encode" }),
     type: arg({
       type: enumType({
-        name: "EntityList",
+        name: "EntityType",
         members: ["Petition", "User", "Contact", "Organization"],
       }),
       required: true,

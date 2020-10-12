@@ -127,7 +127,7 @@ export interface NexusGenEnums {
     | "INCORRECT_PASSWORD"
     | "INVALID_NEW_PASSWORD"
     | "SUCCESS";
-  EntityList: "Contact" | "Organization" | "Petition" | "User";
+  EntityType: "Contact" | "Organization" | "Petition" | "User";
   OnboardingKey:
     | "CONTACT_DETAILS"
     | "CONTACT_LIST"
@@ -331,7 +331,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
-  EntityList: NexusGenEnums["EntityList"];
+  EntityType: NexusGenEnums["EntityType"];
   OnboardingKey: NexusGenEnums["OnboardingKey"];
   OnboardingStatus: NexusGenEnums["OnboardingStatus"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
@@ -1200,7 +1200,7 @@ export interface NexusGenArgTypes {
     globalIdEncode: {
       // args
       id: number; // Int!
-      type: NexusGenEnums["EntityList"]; // EntityList!
+      type: NexusGenEnums["EntityType"]; // EntityType!
     };
     organization: {
       // args
@@ -1335,7 +1335,7 @@ export type NexusGenInputNames =
 
 export type NexusGenEnumNames =
   | "ChangePasswordResult"
-  | "EntityList"
+  | "EntityType"
   | "OnboardingKey"
   | "OnboardingStatus"
   | "OrganizationRole"

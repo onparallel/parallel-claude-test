@@ -1,10 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Box, Flex, Heading, Spinner, Stack, Text } from "@chakra-ui/core";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
-import {
-  Method,
-  MethodModal,
-} from "@parallel/components/admin-support/MethodModal";
+import { SupportMethodModal } from "@parallel/components/admin-support/MethodModal";
 import { Card } from "@parallel/components/common/Card";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import {
@@ -18,6 +15,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
+import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import {
   getIntrospectionQuery,
@@ -48,32 +46,21 @@ function SupportMethods() {
       )! as IntrospectionObjectType;
 
       return [
-        ...mutation.fields.map((m) => ({ ...m, queryType: "mutation" })),
-        ...query.fields.map((m) => ({ ...m, queryType: "query" })),
+        ...mutation.fields.map((field) => ({
+          field,
+          queryType: "mutation" as const,
+        })),
+        ...query.fields.map((field) => ({
+          field,
+          queryType: "query" as const,
+        })),
       ]
         .filter(
-          (f) =>
-            f.type.kind === "NON_NULL" &&
-            (f.type.ofType as any).name === "SupportMethodResponse"
+          ({ field }) =>
+            field.type.kind === "NON_NULL" &&
+            (field.type.ofType as any).name === "SupportMethodResponse"
         )
-        .map((f) => {
-          let name = f.name.replace(/([A-Z])/g, " $1");
-          name = name.charAt(0).toUpperCase() + name.slice(1);
-          return {
-            id: f.name,
-            type: f.type,
-            name,
-            queryType: f.queryType,
-            description: f.description ?? "",
-            args: f.args.map((arg, i) => ({
-              ...arg,
-              position: i,
-              required: arg.type.kind === "NON_NULL",
-              description: arg.description,
-            })),
-          };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.field.name.localeCompare(b.field.name));
     }
   }, [data]);
 
@@ -83,10 +70,10 @@ function SupportMethods() {
 
   const [search, setSearch] = useState("");
   const filteredSupportMethods = useMemo(() => {
-    return supportMethods.filter((m) => {
+    return supportMethods.filter(({ field }) => {
       return (
-        m.name.toLowerCase().includes(search.toLowerCase()) ||
-        m.description.toLowerCase().includes(search.toLowerCase())
+        unCamelCase(field.name).toLowerCase().includes(search.toLowerCase()) ||
+        field.description?.toLowerCase().includes(search.toLowerCase())
       );
     });
   }, [supportMethods, search]);
@@ -118,9 +105,9 @@ function SupportMethods() {
           </Flex>
         ) : (
           <Stack>
-            {filteredSupportMethods.map((m) => (
+            {filteredSupportMethods.map((method) => (
               <Card
-                key={m.id}
+                key={method.field.name}
                 display="flex"
                 paddingX={4}
                 paddingY={2}
@@ -142,11 +129,11 @@ function SupportMethods() {
                 }}
                 role="button"
                 tabIndex={1}
-                onClick={() => setSelected(m)}
+                onClick={() => setSelected(method)}
               >
                 <Box flex="1">
-                  <Heading size="sm">{m.name}</Heading>
-                  <Text fontSize="sm">{m.description}</Text>
+                  <Heading size="sm">{unCamelCase(method.field.name)}</Heading>
+                  <Text fontSize="sm">{method.field.description}</Text>
                 </Box>
                 <Flex justifyContent="center" alignItems="center">
                   <ChevronRightIcon boxSize="24px" color="gray.500" />
@@ -156,8 +143,8 @@ function SupportMethods() {
           </Stack>
         )}
         {selected && (
-          <MethodModal
-            method={selected as Method}
+          <SupportMethodModal
+            {...selected}
             schemaTypes={schemaTypes}
             onClose={() => setSelected(null)}
           />
