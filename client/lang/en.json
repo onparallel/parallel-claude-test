@@ -475,6 +475,11 @@
     "context": "Use this template"
   },
   {
+    "term": "component.user-menu.admin-panel",
+    "definition": "Admin panel",
+    "context": "Admin panel"
+  },
+  {
     "term": "component.user-menu.log-out",
     "definition": "Log out",
     "context": "Log out"

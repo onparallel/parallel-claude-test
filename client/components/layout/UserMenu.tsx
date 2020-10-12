@@ -12,7 +12,7 @@ import {
   Portal,
   UsePopperProps,
 } from "@chakra-ui/core";
-import { LogOutIcon, UserIcon } from "@parallel/chakra/icons";
+import { KeyIcon, LogOutIcon, UserIcon } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -38,6 +38,9 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
     router.push("/[locale]/login", `/${router.query.locale}/login`);
   }
   const locales = useSupportedLocales();
+  const isAdmin =
+    user.organization.identifier === "parallel" &&
+    user.organizationRole === "ADMIN";
 
   return (
     <Menu placement={placement}>
@@ -65,6 +68,17 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
               />
             </MenuItem>
           </NakedLink>
+          {isAdmin ? (
+            <NakedLink href="/app/admin/support">
+              <MenuItem as="a">
+                <KeyIcon marginRight={2} />
+                <FormattedMessage
+                  id="component.user-menu.admin-panel"
+                  defaultMessage="Admin panel"
+                />
+              </MenuItem>
+            </NakedLink>
+          ) : null}
           <MenuOptionGroup
             value={router.query.locale}
             title={intl.formatMessage({
@@ -98,6 +112,10 @@ UserMenu.fragments = {
   User: gql`
     fragment UserMenu_User on User {
       fullName
+      organizationRole
+      organization {
+        identifier
+      }
     }
   `,
 };

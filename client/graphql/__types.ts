@@ -1477,8 +1477,13 @@ export type PetitionTemplateHeader_UserFragment = {
 
 export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "fullName"
->;
+  "fullName" | "organizationRole"
+> & {
+    organization: { __typename?: "Organization" } & Pick<
+      Organization,
+      "identifier"
+    >;
+  };
 
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
@@ -3689,6 +3694,10 @@ export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
 export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
     fullName
+    organizationRole
+    organization {
+      identifier
+    }
   }
 `;
 export const AppLayoutNavbar_UserFragmentDoc = gql`
