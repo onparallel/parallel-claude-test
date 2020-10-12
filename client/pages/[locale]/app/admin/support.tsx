@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Box, Flex, Heading, Spinner, Stack, Text } from "@chakra-ui/core";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
-import { SupportMethodModal } from "@parallel/components/admin-support/MethodModal";
+import { SupportMethodModal } from "@parallel/components/admin-support/SupportMethodModal";
 import { Card } from "@parallel/components/common/Card";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import {

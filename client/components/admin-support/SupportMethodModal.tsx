@@ -19,7 +19,7 @@ import {
   IntrospectionType,
 } from "graphql";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SupportMethodArgumentInput } from "./ArgumentInput";
+import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
 import { getDefaultInputTypeValue } from "./helpers";
 
 type MethodModalProps = {
