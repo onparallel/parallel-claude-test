@@ -13,7 +13,6 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
-  PetitionsUserQuery,
   SupportMethodsUserQuery,
   useSupportMethodsUserQuery,
 } from "@parallel/graphql/__types";
@@ -180,31 +179,30 @@ SupportMethods.fragments = {
 };
 
 SupportMethods.getInitialProps = async ({
-  query,
   fetchQuery,
   res,
 }: WithApolloDataContext) => {
   const [{ data }] = await Promise.all([
-    fetchQuery<PetitionsUserQuery>(gql`
+    fetchQuery<SupportMethodsUserQuery>(gql`
       query SupportMethodsUser {
         me {
-          ...SupportMethods_User
           organizationRole
           organization {
             identifier
           }
+          ...SupportMethods_User
         }
       }
       ${SupportMethods.fragments.User}
     `),
   ]);
-
-  const { me } = data as SupportMethodsUserQuery;
   if (
-    !me ||
-    me.organization.identifier !== "parallel" ||
-    me.organizationRole !== "ADMIN"
+    data?.me &&
+    data.me.organization.identifier === "parallel" &&
+    data.me.organizationRole === "ADMIN"
   ) {
+    // allow
+  } else {
     res?.writeHead(403).end();
   }
 };
