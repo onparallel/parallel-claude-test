@@ -36,6 +36,14 @@ export class Aws {
     return this._logs;
   }
 
+  private _cognitoIdP?: AWS.CognitoIdentityServiceProvider;
+  public get cognitoIdP() {
+    if (!this._cognitoIdP) {
+      this._cognitoIdP = new AWS.CognitoIdentityServiceProvider();
+    }
+    return this._cognitoIdP;
+  }
+
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(LOGGER) private logger: Logger
@@ -138,5 +146,26 @@ export class Aws {
         Key: key,
       })
       .createReadStream();
+  }
+
+  async createCognitoUser(email: string) {
+    const res = await this.cognitoIdP
+      .adminCreateUser({
+        UserPoolId: this.config.cognito.defaultPoolId,
+        Username: email,
+        UserAttributes: [
+          {
+            Name: "email",
+            Value: email,
+          },
+          {
+            Name: "email_verified",
+            Value: "True",
+          },
+        ],
+      })
+      .promise();
+    // return cognito id
+    return res.User!.Username;
   }
 }

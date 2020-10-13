@@ -455,6 +455,7 @@ export interface NexusGenFieldTypes {
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -958,6 +959,14 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionFieldReplyId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    createUser: {
+      // args
+      email: string; // String!
+      firstName: string; // String!
+      lastName: string; // String!
+      organizationId: number; // Int!
+      organizationRole: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     };
     deactivateAccesses: {
       // args

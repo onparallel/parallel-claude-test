@@ -1,8 +1,7 @@
 import { arg, enumType, idArg, intArg, queryField } from "@nexus/schema";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import { authenticate, chain } from "../helpers/authorize";
 import { RESULT } from "../helpers/result";
-import { userBelongsToOrg } from "./authorizers";
+import { supportMethodAccess } from "./authorizers";
 
 export const globalIdDecode = queryField("globalIdDecode", {
   description: "Decodes the given Global ID into an entity in the database.",
@@ -10,7 +9,7 @@ export const globalIdDecode = queryField("globalIdDecode", {
   args: {
     id: idArg({ required: true, description: "Global ID to decode" }),
   },
-  authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
+  authorize: supportMethodAccess(),
   resolve: (_, args) => {
     try {
       const { id, type } = fromGlobalId(args.id);
@@ -34,7 +33,7 @@ export const globalIdEncode = queryField("globalIdEncode", {
       required: true,
     }),
   },
-  authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
+  authorize: supportMethodAccess(),
   resolve: (_, args) => {
     try {
       return {

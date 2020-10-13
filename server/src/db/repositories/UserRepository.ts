@@ -61,4 +61,13 @@ export class UserRepository extends BaseRepository {
       .returning("*");
     return rows[0];
   }
+
+  async createUser(data: CreateUser, user: User) {
+    const [row] = await this.insert("user", {
+      ...data,
+      created_by: `User:${user.id}`,
+      updated_by: `User:${user.id}`,
+    });
+    return row;
+  }
 }

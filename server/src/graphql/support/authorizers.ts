@@ -1,5 +1,6 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { UserOrganizationRole } from "../../db/__types";
+import { authenticate, chain } from "../helpers/authorize";
 
 export function userBelongsToOrg<
   TypeName extends string,
@@ -23,4 +24,11 @@ export function userBelongsToOrg<
     } catch {}
     return false;
   };
+}
+
+export function supportMethodAccess<
+  TypeName extends string,
+  FieldName extends string
+>(): FieldAuthorizeResolver<TypeName, FieldName> {
+  return chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"]));
 }

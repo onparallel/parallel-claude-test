@@ -4,6 +4,7 @@ import { authenticate, chain } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
+import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const createContact = mutationField("createContact", {
@@ -20,6 +21,7 @@ export const createContact = mutationField("createContact", {
       },
     }).asArg({ required: true }),
   },
+  validateArgs: validEmail((args) => args.data.email, "data.email"),
   resolve: async (_, args, ctx) => {
     const { email, firstName, lastName } = args.data;
     try {

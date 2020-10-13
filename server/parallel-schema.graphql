@@ -313,6 +313,36 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Creates a new user in the specified organization.
+  """
+  createUser(
+    """
+    Email of the user
+    """
+    email: String!
+
+    """
+    First name of the user
+    """
+    firstName: String!
+
+    """
+    Last name of the user
+    """
+    lastName: String!
+
+    """
+    ID of the organization
+    """
+    organizationId: Int!
+
+    """
+    Role of the user
+    """
+    organizationRole: OrganizationRole!
+  ): SupportMethodResponse!
+
+  """
   Deactivates the specified active petition accesses.
   """
   deactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
