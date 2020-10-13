@@ -1028,7 +1028,7 @@ export const sendPetitionClosedNotification = mutationField(
   {
     description:
       "Sends an email to all contacts of the petition confirming the replies are ok",
-    type: "Result",
+    type: "Petition",
     args: {
       petitionId: globalIdArg("Petition", { required: true }),
       emailBody: jsonArg({ required: true }),
@@ -1048,17 +1048,28 @@ export const sendPetitionClosedNotification = mutationField(
             status: "PROCESSING",
             email_body: JSON.stringify(args.emailBody),
           })),
-          ctx.user!
+          ctx.user!,
+          false
         );
+
+        await ctx.petitions.createEvent({
+          type: "PETITION_CLOSED_NOTIFIED",
+          petitionId: args.petitionId,
+          data: {
+            user_id: ctx.user!.id,
+            notified_access_ids: accesses.map((a) => a.id),
+          },
+        });
 
         await ctx.emails.sendPetitionClosedEmail(
           args.petitionId,
           ctx.user!.id,
           messages.map((m) => m.id)
         );
-        return RESULT.SUCCESS;
-      } catch {}
-      return RESULT.FAILURE;
+      } catch {
+      } finally {
+        return (await ctx.petitions.loadPetition(args.petitionId))!;
+      }
     },
   }
 );

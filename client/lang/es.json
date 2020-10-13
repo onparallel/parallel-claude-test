@@ -3425,6 +3425,11 @@
     "context": "{contact} completed the petition {timeAgo}"
   },
   {
+    "term": "timeline.petition-correct-notified-description",
+    "definition": "{same, select, true {Notificaste} other {{user} notificó}} a {count, plural, =1{{contact}} other{# contactos} } que la petición está correcta {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} notified {count, plural, =1{{contact}} other{# contacts} } that the petition is correct {timeAgo}"
+  },
+  {
     "term": "timeline.petition-created-description",
     "definition": "{same, select, true {Creaste} other {{user} creó}} esta petición {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"

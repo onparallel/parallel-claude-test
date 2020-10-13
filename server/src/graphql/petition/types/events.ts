@@ -45,6 +45,8 @@ export const PetitionEvent = interfaceType({
           return "OwnershipTransferredEvent";
         case "PETITION_CLOSED":
           return "PetitionClosedEvent";
+        case "PETITION_CLOSED_NOTIFIED":
+          return "PetitionClosedNotifiedEvent";
       }
     });
   },
@@ -399,6 +401,30 @@ export const PetitionClosedEvent = createPetitionEvent(
       nullable: true,
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when the user notifies the petition contacts that the petition is closed.
+ */
+export const PetitionClosedNotifiedEvent = createPetitionEvent(
+  "PetitionClosedNotifiedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+    t.field("notifiedAccesses", {
+      type: "PetitionAccess",
+      list: [false],
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.petitions.loadAccess(data.notified_access_ids);
       },
     });
   }

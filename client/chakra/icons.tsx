@@ -1080,7 +1080,7 @@ export const CloudErrorIcon = createIcon({
 });
 
 export const ThumbUpIcon = createIcon({
-  displayName: "ThumbsUpIcon",
+  displayName: "ThumbUpIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

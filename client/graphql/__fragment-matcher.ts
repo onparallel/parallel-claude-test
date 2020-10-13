@@ -83,6 +83,9 @@ const result: IntrospectionResultData = {
             name: "PetitionClosedEvent",
           },
           {
+            name: "PetitionClosedNotifiedEvent",
+          },
+          {
             name: "PetitionCompletedEvent",
           },
           {

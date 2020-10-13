@@ -536,7 +536,7 @@ type Mutation {
   """
   Sends an email to all contacts of the petition confirming the replies are ok
   """
-  sendPetitionClosedNotification(emailBody: JSON!, petitionId: GID!): Result!
+  sendPetitionClosedNotification(emailBody: JSON!, petitionId: GID!): Petition!
 
   """
   Sends a reminder for the specified petition accesses.
@@ -1018,6 +1018,13 @@ enum PetitionBaseType {
 type PetitionClosedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  user: User
+}
+
+type PetitionClosedNotifiedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  notifiedAccesses: [PetitionAccess]
   user: User
 }
 

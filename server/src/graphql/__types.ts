@@ -231,6 +231,7 @@ export interface NexusGenRootTypes {
     totalCount: number; // Int!
   };
   PetitionClosedEvent: events.PetitionClosedEvent;
+  PetitionClosedNotifiedEvent: events.PetitionClosedNotifiedEvent;
   PetitionCompletedEvent: events.PetitionCompletedEvent;
   PetitionCreatedEvent: events.PetitionCreatedEvent;
   PetitionEventPagination: {
@@ -487,7 +488,7 @@ export interface NexusGenFieldTypes {
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
-    sendPetitionClosedNotification: NexusGenEnums["Result"]; // Result!
+    sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -578,6 +579,13 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  PetitionClosedNotifiedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    notifiedAccesses: Array<NexusGenRootTypes["PetitionAccess"] | null> | null; // [PetitionAccess]
     user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionCompletedEvent: {
@@ -1287,6 +1295,7 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "MessageSentEvent"
     | "OwnershipTransferredEvent"
     | "PetitionClosedEvent"
+    | "PetitionClosedNotifiedEvent"
     | "PetitionCompletedEvent"
     | "PetitionCreatedEvent"
     | "ReminderSentEvent"
@@ -1331,6 +1340,7 @@ export type NexusGenObjectNames =
   | "PetitionAndPartialFields"
   | "PetitionBasePagination"
   | "PetitionClosedEvent"
+  | "PetitionClosedNotifiedEvent"
   | "PetitionCompletedEvent"
   | "PetitionCreatedEvent"
   | "PetitionEventPagination"

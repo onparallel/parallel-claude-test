@@ -348,7 +348,8 @@ export class PetitionRepository extends BaseRepository {
       CreatePetitionMessage,
       "status" | "petition_access_id" | "email_subject" | "email_body"
     >[],
-    user: User
+    user: User,
+    createEvent = true
   ) {
     const rows = await this.insert(
       "petition_message",
@@ -360,14 +361,16 @@ export class PetitionRepository extends BaseRepository {
         created_by: `User:${user.id}`,
       }))
     );
-    await this.createEvent_old(
-      petitionId,
-      scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
-      rows.map((m) => ({
-        petition_access_id: m.petition_access_id,
-        petition_message_id: m.id,
-      }))
-    );
+    if (createEvent) {
+      await this.createEvent_old(
+        petitionId,
+        scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
+        rows.map((m) => ({
+          petition_access_id: m.petition_access_id,
+          petition_message_id: m.id,
+        }))
+      );
+    }
     return rows;
   }
 
