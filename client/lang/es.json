@@ -366,7 +366,7 @@
   },
   {
     "term": "component.petition-progress-bar.not-replied",
-    "definition": "{count, plural, =1{# campo ha sido rellenado} other {# campos han sido rellenados}}.",
+    "definition": "{count, plural, =1{# campo no ha sido rellenado} other {# campos no han sido rellenados}}.",
     "context": "{count, plural, =1{# field has} other {# fields have}} not been replied."
   },
   {
