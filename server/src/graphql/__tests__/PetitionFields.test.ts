@@ -1042,6 +1042,81 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
+    it("sets petition status to pending when updating a field from optional to required", async () => {
+      // first validate all fields and set petition to closed
+      const { data: pre } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!, $value: Boolean!) {
+            validatePetitionFields(
+              petitionId: $petitionId
+              fieldIds: $fieldIds
+              value: $value
+            ) {
+              petition {
+                ... on Petition {
+                  status
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldIds: fields.map((f) => toGlobalId("PetitionField", f.id)),
+          value: true,
+        },
+      });
+      expect(pre!.validatePetitionFields).toEqual({
+        petition: {
+          status: "CLOSED",
+        },
+      });
+
+      // then update field to required, petition status should change
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              petition {
+                ... on Petition {
+                  status
+                }
+              }
+              field {
+                id
+                optional
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[4],
+          data: {
+            optional: false,
+          },
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionField).toEqual({
+        petition: {
+          status: "PENDING",
+        },
+        field: {
+          id: fieldGIDs[4],
+          optional: false,
+        },
+      });
+    });
+
     it("sends error when field title is too long", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
