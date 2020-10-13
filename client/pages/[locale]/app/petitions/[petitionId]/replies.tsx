@@ -1,4 +1,4 @@
-import { ApolloCache, gql, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
 import { DownloadIcon, RepeatIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { Divider } from "@parallel/components/common/Divider";
@@ -31,7 +31,6 @@ import {
   PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
-  PetitionReplies_PetitionStatusFragment,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
   UpdatePetitionInput,
@@ -48,8 +47,6 @@ import {
   usePetitionReplies_validatePetitionFieldsMutation,
   PetitionReplies_PetitionFragment,
   PetitionStatus,
-  PetitionReplies_updatePetitionFieldRepliesStatusMutation,
-  PetitionReplies_validatePetitionFieldsMutation,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
@@ -142,6 +139,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         validatePetitionFields: {
           __typename: "PetitionAndPartialFields",
           petition: {
+            id: petition.id,
             status: petition.status, // TODO predict correct status
             __typename: "Petition",
           },
@@ -162,13 +160,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
             };
           }),
         },
-      },
-      // based on the response, we need to update the petition status on cache
-      update(cache, { data }) {
-        const newStatus = data?.validatePetitionFields.petition.status;
-        writeCachePetitionStatus<
-          PetitionReplies_validatePetitionFieldsMutation
-        >(cache, petitionId, newStatus);
       },
     });
   }
@@ -586,6 +577,7 @@ PetitionReplies.mutations = [
         validateRepliesWith: $validateRepliesWith
       ) {
         petition {
+          id
           status
         }
         fields {
@@ -700,6 +692,7 @@ PetitionReplies.mutations = [
         status: $status
       ) {
         petition {
+          id
           status
         }
         field {
@@ -905,6 +898,7 @@ function useUpdatePetitionFieldRepliesStatus() {
           updatePetitionFieldRepliesStatus: {
             __typename: "PetitionWithFieldAndReplies",
             petition: {
+              id: variables.petitionId,
               status: petitionStatus, // TODO predict correct status
               __typename: "Petition",
             },
@@ -920,38 +914,9 @@ function useUpdatePetitionFieldRepliesStatus() {
             })),
           },
         })) as any,
-        update(cache, { data }) {
-          const newStatus =
-            data?.updatePetitionFieldRepliesStatus.petition.status;
-          writeCachePetitionStatus<
-            PetitionReplies_updatePetitionFieldRepliesStatusMutation
-          >(cache, variables.petitionId, newStatus);
-        },
       }),
     [updatePetitionFieldRepliesStatus]
   );
-}
-
-function writeCachePetitionStatus<T>(
-  cache: ApolloCache<T>,
-  petitionId: string,
-  status?: PetitionStatus
-) {
-  const petitionFragment = gql`
-    fragment PetitionReplies_PetitionStatus on Petition {
-      status
-    }
-  `;
-  const cachedPetition = cache.readFragment<
-    PetitionReplies_PetitionStatusFragment
-  >({ id: petitionId, fragment: petitionFragment });
-  cache.writeFragment<PetitionReplies_PetitionStatusFragment>({
-    id: petitionId,
-    fragment: petitionFragment,
-    data: {
-      status: status || cachedPetition!.status,
-    },
-  });
 }
 
 PetitionReplies.getInitialProps = async ({

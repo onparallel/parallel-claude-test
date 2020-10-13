@@ -3065,7 +3065,7 @@ export type PetitionReplies_validatePetitionFieldsMutation = {
   __typename?: "Mutation";
 } & {
   validatePetitionFields: { __typename?: "PetitionAndPartialFields" } & {
-    petition: { __typename?: "Petition" } & Pick<Petition, "status">;
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
     fields: Array<
       { __typename?: "PetitionField" } & Pick<
         PetitionField,
@@ -3180,7 +3180,7 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   updatePetitionFieldRepliesStatus: {
     __typename?: "PetitionWithFieldAndReplies";
   } & {
-    petition: { __typename?: "Petition" } & Pick<Petition, "status">;
+    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
     field: { __typename?: "PetitionField" } & Pick<
       PetitionField,
       "id" | "validated"
@@ -3303,10 +3303,6 @@ export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
     { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
   >;
 };
-
-export type PetitionReplies_PetitionStatusFragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "status">;
 
 export type PetitionRepliesQueryVariables = Exact<{
   id: Scalars["GID"];
@@ -4809,11 +4805,6 @@ export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc
     comments {
       id
     }
-  }
-`;
-export const PetitionReplies_PetitionStatusFragmentDoc = gql`
-  fragment PetitionReplies_PetitionStatus on Petition {
-    status
   }
 `;
 export const UserAvatarList_UserFragmentDoc = gql`
@@ -7311,6 +7302,7 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
       validateRepliesWith: $validateRepliesWith
     ) {
       petition {
+        id
         status
       }
       fields {
@@ -7740,6 +7732,7 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
       status: $status
     ) {
       petition {
+        id
         status
       }
       field {
