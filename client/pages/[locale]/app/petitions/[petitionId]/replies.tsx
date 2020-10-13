@@ -65,6 +65,8 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
 import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
+import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
+import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 
 type PetitionProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -345,8 +347,22 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const [
     sendPetitionClosedNotification,
   ] = usePetitionReplies_sendPetitionClosedNotificationMutation();
+  const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleConfirmPetitionCompleted = useCallback(async () => {
     try {
+      const events = petition.events.items.filter(
+        (e) =>
+          e.__typename === "PetitionClosedNotifiedEvent" ||
+          e.__typename === "ReplyCreatedEvent"
+      );
+      const lastEvent = events[events.length - 1];
+      const repliedAfterConfirmation =
+        events.find((e) => e.__typename === "PetitionClosedNotifiedEvent") &&
+        lastEvent.__typename === "ReplyCreatedEvent";
+
+      if (!repliedAfterConfirmation) {
+        await petitionAlreadyNotifiedDialog({});
+      }
       const emailBody = await confirmPetitionDialog({});
       await sendPetitionClosedNotification({
         variables: {
@@ -369,7 +385,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         isClosable: true,
       });
     } catch {}
-  }, [petition, intl.locale]);
+  }, [petition.events, intl.locale]);
 
   return (
     <PetitionLayout
@@ -507,10 +523,12 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_Petition on Petition {
         id
         ...PetitionLayout_PetitionBase
+        ...PetitionActivityTimeline_Petition
         fields {
           ...PetitionReplies_PetitionField
         }
       }
+      ${PetitionActivityTimeline.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
     `;
@@ -701,7 +719,15 @@ PetitionReplies.mutations = [
       sendPetitionClosedNotification(
         petitionId: $petitionId
         emailBody: $emailBody
-      )
+      ) {
+        id
+        events(limit: 1000) {
+          items {
+            id
+            __typename
+          }
+        }
+      }
     }
   `,
 ];

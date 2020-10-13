@@ -929,7 +929,8 @@ export class PetitionRepository extends BaseRepository {
         });
 
       let petition: Petition;
-      if (field.type !== "HEADING") {
+      // update petition status if switching a field from optional to required
+      if (field.type !== "HEADING" && data.optional === false) {
         [petition] = await this.from("petition", t)
           .where({
             id: petitionId,

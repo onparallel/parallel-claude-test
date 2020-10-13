@@ -236,7 +236,7 @@ export type Mutation = {
   /** Sends the petition and creates the corresponding accesses and messages. */
   sendPetition: SendPetitionResult;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
-  sendPetitionClosedNotification: Result;
+  sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
   /** Submits all unpublished comments. */
@@ -755,6 +755,14 @@ export type PetitionClosedEvent = PetitionEvent & {
   __typename?: "PetitionClosedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  user?: Maybe<User>;
+};
+
+export type PetitionClosedNotifiedEvent = PetitionEvent & {
+  __typename?: "PetitionClosedNotifiedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  notifiedAccesses?: Maybe<Array<Maybe<PetitionAccess>>>;
   user?: Maybe<User>;
 };
 
@@ -1618,6 +1626,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionClosedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment)
       | ({
+          __typename?: "PetitionClosedNotifiedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment)
+      | ({
           __typename?: "PetitionCompletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment)
       | ({
@@ -1696,6 +1707,11 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment 
 } & Pick<PetitionClosedEvent, "id"> &
   TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+} & Pick<PetitionClosedNotifiedEvent, "id"> &
+  TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
   __typename?: "PetitionCompletedEvent";
 } & Pick<PetitionCompletedEvent, "id"> &
@@ -1747,6 +1763,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
@@ -1894,6 +1911,23 @@ export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
   __typename?: "PetitionClosedEvent";
 } & Pick<PetitionClosedEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
+
+export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+} & Pick<PetitionClosedNotifiedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    notifiedAccesses?: Maybe<
+      Array<
+        Maybe<
+          { __typename?: "PetitionAccess" } & {
+            contact?: Maybe<
+              { __typename?: "Contact" } & ContactLink_ContactFragment
+            >;
+          }
+        >
+      >
+    >;
   };
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
@@ -2928,7 +2962,8 @@ export type PetitionReplies_PetitionFragment = {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
-  } & PetitionLayout_PetitionBase_Petition_Fragment;
+  } & PetitionLayout_PetitionBase_Petition_Fragment &
+  PetitionActivityTimeline_PetitionFragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -3102,7 +3137,90 @@ export type PetitionReplies_sendPetitionClosedNotificationMutationVariables = Ex
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
   __typename?: "Mutation";
-} & Pick<Mutation, "sendPetitionClosedNotification">;
+} & {
+  sendPetitionClosedNotification: { __typename?: "Petition" } & Pick<
+    Petition,
+    "id"
+  > & {
+      events: { __typename?: "PetitionEventPagination" } & {
+        items: Array<
+          | ({ __typename: "AccessActivatedEvent" } & Pick<
+              AccessActivatedEvent,
+              "id"
+            >)
+          | ({ __typename: "AccessDeactivatedEvent" } & Pick<
+              AccessDeactivatedEvent,
+              "id"
+            >)
+          | ({ __typename: "AccessOpenedEvent" } & Pick<
+              AccessOpenedEvent,
+              "id"
+            >)
+          | ({ __typename: "CommentDeletedEvent" } & Pick<
+              CommentDeletedEvent,
+              "id"
+            >)
+          | ({ __typename: "CommentPublishedEvent" } & Pick<
+              CommentPublishedEvent,
+              "id"
+            >)
+          | ({ __typename: "MessageCancelledEvent" } & Pick<
+              MessageCancelledEvent,
+              "id"
+            >)
+          | ({ __typename: "MessageScheduledEvent" } & Pick<
+              MessageScheduledEvent,
+              "id"
+            >)
+          | ({ __typename: "MessageSentEvent" } & Pick<MessageSentEvent, "id">)
+          | ({ __typename: "OwnershipTransferredEvent" } & Pick<
+              OwnershipTransferredEvent,
+              "id"
+            >)
+          | ({ __typename: "PetitionClosedEvent" } & Pick<
+              PetitionClosedEvent,
+              "id"
+            >)
+          | ({ __typename: "PetitionClosedNotifiedEvent" } & Pick<
+              PetitionClosedNotifiedEvent,
+              "id"
+            >)
+          | ({ __typename: "PetitionCompletedEvent" } & Pick<
+              PetitionCompletedEvent,
+              "id"
+            >)
+          | ({ __typename: "PetitionCreatedEvent" } & Pick<
+              PetitionCreatedEvent,
+              "id"
+            >)
+          | ({ __typename: "ReminderSentEvent" } & Pick<
+              ReminderSentEvent,
+              "id"
+            >)
+          | ({ __typename: "ReplyCreatedEvent" } & Pick<
+              ReplyCreatedEvent,
+              "id"
+            >)
+          | ({ __typename: "ReplyDeletedEvent" } & Pick<
+              ReplyDeletedEvent,
+              "id"
+            >)
+          | ({ __typename: "UserPermissionAddedEvent" } & Pick<
+              UserPermissionAddedEvent,
+              "id"
+            >)
+          | ({ __typename: "UserPermissionEditedEvent" } & Pick<
+              UserPermissionEditedEvent,
+              "id"
+            >)
+          | ({ __typename: "UserPermissionRemovedEvent" } & Pick<
+              UserPermissionRemovedEvent,
+              "id"
+            >)
+        >;
+      };
+    };
+};
 
 export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -4273,6 +4391,21 @@ export const TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc = gql`
   }
   ${UserReference_UserFragmentDoc}
 `;
+export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc = gql`
+  fragment TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent on PetitionClosedNotifiedEvent {
+    user {
+      ...UserReference_User
+    }
+    notifiedAccesses {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -4333,6 +4466,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionClosedEvent {
       ...TimelinePetitionClosedEvent_PetitionClosedEvent
     }
+    ... on PetitionClosedNotifiedEvent {
+      ...TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -4352,6 +4488,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragmentDoc}
   ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
   ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
+  ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -4576,11 +4713,13 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
     ...PetitionLayout_PetitionBase
+    ...PetitionActivityTimeline_Petition
     fields {
       ...PetitionReplies_PetitionField
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
+  ${PetitionActivityTimeline_PetitionFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
@@ -7600,7 +7739,15 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
     sendPetitionClosedNotification(
       petitionId: $petitionId
       emailBody: $emailBody
-    )
+    ) {
+      id
+      events(limit: 1000) {
+        items {
+          id
+          __typename
+        }
+      }
+    }
   }
 `;
 export type PetitionReplies_sendPetitionClosedNotificationMutationFn = Apollo.MutationFunction<
