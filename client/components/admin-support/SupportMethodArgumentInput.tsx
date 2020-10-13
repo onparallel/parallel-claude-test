@@ -104,13 +104,12 @@ function ScalarInput({
     />
   ) : (
     <NumberInput
-      placeholder={arg.description ?? ""}
       width="100%"
       isInvalid={isInvalid}
       value={value}
       onChange={(_, value) => (Number.isNaN(value) ? null : onValue(value))}
     >
-      <NumberInputField />
+      <NumberInputField placeholder={arg.description ?? ""} />
     </NumberInput>
   );
 }

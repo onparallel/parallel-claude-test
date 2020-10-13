@@ -263,7 +263,14 @@ type Mutation {
   Creates a new organization.
   """
   createOrganization(
+    """
+    Identifier of the organization
+    """
     identifier: String!
+
+    """
+    Name of the organization
+    """
     name: String!
     status: OrganizationStatus!
   ): SupportMethodResponse!

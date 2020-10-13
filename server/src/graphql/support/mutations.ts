@@ -78,8 +78,14 @@ export const createOrganization = mutationField("createOrganization", {
   description: "Creates a new organization.",
   type: "SupportMethodResponse",
   args: {
-    name: stringArg({ required: true }),
-    identifier: stringArg({ required: true }),
+    name: stringArg({
+      required: true,
+      description: "Name of the organization",
+    }),
+    identifier: stringArg({
+      required: true,
+      description: "Identifier of the organization",
+    }),
     status: arg({ type: "OrganizationStatus", required: true }),
   },
   authorize: chain(authenticate(), userBelongsToOrg("parallel", ["ADMIN"])),
