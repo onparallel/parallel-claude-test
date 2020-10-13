@@ -1,4 +1,4 @@
-import { Button, Text } from "@chakra-ui/core";
+import { Button } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -14,20 +14,19 @@ export function ConfirmResendCompletedNotificationDialog(props: DialogProps) {
 
   return (
     <ConfirmDialog
+      size="sm"
       initialFocusRef={inputRef as any}
       header={
         <FormattedMessage
           id="component.confirm-resend-completed-notification.header"
-          defaultMessage="Notification already sent"
+          defaultMessage="Resend confirmation email"
         />
       }
       body={
-        <Text>
-          <FormattedMessage
-            id="component.confirm-resend-completed-notification.description"
-            defaultMessage="We already sent a confirmation email to the petition contacts. Do you want to send it again?"
-          />
-        </Text>
+        <FormattedMessage
+          id="component.confirm-resend-completed-notification.description"
+          defaultMessage="We already sent a confirmation email to the petition contacts. Do you want to send it again?"
+        />
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>

@@ -1,5 +1,5 @@
 import { Box, Button, Flex, ModalCloseButton, Text } from "@chakra-ui/core";
-import { ThumbUpIcon } from "@parallel/chakra/icons";
+import { EmailIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -130,6 +130,7 @@ export function ConfirmPetitionCompletedDialog({
       }
       confirm={
         <Button
+          leftIcon={<EmailIcon />}
           colorScheme="purple"
           onClick={() => props.onResolve(body)}
           disabled={isInvalidBody}

@@ -10,6 +10,21 @@
     "context": "Open menu"
   },
   {
+    "term": "component.confirm-resend-completed-notification.confirm-button",
+    "definition": "Yes, resend the notification",
+    "context": "Yes, resend the notification"
+  },
+  {
+    "term": "component.confirm-resend-completed-notification.description",
+    "definition": "We already sent a confirmation email to the petition contacts. Do you want to send it again?",
+    "context": "We already sent a confirmation email to the petition contacts. Do you want to send it again?"
+  },
+  {
+    "term": "component.confirm-resend-completed-notification.header",
+    "definition": "Resend confirmation email",
+    "context": "Resend confirmation email"
+  },
+  {
     "term": "component.contact-list-header.actions-button",
     "definition": "Actions",
     "context": "Actions"
