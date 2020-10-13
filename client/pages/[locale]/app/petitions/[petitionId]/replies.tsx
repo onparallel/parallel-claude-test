@@ -65,7 +65,6 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
 import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
-import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 
 type PetitionProps = UnwrapPromise<
@@ -356,11 +355,10 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           e.__typename === "ReplyCreatedEvent"
       );
       const lastEvent = events[events.length - 1];
-      const repliedAfterConfirmation =
-        events.find((e) => e.__typename === "PetitionClosedNotifiedEvent") &&
-        lastEvent.__typename === "ReplyCreatedEvent";
+      const showAlreadyNotifiedDialog =
+        lastEvent && lastEvent.__typename === "PetitionClosedNotifiedEvent";
 
-      if (!repliedAfterConfirmation) {
+      if (showAlreadyNotifiedDialog) {
         await petitionAlreadyNotifiedDialog({});
       }
       const emailBody = await confirmPetitionDialog({});
@@ -385,7 +383,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         isClosable: true,
       });
     } catch {}
-  }, [petition.events, intl.locale]);
+  }, [petition.events.items, intl.locale]);
 
   return (
     <PetitionLayout
@@ -523,12 +521,16 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_Petition on Petition {
         id
         ...PetitionLayout_PetitionBase
-        ...PetitionActivityTimeline_Petition
+        events(limit: 1000) {
+          items {
+            id
+            __typename
+          }
+        }
         fields {
           ...PetitionReplies_PetitionField
         }
       }
-      ${PetitionActivityTimeline.fragments.Petition}
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
     `;

@@ -2959,11 +2959,75 @@ export type PetitionQuery = { __typename?: "Query" } & {
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
+    events: { __typename?: "PetitionEventPagination" } & {
+      items: Array<
+        | ({ __typename: "AccessActivatedEvent" } & Pick<
+            AccessActivatedEvent,
+            "id"
+          >)
+        | ({ __typename: "AccessDeactivatedEvent" } & Pick<
+            AccessDeactivatedEvent,
+            "id"
+          >)
+        | ({ __typename: "AccessOpenedEvent" } & Pick<AccessOpenedEvent, "id">)
+        | ({ __typename: "CommentDeletedEvent" } & Pick<
+            CommentDeletedEvent,
+            "id"
+          >)
+        | ({ __typename: "CommentPublishedEvent" } & Pick<
+            CommentPublishedEvent,
+            "id"
+          >)
+        | ({ __typename: "MessageCancelledEvent" } & Pick<
+            MessageCancelledEvent,
+            "id"
+          >)
+        | ({ __typename: "MessageScheduledEvent" } & Pick<
+            MessageScheduledEvent,
+            "id"
+          >)
+        | ({ __typename: "MessageSentEvent" } & Pick<MessageSentEvent, "id">)
+        | ({ __typename: "OwnershipTransferredEvent" } & Pick<
+            OwnershipTransferredEvent,
+            "id"
+          >)
+        | ({ __typename: "PetitionClosedEvent" } & Pick<
+            PetitionClosedEvent,
+            "id"
+          >)
+        | ({ __typename: "PetitionClosedNotifiedEvent" } & Pick<
+            PetitionClosedNotifiedEvent,
+            "id"
+          >)
+        | ({ __typename: "PetitionCompletedEvent" } & Pick<
+            PetitionCompletedEvent,
+            "id"
+          >)
+        | ({ __typename: "PetitionCreatedEvent" } & Pick<
+            PetitionCreatedEvent,
+            "id"
+          >)
+        | ({ __typename: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id">)
+        | ({ __typename: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id">)
+        | ({ __typename: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id">)
+        | ({ __typename: "UserPermissionAddedEvent" } & Pick<
+            UserPermissionAddedEvent,
+            "id"
+          >)
+        | ({ __typename: "UserPermissionEditedEvent" } & Pick<
+            UserPermissionEditedEvent,
+            "id"
+          >)
+        | ({ __typename: "UserPermissionRemovedEvent" } & Pick<
+            UserPermissionRemovedEvent,
+            "id"
+          >)
+      >;
+    };
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
-  } & PetitionLayout_PetitionBase_Petition_Fragment &
-  PetitionActivityTimeline_PetitionFragment;
+  } & PetitionLayout_PetitionBase_Petition_Fragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -4713,13 +4777,17 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
     ...PetitionLayout_PetitionBase
-    ...PetitionActivityTimeline_Petition
+    events(limit: 1000) {
+      items {
+        id
+        __typename
+      }
+    }
     fields {
       ...PetitionReplies_PetitionField
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${PetitionActivityTimeline_PetitionFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`

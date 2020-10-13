@@ -16,7 +16,7 @@
   },
   {
     "term": "component.confirm-resend-completed-notification.description",
-    "definition": "Ya hemos enviado un email de confirmación a los contactos de la petición. ¿Quieres enviarla nuevamente?",
+    "definition": "Ya hemos enviado un email de confirmación a los contactos de la petición. ¿Quieres enviarlo nuevamente?",
     "context": "We already sent a confirmation email to the petition contacts. Do you want to send it again?"
   },
   {
@@ -3152,7 +3152,7 @@
   {
     "term": "recipient-view.petition-closed-alert",
     "definition": "Esta petición ha sido cerrada. Si deseas realizar cambios, pídele a {name} que la reabra.",
-    "context": "This petition has been closed. If you want to make any changes ask {name} to reopen it."
+    "context": "This petition has been closed. If you want to make any changes, ask {name} to reopen it."
   },
   {
     "term": "recipient-view.petition-completed-alert",
