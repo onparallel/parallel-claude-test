@@ -20,6 +20,7 @@ import {
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userIsCommentAuthor } from "../petition/mutations/authorizers";
+import { toGlobalId } from "../../util/globalId";
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -190,6 +191,14 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       ctx.access!.id
     );
     await ctx.emails.sendPetitionCompletedEmail(ctx.access!.id);
+    ctx.analytics.trackEvent(
+      "PETITION_COMPLETED_BY_RECIPIENT",
+      {
+        petition_id: petition.id,
+        access_id: ctx.access!.id,
+      },
+      toGlobalId("PetitionAccess", ctx.access!.id)
+    );
     return petition;
   },
 });

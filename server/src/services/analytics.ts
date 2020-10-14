@@ -2,28 +2,55 @@ import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
 import { User } from "../db/__types";
-import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
 
-type validEvents = "Petition created" | "User data updated";
+type AnalyticsEventType =
+  | "PETITION_CREATED"
+  | "PETITION_SENT"
+  | "PETITION_COMPLETED_BY_RECIPIENT"
+  | "USER_LOGGED_IN"
+  | "REMINDER_EMAIL_SENT";
+
+type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
+  PETITION_CREATED: {
+    petition_id: number;
+    user_id: number;
+    type: "PETITION" | "TEMPLATE";
+  };
+  PETITION_SENT: {
+    petition_id: number;
+    user_id: number;
+    access_ids: number[];
+  };
+  PETITION_COMPLETED_BY_RECIPIENT: {
+    petition_id: number;
+    access_id: number;
+  };
+  USER_LOGGED_IN: { user_id: number; email: string; org_id: number };
+  REMINDER_EMAIL_SENT: {
+    user_id: number;
+    petition_id: number;
+    access_id: number;
+    sent_count: number;
+    type: "AUTOMATIC" | "MANUAL";
+  };
+}[EventType];
 
 @injectable()
 export class AnalyticsService {
   private analytics: Analytics;
   constructor(@inject(CONFIG) private config: Config) {
-    this.analytics = new Analytics(this.config.analytics.writeKey);
+    this.analytics = new Analytics(this.config.analytics.writeKey, {
+      enable: process.env.NODE_ENV === "production",
+    });
   }
 
-  public async identifyUser(user: User) {
+  public async identifyUser(user: Pick<User, "id" | "email">) {
     return new Promise((resolve, reject) => {
       this.analytics.identify(
         {
           userId: toGlobalId("User", user.id),
-          traits: {
-            email: user.email,
-            name: fullName(user.first_name, user.last_name),
-            createdAt: user.created_at,
-          },
+          traits: { email: user.email },
         },
         (err) => {
           if (err) {
@@ -36,16 +63,16 @@ export class AnalyticsService {
     });
   }
 
-  public async trackEvent(
-    eventName: validEvents,
-    userId: number,
-    properties?: { [key: string]: any }
+  public async trackEvent<EventType extends AnalyticsEventType>(
+    eventName: EventType,
+    properties: AnalyticsEventProperties<EventType>,
+    userGID: string
   ) {
     return new Promise((resolve, reject) => {
       this.analytics.track(
         {
-          userId: toGlobalId("User", userId),
-          event: eventName,
+          userId: userGID,
+          event: this.prettify(eventName),
           properties,
         },
         (err) => {
@@ -57,5 +84,14 @@ export class AnalyticsService {
         }
       );
     });
+  }
+
+  private prettify(text: string): string {
+    return text
+      .split("_")
+      .map((word) =>
+        word.charAt(0).toUpperCase().concat(word.slice(1).toLowerCase())
+      )
+      .join(" ");
   }
 }

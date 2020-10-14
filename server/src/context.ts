@@ -50,6 +50,7 @@ export class WorkerContext {
     public readonly aws: Aws,
     public readonly smtp: Smtp,
     public readonly emails: EmailsService,
+    public readonly analytics: AnalyticsService,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

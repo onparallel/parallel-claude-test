@@ -54,6 +54,7 @@ import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { mapSeries } from "async";
 import { unMaybeArray } from "../../../util/arrays";
+import { toGlobalId } from "../../../util/globalId";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -90,7 +91,7 @@ export const createPetition = mutationField("createPetition", {
         status: isTemplate ? null : "DRAFT",
       });
     } else {
-      return await ctx.petitions.createPetition(
+      const newPetition = await ctx.petitions.createPetition(
         {
           name,
           locale,
@@ -99,6 +100,18 @@ export const createPetition = mutationField("createPetition", {
         },
         ctx.user!
       );
+
+      ctx.analytics.trackEvent(
+        "PETITION_CREATED",
+        {
+          petition_id: newPetition.id,
+          user_id: ctx.user!.id,
+          type: isTemplate ? "TEMPLATE" : "PETITION",
+        },
+        toGlobalId("User", ctx.user!.id)
+      );
+
+      return newPetition;
     }
   },
 });
@@ -725,7 +738,7 @@ export const sendPetition = mutationField("sendPetition", {
         ctx.user!
       );
 
-      await ctx.petitions.updatePetition(
+      const updatedPetition = await ctx.petitions.updatePetition(
         args.petitionId,
         { name: petition.name ?? args.subject, status: "PENDING" },
         ctx.user!
@@ -734,10 +747,19 @@ export const sendPetition = mutationField("sendPetition", {
       if (!args.scheduledAt) {
         await ctx.emails.sendPetitionMessageEmail(messages.map((s) => s.id));
       }
+
+      ctx.analytics.trackEvent(
+        "PETITION_SENT",
+        {
+          petition_id: args.petitionId,
+          user_id: ctx.user!.id,
+          access_ids: accesses.map((a) => a.id),
+        },
+        toGlobalId("User", ctx.user!.id)
+      );
+
       return {
-        petition: await ctx.petitions.loadPetition(args.petitionId, {
-          refresh: true,
-        }),
+        petition: updatedPetition,
         accesses,
         result: RESULT.SUCCESS,
       };
@@ -835,6 +857,22 @@ export const sendReminders = mutationField("sendReminders", {
         }))
       );
       await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
+
+      accesses.forEach((access) => {
+        if (access) {
+          ctx.analytics.trackEvent(
+            "REMINDER_EMAIL_SENT",
+            {
+              petition_id: args.petitionId,
+              user_id: ctx.user!.id,
+              access_id: access.id,
+              sent_count: 10 - access.reminders_left + 1,
+              type: "MANUAL",
+            },
+            toGlobalId("User", ctx.user!.id)
+          );
+        }
+      });
       return RESULT.SUCCESS;
     } catch (error) {
       return RESULT.FAILURE;

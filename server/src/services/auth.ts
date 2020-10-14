@@ -4,7 +4,9 @@ import DataLoader from "dataloader";
 import { NextFunction, Request, Response } from "express";
 import { injectable } from "inversify";
 import jwtDecode from "jwt-decode";
+import { ApiContext } from "../context";
 import { fromDataLoader } from "../util/fromDataLoader";
+import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { Cognito } from "./cognito";
 import { Redis } from "./redis";
@@ -15,11 +17,28 @@ export class Auth {
 
   constructor(private cognito: Cognito, private redis: Redis) {}
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(
+    req: Request & { context: ApiContext },
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { email, password } = req.body;
       const session = await this.cognito.login(email, password);
       const token = await this.storeSession(session);
+      const user = await req.context.users.loadSessionUser(
+        session.getIdToken().payload["cognito:username"]
+      );
+      req.context.analytics.identifyUser(user);
+      req.context.analytics.trackEvent(
+        "USER_LOGGED_IN",
+        {
+          email: user.email,
+          org_id: user.org_id,
+          user_id: user.id,
+        },
+        toGlobalId("User", user.id)
+      );
       this.setSession(res, token);
     } catch (error) {
       switch (error.code) {
