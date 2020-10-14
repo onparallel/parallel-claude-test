@@ -1,4 +1,4 @@
-import { Icon, Tooltip } from "@chakra-ui/core";
+import { Center, Tooltip } from "@chakra-ui/core";
 import {
   CheckIcon,
   DoubleCheckIcon,
@@ -17,7 +17,7 @@ export function PetitionStatusIcon({
   status: PetitionStatus;
 }>) {
   const intl = useIntl();
-  const { label, icon, color } = useMemo(
+  const { label, icon } = useMemo(
     () => ({
       label: {
         DRAFT: intl.formatMessage({
@@ -38,23 +38,17 @@ export function PetitionStatusIcon({
         }),
       }[status],
       icon: {
-        DRAFT: EditIcon,
-        PENDING: TimeIcon,
-        COMPLETED: CheckIcon,
-        CLOSED: DoubleCheckIcon,
-      }[status],
-      color: {
-        DRAFT: "gray.500",
-        PENDING: "yellow.600",
-        COMPLETED: "green.500",
-        CLOSED: "green.500",
+        DRAFT: <EditIcon boxSize="18px" color="gray.500" />,
+        PENDING: <TimeIcon boxSize="18px" color="yellow.600" />,
+        COMPLETED: <CheckIcon boxSize="18px" color="green.500" />,
+        CLOSED: <DoubleCheckIcon boxSize="24px" color="green.500" />,
       }[status],
     }),
     [status, intl.locale]
   );
   return (
-    <Tooltip label={label}>
-      <Icon as={icon} boxSize="18px" color={color} {...props} />
-    </Tooltip>
+    <Center boxSize="24px" {...props}>
+      <Tooltip label={label}>{icon}</Tooltip>
+    </Center>
   );
 }

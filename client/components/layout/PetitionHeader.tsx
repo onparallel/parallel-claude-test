@@ -204,7 +204,7 @@ export function PetitionHeader({
               maxWidth={{
                 base: `calc(100vw - ${
                   16 /* heading padding left */ +
-                  18 /* petition status icon width */ +
+                  24 /* petition status icon width */ +
                   28 /* locale badge width + margins + padding */ +
                   4 /* petition status icon margin right */ +
                   16 /* petition name padding l+r */ +
@@ -214,7 +214,7 @@ export function PetitionHeader({
                 sm: `calc(100vw - ${
                   96 /* left navbar width */ +
                   16 /* heading padding left */ +
-                  18 /* petition status icon width */ +
+                  24 /* petition status icon width */ +
                   28 /* locale badge width + margins + padding */ +
                   4 /* petition status icon margin right */ +
                   16 /* petition name padding l+r */ +
@@ -226,7 +226,7 @@ export function PetitionHeader({
                   350 /* petition navigation tabs width */
                 }px)/2 - ${
                   16 /* heading padding left */ +
-                  18 /* petition status icon width */ +
+                  24 /* petition status icon width */ +
                   28 /* locale badge width + margins + padding */ +
                   16 /* heading padding right */
                 }px)`,
