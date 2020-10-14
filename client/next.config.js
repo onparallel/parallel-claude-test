@@ -39,7 +39,6 @@ const plugins = [
   require("@next/bundle-analyzer")({
     enabled: process.env.ANALYZE === "true",
   }),
-  require("next-transpile-modules")(["@camwiegert/typical"]),
   require("next-plugin-graphql"),
 ];
 

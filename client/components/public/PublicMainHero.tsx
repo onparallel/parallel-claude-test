@@ -42,27 +42,6 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
               id="public.home.hero-title"
               defaultMessage="Say goodbye to email threads to obtain information"
             />
-            {/* <FormattedMessage
-              id="public.home.hero-title"
-              defaultMessage="Better <a><b>communication</b><b>collaboration</b><b>follow-ups</b></a> with your clients"
-              values={{
-                a: (chunks: string[]) => (
-                  <>
-                    <Typical
-                      as="span"
-                      fontFamily="hero"
-                      args={chunks.flatMap((chunk) => [chunk, 3000])}
-                      _after={{
-                        content: `"|"`,
-                        animation: `${keyframes`50% { opacity: 0; }`} 1s infinite step-start`,
-                      }}
-                    />
-                    <br />
-                  </>
-                ),
-                b: (chunks: any) => [chunks],
-              }}
-            /> */}
           </Heading>
           <Text marginTop={8}>
             <Heading as="h2" size="md" fontWeight="light">
