@@ -2,7 +2,7 @@ import { ApolloServer } from "apollo-server-express";
 import { schema } from "./../../schema";
 import { ApiContext } from "../../context";
 import { Auth } from "../../services/auth";
-import { MockAuth, MockRedis } from "./mocks";
+import { MockAnalyticsService, MockAuth, MockRedis } from "./mocks";
 import { createContainer } from "../../container";
 import {
   ApolloServerTestClient,
@@ -12,6 +12,7 @@ import { Redis } from "../../services/redis";
 import { KNEX } from "../../db/knex";
 import Knex from "knex";
 import { deleteAllData } from "../../util/knexUtils";
+import { AnalyticsService } from "../../services/analytics";
 
 export type TestClient = {
   query: ApolloServerTestClient["query"];
@@ -27,6 +28,7 @@ export const initServer = async () => {
     context: () => {
       container.rebind(Auth).to(MockAuth);
       container.rebind(Redis).to(MockRedis);
+      container.rebind(AnalyticsService).to(MockAnalyticsService);
       const context = container.get<ApiContext>(ApiContext);
       context.req = {
         header: (name: string) => {

@@ -3,6 +3,7 @@ import { Cognito } from "../../services/cognito";
 import { Redis } from "./../../services/redis";
 import { injectable, inject } from "inversify";
 import { CONFIG, Config } from "../../config";
+import { AnalyticsService } from "../../services/analytics";
 
 export const userCognitoId = "test-cognito-id";
 
@@ -15,7 +16,7 @@ export class MockAuth extends Auth {
 }
 
 @injectable()
-export class MockRedis {
+export class MockRedis implements Redis {
   public readonly client: any;
   constructor(@inject(CONFIG) config: Config) {}
 
@@ -32,4 +33,12 @@ export class MockRedis {
   async delete(...keys: string[]): Promise<number> {
     return 0;
   }
+}
+
+@injectable()
+export class MockAnalyticsService implements AnalyticsService {
+  public readonly analytics: any;
+  constructor(@inject(CONFIG) config: Config) {}
+  async identifyUser() {}
+  async trackEvent() {}
 }

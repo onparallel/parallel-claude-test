@@ -39,9 +39,9 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
 
 @injectable()
 export class AnalyticsService {
-  private analytics: Analytics;
-  constructor(@inject(CONFIG) private config: Config) {
-    this.analytics = new Analytics(this.config.analytics.writeKey, {
+  public readonly analytics: Analytics;
+  constructor(@inject(CONFIG) config: Config) {
+    this.analytics = new Analytics(config.analytics.writeKey, {
       enable: process.env.NODE_ENV === "production",
     });
   }
