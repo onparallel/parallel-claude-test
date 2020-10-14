@@ -3,6 +3,7 @@ import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
 import { User } from "../db/__types";
 import { toGlobalId } from "../util/globalId";
+import { snakeCaseToCapitalizedText } from "../util/strings";
 
 type AnalyticsEventType =
   | "PETITION_CREATED"
@@ -72,7 +73,7 @@ export class AnalyticsService {
       this.analytics.track(
         {
           userId: userGID,
-          event: this.prettify(eventName),
+          event: snakeCaseToCapitalizedText(eventName),
           properties,
         },
         (err) => {
@@ -84,14 +85,5 @@ export class AnalyticsService {
         }
       );
     });
-  }
-
-  private prettify(text: string): string {
-    return text
-      .split("_")
-      .map((word) =>
-        word.charAt(0).toUpperCase().concat(word.slice(1).toLowerCase())
-      )
-      .join(" ");
   }
 }
