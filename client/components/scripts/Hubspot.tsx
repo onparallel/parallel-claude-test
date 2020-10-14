@@ -17,13 +17,30 @@ export const Hubspot = memo(() => {
     };
   }, []);
   return (
-    <Head>
-      <script
-        id="hs-script-loader"
-        async
-        defer
-        src="//js.hs-scripts.com/6692004.js"
-      ></script>
-    </Head>
+    <>
+      <Head>
+        <script
+          id="hs-script-loader"
+          async
+          defer
+          src="//js.hs-scripts.com/6692004.js"
+        ></script>
+      </Head>
+      <style jsx global>
+        {
+          /* css */ `
+            /* hide the hubspot widget on small screens */
+            div#hubspot-messages-iframe-container {
+              display: none !important;
+            }
+            @media screen and (min-width: 30em) {
+              body:not(.hide-hubspot) div#hubspot-messages-iframe-container {
+                display: block !important;
+              }
+            }
+          `
+        }
+      </style>
+    </>
   );
 });

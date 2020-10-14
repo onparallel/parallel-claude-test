@@ -83,6 +83,15 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       : null;
   }, [activeFieldId]);
 
+  useEffect(() => {
+    if (activeFieldId) {
+      document.body.classList.add("hide-hubspot");
+    } else {
+      document.body.classList.remove("hide-hubspot");
+    }
+    return () => document.body.classList.remove("hide-hubspot");
+  }, [Boolean(activeFieldId)]);
+
   const [
     markPetitionFieldCommentsAsRead,
   ] = usePetitionReplies_markPetitionFieldCommentsAsReadMutation();

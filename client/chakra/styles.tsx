@@ -17,15 +17,5 @@ export const styles: Styles = {
       borderColor: mode("gray.200", "whiteAlpha.300")(props),
       wordWrap: "break-word",
     },
-
-    // Hubspot stuff
-    "div#hubspot-messages-iframe-container": {
-      display: "none !important",
-    },
-    "@media screen and (min-width: 30em)": {
-      "div#hubspot-messages-iframe-container": {
-        display: "block !important",
-      },
-    },
   }),
 };
