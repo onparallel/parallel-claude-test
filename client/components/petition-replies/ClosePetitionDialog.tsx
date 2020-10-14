@@ -1,136 +1,126 @@
 import {
+  Box,
   Button,
-  ButtonProps,
   Flex,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
+  Radio,
+  RadioGroup,
+  Stack,
   Text,
+  useTheme,
 } from "@chakra-ui/core";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import {
-  useDialog,
   DialogProps,
+  useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { ReactElement, ReactNode } from "react";
+import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { ConfirmDialog } from "../common/ConfirmDialog";
 
-export function ClosePetitionDialog({
-  onResolve,
-  onReject,
-  ...props
-}: DialogProps<{}, "APPROVE" | "REJECT" | "MANUAL">) {
+type ClosePetitionDialogAction = "APPROVE" | "REJECT";
+
+export function ClosePetitionDialog(
+  props: DialogProps<{}, ClosePetitionDialogAction>
+) {
+  const [value, setValue] = useState<ClosePetitionDialogAction>();
+
+  // "hack" style config so that buttons con be full width
+  const theme = useTheme();
+  const radioStyleConfig = {
+    ...theme.components.Radio,
+    baseStyle: (props: any) => {
+      const fromTheme = theme.components.Radio.baseStyle(props);
+      return {
+        ...fromTheme,
+        label: {
+          ...fromTheme.label,
+          flex: 1,
+        },
+      };
+    },
+  };
   return (
-    <Modal
-      {...props}
-      size="sm"
-      isOpen={true}
-      onClose={() => onReject({ reason: "CLOSE" })}
-    >
-      <ModalOverlay>
-        <ModalContent borderRadius="md">
-          <ModalHeader>
+    <ConfirmDialog
+      closeOnOverlayClick={false}
+      header={
+        <FormattedMessage
+          id="petition-replies.close-petition.dialog-heading"
+          defaultMessage="There are some unreviewed replies"
+        />
+      }
+      body={
+        <Box>
+          <Text marginBottom={4}>
             <FormattedMessage
-              id="petition-replies.close-petition.dialog-heading"
-              defaultMessage="There are answers without approval or rejection..."
+              id="petition-replies.close-petition.dialog-subheading"
+              defaultMessage="What would you like to do with them?"
             />
-
-            <Text fontWeight="normal" fontSize="sm">
-              <FormattedMessage
-                id="petition-replies.close-petition.dialog-subheading"
-                defaultMessage="What do you want to do with them?"
-              />
-            </Text>
-          </ModalHeader>
-          <ModalBody>
-            <Flex direction="column" alignItems="center" marginBottom={3}>
-              <Option
-                leftIcon={
+          </Text>
+          <RadioGroup onChange={setValue as any} value={value}>
+            <Stack>
+              <Radio value="APPROVE" size="lg" styleConfig={radioStyleConfig}>
+                <Button
+                  as="div"
+                  width="100%"
+                  justifyContent="flex-start"
+                  variant="outline"
+                  isActive={value === "APPROVE"}
+                >
                   <Flex
                     justifyContent="center"
                     alignItems="center"
                     backgroundColor="green.500"
                     borderRadius="md"
-                    margin={1}
-                    height="24px"
-                    width="24px"
+                    boxSize={6}
+                    marginRight={2}
                   >
-                    <CheckIcon fontSize="sm" color="white" />
+                    <CheckIcon boxSize={4} color="white" />
                   </Flex>
-                }
-                onClick={() => onResolve("APPROVE")}
-              >
-                <FormattedMessage
-                  id="petition-replies.close-petition.dialog-approve"
-                  defaultMessage="Approve unreviewed responses"
-                />
-              </Option>
-              <Option
-                leftIcon={
+                  <FormattedMessage
+                    id="petition-replies.close-petition.dialog-approve"
+                    defaultMessage="Approve unreviewed replies"
+                  />
+                </Button>
+              </Radio>
+              <Radio value="REJECT" size="lg" styleConfig={radioStyleConfig}>
+                <Button
+                  as="div"
+                  width="100%"
+                  justifyContent="flex-start"
+                  variant="outline"
+                  isActive={value === "REJECT"}
+                >
                   <Flex
                     justifyContent="center"
                     alignItems="center"
                     backgroundColor="red.500"
                     borderRadius="md"
-                    margin={1}
-                    height="24px"
-                    width="24px"
+                    boxSize={6}
+                    marginRight={2}
                   >
-                    <CloseIcon fontSize="xs" color="white" />
+                    <CloseIcon boxSize={4} color="white" />
                   </Flex>
-                }
-                onClick={() => onResolve("REJECT")}
-              >
-                <FormattedMessage
-                  id="petition-replies.close-petition.dialog-reject"
-                  defaultMessage="Reject unreviewed responses"
-                />
-              </Option>
-              <Option
-                backgroundColor="auto"
-                fontWeight="bold"
-                justifyContent="center"
-                onClick={() => onResolve("MANUAL")}
-              >
-                <FormattedMessage
-                  id="petition-replies.close-petition.dialog-manual-review"
-                  defaultMessage="Manual review"
-                />
-              </Option>
-            </Flex>
-          </ModalBody>
-        </ModalContent>
-      </ModalOverlay>
-    </Modal>
-  );
-}
-function Option({
-  children,
-  leftIcon,
-  ...props
-}: ButtonProps & {
-  children?: ReactNode;
-  leftIcon?: ReactElement;
-}) {
-  return (
-    <Button
-      leftIcon={leftIcon}
-      margin={1}
-      padding={1}
-      height="46px"
-      width="100%"
-      fontWeight="normal"
-      backgroundColor="white"
-      border="1px solid"
-      borderColor="gray.200"
-      display="flex"
-      justifyContent="flex-start"
+                  <FormattedMessage
+                    id="petition-replies.close-petition.dialog-reject"
+                    defaultMessage="Reject unreviewed replies"
+                  />
+                </Button>
+              </Radio>
+            </Stack>
+          </RadioGroup>
+        </Box>
+      }
+      confirm={
+        <Button
+          colorScheme="purple"
+          isDisabled={!value}
+          onClick={() => props.onResolve(value)}
+        >
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      }
       {...props}
-    >
-      {children}
-    </Button>
+    />
   );
 }
 

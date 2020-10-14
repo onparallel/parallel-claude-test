@@ -1371,28 +1371,23 @@
   },
   {
     "term": "petition-replies.close-petition.dialog-approve",
-    "definition": "Approve unreviewed responses",
-    "context": "Approve unreviewed responses"
+    "definition": "Approve unreviewed replies",
+    "context": "Approve unreviewed replies"
   },
   {
     "term": "petition-replies.close-petition.dialog-heading",
-    "definition": "There are answers without approval or rejection...",
-    "context": "There are answers without approval or rejection..."
-  },
-  {
-    "term": "petition-replies.close-petition.dialog-manual-review",
-    "definition": "Manual review",
-    "context": "Manual review"
+    "definition": "There are some unreviewed replies",
+    "context": "There are some unreviewed replies"
   },
   {
     "term": "petition-replies.close-petition.dialog-reject",
-    "definition": "Reject unreviewed responses",
-    "context": "Reject unreviewed responses"
+    "definition": "Reject unreviewed replies",
+    "context": "Reject unreviewed replies"
   },
   {
     "term": "petition-replies.close-petition.dialog-subheading",
-    "definition": "What do you want to do with them?",
-    "context": "What do you want to do with them?"
+    "definition": "What would you like to do with them?",
+    "context": "What would you like to do with them?"
   },
   {
     "term": "petition-replies.comment-pending.label",

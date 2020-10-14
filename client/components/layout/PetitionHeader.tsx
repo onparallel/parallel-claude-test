@@ -435,6 +435,7 @@ PetitionHeader.mutations = [
       reopenPetition(petitionId: $petitionId) {
         id
         status
+        updatedAt
       }
     }
   `,

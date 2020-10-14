@@ -1372,27 +1372,22 @@
   {
     "term": "petition-replies.close-petition.dialog-approve",
     "definition": "Aprobar las respuestas sin revisar",
-    "context": "Approve unreviewed responses"
+    "context": "Approve unreviewed replies"
   },
   {
     "term": "petition-replies.close-petition.dialog-heading",
-    "definition": "Hay respuestas sin aprobar o rechazar...",
-    "context": "There are answers without approval or rejection..."
-  },
-  {
-    "term": "petition-replies.close-petition.dialog-manual-review",
-    "definition": "Revisar manualmente",
-    "context": "Manual review"
+    "definition": "Hay algunas respuestas sin revisar",
+    "context": "There are some unreviewed replies"
   },
   {
     "term": "petition-replies.close-petition.dialog-reject",
     "definition": "Rechazar las respuestas sin revisar",
-    "context": "Reject unreviewed responses"
+    "context": "Reject unreviewed replies"
   },
   {
     "term": "petition-replies.close-petition.dialog-subheading",
     "definition": "¿Qué quieres hacer con ellas?",
-    "context": "What do you want to do with them?"
+    "context": "What would you like to do with them?"
   },
   {
     "term": "petition-replies.comment-pending.label",
