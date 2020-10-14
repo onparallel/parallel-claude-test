@@ -39,28 +39,33 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
 
 @injectable()
 export class AnalyticsService {
-  public readonly analytics: Analytics;
+  public readonly analytics: Analytics | null;
   constructor(@inject(CONFIG) config: Config) {
-    this.analytics = new Analytics(config.analytics.writeKey, {
-      enable: process.env.NODE_ENV === "production",
-    });
+    if (config.analytics.writeKey) {
+      this.analytics = new Analytics(config.analytics.writeKey, {
+        enable: process.env.NODE_ENV === "production",
+      });
+    } else {
+      this.analytics = null;
+    }
   }
 
   public async identifyUser(user: Pick<User, "id" | "email">) {
     return new Promise((resolve, reject) => {
-      this.analytics.identify(
-        {
-          userId: toGlobalId("User", user.id),
-          traits: { email: user.email },
-        },
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
+      this.analytics &&
+        this.analytics.identify(
+          {
+            userId: toGlobalId("User", user.id),
+            traits: { email: user.email },
+          },
+          (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
           }
-        }
-      );
+        );
     });
   }
 
@@ -70,20 +75,21 @@ export class AnalyticsService {
     userGID: string
   ) {
     return new Promise((resolve, reject) => {
-      this.analytics.track(
-        {
-          userId: userGID,
-          event: snakeCaseToCapitalizedText(eventName),
-          properties,
-        },
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
+      this.analytics &&
+        this.analytics.track(
+          {
+            userId: userGID,
+            event: snakeCaseToCapitalizedText(eventName),
+            properties,
+          },
+          (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
           }
-        }
-      );
+        );
     });
   }
 }

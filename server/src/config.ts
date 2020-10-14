@@ -41,7 +41,7 @@ export function buildConfig() {
       }),
     }),
     analytics: Object.freeze({
-      writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY!,
+      writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY, // can be undefined
     }),
     queueWorkers: Object.freeze({
       "email-sender": Object.freeze({
