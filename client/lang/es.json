@@ -2456,8 +2456,8 @@
   },
   {
     "term": "public.home.hero-title",
-    "definition": "Di adiós a las cadenas de correos para obtener información",
-    "context": "Say goodbye to email threads to obtain information"
+    "definition": "Di adiós a las largas cadenas de correos para obtener información",
+    "context": "Say goodbye to long email threads to obtain information"
   },
   {
     "term": "public.home.press",
@@ -2477,7 +2477,7 @@
   {
     "term": "public.how-it-works-hero.client-timings-2",
     "definition": "Mientras tanto, haz seguimiento fácilmente o automatízalo.",
-    "context": "In the meantime, easily track or automate."
+    "context": "In the meantime, track it or automate it easily."
   },
   {
     "term": "public.how-it-works-hero.description",
@@ -2486,13 +2486,13 @@
   },
   {
     "term": "public.how-it-works-hero.keep-working",
-    "definition": "Comparte el Parallel para seguir trabajando con tu equipo.",
-    "context": "Share the Parallel to keep working with your team."
+    "definition": "Comparte el Parallel con tu equipo para trabajar colaborativamente.",
+    "context": "Share the Parallel with your team to keep working collaboratively."
   },
   {
     "term": "public.how-it-works-hero.let-client-complete",
     "definition": "Deja que lo completen a su ritmo",
-    "context": "Let them complete at their own peace"
+    "context": "Let them complete at their own pace"
   },
   {
     "term": "public.how-it-works-hero.receive-inbox",
@@ -2502,7 +2502,7 @@
   {
     "term": "public.how-it-works-hero.review",
     "definition": "Revisa, aprueba o rechaza, y comunícate en Parallel si lo necesitas.",
-    "context": "Review, approve or reject, and communicate within Parallel if necessary."
+    "context": "Review, approve or reject, and communicate within Parallel."
   },
   {
     "term": "public.how-it-works-hero.screenshot-1",
@@ -2518,6 +2518,11 @@
     "term": "public.how-it-works-hero.screenshot-3",
     "definition": "Una captura de pantalla de la aplicación donde se muestra las peticiones que el usario ha creado con información de cada una, de manera que este pueda ver rápidamente el estado global.",
     "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status."
+  },
+  {
+    "term": "public.how-it-works-hero.screenshot-4",
+    "definition": "Una captura de pantalla de la aplicación donde se muestra como la petición se puede compartir con miembros de tu equipo y permitir así la colaboración.",
+    "context": "A screenshot of the app showing that the petition can be shared with other members from your team and enable collaboration."
   },
   {
     "term": "public.how-it-works-hero.send-parallel",
@@ -2536,7 +2541,7 @@
   },
   {
     "term": "public.how-it-works-hero.start-petition-2",
-    "definition": "Tan simple como crear un formulario.",
+    "definition": "Es tan simple como crear un formulario.",
     "context": "As simple as creating a form."
   },
   {

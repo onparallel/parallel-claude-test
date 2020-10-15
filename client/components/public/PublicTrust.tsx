@@ -1,4 +1,4 @@
-import { Box, BoxProps, Heading, Image, Link } from "@chakra-ui/core";
+import { Box, BoxProps, Flex, Heading, Image, Link } from "@chakra-ui/core";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 
@@ -13,25 +13,24 @@ export function PublicTrust(props: BoxProps) {
         ...props,
       }}
     >
-      <Heading as="h2" size="xl" fontWeight="bold">
+      <Heading as="h2" size="xl" fontWeight="bold" marginBottom={8}>
         <FormattedMessage
           id="public.who-trust-us.title"
           defaultMessage="Who trust us"
         />
       </Heading>
-      <Box margin="auto" marginTop={{ base: 8, md: 8 }}>
-        <Link href="https://acelera.cuatrecasas.com/">
+      <Flex justifyContent="center">
+        <Box as="a" href="https://acelera.cuatrecasas.com/" target="_blank">
           <Image
             alt={intl.formatMessage({
               id: "public.trust.cuatrecasas",
               defaultMessage: "Cuatrecasas Acelera",
             })}
-            margin="auto"
             width="250px"
             src="/static/images/cuatrecasas-acelera.png"
           />
-        </Link>
-      </Box>
+        </Box>
+      </Flex>
     </PublicContainer>
   );
 }

@@ -2456,8 +2456,8 @@
   },
   {
     "term": "public.home.hero-title",
-    "definition": "Say goodbye to email threads to obtain information",
-    "context": "Say goodbye to email threads to obtain information"
+    "definition": "Say goodbye to long email threads to obtain information",
+    "context": "Say goodbye to long email threads to obtain information"
   },
   {
     "term": "public.home.press",
@@ -2476,8 +2476,8 @@
   },
   {
     "term": "public.how-it-works-hero.client-timings-2",
-    "definition": "In the meantime, easily track or automate.",
-    "context": "In the meantime, easily track or automate."
+    "definition": "In the meantime, track it or automate it easily.",
+    "context": "In the meantime, track it or automate it easily."
   },
   {
     "term": "public.how-it-works-hero.description",
@@ -2486,13 +2486,13 @@
   },
   {
     "term": "public.how-it-works-hero.keep-working",
-    "definition": "Share the Parallel to keep working with your team.",
-    "context": "Share the Parallel to keep working with your team."
+    "definition": "Share the Parallel with your team to keep working collaboratively.",
+    "context": "Share the Parallel with your team to keep working collaboratively."
   },
   {
     "term": "public.how-it-works-hero.let-client-complete",
-    "definition": "Let them complete at their own peace",
-    "context": "Let them complete at their own peace"
+    "definition": "Let them complete at their own pace",
+    "context": "Let them complete at their own pace"
   },
   {
     "term": "public.how-it-works-hero.receive-inbox",
@@ -2501,8 +2501,8 @@
   },
   {
     "term": "public.how-it-works-hero.review",
-    "definition": "Review, approve or reject, and communicate within Parallel if necessary.",
-    "context": "Review, approve or reject, and communicate within Parallel if necessary."
+    "definition": "Review, approve or reject, and communicate within Parallel.",
+    "context": "Review, approve or reject, and communicate within Parallel."
   },
   {
     "term": "public.how-it-works-hero.screenshot-1",
@@ -2518,6 +2518,11 @@
     "term": "public.how-it-works-hero.screenshot-3",
     "definition": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
     "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status."
+  },
+  {
+    "term": "public.how-it-works-hero.screenshot-4",
+    "definition": "A screenshot of the app showing that the petition can be shared with other members from your team and enable collaboration.",
+    "context": "A screenshot of the app showing that the petition can be shared with other members from your team and enable collaboration."
   },
   {
     "term": "public.how-it-works-hero.send-parallel",

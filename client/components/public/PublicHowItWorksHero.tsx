@@ -1,12 +1,16 @@
 import {
+  AspectRatio,
   Box,
   BoxProps,
   Button,
   Flex,
+  Grid,
   Heading,
   Image,
+  Stack,
   Text,
 } from "@chakra-ui/core";
+import { useRouter } from "next/router";
 import { useCallback, useState, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SwitchTransition, CSSTransition } from "react-transition-group";
@@ -16,13 +20,34 @@ import { Spacer } from "../common/Spacer";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export function PublicHowItWorksHero({ ...props }: BoxProps) {
+  const { query } = useRouter();
   const intl = useIntl();
   const [index, setIndex] = useState(0);
-  const onClick = useCallback(() => setIndex((state) => (state + 1) % 4), []);
-
-  const images = [
+  const steps = [
     {
-      name: "how_it_works_1",
+      header: (
+        <FormattedMessage
+          id="public.how-it-works-hero.send-parallel"
+          defaultMessage="Send a Parallel"
+        />
+      ),
+      description: (
+        <>
+          <Text>
+            <FormattedMessage
+              id="public.how-it-works-hero.start-petition-1"
+              defaultMessage="Start with a template or do it from scratch."
+            />
+          </Text>
+          <Text marginTop={2}>
+            <FormattedMessage
+              id="public.how-it-works-hero.start-petition-2"
+              defaultMessage="It is as simple as creating a form."
+            />
+          </Text>
+        </>
+      ),
+      image: "how_it_works_1",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-1",
         defaultMessage:
@@ -30,7 +55,29 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }),
     },
     {
-      name: "how_it_works_2",
+      header: (
+        <FormattedMessage
+          id="public.how-it-works-hero.let-client-complete"
+          defaultMessage="Let them complete at their own pace"
+        />
+      ),
+      description: (
+        <>
+          <Text>
+            <FormattedMessage
+              id="public.how-it-works-hero.client-timings-1"
+              defaultMessage="Your recipients can return as many times as they need to complete it."
+            />
+          </Text>
+          <Text marginTop={2}>
+            <FormattedMessage
+              id="public.how-it-works-hero.client-timings-2"
+              defaultMessage="In the meantime, track it or automate it easily."
+            />
+          </Text>
+        </>
+      ),
+      image: "how_it_works_2",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-2",
         defaultMessage:
@@ -38,7 +85,19 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }),
     },
     {
-      name: "how_it_works_3",
+      header: (
+        <FormattedMessage
+          id="public.how-it-works-hero.receive-inbox"
+          defaultMessage="Receive all the information on time"
+        />
+      ),
+      description: (
+        <FormattedMessage
+          id="public.how-it-works-hero.review"
+          defaultMessage="Review, approve or reject, and communicate within Parallel."
+        />
+      ),
+      image: "how_it_works_3",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-3",
         defaultMessage:
@@ -46,14 +105,31 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }),
     },
     {
-      name: "how_it_works_4",
+      header: (
+        <FormattedMessage
+          id="public.how-it-works-hero.share"
+          defaultMessage="Share it with your team"
+        />
+      ),
+      description: (
+        <FormattedMessage
+          id="public.how-it-works-hero.keep-working"
+          defaultMessage="Share the Parallel with your team to keep working collaboratively."
+        />
+      ),
+      image: "how_it_works_4",
       alt: intl.formatMessage({
-        id: "public.how-it-works-hero.screenshot-3",
+        id: "public.how-it-works-hero.screenshot-4",
         defaultMessage:
-          "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
+          "A screenshot of the app showing that the petition can be shared with other members from your team and enable collaboration.",
       }),
     },
   ];
+
+  const handleImageClick = useCallback(
+    () => setIndex((state) => (state + 1) % steps.length),
+    [steps.length]
+  );
 
   return (
     <PublicContainer
@@ -76,175 +152,78 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           defaultMessage="Designed to make work easier for you, your team, and your clients."
         />
       </Heading>
-      <Flex
-        flexDirection={{ base: "column", lg: "row" }}
+      <Stack
+        direction={{ base: "column", lg: "row" }}
         alignItems={{ base: "center", md: "stretch" }}
         marginTop={16}
         justifyContent="space-evenly"
+        spacing={6}
       >
-        <Flex
-          flex="1"
-          maxWidth={{ base: "320px", md: "initial", lg: "320px" }}
-          flexDirection={{ base: "column", md: "row", lg: "column" }}
-          alignItems={{ base: "center", md: "stretch" }}
+        <Grid
+          width={{ base: "320px", md: "initial", lg: "320px" }}
+          gridTemplateColumns={{ base: "1fr", md: "1fr 1fr", lg: "1fr" }}
+          gridGap={6}
         >
-          <Step
-            header={
-              <FormattedMessage
-                id="public.how-it-works-hero.send-parallel"
-                defaultMessage="Send a Parallel"
-              />
-            }
-            description={
-              <>
-                <Text>
-                  <FormattedMessage
-                    id="public.how-it-works-hero.start-petition-1"
-                    defaultMessage="Start with a template or do it from scratch."
-                  />
-                </Text>
-                <Text marginTop={2}>
-                  <FormattedMessage
-                    id="public.how-it-works-hero.start-petition-2"
-                    defaultMessage="As simple as creating a form."
-                  />
-                </Text>
-              </>
-            }
-            isActive={index === 0}
-            onClick={() => setIndex(0)}
-          />
-          <Spacer minHeight={6} minWidth={6} />
-          <Step
-            header={
-              <FormattedMessage
-                id="public.how-it-works-hero.let-client-complete"
-                defaultMessage="Let them complete at their own peace"
-              />
-            }
-            description={
-              <>
-                <Text>
-                  <FormattedMessage
-                    id="public.how-it-works-hero.client-timings-1"
-                    defaultMessage="Your recipients can return as many times as they need to complete it."
-                  />
-                </Text>
-                <Text marginTop={2}>
-                  <FormattedMessage
-                    id="public.how-it-works-hero.client-timings-2"
-                    defaultMessage="In the meantime, easily track or automate."
-                  />
-                </Text>
-              </>
-            }
-            isActive={index === 1}
-            onClick={() => setIndex(1)}
-          />
-          <Spacer minHeight={6} minWidth={6} />
-          <Step
-            header={
-              <FormattedMessage
-                id="public.how-it-works-hero.receive-inbox"
-                defaultMessage="Receive all the information on time"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="public.how-it-works-hero.review"
-                defaultMessage="Review, approve or reject, and communicate within Parallel if necessary."
-              />
-            }
-            isActive={index === 2}
-            onClick={() => setIndex(2)}
-          />
-          <Spacer minHeight={6} minWidth={6} />
-          <Step
-            header={
-              <FormattedMessage
-                id="public.how-it-works-hero.share"
-                defaultMessage="Share it with your team"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="public.how-it-works-hero.keep-working"
-                defaultMessage="Share the Parallel to keep working with your team."
-              />
-            }
-            isActive={index === 3}
-            onClick={() => setIndex(3)}
-          />
-        </Flex>
+          {steps.map((step, i) => (
+            <Step
+              key={i}
+              header={step.header}
+              description={step.description}
+              isActive={index === i}
+              onClick={() => setIndex(i)}
+            />
+          ))}
+        </Grid>
         <Flex
           flex="3"
           justifyContent="center"
           display={{ base: "none", md: "flex" }}
-          marginTop={{ sm: 6, lg: 0 }}
-          marginLeft={{ lg: 6 }}
           maxWidth={{ lg: "720px" }}
           alignItems="center"
         >
           <Box flex="1" maxWidth="720px">
-            <Box
-              onClick={onClick}
-              paddingTop={Math.round((520 / 720) * 10000) / 100 + "%"}
-              position="relative"
-            >
-              <SwitchTransition mode="out-in">
-                <CSSTransition
-                  key={index}
-                  timeout={{ enter: 300, exit: 200 }}
-                  addEndListener={(node, done) => {
-                    node.addEventListener("transitionend", done, false);
-                  }}
-                  classNames="fade"
-                >
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    position="absolute"
-                    top={0}
-                    left={0}
-                    width="100%"
-                    height="100%"
-                    willChange="opacity"
-                    sx={{
-                      "&.fade": {
-                        "&-enter": { opacity: 0 },
-                        "&-enter-active": {
-                          opacity: 1,
-                          transition: "opacity 300ms cubic-bezier(0,0,.2,1)",
-                        },
-                        "&-exit": {
-                          opacity: 1,
-                        },
-                        "&-exit-active": {
-                          opacity: 0,
-                          transition: "opacity 200ms cubic-bezier(.4,0,1,1)",
-                        },
+            <SwitchTransition mode="out-in">
+              <CSSTransition
+                key={index}
+                timeout={{ enter: 300, exit: 200 }}
+                addEndListener={(node, done) => {
+                  node.addEventListener("transitionend", done, false);
+                }}
+                classNames="fade"
+              >
+                <AspectRatio
+                  ratio={2520 / 1606}
+                  onClick={handleImageClick}
+                  willChange="opacity"
+                  sx={{
+                    "&.fade": {
+                      "&-enter": { opacity: 0 },
+                      "&-enter-active": {
+                        opacity: 1,
+                        transition: "opacity 300ms cubic-bezier(0,0,.2,1)",
                       },
-                    }}
-                  >
-                    <Card overflow="hidden">
-                      <Image
-                        src={`/static/images/${images[index].name}.png`}
-                        srcSet={[2, 3]
-                          .map(
-                            (size) =>
-                              `/static/images/${images[index].name}@${size}x.png ${size}x`
-                          )
-                          .join(",")}
-                        alt={`${images[index].alt}`}
-                      />
-                    </Card>
-                  </Box>
-                </CSSTransition>
-              </SwitchTransition>
-            </Box>
+                      "&-exit": {
+                        opacity: 1,
+                      },
+                      "&-exit-active": {
+                        opacity: 0,
+                        transition: "opacity 200ms cubic-bezier(.4,0,1,1)",
+                      },
+                    },
+                  }}
+                >
+                  <Card overflow="hidden" role="button">
+                    <Image
+                      src={`/static/images/${steps[index].image}_${query.locale}.png`}
+                      alt={`${steps[index].alt}`}
+                    />
+                  </Card>
+                </AspectRatio>
+              </CSSTransition>
+            </SwitchTransition>
           </Box>
         </Flex>
-      </Flex>
+      </Stack>
       <Flex marginTop={16} justifyContent="center">
         <NakedLink href="/invite">
           <Button as="a" colorScheme="purple">
@@ -281,7 +260,7 @@ function Step({
       <Heading as="h4" size="sm">
         {header}
       </Heading>
-      <Text marginTop={4} fontSize="sm">
+      <Text marginTop={2} fontSize="sm">
         {description}
       </Text>
     </Card>

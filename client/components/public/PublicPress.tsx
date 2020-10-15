@@ -3,6 +3,12 @@ import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export function PublicPress({ ...props }: BoxProps) {
+  const items = [
+    { image: "/static/logos/expansion.png", name: "Expansión" },
+    { image: "/static/logos/cinco_dias.png", name: "CincoDías" },
+    { image: "/static/logos/elreferente.png", name: "ElReferente" },
+    { image: "/static/logos/seedrocket.png", name: "Seedrocket" },
+  ];
   return (
     <PublicContainer
       {...props}
@@ -15,11 +21,10 @@ export function PublicPress({ ...props }: BoxProps) {
         <FormattedMessage
           id="public.home.press"
           defaultMessage="You may also remember us from..."
-        ></FormattedMessage>
+        />
       </Text>
       <Grid
         marginTop={{ base: 4, md: 8 }}
-        // flexDirection={{ base: "column", md: "row" }}
         alignItems="center"
         justifyContent="space-evenly"
         templateColumns={{
@@ -27,39 +32,18 @@ export function PublicPress({ ...props }: BoxProps) {
           md: "repeat(2, minmax(auto, 320px))",
           lg: "repeat(4, minmax(auto, 320px))",
         }}
+        gridGap={4}
       >
-        <Flex minHeight="100px">
-          <Image
-            src="/static/logos/expansion.png"
-            width="150px"
-            margin="auto"
-            alt="Expansión"
-          />
-        </Flex>
-        <Flex minHeight="100px">
-          <Image
-            src="/static/logos/cinco_dias.jpg"
-            width="150px"
-            margin="auto"
-            alt="CincoDías"
-          />
-        </Flex>
-        <Flex minHeight="100px">
-          <Image
-            src="/static/logos/elreferente.png"
-            width="150px"
-            margin="auto"
-            alt="ElReferente"
-          />
-        </Flex>
-        <Flex minHeight="100px">
-          <Image
-            src="/static/logos/seedrocket.jpg"
-            width="150px"
-            margin="auto"
-            alt="Seedrocket"
-          />
-        </Flex>
+        {items.map((item, index) => (
+          <Flex key={index} minHeight="100px" backgroundColor={"red"}>
+            <Image
+              src={item.image}
+              width="200px"
+              margin="auto"
+              alt={item.name}
+            />
+          </Flex>
+        ))}
       </Grid>
     </PublicContainer>
   );

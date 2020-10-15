@@ -40,7 +40,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           >
             <FormattedMessage
               id="public.home.hero-title"
-              defaultMessage="Say goodbye to email threads to obtain information"
+              defaultMessage="Say goodbye to long email threads to obtain information"
             />
           </Heading>
           <Text marginTop={8}>
