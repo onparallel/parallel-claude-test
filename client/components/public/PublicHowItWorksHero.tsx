@@ -16,7 +16,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 import { Card } from "../common/Card";
 import { NakedLink } from "../common/Link";
-import { Spacer } from "../common/Spacer";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export function PublicHowItWorksHero({ ...props }: BoxProps) {
