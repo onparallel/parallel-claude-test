@@ -3,7 +3,6 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionClosedNotification from "../../emails/components/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { eachLimit } from "async";
 import { EmailLog } from "../../db/__types";
 
 export async function petitionClosedNotification(
@@ -32,7 +31,7 @@ export async function petitionClosedNotification(
   ]);
 
   const emails: EmailLog[] = [];
-  await eachLimit(payload.petition_message_ids, 5, async (messageId) => {
+  for (const messageId of payload.petition_message_ids) {
     const message = await context.petitions.loadMessage(messageId);
     const access = await context.petitions.loadAccess(
       message!.petition_access_id
@@ -66,7 +65,7 @@ export async function petitionClosedNotification(
     emails.push(email);
 
     await context.petitions.processPetitionMessage(messageId, email.id);
-  });
+  }
 
   return emails;
 }

@@ -20,7 +20,7 @@ export function greeting({ name }: { name: string | null }, intl: IntlShape) {
   return intl.formatMessage(
     {
       id: "greeting",
-      defaultMessage: "Hi{name, select, null {,} other { {name},}}",
+      defaultMessage: "{name, select, null {Hi,} other {Hi {name},}}",
     },
     { name }
   );

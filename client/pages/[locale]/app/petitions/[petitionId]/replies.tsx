@@ -77,6 +77,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
     usePetitionRepliesQuery({ variables: { id: petitionId } })
   );
   const petition = data!.petition as PetitionReplies_PetitionFragment;
+  const toast = useToast();
 
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
   const activeField = activeFieldId
@@ -123,46 +124,49 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   ] = usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
-  async function handleValidateToggle(
-    fieldIds: string[],
-    value: boolean,
-    validateRepliesWith?: PetitionFieldReplyStatus
-  ) {
-    await validatePetitionFields({
-      variables: {
-        petitionId: petition.id,
-        fieldIds,
-        value,
-        validateRepliesWith,
-      },
-      optimisticResponse: {
-        validatePetitionFields: {
-          __typename: "PetitionAndPartialFields",
-          petition: {
-            id: petition.id,
-            status: petition.status, // TODO predict correct status
-            __typename: "Petition",
-          },
-          fields: fieldIds.map((id) => {
-            const field = petition.fields.find((f) => f.id === id)!;
-            return {
-              __typename: "PetitionField",
-              id,
-              validated: value,
-              replies: field.replies.map((reply) => ({
-                ...pick(reply, ["__typename", "id"]),
-                status:
-                  validateRepliesWith ||
-                  (value && reply.status === "PENDING"
-                    ? "APPROVED"
-                    : reply.status),
-              })),
-            };
-          }),
+  const handleValidateToggle = useCallback(
+    async (
+      fieldIds: string[],
+      value: boolean,
+      validateRepliesWith?: PetitionFieldReplyStatus
+    ) => {
+      await validatePetitionFields({
+        variables: {
+          petitionId: petition.id,
+          fieldIds,
+          value,
+          validateRepliesWith,
         },
-      },
-    });
-  }
+        optimisticResponse: {
+          validatePetitionFields: {
+            __typename: "PetitionAndPartialFields",
+            petition: {
+              id: petition.id,
+              status: petition.status, // TODO predict correct status
+              __typename: "Petition",
+            },
+            fields: fieldIds.map((id) => {
+              const field = petition.fields.find((f) => f.id === id)!;
+              return {
+                __typename: "PetitionField",
+                id,
+                validated: value,
+                replies: field.replies.map((reply) => ({
+                  ...pick(reply, ["__typename", "id"]),
+                  status:
+                    validateRepliesWith ||
+                    (value && reply.status === "PENDING"
+                      ? "APPROVED"
+                      : reply.status),
+                })),
+              };
+            }),
+          },
+        },
+      });
+    },
+    [petition]
+  );
 
   const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
   async function handleUpdateRepliesStatus(
@@ -302,37 +306,6 @@ function PetitionReplies({ petitionId }: PetitionProps) {
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
 
-  const closePetitionDialog = useClosePetitionDialog();
-  const handleClosePetition = useCallback(
-    async (sendNotification: boolean) => {
-      try {
-        const fieldsWithPendingReplies = petition.fields.filter((field) =>
-          field.replies.some((fieldReply) => fieldReply.status === "PENDING")
-        );
-
-        const fieldIds = petition.fields.map((f) => f.id);
-
-        let option = "APPROVE";
-        if (fieldsWithPendingReplies.length > 0) {
-          option = await closePetitionDialog({});
-        }
-
-        if (["APPROVE", "REJECT"].includes(option)) {
-          await handleValidateToggle(
-            fieldIds,
-            true,
-            option === "APPROVE" ? "APPROVED" : "REJECTED"
-          );
-          if (sendNotification) {
-            await handleConfirmPetitionCompleted();
-          }
-        }
-      } catch {}
-    },
-    [petition, intl.locale]
-  );
-
-  const toast = useToast();
   const confirmPetitionDialog = useConfirmPetitionCompletedDialog();
   const [
     sendPetitionClosedNotification,
@@ -352,13 +325,12 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       if (showAlreadyNotifiedDialog) {
         await petitionAlreadyNotifiedDialog({});
       }
-      const emailBody = await confirmPetitionDialog({
-        locale: petition.locale,
-      });
       await sendPetitionClosedNotification({
         variables: {
           petitionId: petition.id,
-          emailBody,
+          emailBody: await confirmPetitionDialog({
+            locale: petition.locale,
+          }),
         },
       });
 
@@ -376,7 +348,32 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         isClosable: true,
       });
     } catch {}
-  }, [petition.events.items, intl.locale, petition.locale]);
+  }, [petition, intl.locale]);
+
+  const closePetitionDialog = useClosePetitionDialog();
+  const handleClosePetition = useCallback(
+    async (sendNotification: boolean) => {
+      try {
+        const hasUnreviewedReplies = petition.fields.some((f) =>
+          f.replies.some((r) => r.status === "PENDING")
+        );
+
+        const option = hasUnreviewedReplies
+          ? await closePetitionDialog({})
+          : "APPROVE";
+
+        await handleValidateToggle(
+          petition.fields.map((f) => f.id),
+          true,
+          option === "APPROVE" ? "APPROVED" : "REJECTED"
+        );
+        if (sendNotification) {
+          await handleConfirmPetitionCompleted();
+        }
+      } catch {}
+    },
+    [petition, handleValidateToggle, handleConfirmPetitionCompleted]
+  );
 
   return (
     <PetitionLayout
@@ -415,7 +412,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         <Button
           hidden={petition.status !== "CLOSED"}
           colorScheme="blue"
-          leftIcon={<ThumbUpIcon fontSize="lg" display="flex" />}
+          leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
           onClick={() => handleConfirmPetitionCompleted()}
         >
           <FormattedMessage
@@ -439,7 +436,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         {showDownloadAll ? (
           <Button
             colorScheme="purple"
-            leftIcon={<DownloadIcon />}
+            leftIcon={<DownloadIcon fontSize="lg" display="block" />}
             onClick={handleDownloadAllClick}
             id="download-all"
           >

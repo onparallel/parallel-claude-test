@@ -7,7 +7,7 @@ export function Greeting({ name }: { name: string | null }) {
     <MjmlText>
       <FormattedMessage
         id="greeting"
-        defaultMessage="Hi{name, select, null {,} other { {name},}}"
+        defaultMessage="{name, select, null {Hi,} other {Hi {name},}}"
         values={{ name }}
       />
     </MjmlText>

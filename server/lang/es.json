@@ -81,8 +81,8 @@
   },
   {
     "term": "greeting",
-    "definition": "Hola{name, select, null {,} other {{name},}}",
-    "context": "Hi{name, select, null {,} other { {name},}}"
+    "definition": "{name, select, null {Hola,} other {Hola {name},}}",
+    "context": "{name, select, null {Hi,} other {Hi {name},}}"
   },
   {
     "term": "invitation.details",

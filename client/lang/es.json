@@ -3116,8 +3116,8 @@
   },
   {
     "term": "recipient-view.petition-closed-alert",
-    "definition": "Esta petición ha sido cerrada. Si deseas realizar cambios, pídele a {name} que la reabra.",
-    "context": "This petition has been closed. If you want to make any changes, ask {name} to reopen it."
+    "definition": "Esta petición ha sido cerrada. Si deseas realizar cambios, por favor, contacta con {name}.",
+    "context": "This petition has been closed. If you need to make any changes, please reach out to {name}."
   },
   {
     "term": "recipient-view.petition-completed-alert",

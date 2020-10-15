@@ -341,7 +341,7 @@ function RecipientView({
                   ) : (
                     <FormattedMessage
                       id="recipient-view.petition-closed-alert"
-                      defaultMessage="This petition has been closed. If you want to make any changes, ask {name} to reopen it."
+                      defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
                       values={{
                         name: granter.firstName,
                       }}
