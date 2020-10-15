@@ -73,7 +73,7 @@ function NewPetition() {
     useNewPetitionPublicTemplatesQuery({
       variables: {
         offset: 0,
-        limit: 5,
+        limit: 6,
         locale: null,
         search: null,
       },
@@ -92,7 +92,7 @@ function NewPetition() {
     useNewPetitionTemplatesQuery({
       variables: {
         offset: 0,
-        limit: 3,
+        limit: 2,
         locale: null,
         search: null,
       },
@@ -125,12 +125,12 @@ function NewPetition() {
       setState({ locale, search });
       debouncedPublicTemplatesRefetch({
         offset: 0,
-        limit: 5,
+        limit: 6,
         search: search || null,
       });
       debouncedTemplatesRefetch({
         offset: 0,
-        limit: 3,
+        limit: 2,
         search: search || null,
       });
     },
@@ -142,12 +142,12 @@ function NewPetition() {
       setState({ locale, search });
       debouncedPublicTemplatesRefetch.immediate({
         offset: 0,
-        limit: 5,
+        limit: 6,
         locale,
       });
       debouncedTemplatesRefetch.immediate({
         offset: 0,
-        limit: 3,
+        limit: 2,
         locale,
       });
     },
@@ -247,49 +247,12 @@ function NewPetition() {
         borderBottom="1px solid"
         borderBottomColor="gray.200"
       />
-      <NewPetitionSection header={"Parallel"} marginTop={4}>
-        <Grid
-          templateColumns={{
-            md: "repeat(2, 1fr)",
-            lg: "repeat(3, 1fr)",
-          }}
-          gap={4}
-        >
-          <EmptyPetitionCard
-            id="empty-petition-card"
-            onPress={handleTemplateClick(null)}
-          />
-          {publicTemplates.map(
-            (template: NewPetition_PetitionTemplateFragment) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                onPress={handleTemplateClick(template.id)}
-              />
-            )
-          )}
-        </Grid>
-        <Stack direction="row" justifyContent="flex-end" marginTop={4}>
-          <Button
-            variant="ghost"
-            size="sm"
-            colorScheme="purple"
-            isDisabled={allPublicTemplatesLoaded}
-            onClick={handlePublicTemplatesLoadMore}
-          >
-            <FormattedMessage
-              id="generic.load-more"
-              defaultMessage="Load more"
-            />
-          </Button>
-        </Stack>
-      </NewPetitionSection>
       <NewPetitionSection
         header={intl.formatMessage({
           id: "new-petition.my-templates",
           defaultMessage: "My templates",
         })}
-        paddingBottom={2}
+        marginTop={4}
       >
         {templates.length === 0 ? (
           <Stack justifyContent="center" alignItems="center" minHeight="120px">
@@ -327,6 +290,10 @@ function NewPetition() {
               }}
               gap={4}
             >
+              <EmptyPetitionCard
+                id="empty-petition-card"
+                onPress={handleTemplateClick(null)}
+              />
               {templates.map((template) => (
                 <TemplateCard
                   key={template.id}
@@ -362,6 +329,39 @@ function NewPetition() {
             </Stack>
           </>
         )}
+      </NewPetitionSection>
+      <NewPetitionSection header={"Parallel"} paddingBottom={2}>
+        <Grid
+          templateColumns={{
+            md: "repeat(2, 1fr)",
+            lg: "repeat(3, 1fr)",
+          }}
+          gap={4}
+        >
+          {publicTemplates.map(
+            (template: NewPetition_PetitionTemplateFragment) => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                onPress={handleTemplateClick(template.id)}
+              />
+            )
+          )}
+        </Grid>
+        <Stack direction="row" justifyContent="flex-end" marginTop={4}>
+          <Button
+            variant="ghost"
+            size="sm"
+            colorScheme="purple"
+            isDisabled={allPublicTemplatesLoaded}
+            onClick={handlePublicTemplatesLoadMore}
+          >
+            <FormattedMessage
+              id="generic.load-more"
+              defaultMessage="Load more"
+            />
+          </Button>
+        </Stack>
       </NewPetitionSection>
     </AppLayout>
   );
@@ -710,7 +710,7 @@ NewPetition.getInitialProps = async ({
       {
         variables: {
           offset: 0,
-          limit: 5,
+          limit: 6,
           search: null,
           locale: null,
         },
@@ -745,7 +745,7 @@ NewPetition.getInitialProps = async ({
       {
         variables: {
           offset: 0,
-          limit: 3,
+          limit: 2,
           search: null,
           locale: null,
         },
