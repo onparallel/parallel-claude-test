@@ -1267,6 +1267,8 @@ export type QueryContacts_OrderBy =
 export type QueryPetitions_OrderBy =
   | "createdAt_ASC"
   | "createdAt_DESC"
+  | "lastUsedAt_ASC"
+  | "lastUsedAt_DESC"
   | "name_ASC"
   | "name_DESC";
 
@@ -8245,6 +8247,7 @@ export const NewPetitionTemplatesDocument = gql`
       limit: $limit
       search: $search
       locale: $locale
+      sortBy: [lastUsedAt_DESC]
       type: TEMPLATE
     ) {
       items {

@@ -1972,6 +1972,8 @@ Order to use on Query.petitions
 enum QueryPetitions_OrderBy {
   createdAt_ASC
   createdAt_DESC
+  lastUsedAt_ASC
+  lastUsedAt_DESC
   name_ASC
   name_DESC
 }

@@ -162,6 +162,8 @@ export interface NexusGenEnums {
   QueryPetitions_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
+    | "lastUsedAt_ASC"
+    | "lastUsedAt_DESC"
     | "name_ASC"
     | "name_DESC";
   Result: "FAILURE" | "SUCCESS";

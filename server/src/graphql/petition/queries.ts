@@ -28,7 +28,7 @@ export const petitionsQuery = queryField((t) => {
       }),
     },
     searchable: true,
-    sortableBy: ["createdAt", "name"],
+    sortableBy: ["createdAt", "name", "lastUsedAt" as any],
     resolve: async (
       _,
       { offset, limit, search, sortBy, status, type, locale },
@@ -45,6 +45,7 @@ export const petitionsQuery = queryField((t) => {
           return {
             column: ({
               createdAt: "created_at",
+              lastUsedAt: "last_used_at",
               name: "name",
             } as any)[field as any],
             order: order.toLowerCase() as "asc" | "desc",
@@ -84,12 +85,15 @@ export const publicTemplatesQuery = queryField((t) => {
     },
     searchable: true,
     resolve: async (_, { limit, offset, locale, search }, ctx) => {
-      return await ctx.petitions.loadPublicTemplates({
-        search,
-        locale,
-        limit,
-        offset,
-      });
+      return await ctx.petitions.loadPublicTemplates(
+        {
+          search,
+          locale,
+          limit,
+          offset,
+        },
+        ctx.user!.id
+      );
     },
   });
 });

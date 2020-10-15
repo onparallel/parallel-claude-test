@@ -729,6 +729,7 @@ NewPetition.getInitialProps = async ({
             limit: $limit
             search: $search
             locale: $locale
+            sortBy: [lastUsedAt_DESC]
             type: TEMPLATE
           ) {
             items {

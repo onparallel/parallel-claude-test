@@ -205,7 +205,32 @@ export class PetitionRepository extends BaseRepository {
           if (status && petitionType === "PETITION") {
             q.where("status", status);
           }
-          q.orderBy(opts.sortBy ?? ["petition.id"]);
+
+          const orderByLastUsed = (opts.sortBy || []).find(
+            (o) => o.column === ("last_used_at" as any)
+          );
+          if (orderByLastUsed && petitionType === "TEMPLATE") {
+            q.leftJoin(
+              this.knex.raw(
+                /* sql */ `
+                (SELECT p.from_template_id AS template_id, MAX(p.created_at) AS last_used_at
+                FROM petition p
+                WHERE created_by = ?
+                GROUP BY p.from_template_id) as lj`,
+                [`User:${userId}`]
+              ),
+              "lj.template_id",
+              "petition.id"
+            ).orderByRaw(
+              opts
+                .sortBy!.map(
+                  ({ column, order }) => `${column} ${order} NULLS LAST`
+                )
+                .join(", ")
+            );
+          } else {
+            q.orderBy(opts.sortBy ?? ["petition.id"]);
+          }
         })
         .select("petition.*"),
       opts
@@ -2262,10 +2287,23 @@ export class PetitionRepository extends BaseRepository {
     opts: {
       search?: string | null;
       locale?: "en" | "es" | null;
-    } & PageOpts
+    } & PageOpts,
+    userId: number
   ) {
     return await this.loadPageAndCount(
       this.from("petition")
+        .leftJoin(
+          this.knex.raw(
+            /* sql */ `
+            (SELECT p.from_template_id AS template_id, MAX(p.created_at) AS last_used_at 
+            FROM petition p
+            WHERE created_by = ?
+            GROUP BY p.from_template_id) as lj`,
+            [`User:${userId}`]
+          ),
+          "lj.template_id",
+          "petition.id"
+        )
         .where({
           template_public: true,
           deleted_at: null,
@@ -2287,6 +2325,7 @@ export class PetitionRepository extends BaseRepository {
             });
           }
         })
+        .orderByRaw(/* sql */ `lj.last_used_at DESC NULLS LAST`)
         .select("*"),
       opts
     );
