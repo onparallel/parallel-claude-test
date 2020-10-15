@@ -156,6 +156,70 @@ describe("GraphQL/Petitions", () => {
       expect(data!.petitions.totalCount).toBe(4);
     });
 
+    it("fetches my templates ordered by last used", async () => {
+      const { data: templates } = await testClient.query({
+        query: gql`
+          query {
+            templates: petitions(limit: 100, type: TEMPLATE) {
+              items {
+                id
+              }
+            }
+          }
+        `,
+      });
+
+      expect(templates).not.toBeNull();
+      const { items } = templates!.templates;
+
+      // pick a random templateId that is not on first position of items array
+      const index = Math.floor(Math.random() * (items.length - 1) + 1);
+      const templateId = items[index].id;
+
+      // use this random template to create a petition
+      await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID) {
+            createPetition(
+              type: PETITION
+              petitionId: $petitionId
+              locale: en
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: templateId,
+        },
+      });
+
+      // templateId should be in first position for petitions query
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query {
+            templates: petitions(
+              limit: 100
+              sortBy: lastUsedAt_DESC
+              type: TEMPLATE
+            ) {
+              items {
+                id
+              }
+            }
+          }
+        `,
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.templates).toEqual({
+        // first the recently used template, then the rest
+        items: [{ id: templateId }].concat(
+          items.filter(({ id }: { id: string }) => id !== templateId)
+        ),
+      });
+    });
+
     it("fetches a single petition from logged user", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
@@ -216,6 +280,66 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.publicTemplates.totalCount).toBe(3);
+    });
+
+    it("orders public templates by last used", async () => {
+      const { data: templates } = await testClient.query({
+        query: gql`
+          query {
+            publicTemplates(limit: 100) {
+              items {
+                id
+              }
+            }
+          }
+        `,
+      });
+
+      expect(templates).not.toBeNull();
+      const { items } = templates!.publicTemplates;
+
+      // pick a random templateId that is not on first position of items array
+      const index = Math.floor(Math.random() * (items.length - 1) + 1);
+      const templateId = items[index].id;
+
+      // use this random template to create a petition
+      await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID) {
+            createPetition(
+              type: PETITION
+              petitionId: $petitionId
+              locale: en
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: templateId,
+        },
+      });
+
+      // templateId should be in first position for publicTemplates query
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query {
+            publicTemplates(limit: 100) {
+              items {
+                id
+              }
+            }
+          }
+        `,
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.publicTemplates).toEqual({
+        // first the recently used template, then the rest
+        items: [{ id: templateId }].concat(
+          items.filter(({ id }: { id: string }) => id !== templateId)
+        ),
+      });
     });
 
     it("fetches all public templates with name matching search query", async () => {
