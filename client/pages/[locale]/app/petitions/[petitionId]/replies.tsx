@@ -352,7 +352,9 @@ function PetitionReplies({ petitionId }: PetitionProps) {
       if (showAlreadyNotifiedDialog) {
         await petitionAlreadyNotifiedDialog({});
       }
-      const emailBody = await confirmPetitionDialog({});
+      const emailBody = await confirmPetitionDialog({
+        locale: petition.locale,
+      });
       await sendPetitionClosedNotification({
         variables: {
           petitionId: petition.id,
@@ -374,7 +376,7 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         isClosable: true,
       });
     } catch {}
-  }, [petition.events.items, intl.locale]);
+  }, [petition.events.items, intl.locale, petition.locale]);
 
   return (
     <PetitionLayout

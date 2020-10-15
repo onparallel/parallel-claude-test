@@ -775,11 +775,6 @@
     "context": "Yes, delete"
   },
   {
-    "term": "generic.confirm-later",
-    "definition": "Confirm later",
-    "context": "Confirm later"
-  },
-  {
     "term": "generic.continue",
     "definition": "Continue",
     "context": "Continue"
@@ -983,16 +978,6 @@
     "term": "generic.go-to-page",
     "definition": "Go to page {page}",
     "context": "Go to page {page}"
-  },
-  {
-    "term": "generic.greetings",
-    "definition": "Greetings.",
-    "context": "Greetings."
-  },
-  {
-    "term": "generic.hi",
-    "definition": "Hi",
-    "context": "Hi"
   },
   {
     "term": "generic.load-more",
@@ -1395,29 +1380,14 @@
     "context": "Pending"
   },
   {
-    "term": "petition-replies.confirm-reviewed-default-body.text-1",
-    "definition": "We have reviewed all the information.",
-    "context": "We have reviewed all the information."
-  },
-  {
-    "term": "petition-replies.confirm-reviewed-default-body.text-2",
-    "definition": "We confirm that everything is correct.",
-    "context": "We confirm that everything is correct."
-  },
-  {
-    "term": "petition-replies.confirm-reviewed-default-body.text-3",
-    "definition": "We will get to work and if we have any questions or need any more information we will let you know.",
-    "context": "We will get to work and if we have any questions or need any more information we will let you know."
-  },
-  {
     "term": "petition-replies.confirm-reviewed.dialog-heading",
     "definition": "Confirm that you have all the information",
     "context": "Confirm that you have all the information"
   },
   {
     "term": "petition-replies.confirm-reviewed.dialog-subheading",
-    "definition": "If everything is correct, notify the recipient for peace of mind",
-    "context": "If everything is correct, notify the recipient for peace of mind"
+    "definition": "If everything is correct, notify the recipient for peace of mind.",
+    "context": "If everything is correct, notify the recipient for peace of mind."
   },
   {
     "term": "petition-replies.download-all",
@@ -2646,8 +2616,8 @@
   },
   {
     "term": "public.how-it-works-hero.start-petition-2",
-    "definition": "As simple as creating a form.",
-    "context": "As simple as creating a form."
+    "definition": "It is as simple as creating a form.",
+    "context": "It is as simple as creating a form."
   },
   {
     "term": "public.how-it-works-hero.title",
