@@ -16,8 +16,8 @@
   },
   {
     "term": "component.confirm-resend-completed-notification.description",
-    "definition": "We already sent a confirmation email to the petition contacts. Do you want to send it again?",
-    "context": "We already sent a confirmation email to the petition contacts. Do you want to send it again?"
+    "definition": "We have already sent a confirmation email to the petition contacts. Would you like to send it again?",
+    "context": "We have already sent a confirmation email to the petition contacts. Would you like to send it again?"
   },
   {
     "term": "component.confirm-resend-completed-notification.header",

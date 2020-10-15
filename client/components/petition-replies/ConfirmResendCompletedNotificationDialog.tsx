@@ -4,18 +4,12 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
-import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { PlaceholderInputRef } from "../common/PlaceholderInput";
-
 export function ConfirmResendCompletedNotificationDialog(props: DialogProps) {
-  const inputRef = useRef<PlaceholderInputRef>(null);
-
   return (
     <ConfirmDialog
       size="sm"
-      initialFocusRef={inputRef as any}
       header={
         <FormattedMessage
           id="component.confirm-resend-completed-notification.header"
@@ -25,7 +19,7 @@ export function ConfirmResendCompletedNotificationDialog(props: DialogProps) {
       body={
         <FormattedMessage
           id="component.confirm-resend-completed-notification.description"
-          defaultMessage="We already sent a confirmation email to the petition contacts. Do you want to send it again?"
+          defaultMessage="We have already sent a confirmation email to the petition contacts. Would you like to send it again?"
         />
       }
       confirm={

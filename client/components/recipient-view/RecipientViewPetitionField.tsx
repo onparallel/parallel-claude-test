@@ -366,7 +366,7 @@ function TextReplyForm({
       <FormControl flex="1" isInvalid={!!errors.content} isDisabled={disabled}>
         {multiline ? (
           <Textarea
-            disabled={!canReply}
+            isDisabled={!canReply}
             name="content"
             ref={register({
               required: true,
@@ -377,7 +377,7 @@ function TextReplyForm({
         ) : (
           <Input
             name="content"
-            disabled={!canReply}
+            isDisabled={!canReply}
             ref={register({
               required: true,
               validate: (val) => val.trim().length > 0,
@@ -438,7 +438,7 @@ function FileUploadReplyForm({
         }
       })
     : undefined;
-  const disabled = !field.multiple && field.replies.length > 0;
+  const isDisabled = !field.multiple && field.replies.length > 0;
   const onDrop = useCallback((files: File[]) => {
     onCreateReply({ type: "FILE_UPLOAD", content: files });
   }, []);
@@ -447,7 +447,12 @@ function FileUploadReplyForm({
     getInputProps,
     isDragActive,
     isDragReject,
-  } = useDropzone({ accept, onDrop, multiple: field.multiple, disabled });
+  } = useDropzone({
+    accept,
+    onDrop,
+    multiple: field.multiple,
+    disabled: isDisabled,
+  });
   return (
     <Flex
       color={
@@ -464,7 +469,7 @@ function FileUploadReplyForm({
       minHeight="100px"
       padding={4}
       textAlign="center"
-      {...(disabled || !canReply
+      {...(isDisabled || !canReply
         ? {
             opacity: 0.4,
             cursor: "not-allowed",

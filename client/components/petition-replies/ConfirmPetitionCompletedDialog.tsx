@@ -40,11 +40,10 @@ export function ConfirmPetitionCompletedDialog({
   locale,
   ...props
 }: DialogProps<{ locale: PetitionLocale }, RichTextEditorContent>) {
-  console.log(locale);
   const intl = useIntl();
   const message = Object.keys(messages).includes(locale)
-    ? message[locale]
-    : message["en"];
+    ? messages[locale]
+    : messages["en"];
   const [body, setBody] = useState<RichTextEditorContent>(
     message.split("\n").map((text) => ({ children: [{ text }] }))
   );
