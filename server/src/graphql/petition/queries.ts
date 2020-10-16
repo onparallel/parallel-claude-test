@@ -34,6 +34,11 @@ export const petitionsQuery = queryField((t) => {
       { offset, limit, search, sortBy, status, type, locale },
       ctx
     ) => {
+      const columnMap = {
+        createdAt: "created_at",
+        name: "name",
+        lastUsedAt: "last_used_at",
+      } as const;
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
         status,
         search,
@@ -43,11 +48,7 @@ export const petitionsQuery = queryField((t) => {
         sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
           const [field, order] = value.split("_");
           return {
-            column: ({
-              createdAt: "created_at",
-              lastUsedAt: "last_used_at",
-              name: "name",
-            } as any)[field as any],
+            column: columnMap[field as keyof typeof columnMap],
             order: order.toLowerCase() as "asc" | "desc",
           };
         }),

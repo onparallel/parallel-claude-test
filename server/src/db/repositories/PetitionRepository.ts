@@ -168,7 +168,7 @@ export class PetitionRepository extends BaseRepository {
     opts: {
       search?: string | null;
       sortBy?: {
-        column: keyof Petition | QueryBuilder;
+        column: keyof Petition | "last_used_at";
         order?: "asc" | "desc";
       }[];
       status?: PetitionStatus | null;
@@ -206,17 +206,21 @@ export class PetitionRepository extends BaseRepository {
             q.where("status", status);
           }
 
-          const orderByLastUsed = (opts.sortBy || []).find(
-            (o) => o.column === ("last_used_at" as any)
+          const hasOrderByLastUsed = opts.sortBy?.some(
+            (o) => o.column === "last_used_at"
           );
-          if (orderByLastUsed && petitionType === "TEMPLATE") {
+          if (hasOrderByLastUsed && petitionType === "TEMPLATE") {
             q.leftJoin(
               this.knex.raw(
-                /* sql */ `
-                (SELECT p.from_template_id AS template_id, MAX(p.created_at) AS last_used_at
-                FROM petition p
-                WHERE created_by = ?
-                GROUP BY p.from_template_id) as lj`,
+                /* sql */ `(
+                  SELECT
+                    p.from_template_id AS template_id,
+                    MAX(p.created_at) AS last_used_at
+                  FROM petition AS p
+                    WHERE created_by = ?
+                    GROUP BY p.from_template_id
+                ) AS lj
+                `,
                 [`User:${userId}`]
               ),
               "lj.template_id",
@@ -2294,11 +2298,14 @@ export class PetitionRepository extends BaseRepository {
       this.from("petition")
         .leftJoin(
           this.knex.raw(
-            /* sql */ `
-            (SELECT p.from_template_id AS template_id, MAX(p.created_at) AS last_used_at 
-            FROM petition p
-            WHERE created_by = ?
-            GROUP BY p.from_template_id) as lj`,
+            /* sql */ `(
+              SELECT
+                p.from_template_id AS template_id,
+                MAX(p.created_at) AS last_used_at 
+              FROM petition AS p
+                WHERE created_by = ?
+                GROUP BY p.from_template_id
+            ) as lj`,
             [`User:${userId}`]
           ),
           "lj.template_id",
@@ -2326,7 +2333,7 @@ export class PetitionRepository extends BaseRepository {
           }
         })
         .orderByRaw(/* sql */ `lj.last_used_at DESC NULLS LAST`)
-        .select("*"),
+        .select<Petition[]>("petition.*"),
       opts
     );
   }
