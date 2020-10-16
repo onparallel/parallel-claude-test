@@ -78,6 +78,7 @@ export class OrganizationRepository extends BaseRepository {
           "prontopiso",
           "brickbro",
           "kantox",
+          "osborneclarke",
         ].includes(org.identifier)
           ? `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`
           : null
