@@ -185,6 +185,8 @@ export type Mutation = {
   createPetitionField: PetitionBaseAndField;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
+  /** Creates a new user in the specified organization. */
+  createUser: SupportMethodResponse;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
@@ -326,6 +328,14 @@ export type MutationcreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+};
+
+export type MutationcreateUserArgs = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  organizationId: Scalars["Int"];
+  organizationRole: OrganizationRole;
 };
 
 export type MutationdeactivateAccessesArgs = {
