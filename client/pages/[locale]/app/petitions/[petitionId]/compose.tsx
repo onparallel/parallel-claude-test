@@ -202,7 +202,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         ...state,
         activeFieldId:
           state.activeFieldId === fieldId ? null : state.activeFieldId,
-        showSettings: state.activeFieldId === fieldId ? false : true,
+        showSettings:
+          state.activeFieldId === fieldId ? false : state.showSettings,
       }));
       try {
         await deletePetitionField({
