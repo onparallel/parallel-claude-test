@@ -17,42 +17,22 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { KeyboardEvent, memo, useCallback, useReducer, useRef } from "react";
+import { KeyboardEvent, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { indexBy } from "remeda";
+import { indexBy, pick } from "remeda";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
-type FieldsReducerState = {
-  fieldsById: { [id: string]: FieldSelection };
+type FieldsState = {
+  fieldsById: Record<string, FieldSelection>;
   fieldIds: string[];
 };
 
-function fieldsReducer(
-  state: FieldsReducerState,
-  action:
-    | { type: "RESET"; fields: FieldSelection[] }
-    | { type: "SORT"; fieldIds: string[] }
-): FieldsReducerState {
-  switch (action.type) {
-    case "RESET":
-      return reset(action.fields, state);
-    case "SORT":
-      return {
-        ...state,
-        fieldIds: action.fieldIds,
-      };
-  }
-}
-
-function reset(
-  fields: FieldSelection[],
-  prev?: FieldsReducerState
-): FieldsReducerState {
-  return {
+function reset(fields: FieldSelection[]): () => FieldsState {
+  return () => ({
     fieldsById: indexBy(fields, (f) => f.id),
     fieldIds: fields.map((f) => f.id),
-  };
+  });
 }
 
 export type PetitionComposeFieldListProps = ExtendChakra<{
@@ -82,14 +62,8 @@ export const PetitionComposeFieldList = Object.assign(
     onFieldEdit,
     ...props
   }: PetitionComposeFieldListProps) {
-    const [{ fieldsById, fieldIds }, dispatch] = useReducer(
-      fieldsReducer,
-      fields,
-      reset
-    );
-    useEffectSkipFirst(() => dispatch({ type: "RESET", fields: fields }), [
-      fields,
-    ]);
+    const [{ fieldsById, fieldIds }, setState] = useState(reset(fields));
+    useEffectSkipFirst(() => setState(reset(fields)), [fields]);
 
     const addFieldRef = useRef<HTMLButtonElement>(null);
 
@@ -99,15 +73,20 @@ export const PetitionComposeFieldList = Object.assign(
         hoverIndex: number,
         dropped?: boolean
       ) {
-        const newFieldIds = [...fieldIds];
-        const [field] = newFieldIds.splice(dragIndex, 1);
-        newFieldIds.splice(hoverIndex, 0, field);
-        dispatch({ type: "SORT", fieldIds: newFieldIds });
-        if (dropped) {
-          onUpdateFieldPositions(newFieldIds);
-        }
+        setState((state) => {
+          const newFieldIds = [...state.fieldIds];
+          const [field] = newFieldIds.splice(dragIndex, 1);
+          newFieldIds.splice(hoverIndex, 0, field);
+          if (dropped) {
+            setTimeout(() => onUpdateFieldPositions(newFieldIds));
+          }
+          return {
+            ...state,
+            fieldIds: newFieldIds,
+          };
+        });
       },
-      [fieldIds.join(",")]
+      [onUpdateFieldPositions]
     );
 
     const focusTitle = useCallback((fieldId: string) => {
@@ -216,7 +195,9 @@ export const PetitionComposeFieldList = Object.assign(
       ]
     );
 
-    const fieldIndexValues = useFieldIndexValues(fields);
+    const fieldIndexValues = useFieldIndexValues(
+      fieldIds.map((fieldId) => pick(fieldsById[fieldId], ["type"]))
+    );
 
     return (
       <>
