@@ -4,7 +4,10 @@ import { AddIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
-import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
+import {
+  PetitionComposeField,
+  PetitionComposeFieldProps,
+} from "@parallel/components/petition-compose/PetitionComposeField";
 import {
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
@@ -12,16 +15,9 @@ import {
 } from "@parallel/graphql/__types";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
+import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import {
-  KeyboardEvent,
-  memo,
-  ReactEventHandler,
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-} from "react";
+import { KeyboardEvent, memo, useCallback, useReducer, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy } from "remeda";
 
@@ -91,7 +87,9 @@ export const PetitionComposeFieldList = Object.assign(
       fields,
       reset
     );
-    useEffect(() => dispatch({ type: "RESET", fields: fields }), [fields]);
+    useEffectSkipFirst(() => dispatch({ type: "RESET", fields: fields }), [
+      fields,
+    ]);
 
     const addFieldRef = useRef<HTMLButtonElement>(null);
 
@@ -113,151 +111,109 @@ export const PetitionComposeFieldList = Object.assign(
     );
 
     const focusTitle = useCallback((fieldId: string) => {
-      const title = document.querySelector<HTMLElement>(
-        `#field-title-${fieldId}`
-      );
-      title?.focus();
-    }, []);
-
-    const focusDescription = useCallback((fieldId: string) => {
-      const title = document.querySelector<HTMLElement>(
-        `#field-description-${fieldId}`
-      );
-      title?.focus();
+      setTimeout(() => {
+        const title = document.querySelector<HTMLElement>(
+          `#field-title-${fieldId}`
+        );
+        title?.focus();
+      });
     }, []);
 
     // Memoize field callbacks
-    const handleFocus = useMemoFactory(
-      (fieldId: string) => () => onSelectField(fieldId),
-      [onSelectField]
-    );
-    const handleClick = useMemoFactory(
-      (fieldId: string) => () => onSelectField(fieldId),
-      [onSelectField]
-    );
-    const handleCloneClick = useMemoFactory(
-      (fieldId: string): ReactEventHandler => (event) => {
-        event.stopPropagation();
-        onCopyFieldClick(fieldId);
-      },
-      [onCopyFieldClick]
-    );
-    const handleSettingsClick = useMemoFactory(
-      (fieldId: string): ReactEventHandler => (event) => {
-        event.stopPropagation();
-        onFieldSettingsClick(fieldId);
-      },
-      [onFieldSettingsClick]
-    );
-    const handleDeleteClick = useMemoFactory(
-      (fieldId: string): ReactEventHandler => (event) => {
-        event.stopPropagation();
-        onDeleteField(fieldId);
-      },
-      [onDeleteField]
-    );
-    const handleFieldEdit = useMemoFactory(
-      (fieldId: string) => (data: UpdatePetitionFieldInput) =>
-        onFieldEdit(fieldId, data),
-      [onFieldEdit]
-    );
-
-    const titleFieldProps = useMemoFactory(
-      (fieldId: string) => ({
-        onKeyDown: (event: KeyboardEvent<any>) => {
-          const field = fields.find((f) => f.id === fieldId)!;
-          const index = fieldIds.indexOf(fieldId);
-          const prev =
-            index > 0
-              ? fields.find((f) => f.id === fieldIds[index - 1])!
-              : null;
-          const next =
-            index < fieldIds.length - 1
-              ? fields.find((f) => f.id === fieldIds[index + 1])!
-              : null;
-          switch (event.key) {
-            case "ArrowDown":
-              setTimeout(() => {
-                if (field.isDescriptionShown) {
-                  focusDescription(field.id);
-                } else if (next) {
-                  focusTitle(next.id);
+    const fieldProps = useMemoFactory(
+      (
+        fieldId
+      ): Pick<
+        PetitionComposeFieldProps,
+        | "onClick"
+        | "onFocus"
+        | "onCloneClick"
+        | "onSettingsClick"
+        | "onDeleteClick"
+        | "onFieldEdit"
+        | "titleFieldProps"
+        | "descriptionFieldProps"
+      > => ({
+        onClick: () => onSelectField(fieldId),
+        onFocus: () => onSelectField(fieldId),
+        onCloneClick: (event) => {
+          event.stopPropagation();
+          onCopyFieldClick(fieldId);
+        },
+        onSettingsClick: (event) => {
+          event.stopPropagation();
+          onFieldSettingsClick(fieldId);
+        },
+        onDeleteClick: (event) => {
+          event.stopPropagation();
+          onDeleteField(fieldId);
+        },
+        onFieldEdit: (data) => onFieldEdit(fieldId, data),
+        titleFieldProps: {
+          onKeyDown: (event) => {
+            const index = fields.findIndex((f) => f.id === fieldId);
+            const prevId = index > 0 ? fields[index - 1].id : null;
+            const nextId =
+              index < fields.length - 1 ? fields[index + 1].id : null;
+            switch (event.key) {
+              case "ArrowDown":
+                if (nextId) {
+                  focusTitle(nextId);
                 }
-              });
-              break;
-            case "ArrowUp":
-              if (prev) {
-                setTimeout(() => {
-                  if (prev.isDescriptionShown) {
-                    focusDescription(prev.id);
-                  } else {
-                    focusTitle(prev.id);
-                  }
-                });
-              }
-              break;
-          }
+                break;
+              case "ArrowUp":
+                if (prevId) {
+                  focusTitle(prevId);
+                }
+                break;
+            }
+          },
+          onKeyUp: (event) => {
+            switch (event.key) {
+              case "Enter":
+                const addFieldButton = document.querySelector<
+                  HTMLButtonElement
+                >(".add-field-after");
+                (addFieldButton ?? addFieldRef.current!).click();
+                break;
+            }
+          },
         },
-        onKeyUp: (event: KeyboardEvent<any>) => {
-          switch (event.key) {
-            case "Enter":
-              const addFieldButton = document.querySelector<HTMLButtonElement>(
-                ".add-field-after"
-              );
-              (addFieldButton ?? addFieldRef.current!).click();
-              break;
-          }
-        },
-      }),
-      [fields]
-    );
-
-    const descriptionFieldProps = useMemoFactory(
-      (fieldId: string) => ({
-        onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => {
-          const textarea = event.target as HTMLTextAreaElement;
-          const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-          const beforeCursor = textarea.value.substr(
-            0,
-            textarea.selectionStart
-          );
-          const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-          const index = fieldIds.indexOf(fieldId);
-          switch (event.key) {
-            case "ArrowDown":
-              if (
-                index < fieldIds.length - 1 &&
-                currentLine === totalLines - 1
-              ) {
-                focusTitle(fieldIds[index + 1]);
-              }
-              break;
-            case "ArrowUp":
-              if (currentLine === 0) {
-                focusTitle(fieldId);
-              }
-              break;
-            case "Enter":
-              // if (!event.shiftKey) {
-              //   event.preventDefault();
-              // }
-              break;
-          }
-        },
-        onKeyUp: (event: KeyboardEvent<any>) => {
-          switch (event.key) {
-            case "Enter":
-              // if (!event.shiftKey) {
-              //   const addFieldButton = document.querySelector<
-              //     HTMLButtonElement
-              //   >(".add-field-after");
-              //   (addFieldButton ?? addFieldRef.current!).click();
-              // }
-              break;
-          }
+        descriptionFieldProps: {
+          onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => {
+            const textarea = event.target as HTMLTextAreaElement;
+            const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+            const beforeCursor = textarea.value.substr(
+              0,
+              textarea.selectionStart
+            );
+            const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+            const index = fields.findIndex((f) => f.id === fieldId);
+            const nextId =
+              index < fields.length - 1 ? fields[index + 1].id : null;
+            switch (event.key) {
+              case "ArrowDown":
+                if (nextId && currentLine === totalLines - 1) {
+                  focusTitle(nextId);
+                }
+                break;
+              case "ArrowUp":
+                if (currentLine === 0) {
+                  focusTitle(fieldId);
+                }
+                break;
+            }
+          },
         },
       }),
-      [fields]
+      [
+        onSelectField,
+        onCopyFieldClick,
+        onFieldSettingsClick,
+        onDeleteField,
+        onFieldEdit,
+        fields.map((f) => f.id).join(","),
+      ]
     );
 
     const fieldIndexValues = useFieldIndexValues(fields);
@@ -277,14 +233,7 @@ export const PetitionComposeFieldList = Object.assign(
               isLast={index === fieldIds.length - 1}
               showError={showErrors}
               onAddField={onAddField}
-              onClick={handleClick(fieldId)}
-              onFocus={handleFocus(fieldId)}
-              onCloneClick={handleCloneClick(fieldId)}
-              onSettingsClick={handleSettingsClick(fieldId)}
-              onDeleteClick={handleDeleteClick(fieldId)}
-              onFieldEdit={handleFieldEdit(fieldId)}
-              titleFieldProps={titleFieldProps(fieldId)}
-              descriptionFieldProps={descriptionFieldProps(fieldId)}
+              {...fieldProps(fieldId)}
             />
           ))}
         </Card>

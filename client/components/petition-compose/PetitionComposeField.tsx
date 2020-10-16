@@ -36,6 +36,8 @@ import {
 } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useIntl } from "react-intl";
+import { omit } from "remeda";
+import { shallowEqualObjects } from "shallow-equal";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -65,329 +67,341 @@ interface DragItem {
 }
 
 export const PetitionComposeField = Object.assign(
-  memo(function PetitionComposeField({
-    field,
-    fieldRelativeIndex,
-    index,
-    isActive,
-    isLast,
-    showError,
-    titleFieldProps,
-    descriptionFieldProps,
-    onMove,
-    onFocus,
-    onAddField,
-    onCloneClick,
-    onSettingsClick,
-    onFieldEdit,
-    onDeleteClick,
-    ...props
-  }: PetitionComposeFieldProps) {
-    const intl = useIntl();
-    const labels = {
-      required: intl.formatMessage({
-        id: "generic.required-field",
-        defaultMessage: "Required field",
-      }),
-    };
-    const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
-      field.id,
+  memo(
+    function PetitionComposeField({
+      field,
+      fieldRelativeIndex,
       index,
+      isActive,
+      isLast,
+      showError,
+      titleFieldProps,
+      descriptionFieldProps,
       onMove,
-      field.isFixed ? "FIXED_FIELD" : "FIELD"
-    );
-    const [title, setTitle] = useState(field.title);
-    const titleRef = useRef<HTMLInputElement>(null);
-    const [description, setDescription] = useState(field.description);
-    const descriptionRef = useRef<HTMLTextAreaElement>(null);
+      onFocus,
+      onAddField,
+      onCloneClick,
+      onSettingsClick,
+      onFieldEdit,
+      onDeleteClick,
+      ...props
+    }: PetitionComposeFieldProps) {
+      const intl = useIntl();
+      const labels = {
+        required: intl.formatMessage({
+          id: "generic.required-field",
+          defaultMessage: "Required field",
+        }),
+      };
+      const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
+        field.id,
+        index,
+        onMove,
+        field.isFixed ? "FIXED_FIELD" : "FIELD"
+      );
+      const [title, setTitle] = useState(field.title);
+      const titleRef = useRef<HTMLInputElement>(null);
+      const [description, setDescription] = useState(field.description);
+      const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
-    // to make sure 'description' is set to null on client
-    useEffect(() => {
-      if (!field.isDescriptionShown) {
-        setDescription(null);
-      }
-    }, [field.isDescriptionShown]);
-    return (
-      <Box
-        ref={elementRef}
-        borderY="1px solid"
-        borderColor="gray.200"
-        marginY="-1px"
-        aria-current={isActive ? "true" : "false"}
-        position="relative"
-        sx={{
-          ...(isDragging &&
-            generateCssStripe({ size: "1rem", color: "gray.50" })),
-        }}
-        onFocus={onFocus}
-        {...props}
-      >
-        {isActive && !field.isFixed ? (
-          <AddFieldButton
-            className="add-field-before"
-            position="absolute"
-            top="-1px"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            zIndex="1"
-            onSelectFieldType={(type) => onAddField(type, index)}
-          />
-        ) : null}
+      // to make sure 'description' is set to null on client
+      useEffect(() => {
+        if (!field.isDescriptionShown) {
+          setDescription(null);
+        }
+      }, [field.isDescriptionShown]);
+      return (
         <Box
-          ref={previewRef}
-          display="flex"
-          flexDirection="row"
-          opacity={isDragging ? 0 : 1}
+          ref={elementRef}
+          borderY="1px solid"
+          borderColor="gray.200"
+          marginY="-1px"
+          aria-current={isActive ? "true" : "false"}
           position="relative"
-          backgroundColor={isActive ? "purple.50" : "white"}
           sx={{
-            "[draggable]": {
-              opacity: 0,
-              transition: "opacity 150ms",
-            },
-            ".field-actions": {
-              display: "none",
-            },
-            "&:hover [draggable]": {
-              opacity: 1,
-            },
-            "&:hover, &:focus-within": {
-              backgroundColor: isActive ? "purple.50" : "gray.50",
-              ".field-actions": {
-                display: "block",
-              },
-            },
+            ...(isDragging &&
+              generateCssStripe({ size: "1rem", color: "gray.50" })),
           }}
+          onFocus={onFocus}
+          {...props}
         >
-          {field.isFixed ? (
-            <Box width="32px" />
-          ) : (
-            <Box
-              ref={dragRef}
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              padding={2}
-              width="32px"
-              cursor={field.isFixed ? "unset" : "grab"}
-              color="gray.400"
-              _hover={{
-                color: "gray.700",
-              }}
-              aria-label={intl.formatMessage({
-                id: "petition.drag-to-sort-label",
-                defaultMessage: "Drag to sort this petition fields",
-              })}
-            >
-              <Tooltip
-                label={intl.formatMessage({
-                  id: "generic.drag-to-sort",
-                  defaultMessage: "Drag to sort",
-                })}
-              >
-                <DragHandleIcon role="presentation" />
-              </Tooltip>
-            </Box>
-          )}
-          {field.optional ? null : (
-            <Box marginX={-2} position="relative">
-              <Tooltip
-                placement="top"
-                aria-label={labels.required}
-                label={labels.required}
-              >
-                <Box
-                  width={4}
-                  height={4}
-                  backgroundColor="red"
-                  textAlign="center"
-                  marginTop="13px"
-                  fontSize="xl"
-                  color="red.600"
-                  userSelect="none"
-                >
-                  <Box position="relative" bottom="4px" pointerEvents="none">
-                    *
-                  </Box>
-                </Box>
-              </Tooltip>
-            </Box>
-          )}
-          <Box marginLeft={3}>
-            <PetitionFieldTypeIndicator
-              type={field.type}
-              relativeIndex={fieldRelativeIndex}
-              as={field.isFixed ? "div" : "button"}
-              onClick={field.isFixed ? undefined : onSettingsClick}
-              marginTop="10px"
-              alignSelf="flex-start"
+          {isActive && !field.isFixed ? (
+            <AddFieldButton
+              className="add-field-before"
+              position="absolute"
+              top="-1px"
+              left="50%"
+              transform="translate(-50%, -50%)"
+              zIndex="1"
+              onSelectFieldType={(type) => onAddField(type, index)}
             />
-          </Box>
+          ) : null}
           <Box
-            flex="1"
-            paddingLeft={2}
-            paddingTop={2}
-            paddingBottom={10}
-            paddingRight={2}
+            ref={previewRef}
+            display="flex"
+            flexDirection="row"
+            opacity={isDragging ? 0 : 1}
+            position="relative"
+            backgroundColor={isActive ? "purple.50" : "white"}
+            sx={{
+              "[draggable]": {
+                opacity: 0,
+                transition: "opacity 150ms",
+              },
+              ".field-actions": {
+                display: "none",
+              },
+              "&:hover [draggable]": {
+                opacity: 1,
+              },
+              "&:hover, &:focus-within": {
+                backgroundColor: isActive ? "purple.50" : "gray.50",
+                ".field-actions": {
+                  display: "block",
+                },
+              },
+            }}
           >
-            <Input
-              id={`field-title-${field.id}`}
-              ref={titleRef}
-              aria-label={intl.formatMessage({
-                id: "petition.field-title-label",
-                defaultMessage: "Field title",
-              })}
-              placeholder={
-                field.type === "HEADING"
-                  ? intl.formatMessage({
-                      id: "petition.field-title-heading-placeholder",
-                      defaultMessage:
-                        "Enter an introductory title for this section...",
-                    })
-                  : field.type === "FILE_UPLOAD"
-                  ? intl.formatMessage({
-                      id: "petition.field-title-file-upload-placeholder",
-                      defaultMessage: "Describe the file(s) that you need...",
-                    })
-                  : field.type === "TEXT"
-                  ? intl.formatMessage({
-                      id: "petition.field-title-text-placeholder",
-                      defaultMessage:
-                        "Ask for the information that you need...",
-                    })
-                  : intl.formatMessage({
-                      id: "petition.field-title-placeholder",
-                      defaultMessage: "Enter a field title",
-                    })
-              }
-              value={title ?? ""}
-              width="100%"
-              maxLength={100}
-              border="none"
-              paddingX={2}
-              height={6}
-              marginBottom={1}
-              backgroundColor={showError && !title ? "red.100" : "transparent"}
-              _focus={{
-                boxShadow: "none",
-              }}
-              onFocus={(event: FocusEvent<HTMLInputElement>) =>
-                event.target.select()
-              }
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setTitle(event.target.value ?? null)
-              }
-              onBlur={() => {
-                const trimmed = title?.trim() ?? null;
-                setNativeValue(titleRef.current!, trimmed ?? "");
-                if (field.title !== trimmed) {
-                  onFieldEdit({ title: trimmed });
-                }
-              }}
-              {...titleFieldProps}
-            />
-            {field.isDescriptionShown ? (
-              <GrowingTextarea
-                id={`field-description-${field.id}`}
-                ref={descriptionRef}
-                placeholder={intl.formatMessage({
-                  id: "petition.field-description-placeholder",
-                  defaultMessage: "Add a description...",
-                })}
+            {field.isFixed ? (
+              <Box width="32px" />
+            ) : (
+              <Box
+                ref={dragRef}
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                padding={2}
+                width="32px"
+                cursor={field.isFixed ? "unset" : "grab"}
+                color="gray.400"
+                _hover={{
+                  color: "gray.700",
+                }}
                 aria-label={intl.formatMessage({
-                  id: "petition.field-description-label",
-                  defaultMessage: "Field description",
+                  id: "petition.drag-to-sort-label",
+                  defaultMessage: "Drag to sort this petition fields",
                 })}
-                fontSize="sm"
-                background="transparent"
-                value={description ?? ""}
-                maxLength={4000}
+              >
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "generic.drag-to-sort",
+                    defaultMessage: "Drag to sort",
+                  })}
+                >
+                  <DragHandleIcon role="presentation" />
+                </Tooltip>
+              </Box>
+            )}
+            {field.optional ? null : (
+              <Box marginX={-2} position="relative">
+                <Tooltip
+                  placement="top"
+                  aria-label={labels.required}
+                  label={labels.required}
+                >
+                  <Box
+                    width={4}
+                    height={4}
+                    backgroundColor="red"
+                    textAlign="center"
+                    marginTop="13px"
+                    fontSize="xl"
+                    color="red.600"
+                    userSelect="none"
+                  >
+                    <Box position="relative" bottom="4px" pointerEvents="none">
+                      *
+                    </Box>
+                  </Box>
+                </Tooltip>
+              </Box>
+            )}
+            <Box marginLeft={3}>
+              <PetitionFieldTypeIndicator
+                type={field.type}
+                relativeIndex={fieldRelativeIndex}
+                as={field.isFixed ? "div" : "button"}
+                onClick={field.isFixed ? undefined : onSettingsClick}
+                marginTop="10px"
+                alignSelf="flex-start"
+              />
+            </Box>
+            <Box
+              flex="1"
+              paddingLeft={2}
+              paddingTop={2}
+              paddingBottom={10}
+              paddingRight={2}
+            >
+              <Input
+                id={`field-title-${field.id}`}
+                ref={titleRef}
+                aria-label={intl.formatMessage({
+                  id: "petition.field-title-label",
+                  defaultMessage: "Field title",
+                })}
+                placeholder={
+                  field.type === "HEADING"
+                    ? intl.formatMessage({
+                        id: "petition.field-title-heading-placeholder",
+                        defaultMessage:
+                          "Enter an introductory title for this section...",
+                      })
+                    : field.type === "FILE_UPLOAD"
+                    ? intl.formatMessage({
+                        id: "petition.field-title-file-upload-placeholder",
+                        defaultMessage: "Describe the file(s) that you need...",
+                      })
+                    : field.type === "TEXT"
+                    ? intl.formatMessage({
+                        id: "petition.field-title-text-placeholder",
+                        defaultMessage:
+                          "Ask for the information that you need...",
+                      })
+                    : intl.formatMessage({
+                        id: "petition.field-title-placeholder",
+                        defaultMessage: "Enter a field title",
+                      })
+                }
+                value={title ?? ""}
+                width="100%"
+                maxLength={100}
                 border="none"
-                height="20px"
                 paddingX={2}
-                paddingY={0}
-                minHeight={0}
-                rows={1}
+                height={6}
+                marginBottom={1}
+                backgroundColor={
+                  showError && !title ? "red.100" : "transparent"
+                }
                 _focus={{
                   boxShadow: "none",
                 }}
-                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                  setDescription(event.target.value ?? null)
+                onFocus={(event: FocusEvent<HTMLInputElement>) =>
+                  event.target.select()
+                }
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setTitle(event.target.value ?? null)
                 }
                 onBlur={() => {
-                  const trimmed = description?.trim() ?? null;
-                  setNativeValue(descriptionRef.current!, trimmed ?? "");
-                  if (field.description !== trimmed) {
-                    onFieldEdit({ description: trimmed });
+                  const trimmed = title?.trim() ?? null;
+                  setNativeValue(titleRef.current!, trimmed ?? "");
+                  if (field.title !== trimmed) {
+                    onFieldEdit({ title: trimmed });
                   }
                 }}
-                {...descriptionFieldProps}
+                {...titleFieldProps}
               />
-            ) : (
-              <Box height="26px" />
-            )}
+              {field.isDescriptionShown ? (
+                <GrowingTextarea
+                  id={`field-description-${field.id}`}
+                  ref={descriptionRef}
+                  placeholder={intl.formatMessage({
+                    id: "petition.field-description-placeholder",
+                    defaultMessage: "Add a description...",
+                  })}
+                  aria-label={intl.formatMessage({
+                    id: "petition.field-description-label",
+                    defaultMessage: "Field description",
+                  })}
+                  fontSize="sm"
+                  background="transparent"
+                  value={description ?? ""}
+                  maxLength={4000}
+                  border="none"
+                  height="20px"
+                  paddingX={2}
+                  paddingY={0}
+                  minHeight={0}
+                  rows={1}
+                  _focus={{
+                    boxShadow: "none",
+                  }}
+                  onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                    setDescription(event.target.value ?? null)
+                  }
+                  onBlur={() => {
+                    const trimmed = description?.trim() ?? null;
+                    setNativeValue(descriptionRef.current!, trimmed ?? "");
+                    if (field.description !== trimmed) {
+                      onFieldEdit({ description: trimmed });
+                    }
+                  }}
+                  {...descriptionFieldProps}
+                />
+              ) : (
+                <Box height="26px" />
+              )}
+            </Box>
+            <Stack
+              className="field-actions"
+              position="absolute"
+              bottom="0"
+              right="0"
+              direction="row"
+              padding={1}
+            >
+              <IconButtonWithTooltip
+                icon={<CopyIcon />}
+                size="sm"
+                variant="ghost"
+                placement="bottom"
+                color="gray.600"
+                label={intl.formatMessage({
+                  id: "petition.field-clone",
+                  defaultMessage: "Clone field",
+                })}
+                onClick={onCloneClick}
+              />
+              <IconButtonWithTooltip
+                icon={<SettingsIcon />}
+                size="sm"
+                variant="ghost"
+                placement="bottom"
+                color="gray.600"
+                label={intl.formatMessage({
+                  id: "petition.field-settings",
+                  defaultMessage: "Field settings",
+                })}
+                onClick={onSettingsClick}
+              />
+              <IconButtonWithTooltip
+                icon={<DeleteIcon />}
+                disabled={field.isFixed}
+                size="sm"
+                variant="ghost"
+                placement="bottom"
+                color="gray.600"
+                label={intl.formatMessage({
+                  id: "petition.field-delete-button",
+                  defaultMessage: "Delete field",
+                })}
+                onClick={onDeleteClick}
+              />
+            </Stack>
           </Box>
-          <Stack
-            className="field-actions"
-            position="absolute"
-            bottom="0"
-            right="0"
-            direction="row"
-            padding={1}
-          >
-            <IconButtonWithTooltip
-              icon={<CopyIcon />}
-              size="sm"
-              variant="ghost"
-              placement="bottom"
-              color="gray.600"
-              label={intl.formatMessage({
-                id: "petition.field-clone",
-                defaultMessage: "Clone field",
-              })}
-              onClick={onCloneClick}
+          {isActive && !isLast ? (
+            <AddFieldButton
+              className="add-field-after"
+              position="absolute"
+              bottom={0}
+              left="50%"
+              transform="translate(-50%, 50%)"
+              zIndex="1"
+              onSelectFieldType={(type) => onAddField(type, index + 1)}
             />
-            <IconButtonWithTooltip
-              icon={<SettingsIcon />}
-              size="sm"
-              variant="ghost"
-              placement="bottom"
-              color="gray.600"
-              label={intl.formatMessage({
-                id: "petition.field-settings",
-                defaultMessage: "Field settings",
-              })}
-              onClick={onSettingsClick}
-            />
-            <IconButtonWithTooltip
-              icon={<DeleteIcon />}
-              disabled={field.isFixed}
-              size="sm"
-              variant="ghost"
-              placement="bottom"
-              color="gray.600"
-              label={intl.formatMessage({
-                id: "petition.field-delete-button",
-                defaultMessage: "Delete field",
-              })}
-              onClick={onDeleteClick}
-            />
-          </Stack>
+          ) : null}
         </Box>
-        {isActive && !isLast ? (
-          <AddFieldButton
-            className="add-field-after"
-            position="absolute"
-            bottom={0}
-            left="50%"
-            transform="translate(-50%, 50%)"
-            zIndex="1"
-            onSelectFieldType={(type) => onAddField(type, index + 1)}
-          />
-        ) : null}
-      </Box>
-    );
-  }),
+      );
+    },
+    (prevProps, nextProps) => {
+      return (
+        shallowEqualObjects(
+          omit(prevProps, ["field"]),
+          omit(nextProps, ["field"])
+        ) && shallowEqualObjects(prevProps["field"], nextProps["field"])
+      );
+    }
+  ),
   {
     fragments: {
       PetitionField: gql`

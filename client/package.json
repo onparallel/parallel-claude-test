@@ -57,6 +57,7 @@
     "react-transition-group": "^4.4.1",
     "remeda": "^0.0.22",
     "sanitize-filename": "^1.6.3",
+    "shallow-equal": "^1.2.1",
     "slate": "^0.58.4",
     "slate-history": "^0.58.4",
     "slate-hyperscript": "^0.58.4",

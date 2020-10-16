@@ -1,36 +1,34 @@
 import { PetitionField } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 
-function numberToBase26(number: number, tail = ""): string {
-  if (number <= 26) {
-    return `${String.fromCharCode(number + 64)}${tail}`;
+/**
+ * Generates and increasing sequence of letter indices (same as Excel columns)
+ * A, B, ... Z, AA, AB, ... AZ, BA ... ZZ, AAA, AAB, ...
+ */
+function* letters() {
+  const symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  let counter = 0;
+  while (true) {
+    let remaining = counter;
+    let result = "";
+    while (remaining >= 0) {
+      result = symbols[remaining % symbols.length] + result;
+      remaining = Math.floor(remaining / symbols.length) - 1;
+    }
+    yield result;
+    counter++;
   }
-
-  const remainder = number % 26 || 26;
-  const division = Math.trunc(number / 26) - (remainder === 26 ? 1 : 0);
-
-  return numberToBase26(
-    division,
-    `${String.fromCharCode(remainder + 64)}${tail}`
-  );
 }
 
 /**
- * searches for the last string type value in the symbols array and returns the next one
- * example: nextLetter(["A", 1, 2, "B", 3]) === "C"
+ * Generates an increasing sequence of numbers
  */
-function nextLetter(symbols: Array<string | number>) {
-  const index = symbols.filter((s) => typeof s === "string").length;
-  return numberToBase26(index + 1);
-}
-
-/**
- * searches for the last number type value in the symbols array and returns the next one
- * example: nextNumber(["A", 1, 2, "B", 3]) === 4
- */
-function nextNumber(symbols: Array<string | number>) {
-  const index = symbols.filter((s) => typeof s === "number").length;
-  return index + 1;
+function* numbers() {
+  let counter = 0;
+  while (true) {
+    yield counter + 1;
+    counter++;
+  }
 }
 
 /**
@@ -41,14 +39,12 @@ export function useFieldIndexValues(
   fields: Pick<PetitionField, "type">[]
 ): Array<number | string> {
   return useMemo(() => {
-    return fields.reduce<Array<string | number>>((values, field) => {
-      if (field.type === "HEADING") {
-        // concat the next letter in alphabet that is not already included in the array
-        return values.concat(nextLetter(values));
-      } else {
-        // concat the next number that is not already included in the array
-        return values.concat(nextNumber(values));
-      }
-    }, []);
-  }, [fields, nextLetter, nextNumber]);
+    const letter = letters();
+    const number = numbers();
+    return fields.map((f) =>
+      f.type === "HEADING"
+        ? (letter.next().value as string)
+        : (number.next().value as number)
+    );
+  }, [fields.map((f) => f.type).join(",")]);
 }
