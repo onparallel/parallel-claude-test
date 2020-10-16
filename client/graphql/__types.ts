@@ -2597,7 +2597,11 @@ export type PetitionActivityUserQuery = { __typename?: "Query" } & {
 
 export type updateIsDescriptionShown_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "isDescriptionShown">;
+} & Pick<PetitionField, "isDescriptionShown" | "description">;
+
+export type onFieldEdit_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & PetitionCompose_PetitionFieldFragment;
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -4305,6 +4309,7 @@ export const PetitionActivity_UserFragmentDoc = gql`
 export const updateIsDescriptionShown_PetitionFieldFragmentDoc = gql`
   fragment updateIsDescriptionShown_PetitionField on PetitionField {
     isDescriptionShown @client
+    description
   }
 `;
 export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
@@ -4337,6 +4342,12 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
   ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
+`;
+export const onFieldEdit_PetitionFieldFragmentDoc = gql`
+  fragment onFieldEdit_PetitionField on PetitionField {
+    ...PetitionCompose_PetitionField
+  }
+  ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionComposeMessageEditor_Petition on Petition {

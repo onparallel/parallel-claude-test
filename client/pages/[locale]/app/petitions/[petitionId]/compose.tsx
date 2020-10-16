@@ -24,6 +24,7 @@ import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petit
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
 import { useScheduleMessageDialog } from "@parallel/components/petition-compose/ScheduleMessageDialog";
 import {
+  onFieldEdit_PetitionFieldFragment,
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
   PetitionComposeUserQuery,
@@ -98,22 +99,30 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const handleIsDescriptionShownChange = useCallback(
     async (fieldId: string) => {
       try {
-        const field = petition!.fields.find((f) => f.id === fieldId)!;
+        const fragment = gql`
+          fragment updateIsDescriptionShown_PetitionField on PetitionField {
+            isDescriptionShown @client
+            description
+          }
+        `;
+        const { isDescriptionShown, description } = client.cache.readFragment<
+          updateIsDescriptionShown_PetitionFieldFragment
+        >({
+          fragment,
+          id: fieldId,
+        })!;
         client.cache.writeFragment<
           updateIsDescriptionShown_PetitionFieldFragment
         >({
-          fragment: gql`
-            fragment updateIsDescriptionShown_PetitionField on PetitionField {
-              isDescriptionShown @client
-            }
-          `,
+          fragment,
           id: fieldId,
           data: {
             __typename: "PetitionField",
-            isDescriptionShown: !field.isDescriptionShown,
+            isDescriptionShown: !isDescriptionShown,
+            description,
           },
         });
-        if (field.isDescriptionShown && !!field.description) {
+        if (isDescriptionShown && !!description) {
           await updatePetitionField({
             variables: {
               petitionId,
@@ -126,7 +135,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         }
       } catch {}
     },
-    [petitionId, petition!.fields]
+    [petitionId]
   );
 
   const [showErrors, setShowErrors] = useState(false);
@@ -242,7 +251,18 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleFieldEdit = useCallback(
     wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
-      const field = (petition!.fields as any[]).find((f) => f.id === fieldId);
+      const field = client.cache.readFragment<
+        onFieldEdit_PetitionFieldFragment
+      >({
+        fragment: gql`
+          fragment onFieldEdit_PetitionField on PetitionField {
+            ...PetitionCompose_PetitionField
+          }
+          ${PetitionCompose.fragments.PetitionField}
+        `,
+        fragmentName: "onFieldEdit_PetitionField",
+        id: fieldId,
+      })!;
       await updatePetitionField({
         variables: { petitionId, fieldId, data },
         optimisticResponse: {
@@ -262,7 +282,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         },
       });
     }),
-    [petitionId, petition!.fields]
+    [petitionId]
   );
 
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
