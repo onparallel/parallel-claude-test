@@ -9,14 +9,14 @@ import {
 import { SearchIcon } from "@parallel/chakra/icons";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, useRef } from "react";
 import { useIntl } from "react-intl";
 
 export const SearchInput = forwardRef<HTMLInputElement, InputProps>(
   function SearchInput(props, ref) {
     const inputRef = useRef<HTMLInputElement>(null);
-    const mergedRef = useMergeRefs(ref, inputRef);
+    const mergedRef = useMergedRef(ref, inputRef);
     const intl = useIntl();
     const [focused, bind] = useFocus<HTMLInputElement>(props);
     const isActive = Boolean(props.value || focused);

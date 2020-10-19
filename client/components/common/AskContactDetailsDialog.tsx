@@ -11,10 +11,10 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useMergeRefs } from "../../utils/useMergeRefs";
 import { EMAIL_REGEX } from "../../utils/validation";
 
 export type ContactDetailsFormData = {
@@ -69,7 +69,7 @@ export function AskContactDetailsDialog({
               />
             </FormLabel>
             <Input
-              ref={useMergeRefs(
+              ref={useMergedRef(
                 emailRef,
                 register({ required: true, pattern: EMAIL_REGEX })
               )}
@@ -95,7 +95,7 @@ export function AskContactDetailsDialog({
                 defaultMessage="First name"
               />
             </FormLabel>
-            <Input name="firstName" ref={useMergeRefs(register(), nameRef)} />
+            <Input name="firstName" ref={useMergedRef(register(), nameRef)} />
           </FormControl>
           <FormControl id="contact-last-name">
             <FormLabel>

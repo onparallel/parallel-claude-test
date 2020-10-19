@@ -1,6 +1,8 @@
 import {
   Box,
   BoxProps,
+  Flex,
+  Heading,
   Menu,
   MenuButton,
   MenuItem,
@@ -8,18 +10,16 @@ import {
   MenuListProps,
   Portal,
   SelectProps,
-  Text,
-  useMenuContext,
-  Flex,
-  Heading,
   Stack,
+  Text,
   TextProps,
+  useMenuContext,
 } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { useMergeRefs } from "@parallel/utils/useMergeRefs";
+import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { useIntl, FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
@@ -164,7 +164,7 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
       }}
       overflow="hidden"
       {...props}
-      ref={useMergeRefs(ref, ownRef)}
+      ref={useMergedRef(ref, ownRef)}
     >
       <Box flex="1" minWidth={`${fieldListWidth}px`}>
         <Box

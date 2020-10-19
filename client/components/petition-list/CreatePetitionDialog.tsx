@@ -16,6 +16,8 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import useMergedRef from "@react-hook/merged-ref";
 import {
   addDays,
   addWeeks,
@@ -27,9 +29,7 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useMergeRefs } from "../../utils/useMergeRefs";
 import { DateTimePicker } from "../common/DateTimePicker";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export type CreatePetitionFormData = {
   name: string;
@@ -63,7 +63,7 @@ export function CreatePetitionDialog({
   });
 
   const focusRef = useRef<HTMLInputElement>(null);
-  const inputRef = useMergeRefs(focusRef, register({ required: true }));
+  const inputRef = useMergedRef(focusRef, register({ required: true }));
 
   const [addDeadline, setAddDeadline] = useState(false);
   // next friday at 18:00
