@@ -109,13 +109,15 @@ export class EmailsService {
   async sendPetitionClosedEmail(
     petitionId: number,
     userId: number,
-    messageIds: MaybeArray<number>
+    petitionAccessIds: MaybeArray<number>,
+    emailBody: any
   ) {
     return await this.enqueueEmail("petition-closed-notification", {
-      id: this.buildQueueId("PetitionClosedNotification", messageIds),
-      petition_message_ids: unMaybeArray(messageIds),
+      id: this.buildQueueId("PetitionClosedNotification", petitionAccessIds),
+      petition_access_ids: unMaybeArray(petitionAccessIds),
       petition_id: petitionId,
       user_id: userId,
+      message: emailBody,
     });
   }
 }

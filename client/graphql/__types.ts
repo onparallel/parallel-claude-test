@@ -760,9 +760,9 @@ export type PetitionClosedEvent = PetitionEvent & {
 
 export type PetitionClosedNotifiedEvent = PetitionEvent & {
   __typename?: "PetitionClosedNotifiedEvent";
+  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  notifiedAccesses?: Maybe<Array<Maybe<PetitionAccess>>>;
   user?: Maybe<User>;
 };
 
@@ -1503,7 +1503,10 @@ export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
 export type PetitionHeader_reopenPetitionMutation = {
   __typename?: "Mutation";
 } & {
-  reopenPetition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
+  reopenPetition: { __typename?: "Petition" } & Pick<
+    Petition,
+    "id" | "status" | "updatedAt"
+  >;
 };
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
@@ -1917,17 +1920,9 @@ export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragm
   __typename?: "PetitionClosedNotifiedEvent";
 } & Pick<PetitionClosedNotifiedEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    notifiedAccesses?: Maybe<
-      Array<
-        Maybe<
-          { __typename?: "PetitionAccess" } & {
-            contact?: Maybe<
-              { __typename?: "Contact" } & ContactLink_ContactFragment
-            >;
-          }
-        >
-      >
-    >;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
   };
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
@@ -4456,7 +4451,7 @@ export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFrag
     user {
       ...UserReference_User
     }
-    notifiedAccesses {
+    access {
       contact {
         ...ContactLink_Contact
       }
@@ -5172,6 +5167,7 @@ export const PetitionHeader_reopenPetitionDocument = gql`
     reopenPetition(petitionId: $petitionId) {
       id
       status
+      updatedAt
     }
   }
 `;

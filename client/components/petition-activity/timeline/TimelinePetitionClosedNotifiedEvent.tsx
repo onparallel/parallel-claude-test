@@ -31,13 +31,10 @@ export function TimelinePetitionClosedNotifiedEvent({
     >
       <FormattedMessage
         id="timeline.petition-correct-notified-description"
-        defaultMessage="{same, select, true {You} other {{user}}} notified {count, plural, =1{{contact}} other{# contacts} } that the petition is correct {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
         values={{
           same: userId === event.user?.id,
-          count: event.notifiedAccesses?.length || 1,
-          contact: (
-            <ContactLink contact={event.notifiedAccesses![0]!.contact!} />
-          ),
+          contact: <ContactLink contact={event.access.contact!} />,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <Link>
@@ -60,7 +57,7 @@ TimelinePetitionClosedNotifiedEvent.fragments = {
       user {
         ...UserReference_User
       }
-      notifiedAccesses {
+      access {
         contact {
           ...ContactLink_Contact
         }

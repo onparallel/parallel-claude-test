@@ -583,9 +583,9 @@ export interface NexusGenFieldTypes {
   };
   PetitionClosedNotifiedEvent: {
     // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    notifiedAccesses: Array<NexusGenRootTypes["PetitionAccess"] | null> | null; // [PetitionAccess]
     user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionCompletedEvent: {

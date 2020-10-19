@@ -419,12 +419,10 @@ export const PetitionClosedNotifiedEvent = createPetitionEvent(
         return await ctx.users.loadUser(data.user_id);
       },
     });
-    t.field("notifiedAccesses", {
+    t.field("access", {
       type: "PetitionAccess",
-      list: [false],
-      nullable: true,
       resolve: async ({ data }, _, ctx) => {
-        return await ctx.petitions.loadAccess(data.notified_access_ids);
+        return (await ctx.petitions.loadAccess(data.petition_access_id))!;
       },
     });
   }

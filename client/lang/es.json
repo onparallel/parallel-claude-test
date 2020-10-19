@@ -3406,8 +3406,8 @@
   },
   {
     "term": "timeline.petition-correct-notified-description",
-    "definition": "{same, select, true {Notificaste} other {{user} notificó}} a {count, plural, =1{{contact}} other{# contactos} } que la petición está correcta {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} notified {count, plural, =1{{contact}} other{# contacts} } that the petition is correct {timeAgo}"
+    "definition": "{same, select, true {Notificaste} other {{user} notificó}} a {contact} que la petición está correcta {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
   },
   {
     "term": "timeline.petition-created-description",

@@ -55,7 +55,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   PETITION_CLOSED_NOTIFIED: {
     user_id: number;
-    notified_access_ids: number[];
+    petition_access_id: number;
   };
 }[TType];
 

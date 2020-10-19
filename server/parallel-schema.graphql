@@ -1022,9 +1022,9 @@ type PetitionClosedEvent implements PetitionEvent {
 }
 
 type PetitionClosedNotifiedEvent implements PetitionEvent {
+  access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
-  notifiedAccesses: [PetitionAccess]
   user: User
 }
 

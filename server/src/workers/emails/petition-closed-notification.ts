@@ -9,7 +9,8 @@ export async function petitionClosedNotification(
   payload: {
     user_id: number;
     petition_id: number;
-    petition_message_ids: number[];
+    petition_access_ids: number[];
+    message: any;
   },
   context: WorkerContext
 ) {
@@ -31,18 +32,16 @@ export async function petitionClosedNotification(
   ]);
 
   const emails: EmailLog[] = [];
-  for (const messageId of payload.petition_message_ids) {
-    const message = await context.petitions.loadMessage(messageId);
-    const access = await context.petitions.loadAccess(
-      message!.petition_access_id
-    );
+  for (const accessId of payload.petition_access_ids) {
+    const access = await context.petitions.loadAccess(accessId);
     const contact = await context.contacts.loadContact(access!.contact_id);
+
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
         senderName: fullName(sender.first_name, sender.last_name)!,
         senderEmail: sender.email,
-        body: message!.email_body ? JSON.parse(message!.email_body) : [],
+        body: payload.message,
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
         logoUrl:
@@ -59,12 +58,10 @@ export async function petitionClosedNotification(
       html,
       reply_to: sender.email,
       track_opens: true,
-      created_from: `PetitionClosedNotification:${messageId}`,
+      created_from: `PetitionClosedNotification:${accessId}`,
     });
 
     emails.push(email);
-
-    await context.petitions.processPetitionMessage(messageId, email.id);
   }
 
   return emails;
