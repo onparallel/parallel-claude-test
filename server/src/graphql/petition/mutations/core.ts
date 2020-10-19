@@ -1034,27 +1034,17 @@ export const presendPetitionClosedNotification = mutationField(
     },
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     resolve: async (_, args, ctx) => {
-      const petitionEvents = await ctx.petitions.loadEventsForPetition(
-        args.petitionId,
-        { limit: 1000 }
+      const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(
+        args.petitionId
       );
-
-      const events = petitionEvents.items.filter(
-        (e) =>
-          e.type === "PETITION_CLOSED_NOTIFIED" || e.type === "REPLY_CREATED"
-      );
-      const lastEvent = events[events.length - 1];
-      const isAlreadyNotified =
-        lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED";
-
-      if (isAlreadyNotified) {
+      if (shouldSendNotification) {
+        return RESULT.SUCCESS;
+      } else {
         throw new WhitelistedError(
           "You already notified the contacts",
           "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
         );
       }
-
-      return RESULT.SUCCESS;
     },
   }
 );
@@ -1073,20 +1063,10 @@ export const sendPetitionClosedNotification = mutationField(
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
     resolve: async (_, args, ctx) => {
-      const petitionEvents = await ctx.petitions.loadEventsForPetition(
-        args.petitionId,
-        { limit: 1000 }
+      const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(
+        args.petitionId
       );
-
-      const events = petitionEvents.items.filter(
-        (e) =>
-          e.type === "PETITION_CLOSED_NOTIFIED" || e.type === "REPLY_CREATED"
-      );
-      const lastEvent = events[events.length - 1];
-      const isAlreadyNotified =
-        lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED";
-
-      if (isAlreadyNotified && !args.force) {
+      if (!shouldSendNotification && !args.force) {
         throw new WhitelistedError(
           "You already notified the contacts",
           "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
@@ -1131,11 +1111,10 @@ export const reopenPetition = mutationField("reopenPetition", {
     petitionId: globalIdArg("Petition", { required: true }),
   },
   resolve: async (_, args, ctx) => {
-    const [petition] = await ctx.petitions.updatePetitionStatus(
+    return await ctx.petitions.updatePetition(
       args.petitionId,
-      "PENDING",
+      { status: "PENDING" },
       ctx.user!
     );
-    return petition;
   },
 });

@@ -43,7 +43,7 @@ import {
   PetitionAccessReminderConfig,
   calculateNextReminder,
 } from "../../util/reminderUtils";
-import { unMaybeArray } from "../../util/arrays";
+import { findMax, unMaybeArray } from "../../util/arrays";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -1333,6 +1333,32 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
+  private async loadLastEventsByType(
+    petitionId: number,
+    eventTypes: MaybeArray<PetitionEventType>
+  ): Promise<{ type: PetitionEventType; last_used_at: Date }[]> {
+    const types = unMaybeArray(eventTypes);
+    return await this.from("petition_event")
+      .where("petition_id", petitionId)
+      .whereIn("type", types)
+      .groupBy("type")
+      .select("type", this.knex.raw("MAX(created_at) as last_used_at"));
+  }
+
+  async shouldNotifyPetitionClosed(petitionId: number) {
+    const events = await this.loadLastEventsByType(petitionId, [
+      "PETITION_CLOSED_NOTIFIED",
+      "REPLY_CREATED",
+    ]);
+
+    const lastEvent = findMax(events, (e) => e.last_used_at);
+    if (lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED") {
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * @deprecated Use `createEvent`
    */
@@ -2264,20 +2290,5 @@ export class PetitionRepository extends BaseRepository {
         .select("*"),
       opts
     );
-  }
-
-  async updatePetitionStatus(
-    petitionId: number,
-    status: PetitionStatus,
-    user: User
-  ) {
-    return await this.from("petition")
-      .where("id", petitionId)
-      .update({
-        status,
-        updated_at: this.now(),
-        updated_by: `User:${user.id}`,
-      })
-      .returning("*");
   }
 }

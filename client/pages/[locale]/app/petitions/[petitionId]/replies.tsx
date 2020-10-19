@@ -347,17 +347,19 @@ function PetitionReplies({ petitionId }: PetitionProps) {
         error?.graphQLErrors?.[0]?.extensions.code ===
         "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
       ) {
-        await petitionAlreadyNotifiedDialog({});
-        await sendPetitionClosedNotification({
-          variables: {
-            petitionId: petition.id,
-            emailBody: await confirmPetitionDialog({
-              locale: petition.locale,
-            }),
-            force: true,
-          },
-        });
-        toast(petitionClosedNotificationToast);
+        try {
+          await petitionAlreadyNotifiedDialog({});
+          await sendPetitionClosedNotification({
+            variables: {
+              petitionId: petition.id,
+              emailBody: await confirmPetitionDialog({
+                locale: petition.locale,
+              }),
+              force: true,
+            },
+          });
+          toast(petitionClosedNotificationToast);
+        } catch {}
       }
     }
   }, [petition, intl.locale]);
