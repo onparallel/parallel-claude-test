@@ -48,6 +48,7 @@ import {
   PetitionReplies_PetitionFragment,
   PetitionStatus,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
+  usePetitionReplies_presendPetitionClosedNotificationMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -310,21 +311,28 @@ function PetitionReplies({ petitionId }: PetitionProps) {
   const [
     sendPetitionClosedNotification,
   ] = usePetitionReplies_sendPetitionClosedNotificationMutation();
+  const [
+    presendPetitionClosedNotification,
+  ] = usePetitionReplies_presendPetitionClosedNotificationMutation();
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleConfirmPetitionCompleted = useCallback(async () => {
+    const petitionClosedNotificationToast = {
+      title: intl.formatMessage({
+        id: "petition.message-sent.toast-header",
+        defaultMessage: "Message sent",
+      }),
+      description: intl.formatMessage({
+        id: "petition.message-sent.toast-description",
+        defaultMessage: "The message is on it's way",
+      }),
+      status: "success" as const,
+      duration: 3000,
+      isClosable: true,
+    };
     try {
-      const events = petition.events.items.filter(
-        (e) =>
-          e.__typename === "PetitionClosedNotifiedEvent" ||
-          e.__typename === "ReplyCreatedEvent"
-      );
-      const lastEvent = events[events.length - 1];
-      const showAlreadyNotifiedDialog =
-        lastEvent && lastEvent.__typename === "PetitionClosedNotifiedEvent";
-
-      if (showAlreadyNotifiedDialog) {
-        await petitionAlreadyNotifiedDialog({});
-      }
+      await presendPetitionClosedNotification({
+        variables: { petitionId: petition.id },
+      });
       await sendPetitionClosedNotification({
         variables: {
           petitionId: petition.id,
@@ -333,21 +341,25 @@ function PetitionReplies({ petitionId }: PetitionProps) {
           }),
         },
       });
-
-      toast({
-        title: intl.formatMessage({
-          id: "petition.message-sent.toast-header",
-          defaultMessage: "Message sent",
-        }),
-        description: intl.formatMessage({
-          id: "petition.message-sent.toast-description",
-          defaultMessage: "The message is on it's way",
-        }),
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch {}
+      toast(petitionClosedNotificationToast);
+    } catch (error) {
+      if (
+        error?.graphQLErrors?.[0]?.extensions.code ===
+        "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+      ) {
+        await petitionAlreadyNotifiedDialog({});
+        await sendPetitionClosedNotification({
+          variables: {
+            petitionId: petition.id,
+            emailBody: await confirmPetitionDialog({
+              locale: petition.locale,
+            }),
+            force: true,
+          },
+        });
+        toast(petitionClosedNotificationToast);
+      }
+    }
   }, [petition, intl.locale]);
 
   const closePetitionDialog = useClosePetitionDialog();
@@ -709,10 +721,12 @@ PetitionReplies.mutations = [
     mutation PetitionReplies_sendPetitionClosedNotification(
       $petitionId: GID!
       $emailBody: JSON!
+      $force: Boolean
     ) {
       sendPetitionClosedNotification(
         petitionId: $petitionId
         emailBody: $emailBody
+        force: $force
       ) {
         id
         events(limit: 1000) {
@@ -722,6 +736,13 @@ PetitionReplies.mutations = [
           }
         }
       }
+    }
+  `,
+  gql`
+    mutation PetitionReplies_presendPetitionClosedNotification(
+      $petitionId: GID!
+    ) {
+      presendPetitionClosedNotification(petitionId: $petitionId)
     }
   `,
 ];

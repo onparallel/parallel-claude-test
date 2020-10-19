@@ -416,6 +416,11 @@ type Mutation {
   ): [PetitionFieldComment!]!
 
   """
+  Checks if a PetitionClosedNotification was already sent or not
+  """
+  presendPetitionClosedNotification(petitionId: GID!): Result!
+
+  """
   Marks a filled petition as ready for review.
   """
   publicCompletePetition(keycode: ID!): PublicPetition!
@@ -536,7 +541,11 @@ type Mutation {
   """
   Sends an email to all contacts of the petition confirming the replies are ok
   """
-  sendPetitionClosedNotification(emailBody: JSON!, petitionId: GID!): Petition!
+  sendPetitionClosedNotification(
+    emailBody: JSON!
+    force: Boolean = false
+    petitionId: GID!
+  ): Petition!
 
   """
   Sends a reminder for the specified petition accesses.

@@ -1023,6 +1023,42 @@ export const changePetitionFieldType = mutationField(
   }
 );
 
+export const presendPetitionClosedNotification = mutationField(
+  "presendPetitionClosedNotification",
+  {
+    description:
+      "Checks if a PetitionClosedNotification was already sent or not",
+    type: "Result",
+    args: {
+      petitionId: globalIdArg("Petition", { required: true }),
+    },
+    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+    resolve: async (_, args, ctx) => {
+      const petitionEvents = await ctx.petitions.loadEventsForPetition(
+        args.petitionId,
+        { limit: 1000 }
+      );
+
+      const events = petitionEvents.items.filter(
+        (e) =>
+          e.type === "PETITION_CLOSED_NOTIFIED" || e.type === "REPLY_CREATED"
+      );
+      const lastEvent = events[events.length - 1];
+      const isAlreadyNotified =
+        lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED";
+
+      if (isAlreadyNotified) {
+        throw new WhitelistedError(
+          "You already notified the contacts",
+          "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+        );
+      }
+
+      return RESULT.SUCCESS;
+    },
+  }
+);
+
 export const sendPetitionClosedNotification = mutationField(
   "sendPetitionClosedNotification",
   {
@@ -1032,40 +1068,57 @@ export const sendPetitionClosedNotification = mutationField(
     args: {
       petitionId: globalIdArg("Petition", { required: true }),
       emailBody: jsonArg({ required: true }),
+      force: booleanArg({ default: false, required: false }),
     },
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
     resolve: async (_, args, ctx) => {
-      try {
-        const accesses = await ctx.petitions.loadAccessesForPetition(
-          args.petitionId
-        );
+      const petitionEvents = await ctx.petitions.loadEventsForPetition(
+        args.petitionId,
+        { limit: 1000 }
+      );
 
-        const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
+      const events = petitionEvents.items.filter(
+        (e) =>
+          e.type === "PETITION_CLOSED_NOTIFIED" || e.type === "REPLY_CREATED"
+      );
+      const lastEvent = events[events.length - 1];
+      const isAlreadyNotified =
+        lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED";
 
-        await ctx.emails.sendPetitionClosedEmail(
-          args.petitionId,
-          ctx.user!.id,
-          activeAccesses.map((a) => a.id),
-          args.emailBody
+      if (isAlreadyNotified && !args.force) {
+        throw new WhitelistedError(
+          "You already notified the contacts",
+          "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
         );
-
-        await Promise.all(
-          activeAccesses.map((access) =>
-            ctx.petitions.createEvent({
-              type: "PETITION_CLOSED_NOTIFIED",
-              petitionId: args.petitionId,
-              data: {
-                user_id: ctx.user!.id,
-                petition_access_id: access.id,
-              },
-            })
-          )
-        );
-      } catch {
-      } finally {
-        return (await ctx.petitions.loadPetition(args.petitionId))!;
       }
+
+      const accesses = await ctx.petitions.loadAccessesForPetition(
+        args.petitionId
+      );
+
+      const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
+
+      await ctx.emails.sendPetitionClosedEmail(
+        args.petitionId,
+        ctx.user!.id,
+        activeAccesses.map((a) => a.id),
+        args.emailBody
+      );
+
+      await Promise.all(
+        activeAccesses.map((access) =>
+          ctx.petitions.createEvent({
+            type: "PETITION_CLOSED_NOTIFIED",
+            petitionId: args.petitionId,
+            data: {
+              user_id: ctx.user!.id,
+              petition_access_id: access.id,
+            },
+          })
+        )
+      );
+      return (await ctx.petitions.loadPetition(args.petitionId))!;
     },
   }
 );

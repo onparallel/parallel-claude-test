@@ -205,6 +205,8 @@ export type Mutation = {
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
+  /** Checks if a PetitionClosedNotification was already sent or not */
+  presendPetitionClosedNotification: Result;
   /** Marks a filled petition as ready for review. */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
@@ -389,6 +391,10 @@ export type MutationmarkPetitionFieldCommentsAsReadArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationpresendPetitionClosedNotificationArgs = {
+  petitionId: Scalars["GID"];
+};
+
 export type MutationpublicCompletePetitionArgs = {
   keycode: Scalars["ID"];
 };
@@ -476,6 +482,7 @@ export type MutationsendPetitionArgs = {
 
 export type MutationsendPetitionClosedNotificationArgs = {
   emailBody: Scalars["JSON"];
+  force?: Maybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -3192,6 +3199,7 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
 export type PetitionReplies_sendPetitionClosedNotificationMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   emailBody: Scalars["JSON"];
+  force?: Maybe<Scalars["Boolean"]>;
 }>;
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
@@ -3280,6 +3288,14 @@ export type PetitionReplies_sendPetitionClosedNotificationMutation = {
       };
     };
 };
+
+export type PetitionReplies_presendPetitionClosedNotificationMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionReplies_presendPetitionClosedNotificationMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "presendPetitionClosedNotification">;
 
 export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -7792,10 +7808,12 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
   mutation PetitionReplies_sendPetitionClosedNotification(
     $petitionId: GID!
     $emailBody: JSON!
+    $force: Boolean
   ) {
     sendPetitionClosedNotification(
       petitionId: $petitionId
       emailBody: $emailBody
+      force: $force
     ) {
       id
       events(limit: 1000) {
@@ -7827,6 +7845,7 @@ export type PetitionReplies_sendPetitionClosedNotificationMutationFn = Apollo.Mu
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      emailBody: // value for 'emailBody'
+ *      force: // value for 'force'
  *   },
  * });
  */
@@ -7850,6 +7869,56 @@ export type PetitionReplies_sendPetitionClosedNotificationMutationResult = Apoll
 export type PetitionReplies_sendPetitionClosedNotificationMutationOptions = Apollo.BaseMutationOptions<
   PetitionReplies_sendPetitionClosedNotificationMutation,
   PetitionReplies_sendPetitionClosedNotificationMutationVariables
+>;
+export const PetitionReplies_presendPetitionClosedNotificationDocument = gql`
+  mutation PetitionReplies_presendPetitionClosedNotification(
+    $petitionId: GID!
+  ) {
+    presendPetitionClosedNotification(petitionId: $petitionId)
+  }
+`;
+export type PetitionReplies_presendPetitionClosedNotificationMutationFn = Apollo.MutationFunction<
+  PetitionReplies_presendPetitionClosedNotificationMutation,
+  PetitionReplies_presendPetitionClosedNotificationMutationVariables
+>;
+
+/**
+ * __usePetitionReplies_presendPetitionClosedNotificationMutation__
+ *
+ * To run a mutation, you first call `usePetitionReplies_presendPetitionClosedNotificationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionReplies_presendPetitionClosedNotificationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionRepliesPresendPetitionClosedNotificationMutation, { data, loading, error }] = usePetitionReplies_presendPetitionClosedNotificationMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionReplies_presendPetitionClosedNotificationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionReplies_presendPetitionClosedNotificationMutation,
+    PetitionReplies_presendPetitionClosedNotificationMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionReplies_presendPetitionClosedNotificationMutation,
+    PetitionReplies_presendPetitionClosedNotificationMutationVariables
+  >(PetitionReplies_presendPetitionClosedNotificationDocument, baseOptions);
+}
+export type PetitionReplies_presendPetitionClosedNotificationMutationHookResult = ReturnType<
+  typeof usePetitionReplies_presendPetitionClosedNotificationMutation
+>;
+export type PetitionReplies_presendPetitionClosedNotificationMutationResult = Apollo.MutationResult<
+  PetitionReplies_presendPetitionClosedNotificationMutation
+>;
+export type PetitionReplies_presendPetitionClosedNotificationMutationOptions = Apollo.BaseMutationOptions<
+  PetitionReplies_presendPetitionClosedNotificationMutation,
+  PetitionReplies_presendPetitionClosedNotificationMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: GID!) {
