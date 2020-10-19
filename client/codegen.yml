@@ -4,6 +4,9 @@ schema:
 documents:
   - "{pages,components,utils}/**/*.{tsx,ts}"
 generates:
+  ./graphql/__support-methods.ts:
+    plugins:
+      - ./build/support-methods
   ./graphql/__fragment-matcher.ts:
     plugins:
       - fragment-matcher

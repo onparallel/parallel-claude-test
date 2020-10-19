@@ -44,11 +44,11 @@ import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 
-type PetitionProps = UnwrapPromise<
+type PetitionActivityProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
 >;
 
-function PetitionActivity({ petitionId }: PetitionProps) {
+function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const intl = useIntl();
   const toast = useToast();
   const {

@@ -70,7 +70,7 @@ import { RecipientViewProgressFooter } from "@parallel/components/recipient-view
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 
-type PublicPetitionProps = UnwrapPromise<
+type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
 >;
 
@@ -78,7 +78,7 @@ function RecipientView({
   keycode,
   currentPage,
   pageCount,
-}: PublicPetitionProps) {
+}: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
   const {

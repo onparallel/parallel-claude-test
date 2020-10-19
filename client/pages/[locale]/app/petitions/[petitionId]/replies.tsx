@@ -65,11 +65,11 @@ import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition
 import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 
-type PetitionProps = UnwrapPromise<
+type PetitionRepliesProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
 >;
 
-function PetitionReplies({ petitionId }: PetitionProps) {
+function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
   const {
     data: { me },
