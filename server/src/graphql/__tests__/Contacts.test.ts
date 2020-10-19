@@ -201,8 +201,7 @@ describe("GraphQL/Contacts", () => {
       `,
       variables: { id: toGlobalId("Contact", otherContact.id) },
     });
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+    expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data!.contact).toBeNull();
   });
 
@@ -251,8 +250,7 @@ describe("GraphQL/Contacts", () => {
       },
     });
 
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("EXISTING_CONTACT");
+    expect(errors).toContainGraphQLError("EXISTING_CONTACT");
     expect(data).toBeNull();
   });
 
@@ -295,8 +293,7 @@ describe("GraphQL/Contacts", () => {
       },
     });
 
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+    expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
     expect(data!).toBeNull();
   });
 
@@ -317,8 +314,7 @@ describe("GraphQL/Contacts", () => {
         firstName: "Jon",
       },
     });
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+    expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data).toBeNull();
   });
 
@@ -336,8 +332,7 @@ describe("GraphQL/Contacts", () => {
         ids: [toGlobalId("Contact", otherContact.id)],
       },
     });
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+    expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data).toBeNull();
   });
 
@@ -352,8 +347,7 @@ describe("GraphQL/Contacts", () => {
         ids: [toGlobalId("Contact", userContacts[0].id)],
       },
     });
-    expect(errors).toBeDefined();
-    expect(errors![0].extensions!.code).toBe("DELETE_CONTACT_ERROR");
+    expect(errors).toContainGraphQLError("DELETE_CONTACT_ERROR");
     expect(data).toBeNull();
   });
 });

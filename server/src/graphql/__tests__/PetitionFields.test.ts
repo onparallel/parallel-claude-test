@@ -395,8 +395,7 @@ describe("GraphQL/Petition Fields", () => {
           position: -1,
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -416,8 +415,7 @@ describe("GraphQL/Petition Fields", () => {
           type: "TEXT",
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -493,8 +491,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -515,8 +512,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -670,8 +666,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -697,8 +692,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -719,8 +713,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -741,8 +734,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FIELD_HAS_REPLIES_ERROR");
+      expect(errors).toContainGraphQLError("FIELD_HAS_REPLIES_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -824,8 +816,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("INVALID_PETITION_FIELD_IDS");
+      expect(errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
       expect(data).toBeNull();
     });
 
@@ -846,8 +837,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -874,8 +864,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("INVALID_PETITION_FIELD_IDS");
+      expect(errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
       expect(data).toBeNull();
     });
   });
@@ -1145,8 +1134,7 @@ describe("GraphQL/Petition Fields", () => {
           },
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1177,8 +1165,7 @@ describe("GraphQL/Petition Fields", () => {
           },
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -1209,8 +1196,7 @@ describe("GraphQL/Petition Fields", () => {
           },
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -1239,8 +1225,7 @@ describe("GraphQL/Petition Fields", () => {
           data: {},
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1272,8 +1257,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1305,8 +1289,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1338,8 +1321,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -1646,8 +1628,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -1680,8 +1661,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -1711,8 +1691,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FIELD_HAS_REPLIES_ERROR");
+      expect(errors).toContainGraphQLError("FIELD_HAS_REPLIES_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1742,8 +1721,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("UPDATE_FIXED_FIELD_ERROR");
+      expect(errors).toContainGraphQLError("UPDATE_FIXED_FIELD_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -2125,8 +2103,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -2152,8 +2129,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -2318,8 +2294,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -2354,8 +2329,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -2390,8 +2364,7 @@ describe("GraphQL/Petition Fields", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });

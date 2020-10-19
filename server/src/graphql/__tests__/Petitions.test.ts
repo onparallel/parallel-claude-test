@@ -261,8 +261,7 @@ describe("GraphQL/Petitions", () => {
         variables: { petitionId: toGlobalId("Petition", otherPetition.id) },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data!.petition).toBeNull();
     });
 
@@ -285,8 +284,7 @@ describe("GraphQL/Petitions", () => {
           }
         `,
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -573,8 +571,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -708,8 +705,7 @@ describe("GraphQL/Petitions", () => {
         variables: { petitionIds: [] },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -725,8 +721,7 @@ describe("GraphQL/Petitions", () => {
         variables: { petitionIds: [toGlobalId("Petition", otherPetition.id)] },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });
@@ -772,8 +767,7 @@ describe("GraphQL/Petitions", () => {
           force: true,
         },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -786,8 +780,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: { ids: [] },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -801,8 +794,7 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: { ids: [toGlobalId("Petition", shared.id)] },
       });
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("DELETE_SHARED_PETITION_ERROR");
+      expect(errors).toContainGraphQLError("DELETE_SHARED_PETITION_ERROR");
       expect(data).toBeNull();
     });
   });
@@ -1001,8 +993,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
 
@@ -1020,8 +1011,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -1039,8 +1029,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("FORBIDDEN");
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
 
@@ -1062,8 +1051,7 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toBeDefined();
-      expect(errors![0].extensions!.code).toBe("ARG_VALIDATION_ERROR");
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
   });
