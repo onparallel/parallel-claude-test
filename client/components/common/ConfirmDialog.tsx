@@ -47,7 +47,7 @@ export function ConfirmDialog<TResult = void>({
         <ModalContent borderRadius="md" {...content}>
           <ModalHeader>{header}</ModalHeader>
           <ModalBody>{body}</ModalBody>
-          <ModalFooter {...({ as: Stack, direction: "row" } as any)}>
+          <ModalFooter as={Stack} direction="row">
             {cancel ?? (
               <Button
                 ref={cancelRef}

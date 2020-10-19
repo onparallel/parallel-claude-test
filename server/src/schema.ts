@@ -12,6 +12,9 @@ function resolve(...paths: string[]) {
 
 export const schema = makeSchema({
   types: allTypes,
+  nonNullDefaults: {
+    output: true,
+  },
   outputs: {
     schema: path.join(__dirname, "../parallel-schema.graphql"),
     typegen: resolve("./graphql/__types.ts"),

@@ -71,7 +71,7 @@ export function createQueueWorker<T>(
               duration,
             });
           },
-          sqs: aws.sqs,
+          sqs: aws.sqs as any,
         });
         consumer.on("error", (error) => {
           logger.error(error.stack);

@@ -65,16 +65,18 @@ export const PetitionBase = interfaceType({
         return (await ctx.petitions.loadPetitionOwners(root.id))!;
       },
     });
-    t.list.field("userPermissions", {
+    t.field("userPermissions", {
       type: "PetitionUserPermission",
+      list: [true],
       description: "The permissions linked to the petition",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadUserPermissions(root.id);
       },
     });
-    t.list.field("fields", {
+    t.field("fields", {
       type: "PetitionField",
       description: "The definition of the petition fields.",
+      list: [true],
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
       },
@@ -130,9 +132,10 @@ export const Petition = objectType({
         return await ctx.petitions.loadStatusForPetition(root.id);
       },
     });
-    t.list.field("accesses", {
+    t.field("accesses", {
       type: "PetitionAccess",
       description: "The accesses for this petition",
+      list: [true],
       resolve: async (root, _, ctx) => {
         return ctx.petitions.loadAccessesForPetition(root.id);
       },
@@ -262,15 +265,17 @@ export const PetitionField = objectType({
       description:
         "Determines if the content of this field has been validated.",
     });
-    t.list.field("replies", {
+    t.field("replies", {
       type: "PetitionFieldReply",
+      list: [true],
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadRepliesForField(root.id);
       },
     });
-    t.list.field("comments", {
+    t.field("comments", {
       type: "PetitionFieldComment",
+      list: [true],
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser({

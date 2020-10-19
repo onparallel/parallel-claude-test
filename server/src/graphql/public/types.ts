@@ -53,8 +53,9 @@ export const PublicPetition = objectType({
       description: "The status of the petition.",
       resolve: (o) => o.status!,
     });
-    t.list.field("fields", {
+    t.field("fields", {
       type: "PublicPetitionField",
+      list: [true],
       description: "The field definition of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
@@ -102,15 +103,17 @@ export const PublicPetitionField = objectType({
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
-    t.list.field("replies", {
+    t.field("replies", {
       type: "PublicPetitionFieldReply",
+      list: [true],
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadRepliesForField(root.id);
       },
     });
-    t.list.field("comments", {
+    t.field("comments", {
       type: "PublicPetitionFieldComment",
+      list: [true],
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionFieldCommentsForFieldAndAccess({

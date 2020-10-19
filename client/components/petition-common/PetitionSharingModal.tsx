@@ -321,7 +321,7 @@ export function PetitionSharingModal({
                   ))}
                 </Stack>
               </ModalBody>
-              <ModalFooter {...({ as: Stack, direction: "row" } as any)}>
+              <ModalFooter as={Stack} direction="row">
                 <Spacer />
                 {hasUsers ? (
                   <>
