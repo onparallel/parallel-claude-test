@@ -155,10 +155,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 replies: field.replies.map((reply) => ({
                   ...pick(reply, ["__typename", "id"]),
                   status:
-                    validateRepliesWith ||
-                    (value && reply.status === "PENDING"
-                      ? "APPROVED"
-                      : reply.status),
+                    reply.status === "PENDING"
+                      ? validateRepliesWith ?? reply.status
+                      : reply.status,
                 })),
               };
             }),
