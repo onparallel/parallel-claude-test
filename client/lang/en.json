@@ -1956,8 +1956,8 @@
   },
   {
     "term": "petition.reopen.dialog-subheading",
-    "definition": "You are about to reopen the petition and it will be registered internally, are you sure? You can always close it again manually.",
-    "context": "You are about to reopen the petition and it will be registered internally, are you sure? You can always close it again manually."
+    "definition": "You are about to reopen the petition and it will be registered internally. You can always close it again manually.",
+    "context": "You are about to reopen the petition and it will be registered internally. You can always close it again manually."
   },
   {
     "term": "petition.replies-not-available",

@@ -22,7 +22,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
           <Text>
             <FormattedMessage
               id="petition.reopen.dialog-subheading"
-              defaultMessage="You are about to reopen the petition and it will be registered internally, are you sure? You can always close it again manually."
+              defaultMessage="You are about to reopen the petition and it will be registered internally. You can always close it again manually."
             />
           </Text>
         </Stack>

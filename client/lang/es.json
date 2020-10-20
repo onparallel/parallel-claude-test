@@ -1956,8 +1956,8 @@
   },
   {
     "term": "petition.reopen.dialog-subheading",
-    "definition": "Vas a reabrir la petición y quedará registrado internamente, ¿estás seguro? Siempre podrás cerrarlo de nuevo manualmente.",
-    "context": "You are about to reopen the petition and it will be registered internally, are you sure? You can always close it again manually."
+    "definition": "Vas a reabrir la petición y quedará registrado internamente. Siempre podrás cerrarla de nuevo manualmente.",
+    "context": "You are about to reopen the petition and it will be registered internally. You can always close it again manually."
   },
   {
     "term": "petition.replies-not-available",
