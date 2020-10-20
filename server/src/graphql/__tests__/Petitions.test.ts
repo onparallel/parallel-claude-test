@@ -160,7 +160,11 @@ describe("GraphQL/Petitions", () => {
       const { data: templates } = await testClient.query({
         query: gql`
           query {
-            templates: petitions(limit: 100, type: TEMPLATE) {
+            templates: petitions(
+              limit: 100
+              type: TEMPLATE
+              sortBy: [lastUsedAt_DESC]
+            ) {
               items {
                 id
               }
@@ -200,7 +204,7 @@ describe("GraphQL/Petitions", () => {
           query {
             templates: petitions(
               limit: 100
-              sortBy: lastUsedAt_DESC
+              sortBy: [lastUsedAt_DESC]
               type: TEMPLATE
             ) {
               items {

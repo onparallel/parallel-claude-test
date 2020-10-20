@@ -232,10 +232,13 @@ export class PetitionRepository extends BaseRepository {
                 )
                 .join(", ")
             );
-          } else {
-            q.orderBy(opts.sortBy ?? ["petition.id"]);
+          } else if (opts.sortBy?.length) {
+            q.orderBy(opts.sortBy);
           }
         })
+        // default order by to ensure result consistency
+        // applies after any previously specified order by
+        .orderBy("petition.id")
         .select("petition.*"),
       opts
     );
