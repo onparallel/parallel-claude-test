@@ -442,6 +442,12 @@ PetitionHeader.mutations = [
         id
         status
         updatedAt
+        events(limit: 1000) {
+          items {
+            id
+            __typename
+          }
+        }
       }
     }
   `,
