@@ -47,6 +47,8 @@ export const PetitionEvent = interfaceType({
           return "PetitionClosedEvent";
         case "PETITION_CLOSED_NOTIFIED":
           return "PetitionClosedNotifiedEvent";
+        case "PETITION_REOPENED":
+          return "PetitionReopenedEvent";
       }
     });
   },
@@ -423,6 +425,22 @@ export const PetitionClosedNotifiedEvent = createPetitionEvent(
       type: "PetitionAccess",
       resolve: async ({ data }, _, ctx) => {
         return (await ctx.petitions.loadAccess(data.petition_access_id))!;
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when the user reopens a petition.
+ */
+export const PetitionReopenedEvent = createPetitionEvent(
+  "PetitionReopenedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
       },
     });
   }

@@ -3415,6 +3415,11 @@
     "context": "{same, select, true {You} other {{user}}} created this petition {timeAgo}"
   },
   {
+    "term": "timeline.petition-reopened-description",
+    "definition": "{same, select, true {Reabriste} other {{user} reabrió}} esta petición {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} reopened the petition {timeAgo}"
+  },
+  {
     "term": "timeline.reminder-sent-description-automatic",
     "definition": "Se envió un recordatorio automático a {contact} {timeAgo}",
     "context": "An automatic reminder was sent to {contact} {timeAgo}"

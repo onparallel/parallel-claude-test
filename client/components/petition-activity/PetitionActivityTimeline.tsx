@@ -21,6 +21,7 @@ import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermiss
 import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
 import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
+import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopenedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -99,6 +100,8 @@ export function PetitionActivityTimeline({
                 event={event}
                 userId={userId}
               />
+            ) : event.__typename === "PetitionReopenedEvent" ? (
+              <TimelinePetitionReopenedEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -180,6 +183,9 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionClosedNotifiedEvent {
         ...TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent
       }
+      ... on PetitionReopenedEvent {
+        ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -200,5 +206,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelineOwnershipTransferredEvent.fragments.OwnershipTransferredEvent}
     ${TimelinePetitionClosedEvent.fragments.PetitionClosedEvent}
     ${TimelinePetitionClosedNotifiedEvent.fragments.PetitionClosedNotifiedEvent}
+    ${TimelinePetitionReopenedEvent.fragments.PetitionReopenedEvent}
   `,
 };

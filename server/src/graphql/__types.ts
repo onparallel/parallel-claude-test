@@ -253,6 +253,7 @@ export interface NexusGenRootTypes {
     validated: number; // Int!
   };
   PetitionReminder: db.PetitionReminder;
+  PetitionReopenedEvent: events.PetitionReopenedEvent;
   PetitionTemplate: db.Petition;
   PetitionTemplateAndField: {
     // root type
@@ -673,6 +674,12 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     sender: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionReminderType"]; // PetitionReminderType!
+  };
+  PetitionReopenedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionTemplate: {
     // field return type
@@ -1307,6 +1314,7 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "PetitionClosedNotifiedEvent"
     | "PetitionCompletedEvent"
     | "PetitionCreatedEvent"
+    | "PetitionReopenedEvent"
     | "ReminderSentEvent"
     | "ReplyCreatedEvent"
     | "ReplyDeletedEvent"
@@ -1359,6 +1367,7 @@ export type NexusGenObjectNames =
   | "PetitionMessage"
   | "PetitionProgress"
   | "PetitionReminder"
+  | "PetitionReopenedEvent"
   | "PetitionTemplate"
   | "PetitionTemplateAndField"
   | "PetitionTemplatePagination"

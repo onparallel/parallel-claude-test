@@ -1111,10 +1111,21 @@ export const reopenPetition = mutationField("reopenPetition", {
     petitionId: globalIdArg("Petition", { required: true }),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.updatePetition(
-      args.petitionId,
-      { status: "PENDING" },
-      ctx.user!
-    );
+    return await ctx.petitions.withTransaction(async (t) => {
+      await ctx.petitions.createEvent(
+        {
+          type: "PETITION_REOPENED",
+          data: { user_id: ctx.user!.id },
+          petitionId: args.petitionId,
+        },
+        t
+      );
+      return await ctx.petitions.updatePetition(
+        args.petitionId,
+        { status: "PENDING" },
+        ctx.user!,
+        t
+      );
+    });
   },
 });

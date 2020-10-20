@@ -964,6 +964,13 @@ export type PetitionReminderType =
   /** The reminder has been sent manually by a user. */
   | "MANUAL";
 
+export type PetitionReopenedEvent = PetitionEvent & {
+  __typename?: "PetitionReopenedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user?: Maybe<User>;
+};
+
 /** The status of a petition. */
 export type PetitionStatus =
   /** The petition has been closed by a user. */
@@ -1648,6 +1655,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "PetitionCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment)
       | ({
+          __typename?: "PetitionReopenedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment)
+      | ({
           __typename?: "ReminderSentEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment)
       | ({
@@ -1735,6 +1745,11 @@ export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
 } & Pick<PetitionCreatedEvent, "id"> &
   TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment = {
+  __typename?: "PetitionReopenedEvent";
+} & Pick<PetitionReopenedEvent, "id"> &
+  TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
   __typename?: "ReminderSentEvent";
 } & Pick<ReminderSentEvent, "id"> &
@@ -1779,6 +1794,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
@@ -1946,6 +1962,12 @@ export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
 } & Pick<PetitionCreatedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
+
+export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
+  __typename?: "PetitionReopenedEvent";
+} & Pick<PetitionReopenedEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
@@ -3012,6 +3034,10 @@ export type PetitionReplies_PetitionFragment = {
             PetitionCreatedEvent,
             "id"
           >)
+        | ({ __typename: "PetitionReopenedEvent" } & Pick<
+            PetitionReopenedEvent,
+            "id"
+          >)
         | ({ __typename: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id">)
         | ({ __typename: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id">)
         | ({ __typename: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id">)
@@ -3261,6 +3287,10 @@ export type PetitionReplies_sendPetitionClosedNotificationMutation = {
             >)
           | ({ __typename: "PetitionCreatedEvent" } & Pick<
               PetitionCreatedEvent,
+              "id"
+            >)
+          | ({ __typename: "PetitionReopenedEvent" } & Pick<
+              PetitionReopenedEvent,
               "id"
             >)
           | ({ __typename: "ReminderSentEvent" } & Pick<
@@ -4455,6 +4485,15 @@ export const TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFrag
   ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gql`
+  fragment TimelinePetitionReopenedEvent_PetitionReopenedEvent on PetitionReopenedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -4518,6 +4557,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionClosedNotifiedEvent {
       ...TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEvent
     }
+    ... on PetitionReopenedEvent {
+      ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -4538,6 +4580,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragmentDoc}
   ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
   ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
+  ${TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

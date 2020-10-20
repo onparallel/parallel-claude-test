@@ -57,6 +57,9 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     petition_access_id: number;
   };
+  PETITION_REOPENED: {
+    user_id: number;
+  };
 }[TType];
 
 type GenericPetitionEvent<TType extends PetitionEventType> = {
@@ -95,6 +98,7 @@ export type PetitionClosedEvent = GenericPetitionEvent<"PETITION_CLOSED">;
 export type PetitionClosedNotifiedEvent = GenericPetitionEvent<
   "PETITION_CLOSED_NOTIFIED"
 >;
+export type PetitionReopenedEvent = GenericPetitionEvent<"PETITION_REOPENED">;
 
 export type PetitionEvent =
   | PetitionCreatedEvent
@@ -115,4 +119,5 @@ export type PetitionEvent =
   | UserPermissionEditedEvent
   | OwnershipTransferredEvent
   | PetitionClosedEvent
-  | PetitionClosedNotifiedEvent;
+  | PetitionClosedNotifiedEvent
+  | PetitionReopenedEvent;

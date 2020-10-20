@@ -719,9 +719,10 @@ export class PetitionRepository extends BaseRepository {
   async updatePetition(
     petitionId: number,
     data: Partial<CreatePetition>,
-    user: User
+    user: User,
+    t?: Transaction
   ) {
-    const [row] = await this.from("petition")
+    const [row] = await this.from("petition", t)
       .where("id", petitionId)
       .update(
         {
