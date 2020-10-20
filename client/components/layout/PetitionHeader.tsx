@@ -44,6 +44,7 @@ import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { LocaleBadge } from "../common/LocaleBadge";
+import { useConfirmReopenPetitionDialog } from "../petition-replies/ConfirmReopenPetitionDialog";
 
 export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
@@ -170,12 +171,17 @@ export function PetitionHeader({
   );
 
   const [reopenPetition] = usePetitionHeader_reopenPetitionMutation();
+  const confirmReopenPetitionDialog = useConfirmReopenPetitionDialog();
+
   const handleReopenPetition = useCallback(async () => {
-    await reopenPetition({
-      variables: {
-        petitionId: petition.id,
-      },
-    });
+    try {
+      await confirmReopenPetitionDialog({});
+      await reopenPetition({
+        variables: {
+          petitionId: petition.id,
+        },
+      });
+    } catch {}
   }, [petition.id]);
   return (
     <>
