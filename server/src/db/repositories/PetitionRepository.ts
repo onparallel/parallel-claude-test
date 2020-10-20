@@ -626,6 +626,25 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
+  async deleteAllPermissions(
+    petitionIds: number[],
+    user: User,
+    t?: Transaction
+  ) {
+    return await this.withTransaction(async (t) => {
+      return await this.from("petition_user", t)
+        .whereIn("petition_id", petitionIds)
+        .where({
+          deleted_at: null,
+        })
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        })
+        .returning("*");
+    }, t);
+  }
+
   /**
    * Delete petition, deactivate all accesses and cancel all scheduled messages
    */
