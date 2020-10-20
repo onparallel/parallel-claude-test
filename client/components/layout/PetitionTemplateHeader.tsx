@@ -60,7 +60,7 @@ export function PetitionTemplateHeader({
   const handleDeleteClick = useCallback(
     async function () {
       try {
-        await deletePetitions(user.id, [petition.id]);
+        await deletePetitions([petition.id]);
         router.push(
           `/[locale]/app/petitions/`,
           `/${router.query.locale}/app/petitions/`

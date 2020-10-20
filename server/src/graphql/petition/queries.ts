@@ -1,5 +1,5 @@
 import { arg, queryField, enumType } from "@nexus/schema";
-import { and, authenticate, chain, or } from "../helpers/authorize";
+import { authenticate, chain, or } from "../helpers/authorize";
 import {
   userHasAccessToPetitions,
   petitionsArePublicTemplates,
@@ -97,19 +97,4 @@ export const publicTemplatesQuery = queryField((t) => {
       );
     },
   });
-});
-
-export const petitionPermissions = queryField("petitionPermissions", {
-  type: "PetitionUserPermission",
-  list: [true],
-  authorize: chain(
-    authenticate(),
-    and(userHasAccessToPetitions("petitionIds" as never))
-  ),
-  args: {
-    petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
-  },
-  resolve: async (_, { petitionIds }, ctx) => {
-    return (await ctx.petitions.loadUserPermissions(petitionIds)).flat();
-  },
 });

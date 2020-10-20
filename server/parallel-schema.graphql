@@ -1904,7 +1904,6 @@ type Query {
   me: User!
   organization(id: GID!): Organization
   petition(id: GID!): PetitionBase
-  petitionPermissions(petitionIds: [GID!]!): [PetitionUserPermission!]!
 
   """
   The petitions of the user

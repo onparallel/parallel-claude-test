@@ -1,4 +1,4 @@
-import { gql, useMutation, useApolloClient } from "@apollo/client";
+import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Button } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -6,22 +6,18 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
 import {
-  ConfirmDeletePetitionsDialog_PetitionBaseFragment,
+  UseDeletePetitions_PetitionBaseFragment,
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables,
-  useDeletePetitions_PetitionQuery,
-  useDeletePetitions_PetitionQueryVariables,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { clearCache } from "../apollo/clearCache";
 import { useCallback } from "react";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
-import { groupBy } from "remeda";
 
 export function useDeletePetitions() {
   const intl = useIntl();
   const showErrorDialog = useErrorDialog();
-  const fetchPetitionPermissions = useFetchPetitionPermissions();
   const confirmDelete = useDialog(ConfirmDeletePetitionsDialog);
 
   const [deletePetitions] = useMutation<
@@ -40,82 +36,67 @@ export function useDeletePetitions() {
     }
   );
 
+  const { cache } = useApolloClient();
   return useCallback(
-    async (userId: string, petitionIds: string[]) => {
-      const {
-        data: { petitionPermissions },
-      } = await fetchPetitionPermissions(petitionIds);
-
-      const byPetitionId = groupBy(petitionPermissions, (p) => p.petition.id);
-      const userIsOwnerOfSharedPetition = Object.values(byPetitionId).some(
-        (permissions) => {
-          const owner = permissions.find((p) => p.permissionType === "OWNER")!
-            .user;
-          return permissions.length > 1 && owner.id === userId;
-        }
-      );
-
-      if (userIsOwnerOfSharedPetition) {
-        return await showErrorDialog({
-          message: intl.formatMessage(
-            {
-              id: "petition.shared-delete-error",
-              defaultMessage:
-                "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
-            },
-            { count: petitionIds.length }
-          ),
+    async (petitionIds: string[]) => {
+      try {
+        const fragment = gql`
+          fragment UseDeletePetitions_PetitionBase on PetitionBase {
+            name
+          }
+        `;
+        // petition name should always be on cache at this point
+        const cachedPetition = cache.readFragment<
+          UseDeletePetitions_PetitionBaseFragment
+        >({
+          fragment,
+          id: petitionIds[0],
         });
+
+        await confirmDelete({
+          petitionIds,
+          name:
+            cachedPetition!.name ||
+            intl.formatMessage({
+              id: "generic.untitled-petition",
+              defaultMessage: "Untitled petition",
+            }),
+        });
+        await deletePetitions({
+          variables: { ids: petitionIds! },
+        });
+      } catch (error) {
+        if (
+          error?.graphQLErrors?.[0]?.extensions.code ===
+          "DELETE_SHARED_PETITION_ERROR"
+        ) {
+          return await showErrorDialog({
+            message: intl.formatMessage(
+              {
+                id: "petition.shared-delete-error",
+                defaultMessage:
+                  "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
+              },
+              { count: petitionIds.length }
+            ),
+          });
+        }
       }
-      await confirmDelete({
-        selected: petitionPermissions.map(({ petition }) => petition),
-      });
-      await deletePetitions({
-        variables: { ids: petitionIds! },
-      });
     },
     [intl.locale]
   );
 }
 
-function useFetchPetitionPermissions() {
-  const apollo = useApolloClient();
-  return useCallback(async (petitionIds) => {
-    return await apollo.query<
-      useDeletePetitions_PetitionQuery,
-      useDeletePetitions_PetitionQueryVariables
-    >({
-      query: gql`
-        query useDeletePetitions_Petition($ids: [GID!]!) {
-          petitionPermissions(petitionIds: $ids) {
-            permissionType
-            user {
-              id
-            }
-            petition {
-              ...ConfirmDeletePetitionsDialog_PetitionBase
-            }
-          }
-        }
-        ${ConfirmDeletePetitionsDialog.fragments.PetitionBase}
-      `,
-      fetchPolicy: "network-only",
-      variables: { ids: petitionIds },
-    });
-  }, []);
-}
-
 export function ConfirmDeletePetitionsDialog({
-  selected,
+  petitionIds,
+  name,
   ...props
-}: DialogProps<
-  {
-    selected: ConfirmDeletePetitionsDialog_PetitionBaseFragment[];
-  },
-  void
->) {
-  const count = selected.length;
-  const name = selected.length && selected[0].name;
+}: DialogProps<{
+  name: string;
+  petitionIds: string[];
+}>) {
+  const count = petitionIds.length;
+
   return (
     <ConfirmDialog
       header={

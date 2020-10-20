@@ -119,7 +119,7 @@ function Petitions() {
   const deletePetitions = useDeletePetitions();
   const handleDeleteClick = useCallback(async () => {
     try {
-      await deletePetitions(me.id, selected);
+      await deletePetitions(selected);
     } catch {}
     refetch();
   }, [intl.locale, petitions, selected]);

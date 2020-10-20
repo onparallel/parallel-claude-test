@@ -1195,7 +1195,6 @@ export type Query = {
   me: User;
   organization?: Maybe<Organization>;
   petition?: Maybe<PetitionBase>;
-  petitionPermissions: Array<PetitionUserPermission>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   /** The publicly available templates */
@@ -1233,10 +1232,6 @@ export type QueryorganizationArgs = {
 
 export type QuerypetitionArgs = {
   id: Scalars["GID"];
-};
-
-export type QuerypetitionPermissionsArgs = {
-  petitionIds: Array<Scalars["GID"]>;
 };
 
 export type QuerypetitionsArgs = {
@@ -3832,23 +3827,17 @@ export type useDeletePetitions_deletePetitionsMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deletePetitions">;
 
-export type useDeletePetitions_PetitionQueryVariables = Exact<{
-  ids: Array<Scalars["GID"]>;
-}>;
+export type UseDeletePetitions_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "name">;
 
-export type useDeletePetitions_PetitionQuery = { __typename?: "Query" } & {
-  petitionPermissions: Array<
-    { __typename?: "PetitionUserPermission" } & Pick<
-      PetitionUserPermission,
-      "permissionType"
-    > & {
-        user: { __typename?: "User" } & Pick<User, "id">;
-        petition: {
-          __typename?: "Petition";
-        } & ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment;
-      }
-  >;
-};
+export type UseDeletePetitions_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "name">;
+
+export type UseDeletePetitions_PetitionBaseFragment =
+  | UseDeletePetitions_PetitionBase_Petition_Fragment
+  | UseDeletePetitions_PetitionBase_PetitionTemplate_Fragment;
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -5116,6 +5105,11 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     comments {
       id
     }
+  }
+`;
+export const UseDeletePetitions_PetitionBaseFragmentDoc = gql`
+  fragment UseDeletePetitions_PetitionBase on PetitionBase {
+    name
   }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
@@ -9475,69 +9469,6 @@ export type useDeletePetitions_deletePetitionsMutationResult = Apollo.MutationRe
 export type useDeletePetitions_deletePetitionsMutationOptions = Apollo.BaseMutationOptions<
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables
->;
-export const useDeletePetitions_PetitionDocument = gql`
-  query useDeletePetitions_Petition($ids: [GID!]!) {
-    petitionPermissions(petitionIds: $ids) {
-      permissionType
-      user {
-        id
-      }
-      petition {
-        ...ConfirmDeletePetitionsDialog_PetitionBase
-      }
-    }
-  }
-  ${ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc}
-`;
-
-/**
- * __useuseDeletePetitions_PetitionQuery__
- *
- * To run a query within a React component, call `useuseDeletePetitions_PetitionQuery` and pass it any options that fit your needs.
- * When your component renders, `useuseDeletePetitions_PetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useuseDeletePetitions_PetitionQuery({
- *   variables: {
- *      ids: // value for 'ids'
- *   },
- * });
- */
-export function useuseDeletePetitions_PetitionQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    useDeletePetitions_PetitionQuery,
-    useDeletePetitions_PetitionQueryVariables
-  >
-) {
-  return Apollo.useQuery<
-    useDeletePetitions_PetitionQuery,
-    useDeletePetitions_PetitionQueryVariables
-  >(useDeletePetitions_PetitionDocument, baseOptions);
-}
-export function useuseDeletePetitions_PetitionLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    useDeletePetitions_PetitionQuery,
-    useDeletePetitions_PetitionQueryVariables
-  >
-) {
-  return Apollo.useLazyQuery<
-    useDeletePetitions_PetitionQuery,
-    useDeletePetitions_PetitionQueryVariables
-  >(useDeletePetitions_PetitionDocument, baseOptions);
-}
-export type useDeletePetitions_PetitionQueryHookResult = ReturnType<
-  typeof useuseDeletePetitions_PetitionQuery
->;
-export type useDeletePetitions_PetitionLazyQueryHookResult = ReturnType<
-  typeof useuseDeletePetitions_PetitionLazyQuery
->;
-export type useDeletePetitions_PetitionQueryResult = Apollo.QueryResult<
-  useDeletePetitions_PetitionQuery,
-  useDeletePetitions_PetitionQueryVariables
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {
