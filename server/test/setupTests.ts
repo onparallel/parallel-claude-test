@@ -24,7 +24,7 @@ expect.extend({
       return {
         message: () => outdent`
           ${this.utils.matcherHint(
-            `${this.isNot ? ".not" : ""}.toContainGraphQLError`,
+            `.toContainGraphQLError`,
             errorCode,
             expectedErrorCode,
             options
@@ -36,7 +36,7 @@ expect.extend({
       return {
         message: () => outdent`
           ${this.utils.matcherHint(
-            `${this.isNot ? ".not" : ""}.toContainGraphQLError`,
+            `.toContainGraphQLError`,
             undefined,
             undefined,
             options
