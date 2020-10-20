@@ -94,7 +94,11 @@ export function SupportMethodModal({
   const handleExecute = useCallback(async () => {
     // Validate missing values
     const invalidFields = field.args.filter(
-      (f) => f.type.kind === "NON_NULL" && values[f.name] === null
+      (f) =>
+        f.type.kind === "NON_NULL" &&
+        (values[f.name] === null ||
+          values[f.name].value === "" ||
+          values[f.name].value === null)
     );
     setValues({
       ...Object.fromEntries(
