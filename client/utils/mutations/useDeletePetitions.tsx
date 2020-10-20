@@ -5,15 +5,15 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import {
-  UseDeletePetitions_PetitionBaseFragment,
+  ConfirmDeletePetitionsDialog_PetitionBaseFragment,
   useDeletePetitions_deletePetitionsMutation,
   useDeletePetitions_deletePetitionsMutationVariables,
 } from "@parallel/graphql/__types";
+import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { clearCache } from "../apollo/clearCache";
-import { useCallback } from "react";
-import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 
 export function useDeletePetitions() {
   const intl = useIntl();
@@ -40,16 +40,11 @@ export function useDeletePetitions() {
   return useCallback(
     async (petitionIds: string[]) => {
       try {
-        const fragment = gql`
-          fragment UseDeletePetitions_PetitionBase on PetitionBase {
-            name
-          }
-        `;
         // petition name should always be on cache at this point
         const cachedPetition = cache.readFragment<
-          UseDeletePetitions_PetitionBaseFragment
+          ConfirmDeletePetitionsDialog_PetitionBaseFragment
         >({
-          fragment,
+          fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
           id: petitionIds[0],
         });
 

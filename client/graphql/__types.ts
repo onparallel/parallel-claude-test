@@ -3827,18 +3827,6 @@ export type useDeletePetitions_deletePetitionsMutation = {
   __typename?: "Mutation";
 } & Pick<Mutation, "deletePetitions">;
 
-export type UseDeletePetitions_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "name">;
-
-export type UseDeletePetitions_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "name">;
-
-export type UseDeletePetitions_PetitionBaseFragment =
-  | UseDeletePetitions_PetitionBase_Petition_Fragment
-  | UseDeletePetitions_PetitionBase_PetitionTemplate_Fragment;
-
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name">;
@@ -5105,11 +5093,6 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     comments {
       id
     }
-  }
-`;
-export const UseDeletePetitions_PetitionBaseFragmentDoc = gql`
-  fragment UseDeletePetitions_PetitionBase on PetitionBase {
-    name
   }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
