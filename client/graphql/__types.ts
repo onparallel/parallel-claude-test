@@ -1195,6 +1195,7 @@ export type Query = {
   me: User;
   organization?: Maybe<Organization>;
   petition?: Maybe<PetitionBase>;
+  petitionPermissions: Array<PetitionUserPermission>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   /** The publicly available templates */
@@ -1232,6 +1233,10 @@ export type QueryorganizationArgs = {
 
 export type QuerypetitionArgs = {
   id: Scalars["GID"];
+};
+
+export type QuerypetitionPermissionsArgs = {
+  petitionIds: Array<Scalars["GID"]>;
 };
 
 export type QuerypetitionsArgs = {
@@ -3828,27 +3833,20 @@ export type useDeletePetitions_deletePetitionsMutation = {
 } & Pick<Mutation, "deletePetitions">;
 
 export type useDeletePetitions_PetitionQueryVariables = Exact<{
-  id: Scalars["GID"];
+  ids: Array<Scalars["GID"]>;
 }>;
 
 export type useDeletePetitions_PetitionQuery = { __typename?: "Query" } & {
-  petition?: Maybe<
-    | ({ __typename?: "Petition" } & {
-        userPermissions: Array<
-          { __typename?: "PetitionUserPermission" } & Pick<
-            PetitionUserPermission,
-            "permissionType"
-          > & { user: { __typename?: "User" } & Pick<User, "id"> }
-        >;
-      } & ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment)
-    | ({ __typename?: "PetitionTemplate" } & {
-        userPermissions: Array<
-          { __typename?: "PetitionUserPermission" } & Pick<
-            PetitionUserPermission,
-            "permissionType"
-          > & { user: { __typename?: "User" } & Pick<User, "id"> }
-        >;
-      } & ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment)
+  petitionPermissions: Array<
+    { __typename?: "PetitionUserPermission" } & Pick<
+      PetitionUserPermission,
+      "permissionType"
+    > & {
+        user: { __typename?: "User" } & Pick<User, "id">;
+        petition: {
+          __typename?: "Petition";
+        } & ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment;
+      }
   >;
 };
 
@@ -9479,15 +9477,15 @@ export type useDeletePetitions_deletePetitionsMutationOptions = Apollo.BaseMutat
   useDeletePetitions_deletePetitionsMutationVariables
 >;
 export const useDeletePetitions_PetitionDocument = gql`
-  query useDeletePetitions_Petition($id: GID!) {
-    petition(id: $id) {
-      userPermissions {
-        permissionType
-        user {
-          id
-        }
+  query useDeletePetitions_Petition($ids: [GID!]!) {
+    petitionPermissions(petitionIds: $ids) {
+      permissionType
+      user {
+        id
       }
-      ...ConfirmDeletePetitionsDialog_PetitionBase
+      petition {
+        ...ConfirmDeletePetitionsDialog_PetitionBase
+      }
     }
   }
   ${ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc}
@@ -9505,7 +9503,7 @@ export const useDeletePetitions_PetitionDocument = gql`
  * @example
  * const { data, loading, error } = useuseDeletePetitions_PetitionQuery({
  *   variables: {
- *      id: // value for 'id'
+ *      ids: // value for 'ids'
  *   },
  * });
  */

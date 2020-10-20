@@ -796,6 +796,7 @@ export interface NexusGenFieldTypes {
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
+    petitionPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
   };
@@ -1266,6 +1267,10 @@ export interface NexusGenArgTypes {
     petition: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    petitionPermissions: {
+      // args
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     petitions: {
       // args

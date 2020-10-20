@@ -16,6 +16,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { clearCache } from "../apollo/clearCache";
 import { useCallback } from "react";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { groupBy } from "remeda";
 
 export function useDeletePetitions() {
   const intl = useIntl();
@@ -41,24 +42,19 @@ export function useDeletePetitions() {
 
   return useCallback(
     async (userId: string, petitionIds: string[]) => {
-      const results = await Promise.all(
-        petitionIds.map(async (id) => await fetchPetitionPermissions(id))
+      const {
+        data: { petitionPermissions },
+      } = await fetchPetitionPermissions(petitionIds);
+
+      const byPetitionId = groupBy(petitionPermissions, (p) => p.petition.id);
+      const userIsOwnerOfSharedPetition = Object.values(byPetitionId).some(
+        (permissions) => {
+          const owner = permissions.find((p) => p.permissionType === "OWNER")!
+            .user;
+          return permissions.length > 1 && owner.id === userId;
+        }
       );
-      if (results.some(({ data }) => !data?.petition)) {
-        await showErrorDialog({
-          message: intl.formatMessage({
-            id: "generic.unexpected-error-happened",
-            defaultMessage:
-              "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
-          }),
-        });
-      }
-      const userIsOwnerOfSharedPetition = results.some(({ data }) => {
-        const permissions = data!.petition!.userPermissions;
-        const owner = permissions.find((p) => p.permissionType === "OWNER")!
-          .user;
-        return permissions.length > 1 && owner.id === userId;
-      });
+
       if (userIsOwnerOfSharedPetition) {
         return await showErrorDialog({
           message: intl.formatMessage(
@@ -72,7 +68,7 @@ export function useDeletePetitions() {
         });
       }
       await confirmDelete({
-        selected: results.map(({ data }) => data!.petition!),
+        selected: petitionPermissions.map(({ petition }) => petition),
       });
       await deletePetitions({
         variables: { ids: petitionIds! },
@@ -84,27 +80,27 @@ export function useDeletePetitions() {
 
 function useFetchPetitionPermissions() {
   const apollo = useApolloClient();
-  return useCallback(async (petitionId) => {
+  return useCallback(async (petitionIds) => {
     return await apollo.query<
       useDeletePetitions_PetitionQuery,
       useDeletePetitions_PetitionQueryVariables
     >({
       query: gql`
-        query useDeletePetitions_Petition($id: GID!) {
-          petition(id: $id) {
-            userPermissions {
-              permissionType
-              user {
-                id
-              }
+        query useDeletePetitions_Petition($ids: [GID!]!) {
+          petitionPermissions(petitionIds: $ids) {
+            permissionType
+            user {
+              id
             }
-            ...ConfirmDeletePetitionsDialog_PetitionBase
+            petition {
+              ...ConfirmDeletePetitionsDialog_PetitionBase
+            }
           }
         }
         ${ConfirmDeletePetitionsDialog.fragments.PetitionBase}
       `,
       fetchPolicy: "network-only",
-      variables: { id: petitionId },
+      variables: { ids: petitionIds },
     });
   }, []);
 }
