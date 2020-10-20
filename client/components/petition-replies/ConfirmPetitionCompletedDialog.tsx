@@ -74,6 +74,12 @@ export function ConfirmPetitionCompletedDialog({
               defaultMessage="If everything is correct, notify the recipient for peace of mind."
             />
           </Text>
+          <Text>
+            <FormattedMessage
+              id="petition-replies.confirm-reviewed.dialog-disclaimer"
+              defaultMessage="We will only notify recipients with active access."
+            />
+          </Text>
           <RichTextEditor
             isInvalid={isInvalidBody}
             value={body}

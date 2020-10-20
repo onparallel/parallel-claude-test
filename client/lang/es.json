@@ -1380,6 +1380,11 @@
     "context": "Pending"
   },
   {
+    "term": "petition-replies.confirm-reviewed.dialog-disclaimer",
+    "definition": "Notificaremos únicamente a los destinatarios con acceso activo.",
+    "context": "We will only notify recipients with active access."
+  },
+  {
     "term": "petition-replies.confirm-reviewed.dialog-heading",
     "definition": "Confirmar que ya tienes toda la información",
     "context": "Confirm that you have all the information"
@@ -1938,6 +1943,21 @@
     "term": "petition.remove-deadline",
     "definition": "Quitar vencimiento",
     "context": "Remove deadline"
+  },
+  {
+    "term": "petition.reopen.confirm",
+    "definition": "Si, reabrir",
+    "context": "Yes, reopen"
+  },
+  {
+    "term": "petition.reopen.dialog-heading",
+    "definition": "¿Reabrir la petición?",
+    "context": "Reopen petition?"
+  },
+  {
+    "term": "petition.reopen.dialog-subheading",
+    "definition": "Vas a reabrir la petición y quedará registrado internamente, ¿estás seguro? Siempre podrás cerrarlo de nuevo manualmente.",
+    "context": "You are about to reopen the petition and it will be registered internally, are you sure? You can always close it again manually."
   },
   {
     "term": "petition.replies-not-available",
