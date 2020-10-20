@@ -20,12 +20,7 @@ export function PublicUserFormContainer({
       {...wrapper}
     >
       <Box flex="1" />
-      <Box
-        margin="0 auto"
-        width="100%"
-        paddingX={4}
-        maxWidth={{ xs: "container.xs" }}
-      >
+      <Box margin="0 auto" width="100%" paddingX={4} maxWidth="container.xs">
         <Card padding={4} {...props}>
           {children}
         </Card>
