@@ -122,6 +122,10 @@ export const createUser = mutationField("createUser", {
       required: true,
       description: "Email of the user",
     }),
+    password: stringArg({
+      required: true,
+      description: "Temporary of the user",
+    }),
     firstName: stringArg({
       required: true,
       description: "First name of the user",
@@ -150,7 +154,10 @@ export const createUser = mutationField("createUser", {
           `Organization with id ${args.organizationId} does not exist.`
         );
       }
-      const cognitoId = await ctx.aws.createCognitoUser(args.email);
+      const cognitoId = await ctx.aws.createCognitoUser(
+        args.email,
+        args.password
+      );
       const user = await ctx.users.createUser(
         {
           cognito_id: cognitoId!,

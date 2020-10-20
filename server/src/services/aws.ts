@@ -148,11 +148,13 @@ export class Aws {
       .createReadStream();
   }
 
-  async createCognitoUser(email: string) {
+  async createCognitoUser(email: string, password: string) {
     const res = await this.cognitoIdP
       .adminCreateUser({
         UserPoolId: this.config.cognito.defaultPoolId,
         Username: email,
+        TemporaryPassword: password,
+        MessageAction: "SUPPRESS",
         UserAttributes: [
           {
             Name: "email",

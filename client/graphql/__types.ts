@@ -342,6 +342,7 @@ export type MutationcreateUserArgs = {
   lastName: Scalars["String"];
   organizationId: Scalars["Int"];
   organizationRole: OrganizationRole;
+  password: Scalars["String"];
 };
 
 export type MutationdeactivateAccessesArgs = {

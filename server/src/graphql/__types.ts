@@ -999,6 +999,7 @@ export interface NexusGenArgTypes {
       lastName: string; // String!
       organizationId: number; // Int!
       organizationRole: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+      password: string; // String!
     };
     deactivateAccesses: {
       // args
