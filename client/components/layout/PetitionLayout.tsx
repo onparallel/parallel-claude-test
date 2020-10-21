@@ -9,18 +9,21 @@ import {
 import {
   PetitionLayout_PetitionBaseFragment,
   PetitionLayout_UserFragment,
+  UpdatePetitionInput,
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
-export type PetitionLayoutProps = ExtendChakra<
-  PetitionHeaderProps & {
-    petition: PetitionLayout_PetitionBaseFragment;
-    user: PetitionLayout_UserFragment;
-    scrollBody: boolean;
-  }
->;
+export type PetitionLayoutProps = ExtendChakra<{
+  petition: PetitionLayout_PetitionBaseFragment;
+  user: PetitionLayout_UserFragment;
+  onUpdatePetition: (value: UpdatePetitionInput) => void;
+  onSuggestEventRefetch?: () => void;
+  section: "compose" | "replies" | "activity";
+  state: "SAVED" | "SAVING" | "ERROR";
+  scrollBody: boolean;
+}>;
 
 export function PetitionLayout({
   user,
