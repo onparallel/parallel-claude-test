@@ -3,8 +3,17 @@ import { CONFIG, Config } from "../config";
 import redis, { RedisClient } from "redis";
 import { promisify } from "util";
 
+export interface IRedis {
+  waitUntilConnected(): Promise<void>;
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, duration?: number): Promise<void>;
+  delete(...keys: string[]): Promise<number>;
+}
+
+export const REDIS = Symbol.for("REDIS");
+
 @injectable()
-export class Redis {
+export class Redis implements IRedis {
   public readonly client: RedisClient;
 
   constructor(@inject(CONFIG) config: Config) {

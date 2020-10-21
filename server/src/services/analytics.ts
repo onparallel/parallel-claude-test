@@ -37,59 +37,46 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   };
 }[EventType];
 
+export const ANALYTICS = Symbol.for("ANALYTICS");
+
+export interface IAnalyticsService {
+  identifyUser(user: Pick<User, "id" | "email">): void;
+
+  trackEvent<EventType extends AnalyticsEventType>(
+    eventName: EventType,
+    properties: AnalyticsEventProperties<EventType>,
+    userGID: string
+  ): void;
+}
+
 @injectable()
-export class AnalyticsService {
-  public readonly analytics: Analytics | null;
+export class AnalyticsService implements IAnalyticsService {
+  readonly analytics?: Analytics;
+
   constructor(@inject(CONFIG) config: Config) {
     if (config.analytics.writeKey) {
       this.analytics = new Analytics(config.analytics.writeKey, {
         enable: process.env.NODE_ENV === "production",
       });
-    } else {
-      this.analytics = null;
     }
   }
 
-  public async identifyUser(user: Pick<User, "id" | "email">) {
-    return new Promise((resolve, reject) => {
-      this.analytics &&
-        this.analytics.identify(
-          {
-            userId: toGlobalId("User", user.id),
-            traits: { email: user.email },
-          },
-          (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          }
-        );
+  identifyUser(user: Pick<User, "id" | "email">) {
+    this.analytics?.identify({
+      userId: toGlobalId("User", user.id),
+      traits: { email: user.email },
     });
   }
 
-  public async trackEvent<EventType extends AnalyticsEventType>(
+  trackEvent<EventType extends AnalyticsEventType>(
     eventName: EventType,
     properties: AnalyticsEventProperties<EventType>,
     userGID: string
   ) {
-    return new Promise((resolve, reject) => {
-      this.analytics &&
-        this.analytics.track(
-          {
-            userId: userGID,
-            event: snakeCaseToCapitalizedText(eventName),
-            properties,
-          },
-          (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          }
-        );
+    return this.analytics?.track({
+      userId: userGID,
+      event: snakeCaseToCapitalizedText(eventName),
+      properties,
     });
   }
 }

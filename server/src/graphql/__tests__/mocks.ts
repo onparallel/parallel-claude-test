@@ -1,25 +1,16 @@
-import { Auth } from "../../services/auth";
-import { Cognito } from "../../services/cognito";
-import { Redis } from "./../../services/redis";
-import { injectable, inject } from "inversify";
-import { CONFIG, Config } from "../../config";
-import { AnalyticsService } from "../../services/analytics";
+import { injectable } from "inversify";
+import { IAnalyticsService } from "../../services/analytics";
+import { IRedis } from "../../services/redis";
 
 export const userCognitoId = "test-cognito-id";
 
 @injectable()
-export class MockAuth extends Auth {
-  constructor(cognito: Cognito, redis: Redis) {
-    super(cognito, redis);
-  }
+export class MockAuth {
   validateSession: any = () => userCognitoId;
 }
 
 @injectable()
-export class MockRedis implements Redis {
-  public readonly client: any;
-  constructor(@inject(CONFIG) config: Config) {}
-
+export class MockRedis implements IRedis {
   async waitUntilConnected() {
     return;
   }
@@ -36,9 +27,7 @@ export class MockRedis implements Redis {
 }
 
 @injectable()
-export class MockAnalyticsService implements AnalyticsService {
-  public readonly analytics: any;
-  constructor(@inject(CONFIG) config: Config) {}
+export class MockAnalyticsService implements IAnalyticsService {
   async identifyUser() {}
   async trackEvent() {}
 }

@@ -2,20 +2,20 @@ import { CognitoUserSession } from "amazon-cognito-identity-js";
 import { map } from "async";
 import DataLoader from "dataloader";
 import { NextFunction, Request, Response } from "express";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import jwtDecode from "jwt-decode";
 import { ApiContext } from "../context";
 import { fromDataLoader } from "../util/fromDataLoader";
 import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
 import { Cognito } from "./cognito";
-import { Redis } from "./redis";
+import { REDIS, Redis } from "./redis";
 
 @injectable()
 export class Auth {
   private readonly EXPIRY = 30 * 24 * 60 * 60;
 
-  constructor(private cognito: Cognito, private redis: Redis) {}
+  constructor(private cognito: Cognito, @inject(REDIS) private redis: Redis) {}
 
   async login(
     req: Request & { context: ApiContext },

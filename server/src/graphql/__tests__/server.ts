@@ -1,18 +1,18 @@
 import { ApolloServer } from "apollo-server-express";
-import { schema } from "./../../schema";
-import { ApiContext } from "../../context";
-import { Auth } from "../../services/auth";
-import { MockAnalyticsService, MockAuth, MockRedis } from "./mocks";
-import { createContainer } from "../../container";
 import {
   ApolloServerTestClient,
   createTestClient,
 } from "apollo-server-testing";
-import { Redis } from "../../services/redis";
-import { KNEX } from "../../db/knex";
 import Knex from "knex";
+import { createContainer } from "../../container";
+import { ApiContext } from "../../context";
+import { KNEX } from "../../db/knex";
+import { ANALYTICS, IAnalyticsService } from "../../services/analytics";
+import { Auth } from "../../services/auth";
+import { IRedis, REDIS } from "../../services/redis";
 import { deleteAllData } from "../../util/knexUtils";
-import { AnalyticsService } from "../../services/analytics";
+import { schema } from "./../../schema";
+import { MockAnalyticsService, MockAuth, MockRedis } from "./mocks";
 
 export type TestClient = {
   query: ApolloServerTestClient["query"];
@@ -23,12 +23,12 @@ export type TestClient = {
 
 export const initServer = async () => {
   const container = createContainer();
+  container.rebind(Auth).to(MockAuth as any);
+  container.rebind<IRedis>(REDIS).to(MockRedis);
+  container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
   const server = new ApolloServer({
     schema,
     context: () => {
-      container.rebind(Auth).to(MockAuth);
-      container.rebind(Redis).to(MockRedis);
-      container.rebind(AnalyticsService).to(MockAnalyticsService);
       const context = container.get<ApiContext>(ApiContext);
       context.req = {
         header: (name: string) => {
