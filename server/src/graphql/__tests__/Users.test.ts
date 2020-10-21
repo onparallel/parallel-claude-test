@@ -4,6 +4,8 @@ import { Organization, User } from "../../db/__types";
 import { userCognitoId } from "./mocks";
 import { toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
+import { KNEX } from "../../db/knex";
+import Knex from "knex";
 
 describe("GraphQL/Users", () => {
   let testClient: TestClient;
@@ -13,7 +15,9 @@ describe("GraphQL/Users", () => {
 
   beforeAll(async (done) => {
     testClient = await initServer();
-    const mocks = new Mocks(testClient.knex);
+    const knex = testClient.container.get<Knex>(KNEX);
+    const mocks = new Mocks(knex);
+
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",
       status: "DEV",

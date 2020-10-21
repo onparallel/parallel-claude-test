@@ -4,6 +4,8 @@ import { Organization, User, Petition } from "../../db/__types";
 import { userCognitoId } from "./mocks";
 import { toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
+import Knex from "knex";
+import { KNEX } from "../../db/knex";
 
 const petitionsBuilder = (orgId: number) => (
   index: number
@@ -35,7 +37,8 @@ describe("GraphQL/Petitions", () => {
 
   beforeAll(async (done) => {
     testClient = await initServer();
-    const mocks = new Mocks(testClient.knex);
+    const knex = testClient.container.get<Knex>(KNEX);
+    const mocks = new Mocks(knex);
 
     // main organization
     [organization] = await mocks.createRandomOrganizations(1, () => ({
@@ -69,7 +72,7 @@ describe("GraphQL/Petitions", () => {
     );
 
     // petitions[0] and petitions[1] are shared to another user
-    await testClient.knex.raw(/* sql */ `
+    await knex.raw(/* sql */ `
       INSERT INTO petition_user(petition_id, user_id, permission_type)
       VALUES 
         (${petitions[0].id}, ${sameOrgUser.id}, 'WRITE'),

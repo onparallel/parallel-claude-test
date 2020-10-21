@@ -1,31 +1,36 @@
 import { ApolloServer } from "apollo-server-express";
+import { schema } from "./../../schema";
+import { ApiContext } from "../../context";
+import { Auth } from "../../services/auth";
 import {
-  ApolloServerTestClient,
-  createTestClient,
-} from "apollo-server-testing";
+  MockAnalyticsService,
+  MockAuth,
+  MockEmailsService,
+  MockRedis,
+} from "./mocks";
+import { createTestClient } from "apollo-server-testing";
+import { Redis } from "../../services/redis";
+import { KNEX } from "../../db/knex";
 import Knex from "knex";
 import { createContainer } from "../../container";
-import { ApiContext } from "../../context";
-import { KNEX } from "../../db/knex";
 import { ANALYTICS, IAnalyticsService } from "../../services/analytics";
-import { Auth } from "../../services/auth";
 import { IRedis, REDIS } from "../../services/redis";
 import { deleteAllData } from "../../util/knexUtils";
-import { schema } from "./../../schema";
-import { MockAnalyticsService, MockAuth, MockRedis } from "./mocks";
+import { EmailsService } from "../../services/emails";
+import { UnwrapPromise } from "../../util/types";
 
-export type TestClient = {
-  query: ApolloServerTestClient["query"];
-  mutate: ApolloServerTestClient["mutate"];
-  stop: () => Promise<void>;
-  knex: Knex;
-};
+export type TestClient = UnwrapPromise<ReturnType<typeof initServer>>;
 
 export const initServer = async () => {
   const container = createContainer();
-  container.rebind(Auth).to(MockAuth as any);
+  container.rebind(Auth).to(MockAuth);
   container.rebind<IRedis>(REDIS).to(MockRedis);
   container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
+  container
+    .rebind(EmailsService)
+    .to(MockEmailsService as any)
+    .inSingletonScope();
+
   const server = new ApolloServer({
     schema,
     context: () => {
@@ -50,7 +55,7 @@ export const initServer = async () => {
   return {
     query,
     mutate,
-    knex,
+    container,
     stop: async () => {
       await knex.destroy();
       await server.stop();

@@ -1,6 +1,8 @@
 import { injectable } from "inversify";
 import { IAnalyticsService } from "../../services/analytics";
 import { IRedis } from "../../services/redis";
+import { Maybe } from "../../db/__types";
+import { MaybeArray } from "../../util/types";
 
 export const userCognitoId = "test-cognito-id";
 
@@ -30,4 +32,33 @@ export class MockRedis implements IRedis {
 export class MockAnalyticsService implements IAnalyticsService {
   async identifyUser() {}
   async trackEvent() {}
+}
+
+export class MockEmailsService {
+  async sendPetitionMessageEmail(messageIds: MaybeArray<number>) {}
+  async sendPetitionReminderEmail(reminderIds: MaybeArray<number>) {}
+  async sendPetitionCompletedEmail(accessIds: MaybeArray<number>) {}
+  async sendPetitionCommentsContactNotificationEmail(
+    petitionId: number,
+    userId: number,
+    accessIds: number[],
+    commentIds: number[]
+  ) {}
+  async sendPetitionCommentsUserNotificationEmail(
+    petitionId: number,
+    accessId: number,
+    userIds: number[],
+    commentIds: number[]
+  ) {}
+  async sendPetitionSharingNotificationEmail(
+    userId: number,
+    petitionUserIds: MaybeArray<number>,
+    message: Maybe<string>
+  ) {}
+  async sendPetitionClosedEmail(
+    petitionId: number,
+    userId: number,
+    petitionAccessIds: MaybeArray<number>,
+    emailBody: any
+  ) {}
 }

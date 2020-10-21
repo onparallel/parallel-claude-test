@@ -7,6 +7,7 @@ import { validateAnd } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { WhitelistedError } from "../../helpers/errors";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -122,12 +123,23 @@ export const editPetitionUserPermission = mutationField(
       userIdNotIncludedInArray((args) => args.userIds, "userIds")
     ),
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.editPetitionUserPermissions(
-        args.petitionIds,
-        args.userIds,
-        args.permissionType,
-        ctx.user!
-      );
+      try {
+        return await ctx.petitions.editPetitionUserPermissions(
+          args.petitionIds,
+          args.userIds,
+          args.permissionType,
+          ctx.user!
+        );
+      } catch (e) {
+        if (e.constraint === "petition_user__owner") {
+          throw new WhitelistedError(
+            "A petition can't have more than one owner.",
+            "PETITION_OWNER_CONSTRAINT_ERROR"
+          );
+        } else {
+          throw e;
+        }
+      }
     },
   }
 );

@@ -22,7 +22,7 @@ import {
 import { random } from "../../../util/token";
 
 export class Mocks {
-  constructor(private knex: Knex) {}
+  constructor(public knex: Knex) {}
 
   async createRandomOrganizations(
     amount: number,

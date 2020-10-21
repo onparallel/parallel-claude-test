@@ -5,6 +5,8 @@ import { userCognitoId } from "./mocks";
 import faker from "faker";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
+import Knex from "knex";
+import { KNEX } from "../../db/knex";
 
 describe("GraphQL/Contacts", () => {
   let testClient: TestClient;
@@ -15,7 +17,8 @@ describe("GraphQL/Contacts", () => {
 
   beforeAll(async (done) => {
     testClient = await initServer();
-    mocks = new Mocks(testClient.knex);
+    const knex = testClient.container.get<Knex>(KNEX);
+    mocks = new Mocks(knex);
 
     // main organization
     [organization] = await mocks.createRandomOrganizations(1, () => ({

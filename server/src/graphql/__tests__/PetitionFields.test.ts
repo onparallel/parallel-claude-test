@@ -14,6 +14,8 @@ import {
 import { toGlobalId } from "../../util/globalId";
 import { userCognitoId } from "./mocks";
 import { initServer, TestClient } from "./server";
+import Knex from "knex";
+import { KNEX } from "../../db/knex";
 
 describe("GraphQL/Petition Fields", () => {
   let testClient: TestClient;
@@ -26,7 +28,9 @@ describe("GraphQL/Petition Fields", () => {
 
   beforeAll(async (done) => {
     testClient = await initServer();
-    mocks = new Mocks(testClient.knex);
+    const knex = testClient.container.get<Knex>(KNEX);
+    mocks = new Mocks(knex);
+
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",
       status: "DEV",
