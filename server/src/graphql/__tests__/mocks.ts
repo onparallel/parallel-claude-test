@@ -1,14 +1,19 @@
 import { injectable } from "inversify";
 import { IAnalyticsService } from "../../services/analytics";
 import { IRedis } from "../../services/redis";
-import { Maybe } from "../../db/__types";
-import { MaybeArray } from "../../util/types";
+import { IAuth } from "../../services/auth";
+import { IEmailsService } from "../../services/emails";
 
 export const userCognitoId = "test-cognito-id";
 
 @injectable()
-export class MockAuth {
+export class MockAuth implements IAuth {
   validateSession: any = () => userCognitoId;
+  async login() {}
+  async logout() {}
+  async newPassword() {}
+  async forgotPassword() {}
+  async confirmForgotPassword() {}
 }
 
 @injectable()
@@ -16,14 +21,11 @@ export class MockRedis implements IRedis {
   async waitUntilConnected() {
     return;
   }
-
-  async get(key: string): Promise<string | null> {
+  async get(): Promise<string | null> {
     return null;
   }
-
-  async set(key: string, value: string, duration?: number) {}
-
-  async delete(...keys: string[]): Promise<number> {
+  async set() {}
+  async delete(): Promise<number> {
     return 0;
   }
 }
@@ -34,31 +36,13 @@ export class MockAnalyticsService implements IAnalyticsService {
   async trackEvent() {}
 }
 
-export class MockEmailsService {
-  async sendPetitionMessageEmail(messageIds: MaybeArray<number>) {}
-  async sendPetitionReminderEmail(reminderIds: MaybeArray<number>) {}
-  async sendPetitionCompletedEmail(accessIds: MaybeArray<number>) {}
-  async sendPetitionCommentsContactNotificationEmail(
-    petitionId: number,
-    userId: number,
-    accessIds: number[],
-    commentIds: number[]
-  ) {}
-  async sendPetitionCommentsUserNotificationEmail(
-    petitionId: number,
-    accessId: number,
-    userIds: number[],
-    commentIds: number[]
-  ) {}
-  async sendPetitionSharingNotificationEmail(
-    userId: number,
-    petitionUserIds: MaybeArray<number>,
-    message: Maybe<string>
-  ) {}
-  async sendPetitionClosedEmail(
-    petitionId: number,
-    userId: number,
-    petitionAccessIds: MaybeArray<number>,
-    emailBody: any
-  ) {}
+@injectable()
+export class MockEmailsService implements IEmailsService {
+  async sendPetitionMessageEmail() {}
+  async sendPetitionReminderEmail() {}
+  async sendPetitionCompletedEmail() {}
+  async sendPetitionCommentsContactNotificationEmail() {}
+  async sendPetitionCommentsUserNotificationEmail() {}
+  async sendPetitionSharingNotificationEmail() {}
+  async sendPetitionClosedEmail() {}
 }

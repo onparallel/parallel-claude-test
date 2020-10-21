@@ -3,7 +3,7 @@ import Knex from "knex";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, User } from "../../db/__types";
-import { EmailsService } from "../../services/emails";
+import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
 import { userCognitoId } from "./mocks";
 import { initServer, TestClient } from "./server";
@@ -238,7 +238,7 @@ describe("GraphQL/User Permissions", () => {
 
     it("sends notification email to users after adding permissions", async () => {
       const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
-        testClient.container.get<EmailsService>(EmailsService),
+        testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharingNotificationEmail"
       );
 
@@ -277,7 +277,7 @@ describe("GraphQL/User Permissions", () => {
 
     it("doesn't send notification email to users if notify arg is false or undefined", async () => {
       const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
-        testClient.container.get<EmailsService>(EmailsService),
+        testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharingNotificationEmail"
       );
 

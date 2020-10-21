@@ -11,8 +11,30 @@ import { random } from "../util/token";
 import { Cognito } from "./cognito";
 import { REDIS, Redis } from "./redis";
 
+export interface IAuth {
+  login(
+    req: Request & { context: ApiContext },
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
+  logout(req: Request, res: Response, next: NextFunction): Promise<void>;
+  newPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
+  forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
+  confirmForgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
+}
+
+export const AUTH = Symbol.for("AUTH");
+
 @injectable()
-export class Auth {
+export class Auth implements IAuth {
   private readonly EXPIRY = 30 * 24 * 60 * 60;
 
   constructor(private cognito: Cognito, @inject(REDIS) private redis: Redis) {}

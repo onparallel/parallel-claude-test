@@ -4,8 +4,38 @@ import { MaybeArray, Maybe } from "../util/types";
 import { Aws } from "./aws";
 import { EmailPayload } from "../workers/email-sender";
 
+export interface IEmailsService {
+  sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
+  sendPetitionReminderEmail(reminderIds: MaybeArray<number>): Promise<void>;
+  sendPetitionCompletedEmail(accessIds: MaybeArray<number>): Promise<void>;
+  sendPetitionCommentsContactNotificationEmail(
+    petitionId: number,
+    userId: number,
+    accessIds: number[],
+    commentIds: number[]
+  ): Promise<void>;
+  sendPetitionCommentsUserNotificationEmail(
+    petitionId: number,
+    accessId: number,
+    userIds: number[],
+    commentIds: number[]
+  ): Promise<void>;
+  sendPetitionSharingNotificationEmail(
+    userId: number,
+    petitionUserIds: MaybeArray<number>,
+    message: Maybe<string>
+  ): Promise<void>;
+  sendPetitionClosedEmail(
+    petitionId: number,
+    userId: number,
+    petitionAccessIds: MaybeArray<number>,
+    emailBody: any
+  ): Promise<void>;
+}
+export const EMAILS = Symbol.for("EMAILS");
+
 @injectable()
-export class EmailsService {
+export class EmailsService implements IEmailsService {
   constructor(private aws: Aws) {}
 
   private async enqueueEmail<T extends keyof EmailPayload>(
