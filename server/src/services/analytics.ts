@@ -73,7 +73,7 @@ export class AnalyticsService implements IAnalyticsService {
     properties: AnalyticsEventProperties<EventType>,
     userGID: string
   ) {
-    return this.analytics?.track({
+    this.analytics?.track({
       userId: userGID,
       event: snakeCaseToCapitalizedText(eventName),
       properties,
