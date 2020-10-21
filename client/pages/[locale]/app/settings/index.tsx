@@ -5,7 +5,7 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useSettingsQuery } from "@parallel/graphql/__types";
+import { useSettingsQuery, SettingsQuery } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -44,7 +44,7 @@ Settings.fragments = {
 };
 
 Settings.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<SettingsQuey>(gql`
+  await fetchQuery<SettingsQuery>(gql`
     query Settings {
       me {
         id
