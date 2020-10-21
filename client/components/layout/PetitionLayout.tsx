@@ -14,12 +14,13 @@ import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
-export type PetitionLayoutProps = ExtendChakra<{
-  petition: PetitionLayout_PetitionBaseFragment;
-  user: PetitionLayout_UserFragment;
-  section?: PetitionHeaderProps["section"];
-  scrollBody: boolean;
-}>;
+export type PetitionLayoutProps = ExtendChakra<
+  PetitionHeaderProps & {
+    petition: PetitionLayout_PetitionBaseFragment;
+    user: PetitionLayout_UserFragment;
+    scrollBody: boolean;
+  }
+>;
 
 export function PetitionLayout({
   user,
@@ -28,6 +29,7 @@ export function PetitionLayout({
   state,
   section,
   onUpdatePetition,
+  onSuggestEventRefetch,
   children,
   ...props
 }: PetitionLayoutProps) {
@@ -76,6 +78,7 @@ export function PetitionLayout({
           petition={petition}
           user={user}
           onUpdatePetition={onUpdatePetition}
+          onSuggestEventRefetch={onSuggestEventRefetch}
           section={section!}
           state={state}
         />

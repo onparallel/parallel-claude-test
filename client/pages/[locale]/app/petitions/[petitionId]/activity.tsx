@@ -387,6 +387,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       user={me}
       petition={petition}
       onUpdatePetition={handleOnUpdatePetition}
+      onSuggestEventRefetch={refetch}
       section="activity"
       scrollBody
       state={state}

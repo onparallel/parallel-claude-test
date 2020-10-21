@@ -50,6 +50,7 @@ export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
+  onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
 }>;
@@ -58,6 +59,7 @@ export function PetitionHeader({
   petition,
   user,
   onUpdatePetition,
+  onSuggestEventRefetch,
   section: current,
   state,
   ...props
@@ -181,8 +183,14 @@ export function PetitionHeader({
           petitionId: petition.id,
         },
       });
+      onSuggestEventRefetch?.();
     } catch {}
   }, [petition.id]);
+
+  const handleCloseSharingModal = useCallback(() => {
+    onCloseSharePetition();
+    onSuggestEventRefetch?.();
+  }, [onCloseSharePetition, onSuggestEventRefetch]);
   return (
     <>
       <Box
@@ -369,7 +377,7 @@ export function PetitionHeader({
           petitionId={petition.id}
           userId={user.id}
           isOpen={true}
-          onClose={onCloseSharePetition}
+          onClose={handleCloseSharingModal}
         />
       ) : null}
     </>
@@ -442,12 +450,6 @@ PetitionHeader.mutations = [
         id
         status
         updatedAt
-        events(limit: 1000) {
-          items {
-            id
-            __typename
-          }
-        }
       }
     }
   `,

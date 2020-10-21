@@ -1523,89 +1523,7 @@ export type PetitionHeader_reopenPetitionMutation = {
   reopenPetition: { __typename?: "Petition" } & Pick<
     Petition,
     "id" | "status" | "updatedAt"
-  > & {
-      events: { __typename?: "PetitionEventPagination" } & {
-        items: Array<
-          | ({ __typename: "AccessActivatedEvent" } & Pick<
-              AccessActivatedEvent,
-              "id"
-            >)
-          | ({ __typename: "AccessDeactivatedEvent" } & Pick<
-              AccessDeactivatedEvent,
-              "id"
-            >)
-          | ({ __typename: "AccessOpenedEvent" } & Pick<
-              AccessOpenedEvent,
-              "id"
-            >)
-          | ({ __typename: "CommentDeletedEvent" } & Pick<
-              CommentDeletedEvent,
-              "id"
-            >)
-          | ({ __typename: "CommentPublishedEvent" } & Pick<
-              CommentPublishedEvent,
-              "id"
-            >)
-          | ({ __typename: "MessageCancelledEvent" } & Pick<
-              MessageCancelledEvent,
-              "id"
-            >)
-          | ({ __typename: "MessageScheduledEvent" } & Pick<
-              MessageScheduledEvent,
-              "id"
-            >)
-          | ({ __typename: "MessageSentEvent" } & Pick<MessageSentEvent, "id">)
-          | ({ __typename: "OwnershipTransferredEvent" } & Pick<
-              OwnershipTransferredEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionClosedEvent" } & Pick<
-              PetitionClosedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionClosedNotifiedEvent" } & Pick<
-              PetitionClosedNotifiedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionCompletedEvent" } & Pick<
-              PetitionCompletedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionCreatedEvent" } & Pick<
-              PetitionCreatedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionReopenedEvent" } & Pick<
-              PetitionReopenedEvent,
-              "id"
-            >)
-          | ({ __typename: "ReminderSentEvent" } & Pick<
-              ReminderSentEvent,
-              "id"
-            >)
-          | ({ __typename: "ReplyCreatedEvent" } & Pick<
-              ReplyCreatedEvent,
-              "id"
-            >)
-          | ({ __typename: "ReplyDeletedEvent" } & Pick<
-              ReplyDeletedEvent,
-              "id"
-            >)
-          | ({ __typename: "UserPermissionAddedEvent" } & Pick<
-              UserPermissionAddedEvent,
-              "id"
-            >)
-          | ({ __typename: "UserPermissionEditedEvent" } & Pick<
-              UserPermissionEditedEvent,
-              "id"
-            >)
-          | ({ __typename: "UserPermissionRemovedEvent" } & Pick<
-              UserPermissionRemovedEvent,
-              "id"
-            >)
-        >;
-      };
-    };
+  >;
 };
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
@@ -5287,12 +5205,6 @@ export const PetitionHeader_reopenPetitionDocument = gql`
       id
       status
       updatedAt
-      events(limit: 1000) {
-        items {
-          id
-          __typename
-        }
-      }
     }
   }
 `;
