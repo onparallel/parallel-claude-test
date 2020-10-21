@@ -15,6 +15,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 function Security() {
   const intl = useIntl();
+
   return (
     <PublicLayout
       title={intl.formatMessage({

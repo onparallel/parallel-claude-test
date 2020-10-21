@@ -22,6 +22,7 @@ import {
   useAccountQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -35,6 +36,8 @@ function Account() {
   const {
     data: { me },
   } = assertQuery(useAccountQuery());
+  const sections = useSettingsSections();
+
   const { handleSubmit, register, errors } = useForm<NameChangeFormData>({
     defaultValues: {
       firstName: me.firstName ?? undefined,
@@ -48,84 +51,86 @@ function Account() {
   }
 
   return (
-    <AppLayout
+    <SettingsLayout
       title={intl.formatMessage({
         id: "settings.account",
         defaultMessage: "Account",
       })}
+      basePath="/app/settings"
+      sections={sections}
       user={me}
+      sectionsHeader={
+        <FormattedMessage id="settings.header" defaultMessage="Settings" />
+      }
+      header={
+        <FormattedMessage id="settings.account" defaultMessage="Account" />
+      }
     >
-      <SettingsLayout
-        header={
-          <FormattedMessage id="settings.account" defaultMessage="Account" />
-        }
-      >
-        <Box padding={4}>
-          <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
-            <FormattedMessage
-              id="settings.account.name-header"
-              defaultMessage="Name"
+      <Box padding={4}>
+        <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
+          <FormattedMessage
+            id="settings.account.name-header"
+            defaultMessage="Name"
+          />
+        </Heading>
+        <Stack
+          maxWidth="container.xs"
+          as="form"
+          onSubmit={handleSubmit(onSaveName)}
+        >
+          <FormControl id="first-name" isInvalid={!!errors.firstName}>
+            <FormLabel>
+              <FormattedMessage
+                id="generic.forms.first-name-label"
+                defaultMessage="First name"
+              />
+            </FormLabel>
+            <Input
+              name="firstName"
+              maxLength={255}
+              ref={register({ required: true })}
             />
-          </Heading>
-          <Stack
-            maxWidth="container.xs"
-            as="form"
-            onSubmit={handleSubmit(onSaveName)}
-          >
-            <FormControl id="first-name" isInvalid={!!errors.firstName}>
-              <FormLabel>
+            {errors.firstName && (
+              <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.first-name-label"
-                  defaultMessage="First name"
+                  id="generic.forms.required-first-name-error"
+                  defaultMessage="First name is required"
                 />
-              </FormLabel>
-              <Input
-                name="firstName"
-                maxLength={255}
-                ref={register({ required: true })}
+              </FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl id="last-name" isInvalid={!!errors.lastName}>
+            <FormLabel>
+              <FormattedMessage
+                id="generic.forms.last-name-label"
+                defaultMessage="Last name"
               />
-              {errors.firstName && (
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.required-first-name-error"
-                    defaultMessage="First name is required"
-                  />
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            <FormControl id="last-name" isInvalid={!!errors.lastName}>
-              <FormLabel>
+            </FormLabel>
+            <Input
+              name="lastName"
+              maxLength={255}
+              ref={register({ required: true })}
+            />
+            {errors.lastName && (
+              <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.last-name-label"
-                  defaultMessage="Last name"
+                  id="generic.forms.required-last-name-error"
+                  defaultMessage="Last name is required"
                 />
-              </FormLabel>
-              <Input
-                name="lastName"
-                maxLength={255}
-                ref={register({ required: true })}
+              </FormErrorMessage>
+            )}
+          </FormControl>
+          <Box>
+            <Button type="submit" colorScheme="purple">
+              <FormattedMessage
+                id="settings.account.update-name-button"
+                defaultMessage="Save changes"
               />
-              {errors.lastName && (
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.required-last-name-error"
-                    defaultMessage="Last name is required"
-                  />
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            <Box>
-              <Button type="submit" colorScheme="purple">
-                <FormattedMessage
-                  id="settings.account.update-name-button"
-                  defaultMessage="Save changes"
-                />
-              </Button>
-            </Box>
-          </Stack>
-        </Box>
-      </SettingsLayout>
-    </AppLayout>
+            </Button>
+          </Box>
+        </Stack>
+      </Box>
+    </SettingsLayout>
   );
 }
 

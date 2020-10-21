@@ -1554,6 +1554,10 @@ export type PetitionTemplateHeader_UserFragment = {
   __typename?: "User";
 } & Pick<User, "id">;
 
+export type SettingsLayout_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
 export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
   "fullName" | "organizationRole"
@@ -3534,6 +3538,16 @@ export type AccountQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
 };
 
+export type Settings_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SettingsQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & Settings_UserFragment;
+};
+
 export type Security_updatePasswordMutationVariables = Exact<{
   password: Scalars["String"];
   newPassword: Scalars["String"];
@@ -3892,6 +3906,41 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
     id
   }
 `;
+export const UserMenu_UserFragmentDoc = gql`
+  fragment UserMenu_User on User {
+    fullName
+    organizationRole
+    organization {
+      identifier
+    }
+  }
+`;
+export const AppLayoutNavbar_UserFragmentDoc = gql`
+  fragment AppLayoutNavbar_User on User {
+    ...UserMenu_User
+  }
+  ${UserMenu_UserFragmentDoc}
+`;
+export const OnboardingTour_UserFragmentDoc = gql`
+  fragment OnboardingTour_User on User {
+    onboardingStatus
+  }
+`;
+export const AppLayout_UserFragmentDoc = gql`
+  fragment AppLayout_User on User {
+    id
+    ...AppLayoutNavbar_User
+    ...OnboardingTour_User
+  }
+  ${AppLayoutNavbar_UserFragmentDoc}
+  ${OnboardingTour_UserFragmentDoc}
+`;
+export const SettingsLayout_UserFragmentDoc = gql`
+  fragment SettingsLayout_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -3975,35 +4024,6 @@ export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
     fullName
     email
   }
-`;
-export const UserMenu_UserFragmentDoc = gql`
-  fragment UserMenu_User on User {
-    fullName
-    organizationRole
-    organization {
-      identifier
-    }
-  }
-`;
-export const AppLayoutNavbar_UserFragmentDoc = gql`
-  fragment AppLayoutNavbar_User on User {
-    ...UserMenu_User
-  }
-  ${UserMenu_UserFragmentDoc}
-`;
-export const OnboardingTour_UserFragmentDoc = gql`
-  fragment OnboardingTour_User on User {
-    onboardingStatus
-  }
-`;
-export const AppLayout_UserFragmentDoc = gql`
-  fragment AppLayout_User on User {
-    id
-    ...AppLayoutNavbar_User
-    ...OnboardingTour_User
-  }
-  ${AppLayoutNavbar_UserFragmentDoc}
-  ${OnboardingTour_UserFragmentDoc}
 `;
 export const SupportMethods_UserFragmentDoc = gql`
   fragment SupportMethods_User on User {
@@ -4920,6 +4940,12 @@ export const Account_UserFragmentDoc = gql`
   fragment Account_User on User {
     firstName
     lastName
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+export const Settings_UserFragmentDoc = gql`
+  fragment Settings_User on User {
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
@@ -8488,6 +8514,58 @@ export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
 export type AccountQueryResult = Apollo.QueryResult<
   AccountQuery,
   AccountQueryVariables
+>;
+export const SettingsDocument = gql`
+  query Settings {
+    me {
+      id
+      ...Settings_User
+    }
+  }
+  ${Settings_UserFragmentDoc}
+`;
+
+/**
+ * __useSettingsQuery__
+ *
+ * To run a query within a React component, call `useSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSettingsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSettingsQuery(
+  baseOptions?: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>
+) {
+  return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(
+    SettingsDocument,
+    baseOptions
+  );
+}
+export function useSettingsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SettingsQuery,
+    SettingsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<SettingsQuery, SettingsQueryVariables>(
+    SettingsDocument,
+    baseOptions
+  );
+}
+export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
+export type SettingsLazyQueryHookResult = ReturnType<
+  typeof useSettingsLazyQuery
+>;
+export type SettingsQueryResult = Apollo.QueryResult<
+  SettingsQuery,
+  SettingsQueryVariables
 >;
 export const Security_updatePasswordDocument = gql`
   mutation Security_updatePassword($password: String!, $newPassword: String!) {

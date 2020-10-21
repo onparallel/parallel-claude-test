@@ -1,61 +1,140 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/core";
-import { ChevronRightIcon } from "@parallel/chakra/icons";
+import { gql } from "@apollo/client";
+import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/core";
+import { ArrowBack, ChevronRightIcon } from "@parallel/chakra/icons";
+import { SettingsLayout_UserFragment } from "@parallel/graphql/__types";
+import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRouter } from "next/router";
-import { ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
+import { ReactNode, useCallback } from "react";
+import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
+import { AppLayout } from "./AppLayout";
 
-export interface SettingsLayoutProps {
-  header: ReactNode;
-  children: ReactNode;
-}
+export type SettingsLayoutProps = {
+  basePath: string;
+  title: string;
+  user: SettingsLayout_UserFragment;
+  sections: { title: string; path: string }[];
+  sectionsHeader: ReactNode;
+  isBase?: boolean;
+  header?: ReactNode;
+  children?: ReactNode;
+};
 
-export function SettingsLayout({ header, children }: SettingsLayoutProps) {
+export function SettingsLayout({
+  basePath,
+  isBase,
+  title,
+  user,
+  sections,
+  sectionsHeader,
+  header,
+  children,
+}: SettingsLayoutProps) {
+  const intl = useIntl();
+  const router = useRouter();
+  useOnMediaQueryChange(
+    "md",
+    useCallback(
+      (matches) => {
+        if (isBase && matches) {
+          const defaultPath = sections[0].path;
+          router.push(
+            `/[locale]${defaultPath}`,
+            `/${router.query.locale}${defaultPath}`
+          );
+        }
+      },
+      [sections, router.query.locale]
+    )
+  );
   return (
-    <Flex flex="1">
-      <Box
-        backgroundColor="white"
-        borderRight="1px solid"
-        borderRightColor="gray.100"
-        width={64}
-      >
-        <Box padding={4} borderBottom="1px solid" borderBottomColor="gray.100">
-          <Heading as="h2" size="md">
-            <FormattedMessage id="settings.header" defaultMessage="Settings" />
-          </Heading>
+    <AppLayout title={title} user={user}>
+      <Flex flex="1">
+        <Box
+          backgroundColor="white"
+          borderRight="1px solid"
+          borderRightColor="gray.100"
+          flex="1"
+          maxWidth={isBase ? "auto" : 64}
+          display={{ base: isBase ? "block" : "none", md: "block" }}
+        >
+          <Flex
+            alignItems="center"
+            paddingX={4}
+            height={16}
+            borderBottom="1px solid"
+            borderBottomColor="gray.100"
+          >
+            <Heading as="h2" size="md">
+              {sectionsHeader}
+            </Heading>
+          </Flex>
+          {sections.map((section, index) => (
+            <SettingsLayoutMenuItem key={index} path={section.path}>
+              {section.title}
+            </SettingsLayoutMenuItem>
+          ))}
         </Box>
-        <SettingsLayoutMenuItem section="account">
-          <FormattedMessage id="settings.account" defaultMessage="Account" />
-        </SettingsLayoutMenuItem>
-        <SettingsLayoutMenuItem section="security">
-          <FormattedMessage id="settings.security" defaultMessage="Security" />
-        </SettingsLayoutMenuItem>
-      </Box>
-      <Box flex="1" backgroundColor="white">
-        <Box padding={4} borderBottom="1px solid" borderBottomColor="gray.100">
-          <Heading as="h3" size="md">
-            {header}
-          </Heading>
-        </Box>
-        {children}
-      </Box>
-    </Flex>
+        <Flex
+          display={isBase ? "none" : "block"}
+          direction="column"
+          flex="1"
+          backgroundColor="white"
+        >
+          <Flex
+            flexDirection="row"
+            alignItems="center"
+            height={16}
+            paddingX={4}
+            borderBottom="1px solid"
+            borderBottomColor="gray.100"
+          >
+            <NakedLink href={basePath}>
+              <IconButton
+                as="a"
+                icon={<ArrowBack />}
+                variant="ghost"
+                aria-label={intl.formatMessage({
+                  id: "generic.go-back-button",
+                  defaultMessage: "Go back",
+                })}
+                marginRight={2}
+                display={{ base: "flex", md: "none" }}
+              />
+            </NakedLink>
+            <Heading as="h3" size="md">
+              {header}
+            </Heading>
+          </Flex>
+          <Flex flex="1">{children}</Flex>
+        </Flex>
+      </Flex>
+    </AppLayout>
   );
 }
 
+SettingsLayout.fragments = {
+  User: gql`
+    fragment SettingsLayout_User on User {
+      ...AppLayout_User
+    }
+    ${AppLayout.fragments.User}
+  `,
+};
+
 interface SettingsLayoutMenuItemProps {
-  section: string;
+  path: string;
   children: ReactNode;
 }
 
 function SettingsLayoutMenuItem({
-  section,
+  path,
   children,
 }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
-  const active = pathname === `/[locale]/app/settings/${section}`;
+  const active = pathname === `/[locale]${path}`;
   return (
-    <NakedLink href={`/app/settings/${section}`}>
+    <NakedLink href={path}>
       <Box
         as="a"
         display="block"

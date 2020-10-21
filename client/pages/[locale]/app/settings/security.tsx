@@ -23,6 +23,7 @@ import {
   useSecurityQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -38,6 +39,8 @@ function Security() {
   const {
     data: { me },
   } = assertQuery(useSecurityQuery());
+  const sections = useSettingsSections();
+
   const [updatePassword] = useUpdatePassword();
   const { handleSubmit, register, errors, getValues, setError } = useForm<
     PasswordChangeFormData
@@ -73,116 +76,115 @@ function Security() {
   }
 
   return (
-    <AppLayout
+    <SettingsLayout
       title={intl.formatMessage({
         id: "settings.security",
         defaultMessage: "Security",
       })}
+      basePath="/app/settings"
+      sections={sections}
       user={me}
+      sectionsHeader={
+        <FormattedMessage id="settings.header" defaultMessage="Settings" />
+      }
+      header={
+        <FormattedMessage id="settings.security" defaultMessage="Security" />
+      }
     >
-      <SettingsLayout
-        header={
-          <FormattedMessage id="settings.security" defaultMessage="Security" />
-        }
-      >
-        <Box padding={4}>
-          <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
-            <FormattedMessage
-              id="settings.security.password-header"
-              defaultMessage="Change password"
+      <Box padding={4}>
+        <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
+          <FormattedMessage
+            id="settings.security.password-header"
+            defaultMessage="Change password"
+          />
+        </Heading>
+        <Stack
+          as="form"
+          maxWidth="container.xs"
+          onSubmit={handleSubmit(onChangePassword)}
+        >
+          <FormControl id="password" isInvalid={!!errors.password}>
+            <FormLabel>
+              <FormattedMessage
+                id="generic.forms.old-password-label"
+                defaultMessage="Old password"
+              />
+            </FormLabel>
+            <PasswordInput name="password" ref={register({ required: true })} />
+            {errors.password?.type === "required" && (
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.required-old-password-error"
+                  defaultMessage="Old password is required"
+                />
+              </FormErrorMessage>
+            )}
+            {errors.password?.type === "validate" && (
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.invalid-old-password-error"
+                  defaultMessage="Old password is incorrect"
+                />
+              </FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl id="new-password" isInvalid={!!errors.newPassword}>
+            <FormLabel>
+              <FormattedMessage
+                id="generic.forms.new-password-label"
+                defaultMessage="New password"
+              />
+            </FormLabel>
+            <PasswordInput
+              name="newPassword"
+              ref={register({
+                required: true,
+                validate: (value) => value.length >= 8,
+              })}
             />
-          </Heading>
-          <Stack
-            as="form"
-            maxWidth="container.xs"
-            onSubmit={handleSubmit(onChangePassword)}
-          >
-            <FormControl id="password" isInvalid={!!errors.password}>
-              <FormLabel>
+            {errors.newPassword && (
+              <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.old-password-label"
-                  defaultMessage="Old password"
+                  id="generic.forms.password-policy-error"
+                  defaultMessage="The password must have a least 8 characters"
                 />
-              </FormLabel>
-              <PasswordInput
-                name="password"
-                ref={register({ required: true })}
+              </FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl id="new-password2" isInvalid={!!errors.newPassword2}>
+            <FormLabel>
+              <FormattedMessage
+                id="generic.forms.confirm-password-label"
+                defaultMessage="Confirm password"
               />
-              {errors.password?.type === "required" && (
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.required-old-password-error"
-                    defaultMessage="Old password is required"
-                  />
-                </FormErrorMessage>
-              )}
-              {errors.password?.type === "validate" && (
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.invalid-old-password-error"
-                    defaultMessage="Old password is incorrect"
-                  />
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            <FormControl id="new-password" isInvalid={!!errors.newPassword}>
-              <FormLabel>
+            </FormLabel>
+            <PasswordInput
+              name="newPassword2"
+              ref={register({
+                required: true,
+                validate: (value) => value === getValues().newPassword,
+              })}
+            />
+            {errors.newPassword2 && (
+              <FormErrorMessage>
                 <FormattedMessage
-                  id="generic.forms.new-password-label"
-                  defaultMessage="New password"
+                  id="generic.forms.passwords-must-match"
+                  defaultMessage="Passwords must match"
                 />
-              </FormLabel>
-              <PasswordInput
-                name="newPassword"
-                ref={register({
-                  required: true,
-                  validate: (value) => value.length >= 8,
-                })}
+              </FormErrorMessage>
+            )}
+          </FormControl>
+          <Box>
+            <Button type="submit" colorScheme="purple" mt="2">
+              <FormattedMessage
+                id="settings.account.change-password-button"
+                defaultMessage="Change password"
               />
-              {errors.newPassword && (
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.password-policy-error"
-                    defaultMessage="The password must have a least 8 characters"
-                  />
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            <FormControl id="new-password2" isInvalid={!!errors.newPassword2}>
-              <FormLabel>
-                <FormattedMessage
-                  id="generic.forms.confirm-password-label"
-                  defaultMessage="Confirm password"
-                />
-              </FormLabel>
-              <PasswordInput
-                name="newPassword2"
-                ref={register({
-                  required: true,
-                  validate: (value) => value === getValues().newPassword,
-                })}
-              />
-              {errors.newPassword2 && (
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.passwords-must-match"
-                    defaultMessage="Passwords must match"
-                  />
-                </FormErrorMessage>
-              )}
-            </FormControl>
-            <Box>
-              <Button type="submit" colorScheme="purple" mt="2">
-                <FormattedMessage
-                  id="settings.account.change-password-button"
-                  defaultMessage="Change password"
-                />
-              </Button>
-            </Box>
-          </Stack>
-        </Box>
-      </SettingsLayout>
-    </AppLayout>
+            </Button>
+          </Box>
+        </Stack>
+      </Box>
+    </SettingsLayout>
   );
 }
 
