@@ -510,9 +510,9 @@
     "context": "Log out"
   },
   {
-    "term": "component.user-menu.my-account",
-    "definition": "Mi cuenta",
-    "context": "My Account"
+    "term": "component.user-menu.settings",
+    "definition": "Ajustes",
+    "context": "Settings"
   },
   {
     "term": "component.user-menu.ui-language",

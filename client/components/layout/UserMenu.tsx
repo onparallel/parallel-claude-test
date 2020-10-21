@@ -59,12 +59,12 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
       </MenuButton>
       <Portal>
         <MenuList>
-          <NakedLink href="/app/settings/account">
+          <NakedLink href="/app/settings">
             <MenuItem as="a">
               <UserIcon marginRight={2} />
               <FormattedMessage
-                id="component.user-menu.my-account"
-                defaultMessage="My Account"
+                id="component.user-menu.settings"
+                defaultMessage="Settings"
               />
             </MenuItem>
           </NakedLink>
