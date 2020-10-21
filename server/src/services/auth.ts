@@ -1,7 +1,7 @@
 import { CognitoUserSession } from "amazon-cognito-identity-js";
 import { map } from "async";
 import DataLoader from "dataloader";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { inject, injectable } from "inversify";
 import jwtDecode from "jwt-decode";
 import { ApiContext } from "../context";
@@ -12,23 +12,12 @@ import { Cognito } from "./cognito";
 import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
-  login(
-    req: Request & { context: ApiContext },
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
-  logout(req: Request, res: Response, next: NextFunction): Promise<void>;
-  newPassword(req: Request, res: Response, next: NextFunction): Promise<void>;
-  forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
-  confirmForgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
+  login: RequestHandler;
+  logout: RequestHandler;
+  newPassword: RequestHandler;
+  forgotPassword: RequestHandler;
+  confirmForgotPassword: RequestHandler;
+  validateSession: (session: string) => Promise<string | null>;
 }
 
 export const AUTH = Symbol.for("AUTH");

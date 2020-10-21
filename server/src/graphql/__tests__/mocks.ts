@@ -8,7 +8,9 @@ export const userCognitoId = "test-cognito-id";
 
 @injectable()
 export class MockAuth implements IAuth {
-  validateSession: any = () => userCognitoId;
+  async validateSession() {
+    return userCognitoId;
+  }
   async login() {}
   async logout() {}
   async newPassword() {}
