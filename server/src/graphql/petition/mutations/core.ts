@@ -90,24 +90,25 @@ export const createPetition = mutationField("createPetition", {
         is_template: isTemplate,
         status: isTemplate ? null : "DRAFT",
       });
-      ctx.analytics.trackEvent(
-        "PETITION_CLONED",
-        {
-          from_petition_id: petitionId,
-          petition_id: cloned.id,
-          user_id: ctx.user!.id,
-          type: isTemplate ? "TEMPLATE" : "PETITION",
-        },
-        toGlobalId("User", ctx.user!.id)
-      );
 
       const originalPetition = (await ctx.petitions.loadPetition(petitionId))!;
-      if (originalPetition.is_template && !isTemplate) {
+      if (originalPetition.is_template) {
         ctx.analytics.trackEvent(
           "TEMPLATE_USED",
           {
             template_id: petitionId,
             user_id: ctx.user!.id,
+          },
+          toGlobalId("User", ctx.user!.id)
+        );
+      } else {
+        ctx.analytics.trackEvent(
+          "PETITION_CLONED",
+          {
+            from_petition_id: petitionId,
+            petition_id: cloned.id,
+            user_id: ctx.user!.id,
+            type: cloned.is_template ? "TEMPLATE" : "PETITION",
           },
           toGlobalId("User", ctx.user!.id)
         );
@@ -165,9 +166,27 @@ export const clonePetitions = mutationField("clonePetitions", {
           petitionId
         ))!;
         const mark = `(${locale === "es" ? "copia" : "copy"})`;
-        return await ctx.petitions.clonePetition(petitionId, ctx.user!, {
-          name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
-        });
+
+        const cloned = await ctx.petitions.clonePetition(
+          petitionId,
+          ctx.user!,
+          {
+            name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
+          }
+        );
+
+        ctx.analytics.trackEvent(
+          "PETITION_CLONED",
+          {
+            from_petition_id: petitionId,
+            petition_id: cloned.id,
+            user_id: ctx.user!.id,
+            type: cloned.is_template ? "TEMPLATE" : "PETITION",
+          },
+          toGlobalId("User", ctx.user!.id)
+        );
+
+        return cloned;
       }
     );
   },
