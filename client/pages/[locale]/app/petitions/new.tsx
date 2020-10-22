@@ -452,6 +452,7 @@ function NewPetitionHeader({
         })}
         value={search}
         onChange={handleSearchChange}
+        backgroundColor="white"
       />
       <Flex marginTop={2} fontSize="sm">
         <Flex flexWrap="wrap" paddingLeft={2}>
