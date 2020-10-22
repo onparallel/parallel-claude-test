@@ -91,8 +91,8 @@ export class AnalyticsService implements IAnalyticsService {
       userId: toGlobalId("User", user.id),
       traits: {
         email: user.email,
-        created_at: user.created_at.toString(),
-        last_active_at: user.last_active_at?.toString(),
+        createdAt: user.created_at.toISOString(),
+        lastActiveAt: user.last_active_at?.toISOString(),
       },
     });
   }
