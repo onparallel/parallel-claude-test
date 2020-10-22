@@ -479,6 +479,7 @@ function NewPetitionHeader({
         </Flex>
         <Spacer />
         <Select
+          flexShrink={0}
           aria-label={intl.formatMessage({
             id: "new-petition.select-label",
             defaultMessage: "Language filter",
@@ -487,6 +488,7 @@ function NewPetitionHeader({
           size="sm"
           width="auto"
           textAlign="right"
+          height={5}
           value={locale ?? ""}
           onChange={handleLocaleChange}
         >
