@@ -1,6 +1,6 @@
 # PRIVACY POLICY
 
-*Last modified: November, 2019.*
+_Last modified: November, 2019._
 
 Your privacy is important for PARALLEL. This Privacy Policy explains what information we collect about you and why, what we do with that information, and how we handle that information
 At PARALLEL, we care about the confidentiality and privacy of your data and are fully committed to protecting it. This is something that will never change. PARALLEL is not in the business of selling or renting your information. PARALLEL shall not sell your personal data to third parties and shall only share it when necessary for the rendering of the PARALLEL service as stated below.
@@ -33,7 +33,7 @@ PARALLEL shall process as controller your personal data to provide you with the 
 
 2.5. PARALLEL may share the personal data with third parties, some of which may be located outside of the European Economic Area, only for the provision of the Service and at all times subject to the guarantees and requirements provided by applicable data protection laws.
 
-2.6. The User may at all times exercise his rights to access, rectification, erasure and restriction of processing and data portability as provided in the GPDR and applicable regulations by contacting PARALLEL at Avinguda Meridiana, nº 89, planta 4, 08960, Barcelona (Spain); or, by sending an email to privacy@parallel.so. The User may also lodge a complaint before the Spanish Data Protection Authority at www.agpd.es.
+2.6. The User may at all times exercise his rights to access, rectification, erasure and restriction of processing and data portability as provided in the GPDR and applicable regulations by contacting PARALLEL at C/Almogàvers 165, 59.203, 08018 Barcelona (Spain); or, by sending an email to privacy@parallel.so. The User may also lodge a complaint before the Spanish Data Protection Authority at www.agpd.es.
 
 If at any time the User wishes to stop receiving communications regarding PARALLEL or with commercial information about the Service, the User may request so by sending an email to privacy@parallel.so
 
@@ -45,26 +45,27 @@ The Service may imply the access and processing by PARALLEL of personal data con
 
 The Accessed Data shall comprise:
 
-* Information required to identify the emails sent through the Service:
-    * information of the recipients;
-    * subject and body of the email;
-    * files requested through the Service;
-    * language for the communications with the recipients; and
-    * date and time in which the email was sent; and
+- Information required to identify the emails sent through the Service:
 
-* Information provided by the Service:
-    * file response status and timestamp;
-    * file delivery by the recipient status;
-    * file storage address;
-    * reminders (number, date and time) sent;
+  - information of the recipients;
+  - subject and body of the email;
+  - files requested through the Service;
+  - language for the communications with the recipients; and
+  - date and time in which the email was sent; and
+
+- Information provided by the Service:
+  - file response status and timestamp;
+  - file delivery by the recipient status;
+  - file storage address;
+  - reminders (number, date and time) sent;
 
 Accessed Data is the only information to which PARALLEL shall access to provide the Service.
 
 PARALLEL guarantees that:
 
-* PARALLEL will never send emails on your behalf, we only send the requests from our domain address
-* PARALLEL will never share the content of your emails or your recipients replies with third parties
-* PARALLEL will never share your browsing data with third parties
+- PARALLEL will never send emails on your behalf, we only send the requests from our domain address
+- PARALLEL will never share the content of your emails or your recipients replies with third parties
+- PARALLEL will never share your browsing data with third parties
 
 The processing of the above personal data is only carried out for the provision of the Service within the terms and duration stated in the **[Service Terms and Conditions](/en/legal/terms)**.
 
@@ -92,15 +93,15 @@ The processing of the above personal data is only carried out for the provision 
 
 In this respect, the following sub-processors are deemed as authorized by the User:
 
-* Amazon Web Services, Inc. as provider of the hosting of the Service, through servers located in Ireland.
-* Google services: Google Analytics
-* Hotjar and Mixpanel, for the usage feedback of the Service
+- Amazon Web Services, Inc. as provider of the hosting of the Service, through servers located in Ireland.
+- Google services: Google Analytics
+- Hotjar and Mixpanel, for the usage feedback of the Service
 
-3.4. PARALLEL shall guarantee the confidentiality of the Accessed Data, even after the termination of the Service.
+  3.4. PARALLEL shall guarantee the confidentiality of the Accessed Data, even after the termination of the Service.
 
-3.5. The User is the data controller of the processing of the Accessed Data within the meaning in GDPR. The User is the only one deciding the purposes and means for the processing of Accessed Data, so PARALLEL does not use Accessed Data for its own purposes and only uses them for the rendering of the Service and on behalf of the User. To such extent, the User shall have to comply with applicable obligations under data protection regulations, including relying on an appropriate legal basis for the processing of personal data of the recipients of the emails sent through the Service. The User, and not PARALLEL, shall be solely responsible for the compliance with such obligations.
+  3.5. The User is the data controller of the processing of the Accessed Data within the meaning in GDPR. The User is the only one deciding the purposes and means for the processing of Accessed Data, so PARALLEL does not use Accessed Data for its own purposes and only uses them for the rendering of the Service and on behalf of the User. To such extent, the User shall have to comply with applicable obligations under data protection regulations, including relying on an appropriate legal basis for the processing of personal data of the recipients of the emails sent through the Service. The User, and not PARALLEL, shall be solely responsible for the compliance with such obligations.
 
-3.6. The User acknowledges and agrees that the use of the Service and the processing of the Accessed Data as a result of the same is its own free and exclusive decision and has verified that the conditions of the Service and the processing of the Accessed Data are in line with its interests.
+  3.6. The User acknowledges and agrees that the use of the Service and the processing of the Accessed Data as a result of the same is its own free and exclusive decision and has verified that the conditions of the Service and the processing of the Accessed Data are in line with its interests.
 
 ## 4. Security
 
@@ -136,7 +137,7 @@ Your credit card information is safe. PARALLEL does not have access to your cred
 
 PARALLEL guarantees that:
 
-* PARALLEL will never send emails on your behalf, we only send the requests from our domain address
-* PARALLEL will never share the content of your emails or your recipients replies with third parties
+- PARALLEL will never send emails on your behalf, we only send the requests from our domain address
+- PARALLEL will never share the content of your emails or your recipients replies with third parties
 
 PARALLEL will never share your browsing data with third parties

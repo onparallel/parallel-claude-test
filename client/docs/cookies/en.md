@@ -16,10 +16,10 @@ If you decide not to accept our cookies, you will be able to continue using our 
 
 Below, PARALLEL SOLUTIONS, S.L lists the types of cookies used on the website, as well as the purpose of these and, where appropriate, the third-party cookies used (service provider):
 
-* User input cookies: Temporal store of users actions to provide the services.
-* User authentication cookies: Authenticate users in our system.
-* Cookies for customizing the user interface: Save the user's preferred language.
-* Cookies for usage tracking: Track usage to improve the services.
+- User input cookies: Temporal store of users actions to provide the services.
+- User authentication cookies: Authenticate users in our system.
+- Cookies for customizing the user interface: Save the user's preferred language.
+- Cookies for usage tracking: Track usage to improve the services.
 
 ## Uninstalling Cookies
 
@@ -29,10 +29,10 @@ You can allow, discover, block or remove the cookies installed on your PC/device
 
 Information on how to do this can be found at the following addresses:
 
-* Firefox at https://support.mozilla.org/t5/Cookies-and-cache/Enable-and-disable-cookies-that-websites-use-to-track-your/ta-p/2784
-* Chrome at http://support.google.com/chrome/bin/answer.py?hl=es&answer=95647
-* Explorer at http://windows.microsoft.com/es-es/windows7/how-to-manage-cookies-in-internet-explorer-9
-* Safari at http://support.apple.com/kb/ph5042
+- Firefox at https://support.mozilla.org/t5/Cookies-and-cache/Enable-and-disable-cookies-that-websites-use-to-track-your/ta-p/2784
+- Chrome at http://support.google.com/chrome/bin/answer.py?hl=es&answer=95647
+- Explorer at http://windows.microsoft.com/es-es/windows7/how-to-manage-cookies-in-internet-explorer-9
+- Safari at http://support.apple.com/kb/ph5042
 
 ## Changes in the Cookies Policy
 

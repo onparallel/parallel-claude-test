@@ -110,7 +110,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               </MjmlSocialElement>
             </MjmlSocial>
             <MjmlText align="center" fontSize="12px">
-              {`Parallel Solutions, S.L. - Av. Meridiana 89, 08026 Barcelona, Spain`}
+              {`Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`}
             </MjmlText>
             <MjmlText align="center" fontSize="12px">
               <a className="link" href={`${parallelUrl}/${locale}/legal/terms`}>
