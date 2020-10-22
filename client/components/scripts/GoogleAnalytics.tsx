@@ -30,7 +30,7 @@ export const GoogleAnalytics = memo(() => {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', '${gtagId}', { 'send_page_view': false });
-          `.replaceAll(/\s*\n\s*/g, " "),
+          `.replace(/\s*\n\s*/g, ""),
         }}
       />
     </Head>
