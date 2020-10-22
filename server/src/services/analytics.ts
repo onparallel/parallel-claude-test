@@ -65,7 +65,7 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
-  identifyUser(user: Pick<User, "id" | "email">): void;
+  identifyUser(user: User): void;
 
   trackEvent<EventType extends AnalyticsEventType>(
     eventName: EventType,
@@ -86,9 +86,7 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  identifyUser(
-    user: Pick<User, "id" | "email" | "last_active_at" | "created_at">
-  ) {
+  identifyUser(user: User) {
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
       traits: {
