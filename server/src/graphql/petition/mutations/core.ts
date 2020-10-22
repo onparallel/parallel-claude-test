@@ -92,7 +92,7 @@ export const createPetition = mutationField("createPetition", {
       });
 
       const originalPetition = (await ctx.petitions.loadPetition(petitionId))!;
-      if (originalPetition.is_template) {
+      if (originalPetition.is_template && !isTemplate) {
         ctx.analytics.trackEvent(
           "TEMPLATE_USED",
           {
@@ -101,7 +101,7 @@ export const createPetition = mutationField("createPetition", {
           },
           toGlobalId("User", ctx.user!.id)
         );
-      } else {
+      } else if (!originalPetition.is_template && !isTemplate) {
         ctx.analytics.trackEvent(
           "PETITION_CLONED",
           {
