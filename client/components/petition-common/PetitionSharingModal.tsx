@@ -7,6 +7,7 @@ import {
   Center,
   Checkbox,
   Circle,
+  Collapse,
   Flex,
   Menu,
   MenuButton,
@@ -42,7 +43,9 @@ import {
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
-import { useCallback, useRef, useState, KeyboardEvent } from "react";
+import useMergedRef from "@react-hook/merged-ref";
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogOpenerProvider";
@@ -50,11 +53,10 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { Spacer } from "../common/Spacer";
 import {
   UserSelect,
-  UserSelectSelection,
   UserSelectInstance,
+  UserSelectSelection,
 } from "../common/UserSelect";
 import { UserPermissionType } from "./UserPermissionType";
-import { useForm, Controller } from "react-hook-form";
 
 export type PetitionSharingModalProps = Omit<ModalProps, "children"> & {
   userId: string;
@@ -80,7 +82,7 @@ export function PetitionSharingModal({
     (up) => up.permissionType === "OWNER" && up.user.id === userId
   );
 
-  const { handleSubmit, register, control, getValues } = useForm<
+  const { handleSubmit, register, control, watch } = useForm<
     PetitionSharingModalData
   >({
     mode: "onChange",
@@ -91,6 +93,9 @@ export function PetitionSharingModal({
     },
   });
   const [hasUsers, setHasUsers] = useState(false);
+
+  const usersRef = useRef<UserSelectInstance>(null);
+  const messageRef = useRef<HTMLInputElement>(null);
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
@@ -115,7 +120,7 @@ export function PetitionSharingModal({
         await addPetitionUserPermission({
           variables: {
             petitionId,
-            userIds: getValues("users").map((u) => u.id),
+            userIds: users.map((u) => u.id),
             permissionType: "WRITE",
             notify,
             message: message || null,
@@ -134,10 +139,15 @@ export function PetitionSharingModal({
         });
       } catch {}
     }),
-    [addPetitionUserPermission, handleSubmit, getValues, props.onClose]
+    [addPetitionUserPermission, handleSubmit, props.onClose]
   );
 
-  const usersRef = useRef<UserSelectInstance>(null);
+  const notify = watch("notify");
+  useEffect(() => {
+    if (notify) {
+      setTimeout(() => messageRef.current?.focus());
+    }
+  }, [notify]);
 
   return (
     <Modal {...props} size="xl" initialFocusRef={usersRef as any}>
@@ -224,19 +234,21 @@ export function PetitionSharingModal({
                       defaultMessage="Notify users"
                     />
                   </Checkbox>
-                  <GrowingTextarea
-                    name="message"
-                    ref={register}
-                    maxHeight="30vh"
-                    aria-label={intl.formatMessage({
-                      id: "petition-sharing.message-placeholder",
-                      defaultMessage: "Message",
-                    })}
-                    placeholder={intl.formatMessage({
-                      id: "petition-sharing.message-placeholder",
-                      defaultMessage: "Message",
-                    })}
-                  />
+                  <Collapse isOpen={notify}>
+                    <GrowingTextarea
+                      name="message"
+                      ref={useMergedRef(messageRef, register)}
+                      maxHeight="30vh"
+                      aria-label={intl.formatMessage({
+                        id: "petition-sharing.message-placeholder",
+                        defaultMessage: "Message",
+                      })}
+                      placeholder={intl.formatMessage({
+                        id: "petition-sharing.message-placeholder",
+                        defaultMessage: "Message",
+                      })}
+                    />
+                  </Collapse>
                 </Stack>
                 <Stack display={hasUsers ? "none" : "flex"} paddingTop={2}>
                   {userPermissions.map(({ user, permissionType }) => (
