@@ -86,10 +86,33 @@ export const createPetition = mutationField("createPetition", {
   resolve: async (_, { name, locale, petitionId, type }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     if (petitionId) {
-      return await ctx.petitions.clonePetition(petitionId, ctx.user!, {
+      const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
         is_template: isTemplate,
         status: isTemplate ? null : "DRAFT",
       });
+      ctx.analytics.trackEvent(
+        "PETITION_CLONED",
+        {
+          from_petition_id: petitionId,
+          petition_id: cloned.id,
+          user_id: ctx.user!.id,
+          type: isTemplate ? "TEMPLATE" : "PETITION",
+        },
+        toGlobalId("User", ctx.user!.id)
+      );
+
+      const originalPetition = (await ctx.petitions.loadPetition(petitionId))!;
+      if (originalPetition.is_template && !isTemplate) {
+        ctx.analytics.trackEvent(
+          "TEMPLATE_USED",
+          {
+            template_id: petitionId,
+            user_id: ctx.user!.id,
+          },
+          toGlobalId("User", ctx.user!.id)
+        );
+      }
+      return cloned;
     } else {
       const newPetition = await ctx.petitions.createPetition(
         {
@@ -528,6 +551,14 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
           user_id: ctx.user!.id,
         },
       });
+      ctx.analytics.trackEvent(
+        "PETITION_CLOSED",
+        {
+          petition_id: petition.id,
+          user_id: ctx.user!.id,
+        },
+        toGlobalId("User", ctx.user!.id)
+      );
     }
     return { petition, fields };
   },
