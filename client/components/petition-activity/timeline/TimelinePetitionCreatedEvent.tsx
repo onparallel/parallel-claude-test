@@ -36,13 +36,11 @@ export function TimelinePetitionCreatedEvent({
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={user} />,
           timeAgo: (
-            <Link>
-              <DateTime
-                value={createdAt}
-                format={FORMATS.LLL}
-                useRelativeTime="always"
-              />
-            </Link>
+            <DateTime
+              value={createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime="always"
+            />
           ),
         }}
       />

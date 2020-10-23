@@ -87,17 +87,14 @@ export const theme = extendTheme({
     },
     Link: {
       baseStyle: {
-        cursor: "default",
-        "&[href]": {
-          cursor: "pointer",
-          color: "purple.600",
-          _hover: {
-            color: "purple.700",
-            textDecoration: "none",
-          },
-          _active: {
-            color: "purple.800",
-          },
+        cursor: "pointer",
+        color: "purple.600",
+        _hover: {
+          color: "purple.700",
+          textDecoration: "none",
+        },
+        _active: {
+          color: "purple.800",
         },
       },
     },

@@ -35,13 +35,11 @@ export function TimelineReplyDeletedEvent({
           ),
           field: <PetitionFieldReference field={field} />,
           timeAgo: (
-            <Link>
-              <DateTime
-                value={createdAt}
-                format={FORMATS.LLL}
-                useRelativeTime="always"
-              />
-            </Link>
+            <DateTime
+              value={createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime="always"
+            />
           ),
         }}
       />

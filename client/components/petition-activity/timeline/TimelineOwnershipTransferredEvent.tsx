@@ -37,13 +37,11 @@ export function TimelineOwnershipTransferredEvent({
           user: <UserReference user={event.user} />,
           owner: <UserReference user={event.owner} />,
           timeAgo: (
-            <Link>
-              <DateTime
-                value={event.createdAt}
-                format={FORMATS.LLL}
-                useRelativeTime="always"
-              />
-            </Link>
+            <DateTime
+              value={event.createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime="always"
+            />
           ),
         }}
       />

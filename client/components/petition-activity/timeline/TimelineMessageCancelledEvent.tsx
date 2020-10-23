@@ -43,13 +43,11 @@ export function TimelineMessageCancelledEvent({
             <DeletedContact />
           ),
           timeAgo: (
-            <Link>
-              <DateTime
-                value={createdAt}
-                format={FORMATS.LLL}
-                useRelativeTime="always"
-              />
-            </Link>
+            <DateTime
+              value={createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime="always"
+            />
           ),
         }}
       />

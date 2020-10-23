@@ -43,13 +43,11 @@ export function TimelineReminderSentEvent({
               <DeletedContact />
             ),
             timeAgo: (
-              <Link>
-                <DateTime
-                  value={createdAt}
-                  format={FORMATS.LLL}
-                  useRelativeTime="always"
-                />
-              </Link>
+              <DateTime
+                value={createdAt}
+                format={FORMATS.LLL}
+                useRelativeTime="always"
+              />
             ),
           }}
         />
@@ -64,13 +62,11 @@ export function TimelineReminderSentEvent({
               <DeletedContact />
             ),
             timeAgo: (
-              <Link>
-                <DateTime
-                  value={createdAt}
-                  format={FORMATS.LLL}
-                  useRelativeTime="always"
-                />
-              </Link>
+              <DateTime
+                value={createdAt}
+                format={FORMATS.LLL}
+                useRelativeTime="always"
+              />
             ),
           }}
         />

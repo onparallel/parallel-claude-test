@@ -49,18 +49,18 @@ export function TimelineMessageScheduledEvent({
                 <DeletedContact />
               ),
               scheduledAt: (
-                <Link fontWeight="bold">
-                  <DateTime value={message.scheduledAt!} format={FORMATS.LLL} />
-                </Link>
+                <DateTime
+                  fontWeight="bold"
+                  value={message.scheduledAt!}
+                  format={FORMATS.LLL}
+                />
               ),
               timeAgo: (
-                <Link>
-                  <DateTime
-                    value={createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
-                </Link>
+                <DateTime
+                  value={createdAt}
+                  format={FORMATS.LLL}
+                  useRelativeTime="always"
+                />
               ),
             }}
           />

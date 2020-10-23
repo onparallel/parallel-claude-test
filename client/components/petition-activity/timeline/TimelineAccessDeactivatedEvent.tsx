@@ -42,13 +42,11 @@ export function TimelineAccessDeactivatedEvent({
             <DeletedContact />
           ),
           timeAgo: (
-            <Link>
-              <DateTime
-                value={event.createdAt}
-                format={FORMATS.LLL}
-                useRelativeTime="always"
-              />
-            </Link>
+            <DateTime
+              value={event.createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime="always"
+            />
           ),
         }}
       />
