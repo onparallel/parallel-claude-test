@@ -913,15 +913,22 @@ export const InfoOutlineIcon = createIcon({
   displayName: "InfoOutlineIcon",
   viewBox: "0 0 24 24",
   path: (
-    <g
-      fill="currentColor"
-      stroke="currentColor"
-      strokeLinecap="square"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" fill="none" r="11" stroke="currentColor"></circle>
-      <line fill="none" x1="11.959" x2="11.959" y1="11" y2="17"></line>
-      <circle cx="11.959" cy="7" r="1" stroke="none"></circle>
+    <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2">
+      <circle cx="12" cy="12" r="11" stroke="currentColor"></circle>
+      <line x1="12" x2="12" y1="11" y2="17"></line>
+      <circle cx="12" cy="7" r="1" fill="currentColor" stroke="none"></circle>
+    </g>
+  ),
+});
+
+export const HelpOutlineIcon = createIcon({
+  displayName: "HelpOutlineIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2">
+      <circle cx="12" cy="12" r="11"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
     </g>
   ),
 });

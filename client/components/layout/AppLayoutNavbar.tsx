@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Flex, List, ListItem, Stack } from "@chakra-ui/core";
 import {
   AddIcon,
-  InfoOutlineIcon,
+  HelpOutlineIcon,
   PaperPlaneIcon,
   PaperPlanesIcon,
   UsersIcon,
@@ -189,7 +189,7 @@ export const AppLayoutNavbar = Object.assign(
                     id: "navbar.start-tour",
                     defaultMessage: "Guide me around",
                   })}
-                  icon={<InfoOutlineIcon />}
+                  icon={<HelpOutlineIcon fontSize="20px" />}
                   variant="ghost"
                   placement="right"
                   isRound
