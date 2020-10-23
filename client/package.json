@@ -11,9 +11,7 @@
     "extract-i18n-terms": "yarn workspace @parallel/bin extract-i18n-terms --locales en es --input '../client/{components,pages,utils}/**/*.{ts,tsx}' --output '../client/lang'",
     "generate-i18n-files": "yarn workspace @parallel/bin generate-i18n-files --locales en es --input '../client/lang' --output-raw '../client/public/static/lang' --output-compiled '../client/public/static/lang/compiled'",
     "build-production": "yarn clean && cross-env ENV=production next build && cross-env ENV=production next export",
-    "deploy-static-landing-prod": "aws s3 sync out s3://parallel-static-landing-prod --profile parallel-deploy && aws cloudfront create-invalidation --distribution-id E200FE05XP92NJ --paths \"/*\" --profile parallel-deploy",
-    "build-staging": "yarn clean && cross-env ENV=staging next build && cross-env ENV=production next export && echo Disallow: / >> out/robots.txt",
-    "deploy-static-landing-staging": "aws s3 sync out s3://parallel-static-landing-staging --profile parallel-deploy && aws cloudfront create-invalidation --distribution-id E2JVYY22XTRJ1B --paths \"/*\" --profile parallel-deploy"
+    "build-staging": "yarn clean && cross-env ENV=staging next build && cross-env ENV=production next export && echo Disallow: / >> out/robots.txt"
   },
   "dependencies": {
     "@apollo/client": "^3.2.4",
