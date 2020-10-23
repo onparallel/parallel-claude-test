@@ -62,18 +62,15 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
           <NakedLink href="/app/settings">
             <MenuItem as="a">
               <UserIcon marginRight={2} />
-              <FormattedMessage
-                id="component.user-menu.settings"
-                defaultMessage="Settings"
-              />
+              <FormattedMessage id="settings.title" defaultMessage="Settings" />
             </MenuItem>
           </NakedLink>
           {isAdmin ? (
-            <NakedLink href="/app/admin/support">
+            <NakedLink href="/app/admin">
               <MenuItem as="a">
                 <KeyIcon marginRight={2} />
                 <FormattedMessage
-                  id="component.user-menu.admin-panel"
+                  id="admin.title"
                   defaultMessage="Admin panel"
                 />
               </MenuItem>

@@ -60,7 +60,7 @@ function Account() {
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage id="settings.header" defaultMessage="Settings" />
+        <FormattedMessage id="settings.title" defaultMessage="Settings" />
       }
       header={
         <FormattedMessage id="settings.account" defaultMessage="Account" />

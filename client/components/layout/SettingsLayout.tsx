@@ -49,7 +49,7 @@ export function SettingsLayout({
   );
   return (
     <AppLayout title={title} user={user}>
-      <Flex flex="1">
+      <Flex flex="1" maxHeight="100vh">
         <Box
           backgroundColor="white"
           borderRight="1px solid"
@@ -76,7 +76,7 @@ export function SettingsLayout({
           ))}
         </Box>
         <Flex
-          display={isBase ? "none" : "block"}
+          display={isBase ? "none" : "flex"}
           direction="column"
           flex="1"
           backgroundColor="white"
@@ -106,7 +106,9 @@ export function SettingsLayout({
               {header}
             </Heading>
           </Flex>
-          <Flex flex="1">{children}</Flex>
+          <Flex flex="1" minHeight={0} overflow="auto">
+            {children}
+          </Flex>
         </Flex>
       </Flex>
     </AppLayout>

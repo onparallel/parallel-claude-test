@@ -3245,7 +3245,7 @@
     "context": "Save changes"
   },
   {
-    "term": "settings.header",
+    "term": "settings.title",
     "definition": "Ajustes",
     "context": "Settings"
   },

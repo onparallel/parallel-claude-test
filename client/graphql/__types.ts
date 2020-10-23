@@ -1465,6 +1465,19 @@ export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
   "id" | "fullName" | "email"
 >;
 
+export type WithSuperAdminAccessQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type WithSuperAdminAccessQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "organizationRole"> & {
+      organization: { __typename?: "Organization" } & Pick<
+        Organization,
+        "identifier"
+      >;
+    };
+};
+
 export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id"
@@ -2469,6 +2482,16 @@ export type RecipientViewSenderCard_PublicUserFragment = {
     >;
   };
 
+export type Admin_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type AdminQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AdminQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & Admin_UserFragment;
+};
+
 export type SupportMethods_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
@@ -2476,12 +2499,7 @@ export type SupportMethods_UserFragment = {
 export type SupportMethodsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SupportMethodsUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "organizationRole"> & {
-      organization: { __typename?: "Organization" } & Pick<
-        Organization,
-        "identifier"
-      >;
-    } & SupportMethods_UserFragment;
+  me: { __typename?: "User" } & SupportMethods_UserFragment;
 };
 
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
@@ -4025,6 +4043,12 @@ export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
     email
   }
 `;
+export const Admin_UserFragmentDoc = gql`
+  fragment Admin_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
 export const SupportMethods_UserFragmentDoc = gql`
   fragment SupportMethods_User on User {
     ...AppLayout_User
@@ -5170,6 +5194,64 @@ export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
     name
   }
 `;
+export const WithSuperAdminAccessDocument = gql`
+  query WithSuperAdminAccess {
+    me {
+      organizationRole
+      organization {
+        identifier
+      }
+    }
+  }
+`;
+
+/**
+ * __useWithSuperAdminAccessQuery__
+ *
+ * To run a query within a React component, call `useWithSuperAdminAccessQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWithSuperAdminAccessQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWithSuperAdminAccessQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useWithSuperAdminAccessQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    WithSuperAdminAccessQuery,
+    WithSuperAdminAccessQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    WithSuperAdminAccessQuery,
+    WithSuperAdminAccessQueryVariables
+  >(WithSuperAdminAccessDocument, baseOptions);
+}
+export function useWithSuperAdminAccessLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    WithSuperAdminAccessQuery,
+    WithSuperAdminAccessQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    WithSuperAdminAccessQuery,
+    WithSuperAdminAccessQueryVariables
+  >(WithSuperAdminAccessDocument, baseOptions);
+}
+export type WithSuperAdminAccessQueryHookResult = ReturnType<
+  typeof useWithSuperAdminAccessQuery
+>;
+export type WithSuperAdminAccessLazyQueryHookResult = ReturnType<
+  typeof useWithSuperAdminAccessLazyQuery
+>;
+export type WithSuperAdminAccessQueryResult = Apollo.QueryResult<
+  WithSuperAdminAccessQuery,
+  WithSuperAdminAccessQueryVariables
+>;
 export const AppLayout_updateOnboardingStatusDocument = gql`
   mutation AppLayout_updateOnboardingStatus(
     $key: OnboardingKey!
@@ -5635,13 +5717,56 @@ export type useTemplateDetailsDialogPetitionQueryResult = Apollo.QueryResult<
   useTemplateDetailsDialogPetitionQuery,
   useTemplateDetailsDialogPetitionQueryVariables
 >;
+export const AdminDocument = gql`
+  query Admin {
+    me {
+      id
+      ...Admin_User
+    }
+  }
+  ${Admin_UserFragmentDoc}
+`;
+
+/**
+ * __useAdminQuery__
+ *
+ * To run a query within a React component, call `useAdminQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAdminQuery(
+  baseOptions?: Apollo.QueryHookOptions<AdminQuery, AdminQueryVariables>
+) {
+  return Apollo.useQuery<AdminQuery, AdminQueryVariables>(
+    AdminDocument,
+    baseOptions
+  );
+}
+export function useAdminLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<AdminQuery, AdminQueryVariables>
+) {
+  return Apollo.useLazyQuery<AdminQuery, AdminQueryVariables>(
+    AdminDocument,
+    baseOptions
+  );
+}
+export type AdminQueryHookResult = ReturnType<typeof useAdminQuery>;
+export type AdminLazyQueryHookResult = ReturnType<typeof useAdminLazyQuery>;
+export type AdminQueryResult = Apollo.QueryResult<
+  AdminQuery,
+  AdminQueryVariables
+>;
 export const SupportMethodsUserDocument = gql`
   query SupportMethodsUser {
     me {
-      organizationRole
-      organization {
-        identifier
-      }
       ...SupportMethods_User
     }
   }

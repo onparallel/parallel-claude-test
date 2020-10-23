@@ -5,54 +5,54 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useSettingsQuery, SettingsQuery } from "@parallel/graphql/__types";
+import { useAdminQuery, AdminQuery } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
-import { useSettingsSections } from "@parallel/utils/useSettingsSections";
+import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function Settings() {
+function Admin() {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useSettingsQuery());
-  const sections = useSettingsSections();
+  } = assertQuery(useAdminQuery());
+  const sections = useAdminSections();
 
   return (
     <SettingsLayout
       title={intl.formatMessage({
-        id: "settings.title",
-        defaultMessage: "Settings",
+        id: "admin.title",
+        defaultMessage: "Admin panel",
       })}
       isBase
-      basePath="/app/settings"
+      basePath="/app/Admin"
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage id="settings.title" defaultMessage="Settings" />
+        <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
       }
     />
   );
 }
 
-Settings.fragments = {
+Admin.fragments = {
   User: gql`
-    fragment Settings_User on User {
+    fragment Admin_User on User {
       ...AppLayout_User
     }
     ${AppLayout.fragments.User}
   `,
 };
 
-Settings.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<SettingsQuery>(gql`
-    query Settings {
+Admin.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
+  await fetchQuery<AdminQuery>(gql`
+    query Admin {
       me {
         id
-        ...Settings_User
+        ...Admin_User
       }
     }
-    ${Settings.fragments.User}
+    ${Admin.fragments.User}
   `);
 };
 
-export default withApolloData(Settings);
+export default withApolloData(Admin);

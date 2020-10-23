@@ -8,7 +8,9 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   SupportMethodsUserQuery,
   useSupportMethodsUserQuery,
@@ -17,7 +19,9 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { unCamelCase } from "@parallel/utils/strings";
 import { Maybe, UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 
 type SupportMethodsProps = Exclude<
   UnwrapPromise<ReturnType<typeof SupportMethods.getInitialProps>>,
@@ -25,9 +29,11 @@ type SupportMethodsProps = Exclude<
 >;
 
 function SupportMethods({ supportMethods, schemaTypes }: SupportMethodsProps) {
+  const intl = useIntl();
   const {
     data: { me },
   } = assertQuery(useSupportMethodsUserQuery());
+  const sections = useAdminSections();
 
   const [search, setSearch] = useState("");
 
@@ -45,9 +51,26 @@ function SupportMethods({ supportMethods, schemaTypes }: SupportMethodsProps) {
   >(null);
 
   return (
-    <AppLayout title="Support methods" user={me}>
-      <Box marginX="auto" width="100%" maxWidth="container.md" padding={2}>
-        <Box paddingY={4} position="sticky" top={0}>
+    <SettingsLayout
+      title={intl.formatMessage({
+        id: "admin.support-methods",
+        defaultMessage: "Support methods",
+      })}
+      basePath="/app/admin"
+      sections={sections}
+      user={me}
+      sectionsHeader={
+        <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
+      }
+      header={
+        <FormattedMessage
+          id="admin.support-methods"
+          defaultMessage="Support methods"
+        />
+      }
+    >
+      <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4}>
+        <Box paddingY={4}>
           <SearchInput
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -98,7 +121,7 @@ function SupportMethods({ supportMethods, schemaTypes }: SupportMethodsProps) {
           />
         )}
       </Box>
-    </AppLayout>
+    </SettingsLayout>
   );
 }
 
@@ -115,34 +138,21 @@ SupportMethods.fragments = {
 
 SupportMethods.getInitialProps = async ({
   fetchQuery,
-  res,
 }: WithApolloDataContext) => {
-  const [{ data }] = await Promise.all([
+  await Promise.all([
     fetchQuery<SupportMethodsUserQuery>(gql`
       query SupportMethodsUser {
         me {
-          organizationRole
-          organization {
-            identifier
-          }
           ...SupportMethods_User
         }
       }
       ${SupportMethods.fragments.User}
     `),
   ]);
-  if (
-    data?.me &&
-    data.me.organization.identifier === "parallel" &&
-    data.me.organizationRole === "ADMIN"
-  ) {
-    const { supportMethods, schemaTypes } = await import(
-      "@parallel/graphql/__support-methods"
-    );
-    return { supportMethods, schemaTypes };
-  } else {
-    res?.writeHead(403).end();
-  }
+  const { supportMethods, schemaTypes } = await import(
+    "@parallel/graphql/__support-methods"
+  );
+  return { supportMethods, schemaTypes };
 };
 
-export default compose(withApolloData)(SupportMethods);
+export default compose(withSuperAdminAccess, withApolloData)(SupportMethods);
