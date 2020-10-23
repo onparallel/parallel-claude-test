@@ -23,6 +23,23 @@ export default function CustomError({
         />
       </Text>
     </ErrorPage>
+  ) : errorCode === "FORBIDDEN" ? (
+    <ErrorPage
+      header={
+        <FormattedMessage
+          id="error.forbidden-access.header"
+          defaultMessage="Access forbidden"
+        />
+      }
+      imageUrl={"/static/images/undraw_cancel.svg"}
+    >
+      <Text>
+        <FormattedMessage
+          id="error.forbidden-access.text"
+          defaultMessage="You don't seem to have access to this page. If you think you should, please reach out to support for help."
+        />
+      </Text>
+    </ErrorPage>
   ) : (
     <ErrorPage
       header={
@@ -44,6 +61,7 @@ export default function CustomError({
 }
 
 CustomError.getInitialProps = function ({ res, err }: NextPageContext) {
-  const errorCode = (err as any)?.graphQLErrors?.[0]?.extensions.code;
+  const errorCode =
+    (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
   return { errorCode };
 };

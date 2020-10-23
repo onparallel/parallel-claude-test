@@ -158,12 +158,8 @@ export function withApolloData<P = {}>(
           if (!process.browser) {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const logger = require("@parallel/utils/logger").logger;
-            if (
-              ![
-                // Errors that are OK
-                "PUBLIC_PETITION_NOT_AVAILABLE",
-              ].includes(code)
-            )
+            if (!["PUBLIC_PETITION_NOT_AVAILABLE"].includes(code))
+              // Errors that are OK
               logger.error(error.message, {
                 error,
               });

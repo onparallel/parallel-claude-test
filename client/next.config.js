@@ -33,6 +33,20 @@ const config = {
       "/": { page: "/" },
     };
   },
+  async redirects() {
+    return [
+      {
+        source: "/:locale/app",
+        destination: "/:locale/app/petitions",
+        permanent: false,
+      },
+      {
+        source: "/:locale/petition/:keycode",
+        destination: "/:locale/petition/:keycode/1",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 const plugins = [

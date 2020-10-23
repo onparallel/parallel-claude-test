@@ -1,5 +1,15 @@
 [
   {
+    "term": "admin.support-methods",
+    "definition": "Support methods",
+    "context": "Support methods"
+  },
+  {
+    "term": "admin.title",
+    "definition": "Admin panel",
+    "context": "Admin panel"
+  },
+  {
     "term": "component.burger-button.label-close",
     "definition": "Close menu",
     "context": "Close menu"
@@ -500,19 +510,9 @@
     "context": "Use this template"
   },
   {
-    "term": "component.user-menu.admin-panel",
-    "definition": "Admin panel",
-    "context": "Admin panel"
-  },
-  {
     "term": "component.user-menu.log-out",
     "definition": "Log out",
     "context": "Log out"
-  },
-  {
-    "term": "component.user-menu.settings",
-    "definition": "Settings",
-    "context": "Settings"
   },
   {
     "term": "component.user-menu.ui-language",
@@ -618,6 +618,16 @@
     "term": "error.404.helpful-links",
     "definition": "Here are some helpful links instead:",
     "context": "Here are some helpful links instead:"
+  },
+  {
+    "term": "error.forbidden-access.header",
+    "definition": "Access forbidden",
+    "context": "Access forbidden"
+  },
+  {
+    "term": "error.forbidden-access.text",
+    "definition": "You don't seem to have access to this page. If you think you should, please reach out to support for help.",
+    "context": "You don't seem to have access to this page. If you think you should, please reach out to support for help."
   },
   {
     "term": "error.main-header",
@@ -3245,11 +3255,6 @@
     "context": "Save changes"
   },
   {
-    "term": "settings.title",
-    "definition": "Settings",
-    "context": "Settings"
-  },
-  {
     "term": "settings.security",
     "definition": "Security",
     "context": "Security"
@@ -3268,6 +3273,11 @@
     "term": "settings.security.password-header",
     "definition": "Change password",
     "context": "Change password"
+  },
+  {
+    "term": "settings.title",
+    "definition": "Settings",
+    "context": "Settings"
   },
   {
     "term": "supported-locales.english",

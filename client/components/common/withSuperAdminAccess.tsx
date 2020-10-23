@@ -43,7 +43,7 @@ export function withSuperAdminAccess<P = {}>(
       ) {
         return await getInitialProps?.(context);
       } else {
-        context.res?.writeHead(403).end();
+        throw new Error("FORBIDDEN");
       }
     },
   });

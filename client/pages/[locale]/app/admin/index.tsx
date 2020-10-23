@@ -3,10 +3,12 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useAdminQuery, AdminQuery } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -55,4 +57,4 @@ Admin.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   `);
 };
 
-export default withApolloData(Admin);
+export default compose(withSuperAdminAccess, withApolloData)(Admin);

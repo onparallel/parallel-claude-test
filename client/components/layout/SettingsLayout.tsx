@@ -38,7 +38,7 @@ export function SettingsLayout({
       (matches) => {
         if (isBase && matches) {
           const defaultPath = sections[0].path;
-          router.push(
+          router.replace(
             `/[locale]${defaultPath}`,
             `/${router.query.locale}${defaultPath}`
           );

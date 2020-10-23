@@ -44,10 +44,11 @@ Petition.getInitialProps = async ({
       `/${query.locale}/app/petitions/${query.petitionId}/${section}`
     );
   } else if (res?.writeHead) {
-    res!.writeHead(302, {
-      Location: `/${query.locale}/app/petitions/${query.petitionId}/${section}`,
-    });
-    res!.end();
+    res
+      .writeHead(302, {
+        Location: `/${query.locale}/app/petitions/${query.petitionId}/${section}`,
+      })
+      .end();
   }
   return {};
 };

@@ -32,8 +32,7 @@ Redirect.getInitialProps = async ({ req, res }: NextPageContext) => {
       languages.map((l) => l.locale),
       languages.find((l) => l.default)!.locale
     );
-    res!.writeHead(302, { Location: `/${language}` });
-    res!.end();
+    res!.writeHead(302, { Location: `/${language}` }).end();
   }
   return {};
 };
