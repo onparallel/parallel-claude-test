@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Link, Text, useDisclosure } from "@chakra-ui/core";
+import { Box, Button, Flex, Text, useDisclosure } from "@chakra-ui/core";
 import { TimeIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";

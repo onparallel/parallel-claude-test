@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { Link } from "@chakra-ui/core";
 import { XCircleIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";

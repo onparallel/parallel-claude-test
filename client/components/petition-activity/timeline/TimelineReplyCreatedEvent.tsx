@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Link } from "@chakra-ui/core";
+import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
@@ -8,7 +8,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
-import { PlusCircleIcon } from "@parallel/chakra/icons";
 
 export type TimelineReplyCreatedEventProps = {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;

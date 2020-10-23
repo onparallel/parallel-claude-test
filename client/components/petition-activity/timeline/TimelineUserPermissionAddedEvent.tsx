@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
-import { Link, Text } from "@chakra-ui/core";
+import { Text } from "@chakra-ui/core";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { UserPermissionType } from "@parallel/components/petition-common/UserPermissionType";
 import { TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
-import { UserPermissionType } from "@parallel/components/petition-common/UserPermissionType";
 
 export type TimelineUserPermissionAddedEventProps = {
   userId: string;

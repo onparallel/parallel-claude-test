@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
-import { Link, Text } from "@chakra-ui/core";
+import { Text } from "@chakra-ui/core";
 import { DoubleCheckIcon } from "@parallel/chakra/icons";
-
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionClosedEvent_PetitionClosedEventFragment } from "@parallel/graphql/__types";

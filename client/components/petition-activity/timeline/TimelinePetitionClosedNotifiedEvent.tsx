@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
-import { Link } from "@chakra-ui/core";
 import { ThumbUpIcon } from "@parallel/chakra/icons";
-
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment } from "@parallel/graphql/__types";
