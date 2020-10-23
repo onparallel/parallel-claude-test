@@ -23,6 +23,9 @@ generates:
         DateTime: string
         JSONObject: "{ [key: string]: any }"
         GID: string
+      withMutationFn: false
+      withResultType: false
+      withMutationOptionsType: false
 
 hooks:
   afterAllFileWrite:

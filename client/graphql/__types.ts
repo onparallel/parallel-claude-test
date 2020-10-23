@@ -5248,10 +5248,6 @@ export type WithSuperAdminAccessQueryHookResult = ReturnType<
 export type WithSuperAdminAccessLazyQueryHookResult = ReturnType<
   typeof useWithSuperAdminAccessLazyQuery
 >;
-export type WithSuperAdminAccessQueryResult = Apollo.QueryResult<
-  WithSuperAdminAccessQuery,
-  WithSuperAdminAccessQueryVariables
->;
 export const AppLayout_updateOnboardingStatusDocument = gql`
   mutation AppLayout_updateOnboardingStatus(
     $key: OnboardingKey!
@@ -5263,10 +5259,6 @@ export const AppLayout_updateOnboardingStatusDocument = gql`
     }
   }
 `;
-export type AppLayout_updateOnboardingStatusMutationFn = Apollo.MutationFunction<
-  AppLayout_updateOnboardingStatusMutation,
-  AppLayout_updateOnboardingStatusMutationVariables
->;
 
 /**
  * __useAppLayout_updateOnboardingStatusMutation__
@@ -5300,13 +5292,6 @@ export function useAppLayout_updateOnboardingStatusMutation(
 export type AppLayout_updateOnboardingStatusMutationHookResult = ReturnType<
   typeof useAppLayout_updateOnboardingStatusMutation
 >;
-export type AppLayout_updateOnboardingStatusMutationResult = Apollo.MutationResult<
-  AppLayout_updateOnboardingStatusMutation
->;
-export type AppLayout_updateOnboardingStatusMutationOptions = Apollo.BaseMutationOptions<
-  AppLayout_updateOnboardingStatusMutation,
-  AppLayout_updateOnboardingStatusMutationVariables
->;
 export const PetitionHeader_reopenPetitionDocument = gql`
   mutation PetitionHeader_reopenPetition($petitionId: GID!) {
     reopenPetition(petitionId: $petitionId) {
@@ -5316,10 +5301,6 @@ export const PetitionHeader_reopenPetitionDocument = gql`
     }
   }
 `;
-export type PetitionHeader_reopenPetitionMutationFn = Apollo.MutationFunction<
-  PetitionHeader_reopenPetitionMutation,
-  PetitionHeader_reopenPetitionMutationVariables
->;
 
 /**
  * __usePetitionHeader_reopenPetitionMutation__
@@ -5352,13 +5333,6 @@ export function usePetitionHeader_reopenPetitionMutation(
 export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
   typeof usePetitionHeader_reopenPetitionMutation
 >;
-export type PetitionHeader_reopenPetitionMutationResult = Apollo.MutationResult<
-  PetitionHeader_reopenPetitionMutation
->;
-export type PetitionHeader_reopenPetitionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionHeader_reopenPetitionMutation,
-  PetitionHeader_reopenPetitionMutationVariables
->;
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(
     $petitionId: GID!
@@ -5379,10 +5353,6 @@ export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-export type PetitionSharingModal_addPetitionUserPermissionMutationFn = Apollo.MutationFunction<
-  PetitionSharingModal_addPetitionUserPermissionMutation,
-  PetitionSharingModal_addPetitionUserPermissionMutationVariables
->;
 
 /**
  * __usePetitionSharingModal_addPetitionUserPermissionMutation__
@@ -5419,13 +5389,6 @@ export function usePetitionSharingModal_addPetitionUserPermissionMutation(
 export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult = ReturnType<
   typeof usePetitionSharingModal_addPetitionUserPermissionMutation
 >;
-export type PetitionSharingModal_addPetitionUserPermissionMutationResult = Apollo.MutationResult<
-  PetitionSharingModal_addPetitionUserPermissionMutation
->;
-export type PetitionSharingModal_addPetitionUserPermissionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionSharingModal_addPetitionUserPermissionMutation,
-  PetitionSharingModal_addPetitionUserPermissionMutationVariables
->;
 export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_removePetitionUserPermission(
     $petitionId: GID!
@@ -5440,10 +5403,6 @@ export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-export type PetitionSharingModal_removePetitionUserPermissionMutationFn = Apollo.MutationFunction<
-  PetitionSharingModal_removePetitionUserPermissionMutation,
-  PetitionSharingModal_removePetitionUserPermissionMutationVariables
->;
 
 /**
  * __usePetitionSharingModal_removePetitionUserPermissionMutation__
@@ -5477,13 +5436,6 @@ export function usePetitionSharingModal_removePetitionUserPermissionMutation(
 export type PetitionSharingModal_removePetitionUserPermissionMutationHookResult = ReturnType<
   typeof usePetitionSharingModal_removePetitionUserPermissionMutation
 >;
-export type PetitionSharingModal_removePetitionUserPermissionMutationResult = Apollo.MutationResult<
-  PetitionSharingModal_removePetitionUserPermissionMutation
->;
-export type PetitionSharingModal_removePetitionUserPermissionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionSharingModal_removePetitionUserPermissionMutation,
-  PetitionSharingModal_removePetitionUserPermissionMutationVariables
->;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership(
     $petitionId: GID!
@@ -5495,10 +5447,6 @@ export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-export type PetitionSharingModal_transferPetitionOwnershipMutationFn = Apollo.MutationFunction<
-  PetitionSharingModal_transferPetitionOwnershipMutation,
-  PetitionSharingModal_transferPetitionOwnershipMutationVariables
->;
 
 /**
  * __usePetitionSharingModal_transferPetitionOwnershipMutation__
@@ -5531,13 +5479,6 @@ export function usePetitionSharingModal_transferPetitionOwnershipMutation(
 }
 export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult = ReturnType<
   typeof usePetitionSharingModal_transferPetitionOwnershipMutation
->;
-export type PetitionSharingModal_transferPetitionOwnershipMutationResult = Apollo.MutationResult<
-  PetitionSharingModal_transferPetitionOwnershipMutation
->;
-export type PetitionSharingModal_transferPetitionOwnershipMutationOptions = Apollo.BaseMutationOptions<
-  PetitionSharingModal_transferPetitionOwnershipMutation,
-  PetitionSharingModal_transferPetitionOwnershipMutationVariables
 >;
 export const PetitionSharingModal_PetitionUserPermissionsDocument = gql`
   query PetitionSharingModal_PetitionUserPermissions($petitionId: GID!) {
@@ -5591,10 +5532,6 @@ export type PetitionSharingModal_PetitionUserPermissionsQueryHookResult = Return
 >;
 export type PetitionSharingModal_PetitionUserPermissionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionUserPermissionsLazyQuery
->;
-export type PetitionSharingModal_PetitionUserPermissionsQueryResult = Apollo.QueryResult<
-  PetitionSharingModal_PetitionUserPermissionsQuery,
-  PetitionSharingModal_PetitionUserPermissionsQueryVariables
 >;
 export const PetitionSharingModal_searchUsersDocument = gql`
   query PetitionSharingModal_searchUsers($search: String!, $exclude: [GID!]!) {
@@ -5656,10 +5593,6 @@ export type PetitionSharingModal_searchUsersQueryHookResult = ReturnType<
 export type PetitionSharingModal_searchUsersLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_searchUsersLazyQuery
 >;
-export type PetitionSharingModal_searchUsersQueryResult = Apollo.QueryResult<
-  PetitionSharingModal_searchUsersQuery,
-  PetitionSharingModal_searchUsersQueryVariables
->;
 export const useTemplateDetailsDialogPetitionDocument = gql`
   query useTemplateDetailsDialogPetition($templateId: GID!) {
     petition(id: $templateId) {
@@ -5713,10 +5646,6 @@ export type useTemplateDetailsDialogPetitionQueryHookResult = ReturnType<
 export type useTemplateDetailsDialogPetitionLazyQueryHookResult = ReturnType<
   typeof useuseTemplateDetailsDialogPetitionLazyQuery
 >;
-export type useTemplateDetailsDialogPetitionQueryResult = Apollo.QueryResult<
-  useTemplateDetailsDialogPetitionQuery,
-  useTemplateDetailsDialogPetitionQueryVariables
->;
 export const AdminDocument = gql`
   query Admin {
     me {
@@ -5760,10 +5689,6 @@ export function useAdminLazyQuery(
 }
 export type AdminQueryHookResult = ReturnType<typeof useAdminQuery>;
 export type AdminLazyQueryHookResult = ReturnType<typeof useAdminLazyQuery>;
-export type AdminQueryResult = Apollo.QueryResult<
-  AdminQuery,
-  AdminQueryVariables
->;
 export const SupportMethodsUserDocument = gql`
   query SupportMethodsUser {
     me {
@@ -5816,10 +5741,6 @@ export type SupportMethodsUserQueryHookResult = ReturnType<
 export type SupportMethodsUserLazyQueryHookResult = ReturnType<
   typeof useSupportMethodsUserLazyQuery
 >;
-export type SupportMethodsUserQueryResult = Apollo.QueryResult<
-  SupportMethodsUserQuery,
-  SupportMethodsUserQueryVariables
->;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
     updateContact(id: $id, data: $data) {
@@ -5828,10 +5749,6 @@ export const Contact_updateContactDocument = gql`
   }
   ${Contact_ContactFragmentDoc}
 `;
-export type Contact_updateContactMutationFn = Apollo.MutationFunction<
-  Contact_updateContactMutation,
-  Contact_updateContactMutationVariables
->;
 
 /**
  * __useContact_updateContactMutation__
@@ -5864,13 +5781,6 @@ export function useContact_updateContactMutation(
 }
 export type Contact_updateContactMutationHookResult = ReturnType<
   typeof useContact_updateContactMutation
->;
-export type Contact_updateContactMutationResult = Apollo.MutationResult<
-  Contact_updateContactMutation
->;
-export type Contact_updateContactMutationOptions = Apollo.BaseMutationOptions<
-  Contact_updateContactMutation,
-  Contact_updateContactMutationVariables
 >;
 export const ContactDocument = gql`
   query Contact($id: GID!) {
@@ -5915,10 +5825,6 @@ export function useContactLazyQuery(
 }
 export type ContactQueryHookResult = ReturnType<typeof useContactQuery>;
 export type ContactLazyQueryHookResult = ReturnType<typeof useContactLazyQuery>;
-export type ContactQueryResult = Apollo.QueryResult<
-  ContactQuery,
-  ContactQueryVariables
->;
 export const ContactUserDocument = gql`
   query ContactUser {
     me {
@@ -5969,19 +5875,11 @@ export type ContactUserQueryHookResult = ReturnType<typeof useContactUserQuery>;
 export type ContactUserLazyQueryHookResult = ReturnType<
   typeof useContactUserLazyQuery
 >;
-export type ContactUserQueryResult = Apollo.QueryResult<
-  ContactUserQuery,
-  ContactUserQueryVariables
->;
 export const Contacts_deleteContactsDocument = gql`
   mutation Contacts_deleteContacts($ids: [GID!]!) {
     deleteContacts(ids: $ids)
   }
 `;
-export type Contacts_deleteContactsMutationFn = Apollo.MutationFunction<
-  Contacts_deleteContactsMutation,
-  Contacts_deleteContactsMutationVariables
->;
 
 /**
  * __useContacts_deleteContactsMutation__
@@ -6013,13 +5911,6 @@ export function useContacts_deleteContactsMutation(
 }
 export type Contacts_deleteContactsMutationHookResult = ReturnType<
   typeof useContacts_deleteContactsMutation
->;
-export type Contacts_deleteContactsMutationResult = Apollo.MutationResult<
-  Contacts_deleteContactsMutation
->;
-export type Contacts_deleteContactsMutationOptions = Apollo.BaseMutationOptions<
-  Contacts_deleteContactsMutation,
-  Contacts_deleteContactsMutationVariables
 >;
 export const ContactsDocument = gql`
   query Contacts(
@@ -6077,10 +5968,6 @@ export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
 export type ContactsLazyQueryHookResult = ReturnType<
   typeof useContactsLazyQuery
 >;
-export type ContactsQueryResult = Apollo.QueryResult<
-  ContactsQuery,
-  ContactsQueryVariables
->;
 export const ContactsUserDocument = gql`
   query ContactsUser {
     me {
@@ -6133,10 +6020,6 @@ export type ContactsUserQueryHookResult = ReturnType<
 export type ContactsUserLazyQueryHookResult = ReturnType<
   typeof useContactsUserLazyQuery
 >;
-export type ContactsUserQueryResult = Apollo.QueryResult<
-  ContactsUserQuery,
-  ContactsUserQueryVariables
->;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition(
     $petitionId: GID!
@@ -6148,10 +6031,6 @@ export const PetitionActivity_updatePetitionDocument = gql`
   }
   ${PetitionActivity_PetitionFragmentDoc}
 `;
-export type PetitionActivity_updatePetitionMutationFn = Apollo.MutationFunction<
-  PetitionActivity_updatePetitionMutation,
-  PetitionActivity_updatePetitionMutationVariables
->;
 
 /**
  * __usePetitionActivity_updatePetitionMutation__
@@ -6185,13 +6064,6 @@ export function usePetitionActivity_updatePetitionMutation(
 export type PetitionActivity_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionActivity_updatePetitionMutation
 >;
-export type PetitionActivity_updatePetitionMutationResult = Apollo.MutationResult<
-  PetitionActivity_updatePetitionMutation
->;
-export type PetitionActivity_updatePetitionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_updatePetitionMutation,
-  PetitionActivity_updatePetitionMutationVariables
->;
 export const PetitionActivity_sendMessagesDocument = gql`
   mutation PetitionActivity_sendMessages(
     $petitionId: GID!
@@ -6209,10 +6081,6 @@ export const PetitionActivity_sendMessagesDocument = gql`
     )
   }
 `;
-export type PetitionActivity_sendMessagesMutationFn = Apollo.MutationFunction<
-  PetitionActivity_sendMessagesMutation,
-  PetitionActivity_sendMessagesMutationVariables
->;
 
 /**
  * __usePetitionActivity_sendMessagesMutation__
@@ -6249,13 +6117,6 @@ export function usePetitionActivity_sendMessagesMutation(
 export type PetitionActivity_sendMessagesMutationHookResult = ReturnType<
   typeof usePetitionActivity_sendMessagesMutation
 >;
-export type PetitionActivity_sendMessagesMutationResult = Apollo.MutationResult<
-  PetitionActivity_sendMessagesMutation
->;
-export type PetitionActivity_sendMessagesMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_sendMessagesMutation,
-  PetitionActivity_sendMessagesMutationVariables
->;
 export const PetitionActivity_sendRemindersDocument = gql`
   mutation PetitionActivity_sendReminders(
     $petitionId: GID!
@@ -6264,10 +6125,6 @@ export const PetitionActivity_sendRemindersDocument = gql`
     sendReminders(petitionId: $petitionId, accessIds: $accessIds)
   }
 `;
-export type PetitionActivity_sendRemindersMutationFn = Apollo.MutationFunction<
-  PetitionActivity_sendRemindersMutation,
-  PetitionActivity_sendRemindersMutationVariables
->;
 
 /**
  * __usePetitionActivity_sendRemindersMutation__
@@ -6301,13 +6158,6 @@ export function usePetitionActivity_sendRemindersMutation(
 export type PetitionActivity_sendRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_sendRemindersMutation
 >;
-export type PetitionActivity_sendRemindersMutationResult = Apollo.MutationResult<
-  PetitionActivity_sendRemindersMutation
->;
-export type PetitionActivity_sendRemindersMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_sendRemindersMutation,
-  PetitionActivity_sendRemindersMutationVariables
->;
 export const PetitionActivity_deactivateAccessesDocument = gql`
   mutation PetitionActivity_deactivateAccesses(
     $petitionId: GID!
@@ -6319,10 +6169,6 @@ export const PetitionActivity_deactivateAccessesDocument = gql`
     }
   }
 `;
-export type PetitionActivity_deactivateAccessesMutationFn = Apollo.MutationFunction<
-  PetitionActivity_deactivateAccessesMutation,
-  PetitionActivity_deactivateAccessesMutationVariables
->;
 
 /**
  * __usePetitionActivity_deactivateAccessesMutation__
@@ -6356,13 +6202,6 @@ export function usePetitionActivity_deactivateAccessesMutation(
 export type PetitionActivity_deactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_deactivateAccessesMutation
 >;
-export type PetitionActivity_deactivateAccessesMutationResult = Apollo.MutationResult<
-  PetitionActivity_deactivateAccessesMutation
->;
-export type PetitionActivity_deactivateAccessesMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_deactivateAccessesMutation,
-  PetitionActivity_deactivateAccessesMutationVariables
->;
 export const PetitionActivity_reactivateAccessesDocument = gql`
   mutation PetitionActivity_reactivateAccesses(
     $petitionId: GID!
@@ -6374,10 +6213,6 @@ export const PetitionActivity_reactivateAccessesDocument = gql`
     }
   }
 `;
-export type PetitionActivity_reactivateAccessesMutationFn = Apollo.MutationFunction<
-  PetitionActivity_reactivateAccessesMutation,
-  PetitionActivity_reactivateAccessesMutationVariables
->;
 
 /**
  * __usePetitionActivity_reactivateAccessesMutation__
@@ -6411,13 +6246,6 @@ export function usePetitionActivity_reactivateAccessesMutation(
 export type PetitionActivity_reactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_reactivateAccessesMutation
 >;
-export type PetitionActivity_reactivateAccessesMutationResult = Apollo.MutationResult<
-  PetitionActivity_reactivateAccessesMutation
->;
-export type PetitionActivity_reactivateAccessesMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_reactivateAccessesMutation,
-  PetitionActivity_reactivateAccessesMutationVariables
->;
 export const PetitionActivity_cancelScheduledMessageDocument = gql`
   mutation PetitionActivity_cancelScheduledMessage(
     $petitionId: GID!
@@ -6429,10 +6257,6 @@ export const PetitionActivity_cancelScheduledMessageDocument = gql`
     }
   }
 `;
-export type PetitionActivity_cancelScheduledMessageMutationFn = Apollo.MutationFunction<
-  PetitionActivity_cancelScheduledMessageMutation,
-  PetitionActivity_cancelScheduledMessageMutationVariables
->;
 
 /**
  * __usePetitionActivity_cancelScheduledMessageMutation__
@@ -6466,13 +6290,6 @@ export function usePetitionActivity_cancelScheduledMessageMutation(
 export type PetitionActivity_cancelScheduledMessageMutationHookResult = ReturnType<
   typeof usePetitionActivity_cancelScheduledMessageMutation
 >;
-export type PetitionActivity_cancelScheduledMessageMutationResult = Apollo.MutationResult<
-  PetitionActivity_cancelScheduledMessageMutation
->;
-export type PetitionActivity_cancelScheduledMessageMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_cancelScheduledMessageMutation,
-  PetitionActivity_cancelScheduledMessageMutationVariables
->;
 export const PetitionsActivity_sendPetitionDocument = gql`
   mutation PetitionsActivity_sendPetition(
     $petitionId: GID!
@@ -6494,10 +6311,6 @@ export const PetitionsActivity_sendPetitionDocument = gql`
     }
   }
 `;
-export type PetitionsActivity_sendPetitionMutationFn = Apollo.MutationFunction<
-  PetitionsActivity_sendPetitionMutation,
-  PetitionsActivity_sendPetitionMutationVariables
->;
 
 /**
  * __usePetitionsActivity_sendPetitionMutation__
@@ -6535,13 +6348,6 @@ export function usePetitionsActivity_sendPetitionMutation(
 export type PetitionsActivity_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionsActivity_sendPetitionMutation
 >;
-export type PetitionsActivity_sendPetitionMutationResult = Apollo.MutationResult<
-  PetitionsActivity_sendPetitionMutation
->;
-export type PetitionsActivity_sendPetitionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionsActivity_sendPetitionMutation,
-  PetitionsActivity_sendPetitionMutationVariables
->;
 export const PetitionActivity_switchAutomaticRemindersDocument = gql`
   mutation PetitionActivity_switchAutomaticReminders(
     $start: Boolean!
@@ -6559,10 +6365,6 @@ export const PetitionActivity_switchAutomaticRemindersDocument = gql`
     }
   }
 `;
-export type PetitionActivity_switchAutomaticRemindersMutationFn = Apollo.MutationFunction<
-  PetitionActivity_switchAutomaticRemindersMutation,
-  PetitionActivity_switchAutomaticRemindersMutationVariables
->;
 
 /**
  * __usePetitionActivity_switchAutomaticRemindersMutation__
@@ -6597,13 +6399,6 @@ export function usePetitionActivity_switchAutomaticRemindersMutation(
 }
 export type PetitionActivity_switchAutomaticRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_switchAutomaticRemindersMutation
->;
-export type PetitionActivity_switchAutomaticRemindersMutationResult = Apollo.MutationResult<
-  PetitionActivity_switchAutomaticRemindersMutation
->;
-export type PetitionActivity_switchAutomaticRemindersMutationOptions = Apollo.BaseMutationOptions<
-  PetitionActivity_switchAutomaticRemindersMutation,
-  PetitionActivity_switchAutomaticRemindersMutationVariables
 >;
 export const PetitionActivityDocument = gql`
   query PetitionActivity($id: GID!) {
@@ -6658,10 +6453,6 @@ export type PetitionActivityQueryHookResult = ReturnType<
 export type PetitionActivityLazyQueryHookResult = ReturnType<
   typeof usePetitionActivityLazyQuery
 >;
-export type PetitionActivityQueryResult = Apollo.QueryResult<
-  PetitionActivityQuery,
-  PetitionActivityQueryVariables
->;
 export const PetitionActivityUserDocument = gql`
   query PetitionActivityUser {
     me {
@@ -6714,10 +6505,6 @@ export type PetitionActivityUserQueryHookResult = ReturnType<
 export type PetitionActivityUserLazyQueryHookResult = ReturnType<
   typeof usePetitionActivityUserLazyQuery
 >;
-export type PetitionActivityUserQueryResult = Apollo.QueryResult<
-  PetitionActivityUserQuery,
-  PetitionActivityUserQueryVariables
->;
 export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition(
     $petitionId: GID!
@@ -6731,10 +6518,6 @@ export const PetitionCompose_updatePetitionDocument = gql`
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionComposeMessageEditor_PetitionFragmentDoc}
 `;
-export type PetitionCompose_updatePetitionMutationFn = Apollo.MutationFunction<
-  PetitionCompose_updatePetitionMutation,
-  PetitionCompose_updatePetitionMutationVariables
->;
 
 /**
  * __usePetitionCompose_updatePetitionMutation__
@@ -6768,13 +6551,6 @@ export function usePetitionCompose_updatePetitionMutation(
 export type PetitionCompose_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionMutation
 >;
-export type PetitionCompose_updatePetitionMutationResult = Apollo.MutationResult<
-  PetitionCompose_updatePetitionMutation
->;
-export type PetitionCompose_updatePetitionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_updatePetitionMutation,
-  PetitionCompose_updatePetitionMutationVariables
->;
 export const PetitionCompose_updateFieldPositionsDocument = gql`
   mutation PetitionCompose_updateFieldPositions(
     $petitionId: GID!
@@ -6790,10 +6566,6 @@ export const PetitionCompose_updateFieldPositionsDocument = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-export type PetitionCompose_updateFieldPositionsMutationFn = Apollo.MutationFunction<
-  PetitionCompose_updateFieldPositionsMutation,
-  PetitionCompose_updateFieldPositionsMutationVariables
->;
 
 /**
  * __usePetitionCompose_updateFieldPositionsMutation__
@@ -6827,13 +6599,6 @@ export function usePetitionCompose_updateFieldPositionsMutation(
 export type PetitionCompose_updateFieldPositionsMutationHookResult = ReturnType<
   typeof usePetitionCompose_updateFieldPositionsMutation
 >;
-export type PetitionCompose_updateFieldPositionsMutationResult = Apollo.MutationResult<
-  PetitionCompose_updateFieldPositionsMutation
->;
-export type PetitionCompose_updateFieldPositionsMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_updateFieldPositionsMutation,
-  PetitionCompose_updateFieldPositionsMutationVariables
->;
 export const PetitionCompose_createPetitionFieldDocument = gql`
   mutation PetitionCompose_createPetitionField(
     $petitionId: GID!
@@ -6860,10 +6625,6 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-export type PetitionCompose_createPetitionFieldMutationFn = Apollo.MutationFunction<
-  PetitionCompose_createPetitionFieldMutation,
-  PetitionCompose_createPetitionFieldMutationVariables
->;
 
 /**
  * __usePetitionCompose_createPetitionFieldMutation__
@@ -6898,13 +6659,6 @@ export function usePetitionCompose_createPetitionFieldMutation(
 export type PetitionCompose_createPetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_createPetitionFieldMutation
 >;
-export type PetitionCompose_createPetitionFieldMutationResult = Apollo.MutationResult<
-  PetitionCompose_createPetitionFieldMutation
->;
-export type PetitionCompose_createPetitionFieldMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_createPetitionFieldMutation,
-  PetitionCompose_createPetitionFieldMutationVariables
->;
 export const PetitionCompose_clonePetitionFieldDocument = gql`
   mutation PetitionCompose_clonePetitionField(
     $petitionId: GID!
@@ -6926,10 +6680,6 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-export type PetitionCompose_clonePetitionFieldMutationFn = Apollo.MutationFunction<
-  PetitionCompose_clonePetitionFieldMutation,
-  PetitionCompose_clonePetitionFieldMutationVariables
->;
 
 /**
  * __usePetitionCompose_clonePetitionFieldMutation__
@@ -6963,13 +6713,6 @@ export function usePetitionCompose_clonePetitionFieldMutation(
 export type PetitionCompose_clonePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_clonePetitionFieldMutation
 >;
-export type PetitionCompose_clonePetitionFieldMutationResult = Apollo.MutationResult<
-  PetitionCompose_clonePetitionFieldMutation
->;
-export type PetitionCompose_clonePetitionFieldMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_clonePetitionFieldMutation,
-  PetitionCompose_clonePetitionFieldMutationVariables
->;
 export const PetitionCompose_deletePetitionFieldDocument = gql`
   mutation PetitionCompose_deletePetitionField(
     $petitionId: GID!
@@ -6990,10 +6733,6 @@ export const PetitionCompose_deletePetitionFieldDocument = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-export type PetitionCompose_deletePetitionFieldMutationFn = Apollo.MutationFunction<
-  PetitionCompose_deletePetitionFieldMutation,
-  PetitionCompose_deletePetitionFieldMutationVariables
->;
 
 /**
  * __usePetitionCompose_deletePetitionFieldMutation__
@@ -7028,13 +6767,6 @@ export function usePetitionCompose_deletePetitionFieldMutation(
 export type PetitionCompose_deletePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_deletePetitionFieldMutation
 >;
-export type PetitionCompose_deletePetitionFieldMutationResult = Apollo.MutationResult<
-  PetitionCompose_deletePetitionFieldMutation
->;
-export type PetitionCompose_deletePetitionFieldMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_deletePetitionFieldMutation,
-  PetitionCompose_deletePetitionFieldMutationVariables
->;
 export const PetitionCompose_updatePetitionFieldDocument = gql`
   mutation PetitionCompose_updatePetitionField(
     $petitionId: GID!
@@ -7061,10 +6793,6 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
-export type PetitionCompose_updatePetitionFieldMutationFn = Apollo.MutationFunction<
-  PetitionCompose_updatePetitionFieldMutation,
-  PetitionCompose_updatePetitionFieldMutationVariables
->;
 
 /**
  * __usePetitionCompose_updatePetitionFieldMutation__
@@ -7099,13 +6827,6 @@ export function usePetitionCompose_updatePetitionFieldMutation(
 export type PetitionCompose_updatePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionFieldMutation
 >;
-export type PetitionCompose_updatePetitionFieldMutationResult = Apollo.MutationResult<
-  PetitionCompose_updatePetitionFieldMutation
->;
-export type PetitionCompose_updatePetitionFieldMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_updatePetitionFieldMutation,
-  PetitionCompose_updatePetitionFieldMutationVariables
->;
 export const PetitionCompose_changePetitionFieldTypeDocument = gql`
   mutation PetitionCompose_changePetitionFieldType(
     $petitionId: GID!
@@ -7131,10 +6852,6 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
-export type PetitionCompose_changePetitionFieldTypeMutationFn = Apollo.MutationFunction<
-  PetitionCompose_changePetitionFieldTypeMutation,
-  PetitionCompose_changePetitionFieldTypeMutationVariables
->;
 
 /**
  * __usePetitionCompose_changePetitionFieldTypeMutation__
@@ -7170,13 +6887,6 @@ export function usePetitionCompose_changePetitionFieldTypeMutation(
 export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
   typeof usePetitionCompose_changePetitionFieldTypeMutation
 >;
-export type PetitionCompose_changePetitionFieldTypeMutationResult = Apollo.MutationResult<
-  PetitionCompose_changePetitionFieldTypeMutation
->;
-export type PetitionCompose_changePetitionFieldTypeMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_changePetitionFieldTypeMutation,
-  PetitionCompose_changePetitionFieldTypeMutationVariables
->;
 export const PetitionCompose_sendPetitionDocument = gql`
   mutation PetitionCompose_sendPetition(
     $petitionId: GID!
@@ -7202,10 +6912,6 @@ export const PetitionCompose_sendPetitionDocument = gql`
     }
   }
 `;
-export type PetitionCompose_sendPetitionMutationFn = Apollo.MutationFunction<
-  PetitionCompose_sendPetitionMutation,
-  PetitionCompose_sendPetitionMutationVariables
->;
 
 /**
  * __usePetitionCompose_sendPetitionMutation__
@@ -7242,13 +6948,6 @@ export function usePetitionCompose_sendPetitionMutation(
 }
 export type PetitionCompose_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_sendPetitionMutation
->;
-export type PetitionCompose_sendPetitionMutationResult = Apollo.MutationResult<
-  PetitionCompose_sendPetitionMutation
->;
-export type PetitionCompose_sendPetitionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionCompose_sendPetitionMutation,
-  PetitionCompose_sendPetitionMutationVariables
 >;
 export const PetitionComposeDocument = gql`
   query PetitionCompose($id: GID!) {
@@ -7303,10 +7002,6 @@ export type PetitionComposeQueryHookResult = ReturnType<
 export type PetitionComposeLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeLazyQuery
 >;
-export type PetitionComposeQueryResult = Apollo.QueryResult<
-  PetitionComposeQuery,
-  PetitionComposeQueryVariables
->;
 export const PetitionComposeUserDocument = gql`
   query PetitionComposeUser {
     me {
@@ -7359,10 +7054,6 @@ export type PetitionComposeUserQueryHookResult = ReturnType<
 export type PetitionComposeUserLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeUserLazyQuery
 >;
-export type PetitionComposeUserQueryResult = Apollo.QueryResult<
-  PetitionComposeUserQuery,
-  PetitionComposeUserQueryVariables
->;
 export const PetitionDocument = gql`
   query Petition($id: GID!) {
     petition(id: $id) {
@@ -7413,10 +7104,6 @@ export type PetitionQueryHookResult = ReturnType<typeof usePetitionQuery>;
 export type PetitionLazyQueryHookResult = ReturnType<
   typeof usePetitionLazyQuery
 >;
-export type PetitionQueryResult = Apollo.QueryResult<
-  PetitionQuery,
-  PetitionQueryVariables
->;
 export const PetitionReplies_updatePetitionDocument = gql`
   mutation PetitionReplies_updatePetition(
     $petitionId: GID!
@@ -7428,10 +7115,6 @@ export const PetitionReplies_updatePetitionDocument = gql`
   }
   ${PetitionReplies_PetitionFragmentDoc}
 `;
-export type PetitionReplies_updatePetitionMutationFn = Apollo.MutationFunction<
-  PetitionReplies_updatePetitionMutation,
-  PetitionReplies_updatePetitionMutationVariables
->;
 
 /**
  * __usePetitionReplies_updatePetitionMutation__
@@ -7465,13 +7148,6 @@ export function usePetitionReplies_updatePetitionMutation(
 export type PetitionReplies_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionMutation
 >;
-export type PetitionReplies_updatePetitionMutationResult = Apollo.MutationResult<
-  PetitionReplies_updatePetitionMutation
->;
-export type PetitionReplies_updatePetitionMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_updatePetitionMutation,
-  PetitionReplies_updatePetitionMutationVariables
->;
 export const PetitionReplies_validatePetitionFieldsDocument = gql`
   mutation PetitionReplies_validatePetitionFields(
     $petitionId: GID!
@@ -7500,10 +7176,6 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
     }
   }
 `;
-export type PetitionReplies_validatePetitionFieldsMutationFn = Apollo.MutationFunction<
-  PetitionReplies_validatePetitionFieldsMutation,
-  PetitionReplies_validatePetitionFieldsMutationVariables
->;
 
 /**
  * __usePetitionReplies_validatePetitionFieldsMutation__
@@ -7539,13 +7211,6 @@ export function usePetitionReplies_validatePetitionFieldsMutation(
 export type PetitionReplies_validatePetitionFieldsMutationHookResult = ReturnType<
   typeof usePetitionReplies_validatePetitionFieldsMutation
 >;
-export type PetitionReplies_validatePetitionFieldsMutationResult = Apollo.MutationResult<
-  PetitionReplies_validatePetitionFieldsMutation
->;
-export type PetitionReplies_validatePetitionFieldsMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_validatePetitionFieldsMutation,
-  PetitionReplies_validatePetitionFieldsMutationVariables
->;
 export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
   mutation PetitionReplies_fileUploadReplyDownloadLink(
     $petitionId: GID!
@@ -7562,10 +7227,6 @@ export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
     }
   }
 `;
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationFn = Apollo.MutationFunction<
-  PetitionReplies_fileUploadReplyDownloadLinkMutation,
-  PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
->;
 
 /**
  * __usePetitionReplies_fileUploadReplyDownloadLinkMutation__
@@ -7600,13 +7261,6 @@ export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation
 >;
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationResult = Apollo.MutationResult<
-  PetitionReplies_fileUploadReplyDownloadLinkMutation
->;
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_fileUploadReplyDownloadLinkMutation,
-  PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
->;
 export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   mutation PetitionReplies_createPetitionFieldComment(
     $petitionId: GID!
@@ -7625,10 +7279,6 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
-export type PetitionReplies_createPetitionFieldCommentMutationFn = Apollo.MutationFunction<
-  PetitionReplies_createPetitionFieldCommentMutation,
-  PetitionReplies_createPetitionFieldCommentMutationVariables
->;
 
 /**
  * __usePetitionReplies_createPetitionFieldCommentMutation__
@@ -7664,13 +7314,6 @@ export function usePetitionReplies_createPetitionFieldCommentMutation(
 export type PetitionReplies_createPetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_createPetitionFieldCommentMutation
 >;
-export type PetitionReplies_createPetitionFieldCommentMutationResult = Apollo.MutationResult<
-  PetitionReplies_createPetitionFieldCommentMutation
->;
-export type PetitionReplies_createPetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_createPetitionFieldCommentMutation,
-  PetitionReplies_createPetitionFieldCommentMutationVariables
->;
 export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_updatePetitionFieldComment(
     $petitionId: GID!
@@ -7689,10 +7332,6 @@ export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
-export type PetitionReplies_updatePetitionFieldCommentMutationFn = Apollo.MutationFunction<
-  PetitionReplies_updatePetitionFieldCommentMutation,
-  PetitionReplies_updatePetitionFieldCommentMutationVariables
->;
 
 /**
  * __usePetitionReplies_updatePetitionFieldCommentMutation__
@@ -7728,13 +7367,6 @@ export function usePetitionReplies_updatePetitionFieldCommentMutation(
 export type PetitionReplies_updatePetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionFieldCommentMutation
 >;
-export type PetitionReplies_updatePetitionFieldCommentMutationResult = Apollo.MutationResult<
-  PetitionReplies_updatePetitionFieldCommentMutation
->;
-export type PetitionReplies_updatePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_updatePetitionFieldCommentMutation,
-  PetitionReplies_updatePetitionFieldCommentMutationVariables
->;
 export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_deletePetitionFieldComment(
     $petitionId: GID!
@@ -7748,10 +7380,6 @@ export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
     )
   }
 `;
-export type PetitionReplies_deletePetitionFieldCommentMutationFn = Apollo.MutationFunction<
-  PetitionReplies_deletePetitionFieldCommentMutation,
-  PetitionReplies_deletePetitionFieldCommentMutationVariables
->;
 
 /**
  * __usePetitionReplies_deletePetitionFieldCommentMutation__
@@ -7786,13 +7414,6 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
 export type PetitionReplies_deletePetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_deletePetitionFieldCommentMutation
 >;
-export type PetitionReplies_deletePetitionFieldCommentMutationResult = Apollo.MutationResult<
-  PetitionReplies_deletePetitionFieldCommentMutation
->;
-export type PetitionReplies_deletePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_deletePetitionFieldCommentMutation,
-  PetitionReplies_deletePetitionFieldCommentMutationVariables
->;
 export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
   mutation PetitionReplies_submitUnpublishedComments($petitionId: GID!) {
     submitUnpublishedComments(petitionId: $petitionId) {
@@ -7801,10 +7422,6 @@ export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
     }
   }
 `;
-export type PetitionReplies_submitUnpublishedCommentsMutationFn = Apollo.MutationFunction<
-  PetitionReplies_submitUnpublishedCommentsMutation,
-  PetitionReplies_submitUnpublishedCommentsMutationVariables
->;
 
 /**
  * __usePetitionReplies_submitUnpublishedCommentsMutation__
@@ -7837,13 +7454,6 @@ export function usePetitionReplies_submitUnpublishedCommentsMutation(
 export type PetitionReplies_submitUnpublishedCommentsMutationHookResult = ReturnType<
   typeof usePetitionReplies_submitUnpublishedCommentsMutation
 >;
-export type PetitionReplies_submitUnpublishedCommentsMutationResult = Apollo.MutationResult<
-  PetitionReplies_submitUnpublishedCommentsMutation
->;
-export type PetitionReplies_submitUnpublishedCommentsMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_submitUnpublishedCommentsMutation,
-  PetitionReplies_submitUnpublishedCommentsMutationVariables
->;
 export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
   mutation PetitionReplies_markPetitionFieldCommentsAsRead(
     $petitionId: GID!
@@ -7858,10 +7468,6 @@ export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
     }
   }
 `;
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationFn = Apollo.MutationFunction<
-  PetitionReplies_markPetitionFieldCommentsAsReadMutation,
-  PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
->;
 
 /**
  * __usePetitionReplies_markPetitionFieldCommentsAsReadMutation__
@@ -7895,13 +7501,6 @@ export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
   typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation
 >;
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationResult = Apollo.MutationResult<
-  PetitionReplies_markPetitionFieldCommentsAsReadMutation
->;
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_markPetitionFieldCommentsAsReadMutation,
-  PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
->;
 export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
   mutation PetitionReplies_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
@@ -7930,10 +7529,6 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
     }
   }
 `;
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationFn = Apollo.MutationFunction<
-  PetitionReplies_updatePetitionFieldRepliesStatusMutation,
-  PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
->;
 
 /**
  * __usePetitionReplies_updatePetitionFieldRepliesStatusMutation__
@@ -7969,13 +7564,6 @@ export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
 >;
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationResult = Apollo.MutationResult<
-  PetitionReplies_updatePetitionFieldRepliesStatusMutation
->;
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_updatePetitionFieldRepliesStatusMutation,
-  PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
->;
 export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
   mutation PetitionReplies_sendPetitionClosedNotification(
     $petitionId: GID!
@@ -7997,10 +7585,6 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
     }
   }
 `;
-export type PetitionReplies_sendPetitionClosedNotificationMutationFn = Apollo.MutationFunction<
-  PetitionReplies_sendPetitionClosedNotificationMutation,
-  PetitionReplies_sendPetitionClosedNotificationMutationVariables
->;
 
 /**
  * __usePetitionReplies_sendPetitionClosedNotificationMutation__
@@ -8035,13 +7619,6 @@ export function usePetitionReplies_sendPetitionClosedNotificationMutation(
 export type PetitionReplies_sendPetitionClosedNotificationMutationHookResult = ReturnType<
   typeof usePetitionReplies_sendPetitionClosedNotificationMutation
 >;
-export type PetitionReplies_sendPetitionClosedNotificationMutationResult = Apollo.MutationResult<
-  PetitionReplies_sendPetitionClosedNotificationMutation
->;
-export type PetitionReplies_sendPetitionClosedNotificationMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_sendPetitionClosedNotificationMutation,
-  PetitionReplies_sendPetitionClosedNotificationMutationVariables
->;
 export const PetitionReplies_presendPetitionClosedNotificationDocument = gql`
   mutation PetitionReplies_presendPetitionClosedNotification(
     $petitionId: GID!
@@ -8049,10 +7626,6 @@ export const PetitionReplies_presendPetitionClosedNotificationDocument = gql`
     presendPetitionClosedNotification(petitionId: $petitionId)
   }
 `;
-export type PetitionReplies_presendPetitionClosedNotificationMutationFn = Apollo.MutationFunction<
-  PetitionReplies_presendPetitionClosedNotificationMutation,
-  PetitionReplies_presendPetitionClosedNotificationMutationVariables
->;
 
 /**
  * __usePetitionReplies_presendPetitionClosedNotificationMutation__
@@ -8084,13 +7657,6 @@ export function usePetitionReplies_presendPetitionClosedNotificationMutation(
 }
 export type PetitionReplies_presendPetitionClosedNotificationMutationHookResult = ReturnType<
   typeof usePetitionReplies_presendPetitionClosedNotificationMutation
->;
-export type PetitionReplies_presendPetitionClosedNotificationMutationResult = Apollo.MutationResult<
-  PetitionReplies_presendPetitionClosedNotificationMutation
->;
-export type PetitionReplies_presendPetitionClosedNotificationMutationOptions = Apollo.BaseMutationOptions<
-  PetitionReplies_presendPetitionClosedNotificationMutation,
-  PetitionReplies_presendPetitionClosedNotificationMutationVariables
 >;
 export const PetitionRepliesDocument = gql`
   query PetitionReplies($id: GID!) {
@@ -8145,10 +7711,6 @@ export type PetitionRepliesQueryHookResult = ReturnType<
 export type PetitionRepliesLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesLazyQuery
 >;
-export type PetitionRepliesQueryResult = Apollo.QueryResult<
-  PetitionRepliesQuery,
-  PetitionRepliesQueryVariables
->;
 export const PetitionRepliesUserDocument = gql`
   query PetitionRepliesUser {
     me {
@@ -8200,10 +7762,6 @@ export type PetitionRepliesUserQueryHookResult = ReturnType<
 >;
 export type PetitionRepliesUserLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserLazyQuery
->;
-export type PetitionRepliesUserQueryResult = Apollo.QueryResult<
-  PetitionRepliesUserQuery,
-  PetitionRepliesUserQueryVariables
 >;
 export const PetitionsDocument = gql`
   query Petitions(
@@ -8272,10 +7830,6 @@ export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
 export type PetitionsLazyQueryHookResult = ReturnType<
   typeof usePetitionsLazyQuery
 >;
-export type PetitionsQueryResult = Apollo.QueryResult<
-  PetitionsQuery,
-  PetitionsQueryVariables
->;
 export const PetitionsUserDocument = gql`
   query PetitionsUser {
     me {
@@ -8327,10 +7881,6 @@ export type PetitionsUserQueryHookResult = ReturnType<
 >;
 export type PetitionsUserLazyQueryHookResult = ReturnType<
   typeof usePetitionsUserLazyQuery
->;
-export type PetitionsUserQueryResult = Apollo.QueryResult<
-  PetitionsUserQuery,
-  PetitionsUserQueryVariables
 >;
 export const NewPetitionPublicTemplatesDocument = gql`
   query NewPetitionPublicTemplates(
@@ -8400,10 +7950,6 @@ export type NewPetitionPublicTemplatesQueryHookResult = ReturnType<
 >;
 export type NewPetitionPublicTemplatesLazyQueryHookResult = ReturnType<
   typeof useNewPetitionPublicTemplatesLazyQuery
->;
-export type NewPetitionPublicTemplatesQueryResult = Apollo.QueryResult<
-  NewPetitionPublicTemplatesQuery,
-  NewPetitionPublicTemplatesQueryVariables
 >;
 export const NewPetitionTemplatesDocument = gql`
   query NewPetitionTemplates(
@@ -8479,10 +8025,6 @@ export type NewPetitionTemplatesQueryHookResult = ReturnType<
 export type NewPetitionTemplatesLazyQueryHookResult = ReturnType<
   typeof useNewPetitionTemplatesLazyQuery
 >;
-export type NewPetitionTemplatesQueryResult = Apollo.QueryResult<
-  NewPetitionTemplatesQuery,
-  NewPetitionTemplatesQueryVariables
->;
 export const NewPetitionUserDocument = gql`
   query NewPetitionUser {
     me {
@@ -8535,10 +8077,6 @@ export type NewPetitionUserQueryHookResult = ReturnType<
 export type NewPetitionUserLazyQueryHookResult = ReturnType<
   typeof useNewPetitionUserLazyQuery
 >;
-export type NewPetitionUserQueryResult = Apollo.QueryResult<
-  NewPetitionUserQuery,
-  NewPetitionUserQueryVariables
->;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
     updateUser(id: $id, data: $data) {
@@ -8549,10 +8087,6 @@ export const Account_updateAccountDocument = gql`
     }
   }
 `;
-export type Account_updateAccountMutationFn = Apollo.MutationFunction<
-  Account_updateAccountMutation,
-  Account_updateAccountMutationVariables
->;
 
 /**
  * __useAccount_updateAccountMutation__
@@ -8585,13 +8119,6 @@ export function useAccount_updateAccountMutation(
 }
 export type Account_updateAccountMutationHookResult = ReturnType<
   typeof useAccount_updateAccountMutation
->;
-export type Account_updateAccountMutationResult = Apollo.MutationResult<
-  Account_updateAccountMutation
->;
-export type Account_updateAccountMutationOptions = Apollo.BaseMutationOptions<
-  Account_updateAccountMutation,
-  Account_updateAccountMutationVariables
 >;
 export const AccountDocument = gql`
   query Account {
@@ -8636,10 +8163,6 @@ export function useAccountLazyQuery(
 }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
-export type AccountQueryResult = Apollo.QueryResult<
-  AccountQuery,
-  AccountQueryVariables
->;
 export const SettingsDocument = gql`
   query Settings {
     me {
@@ -8688,19 +8211,11 @@ export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
 export type SettingsLazyQueryHookResult = ReturnType<
   typeof useSettingsLazyQuery
 >;
-export type SettingsQueryResult = Apollo.QueryResult<
-  SettingsQuery,
-  SettingsQueryVariables
->;
 export const Security_updatePasswordDocument = gql`
   mutation Security_updatePassword($password: String!, $newPassword: String!) {
     changePassword(password: $password, newPassword: $newPassword)
   }
 `;
-export type Security_updatePasswordMutationFn = Apollo.MutationFunction<
-  Security_updatePasswordMutation,
-  Security_updatePasswordMutationVariables
->;
 
 /**
  * __useSecurity_updatePasswordMutation__
@@ -8733,13 +8248,6 @@ export function useSecurity_updatePasswordMutation(
 }
 export type Security_updatePasswordMutationHookResult = ReturnType<
   typeof useSecurity_updatePasswordMutation
->;
-export type Security_updatePasswordMutationResult = Apollo.MutationResult<
-  Security_updatePasswordMutation
->;
-export type Security_updatePasswordMutationOptions = Apollo.BaseMutationOptions<
-  Security_updatePasswordMutation,
-  Security_updatePasswordMutationVariables
 >;
 export const SecurityDocument = gql`
   query Security {
@@ -8788,10 +8296,6 @@ export function useSecurityLazyQuery(
 export type SecurityQueryHookResult = ReturnType<typeof useSecurityQuery>;
 export type SecurityLazyQueryHookResult = ReturnType<
   typeof useSecurityLazyQuery
->;
-export type SecurityQueryResult = Apollo.QueryResult<
-  SecurityQuery,
-  SecurityQueryVariables
 >;
 export const CurrentUserDocument = gql`
   query CurrentUser {
@@ -8843,10 +8347,6 @@ export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<
   typeof useCurrentUserLazyQuery
 >;
-export type CurrentUserQueryResult = Apollo.QueryResult<
-  CurrentUserQuery,
-  CurrentUserQueryVariables
->;
 export const RecipientView_publicDeletePetitionReplyDocument = gql`
   mutation RecipientView_publicDeletePetitionReply(
     $replyId: GID!
@@ -8855,10 +8355,6 @@ export const RecipientView_publicDeletePetitionReplyDocument = gql`
     publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
   }
 `;
-export type RecipientView_publicDeletePetitionReplyMutationFn = Apollo.MutationFunction<
-  RecipientView_publicDeletePetitionReplyMutation,
-  RecipientView_publicDeletePetitionReplyMutationVariables
->;
 
 /**
  * __useRecipientView_publicDeletePetitionReplyMutation__
@@ -8892,13 +8388,6 @@ export function useRecipientView_publicDeletePetitionReplyMutation(
 export type RecipientView_publicDeletePetitionReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicDeletePetitionReplyMutation
 >;
-export type RecipientView_publicDeletePetitionReplyMutationResult = Apollo.MutationResult<
-  RecipientView_publicDeletePetitionReplyMutation
->;
-export type RecipientView_publicDeletePetitionReplyMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_publicDeletePetitionReplyMutation,
-  RecipientView_publicDeletePetitionReplyMutationVariables
->;
 export const RecipientView_publicCreateTextReplyDocument = gql`
   mutation RecipientView_publicCreateTextReply(
     $keycode: ID!
@@ -8911,10 +8400,6 @@ export const RecipientView_publicCreateTextReplyDocument = gql`
   }
   ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
-export type RecipientView_publicCreateTextReplyMutationFn = Apollo.MutationFunction<
-  RecipientView_publicCreateTextReplyMutation,
-  RecipientView_publicCreateTextReplyMutationVariables
->;
 
 /**
  * __useRecipientView_publicCreateTextReplyMutation__
@@ -8949,13 +8434,6 @@ export function useRecipientView_publicCreateTextReplyMutation(
 export type RecipientView_publicCreateTextReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicCreateTextReplyMutation
 >;
-export type RecipientView_publicCreateTextReplyMutationResult = Apollo.MutationResult<
-  RecipientView_publicCreateTextReplyMutation
->;
-export type RecipientView_publicCreateTextReplyMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_publicCreateTextReplyMutation,
-  RecipientView_publicCreateTextReplyMutationVariables
->;
 export const RecipientView_publicCreateFileUploadReplyDocument = gql`
   mutation RecipientView_publicCreateFileUploadReply(
     $keycode: ID!
@@ -8975,10 +8453,6 @@ export const RecipientView_publicCreateFileUploadReplyDocument = gql`
   }
   ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
 `;
-export type RecipientView_publicCreateFileUploadReplyMutationFn = Apollo.MutationFunction<
-  RecipientView_publicCreateFileUploadReplyMutation,
-  RecipientView_publicCreateFileUploadReplyMutationVariables
->;
 
 /**
  * __useRecipientView_publicCreateFileUploadReplyMutation__
@@ -9013,13 +8487,6 @@ export function useRecipientView_publicCreateFileUploadReplyMutation(
 export type RecipientView_publicCreateFileUploadReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicCreateFileUploadReplyMutation
 >;
-export type RecipientView_publicCreateFileUploadReplyMutationResult = Apollo.MutationResult<
-  RecipientView_publicCreateFileUploadReplyMutation
->;
-export type RecipientView_publicCreateFileUploadReplyMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_publicCreateFileUploadReplyMutation,
-  RecipientView_publicCreateFileUploadReplyMutationVariables
->;
 export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
   mutation RecipientView_publicFileUploadReplyComplete(
     $keycode: ID!
@@ -9031,10 +8498,6 @@ export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
     }
   }
 `;
-export type RecipientView_publicFileUploadReplyCompleteMutationFn = Apollo.MutationFunction<
-  RecipientView_publicFileUploadReplyCompleteMutation,
-  RecipientView_publicFileUploadReplyCompleteMutationVariables
->;
 
 /**
  * __useRecipientView_publicFileUploadReplyCompleteMutation__
@@ -9068,13 +8531,6 @@ export function useRecipientView_publicFileUploadReplyCompleteMutation(
 export type RecipientView_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
   typeof useRecipientView_publicFileUploadReplyCompleteMutation
 >;
-export type RecipientView_publicFileUploadReplyCompleteMutationResult = Apollo.MutationResult<
-  RecipientView_publicFileUploadReplyCompleteMutation
->;
-export type RecipientView_publicFileUploadReplyCompleteMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_publicFileUploadReplyCompleteMutation,
-  RecipientView_publicFileUploadReplyCompleteMutationVariables
->;
 export const RecipientView_publicCompletePetitionDocument = gql`
   mutation RecipientView_publicCompletePetition($keycode: ID!) {
     publicCompletePetition(keycode: $keycode) {
@@ -9083,10 +8539,6 @@ export const RecipientView_publicCompletePetitionDocument = gql`
     }
   }
 `;
-export type RecipientView_publicCompletePetitionMutationFn = Apollo.MutationFunction<
-  RecipientView_publicCompletePetitionMutation,
-  RecipientView_publicCompletePetitionMutationVariables
->;
 
 /**
  * __useRecipientView_publicCompletePetitionMutation__
@@ -9119,13 +8571,6 @@ export function useRecipientView_publicCompletePetitionMutation(
 export type RecipientView_publicCompletePetitionMutationHookResult = ReturnType<
   typeof useRecipientView_publicCompletePetitionMutation
 >;
-export type RecipientView_publicCompletePetitionMutationResult = Apollo.MutationResult<
-  RecipientView_publicCompletePetitionMutation
->;
-export type RecipientView_publicCompletePetitionMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_publicCompletePetitionMutation,
-  RecipientView_publicCompletePetitionMutationVariables
->;
 export const RecipientView_createPetitionFieldCommentDocument = gql`
   mutation RecipientView_createPetitionFieldComment(
     $keycode: ID!
@@ -9142,10 +8587,6 @@ export const RecipientView_createPetitionFieldCommentDocument = gql`
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-export type RecipientView_createPetitionFieldCommentMutationFn = Apollo.MutationFunction<
-  RecipientView_createPetitionFieldCommentMutation,
-  RecipientView_createPetitionFieldCommentMutationVariables
->;
 
 /**
  * __useRecipientView_createPetitionFieldCommentMutation__
@@ -9180,13 +8621,6 @@ export function useRecipientView_createPetitionFieldCommentMutation(
 export type RecipientView_createPetitionFieldCommentMutationHookResult = ReturnType<
   typeof useRecipientView_createPetitionFieldCommentMutation
 >;
-export type RecipientView_createPetitionFieldCommentMutationResult = Apollo.MutationResult<
-  RecipientView_createPetitionFieldCommentMutation
->;
-export type RecipientView_createPetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_createPetitionFieldCommentMutation,
-  RecipientView_createPetitionFieldCommentMutationVariables
->;
 export const RecipientView_updatePetitionFieldCommentDocument = gql`
   mutation RecipientView_updatePetitionFieldComment(
     $keycode: ID!
@@ -9205,10 +8639,6 @@ export const RecipientView_updatePetitionFieldCommentDocument = gql`
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-export type RecipientView_updatePetitionFieldCommentMutationFn = Apollo.MutationFunction<
-  RecipientView_updatePetitionFieldCommentMutation,
-  RecipientView_updatePetitionFieldCommentMutationVariables
->;
 
 /**
  * __useRecipientView_updatePetitionFieldCommentMutation__
@@ -9244,13 +8674,6 @@ export function useRecipientView_updatePetitionFieldCommentMutation(
 export type RecipientView_updatePetitionFieldCommentMutationHookResult = ReturnType<
   typeof useRecipientView_updatePetitionFieldCommentMutation
 >;
-export type RecipientView_updatePetitionFieldCommentMutationResult = Apollo.MutationResult<
-  RecipientView_updatePetitionFieldCommentMutation
->;
-export type RecipientView_updatePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_updatePetitionFieldCommentMutation,
-  RecipientView_updatePetitionFieldCommentMutationVariables
->;
 export const RecipientView_deletePetitionFieldCommentDocument = gql`
   mutation RecipientView_deletePetitionFieldComment(
     $keycode: ID!
@@ -9264,10 +8687,6 @@ export const RecipientView_deletePetitionFieldCommentDocument = gql`
     )
   }
 `;
-export type RecipientView_deletePetitionFieldCommentMutationFn = Apollo.MutationFunction<
-  RecipientView_deletePetitionFieldCommentMutation,
-  RecipientView_deletePetitionFieldCommentMutationVariables
->;
 
 /**
  * __useRecipientView_deletePetitionFieldCommentMutation__
@@ -9302,13 +8721,6 @@ export function useRecipientView_deletePetitionFieldCommentMutation(
 export type RecipientView_deletePetitionFieldCommentMutationHookResult = ReturnType<
   typeof useRecipientView_deletePetitionFieldCommentMutation
 >;
-export type RecipientView_deletePetitionFieldCommentMutationResult = Apollo.MutationResult<
-  RecipientView_deletePetitionFieldCommentMutation
->;
-export type RecipientView_deletePetitionFieldCommentMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_deletePetitionFieldCommentMutation,
-  RecipientView_deletePetitionFieldCommentMutationVariables
->;
 export const RecipientView_submitUnpublishedCommentsDocument = gql`
   mutation RecipientView_submitUnpublishedComments($keycode: ID!) {
     publicSubmitUnpublishedComments(keycode: $keycode) {
@@ -9317,10 +8729,6 @@ export const RecipientView_submitUnpublishedCommentsDocument = gql`
     }
   }
 `;
-export type RecipientView_submitUnpublishedCommentsMutationFn = Apollo.MutationFunction<
-  RecipientView_submitUnpublishedCommentsMutation,
-  RecipientView_submitUnpublishedCommentsMutationVariables
->;
 
 /**
  * __useRecipientView_submitUnpublishedCommentsMutation__
@@ -9353,13 +8761,6 @@ export function useRecipientView_submitUnpublishedCommentsMutation(
 export type RecipientView_submitUnpublishedCommentsMutationHookResult = ReturnType<
   typeof useRecipientView_submitUnpublishedCommentsMutation
 >;
-export type RecipientView_submitUnpublishedCommentsMutationResult = Apollo.MutationResult<
-  RecipientView_submitUnpublishedCommentsMutation
->;
-export type RecipientView_submitUnpublishedCommentsMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_submitUnpublishedCommentsMutation,
-  RecipientView_submitUnpublishedCommentsMutationVariables
->;
 export const RecipientView_markPetitionFieldCommentsAsReadDocument = gql`
   mutation RecipientView_markPetitionFieldCommentsAsRead(
     $keycode: ID!
@@ -9374,10 +8775,6 @@ export const RecipientView_markPetitionFieldCommentsAsReadDocument = gql`
     }
   }
 `;
-export type RecipientView_markPetitionFieldCommentsAsReadMutationFn = Apollo.MutationFunction<
-  RecipientView_markPetitionFieldCommentsAsReadMutation,
-  RecipientView_markPetitionFieldCommentsAsReadMutationVariables
->;
 
 /**
  * __useRecipientView_markPetitionFieldCommentsAsReadMutation__
@@ -9410,13 +8807,6 @@ export function useRecipientView_markPetitionFieldCommentsAsReadMutation(
 }
 export type RecipientView_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
   typeof useRecipientView_markPetitionFieldCommentsAsReadMutation
->;
-export type RecipientView_markPetitionFieldCommentsAsReadMutationResult = Apollo.MutationResult<
-  RecipientView_markPetitionFieldCommentsAsReadMutation
->;
-export type RecipientView_markPetitionFieldCommentsAsReadMutationOptions = Apollo.BaseMutationOptions<
-  RecipientView_markPetitionFieldCommentsAsReadMutation,
-  RecipientView_markPetitionFieldCommentsAsReadMutationVariables
 >;
 export const PublicPetitionDocument = gql`
   query PublicPetition($keycode: ID!) {
@@ -9480,10 +8870,6 @@ export type PublicPetitionQueryHookResult = ReturnType<
 export type PublicPetitionLazyQueryHookResult = ReturnType<
   typeof usePublicPetitionLazyQuery
 >;
-export type PublicPetitionQueryResult = Apollo.QueryResult<
-  PublicPetitionQuery,
-  PublicPetitionQueryVariables
->;
 export const useClonePetitions_clonePetitionsDocument = gql`
   mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {
     clonePetitions(petitionIds: $petitionIds) {
@@ -9491,10 +8877,6 @@ export const useClonePetitions_clonePetitionsDocument = gql`
     }
   }
 `;
-export type useClonePetitions_clonePetitionsMutationFn = Apollo.MutationFunction<
-  useClonePetitions_clonePetitionsMutation,
-  useClonePetitions_clonePetitionsMutationVariables
->;
 
 /**
  * __useuseClonePetitions_clonePetitionsMutation__
@@ -9527,13 +8909,6 @@ export function useuseClonePetitions_clonePetitionsMutation(
 export type useClonePetitions_clonePetitionsMutationHookResult = ReturnType<
   typeof useuseClonePetitions_clonePetitionsMutation
 >;
-export type useClonePetitions_clonePetitionsMutationResult = Apollo.MutationResult<
-  useClonePetitions_clonePetitionsMutation
->;
-export type useClonePetitions_clonePetitionsMutationOptions = Apollo.BaseMutationOptions<
-  useClonePetitions_clonePetitionsMutation,
-  useClonePetitions_clonePetitionsMutationVariables
->;
 export const useCreateContact_createContactDocument = gql`
   mutation useCreateContact_createContact($data: CreateContactInput!) {
     createContact(data: $data) {
@@ -9545,10 +8920,6 @@ export const useCreateContact_createContactDocument = gql`
     }
   }
 `;
-export type useCreateContact_createContactMutationFn = Apollo.MutationFunction<
-  useCreateContact_createContactMutation,
-  useCreateContact_createContactMutationVariables
->;
 
 /**
  * __useuseCreateContact_createContactMutation__
@@ -9581,13 +8952,6 @@ export function useuseCreateContact_createContactMutation(
 export type useCreateContact_createContactMutationHookResult = ReturnType<
   typeof useuseCreateContact_createContactMutation
 >;
-export type useCreateContact_createContactMutationResult = Apollo.MutationResult<
-  useCreateContact_createContactMutation
->;
-export type useCreateContact_createContactMutationOptions = Apollo.BaseMutationOptions<
-  useCreateContact_createContactMutation,
-  useCreateContact_createContactMutationVariables
->;
 export const useCreatePetition_createPetitionDocument = gql`
   mutation useCreatePetition_createPetition(
     $name: String
@@ -9605,10 +8969,6 @@ export const useCreatePetition_createPetitionDocument = gql`
     }
   }
 `;
-export type useCreatePetition_createPetitionMutationFn = Apollo.MutationFunction<
-  useCreatePetition_createPetitionMutation,
-  useCreatePetition_createPetitionMutationVariables
->;
 
 /**
  * __useuseCreatePetition_createPetitionMutation__
@@ -9644,22 +9004,11 @@ export function useuseCreatePetition_createPetitionMutation(
 export type useCreatePetition_createPetitionMutationHookResult = ReturnType<
   typeof useuseCreatePetition_createPetitionMutation
 >;
-export type useCreatePetition_createPetitionMutationResult = Apollo.MutationResult<
-  useCreatePetition_createPetitionMutation
->;
-export type useCreatePetition_createPetitionMutationOptions = Apollo.BaseMutationOptions<
-  useCreatePetition_createPetitionMutation,
-  useCreatePetition_createPetitionMutationVariables
->;
 export const useDeletePetitions_deletePetitionsDocument = gql`
   mutation useDeletePetitions_deletePetitions($ids: [GID!]!) {
     deletePetitions(ids: $ids)
   }
 `;
-export type useDeletePetitions_deletePetitionsMutationFn = Apollo.MutationFunction<
-  useDeletePetitions_deletePetitionsMutation,
-  useDeletePetitions_deletePetitionsMutationVariables
->;
 
 /**
  * __useuseDeletePetitions_deletePetitionsMutation__
@@ -9691,13 +9040,6 @@ export function useuseDeletePetitions_deletePetitionsMutation(
 }
 export type useDeletePetitions_deletePetitionsMutationHookResult = ReturnType<
   typeof useuseDeletePetitions_deletePetitionsMutation
->;
-export type useDeletePetitions_deletePetitionsMutationResult = Apollo.MutationResult<
-  useDeletePetitions_deletePetitionsMutation
->;
-export type useDeletePetitions_deletePetitionsMutationOptions = Apollo.BaseMutationOptions<
-  useDeletePetitions_deletePetitionsMutation,
-  useDeletePetitions_deletePetitionsMutationVariables
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {
@@ -9754,8 +9096,4 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 >;
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
->;
-export type PetitionComposeSearchContactsQueryResult = Apollo.QueryResult<
-  PetitionComposeSearchContactsQuery,
-  PetitionComposeSearchContactsQueryVariables
 >;
