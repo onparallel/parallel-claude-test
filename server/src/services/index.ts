@@ -7,6 +7,7 @@ import { Smtp } from "./smtp";
 import { Logger, LOGGER, createLogger } from "./logger";
 import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
+import { Printer, IPrinter, PRINTER } from "./printer";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<Logger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -17,4 +18,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();
   bind<IRedis>(REDIS).to(Redis).inSingletonScope();
   bind<Smtp>(Smtp).toSelf().inSingletonScope();
+  bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
 });

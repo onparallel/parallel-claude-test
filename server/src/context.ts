@@ -14,6 +14,7 @@ import { Aws } from "./services/aws";
 import { Cognito } from "./services/cognito";
 import { EMAILS, EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
+import { PRINTER, Printer } from "./services/printer";
 import { Smtp } from "./services/smtp";
 import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
@@ -55,6 +56,7 @@ export class WorkerContext {
     public readonly smtp: Smtp,
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
+    @inject(PRINTER) public readonly printer: Printer,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
