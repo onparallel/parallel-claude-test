@@ -1,4 +1,4 @@
-import { core, objectType, unionType } from "@nexus/schema";
+import { core, enumType, objectType, unionType } from "@nexus/schema";
 import { fullName } from "../../util/fullName";
 
 export const PublicPetitionAccess = objectType({
@@ -333,6 +333,64 @@ export const PublicPetitionFieldComment = objectType({
           petitionFieldCommentId: root.id,
         });
       },
+    });
+  },
+});
+
+export const PublicPetitionSignature = objectType({
+  name: "PublicPetitionSignature",
+  rootTyping: "db.PetitionSignature",
+  definition(t) {
+    t.globalId("id", {
+      prefixName: "PetitionSignature",
+    });
+    t.field("petition", {
+      type: "Petition",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadPetition(root.petition_id))!;
+      },
+    });
+    t.string("signerEmail", {
+      resolve: (root) => root.signer_email,
+    });
+    t.string("provider");
+    t.string("externalId", {
+      nullable: true,
+      resolve: (root) => root.external_id,
+    });
+    t.field("status", {
+      type: enumType({
+        name: "PetitionSignatureStatus",
+        members: [
+          {
+            name: "PROCESSING",
+            description: "Sign request not yet sent to client API.",
+          },
+          {
+            name: "READY_TO_SIGN",
+            description:
+              "Sign request response received, in this status the petition is ready to be signed by a recipient.",
+          },
+          {
+            name: "DECLINED",
+            description: "The recipient declined the signature.",
+          },
+          {
+            name: "EXPIRED",
+            description: "The signature request has expired.",
+          },
+          {
+            name: "CANCELED",
+            description:
+              "The user canceled the signature request for all recipients on the petition",
+          },
+          { name: "SIGNED", description: "Recipient signed the petition" },
+        ],
+        description: "The status of the signature process for a signer.",
+      }),
+    });
+    t.jsonObject("data", {
+      nullable: true,
     });
   },
 });

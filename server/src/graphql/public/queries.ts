@@ -19,3 +19,18 @@ export const accessQuery = queryField("access", {
     return ctx.access!;
   },
 });
+
+export const publicPetitionSignature = queryField("publicPetitionSignature", {
+  type: "PublicPetitionSignature",
+  list: [true],
+  nullable: false,
+  authorize: fetchPetitionAccess("keycode"),
+  args: {
+    keycode: idArg({ required: true }),
+  },
+  resolve: async (root, args, ctx) => {
+    return (
+      (await ctx.petitions.loadPetitionSignature(ctx.access!.petition_id)) ?? []
+    );
+  },
+});

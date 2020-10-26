@@ -1464,6 +1464,41 @@ type PetitionReopenedEvent implements PetitionEvent {
 }
 
 """
+The status of the signature process for a signer.
+"""
+enum PetitionSignatureStatus {
+  """
+  The user canceled the signature request for all recipients on the petition
+  """
+  CANCELED
+
+  """
+  The recipient declined the signature.
+  """
+  DECLINED
+
+  """
+  The signature request has expired.
+  """
+  EXPIRED
+
+  """
+  Sign request not yet sent to client API.
+  """
+  PROCESSING
+
+  """
+  Sign request response received, in this status the petition is ready to be signed by a recipient.
+  """
+  READY_TO_SIGN
+
+  """
+  Recipient signed the petition
+  """
+  SIGNED
+}
+
+"""
 The status of a petition.
 """
 enum PetitionStatus {
@@ -1858,6 +1893,16 @@ type PublicPetitionFieldReply implements Timestamps {
   updatedAt: DateTime!
 }
 
+type PublicPetitionSignature {
+  data: JSONObject
+  externalId: String
+  id: GID!
+  petition: Petition!
+  provider: String!
+  signerEmail: String!
+  status: PetitionSignatureStatus!
+}
+
 """
 A public view of a user
 """
@@ -1977,6 +2022,7 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
+  publicPetitionSignature(keycode: ID!): [PublicPetitionSignature!]!
 
   """
   The publicly available templates
