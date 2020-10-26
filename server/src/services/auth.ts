@@ -12,7 +12,11 @@ import { Cognito } from "./cognito";
 import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
-  login: RequestHandler;
+  login(
+    req: Request & { context: ApiContext },
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
   logout: RequestHandler;
   newPassword: RequestHandler;
   forgotPassword: RequestHandler;
