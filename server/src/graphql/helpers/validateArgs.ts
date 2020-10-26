@@ -1,6 +1,6 @@
 import { FieldValidateArgsResolver } from "./validateArgsPlugin";
 import { ValidatorOrConditionError } from "./errors";
-import { Maybe } from "../../db/__types";
+import { Maybe } from "../../util/types";
 
 export function validateAnd<TypeName extends string, FieldName extends string>(
   ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]

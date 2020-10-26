@@ -48,7 +48,8 @@ async function generateTypes(dist: string) {
  * Do not make changes to this file directly
  */
 
-export type Maybe<T> = T | null;
+type Maybe<T> = T | null;
+
   ${Array.from(enums.values())
     .map(
       ({ name, values }) => `

@@ -3,7 +3,7 @@
  * Do not make changes to this file directly
  */
 
-export type Maybe<T> = T | null;
+type Maybe<T> = T | null;
 
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
