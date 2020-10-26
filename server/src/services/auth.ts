@@ -28,6 +28,25 @@ export class Auth implements IAuth {
 
   constructor(private cognito: Cognito, @inject(REDIS) private redis: Redis) {}
 
+  private async trackSessionLogin(
+    session: CognitoUserSession,
+    ctx: ApiContext
+  ) {
+    const user = await ctx.users.loadSessionUser(
+      session.getIdToken().payload["cognito:username"]
+    );
+    ctx.analytics.identifyUser(user);
+    ctx.analytics.trackEvent(
+      "USER_LOGGED_IN",
+      {
+        email: user.email,
+        org_id: user.org_id,
+        user_id: user.id,
+      },
+      toGlobalId("User", user.id)
+    );
+  }
+
   async login(
     req: Request & { context: ApiContext },
     res: Response,
@@ -37,19 +56,7 @@ export class Auth implements IAuth {
       const { email, password } = req.body;
       const session = await this.cognito.login(email, password);
       const token = await this.storeSession(session);
-      const user = await req.context.users.loadSessionUser(
-        session.getIdToken().payload["cognito:username"]
-      );
-      req.context.analytics.identifyUser(user);
-      req.context.analytics.trackEvent(
-        "USER_LOGGED_IN",
-        {
-          email: user.email,
-          org_id: user.org_id,
-          user_id: user.id,
-        },
-        toGlobalId("User", user.id)
-      );
+      await this.trackSessionLogin(session, req.context);
       this.setSession(res, token);
     } catch (error) {
       switch (error.code) {
@@ -75,6 +82,7 @@ export class Auth implements IAuth {
         newPassword
       );
       const token = await this.storeSession(session);
+      await this.trackSessionLogin(session, req.context);
       this.setSession(res, token);
       return;
     } catch (error) {
