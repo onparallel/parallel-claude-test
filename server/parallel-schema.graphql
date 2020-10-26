@@ -151,6 +151,10 @@ enum EntityType {
   User
 }
 
+enum FeatureFlag {
+  PETITION_SIGNATURE
+}
+
 type FileUploadReplyDownloadLinkResult {
   result: Result!
   url: String
@@ -2150,6 +2154,7 @@ type User implements Timestamps {
   The full name of the user.
   """
   fullName: String
+  hasFeatureFlag(featureFlag: FeatureFlag!): Boolean!
 
   """
   The ID of the user.

@@ -65,6 +65,12 @@ export class Mocks {
       .returning("*");
   }
 
+  async createFeatureFlags() {
+    await this.knex
+      .into("feature_flag")
+      .insert([{ name: "PETITION_SIGNATURE", default_value: false }]);
+  }
+
   async createRandomContacts(
     orgId: number,
     amount: number,

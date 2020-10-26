@@ -1,0 +1,78 @@
+import { Container } from "inversify";
+import Knex from "knex";
+import { createContainer } from "../../../container";
+import { deleteAllData } from "../../../util/knexUtils";
+import { KNEX } from "../../knex";
+import { Organization, User } from "../../__types";
+import { FeatureFlagRepository } from "../FeatureFlagRepository";
+import { Mocks } from "./mocks";
+
+describe("repositories/FeatureFlagRepository", () => {
+  let container: Container;
+  let knex: Knex;
+  let ff: FeatureFlagRepository;
+
+  let org: Organization;
+  let user1: User;
+  let user2: User;
+
+  beforeAll(async () => {
+    container = createContainer();
+    knex = container.get<Knex>(KNEX);
+    ff = container.get(FeatureFlagRepository);
+
+    await deleteAllData(knex);
+    const mocks = new Mocks(knex);
+    await mocks.createFeatureFlags();
+    [org] = await mocks.createRandomOrganizations(1);
+    [user1, user2] = await mocks.createRandomUsers(org.id, 2);
+  });
+
+  beforeEach(async () => {
+    await knex.from("feature_flag_override").delete();
+    ff._userHasFeatureFlag.dataloader.clearAll();
+  });
+
+  afterAll(async () => {
+    await knex.destroy();
+  });
+
+  test("returns the default value when there's no overrides", async () => {
+    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE");
+    expect(result).toBe(false);
+  });
+
+  test("returns the org overridden value", async () => {
+    await knex.into("feature_flag_override").insert([
+      {
+        feature_flag_name: "PETITION_SIGNATURE",
+        org_id: org.id,
+        value: true,
+      },
+    ]);
+    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE");
+    expect(result).toBe(true);
+  });
+
+  test("returns the user overridden value", async () => {
+    await knex.into("feature_flag_override").insert([
+      {
+        feature_flag_name: "PETITION_SIGNATURE",
+        org_id: org.id,
+        value: true,
+      },
+      {
+        feature_flag_name: "PETITION_SIGNATURE",
+        user_id: user1.id,
+        value: false,
+      },
+    ]);
+    const [result1, result2] = await Promise.all([
+      ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE"),
+      ff.userHasFeatureFlag(user2.id, "PETITION_SIGNATURE"),
+    ]);
+
+    expect(result1).toBe(false);
+    expect(result2).toBe(true);
+  });
+});

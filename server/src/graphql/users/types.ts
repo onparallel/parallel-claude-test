@@ -1,4 +1,4 @@
-import { enumType, objectType } from "@nexus/schema";
+import { arg, enumType, objectType } from "@nexus/schema";
 import { rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
 
@@ -6,6 +6,12 @@ export const OrganizationRole = enumType({
   name: "OrganizationRole",
   members: ["NORMAL", "ADMIN"],
   description: "The roles of a user within an organization.",
+});
+
+export const FeatureFlag = enumType({
+  name: "FeatureFlag",
+  members: ["PETITION_SIGNATURE"],
+  rootTyping: "db.FeatureFlagName",
 });
 
 export const User = objectType({
@@ -48,6 +54,18 @@ export const User = objectType({
       authorize: rootIsContextUser(),
       description: "The onboarding status for the different views of the app.",
       resolve: (o) => o.onboarding_status,
+    });
+    t.boolean("hasFeatureFlag", {
+      authorize: rootIsContextUser(),
+      args: {
+        featureFlag: arg({
+          type: "FeatureFlag",
+          nullable: false,
+        }),
+      },
+      resolve: async (root, { featureFlag }, ctx) => {
+        return ctx.featureFlags.userHasFeatureFlag(root.id, featureFlag);
+      },
     });
   },
 });

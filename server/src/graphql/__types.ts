@@ -128,6 +128,7 @@ export interface NexusGenEnums {
     | "INVALID_NEW_PASSWORD"
     | "SUCCESS";
   EntityType: "Contact" | "Organization" | "Petition" | "User";
+  FeatureFlag: db.FeatureFlagName;
   OnboardingKey:
     | "CONTACT_DETAILS"
     | "CONTACT_LIST"
@@ -343,6 +344,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
   EntityType: NexusGenEnums["EntityType"];
+  FeatureFlag: NexusGenEnums["FeatureFlag"];
   OnboardingKey: NexusGenEnums["OnboardingKey"];
   OnboardingStatus: NexusGenEnums["OnboardingStatus"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
@@ -851,6 +853,7 @@ export interface NexusGenFieldTypes {
     email: string; // String!
     firstName: string | null; // String
     fullName: string | null; // String
+    hasFeatureFlag: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     lastName: string | null; // String
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -1292,6 +1295,12 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
     };
   };
+  User: {
+    hasFeatureFlag: {
+      // args
+      featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
+    };
+  };
 }
 
 export interface NexusGenAbstractResolveReturnTypes {
@@ -1407,6 +1416,7 @@ export type NexusGenInputNames =
 export type NexusGenEnumNames =
   | "ChangePasswordResult"
   | "EntityType"
+  | "FeatureFlag"
   | "OnboardingKey"
   | "OnboardingStatus"
   | "OrganizationRole"

@@ -5,6 +5,8 @@
 
 type Maybe<T> = T | null;
 
+export type FeatureFlagName = "PETITION_SIGNATURE";
+
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
@@ -59,6 +61,8 @@ export interface TableTypes {
   contact: Contact;
   email_event: EmailEvent;
   email_log: EmailLog;
+  feature_flag: FeatureFlag;
+  feature_flag_override: FeatureFlagOverride;
   file_upload: FileUpload;
   organization: Organization;
   petition: Petition;
@@ -79,6 +83,8 @@ export interface TableCreateTypes {
   contact: CreateContact;
   email_event: CreateEmailEvent;
   email_log: CreateEmailLog;
+  feature_flag: CreateFeatureFlag;
+  feature_flag_override: CreateFeatureFlagOverride;
   file_upload: CreateFileUpload;
   organization: CreateOrganization;
   petition: CreatePetition;
@@ -99,6 +105,8 @@ export interface TablePrimaryKeys {
   contact: "id";
   email_event: "id";
   email_log: "id";
+  feature_flag: "id";
+  feature_flag_override: "id";
   file_upload: "id";
   organization: "id";
   petition: "id";
@@ -186,6 +194,32 @@ export interface CreateEmailLog {
   response?: Maybe<string>;
   external_id?: Maybe<string>;
   reply_to?: Maybe<string>;
+}
+
+export interface FeatureFlag {
+  id: number;
+  name: FeatureFlagName;
+  default_value: boolean;
+}
+
+export interface CreateFeatureFlag {
+  name: FeatureFlagName;
+  default_value?: boolean;
+}
+
+export interface FeatureFlagOverride {
+  id: number;
+  feature_flag_name: FeatureFlagName;
+  org_id: Maybe<number>;
+  user_id: Maybe<number>;
+  value: boolean;
+}
+
+export interface CreateFeatureFlagOverride {
+  feature_flag_name: FeatureFlagName;
+  org_id?: Maybe<number>;
+  user_id?: Maybe<number>;
+  value: boolean;
 }
 
 export interface FileUpload {

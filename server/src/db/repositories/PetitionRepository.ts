@@ -134,9 +134,8 @@ export class PetitionRepository extends BaseRepository {
       select count(distinct pfr.id)::int as count
         from petition_field_reply as pfr
         where
-          pfr.petition_field_id = ? and pfr.id in (${replyIds
-            .map((_) => "?")
-            .join(", ")})
+          pfr.petition_field_id = ?
+          and pfr.id in (${replyIds.map(() => "?").join(", ")})
           and pfr.deleted_at is null
     `,
       [fieldId, ...replyIds]
@@ -153,9 +152,8 @@ export class PetitionRepository extends BaseRepository {
           from petition_field as pf
           join petition_field_reply as pfr on pfr.petition_field_id = pf.id
         where
-          pf.petition_id = ? and pfr.id in (${replyIds
-            .map((_) => "?")
-            .join(", ")})
+          pf.petition_id = ?
+          and pfr.id in (${replyIds.map(() => "?").join(", ")})
           and pf.deleted_at is null and pfr.deleted_at is null
     `,
       [petitionId, ...replyIds]
@@ -2015,7 +2013,7 @@ export class PetitionRepository extends BaseRepository {
         from petition_access as pa
           join contact as c on c.id = pa.contact_id
         where
-          pa.id in (${accessIds.map((_) => "?").join(", ")})
+          pa.id in (${accessIds.map(() => "?").join(", ")})
           and c.deleted_at is null
     `,
       [...accessIds]

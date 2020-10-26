@@ -16,6 +16,7 @@ import { EMAILS, EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
 import { Smtp } from "./services/smtp";
 import { ANALYTICS, AnalyticsService } from "./services/analytics";
+import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 
 @injectable()
 export class ApiContext {
@@ -34,6 +35,7 @@ export class ApiContext {
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
+    public readonly featureFlags: FeatureFlagRepository,
     public readonly files: FileUploadRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
