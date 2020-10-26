@@ -40,6 +40,7 @@ import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
   PetitionStatus,
+  PetitionSignature,
   PetitionUser,
   PetitionUserNotification,
   PetitionUserPermissionType,
@@ -2356,5 +2357,42 @@ export class PetitionRepository extends BaseRepository {
         .select<Petition[]>("petition.*"),
       opts
     );
+  }
+
+  readonly loadPetitionSignature = fromDataLoader(
+    new DataLoader<number, PetitionSignature[]>(async (ids) => {
+      const rows = await this.from("petition_signature")
+        .whereIn("petition_id", ids)
+        .select("*");
+
+      const byPetitionId = groupBy(rows, (r) => r.petition_id);
+      return ids.map((id) => byPetitionId[id]);
+    })
+  );
+
+  async createPetitionSignature(
+    petitionId: number,
+    recipients: { email: string }[],
+    provider: string
+  ) {
+    return this.from("petition_signature")
+      .insert(
+        recipients.map((recipient) => ({
+          petition_id: petitionId,
+          signer_email: recipient.email,
+          provider,
+          status: "PROCESSING",
+        }))
+      )
+      .returning("*");
+  }
+
+  async updatePetitionSignature(
+    petitionId: number,
+    data: Partial<PetitionSignature>
+  ) {
+    return this.from("petition_signature")
+      .where("petition_id", petitionId)
+      .update(data);
   }
 }

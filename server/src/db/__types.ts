@@ -54,6 +54,14 @@ export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
+export type PetitionSignatureStatus =
+  | "PROCESSING"
+  | "READY_TO_SIGN"
+  | "DECLINED"
+  | "EXPIRED"
+  | "CANCELED"
+  | "SIGNED";
+
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CLOSED";
 
 export type PetitionUserNotificationType = "COMMENT_CREATED";
@@ -80,6 +88,7 @@ export interface TableTypes {
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
   petition_reminder: PetitionReminder;
+  petition_signature: PetitionSignature;
   petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
   user: User;
@@ -103,6 +112,7 @@ export interface TableCreateTypes {
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
   petition_reminder: CreatePetitionReminder;
+  petition_signature: CreatePetitionSignature;
   petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
   user: CreateUser;
@@ -126,6 +136,7 @@ export interface TablePrimaryKeys {
   petition_field_reply: "id";
   petition_message: "id";
   petition_reminder: "id";
+  petition_signature: "id";
   petition_user: "id";
   petition_user_notification: "id";
   user: "id";
@@ -521,6 +532,27 @@ export type CreatePetitionReminder = PartialProps<
   Omit<PetitionReminder, "id">,
   "email_log_id" | "created_at" | "created_by" | "sender_id"
 >;
+
+export interface PetitionSignature {
+  id: number;
+  petition_id: number;
+  signer_email: string;
+  provider: string;
+  external_id: Maybe<string>;
+  status: PetitionSignatureStatus;
+  data: Maybe<any>;
+  created_at: Date;
+}
+
+export interface CreatePetitionSignature {
+  petition_id: number;
+  signer_email: string;
+  provider: string;
+  external_id?: Maybe<string>;
+  status?: PetitionSignatureStatus;
+  data?: Maybe<any>;
+  created_at?: Date;
+}
 
 export interface PetitionUser {
   id: number;
