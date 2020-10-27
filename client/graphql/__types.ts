@@ -131,6 +131,8 @@ export type CreateTextReplyInput = {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
+export type FeatureFlag = "PETITION_SIGNATURE";
+
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
   result: Result;
@@ -1392,6 +1394,7 @@ export type User = Timestamps & {
   firstName?: Maybe<Scalars["String"]>;
   /** The full name of the user. */
   fullName?: Maybe<Scalars["String"]>;
+  hasFeatureFlag: Scalars["Boolean"];
   /** The ID of the user. */
   id: Scalars["GID"];
   /** The last name of the user. */
@@ -1402,6 +1405,11 @@ export type User = Timestamps & {
   organizationRole: OrganizationRole;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+};
+
+/** A user in the system. */
+export type UserhasFeatureFlagArgs = {
+  featureFlag: FeatureFlag;
 };
 
 export type UserOrPetitionAccess = PetitionAccess | User;
