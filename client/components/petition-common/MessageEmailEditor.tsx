@@ -4,6 +4,7 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/core";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useId } from "@reach/auto-id";
 import { ChangeEvent, Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -11,7 +12,6 @@ import {
   RichTextEditor,
   RichTextEditorContent,
 } from "../common/RichTextEditor";
-import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 
 export function MessageEmailEditor({
   showErrors,

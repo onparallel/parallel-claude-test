@@ -4,14 +4,14 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe } from "@parallel/utils/types";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import {
-  ContactSelectSelection,
   ContactSelect,
   ContactSelectProps,
+  ContactSelectSelection,
 } from "../common/ContactSelect";
 import { RichTextEditorContent } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";

@@ -7,12 +7,12 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/core";
+import { ClaimsList } from "@parallel/components/public/ClaimsList";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ClaimsList } from "../../../components/public/ClaimsList";
 
 function Services() {
   const intl = useIntl();

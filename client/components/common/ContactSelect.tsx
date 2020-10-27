@@ -9,6 +9,11 @@ import {
 } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
+import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
+import {
+  useReactSelectStyle,
+  UserReactSelectStyleProps,
+} from "@parallel/utils/useReactSelectStyle";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useId } from "@reach/auto-id";
 import {
@@ -31,11 +36,6 @@ import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
 import { pick } from "remeda";
-import {
-  useReactSelectStyle,
-  UserReactSelectStyleProps,
-} from "../../utils/useReactSelectStyle";
-import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isInvalid?: boolean;

@@ -1,10 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
+import { useAskContactDetailsDialog } from "@parallel/components/common/AskContactDetailsDialog";
 import {
   useCreateContact_createContactMutation,
   useCreateContact_createContactMutationVariables,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
-import { useAskContactDetailsDialog } from "../../components/common/AskContactDetailsDialog";
 
 export function useCreateContact() {
   const [createContact] = useMutation<

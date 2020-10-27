@@ -11,11 +11,11 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { EMAIL_REGEX } from "../../utils/validation";
 
 export type ContactDetailsFormData = {
   email: string;

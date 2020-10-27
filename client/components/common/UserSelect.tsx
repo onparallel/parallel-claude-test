@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
 import { Image, Link as ChakraLink, Stack, Text } from "@chakra-ui/core";
 import { UserSelect_UserFragment } from "@parallel/graphql/__types";
+import {
+  useReactSelectStyle,
+  UserReactSelectStyleProps,
+} from "@parallel/utils/useReactSelectStyle";
 import { forwardRef, memo, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { components, OptionProps } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
-import {
-  useReactSelectStyle,
-  UserReactSelectStyleProps,
-} from "../../utils/useReactSelectStyle";
 
 export type UserSelectSelection = UserSelect_UserFragment;
 

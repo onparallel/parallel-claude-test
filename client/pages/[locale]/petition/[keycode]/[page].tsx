@@ -9,8 +9,8 @@ import {
   Flex,
   Stack,
   Text,
-  useToast,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/core";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -18,10 +18,16 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
-import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
-import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
+import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
+import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
+import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
+import {
+  CreateReply,
+  RecipientViewPetitionField,
+} from "@parallel/components/recipient-view/RecipientViewPetitionField";
+import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
+import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
   CreateFileUploadReplyInput,
@@ -58,17 +64,11 @@ import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import axios, { CancelTokenSource } from "axios";
 import Head from "next/head";
-import { useCallback, useEffect, useState, useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { omit, pick } from "remeda";
-import {
-  CreateReply,
-  RecipientViewPetitionField,
-} from "../../../../components/recipient-view/RecipientViewPetitionField";
 import { useRouter } from "next/router";
-import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
-import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
+import { omit, pick } from "remeda";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>

@@ -5,17 +5,17 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Portal,
   Stack,
   Text,
   useTheme,
-  Portal,
 } from "@chakra-ui/core";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
-import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
-import { FormattedMessage } from "react-intl";
-import { generateCssStripe } from "../../utils/css";
-import { ProgressIndicator, ProgressTrack } from "./Progress";
 import { ExtendChakra } from "@parallel/chakra/utils";
+import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
+import { generateCssStripe } from "@parallel/utils/css";
+import { FormattedMessage } from "react-intl";
+import { ProgressIndicator, ProgressTrack } from "./Progress";
 
 export function PetitionProgressBar({
   status,

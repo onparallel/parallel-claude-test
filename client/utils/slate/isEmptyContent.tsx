@@ -1,5 +1,5 @@
+import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
 import { Element, Text } from "slate";
-import { RichTextEditorContent } from "../../components/common/RichTextEditor";
 
 export function isEmptyContent(content: RichTextEditorContent) {
   return (

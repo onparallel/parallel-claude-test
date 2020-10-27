@@ -52,12 +52,12 @@ import { resolveUrl } from "@parallel/utils/next";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
+import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { useSearchContacts } from "../../../../../utils/useSearchContacts";
 
 type PetitionComposeProps = UnwrapPromise<
   ReturnType<typeof PetitionCompose.getInitialProps>

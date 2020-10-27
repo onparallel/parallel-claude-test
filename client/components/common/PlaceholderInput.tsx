@@ -26,7 +26,7 @@ import { ReactEditor, Slate, withReact } from "slate-react";
 import {
   useSingleLine,
   withSingleLine,
-} from "../../utils/slate/withSingleLine";
+} from "@parallel/utils/slate/withSingleLine";
 import { Card } from "./Card";
 
 export type PlaceholderInputProps = {

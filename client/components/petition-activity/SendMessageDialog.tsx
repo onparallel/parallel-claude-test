@@ -3,10 +3,10 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogOpenerProvider";
+import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { RichTextEditorContent } from "../common/RichTextEditor";
-import { isEmptyContent } from "../../utils/slate/isEmptyContent";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";

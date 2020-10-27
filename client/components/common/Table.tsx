@@ -13,6 +13,7 @@ import {
   ChevronUpIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
+import { useSelectionState } from "@parallel/utils/useSelectionState";
 import {
   ComponentType,
   memo,
@@ -24,7 +25,6 @@ import {
 } from "react";
 import { useIntl } from "react-intl";
 import { noop } from "remeda";
-import { useSelectionState } from "../../utils/useSelectionState";
 
 export type SortingDirection = "ASC" | "DESC";
 
