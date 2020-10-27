@@ -259,9 +259,9 @@ function Step({
       <Heading as="h4" size="sm">
         {header}
       </Heading>
-      <Text marginTop={2} fontSize="sm">
+      <Box marginTop={2} fontSize="sm">
         {description}
-      </Text>
+      </Box>
     </Card>
   );
 }

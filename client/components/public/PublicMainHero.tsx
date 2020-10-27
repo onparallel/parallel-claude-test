@@ -6,7 +6,6 @@ import {
   Heading,
   Image,
   Stack,
-  Text,
 } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
@@ -43,14 +42,12 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
               defaultMessage="Say goodbye to long email threads to obtain information"
             />
           </Heading>
-          <Text marginTop={8}>
-            <Heading as="h2" size="md" fontWeight="light">
-              <FormattedMessage
-                id="public.home.hero-subtitle"
-                defaultMessage="Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
-              />
-            </Heading>
-          </Text>
+          <Heading as="h2" size="md" fontWeight="light" marginTop={8}>
+            <FormattedMessage
+              id="public.home.hero-subtitle"
+              defaultMessage="Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
+            />
+          </Heading>
           <Flex
             marginTop={8}
             flexDirection={{ base: "column", [breakpoint]: "row" }}
