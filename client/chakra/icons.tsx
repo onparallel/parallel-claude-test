@@ -349,6 +349,45 @@ export const FileTextIcon = createIcon({
   ),
 });
 
+export const FileNewIcon = createIcon({
+  displayName: "FileNewIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+    </g>
+  ),
+});
+
+export const FileShineIcon = createIcon({
+  displayName: "FileShineIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <path d="M 12,12.523314 V 10.993793" />
+      <path d="M 14.355469,14.234662 15.81013,13.762014" />
+      <path d="m 13.45576,17.003681 0.89903,1.237409" />
+      <path d="M 10.54424,17.003681 9.6452102,18.24109" />
+      <path d="M 9.6445314,14.234662 8.1898703,13.762014" />
+    </g>
+  ),
+});
+
 export const ClipboardIcon = createIcon({
   displayName: "ClipboardIcon",
   viewBox: "0 0 24 24",

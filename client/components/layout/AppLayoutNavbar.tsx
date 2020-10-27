@@ -1,7 +1,23 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, List, ListItem, Stack } from "@chakra-ui/core";
+import {
+  Box,
+  Flex,
+  IconButton,
+  List,
+  ListItem,
+  Menu,
+  MenuButton,
+  MenuGroup,
+  MenuItem,
+  MenuList,
+  Portal,
+  Stack,
+  Tooltip,
+} from "@chakra-ui/core";
 import {
   AddIcon,
+  FileNewIcon,
+  FileTextIcon,
   HelpOutlineIcon,
   PaperPlaneIcon,
   PaperPlanesIcon,
@@ -9,10 +25,12 @@ import {
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
-import { memo, useMemo } from "react";
-import { useIntl } from "react-intl";
+import { memo, useCallback, useMemo } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
@@ -36,6 +54,14 @@ export const AppLayoutNavbar = Object.assign(
     const { pathname, query } = useRouter();
     const intl = useIntl();
     const router = useRouter();
+    const createPetition = useCreatePetition();
+    const goToPetition = useGoToPetition();
+    const handleCreatePetition = useCallback(async () => {
+      try {
+        const petitionId = await createPetition();
+        goToPetition(petitionId, "compose");
+      } catch {}
+    }, [createPetition, goToPetition]);
     const items = useMemo(
       () => [
         {
@@ -126,21 +152,55 @@ export const AppLayoutNavbar = Object.assign(
           </Flex>
         )}
         <Flex justifyContent="center" alignItems="center">
-          <NakedLink href="/app/petitions/new">
-            <IconButtonWithTooltip
-              id="new-petition-button"
-              as={"a" as any}
-              colorScheme="purple"
-              icon={<AddIcon />}
-              size="lg"
-              isRound
+          <Menu placement={isMobile ? "top-start" : "right"}>
+            <Tooltip
               label={intl.formatMessage({
-                id: "navbar.new-button",
-                defaultMessage: "Create a new petition",
+                id: "navbar.create-new-petition",
+                defaultMessage: "Create new petition",
               })}
               placement={isMobile ? "top" : "right"}
-            />
-          </NakedLink>
+            >
+              <MenuButton
+                as={IconButton}
+                id="new-petition-button"
+                colorScheme="purple"
+                icon={<AddIcon />}
+                size="lg"
+                isRound
+                aria-label={intl.formatMessage({
+                  id: "navbar.create-new-petition",
+                  defaultMessage: "Create new petition",
+                })}
+              />
+            </Tooltip>
+            <Portal>
+              <MenuList>
+                <MenuGroup
+                  title={intl.formatMessage({
+                    id: "navbar.create-new-petition",
+                    defaultMessage: "Create new petition",
+                  })}
+                >
+                  <NakedLink href="/app/petitions/new">
+                    <MenuItem as="a">
+                      <FileTextIcon marginRight={2} />
+                      <FormattedMessage
+                        id="navbar.create-new-petition-from-template"
+                        defaultMessage="Use a template"
+                      />
+                    </MenuItem>
+                  </NakedLink>
+                  <MenuItem onClick={handleCreatePetition}>
+                    <FileNewIcon marginRight={2} />
+                    <FormattedMessage
+                      id="navbar.create-new-petition-blank"
+                      defaultMessage="Blank petition"
+                    />
+                  </MenuItem>
+                </MenuGroup>
+              </MenuList>
+            </Portal>
+          </Menu>
         </Flex>
         <List
           as={Flex}

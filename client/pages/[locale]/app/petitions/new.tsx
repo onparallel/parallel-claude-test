@@ -648,7 +648,7 @@ const EmptyPetitionCard = memo(function EmptyPetitionCard({
       <Heading size="xs">
         <FormattedMessage
           id="new-petition.empty-petition-create"
-          defaultMessage="Create a petition from scratch"
+          defaultMessage="Create a blank petition"
         />
       </Heading>
     </Card>

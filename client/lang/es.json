@@ -355,16 +355,6 @@
     "context": "Clone {count, plural, =1{template} other{templates}}"
   },
   {
-    "term": "component.petition-list-header.create-petition-button",
-    "definition": "Crear petición",
-    "context": "Create petition"
-  },
-  {
-    "term": "component.petition-list-header.create-template-button",
-    "definition": "Crear plantilla",
-    "context": "Create template"
-  },
-  {
     "term": "component.petition-list-header.delete-petition-label",
     "definition": "Borrar {count, plural, =1{petición} other{peticiones}}",
     "context": "Delete {count, plural, =1{petition} other{petitions}}"
@@ -1185,9 +1175,19 @@
     "context": "Contacts"
   },
   {
-    "term": "navbar.new-button",
-    "definition": "Nueva petición",
-    "context": "Create a new petition"
+    "term": "navbar.create-new-petition",
+    "definition": "Crear petición nueva",
+    "context": "Create new petition"
+  },
+  {
+    "term": "navbar.create-new-petition-blank",
+    "definition": "Petición en blanco",
+    "context": "Blank petition"
+  },
+  {
+    "term": "navbar.create-new-petition-from-template",
+    "definition": "Usar una plantilla",
+    "context": "Use a template"
   },
   {
     "term": "navbar.petitions-link",
@@ -1206,8 +1206,8 @@
   },
   {
     "term": "new-petition.empty-petition-create",
-    "definition": "Crea una petición desde cero",
-    "context": "Create a petition from scratch"
+    "definition": "Crea una petición en blanco",
+    "context": "Create a blank petition"
   },
   {
     "term": "new-petition.empty-petition-header",

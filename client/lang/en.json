@@ -355,16 +355,6 @@
     "context": "Clone {count, plural, =1{template} other{templates}}"
   },
   {
-    "term": "component.petition-list-header.create-petition-button",
-    "definition": "Create petition",
-    "context": "Create petition"
-  },
-  {
-    "term": "component.petition-list-header.create-template-button",
-    "definition": "Create template",
-    "context": "Create template"
-  },
-  {
     "term": "component.petition-list-header.delete-petition-label",
     "definition": "Delete {count, plural, =1{petition} other{petitions}}",
     "context": "Delete {count, plural, =1{petition} other{petitions}}"
@@ -1185,9 +1175,19 @@
     "context": "Contacts"
   },
   {
-    "term": "navbar.new-button",
-    "definition": "Create a new petition",
-    "context": "Create a new petition"
+    "term": "navbar.create-new-petition",
+    "definition": "Create new petition",
+    "context": "Create new petition"
+  },
+  {
+    "term": "navbar.create-new-petition-blank",
+    "definition": "Blank petition",
+    "context": "Blank petition"
+  },
+  {
+    "term": "navbar.create-new-petition-from-template",
+    "definition": "Use a template",
+    "context": "Use a template"
   },
   {
     "term": "navbar.petitions-link",
@@ -1206,8 +1206,8 @@
   },
   {
     "term": "new-petition.empty-petition-create",
-    "definition": "Create a petition from scratch",
-    "context": "Create a petition from scratch"
+    "definition": "Create a blank petition",
+    "context": "Create a blank petition"
   },
   {
     "term": "new-petition.empty-petition-header",

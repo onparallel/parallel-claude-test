@@ -50,7 +50,6 @@ import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useRouter } from "next/router";
 
 const PAGE_SIZE = 10;
 
@@ -69,7 +68,6 @@ const QUERY_STATE = {
 
 function Petitions() {
   const intl = useIntl();
-  const router = useRouter();
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
@@ -153,22 +151,6 @@ function Petitions() {
     [petitions, selected]
   );
 
-  const handleCreatePetition = useCallback(async () => {
-    try {
-      if (state.type === "TEMPLATE") {
-        const templateId = await createPetition({
-          type: "TEMPLATE",
-        });
-        goToPetition(templateId, "compose");
-      } else {
-        router.push(
-          `/[locale]/app/petitions/new`,
-          `/${router.query.locale}/app/petitions/new`
-        );
-      }
-    } catch {}
-  }, [state.type]);
-
   const clonePetitions = useClonePetitions();
   const handleCloneClick = useCallback(
     async function () {
@@ -250,7 +232,6 @@ function Petitions() {
               onUseTemplateClick={handleUseTemplateClick}
               onReload={() => refetch()}
               onCloneClick={handleCloneClick}
-              onCreatePetition={handleCreatePetition}
             />
           }
           body={

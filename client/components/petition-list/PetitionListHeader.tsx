@@ -13,8 +13,8 @@ import {
   ChevronDownIcon,
   CopyIcon,
   DeleteIcon,
-  RepeatIcon,
   PaperPlaneIcon,
+  RepeatIcon,
 } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
@@ -36,7 +36,6 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
   onUseTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
-  onCreatePetition: () => void;
 };
 
 export function PetitionListHeader({
@@ -51,7 +50,6 @@ export function PetitionListHeader({
   onReload,
   onCloneClick,
   onFilterChange,
-  onCreatePetition,
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
@@ -91,98 +89,84 @@ export function PetitionListHeader({
         />
       </Box>
       <Spacer />
-      {showActions ? (
-        <Box>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              <FormattedMessage
-                id="generic.actions-button"
-                defaultMessage="Actions"
-              />
-            </MenuButton>
-            <Portal>
-              <MenuList minWidth="160px">
+      <Box>
+        <Menu>
+          <MenuButton
+            as={Button}
+            rightIcon={<ChevronDownIcon />}
+            isDisabled={!showActions}
+          >
+            <FormattedMessage
+              id="generic.actions-button"
+              defaultMessage="Actions"
+            />
+          </MenuButton>
+          <Portal>
+            <MenuList minWidth="160px">
+              <MenuItem onClick={onCloneClick} isDisabled={selectedCount === 0}>
+                <CopyIcon marginRight={2} />
+                {type === "PETITION" ? (
+                  <FormattedMessage
+                    id="component.petition-list-header.clone-petition-label"
+                    defaultMessage="Clone {count, plural, =1{petition} other{petitions}}"
+                    values={{ count: selectedCount }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.petition-list-header.clone-template-label"
+                    defaultMessage="Clone {count, plural, =1{template} other{templates}}"
+                    values={{ count: selectedCount }}
+                  />
+                )}
+              </MenuItem>
+              {type === "PETITION" ? (
                 <MenuItem
-                  onClick={onCloneClick}
-                  isDisabled={selectedCount === 0}
+                  onClick={onCloneAsTemplateClick}
+                  isDisabled={selectedCount !== 1}
                 >
                   <CopyIcon marginRight={2} />
-                  {type === "PETITION" ? (
-                    <FormattedMessage
-                      id="component.petition-list-header.clone-petition-label"
-                      defaultMessage="Clone {count, plural, =1{petition} other{petitions}}"
-                      values={{ count: selectedCount }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="component.petition-list-header.clone-template-label"
-                      defaultMessage="Clone {count, plural, =1{template} other{templates}}"
-                      values={{ count: selectedCount }}
-                    />
-                  )}
+                  <FormattedMessage
+                    id="component.petition-list-header.save-as-template-label"
+                    defaultMessage="Save as template"
+                  />
                 </MenuItem>
-                {type === "PETITION" ? (
-                  <MenuItem
-                    onClick={onCloneAsTemplateClick}
-                    isDisabled={selectedCount !== 1}
-                  >
-                    <CopyIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-list-header.save-as-template-label"
-                      defaultMessage="Save as template"
-                    />
-                  </MenuItem>
-                ) : (
-                  <MenuItem
-                    onClick={onUseTemplateClick}
-                    isDisabled={selectedCount !== 1}
-                  >
-                    <PaperPlaneIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-list-header.use-template-label"
-                      defaultMessage="Use template"
-                    />
-                  </MenuItem>
-                )}
-                <MenuDivider />
+              ) : (
                 <MenuItem
-                  color="red.500"
-                  onClick={onDeleteClick}
-                  isDisabled={selectedCount === 0}
+                  onClick={onUseTemplateClick}
+                  isDisabled={selectedCount !== 1}
                 >
-                  <DeleteIcon marginRight={2} />
-                  {type === "PETITION" ? (
-                    <FormattedMessage
-                      id="component.petition-list-header.delete-petition-label"
-                      defaultMessage="Delete {count, plural, =1{petition} other{petitions}}"
-                      values={{ count: selectedCount }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="component.petition-list-header.delete-template-label"
-                      defaultMessage="Delete {count, plural, =1{template} other{templates}}"
-                      values={{ count: selectedCount }}
-                    />
-                  )}
+                  <PaperPlaneIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.petition-list-header.use-template-label"
+                    defaultMessage="Use template"
+                  />
                 </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        </Box>
-      ) : null}
-      <Button colorScheme="purple" onClick={onCreatePetition}>
-        {type === "PETITION" ? (
-          <FormattedMessage
-            id="component.petition-list-header.create-petition-button"
-            defaultMessage="Create petition"
-          />
-        ) : (
-          <FormattedMessage
-            id="component.petition-list-header.create-template-button"
-            defaultMessage="Create template"
-          />
-        )}
-      </Button>
+              )}
+              <MenuDivider />
+              <MenuItem
+                color="red.500"
+                onClick={onDeleteClick}
+                isDisabled={selectedCount === 0}
+              >
+                <DeleteIcon marginRight={2} />
+                {type === "PETITION" ? (
+                  <FormattedMessage
+                    id="component.petition-list-header.delete-petition-label"
+                    defaultMessage="Delete {count, plural, =1{petition} other{petitions}}"
+                    values={{ count: selectedCount }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.petition-list-header.delete-template-label"
+                    defaultMessage="Delete {count, plural, =1{template} other{templates}}"
+                    values={{ count: selectedCount }}
+                  />
+                )}
+              </MenuItem>
+            </MenuList>
+          </Portal>
+        </Menu>
+      </Box>
     </Stack>
   );
 }
