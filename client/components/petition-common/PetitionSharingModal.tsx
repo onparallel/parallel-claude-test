@@ -1,4 +1,4 @@
-import { gql, useApolloClient, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useLazyQuery } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
   Avatar,
@@ -76,11 +76,17 @@ export function PetitionSharingModal({
 }: PetitionSharingModalProps) {
   const intl = useIntl();
   const toast = useToast();
-  const { data } = useGetUserPermissions({ petitionId });
+  const [loadUserPermissions, { data }] = useGetUserPermissions();
   const userPermissions = data?.petition?.userPermissions;
   const isOwner = userPermissions?.some(
     (up) => up.permissionType === "OWNER" && up.user.id === userId
   );
+
+  useEffect(() => {
+    if (props.isOpen) {
+      loadUserPermissions({ variables: { petitionId } });
+    }
+  }, [props.isOpen]);
 
   const { handleSubmit, register, control, watch } = useForm<
     PetitionSharingModalData
@@ -456,10 +462,8 @@ PetitionSharingModal.mutations = [
   `,
 ];
 
-function useGetUserPermissions(
-  variables: PetitionSharingModal_PetitionUserPermissionsQueryVariables
-) {
-  return useQuery<
+function useGetUserPermissions() {
+  return useLazyQuery<
     PetitionSharingModal_PetitionUserPermissionsQuery,
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
   >(
@@ -471,10 +475,7 @@ function useGetUserPermissions(
       }
       ${PetitionSharingModal.fragments.Petition}
     `,
-    {
-      variables,
-      fetchPolicy: "cache-and-network",
-    }
+    { fetchPolicy: "cache-and-network" }
   );
 }
 

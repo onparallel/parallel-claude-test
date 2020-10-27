@@ -10,6 +10,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Portal,
   Tooltip,
   useDisclosure,
 } from "@chakra-ui/core";
@@ -199,37 +200,39 @@ export function PetitionTemplateHeader({
                 })}
               />
             </Tooltip>
-            <MenuList>
-              <MenuItem onClick={onOpenSharePetition}>
-                <UserArrowIcon marginRight={2} />
-                <FormattedMessage
-                  id="component.template-header.share-label"
-                  defaultMessage="Share template"
-                />
-              </MenuItem>
-              <MenuItem onClick={handleCloneClick}>
-                <CopyIcon marginRight={2} />
-                <FormattedMessage
-                  id="component.template-header.clone-label"
-                  defaultMessage="Clone template"
-                />
-              </MenuItem>
-              <MenuItem onClick={onOpenSettings}>
-                <SettingsIcon marginRight={2} />
-                <FormattedMessage
-                  id="template.settings-header"
-                  defaultMessage="Template settings"
-                />
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem color="red.500" onClick={handleDeleteClick}>
-                <DeleteIcon marginRight={2} />
-                <FormattedMessage
-                  id="component.petition-template.delete-label"
-                  defaultMessage="Delete template"
-                />
-              </MenuItem>
-            </MenuList>
+            <Portal>
+              <MenuList>
+                <MenuItem onClick={onOpenSharePetition}>
+                  <UserArrowIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.template-header.share-label"
+                    defaultMessage="Share template"
+                  />
+                </MenuItem>
+                <MenuItem onClick={handleCloneClick}>
+                  <CopyIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.template-header.clone-label"
+                    defaultMessage="Clone template"
+                  />
+                </MenuItem>
+                <MenuItem onClick={onOpenSettings}>
+                  <SettingsIcon marginRight={2} />
+                  <FormattedMessage
+                    id="template.settings-header"
+                    defaultMessage="Template settings"
+                  />
+                </MenuItem>
+                <MenuDivider />
+                <MenuItem color="red.500" onClick={handleDeleteClick}>
+                  <DeleteIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.petition-template.delete-label"
+                    defaultMessage="Delete template"
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
           </Menu>
         </Flex>
       </Box>
@@ -239,14 +242,12 @@ export function PetitionTemplateHeader({
         isOpen={isSettingsOpen}
         onClose={onCloseSettings}
       />
-      {isSharePetitionOpen ? (
-        <PetitionSharingModal
-          petitionId={petition.id}
-          userId={user.id}
-          isOpen={true}
-          onClose={onCloseSharePetition}
-        />
-      ) : null}
+      <PetitionSharingModal
+        petitionId={petition.id}
+        userId={user.id}
+        isOpen={isSharePetitionOpen}
+        onClose={onCloseSharePetition}
+      />
     </>
   );
 }

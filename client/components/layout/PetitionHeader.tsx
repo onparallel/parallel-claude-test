@@ -9,6 +9,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Portal,
   Stack,
   Text,
   Tooltip,
@@ -29,22 +30,22 @@ import {
   UpdatePetitionInput,
   usePetitionHeader_reopenPetitionMutation,
 } from "@parallel/graphql/__types";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
-import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
 import { forwardRef, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
+import { LocaleBadge } from "../common/LocaleBadge";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
-import { HeaderNameEditable } from "./HeaderNameEditable";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { LocaleBadge } from "../common/LocaleBadge";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/ConfirmReopenPetitionDialog";
+import { HeaderNameEditable } from "./HeaderNameEditable";
 
 export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
@@ -280,54 +281,56 @@ export function PetitionHeader({
                     })}
                   />
                 </Tooltip>
-                <MenuList>
-                  <MenuItem onClick={onOpenSharePetition}>
-                    <UserArrowIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.share-label"
-                      defaultMessage="Share petition"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleCloneClick}>
-                    <CopyIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.clone-label"
-                      defaultMessage="Clone petition"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleSaveAsTemplate}>
-                    <CopyIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.save-as-template-button"
-                      defaultMessage="Save as template"
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={handleReopenPetition}
-                    hidden={petition.status !== "CLOSED"}
-                  >
-                    <EditIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.reopen-button"
-                      defaultMessage="Reopen petition"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={onOpenSettings}>
-                    <SettingsIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.settings-button"
-                      defaultMessage="Petition settings"
-                    />
-                  </MenuItem>
-                  <MenuDivider />
-                  <MenuItem color="red.500" onClick={handleDeleteClick}>
-                    <DeleteIcon marginRight={2} />
-                    <FormattedMessage
-                      id="component.petition-header.delete-label"
-                      defaultMessage="Delete petition"
-                    />
-                  </MenuItem>
-                </MenuList>
+                <Portal>
+                  <MenuList>
+                    <MenuItem onClick={onOpenSharePetition}>
+                      <UserArrowIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.share-label"
+                        defaultMessage="Share petition"
+                      />
+                    </MenuItem>
+                    <MenuItem onClick={handleCloneClick}>
+                      <CopyIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.clone-label"
+                        defaultMessage="Clone petition"
+                      />
+                    </MenuItem>
+                    <MenuItem onClick={handleSaveAsTemplate}>
+                      <CopyIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.save-as-template-button"
+                        defaultMessage="Save as template"
+                      />
+                    </MenuItem>
+                    <MenuItem
+                      onClick={handleReopenPetition}
+                      hidden={petition.status !== "CLOSED"}
+                    >
+                      <EditIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.reopen-button"
+                        defaultMessage="Reopen petition"
+                      />
+                    </MenuItem>
+                    <MenuItem onClick={onOpenSettings}>
+                      <SettingsIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.settings-button"
+                        defaultMessage="Petition settings"
+                      />
+                    </MenuItem>
+                    <MenuDivider />
+                    <MenuItem color="red.500" onClick={handleDeleteClick}>
+                      <DeleteIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.delete-label"
+                        defaultMessage="Delete petition"
+                      />
+                    </MenuItem>
+                  </MenuList>
+                </Portal>
               </Menu>
             </Box>
           </Stack>
@@ -372,14 +375,12 @@ export function PetitionHeader({
         isOpen={isSettingsOpen}
         onClose={onCloseSettings}
       />
-      {isSharePetitionOpen ? (
-        <PetitionSharingModal
-          petitionId={petition.id}
-          userId={user.id}
-          isOpen={true}
-          onClose={handleCloseSharingModal}
-        />
-      ) : null}
+      <PetitionSharingModal
+        petitionId={petition.id}
+        userId={user.id}
+        isOpen={isSharePetitionOpen}
+        onClose={handleCloseSharingModal}
+      />
     </>
   );
 }
