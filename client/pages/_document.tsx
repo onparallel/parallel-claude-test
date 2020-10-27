@@ -52,10 +52,11 @@ class MyDocument extends Document<MyDocumentProps> {
   }
 
   render() {
-    const { locale, messages } = this.props;
+    const { locale } = this.props;
     return (
       <Html lang={locale}>
         <Head>
+          <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,500,600|Playfair+Display&display=swap"
@@ -78,16 +79,13 @@ class MyDocument extends Document<MyDocumentProps> {
               ].join(",")
             )}`}
           />
+          <script
+            async
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
+          />
         </Head>
         <body>
           <Main />
-          <script
-            id="__LANG_DATA__"
-            type="application/json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({ locale, messages }),
-            }}
-          />
           <NextScript />
         </body>
       </Html>

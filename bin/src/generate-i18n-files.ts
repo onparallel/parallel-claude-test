@@ -1,12 +1,14 @@
 import chalk from "chalk";
+import { promises as fs } from "fs";
 import { MessageFormatElement, parse, TYPE } from "intl-messageformat-parser";
+import outdent from "outdent";
 import path from "path";
+import { difference, uniq } from "remeda";
 import yargs from "yargs";
 import { Term } from "./extract-i18n-terms";
 import { readJson, writeJson } from "./utils/json";
-import { run } from "./utils/run";
-import { uniq, difference } from "remeda";
 import { warn } from "./utils/log";
+import { run } from "./utils/run";
 
 async function generate(
   locales: string[],
@@ -57,6 +59,14 @@ async function generate(
     }
     if (rawOutput) {
       await writeJson(path.join(rawOutput, `${locale}.json`), raw);
+      await fs.writeFile(
+        path.join(rawOutput, `${locale}.js`),
+        outdent`
+          window.__LOCALE__ = "${locale}";
+          window.__LOCALE_DATA__ = ${JSON.stringify(raw)};
+        `,
+        "utf-8"
+      );
     }
     if (compiledOutput) {
       await writeJson(path.join(compiledOutput, `${locale}.json`), compiled);

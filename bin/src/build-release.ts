@@ -45,6 +45,22 @@ async function main() {
     encoding: "utf-8",
   });
 
+  console.log("Getting the secrets 🤫");
+  execSync(
+    "git clone --depth 1 git@github.com:parallel-so/secrets.git secrets",
+    {
+      cwd: WORK_DIR,
+      encoding: "utf-8",
+    }
+  );
+  for (const dir of ["server", "client"]) {
+    execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
+      cwd: WORK_DIR,
+      encoding: "utf-8",
+    });
+  }
+  execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
+
   console.log("Building the client");
   execSync(`yarn build-${env}`, {
     cwd: `${buildDir}/client`,
@@ -69,22 +85,6 @@ async function main() {
      --frozen-lockfile`,
     { cwd: buildDir, encoding: "utf-8" }
   );
-
-  console.log("Getting the secrets 🤫");
-  execSync(
-    "git clone --depth 1 git@github.com:parallel-so/secrets.git secrets",
-    {
-      cwd: WORK_DIR,
-      encoding: "utf-8",
-    }
-  );
-  for (const dir of ["server", "client"]) {
-    execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
-      cwd: WORK_DIR,
-      encoding: "utf-8",
-    });
-  }
-  execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
 
   console.log("Zip and upload to S3");
   execSync(`tar -zcf ${buildId}.tar.gz ${buildId}`, {

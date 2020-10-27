@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const { DefinePlugin } = require("webpack");
 const config = {
   env: {
     ROOT: __dirname,
@@ -8,6 +9,11 @@ const config = {
   poweredByHeader: false,
   webpack(config, options) {
     config.resolve.alias["@parallel"] = __dirname;
+    config.plugins.push(
+      new DefinePlugin({
+        "process.env.BUILD_ID": JSON.stringify(options.buildId),
+      })
+    );
     const originalEntry = config.entry;
     config.entry = async () => {
       const entries = await originalEntry();

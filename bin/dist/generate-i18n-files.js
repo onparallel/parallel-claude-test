@@ -4,13 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
+const fs_1 = require("fs");
 const intl_messageformat_parser_1 = require("intl-messageformat-parser");
+const outdent_1 = __importDefault(require("outdent"));
 const path_1 = __importDefault(require("path"));
+const remeda_1 = require("remeda");
 const yargs_1 = __importDefault(require("yargs"));
 const json_1 = require("./utils/json");
-const run_1 = require("./utils/run");
-const remeda_1 = require("remeda");
 const log_1 = require("./utils/log");
+const run_1 = require("./utils/run");
 async function generate(locales, input, rawOutput, compiledOutput) {
     // store the values used in the default (first) locale to make sure they
     // are used in all the other locales
@@ -52,6 +54,10 @@ async function generate(locales, input, rawOutput, compiledOutput) {
         }
         if (rawOutput) {
             await json_1.writeJson(path_1.default.join(rawOutput, `${locale}.json`), raw);
+            await fs_1.promises.writeFile(path_1.default.join(rawOutput, `${locale}.js`), outdent_1.default `
+          window.__LOCALE__ = "${locale}";
+          window.__LOCALE_DATA__ = ${JSON.stringify(raw)};
+        `, "utf-8");
         }
         if (compiledOutput) {
             await json_1.writeJson(path_1.default.join(compiledOutput, `${locale}.json`), compiled);

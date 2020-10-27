@@ -50,8 +50,8 @@ function useTranslations() {
     query: { locale },
   } = useRouter();
   const [{ current, cache }, setState] = useState<IntlCache>(() => {
-    const el = document.querySelector("#__LANG_DATA__");
-    const { locale, messages } = JSON.parse(el!.firstChild!.nodeValue!);
+    const locale = (window as any).__LOCALE__ as string;
+    const messages = (window as any).__LOCALE_DATA__ as IntlConfig["messages"];
     return {
       current: locale,
       cache: {
@@ -61,7 +61,7 @@ function useTranslations() {
   });
   const setLocale = useCallback(async function (locale: string) {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.json`
+      `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.json?v=${process.env.BUILD_ID}`
     );
     const messages = await res.json();
     setState(({ cache }) => ({
