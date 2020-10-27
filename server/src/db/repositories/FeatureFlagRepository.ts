@@ -2,7 +2,10 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { indexBy, uniq } from "remeda";
-import { fromDataLoader } from "../../util/fromDataLoader";
+import {
+  fromDataLoader,
+  FromDataLoaderOptions,
+} from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -17,24 +20,28 @@ export class FeatureFlagRepository extends BaseRepository {
 
   async userHasFeatureFlag(
     userId: number,
-    featureFlag: FeatureFlagName
+    featureFlag: FeatureFlagName,
+    opts?: FromDataLoaderOptions
   ): Promise<boolean>;
   async userHasFeatureFlag(
     userId: number,
-    featureFlags: FeatureFlagName[]
+    featureFlags: FeatureFlagName[],
+    opts?: FromDataLoaderOptions
   ): Promise<boolean[]>;
   async userHasFeatureFlag(
     userId: number,
-    featureFlag: MaybeArray<FeatureFlagName>
+    featureFlag: MaybeArray<FeatureFlagName>,
+    opts?: FromDataLoaderOptions
   ): Promise<boolean | boolean[]> {
     return Array.isArray(featureFlag)
       ? ((await this._userHasFeatureFlag(
-          featureFlag.map((featureFlag) => ({ userId, featureFlag }))
+          featureFlag.map((featureFlag) => ({ userId, featureFlag })),
+          opts
         )) as boolean[])
-      : await this._userHasFeatureFlag({ userId, featureFlag });
+      : await this._userHasFeatureFlag({ userId, featureFlag }, opts);
   }
 
-  readonly _userHasFeatureFlag = fromDataLoader(
+  private readonly _userHasFeatureFlag = fromDataLoader(
     new DataLoader<
       { userId: number; featureFlag: FeatureFlagName },
       boolean,
@@ -68,7 +75,7 @@ export class FeatureFlagRepository extends BaseRepository {
         const results = indexBy(rows, keyBuilder(["user_id", "feature_flag"]));
         return keys
           .map(keyBuilder(["userId", "featureFlag"]))
-          .map((key) => results[key].value);
+          .map((key) => results[key]?.value ?? false);
       },
       {
         cacheKeyFn: keyBuilder(["userId", "featureFlag"]),

@@ -30,7 +30,6 @@ describe("repositories/FeatureFlagRepository", () => {
 
   beforeEach(async () => {
     await knex.from("feature_flag_override").delete();
-    ff._userHasFeatureFlag.dataloader.clearAll();
   });
 
   afterAll(async () => {
@@ -38,7 +37,9 @@ describe("repositories/FeatureFlagRepository", () => {
   });
 
   test("returns the default value when there's no overrides", async () => {
-    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE");
+    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", {
+      refresh: true,
+    });
     expect(result).toBe(false);
   });
 
@@ -50,7 +51,9 @@ describe("repositories/FeatureFlagRepository", () => {
         value: true,
       },
     ]);
-    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE");
+    const result = await ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", {
+      refresh: true,
+    });
     expect(result).toBe(true);
   });
 
@@ -68,11 +71,22 @@ describe("repositories/FeatureFlagRepository", () => {
       },
     ]);
     const [result1, result2] = await Promise.all([
-      ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE"),
-      ff.userHasFeatureFlag(user2.id, "PETITION_SIGNATURE"),
+      ff.userHasFeatureFlag(user1.id, "PETITION_SIGNATURE", {
+        refresh: true,
+      }),
+      ff.userHasFeatureFlag(user2.id, "PETITION_SIGNATURE", {
+        refresh: true,
+      }),
     ]);
 
     expect(result1).toBe(false);
     expect(result2).toBe(true);
+  });
+
+  test("returns false for unknown userId", async () => {
+    const result = await ff.userHasFeatureFlag(654321, "PETITION_SIGNATURE", {
+      refresh: true,
+    });
+    expect(result).toBe(false);
   });
 });
