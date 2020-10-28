@@ -1493,6 +1493,11 @@ enum PetitionSignatureStatus {
   READY_TO_SIGN
 
   """
+  Client API returned unexpected response.
+  """
+  REQUEST_ERROR
+
+  """
   Recipient signed the petition
   """
   SIGNED

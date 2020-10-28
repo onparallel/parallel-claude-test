@@ -12,6 +12,7 @@ export async function up(knex: Knex): Promise<void> {
         "status",
         [
           "PROCESSING",
+          "REQUEST_ERROR",
           "READY_TO_SIGN",
           "DECLINED",
           "EXPIRED",

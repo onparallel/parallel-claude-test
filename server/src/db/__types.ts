@@ -56,6 +56,7 @@ export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
 export type PetitionSignatureStatus =
   | "PROCESSING"
+  | "REQUEST_ERROR"
   | "READY_TO_SIGN"
   | "DECLINED"
   | "EXPIRED"

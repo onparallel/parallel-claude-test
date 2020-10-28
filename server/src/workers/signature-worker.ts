@@ -20,6 +20,14 @@ async function startSignatureProcess(
   const signatureClient = new SignaturItClient(
     "OWjTPUJhfPeLMEQAHiGLECOJjoITJypAmNwdsEFdXErfuamBBxDUSBofbpbKQPMJhoGIScVVgURyzmebKhzBsS"
   );
+
+  // events url is resolved before writing anything to DB, so if the localtunnel fails on develop nothing will be saved
+  const eventsUrl = (
+    await getBaseEventsUrl(context.config.misc.parallelUrl)
+  ).concat(
+    `/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`
+  );
+
   try {
     // insert a tuple with status PROCESSING <petitionId, signerEmail> for each of the required signers
     await context.petitions.createPetitionSignature(
@@ -34,12 +42,6 @@ async function startSignatureProcess(
       path: tmpPdfPath,
     });
 
-    const eventsUrl = (
-      await getBaseEventsUrl(context.config.misc.parallelUrl)
-    ).concat(
-      `/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`
-    );
-
     // send request to signature client
     const data = await signatureClient.createSignature(
       tmpPdfPath,
@@ -49,15 +51,22 @@ async function startSignatureProcess(
       }
     );
 
-    // update table with response
-    await context.petitions.updatePetitionSignature(petitionId, {
-      status: "READY_TO_SIGN",
-      external_id: data.id,
-      data,
-    });
-
-    // delete temporal file
     unlinkSync(tmpPdfPath);
+
+    // update table with response
+    if (data.documents.every((doc) => doc.status === "in_queue")) {
+      await context.petitions.updatePetitionSignature(petitionId, {
+        status: "READY_TO_SIGN",
+        external_id: data.id,
+        data,
+      });
+    } else {
+      await context.petitions.updatePetitionSignature(petitionId, {
+        status: "REQUEST_ERROR",
+        external_id: data.id,
+        data,
+      });
+    }
   } catch (e) {
     if (e.constraint === "petition_signature_petition_id_signer_email") {
       // whitelisted error

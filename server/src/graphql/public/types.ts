@@ -367,6 +367,10 @@ export const PublicPetitionSignature = objectType({
             description: "Sign request not yet sent to client API.",
           },
           {
+            name: "REQUEST_ERROR",
+            description: "Client API returned unexpected response.",
+          },
+          {
             name: "READY_TO_SIGN",
             description:
               "Sign request response received, in this status the petition is ready to be signed by a recipient.",
