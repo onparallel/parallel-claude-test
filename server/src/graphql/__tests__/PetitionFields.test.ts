@@ -532,7 +532,10 @@ describe("GraphQL/Petition Fields", () => {
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
         user.id,
-        1
+        1,
+        () => ({
+          status: "DRAFT",
+        })
       );
       fields = await mocks.createRandomPetitionFields(
         userPetition.id,
