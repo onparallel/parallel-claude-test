@@ -1,4 +1,5 @@
 import { idArg, queryField } from "@nexus/schema";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { fetchPetitionAccess } from "./authorizers";
 
 export const accessQuery = queryField("access", {
@@ -24,13 +25,10 @@ export const publicPetitionSignature = queryField("publicPetitionSignature", {
   type: "PublicPetitionSignature",
   list: [true],
   nullable: false,
-  authorize: fetchPetitionAccess("keycode"),
   args: {
-    keycode: idArg({ required: true }),
+    petitionId: globalIdArg("Petition", { required: true }),
   },
-  resolve: async (root, args, ctx) => {
-    return (
-      (await ctx.petitions.loadPetitionSignature(ctx.access!.petition_id)) ?? []
-    );
+  resolve: async (_, { petitionId }, ctx) => {
+    return (await ctx.petitions.loadPetitionSignature(petitionId)) ?? [];
   },
 });

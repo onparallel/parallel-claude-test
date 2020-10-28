@@ -363,32 +363,46 @@ export const PublicPetitionSignature = objectType({
         name: "PetitionSignatureStatus",
         members: [
           {
-            name: "PROCESSING",
-            description: "Sign request not yet sent to client API.",
+            name: "REQUEST_SENT",
+            description: "Sign request sent to client API.",
           },
           {
-            name: "REQUEST_ERROR",
-            description: "Client API returned unexpected response.",
-          },
-          {
-            name: "READY_TO_SIGN",
+            name: "EMAIL_DELIVERED",
             description:
-              "Sign request response received, in this status the petition is ready to be signed by a recipient.",
+              "Client API sent email to recipient with access to the signature document",
           },
           {
-            name: "DECLINED",
+            name: "EMAIL_BOUNCED",
+            description:
+              "The server cannot deliver the message. Bounces often are caused by outdated or incorrectly entered email addresses.",
+          },
+          {
+            name: "EMAIL_DEFERRED",
+            description:
+              "The email cannot immediately be delivered, but it hasn’t been completely rejected. Sometimes called a soft bounce, it will be retried for 72 hours.",
+          },
+          {
+            name: "DOCUMENT_DECLINED",
             description: "The recipient declined the signature.",
           },
           {
-            name: "EXPIRED",
+            name: "DOCUMENT_EXPIRED",
             description: "The signature request has expired.",
           },
           {
-            name: "CANCELED",
+            name: "DOCUMENT_CANCELED",
             description:
               "The user canceled the signature request for all recipients on the petition",
           },
-          { name: "SIGNED", description: "Recipient signed the petition" },
+          {
+            name: "DOCUMENT_SIGNED",
+            description: "Recipient signed the petition",
+          },
+          {
+            name: "DOCUMENT_COMPLETED",
+            description:
+              "Signature process is completed. Signed document is ready to be downloaded",
+          },
         ],
         description: "The status of the signature process for a signer.",
       }),

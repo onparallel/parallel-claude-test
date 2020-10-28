@@ -1337,7 +1337,7 @@ export interface NexusGenArgTypes {
     };
     publicPetitionSignature: {
       // args
-      keycode: string; // ID!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     publicTemplates: {
       // args
