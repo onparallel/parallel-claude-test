@@ -89,7 +89,6 @@ class MyDocument extends Document<MyDocumentProps> {
         <body>
           <Main />
           <script
-            async
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
             crossOrigin="anonymous"
           />
