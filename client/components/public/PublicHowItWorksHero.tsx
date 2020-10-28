@@ -11,9 +11,9 @@ import {
   Text,
 } from "@chakra-ui/core";
 import { useRouter } from "next/router";
-import { useCallback, useState, ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SwitchTransition, CSSTransition } from "react-transition-group";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Card } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { PublicContainer } from "./layout/PublicContainer";
@@ -125,10 +125,12 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
     },
   ];
 
-  const handleImageClick = useCallback(
-    () => setIndex((state) => (state + 1) % steps.length),
-    [steps.length]
-  );
+  const handleChangeStep = (index: number) => {
+    // change index when image is loaded on the browser to avoid flashing
+    const img = new window.Image();
+    img.onload = () => setIndex(index);
+    img.src = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png`;
+  };
 
   return (
     <PublicContainer
@@ -169,7 +171,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
               header={step.header}
               description={step.description}
               isActive={index === i}
-              onClick={() => setIndex(i)}
+              onClick={() => handleChangeStep(i)}
             />
           ))}
         </Grid>
@@ -192,7 +194,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
               >
                 <AspectRatio
                   ratio={2520 / 1606}
-                  onClick={handleImageClick}
+                  onClick={() => handleChangeStep((index + 1) % steps.length)}
                   willChange="opacity"
                   sx={{
                     "&.fade": {
@@ -213,7 +215,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                 >
                   <Card overflow="hidden" role="button">
                     <Image
-                      src={`/static/images/${steps[index].image}_${query.locale}.png`}
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png`}
                       alt={`${steps[index].alt}`}
                     />
                   </Card>
