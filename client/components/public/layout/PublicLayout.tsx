@@ -60,7 +60,10 @@ export function PublicLayout({
             key={locale}
             rel="alternate"
             hrefLang={locale}
-            href={resolveUrl(pathname, { ...query, locale })}
+            href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}${resolveUrl(
+              pathname,
+              { ...query, locale }
+            )}`}
           />
         ))}
       </Head>
