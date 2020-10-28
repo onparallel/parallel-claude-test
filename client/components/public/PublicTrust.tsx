@@ -20,7 +20,12 @@ export function PublicTrust(props: BoxProps) {
         />
       </Heading>
       <Flex justifyContent="center">
-        <Box as="a" href="https://acelera.cuatrecasas.com/" target="_blank">
+        <Box
+          as="a"
+          href="https://acelera.cuatrecasas.com/"
+          target="_blank"
+          rel="noopener"
+        >
           <Image
             alt={intl.formatMessage({
               id: "public.trust.cuatrecasas",
