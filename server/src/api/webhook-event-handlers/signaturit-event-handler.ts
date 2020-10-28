@@ -1,5 +1,29 @@
+import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
+import { fromGlobalId } from "../../util/globalId";
+
+export async function validateSignaturitRequest(
+  req: Request & { context: ApiContext },
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const body = req.body as SignaturItEventBody;
+    const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
+    const signatures = await req.context.petitions.loadPetitionSignature(
+      petitionId
+    );
+
+    if (signatures.some((s) => s.external_id === body.document.signature.id)) {
+      next();
+    } else {
+      res.sendStatus(403).end();
+    }
+  } catch {
+    res.sendStatus(403).end();
+  }
+}
 
 export type SignaturItEventBody = {
   document: {

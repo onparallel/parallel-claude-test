@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import {
   signaturItEventHandler,
   SignaturItEventBody,
+  validateSignaturitRequest,
 } from "./webhook-event-handlers/signaturit-event-handler";
 import { fromGlobalId } from "../util/globalId";
 
@@ -14,6 +15,7 @@ export const webhooks = Router()
   .post(
     "/signaturit/:petitionId/events",
     bodyParser.urlencoded({ extended: true }),
+    validateSignaturitRequest,
     async (req, res, next) => {
       try {
         const body = req.body as SignaturItEventBody;
