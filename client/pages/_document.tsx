@@ -1,5 +1,6 @@
 import { I18nProps } from "@parallel/components/common/I18nProvider";
 import languages from "@parallel/lang/languages.json";
+import { logger } from "@parallel/utils/logger";
 import { promises as fs } from "fs";
 import Document, {
   DocumentContext,
@@ -9,22 +10,18 @@ import Document, {
   NextScript,
 } from "next/document";
 import { IntlConfig } from "react-intl";
-import { logger } from "@parallel/utils/logger";
 
 const LANG_DIR = process.env.ROOT + "/public/static/lang";
 
-export async function loadMessages(
-  locale: string
-): Promise<IntlConfig["messages"]> {
-  const [raw, compiled] = await Promise.all([
-    fs.readFile(LANG_DIR + `/${locale}.json`, {
+const messagesCache: Record<string, IntlConfig["messages"]> = {};
+async function loadMessages(locale: string) {
+  if (!(locale in messagesCache)) {
+    const messages = await fs.readFile(LANG_DIR + `/compiled/${locale}.json`, {
       encoding: "utf-8",
-    }),
-    fs.readFile(LANG_DIR + `/compiled/${locale}.json`, {
-      encoding: "utf-8",
-    }),
-  ]);
-  return { raw: JSON.parse(raw), compiled: JSON.parse(compiled) };
+    });
+    messagesCache[locale] = JSON.parse(messages) as IntlConfig["messages"];
+  }
+  return messagesCache[locale];
 }
 
 type MyDocumentProps = I18nProps;
@@ -33,13 +30,13 @@ class MyDocument extends Document<MyDocumentProps> {
   static async getInitialProps(ctx: DocumentContext) {
     const { renderPage } = ctx;
     const locale = getLocale(ctx);
-    const { raw, compiled } = await loadMessages(locale);
+    const messages = await loadMessages(locale);
     ctx.renderPage = () => {
       try {
         return renderPage({
           // eslint-disable-next-line @typescript-eslint/naming-convention
           enhanceApp: (App) => (props) => (
-            <App {...props} {...{ locale, messages: compiled }} />
+            <App {...props} {...{ locale, messages }} />
           ),
         });
       } catch (error) {
@@ -48,7 +45,7 @@ class MyDocument extends Document<MyDocumentProps> {
       }
     };
     const initialProps = await Document.getInitialProps(ctx);
-    return { ...initialProps, locale, messages: raw };
+    return { ...initialProps, locale };
   }
 
   render() {
