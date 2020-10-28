@@ -1470,37 +1470,47 @@ enum PetitionSignatureStatus {
   """
   The user canceled the signature request for all recipients on the petition
   """
-  CANCELED
+  DOCUMENT_CANCELED
+
+  """
+  Signature process is completed. Signed document is ready to be downloaded
+  """
+  DOCUMENT_COMPLETED
 
   """
   The recipient declined the signature.
   """
-  DECLINED
+  DOCUMENT_DECLINED
 
   """
   The signature request has expired.
   """
-  EXPIRED
-
-  """
-  Sign request not yet sent to client API.
-  """
-  PROCESSING
-
-  """
-  Sign request response received, in this status the petition is ready to be signed by a recipient.
-  """
-  READY_TO_SIGN
-
-  """
-  Client API returned unexpected response.
-  """
-  REQUEST_ERROR
+  DOCUMENT_EXPIRED
 
   """
   Recipient signed the petition
   """
-  SIGNED
+  DOCUMENT_SIGNED
+
+  """
+  The server cannot deliver the message. Bounces often are caused by outdated or incorrectly entered email addresses.
+  """
+  EMAIL_BOUNCED
+
+  """
+  The email cannot immediately be delivered, but it hasn’t been completely rejected. Sometimes called a soft bounce, it will be retried for 72 hours.
+  """
+  EMAIL_DEFERRED
+
+  """
+  Client API sent email to recipient with access to the signature document
+  """
+  EMAIL_DELIVERED
+
+  """
+  Sign request sent to client API.
+  """
+  REQUEST_SENT
 }
 
 """
@@ -2027,7 +2037,7 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
-  publicPetitionSignature(keycode: ID!): [PublicPetitionSignature!]!
+  publicPetitionSignature(petitionId: GID!): [PublicPetitionSignature!]!
 
   """
   The publicly available templates

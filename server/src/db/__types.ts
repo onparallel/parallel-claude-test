@@ -55,13 +55,15 @@ export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
 export type PetitionSignatureStatus =
-  | "PROCESSING"
-  | "REQUEST_ERROR"
-  | "READY_TO_SIGN"
-  | "DECLINED"
-  | "EXPIRED"
-  | "CANCELED"
-  | "SIGNED";
+  | "REQUEST_SENT"
+  | "EMAIL_DELIVERED"
+  | "EMAIL_BOUNCED"
+  | "EMAIL_DEFERRED"
+  | "DOCUMENT_DECLINED"
+  | "DOCUMENT_CANCELED"
+  | "DOCUMENT_EXPIRED"
+  | "DOCUMENT_SIGNED"
+  | "DOCUMENT_COMPLETED";
 
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CLOSED";
 

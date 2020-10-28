@@ -39,7 +39,7 @@ export class SignaturItClient implements ISignatureClient {
     opts?: SignatureOptions
   ) {
     return await this.client.createSignature(files, recipients, {
-      delivery_type: "url",
+      delivery_type: "email",
       events_url: opts?.events_url,
     });
   }

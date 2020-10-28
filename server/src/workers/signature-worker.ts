@@ -6,7 +6,7 @@ import { WorkerContext } from "../context";
 import { SignaturItClient } from "../services/signature";
 import { fromGlobalId } from "../util/globalId";
 import { createQueueWorker } from "./helpers/createQueueWorker";
-import { getBaseEventsUrl } from "./helpers/getBaseEventsUrl";
+import { getBaseWebhookUrl } from "./helpers/getBaseWebhookUrl";
 
 /** starts a signature request on the petition for all recipients */
 async function startSignatureProcess(
@@ -23,13 +23,12 @@ async function startSignatureProcess(
 
   // events url is resolved before writing anything to DB, so if the localtunnel fails on develop nothing will be saved
   const eventsUrl = (
-    await getBaseEventsUrl(context.config.misc.parallelUrl)
+    await getBaseWebhookUrl(context.config.misc.parallelUrl)
   ).concat(
     `/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`
   );
 
   try {
-    // insert a tuple with status PROCESSING <petitionId, signerEmail> for each of the required signers
     await context.petitions.createPetitionSignature(
       petitionId,
       payload.recipients,
@@ -51,24 +50,15 @@ async function startSignatureProcess(
       }
     );
 
-    unlinkSync(tmpPdfPath);
+    await context.petitions.updatePetitionSignature(petitionId, {
+      external_id: data.id,
+      data,
+    });
 
-    // update table with response
-    if (data.documents.every((doc) => doc.status === "in_queue")) {
-      await context.petitions.updatePetitionSignature(petitionId, {
-        status: "READY_TO_SIGN",
-        external_id: data.id,
-        data,
-      });
-    } else {
-      await context.petitions.updatePetitionSignature(petitionId, {
-        status: "REQUEST_ERROR",
-        external_id: data.id,
-        data,
-      });
-    }
+    unlinkSync(tmpPdfPath);
   } catch (e) {
     if (e.constraint === "petition_signature_petition_id_signer_email") {
+      console.error(e);
       // whitelisted error
     } else {
       throw e;
@@ -89,14 +79,17 @@ async function cancelSignatureProcess(
   const signatures = await context.petitions.loadPetitionSignature(petitionId);
 
   const startedSignatures = signatures.filter(
-    (s) => s && s.status !== "CANCELED" && s.external_id
+    (s) => s && s.status !== "DOCUMENT_CANCELED" && s.external_id
   );
   const byExternalId = groupBy(startedSignatures, (s) => s.external_id);
-  Object.keys(byExternalId).forEach(async (externalId) => {
-    // do a request to cancel the signature process.
-    // Table petition_signature will be updated as soon as the client confirms the cancelation via events webhook
-    await signatureClient.cancelSignature(externalId);
-  });
+
+  await Promise.all(
+    Object.keys(byExternalId).map((externalId) => {
+      // do a request to cancel the signature process.
+      // Table petition_signature will be updated as soon as the client confirms the cancelation via events webhook
+      return signatureClient.cancelSignature(externalId);
+    })
+  );
 }
 
 const handlers = {

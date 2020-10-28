@@ -2381,7 +2381,6 @@ export class PetitionRepository extends BaseRepository {
           petition_id: petitionId,
           signer_email: recipient.email,
           provider,
-          status: "PROCESSING",
         }))
       )
       .returning("*");

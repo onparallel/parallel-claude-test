@@ -187,7 +187,8 @@ declare module "signaturit-sdk" {
     | "photo_added"
     | "voice_added"
     | "file_added"
-    | "photo_id_added";
+    | "photo_id_added"
+    | "terms_and_conditions_accepted";
 
   export type EmailEvents =
     | "email_processed"

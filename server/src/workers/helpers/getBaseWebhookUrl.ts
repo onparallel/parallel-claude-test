@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import fetch from "node-fetch";
 import { resolve } from "path";
 
-export async function getBaseEventsUrl(defaultURL: string) {
+export async function getBaseWebhookUrl(defaultURL: string) {
   return process.env.NODE_ENV === "production" ? defaultURL : await tunnelUrl();
 }
 
