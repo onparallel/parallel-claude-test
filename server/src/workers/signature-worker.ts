@@ -18,10 +18,9 @@ async function startSignatureProcess(
 ) {
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
   const signatureClient = new SignaturItClient(
-    "OWjTPUJhfPeLMEQAHiGLECOJjoITJypAmNwdsEFdXErfuamBBxDUSBofbpbKQPMJhoGIScVVgURyzmebKhzBsS"
+    context.config.integrations.signaturIt.parallelApiKey
   );
 
-  // events url is resolved before writing anything to DB, so if the localtunnel fails on develop nothing will be saved
   const eventsUrl = (
     await getBaseWebhookUrl(context.config.misc.parallelUrl)
   ).concat(
@@ -72,7 +71,7 @@ async function cancelSignatureProcess(
   context: WorkerContext
 ) {
   const signatureClient = new SignaturItClient(
-    "OWjTPUJhfPeLMEQAHiGLECOJjoITJypAmNwdsEFdXErfuamBBxDUSBofbpbKQPMJhoGIScVVgURyzmebKhzBsS"
+    context.config.integrations.signaturIt.parallelApiKey
   );
 
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;

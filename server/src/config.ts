@@ -74,5 +74,10 @@ export function buildConfig() {
       parallelUrl: process.env.PARALLEL_URL!,
       emailFrom: process.env.EMAIL_FROM!,
     }),
+    integrations: Object.freeze({
+      signaturIt: {
+        parallelApiKey: process.env.SIGNATURIT_PARALLEL_APIKEY!,
+      },
+    }),
   });
 }
