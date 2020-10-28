@@ -9,7 +9,10 @@ import {
   MenuItem,
   MenuList,
   Modal,
+  ModalBody,
+  ModalCloseButton,
   ModalContent,
+  ModalHeader,
   ModalOverlay,
   Portal,
   Stack,
@@ -126,50 +129,52 @@ export function TemplateDetailsDialog({
       {...props}
     >
       <ModalOverlay>
-        <ModalContent
-          paddingX={{ base: 4, md: 6, lg: 8 }}
-          paddingY={{ base: 4, md: 6 }}
-        >
-          <Stack direction="row" spacing={4}>
-            <Stack flex="1" minWidth={0}>
-              {template.name ? (
-                <Heading size="lg" noOfLines={2}>
-                  {template.name}
-                </Heading>
-              ) : (
-                <Heading size="lg">
-                  <FormattedMessage
-                    id="generic.untitled-template"
-                    defaultMessage="Untitled template"
-                  />
-                </Heading>
-              )}
-              <Text as="span" fontSize="sm" fontWeight="normal">
+        <ModalContent>
+          <ModalHeader paddingRight={12} paddingBottom={0}>
+            {template.name ? (
+              <Text as="div" noOfLines={2}>
+                {template.name}
+              </Text>
+            ) : (
+              <Text>
                 <FormattedMessage
-                  id="template-details.created-by"
-                  defaultMessage="Created by {name} from {organization}."
-                  values={{
-                    name: <strong>{template.owner.fullName}</strong>,
-                    organization: template.owner.organization.name,
-                  }}
-                />{" "}
-                <FormattedMessage
-                  id="template-details.last-updated-on"
-                  defaultMessage="Last updated on {date}."
-                  values={{
-                    date: (
-                      <DateTime
-                        value={template.updatedAt}
-                        format={FORMATS.LL}
-                        title={intl.formatDate(template.updatedAt, FORMATS.LLL)}
-                      />
-                    ),
-                  }}
+                  id="generic.untitled-template"
+                  defaultMessage="Untitled template"
                 />
               </Text>
-            </Stack>
-            <Stack>
-              <SplitButton dividerColor="purple.600">
+            )}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text as="span" fontSize="sm" fontWeight="normal">
+              <FormattedMessage
+                id="template-details.created-by"
+                defaultMessage="Created by {name} from {organization}."
+                values={{
+                  name: <strong>{template.owner.fullName}</strong>,
+                  organization: template.owner.organization.name,
+                }}
+              />{" "}
+              <FormattedMessage
+                id="template-details.last-updated-on"
+                defaultMessage="Last updated on {date}."
+                values={{
+                  date: (
+                    <DateTime
+                      value={template.updatedAt}
+                      format={FORMATS.LL}
+                      title={intl.formatDate(template.updatedAt, FORMATS.LLL)}
+                    />
+                  ),
+                }}
+              />
+            </Text>
+            <Stack
+              marginY={4}
+              spacing={4}
+              flexDirection={{ base: "column", md: "row-reverse" }}
+            >
+              <SplitButton dividerColor="purple.600" alignSelf="center">
                 <Button
                   justifyContent="left"
                   colorScheme="purple"
@@ -229,83 +234,87 @@ export function TemplateDetailsDialog({
                   </Portal>
                 </Menu>
               </SplitButton>
+              <Heading flex="1" size="md">
+                <FormattedMessage
+                  id="template-details.about"
+                  defaultMessage="About this template"
+                />
+              </Heading>
             </Stack>
-          </Stack>
-          <Heading size="md" marginBottom={4} marginTop={8}>
-            <FormattedMessage
-              id="template-details.about"
-              defaultMessage="About this template"
-            />
-          </Heading>
-          {template.description ? (
-            <Text>
-              <BreakLines text={template.description} />
-            </Text>
-          ) : (
-            <Text textAlign="center" textStyle="hint">
+            {template.description ? (
+              <Text>
+                <BreakLines text={template.description} />
+              </Text>
+            ) : (
+              <Text textAlign="center" textStyle="hint">
+                <FormattedMessage
+                  id="template-details.no-description-provided"
+                  defaultMessage="No description provided."
+                />
+              </Text>
+            )}
+            <Heading size="md" marginTop={8} marginBottom={4}>
               <FormattedMessage
-                id="template-details.no-description-provided"
-                defaultMessage="No description provided."
+                id="template-details.fields-list"
+                defaultMessage="Information list"
               />
-            </Text>
-          )}
-          <Heading size="md" marginTop={8} marginBottom={4}>
-            <FormattedMessage
-              id="template-details.fields-list"
-              defaultMessage="Information list"
-            />
-          </Heading>
-          <Box paddingLeft={8}>
-            {template.fields.map((field, index) => {
-              return field.type === "HEADING" ? (
-                <Text key={field.id} fontWeight="bold" marginBottom={2}>
-                  {fieldIndexValues[index]}.{" "}
-                  {field.title ? (
-                    <Text as="span" fontWeight="bold" aria-label={field.title}>
-                      {field.title}
-                    </Text>
-                  ) : (
-                    <Text
-                      as="span"
-                      textStyle="hint"
-                      aria-label={intl.formatMessage({
-                        id: "generic.empty-heading",
-                        defaultMessage: "Untitled heading",
-                      })}
-                    >
-                      <FormattedMessage
-                        id="generic.empty-heading"
-                        defaultMessage="Untitled heading"
-                      />
-                    </Text>
-                  )}
-                </Text>
-              ) : (
-                <Text key={field.id} marginLeft={4} marginBottom={2}>
-                  {fieldIndexValues[index]}.{" "}
-                  {field.title ? (
-                    <Text as="span" aria-label={field.title}>
-                      {field.title}
-                    </Text>
-                  ) : (
-                    <Text
-                      as="span"
-                      textStyle="hint"
-                      aria-label={intl.formatMessage({
-                        id: "generic.untitled-field",
-                        defaultMessage: "Untitled field",
-                      })}
-                    >
-                      <FormattedMessage
-                        id="generic.untitled-field"
-                        defaultMessage="Untitled field"
-                      />
-                    </Text>
-                  )}
-                </Text>
-              );
-            })}
-          </Box>
+            </Heading>
+            <Box paddingLeft={8}>
+              {template.fields.map((field, index) => {
+                return field.type === "HEADING" ? (
+                  <Text key={field.id} fontWeight="bold" marginBottom={2}>
+                    {fieldIndexValues[index]}.{" "}
+                    {field.title ? (
+                      <Text
+                        as="span"
+                        fontWeight="bold"
+                        aria-label={field.title}
+                      >
+                        {field.title}
+                      </Text>
+                    ) : (
+                      <Text
+                        as="span"
+                        textStyle="hint"
+                        aria-label={intl.formatMessage({
+                          id: "generic.empty-heading",
+                          defaultMessage: "Untitled heading",
+                        })}
+                      >
+                        <FormattedMessage
+                          id="generic.empty-heading"
+                          defaultMessage="Untitled heading"
+                        />
+                      </Text>
+                    )}
+                  </Text>
+                ) : (
+                  <Text key={field.id} marginLeft={4} marginBottom={2}>
+                    {fieldIndexValues[index]}.{" "}
+                    {field.title ? (
+                      <Text as="span" aria-label={field.title}>
+                        {field.title}
+                      </Text>
+                    ) : (
+                      <Text
+                        as="span"
+                        textStyle="hint"
+                        aria-label={intl.formatMessage({
+                          id: "generic.untitled-field",
+                          defaultMessage: "Untitled field",
+                        })}
+                      >
+                        <FormattedMessage
+                          id="generic.untitled-field"
+                          defaultMessage="Untitled field"
+                        />
+                      </Text>
+                    )}
+                  </Text>
+                );
+              })}
+            </Box>
+          </ModalBody>
         </ModalContent>
       </ModalOverlay>
     </Modal>
