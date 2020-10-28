@@ -926,7 +926,21 @@ export class PetitionRepository extends BaseRepository {
             {
               updated_at: this.now(),
               updated_by: `User:${user.id}`,
-              status: otherFieldsAreValidated ? "CLOSED" : "PENDING",
+              status: this.knex.raw(/* sql */ `
+                case is_template 
+                when false then 
+                  (case ${otherFieldsAreValidated} 
+                    when true then 
+                      (case status 
+                        when 'PENDING' then 'CLOSED'
+                        else status
+                      end) 
+                    else status
+                  end) 
+                else
+                  NULL
+                end
+              `) as any,
             },
             "*"
           ),
