@@ -18,7 +18,11 @@ export interface IAuth {
     next: NextFunction
   ): Promise<void>;
   logout: RequestHandler;
-  newPassword: RequestHandler;
+  newPassword(
+    req: Request & { context: ApiContext },
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
   validateSession: (session: string) => Promise<string | null>;
@@ -73,7 +77,11 @@ export class Auth implements IAuth {
     }
   }
 
-  async newPassword(req: Request, res: Response, next: NextFunction) {
+  async newPassword(
+    req: Request & { context: ApiContext },
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { email, password, newPassword } = req.body;
       const session = await this.cognito.completeNewPasword(
