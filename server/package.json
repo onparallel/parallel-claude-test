@@ -24,7 +24,8 @@
     "worker:email-sender": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/email-sender.ts",
     "worker:reminder-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/reminder-trigger.ts",
     "worker:scheduled-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/scheduled-trigger.ts",
-    "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts"
+    "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts",
+    "localtunnel": "ts-node ./bin/launch-localtunnel.ts"
   },
   "dependencies": {
     "@nexus/schema": "^0.16.0",
@@ -97,6 +98,7 @@
     "@types/graphql-type-json": "^0.3.2",
     "@types/jest": "^26.0.14",
     "@types/jwt-decode": "^2.2.1",
+    "@types/localtunnel": "^2.0.0",
     "@types/mjml": "^4.0.4",
     "@types/mjml-react": "^1.0.4",
     "@types/morgan": "^1.9.1",
@@ -116,6 +118,7 @@
     "graphql-tag": "^2.11.0",
     "jest": "^26.6.0",
     "livereload": "^0.9.1",
+    "localtunnel": "^2.0.0",
     "nodemon": "^2.0.5",
     "ts-jest": "^26.4.1",
     "ts-node": "^9.0.0",

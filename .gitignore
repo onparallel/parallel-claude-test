@@ -2,3 +2,4 @@ node_modules
 client/.next
 client/out
 server/dist
+server/bin/localtunnel-dev.url
