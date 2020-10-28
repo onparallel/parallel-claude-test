@@ -5,6 +5,14 @@ export type SignatureOptions = {
   events_url?: string;
 };
 
+type SignatureResponse = {
+  id: string;
+  created_at: Date;
+  data: any[];
+  documents: Document[];
+  url?: string;
+};
+
 export type Recipient = { email: string; name: string };
 
 export interface ISignatureClient {
@@ -13,9 +21,9 @@ export interface ISignatureClient {
     filePath: string,
     recipients: Recipient[],
     options?: SignatureOptions
-  ) => Promise<any>;
+  ) => Promise<SignatureResponse>;
 
-  cancelSignature: (externalId: string) => Promise<any>;
+  cancelSignature: (externalId: string) => Promise<SignatureResponse>;
 }
 
 export class SignaturItClient implements ISignatureClient {

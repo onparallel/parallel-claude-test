@@ -164,7 +164,7 @@ declare module "signaturit-sdk" {
     events: AnyEvent[];
   };
 
-  type SignatureEvents =
+  export type SignatureEvents =
     | "email_processed"
     | "email_delivered"
     | "email_opened"
@@ -189,7 +189,7 @@ declare module "signaturit-sdk" {
     | "file_added"
     | "photo_id_added";
 
-  type EmailEvents =
+  export type EmailEvents =
     | "email_processed"
     | "email_delivered"
     | "email_opened"
@@ -198,7 +198,7 @@ declare module "signaturit-sdk" {
     | "document_downloaded"
     | "certification_completed";
 
-  type SMSEvents =
+  export type SMSEvents =
     | "sms_processed"
     | "sms_delivered"
     | "documents_opened"
@@ -206,5 +206,5 @@ declare module "signaturit-sdk" {
     | "document_downloaded"
     | "certification_completed";
 
-  type AnyEvent = SignatureEvents | EmailEvents | SMSEvents | "*";
+  export type AnyEvent = SignatureEvents | EmailEvents | SMSEvents | "*";
 }
