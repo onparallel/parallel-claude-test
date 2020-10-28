@@ -4,6 +4,7 @@ import { ApiContext } from "../context";
 import morgan from "morgan";
 import { LOGGER, Logger } from "../services/logger";
 import { downloads } from "./downloads";
+import { webhooks } from "./webhooks";
 
 export function api(container: Container) {
   const logger = container.get<Logger>(LOGGER);
@@ -38,5 +39,6 @@ export function api(container: Container) {
           req.context.auth.confirmForgotPassword(req, res, next)
         )
     )
-    .use("/downloads", downloads);
+    .use("/downloads", downloads)
+    .use("/webhooks", webhooks);
 }
