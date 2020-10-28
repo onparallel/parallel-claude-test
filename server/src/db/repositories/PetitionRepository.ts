@@ -1084,7 +1084,28 @@ export class PetitionRepository extends BaseRepository {
       .where("id", petitionId)
       .update({ status: newStatus });
 
+    if (newStatus === "CLOSED") {
+      await this.updateRemindersForPetition(petitionId, null);
+    }
+
     return fields;
+  }
+
+  async updateRemindersForPetition(
+    petitionId: number,
+    nextReminderAt: Maybe<Date>,
+    t?: Transaction
+  ) {
+    return this.withTransaction(async (t) => {
+      return await this.from("petition_access", t)
+        .where("petition_id", petitionId)
+        .update(
+          {
+            next_reminder_at: nextReminderAt,
+          },
+          "*"
+        );
+    }, t);
   }
 
   async createPetitionFieldReply(
@@ -1184,14 +1205,7 @@ export class PetitionRepository extends BaseRepository {
       .every((f) => f.optional || repliesByFieldId[f.id].length > 0);
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
-        await this.from("petition_access", t)
-          .where("petition_id", petitionId)
-          .update(
-            {
-              next_reminder_at: null,
-            },
-            "*"
-          );
+        await this.updateRemindersForPetition(petitionId, null, t);
         const [updated] = await this.from("petition", t)
           .where("id", petitionId)
           .update(
