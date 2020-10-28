@@ -69,7 +69,10 @@ describe("GraphQL/Petition Fields", () => {
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
         user.id,
-        1
+        1,
+        () => ({
+          status: "DRAFT",
+        })
       );
       done();
     });
@@ -620,7 +623,53 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("sets petition status to closed when deleting a field and other fields are validated", async () => {
+    it("sets petition status to closed when deleting a field, other fields are validated and petition status is pending", async () => {
+      const [pendingPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        user.id,
+        1,
+        () => ({
+          status: "PENDING",
+        })
+      );
+      const pendingPetitionFields = await mocks.createRandomPetitionFields(
+        pendingPetition.id,
+        5,
+        (index) => ({
+          type: index === 0 ? "HEADING" : "TEXT",
+          is_fixed: index === 0,
+          validated: index < 4,
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
+            deletePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              force: $force
+            ) {
+              ... on Petition {
+                status
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", pendingPetition.id),
+          fieldId: toGlobalId("PetitionField", pendingPetitionFields[4].id),
+          force: true,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitionField).toEqual({
+        status: "CLOSED",
+      });
+    });
+
+    it("should not change petition status when deleting fields on a DRAFT petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation($petitionId: GID!, $fieldId: GID!, $force: Boolean) {
@@ -644,7 +693,7 @@ describe("GraphQL/Petition Fields", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.deletePetitionField).toEqual({
-        status: "CLOSED",
+        status: "DRAFT",
       });
     });
 
