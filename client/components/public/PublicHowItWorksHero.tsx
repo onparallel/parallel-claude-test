@@ -6,12 +6,11 @@ import {
   Flex,
   Grid,
   Heading,
-  Image,
   Stack,
   Text,
 } from "@chakra-ui/core";
 import { useRouter } from "next/router";
-import { ReactNode, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Card } from "../common/Card";
@@ -125,11 +124,14 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
     },
   ];
 
+  const imageRef = useRef<HTMLImageElement>();
+
   const handleChangeStep = (index: number) => {
     // change index when image is loaded on the browser to avoid flashing
     const img = new window.Image();
     img.onload = () => setIndex(index);
-    img.src = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png`;
+    const ext = imageRef.current!.currentSrc.replace(/.*\.(?=[a-z]*$)/, "");
+    img.src = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.${ext}`;
   };
 
   return (
@@ -214,10 +216,17 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                   }}
                 >
                   <Card overflow="hidden" role="button">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png`}
-                      alt={`${steps[index].alt}`}
-                    />
+                    <picture>
+                      <source
+                        srcSet={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.webp`}
+                        type="image/webp"
+                      />
+                      <img
+                        ref={imageRef as any}
+                        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png`}
+                        alt={`${steps[index].alt}`}
+                      />
+                    </picture>
                   </Card>
                 </AspectRatio>
               </CSSTransition>

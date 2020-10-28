@@ -1,12 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-} from "@chakra-ui/core";
+import { Box, BoxProps, Button, Flex, Heading, Stack } from "@chakra-ui/core";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -76,16 +68,17 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           </Flex>
         </Box>
         <Flex flex="1" justifyContent="center">
-          <Image
-            alt={intl.formatMessage({
-              id: "public.showcase-hero-alt",
-              defaultMessage:
-                'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
-            })}
-            margin="auto"
-            src={`${imageName}.png`}
-            srcSet={`${imageName}@2x.png 2x`}
-          />
+          <Box as="picture" margin="auto">
+            <source srcSet={`${imageName}.webp`} type="image/webp" />
+            <img
+              alt={intl.formatMessage({
+                id: "public.showcase-hero-alt",
+                defaultMessage:
+                  'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
+              })}
+              src={`${imageName}.png`}
+            />
+          </Box>
         </Flex>
       </Stack>
     </PublicContainer>
