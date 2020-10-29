@@ -1,19 +1,23 @@
 import {
   Box,
   IconButton,
+  IconButtonProps,
   List,
   ListItem,
   Text,
-  IconButtonProps,
 } from "@chakra-ui/core";
-import { ArrowBack, ArrowForward, MoreIcon } from "@parallel/chakra/icons";
+import {
+  ArrowBackIcon,
+  ArrowForwardIcon,
+  MoreIcon,
+} from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
-import { useIntl } from "react-intl";
-import { Spacer } from "../common/Spacer";
-import { range } from "remeda";
-import { NakedLink } from "../common/Link";
 import { useRouter } from "next/router";
 import { useMemo, useRef } from "react";
+import { useIntl } from "react-intl";
+import { range } from "remeda";
+import { NakedLink } from "../common/Link";
+import { Spacer } from "../common/Spacer";
 
 export type RecipientViewPaginationProps = ExtendChakra<{
   currentPage: number;
@@ -36,7 +40,7 @@ export function RecipientViewPagination({
         >
           <PageLink
             page={currentPage - 1}
-            icon={<ArrowBack />}
+            icon={<ArrowBackIcon />}
             variant="outline"
             isDisabled={currentPage === 1}
             aria-label={intl.formatMessage({
@@ -83,7 +87,7 @@ export function RecipientViewPagination({
         >
           <PageLink
             page={currentPage + 1}
-            icon={<ArrowForward />}
+            icon={<ArrowForwardIcon />}
             isDisabled={currentPage === pageCount}
             aria-label={intl.formatMessage({
               id: "generic.next-page",

@@ -720,8 +720,8 @@ export const SaveIcon = createIcon({
   ),
 });
 
-export const ArrowForward = createIcon({
-  displayName: "ArrowForward",
+export const ArrowForwardIcon = createIcon({
+  displayName: "ArrowForwardIcon",
   viewBox: "0 0 24 24",
   path: (
     <g
@@ -737,8 +737,8 @@ export const ArrowForward = createIcon({
   ),
 });
 
-export const ArrowBack = createIcon({
-  displayName: "ArrowBack",
+export const ArrowBackIcon = createIcon({
+  displayName: "ArrowBackIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

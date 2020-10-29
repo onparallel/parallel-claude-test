@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/core";
-import { ArrowBack, ChevronRightIcon } from "@parallel/chakra/icons";
+import { ArrowBackIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { SettingsLayout_UserFragment } from "@parallel/graphql/__types";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";
 import { useRouter } from "next/router";
@@ -92,7 +92,7 @@ export function SettingsLayout({
             <NakedLink href={basePath}>
               <IconButton
                 as="a"
-                icon={<ArrowBack />}
+                icon={<ArrowBackIcon />}
                 variant="ghost"
                 aria-label={intl.formatMessage({
                   id: "generic.go-back-button",
