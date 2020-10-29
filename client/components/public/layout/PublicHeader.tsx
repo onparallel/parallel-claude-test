@@ -70,7 +70,8 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
           opacity={{ base: isOpen ? 1 : 0, lg: 1 }}
           overflow="hidden"
           transition="opacity 500ms"
-          paddingBottom={{ base: isOpen ? 4 : 0, lg: 0 }}
+          padding={2}
+          paddingBottom={{ base: isOpen ? 4 : 2, lg: 2 }}
         >
           <PublicHeaderMenu
             direction={{ base: "column", lg: "row" }}
