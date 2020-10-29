@@ -46,10 +46,14 @@ async function startSignatureProcess(
       }
     );
 
-    await ctx.petitions.updatePetitionSignature(petitionId, {
-      external_id: data.id,
-      data,
-    });
+    await ctx.petitions.updatePetitionSignature(
+      petitionId,
+      payload.recipients.map((r) => r.email),
+      {
+        external_id: data.id,
+        data,
+      }
+    );
 
     unlinkSync(tmpPdfPath);
   } catch (e) {

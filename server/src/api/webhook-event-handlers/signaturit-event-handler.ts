@@ -64,7 +64,7 @@ async function emailDelivered(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "EMAIL_DELIVERED",
     data,
   });
@@ -75,7 +75,7 @@ async function emailBounced(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "EMAIL_BOUNCED",
     data,
   });
@@ -86,7 +86,7 @@ async function emailDeferred(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "EMAIL_DEFERRED",
     data,
   });
@@ -98,7 +98,7 @@ async function documentCanceled(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "DOCUMENT_CANCELED",
     data,
   });
@@ -110,7 +110,7 @@ async function documentDeclined(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "DOCUMENT_DECLINED",
     data,
   });
@@ -122,7 +122,7 @@ async function documentExpired(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "DOCUMENT_EXPIRED",
     data,
   });
@@ -134,7 +134,7 @@ async function documentSigned(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, {
+  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
     status: "DOCUMENT_SIGNED",
     data,
   });
@@ -151,9 +151,13 @@ async function auditTrailCompleted(
     data.document.id
   );
 
-  const [petitionSignature] = (
+  const signatures = (
     await ctx.petitions.loadPetitionSignature(petitionId)
-  ).filter((s) => s.provider === "signaturit");
+  ).filter(
+    (s) =>
+      s.provider === "signaturit" &&
+      s.external_id === data.document.signature.id
+  );
 
   const key = `${data.document.signature.id}/${data.document.id}/audit_trail`;
   await ctx.aws.uploadFile(key, buffer, "application/pdf");
@@ -169,13 +173,21 @@ async function auditTrailCompleted(
     "signaturit"
   );
 
-  await ctx.petitions.updatePetitionSignature(petitionId, {
-    data: {
-      ...petitionSignature.data,
-      ...data,
-      audit_trail_file_upload_id: file.id,
-    },
-  });
+  const signedDocFileId = signatures.find(
+    (s) => s.data.signed_doc_file_upload_id
+  )?.data.signed_doc_file_upload_id;
+
+  await ctx.petitions.updatePetitionSignature(
+    petitionId,
+    signatures.map((s) => s.signer_email),
+    {
+      data: {
+        ...data,
+        audit_trail_file_upload_id: file.id,
+        signed_doc_file_upload_id: signedDocFileId,
+      },
+    }
+  );
 }
 
 /** document has been completed and is ready to be downloaded */
@@ -189,9 +201,13 @@ async function documentCompleted(
     data.document.id
   );
 
-  const [petitionSignature] = (
+  const signatures = (
     await ctx.petitions.loadPetitionSignature(petitionId)
-  ).filter((s) => s.provider === "signaturit");
+  ).filter(
+    (s) =>
+      s.provider === "signaturit" &&
+      s.external_id === data.document.signature.id
+  );
 
   const key = `${data.document.signature.id}/${data.document.id}/signature`;
   await ctx.aws.uploadFile(key, buffer, "application/pdf");
@@ -206,12 +222,20 @@ async function documentCompleted(
     "signaturit"
   );
 
-  await ctx.petitions.updatePetitionSignature(petitionId, {
-    data: {
-      ...petitionSignature.data,
-      ...data,
-      signed_doc_file_upload_id: file.id,
-    },
-    status: "DOCUMENT_COMPLETED",
-  });
+  const auditTrailFileId = signatures.find(
+    (s) => s.data.audit_trail_file_upload_id
+  )?.data.audit_trail_file_upload_id;
+
+  await ctx.petitions.updatePetitionSignature(
+    petitionId,
+    signatures.map((s) => s.signer_email),
+    {
+      data: {
+        ...data,
+        signed_doc_file_upload_id: file.id,
+        audit_trail_file_upload_id: auditTrailFileId,
+      },
+      status: "DOCUMENT_COMPLETED",
+    }
+  );
 }

@@ -2388,10 +2388,13 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionSignature(
     petitionId: number,
-    data: Partial<PetitionSignature>
+    signerEmail: MaybeArray<string>,
+    data: Partial<Omit<PetitionSignature, "signer_email" | "petition_id">>
   ) {
+    const emails = unMaybeArray(signerEmail);
     return this.from("petition_signature")
       .where("petition_id", petitionId)
+      .whereIn("signer_email", emails)
       .update(data);
   }
 }
