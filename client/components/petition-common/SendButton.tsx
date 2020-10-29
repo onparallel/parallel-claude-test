@@ -30,7 +30,7 @@ export function SendButton({
     <SplitButton dividerColor="purple.600" {...props}>
       <Button
         colorScheme="purple"
-        leftIcon={<PaperPlaneIcon />}
+        leftIcon={<PaperPlaneIcon fontSize="18px" />}
         onClick={onSendClick}
       >
         <FormattedMessage id="generic.send" defaultMessage="Send" />

@@ -268,9 +268,9 @@ export const PetitionComposeField = Object.assign(
                 paddingX={2}
                 height={6}
                 marginBottom={1}
-                backgroundColor={
-                  showError && !title ? "red.100" : "transparent"
-                }
+                _placeholder={{
+                  color: showError && !title ? "red.500" : "placeholder",
+                }}
                 _focus={{
                   boxShadow: "none",
                 }}

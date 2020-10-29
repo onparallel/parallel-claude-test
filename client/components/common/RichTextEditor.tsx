@@ -171,8 +171,11 @@ export function RichTextEditor({
       "paddingY",
       "h",
       "height",
+      "_focus",
+      "_invalid",
     ]),
     _focusWithin: (inputStyleConfig as any)._focus,
+    _invalid: (inputStyleConfig as any)._invalid,
   } as any;
   const style = useMemo(
     () =>
