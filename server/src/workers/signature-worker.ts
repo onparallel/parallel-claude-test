@@ -42,6 +42,7 @@ async function startSignatureProcess(
     payload.recipients,
     {
       events_url: eventsUrl,
+      signing_mode: "parallel",
     }
   );
 

@@ -5,6 +5,7 @@ import { Config, CONFIG } from "../config";
 
 export type SignatureOptions = {
   events_url?: string;
+  signing_mode?: "parallel" | "sequential";
 };
 
 type SignatureResponse = {
@@ -48,6 +49,7 @@ export class SignaturItClient implements ISignatureClient {
   ) {
     return await this.sdk.createSignature(files, recipients, {
       delivery_type: "email",
+      signing_mode: opts?.signing_mode,
       events_url: opts?.events_url,
     });
   }
