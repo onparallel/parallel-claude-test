@@ -86,12 +86,17 @@ export const createPetition = mutationField("createPetition", {
   resolve: async (_, { name, locale, petitionId, type }, ctx) => {
     const isTemplate = type === "TEMPLATE";
     if (petitionId) {
+      const originalPetition = (await ctx.petitions.loadPetition(petitionId))!;
+
       const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
         is_template: isTemplate,
         status: isTemplate ? null : "DRAFT",
+        name:
+          originalPetition.is_template && !isTemplate
+            ? null // don't copy original name if making a petition from a template
+            : originalPetition.name,
       });
 
-      const originalPetition = (await ctx.petitions.loadPetition(petitionId))!;
       if (originalPetition.is_template && !isTemplate) {
         ctx.analytics.trackEvent(
           "TEMPLATE_USED",

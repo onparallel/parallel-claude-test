@@ -635,7 +635,7 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.createPetition).toEqual({
-        name: publicTemplate.name,
+        name: null, // name is not copied when making a petition from template
         locale: publicTemplate.locale,
         owner: { id: toGlobalId("User", sessionUser.id) },
         status: "DRAFT",
