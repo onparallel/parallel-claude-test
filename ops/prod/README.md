@@ -23,4 +23,4 @@ The release process has the following steps defined in different scripts on `bin
 ### Additional scripts
 
 - `full-release`: Runs `build-release`, `launch-instance`, `switch-release` and `prune-instances` in sequence.
-- `list-instancesa`: Shows the relevant instances with information: ID, IP, name, release, State, Attached LB and Health
+- `list-instances`: Shows the relevant instances with information: ID, IP, name, release, State, Attached LB and Health

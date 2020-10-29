@@ -23,6 +23,7 @@ sudo systemctl enable parallel-server.service
 sudo systemctl enable parallel-client.service
 sudo systemctl enable parallel-email-events-queue.service
 sudo systemctl enable parallel-email-sender-queue.service
+sudo systemctl enable parallel-signature-worker-queue.service
 sudo systemctl enable parallel-reminder-trigger-cron.service
 sudo systemctl enable parallel-scheduled-trigger-cron.service
 if [[ "$ENV" == "production" ]]; then
