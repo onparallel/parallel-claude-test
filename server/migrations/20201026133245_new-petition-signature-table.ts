@@ -35,6 +35,12 @@ export async function up(knex: Knex): Promise<void> {
     })
     .raw(
       `create unique index "petition_signature_provider_external_id_signer_email" on "petition_signature" ("provider", "external_id", "signer_email")`
+    )
+    .raw(
+      "CREATE INDEX petition_signature_petition_id_idx ON petition_signature (petition_id)"
+    )
+    .raw(
+      "CREATE INDEX petition_signature_signer_email_idx ON petition_signature (signer_email)"
     );
 }
 
