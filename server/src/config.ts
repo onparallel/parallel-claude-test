@@ -26,7 +26,7 @@ export function buildConfig() {
       region: process.env._AWS_REGION!,
     }),
     s3: Object.freeze({
-      uplodsBucketName: process.env.S3_UPLOADS_BUCKET_NAME!,
+      uploadsBucketName: process.env.S3_UPLOADS_BUCKET_NAME!,
     }),
     smtp: Object.freeze({
       host: process.env.SMTP_HOST!,
@@ -74,10 +74,8 @@ export function buildConfig() {
       parallelUrl: process.env.PARALLEL_URL!,
       emailFrom: process.env.EMAIL_FROM!,
     }),
-    integrations: Object.freeze({
-      signaturIt: {
-        parallelApiKey: process.env.SIGNATURIT_PARALLEL_APIKEY!,
-      },
+    signaturit: Object.freeze({
+      parallelApiKey: process.env.SIGNATURIT_PARALLEL_APIKEY!,
     }),
   });
 }

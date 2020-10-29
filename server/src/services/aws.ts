@@ -99,7 +99,7 @@ export class Aws {
 
   async getSignedUploadEndpoint(key: string, contentType: string) {
     return await this.s3.getSignedUrlPromise("putObject", {
-      Bucket: this.config.s3.uplodsBucketName,
+      Bucket: this.config.s3.uploadsBucketName,
       Key: key,
       ContentType: contentType,
       Expires: 60 * 30,
@@ -109,7 +109,7 @@ export class Aws {
   async getFileMetadata(key: string) {
     return this.s3
       .headObject({
-        Bucket: this.config.s3.uplodsBucketName,
+        Bucket: this.config.s3.uploadsBucketName,
         Key: key,
       })
       .promise();
@@ -118,7 +118,7 @@ export class Aws {
   async deleteFile(key: string) {
     this.s3
       .deleteObject({
-        Bucket: this.config.s3.uplodsBucketName,
+        Bucket: this.config.s3.uploadsBucketName,
         Key: key,
       })
       .promise();
@@ -130,7 +130,7 @@ export class Aws {
     cdType: "attachment" | "inline"
   ) {
     return await this.s3.getSignedUrlPromise("getObject", {
-      Bucket: this.config.s3.uplodsBucketName,
+      Bucket: this.config.s3.uploadsBucketName,
       Key: key,
       Expires: 60 * 30,
       ResponseContentDisposition: contentDisposition(filename, {
@@ -142,10 +142,33 @@ export class Aws {
   downloadFile(key: string) {
     return this.s3
       .getObject({
-        Bucket: this.config.s3.uplodsBucketName,
+        Bucket: this.config.s3.uploadsBucketName,
         Key: key,
       })
       .createReadStream();
+  }
+
+  async uploadFile(key: string, buffer: Buffer, contentType: string) {
+    return new Promise(
+      (resolve: (v: AWS.S3.ManagedUpload.SendData) => void, reject) => {
+        return this.s3.upload(
+          {
+            Bucket: this.config.s3.uploadsBucketName,
+            Key: key,
+            ContentType: contentType,
+            Body: buffer,
+          },
+          {},
+          (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          }
+        );
+      }
+    );
   }
 
   async createCognitoUser(email: string, password: string) {

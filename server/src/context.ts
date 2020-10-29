@@ -32,6 +32,7 @@ export class ApiContext {
     @inject(AUTH) public readonly auth: Auth,
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
+
     public readonly aws: Aws,
     public readonly cognito: Cognito,
     // Repositories
@@ -57,6 +58,7 @@ export class WorkerContext {
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     @inject(PRINTER) public readonly printer: Printer,
+
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
