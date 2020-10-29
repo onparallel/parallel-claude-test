@@ -25,7 +25,6 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { ChangeEvent, KeyboardEvent, MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 
@@ -88,9 +87,9 @@ export function PetitionSettingsModal({
                 <Select
                   name="petition-locale"
                   value={petition.locale}
-                  onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                    onUpdatePetition({ locale: event.target.value as any });
-                  }}
+                  onChange={(event) =>
+                    onUpdatePetition({ locale: event.target.value as any })
+                  }
                 >
                   {locales.map((locale) => (
                     <option key={locale.key} value={locale.key}>
@@ -128,7 +127,7 @@ export function PetitionSettingsModal({
                             : ""
                         }
                         onChange={() => {}}
-                        onKeyUp={(event: KeyboardEvent) => {
+                        onKeyUp={(event) => {
                           switch (event.key) {
                             case " ":
                             case "Enter":
@@ -154,7 +153,7 @@ export function PetitionSettingsModal({
                       leftIcon={<TimeIcon />}
                       marginLeft={{ base: 0, sm: 2 }}
                       marginTop={{ base: 2, sm: 0 }}
-                      onClick={(event: MouseEvent) => {
+                      onClick={(event) => {
                         event.stopPropagation();
                         onChangeDeadline();
                       }}

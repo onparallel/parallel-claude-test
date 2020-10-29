@@ -4,7 +4,7 @@ import { Card } from "@parallel/components/common/Card";
 import { UpdatePetitionInput } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type PetitionTemplateDescriptionEditProps = ExtendChakra<{
@@ -44,12 +44,8 @@ export function PetitionTemplateDescriptionEdit({
         <Textarea
           value={templateDescription}
           maxLength={1000}
-          onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-            handleUpdateDescription(event.target.value)
-          }
-          onBlur={() => {
-            setDescription(templateDescription.trim());
-          }}
+          onChange={(event) => handleUpdateDescription(event.target.value)}
+          onBlur={() => setDescription(templateDescription.trim())}
           placeholder={intl.formatMessage({
             id: "template.description-edit.placeholder",
             defaultMessage: "Write a short description of this template.",

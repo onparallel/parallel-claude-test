@@ -1,10 +1,9 @@
 import { Box, Button, Flex, Input } from "@chakra-ui/core";
 import { FORMATS } from "@parallel/utils/dates";
+import { useTimeInput } from "@parallel/utils/useTimeInput";
 import { format, isEqual, isToday, isTomorrow, parse } from "date-fns";
-import { ChangeEvent } from "react";
 import { FormattedDate, FormattedMessage, FormattedTime } from "react-intl";
 import { DatePicker } from "./DatePicker";
-import { useTimeInput } from "@parallel/utils/useTimeInput";
 
 export function DateTimePicker({
   value,
@@ -45,7 +44,7 @@ export function DateTimePicker({
           <Input
             type="date"
             value={format(value, "yyyy-MM-dd")}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            onChange={(event) => {
               if (event.target.value) {
                 onChange(
                   parse(

@@ -72,7 +72,7 @@ export function PetitionComposeFieldSettings({
               id="field-required"
               color="green"
               isChecked={!field.optional}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              onChange={(event) =>
                 onFieldEdit(field.id, { optional: !event.target.checked })
               }
             />
@@ -144,7 +144,7 @@ export function PetitionComposeFieldSettings({
               id="field-multiple"
               color="green"
               isChecked={field.multiple}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              onChange={(event) =>
                 onFieldEdit(field.id, { multiple: event.target.checked })
               }
             />
@@ -193,7 +193,7 @@ function HeadingSettings({
           id="heading-page-break"
           color="green"
           isChecked={options.hasPageBreak}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          onChange={(event) =>
             onFieldEdit(field.id, {
               options: { ...field.options, hasPageBreak: event.target.checked },
             })
@@ -257,7 +257,7 @@ function TextSettings({
           id="text-multiline"
           color="green"
           isChecked={options.multiline}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          onChange={(event) =>
             onFieldEdit(field.id, {
               options: { ...field.options, multiline: event.target.checked },
             })

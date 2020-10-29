@@ -25,8 +25,6 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import {
-  ChangeEvent,
-  FocusEvent,
   forwardRef,
   memo,
   MouseEvent,
@@ -276,12 +274,8 @@ export const PetitionComposeField = Object.assign(
                 _focus={{
                   boxShadow: "none",
                 }}
-                onFocus={(event: FocusEvent<HTMLInputElement>) =>
-                  event.target.select()
-                }
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  setTitle(event.target.value ?? null)
-                }
+                onFocus={(event) => event.target.select()}
+                onChange={(event) => setTitle(event.target.value ?? null)}
                 onBlur={() => {
                   const trimmed = title?.trim() ?? null;
                   setNativeValue(titleRef.current!, trimmed ?? "");
@@ -316,7 +310,7 @@ export const PetitionComposeField = Object.assign(
                   _focus={{
                     boxShadow: "none",
                   }}
-                  onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  onChange={(event) =>
                     setDescription(event.target.value ?? null)
                   }
                   onBlur={() => {

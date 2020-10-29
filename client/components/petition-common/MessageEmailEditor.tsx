@@ -6,7 +6,7 @@ import {
 } from "@chakra-ui/core";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useId } from "@reach/auto-id";
-import { ChangeEvent, Ref } from "react";
+import { Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   RichTextEditor,
@@ -44,12 +44,8 @@ export function MessageEmailEditor({
           ref={subjectRef}
           value={subject}
           maxLength={255}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onSubjectChange(event.target.value)
-          }
-          onBlur={() => {
-            onSubjectChange(subject.trim());
-          }}
+          onChange={(event) => onSubjectChange(event.target.value)}
+          onBlur={() => onSubjectChange(subject.trim())}
           placeholder={intl.formatMessage({
             id: "component.message-email-editor.subject-placeholder",
             defaultMessage: "Enter the subject of the email",
