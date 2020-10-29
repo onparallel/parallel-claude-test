@@ -146,7 +146,36 @@ async function auditTrailCompleted(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  // TODO: download and store audit trail
+  const buffer = await ctx.signaturit.downloadAuditTrail(
+    data.document.signature.id,
+    data.document.id
+  );
+
+  const [petitionSignature] = (
+    await ctx.petitions.loadPetitionSignature(petitionId)
+  ).filter((s) => s.provider === "signaturit");
+
+  const key = `${data.document.signature.id}/${data.document.id}/audit_trail`;
+  await ctx.aws.uploadFile(key, buffer, "application/pdf");
+
+  const file = await ctx.files.createFileUpload(
+    {
+      content_type: "application/pdf",
+      filename: `${petitionId}_audit_trail.pdf`,
+      path: key,
+      size: Buffer.byteLength(buffer),
+      upload_complete: true,
+    },
+    "signaturit"
+  );
+
+  await ctx.petitions.updatePetitionSignature(petitionId, {
+    data: {
+      ...petitionSignature.data,
+      ...data,
+      audit_trail_file_upload_id: file.id,
+    },
+  });
 }
 
 /** document has been completed and is ready to be downloaded */
@@ -155,9 +184,34 @@ async function documentCompleted(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  // TODO: download and store document
+  const buffer = await ctx.signaturit.downloadSignedDocument(
+    data.document.signature.id,
+    data.document.id
+  );
+
+  const [petitionSignature] = (
+    await ctx.petitions.loadPetitionSignature(petitionId)
+  ).filter((s) => s.provider === "signaturit");
+
+  const key = `${data.document.signature.id}/${data.document.id}/signature`;
+  await ctx.aws.uploadFile(key, buffer, "application/pdf");
+  const file = await ctx.files.createFileUpload(
+    {
+      content_type: "application/pdf",
+      filename: `${petitionId}_signed.pdf`,
+      path: key,
+      size: Buffer.byteLength(buffer),
+      upload_complete: true,
+    },
+    "signaturit"
+  );
+
   await ctx.petitions.updatePetitionSignature(petitionId, {
+    data: {
+      ...petitionSignature.data,
+      ...data,
+      signed_doc_file_upload_id: file.id,
+    },
     status: "DOCUMENT_COMPLETED",
-    data,
   });
 }

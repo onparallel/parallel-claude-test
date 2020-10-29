@@ -127,7 +127,7 @@ export const publicCreateFileUploadReply = mutationField(
           size,
           content_type: contentType,
         },
-        ctx.contact!
+        `Contact:${ctx.contact!.id}`
       );
       const [endpoint, reply] = await Promise.all([
         ctx.aws.getSignedUploadEndpoint(key, contentType),

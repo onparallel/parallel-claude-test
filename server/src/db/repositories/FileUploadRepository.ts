@@ -14,11 +14,11 @@ export class FileUploadRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async createFileUpload(data: CreateFileUpload, contact: Contact) {
+  async createFileUpload(data: CreateFileUpload, createdBy: string) {
     const rows = await this.insert("file_upload", {
       ...data,
-      created_by: `Contact:${contact.id}`,
-      updated_by: `Contact:${contact.id}`,
+      created_by: createdBy,
+      updated_by: createdBy,
     }).returning("*");
     return rows[0];
   }
