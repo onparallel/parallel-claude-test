@@ -22,6 +22,7 @@ import {
   MoreVerticalIcon,
   SettingsIcon,
   UserArrowIcon,
+  ArrowForwardIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
@@ -50,6 +51,7 @@ import { HeaderNameEditable } from "./HeaderNameEditable";
 export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
+  onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
@@ -59,6 +61,7 @@ export type PetitionHeaderProps = ExtendChakra<{
 export function PetitionHeader({
   petition,
   user,
+  onNextClick,
   onUpdatePetition,
   onSuggestEventRefetch,
   section: current,
@@ -262,6 +265,15 @@ export function PetitionHeader({
           </Flex>
           <Spacer minWidth={4} />
           <Stack direction="row">
+            {petition.status === "DRAFT" ? (
+              <Button
+                colorScheme="purple"
+                rightIcon={<ArrowForwardIcon fontSize="18px" />}
+                onClick={onNextClick}
+              >
+                <FormattedMessage id="generic.next" defaultMessage="Next" />
+              </Button>
+            ) : null}
             <Box>
               <Menu id="petition-more-options-menu">
                 <Tooltip

@@ -292,7 +292,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         );
         const { remindersConfig } = await configureRemindersDialog({
           enabled: !!(firstAccess && firstAccess!.remindersActive),
-          defaultConfig: firstAccess!.remindersConfig || null,
+          defaultRemindersConfig: firstAccess!.remindersConfig || null,
         });
 
         start = !!remindersConfig;

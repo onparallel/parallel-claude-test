@@ -9,6 +9,10 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import {
+  AddPetitionAccessDialog,
+  useAddPetitionAccessDialog,
+} from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
@@ -16,13 +20,8 @@ import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compo
 import { PetitionComposeField } from "@parallel/components/petition-compose/PetitionComposeField";
 import { PetitionComposeFieldList } from "@parallel/components/petition-compose/PetitionComposeFieldList";
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
-import {
-  PetitionComposeMessageEditor,
-  PetitionComposeMessageEditorProps,
-} from "@parallel/components/petition-compose/PetitionComposeMessageEditor";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
-import { useScheduleMessageDialog } from "@parallel/components/petition-compose/ScheduleMessageDialog";
 import {
   onFieldEdit_PetitionFieldFragment,
   PetitionComposeQuery,
@@ -49,14 +48,12 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { resolveUrl } from "@parallel/utils/next";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<
@@ -333,74 +330,68 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const handleCreateContact = useCreateContact();
 
   const showErrorDialog = useErrorDialog();
-  const showScheduleMessageDialog = useScheduleMessageDialog();
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
-  const handleSend: PetitionComposeMessageEditorProps["onSend"] = useCallback(
-    async ({ contactIds, schedule }) => {
-      if (petition?.__typename !== "Petition") {
-        throw new Error("Can't send a template");
-      }
-      if (petition.fields.filter((f) => f.type !== "HEADING").length === 0) {
-        try {
-          await showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="petition.no-fields-error"
-                defaultMessage="Please add at least one field with information you want to ask."
-              />
-            ),
-          });
-          const element = document.getElementById("menu-button-add-field");
-          element && element.click();
-        } finally {
-          return;
-        }
-      }
-      const fieldWithoutTitle = petition.fields.find((f) => !f.title);
-      if (fieldWithoutTitle) {
-        try {
-          setShowErrors(true);
-          const node = document.querySelector(`#field-${fieldWithoutTitle.id}`);
-          scrollIntoView(node!, { block: "center", behavior: "smooth" });
-          await showErrorDialog({
-            message: (
-              <FormattedMessage
-                id="petition.no-fields-without-title-error"
-                defaultMessage="Please add a title to every field."
-              />
-            ),
-          });
-        } finally {
-          return;
-        }
-      }
-      if (
-        !petition ||
-        contactIds.length === 0 ||
-        !petition.emailSubject ||
-        petition.emailBody === null ||
-        isEmptyContent(petition.emailBody)
-      ) {
-        setShowErrors(true);
+  const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
+  const handleNextClick = useCallback(async () => {
+    if (petition?.__typename !== "Petition") {
+      throw new Error("Can't send a template");
+    }
+    if (petition.fields.filter((f) => f.type !== "HEADING").length === 0) {
+      try {
+        await showErrorDialog({
+          message: (
+            <FormattedMessage
+              id="petition.no-fields-error"
+              defaultMessage="Please add at least one field with information you want to ask."
+            />
+          ),
+        });
+        const element = document.getElementById("menu-button-add-field");
+        element && element.click();
+      } finally {
         return;
       }
-      let scheduledAt: Date | null = null;
-      if (schedule) {
-        try {
-          scheduledAt = await showScheduleMessageDialog({});
-        } catch {
-          return;
-        }
+    }
+    const fieldWithoutTitle = petition.fields.find((f) => !f.title);
+    if (fieldWithoutTitle) {
+      try {
+        setShowErrors(true);
+        const node = document.querySelector(`#field-${fieldWithoutTitle.id}`);
+        scrollIntoView(node!, { block: "center", behavior: "smooth" });
+        await showErrorDialog({
+          message: (
+            <FormattedMessage
+              id="petition.no-fields-without-title-error"
+              defaultMessage="Please add a title to every field."
+            />
+          ),
+        });
+      } finally {
+        return;
       }
+    }
+    try {
+      const {
+        recipientIds,
+        subject,
+        body,
+        remindersConfig,
+        scheduledAt,
+      } = await showAddPetitionAccessDialog({
+        defaultSubject: petition.emailSubject,
+        defaultBody: petition.emailBody,
+        defaultRemindersConfig: petition.remindersConfig,
+        onUpdatePetition: handleUpdatePetition,
+        onCreateContact: handleCreateContact,
+        onSearchContacts: handleSearchContacts,
+      });
       const { data } = await sendPetition({
         variables: {
           petitionId: petition.id,
-          contactIds,
-          subject: petition.emailSubject,
-          body: petition.emailBody,
-          remindersConfig: petition.remindersConfig
-            ? omit(petition.remindersConfig, ["__typename"])
-            : null,
+          contactIds: recipientIds,
+          subject,
+          body,
+          remindersConfig,
           scheduledAt: scheduledAt?.toISOString() ?? null,
         },
         update(client) {
@@ -425,36 +416,40 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         });
         return;
       }
-      toast({
-        isClosable: true,
-        status: schedule ? "info" : "success",
-        title: schedule
-          ? intl.formatMessage({
-              id: "petition.petition-scheduled-toast.title",
-              defaultMessage: "Petition scheduled",
-            })
-          : intl.formatMessage({
-              id: "petition.petition-sent-toast.title",
-              defaultMessage: "Petition sent",
-            }),
-        description: schedule
-          ? intl.formatMessage(
-              {
-                id: "petition.petition-scheduled-toast.description",
-                defaultMessage: "Your petition will be sent on {date}.",
-              },
-              { date: intl.formatTime(scheduledAt!, FORMATS.LLL) }
-            )
-          : intl.formatMessage({
-              id: "petition.petition-sent-toast.description",
-              defaultMessage: "Your petition is on it's way.",
-            }),
-      });
+      if (scheduledAt) {
+        toast({
+          isClosable: true,
+          status: "info",
+          title: intl.formatMessage({
+            id: "petition.petition-scheduled-toast.title",
+            defaultMessage: "Petition scheduled",
+          }),
+          description: intl.formatMessage(
+            {
+              id: "petition.petition-scheduled-toast.description",
+              defaultMessage: "Your petition will be sent on {date}.",
+            },
+            { date: intl.formatTime(scheduledAt!, FORMATS.LLL) }
+          ),
+        });
+      } else {
+        toast({
+          isClosable: true,
+          status: "success",
+          title: intl.formatMessage({
+            id: "petition.petition-sent-toast.title",
+            defaultMessage: "Petition sent",
+          }),
+          description: intl.formatMessage({
+            id: "petition.petition-sent-toast.description",
+            defaultMessage: "Your petition is on it's way.",
+          }),
+        });
+      }
       const pathname = "/[locale]/app/petitions";
       router.push(pathname, resolveUrl(pathname, router.query));
-    },
-    [petition]
-  );
+    } catch {}
+  }, [petition]);
 
   const handleIndexFieldClick = useCallback((fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
@@ -488,6 +483,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       user={me}
       petition={petition!}
       onUpdatePetition={handleUpdatePetition}
+      onNextClick={handleNextClick}
       section="compose"
       scrollBody
       state={petitionState}
@@ -537,17 +533,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             />
           ) : null}
           {petition && petition.__typename === "Petition" ? (
-            petition!.status === "DRAFT" ? (
-              <PetitionComposeMessageEditor
-                marginTop={4}
-                petition={petition!}
-                showErrors={showErrors}
-                onCreateContact={handleCreateContact}
-                onSearchContacts={handleSearchContacts}
-                onUpdatePetition={handleUpdatePetition}
-                onSend={handleSend}
-              />
-            ) : (
+            petition!.status !== "DRAFT" ? (
               <Box
                 color="gray.500"
                 marginTop={12}
@@ -577,7 +563,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   />
                 </Text>
               </Box>
-            )
+            ) : null
           ) : petition?.__typename === "PetitionTemplate" ? (
             <PetitionTemplateComposeMessageEditor
               marginTop={4}
@@ -597,14 +583,14 @@ PetitionCompose.fragments = {
       fragment PetitionCompose_PetitionBase on PetitionBase {
         id
         ...PetitionLayout_PetitionBase
+        ...AddPetitionAccessDialog_Petition
+        ...PetitionTemplateComposeMessageEditor_Petition
         fields {
           ...PetitionCompose_PetitionField
         }
-        ...PetitionComposeMessageEditor_Petition
-        ...PetitionTemplateComposeMessageEditor_Petition
       }
       ${PetitionLayout.fragments.PetitionBase}
-      ${PetitionComposeMessageEditor.fragments.Petition}
+      ${AddPetitionAccessDialog.fragments.Petition}
       ${PetitionTemplateComposeMessageEditor.fragments.Petition}
       ${this.PetitionField}
     `;
@@ -639,11 +625,13 @@ PetitionCompose.mutations = [
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_PetitionBase
-        ...PetitionComposeMessageEditor_Petition
+        ...AddPetitionAccessDialog_Petition
+        ...PetitionTemplateComposeMessageEditor_Petition
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
-    ${PetitionComposeMessageEditor.fragments.Petition}
+    ${AddPetitionAccessDialog.fragments.Petition}
+    ${PetitionTemplateComposeMessageEditor.fragments.Petition}
   `,
   gql`
     mutation PetitionCompose_updateFieldPositions(

@@ -1589,6 +1589,17 @@ export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
     >;
   };
 
+export type AddPetitionAccessDialog_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "emailSubject" | "emailBody"> & {
+    remindersConfig?: Maybe<
+      { __typename?: "RemindersConfig" } & Pick<
+        RemindersConfig,
+        "offset" | "time" | "timezone" | "weekdaysOnly"
+      >
+    >;
+  };
+
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
 } & Pick<PetitionMessage, "bouncedAt" | "deliveredAt" | "openedAt">;
@@ -2274,21 +2285,6 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   | "position"
 >;
 
-export type PetitionComposeMessageEditor_ContactFragment = {
-  __typename?: "Contact";
-} & Pick<Contact, "id" | "fullName" | "email">;
-
-export type PetitionComposeMessageEditor_PetitionFragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "emailSubject" | "emailBody"> & {
-    remindersConfig?: Maybe<
-      { __typename?: "RemindersConfig" } & Pick<
-        RemindersConfig,
-        "offset" | "time" | "timezone" | "weekdaysOnly"
-      >
-    >;
-  };
-
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
 } & Pick<PetitionTemplate, "id" | "emailSubject" | "emailBody" | "description">;
@@ -2757,7 +2753,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionBase_Petition_Fragment &
-  PetitionComposeMessageEditor_PetitionFragment;
+  AddPetitionAccessDialog_PetitionFragment;
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
@@ -2794,10 +2790,11 @@ export type PetitionCompose_updatePetitionMutation = {
     | ({
         __typename?: "Petition";
       } & PetitionLayout_PetitionBase_Petition_Fragment &
-        PetitionComposeMessageEditor_PetitionFragment)
+        AddPetitionAccessDialog_PetitionFragment)
     | ({
         __typename?: "PetitionTemplate";
-      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
+      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
+        PetitionTemplateComposeMessageEditor_PetitionFragment);
 };
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
@@ -4044,13 +4041,6 @@ export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
 `;
-export const PetitionComposeMessageEditor_ContactFragmentDoc = gql`
-  fragment PetitionComposeMessageEditor_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
 export const Admin_UserFragmentDoc = gql`
   fragment Admin_User on User {
     ...AppLayout_User
@@ -4717,8 +4707,8 @@ export const onFieldEdit_PetitionFieldFragmentDoc = gql`
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
-export const PetitionComposeMessageEditor_PetitionFragmentDoc = gql`
-  fragment PetitionComposeMessageEditor_Petition on Petition {
+export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_Petition on Petition {
     emailSubject
     emailBody
     remindersConfig {
@@ -4741,16 +4731,16 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
     id
     ...PetitionLayout_PetitionBase
+    ...AddPetitionAccessDialog_Petition
+    ...PetitionTemplateComposeMessageEditor_Petition
     fields {
       ...PetitionCompose_PetitionField
     }
-    ...PetitionComposeMessageEditor_Petition
-    ...PetitionTemplateComposeMessageEditor_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${PetitionCompose_PetitionFieldFragmentDoc}
-  ${PetitionComposeMessageEditor_PetitionFragmentDoc}
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
   ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
+  ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
 export const PetitionCompose_UserFragmentDoc = gql`
   fragment PetitionCompose_User on User {
@@ -6520,11 +6510,13 @@ export const PetitionCompose_updatePetitionDocument = gql`
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionLayout_PetitionBase
-      ...PetitionComposeMessageEditor_Petition
+      ...AddPetitionAccessDialog_Petition
+      ...PetitionTemplateComposeMessageEditor_Petition
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
-  ${PetitionComposeMessageEditor_PetitionFragmentDoc}
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
+  ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
 `;
 
 /**

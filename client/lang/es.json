@@ -460,11 +460,6 @@
     "context": "Schedule send"
   },
   {
-    "term": "component.send-petition-dialog.same-petition-warning",
-    "definition": "Los destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
-    "context": "Recipients will receive a link to the same petition so they can fill it out collaboratively."
-  },
-  {
     "term": "component.table.next-page-button",
     "definition": "Siguiente",
     "context": "Next"
@@ -988,6 +983,11 @@
     "term": "generic.more-options",
     "definition": "Más opciones...",
     "context": "More options..."
+  },
+  {
+    "term": "generic.next",
+    "definition": "Siguiente",
+    "context": "Next"
   },
   {
     "term": "generic.next-page",
@@ -1550,6 +1550,16 @@
     "context": "Once you send this petition, you will be able to see all the petition activity here."
   },
   {
+    "term": "petition.add-access.header",
+    "definition": "¿A quién quieres enviárselo?",
+    "context": "Who do you want to send it to?"
+  },
+  {
+    "term": "petition.add-access.same-petition-warning",
+    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
+    "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
+  },
+  {
     "term": "petition.add-another-field-button",
     "definition": "Añadir otro campo",
     "context": "Add another field"
@@ -1823,16 +1833,6 @@
     "term": "petition.message-sent.toast-header",
     "definition": "Mensaje enviado",
     "context": "Message sent"
-  },
-  {
-    "term": "petition.message-settings.header",
-    "definition": "¿A quién quieres enviárselo?",
-    "context": "Who do you want to send it to?"
-  },
-  {
-    "term": "petition.message-settings.same-petition-warning",
-    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
-    "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
   },
   {
     "term": "petition.message-settings.unknown-recipients",

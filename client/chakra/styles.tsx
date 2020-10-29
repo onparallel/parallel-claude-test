@@ -12,6 +12,7 @@ export const styles: Styles = {
     },
     "*::placeholder": {
       color: mode("gray.400", "whiteAlpha.400")(props),
+      opacity: 1,
     },
     "*, *::before, &::after": {
       borderColor: mode("gray.200", "whiteAlpha.300")(props),

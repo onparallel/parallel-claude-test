@@ -11,7 +11,7 @@ import { FormattedMessage } from "react-intl";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 
 export type ConfigureRemindersDialogProps = {
-  defaultConfig: Maybe<RemindersConfig>;
+  defaultRemindersConfig: Maybe<RemindersConfig>;
   enabled: boolean;
 };
 
@@ -20,14 +20,13 @@ export type ConfigureRemindersDialogResult = {
 };
 
 export function ConfigureRemindersDialog({
-  defaultConfig,
+  defaultRemindersConfig,
   enabled,
   ...props
 }: DialogProps<ConfigureRemindersDialogProps, ConfigureRemindersDialogResult>) {
-  const [reminderIsActive, setActive] = useState<boolean>(enabled);
-  const [remindersConfig, setConfig] = useState<Maybe<RemindersConfig>>(
-    defaultConfig
-  );
+  const [remindersConfig, setRemindersConfig] = useState<
+    Maybe<RemindersConfig>
+  >(defaultRemindersConfig);
 
   return (
     <ConfirmDialog
@@ -42,20 +41,14 @@ export function ConfigureRemindersDialog({
         <PetitionRemindersConfig
           id="petition-reminders"
           value={remindersConfig}
-          onChange={setConfig}
-          isEnabled={reminderIsActive}
-          onSwitched={setActive}
+          onChange={setRemindersConfig}
           marginTop={2}
         />
       }
       confirm={
         <Button
           colorScheme="purple"
-          onClick={() =>
-            props.onResolve({
-              remindersConfig: reminderIsActive ? remindersConfig : null,
-            })
-          }
+          onClick={() => props.onResolve({ remindersConfig })}
         >
           <FormattedMessage
             id="petition.reminder-settings-dialog.confirm"
