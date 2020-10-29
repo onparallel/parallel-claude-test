@@ -24,46 +24,37 @@ async function startSignatureProcess(
     `/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`
   );
 
-  try {
-    await ctx.petitions.createPetitionSignature(
-      petitionId,
-      payload.recipients,
-      signatureClient.name
-    );
+  await ctx.petitions.createPetitionSignature(
+    petitionId,
+    payload.recipients,
+    signatureClient.name
+  );
 
-    // print and save pdf to disk
-    const tmpPdfPath = resolve(tmpdir(), payload.petitionId.concat(".pdf"));
-    await ctx.printer.pdf("https://www.parallel.so", {
-      path: tmpPdfPath,
-    });
+  // print and save pdf to disk
+  const tmpPdfPath = resolve(tmpdir(), payload.petitionId.concat(".pdf"));
+  await ctx.printer.pdf("https://www.parallel.so", {
+    path: tmpPdfPath,
+  });
 
-    // send request to signature client
-    const data = await signatureClient.createSignature(
-      tmpPdfPath,
-      payload.recipients,
-      {
-        events_url: eventsUrl,
-      }
-    );
-
-    await ctx.petitions.updatePetitionSignature(
-      petitionId,
-      payload.recipients.map((r) => r.email),
-      {
-        external_id: data.id,
-        data,
-      }
-    );
-
-    unlinkSync(tmpPdfPath);
-  } catch (e) {
-    if (e.constraint === "petition_signature_petition_id_signer_email") {
-      console.error(e);
-      // whitelisted error
-    } else {
-      throw e;
+  // send request to signature client
+  const data = await signatureClient.createSignature(
+    tmpPdfPath,
+    payload.recipients,
+    {
+      events_url: eventsUrl,
     }
-  }
+  );
+
+  await ctx.petitions.updatePetitionSignature(
+    petitionId,
+    payload.recipients.map((r) => r.email),
+    {
+      external_id: data.id,
+      data,
+    }
+  );
+
+  unlinkSync(tmpPdfPath);
 }
 
 /** cancels the signature request for all signers on the petition */
