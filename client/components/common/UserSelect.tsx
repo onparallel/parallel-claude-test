@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Image, Link as ChakraLink, Stack, Text } from "@chakra-ui/core";
+import { Image, Stack, Text } from "@chakra-ui/core";
 import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import {
   useReactSelectStyle,
@@ -9,6 +9,7 @@ import { forwardRef, memo, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { components, OptionProps } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
+import { NormalLink } from "./Link";
 
 export type UserSelectSelection = UserSelect_UserFragment;
 
@@ -101,9 +102,9 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
                         defaultMessage="Contact us via email on <a>support@parallel.so</a> or the support chat and we will create them an account"
                         values={{
                           a: (chunks: any[]) => (
-                            <ChakraLink href={`mailto:${chunks[0]}`}>
+                            <NormalLink href={`mailto:${chunks[0]}`}>
                               {chunks}
-                            </ChakraLink>
+                            </NormalLink>
                           ),
                         }}
                       />

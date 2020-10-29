@@ -1,6 +1,5 @@
 import {
   Button,
-  Link,
   List,
   ListIcon,
   ListItem,
@@ -18,6 +17,7 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
+import { NormalLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 
@@ -79,7 +79,7 @@ export function RecipientViewHelpModal(props: ModalProps) {
             </Stack>
           </ModalBody>
           <ModalFooter>
-            <Link
+            <NormalLink
               href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
               target="_blank"
               rel="noopener"
@@ -88,7 +88,7 @@ export function RecipientViewHelpModal(props: ModalProps) {
                 id="recipient-view.first-time.see-more"
                 defaultMessage="See more frequently asked questions"
               />
-            </Link>
+            </NormalLink>
             <Spacer />
             <Button colorScheme="purple" onClick={props.onClose}>
               <FormattedMessage
