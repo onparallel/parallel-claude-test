@@ -107,6 +107,11 @@ const email: Email<PetitionCompletedProps> = {
                 }}
               />
             </MjmlText>
+            {fields.length > 10 && (
+              <AccessInfoButton
+                href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
+              />
+            )}
             <MjmlText fontSize="16px">
               {petitionName ? (
                 <span style={{ textDecoration: "underline" }}>
@@ -122,14 +127,9 @@ const email: Email<PetitionCompletedProps> = {
               )}
             </MjmlText>
             <PetitionFieldList fields={fields} />
-            <Button
+            <AccessInfoButton
               href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
-            >
-              <FormattedMessage
-                id="petition-completed.access-button"
-                defaultMessage="Access the information here"
-              />
-            </Button>
+            />
             <Closing />
           </MjmlColumn>
         </MjmlSection>
@@ -139,6 +139,17 @@ const email: Email<PetitionCompletedProps> = {
 };
 
 export default email;
+
+function AccessInfoButton({ href }: { href: string }) {
+  return (
+    <Button href={href}>
+      <FormattedMessage
+        id="petition-completed.access-button"
+        defaultMessage="Access the information here"
+      />
+    </Button>
+  );
+}
 
 export const props: PetitionCompletedProps = {
   name: "Derek",
