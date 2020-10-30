@@ -98,10 +98,22 @@ async function documentCanceled(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "DOCUMENT_CANCELED",
-    data,
-  });
+  const signatures = (
+    await ctx.petitions.loadPetitionSignature(petitionId)
+  ).filter(
+    (s) =>
+      s.provider === "signaturit" &&
+      s.external_id === data.document.signature.id
+  );
+
+  await ctx.petitions.updatePetitionSignature(
+    petitionId,
+    signatures.map((s) => s.signer_email),
+    {
+      status: "DOCUMENT_CANCELED",
+      data,
+    }
+  );
 }
 
 /** recipient declined the document */
@@ -122,10 +134,22 @@ async function documentExpired(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "DOCUMENT_EXPIRED",
-    data,
-  });
+  const signatures = (
+    await ctx.petitions.loadPetitionSignature(petitionId)
+  ).filter(
+    (s) =>
+      s.provider === "signaturit" &&
+      s.external_id === data.document.signature.id
+  );
+
+  await ctx.petitions.updatePetitionSignature(
+    petitionId,
+    signatures.map((s) => s.signer_email),
+    {
+      status: "DOCUMENT_EXPIRED",
+      data,
+    }
+  );
 }
 
 /** recipient signed the document */
