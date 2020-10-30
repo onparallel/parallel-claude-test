@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertIcon, Box } from "@chakra-ui/core";
+import { Alert, AlertIcon, Box, Button } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -179,6 +179,14 @@ export function AddPetitionAccessDialog({
           onSendClick={() => handleSendClick(false)}
           onScheduleClick={() => handleSendClick(true)}
         />
+      }
+      cancel={
+        <Button onClick={() => props.onReject({ reason: "CANCEL" })}>
+          <FormattedMessage
+            id="generic.go-back-button"
+            defaultMessage="Go back"
+          />
+        </Button>
       }
       {...props}
     />
