@@ -1,6 +1,7 @@
 import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
+import { ApiContext } from "../context";
 import { User } from "../db/__types";
 import { toGlobalId } from "../util/globalId";
 import { snakeCaseToCapitalizedText } from "../util/strings";
@@ -11,6 +12,7 @@ type AnalyticsEventType =
   | "PETITION_CLOSED"
   | "PETITION_SENT"
   | "PETITION_COMPLETED_BY_RECIPIENT"
+  | "USER_PETITION_COMPLETED"
   | "USER_LOGGED_IN"
   | "REMINDER_EMAIL_SENT"
   | "TEMPLATE_USED";
@@ -47,6 +49,15 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   };
   /** recipient completes the petition */
   PETITION_COMPLETED_BY_RECIPIENT: {
+    user_id: number;
+    petition_id: number;
+    access_id: number;
+  };
+  /**
+   * A petition made by the user has been completed by the recipient
+   * similar to PETITION_COMPLETED_BY_RECIPIENT, but tracks the id of the User instead of the Contact
+   */
+  USER_PETITION_COMPLETED: {
     petition_id: number;
     access_id: number;
   };
@@ -65,7 +76,7 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
-  identifyUser(user: User): void;
+  identifyUser(user: User, ctx: ApiContext): void;
 
   trackEvent<EventType extends AnalyticsEventType>(
     eventName: EventType,
@@ -86,14 +97,11 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  identifyUser(user: User) {
+  async identifyUser(user: User, ctx: ApiContext) {
+    const traits = await ctx.users.fetchSegmentUserTraits(user);
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
-      traits: {
-        email: user.email,
-        createdAt: user.created_at.toISOString(),
-        lastActiveAt: user.last_active_at?.toISOString(),
-      },
+      traits,
     });
   }
 

@@ -35,7 +35,7 @@ export class Auth implements IAuth {
     const user = await ctx.users.loadSessionUser(
       session.getIdToken().payload["cognito:username"]
     );
-    ctx.analytics.identifyUser(user);
+    ctx.analytics.identifyUser(user, ctx);
     ctx.analytics.trackEvent(
       "USER_LOGGED_IN",
       {

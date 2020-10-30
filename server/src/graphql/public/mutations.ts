@@ -190,14 +190,25 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       ctx.access!.petition_id,
       ctx.access!.id
     );
+
+    const contact = await ctx.contacts.loadContact(ctx.access!.contact_id);
     await ctx.emails.sendPetitionCompletedEmail(ctx.access!.id);
     ctx.analytics.trackEvent(
       "PETITION_COMPLETED_BY_RECIPIENT",
       {
         petition_id: petition.id,
         access_id: ctx.access!.id,
+        user_id: ctx.access!.granter_id,
       },
-      toGlobalId("PetitionAccess", ctx.access!.id)
+      toGlobalId("Contact", contact!.id)
+    );
+    ctx.analytics.trackEvent(
+      "USER_PETITION_COMPLETED",
+      {
+        access_id: ctx.access!.id,
+        petition_id: petition.id,
+      },
+      toGlobalId("User", ctx.access!.granter_id)
     );
     return petition;
   },
