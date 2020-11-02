@@ -72,6 +72,7 @@ export function HeaderNameEditable({
               paddingX={2}
               maxLength={255}
               width={props.maxWidth}
+              transition="all 250ms, width 0s"
             />
           </Flex>
           {!isEditing && (
