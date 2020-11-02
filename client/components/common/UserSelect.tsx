@@ -87,7 +87,7 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
                   <>
                     <Image
                       width="120px"
-                      src="/static/images/undraw_void.svg"
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_void.svg`}
                       role="presentation"
                     />
                     <Text as="strong">

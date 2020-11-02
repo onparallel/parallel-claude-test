@@ -74,7 +74,7 @@ function Invite() {
             </Text>
 
             <Image
-              src="/static/images/undraw_setup.svg"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_setup.svg`}
               width="350px"
               marginX="auto"
               marginY={8}

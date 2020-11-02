@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/core";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
 import languages from "@parallel/lang/languages.json";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -52,7 +53,10 @@ function Security() {
       </PublicContainer>
       <PublicContainer paddingY={16} maxWidth="container.md">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
-          <SecurityClaim image="/static/images/undraw_safe.svg">
+          <PublicShowcase
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_safe.svg`}
+            imageSize="150px"
+          >
             <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
               <FormattedMessage
                 id="public.security.how-we-protect"
@@ -71,10 +75,11 @@ function Security() {
                 defaultMessage="Your data at rest is encrypted using the 256-bit AES-256 (Advanced Encryption Standard)."
               />
             </Text>
-          </SecurityClaim>
-          <SecurityClaim
-            reverse
-            image="/static/images/undraw_secure_server.svg"
+          </PublicShowcase>
+          <PublicShowcase
+            isReversed
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_secure_server.svg`}
+            imageSize="150px"
           >
             <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
               <FormattedMessage
@@ -88,8 +93,11 @@ function Security() {
                 defaultMessage="We use SSL (Secure Sockets Layer) to protect data in transit between the Parallel application in your browser and our servers."
               />
             </Text>
-          </SecurityClaim>
-          <SecurityClaim image="/static/images/undraw_personal_information.svg">
+          </PublicShowcase>
+          <PublicShowcase
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_personal_information.svg`}
+            imageSize="150px"
+          >
             <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
               <FormattedMessage
                 id="public.security.protect-your-customer"
@@ -108,7 +116,7 @@ function Security() {
                 defaultMessage="In addition, no one will be able to access upload pages to download or view information without first identifying themselves."
               />
             </Text>
-          </SecurityClaim>
+          </PublicShowcase>
         </Stack>
         <Box marginTop={20} textAlign="center">
           <Text>
@@ -120,39 +128,6 @@ function Security() {
         </Box>
       </PublicContainer>
     </PublicLayout>
-  );
-}
-
-function SecurityClaim({
-  reverse,
-  image,
-  children,
-  ...props
-}: {
-  reverse?: boolean;
-  image: string;
-  children: ReactNode;
-} & BoxProps) {
-  return (
-    <Flex
-      {...props}
-      alignItems="center"
-      direction={{ base: "column", md: reverse ? "row" : "row-reverse" }}
-    >
-      <Flex flex="1" justifyContent="center">
-        <Image src={image} height="150px" role="presentation" />
-      </Flex>
-      <Box
-        flex="1"
-        justifyContent="center"
-        marginTop={{ base: 8, md: 0 }}
-        {...(reverse
-          ? { marginLeft: { base: 0, md: 8 } }
-          : { marginRight: { base: 0, md: 8 } })}
-      >
-        {children}
-      </Box>
-    </Flex>
   );
 }
 

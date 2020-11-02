@@ -1,17 +1,9 @@
-import {
-  Box,
-  BoxProps,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/core";
+import { Heading, Stack, Text } from "@chakra-ui/core";
 import { ClaimsList } from "@parallel/components/public/ClaimsList";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
 import languages from "@parallel/lang/languages.json";
-import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Services() {
@@ -61,7 +53,9 @@ function Services() {
       </PublicContainer>
       <PublicContainer paddingBottom={16} maxWidth="container.lg">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
-          <BenefitClaim image="/static/images/undraw_product_iteration.svg">
+          <PublicShowcase
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_product_iteration.svg`}
+          >
             <ClaimsList
               claims={[
                 intl.formatMessage({
@@ -84,7 +78,7 @@ function Services() {
                 }),
               ]}
             />
-          </BenefitClaim>
+          </PublicShowcase>
         </Stack>
       </PublicContainer>
       <PublicContainer
@@ -103,17 +97,17 @@ function Services() {
       </PublicContainer>
       <PublicContainer paddingBottom={16} maxWidth="container.lg">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
-          <BenefitClaim
-            reverse
-            image="/static/images/undraw_document_collaboration.svg"
+          <PublicShowcase
+            isReversed
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_document_collaboration.svg`}
           >
             <Stack spacing={4}>
-              <Text fontWeight="bold">
+              <Heading size="sm" as="h3">
                 <FormattedMessage
                   id="public.services.collaboration.between-professionals"
                   defaultMessage="Between your profesionals:"
                 />
-              </Text>
+              </Heading>
               <ClaimsList
                 claims={[
                   intl.formatMessage({
@@ -128,12 +122,12 @@ function Services() {
                   }),
                 ]}
               />
-              <Text fontWeight="bold">
+              <Heading size="sm" as="h3">
                 <FormattedMessage
                   id="public.services.collaboration.with-clients"
                   defaultMessage="With your clients:"
                 />
-              </Text>
+              </Heading>
               <ClaimsList
                 claims={[
                   intl.formatMessage({
@@ -154,7 +148,7 @@ function Services() {
                 ]}
               />
             </Stack>
-          </BenefitClaim>
+          </PublicShowcase>
         </Stack>
       </PublicContainer>
       <PublicContainer
@@ -173,7 +167,9 @@ function Services() {
       </PublicContainer>
       <PublicContainer paddingBottom={16} maxWidth="container.lg">
         <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
-          <BenefitClaim image="/static/images/undraw_fast_loading.svg">
+          <PublicShowcase
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_fast_loading.svg`}
+          >
             <ClaimsList
               claims={[
                 intl.formatMessage({
@@ -192,43 +188,10 @@ function Services() {
                 }),
               ]}
             />
-          </BenefitClaim>
+          </PublicShowcase>
         </Stack>
       </PublicContainer>
     </PublicLayout>
-  );
-}
-
-function BenefitClaim({
-  reverse,
-  image,
-  children,
-  ...props
-}: {
-  reverse?: boolean;
-  image: string;
-  children: ReactNode;
-} & BoxProps) {
-  return (
-    <Flex
-      {...props}
-      alignItems="center"
-      direction={{ base: "column", md: reverse ? "row" : "row-reverse" }}
-    >
-      <Flex flex="1" justifyContent="center">
-        <Image src={image} height="250px" role="presentation" />
-      </Flex>
-      <Box
-        flex="1"
-        justifyContent="center"
-        marginTop={{ base: 8, md: 0 }}
-        {...(reverse
-          ? { marginLeft: { base: 0, md: 8 } }
-          : { marginRight: { base: 0, md: 8 } })}
-      >
-        {children}
-      </Box>
-    </Flex>
   );
 }
 

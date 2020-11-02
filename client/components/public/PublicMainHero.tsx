@@ -8,8 +8,8 @@ export type PublicHeroProps = BoxProps;
 
 export function PublicMainHero({ ...props }: PublicHeroProps) {
   const intl = useIntl();
-  const router = useRouter();
-  const imageName = `/static/images/showcase_hero_${router.query.locale}`;
+  const { query } = useRouter();
+  const imageName = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/showcase_hero_${query.locale}`;
   const breakpoint = "lg";
   return (
     <PublicContainer

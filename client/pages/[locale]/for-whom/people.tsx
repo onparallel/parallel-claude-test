@@ -79,7 +79,7 @@ function People() {
             right={
               <Image
                 margin="auto"
-                src="/static/images/undraw_working_remotely.svg"
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_working_remotely.svg`}
                 width="250px"
                 role="presentation"
               />
@@ -135,7 +135,7 @@ function People() {
             left={
               <Image
                 margin="auto"
-                src="/static/images/undraw_freelancer.svg"
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_freelancer.svg`}
                 width="250px"
                 role="presentation"
               />
@@ -225,7 +225,7 @@ function Separator({
           border="2px solid"
           borderColor="white"
           background="white"
-          src="/static/images/logo-lila.svg"
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/logo-lila.svg`}
           role="presentation"
           width="36px"
         />

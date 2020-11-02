@@ -282,7 +282,7 @@ function TextSettings({
             <Image
               height="55px"
               marginTop={2}
-              src="/static/images/placeholder.gif"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/placeholder.gif`}
               role="presentation"
             />
           </>

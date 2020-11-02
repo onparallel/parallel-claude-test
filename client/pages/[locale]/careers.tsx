@@ -1,17 +1,8 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/core";
+import { Button, Flex, Heading, Stack, Text } from "@chakra-ui/core";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
 import languages from "@parallel/lang/languages.json";
-import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Career() {
@@ -53,7 +44,9 @@ function Career() {
         </Heading>
       </PublicContainer>
       <PublicContainer paddingBottom={16} maxWidth="container.md">
-        <CareerOptions image="/static/images/undraw_team.svg">
+        <PublicShowcase
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_team.svg`}
+        >
           <Stack spacing={8}>
             <Text>
               <FormattedMessage
@@ -82,7 +75,7 @@ function Career() {
               </Button>
             </Flex>
           </Stack>
-        </CareerOptions>
+        </PublicShowcase>
       </PublicContainer>
       <PublicContainer
         paddingY={16}
@@ -98,7 +91,10 @@ function Career() {
         </Heading>
       </PublicContainer>
       <PublicContainer paddingBottom={16} maxWidth="container.md">
-        <CareerOptions reverse image="/static/images/undraw_whiteboard.svg">
+        <PublicShowcase
+          isReversed
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_whiteboard.svg`}
+        >
           <Stack spacing={8}>
             <Text>
               <FormattedMessage
@@ -127,42 +123,9 @@ function Career() {
               </Button>
             </Flex>
           </Stack>
-        </CareerOptions>
+        </PublicShowcase>
       </PublicContainer>
     </PublicLayout>
-  );
-}
-
-function CareerOptions({
-  reverse,
-  image,
-  children,
-  ...props
-}: {
-  reverse?: boolean;
-  image: string;
-  children: ReactNode;
-} & BoxProps) {
-  return (
-    <Flex
-      {...props}
-      alignItems="center"
-      direction={{ base: "column", md: reverse ? "row" : "row-reverse" }}
-    >
-      <Flex flex="1" justifyContent="center">
-        <Image src={image} height="250px" role="presentation" />
-      </Flex>
-      <Box
-        flex="1"
-        justifyContent="center"
-        marginTop={{ base: 8, md: 0 }}
-        {...(reverse
-          ? { marginLeft: { base: 0, md: 8 } }
-          : { marginRight: { base: 0, md: 8 } })}
-      >
-        {children}
-      </Box>
-    </Flex>
   );
 }
 

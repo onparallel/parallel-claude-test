@@ -4,10 +4,22 @@ import { PublicContainer } from "./layout/PublicContainer";
 
 export function PublicPress({ ...props }: BoxProps) {
   const items = [
-    { image: "/static/logos/expansion.png", name: "Expansión" },
-    { image: "/static/logos/cinco_dias.png", name: "CincoDías" },
-    { image: "/static/logos/elreferente.png", name: "ElReferente" },
-    { image: "/static/logos/seedrocket.png", name: "Seedrocket" },
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/expansion.png`,
+      name: "Expansión",
+    },
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/cinco_dias.png`,
+      name: "CincoDías",
+    },
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/elreferente.png`,
+      name: "ElReferente",
+    },
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/seedrocket.png`,
+      name: "Seedrocket",
+    },
   ];
   return (
     <PublicContainer

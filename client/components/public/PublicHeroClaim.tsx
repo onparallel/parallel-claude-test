@@ -32,7 +32,7 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
       </Heading>
       <Flex justifyContent="center" flexWrap="wrap">
         <Feature
-          imageSrc="/static/images/undraw_folder.svg"
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_folder.svg`}
           header={
             <FormattedMessage
               id="public.claim.productivity"
@@ -47,7 +47,7 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           }
         />
         <Feature
-          imageSrc="/static/images/undraw_progress.svg"
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_progress.svg`}
           header={
             <FormattedMessage
               id="public.claim.speed"
@@ -62,7 +62,7 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
           }
         />
         <Feature
-          imageSrc="/static/images/undraw_checklist.svg"
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_checklist.svg`}
           header={
             <FormattedMessage
               id="public.claim.client-experience"
@@ -82,11 +82,11 @@ export function PublicHeroClaim({ ...props }: BoxProps) {
 }
 
 function Feature({
-  imageSrc,
+  imageUrl,
   header,
   description,
 }: {
-  imageSrc: string;
+  imageUrl: string;
   header: ReactNode;
   description: ReactNode;
 }) {
@@ -100,7 +100,7 @@ function Feature({
       margin={4}
     >
       <Flex justifyContent="center" alignItems="bottom" height="180px">
-        <Image src={imageSrc} maxWidth="80%" role="presentation" />
+        <Image src={imageUrl} maxWidth="80%" role="presentation" />
       </Flex>
       <Heading as="h4" size="sm" marginY={4}>
         {header}

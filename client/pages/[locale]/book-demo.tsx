@@ -123,7 +123,7 @@ function BookDemo() {
                 maxWidth="50%"
                 marginX="auto"
                 marginY={8}
-                src="/static/images/undraw_steps.svg"
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_steps.svg`}
                 role="presentation"
               />
             </Box>

@@ -14,7 +14,7 @@ export default function CustomError({
           defaultMessage="It seems that this petition is no longer available."
         />
       }
-      imageUrl={"/static/images/undraw_road_sign.svg"}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_road_sign.svg`}
     >
       <Text>
         <FormattedMessage
@@ -31,7 +31,7 @@ export default function CustomError({
           defaultMessage="Access forbidden"
         />
       }
-      imageUrl={"/static/images/undraw_cancel.svg"}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_cancel.svg`}
     >
       <Text>
         <FormattedMessage
@@ -48,7 +48,7 @@ export default function CustomError({
           defaultMessage="An error happened and our developers have already been notified."
         />
       }
-      imageUrl={"/static/images/undraw_bug_fixing.svg"}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_bug_fixing.svg`}
     >
       <Text>
         <FormattedMessage

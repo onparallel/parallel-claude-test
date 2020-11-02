@@ -37,7 +37,7 @@ export default function Custom404() {
           defaultMessage="We can't seem to find the page you're looking for."
         />
       }
-      imageUrl={"/static/images/undraw_void.svg"}
+      imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_void.svg`}
     >
       <Text>
         <FormattedMessage

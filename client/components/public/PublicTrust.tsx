@@ -28,7 +28,7 @@ export function PublicTrust(props: BoxProps) {
               defaultMessage: "Cuatrecasas Acelera",
             })}
             width="250px"
-            src="/static/images/cuatrecasas-acelera.png"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/cuatrecasas-acelera.png`}
           />
         </NormalLink>
       </Flex>
