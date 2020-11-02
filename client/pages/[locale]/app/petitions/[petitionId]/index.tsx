@@ -4,12 +4,11 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { compose } from "@parallel/utils/compose";
-import Router from "next/router";
 import {
   PetitionQuery,
   PetitionQueryVariables,
 } from "@parallel/graphql/__types";
+import { compose } from "@parallel/utils/compose";
 
 function Petition() {
   return <></>;

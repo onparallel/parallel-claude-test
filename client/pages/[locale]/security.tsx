@@ -1,17 +1,8 @@
-import {
-  Box,
-  BoxProps,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/core";
+import { Box, Heading, Stack, Text } from "@chakra-ui/core";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
 import languages from "@parallel/lang/languages.json";
-import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Security() {
