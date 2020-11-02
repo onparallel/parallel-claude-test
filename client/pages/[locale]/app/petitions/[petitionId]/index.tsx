@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  RedirectError,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
@@ -33,22 +34,12 @@ Petition.getInitialProps = async ({
     variables: { id: query.petitionId as string },
   });
   const section =
-    data?.petition?.__typename === "Petition"
-      ? data?.petition?.status === "DRAFT"
-        ? "compose"
-        : "replies"
+    data?.petition?.__typename === "Petition" &&
+    data.petition.status !== "DRAFT"
+      ? "replies"
       : "compose";
-  if (process.browser) {
-    const { locale, petitionId } = query;
-    Router.push(`/${locale}/app/petitions/${petitionId}/${section}`);
-  } else if (res?.writeHead) {
-    res
-      .writeHead(302, {
-        Location: `/${query.locale}/app/petitions/${query.petitionId}/${section}`,
-      })
-      .end();
-  }
-  return {};
+  const { locale, petitionId } = query;
+  throw new RedirectError(`/${locale}/app/petitions/${petitionId}/${section}`);
 };
 
 export default compose(withApolloData)(Petition);

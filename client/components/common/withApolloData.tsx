@@ -32,8 +32,7 @@ export function redirect(context: NextPageContext, location: string) {
   if (process.browser) {
     Router.push(location);
   } else {
-    context.res!.writeHead(302, { Location: location });
-    context.res!.end();
+    context.res?.writeHead?.(302, { Location: location }).end();
   }
 }
 
