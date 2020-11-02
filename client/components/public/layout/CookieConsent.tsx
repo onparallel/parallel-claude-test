@@ -45,8 +45,7 @@ export function CookieConsent({}: CookieConsentProps) {
           values={{
             a: (chunks: any[]) => (
               <Link
-                href="/legal/[doc]"
-                as="/legal/cookies"
+                href="/legal/cookies"
                 {...{
                   color: "white",
                   textDecoration: "underline",

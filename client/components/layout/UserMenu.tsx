@@ -35,7 +35,7 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
     await postJson("/api/auth/logout");
     localStorage.removeItem("token");
     await apollo.clearStore();
-    router.push("/[locale]/login", `/${router.query.locale}/login`);
+    router.push(`/${router.query.locale}/login`);
   }
   const locales = useSupportedLocales();
   const isAdmin =

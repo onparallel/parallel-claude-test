@@ -10,14 +10,10 @@ export function ContactLink({
 }: {
   contact: ContactLink_ContactFragment;
   isFull?: boolean;
-} & Omit<LinkProps, "href" | "as">) {
+} & Omit<LinkProps, "href">) {
   return (
     <Tooltip isDisabled={!fullName && !isFull} label={email}>
-      <Link
-        href="/app/contacts/[contactId]"
-        as={`/app/contacts/${id}`}
-        {...props}
-      >
+      <Link href={`/app/contacts/${id}`} {...props}>
         {fullName || email}
         {isFull && fullName ? `<${email}>` : null}
       </Link>

@@ -62,7 +62,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
           </Link>
         </ListItem>
         <ListItem>
-          <Link href="/legal/[doc]" as="/legal/terms" target="_blank">
+          <Link href="/legal/terms" target="_blank">
             <FormattedMessage
               id="public.terms.title"
               defaultMessage="Terms & Conditions"

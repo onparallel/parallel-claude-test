@@ -5,11 +5,8 @@ export function useGoToPetition() {
   const router = useRouter();
   return useCallback(
     (id: string, section: "compose" | "replies" | "activity") => {
-      router.push(
-        `/[locale]/app/petitions/[petitionId]/${section}`,
-        `/${router.query.locale}/app/petitions/${id}/${section}`
-      );
+      router.push(`/${router.query.locale}/app/petitions/${id}/${section}`);
     },
-    [router, router.query]
+    [router.query.locale]
   );
 }

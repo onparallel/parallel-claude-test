@@ -39,10 +39,8 @@ Petition.getInitialProps = async ({
         : "replies"
       : "compose";
   if (process.browser) {
-    Router.push(
-      `/[locale]/app/petitions/[petitionId]/${section}`,
-      `/${query.locale}/app/petitions/${query.petitionId}/${section}`
-    );
+    const { locale, petitionId } = query;
+    Router.push(`/${locale}/app/petitions/${petitionId}/${section}`);
   } else if (res?.writeHead) {
     res
       .writeHead(302, {

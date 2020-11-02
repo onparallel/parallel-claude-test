@@ -347,8 +347,7 @@ function usePetitionsColumns(
                           more: rest.length,
                           a: (chunks: any[]) => (
                             <Link
-                              href="/app/petitions/[petitionId]/activity"
-                              as={`/app/petitions/${row.id}/activity`}
+                              href={`/app/petitions/${row.id}/activity`}
                               onClick={(e: MouseEvent) => e.stopPropagation()}
                             >
                               {chunks}

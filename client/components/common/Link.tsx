@@ -5,33 +5,27 @@ import {
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, forwardRef, Ref } from "react";
-import { omit } from "remeda";
 
-export type LinkProps = Pick<NextLinkProps, "href" | "as"> &
-  Omit<ChakraLinkProps, "href" | "as"> & {
-    render?: (children?: ReactNode) => ReactNode;
-    next?: Omit<NextLinkProps, "href" | "as">;
+export type LinkProps = Pick<NextLinkProps, "href"> &
+  Omit<ChakraLinkProps, "href"> & {
+    next?: Omit<NextLinkProps, "href">;
     children?: ReactNode;
   };
 
 export const Link = forwardRef(function Link(
-  { next, render, children, ...props }: LinkProps,
+  { next, children, href, ...props }: LinkProps,
   ref: Ref<HTMLAnchorElement>
 ) {
   const { query } = useRouter();
-  let { href, as } = props;
-  href = href === "/" ? "" : href;
-  as = `/${query.locale}${as ?? href}`;
-  href = `/[locale]${href}`;
   return (
-    <NextLink href={href} as={as} {...next} passHref>
-      {render ? (
-        render(children)
-      ) : (
-        <ChakraLink {...omit(props, ["href", "as"])} ref={ref}>
-          {children}
-        </ChakraLink>
-      )}
+    <NextLink
+      href={`/${query.locale}/${href.toString().replace(/^\//, "")}`}
+      {...next}
+      passHref
+    >
+      <ChakraLink {...props} ref={ref}>
+        {children}
+      </ChakraLink>
     </NextLink>
   );
 });
@@ -40,13 +34,14 @@ export type NakedLinkProps = NextLinkProps & {
   children?: ReactNode;
 };
 
-export function NakedLink({ href, as, children, ...props }: NakedLinkProps) {
+export function NakedLink({ href, children, ...props }: NakedLinkProps) {
   const { query } = useRouter();
-  href = href === "/" ? "" : href;
-  as = `/${query.locale}${as ?? href}`;
-  href = `/[locale]${href}`;
   return (
-    <NextLink href={href} as={as} {...props} passHref>
+    <NextLink
+      href={`/${query.locale}/${href.toString().replace(/^\//, "")}`}
+      {...props}
+      passHref
+    >
       {children}
     </NextLink>
   );

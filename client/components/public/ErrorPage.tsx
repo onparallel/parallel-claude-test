@@ -18,7 +18,7 @@ export function ErrorPage({
   return (
     <Flex minHeight="100vh" flexDirection="column">
       <PublicContainer minHeight={20} display="flex" alignItems="center">
-        <NextLink href="/" as="/" passHref>
+        <NextLink href="/" passHref>
           <Box
             as="a"
             color="gray.700"

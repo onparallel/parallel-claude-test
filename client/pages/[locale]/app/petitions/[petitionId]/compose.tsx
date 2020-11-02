@@ -47,7 +47,6 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
-import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
@@ -446,8 +445,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           }),
         });
       }
-      const pathname = "/[locale]/app/petitions";
-      router.push(pathname, resolveUrl(pathname, router.query));
+      router.push(`/${router.query.locale}/app/petitions`);
     } catch {}
   }, [petition]);
 
@@ -552,10 +550,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
                     values={{
                       a: (chunks: any[]) => (
-                        <Link
-                          href="/app/petitions/[petitionId]/activity"
-                          as={`/app/petitions/${petitionId}/activity`}
-                        >
+                        <Link href={`/app/petitions/${petitionId}/activity`}>
                           {chunks}
                         </Link>
                       ),

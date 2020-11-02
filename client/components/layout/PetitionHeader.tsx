@@ -81,10 +81,7 @@ export function PetitionHeader({
     async function () {
       try {
         await deletePetitions([petition.id]);
-        router.push(
-          `/[locale]/app/petitions/`,
-          `/${router.query.locale}/app/petitions/`
-        );
+        router.push(`/${router.query.locale}/app/petitions/`);
       } catch {}
     },
     [petition.id, petition.name, deletePetitions]
@@ -370,8 +367,7 @@ export function PetitionHeader({
             ) : (
               <NakedLink
                 key={section}
-                href={`/app/petitions/[petitionId]/${section}`}
-                as={`/app/petitions/${petition.id}/${section}`}
+                href={`/app/petitions/${petition.id}/${section}`}
               >
                 <PetitionHeaderTab isActive={current === section}>
                   {label}

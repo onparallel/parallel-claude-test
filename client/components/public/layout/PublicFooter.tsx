@@ -30,14 +30,8 @@ export function PublicFooter(props: BoxProps) {
     "https://support.parallel.so/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
-    const value = event.target.value;
-    router.push(
-      router.pathname,
-      resolveUrl(router.pathname, {
-        ...router.query,
-        locale: value,
-      })
-    );
+    const locale = event.target.value;
+    router.push(resolveUrl(router.pathname, { ...router.query, locale }));
   }
 
   const locales = useSupportedLocales();
@@ -67,7 +61,7 @@ export function PublicFooter(props: BoxProps) {
         >
           <List>
             <ListItem>
-              <Link href="/security" as="/security">
+              <Link href="/security">
                 <FormattedMessage
                   id="public.security-link"
                   defaultMessage="Security"
@@ -117,7 +111,7 @@ export function PublicFooter(props: BoxProps) {
         >
           <List>
             <ListItem>
-              <Link href="/about" as="/about">
+              <Link href="/about">
                 <FormattedMessage
                   id="public.about-link"
                   defaultMessage="About"
@@ -125,7 +119,7 @@ export function PublicFooter(props: BoxProps) {
               </Link>
             </ListItem>
             <ListItem>
-              <Link href="/careers" as="/careers">
+              <Link href="/careers">
                 <FormattedMessage
                   id="public.careers"
                   defaultMessage="Careers"
@@ -158,7 +152,7 @@ export function PublicFooter(props: BoxProps) {
         >
           <List>
             <ListItem>
-              <Link href="/legal/[doc]" as="/legal/terms">
+              <Link href="/legal/terms">
                 <FormattedMessage
                   id="public.terms.title"
                   defaultMessage="Terms & Conditions"
@@ -166,7 +160,7 @@ export function PublicFooter(props: BoxProps) {
               </Link>
             </ListItem>
             <ListItem>
-              <Link href="/legal/[doc]" as="/legal/privacy">
+              <Link href="/legal/privacy">
                 <FormattedMessage
                   id="public.privacy.title"
                   defaultMessage="Privacy policy"
@@ -174,7 +168,7 @@ export function PublicFooter(props: BoxProps) {
               </Link>
             </ListItem>
             <ListItem>
-              <Link href="/legal/[doc]" as="/legal/cookies">
+              <Link href="/legal/cookies">
                 <FormattedMessage
                   id="public.cookies.title"
                   defaultMessage="Cookie policy"

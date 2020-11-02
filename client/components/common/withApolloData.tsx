@@ -28,11 +28,11 @@ export type WithDataProps<P> = {
   componentProps: P;
 };
 
-function redirect(context: NextPageContext, pathname: string, asHref: string) {
+export function redirect(context: NextPageContext, location: string) {
   if (process.browser) {
-    Router.push(pathname, asHref);
+    Router.push(location);
   } else {
-    context.res!.writeHead(302, { Location: asHref });
+    context.res!.writeHead(302, { Location: location });
     context.res!.end();
   }
 }
@@ -137,17 +137,13 @@ export function withApolloData<P = {}>(
         }
       } catch (error) {
         if (error instanceof RedirectError) {
-          return redirect(context, error.pathname, error.asHref);
+          return redirect(context, error.location);
         }
         const code = error?.graphQLErrors?.[0]?.extensions?.code;
         if (code === "UNAUTHENTICATED") {
-          redirect(
-            context,
-            "/[locale]/login",
-            `/${context.query.locale}/login`
-          );
+          redirect(context, `/${context.query.locale}/login`);
         } else if (code === "FORBIDDEN") {
-          redirect(context, "/[locale]/app", `/${context.query.locale}/app`);
+          redirect(context, `/${context.query.locale}/app`);
         } else {
           if (
             process.env.NODE_ENV === "development" &&
@@ -172,7 +168,7 @@ export function withApolloData<P = {}>(
 }
 
 export class RedirectError extends Error {
-  constructor(public pathname: string, public asHref: string) {
+  constructor(public location: string) {
     super();
   }
 }

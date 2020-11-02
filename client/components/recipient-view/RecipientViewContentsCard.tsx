@@ -63,10 +63,7 @@ export function RecipientViewContentsCard({
                     transform="translate(0, -50%)"
                   />
                 ) : null}
-                <NakedLink
-                  href="/petition/[keycode]/[page]"
-                  as={`/petition/${query.keycode}/${index + 1}`}
-                >
+                <NakedLink href={`/petition/${query.keycode}/${index + 1}`}>
                   <Box
                     as="a"
                     display="block"
@@ -114,8 +111,7 @@ export function RecipientViewContentsCard({
                         transform="translate(0, -50%)"
                       />
                       <NakedLink
-                        href="/petition/[keycode]/[page]"
-                        as={`/petition/${query.keycode}/${index + 1}#field-${
+                        href={`/petition/${query.keycode}/${index + 1}#field-${
                           field.id
                         }`}
                       >

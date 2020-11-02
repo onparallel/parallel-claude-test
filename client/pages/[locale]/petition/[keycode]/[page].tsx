@@ -205,10 +205,7 @@ function RecipientView({
           return f.replies.length === 0 && !f.optional && !f.isReadOnly;
         })!;
         const { keycode, locale } = router.query;
-        router.push(
-          "/[locale]/petition/[keycode]/[page]",
-          `/${locale}/petition/${keycode}/${page}#field-${field.id}`
-        );
+        router.push(`/${locale}/petition/${keycode}/${page}#field-${field.id}`);
       }
     },
     [petition.fields, granter, router.query]
@@ -1015,10 +1012,7 @@ RecipientView.getInitialProps = async ({
   const keycode = query.keycode as string;
   const page = parseInt(query.page as string);
   if (!Number.isInteger(page) || page <= 0) {
-    throw new RedirectError(
-      pathname,
-      resolveUrl(pathname, { ...query, page: "1" })
-    );
+    throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
   }
 
   const result = await fetchQuery<
@@ -1054,10 +1048,7 @@ RecipientView.getInitialProps = async ({
       (f) => f.type === "HEADING" && f.options!.hasPageBreak
     ).length + 1;
   if (page > pageCount) {
-    throw new RedirectError(
-      pathname,
-      resolveUrl(pathname, { ...query, page: "1" })
-    );
+    throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
   }
   return { keycode, currentPage: page, pageCount };
 };

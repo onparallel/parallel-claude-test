@@ -110,10 +110,7 @@ function Contacts() {
   }
 
   function handleRowClick(row: ContactSelection) {
-    router.push(
-      `/[locale]/app/contacts/[contactId]`,
-      `/${router.query.locale}/app/contacts/${row.id}`
-    );
+    router.push(`/${router.query.locale}/app/contacts/${row.id}`);
   }
 
   async function handleCreateClick() {

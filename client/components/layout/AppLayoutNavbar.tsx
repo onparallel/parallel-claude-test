@@ -100,7 +100,6 @@ export const AppLayoutNavbar = Object.assign(
     );
     function handleLocaleChange(locale: string) {
       router.push(
-        router.pathname,
         resolveUrl(router.pathname, {
           ...router.query,
           locale,

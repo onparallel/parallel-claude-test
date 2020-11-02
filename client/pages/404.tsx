@@ -47,7 +47,7 @@ export default function Custom404() {
       </Text>
       <List>
         <ListItem>
-          <NextLink href="/" as="/" passHref>
+          <NextLink href="/" passHref>
             <NormalLink>
               <FormattedMessage id="public.home-link" defaultMessage="Home" />
             </NormalLink>

@@ -139,9 +139,7 @@ function BookDemo() {
                 defaultMessage="For more information, please review our <a>Privacy Policy</a>."
                 values={{
                   a: (chunks: any[]) => (
-                    <Link href="/legal/[doc]" as="/legal/privacy">
-                      {chunks}
-                    </Link>
+                    <Link href="/legal/privacy">{chunks}</Link>
                   ),
                 }}
               />

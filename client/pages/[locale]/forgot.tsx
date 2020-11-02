@@ -84,7 +84,7 @@ function Forgot() {
         status: "success",
         isClosable: true,
       });
-      router.push("/[locale]/login", `/${router.query.locale}/login`);
+      router.push(`/${router.query.locale}/login`);
     } catch (error) {
       setVerification({ ...verification, verificationCodeError: true });
     }

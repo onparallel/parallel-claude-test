@@ -121,12 +121,7 @@ function PageLink({
   return props.isDisabled ? (
     button
   ) : (
-    <NakedLink
-      href="/petition/[keycode]/[page]"
-      as={`/petition/${query.keycode}/${page}`}
-    >
-      {button}
-    </NakedLink>
+    <NakedLink href={`/petition/${query.keycode}/${page}`}>{button}</NakedLink>
   );
 }
 

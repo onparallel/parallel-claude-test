@@ -62,10 +62,7 @@ export function PetitionTemplateHeader({
     async function () {
       try {
         await deletePetitions([petition.id]);
-        router.push(
-          `/[locale]/app/petitions/`,
-          `/${router.query.locale}/app/petitions/`
-        );
+        router.push(`/${router.query.locale}/app/petitions/`);
       } catch {}
     },
     [petition.id, deletePetitions, router]
