@@ -52,7 +52,7 @@ export function SettingsLayout({
           borderRight="1px solid"
           borderRightColor="gray.100"
           flex="1"
-          maxWidth={isBase ? "auto" : 64}
+          maxWidth={{ base: "auto", md: 64 }}
           display={{ base: isBase ? "block" : "none", md: "block" }}
         >
           <Flex
@@ -73,39 +73,43 @@ export function SettingsLayout({
           ))}
         </Box>
         <Flex
-          display={isBase ? "none" : "flex"}
+          display={{ base: isBase ? "none" : "flex", md: "flex" }}
           direction="column"
           flex="1"
           backgroundColor="white"
         >
-          <Flex
-            flexDirection="row"
-            alignItems="center"
-            height={16}
-            paddingX={4}
-            borderBottom="1px solid"
-            borderBottomColor="gray.100"
-          >
-            <NakedLink href={basePath}>
-              <IconButton
-                as="a"
-                icon={<ArrowBackIcon />}
-                variant="ghost"
-                aria-label={intl.formatMessage({
-                  id: "generic.go-back-button",
-                  defaultMessage: "Go back",
-                })}
-                marginRight={2}
-                display={{ base: "flex", md: "none" }}
-              />
-            </NakedLink>
-            <Heading as="h3" size="md">
-              {header}
-            </Heading>
-          </Flex>
-          <Flex flex="1" minHeight={0} overflow="auto">
-            {children}
-          </Flex>
+          {isBase ? null : (
+            <>
+              <Flex
+                flexDirection="row"
+                alignItems="center"
+                height={16}
+                paddingX={4}
+                borderBottom="1px solid"
+                borderBottomColor="gray.100"
+              >
+                <NakedLink href={basePath}>
+                  <IconButton
+                    as="a"
+                    icon={<ArrowBackIcon />}
+                    variant="ghost"
+                    aria-label={intl.formatMessage({
+                      id: "generic.go-back-button",
+                      defaultMessage: "Go back",
+                    })}
+                    marginRight={2}
+                    display={{ base: "flex", md: "none" }}
+                  />
+                </NakedLink>
+                <Heading as="h3" size="md">
+                  {header}
+                </Heading>
+              </Flex>
+              <Flex flex="1" minHeight={0} overflow="auto">
+                {children}
+              </Flex>
+            </>
+          )}
         </Flex>
       </Flex>
     </AppLayout>
