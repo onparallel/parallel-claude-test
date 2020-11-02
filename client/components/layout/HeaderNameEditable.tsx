@@ -79,7 +79,6 @@ export function HeaderNameEditable({
               alignItems="center"
               fontSize="sm"
               position="relative"
-              display={{ base: "flex", md: "none", lg: "flex" }}
               top="3px"
             >
               <Tooltip
@@ -111,30 +110,39 @@ export function HeaderNameEditable({
                   cursor="default"
                 >
                   {state === "SAVING" ? (
-                    <>
-                      <CloudUploadIcon marginRight={1} fontSize="sm" />
+                    <CloudUploadIcon fontSize="sm" />
+                  ) : state === "SAVED" ? (
+                    <CloudOkIcon fontSize="sm" />
+                  ) : state === "ERROR" ? (
+                    <CloudErrorIcon fontSize="sm" />
+                  ) : null}
+                  <Text
+                    as="span"
+                    marginLeft={1}
+                    display={{
+                      base: "none",
+                      sm: "inline",
+                      md: "none",
+                      lg: "inline",
+                    }}
+                  >
+                    {state === "SAVING" ? (
                       <FormattedMessage
                         id="generic.saving-changes"
                         defaultMessage="Saving..."
                       />
-                    </>
-                  ) : state === "SAVED" ? (
-                    <>
-                      <CloudOkIcon marginRight={1} fontSize="sm" />
+                    ) : state === "SAVED" ? (
                       <FormattedMessage
                         id="generic.changes-saved"
                         defaultMessage="Saved"
                       />
-                    </>
-                  ) : state === "ERROR" ? (
-                    <>
-                      <CloudErrorIcon marginRight={1} fontSize="sm" />
+                    ) : state === "ERROR" ? (
                       <FormattedMessage
                         id="petition.status.error"
                         defaultMessage="Error"
                       />
-                    </>
-                  ) : null}
+                    ) : null}
+                  </Text>
                 </Text>
               </Tooltip>
             </Flex>

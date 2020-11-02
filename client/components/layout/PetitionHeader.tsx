@@ -16,13 +16,13 @@ import {
   useDisclosure,
 } from "@chakra-ui/core";
 import {
+  ArrowForwardIcon,
   CopyIcon,
   DeleteIcon,
   EditIcon,
   MoreVerticalIcon,
   SettingsIcon,
   UserArrowIcon,
-  ArrowForwardIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
@@ -218,32 +218,35 @@ export function PetitionHeader({
               onNameChange={(name) => onUpdatePetition({ name: name || null })}
               maxWidth={{
                 base: `calc(100vw - ${
-                  16 /* heading padding left */ +
+                  32 /* heading padding l+r */ +
                   24 /* petition status icon width */ +
-                  28 /* locale badge width + margins + padding */ +
                   4 /* petition status icon margin right */ +
+                  4 /* locale badge margin left */ +
+                  24 /* locale badge width */ +
                   16 /* petition name padding l+r */ +
-                  40 /* more options button width */ +
-                  16 /* heading padding right */
+                  (petition.status === "DRAFT" ? 40 + 8 : 0) +
+                  40 /* more options button width */
                 }px)`,
                 sm: `calc(100vw - ${
                   96 /* left navbar width */ +
-                  16 /* heading padding left */ +
+                  32 /* heading padding l+r */ +
                   24 /* petition status icon width */ +
-                  28 /* locale badge width + margins + padding */ +
                   4 /* petition status icon margin right */ +
+                  4 /* locale badge margin left */ +
+                  24 /* locale badge width */ +
                   16 /* petition name padding l+r */ +
-                  40 /* more options button width */ +
-                  16 /* heading padding right */
+                  (petition.status === "DRAFT" ? 40 + 8 : 0) +
+                  40 /* more options button width */
                 }px)`,
                 md: `calc((100vw - ${
                   96 /* left navbar width */ +
                   350 /* petition navigation tabs width */
                 }px)/2 - ${
-                  16 /* heading padding left */ +
+                  32 /* heading padding l+r */ +
                   24 /* petition status icon width */ +
-                  28 /* locale badge width + margins + padding */ +
-                  16 /* heading padding right */
+                  4 /* petition status icon margin right */ +
+                  4 /* locale badge margin left */ +
+                  24 /* locale badge width */
                 }px)`,
               }}
               placeholder={
@@ -263,13 +266,26 @@ export function PetitionHeader({
           <Spacer minWidth={4} />
           <Stack direction="row">
             {petition.status === "DRAFT" ? (
-              <Button
-                colorScheme="purple"
-                rightIcon={<ArrowForwardIcon fontSize="18px" />}
-                onClick={onNextClick}
-              >
-                <FormattedMessage id="generic.next" defaultMessage="Next" />
-              </Button>
+              <Box>
+                <IconButton
+                  display={{ base: "flex", md: "none" }}
+                  colorScheme="purple"
+                  icon={<ArrowForwardIcon fontSize="18px" />}
+                  onClick={onNextClick}
+                  aria-label={intl.formatMessage({
+                    id: "generic.next",
+                    defaultMessage: "Next",
+                  })}
+                />
+                <Button
+                  display={{ base: "none", md: "flex" }}
+                  colorScheme="purple"
+                  rightIcon={<ArrowForwardIcon fontSize="18px" />}
+                  onClick={onNextClick}
+                >
+                  <FormattedMessage id="generic.next" defaultMessage="Next" />
+                </Button>
+              </Box>
             ) : null}
             <Box>
               <Menu id="petition-more-options-menu">
