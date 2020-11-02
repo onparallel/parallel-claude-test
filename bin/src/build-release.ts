@@ -68,8 +68,8 @@ async function main() {
   });
   execSync(
     `aws s3 sync \
-      ${buildDir}/client/.next \
-      s3://parallel-static-${env}/_next \
+      ${buildDir}/client/.next/static \
+      s3://parallel-static-${env}/_next/static \
       --profile parallel-deploy`
   );
   execSync(

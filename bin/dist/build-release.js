@@ -57,8 +57,8 @@ async function main() {
         encoding: "utf-8",
     });
     child_process_1.execSync(`aws s3 sync \
-      ${buildDir}/client/.next \
-      s3://parallel-static-${env}/_next \
+      ${buildDir}/client/.next/static \
+      s3://parallel-static-${env}/_next/static \
       --profile parallel-deploy`);
     child_process_1.execSync(`aws s3 sync \
       ${buildDir}/client/public \
