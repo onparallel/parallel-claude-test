@@ -46,9 +46,8 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
       >
         <ListItem>
           <NormalLink
-            target="_blank"
-            rel="noopener"
             href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
+            isExternal
           >
             <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
           </NormalLink>

@@ -72,6 +72,7 @@ function Career() {
                 as="a"
                 colorScheme="purple"
                 target="_blank"
+                rel="noopener noreferrer"
                 href="https://forms.office.com/Pages/ResponsePage.aspx?id=EZYeioEzRUSW-C7eU9f048XajsMdglZKnEBUYUgWpBhURTdWUk03R0xQQk0wQUw5RVk4MDlQRzc4WC4u"
               >
                 <FormattedMessage
@@ -116,6 +117,7 @@ function Career() {
                 as="a"
                 colorScheme="purple"
                 target="_blank"
+                rel="noopener noreferrer"
                 href="https://forms.office.com/Pages/ResponsePage.aspx?id=EZYeioEzRUSW-C7eU9f048XajsMdglZKnEBUYUgWpBhUMFhaRjZEN083U1k1OVJNUllOR1ZOU1hRQi4u"
               >
                 <FormattedMessage

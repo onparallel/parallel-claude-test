@@ -81,8 +81,7 @@ export function RecipientViewHelpModal(props: ModalProps) {
           <ModalFooter>
             <NormalLink
               href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
-              target="_blank"
-              rel="noopener"
+              isExternal
             >
               <FormattedMessage
                 id="recipient-view.first-time.see-more"

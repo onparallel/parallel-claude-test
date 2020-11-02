@@ -1,5 +1,6 @@
 import { Box, BoxProps, Flex, Heading, Image } from "@chakra-ui/core";
 import { FormattedMessage, useIntl } from "react-intl";
+import { NormalLink } from "../common/Link";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export function PublicTrust(props: BoxProps) {
@@ -20,12 +21,7 @@ export function PublicTrust(props: BoxProps) {
         />
       </Heading>
       <Flex justifyContent="center">
-        <Box
-          as="a"
-          href="https://acelera.cuatrecasas.com/"
-          target="_blank"
-          rel="noopener"
-        >
+        <NormalLink href="https://acelera.cuatrecasas.com/" isExternal>
           <Image
             alt={intl.formatMessage({
               id: "public.trust.cuatrecasas",
@@ -34,7 +30,7 @@ export function PublicTrust(props: BoxProps) {
             width="250px"
             src="/static/images/cuatrecasas-acelera.png"
           />
-        </Box>
+        </NormalLink>
       </Flex>
     </PublicContainer>
   );

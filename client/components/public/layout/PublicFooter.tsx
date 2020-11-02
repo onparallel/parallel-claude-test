@@ -209,7 +209,7 @@ export function PublicFooter(props: BoxProps) {
             {...{
               href: "https://twitter.com/Parallel_SO",
               target: "_blank",
-              rel: "noopener",
+              rel: "noopener noreferrer",
             }}
             icon={<TwitterIcon />}
             isRound
@@ -224,7 +224,7 @@ export function PublicFooter(props: BoxProps) {
             {...{
               href: "https://www.linkedin.com/company/parallel-so/",
               target: "_blank",
-              rel: "noopener",
+              rel: "noopener noreferrer",
             }}
             icon={<LinkedInIcon />}
             isRound

@@ -47,9 +47,4 @@ export function NakedLink({ href, children, ...props }: NakedLinkProps) {
   );
 }
 
-export const NormalLink: typeof ChakraLink = forwardRef(function NormalLink(
-  props: ChakraLinkProps,
-  ref
-) {
-  return <ChakraLink {...props} ref={ref} />;
-});
+export const NormalLink = ChakraLink;
