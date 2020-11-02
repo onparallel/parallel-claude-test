@@ -62,13 +62,19 @@ async function main() {
   execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
 
   console.log("Building the client");
-  execSync(`yarn build-${env}`, {
+  execSync(`yarn build`, {
     cwd: `${buildDir}/client`,
     encoding: "utf-8",
   });
   execSync(
     `aws s3 sync \
-      ${buildDir}/client/out \
+      ${buildDir}/client/.next \
+      s3://parallel-static-${env}/_next \
+      --profile parallel-deploy`
+  );
+  execSync(
+    `aws s3 sync \
+      ${buildDir}/client/public \
       s3://parallel-static-${env} \
       --profile parallel-deploy`
   );
