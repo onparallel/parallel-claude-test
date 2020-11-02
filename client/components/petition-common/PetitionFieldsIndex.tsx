@@ -1,13 +1,15 @@
-import { Card, CardHeader } from "../common/Card";
-import { Stack, Box, Button, Text } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { gql } from "@apollo/client";
+import { Box, Button, Stack, Text } from "@chakra-ui/core";
+import { CommentIcon } from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldsIndex_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
-import { FormattedMessage } from "react-intl";
-import { Divider } from "../common/Divider";
-import { Fragment } from "react";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { Fragment } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Card, CardHeader } from "../common/Card";
+import { Divider } from "../common/Divider";
+import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
+import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 
 export type PetitionFieldsIndexProps = ExtendChakra<{
   fields: PetitionFieldsIndex_PetitionFieldFragment[];
@@ -19,6 +21,7 @@ export function PetitionFieldsIndex({
   onFieldClick,
   ...props
 }: PetitionFieldsIndexProps) {
+  const intl = useIntl();
   const fieldIndexValues = useFieldIndexValues(fields);
   return (
     <Card display="flex" flexDirection="column" {...props}>
@@ -61,7 +64,9 @@ export function PetitionFieldsIndex({
                 </Divider>
               ) : null}
               <Box as="li" listStyleType="none" display="flex">
-                <Button
+                <Stack
+                  as={Button}
+                  direction="row"
                   flex="1"
                   variant="ghost"
                   alignItems="center"
@@ -93,13 +98,33 @@ export function PetitionFieldsIndex({
                       )}
                     </Text>
                   )}
+                  {field.comments.length ? (
+                    <Stack
+                      as="span"
+                      direction="row"
+                      display="inline-flex"
+                      alignItems="center"
+                    >
+                      <RecipientViewCommentsBadge
+                        hasUnreadComments={field.comments.some(
+                          (c) => c.isUnread
+                        )}
+                        hasUnpublishedComments={field.comments.some(
+                          (c) => !c.publishedAt
+                        )}
+                      />
+                      <Text as="span" fontSize="sm">
+                        {intl.formatNumber(field.comments.length)}
+                      </Text>
+                      <CommentIcon color="gray.700" fontSize="md" />
+                    </Stack>
+                  ) : null}
                   <PetitionFieldTypeIndicator
                     as="div"
                     type={field.type}
                     relativeIndex={fieldIndexValues[index]}
-                    marginLeft={2}
                   />
-                </Button>
+                </Stack>
               </Box>
             </Fragment>
           ))}
@@ -116,6 +141,11 @@ PetitionFieldsIndex.fragments = {
       title
       type
       options
+      comments {
+        id
+        isUnread
+        publishedAt
+      }
     }
   `,
 };

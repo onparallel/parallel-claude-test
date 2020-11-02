@@ -2078,7 +2078,14 @@ export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmen
 
 export type PetitionFieldsIndex_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "title" | "type" | "options">;
+} & Pick<PetitionField, "id" | "title" | "type" | "options"> & {
+    comments: Array<
+      { __typename?: "PetitionFieldComment" } & Pick<
+        PetitionFieldComment,
+        "id" | "isUnread" | "publishedAt"
+      >
+    >;
+  };
 
 export type PetitionSettingsModal_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -4689,6 +4696,11 @@ export const PetitionFieldsIndex_PetitionFieldFragmentDoc = gql`
     title
     type
     options
+    comments {
+      id
+      isUnread
+      publishedAt
+    }
   }
 `;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`

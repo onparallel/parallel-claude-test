@@ -297,10 +297,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const handleIndexFieldClick = useCallback((fieldId: string) => {
+  const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
     if (fieldElement) {
-      scrollIntoView(fieldElement, { scrollMode: "if-needed" });
+      await scrollIntoView(fieldElement, { scrollMode: "if-needed" });
+      fieldElement.setAttribute("data-highlighted", "true");
+      setTimeout(() => {
+        fieldElement.removeAttribute("data-highlighted");
+      }, 1000);
     }
   }, []);
 
@@ -495,7 +499,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 field={field}
                 fieldRelativeIndex={fieldIndexValues[index]}
                 index={index}
-                highlighted={activeFieldId === field.id}
                 onValidateToggle={() =>
                   handleValidateToggle([field.id], !field.validated)
                 }

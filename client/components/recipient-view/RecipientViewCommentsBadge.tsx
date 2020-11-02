@@ -5,11 +5,13 @@ import { useIntl } from "react-intl";
 export type RecipientViewCommentsBadgeProps = ExtendChakra<{
   hasUnreadComments?: boolean;
   hasUnpublishedComments?: boolean;
+  isReversedPurple?: boolean;
 }>;
 
 export function RecipientViewCommentsBadge({
   hasUnreadComments,
   hasUnpublishedComments,
+  isReversedPurple,
   ...props
 }: RecipientViewCommentsBadgeProps) {
   const intl = useIntl();
@@ -39,12 +41,12 @@ export function RecipientViewCommentsBadge({
           {...(!hasUnreadComments
             ? { borderColor: "yellow.500" }
             : !hasUnpublishedComments
-            ? { borderColor: "purple.500" }
+            ? { borderColor: isReversedPurple ? "white" : "purple.500" }
             : {
                 borderLeftColor: "yellow.500",
                 borderTopColor: "yellow.500",
-                borderRightColor: "purple.500",
-                borderBottomColor: "purple.500",
+                borderRightColor: isReversedPurple ? "white" : "purple.500",
+                borderBottomColor: isReversedPurple ? "white" : "purple.500",
               })}
           borderWidth="4px"
           transform="rotate(-45deg)"

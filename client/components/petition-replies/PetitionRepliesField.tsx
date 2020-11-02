@@ -5,13 +5,23 @@ import {
   Button,
   ButtonProps,
   Flex,
+  Heading,
   IconButton,
+  keyframes,
   Stack,
   Switch,
   Text,
+  Theme,
   VisuallyHidden,
-  Heading,
 } from "@chakra-ui/core";
+import {
+  CheckIcon,
+  CloseIcon,
+  CommentIcon,
+  DownloadIcon,
+  EyeIcon,
+} from "@parallel/chakra/icons";
+import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
@@ -29,14 +39,7 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
-import {
-  EyeIcon,
-  DownloadIcon,
-  CheckIcon,
-  CloseIcon,
-  CommentIcon,
-} from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 
 export type PetitionRepliesFieldAction = {
   type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
@@ -47,7 +50,6 @@ export type PetitionRepliesFieldProps = ExtendChakra<{
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldRelativeIndex: number | string;
   index: number;
-  highlighted: boolean;
   commentCount: number;
   newCommentCount: number;
   isActive: boolean;
@@ -64,7 +66,6 @@ export function PetitionRepliesField({
   field,
   fieldRelativeIndex,
   index,
-  highlighted,
   commentCount,
   newCommentCount,
   isActive: isShowingComments,
@@ -122,7 +123,19 @@ export function PetitionRepliesField({
       display="flex"
       flexDirection="column"
       position="relative"
-      backgroundColor={highlighted ? "purple.50" : "white"}
+      sx={{
+        "&[data-highlighted]": {
+          animation: (theme: Theme) =>
+            `${keyframes`
+            0% { background-color: white; }
+            25% { background-color: ${theme.colors.gray[100]}; }
+            50% { background-color: white }
+            75% { background-color: ${theme.colors.gray[100]}; }
+            100% { background-color: white; }
+          `} 500ms ease`,
+        },
+        animationIterationCount: 1,
+      }}
       paddingY={4}
       paddingX={{ base: 4, md: 6 }}
       {...props}
@@ -409,29 +422,19 @@ const CommentsButton = forwardRef<
   } as const;
   return commentCount > 0 ? (
     <Button
-      rightIcon={<CommentIcon />}
+      rightIcon={
+        <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
+      }
       fontWeight="normal"
       {...common}
       ref={ref}
     >
-      {hasUnreadComments || hasUnpublishedComments ? (
-        <Box
-          {...(!hasUnreadComments
-            ? { borderColor: "yellow.500" }
-            : !hasUnpublishedComments
-            ? { borderColor: isActive ? "white" : "purple.500" }
-            : {
-                borderLeftColor: "yellow.500",
-                borderTopColor: "yellow.500",
-                borderRightColor: isActive ? "white" : "purple.500",
-                borderBottomColor: isActive ? "white" : "purple.500",
-              })}
-          borderWidth="4px"
-          transform="rotate(-45deg)"
-          borderRadius="full"
-          marginRight={2}
-        />
-      ) : null}
+      <RecipientViewCommentsBadge
+        hasUnpublishedComments={hasUnpublishedComments}
+        hasUnreadComments={hasUnreadComments}
+        isReversedPurple={isActive}
+        marginRight={2}
+      />
       {intl.formatNumber(commentCount)}
     </Button>
   ) : (

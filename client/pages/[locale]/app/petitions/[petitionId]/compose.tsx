@@ -356,7 +356,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       try {
         setShowErrors(true);
         const node = document.querySelector(`#field-${fieldWithoutTitle.id}`);
-        scrollIntoView(node!, { block: "center", behavior: "smooth" });
+        await scrollIntoView(node!, { block: "center", behavior: "smooth" });
         await showErrorDialog({
           message: (
             <FormattedMessage
@@ -449,11 +449,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     } catch {}
   }, [petition]);
 
-  const handleIndexFieldClick = useCallback((fieldId: string) => {
+  const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
     if (fieldElement) {
-      scrollIntoView(fieldElement, { scrollMode: "if-needed" });
       focusFieldTitle(fieldId);
+      await scrollIntoView(fieldElement, { scrollMode: "if-needed" });
     }
   }, []);
 
