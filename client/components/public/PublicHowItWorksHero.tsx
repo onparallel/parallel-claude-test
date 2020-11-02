@@ -130,7 +130,9 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
     // change index when image is loaded on the browser to avoid flashing
     const img = new window.Image();
     img.onload = () => setIndex(index);
-    const ext = imageRef.current!.currentSrc.replace(/.*\.(?=[a-z]*$)/, "");
+    const ext = imageRef
+      .current!.currentSrc.replace(/.*\.(?=[a-z]*\?.*$)/, "")
+      .replace(/\?.*$/, "");
     img.src = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.${ext}?v=${process.env.BUILD_ID}`;
   };
 
