@@ -69,14 +69,17 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
         </Box>
         <Flex flex="1" justifyContent="center">
           <Box as="picture" margin="auto">
-            <source srcSet={`${imageName}.webp`} type="image/webp" />
+            <source
+              srcSet={`${imageName}.webp?v=${process.env.BUILD_ID}`}
+              type="image/webp"
+            />
             <img
               alt={intl.formatMessage({
                 id: "public.showcase-hero-alt",
                 defaultMessage:
                   'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
               })}
-              src={`${imageName}.png`}
+              src={`${imageName}.png?v=${process.env.BUILD_ID}`}
             />
           </Box>
         </Flex>

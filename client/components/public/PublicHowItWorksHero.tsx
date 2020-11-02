@@ -131,7 +131,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
     const img = new window.Image();
     img.onload = () => setIndex(index);
     const ext = imageRef.current!.currentSrc.replace(/.*\.(?=[a-z]*$)/, "");
-    img.src = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.${ext}`;
+    img.src = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.${ext}?v=${process.env.BUILD_ID}`;
   };
 
   return (
@@ -218,12 +218,12 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                   <Card overflow="hidden" role="button">
                     <picture>
                       <source
-                        srcSet={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.webp`}
+                        srcSet={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.webp?v=${process.env.BUILD_ID}`}
                         type="image/webp"
                       />
                       <img
                         ref={imageRef as any}
-                        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png`}
+                        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png?v=${process.env.BUILD_ID}`}
                         alt={`${steps[index].alt}`}
                       />
                     </picture>
