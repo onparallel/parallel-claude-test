@@ -7,12 +7,16 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
+import { mapSeries } from "async";
+import { countBy } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import {
   CreatePetition,
   CreatePetitionField,
   PetitionUser,
 } from "../../../db/__types";
+import { unMaybeArray } from "../../../util/arrays";
+import { toGlobalId } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import {
   and,
@@ -22,28 +26,29 @@ import {
   or,
 } from "../../helpers/authorize";
 import { dateTimeArg } from "../../helpers/date";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
 import { validateAnd, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
+import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
-import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
+  fieldIsNotFixed,
   fieldsBelongsToPetition,
   messageBelongToPetition,
+  petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
   userHasAccessToPetitions,
-  fieldIsNotFixed,
-  petitionsArePublicTemplates,
 } from "../authorizers";
 import {
   validateAccessesRemindersLeft,
@@ -51,10 +56,6 @@ import {
   validatePetitionStatus,
 } from "../validations";
 import { ArgValidationError, WhitelistedError } from "./../../helpers/errors";
-import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { mapSeries } from "async";
-import { unMaybeArray } from "../../../util/arrays";
-import { toGlobalId } from "../../../util/globalId";
 
 export const createPetition = mutationField("createPetition", {
   description: "Create petition.",
@@ -219,14 +220,6 @@ export const deletePetitions = mutationField("deletePetitions", {
 
     // user permissions grouped by permission_id
     const userPermissions = await ctx.petitions.loadUserPermissions(args.ids);
-
-    // if userPermissions === [undefined], the petition is deleted
-    if (userPermissions.filter((p) => !!p).length === 0) {
-      throw new WhitelistedError(
-        "The requested petition was not found",
-        "PETITION_NOT_FOUND"
-      );
-    }
 
     if (userPermissions.some(petitionIsSharedByOwner) && !args.force) {
       throw new WhitelistedError(
@@ -761,7 +754,7 @@ export const sendPetition = mutationField("sendPetition", {
       if (!petition) {
         throw new Error("Petition not available");
       }
-      if (fields.filter((f) => f.type !== "HEADING").length === 0) {
+      if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
         throw new Error("Petition has no repliable fields");
       }
       const accesses = await ctx.petitions.createAccesses(

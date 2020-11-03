@@ -53,6 +53,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { countBy } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<
@@ -335,7 +336,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (petition?.__typename !== "Petition") {
       throw new Error("Can't send a template");
     }
-    if (petition.fields.filter((f) => f.type !== "HEADING").length === 0) {
+    if (countBy(petition.fields, (f) => f.type !== "HEADING") === 0) {
       try {
         await showErrorDialog({
           message: (

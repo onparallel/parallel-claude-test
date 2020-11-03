@@ -1,11 +1,11 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
-import { groupBy, indexBy, omit, sortBy, uniq } from "remeda";
+import { countBy, groupBy, indexBy, omit, sortBy, uniq } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
-import { count, isDefined } from "../../util/remedaExtensions";
+import { isDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -307,9 +307,9 @@ export class PetitionRepository extends BaseRepository {
       return ids.map((id) => {
         const fields = fieldsById[id] ?? [];
         return {
-          validated: count(fields, (f) => f.validated),
-          replied: count(fields, (f) => f.replies > 0 && !f.validated),
-          optional: count(
+          validated: countBy(fields, (f) => f.validated),
+          replied: countBy(fields, (f) => f.replies > 0 && !f.validated),
+          optional: countBy(
             fields,
             (f) => f.optional && f.replies === 0 && !f.validated
           ),
@@ -2091,13 +2091,14 @@ export class PetitionRepository extends BaseRepository {
         .select("*");
       const byPetitionId = groupBy(rows, (r) => r.petition_id);
       const order = ["OWNER", "WRITE", "READ"];
-      return ids.map((id) =>
-        byPetitionId[id].sort((a, b) =>
-          a.permission_type === b.permission_type
-            ? a.created_at.valueOf() - b.created_at.valueOf()
-            : order.indexOf(a.permission_type) -
-              order.indexOf(b.permission_type)
-        )
+      return ids.map(
+        (id) =>
+          byPetitionId[id]?.sort((a, b) =>
+            a.permission_type === b.permission_type
+              ? a.created_at.valueOf() - b.created_at.valueOf()
+              : order.indexOf(a.permission_type) -
+                order.indexOf(b.permission_type)
+          ) ?? null
       );
     })
   );

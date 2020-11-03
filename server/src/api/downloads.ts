@@ -1,12 +1,11 @@
 import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
-import { indexBy } from "remeda";
+import { indexBy, zip } from "remeda";
 import sanitize from "sanitize-filename";
 import { ApiContext } from "../context";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { fromGlobalId } from "../util/globalId";
-import { zip } from "../util/remedaExtensions";
 import { authenticate } from "./helpers/authenticate";
 import { TextRepliesExcel } from "./helpers/TextRepliesExcel";
 

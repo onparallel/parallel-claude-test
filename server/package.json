@@ -67,7 +67,7 @@
     "react-intl": "^5.8.6",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
-    "remeda": "^0.0.23",
+    "remeda": "^0.0.26",
     "sanitize-filename": "^1.6.3",
     "sqs-consumer": "^5.4.0",
     "timezone-support": "^2.0.2",

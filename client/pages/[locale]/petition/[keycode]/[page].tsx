@@ -68,7 +68,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
-import { omit, pick } from "remeda";
+import { countBy, omit, pick } from "remeda";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -257,7 +257,7 @@ function RecipientView({
   }
 
   const pendingComments = petition.fields.reduce(
-    (acc, f) => acc + f.comments.filter((c) => !c.publishedAt).length,
+    (acc, f) => acc + countBy(f.comments, (c) => !c.publishedAt),
     0
   );
 
