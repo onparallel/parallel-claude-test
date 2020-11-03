@@ -23,10 +23,7 @@ export function PublicTrust(props: BoxProps) {
       <Flex justifyContent="center">
         <NormalLink href="https://acelera.cuatrecasas.com/" isExternal>
           <Image
-            alt={intl.formatMessage({
-              id: "public.trust.cuatrecasas",
-              defaultMessage: "Cuatrecasas Acelera",
-            })}
+            alt="Cuatrecasas Acelera"
             width="250px"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/cuatrecasas-acelera.png`}
           />

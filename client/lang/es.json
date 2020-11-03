@@ -761,7 +761,7 @@
   },
   {
     "term": "generic.comments-button-label",
-    "definition": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+    "definition": "{commentCount, plural, =0 {Sin comentarios} =1 {# comentario} other {# comentarios}}",
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
   },
   {
@@ -3058,11 +3058,6 @@
     "term": "public.terms.title",
     "definition": "Términos y condiciones",
     "context": "Terms & Conditions"
-  },
-  {
-    "term": "public.trust.cuatrecasas",
-    "definition": "Cuatrecasas Acelera",
-    "context": "Cuatrecasas Acelera"
   },
   {
     "term": "public.who-trust-us.title",
