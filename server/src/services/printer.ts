@@ -21,6 +21,7 @@ export class Printer implements IPrinter {
     await page.emulateMedia({ media: "screen" });
     const buffer = await page.pdf({
       printBackground: true,
+      preferCSSPageSize: true,
       ...opts,
     });
     await browser.close();

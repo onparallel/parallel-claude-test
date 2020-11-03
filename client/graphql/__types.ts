@@ -994,6 +994,27 @@ export type PetitionReopenedEvent = PetitionEvent & {
   user?: Maybe<User>;
 };
 
+/** The status of the signature process for a signer. */
+export type PetitionSignatureStatus =
+  /** The user canceled the signature request for all recipients on the petition */
+  | "DOCUMENT_CANCELED"
+  /** Signature process is completed. Signed document is ready to be downloaded */
+  | "DOCUMENT_COMPLETED"
+  /** The recipient declined the signature. */
+  | "DOCUMENT_DECLINED"
+  /** The signature request has expired. */
+  | "DOCUMENT_EXPIRED"
+  /** Recipient signed the petition */
+  | "DOCUMENT_SIGNED"
+  /** The server cannot deliver the message. Bounces often are caused by outdated or incorrectly entered email addresses. */
+  | "EMAIL_BOUNCED"
+  /** The email cannot immediately be delivered, but it hasn’t been completely rejected. Sometimes called a soft bounce, it will be retried for 72 hours. */
+  | "EMAIL_DEFERRED"
+  /** Client API sent email to recipient with access to the signature document */
+  | "EMAIL_DELIVERED"
+  /** Sign request sent to client API. */
+  | "REQUEST_SENT";
+
 /** The status of a petition. */
 export type PetitionStatus =
   /** The petition has been closed by a user. */
@@ -1193,6 +1214,17 @@ export type PublicPetitionFieldReply = Timestamps & {
   updatedAt: Scalars["DateTime"];
 };
 
+export type PublicPetitionSignature = {
+  __typename?: "PublicPetitionSignature";
+  data?: Maybe<Scalars["JSONObject"]>;
+  externalId?: Maybe<Scalars["String"]>;
+  id: Scalars["GID"];
+  petition: Petition;
+  provider: Scalars["String"];
+  signerEmail: Scalars["String"];
+  status: PetitionSignatureStatus;
+};
+
 /** A public view of a user */
 export type PublicUser = {
   __typename?: "PublicUser";
@@ -1227,6 +1259,7 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
+  publicPetitionSignature: Array<PublicPetitionSignature>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
 };
@@ -1272,6 +1305,10 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
+};
+
+export type QuerypublicPetitionSignatureArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type QuerypublicTemplatesArgs = {
@@ -3920,6 +3957,45 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
+export type PdfView_FieldFragment = { __typename?: "PetitionField" } & Pick<
+  PetitionField,
+  "id" | "type" | "title" | "options" | "description" | "validated"
+> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
+        "id" | "status" | "content"
+      >
+    >;
+  };
+
+export type PdfView_AccessFragment = { __typename?: "PetitionAccess" } & Pick<
+  PetitionAccess,
+  "status"
+> & {
+    contact?: Maybe<
+      { __typename?: "Contact" } & Pick<Contact, "email" | "fullName">
+    >;
+  };
+
+export type PdfViewPetitionQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type PdfViewPetitionQuery = { __typename?: "Query" } & {
+  petition?: Maybe<
+    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+          accesses: Array<
+            { __typename?: "PetitionAccess" } & PdfView_AccessFragment
+          >;
+          fields: Array<
+            { __typename?: "PetitionField" } & PdfView_FieldFragment
+          >;
+        })
+    | { __typename?: "PetitionTemplate" }
+  >;
+};
+
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]>;
 }>;
@@ -5294,6 +5370,30 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     comments {
       id
     }
+  }
+`;
+export const PdfView_FieldFragmentDoc = gql`
+  fragment PdfView_Field on PetitionField {
+    id
+    type
+    title
+    options
+    description
+    validated
+    replies {
+      id
+      status
+      content
+    }
+  }
+`;
+export const PdfView_AccessFragmentDoc = gql`
+  fragment PdfView_Access on PetitionAccess {
+    contact {
+      email
+      fullName
+    }
+    status
   }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
@@ -8978,6 +9078,69 @@ export type PublicPetitionQueryHookResult = ReturnType<
 >;
 export type PublicPetitionLazyQueryHookResult = ReturnType<
   typeof usePublicPetitionLazyQuery
+>;
+export const PdfViewPetitionDocument = gql`
+  query PdfViewPetition($id: GID!) {
+    petition(id: $id) {
+      ... on Petition {
+        id
+        name
+        accesses {
+          ...PdfView_Access
+        }
+        fields {
+          ...PdfView_Field
+        }
+      }
+    }
+  }
+  ${PdfView_AccessFragmentDoc}
+  ${PdfView_FieldFragmentDoc}
+`;
+
+/**
+ * __usePdfViewPetitionQuery__
+ *
+ * To run a query within a React component, call `usePdfViewPetitionQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePdfViewPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePdfViewPetitionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function usePdfViewPetitionQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PdfViewPetitionQuery,
+    PdfViewPetitionQueryVariables
+  >
+) {
+  return Apollo.useQuery<PdfViewPetitionQuery, PdfViewPetitionQueryVariables>(
+    PdfViewPetitionDocument,
+    baseOptions
+  );
+}
+export function usePdfViewPetitionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PdfViewPetitionQuery,
+    PdfViewPetitionQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    PdfViewPetitionQuery,
+    PdfViewPetitionQueryVariables
+  >(PdfViewPetitionDocument, baseOptions);
+}
+export type PdfViewPetitionQueryHookResult = ReturnType<
+  typeof usePdfViewPetitionQuery
+>;
+export type PdfViewPetitionLazyQueryHookResult = ReturnType<
+  typeof usePdfViewPetitionLazyQuery
 >;
 export const useClonePetitions_clonePetitionsDocument = gql`
   mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {

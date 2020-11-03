@@ -62,6 +62,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import axios, { CancelTokenSource } from "axios";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -973,22 +974,8 @@ function useGetPageFields(
   page: number
 ) {
   return useMemo(() => {
-    const _fields: RecipientView_PublicPetitionFieldFragment[] = [];
-    let pages = 1;
-    for (const field of fields) {
-      if (field.type === "HEADING" && field.options!.hasPageBreak) {
-        pages += 1;
-        page -= 1;
-      }
-      if (page === 0) {
-        break;
-      } else if (page === 1) {
-        _fields.push(field);
-      } else {
-        continue;
-      }
-    }
-    return { fields: _fields, pages };
+    const fieldsByPage = groupFieldsByPages(fields);
+    return { fields: fieldsByPage[page - 1], pages: fieldsByPage.length };
   }, [fields, page]);
 }
 
