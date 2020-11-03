@@ -21,7 +21,6 @@ import {
   DeleteIcon,
   EditIcon,
   MoreVerticalIcon,
-  SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
@@ -43,7 +42,6 @@ import { LocaleBadge } from "../common/LocaleBadge";
 import { PetitionStatusIcon } from "../common/PetitionStatusIcon";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
-import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { useConfirmReopenPetitionDialog } from "../petition-replies/ConfirmReopenPetitionDialog";
 import { HeaderNameEditable } from "./HeaderNameEditable";
@@ -70,11 +68,6 @@ export function PetitionHeader({
 }: PetitionHeaderProps) {
   const intl = useIntl();
   const router = useRouter();
-  const {
-    isOpen: isSettingsOpen,
-    onOpen: onOpenSettings,
-    onClose: onCloseSettings,
-  } = useDisclosure();
 
   const deletePetitions = useDeletePetitions();
   const handleDeleteClick = useCallback(
@@ -205,13 +198,7 @@ export function PetitionHeader({
         <Flex height={16} alignItems="center" paddingX={4}>
           <Flex alignItems="center">
             <PetitionStatusIcon marginRight={1} status={petition.status} />
-            <LocaleBadge
-              locale={petition.locale}
-              marginLeft={1}
-              as="button"
-              cursor="pointer"
-              onClick={() => onOpenSettings()}
-            />
+            <LocaleBadge locale={petition.locale} marginLeft={1} />
             <HeaderNameEditable
               petition={petition}
               state={state}
@@ -339,13 +326,6 @@ export function PetitionHeader({
                         defaultMessage="Reopen petition"
                       />
                     </MenuItem>
-                    <MenuItem onClick={onOpenSettings}>
-                      <SettingsIcon marginRight={2} />
-                      <FormattedMessage
-                        id="component.petition-header.settings-button"
-                        defaultMessage="Petition settings"
-                      />
-                    </MenuItem>
                     <MenuDivider />
                     <MenuItem color="red.500" onClick={handleDeleteClick}>
                       <DeleteIcon marginRight={2} />
@@ -393,12 +373,6 @@ export function PetitionHeader({
           })}
         </Stack>
       </Box>
-      <PetitionSettingsModal
-        onUpdatePetition={onUpdatePetition}
-        petition={petition}
-        isOpen={isSettingsOpen}
-        onClose={onCloseSettings}
-      />
       <PetitionSharingModal
         petitionId={petition.id}
         userId={user.id}
@@ -456,9 +430,7 @@ PetitionHeader.fragments = {
       deadline
       status
       ...HeaderNameEditable_PetitionBase
-      ...PetitionSettingsModal_PetitionBase
     }
-    ${PetitionSettingsModal.fragments.Petition}
     ${HeaderNameEditable.fragments.PetitionBase}
   `,
   User: gql`

@@ -18,7 +18,6 @@ import {
   CopyIcon,
   DeleteIcon,
   MoreVerticalIcon,
-  SettingsIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
@@ -36,7 +35,6 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { LocaleBadge } from "../common/LocaleBadge";
 import { Spacer } from "../common/Spacer";
-import { PetitionSettingsModal } from "../petition-common/PetitionSettingsModal";
 import { PetitionSharingModal } from "../petition-common/PetitionSharingModal";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
@@ -96,12 +94,6 @@ export function PetitionTemplateHeader({
   );
 
   const {
-    isOpen: isSettingsOpen,
-    onOpen: onOpenSettings,
-    onClose: onCloseSettings,
-  } = useDisclosure();
-
-  const {
     isOpen: isSharePetitionOpen,
     onOpen: onOpenSharePetition,
     onClose: onCloseSharePetition,
@@ -119,14 +111,7 @@ export function PetitionTemplateHeader({
           <Badge colorScheme="purple" marginRight={1}>
             <FormattedMessage id="generic.template" defaultMessage="Template" />
           </Badge>
-
-          <LocaleBadge
-            locale={petition.locale}
-            marginLeft={1}
-            as="button"
-            cursor="pointer"
-            onClick={() => onOpenSettings()}
-          />
+          <LocaleBadge locale={petition.locale} marginLeft={1} />
           <HeaderNameEditable
             petition={petition}
             state={state}
@@ -213,13 +198,6 @@ export function PetitionTemplateHeader({
                     defaultMessage="Clone template"
                   />
                 </MenuItem>
-                <MenuItem onClick={onOpenSettings}>
-                  <SettingsIcon marginRight={2} />
-                  <FormattedMessage
-                    id="template.settings-header"
-                    defaultMessage="Template settings"
-                  />
-                </MenuItem>
                 <MenuDivider />
                 <MenuItem color="red.500" onClick={handleDeleteClick}>
                   <DeleteIcon marginRight={2} />
@@ -233,12 +211,6 @@ export function PetitionTemplateHeader({
           </Menu>
         </Flex>
       </Box>
-      <PetitionSettingsModal
-        onUpdatePetition={onUpdatePetition}
-        petition={petition}
-        isOpen={isSettingsOpen}
-        onClose={onCloseSettings}
-      />
       <PetitionSharingModal
         petitionId={petition.id}
         userId={user.id}

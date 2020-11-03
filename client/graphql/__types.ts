@@ -1526,8 +1526,7 @@ export type HeaderNameEditable_PetitionBaseFragment =
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "locale" | "deadline" | "status"> &
-  HeaderNameEditable_PetitionBase_Petition_Fragment &
-  PetitionSettingsModal_PetitionBase_Petition_Fragment;
+  HeaderNameEditable_PetitionBase_Petition_Fragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -2087,17 +2086,17 @@ export type PetitionFieldsIndex_PetitionFieldFragment = {
     >;
   };
 
-export type PetitionSettingsModal_PetitionBase_Petition_Fragment = {
+export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "status" | "deadline" | "id" | "locale">;
 
-export type PetitionSettingsModal_PetitionBase_PetitionTemplate_Fragment = {
+export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
 } & Pick<PetitionTemplate, "id" | "locale">;
 
-export type PetitionSettingsModal_PetitionBaseFragment =
-  | PetitionSettingsModal_PetitionBase_Petition_Fragment
-  | PetitionSettingsModal_PetitionBase_PetitionTemplate_Fragment;
+export type PetitionSettings_PetitionBaseFragment =
+  | PetitionSettings_PetitionBase_Petition_Fragment
+  | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
@@ -2760,7 +2759,8 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionBase_Petition_Fragment &
-  AddPetitionAccessDialog_PetitionFragment;
+  AddPetitionAccessDialog_PetitionFragment &
+  PetitionSettings_PetitionBase_Petition_Fragment;
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
@@ -2769,7 +2769,8 @@ export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
   } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
-  PetitionTemplateComposeMessageEditor_PetitionFragment;
+  PetitionTemplateComposeMessageEditor_PetitionFragment &
+  PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionCompose_PetitionBaseFragment =
   | PetitionCompose_PetitionBase_Petition_Fragment
@@ -4123,16 +4124,6 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
     updatedAt
   }
 `;
-export const PetitionSettingsModal_PetitionBaseFragmentDoc = gql`
-  fragment PetitionSettingsModal_PetitionBase on PetitionBase {
-    id
-    locale
-    ... on Petition {
-      status
-      deadline
-    }
-  }
-`;
 export const PetitionHeader_PetitionFragmentDoc = gql`
   fragment PetitionHeader_Petition on Petition {
     id
@@ -4140,10 +4131,8 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     deadline
     status
     ...HeaderNameEditable_PetitionBase
-    ...PetitionSettingsModal_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
-  ${PetitionSettingsModal_PetitionBaseFragmentDoc}
 `;
 export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
@@ -4739,12 +4728,23 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     description
   }
 `;
+export const PetitionSettings_PetitionBaseFragmentDoc = gql`
+  fragment PetitionSettings_PetitionBase on PetitionBase {
+    id
+    locale
+    ... on Petition {
+      status
+      deadline
+    }
+  }
+`;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
     id
     ...PetitionLayout_PetitionBase
     ...AddPetitionAccessDialog_Petition
     ...PetitionTemplateComposeMessageEditor_Petition
+    ...PetitionSettings_PetitionBase
     fields {
       ...PetitionCompose_PetitionField
     }
@@ -4752,6 +4752,7 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
   ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
+  ${PetitionSettings_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
 export const PetitionCompose_UserFragmentDoc = gql`

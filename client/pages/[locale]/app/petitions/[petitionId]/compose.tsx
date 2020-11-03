@@ -1,5 +1,16 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Text, useToast } from "@chakra-ui/core";
+import {
+  Box,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  useToast,
+} from "@chakra-ui/core";
+import { ListIcon, SettingsIcon } from "@parallel/chakra/icons";
+import { Card } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -14,6 +25,7 @@ import {
   useAddPetitionAccessDialog,
 } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
 import { useConfirmDeleteFieldDialog } from "@parallel/components/petition-compose/ConfirmDeleteFieldDialog";
@@ -51,7 +63,13 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { countBy } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -475,6 +493,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       title?.focus();
     });
   }
+  const extendFlexColumn = {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    minHeight: 0,
+  } as const;
 
   return (
     <PetitionLayout
@@ -502,11 +526,44 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 onClose={handleSettingsClose}
               />
             ) : (
-              <PetitionFieldsIndex
-                fields={petition!.fields}
-                onFieldClick={handleIndexFieldClick}
+              <Card
+                display="flex"
+                flexDirection="column"
                 maxHeight={`calc(100vh - 6rem)`}
-              />
+              >
+                <Tabs variant="enclosed" {...extendFlexColumn}>
+                  <TabList marginX="-1px" marginTop="-1px">
+                    <Tab padding={4} lineHeight={5} fontWeight="bold">
+                      <ListIcon fontSize="18px" marginRight={2} />
+                      <FormattedMessage
+                        id="petition.contents"
+                        defaultMessage="Contents"
+                      />
+                    </Tab>
+                    <Tab padding={4} lineHeight={5} fontWeight="bold">
+                      <SettingsIcon fontSize="16px" marginRight={2} />
+                      <FormattedMessage
+                        id="petition-compose.settings"
+                        defaultMessage="Settings"
+                      />
+                    </Tab>
+                  </TabList>
+                  <TabPanels {...extendFlexColumn}>
+                    <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
+                      <PetitionFieldsIndex
+                        fields={petition!.fields}
+                        onFieldClick={handleIndexFieldClick}
+                      />
+                    </TabPanel>
+                    <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
+                      <PetitionSettings
+                        petition={petition!}
+                        onUpdatePetition={handleUpdatePetition}
+                      />
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
+              </Card>
             )}
           </Box>
         }
@@ -581,11 +638,13 @@ PetitionCompose.fragments = {
         ...PetitionLayout_PetitionBase
         ...AddPetitionAccessDialog_Petition
         ...PetitionTemplateComposeMessageEditor_Petition
+        ...PetitionSettings_PetitionBase
         fields {
           ...PetitionCompose_PetitionField
         }
       }
       ${PetitionLayout.fragments.PetitionBase}
+      ${PetitionSettings.fragments.PetitionBase}
       ${AddPetitionAccessDialog.fragments.Petition}
       ${PetitionTemplateComposeMessageEditor.fragments.Petition}
       ${this.PetitionField}

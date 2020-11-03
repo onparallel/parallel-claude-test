@@ -69,7 +69,7 @@ export function PaneWithFlyout({
       </Box>
       <Box
         flex="1"
-        minWidth={0}
+        minWidth={{ base: 0, sm: "320px" }}
         display={{ base: isFlyoutActive ? "block" : "none", md: "block" }}
       >
         {flyout ? (

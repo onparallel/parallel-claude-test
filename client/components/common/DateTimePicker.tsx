@@ -87,7 +87,12 @@ export function DateTimePicker({
                 }}
               />
             ) : (
-              <FormattedDate value={date} weekday="short" {...FORMATS.LLL} />
+              <FormattedDate
+                value={date}
+                weekday="short"
+                {...FORMATS.LLL}
+                month="short"
+              />
             )}
           </Button>
         ))}

@@ -1,6 +1,12 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
-import { DownloadIcon, RepeatIcon, ThumbUpIcon } from "@parallel/chakra/icons";
+import {
+  DownloadIcon,
+  ListIcon,
+  RepeatIcon,
+  ThumbUpIcon,
+} from "@parallel/chakra/icons";
+import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -10,6 +16,11 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
+import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
+import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
+import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
+import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 import {
   DownloadAllDialog,
   useDownloadAllDialog,
@@ -31,8 +42,10 @@ import {
   PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
+  PetitionReplies_PetitionFragment,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
+  PetitionStatus,
   UpdatePetitionInput,
   usePetitionRepliesQuery,
   usePetitionRepliesUserQuery,
@@ -40,30 +53,23 @@ import {
   usePetitionReplies_deletePetitionFieldCommentMutation,
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
   usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
+  usePetitionReplies_presendPetitionClosedNotificationMutation,
+  usePetitionReplies_sendPetitionClosedNotificationMutation,
   usePetitionReplies_submitUnpublishedCommentsMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
-  PetitionReplies_PetitionFragment,
-  PetitionStatus,
-  usePetitionReplies_sendPetitionClosedNotificationMutation,
-  usePetitionReplies_presendPetitionClosedNotificationMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
-import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
-import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
-import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 
 type PetitionRepliesProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -482,11 +488,27 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   onDeleteComment={handleDeleteComment}
                 />
               ) : (
-                <PetitionFieldsIndex
-                  fields={petition.fields}
-                  onFieldClick={handleIndexFieldClick}
-                  maxHeight="calc(100vh - 10rem)"
-                />
+                <Card
+                  display="flex"
+                  flexDirection="column"
+                  maxHeight={`calc(100vh - 6rem)`}
+                >
+                  <CardHeader>
+                    <Text as="span" display="inline-flex" alignItems="center">
+                      <ListIcon fontSize="18px" marginRight={2} />
+                      <FormattedMessage
+                        id="petition.contents"
+                        defaultMessage="Contents"
+                      />
+                    </Text>
+                  </CardHeader>
+                  <Box overflow="auto">
+                    <PetitionFieldsIndex
+                      fields={petition.fields}
+                      onFieldClick={handleIndexFieldClick}
+                    />
+                  </Box>
+                </Card>
               )}
             </Box>
           }
