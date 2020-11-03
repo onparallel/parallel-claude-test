@@ -7,12 +7,12 @@ import {
   ModalContent,
   ModalOverlay,
   ModalProps,
-  Text,
   Stack,
+  Text,
 } from "@chakra-ui/core";
 import { MessageSentEventModal_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { RenderSlate } from "@parallel/utils/RenderSlate";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { ContactLink } from "../common/ContactLink";
 import { Divider } from "../common/Divider";
 
@@ -24,11 +24,17 @@ export function MessageSentEventModal({
   message,
   ...props
 }: MessageSentEventModalProps) {
+  const intl = useIntl();
   return (
     <Modal {...props} size="xl">
       <ModalOverlay>
         <ModalContent>
-          <ModalCloseButton />
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+          />
           <ModalBody paddingY={6}>
             <Stack>
               <Text fontSize="lg" fontWeight="bold">

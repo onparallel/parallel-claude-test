@@ -144,7 +144,12 @@ export function TemplateDetailsDialog({
               </Text>
             )}
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+          />
           <ModalBody>
             <Text as="span" fontSize="sm" fontWeight="normal">
               <FormattedMessage

@@ -32,7 +32,12 @@ export function RecipientViewHelpModal(props: ModalProps) {
     <Modal {...props} size="3xl">
       <ModalOverlay>
         <ModalContent>
-          <ModalCloseButton />
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+          />
           <ModalHeader display="flex" justifyContent="center" paddingTop={8}>
             <Logo width="152px" />
           </ModalHeader>

@@ -67,7 +67,12 @@ export function PetitionSettingsModal({
               />
             )}
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+          />
           <ModalBody paddingBottom={6}>
             <Stack>
               <FormControl id="petition-locale">

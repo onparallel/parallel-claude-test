@@ -179,7 +179,12 @@ export function PetitionSharingModal({
               />
             </Text>
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+          />
           {userPermissions ? (
             <>
               <ModalBody as={Stack}>
