@@ -75,7 +75,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   // Scroll to bottom when a comment is added
   const commentsRef = useRef<HTMLDivElement>(null);
-  const closeRef = useRef<HTMButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const previousCommentCount = usePreviousValue(field.comments.length);
   useEffect(() => {
     if (
