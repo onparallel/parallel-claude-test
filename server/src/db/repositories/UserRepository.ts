@@ -6,7 +6,6 @@ import { CreateUser, User } from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import DataLoader from "dataloader";
 import { indexBy } from "remeda";
-import { Maybe } from "../../util/types";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -71,49 +70,4 @@ export class UserRepository extends BaseRepository {
     });
     return row;
   }
-
-  async fetchSegmentUserTraits(user: User): Promise<UserTraits> {
-    const {
-      rows: [traits],
-    } = await this.knex.raw<{
-      rows: {
-        last_petition_created_at: Date;
-        last_petition_sent_at: Date;
-        last_petition_completed_at: Date;
-      }[];
-    }>(
-      /* sql */ `
-      select 
-        max(pu.created_at) as last_petition_created_at,
-        max(pa.created_at) as last_petition_sent_at,
-        max(pe.created_at) as last_petition_completed_at
-      from 
-        petition_user pu
-        left join petition_access pa on pu.petition_id = pa.petition_id 
-        left join petition_event pe on pu.petition_id = pe.petition_id and pe.type = 'PETITION_COMPLETED'
-      where 
-        pu.user_id = ?`,
-      [user.id]
-    );
-
-    return {
-      email: user.email,
-      createdAt: user.created_at.toISOString(),
-      lastActiveAt: user.last_active_at?.toISOString() ?? null,
-      lastPetitionCreatedAt:
-        traits.last_petition_created_at?.toISOString() ?? null,
-      lastPetitionSentAt: traits.last_petition_sent_at?.toISOString() ?? null,
-      lastPetitionCompletedAt:
-        traits.last_petition_completed_at?.toISOString() ?? null,
-    };
-  }
 }
-
-type UserTraits = {
-  email: string;
-  createdAt: string;
-  lastActiveAt: Maybe<string>;
-  lastPetitionCreatedAt: Maybe<string>;
-  lastPetitionSentAt: Maybe<string>;
-  lastPetitionCompletedAt: Maybe<string>;
-};
