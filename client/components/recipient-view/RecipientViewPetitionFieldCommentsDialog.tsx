@@ -73,8 +73,9 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Scroll to bttom when a comment is added
+  // Scroll to bottom when a comment is added
   const commentsRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMButtonElement>(null);
   const previousCommentCount = usePreviousValue(field.comments.length);
   useEffect(() => {
     if (
@@ -100,10 +101,12 @@ export function RecipientViewPetitionFieldCommentsDialog({
   function handleSubmitClick() {
     onAddComment(draft.trim());
     setNativeValue(textareaRef.current!, "");
+    closeRef.current!.focus();
   }
 
   function handleCancelClick() {
     setNativeValue(textareaRef.current!, "");
+    closeRef.current!.focus();
   }
 
   const isExpanded = Boolean(inputFocused || draft);
@@ -123,6 +126,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
             )}
           </ModalHeader>
           <ModalCloseButton
+            ref={closeRef}
             aria-label={intl.formatMessage({
               id: "generic.close",
               defaultMessage: "Close",

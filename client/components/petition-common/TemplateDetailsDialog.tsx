@@ -39,7 +39,7 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
@@ -111,6 +111,7 @@ export function TemplateDetailsDialog({
   },
   "CREATE_PETITION" | "CLONE_TEMPLATE" | "EDIT_TEMPLATE"
 >) {
+  const closeRef = useRef<HTMLButtonElement>(null);
   const intl = useIntl();
   const canEdit = template.userPermissions.some(
     (permission) =>
@@ -124,8 +125,8 @@ export function TemplateDetailsDialog({
     <Modal
       size="4xl"
       isOpen
-      autoFocus={false}
       onClose={() => props.onReject({ reason: "CLOSE" })}
+      initialFocusRef={closeRef}
       {...props}
     >
       <ModalOverlay>
@@ -145,6 +146,7 @@ export function TemplateDetailsDialog({
             )}
           </ModalHeader>
           <ModalCloseButton
+            ref={closeRef}
             aria-label={intl.formatMessage({
               id: "generic.close",
               defaultMessage: "Close",
