@@ -15,26 +15,23 @@ export function RecipientViewCommentsBadge({
   ...props
 }: RecipientViewCommentsBadgeProps) {
   const intl = useIntl();
+  const label = hasUnreadComments
+    ? hasUnpublishedComments
+      ? intl.formatMessage({
+          id: "recipient-view.unread-and-unpublished-comments",
+          defaultMessage: "There's unread and unpublished comments",
+        })
+      : intl.formatMessage({
+          id: "recipient-view.unread-comments",
+          defaultMessage: "There's unread comments",
+        })
+    : intl.formatMessage({
+        id: "recipient-view.unpublished-comments",
+        defaultMessage: "There's unpublished comments",
+      });
   return hasUnreadComments || hasUnpublishedComments ? (
-    <Box display="inline-block" {...props}>
-      <Tooltip
-        label={
-          hasUnreadComments
-            ? hasUnpublishedComments
-              ? intl.formatMessage({
-                  id: "recipient-view.unread-and-unpublished-comments",
-                  defaultMessage: "There's unread and unpublished comments",
-                })
-              : intl.formatMessage({
-                  id: "recipient-view.unread-comments",
-                  defaultMessage: "There's unread comments",
-                })
-            : intl.formatMessage({
-                id: "recipient-view.unpublished-comments",
-                defaultMessage: "There's unpublished comments",
-              })
-        }
-      >
+    <Box display="inline-block" aria-label={label} role="img" {...props}>
+      <Tooltip label={label}>
         <Box
           width="4px"
           height="4px"

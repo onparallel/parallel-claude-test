@@ -410,35 +410,57 @@ const CommentsButton = forwardRef<
     size: "sm",
     variant: isActive ? "solid" : "ghost",
     colorScheme: isActive ? "purple" : "gray",
-    "aria-label": intl.formatMessage(
-      {
-        id: "generic.comments-button-label",
-        defaultMessage:
-          "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-      },
-      { commentCount }
-    ),
     ...props,
   } as const;
   return commentCount > 0 ? (
     <Button
-      rightIcon={
-        <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
-      }
+      flexDirection="row-reverse"
       fontWeight="normal"
+      alignItems="center"
       {...common}
       ref={ref}
     >
+      <Stack
+        display="inline-flex"
+        direction="row-reverse"
+        alignItems="flex-end"
+      >
+        <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
+        <Text
+          as="span"
+          aria-label={intl.formatMessage(
+            {
+              id: "generic.comments-button-label",
+              defaultMessage:
+                "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+            },
+            { commentCount }
+          )}
+        >
+          {intl.formatNumber(commentCount)}
+        </Text>
+      </Stack>
       <RecipientViewCommentsBadge
         hasUnpublishedComments={hasUnpublishedComments}
         hasUnreadComments={hasUnreadComments}
         isReversedPurple={isActive}
         marginRight={2}
       />
-      {intl.formatNumber(commentCount)}
     </Button>
   ) : (
-    <IconButton icon={<CommentIcon />} {...common} ref={ref} />
+    <IconButton
+      icon={<CommentIcon />}
+      {...common}
+      aria-label={intl.formatMessage(
+        {
+          id: "generic.comments-button-label",
+          defaultMessage:
+            "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+        },
+        { commentCount }
+      )}
+      ref={ref}
+    />
   );
 });
 

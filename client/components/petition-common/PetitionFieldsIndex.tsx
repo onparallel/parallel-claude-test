@@ -101,10 +101,35 @@ export function PetitionFieldsIndex({
                   {field.comments.length ? (
                     <Stack
                       as="span"
-                      direction="row"
+                      direction="row-reverse"
                       display="inline-flex"
                       alignItems="center"
                     >
+                      <Stack
+                        as="span"
+                        direction="row-reverse"
+                        spacing={1}
+                        display="inline-flex"
+                        alignItems="flex-end"
+                        color="gray.600"
+                      >
+                        <CommentIcon fontSize="sm" opacity="0.8" />
+                        <Text
+                          as="span"
+                          fontSize="xs"
+                          role="img"
+                          aria-label={intl.formatMessage(
+                            {
+                              id: "generic.comments-button-label",
+                              defaultMessage:
+                                "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+                            },
+                            { commentCount: field.comments.length }
+                          )}
+                        >
+                          {intl.formatNumber(field.comments.length)}
+                        </Text>
+                      </Stack>
                       <RecipientViewCommentsBadge
                         hasUnreadComments={field.comments.some(
                           (c) => c.isUnread
@@ -113,10 +138,6 @@ export function PetitionFieldsIndex({
                           (c) => !c.publishedAt
                         )}
                       />
-                      <Text as="span" fontSize="sm">
-                        {intl.formatNumber(field.comments.length)}
-                      </Text>
-                      <CommentIcon color="gray.700" fontSize="md" />
                     </Stack>
                   ) : null}
                   <PetitionFieldTypeIndicator
