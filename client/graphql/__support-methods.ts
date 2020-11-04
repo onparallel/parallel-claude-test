@@ -133,22 +133,22 @@ export const supportMethods: {
           defaultValue: null,
         },
         {
-          name: "organizationRole",
-          description: "Role of the user",
-          type: {
-            kind: "NON_NULL",
-            name: null,
-            ofType: { kind: "ENUM", name: "OrganizationRole", ofType: null },
-          },
-          defaultValue: null,
-        },
-        {
           name: "password",
           description: "Temporary of the user",
           type: {
             kind: "NON_NULL",
             name: null,
             ofType: { kind: "SCALAR", name: "String", ofType: null },
+          },
+          defaultValue: null,
+        },
+        {
+          name: "role",
+          description: "Role of the user",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "ENUM", name: "OrganizationRole", ofType: null },
           },
           defaultValue: null,
         },

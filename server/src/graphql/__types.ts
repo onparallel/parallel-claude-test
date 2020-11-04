@@ -855,10 +855,11 @@ export interface NexusGenFieldTypes {
     fullName: string | null; // String
     hasFeatureFlag: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isSuperAdmin: boolean; // Boolean!
     lastName: string | null; // String
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
-    organizationRole: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+    role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserPagination: {
@@ -1008,8 +1009,8 @@ export interface NexusGenArgTypes {
       firstName: string; // String!
       lastName: string; // String!
       organizationId: number; // Int!
-      organizationRole: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
       password: string; // String!
+      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     };
     deactivateAccesses: {
       // args

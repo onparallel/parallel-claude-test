@@ -38,9 +38,6 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
     router.push(`/${router.query.locale}/login`);
   }
   const locales = useSupportedLocales();
-  const isAdmin =
-    user.organization.identifier === "parallel" &&
-    user.organizationRole === "ADMIN";
 
   return (
     <Menu placement={placement}>
@@ -65,7 +62,7 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
               <FormattedMessage id="settings.title" defaultMessage="Settings" />
             </MenuItem>
           </NakedLink>
-          {isAdmin ? (
+          {user.isSuperAdmin ? (
             <NakedLink href="/app/admin">
               <MenuItem as="a">
                 <KeyIcon marginRight={2} />
@@ -109,10 +106,7 @@ UserMenu.fragments = {
   User: gql`
     fragment UserMenu_User on User {
       fullName
-      organizationRole
-      organization {
-        identifier
-      }
+      isSuperAdmin
     }
   `,
 };

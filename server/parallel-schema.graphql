@@ -341,14 +341,14 @@ type Mutation {
     organizationId: Int!
 
     """
-    Role of the user
-    """
-    organizationRole: OrganizationRole!
-
-    """
     Temporary of the user
     """
     password: String!
+
+    """
+    Role of the user
+    """
+    role: OrganizationRole!
   ): SupportMethodResponse!
 
   """
@@ -2160,6 +2160,7 @@ type User implements Timestamps {
   The ID of the user.
   """
   id: GID!
+  isSuperAdmin: Boolean!
 
   """
   The last name of the user.
@@ -2171,7 +2172,7 @@ type User implements Timestamps {
   """
   onboardingStatus: JSONObject!
   organization: Organization!
-  organizationRole: OrganizationRole!
+  role: OrganizationRole!
 
   """
   Time when the resource was last updated.

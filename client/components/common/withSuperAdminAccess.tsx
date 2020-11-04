@@ -28,19 +28,12 @@ export function withSuperAdminAccess<P = {}>(
         query: gql`
           query WithSuperAdminAccess {
             me {
-              organizationRole
-              organization {
-                identifier
-              }
+              isSuperAdmin
             }
           }
         `,
       });
-      if (
-        data?.me &&
-        data.me.organization.identifier === "parallel" &&
-        data.me.organizationRole === "ADMIN"
-      ) {
+      if (data?.me?.isSuperAdmin) {
         return await getInitialProps?.(context);
       } else {
         throw new Error("FORBIDDEN");

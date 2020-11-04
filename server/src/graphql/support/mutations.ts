@@ -134,7 +134,7 @@ export const createUser = mutationField("createUser", {
       required: true,
       description: "Last name of the user",
     }),
-    organizationRole: arg({
+    role: arg({
       type: "OrganizationRole",
       required: true,
       description: "Role of the user",
@@ -162,7 +162,7 @@ export const createUser = mutationField("createUser", {
         {
           cognito_id: cognitoId!,
           org_id: args.organizationId,
-          organization_role: args.organizationRole,
+          organization_role: args.role,
           email: args.email,
           first_name: args.firstName,
           last_name: args.lastName,

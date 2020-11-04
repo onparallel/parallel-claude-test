@@ -22,9 +22,17 @@ export const User = objectType({
     t.globalId("id", {
       description: "The ID of the user.",
     });
-    t.field("organizationRole", {
+    t.field("role", {
       type: "OrganizationRole",
       resolve: (o) => o.organization_role,
+    });
+    t.boolean("isSuperAdmin", {
+      resolve: async (o, _, ctx) => {
+        const org = await ctx.organizations.loadOrg(o.org_id);
+        return (
+          org?.identifier === "parallel" && o.organization_role === "ADMIN"
+        );
+      },
     });
     t.string("email", {
       description: "The email of the user.",

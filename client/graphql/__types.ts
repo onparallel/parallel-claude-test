@@ -343,8 +343,8 @@ export type MutationcreateUserArgs = {
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   organizationId: Scalars["Int"];
-  organizationRole: OrganizationRole;
   password: Scalars["String"];
+  role: OrganizationRole;
 };
 
 export type MutationdeactivateAccessesArgs = {
@@ -1397,12 +1397,13 @@ export type User = Timestamps & {
   hasFeatureFlag: Scalars["Boolean"];
   /** The ID of the user. */
   id: Scalars["GID"];
+  isSuperAdmin: Scalars["Boolean"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
-  organizationRole: OrganizationRole;
+  role: OrganizationRole;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -1478,12 +1479,7 @@ export type WithSuperAdminAccessQueryVariables = Exact<{
 }>;
 
 export type WithSuperAdminAccessQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "organizationRole"> & {
-      organization: { __typename?: "Organization" } & Pick<
-        Organization,
-        "identifier"
-      >;
-    };
+  me: { __typename?: "User" } & Pick<User, "isSuperAdmin">;
 };
 
 export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
@@ -1580,13 +1576,8 @@ export type SettingsLayout_UserFragment = {
 
 export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "fullName" | "organizationRole"
-> & {
-    organization: { __typename?: "Organization" } & Pick<
-      Organization,
-      "identifier"
-    >;
-  };
+  "fullName" | "isSuperAdmin"
+>;
 
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
@@ -3940,10 +3931,7 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
 export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
     fullName
-    organizationRole
-    organization {
-      identifier
-    }
+    isSuperAdmin
   }
 `;
 export const AppLayoutNavbar_UserFragmentDoc = gql`
@@ -5208,10 +5196,7 @@ export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
     me {
-      organizationRole
-      organization {
-        identifier
-      }
+      isSuperAdmin
     }
   }
 `;
