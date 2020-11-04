@@ -305,11 +305,6 @@
     "context": "Save as template"
   },
   {
-    "term": "component.petition-header.settings-button",
-    "definition": "Ajustes de la petición",
-    "context": "Petition settings"
-  },
-  {
     "term": "component.petition-header.share-label",
     "definition": "Compartir petición",
     "context": "Share petition"
@@ -738,6 +733,11 @@
     "term": "generic.cancel-save-changes",
     "definition": "Cancelar",
     "context": "Cancel"
+  },
+  {
+    "term": "generic.change",
+    "definition": "Cambiar",
+    "context": "Change"
   },
   {
     "term": "generic.changes-saved",
@@ -1350,9 +1350,9 @@
     "context": "Status"
   },
   {
-    "term": "petition-fields-index.header",
-    "definition": "Contenido",
-    "context": "Contents"
+    "term": "petition-compose.settings",
+    "definition": "Ajustes",
+    "context": "Settings"
   },
   {
     "term": "petition-replies.close-petition-without-notify.button",
@@ -1585,11 +1585,6 @@
     "context": "This petition has already been sent."
   },
   {
-    "term": "petition.change-deadline",
-    "definition": "Cambiar vencimiento",
-    "context": "Change deadline"
-  },
-  {
     "term": "petition.completed-petition-dialog.body",
     "definition": "Esta petición ya fue completada por el destinatario. Si realiza cualquier cambio a los campos, el destinatario deberá finalizar la petición de nuevo.",
     "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
@@ -1698,6 +1693,11 @@
     "term": "petition.confirm-send-reminder-message.header",
     "definition": "Enviar recordatorios",
     "context": "Send reminders"
+  },
+  {
+    "term": "petition.contents",
+    "definition": "Contenido",
+    "context": "Contents"
   },
   {
     "term": "petition.deadline-label",
@@ -1950,11 +1950,6 @@
     "context": "Enable automatic reminders"
   },
   {
-    "term": "petition.remove-deadline",
-    "definition": "Quitar vencimiento",
-    "context": "Remove deadline"
-  },
-  {
     "term": "petition.reopen.confirm",
     "definition": "Si, reabrir",
     "context": "Yes, reopen"
@@ -2005,19 +2000,9 @@
     "context": "Send message"
   },
   {
-    "term": "petition.set-a-deadline",
-    "definition": "Establecer vencimiento",
-    "context": "Set a deadline"
-  },
-  {
     "term": "petition.set-deadline",
     "definition": "Establecer vencimiento",
     "context": "Set deadline"
-  },
-  {
-    "term": "petition.settings-header",
-    "definition": "Ajustes de la petición",
-    "context": "Petition settings"
   },
   {
     "term": "petition.shared-delete-error",
@@ -3338,11 +3323,6 @@
     "term": "template.message-settings.header",
     "definition": "Email a enviar junto con la plantilla",
     "context": "Email to send with the template"
-  },
-  {
-    "term": "template.settings-header",
-    "definition": "Ajustes de la plantilla",
-    "context": "Template settings"
   },
   {
     "term": "timeline.access-activated-description",
