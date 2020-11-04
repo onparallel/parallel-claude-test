@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
     "debug": "ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
-    "nodemon": "nodemon --watch 'src/' --ignore 'src/graphql/__types.ts' -e 'ts tsx json' --exec 'node --inspect -r ts-node/register/transpile-only' src/index.ts",
+    "nodemon": "nodemon --watch 'src/' --ignore 'src/graphql/__types.ts' -e 'ts tsx json' --exec 'node -r ts-node/register/transpile-only' src/index.ts",
     "build": "tsc --project tsconfig.prod.json",
     "migrate": "knex migrate:latest",
     "postmigrate": "yarn generate-db-types",
@@ -24,7 +24,7 @@
     "worker:email-sender": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/email-sender.ts",
     "worker:reminder-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/reminder-trigger.ts",
     "worker:scheduled-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/scheduled-trigger.ts",
-    "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts",
+    "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json src/workers/signature-worker.ts",
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts"
   },
   "dependencies": {
@@ -63,6 +63,7 @@
     "node-fetch": "^2.6.1",
     "nodemailer": "^6.4.14",
     "outdent": "^0.7.1",
+    "pdf2json": "^1.2.0",
     "pg": "^8.4.1",
     "playwright": "^1.5.1",
     "react": "^16.14.0",

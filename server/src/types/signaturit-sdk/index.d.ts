@@ -121,7 +121,7 @@ declare module "signaturit-sdk" {
     /** List with signature recipients containing name, email and extra requirements for the signature process if needed. */
     recipients?: Array<
       Recipient & {
-        require_signature_in_coordinates?: Array<PageCoordinates | number>;
+        require_signature_in_coordinates?: Array<PageCoordinates | number | {}>;
       }
     >;
     /** List with email recipients containing name and email for people that will receive a copy of the signed document when the process is completed. */

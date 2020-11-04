@@ -1,7 +1,6 @@
-import { Box } from "@chakra-ui/core";
+import { Box, Text } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Maybe } from "@parallel/utils/types";
-import { Ref } from "react";
 import { Card } from "../common/Card";
 
 type SignatureBoxProps = ExtendChakra<{
@@ -9,13 +8,16 @@ type SignatureBoxProps = ExtendChakra<{
   left?: string;
   bottom?: string;
   right?: string;
-  signer: { email: string; fullName?: Maybe<string> };
+  signer: { email: string; name?: Maybe<string>; key: number };
 }>;
 
-export function SignatureBox(
-  { top, left, bottom, right, signer }: SignatureBoxProps,
-  ref?: Ref<HTMLDivElement>
-) {
+export function SignatureBox({
+  top,
+  left,
+  bottom,
+  right,
+  signer,
+}: SignatureBoxProps) {
   const date = new Date();
   const [day, month, year] = [
     date.getDate().toString().padStart(2, "0"),
@@ -26,7 +28,6 @@ export function SignatureBox(
   return (
     <Box>
       <Card
-        ref={ref}
         boxShadow="none"
         sx={{
           height: "35mm",
@@ -42,7 +43,10 @@ export function SignatureBox(
         }}
         style={{ top, left, bottom, right }}
       >
-        {signer.fullName}
+        <Text color="#ffffff" position="absolute" top="0" left="0">
+          {`SIGNER_${signer.key}`}
+        </Text>
+        {signer.name}
         <br />
         {day}/{month}/{year}
       </Card>

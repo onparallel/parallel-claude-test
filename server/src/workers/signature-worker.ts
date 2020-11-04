@@ -1,10 +1,11 @@
-import { unlinkSync } from "fs";
+import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
 import { groupBy } from "remeda";
 import { WorkerContext } from "../context";
 import { fromGlobalId } from "../util/globalId";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "./helpers/getBaseWebhookUrl";
 
 /** starts a signature request on the petition for all recipients */
@@ -16,13 +17,11 @@ async function startSignatureProcess(
   ctx: WorkerContext
 ) {
   const signatureClient = ctx.signaturit;
+  const recipients = payload.recipients;
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
 
-  const eventsUrl = (
-    await getBaseWebhookUrl(ctx.config.misc.parallelUrl)
-  ).concat(
-    `/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`
-  );
+  const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
+  const eventsUrl = `${baseWebhookUrl}/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`;
 
   await ctx.petitions.createPetitionSignature(
     petitionId,
@@ -31,20 +30,37 @@ async function startSignatureProcess(
   );
 
   // print and save pdf to disk
+  const basePrintUrl =
+    process.env.NODE_ENV === "production"
+      ? ctx.config.misc.parallelUrl
+      : "http://localhost";
+  const printURL = `${basePrintUrl}/en/petition/print/${
+    payload.petitionId
+  }?recipients=${encodeURIComponent(JSON.stringify(recipients))}`;
+
   const tmpPdfPath = resolve(tmpdir(), payload.petitionId.concat(".pdf"));
-  await ctx.printer.pdf("https://www.parallel.so", {
+
+  const buffer = await ctx.printer.pdf(printURL, {
     path: tmpPdfPath,
+    height: "297mm",
+    width: "210mm",
+    margin: {
+      top: "10mm",
+      bottom: "10mm",
+      left: "10mm",
+      right: "10mm",
+    },
   });
 
   // send request to signature client
-  const data = await signatureClient.createSignature(
-    tmpPdfPath,
-    payload.recipients,
-    {
-      events_url: eventsUrl,
-      signing_mode: "parallel",
-    }
-  );
+  const data = await signatureClient.createSignature(tmpPdfPath, recipients, {
+    events_url: eventsUrl,
+    signing_mode: "parallel",
+    signature_box_positions: await calculateSignatureBoxPositions(
+      buffer,
+      recipients
+    ),
+  });
 
   await ctx.petitions.updatePetitionSignature(
     petitionId,
@@ -55,7 +71,7 @@ async function startSignatureProcess(
     }
   );
 
-  unlinkSync(tmpPdfPath);
+  await fs.unlink(tmpPdfPath);
 }
 
 /** cancels the signature request for all signers on the petition */

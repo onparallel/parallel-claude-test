@@ -2037,6 +2037,7 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
+  publicPetitionPdf(petitionId: GID!): Petition
   publicPetitionSignature(petitionId: GID!): [PublicPetitionSignature!]!
 
   """

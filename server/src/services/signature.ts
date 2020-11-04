@@ -3,9 +3,24 @@ import "reflect-metadata";
 import SignaturitSDK from "signaturit-sdk";
 import { Config, CONFIG } from "../config";
 
+type SignerBox = {
+  email?: string;
+  box?: {
+    top: number;
+    left: number;
+    height: number;
+    width: number;
+  };
+};
+
 export type SignatureOptions = {
   events_url?: string;
   signing_mode?: "parallel" | "sequential";
+  /**
+   *  each element on the array represents the pdf page.
+   *   inside each page, there's an array with the signers information
+   */
+  signature_box_positions?: Array<SignerBox[]>;
 };
 
 type SignatureResponse = {
@@ -51,6 +66,14 @@ export class SignaturItClient implements ISignatureClient {
       delivery_type: "email",
       signing_mode: opts?.signing_mode,
       events_url: opts?.events_url,
+      recipients: recipients.map((r) => ({
+        email: r.email,
+        name: r.name,
+        require_signature_in_coordinates: opts?.signature_box_positions?.map(
+          (boxPosition) =>
+            boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
+        ),
+      })),
     });
   }
 

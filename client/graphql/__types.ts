@@ -1259,6 +1259,7 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
+  publicPetitionPdf?: Maybe<Petition>;
   publicPetitionSignature: Array<PublicPetitionSignature>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1305,6 +1306,10 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
+};
+
+export type QuerypublicPetitionPdfArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type QuerypublicPetitionSignatureArgs = {
@@ -3964,17 +3969,8 @@ export type PdfView_FieldFragment = { __typename?: "PetitionField" } & Pick<
     replies: Array<
       { __typename?: "PetitionFieldReply" } & Pick<
         PetitionFieldReply,
-        "id" | "status" | "content"
+        "id" | "content"
       >
-    >;
-  };
-
-export type PdfView_AccessFragment = { __typename?: "PetitionAccess" } & Pick<
-  PetitionAccess,
-  "status"
-> & {
-    contact?: Maybe<
-      { __typename?: "Contact" } & Pick<Contact, "email" | "fullName">
     >;
   };
 
@@ -3983,16 +3979,10 @@ export type PdfViewPetitionQueryVariables = Exact<{
 }>;
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
-  petition?: Maybe<
-    | ({ __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
-          accesses: Array<
-            { __typename?: "PetitionAccess" } & PdfView_AccessFragment
-          >;
-          fields: Array<
-            { __typename?: "PetitionField" } & PdfView_FieldFragment
-          >;
-        })
-    | { __typename?: "PetitionTemplate" }
+  publicPetitionPdf?: Maybe<
+    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+        fields: Array<{ __typename?: "PetitionField" } & PdfView_FieldFragment>;
+      }
   >;
 };
 
@@ -5382,18 +5372,8 @@ export const PdfView_FieldFragmentDoc = gql`
     validated
     replies {
       id
-      status
       content
     }
-  }
-`;
-export const PdfView_AccessFragmentDoc = gql`
-  fragment PdfView_Access on PetitionAccess {
-    contact {
-      email
-      fullName
-    }
-    status
   }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
@@ -9081,20 +9061,14 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($id: GID!) {
-    petition(id: $id) {
-      ... on Petition {
-        id
-        name
-        accesses {
-          ...PdfView_Access
-        }
-        fields {
-          ...PdfView_Field
-        }
+    publicPetitionPdf(petitionId: $id) {
+      id
+      name
+      fields {
+        ...PdfView_Field
       }
     }
   }
-  ${PdfView_AccessFragmentDoc}
   ${PdfView_FieldFragmentDoc}
 `;
 

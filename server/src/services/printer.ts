@@ -3,6 +3,14 @@ import { chromium } from "playwright";
 
 type PdfPrintOptions = {
   path?: string;
+  height?: string;
+  width?: string;
+  margin?: {
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+  };
 };
 
 export interface IPrinter {
@@ -17,11 +25,10 @@ export class Printer implements IPrinter {
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(url, { waitUntil: "networkidle" });
-    await page.emulateMedia({ media: "screen" });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
     const buffer = await page.pdf({
       printBackground: true,
-      preferCSSPageSize: true,
+      displayHeaderFooter: false,
       ...opts,
     });
     await browser.close();

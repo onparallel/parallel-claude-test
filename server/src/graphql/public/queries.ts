@@ -32,3 +32,15 @@ export const publicPetitionSignature = queryField("publicPetitionSignature", {
     return (await ctx.petitions.loadPetitionSignature(petitionId)) ?? [];
   },
 });
+
+// temporal endpoint until implementing token
+export const publicPetitionPdfData = queryField("publicPetitionPdf", {
+  type: "Petition",
+  args: {
+    petitionId: globalIdArg("Petition", { required: true }),
+  },
+  nullable: true,
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.loadPetition(args.petitionId);
+  },
+});

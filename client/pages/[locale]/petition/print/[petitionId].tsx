@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Heading, Flex, Text, Box, VisuallyHidden } from "@chakra-ui/core";
+import { Heading, Flex, Text, Box } from "@chakra-ui/core";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -16,22 +16,28 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Logo } from "@parallel/components/common/Logo";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
 
-function PdfView({ petitionId }: { petitionId: string }) {
-  const {
-    data: { petition },
-  } = assertQuery(
+type PdfRecipient = { email: string; name: string };
+function PdfView({
+  petitionId,
+  recipients,
+}: {
+  petitionId: string;
+  recipients: PdfRecipient[];
+}) {
+  const { data } = assertQuery(
     usePdfViewPetitionQuery({
       variables: { id: petitionId },
     })
   );
 
-  const p = petition?.__typename === "Petition" ? petition : null;
+  const p = data?.publicPetitionPdf;
+
   if (!p) {
     throw new Error("petition not found");
   }
@@ -44,19 +50,6 @@ function PdfView({ petitionId }: { petitionId: string }) {
     }));
     return groupFieldsByPages<PdfView_FieldFragment>(fields);
   }, [p.fields]);
-
-  const signers = p.accesses.map((a) => a.contact!);
-  const signBoxRefs = signers.map(() => useRef<HTMLDivElement | null>(null));
-
-  const [bboxData, setData] = useState<any[]>([]);
-  useEffect(() => {
-    setData(
-      signBoxRefs.map((r, i) => ({
-        signer: signers[i],
-        box: r.current?.getBoundingClientRect(),
-      }))
-    );
-  }, []);
 
   return (
     <>
@@ -78,43 +71,36 @@ function PdfView({ petitionId }: { petitionId: string }) {
           {fields.map((field, fieldNum) => (
             <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
           ))}
-          {pageNum === pages.length - 1 && signers && signers.length > 0 && (
-            <Box sx={{ pageBreakInside: "avoid" }}>
-              <SignatureDisclaimer
-                textAlign="center"
-                margin="15mm 4mm 5mm 4mm"
-                fontStyle="italic"
-              />
-              <Flex
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gridAutoRows: "minmax(150px, auto)",
-                  alignItems: "center",
-                  justifyItems: "center",
-                  width: "100%",
-                }}
-              >
-                {signers?.map((signer, n) => (
-                  <SignatureBoxWithRef
-                    key={`signer-${n}`}
-                    signer={signer}
-                    ref={signBoxRefs[n]}
-                  />
-                ))}
-              </Flex>
-              <VisuallyHidden id="signature-bbox-data">
-                {JSON.stringify(bboxData)}
-              </VisuallyHidden>
-            </Box>
+          {pageNum === pages.length - 1 && recipients && recipients.length > 0 && (
+            <>
+              <Box sx={{ pageBreakInside: "avoid" }}>
+                <SignatureDisclaimer
+                  textAlign="center"
+                  margin="15mm 4mm 5mm 4mm"
+                  fontStyle="italic"
+                />
+                <Flex
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gridAutoRows: "minmax(150px, auto)",
+                    alignItems: "center",
+                    justifyItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {recipients?.map((signer, n) => (
+                    <SignatureBox key={n} signer={{ ...signer, key: n }} />
+                  ))}
+                </Flex>
+              </Box>
+            </>
           )}
         </PdfPage>
       ))}
     </>
   );
 }
-
-const SignatureBoxWithRef = forwardRef(SignatureBox);
 
 function SignatureDisclaimer(props: ExtendChakra) {
   return (
@@ -138,18 +124,8 @@ PdfView.fragments = {
       validated
       replies {
         id
-        status
         content
       }
-    }
-  `,
-  Access: gql`
-    fragment PdfView_Access on PetitionAccess {
-      contact {
-        email
-        fullName
-      }
-      status
     }
   `,
 };
@@ -159,30 +135,32 @@ PdfView.getInitialProps = async ({
   fetchQuery,
 }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
+  if (!query.recipients) {
+    throw new Error("expected recipients data on URL");
+  }
+  const recipients: PdfRecipient[] = JSON.parse(query.recipients as string);
+  if (!recipients.every((r) => r.email && r.name)) {
+    throw new Error("expected email and name info for each recipient");
+  }
+
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($id: GID!) {
-        petition(id: $id) {
-          ... on Petition {
-            id
-            name
-            accesses {
-              ...PdfView_Access
-            }
-            fields {
-              ...PdfView_Field
-            }
+        publicPetitionPdf(petitionId: $id) {
+          id
+          name
+          fields {
+            ...PdfView_Field
           }
         }
       }
       ${PdfView.fragments.Field}
-      ${PdfView.fragments.Access}
     `,
     {
       variables: { id: petitionId },
     }
   );
-  return { petitionId };
+  return { petitionId, recipients };
 };
 
 export default withApolloData(PdfView);
