@@ -1,4 +1,4 @@
-import { core, enumType, objectType, unionType } from "@nexus/schema";
+import { core, objectType, unionType } from "@nexus/schema";
 import { fullName } from "../../util/fullName";
 
 export const PublicPetitionAccess = objectType({
@@ -333,82 +333,6 @@ export const PublicPetitionFieldComment = objectType({
           petitionFieldCommentId: root.id,
         });
       },
-    });
-  },
-});
-
-export const PublicPetitionSignature = objectType({
-  name: "PublicPetitionSignature",
-  rootTyping: "db.PetitionSignature",
-  definition(t) {
-    t.globalId("id", {
-      prefixName: "PetitionSignature",
-    });
-    t.field("petition", {
-      type: "Petition",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadPetition(root.petition_id))!;
-      },
-    });
-    t.string("signerEmail", {
-      resolve: (root) => root.signer_email,
-    });
-    t.string("provider");
-    t.string("externalId", {
-      nullable: true,
-      resolve: (root) => root.external_id,
-    });
-    t.field("status", {
-      type: enumType({
-        name: "PetitionSignatureStatus",
-        members: [
-          {
-            name: "REQUEST_SENT",
-            description: "Sign request sent to client API.",
-          },
-          {
-            name: "EMAIL_DELIVERED",
-            description:
-              "Client API sent email to recipient with access to the signature document",
-          },
-          {
-            name: "EMAIL_BOUNCED",
-            description:
-              "The server cannot deliver the message. Bounces often are caused by outdated or incorrectly entered email addresses.",
-          },
-          {
-            name: "EMAIL_DEFERRED",
-            description:
-              "The email cannot immediately be delivered, but it hasn’t been completely rejected. Sometimes called a soft bounce, it will be retried for 72 hours.",
-          },
-          {
-            name: "DOCUMENT_DECLINED",
-            description: "The recipient declined the signature.",
-          },
-          {
-            name: "DOCUMENT_EXPIRED",
-            description: "The signature request has expired.",
-          },
-          {
-            name: "DOCUMENT_CANCELED",
-            description:
-              "The user canceled the signature request for all recipients on the petition",
-          },
-          {
-            name: "DOCUMENT_SIGNED",
-            description: "Recipient signed the petition",
-          },
-          {
-            name: "DOCUMENT_COMPLETED",
-            description:
-              "Signature process is completed. Signed document is ready to be downloaded",
-          },
-        ],
-        description: "The status of the signature process for a signer.",
-      }),
-    });
-    t.jsonObject("data", {
-      nullable: true,
     });
   },
 });

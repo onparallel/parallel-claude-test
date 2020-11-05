@@ -22,6 +22,9 @@ export async function up(knex: Knex): Promise<void> {
       "CREATE INDEX petition_signature_request_petition_id_idx ON petition_signature_request (petition_id)"
     )
     .raw(
+      `create unique index "petition_signature_request_petition_id_unique" on "petition_signature_request" ("petition_id") where "status" = 'PROCESSING'`
+    )
+    .raw(
       "CREATE INDEX petition_signature_request_external_id_idx ON petition_signature_request (external_id)"
     )
     .raw(

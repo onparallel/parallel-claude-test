@@ -10,6 +10,9 @@ export const PetitionSignatureRequest = objectType({
   name: "PetitionSignatureRequest",
   rootTyping: "db.PetitionSignatureRequest",
   definition(t) {
+    t.globalId("id", {
+      prefixName: "PetitionSignature",
+    });
     t.implements("Timestamps");
     t.field("petition", {
       type: "Petition",

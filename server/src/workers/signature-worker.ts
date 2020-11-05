@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { countBy, groupBy } from "remeda";
+import { countBy } from "remeda";
 import { WorkerContext } from "../context";
 import { fromGlobalId } from "../util/globalId";
 import { createQueueWorker } from "./helpers/createQueueWorker";
@@ -118,22 +118,19 @@ async function cancelSignatureProcess(
   const signatureClient = ctx.signature.getClient(payload.provider);
 
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
-  const signatures = await ctx.petitions.loadPetitionSignatureByPetitionId(
+  const signature = await ctx.petitions.loadPetitionSignatureByPetitionId(
     petitionId
   );
 
-  const pendingSignatures = signatures.filter(
-    (s) => s && s.status === "PROCESSING" && s.external_id
-  );
-  const byExternalId = groupBy(pendingSignatures, (s) => s.external_id);
+  if (!signature || !signature.external_id) {
+    throw new Error(
+      `Can't find external_id for signature on petition ${petitionId}`
+    );
+  }
 
-  await Promise.all(
-    Object.keys(byExternalId).map((externalId) => {
-      // do a request to cancel the signature process.
-      // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
-      return signatureClient.cancelSignatureRequest(externalId);
-    })
-  );
+  // do a request to cancel the signature process.
+  // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
+  await signatureClient.cancelSignatureRequest(signature.external_id);
 }
 
 const handlers = {

@@ -2359,15 +2359,12 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadPetitionSignatureByPetitionId = fromDataLoader(
-    new DataLoader<number, PetitionSignatureRequest[]>(async (ids) => {
-      const rows = await this.from("petition_signature_request")
-        .whereIn("petition_id", ids)
-        .select("*");
-
-      const byPetitionId = groupBy(rows, (r) => r.petition_id);
-      return ids.map((id) => byPetitionId[id]);
-    })
+  readonly loadPetitionSignatureByPetitionId = this.buildLoadBy(
+    "petition_signature_request",
+    "petition_id",
+    (b) => {
+      b.where("status", "PROCESSING");
+    }
   );
 
   readonly loadPetitionSignatureByExternalId = this.buildLoadBy(

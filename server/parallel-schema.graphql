@@ -1470,6 +1470,7 @@ type PetitionSignatureRequest implements Timestamps {
   createdAt: DateTime!
   data: JSONObject
   externalId: String
+  id: GID!
   petition: Petition!
   settings: JSONObject!
   signedDocument: JSONObject
@@ -1486,56 +1487,6 @@ enum PetitionSignatureRequestStatus {
   CANCELLED
   COMPLETED
   PROCESSING
-}
-
-"""
-The status of the signature process for a signer.
-"""
-enum PetitionSignatureStatus {
-  """
-  The user canceled the signature request for all recipients on the petition
-  """
-  DOCUMENT_CANCELED
-
-  """
-  Signature process is completed. Signed document is ready to be downloaded
-  """
-  DOCUMENT_COMPLETED
-
-  """
-  The recipient declined the signature.
-  """
-  DOCUMENT_DECLINED
-
-  """
-  The signature request has expired.
-  """
-  DOCUMENT_EXPIRED
-
-  """
-  Recipient signed the petition
-  """
-  DOCUMENT_SIGNED
-
-  """
-  The server cannot deliver the message. Bounces often are caused by outdated or incorrectly entered email addresses.
-  """
-  EMAIL_BOUNCED
-
-  """
-  The email cannot immediately be delivered, but it hasn’t been completely rejected. Sometimes called a soft bounce, it will be retried for 72 hours.
-  """
-  EMAIL_DEFERRED
-
-  """
-  Client API sent email to recipient with access to the signature document
-  """
-  EMAIL_DELIVERED
-
-  """
-  Sign request sent to client API.
-  """
-  REQUEST_SENT
 }
 
 """
@@ -1933,16 +1884,6 @@ type PublicPetitionFieldReply implements Timestamps {
   updatedAt: DateTime!
 }
 
-type PublicPetitionSignature {
-  data: JSONObject
-  externalId: String
-  id: GID!
-  petition: Petition!
-  provider: String!
-  signerEmail: String!
-  status: PetitionSignatureStatus!
-}
-
 """
 A public view of a user
 """
@@ -2062,8 +2003,7 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
-  publicPetitionPdf(petitionId: GID!): PetitionSignatureRequest
-  publicPetitionSignature(petitionId: GID!): [PublicPetitionSignature!]!
+  publicPetitionSignature(petitionId: GID!): PetitionSignatureRequest
 
   """
   The publicly available templates

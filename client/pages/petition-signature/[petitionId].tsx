@@ -34,12 +34,12 @@ function PdfView({ petitionId }: { petitionId: string }) {
     })
   );
 
-  const petition = data?.publicPetitionPdf?.petition;
-  const settings = data?.publicPetitionPdf?.settings;
-  const recipients = data?.publicPetitionPdf?.signers;
+  const petition = data?.publicPetitionSignature?.petition;
+  const settings = data?.publicPetitionSignature?.settings;
+  const recipients = data?.publicPetitionSignature?.signers;
 
   if (!petition) {
-    throw new Error("petition not found");
+    throw new Error(`petition with id ${petitionId} not found`);
   }
 
   if (!settings || Object.keys(settings).length === 0) {
@@ -154,7 +154,7 @@ PdfView.getInitialProps = async ({
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($id: GID!) {
-        publicPetitionPdf(petitionId: $id) {
+        publicPetitionSignature(petitionId: $id) {
           settings
           signers {
             id

@@ -1000,6 +1000,7 @@ export type PetitionSignatureRequest = Timestamps & {
   createdAt: Scalars["DateTime"];
   data?: Maybe<Scalars["JSONObject"]>;
   externalId?: Maybe<Scalars["String"]>;
+  id: Scalars["GID"];
   petition: Petition;
   settings: Scalars["JSONObject"];
   signedDocument?: Maybe<Scalars["JSONObject"]>;
@@ -1013,27 +1014,6 @@ export type PetitionSignatureRequestStatus =
   | "CANCELLED"
   | "COMPLETED"
   | "PROCESSING";
-
-/** The status of the signature process for a signer. */
-export type PetitionSignatureStatus =
-  /** The user canceled the signature request for all recipients on the petition */
-  | "DOCUMENT_CANCELED"
-  /** Signature process is completed. Signed document is ready to be downloaded */
-  | "DOCUMENT_COMPLETED"
-  /** The recipient declined the signature. */
-  | "DOCUMENT_DECLINED"
-  /** The signature request has expired. */
-  | "DOCUMENT_EXPIRED"
-  /** Recipient signed the petition */
-  | "DOCUMENT_SIGNED"
-  /** The server cannot deliver the message. Bounces often are caused by outdated or incorrectly entered email addresses. */
-  | "EMAIL_BOUNCED"
-  /** The email cannot immediately be delivered, but it hasn’t been completely rejected. Sometimes called a soft bounce, it will be retried for 72 hours. */
-  | "EMAIL_DEFERRED"
-  /** Client API sent email to recipient with access to the signature document */
-  | "EMAIL_DELIVERED"
-  /** Sign request sent to client API. */
-  | "REQUEST_SENT";
 
 /** The status of a petition. */
 export type PetitionStatus =
@@ -1234,17 +1214,6 @@ export type PublicPetitionFieldReply = Timestamps & {
   updatedAt: Scalars["DateTime"];
 };
 
-export type PublicPetitionSignature = {
-  __typename?: "PublicPetitionSignature";
-  data?: Maybe<Scalars["JSONObject"]>;
-  externalId?: Maybe<Scalars["String"]>;
-  id: Scalars["GID"];
-  petition: Petition;
-  provider: Scalars["String"];
-  signerEmail: Scalars["String"];
-  status: PetitionSignatureStatus;
-};
-
 /** A public view of a user */
 export type PublicUser = {
   __typename?: "PublicUser";
@@ -1279,8 +1248,7 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  publicPetitionPdf?: Maybe<PetitionSignatureRequest>;
-  publicPetitionSignature: Array<PublicPetitionSignature>;
+  publicPetitionSignature?: Maybe<PetitionSignatureRequest>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
 };
@@ -1326,10 +1294,6 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
-};
-
-export type QuerypublicPetitionPdfArgs = {
-  petitionId: Scalars["GID"];
 };
 
 export type QuerypublicPetitionSignatureArgs = {
@@ -3999,7 +3963,7 @@ export type PdfViewPetitionQueryVariables = Exact<{
 }>;
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
-  publicPetitionPdf?: Maybe<
+  publicPetitionSignature?: Maybe<
     { __typename?: "PetitionSignatureRequest" } & Pick<
       PetitionSignatureRequest,
       "settings"
@@ -9097,7 +9061,7 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($id: GID!) {
-    publicPetitionPdf(petitionId: $id) {
+    publicPetitionSignature(petitionId: $id) {
       settings
       signers {
         id
