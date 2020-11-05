@@ -143,6 +143,9 @@ const result: IntrospectionResultData = {
             name: "PetitionFieldReply",
           },
           {
+            name: "PetitionSignatureRequest",
+          },
+          {
             name: "PetitionUserPermission",
           },
           {

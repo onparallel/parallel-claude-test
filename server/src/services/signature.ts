@@ -17,8 +17,8 @@ export type SignatureOptions = {
   events_url?: string;
   signing_mode?: "parallel" | "sequential";
   /**
-   *  each element on the array represents the pdf page.
-   *   inside each page, there's an array with the signers information
+   *  Each element on the array represents a page in the document.
+   *  Inside each page, there's an array with the signers information.
    */
   signature_box_positions?: Array<SignerBox[]>;
 };
@@ -34,30 +34,40 @@ type SignatureResponse = {
 export type Recipient = { email: string; name: string };
 
 export interface ISignatureClient {
-  readonly name: string;
-  createSignature: (
+  startSignatureRequest: (
     filePath: string,
     recipients: Recipient[],
     options?: SignatureOptions
   ) => Promise<SignatureResponse>;
 
-  cancelSignature: (externalId: string) => Promise<SignatureResponse>;
+  cancelSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
+  downloadSignedDocument: (externalId: string) => Promise<Buffer>;
 }
 
-export const SIGNATURIT = Symbol.for("SIGNATURIT");
-
+export const SIGNATURE = Symbol.for("SIGNATURE");
 @injectable()
-export class SignaturItClient implements ISignatureClient {
-  public readonly name = "signaturit";
+export class SignatureService {
+  constructor(@inject(CONFIG) private config: Config) {}
+  public getClient(provider: string): ISignatureClient {
+    switch (provider) {
+      case "signaturit":
+        return new SignaturItClient(this.config);
+      default:
+        throw new Error(`Couldn't resolve signature client: ${provider}`);
+    }
+  }
+}
+
+class SignaturItClient implements ISignatureClient {
   private sdk: SignaturitSDK;
-  constructor(@inject(CONFIG) config: Config) {
+  constructor(config: Config) {
     const isProduction = process.env.NODE_ENV === "production";
     this.sdk = new SignaturitSDK(
       config.signaturit.parallelApiKey,
       isProduction
     );
   }
-  public async createSignature(
+  public async startSignatureRequest(
     files: string,
     recipients: Recipient[],
     opts?: SignatureOptions
@@ -77,27 +87,15 @@ export class SignaturItClient implements ISignatureClient {
     });
   }
 
-  public async cancelSignature(signatureId: string) {
+  public async cancelSignatureRequest(signatureId: string) {
     return await this.sdk.cancelSignature(signatureId);
   }
 
   // returns a binary encoded buffer of the signed document
-  public async downloadSignedDocument(
-    signatureId: string,
-    documentId: string
-  ): Promise<Buffer> {
+  public async downloadSignedDocument(externalId: string): Promise<Buffer> {
+    const [signatureId, documentId] = externalId.split("/");
     return Buffer.from(
       await this.sdk.downloadSignedDocument(signatureId, documentId)
-    );
-  }
-
-  // returns a binary encoded buffer of the audit trail document
-  public async downloadAuditTrail(
-    signatureId: string,
-    documentId: string
-  ): Promise<Buffer> {
-    return Buffer.from(
-      await this.sdk.downloadAuditTrail(signatureId, documentId)
     );
   }
 }

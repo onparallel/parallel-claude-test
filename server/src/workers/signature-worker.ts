@@ -1,99 +1,137 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { groupBy } from "remeda";
+import { countBy, groupBy } from "remeda";
 import { WorkerContext } from "../context";
 import { fromGlobalId } from "../util/globalId";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "./helpers/getBaseWebhookUrl";
+import { fullName } from "../util/fullName";
 
-/** starts a signature request on the petition for all recipients */
+/** starts a signature request on the petition for the provided contacts */
 async function startSignatureProcess(
   payload: {
     petitionId: string;
-    recipients: { email: string; name: string }[];
+    settings: {
+      provider: string;
+      contactIds: number[];
+      timezone: string;
+      locale: string;
+    };
   },
   ctx: WorkerContext
 ) {
-  const signatureClient = ctx.signaturit;
-  const recipients = payload.recipients;
-  const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
-
-  const baseWebhookUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
-  const eventsUrl = `${baseWebhookUrl}/api/webhooks/${signatureClient.name}/${payload.petitionId}/events`;
-
-  await ctx.petitions.createPetitionSignature(
-    petitionId,
-    payload.recipients,
-    signatureClient.name
-  );
-
-  // print and save pdf to disk
-  const basePrintUrl =
-    process.env.NODE_ENV === "production"
-      ? ctx.config.misc.parallelUrl
-      : "http://localhost";
-  const printURL = `${basePrintUrl}/en/petition/print/${
-    payload.petitionId
-  }?recipients=${encodeURIComponent(JSON.stringify(recipients))}`;
-
   const tmpPdfPath = resolve(tmpdir(), payload.petitionId.concat(".pdf"));
+  try {
+    const signatureClient = ctx.signature.getClient(payload.settings.provider);
 
-  const buffer = await ctx.printer.pdf(printURL, {
-    path: tmpPdfPath,
-    height: "297mm",
-    width: "210mm",
-    margin: {
-      top: "10mm",
-      bottom: "10mm",
-      left: "10mm",
-      right: "10mm",
-    },
-  });
+    const contacts = await ctx.contacts.loadContactById(
+      payload.settings.contactIds
+    );
 
-  // send request to signature client
-  const data = await signatureClient.createSignature(tmpPdfPath, recipients, {
-    events_url: eventsUrl,
-    signing_mode: "parallel",
-    signature_box_positions: await calculateSignatureBoxPositions(
+    if (contacts.length !== payload.settings.contactIds.length) {
+      throw new Error(
+        `Couldn't load all required contacts: ${payload.settings.contactIds.toString()}`
+      );
+    }
+
+    const recipients = contacts.map((c) => ({
+      email: c.email,
+      name: fullName(c.first_name, c.last_name) ?? "",
+    }));
+
+    const baseEventsUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
+    const eventsUrl = `${baseEventsUrl}/api/webhooks/${payload.settings.provider}/${payload.petitionId}/events`;
+
+    // insert before printing, so the pdf view can access the signature settings
+    const {
+      id: petitionSignatureId,
+    } = await ctx.petitions.createPetitionSignature(
+      fromGlobalId(payload.petitionId, "Petition").id,
+      payload.settings
+    );
+
+    // print and save pdf to disk
+    const basePrintUrl =
+      process.env.NODE_ENV === "production"
+        ? ctx.config.misc.parallelUrl
+        : "http://localhost";
+
+    const printURL = `${basePrintUrl}/petition-signature/${payload.petitionId}`;
+
+    const buffer = await ctx.printer.pdf(printURL, {
+      path: tmpPdfPath,
+      height: "297mm",
+      width: "210mm",
+      margin: {
+        top: "10mm",
+        bottom: "10mm",
+        left: "10mm",
+        right: "10mm",
+      },
+    });
+
+    // send request to signature client
+    const signatureBoxPositions = await calculateSignatureBoxPositions(
       buffer,
       recipients
-    ),
-  });
+    );
+    if (
+      countBy(
+        signatureBoxPositions,
+        (pageSignature) => pageSignature.length > 0
+      ) === 0
+    ) {
+      throw new Error(
+        "couldn't find signature box positions on the signature pdf"
+      );
+    }
 
-  await ctx.petitions.updatePetitionSignature(
-    petitionId,
-    payload.recipients.map((r) => r.email),
-    {
+    const data = await signatureClient.startSignatureRequest(
+      tmpPdfPath,
+      recipients,
+      {
+        events_url: eventsUrl,
+        signing_mode: "parallel",
+        signature_box_positions: signatureBoxPositions,
+      }
+    );
+
+    await ctx.petitions.updatePetitionSignature(petitionSignatureId, {
       external_id: data.id,
       data,
-    }
-  );
-
-  await fs.unlink(tmpPdfPath);
+    });
+  } catch {
+  } finally {
+    try {
+      await fs.unlink(tmpPdfPath);
+    } catch {}
+  }
 }
 
 /** cancels the signature request for all signers on the petition */
 async function cancelSignatureProcess(
-  payload: { petitionId: string },
+  payload: { petitionId: string; provider: string },
   ctx: WorkerContext
 ) {
-  const signatureClient = ctx.signaturit;
+  const signatureClient = ctx.signature.getClient(payload.provider);
 
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
-  const signatures = await ctx.petitions.loadPetitionSignature(petitionId);
-
-  const startedSignatures = signatures.filter(
-    (s) => s && s.status !== "DOCUMENT_CANCELED" && s.external_id
+  const signatures = await ctx.petitions.loadPetitionSignatureByPetitionId(
+    petitionId
   );
-  const byExternalId = groupBy(startedSignatures, (s) => s.external_id);
+
+  const pendingSignatures = signatures.filter(
+    (s) => s && s.status === "PROCESSING" && s.external_id
+  );
+  const byExternalId = groupBy(pendingSignatures, (s) => s.external_id);
 
   await Promise.all(
     Object.keys(byExternalId).map((externalId) => {
       // do a request to cancel the signature process.
-      // Table petition_signature will be updated as soon as the client confirms the cancelation via events webhook
-      return signatureClient.cancelSignature(externalId);
+      // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
+      return signatureClient.cancelSignatureRequest(externalId);
     })
   );
 }

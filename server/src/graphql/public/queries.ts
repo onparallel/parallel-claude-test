@@ -29,18 +29,24 @@ export const publicPetitionSignature = queryField("publicPetitionSignature", {
     petitionId: globalIdArg("Petition", { required: true }),
   },
   resolve: async (_, { petitionId }, ctx) => {
-    return (await ctx.petitions.loadPetitionSignature(petitionId)) ?? [];
+    return (
+      (await ctx.petitions.loadPetitionSignatureByPetitionId(petitionId)) ?? []
+    );
   },
 });
 
-// temporal endpoint until implementing token
+// temporal endpoint until implementing auth token
 export const publicPetitionPdfData = queryField("publicPetitionPdf", {
-  type: "Petition",
+  type: "PetitionSignatureRequest",
   args: {
     petitionId: globalIdArg("Petition", { required: true }),
   },
   nullable: true,
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.loadPetition(args.petitionId);
+    const data = await ctx.petitions.loadPetitionSignatureByPetitionId(
+      args.petitionId
+    );
+    console.log(data);
+    return data[0];
   },
 });

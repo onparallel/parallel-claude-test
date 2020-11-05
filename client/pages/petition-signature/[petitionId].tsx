@@ -1,14 +1,16 @@
 import { gql } from "@apollo/client";
-import { Heading, Flex, Text, Box } from "@chakra-ui/core";
+import {
+  Heading,
+  Flex,
+  Text,
+  Box,
+  ChakraProvider,
+  useTheme,
+} from "@chakra-ui/core";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import {
-  FieldWithReplies,
-  PdfPage,
-  SignatureBox,
-} from "@parallel/components/print";
 import {
   PdfViewPetitionQuery,
   PdfView_FieldFragment,
@@ -21,38 +23,47 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Logo } from "@parallel/components/common/Logo";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { FormattedMessage } from "react-intl";
+import { PdfPage } from "@parallel/components/print/PdfPage";
+import { FieldWithReplies } from "@parallel/components/print/FieldWithReplies";
+import { SignatureBox } from "@parallel/components/print/SignatureBox";
 
-type PdfRecipient = { email: string; name: string };
-function PdfView({
-  petitionId,
-  recipients,
-}: {
-  petitionId: string;
-  recipients: PdfRecipient[];
-}) {
+function PdfView({ petitionId }: { petitionId: string }) {
   const { data } = assertQuery(
     usePdfViewPetitionQuery({
       variables: { id: petitionId },
     })
   );
 
-  const p = data?.publicPetitionPdf;
+  const petition = data?.publicPetitionPdf?.petition;
+  const settings = data?.publicPetitionPdf?.settings;
+  const recipients = data?.publicPetitionPdf?.signers;
 
-  if (!p) {
+  if (!petition) {
     throw new Error("petition not found");
   }
 
-  const fieldIndexValues = useFieldIndexValues(p.fields);
+  if (!settings || Object.keys(settings).length === 0) {
+    throw new Error("petition signature request must have defined settings");
+  }
+
+  if (!recipients || recipients.length === 0) {
+    throw new Error(
+      "petition signature request must contain valid contactIds in its settings"
+    );
+  }
+
+  const fieldIndexValues = useFieldIndexValues(petition.fields);
   const pages = useMemo(() => {
     const fields = fieldIndexValues.map((indexValue, i) => ({
-      ...p.fields[i],
-      title: `${indexValue} - ${p.fields[i].title}`,
+      ...petition.fields[i],
+      title: `${indexValue} - ${petition.fields[i].title}`,
     }));
     return groupFieldsByPages<PdfView_FieldFragment>(fields);
-  }, [p.fields]);
+  }, [petition.fields]);
 
+  const theme = useTheme();
   return (
-    <>
+    <ChakraProvider theme={theme}>
       {pages.map((fields, pageNum) => (
         <PdfPage key={pageNum}>
           {pageNum === 0 ? (
@@ -64,7 +75,7 @@ function PdfView({
                 margin="5mm auto"
               />
               <Heading justifyContent="center" display="flex">
-                {p.name}
+                {petition.name}
               </Heading>
             </>
           ) : undefined}
@@ -90,7 +101,11 @@ function PdfView({
                   }}
                 >
                   {recipients?.map((signer, n) => (
-                    <SignatureBox key={n} signer={{ ...signer, key: n }} />
+                    <SignatureBox
+                      key={n}
+                      signer={{ ...signer, key: n }}
+                      timezone={settings["timezone"]}
+                    />
                   ))}
                 </Flex>
               </Box>
@@ -98,7 +113,7 @@ function PdfView({
           )}
         </PdfPage>
       ))}
-    </>
+    </ChakraProvider>
   );
 }
 
@@ -107,7 +122,7 @@ function SignatureDisclaimer(props: ExtendChakra) {
     <Text {...props}>
       <FormattedMessage
         id="petition.print-pdf.signatures-disclaimer"
-        defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified."
+        defaultMessage="HOLA_EN"
       />
     </Text>
   );
@@ -135,22 +150,23 @@ PdfView.getInitialProps = async ({
   fetchQuery,
 }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-  if (!query.recipients) {
-    throw new Error("expected recipients data on URL");
-  }
-  const recipients: PdfRecipient[] = JSON.parse(query.recipients as string);
-  if (!recipients.every((r) => r.email && r.name)) {
-    throw new Error("expected email and name info for each recipient");
-  }
 
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($id: GID!) {
         publicPetitionPdf(petitionId: $id) {
-          id
-          name
-          fields {
-            ...PdfView_Field
+          settings
+          signers {
+            id
+            fullName
+            email
+          }
+          petition {
+            id
+            name
+            fields {
+              ...PdfView_Field
+            }
           }
         }
       }
@@ -160,7 +176,7 @@ PdfView.getInitialProps = async ({
       variables: { id: petitionId },
     }
   );
-  return { petitionId, recipients };
+  return { petitionId };
 };
 
 export default withApolloData(PdfView);

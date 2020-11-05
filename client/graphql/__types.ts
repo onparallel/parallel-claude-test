@@ -994,6 +994,26 @@ export type PetitionReopenedEvent = PetitionEvent & {
   user?: Maybe<User>;
 };
 
+export type PetitionSignatureRequest = Timestamps & {
+  __typename?: "PetitionSignatureRequest";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  data?: Maybe<Scalars["JSONObject"]>;
+  externalId?: Maybe<Scalars["String"]>;
+  petition: Petition;
+  settings: Scalars["JSONObject"];
+  signedDocument?: Maybe<Scalars["JSONObject"]>;
+  signers: Array<Contact>;
+  status: PetitionSignatureRequestStatus;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+};
+
+export type PetitionSignatureRequestStatus =
+  | "CANCELLED"
+  | "COMPLETED"
+  | "PROCESSING";
+
 /** The status of the signature process for a signer. */
 export type PetitionSignatureStatus =
   /** The user canceled the signature request for all recipients on the petition */
@@ -1259,7 +1279,7 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  publicPetitionPdf?: Maybe<Petition>;
+  publicPetitionPdf?: Maybe<PetitionSignatureRequest>;
   publicPetitionSignature: Array<PublicPetitionSignature>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -3980,8 +4000,24 @@ export type PdfViewPetitionQueryVariables = Exact<{
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
   publicPetitionPdf?: Maybe<
-    { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
-        fields: Array<{ __typename?: "PetitionField" } & PdfView_FieldFragment>;
+    { __typename?: "PetitionSignatureRequest" } & Pick<
+      PetitionSignatureRequest,
+      "settings"
+    > & {
+        signers: Array<
+          { __typename?: "Contact" } & Pick<
+            Contact,
+            "id" | "fullName" | "email"
+          >
+        >;
+        petition: { __typename?: "Petition" } & Pick<
+          Petition,
+          "id" | "name"
+        > & {
+            fields: Array<
+              { __typename?: "PetitionField" } & PdfView_FieldFragment
+            >;
+          };
       }
   >;
 };
@@ -9062,10 +9098,18 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($id: GID!) {
     publicPetitionPdf(petitionId: $id) {
-      id
-      name
-      fields {
-        ...PdfView_Field
+      settings
+      signers {
+        id
+        fullName
+        email
+      }
+      petition {
+        id
+        name
+        fields {
+          ...PdfView_Field
+        }
       }
     }
   }

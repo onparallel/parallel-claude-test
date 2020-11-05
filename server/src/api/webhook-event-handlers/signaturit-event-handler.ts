@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
-import { fromGlobalId } from "../../util/globalId";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -10,12 +9,11 @@ export async function validateSignaturitRequest(
 ) {
   try {
     const body = req.body as SignaturItEventBody;
-    const petitionId = fromGlobalId(req.params.petitionId, "Petition").id;
-    const signatures = await req.context.petitions.loadPetitionSignature(
-      petitionId
+    const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
+      body.document.signature.id
     );
 
-    if (signatures.some((s) => s.external_id === body.document.signature.id)) {
+    if (signature) {
       next();
     } else {
       res.sendStatus(403).end();
@@ -48,170 +46,43 @@ export const signaturItEventHandler: Record<
     context: ApiContext
   ) => Promise<void>
 > = {
-  email_delivered: emailDelivered,
-  email_bounced: emailBounced,
-  email_deferred: emailDeferred,
   document_canceled: documentCanceled,
   document_declined: documentDeclined,
-  document_expired: documentExpired,
-  document_signed: documentSigned,
   document_completed: documentCompleted,
-  audit_trail_completed: auditTrailCompleted,
 };
 
-async function emailDelivered(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "EMAIL_DELIVERED",
-    data,
-  });
-}
-
-async function emailBounced(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "EMAIL_BOUNCED",
-    data,
-  });
-}
-
-async function emailDeferred(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "EMAIL_DEFERRED",
-    data,
-  });
-}
-
-/** signature process wass canceled */
+/** signature process was canceled, need to update petition_signature_request table */
 async function documentCanceled(
   petitionId: number,
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  const signatures = (
-    await ctx.petitions.loadPetitionSignature(petitionId)
-  ).filter(
-    (s) =>
-      s.provider === "signaturit" &&
-      s.external_id === data.document.signature.id
+  const externalId = data.document.signature.id;
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    externalId
   );
 
-  await ctx.petitions.updatePetitionSignature(
-    petitionId,
-    signatures.map((s) => s.signer_email),
-    {
-      status: "DOCUMENT_CANCELED",
-      data,
-    }
-  );
+  if (!signature) {
+    throw new Error(
+      `Petition signature request with externalId: ${externalId} not found.`
+    );
+  }
+
+  await ctx.petitions.updatePetitionSignature(signature.id, {
+    status: "CANCELLED",
+    data,
+  });
 }
 
-/** recipient declined the document */
+/** signer declined the document. Whole signature process will be cancelled */
 async function documentDeclined(
   petitionId: number,
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "DOCUMENT_DECLINED",
-    data,
-  });
-}
-
-/** document expired */
-async function documentExpired(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  const signatures = (
-    await ctx.petitions.loadPetitionSignature(petitionId)
-  ).filter(
-    (s) =>
-      s.provider === "signaturit" &&
-      s.external_id === data.document.signature.id
-  );
-
-  await ctx.petitions.updatePetitionSignature(
-    petitionId,
-    signatures.map((s) => s.signer_email),
-    {
-      status: "DOCUMENT_EXPIRED",
-      data,
-    }
-  );
-}
-
-/** recipient signed the document */
-async function documentSigned(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  await ctx.petitions.updatePetitionSignature(petitionId, data.document.email, {
-    status: "DOCUMENT_SIGNED",
-    data,
-  });
-}
-
-/** audit trail is ready to be downloaded */
-async function auditTrailCompleted(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  const buffer = await ctx.signaturit.downloadAuditTrail(
-    data.document.signature.id,
-    data.document.id
-  );
-
-  const signatures = (
-    await ctx.petitions.loadPetitionSignature(petitionId)
-  ).filter(
-    (s) =>
-      s.provider === "signaturit" &&
-      s.external_id === data.document.signature.id
-  );
-
-  const key = `${data.document.signature.id}/${data.document.id}/audit_trail`;
-  await ctx.aws.uploadFile(key, buffer, "application/pdf");
-
-  const file = await ctx.files.createFileUpload(
-    {
-      content_type: "application/pdf",
-      filename: `${petitionId}_audit_trail.pdf`,
-      path: key,
-      size: Buffer.byteLength(buffer),
-      upload_complete: true,
-    },
-    "signaturit"
-  );
-
-  const signedDocFileId = signatures.find(
-    (s) => s.data.signed_doc_file_upload_id
-  )?.data.signed_doc_file_upload_id;
-
-  await ctx.petitions.updatePetitionSignature(
-    petitionId,
-    signatures.map((s) => s.signer_email),
-    {
-      data: {
-        ...data,
-        audit_trail_file_upload_id: file.id,
-        signed_doc_file_upload_id: signedDocFileId,
-      },
-    }
-  );
+  // just send a cancel request. It will later send a document_cancelled event
+  const client = ctx.signature.getClient("signaturit");
+  await client.cancelSignatureRequest(data.document.signature.id);
 }
 
 /** document has been completed and is ready to be downloaded */
@@ -220,25 +91,39 @@ async function documentCompleted(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  const buffer = await ctx.signaturit.downloadSignedDocument(
-    data.document.signature.id,
-    data.document.id
+  const client = ctx.signature.getClient("signaturit");
+
+  const {
+    id: documentId,
+    signature: { id: externalId },
+  } = data.document;
+
+  const buffer = await client.downloadSignedDocument(
+    `${externalId}/${documentId}`
   );
 
-  const signatures = (
-    await ctx.petitions.loadPetitionSignature(petitionId)
-  ).filter(
-    (s) =>
-      s.provider === "signaturit" &&
-      s.external_id === data.document.signature.id
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    externalId
   );
 
-  const key = `${data.document.signature.id}/${data.document.id}/signature`;
+  if (!signature) {
+    throw new Error(
+      `Petition signature request with externalId: ${externalId} not found.`
+    );
+  }
+
+  const petition = await ctx.petitions.loadPetition(petitionId);
+
+  if (!petition) {
+    throw new Error(`petition with id ${petitionId} not found.`);
+  }
+
+  const key = `${externalId}/${documentId}/signature`;
   await ctx.aws.uploadFile(key, buffer, "application/pdf");
   const file = await ctx.files.createFileUpload(
     {
       content_type: "application/pdf",
-      filename: `${petitionId}_signed.pdf`,
+      filename: `${petition.name ?? petitionId}_signed.pdf`,
       path: key,
       size: Buffer.byteLength(buffer),
       upload_complete: true,
@@ -246,20 +131,8 @@ async function documentCompleted(
     "signaturit"
   );
 
-  const auditTrailFileId = signatures.find(
-    (s) => s.data.audit_trail_file_upload_id
-  )?.data.audit_trail_file_upload_id;
-
-  await ctx.petitions.updatePetitionSignature(
-    petitionId,
-    signatures.map((s) => s.signer_email),
-    {
-      data: {
-        ...data,
-        signed_doc_file_upload_id: file.id,
-        audit_trail_file_upload_id: auditTrailFileId,
-      },
-      status: "DOCUMENT_COMPLETED",
-    }
-  );
+  await ctx.petitions.updatePetitionSignature(signature.id, {
+    status: "COMPLETED",
+    file_upload_id: file.id,
+  });
 }

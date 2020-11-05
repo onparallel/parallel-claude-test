@@ -1,51 +1,36 @@
 import * as Knex from "knex";
+import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema
-    .createTable("petition_signature", (t) => {
+    .createTable("petition_signature_request", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable().references("petition.id");
-      t.string("signer_email").notNullable();
-      t.string("provider").notNullable();
       t.string("external_id");
-      t.enum(
-        "status",
-        [
-          "REQUEST_SENT",
-          "EMAIL_DELIVERED",
-          "EMAIL_BOUNCED",
-          "EMAIL_DEFERRED",
-          "DOCUMENT_DECLINED",
-          "DOCUMENT_CANCELED",
-          "DOCUMENT_EXPIRED",
-          "DOCUMENT_SIGNED",
-          "DOCUMENT_COMPLETED",
-        ],
-        {
-          useNative: true,
-          enumName: "petition_signature_status",
-        }
-      )
+      t.jsonb("signature_settings").notNullable();
+      t.enum("status", ["PROCESSING", "CANCELLED", "COMPLETED"], {
+        useNative: true,
+        enumName: "petition_signature_status",
+      })
         .notNullable()
-        .defaultTo("REQUEST_SENT");
+        .defaultTo("PROCESSING");
       t.jsonb("data");
-      t.timestamp("created_at")
-        .notNullable()
-        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+      t.integer("file_upload_id").nullable().references("file_upload.id");
+      timestamps(t, { deleted: false });
     })
     .raw(
-      `create unique index "petition_signature_provider_external_id_signer_email" on "petition_signature" ("provider", "external_id", "signer_email")`
+      "CREATE INDEX petition_signature_request_petition_id_idx ON petition_signature_request (petition_id)"
     )
     .raw(
-      "CREATE INDEX petition_signature_petition_id_idx ON petition_signature (petition_id)"
+      "CREATE INDEX petition_signature_request_external_id_idx ON petition_signature_request (external_id)"
     )
     .raw(
-      "CREATE INDEX petition_signature_signer_email_idx ON petition_signature (signer_email)"
+      `create unique index "petition_signature_request_external_id_unique" on "petition_signature_request" ("external_id") where "status" = 'PROCESSING'`
     );
 }
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema
-    .dropTable("petition_signature")
+    .dropTable("petition_signature_request")
     .raw(/* sql */ `drop type petition_signature_status`);
 }

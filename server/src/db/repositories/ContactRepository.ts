@@ -6,12 +6,20 @@ import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { CreateContact, User, Contact, PetitionAccess } from "../__types";
 import { unMaybeArray } from "../../util/arrays";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import DataLoader from "dataloader";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
     super(knex);
   }
+
+  readonly loadContactById = fromDataLoader(
+    new DataLoader<number, Contact>(async (ids) => {
+      return await this.from("contact").whereIn("id", ids).select("*");
+    })
+  );
 
   readonly loadContact = this.buildLoadById("contact", "id", (q) =>
     q.whereNull("deleted_at")

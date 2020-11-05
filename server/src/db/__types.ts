@@ -54,16 +54,7 @@ export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
-export type PetitionSignatureStatus =
-  | "REQUEST_SENT"
-  | "EMAIL_DELIVERED"
-  | "EMAIL_BOUNCED"
-  | "EMAIL_DEFERRED"
-  | "DOCUMENT_DECLINED"
-  | "DOCUMENT_CANCELED"
-  | "DOCUMENT_EXPIRED"
-  | "DOCUMENT_SIGNED"
-  | "DOCUMENT_COMPLETED";
+export type PetitionSignatureStatus = "PROCESSING" | "CANCELLED" | "COMPLETED";
 
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CLOSED";
 
@@ -91,7 +82,7 @@ export interface TableTypes {
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
   petition_reminder: PetitionReminder;
-  petition_signature: PetitionSignature;
+  petition_signature_request: PetitionSignatureRequest;
   petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
   user: User;
@@ -115,7 +106,7 @@ export interface TableCreateTypes {
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
   petition_reminder: CreatePetitionReminder;
-  petition_signature: CreatePetitionSignature;
+  petition_signature_request: CreatePetitionSignatureRequest;
   petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
   user: CreateUser;
@@ -139,7 +130,7 @@ export interface TablePrimaryKeys {
   petition_field_reply: "id";
   petition_message: "id";
   petition_reminder: "id";
-  petition_signature: "id";
+  petition_signature_request: "id";
   petition_user: "id";
   petition_user_notification: "id";
   user: "id";
@@ -536,25 +527,31 @@ export type CreatePetitionReminder = PartialProps<
   "email_log_id" | "created_at" | "created_by" | "sender_id"
 >;
 
-export interface PetitionSignature {
+export interface PetitionSignatureRequest {
   id: number;
   petition_id: number;
-  signer_email: string;
-  provider: string;
   external_id: Maybe<string>;
+  signature_settings: any;
   status: PetitionSignatureStatus;
   data: Maybe<any>;
+  file_upload_id: Maybe<number>;
   created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
 }
 
-export interface CreatePetitionSignature {
+export interface CreatePetitionSignatureRequest {
   petition_id: number;
-  signer_email: string;
-  provider: string;
   external_id?: Maybe<string>;
+  signature_settings: any;
   status?: PetitionSignatureStatus;
   data?: Maybe<any>;
+  file_upload_id?: Maybe<number>;
   created_at?: Date;
+  created_by?: Maybe<string>;
+  updated_at?: Date;
+  updated_by?: Maybe<string>;
 }
 
 export interface PetitionUser {

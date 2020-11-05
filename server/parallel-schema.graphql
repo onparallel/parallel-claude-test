@@ -1463,6 +1463,31 @@ type PetitionReopenedEvent implements PetitionEvent {
   user: User
 }
 
+type PetitionSignatureRequest implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  data: JSONObject
+  externalId: String
+  petition: Petition!
+  settings: JSONObject!
+  signedDocument: JSONObject
+  signers: [Contact!]!
+  status: PetitionSignatureRequestStatus!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+enum PetitionSignatureRequestStatus {
+  CANCELLED
+  COMPLETED
+  PROCESSING
+}
+
 """
 The status of the signature process for a signer.
 """
@@ -2037,7 +2062,7 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
-  publicPetitionPdf(petitionId: GID!): Petition
+  publicPetitionPdf(petitionId: GID!): PetitionSignatureRequest
   publicPetitionSignature(petitionId: GID!): [PublicPetitionSignature!]!
 
   """

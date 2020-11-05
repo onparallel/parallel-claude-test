@@ -13,7 +13,7 @@ async function tunnelUrl() {
     });
 
     // ping the webhooks endpoint to make sure tunnel is active.
-    const { status } = await fetch(tunnelUrl.concat("/api/webhooks/ping"), {
+    const { status } = await fetch(`${tunnelUrl}/api/webhooks/ping`, {
       timeout: 5000, //5 seconds
     });
     if (status !== 200) {

@@ -40,11 +40,11 @@ import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
   PetitionStatus,
-  PetitionSignature,
+  User,
+  PetitionSignatureRequest,
   PetitionUser,
   PetitionUserNotification,
   PetitionUserPermissionType,
-  User,
 } from "../__types";
 
 type PetitionType = "PETITION" | "TEMPLATE";
@@ -2359,9 +2359,9 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadPetitionSignature = fromDataLoader(
-    new DataLoader<number, PetitionSignature[]>(async (ids) => {
-      const rows = await this.from("petition_signature")
+  readonly loadPetitionSignatureByPetitionId = fromDataLoader(
+    new DataLoader<number, PetitionSignatureRequest[]>(async (ids) => {
+      const rows = await this.from("petition_signature_request")
         .whereIn("petition_id", ids)
         .select("*");
 
@@ -2370,31 +2370,42 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  readonly loadPetitionSignatureByExternalId = this.buildLoadBy(
+    "petition_signature_request",
+    "external_id",
+    (b) => {
+      b.where("status", "PROCESSING");
+    }
+  );
+
   async createPetitionSignature(
     petitionId: number,
-    recipients: { email: string }[],
-    provider: string
+    settings: {
+      provider: string;
+      contactIds: number[];
+      timezone: string;
+    }
   ) {
-    return this.from("petition_signature")
-      .insert(
-        recipients.map((recipient) => ({
-          petition_id: petitionId,
-          signer_email: recipient.email,
-          provider,
-        }))
-      )
+    const [row] = await this.from("petition_signature_request")
+      .insert({
+        petition_id: petitionId,
+        signature_settings: settings,
+        status: "PROCESSING",
+      })
       .returning("*");
+
+    return row;
   }
 
   async updatePetitionSignature(
-    petitionId: number,
-    signerEmail: MaybeArray<string>,
-    data: Partial<Omit<PetitionSignature, "signer_email" | "petition_id">>
+    petitionSignatureId: number,
+    data: Partial<PetitionSignatureRequest>
   ) {
-    const emails = unMaybeArray(signerEmail);
-    return this.from("petition_signature")
-      .where("petition_id", petitionId)
-      .whereIn("signer_email", emails)
-      .update(data);
+    return this.from("petition_signature_request")
+      .where("id", petitionSignatureId)
+      .update({
+        ...data,
+        updated_at: this.now(),
+      });
   }
 }

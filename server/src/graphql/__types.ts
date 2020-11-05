@@ -154,6 +154,7 @@ export interface NexusGenEnums {
   PetitionLocale: "en" | "es";
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionReminderType: db.PetitionReminderType;
+  PetitionSignatureRequestStatus: "CANCELLED" | "COMPLETED" | "PROCESSING";
   PetitionSignatureStatus: db.PetitionSignatureStatus;
   PetitionStatus: db.PetitionStatus;
   PetitionUserPermissionType: db.PetitionUserPermissionType;
@@ -265,6 +266,7 @@ export interface NexusGenRootTypes {
   };
   PetitionReminder: db.PetitionReminder;
   PetitionReopenedEvent: events.PetitionReopenedEvent;
+  PetitionSignatureRequest: db.PetitionSignatureRequest;
   PetitionTemplate: db.Petition;
   PetitionTemplateAndField: {
     // root type
@@ -373,6 +375,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PetitionLocale: NexusGenEnums["PetitionLocale"];
   PetitionMessageStatus: NexusGenEnums["PetitionMessageStatus"];
   PetitionReminderType: NexusGenEnums["PetitionReminderType"];
+  PetitionSignatureRequestStatus: NexusGenEnums["PetitionSignatureRequestStatus"];
   PetitionSignatureStatus: NexusGenEnums["PetitionSignatureStatus"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
   PetitionUserPermissionType: NexusGenEnums["PetitionUserPermissionType"];
@@ -709,6 +712,18 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
   };
+  PetitionSignatureRequest: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    data: NexusGenScalars["JSONObject"] | null; // JSONObject
+    externalId: string | null; // String
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    settings: NexusGenScalars["JSONObject"]; // JSONObject!
+    signedDocument: NexusGenScalars["JSONObject"] | null; // JSONObject
+    signers: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
   PetitionTemplate: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -842,7 +857,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
-    publicPetitionPdf: NexusGenRootTypes["Petition"] | null; // Petition
+    publicPetitionPdf: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     publicPetitionSignature: NexusGenRootTypes["PublicPetitionSignature"][]; // [PublicPetitionSignature!]!
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
   };
@@ -1392,6 +1407,7 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "Organization"
     | "PetitionAccess"
     | "PetitionFieldReply"
+    | "PetitionSignatureRequest"
     | "PetitionUserPermission"
     | "PublicPetition"
     | "PublicPetitionFieldReply"
@@ -1435,6 +1451,7 @@ export type NexusGenObjectNames =
   | "PetitionProgress"
   | "PetitionReminder"
   | "PetitionReopenedEvent"
+  | "PetitionSignatureRequest"
   | "PetitionTemplate"
   | "PetitionTemplateAndField"
   | "PetitionTemplatePagination"
@@ -1490,6 +1507,7 @@ export type NexusGenEnumNames =
   | "PetitionLocale"
   | "PetitionMessageStatus"
   | "PetitionReminderType"
+  | "PetitionSignatureRequestStatus"
   | "PetitionSignatureStatus"
   | "PetitionStatus"
   | "PetitionUserPermissionType"

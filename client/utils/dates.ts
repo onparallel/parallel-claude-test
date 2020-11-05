@@ -8,6 +8,14 @@ export type DateTimeFormatOptions = Exclude<
  */
 export const FORMATS = {
   /**
+   * E.g. 05/03/2020
+   */
+  L: {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  },
+  /**
    * E.g. March 5, 2020
    */
   LL: {

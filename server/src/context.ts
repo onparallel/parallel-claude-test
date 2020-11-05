@@ -19,6 +19,7 @@ import { Smtp } from "./services/smtp";
 import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
+import { SIGNATURE, SignatureService } from "./services/signature";
 
 @injectable()
 export class ApiContext {
@@ -32,7 +33,7 @@ export class ApiContext {
     @inject(AUTH) public readonly auth: Auth,
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
-
+    @inject(SIGNATURE) public readonly signature: SignatureService,
     public readonly aws: Aws,
     public readonly cognito: Cognito,
     // Repositories
@@ -58,7 +59,7 @@ export class WorkerContext {
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     @inject(PRINTER) public readonly printer: Printer,
-
+    @inject(SIGNATURE) public readonly signature: SignatureService,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

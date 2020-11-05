@@ -1,6 +1,8 @@
 import { Box, Text } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
+import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
+import { FormattedDate } from "react-intl";
 import { Card } from "../common/Card";
 
 type SignatureBoxProps = ExtendChakra<{
@@ -8,7 +10,8 @@ type SignatureBoxProps = ExtendChakra<{
   left?: string;
   bottom?: string;
   right?: string;
-  signer: { email: string; name?: Maybe<string>; key: number };
+  signer: { email: string; fullName?: Maybe<string>; key: number };
+  timezone?: string;
 }>;
 
 export function SignatureBox({
@@ -17,14 +20,8 @@ export function SignatureBox({
   bottom,
   right,
   signer,
+  timezone,
 }: SignatureBoxProps) {
-  const date = new Date();
-  const [day, month, year] = [
-    date.getDate().toString().padStart(2, "0"),
-    date.getMonth().toString().padStart(2, "0"),
-    date.getFullYear().toString(),
-  ];
-
   return (
     <Box>
       <Card
@@ -46,9 +43,9 @@ export function SignatureBox({
         <Text color="#ffffff" position="absolute" top="0" left="0">
           {`SIGNER_${signer.key}`}
         </Text>
-        {signer.name}
+        {signer.fullName}
         <br />
-        {day}/{month}/{year}
+        <FormattedDate timeZone={timezone} value={new Date()} {...FORMATS.L} />
       </Card>
     </Box>
   );
