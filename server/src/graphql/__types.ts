@@ -718,7 +718,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     settings: NexusGenScalars["JSONObject"]; // JSONObject!
     signedDocument: NexusGenScalars["JSONObject"] | null; // JSONObject
-    signers: NexusGenRootTypes["Contact"][]; // [Contact!]!
+    signers: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };

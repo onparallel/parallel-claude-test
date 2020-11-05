@@ -22,7 +22,8 @@ export const PetitionSignatureRequest = objectType({
     });
     t.field("signers", {
       type: "Contact",
-      list: [true],
+      list: [false],
+      nullable: false,
       resolve: async (root, _, ctx) => {
         const ids = root.signature_settings.contactIds as number[];
         return await ctx.contacts.loadContact(ids);
