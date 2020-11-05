@@ -27,9 +27,14 @@ export async function validateSignaturitRequest(
 export type SignaturItEventBody = {
   document: {
     created_at: string;
+    decline_reason?: string; // only for document_declined event type
     file: { name: string; pages: string; size: string };
     id: string;
-    events: { created_at: string; type: SignatureEvents }[];
+    events: {
+      created_at: string;
+      type: SignatureEvents;
+      decline_reason?: string;
+    }[];
     signature: { id: string };
     email: string;
     name: string;
@@ -72,6 +77,12 @@ async function documentCanceled(
   await ctx.petitions.updatePetitionSignature(signature.id, {
     status: "CANCELLED",
     data,
+    event_logs: JSON.stringify(
+      data.document.events.concat({
+        created_at: data.created_at,
+        type: data.type,
+      })
+    ),
   });
 }
 
@@ -81,9 +92,28 @@ async function documentDeclined(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  // just send a cancel request. It will later send a document_cancelled event
-  const client = ctx.signature.getClient("signaturit");
-  await client.cancelSignatureRequest(data.document.signature.id);
+  const externalId = data.document.signature.id;
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
+    externalId
+  );
+
+  if (!signature) {
+    throw new Error(
+      `Petition signature request with externalId: ${externalId} not found.`
+    );
+  }
+  // when a document is declined, the signature request is automatically cancelled for all recipients
+  await ctx.petitions.updatePetitionSignature(signature.id, {
+    status: "CANCELLED",
+    data,
+    event_logs: JSON.stringify(
+      data.document.events.concat({
+        created_at: data.created_at,
+        type: data.type,
+        decline_reason: data.document.decline_reason,
+      })
+    ),
+  });
 }
 
 /** document has been completed and is ready to be downloaded */
@@ -141,5 +171,11 @@ async function documentCompleted(
     status: "COMPLETED",
     file_upload_id: file.id,
     data,
+    event_logs: JSON.stringify(
+      data.document.events.concat({
+        created_at: data.created_at,
+        type: data.type,
+      })
+    ),
   });
 }

@@ -534,6 +534,7 @@ export interface PetitionSignatureRequest {
   signature_settings: any;
   status: PetitionSignatureStatus;
   data: Maybe<any>;
+  event_logs: Maybe<any>;
   file_upload_id: Maybe<number>;
   created_at: Date;
   updated_at: Date;
@@ -545,6 +546,7 @@ export interface CreatePetitionSignatureRequest {
   signature_settings: any;
   status?: PetitionSignatureStatus;
   data?: Maybe<any>;
+  event_logs?: Maybe<any>;
   file_upload_id?: Maybe<number>;
   created_at?: Date;
   updated_at?: Date;

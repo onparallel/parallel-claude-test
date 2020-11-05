@@ -8,6 +8,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { getBaseWebhookUrl } from "./helpers/getBaseWebhookUrl";
 import { fullName } from "../util/fullName";
+import { Contact } from "../db/__types";
 
 /** starts a signature request on the petition for the provided contacts */
 async function startSignatureProcess(
@@ -31,9 +32,9 @@ async function startSignatureProcess(
   try {
     const signatureClient = ctx.signature.getClient(payload.settings.provider);
 
-    const contacts = await ctx.contacts.loadContactById(
-      payload.settings.contactIds
-    );
+    const contacts = (
+      await ctx.contacts.loadContact(payload.settings.contactIds)
+    ).filter((c) => !!c) as Contact[];
 
     if (contacts.length !== payload.settings.contactIds.length) {
       throw new Error(

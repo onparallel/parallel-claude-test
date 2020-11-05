@@ -25,7 +25,7 @@ export const PetitionSignatureRequest = objectType({
       list: [true],
       resolve: async (root, _, ctx) => {
         const ids = root.signature_settings.contactIds as number[];
-        return (await ctx.contacts.loadContactById(ids))!;
+        return await ctx.contacts.loadContact(ids);
       },
     });
     t.string("externalId", {
