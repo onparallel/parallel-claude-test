@@ -22,7 +22,12 @@ async function startSignatureProcess(
   },
   ctx: WorkerContext
 ) {
-  const tmpPdfPath = resolve(tmpdir(), payload.petitionId.concat(".pdf"));
+  const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
+  const petition = await ctx.petitions.loadPetition(petitionId);
+  const tmpPdfPath = resolve(
+    tmpdir(),
+    `${petition?.name ?? payload.petitionId}.pdf`
+  );
   try {
     const signatureClient = ctx.signature.getClient(payload.settings.provider);
 
@@ -102,7 +107,6 @@ async function startSignatureProcess(
       external_id: data.id,
       data,
     });
-  } catch {
   } finally {
     try {
       await fs.unlink(tmpPdfPath);
@@ -128,6 +132,9 @@ async function cancelSignatureProcess(
     );
   }
 
+  if (signature.status !== "PROCESSING") {
+    throw new Error(`Can't cancel a ${signature.status} signature process`);
+  }
   // do a request to cancel the signature process.
   // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
   await signatureClient.cancelSignatureRequest(signature.external_id);

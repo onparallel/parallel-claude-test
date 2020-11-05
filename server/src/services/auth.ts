@@ -55,7 +55,11 @@ export class Auth implements IAuth {
     );
   }
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(
+    req: Request & { context: ApiContext },
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { email, password } = req.body;
       const session = await this.cognito.login(email, password);

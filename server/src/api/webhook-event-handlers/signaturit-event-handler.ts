@@ -13,13 +13,14 @@ export async function validateSignaturitRequest(
       body.document.signature.id
     );
 
-    if (signature) {
+    if (signature && signature.status !== "CANCELLED") {
       next();
     } else {
-      res.sendStatus(403).end();
+      // status 200 to kill request but avoid sending an error to signaturit
+      res.sendStatus(200).end();
     }
   } catch {
-    res.sendStatus(403).end();
+    res.sendStatus(200).end();
   }
 }
 
@@ -112,18 +113,23 @@ async function documentCompleted(
     );
   }
 
+  if (signature.status === "CANCELLED") {
+    throw new Error(`Requested petition signature was previously cancelled`);
+  }
+
   const petition = await ctx.petitions.loadPetition(petitionId);
 
   if (!petition) {
     throw new Error(`petition with id ${petitionId} not found.`);
   }
 
-  const key = `${externalId}/${documentId}/signature`;
+  const filename = `${petition.name ?? petitionId}_signed.pdf`;
+  const key = `${externalId}/${documentId}/${filename}`;
   await ctx.aws.uploadFile(key, buffer, "application/pdf");
   const file = await ctx.files.createFileUpload(
     {
       content_type: "application/pdf",
-      filename: `${petition.name ?? petitionId}_signed.pdf`,
+      filename,
       path: key,
       size: Buffer.byteLength(buffer),
       upload_complete: true,
@@ -134,5 +140,6 @@ async function documentCompleted(
   await ctx.petitions.updatePetitionSignature(signature.id, {
     status: "COMPLETED",
     file_upload_id: file.id,
+    data,
   });
 }

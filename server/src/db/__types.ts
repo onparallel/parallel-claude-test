@@ -536,9 +536,7 @@ export interface PetitionSignatureRequest {
   data: Maybe<any>;
   file_upload_id: Maybe<number>;
   created_at: Date;
-  created_by: Maybe<string>;
   updated_at: Date;
-  updated_by: Maybe<string>;
 }
 
 export interface CreatePetitionSignatureRequest {
@@ -549,9 +547,7 @@ export interface CreatePetitionSignatureRequest {
   data?: Maybe<any>;
   file_upload_id?: Maybe<number>;
   created_at?: Date;
-  created_by?: Maybe<string>;
   updated_at?: Date;
-  updated_by?: Maybe<string>;
 }
 
 export interface PetitionUser {
