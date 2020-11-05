@@ -10,8 +10,10 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/core";
+import { EditIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
 import { PetitionStatusIcon } from "@parallel/components/common/PetitionStatusIcon";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -31,9 +33,10 @@ import {
   useContact_updateContactMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { UnwrapPromise } from "@parallel/utils/types";
-
 import {
   forwardRef,
   ReactNode,
@@ -44,10 +47,7 @@ import {
 } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { EditIcon } from "@parallel/chakra/icons";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { compose } from "@parallel/utils/compose";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
+import { omit } from "remeda";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -292,7 +292,7 @@ function useContactPetitionAccessesColumns(): TableColumn<
             <Flex alignItems="center">
               <PetitionProgressBar
                 status={petition.status}
-                {...petition.progress}
+                {...omit(petition.progress, ["__typename"])}
                 flex="1"
                 minWidth="80px"
               />

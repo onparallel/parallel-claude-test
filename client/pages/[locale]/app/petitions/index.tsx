@@ -23,10 +23,10 @@ import {
   PetitionStatus,
   PetitionsUserQuery,
   Petitions_PetitionBasePaginationFragment,
+  Petitions_PetitionBase_PetitionTemplate_Fragment,
   QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
-  Petitions_PetitionBase_PetitionTemplate_Fragment,
 } from "@parallel/graphql/__types";
 import {
   assertQuery,
@@ -35,7 +35,9 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
+import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
+import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   enums,
@@ -48,8 +50,7 @@ import {
 import { UnwrapArray } from "@parallel/utils/types";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
+import { omit } from "remeda";
 
 const PAGE_SIZE = 10;
 
@@ -381,7 +382,7 @@ function usePetitionsColumns(
                   <Flex alignItems="center">
                     <PetitionProgressBar
                       status={row.status}
-                      {...row.progress}
+                      {...omit(row.progress, ["__typename"])}
                       flex="1"
                       minWidth="80px"
                     />
