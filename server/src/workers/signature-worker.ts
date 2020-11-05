@@ -25,9 +25,12 @@ async function startSignatureProcess(
 ) {
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
   const petition = await ctx.petitions.loadPetition(petitionId);
+  if (!petition) {
+    throw new Error(`petition with id ${petitionId} not found`);
+  }
   const tmpPdfPath = resolve(
     tmpdir(),
-    `${petition?.name ?? payload.petitionId}.pdf`
+    `${petition.name ?? payload.petitionId}.pdf`
   );
   try {
     const signatureClient = ctx.signature.getClient(payload.settings.provider);
