@@ -8,7 +8,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { mapSeries } from "async";
-import { countBy } from "remeda";
+import { countBy, pick } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import {
   CreatePetition,
@@ -399,7 +399,7 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {
-        ...signatureConfig,
+        ...pick(signatureConfig, ["provider", "timezone"]),
         contactIds: fromGlobalIds(signatureConfig.contactIds, "Contact").ids,
       };
     }

@@ -29,7 +29,7 @@ export type UserSelectInstance = AsyncSelect<UserSelectSelection>;
 
 export const UserSelect = Object.assign(
   forwardRef(function (
-    { value, isInvalid, onSearchUsers, onChange, ...props }: UserSelectProps,
+    { value, onSearchUsers, onChange, ...props }: UserSelectProps,
     ref: Ref<UserSelectInstance>
   ) {
     const loadOptions = useCallback(
@@ -43,7 +43,7 @@ export const UserSelect = Object.assign(
       [onSearchUsers, value]
     );
 
-    const reactSelectProps = useUserSelectReactSelectProps({ isInvalid });
+    const reactSelectProps = useUserSelectReactSelectProps(props);
 
     return (
       <AsyncSelect<UserSelectSelection>
