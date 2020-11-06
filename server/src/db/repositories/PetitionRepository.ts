@@ -1,11 +1,16 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
-import { countBy, groupBy, indexBy, omit, sortBy, uniq } from "remeda";
+import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
+import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isDefined } from "../../util/remedaExtensions";
+import {
+  calculateNextReminder,
+  PetitionAccessReminderConfig,
+} from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
@@ -23,8 +28,10 @@ import {
   CreatePetitionFieldReply,
   CreatePetitionMessage,
   CreatePetitionReminder,
+  CreatePetitionUser,
   Petition,
   PetitionAccess,
+  PetitionContactNotification,
   PetitionEventType,
   PetitionField,
   PetitionFieldComment,
@@ -32,18 +39,11 @@ import {
   PetitionFieldReplyStatus,
   PetitionFieldType,
   PetitionStatus,
-  User,
-  PetitionUserNotification,
-  PetitionContactNotification,
   PetitionUser,
+  PetitionUserNotification,
   PetitionUserPermissionType,
-  CreatePetitionUser,
+  User,
 } from "../__types";
-import {
-  PetitionAccessReminderConfig,
-  calculateNextReminder,
-} from "../../util/reminderUtils";
-import { findMax, unMaybeArray } from "../../util/arrays";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -1432,7 +1432,7 @@ export class PetitionRepository extends BaseRepository {
       "REPLY_CREATED",
     ]);
 
-    const lastEvent = findMax(events, (e) => e.last_used_at);
+    const lastEvent = maxBy(events, (e) => e.last_used_at.valueOf());
     if (lastEvent && lastEvent.type === "PETITION_CLOSED_NOTIFIED") {
       return false;
     }

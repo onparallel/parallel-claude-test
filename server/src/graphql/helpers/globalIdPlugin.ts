@@ -1,7 +1,12 @@
 import { core, dynamicOutputMethod, plugin } from "@nexus/schema";
 import { GraphQLResolveInfo } from "graphql";
-import { omit } from "remeda";
+import { mapValues, omit } from "remeda";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { isDefined } from "../../util/remedaExtensions";
+
+export type GlobalIdConfig = {
+  prefixName?: string;
+};
 
 export type GlobalIdConfigSpread<
   TypeName extends string,
@@ -19,10 +24,6 @@ export type GlobalIdConfigSpread<
             Partial<GlobalIdResolverConfig<TypeName, FieldName>> &
             core.CommonOutputFieldConfig<TypeName, FieldName>
         ];
-
-export type GlobalIdConfig = {
-  prefixName?: string;
-};
 
 export type GlobalIdResolverConfig<
   TypeName extends string,
@@ -63,8 +64,7 @@ export function globalIdArg(
   prefixNameOrOpts?: string | Omit<core.NexusArgConfig<"ID">, "type">,
   opts?: Omit<core.NexusArgConfig<"ID">, "type">
 ): core.NexusArgDef<any> {
-  const _opts =
-    typeof prefixNameOrOpts === "string" ? opts : prefixNameOrOpts ?? {};
+  opts = typeof prefixNameOrOpts === "string" ? opts : prefixNameOrOpts ?? {};
   const prefixName =
     typeof prefixNameOrOpts === "string" ? prefixNameOrOpts : null;
   return core.arg({
@@ -72,7 +72,7 @@ export function globalIdArg(
       [PREFIX_NAME]: prefixName,
     },
     type: "GID" as any,
-    ..._opts,
+    ...opts,
   });
 }
 
@@ -91,27 +91,18 @@ export function globalIdPlugin() {
     onCreateFieldResolver({ fieldConfig, schemaExtension, ...a }) {
       const config = fieldConfig.extensions?.nexus?.config;
       return async function (root, args, ctx, info, next) {
-        const _args =
-          args &&
-          Object.fromEntries(
-            Object.entries(args).map(([argName, argValue]) => {
-              const argConfig = config.args[argName].config;
-              if (argConfig.type === "GID") {
-                const isList = argConfig.list;
-                const prefixName = argConfig[PREFIX_NAME] ?? config.type;
-                return [
-                  argName,
-                  argValue &&
-                    (isList
-                      ? fromGlobalIds(argValue as string[], prefixName).ids
-                      : fromGlobalId(argValue as string, prefixName).id),
-                ];
-              } else {
-                return [argName, argValue];
-              }
-            })
-          );
-
+        // decode any GID args
+        const _args = mapValues(args ?? {}, (argValue, argName) => {
+          const argConfig = config.args[argName].config;
+          if (argConfig.type === "GID" && isDefined(argValue)) {
+            const isList = argConfig.list;
+            const prefixName = argConfig[PREFIX_NAME] ?? config.type;
+            return isList
+              ? fromGlobalIds(argValue as string[], prefixName).ids
+              : fromGlobalId(argValue as string, prefixName).id;
+          }
+          return argValue;
+        });
         const result = await next(root, _args, ctx, info);
         return config.type === "GID"
           ? toGlobalId(config[PREFIX_NAME], result)
