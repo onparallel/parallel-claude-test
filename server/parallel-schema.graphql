@@ -2114,7 +2114,7 @@ type SendPetitionResult {
 }
 
 """
-The reminder settings of a petition
+The signature settings of a petition
 """
 type SignatureConfig {
   """

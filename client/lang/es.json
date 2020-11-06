@@ -476,7 +476,7 @@
   },
   {
     "term": "component.signature-config-dialog.provider-label",
-    "definition": "Proveedor de firma de digital",
+    "definition": "Proveedor de firma digital",
     "context": "eSignature provider"
   },
   {

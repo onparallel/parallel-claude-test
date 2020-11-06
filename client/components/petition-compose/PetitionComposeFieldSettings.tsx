@@ -323,7 +323,12 @@ function SettingsRow({
 }>) {
   return (
     <FormControl display="flex" alignItems="center" id={controlId} {...props}>
-      <FormLabel display="flex" alignItems="center">
+      <FormLabel
+        display="flex"
+        alignItems="center"
+        fontWeight="normal"
+        margin={0}
+      >
         {label}
         <HelpPopover marginLeft={2}>{description}</HelpPopover>
       </FormLabel>

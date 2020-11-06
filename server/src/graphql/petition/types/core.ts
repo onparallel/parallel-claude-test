@@ -334,7 +334,7 @@ export const RemindersConfig = objectType({
 
 export const SignatureConfig = objectType({
   name: "SignatureConfig",
-  description: "The reminder settings of a petition",
+  description: "The signature settings of a petition",
   definition(t) {
     t.string("provider", {
       description: "The selected provider for the signature.",
