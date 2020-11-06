@@ -1,21 +1,13 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Text,
-  Tooltip,
-} from "@chakra-ui/core";
+import { Box, Text, Tooltip } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import {
-  useReactSelectStyle,
-  UserReactSelectStyleProps,
-} from "@parallel/utils/useReactSelectStyle";
+  useReactSelectProps,
+  UserReactSelectProps,
+} from "@parallel/utils/useReactSelectProps";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useId } from "@reach/auto-id";
 import {
   forwardRef,
   memo,
@@ -36,17 +28,19 @@ import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
 import { pick } from "remeda";
+import { DeletedContact } from "./DeletedContact";
 
 export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isInvalid?: boolean;
+  isDeleted?: boolean;
 };
 
-export type ContactSelectProps = Pick<
+export type ContactSelectProps = Omit<
   AsyncCreatableSelectProps<ContactSelectSelection>,
-  "inputId"
+  "value" | "onChange"
 > & {
+  placeholder?: string;
   value: ContactSelectSelection[];
-  isInvalid?: boolean;
   onChange: (recipients: ContactSelectSelection[]) => void;
   onCreateContact: (data: {
     defaultEmail?: string;
@@ -55,13 +49,12 @@ export type ContactSelectProps = Pick<
     search: string,
     exclude: string[]
   ) => Promise<ContactSelectSelection[]>;
-};
+} & UserReactSelectProps;
 
 export const ContactSelect = Object.assign(
   forwardRef(function (
     {
       value,
-      isInvalid,
       onSearchContacts,
       onCreateContact,
       onChange,
@@ -69,7 +62,6 @@ export const ContactSelect = Object.assign(
     }: ContactSelectProps,
     ref: Ref<AsyncCreatableSelect<ContactSelectSelection>>
   ) {
-    const intl = useIntl();
     const errorToast = useExistingContactToast();
 
     const [isCreating, setIsCreating] = useState(false);
@@ -78,7 +70,7 @@ export const ContactSelect = Object.assign(
 
     const loadOptions = useCallback(
       async (search) => {
-        const exclude = [];
+        const exclude: string[] = [];
         for (const recipient of value) {
           if (!recipient.isInvalid) {
             exclude.push(recipient.id);
@@ -111,8 +103,10 @@ export const ContactSelect = Object.assign(
       },
       [value, onCreateContact, onChange]
     );
-    const inputId = `contact-select-${useId()}`;
-    const reactSelectProps = useReactSelectProps({ isInvalid }, handleCreate);
+    const reactSelectProps = useContactSelectReactSelectProps(
+      { ...props, isDisabled: props.isDisabled || isCreating },
+      handleCreate
+    );
 
     const [previousValue, setPreviousValue] = useState("");
     const handleInputChange = useCallback(
@@ -135,54 +129,18 @@ export const ContactSelect = Object.assign(
       [value, previousValue]
     );
 
-    const invalidRecipients = useMemo(() => value.filter((v) => v.isInvalid), [
-      value,
-    ]);
-
     return (
-      <FormControl id={inputId} isInvalid={isInvalid}>
-        <FormLabel paddingBottom={0}>
-          <FormattedMessage
-            id="component.contact-select.label"
-            defaultMessage="Recipients"
-          />
-        </FormLabel>
-        <AsyncCreatableSelect<ContactSelectSelection>
-          inputId={inputId}
-          placeholder={intl.formatMessage({
-            id: "component.contact-select.placeholder",
-            defaultMessage: "Enter recipients...",
-          })}
-          ref={ref}
-          value={value}
-          isDisabled={isCreating}
-          onChange={(value) => onChange((value as any) ?? [])}
-          onInputChange={handleInputChange}
-          onCreateOption={handleCreate}
-          isMulti
-          loadOptions={loadOptions}
-          {...reactSelectProps}
-          {...props}
-        />
-
-        <FormErrorMessage>
-          {invalidRecipients.length === 0 ? (
-            <FormattedMessage
-              id="component.contact-select.required-error"
-              defaultMessage="Please specify at least one recipient"
-            />
-          ) : (
-            <FormattedMessage
-              id="petition.message-settings.unknown-recipients"
-              defaultMessage="We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
-              values={{
-                count: invalidRecipients.length,
-                email: invalidRecipients[0].email,
-              }}
-            />
-          )}
-        </FormErrorMessage>
-      </FormControl>
+      <AsyncCreatableSelect<ContactSelectSelection>
+        ref={ref}
+        value={value}
+        isMulti
+        onChange={(value) => onChange((value as any) ?? [])}
+        onInputChange={handleInputChange}
+        onCreateOption={handleCreate}
+        loadOptions={loadOptions}
+        {...props}
+        {...reactSelectProps}
+      />
     );
   }),
   {
@@ -198,17 +156,17 @@ export const ContactSelect = Object.assign(
   }
 );
 
-function useReactSelectProps(
-  props: UserReactSelectStyleProps,
+function useContactSelectReactSelectProps(
+  props: UserReactSelectProps,
   handleCreateContact: (email: string) => Promise<void>
 ) {
-  const styleProps = useReactSelectStyle<ContactSelectSelection>(props);
+  const reactSelectProps = useReactSelectProps<ContactSelectSelection>(props);
   return useMemo(
     () =>
       ({
-        ...styleProps,
+        ...reactSelectProps,
         components: {
-          ...styleProps.components,
+          ...reactSelectProps.components,
           NoOptionsMessage: memo(({ selectProps }) => {
             const search = selectProps.inputValue;
             return (
@@ -253,7 +211,7 @@ function useReactSelectProps(
               data: ContactSelectSelection;
               children: ReactNode;
             }) => {
-              const { fullName, email, isInvalid } = data;
+              const { fullName, email, isInvalid, isDeleted } = data;
               const intl = useIntl();
               return (
                 <Tooltip
@@ -270,7 +228,13 @@ function useReactSelectProps(
                   >
                     <components.MultiValueLabel {...props}>
                       <Text as="span" marginLeft={1}>
-                        {fullName ? `${fullName} <${email}>` : email}
+                        {isDeleted ? (
+                          <DeletedContact color="red.600" />
+                        ) : fullName ? (
+                          `${fullName} <${email}>`
+                        ) : (
+                          email
+                        )}
                       </Text>
                     </components.MultiValueLabel>
                   </Box>
@@ -342,6 +306,6 @@ function useReactSelectProps(
           );
         },
       } as Partial<AsyncCreatableSelectProps<ContactSelectSelection>>),
-    [styleProps, handleCreateContact]
+    [reactSelectProps, handleCreateContact]
   );
 }

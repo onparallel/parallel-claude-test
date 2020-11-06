@@ -1,14 +1,14 @@
 /**
- * converts snake_case @param text to capitalized words
- * ex: snakeCaseToCapitalizedText("HELLO_WORLD") === "Hello World"
+ * converts @param text to capitalized words
+ * ex: titleize("HELLO_WORLD") === "Hello World"
  */
-export function snakeCaseToCapitalizedText(text: string): string {
+export function titleize(text: string) {
   return text
     .split("_")
     .map((word) => capitalize(word))
     .join(" ");
 }
 
-function capitalize(text: string): string {
+function capitalize(text: string) {
   return text.charAt(0).toUpperCase().concat(text.slice(1).toLowerCase());
 }

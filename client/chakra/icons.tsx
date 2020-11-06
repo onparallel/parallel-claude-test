@@ -1137,3 +1137,20 @@ export const ThumbUpIcon = createIcon({
     </g>
   ),
 });
+
+export const SignatureIcon = createIcon({
+  displayName: "SignatureIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m 7.5000748,2.5 c -1.9999991,-1.99999913 -4.9999991,1.0000009 -3,3 l 9.5000002,9.5 4,1 -1,-4 z" />
+      <path d="M 2,22 C 3.1649453,21.417527 7.3693738,17.42089 7.2090576,15.068107 7,12 3,12 2.3116295,14.810237 1.7796301,16.982097 4,20 5,21 6,22 8,23 9.501696,20.381818 12.040646,15.9552 11.260423,21.990344 13,22 15,22 15.851017,17.833359 16.874752,19.354938 20,24 24,22 22,19" />
+    </g>
+  ),
+});

@@ -92,6 +92,12 @@ export interface NexusGenInputs {
     timezone: string; // String!
     weekdaysOnly: boolean; // Boolean!
   };
+  SignatureConfigInput: {
+    // input type
+    contactIds: string[]; // [ID!]!
+    provider: string; // String!
+    timezone: string; // String!
+  };
   UpdateContactInput: {
     // input type
     firstName?: string | null; // String
@@ -114,6 +120,7 @@ export interface NexusGenInputs {
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
+    signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
   };
   UpdateUserInput: {
     // input type
@@ -129,6 +136,7 @@ export interface NexusGenEnums {
     | "SUCCESS";
   EntityType: "Contact" | "Organization" | "Petition" | "User";
   FeatureFlag: db.FeatureFlagName;
+  IntegrationType: db.IntegrationType;
   OnboardingKey:
     | "CONTACT_DETAILS"
     | "CONTACT_LIST"
@@ -209,6 +217,7 @@ export interface NexusGenRootTypes {
   MessageScheduledEvent: events.MessageScheduledEvent;
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
+  OrgIntegration: db.OrgIntegration;
   Organization: db.Organization;
   OwnershipTransferredEvent: events.OwnershipTransferredEvent;
   Petition: db.Petition;
@@ -284,11 +293,10 @@ export interface NexusGenRootTypes {
   Query: {};
   ReminderSentEvent: events.ReminderSentEvent;
   RemindersConfig: {
-    // root type
-    offset: number; // Int!
-    time: string; // String!
-    timezone: string; // String!
-    weekdaysOnly: boolean; // Boolean!
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
   };
   ReplyCreatedEvent: events.ReplyCreatedEvent;
   ReplyDeletedEvent: events.ReplyDeletedEvent;
@@ -297,6 +305,11 @@ export interface NexusGenRootTypes {
     accesses?: NexusGenRootTypes["PetitionAccess"][] | null; // [PetitionAccess!]
     petition?: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
+  };
+  SignatureConfig: {
+    provider: string;
+    contactIds: number[];
+    timezone: string;
   };
   SupportMethodResponse: {
     // root type
@@ -338,6 +351,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   CreateFileUploadReplyInput: NexusGenInputs["CreateFileUploadReplyInput"];
   CreateTextReplyInput: NexusGenInputs["CreateTextReplyInput"];
   RemindersConfigInput: NexusGenInputs["RemindersConfigInput"];
+  SignatureConfigInput: NexusGenInputs["SignatureConfigInput"];
   UpdateContactInput: NexusGenInputs["UpdateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
@@ -345,6 +359,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
   EntityType: NexusGenEnums["EntityType"];
   FeatureFlag: NexusGenEnums["FeatureFlag"];
+  IntegrationType: NexusGenEnums["IntegrationType"];
   OnboardingKey: NexusGenEnums["OnboardingKey"];
   OnboardingStatus: NexusGenEnums["OnboardingStatus"];
   OrganizationRole: NexusGenEnums["OrganizationRole"];
@@ -509,11 +524,18 @@ export interface NexusGenFieldTypes {
     updateUser: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
   };
+  OrgIntegration: {
+    // field return type
+    name: string; // String!
+    provider: string; // String!
+    type: NexusGenEnums["IntegrationType"]; // IntegrationType!
+  };
   Organization: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     identifier: string; // String!
+    integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
     name: string; // String!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -542,6 +564,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
+    signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
@@ -841,6 +864,12 @@ export interface NexusGenFieldTypes {
     accesses: NexusGenRootTypes["PetitionAccess"][] | null; // [PetitionAccess!]
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
+  };
+  SignatureConfig: {
+    // field return type
+    contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
+    provider: string; // String!
+    timezone: string; // String!
   };
   SupportMethodResponse: {
     // field return type
@@ -1229,6 +1258,10 @@ export interface NexusGenArgTypes {
     };
   };
   Organization: {
+    integrations: {
+      // args
+      type?: NexusGenEnums["IntegrationType"] | null; // IntegrationType
+    };
     users: {
       // args
       exclude?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -1358,6 +1391,7 @@ export type NexusGenObjectNames =
   | "MessageScheduledEvent"
   | "MessageSentEvent"
   | "Mutation"
+  | "OrgIntegration"
   | "Organization"
   | "OwnershipTransferredEvent"
   | "Petition"
@@ -1397,6 +1431,7 @@ export type NexusGenObjectNames =
   | "ReplyCreatedEvent"
   | "ReplyDeletedEvent"
   | "SendPetitionResult"
+  | "SignatureConfig"
   | "SupportMethodResponse"
   | "User"
   | "UserPagination"
@@ -1409,6 +1444,7 @@ export type NexusGenInputNames =
   | "CreateFileUploadReplyInput"
   | "CreateTextReplyInput"
   | "RemindersConfigInput"
+  | "SignatureConfigInput"
   | "UpdateContactInput"
   | "UpdatePetitionFieldInput"
   | "UpdatePetitionInput"
@@ -1418,6 +1454,7 @@ export type NexusGenEnumNames =
   | "ChangePasswordResult"
   | "EntityType"
   | "FeatureFlag"
+  | "IntegrationType"
   | "OnboardingKey"
   | "OnboardingStatus"
   | "OrganizationRole"

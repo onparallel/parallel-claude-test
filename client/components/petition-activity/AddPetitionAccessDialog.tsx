@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
-import { Alert, AlertIcon, Box, Button } from "@chakra-ui/core";
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+} from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -13,7 +21,7 @@ import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { noop, omit } from "remeda";
 import {
   ContactSelect,
@@ -52,6 +60,7 @@ export function AddPetitionAccessDialog({
   onCreateContact,
   ...props
 }: DialogProps<AddPettionAccessDialogProps, AddPettionAccessDialogResult>) {
+  const intl = useIntl();
   const [showErrors, setShowErrors] = useState(false);
   const [recipients, setRecipients] = useState<ContactSelectSelection[]>([]);
   const [subject, setSubject] = useState(defaultSubject ?? "");
@@ -138,16 +147,47 @@ export function AddPetitionAccessDialog({
       }
       body={
         <>
-          <ContactSelect
+          <FormControl
+            id="petition-recipients"
             isInvalid={
               (showErrors && recipients.length === 0) ||
               invalidRecipients.length > 0
             }
-            onCreateContact={onCreateContact}
-            onSearchContacts={onSearchContacts}
-            value={recipients}
-            onChange={setRecipients}
-          />
+          >
+            <FormLabel>
+              <FormattedMessage
+                id="petition.add-access.recipients-label"
+                defaultMessage="Recipients"
+              />
+            </FormLabel>
+            <ContactSelect
+              placeholder={intl.formatMessage({
+                id: "petition.add-access.recipients-placeholder",
+                defaultMessage: "Enter recipients...",
+              })}
+              onCreateContact={onCreateContact}
+              onSearchContacts={onSearchContacts}
+              value={recipients}
+              onChange={setRecipients}
+            />
+            <FormErrorMessage>
+              {invalidRecipients.length === 0 ? (
+                <FormattedMessage
+                  id="petition.add-access.required-recipients-error"
+                  defaultMessage="Please specify at least one recipient"
+                />
+              ) : (
+                <FormattedMessage
+                  id="petition.add-access.unknown-recipients"
+                  defaultMessage="We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+                  values={{
+                    count: invalidRecipients.length,
+                    email: invalidRecipients[0].email,
+                  }}
+                />
+              )}
+            </FormErrorMessage>
+          </FormControl>
           {validRecipients.length >= 2 && invalidRecipients.length === 0 ? (
             <Alert status="info" marginTop={4}>
               <AlertIcon />

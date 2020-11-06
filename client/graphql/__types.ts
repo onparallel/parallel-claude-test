@@ -139,6 +139,9 @@ export type FileUploadReplyDownloadLinkResult = {
   url?: Maybe<Scalars["String"]>;
 };
 
+/** The types of integrations available. */
+export type IntegrationType = "SIGNATURE";
+
 export type MessageCancelledEvent = PetitionEvent & {
   __typename?: "MessageCancelledEvent";
   createdAt: Scalars["DateTime"];
@@ -581,6 +584,7 @@ export type Organization = Timestamps & {
   id: Scalars["GID"];
   /** The unique text identifier of the organization. */
   identifier: Scalars["String"];
+  integrations: Array<OrgIntegration>;
   /** The name of the organization. */
   name: Scalars["String"];
   /** The status of the organization. */
@@ -589,6 +593,11 @@ export type Organization = Timestamps & {
   updatedAt: Scalars["DateTime"];
   /** The users in the organization. */
   users: UserPagination;
+};
+
+/** An organization in the system. */
+export type OrganizationintegrationsArgs = {
+  type?: Maybe<IntegrationType>;
 };
 
 /** An organization in the system. */
@@ -612,6 +621,16 @@ export type OrganizationStatus =
   | "DEMO"
   /** Used for development or testing purposes */
   | "DEV";
+
+export type OrgIntegration = {
+  __typename?: "OrgIntegration";
+  /** The name of the integration. */
+  name: Scalars["String"];
+  /** The provider used for this integration. */
+  provider: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
+};
 
 export type OwnershipTransferredEvent = PetitionEvent & {
   __typename?: "OwnershipTransferredEvent";
@@ -651,6 +670,8 @@ export type Petition = PetitionBase & {
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
+  /** The signature configuration for the petition. */
+  signatureConfig?: Maybe<SignatureConfig>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** Time when the resource was last updated. */
@@ -1341,6 +1362,27 @@ export type SendPetitionResult = {
   result: Result;
 };
 
+/** The reminder settings of a petition */
+export type SignatureConfig = {
+  __typename?: "SignatureConfig";
+  /** The contacts that need to sign the generated document. */
+  contacts: Array<Maybe<Contact>>;
+  /** The selected provider for the signature. */
+  provider: Scalars["String"];
+  /** The timezone used to generate the document. */
+  timezone: Scalars["String"];
+};
+
+/** The signature settings for the petition */
+export type SignatureConfigInput = {
+  /** The contacts that need to sign the generated document. */
+  contactIds: Array<Scalars["ID"]>;
+  /** The selected provider for the signature. */
+  provider: Scalars["String"];
+  /** The timezone used to generate the document. */
+  timezone: Scalars["String"];
+};
+
 /** Return type for all support methods */
 export type SupportMethodResponse = {
   __typename?: "SupportMethodResponse";
@@ -1376,6 +1418,7 @@ export type UpdatePetitionInput = {
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
+  signatureConfig?: Maybe<SignatureConfigInput>;
 };
 
 export type UpdateUserInput = {
@@ -2077,9 +2120,27 @@ export type PetitionFieldsIndex_PetitionFieldFragment = {
     >;
   };
 
+export type PetitionSettings_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
+} & {
+  organization: { __typename?: "Organization" } & {
+    signatureIntegrations: Array<
+      {
+        __typename?: "OrgIntegration";
+      } & SignatureConfigDialog_OrgIntegrationFragment
+    >;
+  };
+};
+
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "deadline" | "id" | "locale">;
+} & Pick<Petition, "status" | "deadline" | "id" | "locale"> & {
+    signatureConfig?: Maybe<
+      {
+        __typename?: "SignatureConfig";
+      } & SignatureConfigDialog_SignatureConfigFragment
+    >;
+  };
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
@@ -2206,6 +2267,18 @@ export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
     };
   };
 };
+
+export type SignatureConfigDialog_SignatureConfigFragment = {
+  __typename?: "SignatureConfig";
+} & Pick<SignatureConfig, "provider" | "timezone"> & {
+    contacts: Array<
+      Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
+    >;
+  };
+
+export type SignatureConfigDialog_OrgIntegrationFragment = {
+  __typename?: "OrgIntegration";
+} & Pick<OrgIntegration, "name" | "provider">;
 
 export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
   templateId: Scalars["GID"];
@@ -2775,7 +2848,8 @@ export type PetitionCompose_PetitionFieldFragment = {
 
 export type PetitionCompose_UserFragment = {
   __typename?: "User";
-} & PetitionLayout_UserFragment;
+} & PetitionLayout_UserFragment &
+  PetitionSettings_UserFragment;
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -2789,10 +2863,12 @@ export type PetitionCompose_updatePetitionMutation = {
     | ({
         __typename?: "Petition";
       } & PetitionLayout_PetitionBase_Petition_Fragment &
+        PetitionSettings_PetitionBase_Petition_Fragment &
         AddPetitionAccessDialog_PetitionFragment)
     | ({
         __typename?: "PetitionTemplate";
       } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
+        PetitionSettings_PetitionBase_PetitionTemplate_Fragment &
         PetitionTemplateComposeMessageEditor_PetitionFragment);
 };
 
@@ -3916,13 +3992,6 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   };
 };
 
-export const ContactSelect_ContactFragmentDoc = gql`
-  fragment ContactSelect_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
@@ -4716,6 +4785,23 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     description
   }
 `;
+export const ContactSelect_ContactFragmentDoc = gql`
+  fragment ContactSelect_Contact on Contact {
+    id
+    fullName
+    email
+  }
+`;
+export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
+  fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
+    provider
+    contacts {
+      ...ContactSelect_Contact
+    }
+    timezone
+  }
+  ${ContactSelect_ContactFragmentDoc}
+`;
 export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
@@ -4723,8 +4809,12 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     ... on Petition {
       status
       deadline
+      signatureConfig {
+        ...SignatureConfigDialog_SignatureConfig
+      }
     }
   }
+  ${SignatureConfigDialog_SignatureConfigFragmentDoc}
 `;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
@@ -4743,11 +4833,30 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   ${PetitionSettings_PetitionBaseFragmentDoc}
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
+export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
+  fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
+    name
+    provider
+  }
+`;
+export const PetitionSettings_UserFragmentDoc = gql`
+  fragment PetitionSettings_User on User {
+    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+    organization {
+      signatureIntegrations: integrations(type: SIGNATURE) {
+        ...SignatureConfigDialog_OrgIntegration
+      }
+    }
+  }
+  ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
+`;
 export const PetitionCompose_UserFragmentDoc = gql`
   fragment PetitionCompose_User on User {
     ...PetitionLayout_User
+    ...PetitionSettings_User
   }
   ${PetitionLayout_UserFragmentDoc}
+  ${PetitionSettings_UserFragmentDoc}
 `;
 export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
@@ -6508,11 +6617,13 @@ export const PetitionCompose_updatePetitionDocument = gql`
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionLayout_PetitionBase
+      ...PetitionSettings_PetitionBase
       ...AddPetitionAccessDialog_Petition
       ...PetitionTemplateComposeMessageEditor_Petition
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
+  ${PetitionSettings_PetitionBaseFragmentDoc}
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
   ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
 `;

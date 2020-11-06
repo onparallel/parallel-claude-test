@@ -163,6 +163,13 @@ type FileUploadReplyDownloadLinkResult {
 scalar GID
 
 """
+The types of integrations available.
+"""
+enum IntegrationType {
+  SIGNATURE
+}
+
+"""
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
@@ -678,6 +685,12 @@ type Organization implements Timestamps {
   The unique text identifier of the organization.
   """
   identifier: String!
+  integrations(
+    """
+    Filter by integration type.
+    """
+    type: IntegrationType
+  ): [OrgIntegration!]!
 
   """
   The name of the organization.
@@ -748,6 +761,23 @@ enum OrganizationStatus {
   Used for development or testing purposes
   """
   DEV
+}
+
+type OrgIntegration {
+  """
+  The name of the integration.
+  """
+  name: String!
+
+  """
+  The provider used for this integration.
+  """
+  provider: String!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
 }
 
 type OwnershipTransferredEvent implements PetitionEvent {
@@ -836,6 +866,11 @@ type Petition implements PetitionBase {
   The reminders configuration for the petition.
   """
   remindersConfig: RemindersConfig
+
+  """
+  The signature configuration for the petition.
+  """
+  signatureConfig: SignatureConfig
 
   """
   The status of the petition.
@@ -2079,6 +2114,46 @@ type SendPetitionResult {
 }
 
 """
+The reminder settings of a petition
+"""
+type SignatureConfig {
+  """
+  The contacts that need to sign the generated document.
+  """
+  contacts: [Contact]!
+
+  """
+  The selected provider for the signature.
+  """
+  provider: String!
+
+  """
+  The timezone used to generate the document.
+  """
+  timezone: String!
+}
+
+"""
+The signature settings for the petition
+"""
+input SignatureConfigInput {
+  """
+  The contacts that need to sign the generated document.
+  """
+  contactIds: [ID!]!
+
+  """
+  The selected provider for the signature.
+  """
+  provider: String!
+
+  """
+  The timezone used to generate the document.
+  """
+  timezone: String!
+}
+
+"""
 Return type for all support methods
 """
 type SupportMethodResponse {
@@ -2119,6 +2194,7 @@ input UpdatePetitionInput {
   locale: PetitionLocale
   name: String
   remindersConfig: RemindersConfigInput
+  signatureConfig: SignatureConfigInput
 }
 
 input UpdateUserInput {

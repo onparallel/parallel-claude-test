@@ -1269,6 +1269,9 @@ export class PetitionRepository extends BaseRepository {
             "updated_at",
             "template_public",
             "from_template_id",
+            ...(data?.is_template
+              ? (["reminders_active", "reminders_config"] as const)
+              : (["template_description"] as const)),
           ]),
           org_id: user.org_id,
           status: petition?.is_template ? null : "DRAFT",
@@ -1279,11 +1282,11 @@ export class PetitionRepository extends BaseRepository {
         },
         t
       );
-      await this.createEvent_old(
-        cloned.id,
-        "PETITION_CREATED",
+      await this.createEvent(
         {
-          user_id: user.id,
+          petitionId: cloned.id,
+          type: "PETITION_CREATED",
+          data: { user_id: user.id },
         },
         t
       );

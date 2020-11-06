@@ -65,24 +65,9 @@
     "context": "You can also enter a valid email."
   },
   {
-    "term": "component.contact-select.label",
-    "definition": "Recipients",
-    "context": "Recipients"
-  },
-  {
     "term": "component.contact-select.no-options",
     "definition": "We could not find any exisiting contacts for <em>{search}</em>",
     "context": "We could not find any exisiting contacts for <em>{search}</em>"
-  },
-  {
-    "term": "component.contact-select.placeholder",
-    "definition": "Enter recipients...",
-    "context": "Enter recipients..."
-  },
-  {
-    "term": "component.contact-select.required-error",
-    "definition": "Please specify at least one recipient",
-    "context": "Please specify at least one recipient"
   },
   {
     "term": "component.contact-select.search-hint",
@@ -120,19 +105,9 @@
     "context": "Creating petition"
   },
   {
-    "term": "component.create-petition-dialog.locale-label",
-    "definition": "Language of the petition",
-    "context": "Language of the petition"
-  },
-  {
     "term": "component.create-petition-dialog.name-label",
     "definition": "Give it an identifying name",
     "context": "Give it an identifying name"
-  },
-  {
-    "term": "component.create-template-dialog.locale-label",
-    "definition": "Language of the template",
-    "context": "Language of the template"
   },
   {
     "term": "component.date-picker.next-month",
@@ -425,6 +400,41 @@
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
   },
   {
+    "term": "component.petition-settings.deadline-description",
+    "definition": "This date is used to inform the recipients of the deadline for which you need to have the information.",
+    "context": "This date is used to inform the recipients of the deadline for which you need to have the information."
+  },
+  {
+    "term": "component.petition-settings.locale-description",
+    "definition": "This is the language that will be used in the communications with the recipients of this petition.",
+    "context": "This is the language that will be used in the communications with the recipients of this petition."
+  },
+  {
+    "term": "component.petition-settings.locale-label",
+    "definition": "Language of the petition",
+    "context": "Language of the petition"
+  },
+  {
+    "term": "component.petition-settings.petition-signature-configure",
+    "definition": "Configure eSignature",
+    "context": "Configure eSignature"
+  },
+  {
+    "term": "component.petition-settings.petition-signature-description",
+    "definition": "By enabling eSignature, once the petition is completed by the recipient, Parallel will generate a PDF document with all the replies and send it to the selected eSignature provider to start the signature process.",
+    "context": "By enabling eSignature, once the petition is completed by the recipient, Parallel will generate a PDF document with all the replies and send it to the selected eSignature provider to start the signature process."
+  },
+  {
+    "term": "component.petition-settings.petition-signature-enable",
+    "definition": "Enable eSignature",
+    "context": "Enable eSignature"
+  },
+  {
+    "term": "component.petition-settings.template-locale-label",
+    "definition": "Language of the template",
+    "context": "Language of the template"
+  },
+  {
     "term": "component.petition-template.delete-label",
     "definition": "Delete template",
     "context": "Delete template"
@@ -453,6 +463,21 @@
     "term": "component.send-button.schedule",
     "definition": "Schedule send",
     "context": "Schedule send"
+  },
+  {
+    "term": "component.signature-config-dialog.contacts-label",
+    "definition": "Who has to sign the petition?",
+    "context": "Who has to sign the petition?"
+  },
+  {
+    "term": "component.signature-config-dialog.header",
+    "definition": "eSignature configuration",
+    "context": "eSignature configuration"
+  },
+  {
+    "term": "component.signature-config-dialog.provider-label",
+    "definition": "eSignature provider",
+    "context": "eSignature provider"
   },
   {
     "term": "component.table.next-page-button",
@@ -1555,9 +1580,29 @@
     "context": "Who do you want to send it to?"
   },
   {
+    "term": "petition.add-access.recipients-label",
+    "definition": "Recipients",
+    "context": "Recipients"
+  },
+  {
+    "term": "petition.add-access.recipients-placeholder",
+    "definition": "Enter recipients...",
+    "context": "Enter recipients..."
+  },
+  {
+    "term": "petition.add-access.required-recipients-error",
+    "definition": "Please specify at least one recipient",
+    "context": "Please specify at least one recipient"
+  },
+  {
     "term": "petition.add-access.same-petition-warning",
     "definition": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively.",
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
+  },
+  {
+    "term": "petition.add-access.unknown-recipients",
+    "definition": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list.",
+    "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
     "term": "petition.add-another-field-button",
@@ -1833,11 +1878,6 @@
     "term": "petition.message-sent.toast-header",
     "definition": "Message sent",
     "context": "Message sent"
-  },
-  {
-    "term": "petition.message-settings.unknown-recipients",
-    "definition": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list.",
-    "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
     "term": "petition.name-label",

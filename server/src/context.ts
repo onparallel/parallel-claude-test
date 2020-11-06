@@ -17,6 +17,7 @@ import { LOGGER, Logger } from "./services/logger";
 import { Smtp } from "./services/smtp";
 import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
+import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 
 @injectable()
 export class ApiContext {
@@ -37,6 +38,7 @@ export class ApiContext {
     public readonly emailLogs: EmailLogRepository,
     public readonly featureFlags: FeatureFlagRepository,
     public readonly files: FileUploadRepository,
+    public readonly integrations: IntegrationRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository
@@ -57,6 +59,7 @@ export class WorkerContext {
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
     public readonly files: FileUploadRepository,
+    public readonly integrations: IntegrationRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,

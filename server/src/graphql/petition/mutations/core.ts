@@ -16,7 +16,7 @@ import {
   PetitionUser,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import { toGlobalId } from "../../../util/globalId";
+import { fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import {
   and,
@@ -39,6 +39,7 @@ import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
+import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -298,6 +299,27 @@ export const RemindersConfigInput = inputObjectType({
   },
 });
 
+export const SignatureConfigInput = inputObjectType({
+  name: "SignatureConfigInput",
+  description: "The signature settings for the petition",
+  definition(t) {
+    t.string("provider", {
+      description: "The selected provider for the signature.",
+      required: true,
+    });
+    t.field("contactIds", {
+      type: "ID",
+      list: [true],
+      description: "The contacts that need to sign the generated document.",
+      required: true,
+    });
+    t.string("timezone", {
+      description: "The timezone used to generate the document.",
+      required: true,
+    });
+  },
+});
+
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "PetitionBase",
@@ -316,6 +338,10 @@ export const updatePetition = mutationField("updatePetition", {
           type: "RemindersConfigInput",
           nullable: true,
         });
+        t.field("signatureConfig", {
+          type: "SignatureConfigInput",
+          nullable: true,
+        });
         t.string("description", { nullable: true });
       },
     }).asArg({ required: true }),
@@ -329,6 +355,10 @@ export const updatePetition = mutationField("updatePetition", {
     validRemindersConfig(
       (args) => args.data.remindersConfig,
       "data.remindersConfig"
+    ),
+    validSignatureConfig(
+      (args) => args.data.signatureConfig,
+      "data.signatureConfig"
     )
   ),
   resolve: async (_, args, ctx) => {
@@ -339,6 +369,7 @@ export const updatePetition = mutationField("updatePetition", {
       emailSubject,
       emailBody,
       remindersConfig,
+      signatureConfig,
       description,
     } = args.data;
     const data: Partial<CreatePetition> = {};
@@ -365,6 +396,12 @@ export const updatePetition = mutationField("updatePetition", {
         data.reminders_config = remindersConfig;
         data.reminders_active = true;
       }
+    }
+    if (signatureConfig !== undefined) {
+      data.signature_config = signatureConfig && {
+        ...signatureConfig,
+        contactIds: fromGlobalIds(signatureConfig.contactIds, "Contact").ids,
+      };
     }
     if (description !== undefined) {
       data.template_description = description?.trim() || null;

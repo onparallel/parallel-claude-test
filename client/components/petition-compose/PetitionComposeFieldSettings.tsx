@@ -1,6 +1,14 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Image, Input, Stack, Switch, Text } from "@chakra-ui/core";
-import { QuestionIcon } from "@parallel/chakra/icons";
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Image,
+  Input,
+  Stack,
+  Switch,
+  Text,
+} from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -13,7 +21,7 @@ import { FieldOptions } from "@parallel/utils/FieldOptions";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { SmallPopover } from "../common/SmallPopover";
+import { HelpPopover } from "../common/HelpPopover";
 import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
 
 export type PetitionComposeFieldSettingsProps = {
@@ -314,14 +322,14 @@ function SettingsRow({
   description: ReactNode;
 }>) {
   return (
-    <SmallPopover content={description} placement="left">
-      <Flex as="label" alignItems="center" htmlFor={controlId} {...props}>
-        <Text as="div">{label}</Text>
-        <QuestionIcon marginLeft={2} color="gray.200" />
-        <Spacer minWidth={4} />
-        <Flex alignSelf="center">{children}</Flex>
-      </Flex>
-    </SmallPopover>
+    <FormControl display="flex" alignItems="center" id={controlId} {...props}>
+      <FormLabel display="flex" alignItems="center">
+        {label}
+        <HelpPopover marginLeft={2}>{description}</HelpPopover>
+      </FormLabel>
+      <Spacer minWidth={4} />
+      {children}
+    </FormControl>
   );
 }
 

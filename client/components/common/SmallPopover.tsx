@@ -13,13 +13,12 @@ import { cloneElement, ReactNode, useState } from "react";
 
 export function SmallPopover({
   children,
-  placement,
   content,
+  ...props
 }: {
   content: ReactNode;
-  placement?: PopoverProps["placement"];
   children: ReactNode;
-}) {
+} & Pick<PopoverProps, "placement" | "openDelay">) {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
   const popoverId = `popover-${useId()}`;
@@ -27,9 +26,9 @@ export function SmallPopover({
     <Popover
       trigger="hover"
       id={popoverId}
-      placement={placement}
       onOpen={() => setIsOpen(true)}
       onClose={() => setIsOpen(false)}
+      {...props}
     >
       <PopoverTrigger>
         {cloneElement(children as any, {

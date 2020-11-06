@@ -148,6 +148,14 @@ export const Petition = objectType({
         return root.reminders_config;
       },
     });
+    t.field("signatureConfig", {
+      type: "SignatureConfig",
+      description: "The signature configuration for the petition.",
+      nullable: true,
+      resolve: async (root, _, ctx) => {
+        return root.signature_config;
+      },
+    });
     t.paginationField("events", {
       type: "PetitionEvent",
       description: "The events for the petition.",
@@ -316,6 +324,38 @@ export const RemindersConfig = objectType({
       description: "Whether to send reminders only from monday to friday.",
     });
   },
+  rootTyping: /* ts */ `{
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  }`,
+});
+
+export const SignatureConfig = objectType({
+  name: "SignatureConfig",
+  description: "The reminder settings of a petition",
+  definition(t) {
+    t.string("provider", {
+      description: "The selected provider for the signature.",
+    });
+    t.field("contacts", {
+      type: "Contact",
+      list: [false],
+      description: "The contacts that need to sign the generated document.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.contacts.loadContact(root.contactIds);
+      },
+    });
+    t.string("timezone", {
+      description: "The timezone used to generate the document.",
+    });
+  },
+  rootTyping: /* ts */ `{
+    provider: string;
+    contactIds: number[];
+    timezone: string;
+  }`,
 });
 
 export const PetitionAccessStatus = enumType({

@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
 import { User } from "../db/__types";
 import { toGlobalId } from "../util/globalId";
-import { snakeCaseToCapitalizedText } from "../util/strings";
+import { titleize } from "../util/strings";
 
 type AnalyticsEventType =
   | "PETITION_CREATED"
@@ -114,7 +114,7 @@ export class AnalyticsService implements IAnalyticsService {
   ) {
     this.analytics?.track({
       userId: userGID,
-      event: snakeCaseToCapitalizedText(eventName),
+      event: titleize(eventName),
       properties,
     });
   }

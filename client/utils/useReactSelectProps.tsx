@@ -1,4 +1,10 @@
-import { Box, CloseButton, Text, useTheme } from "@chakra-ui/core";
+import {
+  Box,
+  CloseButton,
+  Text,
+  useFormControl,
+  useTheme,
+} from "@chakra-ui/core";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { memo, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -48,18 +54,27 @@ export const SIZES = {
   },
 };
 
-export type UserReactSelectStyleProps = {
+export type UserReactSelectProps = {
   size?: keyof typeof SIZES;
+  id?: string;
+  isDisabled?: boolean;
   isInvalid?: boolean;
 };
 /**
  * Generates the props necessary for styling react-select as a chakra component
  */
-export function useReactSelectStyle<
+export function useReactSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string }
->({ size = "md", isInvalid = false }: UserReactSelectStyleProps) {
-  const { colors, radii, sizes } = useTheme();
+>({ size = "md", ...props }: UserReactSelectProps) {
   const intl = useIntl();
+  const { colors, radii, sizes } = useTheme();
+
+  const {
+    id: inputId,
+    "aria-invalid": isInvalid,
+    disabled: isDisabled,
+  } = useFormControl(props);
+
   const labels = useMemo(
     () => ({
       clear: intl.formatMessage({
@@ -71,6 +86,8 @@ export function useReactSelectStyle<
   );
   return useMemo<SelectProps<OptionType>>(
     () => ({
+      inputId,
+      isDisabled,
       theme: (theme: Theme) =>
         ({
           spacing: SIZES[size].spacing,
@@ -218,6 +235,6 @@ export function useReactSelectStyle<
         }),
       },
     }),
-    [size, isInvalid]
+    [size, inputId, isInvalid, isDisabled]
   );
 }

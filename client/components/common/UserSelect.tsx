@@ -2,9 +2,9 @@ import { gql } from "@apollo/client";
 import { Image, Stack, Text } from "@chakra-ui/core";
 import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import {
-  useReactSelectStyle,
-  UserReactSelectStyleProps,
-} from "@parallel/utils/useReactSelectStyle";
+  useReactSelectProps,
+  UserReactSelectProps,
+} from "@parallel/utils/useReactSelectProps";
 import { forwardRef, memo, ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { components, OptionProps } from "react-select";
@@ -19,12 +19,11 @@ export type UserSelectProps = Omit<
 > & {
   value?: UserSelectSelection[];
   onChange?: (users: UserSelectSelection[]) => void;
-  isInvalid?: boolean;
   onSearchUsers: (
     search: string,
     exclude: string[]
   ) => Promise<UserSelectSelection[]>;
-};
+} & UserReactSelectProps;
 
 export type UserSelectInstance = AsyncSelect<UserSelectSelection>;
 
@@ -44,7 +43,7 @@ export const UserSelect = Object.assign(
       [onSearchUsers, value]
     );
 
-    const reactSelectProps = useReactSelectProps({ isInvalid });
+    const reactSelectProps = useUserSelectReactSelectProps({ isInvalid });
 
     return (
       <AsyncSelect<UserSelectSelection>
@@ -53,8 +52,8 @@ export const UserSelect = Object.assign(
         onChange={(value) => onChange?.((value as any) ?? [])}
         isMulti
         loadOptions={loadOptions}
-        {...reactSelectProps}
         {...props}
+        {...reactSelectProps}
       />
     );
   }),
@@ -71,14 +70,14 @@ export const UserSelect = Object.assign(
   }
 );
 
-function useReactSelectProps(props: UserReactSelectStyleProps) {
-  const styleProps = useReactSelectStyle<UserSelectSelection>(props);
+function useUserSelectReactSelectProps(props: UserReactSelectProps) {
+  const reactSelectProps = useReactSelectProps<UserSelectSelection>(props);
   return useMemo(
     () =>
       ({
-        ...styleProps,
+        ...reactSelectProps,
         components: {
-          ...styleProps.components,
+          ...reactSelectProps.components,
           NoOptionsMessage: memo(({ selectProps }) => {
             const search = selectProps.inputValue;
             return (
@@ -173,6 +172,6 @@ function useReactSelectProps(props: UserReactSelectStyleProps) {
         },
         getOptionValue: (option) => option.id,
       } as Partial<AsyncSelectProps<UserSelectSelection>>),
-    [styleProps]
+    [reactSelectProps]
   );
 }

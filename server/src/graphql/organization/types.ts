@@ -1,6 +1,7 @@
-import { enumType, objectType } from "@nexus/schema";
-import { belongsToOrg } from "./authorizers";
+import { arg, enumType, objectType } from "@nexus/schema";
+import { titleize } from "../../util/strings";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { belongsToOrg } from "./authorizers";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -11,6 +12,29 @@ export const OrganizationStatus = enumType({
     { name: "CHURNED", description: "Used on churned clients" },
   ],
   description: "The status of the organization.",
+});
+
+export const IntegrationType = enumType({
+  name: "IntegrationType",
+  members: ["SIGNATURE"],
+  description: "The types of integrations available.",
+});
+
+export const OrgIntegration = objectType({
+  name: "OrgIntegration",
+  definition(t) {
+    t.string("name", {
+      description: "The name of the integration.",
+      resolve: (o) => titleize(o.provider),
+    });
+    t.field("type", {
+      type: "IntegrationType",
+      description: "The type of the integration.",
+    });
+    t.string("provider", {
+      description: "The provider used for this integration.",
+    });
+  },
 });
 
 export const Organization = objectType({
@@ -51,6 +75,24 @@ export const Organization = objectType({
           search,
           excludeIds: exclude,
         });
+      },
+    });
+    t.field("integrations", {
+      type: "OrgIntegration",
+      list: [true],
+      args: {
+        type: arg({
+          type: "IntegrationType",
+          description: "Filter by integration type.",
+        }),
+      },
+      resolve: async (root, { type }, ctx) => {
+        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
+          root.id
+        );
+        return type
+          ? integrations.filter((i) => i.type === type)
+          : integrations;
       },
     });
   },

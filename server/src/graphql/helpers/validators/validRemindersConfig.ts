@@ -1,7 +1,7 @@
 import { core } from "@nexus/schema";
 import { ArgValidationError } from "../errors";
-import { findTimeZone } from "timezone-support";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
+import { isValidTime, isValidTimezone } from "../../../util/validators";
 
 export function validRemindersConfig<
   TypeName extends string,
@@ -16,16 +16,14 @@ export function validRemindersConfig<
     const remindersConfig = prop(args);
     if (remindersConfig) {
       const { time, timezone, offset } = remindersConfig;
-      if (!/(2[0-3]|[01][0-9]):([0-5][0-9])/.test(time)) {
+      if (!isValidTime(time)) {
         throw new ArgValidationError(
           info,
           `${argName}.time`,
           `Value must be a valid 00:00-23:59 time.`
         );
       }
-      try {
-        findTimeZone(timezone);
-      } catch {
+      if (!isValidTimezone(timezone)) {
         throw new ArgValidationError(
           info,
           `${argName}.timezone`,

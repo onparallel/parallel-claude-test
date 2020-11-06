@@ -133,7 +133,7 @@ export function CreatePetitionDialog({
           <FormControl id="petition-locale">
             <FormLabel>
               <FormattedMessage
-                id="component.create-petition-dialog.locale-label"
+                id="component.petition-settings.locale-label"
                 defaultMessage="Language of the petition"
               />
             </FormLabel>

@@ -7,6 +7,8 @@ type Maybe<T> = T | null;
 
 export type FeatureFlagName = "PETITION_SIGNATURE";
 
+export type IntegrationType = "SIGNATURE";
+
 export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
@@ -65,6 +67,7 @@ export interface TableTypes {
   feature_flag_override: FeatureFlagOverride;
   file_upload: FileUpload;
   organization: Organization;
+  org_integration: OrgIntegration;
   petition: Petition;
   petition_access: PetitionAccess;
   petition_contact_notification: PetitionContactNotification;
@@ -87,6 +90,7 @@ export interface TableCreateTypes {
   feature_flag_override: CreateFeatureFlagOverride;
   file_upload: CreateFileUpload;
   organization: CreateOrganization;
+  org_integration: CreateOrgIntegration;
   petition: CreatePetition;
   petition_access: CreatePetitionAccess;
   petition_contact_notification: CreatePetitionContactNotification;
@@ -109,6 +113,7 @@ export interface TablePrimaryKeys {
   feature_flag_override: "id";
   file_upload: "id";
   organization: "id";
+  org_integration: "id";
   petition: "id";
   petition_access: "id";
   petition_contact_notification: "id";
@@ -276,6 +281,23 @@ export interface CreateOrganization {
   deleted_by?: Maybe<string>;
 }
 
+export interface OrgIntegration {
+  id: number;
+  org_id: Maybe<number>;
+  type: IntegrationType;
+  provider: string;
+  settings: Maybe<any>;
+  is_enabled: boolean;
+}
+
+export interface CreateOrgIntegration {
+  org_id?: Maybe<number>;
+  type: IntegrationType;
+  provider: string;
+  settings?: Maybe<any>;
+  is_enabled?: boolean;
+}
+
 export interface Petition {
   id: number;
   org_id: number;
@@ -298,6 +320,7 @@ export interface Petition {
   template_description: Maybe<string>;
   template_public: boolean;
   from_template_id: Maybe<number>;
+  signature_config: Maybe<any>;
 }
 
 export interface CreatePetition {
@@ -321,6 +344,7 @@ export interface CreatePetition {
   template_description?: Maybe<string>;
   template_public?: boolean;
   from_template_id?: Maybe<number>;
+  signature_config?: Maybe<any>;
 }
 
 export interface PetitionAccess {

@@ -557,6 +557,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     </TabPanel>
                     <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
                       <PetitionSettings
+                        user={me}
                         petition={petition!}
                         onUpdatePetition={handleUpdatePetition}
                       />
@@ -666,8 +667,10 @@ PetitionCompose.fragments = {
     return gql`
       fragment PetitionCompose_User on User {
         ...PetitionLayout_User
+        ...PetitionSettings_User
       }
       ${PetitionLayout.fragments.User}
+      ${PetitionSettings.fragments.User}
     `;
   },
 };
@@ -680,11 +683,13 @@ PetitionCompose.mutations = [
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_PetitionBase
+        ...PetitionSettings_PetitionBase
         ...AddPetitionAccessDialog_Petition
         ...PetitionTemplateComposeMessageEditor_Petition
       }
     }
     ${PetitionLayout.fragments.PetitionBase}
+    ${PetitionSettings.fragments.PetitionBase}
     ${AddPetitionAccessDialog.fragments.Petition}
     ${PetitionTemplateComposeMessageEditor.fragments.Petition}
   `,

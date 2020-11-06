@@ -5,6 +5,7 @@ import { ContactRepository } from "./repositories/ContactRepository";
 import { EmailLogRepository } from "./repositories/EmailLogRepository";
 import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
 import { FileUploadRepository } from "./repositories/FileUploadRepository";
+import { IntegrationRepository } from "./repositories/IntegrationRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ReportingRepository } from "./repositories/ReportingRepository";
@@ -18,6 +19,7 @@ export const dbModule = new ContainerModule((bind) => {
   bind<EmailLogRepository>(EmailLogRepository).toSelf();
   bind<FeatureFlagRepository>(FeatureFlagRepository).toSelf();
   bind<FileUploadRepository>(FileUploadRepository).toSelf();
+  bind<IntegrationRepository>(IntegrationRepository).toSelf();
   bind<OrganizationRepository>(OrganizationRepository).toSelf();
   bind<PetitionRepository>(PetitionRepository).toSelf();
   bind<UserRepository>(UserRepository).toSelf();
