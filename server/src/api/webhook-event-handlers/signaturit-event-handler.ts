@@ -129,10 +129,6 @@ async function documentCompleted(
     signature: { id: externalId },
   } = data.document;
 
-  const buffer = await client.downloadSignedDocument(
-    `${externalId}/${documentId}`
-  );
-
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
     externalId
   );
@@ -144,7 +140,9 @@ async function documentCompleted(
   }
 
   if (signature.status === "CANCELLED") {
-    throw new Error(`Requested petition signature was previously cancelled`);
+    throw new Error(
+      `Requested petition signature with externalId: ${externalId} was previously cancelled`
+    );
   }
 
   const petition = await ctx.petitions.loadPetition(petitionId);
@@ -152,6 +150,10 @@ async function documentCompleted(
   if (!petition) {
     throw new Error(`petition with id ${petitionId} not found.`);
   }
+
+  const buffer = await client.downloadSignedDocument(
+    `${externalId}/${documentId}`
+  );
 
   const filename = `${petition.name ?? petitionId}_signed.pdf`;
   const key = `${externalId}/${documentId}/${filename}`;
