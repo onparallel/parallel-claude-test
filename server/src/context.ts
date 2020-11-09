@@ -20,6 +20,7 @@ import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { SIGNATURE, SignatureService } from "./services/signature";
+import { Redis, REDIS } from "./services/redis";
 
 @injectable()
 export class ApiContext {
@@ -28,6 +29,7 @@ export class ApiContext {
   access: PetitionAccess | null = null;
   req!: express.Request;
   constructor(
+    @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: Logger,
     // Services
     @inject(AUTH) public readonly auth: Auth,
@@ -36,6 +38,7 @@ export class ApiContext {
     @inject(SIGNATURE) public readonly signature: SignatureService,
     public readonly aws: Aws,
     public readonly cognito: Cognito,
+    @inject(REDIS) public readonly redis: Redis,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
@@ -60,6 +63,7 @@ export class WorkerContext {
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(SIGNATURE) public readonly signature: SignatureService,
+    @inject(REDIS) public readonly redis: Redis,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

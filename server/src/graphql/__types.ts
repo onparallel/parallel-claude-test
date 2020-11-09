@@ -845,7 +845,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
-    publicPetitionSignature:
+    petitionSignatureRequest:
       | NexusGenRootTypes["PetitionSignatureRequest"]
       | null; // PetitionSignatureRequest
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
@@ -1340,9 +1340,9 @@ export interface NexusGenArgTypes {
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
-    publicPetitionSignature: {
+    petitionSignatureRequest: {
       // args
-      petitionId: NexusGenScalars["GID"]; // GID!
+      token: string; // String!
     };
     publicTemplates: {
       // args

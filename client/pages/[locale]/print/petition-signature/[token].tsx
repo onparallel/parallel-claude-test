@@ -27,19 +27,19 @@ import { PdfPage } from "@parallel/components/print/PdfPage";
 import { FieldWithReplies } from "@parallel/components/print/FieldWithReplies";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
 
-function PdfView({ petitionId }: { petitionId: string }) {
+function PdfView({ token }: { token: string }) {
   const { data } = assertQuery(
     usePdfViewPetitionQuery({
-      variables: { id: petitionId },
+      variables: { token },
     })
   );
 
-  const petition = data?.publicPetitionSignature?.petition;
+  const petition = data?.petitionSignatureRequest?.petition;
   const settings = petition?.signatureConfig;
   const contacts = settings?.contacts;
 
   if (!petition) {
-    throw new Error(`petition ${petitionId} for signature request not found`);
+    throw new Error(`petition for signature request not found`);
   }
 
   if (!settings || Object.keys(settings).length === 0) {
@@ -149,11 +149,11 @@ PdfView.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  const petitionId = query.petitionId as string;
+  const token = query.token as string;
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
-      query PdfViewPetition($id: GID!) {
-        publicPetitionSignature(petitionId: $id) {
+      query PdfViewPetition($token: String!) {
+        petitionSignatureRequest(token: $token) {
           petition {
             id
             name
@@ -174,10 +174,10 @@ PdfView.getInitialProps = async ({
       ${PdfView.fragments.Field}
     `,
     {
-      variables: { id: petitionId },
+      variables: { token },
     }
   );
-  return { petitionId };
+  return { token };
 };
 
 export default withApolloData(PdfView);

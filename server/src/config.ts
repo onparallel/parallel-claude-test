@@ -52,6 +52,7 @@ export function buildConfig() {
       }),
       "signature-worker": Object.freeze({
         endpoint: process.env.SIGNATURE_WORKER_QUEUE_ENDPOINT!,
+        jwtSecret: process.env.SIGNATURE_WORKER_JWT_SECRET!,
       }),
     }),
     cronWorkers: Object.freeze({

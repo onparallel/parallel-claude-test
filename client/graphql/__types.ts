@@ -1248,7 +1248,7 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  publicPetitionSignature?: Maybe<PetitionSignatureRequest>;
+  petitionSignatureRequest?: Maybe<PetitionSignatureRequest>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
 };
@@ -1296,8 +1296,8 @@ export type QuerypetitionsArgs = {
   type?: Maybe<PetitionBaseType>;
 };
 
-export type QuerypublicPetitionSignatureArgs = {
-  petitionId: Scalars["GID"];
+export type QuerypetitionSignatureRequestArgs = {
+  token: Scalars["String"];
 };
 
 export type QuerypublicTemplatesArgs = {
@@ -3959,11 +3959,11 @@ export type PdfView_FieldFragment = { __typename?: "PetitionField" } & Pick<
   };
 
 export type PdfViewPetitionQueryVariables = Exact<{
-  id: Scalars["GID"];
+  token: Scalars["String"];
 }>;
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
-  publicPetitionSignature?: Maybe<
+  petitionSignatureRequest?: Maybe<
     { __typename?: "PetitionSignatureRequest" } & {
       petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
           fields: Array<
@@ -9063,8 +9063,8 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
   typeof usePublicPetitionLazyQuery
 >;
 export const PdfViewPetitionDocument = gql`
-  query PdfViewPetition($id: GID!) {
-    publicPetitionSignature(petitionId: $id) {
+  query PdfViewPetition($token: String!) {
+    petitionSignatureRequest(token: $token) {
       petition {
         id
         name
@@ -9097,7 +9097,7 @@ export const PdfViewPetitionDocument = gql`
  * @example
  * const { data, loading, error } = usePdfViewPetitionQuery({
  *   variables: {
- *      id: // value for 'id'
+ *      token: // value for 'token'
  *   },
  * });
  */

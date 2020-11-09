@@ -7,6 +7,8 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { fullName } from "../util/fullName";
 import { Contact, OrgIntegration, Petition } from "../db/__types";
+import jwt from "jsonwebtoken";
+import { random } from "../util/token";
 
 type PetitionSignatureConfig = {
   provider: string;
@@ -47,8 +49,20 @@ async function startSignatureProcess(
       id: petitionSignatureId,
     } = await ctx.petitions.createPetitionSignature(petitionId, settings);
 
+    const authToken = jwt.sign(
+      { petitionId },
+      ctx.config.queueWorkers["signature-worker"].jwtSecret,
+      {
+        expiresIn: 5, // 5 seconds
+        issuer: "worker:signature",
+        algorithm: "HS256",
+      }
+    );
+    const token = random(48);
+    await ctx.redis.set(`signatureWorker:${token}:authToken`, authToken, 5);
+
     // print and save pdf to disk
-    const printURL = `${ctx.config.misc.parallelUrl}/${petition.locale}/print/petition-signature/${payload.petitionId}`;
+    const printURL = `${ctx.config.misc.parallelUrl}/${petition.locale}/print/petition-signature/${token}`;
     const buffer = await ctx.printer.pdf(printURL, {
       path: tmpPdfPath,
       height: "297mm",

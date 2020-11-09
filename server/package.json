@@ -55,6 +55,7 @@
     "graphql-iso-date": "^3.6.1",
     "graphql-type-json": "^0.3.2",
     "inversify": "^5.0.1",
+    "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.0.0",
     "knex": "^0.21.6",
     "mjml": "^4.7.1",

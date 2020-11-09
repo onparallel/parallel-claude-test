@@ -1,5 +1,4 @@
 import { idArg, queryField } from "@nexus/schema";
-import { globalIdArg } from "../helpers/globalIdPlugin";
 import { fetchPetitionAccess } from "./authorizers";
 
 export const accessQuery = queryField("access", {
@@ -18,17 +17,5 @@ export const accessQuery = queryField("access", {
       }
     );
     return ctx.access!;
-  },
-});
-
-// temporal public endpoint until implementing auth token
-export const publicPetitionSignature = queryField("publicPetitionSignature", {
-  type: "PetitionSignatureRequest",
-  args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-  },
-  nullable: true,
-  resolve: async (_, { petitionId }, ctx) => {
-    return await ctx.petitions.loadPetitionSignatureByPetitionId(petitionId);
   },
 });
