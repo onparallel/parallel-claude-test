@@ -114,20 +114,22 @@ export const AppLayoutNavbar = Object.assign(
         {...(isMobile
           ? {
               display: { base: "flex", sm: "none" },
+              borderTop: "1px",
+              borderTopColor: "gray.200",
               flexDirection: "row",
               minHeight: 16,
               height: 16,
-              boxShadow:
-                "0 -4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);",
               paddingX: 2,
             }
           : {
               display: { base: "none", sm: "flex" },
+              borderRight: "1px",
+              borderRightColor: "gray.200",
+              boxShadow: "md",
               flexDirection: "column",
               minWidth: 24,
               paddingTop: 6,
               paddingBottom: 4,
-              boxShadow: "md",
             })}
         {...props}
       >

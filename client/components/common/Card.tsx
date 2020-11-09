@@ -25,15 +25,15 @@ export const Card: typeof Box = forwardRef(function Card(
 
 export type CardHeaderProps = {
   children: ReactNode;
-  headingAs?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  headingSize?: HeadingProps["size"];
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  size?: HeadingProps["size"];
   isCloseable?: boolean;
   onClose?: () => void;
 };
 
 export function CardHeader({
-  headingAs = "h3",
-  headingSize = "sm",
+  as = "h3",
+  size: size = "sm",
   children,
   isCloseable,
   onClose,
@@ -41,24 +41,28 @@ export function CardHeader({
   const intl = useIntl();
   return (
     <>
-      <Flex padding={4}>
-        <Flex flex="1">
-          <Heading as={headingAs} size={headingSize} overflowWrap="anywhere">
-            {children}
-          </Heading>
-          {isCloseable ? (
-            <Flex flex="1" height={5} marginLeft={2} justifyContent="flex-end">
-              <CloseButton
-                size="sm"
-                aria-label={intl.formatMessage({
-                  id: "generic.close",
-                  defaultMessage: "Close",
-                })}
-                onClick={onClose}
-              />
-            </Flex>
-          ) : null}
-        </Flex>
+      <Flex as="header" padding={4}>
+        <Heading as={as} size={size} overflowWrap="anywhere">
+          {children}
+        </Heading>
+        {isCloseable ? (
+          <Flex
+            flex="1"
+            height={5}
+            marginLeft={2}
+            justifyContent="flex-end"
+            alignItems="center"
+          >
+            <CloseButton
+              size="sm"
+              aria-label={intl.formatMessage({
+                id: "generic.close",
+                defaultMessage: "Close",
+              })}
+              onClick={onClose}
+            />
+          </Flex>
+        ) : null}
       </Flex>
       <Divider />
     </>

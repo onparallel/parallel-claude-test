@@ -115,7 +115,7 @@ function Contact({ contactId }: ContactProps) {
             onSubmit={isEditing ? handleContactSaveSubmit : undefined}
             id="contact-details"
           >
-            <CardHeader headingAs="h2" headingSize="md">
+            <CardHeader as="h2" size="md">
               {`${contact!.fullName ?? ""} <${contact!.email}>`}
             </CardHeader>
             <Stack padding={4}>
