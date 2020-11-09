@@ -1940,6 +1940,11 @@
     "context": "Petition sent"
   },
   {
+    "term": "petition.print-pdf.signatures-disclaimer",
+    "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de la persona jurídica identificada.",
+    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified."
+  },
+  {
     "term": "petition.reminder-sent.toast-description",
     "definition": "El recordatorio está en camino",
     "context": "The reminder is on it's way"

@@ -1940,6 +1940,11 @@
     "context": "Petition sent"
   },
   {
+    "term": "petition.print-pdf.signatures-disclaimer",
+    "definition": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified.",
+    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified."
+  },
+  {
     "term": "petition.reminder-sent.toast-description",
     "definition": "The reminder is on it's way",
     "context": "The reminder is on it's way"
