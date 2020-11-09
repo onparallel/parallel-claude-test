@@ -26,7 +26,10 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
+import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ConfirmDialog } from "../common/ConfirmDialog";
+import { DialogProps, useDialog } from "../common/DialogOpenerProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
@@ -55,11 +58,16 @@ export function PetitionSettings({
   const showSignatureConfigDialog = useSignatureConfigDialog();
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
+  const showConfirmConfigureOngoingSignature = useDialog(
+    ConfirmConfigureOngoingSignature
+  );
   async function handleConfigureSignatureClick() {
     if (petition.__typename !== "Petition") {
       return;
     }
     try {
+      // TODO: check for ongoing signatures
+      await showConfirmConfigureOngoingSignature({});
       const signatureConfig = await showSignatureConfigDialog({
         providers: user.organization.signatureIntegrations,
         config: petition.signatureConfig ?? null,
@@ -68,6 +76,21 @@ export function PetitionSettings({
       });
       onUpdatePetition({ signatureConfig });
     } catch {}
+  }
+
+  const showConfirmDisableOngoingSignature = useDialog(
+    ConfirmDisableOngoingSignature
+  );
+  async function handleSignatureChange(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.checked) {
+      await handleConfigureSignatureClick();
+    } else {
+      try {
+        // TODO: check for ongoing signatures
+        await showConfirmDisableOngoingSignature({});
+        onUpdatePetition({ signatureConfig: null });
+      } catch {}
+    }
   }
 
   return (
@@ -146,13 +169,7 @@ export function PetitionSettings({
             </FormLabel>
             <Spacer />
             <Switch
-              onChange={async (e) => {
-                if (e.target.checked) {
-                  await handleConfigureSignatureClick();
-                } else {
-                  onUpdatePetition({ signatureConfig: null });
-                }
-              }}
+              onChange={handleSignatureChange}
               isChecked={Boolean(petition.signatureConfig)}
               isDisabled={!hasSignature}
             />
@@ -277,5 +294,61 @@ function DeadlineInput({
         <FormattedMessage id="generic.change" defaultMessage="Change" />
       </Button>
     </Stack>
+  );
+}
+
+function ConfirmDisableOngoingSignature(props: DialogProps<{}, void>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-disable-ongoing-signature.header"
+          defaultMessage="Ongoing eSignature"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="component.confirm-disable-ongoing-signature.body"
+          defaultMessage="There is an ongoing eSignature process. If you disable eSignature this process will be cancelled."
+        />
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-disable-ongoing-signature.confirm"
+            defaultMessage="Disable eSignature"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function ConfirmConfigureOngoingSignature(props: DialogProps<{}, void>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-configure-ongoing-signature.header"
+          defaultMessage="Ongoing eSignature"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="component.confirm-configure-ongoing-signature.body"
+          defaultMessage="There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
+        />
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-configure-ongoing-signature-body.confirm"
+            defaultMessage="I understand"
+          />
+        </Button>
+      }
+      {...props}
+    />
   );
 }
