@@ -100,7 +100,7 @@ export const publicTemplatesQuery = queryField((t) => {
   });
 });
 
-export const publicPetitionSignature = queryField("petitionSignatureRequest", {
+export const petitionSignatureRequest = queryField("petitionSignatureRequest", {
   type: "PetitionSignatureRequest",
   args: {
     token: stringArg({
@@ -118,14 +118,17 @@ export const publicPetitionSignature = queryField("petitionSignatureRequest", {
         ctx.config.queueWorkers["signature-worker"].jwtSecret,
         {
           issuer: "worker:signature",
+          algorithms: ["HS256"],
         }
       );
+      // make sure this endpoint can be called only once per signature request
       await ctx.redis.delete(key);
 
-      return await ctx.petitions.loadPetitionSignatureByPetitionId(
-        payload.petitionId
+      return await ctx.petitions.loadPetitionSignatureById(
+        payload.petitionSignatureRequestId
       );
     } catch (e) {
+      // any JWT error is rethrown as Forbidden
       if (e.name === "JsonWebTokenError") {
         throw new Error("FORBIDDEN");
       } else {

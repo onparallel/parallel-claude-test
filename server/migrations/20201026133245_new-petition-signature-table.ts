@@ -21,7 +21,6 @@ export async function up(knex: Knex): Promise<void> {
     t.timestamp("updated_at")
       .notNullable()
       .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
-    t.index(["petition_id"], "petition_signature_request__petition_id");
     t.unique(["external_id"], "petition_signature_request__external_id");
   }).raw(/* sql */ `
         CREATE UNIQUE INDEX "petition_signature_request__petition_id_processing_uniq" 

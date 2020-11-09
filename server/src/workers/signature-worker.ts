@@ -46,11 +46,11 @@ async function startSignatureProcess(
     const recipients = await fetchSignatureRecipients(settings.contactIds, ctx);
 
     const {
-      id: petitionSignatureId,
+      id: petitionSignatureRequestId,
     } = await ctx.petitions.createPetitionSignature(petitionId, settings);
 
     const authToken = jwt.sign(
-      { petitionId },
+      { petitionSignatureRequestId },
       ctx.config.queueWorkers["signature-worker"].jwtSecret,
       {
         expiresIn: 5, // 5 seconds
@@ -93,7 +93,7 @@ async function startSignatureProcess(
       }
     );
 
-    await ctx.petitions.updatePetitionSignature(petitionSignatureId, {
+    await ctx.petitions.updatePetitionSignature(petitionSignatureRequestId, {
       external_id: data.id,
       data,
     });

@@ -2359,11 +2359,6 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadPetitionSignatureByPetitionId = this.buildLoadBy(
-    "petition_signature_request",
-    "petition_id"
-  );
-
   readonly loadPetitionSignatureByExternalId = this.buildLoadBy(
     "petition_signature_request",
     "external_id"

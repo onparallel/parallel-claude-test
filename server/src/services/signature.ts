@@ -75,6 +75,11 @@ class SignaturItClient implements ISignatureClient {
     private config: Config
   ) {
     const isProduction = process.env.NODE_ENV === "production";
+    if (!settings.API_KEY) {
+      throw new Error(
+        "Signaturit API KEY not found on org_integration settings"
+      );
+    }
     this.sdk = new SignaturitSDK(settings.API_KEY, isProduction);
   }
   public async startSignatureRequest(
