@@ -1,4 +1,5 @@
 import { enumType, objectType } from "@nexus/schema";
+import { Contact } from "../../../db/__types";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 
 export const PetitionSignatureRequestStatus = enumType({
@@ -22,11 +23,13 @@ export const PetitionSignatureRequest = objectType({
     });
     t.field("signers", {
       type: "Contact",
-      list: [false],
+      list: [true],
       nullable: false,
       resolve: async (root, _, ctx) => {
         const ids = root.signature_settings.contactIds as number[];
-        return await ctx.contacts.loadContact(ids);
+        const contacts = await ctx.contacts.loadContact(ids);
+        // avoid returning null contacts
+        return contacts.filter((c) => !!c) as Contact[];
       },
     });
     t.string("externalId", {

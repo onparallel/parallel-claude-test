@@ -1,74 +1,54 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { countBy } from "remeda";
 import { WorkerContext } from "../context";
 import { fromGlobalId } from "../util/globalId";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
-import { getBaseWebhookUrl } from "./helpers/getBaseWebhookUrl";
 import { fullName } from "../util/fullName";
-import { Contact } from "../db/__types";
+import { Contact, OrgIntegration, Petition } from "../db/__types";
+
+type PetitionSignatureConfig = {
+  provider: string;
+  timezone: string;
+  contactIds: number[];
+};
 
 /** starts a signature request on the petition for the provided contacts */
 async function startSignatureProcess(
   payload: {
     petitionId: string;
-    settings: {
-      provider: string;
-      contactIds: number[];
-      timezone: string;
-      locale: string;
-    };
   },
   ctx: WorkerContext
 ) {
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
-  const petition = await ctx.petitions.loadPetition(petitionId);
-  if (!petition) {
-    throw new Error(`petition with id ${petitionId} not found`);
+  const petition = await fetchPetition(petitionId, ctx);
+  if (!petition.signature_config) {
+    throw new Error(
+      `Signature is not enabled on petition with id ${petitionId}`
+    );
   }
+
   const tmpPdfPath = resolve(
     tmpdir(),
     `${petition.name ?? payload.petitionId}.pdf`
   );
   try {
-    const signatureClient = ctx.signature.getClient(payload.settings.provider);
-
-    const contacts = (
-      await ctx.contacts.loadContact(payload.settings.contactIds)
-    ).filter((c) => !!c) as Contact[];
-
-    if (contacts.length !== payload.settings.contactIds.length) {
-      throw new Error(
-        `Couldn't load all required contacts: ${payload.settings.contactIds.toString()}`
-      );
-    }
-
-    const recipients = contacts.map((c) => ({
-      email: c.email,
-      name: fullName(c.first_name, c.last_name) ?? "",
-    }));
-
-    const baseEventsUrl = await getBaseWebhookUrl(ctx.config.misc.parallelUrl);
-    const eventsUrl = `${baseEventsUrl}/api/webhooks/${payload.settings.provider}/${payload.petitionId}/events`;
-
-    // insert before printing, so the pdf view can access the signature settings
-    const {
-      id: petitionSignatureId,
-    } = await ctx.petitions.createPetitionSignature(
-      fromGlobalId(payload.petitionId, "Petition").id,
-      payload.settings
+    const orgSignatureIntegration = await fetchOrgSignatureIntegration(
+      petition.org_id,
+      ctx
     );
 
+    const settings = petition.signature_config as PetitionSignatureConfig;
+
+    const recipients = await fetchSignatureRecipients(settings.contactIds, ctx);
+
+    const {
+      id: petitionSignatureId,
+    } = await ctx.petitions.createPetitionSignature(petitionId, settings);
+
     // print and save pdf to disk
-    const basePrintUrl =
-      process.env.NODE_ENV === "production"
-        ? ctx.config.misc.parallelUrl
-        : "http://localhost";
-
-    const printURL = `${basePrintUrl}/petition-signature/${payload.petitionId}`;
-
+    const printURL = `${ctx.config.misc.parallelUrl}/${petition.locale}/print/petition-signature/${payload.petitionId}`;
     const buffer = await ctx.printer.pdf(printURL, {
       path: tmpPdfPath,
       height: "297mm",
@@ -81,27 +61,19 @@ async function startSignatureProcess(
       },
     });
 
-    // send request to signature client
     const signatureBoxPositions = await calculateSignatureBoxPositions(
       buffer,
       recipients
     );
-    if (
-      countBy(
-        signatureBoxPositions,
-        (pageSignature) => pageSignature.length > 0
-      ) === 0
-    ) {
-      throw new Error(
-        "couldn't find signature box positions on the signature pdf"
-      );
-    }
 
+    const signatureClient = ctx.signature.getClient(orgSignatureIntegration);
+
+    // send request to signature client
     const data = await signatureClient.startSignatureRequest(
+      petition,
       tmpPdfPath,
       recipients,
       {
-        events_url: eventsUrl,
         signing_mode: "parallel",
         signature_box_positions: signatureBoxPositions,
       }
@@ -120,28 +92,44 @@ async function startSignatureProcess(
 
 /** cancels the signature request for all signers on the petition */
 async function cancelSignatureProcess(
-  payload: { petitionId: string; provider: string },
+  payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signatureClient = ctx.signature.getClient(payload.provider);
-
-  const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
-  const signature = await ctx.petitions.loadPetitionSignatureByPetitionId(
-    petitionId
+  const petitionSignatureRequest = await ctx.petitions.loadPetitionSignatureById(
+    payload.petitionSignatureRequestId
   );
-
-  if (!signature || !signature.external_id) {
+  if (!petitionSignatureRequest) {
     throw new Error(
-      `Can't find external_id for signature on petition ${petitionId}`
+      `Petition Signature Request with id ${payload.petitionSignatureRequestId} not found`
+    );
+  }
+  if (!petitionSignatureRequest || !petitionSignatureRequest.external_id) {
+    throw new Error(
+      `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
     );
   }
 
-  if (signature.status !== "PROCESSING") {
-    throw new Error(`Can't cancel a ${signature.status} signature process`);
+  if (petitionSignatureRequest.status !== "PROCESSING") {
+    throw new Error(
+      `Can't cancel a ${petitionSignatureRequest.status} signature process.`
+    );
   }
+
+  const petitionId = petitionSignatureRequest.petition_id;
+  const petition = await fetchPetition(petitionId, ctx);
+
+  const signatureIntegration = await fetchOrgSignatureIntegration(
+    petition.org_id,
+    ctx
+  );
+
+  const signatureClient = ctx.signature.getClient(signatureIntegration);
+
   // do a request to cancel the signature process.
   // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
-  await signatureClient.cancelSignatureRequest(signature.external_id);
+  await signatureClient.cancelSignatureRequest(
+    petitionSignatureRequest.external_id
+  );
 }
 
 const handlers = {
@@ -168,3 +156,55 @@ createQueueWorker<SignatureWorkerPayload>(
     await handlers[data.type](data.payload as any, ctx);
   }
 );
+
+async function fetchOrgSignatureIntegration(
+  orgId: number,
+  ctx: WorkerContext
+): Promise<OrgIntegration> {
+  const orgIntegrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
+    orgId
+  );
+
+  const orgSignatureIntegration = orgIntegrations.find(
+    (i) => i.type === "SIGNATURE"
+  );
+
+  if (!orgSignatureIntegration) {
+    throw new Error(
+      `Couldn't find any enabled signature integration for organization with id ${orgId}`
+    );
+  }
+
+  return orgSignatureIntegration;
+}
+
+async function fetchPetition(
+  id: number,
+  ctx: WorkerContext
+): Promise<Petition> {
+  const petition = await ctx.petitions.loadPetition(id);
+  if (!petition) {
+    throw new Error(`Couldn't find petition with id ${id}`);
+  }
+  return petition;
+}
+
+async function fetchSignatureRecipients(
+  contactIds: number[],
+  ctx: WorkerContext
+) {
+  const contacts = (await ctx.contacts.loadContact(contactIds)).filter(
+    (c) => !!c
+  ) as Contact[];
+
+  if (contacts.length !== contactIds.length) {
+    throw new Error(
+      `Couldn't load all required contacts: ${contactIds.toString()}`
+    );
+  }
+
+  return contacts.map((c) => ({
+    email: c.email,
+    name: fullName(c.first_name, c.last_name) ?? "",
+  }));
+}

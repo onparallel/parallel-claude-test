@@ -1,7 +1,11 @@
-import { inject, injectable } from "inversify";
+import { injectable, inject } from "inversify";
 import "reflect-metadata";
 import SignaturitSDK from "signaturit-sdk";
-import { Config, CONFIG } from "../config";
+import { SignaturitIntegrationSettings } from "../db/repositories/IntegrationRepository";
+import { OrgIntegration, Petition } from "../db/__types";
+import { toGlobalId } from "../util/globalId";
+import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
+import { CONFIG, Config } from "./../config";
 
 type SignerBox = {
   email?: string;
@@ -35,6 +39,7 @@ export type Recipient = { email: string; name: string };
 
 export interface ISignatureClient {
   startSignatureRequest: (
+    petition: Petition,
     filePath: string,
     recipients: Recipient[],
     options?: SignatureOptions
@@ -48,34 +53,42 @@ export const SIGNATURE = Symbol.for("SIGNATURE");
 @injectable()
 export class SignatureService {
   constructor(@inject(CONFIG) private config: Config) {}
-  public getClient(provider: string): ISignatureClient {
-    switch (provider) {
-      case "signaturit":
-        return new SignaturItClient(this.config);
+  public getClient(integration: OrgIntegration): ISignatureClient {
+    switch (integration.provider.toUpperCase()) {
+      case "SIGNATURIT":
+        return new SignaturItClient(
+          integration.settings as SignaturitIntegrationSettings,
+          this.config
+        );
       default:
-        throw new Error(`Couldn't resolve signature client: ${provider}`);
+        throw new Error(
+          `Couldn't resolve signature client: ${integration.provider}`
+        );
     }
   }
 }
 
 class SignaturItClient implements ISignatureClient {
   private sdk: SignaturitSDK;
-  constructor(config: Config) {
+  constructor(
+    private settings: SignaturitIntegrationSettings,
+    private config: Config
+  ) {
     const isProduction = process.env.NODE_ENV === "production";
-    this.sdk = new SignaturitSDK(
-      config.signaturit.parallelApiKey,
-      isProduction
-    );
+    this.sdk = new SignaturitSDK(settings.API_KEY, isProduction);
   }
   public async startSignatureRequest(
+    petition: Petition,
     files: string,
     recipients: Recipient[],
     opts?: SignatureOptions
   ) {
+    const petitionId = toGlobalId("Petition", petition.id);
+    const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
     return await this.sdk.createSignature(files, recipients, {
       delivery_type: "email",
       signing_mode: opts?.signing_mode,
-      events_url: opts?.events_url,
+      events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
       recipients: recipients.map((r) => ({
         email: r.email,
         name: r.name,
@@ -84,11 +97,13 @@ class SignaturItClient implements ISignatureClient {
             boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
         ),
       })),
+      expire_time: 0, // disable signaturit reminder emails
+      reminders: 0,
     });
   }
 
-  public async cancelSignatureRequest(signatureId: string) {
-    return await this.sdk.cancelSignature(signatureId);
+  public async cancelSignatureRequest(externalId: string) {
+    return await this.sdk.cancelSignature(externalId);
   }
 
   // returns a binary encoded buffer of the signed document

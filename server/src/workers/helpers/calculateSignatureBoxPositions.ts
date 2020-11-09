@@ -1,4 +1,5 @@
 import PDFParser from "pdf2json";
+import { countBy } from "remeda";
 
 export type PageSignatureMetadata = {
   email: string;
@@ -20,7 +21,7 @@ export async function calculateSignatureBoxPositions(
     parser.on("pdfParser_dataError", reject);
     parser.parseBuffer(pdfBuffer);
   });
-  return metadata.formImage.Pages.map(
+  const positions: PageSignatureMetadata[] = metadata.formImage.Pages.map(
     (page: {
       Texts: { R: { T: string }[]; x: number; y: number }[];
       Height: number;
@@ -46,4 +47,12 @@ export async function calculateSignatureBoxPositions(
       });
     }
   );
+
+  if (countBy(positions, (pageSignature) => pageSignature.length > 0) === 0) {
+    throw new Error(
+      "couldn't find signature box positions on the signature pdf"
+    );
+  }
+
+  return positions;
 }

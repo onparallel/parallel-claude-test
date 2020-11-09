@@ -1388,7 +1388,7 @@ export type SendPetitionResult = {
   result: Result;
 };
 
-/** The reminder settings of a petition */
+/** The signature settings of a petition */
 export type SignatureConfig = {
   __typename?: "SignatureConfig";
   /** The contacts that need to sign the generated document. */
@@ -3964,25 +3964,28 @@ export type PdfViewPetitionQueryVariables = Exact<{
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
   publicPetitionSignature?: Maybe<
-    { __typename?: "PetitionSignatureRequest" } & Pick<
-      PetitionSignatureRequest,
-      "settings"
-    > & {
-        signers: Array<
-          { __typename?: "Contact" } & Pick<
-            Contact,
-            "id" | "fullName" | "email"
-          >
-        >;
-        petition: { __typename?: "Petition" } & Pick<
-          Petition,
-          "id" | "name"
-        > & {
-            fields: Array<
-              { __typename?: "PetitionField" } & PdfView_FieldFragment
-            >;
-          };
-      }
+    { __typename?: "PetitionSignatureRequest" } & {
+      petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+          fields: Array<
+            { __typename?: "PetitionField" } & PdfView_FieldFragment
+          >;
+          signatureConfig?: Maybe<
+            { __typename?: "SignatureConfig" } & Pick<
+              SignatureConfig,
+              "provider" | "timezone"
+            > & {
+                contacts: Array<
+                  Maybe<
+                    { __typename?: "Contact" } & Pick<
+                      Contact,
+                      "fullName" | "email"
+                    >
+                  >
+                >;
+              }
+          >;
+        };
+    }
   >;
 };
 
@@ -9062,17 +9065,19 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($id: GID!) {
     publicPetitionSignature(petitionId: $id) {
-      settings
-      signers {
-        id
-        fullName
-        email
-      }
       petition {
         id
         name
         fields {
           ...PdfView_Field
+        }
+        signatureConfig {
+          contacts {
+            fullName
+            email
+          }
+          provider
+          timezone
         }
       }
     }

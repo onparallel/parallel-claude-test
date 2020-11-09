@@ -122,6 +122,7 @@ declare module "signaturit-sdk" {
     recipients?: Array<
       Recipient & {
         require_signature_in_coordinates?: Array<PageCoordinates | number | {}>;
+        widgets?: SignaturItWidget[];
       }
     >;
     /** List with email recipients containing name and email for people that will receive a copy of the signed document when the process is completed. */
@@ -130,6 +131,27 @@ declare module "signaturit-sdk" {
     signing_mode?: "sequential" | "parallel";
     /** The type of the signature. Note: the default value is the advanced signature request. */
     type?: "simple" | "advanced" | "smart";
+  };
+
+  type SignaturItWidget = {
+    page?: number; // range 1...N
+    editable?: number; // 0 or 1
+    required?: number; // 0 or 1
+    height?: number;
+    width?: number;
+    top?: number;
+    left?: number;
+    type:
+      | "date"
+      | "image"
+      | "check"
+      | "radio"
+      | "select"
+      | "text"
+      | "signature";
+    default?: any;
+    word_anchor?: string;
+    options?: any;
   };
 
   type Document = {

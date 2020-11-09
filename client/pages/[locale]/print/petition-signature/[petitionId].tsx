@@ -35,18 +35,18 @@ function PdfView({ petitionId }: { petitionId: string }) {
   );
 
   const petition = data?.publicPetitionSignature?.petition;
-  const settings = data?.publicPetitionSignature?.settings;
-  const recipients = data?.publicPetitionSignature?.signers;
+  const settings = petition?.signatureConfig;
+  const contacts = settings?.contacts;
 
   if (!petition) {
-    throw new Error(`petition with id ${petitionId} not found`);
+    throw new Error(`petition ${petitionId} for signature request not found`);
   }
 
   if (!settings || Object.keys(settings).length === 0) {
     throw new Error("petition signature request must have defined settings");
   }
 
-  if (!recipients || recipients.length === 0) {
+  if (!contacts || contacts.length === 0) {
     throw new Error(
       "petition signature request must contain valid contactIds in its settings"
     );
@@ -82,7 +82,7 @@ function PdfView({ petitionId }: { petitionId: string }) {
           {fields.map((field, fieldNum) => (
             <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
           ))}
-          {pageNum === pages.length - 1 && recipients && recipients.length > 0 && (
+          {pageNum === pages.length - 1 && contacts && contacts.length > 0 && (
             <>
               <Box sx={{ pageBreakInside: "avoid" }}>
                 <SignatureDisclaimer
@@ -100,10 +100,10 @@ function PdfView({ petitionId }: { petitionId: string }) {
                     width: "100%",
                   }}
                 >
-                  {recipients?.map((signer, n) => (
+                  {contacts?.map((signer, n) => (
                     <SignatureBox
                       key={n}
-                      signer={{ ...signer, key: n }}
+                      signer={{ ...signer!, key: n }}
                       timezone={settings["timezone"]}
                     />
                   ))}
@@ -150,22 +150,23 @@ PdfView.getInitialProps = async ({
   fetchQuery,
 }: WithApolloDataContext) => {
   const petitionId = query.petitionId as string;
-
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($id: GID!) {
         publicPetitionSignature(petitionId: $id) {
-          settings
-          signers {
-            id
-            fullName
-            email
-          }
           petition {
             id
             name
             fields {
               ...PdfView_Field
+            }
+            signatureConfig {
+              contacts {
+                fullName
+                email
+              }
+              provider
+              timezone
             }
           }
         }

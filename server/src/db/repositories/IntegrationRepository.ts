@@ -3,6 +3,19 @@ import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 
+type SignatureIntegrationProviders = "SIGNATURIT";
+
+type SignatureIntegrationSettings<K extends SignatureIntegrationProviders> = {
+  SIGNATURIT: {
+    API_KEY: string;
+    BRANDING_ID?: string;
+  };
+}[K];
+
+export type SignaturitIntegrationSettings = SignatureIntegrationSettings<
+  "SIGNATURIT"
+>;
+
 @injectable()
 export class IntegrationRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {

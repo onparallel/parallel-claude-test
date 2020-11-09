@@ -149,26 +149,17 @@ export class Aws {
   }
 
   async uploadFile(key: string, buffer: Buffer, contentType: string) {
-    return new Promise(
-      (resolve: (v: AWS.S3.ManagedUpload.SendData) => void, reject) => {
-        return this.s3.upload(
-          {
-            Bucket: this.config.s3.uploadsBucketName,
-            Key: key,
-            ContentType: contentType,
-            Body: buffer,
-          },
-          {},
-          (err, data) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(data);
-            }
-          }
-        );
-      }
-    );
+    return this.s3
+      .upload(
+        {
+          Bucket: this.config.s3.uploadsBucketName,
+          Key: key,
+          ContentType: contentType,
+          Body: buffer,
+        },
+        {}
+      )
+      .promise();
   }
 
   async createCognitoUser(email: string, password: string) {

@@ -2369,6 +2369,11 @@ export class PetitionRepository extends BaseRepository {
     "external_id"
   );
 
+  readonly loadPetitionSignatureById = this.buildLoadBy(
+    "petition_signature_request",
+    "id"
+  );
+
   async createPetitionSignature(
     petitionId: number,
     settings: {

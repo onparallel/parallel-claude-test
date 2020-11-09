@@ -24,15 +24,19 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
       element.parentElement?.removeChild(element);
     }
   }, []);
+
+  const loadTrackingScripts =
+    process.env.NODE_ENV === "production" &&
+    !router.route.startsWith("[locale]/print");
   return (
     <>
-      {process.env.NODE_ENV === "development" ? null : (
+      {loadTrackingScripts ? (
         <>
           <GoogleAnalytics />
           <Hubspot />
           <Hotjar />
         </>
-      )}
+      ) : null}
       <I18nProvider {...props}>
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
           <DndProvider backend={HTML5Backend}>
