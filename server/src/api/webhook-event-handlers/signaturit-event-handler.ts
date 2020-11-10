@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
+import { removeNotDefined } from "../../util/remedaExtensions";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -50,7 +51,7 @@ export function signaturItEventHandler(type: SignatureEvents) {
     case "document_completed":
       return documentCompleted;
     default:
-      return updateEventLogs;
+      return appendEventLogs;
   }
 }
 
@@ -60,17 +61,13 @@ async function documentCanceled(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`,
-    {
-      status: "CANCELLED",
-      data,
-      event_logs: (data.document.events ?? []).concat({
-        created_at: data.created_at,
-        type: data.type,
-      }),
-    }
-  );
+  const externalId = `SIGNATURIT/${data.document.signature.id}`;
+  await ctx.petitions.updatePetitionSignatureByExternalId(externalId, {
+    status: "CANCELLED",
+    data,
+  });
+
+  await appendEventLogs(petitionId, data, ctx);
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
@@ -80,18 +77,13 @@ async function documentDeclined(
   ctx: ApiContext
 ) {
   // when a document is declined, the signature request is automatically cancelled for all recipients
-  await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`,
-    {
-      status: "CANCELLED",
-      data,
-      event_logs: (data.document.events ?? []).concat({
-        created_at: data.created_at,
-        type: data.type,
-        decline_reason: data.document.decline_reason,
-      }),
-    }
-  );
+  const externalId = `SIGNATURIT/${data.document.signature.id}`;
+  await ctx.petitions.updatePetitionSignatureByExternalId(externalId, {
+    status: "CANCELLED",
+    data,
+  });
+
+  await appendEventLogs(petitionId, data, ctx);
 }
 
 /** document has been completed and is ready to be downloaded */
@@ -123,22 +115,22 @@ async function documentCompleted(
 
   const {
     id: documentId,
-    signature: { id: externalId },
+    signature: { id: signatureId },
   } = data.document;
 
-  const signature = await fetchPetitionSignature(externalId, ctx);
+  const signature = await fetchPetitionSignature(signatureId, ctx);
   if (signature.status === "CANCELLED") {
     throw new Error(
-      `Requested petition signature with externalId: ${externalId} was previously cancelled`
+      `Requested petition signature with externalId: ${signatureId} was previously cancelled`
     );
   }
 
   const buffer = await client.downloadSignedDocument(
-    `${externalId}/${documentId}`
+    `${signatureId}/${documentId}`
   );
 
   const filename = `${petition.name ?? petitionId}_signed.pdf`;
-  const key = `${externalId}/${documentId}/${filename}`;
+  const key = `${signatureId}/${documentId}/${filename}`;
   await ctx.aws.uploadFile(key, buffer, "application/pdf");
   const file = await ctx.files.createFileUpload(
     {
@@ -151,26 +143,23 @@ async function documentCompleted(
     `OrgIntegration:${signaturitIntegration.id}`
   );
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`,
-    {
-      status: "COMPLETED",
-      file_upload_id: file.id,
-      data,
-      event_logs: (data.document.events ?? []).concat({
-        created_at: data.created_at,
-        type: data.type,
-      }),
-    }
-  );
+  const externalId = `SIGNATURIT/${signatureId}`;
+  await ctx.petitions.updatePetitionSignatureByExternalId(externalId, {
+    status: "COMPLETED",
+    file_upload_id: file.id,
+    data,
+  });
+
+  await appendEventLogs(petitionId, data, ctx);
 }
 
 async function fetchPetitionSignature(
-  externalId: string,
+  signatureId: string,
   ctx: ApiContext
 ): Promise<PetitionSignatureRequest> {
+  const externalId = `SIGNATURIT/${signatureId}`;
   const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${externalId}`
+    externalId
   );
   if (!signature) {
     throw new Error(
@@ -181,18 +170,19 @@ async function fetchPetitionSignature(
   return signature;
 }
 
-async function updateEventLogs(
+async function appendEventLogs(
   petitionId: number,
   data: SignaturItEventBody,
   ctx: ApiContext
 ): Promise<void> {
-  await ctx.petitions.updatePetitionSignatureByExternalId(
+  await ctx.petitions.appendPetitionSignatureEventLogs(
     `SIGNATURIT/${data.document.signature.id}`,
-    {
-      event_logs: (data.document.events ?? []).concat({
+    [
+      removeNotDefined({
         created_at: data.created_at,
         type: data.type,
+        decline_reason: data.document.decline_reason,
       }),
-    }
+    ]
   );
 }

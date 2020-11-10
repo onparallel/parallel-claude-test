@@ -2402,13 +2402,24 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionSignatureByExternalId(
     externalId: string,
-    data: Partial<PetitionSignatureRequest>
+    data: Partial<Omit<PetitionSignatureRequest, "event_logs">>
   ) {
-    return this.from("petition_signature_request")
+    return await this.from("petition_signature_request")
       .where("external_id", externalId)
       .update({
         ...data,
         updated_at: this.now(),
       });
+  }
+
+  async appendPetitionSignatureEventLogs(externalId: string, logs: any[]) {
+    return await this.knex.raw(
+      /* sql */ `
+        UPDATE petition_signature_request
+        SET event_logs = array_cat(event_logs, ?::jsonb[])
+        WHERE external_id = ?
+      `,
+      [logs, externalId]
+    );
   }
 }
