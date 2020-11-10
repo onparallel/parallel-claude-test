@@ -13,17 +13,22 @@ export type QueueWorkerOptions<T> = {
   parser?: (message: string) => T;
 };
 
-export function createQueueWorker<T>(
-  name: keyof Config["queueWorkers"],
-  handler: (payload: T, context: WorkerContext) => Promise<void>,
-  options?: QueueWorkerOptions<T>
+export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
+  name: Q,
+  handler: (
+    payload: P,
+    context: WorkerContext,
+    config: Config["queueWorkers"][Q]
+  ) => Promise<void>,
+  options?: QueueWorkerOptions<P>
 ) {
   loadEnv(`.${name}.env`);
   const { parser } = {
-    parser: (message: string) => JSON.parse(message) as T,
+    parser: (message: string) => JSON.parse(message) as P,
     ...options,
   };
   const container = createContainer();
+  const config = container.get<Config>(CONFIG);
   yargs
     .command(
       "run [payload]",
@@ -39,7 +44,8 @@ export function createQueueWorker<T>(
         try {
           await handler(
             parser(payload),
-            container.get<WorkerContext>(WorkerContext)
+            container.get<WorkerContext>(WorkerContext),
+            config.queueWorkers[name]
           );
         } catch (error) {
           console.log(error);
@@ -53,7 +59,6 @@ export function createQueueWorker<T>(
       "Start listening to the queue",
       () => {},
       () => {
-        const config = container.get<Config>(CONFIG);
         const logger = container.get<Logger>(LOGGER);
         const aws = container.get<Aws>(Aws);
         const consumer = Consumer.create({
@@ -64,7 +69,7 @@ export function createQueueWorker<T>(
             const context = container.get<WorkerContext>(WorkerContext);
             logger.info("Start processing message", { payload });
             const duration = await stopwatch(async () => {
-              await handler(payload, context);
+              await handler(payload, context, config.queueWorkers[name]);
             });
             logger.info(`Successfully processed message in ${duration}ms`, {
               payload,

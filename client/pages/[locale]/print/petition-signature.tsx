@@ -6,6 +6,7 @@ import {
   Box,
   ChakraProvider,
   useTheme,
+  Image,
 } from "@chakra-ui/core";
 import {
   withApolloData,
@@ -35,6 +36,8 @@ function PdfView({ token }: { token: string }) {
   );
 
   const petition = data?.petitionSignatureRequest?.petition;
+  const orgName = petition?.organization.name;
+  const orgLogo = petition?.organization.logoUrl;
   const settings = petition?.signatureConfig;
   const contacts = settings?.contacts;
 
@@ -68,12 +71,21 @@ function PdfView({ token }: { token: string }) {
         <PdfPage key={pageNum}>
           {pageNum === 0 ? (
             <>
-              <Logo
-                width="50mm"
-                justifyContent="center"
-                display="flex"
-                margin="5mm auto"
-              />
+              {orgLogo ? (
+                <Image
+                  margin="5mm auto"
+                  src={orgLogo}
+                  alt={orgName}
+                  width="50%"
+                />
+              ) : (
+                <Logo
+                  width="50mm"
+                  justifyContent="center"
+                  display="flex"
+                  margin="5mm auto"
+                />
+              )}
               <Heading justifyContent="center" display="flex">
                 {petition.name}
               </Heading>
@@ -149,7 +161,7 @@ PdfView.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  const token = query.token as string;
+  const token = decodeURIComponent(query.token as string);
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($token: String!) {
@@ -159,6 +171,10 @@ PdfView.getInitialProps = async ({
             name
             fields {
               ...PdfView_Field
+            }
+            organization {
+              name
+              logoUrl
             }
             signatureConfig {
               contacts {

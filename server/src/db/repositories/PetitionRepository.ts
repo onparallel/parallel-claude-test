@@ -2399,4 +2399,16 @@ export class PetitionRepository extends BaseRepository {
         updated_at: this.now(),
       });
   }
+
+  async updatePetitionSignatureByExternalId(
+    externalId: string,
+    data: Partial<PetitionSignatureRequest>
+  ) {
+    return this.from("petition_signature_request")
+      .where("external_id", externalId)
+      .update({
+        ...data,
+        updated_at: this.now(),
+      });
+  }
 }

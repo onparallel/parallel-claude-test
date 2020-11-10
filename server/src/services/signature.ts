@@ -2,10 +2,11 @@ import { injectable, inject } from "inversify";
 import "reflect-metadata";
 import SignaturitSDK from "signaturit-sdk";
 import { SignaturitIntegrationSettings } from "../db/repositories/IntegrationRepository";
-import { OrgIntegration, Petition } from "../db/__types";
-import { toGlobalId } from "../util/globalId";
+import { OrgIntegration } from "../db/__types";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
+import { sign, verify } from "jsonwebtoken";
+import { removeNotDefined } from "../util/remedaExtensions";
 
 type SignerBox = {
   email?: string;
@@ -39,7 +40,7 @@ export type Recipient = { email: string; name: string };
 
 export interface ISignatureClient {
   startSignatureRequest: (
-    petition: Petition,
+    petitionId: string,
     filePath: string,
     recipients: Recipient[],
     options?: SignatureOptions
@@ -66,6 +67,26 @@ export class SignatureService {
         );
     }
   }
+
+  public generateAuthToken(payload: any) {
+    return sign(payload, this.config.signature.jwtSecret, {
+      expiresIn: 5, // 5 seconds
+      issuer: "signature-service",
+      algorithm: "HS256",
+    });
+  }
+
+  public verifyAuthToken(token: string) {
+    try {
+      verify(token, this.config.signature.jwtSecret, {
+        algorithms: ["HS256"],
+        issuer: "signature-service",
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 class SignaturItClient implements ISignatureClient {
@@ -75,36 +96,40 @@ class SignaturItClient implements ISignatureClient {
     private config: Config
   ) {
     const isProduction = process.env.NODE_ENV === "production";
-    if (!settings.API_KEY) {
+    if (!this.settings.API_KEY) {
       throw new Error(
         "Signaturit API KEY not found on org_integration settings"
       );
     }
-    this.sdk = new SignaturitSDK(settings.API_KEY, isProduction);
+    this.sdk = new SignaturitSDK(this.settings.API_KEY, isProduction);
   }
   public async startSignatureRequest(
-    petition: Petition,
+    petitionId: string,
     files: string,
     recipients: Recipient[],
     opts?: SignatureOptions
   ) {
-    const petitionId = toGlobalId("Petition", petition.id);
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
-    return await this.sdk.createSignature(files, recipients, {
-      delivery_type: "email",
-      signing_mode: opts?.signing_mode,
-      events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
-      recipients: recipients.map((r) => ({
-        email: r.email,
-        name: r.name,
-        require_signature_in_coordinates: opts?.signature_box_positions?.map(
-          (boxPosition) =>
-            boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
-        ),
-      })),
-      expire_time: 0, // disable signaturit reminder emails
-      reminders: 0,
-    });
+    return await this.sdk.createSignature(
+      files,
+      recipients,
+      removeNotDefined({
+        delivery_type: "email",
+        signing_mode: opts?.signing_mode ?? "parallel",
+        branding_id: this.settings.BRANDING_ID,
+        events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
+        recipients: recipients.map((r) => ({
+          email: r.email,
+          name: r.name,
+          require_signature_in_coordinates: opts?.signature_box_positions?.map(
+            (boxPosition) =>
+              boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
+          ),
+        })),
+        expire_time: 0, // disable signaturit reminder emails
+        reminders: 0,
+      }) as any
+    );
   }
 
   public async cancelSignatureRequest(externalId: string) {

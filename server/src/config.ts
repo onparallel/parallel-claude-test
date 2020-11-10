@@ -43,6 +43,9 @@ export function buildConfig() {
     analytics: Object.freeze({
       writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY, // can be undefined
     }),
+    signature: Object.freeze({
+      jwtSecret: process.env.SIGNATURE_SERVICE_JWT_SECRET!,
+    }),
     queueWorkers: Object.freeze({
       "email-sender": Object.freeze({
         endpoint: process.env.WORKERS_EMAIL_SENDER_ENDPOINT!,
@@ -52,7 +55,6 @@ export function buildConfig() {
       }),
       "signature-worker": Object.freeze({
         endpoint: process.env.SIGNATURE_WORKER_QUEUE_ENDPOINT!,
-        jwtSecret: process.env.SIGNATURE_WORKER_JWT_SECRET!,
       }),
     }),
     cronWorkers: Object.freeze({

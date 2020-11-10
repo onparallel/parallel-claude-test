@@ -693,6 +693,11 @@ type Organization implements Timestamps {
   ): [OrgIntegration!]!
 
   """
+  URL of the organization logo
+  """
+  logoUrl: String
+
+  """
   The name of the organization.
   """
   name: String!
@@ -855,6 +860,7 @@ type Petition implements PetitionBase {
   The name of the petition.
   """
   name: String
+  organization: Organization!
   owner: User!
 
   """
@@ -1033,6 +1039,7 @@ interface PetitionBase {
   The name of the petition.
   """
   name: String
+  organization: Organization!
   owner: User!
 
   """
@@ -1464,6 +1471,8 @@ type PetitionReopenedEvent implements PetitionEvent {
 }
 
 type PetitionSignatureRequest implements Timestamps {
+  contacts: [Contact]!
+
   """
   Time when the resource was created.
   """
@@ -1474,7 +1483,6 @@ type PetitionSignatureRequest implements Timestamps {
   petition: Petition!
   settings: JSONObject!
   signedDocument: JSONObject
-  signers: [Contact!]!
   status: PetitionSignatureRequestStatus!
 
   """
@@ -1567,6 +1575,7 @@ type PetitionTemplate implements PetitionBase {
   The name of the petition.
   """
   name: String
+  organization: Organization!
   owner: User!
 
   """

@@ -585,6 +585,8 @@ export type Organization = Timestamps & {
   /** The unique text identifier of the organization. */
   identifier: Scalars["String"];
   integrations: Array<OrgIntegration>;
+  /** URL of the organization logo */
+  logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
   /** The status of the organization. */
@@ -665,6 +667,7 @@ export type Petition = PetitionBase & {
   locale: PetitionLocale;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
+  organization: Organization;
   owner: User;
   /** The progress of the petition. */
   progress: PetitionProgress;
@@ -760,6 +763,7 @@ export type PetitionBase = {
   locale: PetitionLocale;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
+  organization: Organization;
   owner: User;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -996,6 +1000,7 @@ export type PetitionReopenedEvent = PetitionEvent & {
 
 export type PetitionSignatureRequest = Timestamps & {
   __typename?: "PetitionSignatureRequest";
+  contacts: Array<Maybe<Contact>>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   data?: Maybe<Scalars["JSONObject"]>;
@@ -1004,7 +1009,6 @@ export type PetitionSignatureRequest = Timestamps & {
   petition: Petition;
   settings: Scalars["JSONObject"];
   signedDocument?: Maybe<Scalars["JSONObject"]>;
-  signers: Array<Contact>;
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -1049,6 +1053,7 @@ export type PetitionTemplate = PetitionBase & {
   locale: PetitionLocale;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
+  organization: Organization;
   owner: User;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -3968,6 +3973,10 @@ export type PdfViewPetitionQuery = { __typename?: "Query" } & {
       petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
           fields: Array<
             { __typename?: "PetitionField" } & PdfView_FieldFragment
+          >;
+          organization: { __typename?: "Organization" } & Pick<
+            Organization,
+            "name" | "logoUrl"
           >;
           signatureConfig?: Maybe<
             { __typename?: "SignatureConfig" } & Pick<
@@ -9070,6 +9079,10 @@ export const PdfViewPetitionDocument = gql`
         name
         fields {
           ...PdfView_Field
+        }
+        organization {
+          name
+          logoUrl
         }
         signatureConfig {
           contacts {

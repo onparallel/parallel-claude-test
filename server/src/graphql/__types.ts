@@ -539,6 +539,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     identifier: string; // String!
     integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
+    logoUrl: string | null; // String
     name: string; // String!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -564,6 +565,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
+    organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
@@ -711,6 +713,7 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequest: {
     // field return type
+    contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     data: NexusGenScalars["JSONObject"] | null; // JSONObject
     externalId: string | null; // String
@@ -718,7 +721,6 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     settings: NexusGenScalars["JSONObject"]; // JSONObject!
     signedDocument: NexusGenScalars["JSONObject"] | null; // JSONObject
-    signers: NexusGenRootTypes["Contact"][]; // [Contact!]!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -734,6 +736,7 @@ export interface NexusGenFieldTypes {
     isPublic: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
+    organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
@@ -952,6 +955,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
+    organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!

@@ -9,12 +9,16 @@ import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
 import yargs from "yargs";
 
-export function createCronWorker(
-  name: keyof Config["cronWorkers"],
-  handler: (context: WorkerContext) => Promise<void>
+export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
+  name: Q,
+  handler: (
+    context: WorkerContext,
+    config: Config["cronWorkers"][Q]
+  ) => Promise<void>
 ) {
   loadEnv(`.${name}.env`);
   const container = createContainer();
+  const config = container.get<Config>(CONFIG);
   yargs
     .command(
       "run",
@@ -22,7 +26,10 @@ export function createCronWorker(
       () => {},
       async () => {
         try {
-          await handler(container.get<WorkerContext>(WorkerContext));
+          await handler(
+            container.get<WorkerContext>(WorkerContext),
+            config["cronWorkers"][name]
+          );
         } catch (error) {
           console.log(error);
           process.exit(1);
@@ -35,7 +42,6 @@ export function createCronWorker(
       "Start the cron job",
       () => {},
       () => {
-        const config = container.get<Config>(CONFIG);
         const logger = container.get<Logger>(LOGGER);
         let running = false;
         const events = new EventEmitter();
@@ -46,7 +52,10 @@ export function createCronWorker(
               running = true;
               logger.info(`Execution start`);
               const duration = await stopwatch(async () => {
-                await handler(container.get<WorkerContext>(WorkerContext));
+                await handler(
+                  container.get<WorkerContext>(WorkerContext),
+                  config["cronWorkers"][name]
+                );
               });
               const nextExecution = job.nextDate().toDate().toISOString();
               logger.info(

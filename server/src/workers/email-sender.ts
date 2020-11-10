@@ -31,9 +31,9 @@ type EmailSenderWorkerPayload = {
   };
 }[EmailType];
 
-createQueueWorker<EmailSenderWorkerPayload>(
+createQueueWorker(
   "email-sender",
-  async (payload, context) => {
+  async (payload: EmailSenderWorkerPayload, context) => {
     const builder = builders[payload.type];
     const emails = await builder(payload.payload as any, context);
     for (const email of unMaybeArray(emails)) {

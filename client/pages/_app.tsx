@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
 
   const loadTrackingScripts =
     process.env.NODE_ENV === "production" &&
-    !router.route.startsWith("[locale]/print");
+    !router.pathname.startsWith("/[locale]/print");
   return (
     <>
       {loadTrackingScripts ? (

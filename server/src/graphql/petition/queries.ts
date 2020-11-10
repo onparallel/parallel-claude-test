@@ -5,7 +5,7 @@ import {
   petitionsArePublicTemplates,
 } from "./authorizers";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { verify } from "jsonwebtoken";
+import { decode } from "jsonwebtoken";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -109,31 +109,11 @@ export const petitionSignatureRequest = queryField("petitionSignatureRequest", {
     }),
   },
   nullable: true,
+  authorize: (_, { token }, ctx) => ctx.signature.verifyAuthToken(token),
   resolve: async (_, { token }, ctx) => {
-    try {
-      const key = `signatureWorker:${token}:authToken`;
-      const authToken = await ctx.redis.get(key);
-      const payload: any = verify(
-        authToken!,
-        ctx.config.queueWorkers["signature-worker"].jwtSecret,
-        {
-          issuer: "worker:signature",
-          algorithms: ["HS256"],
-        }
-      );
-      // make sure this endpoint can be called only once per signature request
-      await ctx.redis.delete(key);
-
-      return await ctx.petitions.loadPetitionSignatureById(
-        payload.petitionSignatureRequestId
-      );
-    } catch (e) {
-      // any JWT error is rethrown as Forbidden
-      if (e.name === "JsonWebTokenError") {
-        throw new Error("FORBIDDEN");
-      } else {
-        throw e;
-      }
-    }
+    const payload: any = decode(token);
+    return await ctx.petitions.loadPetitionSignatureById(
+      payload.petitionSignatureRequestId
+    );
   },
 });

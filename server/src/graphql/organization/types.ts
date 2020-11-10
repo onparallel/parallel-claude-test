@@ -52,6 +52,13 @@ export const Organization = objectType({
       description: "The unique text identifier of the organization.",
       authorize: belongsToOrg(),
     });
+    t.string("logoUrl", {
+      nullable: true,
+      description: "URL of the organization logo",
+      resolve: async (root, _, ctx) => {
+        return await ctx.organizations.getOrgLogoUrl(root.id);
+      },
+    });
     t.field("status", {
       type: "OrganizationStatus",
       description: "The status of the organization.",

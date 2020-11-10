@@ -7,8 +7,6 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { fullName } from "../util/fullName";
 import { Contact, OrgIntegration, Petition } from "../db/__types";
-import jwt from "jsonwebtoken";
-import { random } from "../util/token";
 
 type PetitionSignatureConfig = {
   provider: string;
@@ -18,9 +16,7 @@ type PetitionSignatureConfig = {
 
 /** starts a signature request on the petition for the provided contacts */
 async function startSignatureProcess(
-  payload: {
-    petitionId: string;
-  },
+  payload: { petitionId: string },
   ctx: WorkerContext
 ) {
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
@@ -49,20 +45,14 @@ async function startSignatureProcess(
       id: petitionSignatureRequestId,
     } = await ctx.petitions.createPetitionSignature(petitionId, settings);
 
-    const authToken = jwt.sign(
-      { petitionSignatureRequestId },
-      ctx.config.queueWorkers["signature-worker"].jwtSecret,
-      {
-        expiresIn: 5, // 5 seconds
-        issuer: "worker:signature",
-        algorithm: "HS256",
-      }
-    );
-    const token = random(48);
-    await ctx.redis.set(`signatureWorker:${token}:authToken`, authToken, 5);
+    const token = ctx.signature.generateAuthToken({
+      petitionSignatureRequestId,
+    });
 
     // print and save pdf to disk
-    const printURL = `${ctx.config.misc.parallelUrl}/${petition.locale}/print/petition-signature/${token}`;
+    const printURL = `${ctx.config.misc.parallelUrl}/${
+      petition.locale
+    }/print/petition-signature?token=${encodeURIComponent(token)}`;
     const buffer = await ctx.printer.pdf(printURL, {
       path: tmpPdfPath,
       height: "297mm",
@@ -84,7 +74,7 @@ async function startSignatureProcess(
 
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
-      petition,
+      payload.petitionId,
       tmpPdfPath,
       recipients,
       {
@@ -93,8 +83,9 @@ async function startSignatureProcess(
       }
     );
 
+    const provider = orgSignatureIntegration.provider.toUpperCase();
     await ctx.petitions.updatePetitionSignature(petitionSignatureRequestId, {
-      external_id: data.id,
+      external_id: `${provider}/${data.id}`,
       data,
     });
   } finally {
@@ -164,9 +155,9 @@ type SignatureWorkerPayload = {
   };
 }[HandlerType];
 
-createQueueWorker<SignatureWorkerPayload>(
+createQueueWorker(
   "signature-worker",
-  async (data: SignatureWorkerPayload, ctx: WorkerContext) => {
+  async (data: SignatureWorkerPayload, ctx) => {
     await handlers[data.type](data.payload as any, ctx);
   }
 );

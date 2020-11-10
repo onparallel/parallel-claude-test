@@ -55,10 +55,16 @@ export const PetitionBase = interfaceType({
       description: "The name of the petition.",
       nullable: true,
     });
-    t.field("locale", {
-      type: "PetitionLocale",
-      description: "The locale of the petition.",
-    });
+    t.field("organization", {
+      type: "Organization",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.organizations.loadOrg(root.org_id))!;
+      },
+    }),
+      t.field("locale", {
+        type: "PetitionLocale",
+        description: "The locale of the petition.",
+      });
     t.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {

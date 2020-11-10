@@ -16,7 +16,11 @@ export async function up(knex: Knex): Promise<void> {
       ["org_id", "type", "provider"],
       "org_integration__org_id__type__provider"
     );
-  });
+  }).raw(/* sql */ `
+      alter table org_integration 
+      add constraint org_integration__provider_uppercase_check
+      check (upper("provider") = "provider")
+    `);
 }
 
 export async function down(knex: Knex): Promise<void> {
