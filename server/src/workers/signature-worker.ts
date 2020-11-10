@@ -132,9 +132,10 @@ async function cancelSignatureProcess(
 
   // do a request to cancel the signature process.
   // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
-  await signatureClient.cancelSignatureRequest(
-    petitionSignatureRequest.external_id
-  );
+  const prefixedExternalId = petitionSignatureRequest.external_id;
+  const [, ...rest] = prefixedExternalId.split("/");
+  const externalId = rest.join("/");
+  await signatureClient.cancelSignatureRequest(externalId);
 }
 
 const handlers = {
