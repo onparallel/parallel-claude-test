@@ -33,7 +33,10 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       groupId: `signature-${toGlobalId("Petition", petitionId)}`,
       body: {
         type: "start-signature-process",
-        payload: { petitionId: toGlobalId("Petition", petitionId) },
+        payload: {
+          petitionId: toGlobalId("Petition", petitionId),
+          userId: ctx.user!.id,
+        },
       },
     });
 
@@ -57,7 +60,10 @@ export const restartSignatureRequest = mutationField(
         groupId: `signature-${toGlobalId("Petition", petitionId)}`,
         body: {
           type: "restart-signature-process",
-          payload: { petitionId: toGlobalId("Petition", petitionId) },
+          payload: {
+            petitionId: toGlobalId("Petition", petitionId),
+            userId: ctx.user!.id,
+          },
         },
       });
 
@@ -86,7 +92,10 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
         groupId: `signature-${toGlobalId("Petition", petitionId)}`,
         body: {
           type: "cancel-signature-process",
-          payload: { petitionSignatureRequestId: signature.id },
+          payload: {
+            petitionSignatureRequestId: signature.id,
+            userId: ctx.user!.id,
+          },
         },
       });
 

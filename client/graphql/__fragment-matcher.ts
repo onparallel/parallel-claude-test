@@ -104,6 +104,18 @@ const result: IntrospectionResultData = {
             name: "ReplyDeletedEvent",
           },
           {
+            name: "SignatureCancelledEvent",
+          },
+          {
+            name: "SignatureCompletedEvent",
+          },
+          {
+            name: "SignatureDeclinedEvent",
+          },
+          {
+            name: "SignatureStartedEvent",
+          },
+          {
             name: "UserPermissionAddedEvent",
           },
           {

@@ -308,11 +308,15 @@ export interface NexusGenRootTypes {
     petition?: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
+  SignatureCancelledEvent: events.SignatureCancelledEvent;
+  SignatureCompletedEvent: events.SignatureCompletedEvent;
   SignatureConfig: {
     provider: string;
     contactIds: number[];
     timezone: string;
   };
+  SignatureDeclinedEvent: events.SignatureDeclinedEvent;
+  SignatureStartedEvent: events.SignatureStartedEvent;
   SupportMethodResponse: {
     // root type
     message?: string | null; // String
@@ -893,11 +897,37 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     result: NexusGenEnums["Result"]; // Result!
   };
+  SignatureCancelledEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"] | null; // User
+  };
+  SignatureCompletedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    file: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+  };
   SignatureConfig: {
     // field return type
     contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     provider: string; // String!
     timezone: string; // String!
+  };
+  SignatureDeclinedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    declineReason: string | null; // String
+    declinerEmail: string; // String!
+    declinerName: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+  };
+  SignatureStartedEvent: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   SupportMethodResponse: {
     // field return type
@@ -1410,6 +1440,10 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "ReminderSentEvent"
     | "ReplyCreatedEvent"
     | "ReplyDeletedEvent"
+    | "SignatureCancelledEvent"
+    | "SignatureCompletedEvent"
+    | "SignatureDeclinedEvent"
+    | "SignatureStartedEvent"
     | "UserPermissionAddedEvent"
     | "UserPermissionEditedEvent"
     | "UserPermissionRemovedEvent";
@@ -1482,7 +1516,11 @@ export type NexusGenObjectNames =
   | "ReplyCreatedEvent"
   | "ReplyDeletedEvent"
   | "SendPetitionResult"
+  | "SignatureCancelledEvent"
+  | "SignatureCompletedEvent"
   | "SignatureConfig"
+  | "SignatureDeclinedEvent"
+  | "SignatureStartedEvent"
   | "SupportMethodResponse"
   | "User"
   | "UserPagination"

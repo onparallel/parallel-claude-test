@@ -16,7 +16,7 @@ type PetitionSignatureConfig = {
 
 /** starts a signature request on the petition */
 async function startSignatureProcess(
-  payload: { petitionId: string },
+  payload: { petitionId: string; userId: number },
   ctx: WorkerContext
 ) {
   const petitionId = fromGlobalId(payload.petitionId, "Petition").id;
@@ -89,6 +89,14 @@ async function startSignatureProcess(
       external_id: `${provider}/${data.id}`,
       data,
     });
+
+    await ctx.petitions.createEvent({
+      type: "SIGNATURE_STARTED",
+      petitionId,
+      data: {
+        user_id: payload.userId,
+      },
+    });
   } finally {
     try {
       await fs.unlink(tmpPdfPath);
@@ -98,7 +106,7 @@ async function startSignatureProcess(
 
 /** cancels the signature request for all signers on the petition */
 async function cancelSignatureProcess(
-  payload: { petitionSignatureRequestId: number },
+  payload: { petitionSignatureRequestId: number; userId: number },
   ctx: WorkerContext
 ) {
   const petitionSignatureRequest = await ctx.petitions.loadPetitionSignatureById(
@@ -138,11 +146,19 @@ async function cancelSignatureProcess(
   // Table petition_signature_request will be updated as soon as the client confirms the cancelation via events webhook
   const externalId = petitionSignatureRequest.external_id.replace(/^.*?\//, "");
   await signatureClient.cancelSignatureRequest(externalId);
+
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_CANCELLED",
+    petitionId,
+    data: {
+      user_id: payload.userId,
+    },
+  });
 }
 
 /* restarts the signature process for petition */
 async function restartSignatureProcess(
-  payload: { petitionId: string },
+  payload: { petitionId: string; userId: number },
   ctx: WorkerContext
 ) {
   const { id: petitionId } = fromGlobalId(payload.petitionId, "Petition");
@@ -189,6 +205,14 @@ async function restartSignatureProcess(
       created_at: new Date().toISOString(),
     },
   ]);
+
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_CANCELLED",
+    petitionId,
+    data: {
+      user_id: payload.userId,
+    },
+  });
 
   await startSignatureProcess(payload, ctx);
 }

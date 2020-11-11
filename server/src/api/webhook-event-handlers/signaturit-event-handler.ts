@@ -84,6 +84,16 @@ async function documentDeclined(
   });
 
   await appendEventLogs(petitionId, data, ctx);
+
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_DECLINED",
+    petitionId,
+    data: {
+      decliner_email: data.document.email,
+      decliner_name: data.document.name,
+      decline_reason: data.document.decline_reason,
+    },
+  });
 }
 
 /** document has been completed and is ready to be downloaded */
@@ -151,6 +161,14 @@ async function documentCompleted(
   });
 
   await appendEventLogs(petitionId, data, ctx);
+
+  await ctx.petitions.createEvent({
+    type: "SIGNATURE_COMPLETED",
+    petitionId,
+    data: {
+      file_upload_id: file.id,
+    },
+  });
 }
 
 async function fetchPetitionSignature(

@@ -172,6 +172,7 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
+  cancelSignatureRequest: Result;
   /** Changes the password for the current logged in user. */
   changePassword: ChangePasswordResult;
   /** Changes the type of a petition Field */
@@ -238,6 +239,7 @@ export type Mutation = {
   removePetitionUserPermission: Array<Petition>;
   /** Reopens the petition */
   reopenPetition: Petition;
+  restartSignatureRequest: Result;
   /** Sends a petition message to the speicified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -246,6 +248,7 @@ export type Mutation = {
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  startSignatureRequest: Result;
   /** Submits all unpublished comments. */
   submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
@@ -287,6 +290,10 @@ export type MutationassignPetitionToUserArgs = {
 
 export type MutationcancelScheduledMessageArgs = {
   messageId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
+export type MutationcancelSignatureRequestArgs = {
   petitionId: Scalars["GID"];
 };
 
@@ -469,6 +476,10 @@ export type MutationreopenPetitionArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationrestartSignatureRequestArgs = {
+  petitionId: Scalars["GID"];
+};
+
 export type MutationsendMessagesArgs = {
   accessIds: Array<Scalars["GID"]>;
   body: Scalars["JSON"];
@@ -494,6 +505,10 @@ export type MutationsendPetitionClosedNotificationArgs = {
 
 export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+};
+
+export type MutationstartSignatureRequestArgs = {
   petitionId: Scalars["GID"];
 };
 
@@ -1253,7 +1268,8 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  petitionSignatureRequest?: Maybe<PetitionSignatureRequest>;
+  petitionSignatureRequest: Array<Maybe<PetitionSignatureRequest>>;
+  petitionSignatureRequestToken?: Maybe<PetitionSignatureRequest>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
 };
@@ -1302,6 +1318,10 @@ export type QuerypetitionsArgs = {
 };
 
 export type QuerypetitionSignatureRequestArgs = {
+  petitionId: Scalars["GID"];
+};
+
+export type QuerypetitionSignatureRequestTokenArgs = {
   token: Scalars["String"];
 };
 
@@ -1393,6 +1413,20 @@ export type SendPetitionResult = {
   result: Result;
 };
 
+export type SignatureCancelledEvent = PetitionEvent & {
+  __typename?: "SignatureCancelledEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user?: Maybe<User>;
+};
+
+export type SignatureCompletedEvent = PetitionEvent & {
+  __typename?: "SignatureCompletedEvent";
+  createdAt: Scalars["DateTime"];
+  file: Scalars["JSONObject"];
+  id: Scalars["GID"];
+};
+
 /** The signature settings of a petition */
 export type SignatureConfig = {
   __typename?: "SignatureConfig";
@@ -1412,6 +1446,22 @@ export type SignatureConfigInput = {
   provider: Scalars["String"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
+};
+
+export type SignatureDeclinedEvent = PetitionEvent & {
+  __typename?: "SignatureDeclinedEvent";
+  createdAt: Scalars["DateTime"];
+  declineReason?: Maybe<Scalars["String"]>;
+  declinerEmail: Scalars["String"];
+  declinerName: Scalars["String"];
+  id: Scalars["GID"];
+};
+
+export type SignatureStartedEvent = PetitionEvent & {
+  __typename?: "SignatureStartedEvent";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user?: Maybe<User>;
 };
 
 /** Return type for all support methods */
@@ -1767,6 +1817,18 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "ReplyDeletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment)
       | ({
+          __typename?: "SignatureCancelledEvent";
+        } & PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment)
+      | ({
+          __typename?: "SignatureCompletedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment)
+      | ({
+          __typename?: "SignatureDeclinedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_SignatureDeclinedEvent_Fragment)
+      | ({
+          __typename?: "SignatureStartedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment)
+      | ({
           __typename?: "UserPermissionAddedEvent";
         } & PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment)
       | ({
@@ -1865,6 +1927,26 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = 
 } & Pick<ReplyDeletedEvent, "id"> &
   TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
+  __typename?: "SignatureCancelledEvent";
+} & Pick<SignatureCancelledEvent, "id"> &
+  TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment = {
+  __typename?: "SignatureCompletedEvent";
+} & Pick<SignatureCompletedEvent, "id"> &
+  TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_SignatureDeclinedEvent_Fragment = {
+  __typename?: "SignatureDeclinedEvent";
+} & Pick<SignatureDeclinedEvent, "id"> &
+  TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment = {
+  __typename?: "SignatureStartedEvent";
+} & Pick<SignatureStartedEvent, "id"> &
+  TimelineSignatureStartedEvent_SignatureStartedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment = {
   __typename?: "UserPermissionAddedEvent";
 } & Pick<UserPermissionAddedEvent, "id"> &
@@ -1898,6 +1980,10 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_SignatureDeclinedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment;
@@ -2111,6 +2197,29 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+  };
+
+export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
+  __typename?: "SignatureCancelledEvent";
+} & Pick<SignatureCancelledEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
+
+export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
+  __typename?: "SignatureCompletedEvent";
+} & Pick<SignatureCompletedEvent, "createdAt">;
+
+export type TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragment = {
+  __typename?: "SignatureDeclinedEvent";
+} & Pick<
+  SignatureDeclinedEvent,
+  "declinerEmail" | "declinerName" | "declineReason" | "createdAt"
+>;
+
+export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
+  __typename?: "SignatureStartedEvent";
+} & Pick<SignatureStartedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
@@ -3174,6 +3283,22 @@ export type PetitionReplies_PetitionFragment = {
         | ({ __typename: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id">)
         | ({ __typename: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id">)
         | ({ __typename: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id">)
+        | ({ __typename: "SignatureCancelledEvent" } & Pick<
+            SignatureCancelledEvent,
+            "id"
+          >)
+        | ({ __typename: "SignatureCompletedEvent" } & Pick<
+            SignatureCompletedEvent,
+            "id"
+          >)
+        | ({ __typename: "SignatureDeclinedEvent" } & Pick<
+            SignatureDeclinedEvent,
+            "id"
+          >)
+        | ({ __typename: "SignatureStartedEvent" } & Pick<
+            SignatureStartedEvent,
+            "id"
+          >)
         | ({ __typename: "UserPermissionAddedEvent" } & Pick<
             UserPermissionAddedEvent,
             "id"
@@ -3436,6 +3561,22 @@ export type PetitionReplies_sendPetitionClosedNotificationMutation = {
             >)
           | ({ __typename: "ReplyDeletedEvent" } & Pick<
               ReplyDeletedEvent,
+              "id"
+            >)
+          | ({ __typename: "SignatureCancelledEvent" } & Pick<
+              SignatureCancelledEvent,
+              "id"
+            >)
+          | ({ __typename: "SignatureCompletedEvent" } & Pick<
+              SignatureCompletedEvent,
+              "id"
+            >)
+          | ({ __typename: "SignatureDeclinedEvent" } & Pick<
+              SignatureDeclinedEvent,
+              "id"
+            >)
+          | ({ __typename: "SignatureStartedEvent" } & Pick<
+              SignatureStartedEvent,
               "id"
             >)
           | ({ __typename: "UserPermissionAddedEvent" } & Pick<
@@ -3968,7 +4109,7 @@ export type PdfViewPetitionQueryVariables = Exact<{
 }>;
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
-  petitionSignatureRequest?: Maybe<
+  petitionSignatureRequestToken?: Maybe<
     { __typename?: "PetitionSignatureRequest" } & {
       petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
           fields: Array<
@@ -4667,6 +4808,37 @@ export const TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc = gq
   }
   ${UserReference_UserFragmentDoc}
 `;
+export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gql`
+  fragment TimelineSignatureStartedEvent_SignatureStartedEvent on SignatureStartedEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
+export const TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragmentDoc = gql`
+  fragment TimelineSignatureDeclinedEvent_SignatureDeclinedEvent on SignatureDeclinedEvent {
+    declinerEmail
+    declinerName
+    declineReason
+    createdAt
+  }
+`;
+export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc = gql`
+  fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
+    createdAt
+  }
+`;
+export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc = gql`
+  fragment TimelineSignatureCancelledEvent_SignatureCancelledEvent on SignatureCancelledEvent {
+    user {
+      ...UserReference_User
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -4733,6 +4905,18 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionReopenedEvent {
       ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
     }
+    ... on SignatureStartedEvent {
+      ...TimelineSignatureStartedEvent_SignatureStartedEvent
+    }
+    ... on SignatureDeclinedEvent {
+      ...TimelineSignatureDeclinedEvent_SignatureDeclinedEvent
+    }
+    ... on SignatureCompletedEvent {
+      ...TimelineSignatureCompletedEvent_SignatureCompletedEvent
+    }
+    ... on SignatureCancelledEvent {
+      ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -4754,6 +4938,10 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelinePetitionClosedEvent_PetitionClosedEventFragmentDoc}
   ${TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragmentDoc}
   ${TimelinePetitionReopenedEvent_PetitionReopenedEventFragmentDoc}
+  ${TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc}
+  ${TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragmentDoc}
+  ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
+  ${TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -9073,7 +9261,7 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {
-    petitionSignatureRequest(token: $token) {
+    petitionSignatureRequestToken(token: $token) {
       petition {
         id
         name

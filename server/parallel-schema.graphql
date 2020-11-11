@@ -2158,6 +2158,18 @@ type SendPetitionResult {
   result: Result!
 }
 
+type SignatureCancelledEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  user: User
+}
+
+type SignatureCompletedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  file: JSONObject!
+  id: GID!
+}
+
 """
 The signature settings of a petition
 """
@@ -2196,6 +2208,20 @@ input SignatureConfigInput {
   The timezone used to generate the document.
   """
   timezone: String!
+}
+
+type SignatureDeclinedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  declineReason: String
+  declinerEmail: String!
+  declinerName: String!
+  id: GID!
+}
+
+type SignatureStartedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  user: User
 }
 
 """

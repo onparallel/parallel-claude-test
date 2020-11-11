@@ -49,6 +49,14 @@ export const PetitionEvent = interfaceType({
           return "PetitionClosedNotifiedEvent";
         case "PETITION_REOPENED":
           return "PetitionReopenedEvent";
+        case "SIGNATURE_STARTED":
+          return "SignatureStartedEvent";
+        case "SIGNATURE_COMPLETED":
+          return "SignatureCompletedEvent";
+        case "SIGNATURE_CANCELLED":
+          return "SignatureCancelledEvent";
+        case "SIGNATURE_DECLINED":
+          return "SignatureDeclinedEvent";
       }
     });
   },
@@ -442,6 +450,71 @@ export const PetitionReopenedEvent = createPetitionEvent(
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
       },
+    });
+  }
+);
+
+/**
+ * Triggered when a signature request on the petition is started.
+ */
+export const SignatureStartedEvent = createPetitionEvent(
+  "SignatureStartedEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when a signature request on the petition is completed.
+ */
+export const SignatureCompletedEvent = createPetitionEvent(
+  "SignatureCompletedEvent",
+  (t) => {
+    t.jsonObject("file", {
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.files.loadFileUpload(data.file_upload_id);
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when a signature request on the petition is cancelled.
+ */
+export const SignatureCancelledEvent = createPetitionEvent(
+  "SignatureCancelledEvent",
+  (t) => {
+    t.field("user", {
+      type: "User",
+      nullable: true,
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+  }
+);
+
+/**
+ * Triggered when a signer declines the signature.
+ */
+export const SignatureDeclinedEvent = createPetitionEvent(
+  "SignatureDeclinedEvent",
+  (t) => {
+    t.string("declinerName", {
+      resolve: ({ data }) => data.decliner_name,
+    });
+    t.string("declinerEmail", {
+      resolve: ({ data }) => data.decliner_email,
+    });
+    t.string("declineReason", {
+      nullable: true,
+      resolve: ({ data }) => data.decline_reason ?? null,
     });
   }
 );

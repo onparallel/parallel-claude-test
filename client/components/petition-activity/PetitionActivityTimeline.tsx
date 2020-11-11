@@ -22,6 +22,10 @@ import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermis
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
 import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
 import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopenedEvent";
+import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
+import { TimelineSignatureDeclinedEvent } from "./timeline/TimelineSignatureDeclinedEvent";
+import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
+import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -102,6 +106,14 @@ export function PetitionActivityTimeline({
               />
             ) : event.__typename === "PetitionReopenedEvent" ? (
               <TimelinePetitionReopenedEvent event={event} userId={userId} />
+            ) : event.__typename === "SignatureStartedEvent" ? (
+              <TimelineSignatureStartedEvent event={event} userId={userId} />
+            ) : event.__typename === "SignatureDeclinedEvent" ? (
+              <TimelineSignatureDeclinedEvent event={event} />
+            ) : event.__typename === "SignatureCompletedEvent" ? (
+              <TimelineSignatureCompletedEvent event={event} />
+            ) : event.__typename === "SignatureCancelledEvent" ? (
+              <TimelineSignatureCancelledEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -186,6 +198,18 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionReopenedEvent {
         ...TimelinePetitionReopenedEvent_PetitionReopenedEvent
       }
+      ... on SignatureStartedEvent {
+        ...TimelineSignatureStartedEvent_SignatureStartedEvent
+      }
+      ... on SignatureDeclinedEvent {
+        ...TimelineSignatureDeclinedEvent_SignatureDeclinedEvent
+      }
+      ... on SignatureCompletedEvent {
+        ...TimelineSignatureCompletedEvent_SignatureCompletedEvent
+      }
+      ... on SignatureCancelledEvent {
+        ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -207,5 +231,9 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionClosedEvent.fragments.PetitionClosedEvent}
     ${TimelinePetitionClosedNotifiedEvent.fragments.PetitionClosedNotifiedEvent}
     ${TimelinePetitionReopenedEvent.fragments.PetitionReopenedEvent}
+    ${TimelineSignatureStartedEvent.fragments.SignatureStartedEvent}
+    ${TimelineSignatureDeclinedEvent.fragments.SignatureDeclinedEvent}
+    ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}
+    ${TimelineSignatureCancelledEvent.fragments.SignatureCancelledEvent}
   `,
 };

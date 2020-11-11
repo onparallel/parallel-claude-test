@@ -60,6 +60,20 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_REOPENED: {
     user_id: number;
   };
+  SIGNATURE_STARTED: {
+    user_id: number;
+  };
+  SIGNATURE_CANCELLED: {
+    user_id: number;
+  };
+  SIGNATURE_COMPLETED: {
+    file_upload_id: number;
+  };
+  SIGNATURE_DECLINED: {
+    decliner_name: string;
+    decliner_email: string;
+    decline_reason?: string;
+  };
 }[TType];
 
 type GenericPetitionEvent<TType extends PetitionEventType> = {
@@ -100,6 +114,16 @@ export type PetitionClosedNotifiedEvent = GenericPetitionEvent<
 >;
 export type PetitionReopenedEvent = GenericPetitionEvent<"PETITION_REOPENED">;
 
+export type SignatureStartedEvent = GenericPetitionEvent<"SIGNATURE_STARTED">;
+export type SignatureCompletedEvent = GenericPetitionEvent<
+  "SIGNATURE_COMPLETED"
+>;
+export type SignatureCancelledEvent = GenericPetitionEvent<
+  "SIGNATURE_CANCELLED"
+>;
+
+export type SignatureDeclinedEvent = GenericPetitionEvent<"SIGNATURE_DECLINED">;
+
 export type PetitionEvent =
   | PetitionCreatedEvent
   | PetitionCompletedEvent
@@ -120,4 +144,8 @@ export type PetitionEvent =
   | OwnershipTransferredEvent
   | PetitionClosedEvent
   | PetitionClosedNotifiedEvent
-  | PetitionReopenedEvent;
+  | PetitionReopenedEvent
+  | SignatureStartedEvent
+  | SignatureCompletedEvent
+  | SignatureCancelledEvent
+  | SignatureDeclinedEvent;
