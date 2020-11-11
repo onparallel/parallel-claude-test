@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
-    "debug": "ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
-    "nodemon": "nodemon --watch 'src/' --ignore 'src/graphql/__types.ts' -e 'ts tsx json' --exec 'node -r ts-node/register/transpile-only' src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
+    "debug": "NODE_ENV=development ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
+    "nodemon": "NODE_ENV=development nodemon --watch 'src/' --ignore 'src/graphql/__types.ts' -e 'ts tsx json' --exec 'node -r ts-node/register/transpile-only' --inspect src/index.ts",
     "build": "tsc --project tsconfig.prod.json",
     "migrate": "knex migrate:latest",
     "postmigrate": "yarn generate-db-types",

@@ -45,6 +45,7 @@ import {
   PetitionUser,
   PetitionUserNotification,
   PetitionUserPermissionType,
+  PetitionSignatureStatus,
 } from "../__types";
 
 type PetitionType = "PETITION" | "TEMPLATE";
@@ -2369,6 +2370,20 @@ export class PetitionRepository extends BaseRepository {
     "id"
   );
 
+  async loadPetitionSignaturesByPetitionId(
+    petitionId: number,
+    status?: MaybeArray<PetitionSignatureStatus>
+  ): Promise<Maybe<PetitionSignatureRequest>[]> {
+    return await this.from("petition_signature_request")
+      .where("petition_id", petitionId)
+      .mmodify((q) => {
+        if (status) {
+          q.whereIn("status", unMaybeArray(status));
+        }
+      })
+      .select("*");
+  }
+
   async createPetitionSignature(
     petitionId: number,
     settings: {
@@ -2412,14 +2427,17 @@ export class PetitionRepository extends BaseRepository {
       });
   }
 
-  async appendPetitionSignatureEventLogs(externalId: string, logs: any[]) {
+  async appendPetitionSignatureEventLogs(
+    prefixedExternalId: string,
+    logs: any[]
+  ) {
     return await this.knex.raw(
       /* sql */ `
         UPDATE petition_signature_request
         SET event_logs = array_cat(event_logs, ?::jsonb[])
         WHERE external_id = ?
       `,
-      [logs, externalId]
+      [logs, prefixedExternalId]
     );
   }
 }

@@ -477,6 +477,7 @@ export interface NexusGenFieldTypes {
     addPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
+    cancelSignatureRequest: NexusGenEnums["Result"]; // Result!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -510,10 +511,12 @@ export interface NexusGenFieldTypes {
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
+    restartSignatureRequest: NexusGenEnums["Result"]; // Result!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
+    startSignatureRequest: NexusGenEnums["Result"]; // Result!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
@@ -848,7 +851,10 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
-    petitionSignatureRequest:
+    petitionSignatureRequest: Array<
+      NexusGenRootTypes["PetitionSignatureRequest"] | null
+    >; // [PetitionSignatureRequest]!
+    petitionSignatureRequestToken:
       | NexusGenRootTypes["PetitionSignatureRequest"]
       | null; // PetitionSignatureRequest
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
@@ -1002,6 +1008,10 @@ export interface NexusGenArgTypes {
     cancelScheduledMessage: {
       // args
       messageId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    cancelSignatureRequest: {
+      // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     changePassword: {
@@ -1183,6 +1193,10 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    restartSignatureRequest: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     sendMessages: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -1209,6 +1223,10 @@ export interface NexusGenArgTypes {
     sendReminders: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    startSignatureRequest: {
+      // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     submitUnpublishedComments: {
@@ -1345,6 +1363,10 @@ export interface NexusGenArgTypes {
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
     petitionSignatureRequest: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    petitionSignatureRequestToken: {
       // args
       token: string; // String!
     };

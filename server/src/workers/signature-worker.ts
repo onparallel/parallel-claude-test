@@ -14,7 +14,7 @@ type PetitionSignatureConfig = {
   contactIds: number[];
 };
 
-/** starts a signature request on the petition for the provided contacts */
+/** starts a signature request on the petition */
 async function startSignatureProcess(
   payload: { petitionId: string },
   ctx: WorkerContext
@@ -32,12 +32,13 @@ async function startSignatureProcess(
     `${petition.name ?? payload.petitionId}.pdf`
   );
   try {
-    const orgSignatureIntegration = await fetchOrgSignatureIntegration(
+    const settings = petition.signature_config as PetitionSignatureConfig;
+
+    const signatureIntegration = await fetchOrgSignatureIntegration(
       petition.org_id,
+      settings.provider,
       ctx
     );
-
-    const settings = petition.signature_config as PetitionSignatureConfig;
 
     const recipients = await fetchSignatureRecipients(settings.contactIds, ctx);
 
@@ -70,7 +71,7 @@ async function startSignatureProcess(
       recipients
     );
 
-    const signatureClient = ctx.signature.getClient(orgSignatureIntegration);
+    const signatureClient = ctx.signature.getClient(signatureIntegration);
 
     // send request to signature client
     const data = await signatureClient.startSignatureRequest(
@@ -83,7 +84,7 @@ async function startSignatureProcess(
       }
     );
 
-    const provider = orgSignatureIntegration.provider.toUpperCase();
+    const provider = signatureIntegration.provider.toUpperCase();
     await ctx.petitions.updatePetitionSignature(petitionSignatureRequestId, {
       external_id: `${provider}/${data.id}`,
       data,
@@ -101,7 +102,8 @@ async function cancelSignatureProcess(
   ctx: WorkerContext
 ) {
   const petitionSignatureRequest = await ctx.petitions.loadPetitionSignatureById(
-    payload.petitionSignatureRequestId
+    payload.petitionSignatureRequestId,
+    { cache: false }
   );
   if (!petitionSignatureRequest) {
     throw new Error(
@@ -122,9 +124,11 @@ async function cancelSignatureProcess(
 
   const petitionId = petitionSignatureRequest.petition_id;
   const petition = await fetchPetition(petitionId, ctx);
+  const config = petition.signature_config as PetitionSignatureConfig;
 
   const signatureIntegration = await fetchOrgSignatureIntegration(
     petition.org_id,
+    config.provider,
     ctx
   );
 
@@ -136,9 +140,63 @@ async function cancelSignatureProcess(
   await signatureClient.cancelSignatureRequest(externalId);
 }
 
+/* restarts the signature process for petition */
+async function restartSignatureProcess(
+  payload: { petitionId: string },
+  ctx: WorkerContext
+) {
+  const { id: petitionId } = fromGlobalId(payload.petitionId, "Petition");
+  const [signature] = await ctx.petitions.loadPetitionSignaturesByPetitionId(
+    petitionId,
+    "PROCESSING"
+  );
+
+  if (!signature) {
+    throw new Error(
+      `Can't find any pending signature request for petition with id ${petitionId}`
+    );
+  }
+
+  if (!signature.external_id) {
+    throw new Error(
+      `PetitionSignatureRequest with id ${signature.id} has null external_id`
+    );
+  }
+
+  const externalId = signature.external_id.replace(/^.*?\//, "");
+
+  const petition = await fetchPetition(petitionId, ctx);
+  const config = petition.signature_config as PetitionSignatureConfig;
+
+  const signatureIntegration = await fetchOrgSignatureIntegration(
+    petition.org_id,
+    config.provider,
+    ctx
+  );
+
+  await ctx.petitions.updatePetitionSignature(signature.id, {
+    status: "CANCELLED",
+  });
+
+  const signatureClient = await ctx.signature.getClient(signatureIntegration);
+
+  await signatureClient.cancelSignatureRequest(externalId);
+
+  await ctx.petitions.appendPetitionSignatureEventLogs(signature.external_id, [
+    {
+      type: "document_canceled",
+      cancel_reason: "Cancelled by signature worker.",
+      created_at: new Date().toISOString(),
+    },
+  ]);
+
+  await startSignatureProcess(payload, ctx);
+}
+
 const handlers = {
   "start-signature-process": startSignatureProcess,
   "cancel-signature-process": cancelSignatureProcess,
+  "restart-signature-process": restartSignatureProcess,
 };
 
 type HandlerType = keyof typeof handlers;
@@ -163,6 +221,7 @@ createQueueWorker(
 
 async function fetchOrgSignatureIntegration(
   orgId: number,
+  provider: string,
   ctx: WorkerContext
 ): Promise<OrgIntegration> {
   const orgIntegrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
@@ -170,12 +229,12 @@ async function fetchOrgSignatureIntegration(
   );
 
   const orgSignatureIntegration = orgIntegrations.find(
-    (i) => i.type === "SIGNATURE"
+    (i) => i.type === "SIGNATURE" && i.provider === provider.toUpperCase()
   );
 
   if (!orgSignatureIntegration) {
     throw new Error(
-      `Couldn't find any enabled signature integration for organization with id ${orgId}`
+      `Couldn't find an enabled ${provider} signature integration for organization with id ${orgId}`
     );
   }
 

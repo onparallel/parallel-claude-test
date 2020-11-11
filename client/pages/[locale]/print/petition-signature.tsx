@@ -35,7 +35,7 @@ function PdfView({ token }: { token: string }) {
     })
   );
 
-  const petition = data?.petitionSignatureRequest?.petition;
+  const petition = data?.petitionSignatureRequestToken?.petition;
   const orgName = petition?.organization.name;
   const orgLogo = petition?.organization.logoUrl;
   const settings = petition?.signatureConfig;
@@ -165,7 +165,7 @@ PdfView.getInitialProps = async ({
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($token: String!) {
-        petitionSignatureRequest(token: $token) {
+        petitionSignatureRequestToken(token: $token) {
           petition {
             id
             name

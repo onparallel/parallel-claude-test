@@ -30,7 +30,10 @@ export const PetitionSignatureRequest = objectType({
     });
     t.string("externalId", {
       nullable: true,
-      resolve: (o) => o.external_id,
+      resolve: (o) => {
+        // remove provider prefix before sending to client
+        return o.external_id?.replace(/^.*?\//, "") ?? null;
+      },
     });
     t.jsonObject("settings", {
       validateArgs: notEmptyObject((o) => o.signature_settings, "settings"),
