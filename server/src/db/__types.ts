@@ -5,6 +5,9 @@
 
 type Maybe<T> = T | null;
 
+type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
+  Partial<Pick<T, K>>;
+
 export type FeatureFlagName = "PETITION_SIGNATURE";
 
 export type IntegrationType = "SIGNATURE";
@@ -142,18 +145,17 @@ export interface Contact {
   deleted_by: Maybe<string>;
 }
 
-export interface CreateContact {
-  email: string;
-  first_name?: Maybe<string>;
-  last_name?: Maybe<string>;
-  org_id: number;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-}
+export type CreateContact = PartialProps<
+  Omit<Contact, "id">,
+  | "first_name"
+  | "last_name"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
 
 export interface EmailEvent {
   id: number;
@@ -163,12 +165,10 @@ export interface EmailEvent {
   created_at: Date;
 }
 
-export interface CreateEmailEvent {
-  email_log_id: number;
-  event: string;
-  payload: string;
-  created_at?: Date;
-}
+export type CreateEmailEvent = PartialProps<
+  Omit<EmailEvent, "id">,
+  "created_at"
+>;
 
 export interface EmailLog {
   id: number;
@@ -186,20 +186,15 @@ export interface EmailLog {
   reply_to: Maybe<string>;
 }
 
-export interface CreateEmailLog {
-  to: string;
-  from: string;
-  subject: string;
-  text: string;
-  html: string;
-  track_opens?: boolean;
-  created_at?: Date;
-  created_from: string;
-  sent_at?: Maybe<Date>;
-  response?: Maybe<string>;
-  external_id?: Maybe<string>;
-  reply_to?: Maybe<string>;
-}
+export type CreateEmailLog = PartialProps<
+  Omit<EmailLog, "id">,
+  | "track_opens"
+  | "created_at"
+  | "sent_at"
+  | "response"
+  | "external_id"
+  | "reply_to"
+>;
 
 export interface FeatureFlag {
   id: number;
@@ -207,10 +202,10 @@ export interface FeatureFlag {
   default_value: boolean;
 }
 
-export interface CreateFeatureFlag {
-  name: FeatureFlagName;
-  default_value?: boolean;
-}
+export type CreateFeatureFlag = PartialProps<
+  Omit<FeatureFlag, "id">,
+  "default_value"
+>;
 
 export interface FeatureFlagOverride {
   id: number;
@@ -220,12 +215,10 @@ export interface FeatureFlagOverride {
   value: boolean;
 }
 
-export interface CreateFeatureFlagOverride {
-  feature_flag_name: FeatureFlagName;
-  org_id?: Maybe<number>;
-  user_id?: Maybe<number>;
-  value: boolean;
-}
+export type CreateFeatureFlagOverride = PartialProps<
+  Omit<FeatureFlagOverride, "id">,
+  "org_id" | "user_id"
+>;
 
 export interface FileUpload {
   id: number;
@@ -242,19 +235,16 @@ export interface FileUpload {
   deleted_by: Maybe<string>;
 }
 
-export interface CreateFileUpload {
-  path: string;
-  filename: string;
-  size: number;
-  content_type: string;
-  upload_complete?: boolean;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-}
+export type CreateFileUpload = PartialProps<
+  Omit<FileUpload, "id">,
+  | "upload_complete"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
 
 export interface Organization {
   id: number;
@@ -269,17 +259,15 @@ export interface Organization {
   deleted_by: Maybe<string>;
 }
 
-export interface CreateOrganization {
-  name: string;
-  identifier: string;
-  status: OrganizationStatus;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-}
+export type CreateOrganization = PartialProps<
+  Omit<Organization, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
 
 export interface OrgIntegration {
   id: number;
@@ -290,13 +278,10 @@ export interface OrgIntegration {
   is_enabled: boolean;
 }
 
-export interface CreateOrgIntegration {
-  org_id?: Maybe<number>;
-  type: IntegrationType;
-  provider: string;
-  settings?: Maybe<any>;
-  is_enabled?: boolean;
-}
+export type CreateOrgIntegration = PartialProps<
+  Omit<OrgIntegration, "id">,
+  "org_id" | "settings" | "is_enabled"
+>;
 
 export interface Petition {
   id: number;
@@ -323,29 +308,28 @@ export interface Petition {
   signature_config: Maybe<any>;
 }
 
-export interface CreatePetition {
-  org_id: number;
-  name?: Maybe<string>;
-  custom_ref?: Maybe<string>;
-  locale: string;
-  is_template?: boolean;
-  status?: Maybe<PetitionStatus>;
-  deadline?: Maybe<Date>;
-  email_subject?: Maybe<string>;
-  email_body?: Maybe<string>;
-  reminders_active?: boolean;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-  reminders_config?: Maybe<any>;
-  template_description?: Maybe<string>;
-  template_public?: boolean;
-  from_template_id?: Maybe<number>;
-  signature_config?: Maybe<any>;
-}
+export type CreatePetition = PartialProps<
+  Omit<Petition, "id">,
+  | "name"
+  | "custom_ref"
+  | "is_template"
+  | "status"
+  | "deadline"
+  | "email_subject"
+  | "email_body"
+  | "reminders_active"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "reminders_config"
+  | "template_description"
+  | "template_public"
+  | "from_template_id"
+  | "signature_config"
+>;
 
 export interface PetitionAccess {
   id: number;
@@ -364,21 +348,17 @@ export interface PetitionAccess {
   updated_by: Maybe<string>;
 }
 
-export interface CreatePetitionAccess {
-  petition_id: number;
-  granter_id: number;
-  contact_id: number;
-  keycode: string;
-  status: PetitionAccessStatus;
-  next_reminder_at?: Maybe<Date>;
-  reminders_active?: boolean;
-  reminders_config?: Maybe<any>;
-  reminders_left?: number;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-}
+export type CreatePetitionAccess = PartialProps<
+  Omit<PetitionAccess, "id">,
+  | "next_reminder_at"
+  | "reminders_active"
+  | "reminders_config"
+  | "reminders_left"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+>;
 
 export interface PetitionContactNotification {
   id: number;
@@ -390,14 +370,10 @@ export interface PetitionContactNotification {
   created_at: Date;
 }
 
-export interface CreatePetitionContactNotification {
-  petition_access_id: number;
-  petition_id: number;
-  type: PetitionContactNotificationType;
-  data?: Maybe<any>;
-  is_read?: boolean;
-  created_at?: Date;
-}
+export type CreatePetitionContactNotification = PartialProps<
+  Omit<PetitionContactNotification, "id">,
+  "data" | "is_read" | "created_at"
+>;
 
 export interface PetitionEvent {
   id: number;
@@ -407,12 +383,10 @@ export interface PetitionEvent {
   created_at: Date;
 }
 
-export interface CreatePetitionEvent {
-  petition_id: number;
-  type: PetitionEventType;
-  data?: Maybe<any>;
-  created_at?: Date;
-}
+export type CreatePetitionEvent = PartialProps<
+  Omit<PetitionEvent, "id">,
+  "data" | "created_at"
+>;
 
 export interface PetitionField {
   id: number;
@@ -434,24 +408,22 @@ export interface PetitionField {
   is_fixed: boolean;
 }
 
-export interface CreatePetitionField {
-  petition_id: number;
-  position: number;
-  type: PetitionFieldType;
-  title?: Maybe<string>;
-  description?: Maybe<string>;
-  optional?: boolean;
-  multiple?: boolean;
-  options?: Maybe<any>;
-  validated?: boolean;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-  is_fixed?: boolean;
-}
+export type CreatePetitionField = PartialProps<
+  Omit<PetitionField, "id">,
+  | "title"
+  | "description"
+  | "optional"
+  | "multiple"
+  | "options"
+  | "validated"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "is_fixed"
+>;
 
 export interface PetitionFieldComment {
   id: number;
@@ -470,21 +442,19 @@ export interface PetitionFieldComment {
   deleted_by: Maybe<string>;
 }
 
-export interface CreatePetitionFieldComment {
-  petition_id: number;
-  petition_field_id: number;
-  petition_field_reply_id?: Maybe<number>;
-  content: string;
-  user_id?: Maybe<number>;
-  petition_access_id?: Maybe<number>;
-  published_at?: Maybe<Date>;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-}
+export type CreatePetitionFieldComment = PartialProps<
+  Omit<PetitionFieldComment, "id">,
+  | "petition_field_reply_id"
+  | "user_id"
+  | "petition_access_id"
+  | "published_at"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
 
 export interface PetitionFieldReply {
   id: number;
@@ -501,19 +471,16 @@ export interface PetitionFieldReply {
   status: PetitionFieldReplyStatus;
 }
 
-export interface CreatePetitionFieldReply {
-  petition_field_id: number;
-  type: PetitionFieldType;
-  content: any;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-  petition_access_id: number;
-  status?: PetitionFieldReplyStatus;
-}
+export type CreatePetitionFieldReply = PartialProps<
+  Omit<PetitionFieldReply, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "status"
+>;
 
 export interface PetitionMessage {
   id: number;
@@ -529,18 +496,15 @@ export interface PetitionMessage {
   created_by: Maybe<string>;
 }
 
-export interface CreatePetitionMessage {
-  petition_id: number;
-  petition_access_id: number;
-  sender_id: number;
-  email_subject?: Maybe<string>;
-  email_body?: Maybe<string>;
-  status: PetitionMessageStatus;
-  scheduled_at?: Maybe<Date>;
-  email_log_id?: Maybe<number>;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-}
+export type CreatePetitionMessage = PartialProps<
+  Omit<PetitionMessage, "id">,
+  | "email_subject"
+  | "email_body"
+  | "scheduled_at"
+  | "email_log_id"
+  | "created_at"
+  | "created_by"
+>;
 
 export interface PetitionReminder {
   id: number;
@@ -553,15 +517,10 @@ export interface PetitionReminder {
   petition_access_id: number;
 }
 
-export interface CreatePetitionReminder {
-  email_log_id?: Maybe<number>;
-  type: PetitionReminderType;
-  status: PetitionReminderStatus;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  sender_id?: Maybe<number>;
-  petition_access_id: number;
-}
+export type CreatePetitionReminder = PartialProps<
+  Omit<PetitionReminder, "id">,
+  "email_log_id" | "created_at" | "created_by" | "sender_id"
+>;
 
 export interface PetitionUser {
   id: number;
@@ -577,18 +536,17 @@ export interface PetitionUser {
   deleted_by: Maybe<string>;
 }
 
-export interface CreatePetitionUser {
-  petition_id: number;
-  user_id: number;
-  permission_type?: PetitionUserPermissionType;
-  is_subscribed?: boolean;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-}
+export type CreatePetitionUser = PartialProps<
+  Omit<PetitionUser, "id">,
+  | "permission_type"
+  | "is_subscribed"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
 
 export interface PetitionUserNotification {
   id: number;
@@ -600,14 +558,10 @@ export interface PetitionUserNotification {
   created_at: Date;
 }
 
-export interface CreatePetitionUserNotification {
-  user_id: number;
-  petition_id: number;
-  type: PetitionUserNotificationType;
-  data?: Maybe<any>;
-  is_read?: boolean;
-  created_at?: Date;
-}
+export type CreatePetitionUserNotification = PartialProps<
+  Omit<PetitionUserNotification, "id">,
+  "data" | "is_read" | "created_at"
+>;
 
 export interface User {
   id: number;
@@ -627,19 +581,17 @@ export interface User {
   onboarding_status: any;
 }
 
-export interface CreateUser {
-  cognito_id: string;
-  org_id: number;
-  organization_role?: UserOrganizationRole;
-  email: string;
-  first_name?: Maybe<string>;
-  last_name?: Maybe<string>;
-  created_at?: Date;
-  created_by?: Maybe<string>;
-  updated_at?: Date;
-  updated_by?: Maybe<string>;
-  deleted_at?: Maybe<Date>;
-  deleted_by?: Maybe<string>;
-  last_active_at?: Maybe<Date>;
-  onboarding_status?: any;
-}
+export type CreateUser = PartialProps<
+  Omit<User, "id">,
+  | "organization_role"
+  | "first_name"
+  | "last_name"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "last_active_at"
+  | "onboarding_status"
+>;
