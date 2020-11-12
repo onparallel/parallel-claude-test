@@ -2211,10 +2211,9 @@ input SignatureConfigInput {
 }
 
 type SignatureDeclinedEvent implements PetitionEvent {
+  contact: Contact
   createdAt: DateTime!
   declineReason: String
-  declinerEmail: String!
-  declinerName: String!
   id: GID!
 }
 

@@ -506,11 +506,12 @@ export const SignatureCancelledEvent = createPetitionEvent(
 export const SignatureDeclinedEvent = createPetitionEvent(
   "SignatureDeclinedEvent",
   (t) => {
-    t.string("declinerName", {
-      resolve: ({ data }) => data.decliner_name,
-    });
-    t.string("declinerEmail", {
-      resolve: ({ data }) => data.decliner_email,
+    t.field("contact", {
+      nullable: true,
+      type: "Contact",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.contacts.loadContactByEmail(data.decliner_email);
+      },
     });
     t.string("declineReason", {
       nullable: true,

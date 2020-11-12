@@ -17,6 +17,10 @@ export class ContactRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
+  readonly loadContactByEmail = this.buildLoadBy("contact", "email", (q) =>
+    q.whereNull("deleted_at")
+  );
+
   async userHasAccessToContacts(user: User, contactIds: number[]) {
     const [{ count }] = await this.from("contact")
       .where({

@@ -917,10 +917,9 @@ export interface NexusGenFieldTypes {
   };
   SignatureDeclinedEvent: {
     // field return type
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     declineReason: string | null; // String
-    declinerEmail: string; // String!
-    declinerName: string; // String!
     id: NexusGenScalars["GID"]; // GID!
   };
   SignatureStartedEvent: {

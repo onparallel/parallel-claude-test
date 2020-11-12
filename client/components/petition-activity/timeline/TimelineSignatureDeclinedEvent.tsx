@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, useDisclosure } from "@chakra-ui/core";
 import { SignatureIcon } from "@parallel/chakra/icons";
+import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -32,10 +34,13 @@ export function TimelineSignatureDeclinedEvent({
         <Box>
           <FormattedMessage
             id="timeline.signature-declined-description"
-            defaultMessage="{declinerName} ({declinerEmail}) declined the signature {timeAgo}"
+            defaultMessage="{contact} declined the signature {timeAgo}"
             values={{
-              declinerName: event.declinerName,
-              declinerEmail: event.declinerEmail,
+              contact: event.contact ? (
+                <ContactLink contact={event.contact} />
+              ) : (
+                <DeletedContact />
+              ),
               timeAgo: (
                 <DateTime
                   value={event.createdAt}
@@ -59,8 +64,7 @@ export function TimelineSignatureDeclinedEvent({
       <SignatureDeclinedEventModal
         isOpen={isOpen}
         onClose={onClose}
-        declinerEmail={event.declinerEmail}
-        declinerName={event.declinerName}
+        contact={event.contact ?? null}
         declineReason={event.declineReason!}
       />
     </TimelineItem>
@@ -70,10 +74,12 @@ export function TimelineSignatureDeclinedEvent({
 TimelineSignatureDeclinedEvent.fragments = {
   SignatureDeclinedEvent: gql`
     fragment TimelineSignatureDeclinedEvent_SignatureDeclinedEvent on SignatureDeclinedEvent {
-      declinerEmail
-      declinerName
+      contact {
+        ...ContactLink_Contact
+      }
       declineReason
       createdAt
     }
+    ${ContactLink.fragments.Contact}
   `,
 };

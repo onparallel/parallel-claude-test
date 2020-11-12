@@ -1450,10 +1450,9 @@ export type SignatureConfigInput = {
 
 export type SignatureDeclinedEvent = PetitionEvent & {
   __typename?: "SignatureDeclinedEvent";
+  contact?: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
   declineReason?: Maybe<Scalars["String"]>;
-  declinerEmail: Scalars["String"];
-  declinerName: Scalars["String"];
   id: Scalars["GID"];
 };
 
@@ -2211,10 +2210,9 @@ export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
 
 export type TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragment = {
   __typename?: "SignatureDeclinedEvent";
-} & Pick<
-  SignatureDeclinedEvent,
-  "declinerEmail" | "declinerName" | "declineReason" | "createdAt"
->;
+} & Pick<SignatureDeclinedEvent, "declineReason" | "createdAt"> & {
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
 
 export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   __typename?: "SignatureStartedEvent";
@@ -4819,11 +4817,13 @@ export const TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc = gq
 `;
 export const TimelineSignatureDeclinedEvent_SignatureDeclinedEventFragmentDoc = gql`
   fragment TimelineSignatureDeclinedEvent_SignatureDeclinedEvent on SignatureDeclinedEvent {
-    declinerEmail
-    declinerName
+    contact {
+      ...ContactLink_Contact
+    }
     declineReason
     createdAt
   }
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc = gql`
   fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {

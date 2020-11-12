@@ -9,18 +9,19 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/core";
+import { ContactLink_ContactFragment, Maybe } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
+import { ContactLink } from "../common/ContactLink";
+import { DeletedContact } from "../common/DeletedContact";
 
 export type SignatureDeclinedEventModalProps = Omit<ModalProps, "children"> & {
   declineReason: string;
-  declinerEmail: string;
-  declinerName: string;
+  contact: Maybe<ContactLink_ContactFragment>;
 };
 
 export function SignatureDeclinedEventModal({
   declineReason,
-  declinerEmail,
-  declinerName,
+  contact,
   ...props
 }: SignatureDeclinedEventModalProps) {
   const intl = useIntl();
@@ -37,7 +38,11 @@ export function SignatureDeclinedEventModal({
           <ModalBody paddingY={6}>
             <Stack>
               <Text fontSize="lg" fontWeight="bold">
-                {declinerName} ({declinerEmail})
+                {contact ? (
+                  <ContactLink contact={contact} />
+                ) : (
+                  <DeletedContact />
+                )}
               </Text>
 
               <Box>
