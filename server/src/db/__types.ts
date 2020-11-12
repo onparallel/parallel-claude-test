@@ -547,7 +547,7 @@ export interface PetitionSignatureRequest {
   cancel_reason: Maybe<PetitionSignatureCancelReason>;
   cancel_data: Maybe<any>;
   data: Maybe<any>;
-  event_logs: Maybe<any[]>;
+  event_logs: Maybe<any>;
   file_upload_id: Maybe<number>;
   created_at: Date;
   updated_at: Date;
@@ -561,7 +561,7 @@ export interface CreatePetitionSignatureRequest {
   cancel_reason?: Maybe<PetitionSignatureCancelReason>;
   cancel_data?: Maybe<any>;
   data?: Maybe<any>;
-  event_logs?: Maybe<any[]>;
+  event_logs?: Maybe<any>;
   file_upload_id?: Maybe<number>;
   created_at?: Date;
   updated_at?: Date;

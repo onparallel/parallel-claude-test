@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
     }).nullable();
     t.jsonb("cancel_data").nullable();
     t.jsonb("data");
-    t.specificType("event_logs", "jsonb[]").defaultTo("{}");
+    t.jsonb("event_logs").defaultTo("[]");
     t.integer("file_upload_id").nullable().references("file_upload.id");
     t.timestamp("created_at")
       .notNullable()
