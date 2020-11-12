@@ -23,7 +23,6 @@ import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermi
 import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
 import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopenedEvent";
 import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
-import { TimelineSignatureDeclinedEvent } from "./timeline/TimelineSignatureDeclinedEvent";
 import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
 import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
 
@@ -107,9 +106,7 @@ export function PetitionActivityTimeline({
             ) : event.__typename === "PetitionReopenedEvent" ? (
               <TimelinePetitionReopenedEvent event={event} userId={userId} />
             ) : event.__typename === "SignatureStartedEvent" ? (
-              <TimelineSignatureStartedEvent event={event} userId={userId} />
-            ) : event.__typename === "SignatureDeclinedEvent" ? (
-              <TimelineSignatureDeclinedEvent event={event} />
+              <TimelineSignatureStartedEvent event={event} />
             ) : event.__typename === "SignatureCompletedEvent" ? (
               <TimelineSignatureCompletedEvent event={event} />
             ) : event.__typename === "SignatureCancelledEvent" ? (
@@ -201,9 +198,6 @@ PetitionActivityTimeline.fragments = {
       ... on SignatureStartedEvent {
         ...TimelineSignatureStartedEvent_SignatureStartedEvent
       }
-      ... on SignatureDeclinedEvent {
-        ...TimelineSignatureDeclinedEvent_SignatureDeclinedEvent
-      }
       ... on SignatureCompletedEvent {
         ...TimelineSignatureCompletedEvent_SignatureCompletedEvent
       }
@@ -232,7 +226,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelinePetitionClosedNotifiedEvent.fragments.PetitionClosedNotifiedEvent}
     ${TimelinePetitionReopenedEvent.fragments.PetitionReopenedEvent}
     ${TimelineSignatureStartedEvent.fragments.SignatureStartedEvent}
-    ${TimelineSignatureDeclinedEvent.fragments.SignatureDeclinedEvent}
     ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}
     ${TimelineSignatureCancelledEvent.fragments.SignatureCancelledEvent}
   `,

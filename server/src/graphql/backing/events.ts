@@ -1,5 +1,6 @@
 import {
   PetitionEventType,
+  PetitionSignatureCancelReason,
   PetitionUserPermissionType,
 } from "../../db/__types";
 export type PetitionEventPayload<TType extends PetitionEventType> = {
@@ -62,21 +63,18 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
   SIGNATURE_STARTED: {
     petition_signature_request_id: number;
-    user_id: number;
   };
   SIGNATURE_CANCELLED: {
     petition_signature_request_id: number;
-    user_id: number;
+    cancel_reason: PetitionSignatureCancelReason;
+    cancel_data?: {
+      canceller_id?: number; // User or Contact
+      canceller_reason?: string;
+    };
   };
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
     file_upload_id: number;
-  };
-  SIGNATURE_DECLINED: {
-    petition_signature_request_id: number;
-    decliner_name: string;
-    decliner_email: string;
-    decline_reason?: string;
   };
 }[TType];
 
@@ -126,8 +124,6 @@ export type SignatureCancelledEvent = GenericPetitionEvent<
   "SIGNATURE_CANCELLED"
 >;
 
-export type SignatureDeclinedEvent = GenericPetitionEvent<"SIGNATURE_DECLINED">;
-
 export type PetitionEvent =
   | PetitionCreatedEvent
   | PetitionCompletedEvent
@@ -151,5 +147,4 @@ export type PetitionEvent =
   | PetitionReopenedEvent
   | SignatureStartedEvent
   | SignatureCompletedEvent
-  | SignatureCancelledEvent
-  | SignatureDeclinedEvent;
+  | SignatureCancelledEvent;

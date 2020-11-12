@@ -154,7 +154,12 @@ export interface NexusGenEnums {
   PetitionLocale: "en" | "es";
   PetitionMessageStatus: db.PetitionMessageStatus;
   PetitionReminderType: db.PetitionReminderType;
-  PetitionSignatureRequestStatus: "CANCELLED" | "COMPLETED" | "PROCESSING";
+  PetitionSignatureCancelReason: db.PetitionSignatureCancelReason;
+  PetitionSignatureRequestStatus:
+    | "CANCELLED"
+    | "COMPLETED"
+    | "ENQUEUED"
+    | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
   PetitionUserPermissionType: db.PetitionUserPermissionType;
   PetitionUserPermissionTypeRW: "READ" | "WRITE";
@@ -315,7 +320,6 @@ export interface NexusGenRootTypes {
     contactIds: number[];
     timezone: string;
   };
-  SignatureDeclinedEvent: events.SignatureDeclinedEvent;
   SignatureStartedEvent: events.SignatureStartedEvent;
   SupportMethodResponse: {
     // root type
@@ -377,6 +381,7 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   PetitionLocale: NexusGenEnums["PetitionLocale"];
   PetitionMessageStatus: NexusGenEnums["PetitionMessageStatus"];
   PetitionReminderType: NexusGenEnums["PetitionReminderType"];
+  PetitionSignatureCancelReason: NexusGenEnums["PetitionSignatureCancelReason"];
   PetitionSignatureRequestStatus: NexusGenEnums["PetitionSignatureRequestStatus"];
   PetitionStatus: NexusGenEnums["PetitionStatus"];
   PetitionUserPermissionType: NexusGenEnums["PetitionUserPermissionType"];
@@ -481,7 +486,7 @@ export interface NexusGenFieldTypes {
     addPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     cancelScheduledMessage: NexusGenRootTypes["PetitionMessage"] | null; // PetitionMessage
-    cancelSignatureRequest: NexusGenEnums["Result"]; // Result!
+    cancelSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     changePassword: NexusGenEnums["ChangePasswordResult"]; // ChangePasswordResult!
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
@@ -515,12 +520,11 @@ export interface NexusGenFieldTypes {
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
-    restartSignatureRequest: NexusGenEnums["Result"]; // Result!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
-    startSignatureRequest: NexusGenEnums["Result"]; // Result!
+    startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
@@ -896,6 +900,9 @@ export interface NexusGenFieldTypes {
   };
   SignatureCancelledEvent: {
     // field return type
+    cancellerReason: string | null; // String
+    cancelType: NexusGenEnums["PetitionSignatureCancelReason"]; // PetitionSignatureCancelReason!
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
@@ -912,18 +919,10 @@ export interface NexusGenFieldTypes {
     provider: string; // String!
     timezone: string; // String!
   };
-  SignatureDeclinedEvent: {
-    // field return type
-    contact: NexusGenRootTypes["Contact"] | null; // Contact
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    declineReason: string | null; // String
-    id: NexusGenScalars["GID"]; // GID!
-  };
   SignatureStartedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    user: NexusGenRootTypes["User"] | null; // User
   };
   SupportMethodResponse: {
     // field return type
@@ -1038,7 +1037,7 @@ export interface NexusGenArgTypes {
     };
     cancelSignatureRequest: {
       // args
-      petitionId: NexusGenScalars["GID"]; // GID!
+      petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
     };
     changePassword: {
       // args
@@ -1216,10 +1215,6 @@ export interface NexusGenArgTypes {
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     reopenPetition: {
-      // args
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    restartSignatureRequest: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
@@ -1438,7 +1433,6 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "ReplyDeletedEvent"
     | "SignatureCancelledEvent"
     | "SignatureCompletedEvent"
-    | "SignatureDeclinedEvent"
     | "SignatureStartedEvent"
     | "UserPermissionAddedEvent"
     | "UserPermissionEditedEvent"
@@ -1515,7 +1509,6 @@ export type NexusGenObjectNames =
   | "SignatureCancelledEvent"
   | "SignatureCompletedEvent"
   | "SignatureConfig"
-  | "SignatureDeclinedEvent"
   | "SignatureStartedEvent"
   | "SupportMethodResponse"
   | "User"
@@ -1551,6 +1544,7 @@ export type NexusGenEnumNames =
   | "PetitionLocale"
   | "PetitionMessageStatus"
   | "PetitionReminderType"
+  | "PetitionSignatureCancelReason"
   | "PetitionSignatureRequestStatus"
   | "PetitionStatus"
   | "PetitionUserPermissionType"

@@ -41,8 +41,7 @@ export type PetitionEventType =
   | "PETITION_REOPENED"
   | "SIGNATURE_STARTED"
   | "SIGNATURE_COMPLETED"
-  | "SIGNATURE_CANCELLED"
-  | "SIGNATURE_DECLINED";
+  | "SIGNATURE_CANCELLED";
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
 
@@ -58,7 +57,15 @@ export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
 
 export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
-export type PetitionSignatureStatus = "PROCESSING" | "CANCELLED" | "COMPLETED";
+export type PetitionSignatureCancelReason =
+  | "CANCELLED_BY_USER"
+  | "DECLINED_BY_SIGNER";
+
+export type PetitionSignatureStatus =
+  | "ENQUEUED"
+  | "PROCESSING"
+  | "CANCELLED"
+  | "COMPLETED";
 
 export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CLOSED";
 
@@ -537,6 +544,8 @@ export interface PetitionSignatureRequest {
   external_id: Maybe<string>;
   signature_config: any;
   status: PetitionSignatureStatus;
+  cancel_reason: Maybe<PetitionSignatureCancelReason>;
+  cancel_data: Maybe<any>;
   data: Maybe<any>;
   event_logs: Maybe<any[]>;
   file_upload_id: Maybe<number>;
@@ -549,6 +558,8 @@ export interface CreatePetitionSignatureRequest {
   external_id?: Maybe<string>;
   signature_config: any;
   status?: PetitionSignatureStatus;
+  cancel_reason?: Maybe<PetitionSignatureCancelReason>;
+  cancel_data?: Maybe<any>;
   data?: Maybe<any>;
   event_logs?: Maybe<any[]>;
   file_upload_id?: Maybe<number>;

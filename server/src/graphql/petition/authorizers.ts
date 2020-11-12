@@ -1,7 +1,7 @@
 import { FieldAuthorizeResolver } from "@nexus/schema";
 import { Arg } from "../helpers/authorize";
 import { unMaybeArray } from "../../util/arrays";
-import { PetitionUserPermissionType } from "../../db/__types";
+import { FeatureFlagName, PetitionUserPermissionType } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
 
 export function userHasAccessToPetitions<
@@ -22,6 +22,27 @@ export function userHasAccessToPetitions<
         ctx.user!.id,
         petitionIds,
         permissionTypes
+      );
+    } catch {}
+    return false;
+  };
+}
+
+export function userHasAccessToSignatureRequest<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const signatureRequestIds = unMaybeArray(args[argName]);
+      if (signatureRequestIds.length === 0) {
+        return true;
+      }
+
+      return ctx.petitions.userHasAccessToPetitionSignatureRequests(
+        ctx.user!.id,
+        signatureRequestIds
       );
     } catch {}
     return false;
@@ -187,6 +208,18 @@ export function accessesBelongToValidContacts<
       return ctx.petitions.accessesBelongToValidContacts(
         unMaybeArray(args[argNameAccessIds])
       );
+    } catch {}
+    return false;
+  };
+}
+
+export function userHasFeatureFlag<
+  TypeName extends string,
+  FieldName extends string
+>(feature: FeatureFlagName): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      return ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, feature);
     } catch {}
     return false;
   };

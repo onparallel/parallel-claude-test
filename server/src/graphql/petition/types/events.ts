@@ -55,8 +55,6 @@ export const PetitionEvent = interfaceType({
           return "SignatureCompletedEvent";
         case "SIGNATURE_CANCELLED":
           return "SignatureCancelledEvent";
-        case "SIGNATURE_DECLINED":
-          return "SignatureDeclinedEvent";
       }
     });
   },
@@ -459,15 +457,7 @@ export const PetitionReopenedEvent = createPetitionEvent(
  */
 export const SignatureStartedEvent = createPetitionEvent(
   "SignatureStartedEvent",
-  (t) => {
-    t.field("user", {
-      type: "User",
-      nullable: true,
-      resolve: async ({ data }, _, ctx) => {
-        return await ctx.users.loadUser(data.user_id);
-      },
-    });
-  }
+  (t) => {}
 );
 
 /**
@@ -494,28 +484,36 @@ export const SignatureCancelledEvent = createPetitionEvent(
       type: "User",
       nullable: true,
       resolve: async ({ data }, _, ctx) => {
-        return await ctx.users.loadUser(data.user_id);
+        const cancellerId = data.cancel_data?.canceller_id;
+        if (data.cancel_reason === "CANCELLED_BY_USER" && cancellerId) {
+          return await ctx.users.loadUser(cancellerId);
+        }
+        return null;
       },
     });
-  }
-);
-
-/**
- * Triggered when a signer declines the signature.
- */
-export const SignatureDeclinedEvent = createPetitionEvent(
-  "SignatureDeclinedEvent",
-  (t) => {
     t.field("contact", {
-      nullable: true,
       type: "Contact",
+      nullable: true,
       resolve: async ({ data }, _, ctx) => {
-        return await ctx.contacts.loadContactByEmail(data.decliner_email);
+        const cancellerId = data.cancel_data?.canceller_id;
+        if (data.cancel_reason === "DECLINED_BY_SIGNER" && cancellerId) {
+          return await ctx.contacts.loadContact(cancellerId);
+        }
+        return null;
       },
     });
-    t.string("declineReason", {
+    t.field("cancellerReason", {
+      type: "String",
       nullable: true,
-      resolve: ({ data }) => data.decline_reason ?? null,
+      resolve: ({ data }) => {
+        return data.cancel_data?.canceller_reason ?? null;
+      },
+    });
+    t.field("cancelType", {
+      type: "PetitionSignatureCancelReason",
+      resolve: ({ data }) => {
+        return data.cancel_reason;
+      },
     });
   }
 );

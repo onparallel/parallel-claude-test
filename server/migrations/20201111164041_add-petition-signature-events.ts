@@ -5,7 +5,6 @@ export async function up(knex: Knex): Promise<void> {
     alter type "petition_event_type" add value 'SIGNATURE_STARTED';
     alter type "petition_event_type" add value 'SIGNATURE_COMPLETED';
     alter type "petition_event_type" add value 'SIGNATURE_CANCELLED';
-    alter type "petition_event_type" add value 'SIGNATURE_DECLINED';
   `);
 }
 

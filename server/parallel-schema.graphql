@@ -239,7 +239,9 @@ type Mutation {
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
-  cancelSignatureRequest(petitionId: GID!): Result!
+  cancelSignatureRequest(
+    petitionSignatureRequestId: GID!
+  ): PetitionSignatureRequest!
 
   """
   Changes the password for the current logged in user.
@@ -531,7 +533,6 @@ type Mutation {
   Reopens the petition
   """
   reopenPetition(petitionId: GID!): Petition!
-  restartSignatureRequest(petitionId: GID!): Result!
 
   """
   Sends a petition message to the speicified contacts.
@@ -569,7 +570,7 @@ type Mutation {
   Sends a reminder for the specified petition accesses.
   """
   sendReminders(accessIds: [GID!]!, petitionId: GID!): Result!
-  startSignatureRequest(petitionId: GID!): Result!
+  startSignatureRequest(petitionId: GID!): PetitionSignatureRequest!
 
   """
   Submits all unpublished comments.
@@ -1473,6 +1474,11 @@ type PetitionReopenedEvent implements PetitionEvent {
   user: User
 }
 
+enum PetitionSignatureCancelReason {
+  CANCELLED_BY_USER
+  DECLINED_BY_SIGNER
+}
+
 type PetitionSignatureRequest implements Timestamps {
   contacts: [Contact]!
 
@@ -1498,6 +1504,7 @@ type PetitionSignatureRequest implements Timestamps {
 enum PetitionSignatureRequestStatus {
   CANCELLED
   COMPLETED
+  ENQUEUED
   PROCESSING
 }
 
@@ -2160,6 +2167,9 @@ type SendPetitionResult {
 }
 
 type SignatureCancelledEvent implements PetitionEvent {
+  cancellerReason: String
+  cancelType: PetitionSignatureCancelReason!
+  contact: Contact
   createdAt: DateTime!
   id: GID!
   user: User
@@ -2211,17 +2221,9 @@ input SignatureConfigInput {
   timezone: String!
 }
 
-type SignatureDeclinedEvent implements PetitionEvent {
-  contact: Contact
-  createdAt: DateTime!
-  declineReason: String
-  id: GID!
-}
-
 type SignatureStartedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
-  user: User
 }
 
 """

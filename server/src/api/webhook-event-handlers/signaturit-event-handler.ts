@@ -44,8 +44,6 @@ export type SignaturItEventBody = {
 
 export function signaturItEventHandler(type: SignatureEvents) {
   switch (type) {
-    case "document_canceled":
-      return documentCanceled;
     case "document_declined":
       return documentDeclined;
     case "document_completed":
@@ -53,21 +51,6 @@ export function signaturItEventHandler(type: SignatureEvents) {
     default:
       return appendEventLogs;
   }
-}
-
-/** signature process was canceled, need to update petition_signature_request table */
-async function documentCanceled(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
-) {
-  const externalId = `SIGNATURIT/${data.document.signature.id}`;
-  await ctx.petitions.updatePetitionSignatureByExternalId(externalId, {
-    status: "CANCELLED",
-    data,
-  });
-
-  await appendEventLogs(petitionId, data, ctx);
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
@@ -78,20 +61,42 @@ async function documentDeclined(
 ) {
   // when a document is declined, the signature request is automatically cancelled for all recipients
   const externalId = `SIGNATURIT/${data.document.signature.id}`;
-  await ctx.petitions.updatePetitionSignatureByExternalId(externalId, {
-    status: "CANCELLED",
-    data,
+
+  const petition = await ctx.petitions.loadPetition(petitionId);
+  if (!petition) {
+    throw new Error(`Can't find petition with id ${petitionId}`);
+  }
+
+  const contact = await ctx.contacts.loadContactByEmail({
+    orgId: petition.org_id,
+    email: data.document.email,
   });
+
+  const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
+    externalId,
+    {
+      status: "CANCELLED",
+      cancel_reason: "DECLINED_BY_SIGNER",
+      cancel_data: {
+        contact_id: contact?.id,
+        decline_reason: data.document.decline_reason,
+      },
+      data,
+    }
+  );
 
   await appendEventLogs(petitionId, data, ctx);
 
   await ctx.petitions.createEvent({
-    type: "SIGNATURE_DECLINED",
+    type: "SIGNATURE_CANCELLED",
     petitionId,
     data: {
-      decliner_email: data.document.email,
-      decliner_name: data.document.name,
-      decline_reason: data.document.decline_reason,
+      petition_signature_request_id: signatureRequest.id,
+      cancel_reason: "DECLINED_BY_SIGNER",
+      cancel_data: {
+        canceller_id: contact?.id,
+        canceller_reason: data.document.decline_reason,
+      },
     },
   });
 }
@@ -154,11 +159,14 @@ async function documentCompleted(
   );
 
   const externalId = `SIGNATURIT/${signatureId}`;
-  await ctx.petitions.updatePetitionSignatureByExternalId(externalId, {
-    status: "COMPLETED",
-    file_upload_id: file.id,
-    data,
-  });
+  const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
+    externalId,
+    {
+      status: "COMPLETED",
+      file_upload_id: file.id,
+      data,
+    }
+  );
 
   await appendEventLogs(petitionId, data, ctx);
 
@@ -166,6 +174,7 @@ async function documentCompleted(
     type: "SIGNATURE_COMPLETED",
     petitionId,
     data: {
+      petition_signature_request_id: signatureRequest.id,
       file_upload_id: file.id,
     },
   });

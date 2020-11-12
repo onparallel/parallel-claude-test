@@ -2395,7 +2395,6 @@ export class PetitionRepository extends BaseRepository {
     const [row] = await this.insert("petition_signature_request", {
       petition_id: petitionId,
       signature_config: config,
-      status: "PROCESSING",
     }).returning("*");
 
     return row;
@@ -2405,24 +2404,30 @@ export class PetitionRepository extends BaseRepository {
     petitionSignatureId: number,
     data: Partial<PetitionSignatureRequest>
   ) {
-    return this.from("petition_signature_request")
+    const [row] = await this.from("petition_signature_request")
       .where("id", petitionSignatureId)
       .update({
         ...data,
         updated_at: this.now(),
-      });
+      })
+      .returning("*");
+
+    return row;
   }
 
   async updatePetitionSignatureByExternalId(
-    externalId: string,
+    prefixedExternalId: string,
     data: Partial<Omit<PetitionSignatureRequest, "event_logs">>
   ) {
-    return await this.from("petition_signature_request")
-      .where("external_id", externalId)
+    const [row] = await this.from("petition_signature_request")
+      .where("external_id", prefixedExternalId)
       .update({
         ...data,
         updated_at: this.now(),
-      });
+      })
+      .returning("*");
+
+    return row;
   }
 
   async appendPetitionSignatureEventLogs(
@@ -2437,5 +2442,25 @@ export class PetitionRepository extends BaseRepository {
       `,
       [logs, prefixedExternalId]
     );
+  }
+
+  async userHasAccessToPetitionSignatureRequests(
+    userId: number,
+    ids: number[]
+  ) {
+    const [{ count }] = await this.from("petition_signature_request")
+      .join(
+        "petition_user",
+        "petition_signature_request.petition_id",
+        "petition_user.petition_id"
+      )
+      .whereIn("petition_signature_request.id", ids)
+      .where("petition_user.user_id", userId)
+      .where("petition_user.permission_type", "OWNER")
+      .whereNull("petition_user.deleted_at")
+      .whereNull("petition_user.deleted_at")
+      .select(this.count());
+
+    return count === new Set(ids).size;
   }
 }

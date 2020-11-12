@@ -110,9 +110,6 @@ const result: IntrospectionResultData = {
             name: "SignatureCompletedEvent",
           },
           {
-            name: "SignatureDeclinedEvent",
-          },
-          {
             name: "SignatureStartedEvent",
           },
           {

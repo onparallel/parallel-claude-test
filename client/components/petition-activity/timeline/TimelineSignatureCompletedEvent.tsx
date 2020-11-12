@@ -5,7 +5,6 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineSignatureCompletedEvent_SignatureCompletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
-import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineSignatureCompletedEventProps = {
@@ -47,6 +46,5 @@ TimelineSignatureCompletedEvent.fragments = {
     fragment TimelineSignatureCompletedEvent_SignatureCompletedEvent on SignatureCompletedEvent {
       createdAt
     }
-    ${UserReference.fragments.User}
   `,
 };
