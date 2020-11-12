@@ -1,6 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
+import { outdent } from "outdent";
 import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
 import { unMaybeArray } from "../../util/arrays";
@@ -242,29 +243,16 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadFieldsForPetition = fromDataLoader(
-    new DataLoader<number, PetitionField[]>(async (ids) => {
-      const rows = await this.from("petition_field")
-        .whereIn("petition_id", ids)
-        .whereNull("deleted_at")
-        .select("*");
-      const byPetitionId = groupBy(rows, (r) => r.petition_id);
-      return ids.map((id) => {
-        return sortBy(byPetitionId[id as any] || [], (p) => p.position);
-      });
-    })
+  readonly loadFieldsForPetition = this.buildLoadMultipleBy(
+    "petition_field",
+    "petition_id",
+    (q) => q.whereNull("deleted_at").orderBy("position")
   );
 
-  readonly loadFieldCountForPetition = fromDataLoader(
-    new DataLoader<number, number>(async (ids) => {
-      const rows = await this.from("petition_field")
-        .whereIn("petition_id", ids)
-        .whereNull("deleted_at")
-        .groupBy("petition_id")
-        .select("petition_id", this.count());
-      const byPetitionId = indexBy(rows, (r) => r.petition_id);
-      return ids.map((id) => byPetitionId[id]?.count ?? 0);
-    })
+  readonly loadFieldCountForPetition = this.buildLoadCountBy(
+    "petition_field",
+    "petition_id",
+    (q) => q.whereNull("deleted_at")
   );
 
   readonly loadStatusForPetition = fromDataLoader(
@@ -323,15 +311,10 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadAccessByKeycode = this.buildLoadBy("petition_access", "keycode");
 
-  readonly loadAccessesForPetition = fromDataLoader(
-    new DataLoader<number, PetitionAccess[]>(async (ids) => {
-      const rows = await this.from("petition_access")
-        .whereIn("petition_id", ids)
-        .select("*")
-        .orderBy("id", "asc");
-      const byPetitionId = groupBy(rows, (r) => r.petition_id);
-      return ids.map((id) => byPetitionId[id as any] || []);
-    })
+  readonly loadAccessesForPetition = this.buildLoadMultipleBy(
+    "petition_access",
+    "petition_id",
+    (q) => q.orderBy("id")
   );
 
   async createAccesses(
@@ -1325,15 +1308,9 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
 
-  readonly loadReminderCountForAccess = fromDataLoader(
-    new DataLoader<number, number>(async (ids) => {
-      const rows = await this.from("petition_reminder")
-        .whereIn("petition_access_id", ids)
-        .groupBy("petition_access_id")
-        .select("petition_access_id", this.count());
-      const byPetitioinAccessId = indexBy(rows, (r) => r.petition_access_id);
-      return ids.map((id) => byPetitioinAccessId[id]?.count ?? 0);
-    })
+  readonly loadReminderCountForAccess = this.buildLoadCountBy(
+    "petition_reminder",
+    "petition_access_id"
   );
 
   async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
@@ -2086,24 +2063,14 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadUserPermissions = fromDataLoader(
-    new DataLoader<number, PetitionUser[]>(async (ids) => {
-      const rows = await this.from("petition_user")
-        .whereIn("petition_id", ids)
-        .whereNull("deleted_at")
-        .select("*");
-      const byPetitionId = groupBy(rows, (r) => r.petition_id);
-      const order = ["OWNER", "WRITE", "READ"];
-      return ids.map(
-        (id) =>
-          byPetitionId[id]?.sort((a, b) =>
-            a.permission_type === b.permission_type
-              ? a.created_at.valueOf() - b.created_at.valueOf()
-              : order.indexOf(a.permission_type) -
-                order.indexOf(b.permission_type)
-          ) ?? null
-      );
-    })
+  readonly loadUserPermissions = this.buildLoadMultipleBy(
+    "petition_user",
+    "petition_id",
+    (q) =>
+      q.whereNull("deleted_at").orderByRaw(/* sql */ outdent`
+        case "permission_type" ${["OWNER", "WRITE", "READ"]
+          .map((v, i) => `when '${v}' then ${i}`)
+          .join(" ")} end, "created_at"`)
   );
 
   readonly loadPetitionOwners = fromDataLoader(

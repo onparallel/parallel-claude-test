@@ -2,15 +2,7 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import {
-  CreateEmailLog,
-  EmailLog,
-  CreateEmailEvent,
-  EmailEvent,
-} from "../__types";
-import { fromDataLoader } from "../../util/fromDataLoader";
-import DataLoader from "dataloader";
-import { groupBy, sortBy } from "remeda";
+import { CreateEmailEvent, CreateEmailLog, EmailLog } from "../__types";
 
 @injectable()
 export class EmailLogRepository extends BaseRepository {
@@ -48,13 +40,9 @@ export class EmailLogRepository extends BaseRepository {
     return await this.insert("email_event", data);
   }
 
-  readonly loadEmailEvents = fromDataLoader(
-    new DataLoader<number, EmailEvent[]>(async (ids) => {
-      const rows = await this.from("email_event").whereIn("email_log_id", ids);
-      const byEmailId = groupBy(rows, (r) => r.email_log_id);
-      return ids.map((id) =>
-        byEmailId[id] ? sortBy(byEmailId[id], (event) => event.created_at) : []
-      );
-    })
+  readonly loadEmailEvents = this.buildLoadMultipleBy(
+    "email_event",
+    "email_log_id",
+    (q) => q.orderBy("created_at")
   );
 }
