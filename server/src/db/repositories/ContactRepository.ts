@@ -1,11 +1,15 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder } from "knex";
+import { groupBy, indexBy, mapValues, pipe, toPairs } from "remeda";
+import { unMaybeArray } from "../../util/arrays";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CreateContact, User, Contact, PetitionAccess } from "../__types";
-import { unMaybeArray } from "../../util/arrays";
+import { Contact, CreateContact, PetitionAccess, User } from "../__types";
 
 @injectable()
 export class ContactRepository extends BaseRepository {
@@ -17,8 +21,33 @@ export class ContactRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadContactByEmail = this.buildLoadBy("contact", "email", (q) =>
-    q.whereNull("deleted_at")
+  readonly loadContactByEmail = fromDataLoader(
+    new DataLoader<{ orgId: number; email: string }, Contact | null, string>(
+      async (keys) => {
+        const byOrgId = pipe(
+          keys,
+          groupBy((k) => k.orgId),
+          mapValues((keys) => keys.map((k) => k.email)),
+          toPairs
+        );
+        const rows = await this.from("contact")
+          .whereNull("deleted_at")
+          .where((qb: QueryBuilder<Contact>) => {
+            for (const [orgId, emails] of byOrgId) {
+              qb.orWhere((qb: QueryBuilder<Contact>) =>
+                qb.where("org_id", parseInt(orgId)).whereIn("email", emails)
+              );
+            }
+          });
+        const results = indexBy(rows, keyBuilder(["org_id", "email"]));
+        return keys
+          .map(keyBuilder(["orgId", "email"]))
+          .map((key) => results[key] ?? null);
+      },
+      {
+        cacheKeyFn: keyBuilder(["orgId", "email"]),
+      }
+    )
   );
 
   async userHasAccessToContacts(user: User, contactIds: number[]) {
