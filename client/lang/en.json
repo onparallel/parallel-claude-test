@@ -20,6 +20,36 @@
     "context": "Open menu"
   },
   {
+    "term": "component.confirm-configure-ongoing-signature-body.confirm",
+    "definition": "I understand",
+    "context": "I understand"
+  },
+  {
+    "term": "component.confirm-configure-ongoing-signature.body",
+    "definition": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled.",
+    "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
+  },
+  {
+    "term": "component.confirm-configure-ongoing-signature.header",
+    "definition": "Ongoing eSignature",
+    "context": "Ongoing eSignature"
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature.body",
+    "definition": "There is an ongoing eSignature process. If you disable eSignature this process will be cancelled.",
+    "context": "There is an ongoing eSignature process. If you disable eSignature this process will be cancelled."
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature.confirm",
+    "definition": "Disable eSignature",
+    "context": "Disable eSignature"
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature.header",
+    "definition": "Ongoing eSignature",
+    "context": "Ongoing eSignature"
+  },
+  {
     "term": "component.confirm-resend-completed-notification.confirm-button",
     "definition": "Yes, resend the notification",
     "context": "Yes, resend the notification"
@@ -3498,6 +3528,31 @@
     "term": "timeline.reply-deleted-description",
     "definition": "{contact} deleted a reply to the field {field} {timeAgo}",
     "context": "{contact} deleted a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-description",
+    "definition": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-completed-description",
+    "definition": "The eSignature process on the petition has been completed {timeAgo}",
+    "context": "The eSignature process on the petition has been completed {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-declined-description",
+    "definition": "{contact} has declined the eSignature process {timeAgo}",
+    "context": "{contact} has declined the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-declined.see-reason",
+    "definition": "See reason",
+    "context": "See reason"
+  },
+  {
+    "term": "timeline.signature-started-description",
+    "definition": "We started an eSignature process on the petition {timeAgo}",
+    "context": "We started an eSignature process on the petition {timeAgo}"
   },
   {
     "term": "tour.back",

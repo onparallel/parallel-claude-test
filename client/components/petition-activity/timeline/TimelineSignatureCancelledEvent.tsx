@@ -37,7 +37,7 @@ export function TimelineSignatureCancelledEvent({
           {event.cancelType === "CANCELLED_BY_USER" && (
             <FormattedMessage
               id="timeline.signature-cancelled-description"
-              defaultMessage="{same, select, true {You} other {{user}}} cancelled the signature process {timeAgo}"
+              defaultMessage="{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
               values={{
                 same: userId === event.user?.id,
                 user: <UserReference user={event.user} />,
@@ -54,7 +54,7 @@ export function TimelineSignatureCancelledEvent({
           {event.cancelType === "DECLINED_BY_SIGNER" && (
             <FormattedMessage
               id="timeline.signature-declined-description"
-              defaultMessage="{contact} declined the signature {timeAgo}"
+              defaultMessage="{contact} has declined the eSignature process {timeAgo}"
               values={{
                 contact: event.contact ? (
                   <ContactLink contact={event.contact} />

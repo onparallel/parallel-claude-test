@@ -20,6 +20,36 @@
     "context": "Open menu"
   },
   {
+    "term": "component.confirm-configure-ongoing-signature-body.confirm",
+    "definition": "Ok, entiendo",
+    "context": "I understand"
+  },
+  {
+    "term": "component.confirm-configure-ongoing-signature.body",
+    "definition": "Hay un proceso de firma digital pendiente. Si realiza cualquier cambio, el proceso será cancelado.",
+    "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
+  },
+  {
+    "term": "component.confirm-configure-ongoing-signature.header",
+    "definition": "Firma digital pendiente",
+    "context": "Ongoing eSignature"
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature.body",
+    "definition": "Hay un proceso de firma digital pendiente. Si desactivas la firma digital, el proceso será cancelado.",
+    "context": "There is an ongoing eSignature process. If you disable eSignature this process will be cancelled."
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature.confirm",
+    "definition": "Desactivar firma digital",
+    "context": "Disable eSignature"
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature.header",
+    "definition": "Firma digital pendiente",
+    "context": "Ongoing eSignature"
+  },
+  {
     "term": "component.confirm-resend-completed-notification.confirm-button",
     "definition": "Si, reenviar la notificación",
     "context": "Yes, resend the notification"
@@ -3498,6 +3528,31 @@
     "term": "timeline.reply-deleted-description",
     "definition": "{contact} eliminó una respuesta al campo {field} {timeAgo}",
     "context": "{contact} deleted a reply to the field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-cancelled-description",
+    "definition": "{same, select, true {Cancelaste} other {{user} canceló}} el proceso de firma digital {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-completed-description",
+    "definition": "El proceso de firma digital en la petición ha sido completado {timeAgo}",
+    "context": "The eSignature process on the petition has been completed {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-declined-description",
+    "definition": "{contact} ha rechazado el proceso de firma digital {timeAgo}",
+    "context": "{contact} has declined the eSignature process {timeAgo}"
+  },
+  {
+    "term": "timeline.signature-declined.see-reason",
+    "definition": "Ver motivo",
+    "context": "See reason"
+  },
+  {
+    "term": "timeline.signature-started-description",
+    "definition": "Hemos iniciado un proceso de firma digital en la petición {timeAgo}",
+    "context": "We started an eSignature process on the petition {timeAgo}"
   },
   {
     "term": "tour.back",

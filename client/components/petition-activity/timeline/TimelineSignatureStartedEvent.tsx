@@ -25,7 +25,7 @@ export function TimelineSignatureStartedEvent({
     >
       <FormattedMessage
         id="timeline.signature-started-description"
-        defaultMessage="We sent the petition to sign {timeAgo}"
+        defaultMessage="We started an eSignature process on the petition {timeAgo}"
         values={{
           timeAgo: (
             <DateTime

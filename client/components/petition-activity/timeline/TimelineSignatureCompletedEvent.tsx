@@ -26,7 +26,7 @@ export function TimelineSignatureCompletedEvent({
     >
       <FormattedMessage
         id="timeline.signature-completed-description"
-        defaultMessage="The petition has been signed {timeAgo}"
+        defaultMessage="The eSignature process on the petition has been completed {timeAgo}"
         values={{
           timeAgo: (
             <DateTime
