@@ -61,15 +61,19 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
   };
   SIGNATURE_STARTED: {
+    petition_signature_request_id: number;
     user_id: number;
   };
   SIGNATURE_CANCELLED: {
+    petition_signature_request_id: number;
     user_id: number;
   };
   SIGNATURE_COMPLETED: {
+    petition_signature_request_id: number;
     file_upload_id: number;
   };
   SIGNATURE_DECLINED: {
+    petition_signature_request_id: number;
     decliner_name: string;
     decliner_email: string;
     decline_reason?: string;

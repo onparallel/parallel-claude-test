@@ -535,7 +535,7 @@ export interface PetitionSignatureRequest {
   id: number;
   petition_id: number;
   external_id: Maybe<string>;
-  signature_settings: any;
+  signature_config: any;
   status: PetitionSignatureStatus;
   data: Maybe<any>;
   event_logs: Maybe<any[]>;
@@ -547,7 +547,7 @@ export interface PetitionSignatureRequest {
 export interface CreatePetitionSignatureRequest {
   petition_id: number;
   external_id?: Maybe<string>;
-  signature_settings: any;
+  signature_config: any;
   status?: PetitionSignatureStatus;
   data?: Maybe<any>;
   event_logs?: Maybe<any[]>;

@@ -722,12 +722,9 @@ export interface NexusGenFieldTypes {
     // field return type
     contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    data: NexusGenScalars["JSONObject"] | null; // JSONObject
-    externalId: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"]; // Petition!
-    settings: NexusGenScalars["JSONObject"]; // JSONObject!
-    signedDocument: NexusGenScalars["JSONObject"] | null; // JSONObject
+    signatureConfig: NexusGenRootTypes["SignatureConfig"]; // SignatureConfig!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };

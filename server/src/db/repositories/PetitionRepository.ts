@@ -2386,19 +2386,17 @@ export class PetitionRepository extends BaseRepository {
 
   async createPetitionSignature(
     petitionId: number,
-    settings: {
+    config: {
       provider: string;
       contactIds: number[];
       timezone: string;
     }
   ) {
-    const [row] = await this.from("petition_signature_request")
-      .insert({
-        petition_id: petitionId,
-        signature_settings: settings,
-        status: "PROCESSING",
-      })
-      .returning("*");
+    const [row] = await this.insert("petition_signature_request", {
+      petition_id: petitionId,
+      signature_config: config,
+      status: "PROCESSING",
+    }).returning("*");
 
     return row;
   }

@@ -1,5 +1,4 @@
 import { enumType, objectType } from "@nexus/schema";
-import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 
 export const PetitionSignatureRequestStatus = enumType({
   name: "PetitionSignatureRequestStatus",
@@ -10,9 +9,7 @@ export const PetitionSignatureRequest = objectType({
   name: "PetitionSignatureRequest",
   rootTyping: "db.PetitionSignatureRequest",
   definition(t) {
-    t.globalId("id", {
-      prefixName: "PetitionSignature",
-    });
+    t.globalId("id");
     t.implements("Timestamps");
     t.field("petition", {
       type: "Petition",
@@ -24,35 +21,18 @@ export const PetitionSignatureRequest = objectType({
       type: "Contact",
       list: [false],
       resolve: async (root, _, ctx) => {
-        const ids = root.signature_settings.contactIds as number[];
+        const ids = root.signature_config.contactIds as number[];
         return await ctx.contacts.loadContact(ids);
       },
     });
-    t.string("externalId", {
-      nullable: true,
-      resolve: (o) => {
-        // remove provider prefix before sending to client
-        return o.external_id?.replace(/^.*?\//, "") ?? null;
-      },
-    });
-    t.jsonObject("settings", {
-      validateArgs: notEmptyObject((o) => o.signature_settings, "settings"),
-      resolve: (o) => o.signature_settings,
+    t.field("signatureConfig", {
+      type: "SignatureConfig",
+      description: "The signature configuration for the request.",
+      resolve: (o) => o.signature_config,
     });
     t.field("status", {
       type: "PetitionSignatureRequestStatus",
       resolve: (o) => o.status,
-    });
-    t.jsonObject("data", {
-      nullable: true,
-      resolve: (o) => o.data,
-    });
-    t.jsonObject("signedDocument", {
-      nullable: true,
-      resolve: async (root, _, ctx) => {
-        if (!root.file_upload_id) return {};
-        return await ctx.files.loadFileUpload(root.file_upload_id);
-      },
     });
   },
 });

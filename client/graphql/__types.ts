@@ -1018,12 +1018,10 @@ export type PetitionSignatureRequest = Timestamps & {
   contacts: Array<Maybe<Contact>>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  data?: Maybe<Scalars["JSONObject"]>;
-  externalId?: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   petition: Petition;
-  settings: Scalars["JSONObject"];
-  signedDocument?: Maybe<Scalars["JSONObject"]>;
+  /** The signature configuration for the request. */
+  signatureConfig: SignatureConfig;
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -4090,7 +4088,38 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
-export type PdfView_FieldFragment = { __typename?: "PetitionField" } & Pick<
+export type PrintPetitionSignature_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+} & {
+  petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+      fields: Array<
+        {
+          __typename?: "PetitionField";
+        } & PrintPetitionSignature_PetitionFieldFragment
+      >;
+      organization: { __typename?: "Organization" } & Pick<
+        Organization,
+        "name" | "logoUrl"
+      >;
+    };
+  signatureConfig: { __typename?: "SignatureConfig" } & Pick<
+    SignatureConfig,
+    "provider" | "timezone"
+  > & {
+      contacts: Array<
+        Maybe<
+          { __typename?: "Contact" } & Pick<
+            Contact,
+            "id" | "fullName" | "email"
+          >
+        >
+      >;
+    };
+};
+
+export type PrintPetitionSignature_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<
   PetitionField,
   "id" | "type" | "title" | "options" | "description" | "validated"
 > & {
@@ -4108,32 +4137,9 @@ export type PdfViewPetitionQueryVariables = Exact<{
 
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
   petitionSignatureRequestToken?: Maybe<
-    { __typename?: "PetitionSignatureRequest" } & {
-      petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
-          fields: Array<
-            { __typename?: "PetitionField" } & PdfView_FieldFragment
-          >;
-          organization: { __typename?: "Organization" } & Pick<
-            Organization,
-            "name" | "logoUrl"
-          >;
-          signatureConfig?: Maybe<
-            { __typename?: "SignatureConfig" } & Pick<
-              SignatureConfig,
-              "provider" | "timezone"
-            > & {
-                contacts: Array<
-                  Maybe<
-                    { __typename?: "Contact" } & Pick<
-                      Contact,
-                      "fullName" | "email"
-                    >
-                  >
-                >;
-              }
-          >;
-        };
-    }
+    {
+      __typename?: "PetitionSignatureRequest";
+    } & PrintPetitionSignature_PetitionSignatureRequestFragment
   >;
 };
 
@@ -5562,8 +5568,8 @@ export const RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragmen
     }
   }
 `;
-export const PdfView_FieldFragmentDoc = gql`
-  fragment PdfView_Field on PetitionField {
+export const PrintPetitionSignature_PetitionFieldFragmentDoc = gql`
+  fragment PrintPetitionSignature_PetitionField on PetitionField {
     id
     type
     title
@@ -5575,6 +5581,31 @@ export const PdfView_FieldFragmentDoc = gql`
       content
     }
   }
+`;
+export const PrintPetitionSignature_PetitionSignatureRequestFragmentDoc = gql`
+  fragment PrintPetitionSignature_PetitionSignatureRequest on PetitionSignatureRequest {
+    petition {
+      id
+      name
+      fields {
+        ...PrintPetitionSignature_PetitionField
+      }
+      organization {
+        name
+        logoUrl
+      }
+    }
+    signatureConfig {
+      contacts {
+        id
+        fullName
+        email
+      }
+      provider
+      timezone
+    }
+  }
+  ${PrintPetitionSignature_PetitionFieldFragmentDoc}
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
@@ -9262,28 +9293,10 @@ export type PublicPetitionLazyQueryHookResult = ReturnType<
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {
     petitionSignatureRequestToken(token: $token) {
-      petition {
-        id
-        name
-        fields {
-          ...PdfView_Field
-        }
-        organization {
-          name
-          logoUrl
-        }
-        signatureConfig {
-          contacts {
-            fullName
-            email
-          }
-          provider
-          timezone
-        }
-      }
+      ...PrintPetitionSignature_PetitionSignatureRequest
     }
   }
-  ${PdfView_FieldFragmentDoc}
+  ${PrintPetitionSignature_PetitionSignatureRequestFragmentDoc}
 `;
 
 /**

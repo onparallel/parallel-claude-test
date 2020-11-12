@@ -1480,12 +1480,13 @@ type PetitionSignatureRequest implements Timestamps {
   Time when the resource was created.
   """
   createdAt: DateTime!
-  data: JSONObject
-  externalId: String
   id: GID!
   petition: Petition!
-  settings: JSONObject!
-  signedDocument: JSONObject
+
+  """
+  The signature configuration for the request.
+  """
+  signatureConfig: SignatureConfig!
   status: PetitionSignatureRequestStatus!
 
   """

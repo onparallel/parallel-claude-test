@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id");
     t.integer("petition_id").notNullable().references("petition.id");
     t.string("external_id");
-    t.jsonb("signature_settings").notNullable();
+    t.jsonb("signature_config").notNullable();
     t.enum("status", ["PROCESSING", "CANCELLED", "COMPLETED"], {
       useNative: true,
       enumName: "petition_signature_status",
