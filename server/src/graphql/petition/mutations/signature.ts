@@ -26,9 +26,14 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     if (!petition) {
       throw new Error(`Petition with id ${petitionId} not found`);
     }
+    if (!petition.signature_config) {
+      throw new Error(
+        `Signature configuration not found for petition with id ${petitionId}`
+      );
+    }
     if (process.env.NODE_ENV !== "production") {
       const contacts = await ctx.contacts.loadContact(
-        petition?.signature_config.contactIds as number[]
+        petition.signature_config.contactIds as number[]
       );
       if (!contacts.every((c) => c && c.email.endsWith("@parallel.so"))) {
         throw new WhitelistedError(

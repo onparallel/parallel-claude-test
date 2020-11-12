@@ -1,9 +1,10 @@
 import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
-import { indexBy, zip } from "remeda";
+import { indexBy, zip, maxBy } from "remeda";
 import sanitize from "sanitize-filename";
 import { ApiContext } from "../context";
+import { PetitionSignatureRequest } from "../db/__types";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { fromGlobalId } from "../util/globalId";
 import { authenticate } from "./helpers/authenticate";
@@ -161,6 +162,25 @@ async function* getPetitionFiles(
 
   if (textReplies.hasRows()) {
     yield await textReplies.export();
+  }
+
+  const completedSignatures = (
+    await ctx.petitions.loadPetitionSignaturesByPetitionId(petitionId, [
+      "COMPLETED",
+    ])
+  ).filter((s) => !!s && s.file_upload_id) as PetitionSignatureRequest[];
+
+  const lastSignature = maxBy(completedSignatures, (s) => +s.created_at);
+  if (lastSignature) {
+    const signedPetition = await ctx.files.loadFileUpload(
+      lastSignature.file_upload_id!
+    );
+    if (signedPetition) {
+      yield {
+        filename: signedPetition.filename,
+        stream: ctx.aws.downloadFile(signedPetition.path),
+      };
+    }
   }
 }
 
