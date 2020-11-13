@@ -1,6 +1,6 @@
 import { mutationField } from "@nexus/schema";
 import { toGlobalId } from "../../../util/globalId";
-import { chain, authenticate, and } from "../../helpers/authorize";
+import { authenticateAnd } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import {
@@ -14,12 +14,9 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   args: {
     petitionId: globalIdArg("Petition", { required: true }),
   },
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasFeatureFlag("PETITION_SIGNATURE"),
-      userHasAccessToPetitions("petitionId", ["OWNER"])
-    )
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasAccessToPetitions("petitionId", ["OWNER"])
   ),
   resolve: async (_, { petitionId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(petitionId);
@@ -63,16 +60,11 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
 export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   type: "PetitionSignatureRequest",
   args: {
-    petitionSignatureRequestId: globalIdArg("PetitionSignatureRequest", {
-      required: true,
-    }),
+    petitionSignatureRequestId: globalIdArg({ required: true }),
   },
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasFeatureFlag("PETITION_SIGNATURE"),
-      userHasAccessToSignatureRequest("petitionSignatureRequestId")
-    )
+  authorize: authenticateAnd(
+    userHasFeatureFlag("PETITION_SIGNATURE"),
+    userHasAccessToSignatureRequest("petitionSignatureRequestId")
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(

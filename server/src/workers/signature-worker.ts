@@ -91,19 +91,21 @@ async function startSignatureProcess(
 
     const provider = signatureIntegration.provider.toUpperCase();
 
-    await ctx.petitions.updatePetitionSignature(signature.id, {
-      external_id: `${provider}/${data.id}`,
-      data,
-      status: "PROCESSING",
-    });
+    await Promise.all([
+      ctx.petitions.updatePetitionSignature(signature.id, {
+        external_id: `${provider}/${data.id}`,
+        data,
+        status: "PROCESSING",
+      }),
 
-    await ctx.petitions.createEvent({
-      type: "SIGNATURE_STARTED",
-      petitionId: signature.petition_id,
-      data: {
-        petition_signature_request_id: signature.id,
-      },
-    });
+      ctx.petitions.createEvent({
+        type: "SIGNATURE_STARTED",
+        petitionId: signature.petition_id,
+        data: {
+          petition_signature_request_id: signature.id,
+        },
+      }),
+    ]);
   } finally {
     try {
       await fs.unlink(tmpPdfPath);

@@ -29,6 +29,15 @@ export function authenticate<
   };
 }
 
+export function authenticateAnd<
+  TypeName extends string,
+  FieldName extends string
+>(
+  ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return chain(authenticate(), and(...resolvers));
+}
+
 export type Arg<
   TypeName extends string,
   FieldName extends string,
