@@ -20,6 +20,7 @@ import {
   PetitionSettings_PetitionBaseFragment,
   PetitionSettings_UserFragment,
   UpdatePetitionInput,
+  usePetitionSettings_cancelPetitionSignatureRequestMutation,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
@@ -55,39 +56,75 @@ export function PetitionSettings({
     user.hasPetitionSignature &&
     user.organization.signatureIntegrations.length > 0;
 
+  const ongoingSignatureRequest =
+    petition.__typename === "Petition" &&
+    petition.currentSignatureRequest &&
+    ["PROCESSING", "ENQUEUED"].includes(petition.currentSignatureRequest.status)
+      ? petition.currentSignatureRequest
+      : null;
+
   const showSignatureConfigDialog = useSignatureConfigDialog();
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
   const showConfirmConfigureOngoingSignature = useDialog(
     ConfirmConfigureOngoingSignature
   );
+
+  const showConfirmDisableOngoingSignature = useDialog(
+    ConfirmDisableOngoingSignature
+  );
+
+  const showConfirmSignatureConfigChanged = useDialog(
+    ConfirmSignatureConfigChanged
+  );
+  const [
+    cancelSignatureRequest,
+  ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
   async function handleConfigureSignatureClick() {
     if (petition.__typename !== "Petition") {
       return;
     }
     try {
-      // TODO: check for ongoing signatures
-      await showConfirmConfigureOngoingSignature({});
+      if (ongoingSignatureRequest) {
+        await showConfirmConfigureOngoingSignature({});
+      }
       const signatureConfig = await showSignatureConfigDialog({
         providers: user.organization.signatureIntegrations,
         config: petition.signatureConfig ?? null,
         onSearchContacts: handleSearchContacts,
         onCreateContact: handleCreateContact,
       });
+      if (
+        // config changed
+        ongoingSignatureRequest &&
+        (signatureConfig.provider !== petition.signatureConfig?.provider ||
+          signatureConfig.contactIds.toString() !==
+            petition.signatureConfig?.contacts.map((c) => c?.id).toString())
+      ) {
+        await showConfirmSignatureConfigChanged({});
+        await cancelSignatureRequest({
+          variables: {
+            petitionSignatureRequestId: ongoingSignatureRequest!.id,
+          },
+        });
+      }
       onUpdatePetition({ signatureConfig });
     } catch {}
   }
 
-  const showConfirmDisableOngoingSignature = useDialog(
-    ConfirmDisableOngoingSignature
-  );
   async function handleSignatureChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
       await handleConfigureSignatureClick();
     } else {
       try {
-        // TODO: check for ongoing signatures
-        await showConfirmDisableOngoingSignature({});
+        if (ongoingSignatureRequest) {
+          await showConfirmDisableOngoingSignature({});
+          await cancelSignatureRequest({
+            variables: {
+              petitionSignatureRequestId: ongoingSignatureRequest.id,
+            },
+          });
+        }
         onUpdatePetition({ signatureConfig: null });
       } catch {}
     }
@@ -218,11 +255,30 @@ PetitionSettings.fragments = {
         signatureConfig {
           ...SignatureConfigDialog_SignatureConfig
         }
+        currentSignatureRequest {
+          id
+          status
+        }
       }
     }
     ${SignatureConfigDialog.fragments.SignatureConfig}
   `,
 };
+
+PetitionSettings.mutations = [
+  gql`
+    mutation PetitionSettings_cancelPetitionSignatureRequest(
+      $petitionSignatureRequestId: GID!
+    ) {
+      cancelSignatureRequest(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+      ) {
+        id
+        status
+      }
+    }
+  `,
+];
 
 function DeadlineInput({
   value,
@@ -344,6 +400,34 @@ function ConfirmConfigureOngoingSignature(props: DialogProps<{}, void>) {
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
             id="component.confirm-configure-ongoing-signature-body.confirm"
+            defaultMessage="I understand"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function ConfirmSignatureConfigChanged(props: DialogProps<{}, void>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-signature-config-changed.header"
+          defaultMessage="Ongoing eSignature"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="component.confirm-signature-config-changed.body"
+          defaultMessage="You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
+        />
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-signature-config-changed.confirm"
             defaultMessage="I understand"
           />
         </Button>

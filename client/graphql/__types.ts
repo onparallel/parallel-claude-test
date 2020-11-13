@@ -1025,6 +1025,7 @@ export type PetitionSignatureRequest = Timestamps & {
   petition: Petition;
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
+  /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
@@ -1428,7 +1429,6 @@ export type SignatureCancelledEvent = PetitionEvent & {
 export type SignatureCompletedEvent = PetitionEvent & {
   __typename?: "SignatureCompletedEvent";
   createdAt: Scalars["DateTime"];
-  file: Scalars["JSONObject"];
   id: Scalars["GID"];
 };
 
@@ -2285,6 +2285,12 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
         __typename?: "SignatureConfig";
       } & SignatureConfigDialog_SignatureConfigFragment
     >;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "id" | "status"
+      >
+    >;
   };
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
@@ -2294,6 +2300,19 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
   | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
+
+export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
+  __typename?: "Mutation";
+} & {
+  cancelSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
+};
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
@@ -5158,6 +5177,10 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       signatureConfig {
         ...SignatureConfigDialog_SignatureConfig
       }
+      currentSignatureRequest {
+        id
+        status
+      }
     }
   }
   ${SignatureConfigDialog_SignatureConfigFragmentDoc}
@@ -5828,6 +5851,50 @@ export function usePetitionHeader_reopenPetitionMutation(
 }
 export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
   typeof usePetitionHeader_reopenPetitionMutation
+>;
+export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
+  mutation PetitionSettings_cancelPetitionSignatureRequest(
+    $petitionSignatureRequestId: GID!
+  ) {
+    cancelSignatureRequest(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+    ) {
+      id
+      status
+    }
+  }
+`;
+
+/**
+ * __usePetitionSettings_cancelPetitionSignatureRequestMutation__
+ *
+ * To run a mutation, you first call `usePetitionSettings_cancelPetitionSignatureRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSettings_cancelPetitionSignatureRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSettingsCancelPetitionSignatureRequestMutation, { data, loading, error }] = usePetitionSettings_cancelPetitionSignatureRequestMutation({
+ *   variables: {
+ *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
+ *   },
+ * });
+ */
+export function usePetitionSettings_cancelPetitionSignatureRequestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSettings_cancelPetitionSignatureRequestMutation,
+    PetitionSettings_cancelPetitionSignatureRequestMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSettings_cancelPetitionSignatureRequestMutation,
+    PetitionSettings_cancelPetitionSignatureRequestMutationVariables
+  >(PetitionSettings_cancelPetitionSignatureRequestDocument, baseOptions);
+}
+export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSettings_cancelPetitionSignatureRequestMutation
 >;
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(
