@@ -59,7 +59,7 @@ export function PetitionSettings({
   const ongoingSignatureRequest =
     petition.__typename === "Petition" &&
     petition.currentSignatureRequest &&
-    ["PROCESSING", "ENQUEUED"].includes(petition.currentSignatureRequest.status)
+    petition.currentSignatureRequest.status === "PROCESSING"
       ? petition.currentSignatureRequest
       : null;
 

@@ -1271,7 +1271,6 @@ export type Query = {
   petition?: Maybe<PetitionBase>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  petitionSignatureRequest: Array<Maybe<PetitionSignatureRequest>>;
   petitionSignatureRequestToken?: Maybe<PetitionSignatureRequest>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1318,10 +1317,6 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
-};
-
-export type QuerypetitionSignatureRequestArgs = {
-  petitionId: Scalars["GID"];
 };
 
 export type QuerypetitionSignatureRequestTokenArgs = {
@@ -3357,6 +3352,12 @@ export type PetitionReplies_PetitionFragment = {
         >
       >
     >;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "id" | "status"
+      >
+    >;
   } & PetitionLayout_PetitionBase_Petition_Fragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -5336,6 +5337,10 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       ...PetitionReplies_PetitionField
     }
     signatureRequests @include(if: $hasPetitionSignature) {
+      id
+      status
+    }
+    currentSignatureRequest @include(if: $hasPetitionSignature) {
       id
       status
     }

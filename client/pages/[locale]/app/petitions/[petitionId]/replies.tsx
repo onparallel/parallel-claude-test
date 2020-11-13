@@ -8,7 +8,12 @@ import {
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactLink } from "@parallel/components/common/ContactLink";
+import {
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/DialogOpenerProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -63,6 +68,7 @@ import {
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
+  usePetitionSettings_cancelPetitionSignatureRequestMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -382,12 +388,34 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [petition, intl.locale]);
 
   const closePetitionDialog = useClosePetitionDialog();
+
+  const showConfirmDisableOngoingSignature = useDialog(
+    ConfirmDisableOngoingSignature
+  );
+  const [
+    cancelSignatureRequest,
+  ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
+
   const handleClosePetition = useCallback(
     async (sendNotification: boolean) => {
       try {
         const hasUnreviewedReplies = petition.fields.some((f) =>
           f.replies.some((r) => r.status === "PENDING")
         );
+
+        const hasPendingSignature =
+          (petition.currentSignatureRequest &&
+            petition.currentSignatureRequest.status === "PROCESSING") ??
+          false;
+
+        if (hasPendingSignature) {
+          await showConfirmDisableOngoingSignature({});
+          await cancelSignatureRequest({
+            variables: {
+              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
+            },
+          });
+        }
 
         const option = hasUnreviewedReplies
           ? await closePetitionDialog({})
@@ -403,7 +431,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         }
       } catch {}
     },
-    [petition, handleValidateToggle, handleConfirmPetitionCompleted]
+    [
+      petition,
+      handleValidateToggle,
+      handleConfirmPetitionCompleted,
+      cancelSignatureRequest,
+    ]
   );
 
   return (
@@ -589,6 +622,10 @@ PetitionReplies.fragments = {
           ...PetitionReplies_PetitionField
         }
         signatureRequests @include(if: $hasPetitionSignature) {
+          id
+          status
+        }
+        currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status
         }
@@ -998,6 +1035,34 @@ function useUpdatePetitionFieldRepliesStatus() {
         })) as any,
       }),
     [updatePetitionFieldRepliesStatus]
+  );
+}
+
+function ConfirmDisableOngoingSignature(props: DialogProps<{}, void>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-disable-ongoing-signature.header"
+          defaultMessage="Ongoing eSignature"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="component.confirm-disable-ongoing-signature-petition-close.body"
+          defaultMessage="There is an ongoing eSignature process. If you close this petition now, the process will be cancelled."
+        />
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-disable-ongoing-signature-petition-close.confirm"
+            defaultMessage="Cancel eSignature and close"
+          />
+        </Button>
+      }
+      {...props}
+    />
   );
 }
 

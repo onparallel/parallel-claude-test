@@ -30,6 +30,16 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-disable-ongoing-signature-petition-close.body",
+    "definition": "Hay un proceso de firma digital pendiente. Si cierras esta petición, el proceso será cancelado.",
+    "context": "There is an ongoing eSignature process. If you close this petition now, the process will be cancelled."
+  },
+  {
+    "term": "component.confirm-disable-ongoing-signature-petition-close.confirm",
+    "definition": "Cancelar firma digital y cerrar",
+    "context": "Cancel eSignature and close"
+  },
+  {
     "term": "component.confirm-disable-ongoing-signature.body",
     "definition": "Hay un proceso de firma digital pendiente. Si desactivas la firma digital, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you disable eSignature this process will be cancelled."
