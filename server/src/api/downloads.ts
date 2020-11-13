@@ -165,10 +165,10 @@ async function* getPetitionFiles(
   }
 
   const completedSignatures = (
-    await ctx.petitions.loadPetitionSignaturesByPetitionId(petitionId, [
-      "COMPLETED",
-    ])
-  ).filter((s) => !!s && s.file_upload_id) as PetitionSignatureRequest[];
+    await ctx.petitions.loadPetitionSignaturesByPetitionId(petitionId)
+  ).filter(
+    (s) => !!s && s.status === "COMPLETED" && s.file_upload_id
+  ) as PetitionSignatureRequest[];
 
   const lastSignature = maxBy(completedSignatures, (s) => +s.created_at);
   if (lastSignature) {

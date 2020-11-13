@@ -500,7 +500,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 <Card
                   display="flex"
                   flexDirection="column"
-                  maxHeight={`calc(100vh - 6rem)`}
+                  maxHeight={`calc(100vh - 10rem)`}
                 >
                   <CardHeader>
                     <Text as="span" display="flex" alignItems="center">

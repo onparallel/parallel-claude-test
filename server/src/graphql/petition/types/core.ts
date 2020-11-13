@@ -179,6 +179,7 @@ export const Petition = objectType({
       list: [true],
       nullable: true,
       description: "The list of signature requests.",
+      authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionSignaturesByPetitionId(root.id);
       },

@@ -45,7 +45,6 @@ import {
   PetitionUser,
   PetitionUserNotification,
   PetitionUserPermissionType,
-  PetitionSignatureStatus,
 } from "../__types";
 
 type PetitionType = "PETITION" | "TEMPLATE";
