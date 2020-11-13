@@ -16,6 +16,10 @@ type TableKey<
   TName extends TableNames
 > = TableTypes[TName][TablePrimaryKeys[TName]] & (string | number);
 
+type QueryBuilderFunction<TRecord, TResult = TRecord> = (
+  q: QueryBuilder<TRecord, TResult>
+) => void;
+
 @injectable()
 export class BaseRepository {
   constructor(protected readonly knex: Knex) {}
@@ -51,9 +55,7 @@ export class BaseRepository {
   protected buildLoadById<TName extends TableNames>(
     tableName: TName,
     idColumn: TablePrimaryKeys[TName],
-    builder?: (
-      builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
-    ) => void
+    builder?: QueryBuilderFunction<TableTypes[TName]>
   ) {
     return this.buildLoadBy(tableName, idColumn, builder);
   }
@@ -64,9 +66,7 @@ export class BaseRepository {
   >(
     tableName: TName,
     column: TColumn,
-    builder?: (
-      builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
-    ) => void
+    builder?: QueryBuilderFunction<TableTypes[TName]>
   ) {
     return fromDataLoader(
       new DataLoader<TableTypes[TName][TColumn], TableTypes[TName] | null>(
@@ -89,9 +89,7 @@ export class BaseRepository {
   >(
     tableName: TName,
     column: TColumn,
-    builder?: (
-      builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
-    ) => void
+    builder?: QueryBuilderFunction<TableTypes[TName]>
   ) {
     return fromDataLoader(
       new DataLoader<TableTypes[TName][TColumn], TableTypes[TName][]>(

@@ -97,6 +97,24 @@ export const LogOutIcon = createIcon({
   ),
 });
 
+export const AlertCircleIcon = createIcon({
+  displayName: "AlertCircleIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.1" y2="16"></line>
+    </g>
+  ),
+});
+
 export const PaperPlaneIcon = createIcon({
   displayName: "PaperPlaneIcon",
   viewBox: "0 0 24 24",

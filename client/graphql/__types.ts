@@ -659,6 +659,8 @@ export type Petition = PetitionBase & {
   accesses: Array<PetitionAccess>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The current signature request. */
+  currentSignatureRequest?: Maybe<PetitionSignatureRequest>;
   /** The deadline of the petition. */
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The body of the petition. */
@@ -685,6 +687,8 @@ export type Petition = PetitionBase & {
   remindersConfig?: Maybe<RemindersConfig>;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
+  /** The list of signature requests. */
+  signatureRequests?: Maybe<Array<PetitionSignatureRequest>>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** Time when the resource was last updated. */
@@ -1578,6 +1582,30 @@ export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
   User,
   "onboardingStatus"
 >;
+
+export type PetitionSignatureCellContent_PetitionFragment = {
+  __typename?: "Petition";
+} & {
+  currentSignatureRequest?: Maybe<
+    { __typename?: "PetitionSignatureRequest" } & Pick<
+      PetitionSignatureRequest,
+      "status"
+    >
+  >;
+};
+
+export type PetitionSignatureCellContent_UserFragment = {
+  __typename?: "User";
+} & { hasPetitionSignature: User["hasFeatureFlag"] };
+
+export type PetitionStatusCellContent_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "status"> & {
+    progress: { __typename?: "PetitionProgress" } & Pick<
+      PetitionProgress,
+      "validated" | "replied" | "optional" | "total"
+    >;
+  };
 
 export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -2695,34 +2723,46 @@ export type SupportMethodsUserQuery = { __typename?: "Query" } & {
 
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
-  "id" | "email" | "fullName" | "firstName" | "lastName"
+  "id"
 > & {
     accesses: { __typename?: "PetitionAccessPagination" } & {
       items: Array<
         { __typename?: "PetitionAccess" } & Contact_PetitionAccessFragment
       >;
     };
-  };
+  } & Contact_Contact_ProfileFragment;
+
+export type Contact_Contact_ProfileFragment = { __typename?: "Contact" } & Pick<
+  Contact,
+  "id" | "email" | "fullName" | "firstName" | "lastName"
+>;
 
 export type Contact_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
 } & Pick<PetitionAccess, "id"> & {
-    petition?: Maybe<
-      { __typename?: "Petition" } & Pick<
-        Petition,
-        "id" | "name" | "status" | "deadline"
+    petition?: Maybe<{ __typename?: "Petition" } & Contact_PetitionFragment>;
+  };
+
+export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
+  Petition,
+  "id" | "name" | "createdAt"
+> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
       > & {
-          progress: { __typename?: "PetitionProgress" } & Pick<
-            PetitionProgress,
-            "validated" | "replied" | "optional" | "total"
-          >;
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            UserAvatarList_UserFragment;
         }
     >;
-  };
+  } & PetitionStatusCellContent_PetitionFragment &
+  PetitionSignatureCellContent_PetitionFragment;
 
 export type Contact_UserFragment = {
   __typename?: "User";
-} & AppLayout_UserFragment;
+} & AppLayout_UserFragment &
+  PetitionSignatureCellContent_UserFragment;
 
 export type Contact_updateContactMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -2730,21 +2770,22 @@ export type Contact_updateContactMutationVariables = Exact<{
 }>;
 
 export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
-  updateContact: { __typename?: "Contact" } & Contact_ContactFragment;
-};
-
-export type ContactQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type ContactQuery = { __typename?: "Query" } & {
-  contact?: Maybe<{ __typename?: "Contact" } & Contact_ContactFragment>;
+  updateContact: { __typename?: "Contact" } & Contact_Contact_ProfileFragment;
 };
 
 export type ContactUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contact_UserFragment;
+};
+
+export type ContactQueryVariables = Exact<{
+  id: Scalars["GID"];
+  hasPetitionSignature: Scalars["Boolean"];
+}>;
+
+export type ContactQuery = { __typename?: "Query" } & {
+  contact?: Maybe<{ __typename?: "Contact" } & Contact_ContactFragment>;
 };
 
 export type Contacts_ContactsListFragment = {
@@ -3289,6 +3330,14 @@ export type PetitionReplies_PetitionFragment = {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
+    signatureRequests?: Maybe<
+      Array<
+        { __typename?: "PetitionSignatureRequest" } & Pick<
+          PetitionSignatureRequest,
+          "id" | "status"
+        >
+      >
+    >;
   } & PetitionLayout_PetitionBase_Petition_Fragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -3299,8 +3348,8 @@ export type PetitionReplies_PetitionFieldFragment = {
   PetitionRepliesFieldComments_PetitionFieldFragment &
   DownloadAllDialog_PetitionFieldFragment;
 
-export type PetitionReplies_UserFragment = {
-  __typename?: "User";
+export type PetitionReplies_UserFragment = { __typename?: "User" } & {
+  hasPetitionSignature: User["hasFeatureFlag"];
 } & PetitionLayout_UserFragment;
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
@@ -3312,8 +3361,12 @@ export type PetitionReplies_updatePetitionMutation = {
   __typename?: "Mutation";
 } & {
   updatePetition:
-    | ({ __typename?: "Petition" } & PetitionReplies_PetitionFragment)
-    | { __typename?: "PetitionTemplate" };
+    | ({
+        __typename?: "Petition";
+      } & PetitionLayout_PetitionBase_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
 };
 
 export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
@@ -3591,8 +3644,15 @@ export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
   >;
 };
 
+export type PetitionRepliesUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & PetitionReplies_UserFragment;
+};
+
 export type PetitionRepliesQueryVariables = Exact<{
   id: Scalars["GID"];
+  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type PetitionRepliesQuery = { __typename?: "Query" } & {
@@ -3600,12 +3660,6 @@ export type PetitionRepliesQuery = { __typename?: "Query" } & {
     | ({ __typename?: "Petition" } & PetitionReplies_PetitionFragment)
     | { __typename?: "PetitionTemplate" }
   >;
-};
-
-export type PetitionRepliesUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & PetitionReplies_UserFragment;
 };
 
 export type Petitions_PetitionBasePaginationFragment = {
@@ -3621,47 +3675,11 @@ export type Petitions_PetitionBasePaginationFragment = {
 
 export type Petitions_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "id" | "locale" | "name" | "createdAt"> & {
-    accesses: Array<
-      { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status"> & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        }
-    >;
-    progress: { __typename?: "PetitionProgress" } & Pick<
-      PetitionProgress,
-      "validated" | "replied" | "optional" | "total"
-    >;
-    userPermissions: Array<
-      { __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "permissionType"
-      > & {
-          user: { __typename?: "User" } & Pick<User, "id"> &
-            UserAvatarList_UserFragment;
-        }
-    >;
-    owner: { __typename?: "User" } & Pick<User, "id">;
-  };
+} & usePetitionsTableColumns_PetitionBase_Petition_Fragment;
 
 export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<
-  PetitionTemplate,
-  "description" | "id" | "locale" | "name" | "createdAt"
-> & {
-    userPermissions: Array<
-      { __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "permissionType"
-      > & {
-          user: { __typename?: "User" } & Pick<User, "id"> &
-            UserAvatarList_UserFragment;
-        }
-    >;
-    owner: { __typename?: "User" } & Pick<User, "id">;
-  };
+} & usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 
 export type Petitions_PetitionBaseFragment =
   | Petitions_PetitionBase_Petition_Fragment
@@ -3669,7 +3687,14 @@ export type Petitions_PetitionBaseFragment =
 
 export type Petitions_UserFragment = {
   __typename?: "User";
-} & AppLayout_UserFragment;
+} & AppLayout_UserFragment &
+  usePetitionsTableColumns_UserFragment;
+
+export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PetitionsUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Petitions_UserFragment;
+};
 
 export type PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -3678,18 +3703,13 @@ export type PetitionsQueryVariables = Exact<{
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
+  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type PetitionsQuery = { __typename?: "Query" } & {
   petitions: {
     __typename?: "PetitionBasePagination";
   } & Petitions_PetitionBasePaginationFragment;
-};
-
-export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type PetitionsUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Petitions_UserFragment;
 };
 
 export type NewPetition_PetitionTemplateFragment = {
@@ -4177,6 +4197,50 @@ export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
   | ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
 
+export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name" | "createdAt"> & {
+    accesses: Array<
+      { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status"> & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        }
+    >;
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            UserAvatarList_UserFragment;
+        }
+    >;
+  } & PetitionStatusCellContent_PetitionFragment &
+  PetitionSignatureCellContent_PetitionFragment;
+
+export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "description" | "id" | "name" | "createdAt"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            UserAvatarList_UserFragment;
+        }
+    >;
+  };
+
+export type usePetitionsTableColumns_PetitionBaseFragment =
+  | usePetitionsTableColumns_PetitionBase_Petition_Fragment
+  | usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
+
+export type usePetitionsTableColumns_UserFragment = {
+  __typename?: "User";
+} & PetitionSignatureCellContent_UserFragment;
+
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
   exclude?: Maybe<Array<Scalars["GID"]>>;
@@ -4314,43 +4378,92 @@ export const SupportMethods_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
-export const Contact_PetitionAccessFragmentDoc = gql`
-  fragment Contact_PetitionAccess on PetitionAccess {
-    id
-    petition {
-      id
-      name
-      status
-      deadline
-      progress {
-        validated
-        replied
-        optional
-        total
-      }
-    }
-  }
-`;
-export const Contact_ContactFragmentDoc = gql`
-  fragment Contact_Contact on Contact {
+export const Contact_Contact_ProfileFragmentDoc = gql`
+  fragment Contact_Contact_Profile on Contact {
     id
     email
     fullName
     firstName
     lastName
+  }
+`;
+export const UserAvatarList_UserFragmentDoc = gql`
+  fragment UserAvatarList_User on User {
+    id
+    fullName
+  }
+`;
+export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionStatusCellContent_Petition on Petition {
+    status
+    progress {
+      validated
+      replied
+      optional
+      total
+    }
+  }
+`;
+export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionSignatureCellContent_Petition on Petition {
+    currentSignatureRequest @include(if: $hasPetitionSignature) {
+      status
+    }
+  }
+`;
+export const Contact_PetitionFragmentDoc = gql`
+  fragment Contact_Petition on Petition {
+    id
+    name
+    createdAt
+    userPermissions {
+      permissionType
+      user {
+        id
+        ...UserAvatarList_User
+      }
+    }
+    ...PetitionStatusCellContent_Petition
+    ...PetitionSignatureCellContent_Petition
+  }
+  ${UserAvatarList_UserFragmentDoc}
+  ${PetitionStatusCellContent_PetitionFragmentDoc}
+  ${PetitionSignatureCellContent_PetitionFragmentDoc}
+`;
+export const Contact_PetitionAccessFragmentDoc = gql`
+  fragment Contact_PetitionAccess on PetitionAccess {
+    id
+    petition {
+      ...Contact_Petition
+    }
+  }
+  ${Contact_PetitionFragmentDoc}
+`;
+export const Contact_ContactFragmentDoc = gql`
+  fragment Contact_Contact on Contact {
+    id
+    ...Contact_Contact_Profile
     accesses(limit: 100) {
       items {
         ...Contact_PetitionAccess
       }
     }
   }
+  ${Contact_Contact_ProfileFragmentDoc}
   ${Contact_PetitionAccessFragmentDoc}
+`;
+export const PetitionSignatureCellContent_UserFragmentDoc = gql`
+  fragment PetitionSignatureCellContent_User on User {
+    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+  }
 `;
 export const Contact_UserFragmentDoc = gql`
   fragment Contact_User on User {
     ...AppLayout_User
+    ...PetitionSignatureCellContent_User
   }
   ${AppLayout_UserFragmentDoc}
+  ${PetitionSignatureCellContent_UserFragmentDoc}
 `;
 export const Contacts_ContactsListFragmentDoc = gql`
   fragment Contacts_ContactsList on ContactPagination {
@@ -5199,12 +5312,17 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     fields {
       ...PetitionReplies_PetitionField
     }
+    signatureRequests @include(if: $hasPetitionSignature) {
+      id
+      status
+    }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
+    hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
     ...PetitionLayout_User
   }
   ${PetitionLayout_UserFragmentDoc}
@@ -5224,16 +5342,9 @@ export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc
     }
   }
 `;
-export const UserAvatarList_UserFragmentDoc = gql`
-  fragment UserAvatarList_User on User {
+export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
+  fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
     id
-    fullName
-  }
-`;
-export const Petitions_PetitionBaseFragmentDoc = gql`
-  fragment Petitions_PetitionBase on PetitionBase {
-    id
-    locale
     name
     createdAt
     userPermissions {
@@ -5243,9 +5354,6 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
         ...UserAvatarList_User
       }
     }
-    owner {
-      id
-    }
     ... on Petition {
       accesses {
         status
@@ -5253,13 +5361,8 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
           ...ContactLink_Contact
         }
       }
-      status
-      progress {
-        validated
-        replied
-        optional
-        total
-      }
+      ...PetitionStatusCellContent_Petition
+      ...PetitionSignatureCellContent_Petition
     }
     ... on PetitionTemplate {
       description
@@ -5267,6 +5370,14 @@ export const Petitions_PetitionBaseFragmentDoc = gql`
   }
   ${UserAvatarList_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
+  ${PetitionStatusCellContent_PetitionFragmentDoc}
+  ${PetitionSignatureCellContent_PetitionFragmentDoc}
+`;
+export const Petitions_PetitionBaseFragmentDoc = gql`
+  fragment Petitions_PetitionBase on PetitionBase {
+    ...usePetitionsTableColumns_PetitionBase
+  }
+  ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
 `;
 export const Petitions_PetitionBasePaginationFragmentDoc = gql`
   fragment Petitions_PetitionBasePagination on PetitionBasePagination {
@@ -5277,11 +5388,19 @@ export const Petitions_PetitionBasePaginationFragmentDoc = gql`
   }
   ${Petitions_PetitionBaseFragmentDoc}
 `;
+export const usePetitionsTableColumns_UserFragmentDoc = gql`
+  fragment usePetitionsTableColumns_User on User {
+    ...PetitionSignatureCellContent_User
+  }
+  ${PetitionSignatureCellContent_UserFragmentDoc}
+`;
 export const Petitions_UserFragmentDoc = gql`
   fragment Petitions_User on User {
     ...AppLayout_User
+    ...usePetitionsTableColumns_User
   }
   ${AppLayout_UserFragmentDoc}
+  ${usePetitionsTableColumns_UserFragmentDoc}
 `;
 export const NewPetition_PetitionTemplateFragmentDoc = gql`
   fragment NewPetition_PetitionTemplate on PetitionTemplate {
@@ -6121,10 +6240,10 @@ export type SupportMethodsUserLazyQueryHookResult = ReturnType<
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
     updateContact(id: $id, data: $data) {
-      ...Contact_Contact
+      ...Contact_Contact_Profile
     }
   }
-  ${Contact_ContactFragmentDoc}
+  ${Contact_Contact_ProfileFragmentDoc}
 `;
 
 /**
@@ -6159,49 +6278,6 @@ export function useContact_updateContactMutation(
 export type Contact_updateContactMutationHookResult = ReturnType<
   typeof useContact_updateContactMutation
 >;
-export const ContactDocument = gql`
-  query Contact($id: GID!) {
-    contact(id: $id) {
-      ...Contact_Contact
-    }
-  }
-  ${Contact_ContactFragmentDoc}
-`;
-
-/**
- * __useContactQuery__
- *
- * To run a query within a React component, call `useContactQuery` and pass it any options that fit your needs.
- * When your component renders, `useContactQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContactQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useContactQuery(
-  baseOptions?: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
-) {
-  return Apollo.useQuery<ContactQuery, ContactQueryVariables>(
-    ContactDocument,
-    baseOptions
-  );
-}
-export function useContactLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<ContactQuery, ContactQueryVariables>
-) {
-  return Apollo.useLazyQuery<ContactQuery, ContactQueryVariables>(
-    ContactDocument,
-    baseOptions
-  );
-}
-export type ContactQueryHookResult = ReturnType<typeof useContactQuery>;
-export type ContactLazyQueryHookResult = ReturnType<typeof useContactLazyQuery>;
 export const ContactUserDocument = gql`
   query ContactUser {
     me {
@@ -6252,6 +6328,50 @@ export type ContactUserQueryHookResult = ReturnType<typeof useContactUserQuery>;
 export type ContactUserLazyQueryHookResult = ReturnType<
   typeof useContactUserLazyQuery
 >;
+export const ContactDocument = gql`
+  query Contact($id: GID!, $hasPetitionSignature: Boolean!) {
+    contact(id: $id) {
+      ...Contact_Contact
+    }
+  }
+  ${Contact_ContactFragmentDoc}
+`;
+
+/**
+ * __useContactQuery__
+ *
+ * To run a query within a React component, call `useContactQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContactQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContactQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      hasPetitionSignature: // value for 'hasPetitionSignature'
+ *   },
+ * });
+ */
+export function useContactQuery(
+  baseOptions?: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
+) {
+  return Apollo.useQuery<ContactQuery, ContactQueryVariables>(
+    ContactDocument,
+    baseOptions
+  );
+}
+export function useContactLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ContactQuery, ContactQueryVariables>
+) {
+  return Apollo.useLazyQuery<ContactQuery, ContactQueryVariables>(
+    ContactDocument,
+    baseOptions
+  );
+}
+export type ContactQueryHookResult = ReturnType<typeof useContactQuery>;
+export type ContactLazyQueryHookResult = ReturnType<typeof useContactLazyQuery>;
 export const Contacts_deleteContactsDocument = gql`
   mutation Contacts_deleteContacts($ids: [GID!]!) {
     deleteContacts(ids: $ids)
@@ -7491,10 +7611,10 @@ export const PetitionReplies_updatePetitionDocument = gql`
     $data: UpdatePetitionInput!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
-      ...PetitionReplies_Petition
+      ...PetitionLayout_PetitionBase
     }
   }
-  ${PetitionReplies_PetitionFragmentDoc}
+  ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
 
 /**
@@ -8039,59 +8159,6 @@ export function usePetitionReplies_presendPetitionClosedNotificationMutation(
 export type PetitionReplies_presendPetitionClosedNotificationMutationHookResult = ReturnType<
   typeof usePetitionReplies_presendPetitionClosedNotificationMutation
 >;
-export const PetitionRepliesDocument = gql`
-  query PetitionReplies($id: GID!) {
-    petition(id: $id) {
-      ...PetitionReplies_Petition
-    }
-  }
-  ${PetitionReplies_PetitionFragmentDoc}
-`;
-
-/**
- * __usePetitionRepliesQuery__
- *
- * To run a query within a React component, call `usePetitionRepliesQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionRepliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionRepliesQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function usePetitionRepliesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >
-) {
-  return Apollo.useQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
-    PetitionRepliesDocument,
-    baseOptions
-  );
-}
-export function usePetitionRepliesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >
-) {
-  return Apollo.useLazyQuery<
-    PetitionRepliesQuery,
-    PetitionRepliesQueryVariables
-  >(PetitionRepliesDocument, baseOptions);
-}
-export type PetitionRepliesQueryHookResult = ReturnType<
-  typeof usePetitionRepliesQuery
->;
-export type PetitionRepliesLazyQueryHookResult = ReturnType<
-  typeof usePetitionRepliesLazyQuery
->;
 export const PetitionRepliesUserDocument = gql`
   query PetitionRepliesUser {
     me {
@@ -8144,72 +8211,59 @@ export type PetitionRepliesUserQueryHookResult = ReturnType<
 export type PetitionRepliesUserLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserLazyQuery
 >;
-export const PetitionsDocument = gql`
-  query Petitions(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $sortBy: [QueryPetitions_OrderBy!]
-    $status: PetitionStatus
-    $type: PetitionBaseType
-  ) {
-    petitions(
-      offset: $offset
-      limit: $limit
-      search: $search
-      sortBy: $sortBy
-      type: $type
-      status: $status
-    ) {
-      ...Petitions_PetitionBasePagination
+export const PetitionRepliesDocument = gql`
+  query PetitionReplies($id: GID!, $hasPetitionSignature: Boolean!) {
+    petition(id: $id) {
+      ...PetitionReplies_Petition
     }
   }
-  ${Petitions_PetitionBasePaginationFragmentDoc}
+  ${PetitionReplies_PetitionFragmentDoc}
 `;
 
 /**
- * __usePetitionsQuery__
+ * __usePetitionRepliesQuery__
  *
- * To run a query within a React component, call `usePetitionsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `usePetitionRepliesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionRepliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = usePetitionsQuery({
+ * const { data, loading, error } = usePetitionRepliesQuery({
  *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *      status: // value for 'status'
- *      type: // value for 'type'
+ *      id: // value for 'id'
+ *      hasPetitionSignature: // value for 'hasPetitionSignature'
  *   },
  * });
  */
-export function usePetitionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
-) {
-  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
-    PetitionsDocument,
-    baseOptions
-  );
-}
-export function usePetitionsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionsQuery,
-    PetitionsQueryVariables
+export function usePetitionRepliesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionRepliesQuery,
+    PetitionRepliesQueryVariables
   >
 ) {
-  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
-    PetitionsDocument,
+  return Apollo.useQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
+    PetitionRepliesDocument,
     baseOptions
   );
 }
-export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
-export type PetitionsLazyQueryHookResult = ReturnType<
-  typeof usePetitionsLazyQuery
+export function usePetitionRepliesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionRepliesQuery,
+    PetitionRepliesQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    PetitionRepliesQuery,
+    PetitionRepliesQueryVariables
+  >(PetitionRepliesDocument, baseOptions);
+}
+export type PetitionRepliesQueryHookResult = ReturnType<
+  typeof usePetitionRepliesQuery
+>;
+export type PetitionRepliesLazyQueryHookResult = ReturnType<
+  typeof usePetitionRepliesLazyQuery
 >;
 export const PetitionsUserDocument = gql`
   query PetitionsUser {
@@ -8262,6 +8316,75 @@ export type PetitionsUserQueryHookResult = ReturnType<
 >;
 export type PetitionsUserLazyQueryHookResult = ReturnType<
   typeof usePetitionsUserLazyQuery
+>;
+export const PetitionsDocument = gql`
+  query Petitions(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryPetitions_OrderBy!]
+    $status: PetitionStatus
+    $type: PetitionBaseType
+    $hasPetitionSignature: Boolean!
+  ) {
+    petitions(
+      offset: $offset
+      limit: $limit
+      search: $search
+      sortBy: $sortBy
+      type: $type
+      status: $status
+    ) {
+      ...Petitions_PetitionBasePagination
+    }
+  }
+  ${Petitions_PetitionBasePaginationFragmentDoc}
+`;
+
+/**
+ * __usePetitionsQuery__
+ *
+ * To run a query within a React component, call `usePetitionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionsQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *      sortBy: // value for 'sortBy'
+ *      status: // value for 'status'
+ *      type: // value for 'type'
+ *      hasPetitionSignature: // value for 'hasPetitionSignature'
+ *   },
+ * });
+ */
+export function usePetitionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
+) {
+  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
+    PetitionsDocument,
+    baseOptions
+  );
+}
+export function usePetitionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionsQuery,
+    PetitionsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
+    PetitionsDocument,
+    baseOptions
+  );
+}
+export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
+export type PetitionsLazyQueryHookResult = ReturnType<
+  typeof usePetitionsLazyQuery
 >;
 export const NewPetitionPublicTemplatesDocument = gql`
   query NewPetitionPublicTemplates(

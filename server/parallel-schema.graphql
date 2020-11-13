@@ -811,6 +811,11 @@ type Petition implements PetitionBase {
   createdAt: DateTime!
 
   """
+  The current signature request.
+  """
+  currentSignatureRequest: PetitionSignatureRequest
+
+  """
   The deadline of the petition.
   """
   deadline: DateTime
@@ -881,6 +886,11 @@ type Petition implements PetitionBase {
   The signature configuration for the petition.
   """
   signatureConfig: SignatureConfig
+
+  """
+  The list of signature requests.
+  """
+  signatureRequests: [PetitionSignatureRequest!]
 
   """
   The status of the petition.

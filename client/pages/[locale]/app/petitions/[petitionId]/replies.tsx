@@ -4,12 +4,15 @@ import {
   DownloadIcon,
   ListIcon,
   RepeatIcon,
+  SignatureIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
+import { ContactLink } from "@parallel/components/common/ContactLink";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { Spacer } from "@parallel/components/common/Spacer";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -81,7 +84,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     data: { me },
   } = assertQuery(usePetitionRepliesUserQuery());
   const { data, refetch } = assertQuery(
-    usePetitionRepliesQuery({ variables: { id: petitionId } })
+    usePetitionRepliesQuery({
+      variables: {
+        id: petitionId,
+        hasPetitionSignature: me.hasPetitionSignature,
+      },
+    })
   );
   const petition = data!.petition as PetitionReplies_PetitionFragment;
   const toast = useToast();
@@ -443,19 +451,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             defaultMessage="Notify that it is correct"
           />
         </Button>
-        {pendingComments ? (
-          <Button
-            colorScheme="yellow"
-            isDisabled={isSubmitting}
-            onClick={handleSubmitUnpublished}
-          >
-            <FormattedMessage
-              id="petition-replies.submit-comments"
-              defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-              values={{ commentCount: pendingComments }}
-            />
-          </Button>
-        ) : null}
         {showDownloadAll ? (
           <Button
             colorScheme="purple"
@@ -466,6 +461,20 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             <FormattedMessage
               id="petition-replies.download-all"
               defaultMessage="Download replies"
+            />
+          </Button>
+        ) : null}
+        <Spacer />
+        {pendingComments ? (
+          <Button
+            colorScheme="yellow"
+            isDisabled={isSubmitting}
+            onClick={handleSubmitUnpublished}
+          >
+            <FormattedMessage
+              id="petition-replies.submit-comments"
+              defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
+              values={{ commentCount: pendingComments }}
             />
           </Button>
         ) : null}
@@ -494,7 +503,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   maxHeight={`calc(100vh - 6rem)`}
                 >
                   <CardHeader>
-                    <Text as="span" display="inline-flex" alignItems="center">
+                    <Text as="span" display="flex" alignItems="center">
                       <ListIcon fontSize="18px" marginRight={2} />
                       <FormattedMessage
                         id="petition.contents"
@@ -513,30 +522,51 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </Box>
           }
         >
-          <Stack flex="2" spacing={4} padding={4} id="petition-replies">
-            {petition.fields.map((field, index) => (
-              <PetitionRepliesField
-                id={`field-${field.id}`}
-                key={field.id}
-                field={field}
-                fieldRelativeIndex={fieldIndexValues[index]}
-                index={index}
-                onValidateToggle={() =>
-                  handleValidateToggle([field.id], !field.validated)
-                }
-                onAction={handleAction}
-                isActive={activeFieldId === field.id}
-                commentCount={index}
-                newCommentCount={index > 1 ? index - 1 : 0}
-                onToggleComments={() =>
-                  setActiveFieldId(activeFieldId === field.id ? null : field.id)
-                }
-                onUpdateReplyStatus={(replyId, status) =>
-                  handleUpdateRepliesStatus(field.id, [replyId], status)
-                }
-              />
-            ))}
-          </Stack>
+          <Box padding={4}>
+            <Stack flex="2" spacing={4} id="petition-replies">
+              {petition.fields.map((field, index) => (
+                <PetitionRepliesField
+                  id={`field-${field.id}`}
+                  key={field.id}
+                  field={field}
+                  fieldRelativeIndex={fieldIndexValues[index]}
+                  index={index}
+                  onValidateToggle={() =>
+                    handleValidateToggle([field.id], !field.validated)
+                  }
+                  onAction={handleAction}
+                  isActive={activeFieldId === field.id}
+                  commentCount={index}
+                  newCommentCount={index > 1 ? index - 1 : 0}
+                  onToggleComments={() =>
+                    setActiveFieldId(
+                      activeFieldId === field.id ? null : field.id
+                    )
+                  }
+                  onUpdateReplyStatus={(replyId, status) =>
+                    handleUpdateRepliesStatus(field.id, [replyId], status)
+                  }
+                />
+              ))}
+            </Stack>
+            {me.hasPetitionSignature ? (
+              <Card marginTop={4}>
+                <CardHeader>
+                  <Box as="span" display="flex">
+                    <SignatureIcon
+                      fontSize="20px"
+                      marginRight={2}
+                      lineHeight={5}
+                    />
+                    Petition Signature
+                  </Box>
+                </CardHeader>
+                <Box padding={4}>
+                  {JSON.stringify(petition.signatureRequests)}
+                </Box>
+              </Card>
+            ) : null}
+          </Box>
         </PaneWithFlyout>
       </Box>
     </PetitionLayout>
@@ -558,8 +588,13 @@ PetitionReplies.fragments = {
         fields {
           ...PetitionReplies_PetitionField
         }
+        signatureRequests @include(if: $hasPetitionSignature) {
+          id
+          status
+        }
       }
       ${PetitionLayout.fragments.PetitionBase}
+      ${ContactLink.fragments.Contact}
       ${this.PetitionField}
     `;
   },
@@ -581,6 +616,7 @@ PetitionReplies.fragments = {
   get User() {
     return gql`
       fragment PetitionReplies_User on User {
+        hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
         ...PetitionLayout_User
       }
       ${PetitionLayout.fragments.User}
@@ -595,10 +631,10 @@ PetitionReplies.mutations = [
       $data: UpdatePetitionInput!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
-        ...PetitionReplies_Petition
+        ...PetitionLayout_PetitionBase
       }
     }
-    ${PetitionReplies.fragments.Petition}
+    ${PetitionLayout.fragments.PetitionBase}
   `,
   gql`
     mutation PetitionReplies_validatePetitionFields(
@@ -969,31 +1005,34 @@ PetitionReplies.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
-      gql`
-        query PetitionReplies($id: GID!) {
-          petition(id: $id) {
-            ...PetitionReplies_Petition
-          }
+  const {
+    data: { me },
+  } = await fetchQuery<PetitionRepliesUserQuery>(
+    gql`
+      query PetitionRepliesUser {
+        me {
+          ...PetitionReplies_User
         }
-        ${PetitionReplies.fragments.Petition}
-      `,
-      {
-        variables: { id: query.petitionId as string },
       }
-    ),
-    fetchQuery<PetitionRepliesUserQuery>(
-      gql`
-        query PetitionRepliesUser {
-          me {
-            ...PetitionReplies_User
-          }
+      ${PetitionReplies.fragments.User}
+    `
+  );
+  await fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
+    gql`
+      query PetitionReplies($id: GID!, $hasPetitionSignature: Boolean!) {
+        petition(id: $id) {
+          ...PetitionReplies_Petition
         }
-        ${PetitionReplies.fragments.User}
-      `
-    ),
-  ]);
+      }
+      ${PetitionReplies.fragments.Petition}
+    `,
+    {
+      variables: {
+        id: query.petitionId as string,
+        hasPetitionSignature: me.hasPetitionSignature,
+      },
+    }
+  );
   return {
     petitionId: query.petitionId as string,
   };

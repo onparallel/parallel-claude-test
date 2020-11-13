@@ -10,8 +10,8 @@ import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { ExtendChakra } from "@parallel/chakra/utils";
 
-export type TableCardProps<T> = ExtendChakra<
-  TableProps<T> & {
+export type TableCardProps<T, TContext = unknown> = ExtendChakra<
+  TableProps<T, TContext> & {
     loading: boolean;
     header?: ReactNode;
     body?: ReactNode;
@@ -22,9 +22,10 @@ export type TableCardProps<T> = ExtendChakra<
   }
 >;
 
-export function TablePage<T>({
+export function TablePage<T, TContext = unknown>({
   columns,
   rows,
+  context,
   rowKeyProp,
   isSelectable: selectable,
   isHighlightable: highlightable,
@@ -40,7 +41,7 @@ export function TablePage<T>({
   pageSize,
   onPageChange,
   ...props
-}: TableCardProps<T>) {
+}: TableCardProps<T, TContext>) {
   const colors = useTableColors();
 
   return (
@@ -75,6 +76,7 @@ export function TablePage<T>({
           <Table
             columns={columns}
             rows={rows}
+            context={context}
             rowKeyProp={rowKeyProp}
             isSelectable={selectable}
             isHighlightable={highlightable}

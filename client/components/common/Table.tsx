@@ -24,7 +24,6 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
-import { noop } from "remeda";
 
 export type SortingDirection = "ASC" | "DESC";
 
@@ -37,9 +36,10 @@ function toggleSortingDirection(direction: SortingDirection): SortingDirection {
   return direction === "ASC" ? "DESC" : "ASC";
 }
 
-export type TableProps<TRow> = ExtendChakra<{
-  columns: TableColumn<TRow>[];
+export type TableProps<TRow, TContext = unknown> = ExtendChakra<{
+  columns: TableColumn<TRow, TContext>[];
   rows: TRow[];
+  context?: TContext;
   rowKeyProp: keyof TRow;
   sort?: Sorting<any>;
   isSelectable?: boolean;
@@ -48,11 +48,11 @@ export type TableProps<TRow> = ExtendChakra<{
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: TRow, event: MouseEvent) => void;
   onSortChange?: (sort: Sorting<any>) => void;
-  onAction?: (row: TRow, action: string, data?: any) => void;
 }>;
 
-export type TableHeaderProps<TRow> = {
-  column: TableColumn<TRow>;
+export type TableHeaderProps<TRow, TContext = unknown> = {
+  column: TableColumn<TRow, TContext>;
+  context?: TContext;
   sort: Sorting<any> | undefined;
   allSelected: boolean;
   anySelected: boolean;
@@ -60,30 +60,32 @@ export type TableHeaderProps<TRow> = {
   onToggleAll: (event?: any) => void;
 };
 
-export type TableCellProps<TRow> = {
+export type TableCellProps<TRow, TContext = unknown> = {
   row: TRow;
+  context?: TContext;
   rowKey: string;
-  column: TableColumn<TRow>;
+  column: TableColumn<TRow, TContext>;
   isSelected?: boolean;
   isExpanded?: boolean;
   onToggleSelection?: (event: any) => void;
   onToggleExpand?: (expanded: boolean) => void;
-  onAction: (action: string, data?: any) => void;
 };
 
-export type TableColumn<TRow> = {
+export type TableColumn<TRow, TContext = unknown> = {
   key: string;
   align?: BoxProps["textAlign"];
+  context?: TContext;
   isSortable?: true;
   header: string;
-  Header?: ComponentType<TableHeaderProps<TRow>>;
-  CellContent: ComponentType<TableCellProps<TRow>>;
+  Header?: ComponentType<TableHeaderProps<TRow, TContext>>;
+  CellContent: ComponentType<TableCellProps<TRow, TContext>>;
   cellProps?: ExtendChakra;
 };
 
-function _Table<TRow>({
+function _Table<TRow, TContext = unknown>({
   columns,
   rows,
+  context,
   rowKeyProp,
   isSelectable,
   isExpandable,
@@ -92,9 +94,8 @@ function _Table<TRow>({
   onSelectionChange,
   onRowClick,
   onSortChange,
-  onAction,
   ...props
-}: TableProps<TRow>) {
+}: TableProps<TRow, TContext>) {
   const {
     selection,
     allSelected,
@@ -257,6 +258,7 @@ function _Table<TRow>({
               <column.Header
                 key={column.key}
                 column={column}
+                context={context}
                 sort={sort}
                 onSortByClick={handleOnSortByClick}
                 allSelected={allSelected}
@@ -267,6 +269,7 @@ function _Table<TRow>({
               <DefaultHeader
                 key={column.key}
                 column={column as any}
+                context={context}
                 sort={sort}
                 onSortByClick={handleOnSortByClick}
                 allSelected={allSelected}
@@ -286,6 +289,7 @@ function _Table<TRow>({
             <Row
               key={key}
               row={row}
+              context={context}
               rowKey={key}
               columns={columns}
               isSelected={isSelected}
@@ -295,7 +299,6 @@ function _Table<TRow>({
               onRowClick={onRowClick}
               onToggleExpand={handleToggleExpand}
               onToggleSelection={toggle}
-              onAction={onAction}
             />
           );
         })}
@@ -318,8 +321,9 @@ export function useTableColors() {
   }, []);
 }
 
-function _Row<TRow>({
+function _Row<TRow, TContext = unknown>({
   row,
+  context,
   rowKey,
   columns,
   isSelected,
@@ -327,19 +331,19 @@ function _Row<TRow>({
   isExpandable,
   isHighlightable,
   onRowClick,
-  onAction,
   onToggleSelection,
   onToggleExpand,
 }: {
   row: TRow;
+  context?: TContext;
   rowKey: string;
   isSelected: boolean;
   isExpanded: boolean;
   onToggleSelection: (key: string, event: any) => void;
   onToggleExpand: (key: string, value: boolean) => void;
 } & Pick<
-  TableProps<TRow>,
-  "columns" | "isExpandable" | "isHighlightable" | "onRowClick" | "onAction"
+  TableProps<TRow, TContext>,
+  "columns" | "isExpandable" | "isHighlightable" | "onRowClick"
 >) {
   const colors = useTableColors();
   const handleToggleSelection = useCallback(
@@ -349,10 +353,6 @@ function _Row<TRow>({
   const handleToggleExpand = useCallback(onToggleExpand.bind(null, rowKey), [
     onToggleExpand,
     rowKey,
-  ]);
-  const handleAction = useCallback(onAction?.bind(null, row) ?? noop, [
-    onAction,
-    row,
   ]);
   return (
     <>
@@ -382,13 +382,13 @@ function _Row<TRow>({
             <Cell
               key={column.key}
               row={row}
+              context={context}
               rowKey={rowKey}
               column={column}
               isSelected={isSelected}
               isExpanded={isExpanded}
               onToggleSelection={handleToggleSelection}
               onToggleExpand={handleToggleExpand}
-              onAction={handleAction}
             />
           );
         })}
@@ -407,7 +407,10 @@ function _Row<TRow>({
 }
 const Row: typeof _Row = memo(_Row) as any;
 
-function _Cell<TRow>({ column, ...props }: TableCellProps<TRow>) {
+function _Cell<TRow, TContext>({
+  column,
+  ...props
+}: TableCellProps<TRow, TContext>) {
   return (
     <Box
       as="td"

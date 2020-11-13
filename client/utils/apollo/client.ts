@@ -85,6 +85,9 @@ export function createApolloClient(
             userPermissions: {
               merge: mergeArraysBy(["user", "id"]),
             },
+            signatureConfig: {
+              merge: true,
+            },
           },
         },
         PetitionField: {

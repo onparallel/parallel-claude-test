@@ -14,10 +14,11 @@ import { EditIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { PetitionProgressBar } from "@parallel/components/common/PetitionProgressBar";
-import { PetitionStatusIcon } from "@parallel/components/common/PetitionStatusIcon";
+import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
+import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -28,6 +29,7 @@ import {
   ContactQueryVariables,
   ContactUserQuery,
   Contact_PetitionAccessFragment,
+  Contact_UserFragment,
   useContactQuery,
   useContactUserQuery,
   useContact_updateContactMutation,
@@ -35,6 +37,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { ellipsis } from "@parallel/utils/ellipsis";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { UnwrapPromise } from "@parallel/utils/types";
 import {
@@ -47,7 +50,6 @@ import {
 } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit } from "remeda";
 
 type ContactProps = UnwrapPromise<ReturnType<typeof Contact.getInitialProps>>;
 
@@ -64,7 +66,14 @@ function Contact({ contactId }: ContactProps) {
   } = assertQuery(useContactUserQuery());
   const {
     data: { contact },
-  } = assertQuery(useContactQuery({ variables: { id: contactId } }));
+  } = assertQuery(
+    useContactQuery({
+      variables: {
+        id: contactId,
+        hasPetitionSignature: me.hasPetitionSignature,
+      },
+    })
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [updateContact, { loading }] = useContact_updateContactMutation();
   const { register, handleSubmit, reset } = useForm<ContactDetailsFormData>({
@@ -105,6 +114,7 @@ function Contact({ contactId }: ContactProps) {
   );
 
   const columns = useContactPetitionAccessesColumns();
+  const context = useMemo(() => ({ user: me }), [me]);
 
   return (
     <AppLayout title={contact!.fullName ?? contact!.email} user={me}>
@@ -211,6 +221,7 @@ function Contact({ contactId }: ContactProps) {
             {contact!.accesses.items.length ? (
               <Table
                 columns={columns}
+                context={context}
                 rows={contact!.accesses.items ?? []}
                 rowKeyProp="id"
                 onRowClick={handleRowClick}
@@ -237,109 +248,162 @@ function Contact({ contactId }: ContactProps) {
 
 type PetitionAccessSelection = Contact_PetitionAccessFragment;
 
-function useContactPetitionAccessesColumns(): TableColumn<
-  PetitionAccessSelection
->[] {
+function useContactPetitionAccessesColumns() {
   const intl = useIntl();
   return useMemo(
-    () => [
-      {
-        key: "name",
-        header: intl.formatMessage({
-          id: "petitions.header.name",
-          defaultMessage: "Petition name",
-        }),
-        CellContent: ({ row: { petition } }) => (
-          <>
-            {petition?.name || (
-              <Text as="span" textStyle="hint">
-                <FormattedMessage
-                  id="generic.untitled-petition"
-                  defaultMessage="Untitled petition"
-                />
-              </Text>
-            )}
-          </>
-        ),
-      },
-      {
-        key: "deadline",
-        header: intl.formatMessage({
-          id: "petition-accesses.deadline-header",
-          defaultMessage: "Deadline",
-        }),
-        CellContent: ({ row: { petition } }) =>
-          petition?.deadline ? (
-            <DateTime value={petition.deadline} format={FORMATS.LLL} />
-          ) : (
-            <Text as="span" textStyle="hint" whiteSpace="nowrap">
-              <FormattedMessage
-                id="generic.no-deadline"
-                defaultMessage="No deadline"
-              />
-            </Text>
+    () =>
+      [
+        {
+          key: "name",
+          header: intl.formatMessage({
+            id: "petitions.header.name",
+            defaultMessage: "Petition name",
+          }),
+          CellContent: ({ row: { petition } }) => (
+            <>
+              {petition!.name ? (
+                ellipsis(petition!.name, 50)
+              ) : (
+                <Text as="span" textStyle="hint" whiteSpace="nowrap">
+                  <FormattedMessage
+                    id="generic.untitled-petition"
+                    defaultMessage="Untitled petition"
+                  />
+                </Text>
+              )}
+            </>
           ),
-      },
-      {
-        key: "status",
-        header: intl.formatMessage({
-          id: "petition-accesses.status-header",
-          defaultMessage: "Status",
-        }),
-        align: "center",
-        CellContent: ({ row: { petition } }) =>
-          petition ? (
+        },
+        {
+          key: "status",
+          header: intl.formatMessage({
+            id: "petitions.header.status",
+            defaultMessage: "Status",
+          }),
+          align: "center",
+          CellContent: ({ row: { petition } }) => (
+            <PetitionStatusCellContent petition={petition!} />
+          ),
+        },
+        {
+          key: "signature",
+          align: "center",
+          Header: () => <Box as="th" width="1px" />,
+          cellProps: { paddingLeft: 0, width: "1px" },
+          CellContent: ({ row: { petition }, context }) => (
             <Flex alignItems="center">
-              <PetitionProgressBar
-                status={petition.status}
-                {...omit(petition.progress, ["__typename"])}
-                flex="1"
-                minWidth="80px"
+              <PetitionSignatureCellContent
+                petition={petition!}
+                user={context!.user}
               />
-              <PetitionStatusIcon status={petition.status} marginLeft={2} />
             </Flex>
-          ) : null,
-      },
-    ],
+          ),
+        },
+        {
+          key: "sharedWith",
+          header: intl.formatMessage({
+            id: "petitions.header.shared-with",
+            defaultMessage: "Shared with",
+          }),
+          align: "center",
+          cellProps: { width: "1%" },
+          CellContent: ({ row: { petition }, column }) => (
+            <Flex justifyContent={column.align}>
+              <UserAvatarList
+                users={petition!.userPermissions.map((p) => p.user)}
+              />
+            </Flex>
+          ),
+        },
+        {
+          key: "createdAt",
+          isSortable: true,
+          header: intl.formatMessage({
+            id: "petitions.header.created-at",
+            defaultMessage: "Created at",
+          }),
+          cellProps: { width: "1%" },
+          CellContent: ({ row: { petition } }) => (
+            <DateTime
+              value={petition!.createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+              whiteSpace="nowrap"
+            />
+          ),
+        },
+      ] as TableColumn<
+        PetitionAccessSelection,
+        { user: Contact_UserFragment }
+      >[],
     [intl.locale]
   );
 }
 
 Contact.fragments = {
-  Contact: gql`
-    fragment Contact_Contact on Contact {
-      id
-      email
-      fullName
-      firstName
-      lastName
-      accesses(limit: 100) {
-        items {
-          ...Contact_PetitionAccess
-        }
-      }
-    }
-    fragment Contact_PetitionAccess on PetitionAccess {
-      id
-      petition {
+  get Contact() {
+    return gql`
+      fragment Contact_Contact on Contact {
         id
-        name
-        status
-        deadline
-        progress {
-          validated
-          replied
-          optional
-          total
+        ...Contact_Contact_Profile
+        accesses(limit: 100) {
+          items {
+            ...Contact_PetitionAccess
+          }
         }
       }
+      ${this.Contact_Profile}
+      ${this.PetitionAccess}
+    `;
+  },
+  get Contact_Profile() {
+    return gql`
+      fragment Contact_Contact_Profile on Contact {
+        id
+        email
+        fullName
+        firstName
+        lastName
+      }
+    `;
+  },
+  get PetitionAccess() {
+    return gql`
+      fragment Contact_PetitionAccess on PetitionAccess {
+        id
+        petition {
+          ...Contact_Petition
+        }
+      }
+      ${this.Petition}
+    `;
+  },
+  Petition: gql`
+    fragment Contact_Petition on Petition {
+      id
+      name
+      createdAt
+      userPermissions {
+        permissionType
+        user {
+          id
+          ...UserAvatarList_User
+        }
+      }
+      ...PetitionStatusCellContent_Petition
+      ...PetitionSignatureCellContent_Petition
     }
+    ${PetitionStatusCellContent.fragments.Petition}
+    ${PetitionSignatureCellContent.fragments.Petition}
+    ${UserAvatarList.fragments.User}
   `,
   User: gql`
     fragment Contact_User on User {
       ...AppLayout_User
+      ...PetitionSignatureCellContent_User
     }
     ${AppLayout.fragments.User}
+    ${PetitionSignatureCellContent.fragments.User}
   `,
 };
 
@@ -347,10 +411,10 @@ Contact.mutations = [
   gql`
     mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {
       updateContact(id: $id, data: $data) {
-        ...Contact_Contact
+        ...Contact_Contact_Profile
       }
     }
-    ${Contact.fragments.Contact}
+    ${Contact.fragments.Contact_Profile}
   `,
 ];
 
@@ -388,29 +452,32 @@ Contact.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery<ContactQuery, ContactQueryVariables>(
-      gql`
-        query Contact($id: GID!) {
-          contact(id: $id) {
-            ...Contact_Contact
-          }
-        }
-        ${Contact.fragments.Contact}
-      `,
-      {
-        variables: { id: query.contactId as string },
+  const {
+    data: { me },
+  } = await fetchQuery<ContactUserQuery>(gql`
+    query ContactUser {
+      me {
+        ...Contact_User
       }
-    ),
-    fetchQuery<ContactUserQuery>(gql`
-      query ContactUser {
-        me {
-          ...Contact_User
+    }
+    ${Contact.fragments.User}
+  `);
+  await fetchQuery<ContactQuery, ContactQueryVariables>(
+    gql`
+      query Contact($id: GID!, $hasPetitionSignature: Boolean!) {
+        contact(id: $id) {
+          ...Contact_Contact
         }
       }
-      ${Contact.fragments.User}
-    `),
-  ]);
+      ${Contact.fragments.Contact}
+    `,
+    {
+      variables: {
+        id: query.contactId as string,
+        hasPetitionSignature: me.hasPetitionSignature,
+      },
+    }
+  );
   return {
     contactId: query.contactId as string,
   };

@@ -1,0 +1,38 @@
+import { gql } from "@apollo/client";
+import { Stack } from "@chakra-ui/core";
+import { PetitionStatusCellContent_PetitionFragment } from "@parallel/graphql/__types";
+import { omit } from "remeda";
+import { PetitionProgressBar } from "./PetitionProgressBar";
+import { PetitionStatusIcon } from "./PetitionStatusIcon";
+
+export function PetitionStatusCellContent({
+  petition: { status, progress },
+}: {
+  petition: PetitionStatusCellContent_PetitionFragment;
+}) {
+  return (
+    <Stack direction="row" alignItems="center">
+      <PetitionProgressBar
+        status={status}
+        {...omit(progress, ["__typename"])}
+        flex="1"
+        minWidth="80px"
+      />
+      <PetitionStatusIcon status={status} />
+    </Stack>
+  );
+}
+
+PetitionStatusCellContent.fragments = {
+  Petition: gql`
+    fragment PetitionStatusCellContent_Petition on Petition {
+      status
+      progress {
+        validated
+        replied
+        optional
+        total
+      }
+    }
+  `,
+};

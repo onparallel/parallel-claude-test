@@ -2370,19 +2370,32 @@ export class PetitionRepository extends BaseRepository {
     "id"
   );
 
-  async loadPetitionSignaturesByPetitionId(
-    petitionId: number,
-    status?: MaybeArray<PetitionSignatureStatus>
-  ): Promise<Maybe<PetitionSignatureRequest>[]> {
-    return await this.from("petition_signature_request")
-      .where("petition_id", petitionId)
-      .mmodify((q) => {
-        if (status) {
-          q.whereIn("status", unMaybeArray(status));
-        }
-      })
-      .select("*");
-  }
+  readonly loadPetitionSignaturesByPetitionId = this.buildLoadMultipleBy(
+    "petition_signature_request",
+    "petition_id",
+    (q) => q.orderBy("created_at", "desc")
+  );
+
+  readonly loadLatestPetitionSignatureByPetitionId = fromDataLoader(
+    new DataLoader<number, PetitionSignatureRequest | null>(async (keys) => {
+      const { rows } = await this.knex.raw<{
+        rows: (PetitionSignatureRequest & { _rank: number })[];
+      }>(
+        /* sql */ `
+        with cte as (
+          select *, rank() over (partition by petition_id order by created_at desc) _rank
+          from petition_signature_request
+          where petition_id in (${keys.map(() => "?").join(", ")})
+        ) select * from cte where _rank = 1
+      `,
+        [...keys]
+      );
+      const byPetitionId = indexBy(rows, (r) => r.petition_id);
+      return keys.map((key) =>
+        byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null
+      );
+    })
+  );
 
   async createPetitionSignature(
     petitionId: number,

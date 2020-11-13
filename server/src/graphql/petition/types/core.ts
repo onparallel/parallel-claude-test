@@ -1,5 +1,6 @@
 import { enumType, objectType, interfaceType } from "@nexus/schema";
 import { safeJsonParse } from "../../../util/safeJsonParse";
+import { userHasFeatureFlag } from "../authorizers";
 
 export const PetitionLocale = enumType({
   name: "PetitionLocale",
@@ -160,6 +161,26 @@ export const Petition = objectType({
       nullable: true,
       resolve: async (root, _, ctx) => {
         return root.signature_config;
+      },
+    });
+    t.field("currentSignatureRequest", {
+      type: "PetitionSignatureRequest",
+      nullable: true,
+      description: "The current signature request.",
+      authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
+          root.id
+        );
+      },
+    });
+    t.field("signatureRequests", {
+      type: "PetitionSignatureRequest",
+      list: [true],
+      nullable: true,
+      description: "The list of signature requests.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionSignaturesByPetitionId(root.id);
       },
     });
     t.paginationField("events", {

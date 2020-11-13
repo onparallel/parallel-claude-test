@@ -567,6 +567,9 @@ export interface NexusGenFieldTypes {
     // field return type
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    currentSignatureRequest:
+      | NexusGenRootTypes["PetitionSignatureRequest"]
+      | null; // PetitionSignatureRequest
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -581,6 +584,7 @@ export interface NexusGenFieldTypes {
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
+    signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][] | null; // [PetitionSignatureRequest!]
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
