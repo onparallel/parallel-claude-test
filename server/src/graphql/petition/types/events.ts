@@ -465,13 +465,7 @@ export const SignatureStartedEvent = createPetitionEvent(
  */
 export const SignatureCompletedEvent = createPetitionEvent(
   "SignatureCompletedEvent",
-  (t) => {
-    t.jsonObject("file", {
-      resolve: async ({ data }, _, ctx) => {
-        return await ctx.files.loadFileUpload(data.file_upload_id);
-      },
-    });
-  }
+  (t) => {}
 );
 
 /**

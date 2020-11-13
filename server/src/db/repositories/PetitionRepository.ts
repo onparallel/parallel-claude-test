@@ -2460,7 +2460,8 @@ export class PetitionRepository extends BaseRepository {
 
   async userHasAccessToPetitionSignatureRequests(
     userId: number,
-    ids: number[]
+    ids: number[],
+    petitionPermissionTypes?: PetitionUserPermissionType[]
   ) {
     const [{ count }] = await this.from("petition_signature_request")
       .join(
@@ -2470,9 +2471,13 @@ export class PetitionRepository extends BaseRepository {
       )
       .whereIn("petition_signature_request.id", ids)
       .where("petition_user.user_id", userId)
-      .where("petition_user.permission_type", "OWNER")
       .whereNull("petition_user.deleted_at")
       .whereNull("petition_user.deleted_at")
+      .mmodify((q) => {
+        if (petitionPermissionTypes) {
+          q.whereIn("petition_user.permission_type", petitionPermissionTypes);
+        }
+      })
       .select(this.count());
 
     return count === new Set(ids).size;

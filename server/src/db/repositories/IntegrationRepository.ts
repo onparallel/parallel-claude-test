@@ -5,16 +5,14 @@ import { KNEX } from "../knex";
 
 type SignatureIntegrationProviders = "SIGNATURIT";
 
-type SignatureIntegrationSettings<K extends SignatureIntegrationProviders> = {
+export type SignatureIntegrationSettings<
+  K extends SignatureIntegrationProviders
+> = {
   SIGNATURIT: {
     API_KEY: string;
     BRANDING_ID?: string;
   };
 }[K];
-
-export type SignaturitIntegrationSettings = SignatureIntegrationSettings<
-  "SIGNATURIT"
->;
 
 @injectable()
 export class IntegrationRepository extends BaseRepository {

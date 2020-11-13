@@ -16,7 +16,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
-    userHasAccessToPetitions("petitionId", ["OWNER"])
+    userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
   resolve: async (_, { petitionId }, ctx) => {
     const petition = await ctx.petitions.loadPetition(petitionId);
@@ -64,7 +64,10 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
-    userHasAccessToSignatureRequest("petitionSignatureRequestId")
+    userHasAccessToSignatureRequest("petitionSignatureRequestId", [
+      "OWNER",
+      "WRITE",
+    ])
   ),
   resolve: async (_, { petitionSignatureRequestId }, ctx) => {
     const signature = await ctx.petitions.loadPetitionSignatureById(

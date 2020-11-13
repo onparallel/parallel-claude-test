@@ -24,7 +24,7 @@
     "worker:email-sender": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/email-sender.ts",
     "worker:reminder-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/reminder-trigger.ts",
     "worker:scheduled-trigger": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/scheduled-trigger.ts",
-    "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json src/workers/signature-worker.ts",
+    "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts",
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts"
   },
   "dependencies": {

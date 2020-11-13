@@ -37,7 +37,7 @@ export const PetitionSignatureRequest = objectType({
     });
     t.field("status", {
       type: "PetitionSignatureRequestStatus",
-      resolve: (o) => o.status,
+      description: "The status of the petition signature.",
     });
   },
 });

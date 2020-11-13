@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
 import SignaturitSDK from "signaturit-sdk";
-import { SignaturitIntegrationSettings } from "../db/repositories/IntegrationRepository";
+import { SignatureIntegrationSettings } from "../db/repositories/IntegrationRepository";
 import { OrgIntegration } from "../db/__types";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
@@ -58,7 +58,7 @@ export class SignatureService {
     switch (integration.provider.toUpperCase()) {
       case "SIGNATURIT":
         return new SignaturItClient(
-          integration.settings as SignaturitIntegrationSettings,
+          integration.settings as SignatureIntegrationSettings<"SIGNATURIT">,
           this.config
         );
       default:
@@ -92,7 +92,7 @@ export class SignatureService {
 class SignaturItClient implements ISignatureClient {
   private sdk: SignaturitSDK;
   constructor(
-    private settings: SignaturitIntegrationSettings,
+    private settings: SignatureIntegrationSettings<"SIGNATURIT">,
     private config: Config
   ) {
     const isProduction = process.env.NODE_ENV === "production";

@@ -32,7 +32,10 @@ export function userHasAccessToSignatureRequest<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+>(
+  argName: TArg,
+  permissionTypes?: PetitionUserPermissionType[]
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       const signatureRequestIds = unMaybeArray(args[argName]);
@@ -42,7 +45,8 @@ export function userHasAccessToSignatureRequest<
 
       return await ctx.petitions.userHasAccessToPetitionSignatureRequests(
         ctx.user!.id,
-        signatureRequestIds
+        signatureRequestIds,
+        permissionTypes
       );
     } catch {}
     return false;

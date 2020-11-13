@@ -914,7 +914,6 @@ export interface NexusGenFieldTypes {
   SignatureCompletedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    file: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
   };
   SignatureConfig: {

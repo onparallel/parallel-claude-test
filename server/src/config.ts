@@ -54,7 +54,7 @@ export function buildConfig() {
         endpoint: process.env.WORKERS_EMAIL_EVENTS_ENDPOINT!,
       }),
       "signature-worker": Object.freeze({
-        endpoint: process.env.SIGNATURE_WORKER_QUEUE_ENDPOINT!,
+        endpoint: process.env.WORKERS_SIGNATURE_ENDPOINT!,
       }),
     }),
     cronWorkers: Object.freeze({

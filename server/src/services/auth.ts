@@ -12,17 +12,9 @@ import { Cognito } from "./cognito";
 import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
-  login(
-    req: Request & { context: ApiContext },
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
+  login: RequestHandler;
   logout: RequestHandler;
-  newPassword(
-    req: Request & { context: ApiContext },
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
+  newPassword: RequestHandler;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
   validateSession: (session: string) => Promise<string | null>;
@@ -55,11 +47,7 @@ export class Auth implements IAuth {
     );
   }
 
-  async login(
-    req: Request & { context: ApiContext },
-    res: Response,
-    next: NextFunction
-  ) {
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
       const session = await this.cognito.login(email, password);
@@ -81,11 +69,7 @@ export class Auth implements IAuth {
     }
   }
 
-  async newPassword(
-    req: Request & { context: ApiContext },
-    res: Response,
-    next: NextFunction
-  ) {
+  async newPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password, newPassword } = req.body;
       const session = await this.cognito.completeNewPasword(

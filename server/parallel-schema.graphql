@@ -1503,6 +1503,10 @@ type PetitionSignatureRequest implements Timestamps {
   The signature configuration for the request.
   """
   signatureConfig: SignatureConfig!
+
+  """
+  The status of the petition signature.
+  """
   status: PetitionSignatureRequestStatus!
 
   """
@@ -2187,7 +2191,6 @@ type SignatureCancelledEvent implements PetitionEvent {
 
 type SignatureCompletedEvent implements PetitionEvent {
   createdAt: DateTime!
-  file: JSONObject!
   id: GID!
 }
 
