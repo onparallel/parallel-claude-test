@@ -1,12 +1,12 @@
 import contentDisposition from "content-disposition";
 import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
-import { indexBy, zip, maxBy } from "remeda";
+import { indexBy, zip } from "remeda";
 import sanitize from "sanitize-filename";
 import { ApiContext } from "../context";
-import { PetitionSignatureRequest } from "../db/__types";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { fromGlobalId } from "../util/globalId";
+import { isDefined } from "../util/remedaExtensions";
 import { authenticate } from "./helpers/authenticate";
 import { TextRepliesExcel } from "./helpers/TextRepliesExcel";
 
@@ -164,16 +164,17 @@ async function* getPetitionFiles(
     yield await textReplies.export();
   }
 
-  const completedSignatures = (
-    await ctx.petitions.loadPetitionSignaturesByPetitionId(petitionId)
-  ).filter(
-    (s) => !!s && s.status === "COMPLETED" && s.file_upload_id
-  ) as PetitionSignatureRequest[];
+  const latestPetitionSignature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
+    petitionId
+  );
 
-  const lastSignature = maxBy(completedSignatures, (s) => +s.created_at);
-  if (lastSignature) {
+  if (
+    latestPetitionSignature &&
+    latestPetitionSignature.status === "COMPLETED" &&
+    isDefined(latestPetitionSignature.file_upload_id)
+  ) {
     const signedPetition = await ctx.files.loadFileUpload(
-      lastSignature.file_upload_id!
+      latestPetitionSignature.file_upload_id
     );
     if (signedPetition) {
       yield {

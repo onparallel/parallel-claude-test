@@ -860,9 +860,6 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
-    petitionSignatureRequest: Array<
-      NexusGenRootTypes["PetitionSignatureRequest"] | null
-    >; // [PetitionSignatureRequest]!
     petitionSignatureRequestToken:
       | NexusGenRootTypes["PetitionSignatureRequest"]
       | null; // PetitionSignatureRequest
@@ -1385,10 +1382,6 @@ export interface NexusGenArgTypes {
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
-    };
-    petitionSignatureRequest: {
-      // args
-      petitionId: NexusGenScalars["GID"]; // GID!
     };
     petitionSignatureRequestToken: {
       // args

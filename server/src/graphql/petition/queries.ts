@@ -120,15 +120,3 @@ export const petitionSignatureRequestToken = queryField(
     },
   }
 );
-
-export const petitionSignatureRequest = queryField("petitionSignatureRequest", {
-  type: "PetitionSignatureRequest",
-  args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-  },
-  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
-  list: [false],
-  resolve: async (_, { petitionId }, ctx) => {
-    return await ctx.petitions.loadPetitionSignaturesByPetitionId(petitionId);
-  },
-});
