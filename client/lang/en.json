@@ -20,11 +20,6 @@
     "context": "Open menu"
   },
   {
-    "term": "component.confirm-configure-ongoing-signature-body.confirm",
-    "definition": "I understand",
-    "context": "I understand"
-  },
-  {
     "term": "component.confirm-configure-ongoing-signature.body",
     "definition": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled.",
     "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
@@ -63,6 +58,16 @@
     "term": "component.confirm-resend-completed-notification.header",
     "definition": "Resend confirmation email",
     "context": "Resend confirmation email"
+  },
+  {
+    "term": "component.confirm-signature-config-changed.body",
+    "definition": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled.",
+    "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
+  },
+  {
+    "term": "component.confirm-signature-config-changed.header",
+    "definition": "Ongoing eSignature",
+    "context": "Ongoing eSignature"
   },
   {
     "term": "component.contact-list-header.actions-button",
@@ -463,6 +468,21 @@
     "term": "component.petition-settings.template-locale-label",
     "definition": "Language of the template",
     "context": "Language of the template"
+  },
+  {
+    "term": "component.petition-status-cell-content.e-signature-cancelled",
+    "definition": "eSignature cancelled",
+    "context": "eSignature cancelled"
+  },
+  {
+    "term": "component.petition-status-cell-content.e-signature-completed",
+    "definition": "eSignature completed",
+    "context": "eSignature completed"
+  },
+  {
+    "term": "component.petition-status-cell-content.e-signature-processing",
+    "definition": "eSignature pending",
+    "context": "eSignature pending"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -1030,6 +1050,11 @@
     "context": "Go to page {page}"
   },
   {
+    "term": "generic.i-understand",
+    "definition": "I understand",
+    "context": "I understand"
+  },
+  {
     "term": "generic.load-more",
     "definition": "Load more",
     "context": "Load more"
@@ -1365,11 +1390,6 @@
     "context": "Remove access"
   },
   {
-    "term": "petition-accesses.deadline-header",
-    "definition": "Deadline",
-    "context": "Deadline"
-  },
-  {
     "term": "petition-accesses.next-reminder-header",
     "definition": "Next reminder",
     "context": "Next reminder"
@@ -1663,11 +1683,6 @@
     "term": "petition.completed-petition-dialog.body",
     "definition": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again.",
     "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
-  },
-  {
-    "term": "petition.completed-petition-dialog.confirm-button",
-    "definition": "I understand",
-    "context": "I understand"
   },
   {
     "term": "petition.completed-petition-dialog.header",

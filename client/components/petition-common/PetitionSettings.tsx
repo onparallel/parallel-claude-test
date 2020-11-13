@@ -399,7 +399,7 @@ function ConfirmConfigureOngoingSignature(props: DialogProps<{}, void>) {
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="component.confirm-configure-ongoing-signature-body.confirm"
+            id="generic.i-understand"
             defaultMessage="I understand"
           />
         </Button>
@@ -427,7 +427,7 @@ function ConfirmSignatureConfigChanged(props: DialogProps<{}, void>) {
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="component.confirm-signature-config-changed.confirm"
+            id="generic.i-understand"
             defaultMessage="I understand"
           />
         </Button>

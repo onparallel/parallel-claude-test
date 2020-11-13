@@ -20,11 +20,6 @@
     "context": "Open menu"
   },
   {
-    "term": "component.confirm-configure-ongoing-signature-body.confirm",
-    "definition": "Ok, entiendo",
-    "context": "I understand"
-  },
-  {
     "term": "component.confirm-configure-ongoing-signature.body",
     "definition": "Hay un proceso de firma digital pendiente. Si realiza cualquier cambio, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
@@ -63,6 +58,16 @@
     "term": "component.confirm-resend-completed-notification.header",
     "definition": "Reenviar email de confirmación",
     "context": "Resend confirmation email"
+  },
+  {
+    "term": "component.confirm-signature-config-changed.body",
+    "definition": "Haz hecho cambios a la configuración de firma digital. Si continúas, el proceso será cancelado.",
+    "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
+  },
+  {
+    "term": "component.confirm-signature-config-changed.header",
+    "definition": "Firma digital pendiente",
+    "context": "Ongoing eSignature"
   },
   {
     "term": "component.contact-list-header.actions-button",
@@ -463,6 +468,21 @@
     "term": "component.petition-settings.template-locale-label",
     "definition": "Idioma de la plantilla",
     "context": "Language of the template"
+  },
+  {
+    "term": "component.petition-status-cell-content.e-signature-cancelled",
+    "definition": "Firma digital cancelada",
+    "context": "eSignature cancelled"
+  },
+  {
+    "term": "component.petition-status-cell-content.e-signature-completed",
+    "definition": "Firma digital completada",
+    "context": "eSignature completed"
+  },
+  {
+    "term": "component.petition-status-cell-content.e-signature-processing",
+    "definition": "Firma digital pendiente",
+    "context": "eSignature pending"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -1030,6 +1050,11 @@
     "context": "Go to page {page}"
   },
   {
+    "term": "generic.i-understand",
+    "definition": "Ok, entiendo",
+    "context": "I understand"
+  },
+  {
     "term": "generic.load-more",
     "definition": "Mostrar más",
     "context": "Load more"
@@ -1365,11 +1390,6 @@
     "context": "Remove access"
   },
   {
-    "term": "petition-accesses.deadline-header",
-    "definition": "Vencimiento",
-    "context": "Deadline"
-  },
-  {
     "term": "petition-accesses.next-reminder-header",
     "definition": "Siguiente recordatorio",
     "context": "Next reminder"
@@ -1663,11 +1683,6 @@
     "term": "petition.completed-petition-dialog.body",
     "definition": "Esta petición ya fue completada por el destinatario. Si realiza cualquier cambio a los campos, el destinatario deberá finalizar la petición de nuevo.",
     "context": "This petition was already completed by the recipient. If you make any changes to the fields, the recipients will have to submit it again."
-  },
-  {
-    "term": "petition.completed-petition-dialog.confirm-button",
-    "definition": "Ok, entiendo",
-    "context": "I understand"
   },
   {
     "term": "petition.completed-petition-dialog.header",
