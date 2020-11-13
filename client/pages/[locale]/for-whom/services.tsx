@@ -105,7 +105,7 @@ function Services() {
               <Heading size="sm" as="h3">
                 <FormattedMessage
                   id="public.services.collaboration.between-professionals"
-                  defaultMessage="Between your profesionals:"
+                  defaultMessage="Between your professionals:"
                 />
               </Heading>
               <ClaimsList

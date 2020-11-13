@@ -113,7 +113,7 @@ function useUserSelectReactSelectProps(props: UserReactSelectProps) {
                   <Text as="div" color="gray.400">
                     <FormattedMessage
                       id="component.user-select.search-hint"
-                      defaultMessage="Search for exisiting users"
+                      defaultMessage="Search for existing users"
                     />
                   </Text>
                 )}

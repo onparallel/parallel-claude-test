@@ -101,13 +101,13 @@
   },
   {
     "term": "component.contact-select.no-options",
-    "definition": "We could not find any exisiting contacts for <em>{search}</em>",
-    "context": "We could not find any exisiting contacts for <em>{search}</em>"
+    "definition": "We could not find any existing contacts for <em>{search}</em>",
+    "context": "We could not find any existing contacts for <em>{search}</em>"
   },
   {
     "term": "component.contact-select.search-hint",
-    "definition": "Search for exisiting contacts or enter a valid email.",
-    "context": "Search for exisiting contacts or enter a valid email."
+    "definition": "Search for existing contacts or enter a valid email.",
+    "context": "Search for existing contacts or enter a valid email."
   },
   {
     "term": "component.cookie-consent.accept-button",
@@ -586,8 +586,8 @@
   },
   {
     "term": "component.user-select.search-hint",
-    "definition": "Search for exisiting users",
-    "context": "Search for exisiting users"
+    "definition": "Search for existing users",
+    "context": "Search for existing users"
   },
   {
     "term": "components.table.change-sorting",
@@ -1610,7 +1610,7 @@
     "context": "Reader"
   },
   {
-    "term": "petition-sharing.succes-title",
+    "term": "petition-sharing.success-title",
     "definition": "Petition shared",
     "context": "Petition shared"
   },
@@ -3056,8 +3056,8 @@
   },
   {
     "term": "public.services.collaboration.between-professionals",
-    "definition": "Between your profesionals:",
-    "context": "Between your profesionals:"
+    "definition": "Between your professionals:",
+    "context": "Between your professionals:"
   },
   {
     "term": "public.services.collaboration.centralize-conversations",

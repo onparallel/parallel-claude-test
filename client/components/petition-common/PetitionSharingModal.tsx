@@ -136,7 +136,7 @@ export function PetitionSharingModal({
         props.onClose();
         toast({
           title: intl.formatMessage({
-            id: "petition-sharing.succes-title",
+            id: "petition-sharing.success-title",
             defaultMessage: "Petition shared",
           }),
           status: "success",

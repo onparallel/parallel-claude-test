@@ -177,7 +177,7 @@ function useContactSelectReactSelectProps(
                     <Text as="div" marginTop={2}>
                       <FormattedMessage
                         id="component.contact-select.no-options"
-                        defaultMessage="We could not find any exisiting contacts for <em>{search}</em>"
+                        defaultMessage="We could not find any existing contacts for <em>{search}</em>"
                         values={{
                           search,
                           em: (chunks: any[]) => <em>{chunks}</em>,
@@ -195,7 +195,7 @@ function useContactSelectReactSelectProps(
                   <Text as="div" marginTop={2}>
                     <FormattedMessage
                       id="component.contact-select.search-hint"
-                      defaultMessage="Search for exisiting contacts or enter a valid email."
+                      defaultMessage="Search for existing contacts or enter a valid email."
                     />
                   </Text>
                 )}

@@ -102,12 +102,12 @@
   {
     "term": "component.contact-select.no-options",
     "definition": "No pudimos encontrar ningún contacto con <em>{search}</em>",
-    "context": "We could not find any exisiting contacts for <em>{search}</em>"
+    "context": "We could not find any existing contacts for <em>{search}</em>"
   },
   {
     "term": "component.contact-select.search-hint",
     "definition": "Busca contactos existentes o introduce un correo electrónico válido",
-    "context": "Search for exisiting contacts or enter a valid email."
+    "context": "Search for existing contacts or enter a valid email."
   },
   {
     "term": "component.cookie-consent.accept-button",
@@ -261,7 +261,7 @@
   },
   {
     "term": "component.message-events-indicator.bounced-explanation",
-    "definition": "No pudimos enviar el correo a este destinatario. Por favor, asegurese de que la dirección es válida.",
+    "definition": "No pudimos enviar el correo a este destinatario. Por favor, asegúrese de que la dirección es válida.",
     "context": "We couldn't deliver the email to the specified recipient. Please make sure the email is valid."
   },
   {
@@ -587,7 +587,7 @@
   {
     "term": "component.user-select.search-hint",
     "definition": "Busca usuarios existentes",
-    "context": "Search for exisiting users"
+    "context": "Search for existing users"
   },
   {
     "term": "components.table.change-sorting",
@@ -1610,7 +1610,7 @@
     "context": "Reader"
   },
   {
-    "term": "petition-sharing.succes-title",
+    "term": "petition-sharing.success-title",
     "definition": "Petición compartida",
     "context": "Petition shared"
   },
@@ -1691,7 +1691,7 @@
   },
   {
     "term": "petition.confirm-activate-access-message.body",
-    "definition": "¿Estás seguro de que quieres <b>reactivar el accesso</b> a {nameOrEmail}?",
+    "definition": "¿Estás seguro de que quieres <b>reactivar el acceso</b> a {nameOrEmail}?",
     "context": "Are you sure you want to <b>reactivate access</b> to {nameOrEmail}?"
   },
   {
@@ -1741,7 +1741,7 @@
   },
   {
     "term": "petition.confirm-deactivate-access-message.body",
-    "definition": "¿Estás seguro de que quieres <b>revocar el accesso</b> a {nameOrEmail}?",
+    "definition": "¿Estás seguro de que quieres <b>revocar el acceso</b> a {nameOrEmail}?",
     "context": "Are you sure you want to <b>remove access</b> to {nameOrEmail}?"
   },
   {
@@ -2436,7 +2436,7 @@
   },
   {
     "term": "public.claim.help-your-recipients",
-    "definition": "Ayuda a tus destinatarios a completar más facilmente la información.",
+    "definition": "Ayuda a tus destinatarios a completar más fácilmente la información.",
     "context": "Help your recipients complete the information more easily."
   },
   {
@@ -2596,7 +2596,7 @@
   },
   {
     "term": "public.forgot-password.toast-description",
-    "definition": "Le hemos enviado un correo electrónico. Siga las instrucciones para restablecer su contaseña.",
+    "definition": "Le hemos enviado un correo electrónico. Siga las instrucciones para restablecer su contraseña.",
     "context": "An email is on its way to you with a verification code."
   },
   {
@@ -2961,7 +2961,7 @@
   },
   {
     "term": "public.security.pass-storage",
-    "definition": "Nunca almacenaremos tus contraseñas tal y como la escribes, únicamente podrás reestablecerla por medios que permitan que verifiquemos tus credenciales.",
+    "definition": "Nunca almacenaremos tus contraseñas tal y como la escribes, únicamente podrás restablecerla por medios que permitan que verifiquemos tus credenciales.",
     "context": "We will never store your passwords as you type them, you can only reset them by means that allow us to verify your credentials."
   },
   {
@@ -3057,7 +3057,7 @@
   {
     "term": "public.services.collaboration.between-professionals",
     "definition": "Entre tus profesionales:",
-    "context": "Between your profesionals:"
+    "context": "Between your professionals:"
   },
   {
     "term": "public.services.collaboration.centralize-conversations",
@@ -3451,7 +3451,7 @@
   },
   {
     "term": "timeline.edit-user-permission-description",
-    "definition": "{same, select, true {Tú actualizaste} other {{user} actualizó}} el permison de {other} a {permissionType} {timeAgo}",
+    "definition": "{same, select, true {Tú actualizaste} other {{user} actualizó}} el permiso de {other} a {permissionType} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
   },
   {
