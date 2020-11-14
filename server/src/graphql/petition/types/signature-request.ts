@@ -22,14 +22,6 @@ export const PetitionSignatureRequest = objectType({
         return (await ctx.petitions.loadPetition(o.petition_id))!;
       },
     });
-    t.field("contacts", {
-      type: "Contact",
-      list: [false],
-      resolve: async (root, _, ctx) => {
-        const ids = root.signature_config.contactIds as number[];
-        return await ctx.contacts.loadContact(ids);
-      },
-    });
     t.field("signatureConfig", {
       type: "SignatureConfig",
       description: "The signature configuration for the request.",

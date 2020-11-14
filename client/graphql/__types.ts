@@ -1018,7 +1018,6 @@ export type PetitionSignatureCancelReason =
 
 export type PetitionSignatureRequest = Timestamps & {
   __typename?: "PetitionSignatureRequest";
-  contacts: Array<Maybe<Contact>>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -2596,6 +2595,28 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
     >;
   };
 
+export type PetitionSignaturesCard_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "provider">
+    >;
+    signatureRequests?: Maybe<
+      Array<
+        { __typename?: "PetitionSignatureRequest" } & Pick<
+          PetitionSignatureRequest,
+          "id" | "status"
+        > & {
+            signatureConfig: { __typename?: "SignatureConfig" } & {
+              contacts: Array<
+                Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
+              >;
+            };
+          }
+      >
+    >;
+  };
+
 export type RecipientViewContentsCard_PublicUserFragment = {
   __typename?: "PublicUser";
 } & Pick<PublicUser, "firstName">;
@@ -3344,21 +3365,14 @@ export type PetitionReplies_PetitionFragment = {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
-    signatureRequests?: Maybe<
-      Array<
-        { __typename?: "PetitionSignatureRequest" } & Pick<
-          PetitionSignatureRequest,
-          "id" | "status"
-        >
-      >
-    >;
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
         "id" | "status"
       >
     >;
-  } & PetitionLayout_PetitionBase_Petition_Fragment;
+  } & PetitionLayout_PetitionBase_Petition_Fragment &
+  PetitionSignaturesCard_PetitionFragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -5323,6 +5337,24 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${DownloadAllDialog_PetitionFieldFragmentDoc}
 `;
+export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
+  fragment PetitionSignaturesCard_Petition on Petition {
+    id
+    signatureConfig {
+      provider
+    }
+    signatureRequests {
+      id
+      status
+      signatureConfig {
+        contacts {
+          ...ContactLink_Contact
+        }
+      }
+    }
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
@@ -5336,17 +5368,15 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     fields {
       ...PetitionReplies_PetitionField
     }
-    signatureRequests @include(if: $hasPetitionSignature) {
-      id
-      status
-    }
     currentSignatureRequest @include(if: $hasPetitionSignature) {
       id
       status
     }
+    ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
+  ${PetitionSignaturesCard_PetitionFragmentDoc}
 `;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {

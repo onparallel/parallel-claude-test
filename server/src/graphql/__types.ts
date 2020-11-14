@@ -728,7 +728,6 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequest: {
     // field return type
-    contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"]; // Petition!

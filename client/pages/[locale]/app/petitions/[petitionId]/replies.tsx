@@ -4,12 +4,10 @@ import {
   DownloadIcon,
   ListIcon,
   RepeatIcon,
-  SignatureIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import { ContactLink } from "@parallel/components/common/ContactLink";
 import {
   DialogProps,
   useDialog,
@@ -39,6 +37,7 @@ import {
   PetitionRepliesFieldAction,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
+import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
@@ -533,7 +532,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 <Card
                   display="flex"
                   flexDirection="column"
-                  maxHeight={`calc(100vh - 10rem)`}
+                  maxHeight={`calc(100vh - 153px)`}
                 >
                   <CardHeader>
                     <Text as="span" display="flex" alignItems="center">
@@ -583,21 +582,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               ))}
             </Stack>
             {me.hasPetitionSignature ? (
-              <Card marginTop={4}>
-                <CardHeader>
-                  <Box as="span" display="flex">
-                    <SignatureIcon
-                      fontSize="20px"
-                      marginRight={2}
-                      lineHeight={5}
-                    />
-                    Petition Signature
-                  </Box>
-                </CardHeader>
-                <Box padding={4}>
-                  {JSON.stringify(petition.signatureRequests)}
-                </Box>
-              </Card>
+              <PetitionSignaturesCard petition={petition} marginTop={8} />
             ) : null}
           </Box>
         </PaneWithFlyout>
@@ -621,18 +606,15 @@ PetitionReplies.fragments = {
         fields {
           ...PetitionReplies_PetitionField
         }
-        signatureRequests @include(if: $hasPetitionSignature) {
-          id
-          status
-        }
         currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status
         }
+        ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
       }
       ${PetitionLayout.fragments.PetitionBase}
-      ${ContactLink.fragments.Contact}
       ${this.PetitionField}
+      ${PetitionSignaturesCard.fragments.Petition}
     `;
   },
   get PetitionField() {

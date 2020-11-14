@@ -1490,8 +1490,6 @@ enum PetitionSignatureCancelReason {
 }
 
 type PetitionSignatureRequest implements Timestamps {
-  contacts: [Contact]!
-
   """
   Time when the resource was created.
   """

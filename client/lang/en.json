@@ -175,11 +175,6 @@
     "context": "Select if you want to rename the individual files."
   },
   {
-    "term": "component.download-all-dialog.download-button",
-    "definition": "Download files",
-    "context": "Download files"
-  },
-  {
     "term": "component.download-all-dialog.header",
     "definition": "Download all files",
     "context": "Download all files"
@@ -478,6 +473,56 @@
     "term": "component.petition-settings.template-locale-label",
     "definition": "Language of the template",
     "context": "Language of the template"
+  },
+  {
+    "term": "component.petition-sigatures-card.awaiting",
+    "definition": "Awaiting",
+    "context": "Awaiting"
+  },
+  {
+    "term": "component.petition-sigatures-card.cancelled",
+    "definition": "Cancelled",
+    "context": "Cancelled"
+  },
+  {
+    "term": "component.petition-sigatures-card.sending",
+    "definition": "Sending",
+    "context": "Sending"
+  },
+  {
+    "term": "component.petition-signatures-card.header",
+    "definition": "Petition eSignature",
+    "context": "Petition eSignature"
+  },
+  {
+    "term": "component.petition-signatures-card.no-signature-configured",
+    "definition": "No signature has been configured for this petition.",
+    "context": "No signature has been configured for this petition."
+  },
+  {
+    "term": "component.petition-signatures-card.no-signature-configured-2",
+    "definition": "If you need it, you can configure it from the petition settings in the <a>Compose</a> tab.",
+    "context": "If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
+  },
+  {
+    "term": "component.petition-signatures-card.previous-signatures",
+    "definition": "Previous signatures",
+    "context": "Previous signatures"
+  },
+  {
+    "term": "component.petition-signatures-card.signature-not-started",
+    "definition": "The signature process will start when the recipients complete the petition.",
+    "context": "The signature process will start when the recipients complete the petition."
+  },
+  {
+    "term": "component.petition-signatures-card.signers",
+    "definition": "Signers",
+    "context": "Signers"
+  },
+  {
+    "term": "component.petition-signatures-card.status",
+    "definition": "Status",
+    "context": "Status"
   },
   {
     "term": "component.petition-status-cell-content.e-signature-cancelled",
@@ -880,6 +925,11 @@
     "context": "Done"
   },
   {
+    "term": "generic.download",
+    "definition": "Download",
+    "context": "Download"
+  },
+  {
     "term": "generic.drag-to-sort",
     "definition": "Drag to sort",
     "context": "Drag to sort"
@@ -1148,6 +1198,11 @@
     "term": "generic.required-field",
     "definition": "Required field",
     "context": "Required field"
+  },
+  {
+    "term": "generic.restart",
+    "definition": "Restart",
+    "context": "Restart"
   },
   {
     "term": "generic.richtext.bold",
