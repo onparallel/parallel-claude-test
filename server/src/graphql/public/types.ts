@@ -61,6 +61,20 @@ export const PublicPetition = objectType({
         return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
+    t.field("signers", {
+      type: "PublicContact",
+      list: [false],
+      nullable: false,
+      description: "The signers of the petition",
+      resolve: async (root, _, ctx) => {
+        if (!root.signature_config || !root.signature_config.contactIds) {
+          return [];
+        }
+        return (await ctx.contacts.loadContact(
+          root.signature_config!.contactIds as number[]
+        ))!;
+      },
+    });
   },
 });
 

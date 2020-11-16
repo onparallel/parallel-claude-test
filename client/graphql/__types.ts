@@ -1163,6 +1163,8 @@ export type PublicPetition = Timestamps & {
   id: Scalars["GID"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The signers of the petition */
+  signers: Array<Maybe<PublicContact>>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** Time when the resource was last updated. */
@@ -2617,6 +2619,32 @@ export type PetitionSignaturesCard_PetitionFragment = {
     >;
   };
 
+export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
+
+export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
+  __typename?: "Mutation";
+} & {
+  cancelSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
+};
+
+export type PetitionSignaturesCard_startSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionSignaturesCard_startSignatureRequestMutation = {
+  __typename?: "Mutation";
+} & {
+  startSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
+};
+
 export type RecipientViewContentsCard_PublicUserFragment = {
   __typename?: "PublicUser";
 } & Pick<PublicUser, "firstName">;
@@ -2713,6 +2741,9 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
       {
         __typename?: "PublicPetitionField";
       } & RecipientViewProgressFooter_PublicPetitionFieldFragment
+    >;
+    signers: Array<
+      Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>
     >;
   };
 
@@ -3875,8 +3906,17 @@ export type RecipientView_PublicPetitionFragment = {
         __typename?: "PublicPetitionField";
       } & RecipientView_PublicPetitionFieldFragment
     >;
+    signers: Array<
+      Maybe<
+        { __typename?: "PublicContact" } & RecipientView_PublicSignerFragment
+      >
+    >;
   } & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
+
+export type RecipientView_PublicSignerFragment = {
+  __typename?: "PublicContact";
+} & Pick<PublicContact, "id" | "fullName" | "email">;
 
 export type RecipientView_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
@@ -5596,6 +5636,13 @@ export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
 `;
+export const RecipientView_PublicSignerFragmentDoc = gql`
+  fragment RecipientView_PublicSigner on PublicContact {
+    id
+    fullName
+    email
+  }
+`;
 export const RecipientViewContentsCard_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
     status
@@ -5611,6 +5658,9 @@ export const RecipientViewProgressFooter_PublicPetitionFragmentDoc = gql`
     fields {
       ...RecipientViewProgressFooter_PublicPetitionField
     }
+    signers {
+      id
+    }
   }
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
 `;
@@ -5622,10 +5672,14 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     fields {
       ...RecipientView_PublicPetitionField
     }
+    signers {
+      ...RecipientView_PublicSigner
+    }
     ...RecipientViewContentsCard_PublicPetition
     ...RecipientViewProgressFooter_PublicPetition
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
+  ${RecipientView_PublicSignerFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 `;
@@ -6243,6 +6297,90 @@ export type useTemplateDetailsDialogPetitionQueryHookResult = ReturnType<
 >;
 export type useTemplateDetailsDialogPetitionLazyQueryHookResult = ReturnType<
   typeof useuseTemplateDetailsDialogPetitionLazyQuery
+>;
+export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
+  mutation PetitionSignaturesCard_cancelSignatureRequest(
+    $petitionSignatureRequestId: GID!
+  ) {
+    cancelSignatureRequest(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+    ) {
+      id
+      status
+    }
+  }
+`;
+
+/**
+ * __usePetitionSignaturesCard_cancelSignatureRequestMutation__
+ *
+ * To run a mutation, you first call `usePetitionSignaturesCard_cancelSignatureRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSignaturesCard_cancelSignatureRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSignaturesCardCancelSignatureRequestMutation, { data, loading, error }] = usePetitionSignaturesCard_cancelSignatureRequestMutation({
+ *   variables: {
+ *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
+ *   },
+ * });
+ */
+export function usePetitionSignaturesCard_cancelSignatureRequestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSignaturesCard_cancelSignatureRequestMutation,
+    PetitionSignaturesCard_cancelSignatureRequestMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSignaturesCard_cancelSignatureRequestMutation,
+    PetitionSignaturesCard_cancelSignatureRequestMutationVariables
+  >(PetitionSignaturesCard_cancelSignatureRequestDocument, baseOptions);
+}
+export type PetitionSignaturesCard_cancelSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_cancelSignatureRequestMutation
+>;
+export const PetitionSignaturesCard_startSignatureRequestDocument = gql`
+  mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
+    startSignatureRequest(petitionId: $petitionId) {
+      id
+      status
+    }
+  }
+`;
+
+/**
+ * __usePetitionSignaturesCard_startSignatureRequestMutation__
+ *
+ * To run a mutation, you first call `usePetitionSignaturesCard_startSignatureRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSignaturesCard_startSignatureRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSignaturesCardStartSignatureRequestMutation, { data, loading, error }] = usePetitionSignaturesCard_startSignatureRequestMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionSignaturesCard_startSignatureRequestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSignaturesCard_startSignatureRequestMutation,
+    PetitionSignaturesCard_startSignatureRequestMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSignaturesCard_startSignatureRequestMutation,
+    PetitionSignaturesCard_startSignatureRequestMutationVariables
+  >(PetitionSignaturesCard_startSignatureRequestDocument, baseOptions);
+}
+export type PetitionSignaturesCard_startSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_startSignatureRequestMutation
 >;
 export const AdminDocument = gql`
   query Admin {

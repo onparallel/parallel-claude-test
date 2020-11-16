@@ -17,13 +17,11 @@ export function RecipientViewContentsCard({
   currentPage,
   sender,
   petition,
-  onFinalize,
   ...props
 }: ExtendChakra<{
   currentPage: number;
   sender: RecipientViewContentsCard_PublicUserFragment;
   petition: RecipientViewContentsCard_PublicPetitionFragment;
-  onFinalize: () => void;
 }>) {
   const { query } = useRouter();
   const { pages, fields } = getPagesAndFields(petition.fields, currentPage);

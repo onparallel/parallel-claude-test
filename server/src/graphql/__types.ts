@@ -799,6 +799,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };

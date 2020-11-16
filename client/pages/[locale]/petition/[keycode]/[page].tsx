@@ -46,6 +46,7 @@ import {
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFragment,
   RecipientView_PublicPetitionFieldFragment,
+  RecipientView_PublicSignerFragment,
   RecipientView_updatePetitionFieldCommentMutationVariables,
   usePublicPetitionQuery,
   useRecipientView_createPetitionFieldCommentMutation,
@@ -67,9 +68,14 @@ import axios, { CancelTokenSource } from "axios";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 import { countBy, omit, pick } from "remeda";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import {
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/DialogOpenerProvider";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -88,6 +94,7 @@ function RecipientView({
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
+  const signers = petition!.signers!;
 
   const { fields, pages } = useGetPageFields(petition.fields, currentPage);
 
@@ -172,42 +179,56 @@ function RecipientView({
 
   const [finalized, setFinalized] = useState(false);
 
+  const confirmStartSignatureProcessDialog = useDialog(
+    ConfirmStartSignatureProcess
+  );
+
   const handleFinalize = useCallback(
     async function () {
-      setFinalized(true);
-      const canFinalize = petition.fields.every(
-        (f) => f.optional || f.replies.length > 0 || f.isReadOnly
-      );
-      if (canFinalize) {
-        await completePetition({ variables: { keycode } });
-        toast({
-          title: intl.formatMessage({
-            id: "recipient-view.completed-petition.toast-title",
-            defaultMessage: "Petition completed!",
-          }),
-          description: intl.formatMessage(
-            {
-              id: "recipient-view.completed-petition.toast-description",
-              defaultMessage:
-                "You have completed this petition and {name} will be notified",
-            },
-            { name: granter.firstName }
-          ),
-          status: "success",
-          isClosable: true,
-        });
-      } else {
-        // go to first repliable field without replies
-        let page = 1;
-        const field = petition.fields.find((f) => {
-          if (f.type === "HEADING" && f.options?.hasPageBreak) {
-            page += 1;
+      try {
+        setFinalized(true);
+        const canFinalize = petition.fields.every(
+          (f) => f.optional || f.replies.length > 0 || f.isReadOnly
+        );
+        if (canFinalize) {
+          if (signers.length > 0) {
+            await confirmStartSignatureProcessDialog({
+              signers,
+              contactId: contact.id,
+            });
           }
-          return f.replies.length === 0 && !f.optional && !f.isReadOnly;
-        })!;
-        const { keycode, locale } = router.query;
-        router.push(`/${locale}/petition/${keycode}/${page}#field-${field.id}`);
-      }
+          await completePetition({ variables: { keycode } });
+          toast({
+            title: intl.formatMessage({
+              id: "recipient-view.completed-petition.toast-title",
+              defaultMessage: "Petition completed!",
+            }),
+            description: intl.formatMessage(
+              {
+                id: "recipient-view.completed-petition.toast-description",
+                defaultMessage:
+                  "You have completed this petition and {name} will be notified",
+              },
+              { name: granter.firstName }
+            ),
+            status: "success",
+            isClosable: true,
+          });
+        } else {
+          // go to first repliable field without replies
+          let page = 1;
+          const field = petition.fields.find((f) => {
+            if (f.type === "HEADING" && f.options?.hasPageBreak) {
+              page += 1;
+            }
+            return f.replies.length === 0 && !f.optional && !f.isReadOnly;
+          })!;
+          const { keycode, locale } = router.query;
+          router.push(
+            `/${locale}/petition/${keycode}/${page}#field-${field.id}`
+          );
+        }
+      } catch {}
     },
     [petition.fields, granter, router.query]
   );
@@ -413,7 +434,6 @@ function RecipientView({
                 currentPage={currentPage}
                 sender={granter}
                 petition={petition}
-                onFinalize={handleFinalize}
                 display={{ base: "none", [breakpoint]: "flex" }}
               />
               <Button variant="ghost" onClick={handleOpenHelp}>
@@ -483,6 +503,63 @@ function RecipientView({
   );
 }
 
+type ConfirmStartSignatureProcessProps = {
+  signers: Maybe<RecipientView_PublicSignerFragment>[];
+  contactId: string;
+};
+
+function ConfirmStartSignatureProcess({
+  signers,
+  contactId,
+  ...props
+}: DialogProps<ConfirmStartSignatureProcessProps>) {
+  const intl = useIntl();
+  return (
+    <ConfirmDialog
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
+      size="md"
+      header={
+        <FormattedMessage
+          id="petition.finalize-start-signature.header"
+          defaultMessage="Sign petition"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="petition.finalize-start-signature.body"
+          defaultMessage="This petition requires an eSignature in order to be completed. After you click on Continue, we will send {signers} an e-mail with information on how to complete the process."
+          values={{
+            signers: (
+              <FormattedList
+                value={signers.map((signer) => [
+                  signer && signer.id === contactId
+                    ? `${intl
+                        .formatMessage({
+                          id: "generic.you",
+                          defaultMessage: "you",
+                        })
+                        .toLowerCase()}`
+                    : `${signer?.fullName} (${signer?.email})`,
+                ])}
+              />
+            ),
+          }}
+        />
+      }
+      confirm={
+        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="generic.continue.eSignature"
+            defaultMessage="Continue with eSignature"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
 RecipientView.fragments = {
   get PublicPetition() {
     return gql`
@@ -493,12 +570,26 @@ RecipientView.fragments = {
         fields {
           ...RecipientView_PublicPetitionField
         }
+        signers {
+          ...RecipientView_PublicSigner
+        }
         ...RecipientViewContentsCard_PublicPetition
         ...RecipientViewProgressFooter_PublicPetition
       }
+
       ${this.PublicPetitionField}
+      ${this.PublicSigner}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
+    `;
+  },
+  get PublicSigner() {
+    return gql`
+      fragment RecipientView_PublicSigner on PublicContact {
+        id
+        fullName
+        email
+      }
     `;
   },
   get PublicPetitionField() {

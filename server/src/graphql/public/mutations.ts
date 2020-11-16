@@ -191,6 +191,20 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       ctx.access!.id
     );
 
+    const config = petition.signature_config as { contactIds: number[] };
+    if (config && config.contactIds.length > 0) {
+      const signatureRequest = await ctx.petitions.createPetitionSignature(
+        petition.id,
+        petition.signature_config
+      );
+      await ctx.aws.enqueueMessages("signature-worker", {
+        groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+        body: {
+          type: "start-signature-process",
+          payload: { petitionSignatureRequestId: signatureRequest.id },
+        },
+      });
+    }
     await ctx.emails.sendPetitionCompletedEmail(ctx.access!.id);
     ctx.analytics.trackEvent(
       "PETITION_COMPLETED",

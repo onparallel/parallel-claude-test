@@ -1772,6 +1772,11 @@ type PublicPetition implements Timestamps {
   locale: PetitionLocale!
 
   """
+  The signers of the petition
+  """
+  signers: [PublicContact]!
+
+  """
   The status of the petition.
   """
   status: PetitionStatus!

@@ -106,10 +106,17 @@ export function RecipientViewProgressFooter({
         isDisabled={isCompleted}
         onClick={onFinalize}
       >
-        <FormattedMessage
-          id="recipient-view.submit-button-short"
-          defaultMessage="Finalize"
-        />
+        {petition.signers.length > 0 ? (
+          <FormattedMessage
+            id="recipient-view.submit-and-sign-button-short"
+            defaultMessage="Finalize and sign"
+          />
+        ) : (
+          <FormattedMessage
+            id="recipient-view.submit-button-short"
+            defaultMessage="Finalize"
+          />
+        )}
       </Button>
     </Card>
   );
@@ -122,6 +129,9 @@ RecipientViewProgressFooter.fragments = {
         status
         fields {
           ...RecipientViewProgressFooter_PublicPetitionField
+        }
+        signers {
+          id
         }
       }
       ${this.PublicPetitionField}

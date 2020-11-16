@@ -19,23 +19,51 @@ import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionSignatureRequestStatus,
   PetitionSignaturesCard_PetitionFragment,
+  usePetitionSignaturesCard_cancelSignatureRequestMutation,
+  usePetitionSignaturesCard_startSignatureRequestMutation,
 } from "@parallel/graphql/__types";
+import { useCallback } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { Card, CardHeader } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
-import { HelpPopover } from "../common/HelpPopover";
 import { Link } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 
 export function PetitionSignaturesCard({
   petition,
+  onRefetchPetition,
   ...props
 }: ExtendChakra<{
   petition: PetitionSignaturesCard_PetitionFragment;
+  onRefetchPetition: () => Promise<void>;
 }>) {
   const [current, ...older] = petition.signatureRequests!;
+
+  const [
+    cancelSignatureRequest,
+  ] = usePetitionSignaturesCard_cancelSignatureRequestMutation();
+  const [
+    startSignatureRequest,
+  ] = usePetitionSignaturesCard_startSignatureRequestMutation();
+
+  const handleCancelSignatureProcess = useCallback(
+    async (petitionSignatureRequestId: string) => {
+      await cancelSignatureRequest({
+        variables: { petitionSignatureRequestId },
+      });
+    },
+    [cancelSignatureRequest]
+  );
+
+  const handleStartSignatureProcess = useCallback(async () => {
+    await startSignatureRequest({
+      variables: { petitionId: petition.id },
+    });
+    await onRefetchPetition();
+  }, [startSignatureRequest, petition]);
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -72,18 +100,21 @@ export function PetitionSignaturesCard({
                 />
               </Heading>
               <FormattedList
-                value={current.signatureConfig.contacts.map((contact) => [
+                value={current.signatureConfig.contacts.map((contact, i) => [
                   contact ? (
-                    <ContactLink contact={contact} />
+                    <ContactLink contact={contact} key={i} />
                   ) : (
-                    <DeletedContact />
+                    <DeletedContact key={i} />
                   ),
                 ])}
               />
             </Box>
             <Stack flex="1" direction="row" justifyContent="flex-end">
               {current.status === "PROCESSING" ? (
-                <Button colorScheme="red">
+                <Button
+                  colorScheme="red"
+                  onClick={() => handleCancelSignatureProcess(current.id)}
+                >
                   <FormattedMessage
                     id="generic.cancel"
                     defaultMessage="Cancel"
@@ -91,7 +122,7 @@ export function PetitionSignaturesCard({
                 </Button>
               ) : null}
               {["CANCELLED", "COMPLETED"].includes(current.status) ? (
-                <Button>
+                <Button onClick={() => handleStartSignatureProcess()}>
                   <FormattedMessage
                     id="generic.restart"
                     defaultMessage="Restart"
@@ -99,6 +130,7 @@ export function PetitionSignaturesCard({
                 </Button>
               ) : null}
               {current.status === "COMPLETED" ? (
+                // TODO download signed doc
                 <Button colorScheme="purple">
                   <FormattedMessage
                     id="generic.download"
@@ -136,17 +168,18 @@ export function PetitionSignaturesCard({
                     </Text>
                     <FormattedList
                       value={signature.signatureConfig.contacts.map(
-                        (contact) => [
+                        (contact, i) => [
                           contact ? (
-                            <ContactLink contact={contact} />
+                            <ContactLink contact={contact} key={i} />
                           ) : (
-                            <DeletedContact />
+                            <DeletedContact key={i} />
                           ),
                         ]
                       )}
                     />
                     <Spacer />
                     {signature.status === "COMPLETED" ? (
+                      // TODO download signed doc
                       <Button size="xs">
                         <FormattedMessage
                           id="generic.download"
@@ -293,3 +326,26 @@ PetitionSignaturesCard.fragments = {
     ${ContactLink.fragments.Contact}
   `,
 };
+
+PetitionSignaturesCard.mutations = [
+  gql`
+    mutation PetitionSignaturesCard_cancelSignatureRequest(
+      $petitionSignatureRequestId: GID!
+    ) {
+      cancelSignatureRequest(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+      ) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
+      startSignatureRequest(petitionId: $petitionId) {
+        id
+        status
+      }
+    }
+  `,
+];

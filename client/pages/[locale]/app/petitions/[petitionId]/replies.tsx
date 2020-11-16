@@ -582,7 +582,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               ))}
             </Stack>
             {me.hasPetitionSignature ? (
-              <PetitionSignaturesCard petition={petition} marginTop={8} />
+              <PetitionSignaturesCard
+                petition={petition}
+                marginTop={8}
+                onRefetchPetition={refetch}
+              />
             ) : null}
           </Box>
         </PaneWithFlyout>
