@@ -1,8 +1,9 @@
-import { mutationField } from "@nexus/schema";
+import { booleanArg, mutationField } from "@nexus/schema";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { RESULT } from "../../helpers/result";
 import {
   userHasAccessToPetitions,
   userHasAccessToSignatureRequest,
@@ -127,3 +128,58 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
     return signatureRequest;
   },
 });
+
+export const signedPetitionDownloadLink = mutationField(
+  "signedPetitionDownloadLink",
+  {
+    description: "Generates a download link for the signed PDF petition.",
+    type: "FileUploadReplyDownloadLinkResult",
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PETITION_SIGNATURE"),
+      userHasAccessToSignatureRequest("petitionSignatureRequestId", [
+        "OWNER",
+        "WRITE",
+      ])
+    ),
+    args: {
+      petitionSignatureRequestId: globalIdArg("PetitionSignatureRequest", {
+        required: true,
+      }),
+      preview: booleanArg({
+        description:
+          "If true will use content-disposition inline instead of attachment",
+      }),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const signature = await ctx.petitions.loadPetitionSignatureById(
+          args.petitionSignatureRequestId
+        );
+
+        if (signature?.status !== "COMPLETED") {
+          throw new Error(
+            `Can't download signed doc on ${signature?.status} petitionSignatureRequest with id ${args.petitionSignatureRequestId}`
+          );
+        }
+        const file = await ctx.files.loadFileUpload(signature.file_upload_id!);
+        if (!file) {
+          throw new Error(
+            `Can't get signed file for signature request with id ${args.petitionSignatureRequestId}`
+          );
+        }
+        return {
+          result: RESULT.SUCCESS,
+          url: await ctx.aws.getSignedDownloadEndpoint(
+            file!.path,
+            file!.filename,
+            args.preview ? "inline" : "attachment"
+          ),
+        };
+      } catch {
+        return {
+          result: RESULT.FAILURE,
+        };
+      }
+    },
+  }
+);

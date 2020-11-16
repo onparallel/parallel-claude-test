@@ -694,13 +694,7 @@ export const fileUploadReplyDownloadLink = mutationField(
   "fileUploadReplyDownloadLink",
   {
     description: "Generates a download link for a file reply.",
-    type: objectType({
-      name: "FileUploadReplyDownloadLinkResult",
-      definition(t) {
-        t.field("result", { type: "Result" });
-        t.string("url", { nullable: true });
-      },
-    }),
+    type: "FileUploadReplyDownloadLinkResult",
     authorize: chain(
       authenticate(),
       and(

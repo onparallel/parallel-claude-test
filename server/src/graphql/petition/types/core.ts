@@ -537,3 +537,11 @@ export const PetitionFieldReply = objectType({
     });
   },
 });
+
+export const FileUploadReplyDownloadLinkResult = objectType({
+  name: "FileUploadReplyDownloadLinkResult",
+  definition(t) {
+    t.field("result", { type: "Result" });
+    t.string("url", { nullable: true });
+  },
+});

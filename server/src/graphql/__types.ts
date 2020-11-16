@@ -524,6 +524,7 @@ export interface NexusGenFieldTypes {
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
+    signedPetitionDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -1245,6 +1246,11 @@ export interface NexusGenArgTypes {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    signedPetitionDownloadLink: {
+      // args
+      petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
+      preview?: boolean | null; // Boolean
     };
     startSignatureRequest: {
       // args

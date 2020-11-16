@@ -20,6 +20,7 @@ import {
   PetitionSignatureRequestStatus,
   PetitionSignaturesCard_PetitionFragment,
   usePetitionSignaturesCard_cancelSignatureRequestMutation,
+  usePetitionSignaturesCard_signedPetitionDownloadLinkMutation,
   usePetitionSignaturesCard_startSignatureRequestMutation,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
@@ -48,6 +49,10 @@ export function PetitionSignaturesCard({
     startSignatureRequest,
   ] = usePetitionSignaturesCard_startSignatureRequestMutation();
 
+  const [
+    downloadSignedDoc,
+  ] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
+
   const handleCancelSignatureProcess = useCallback(
     async (petitionSignatureRequestId: string) => {
       await cancelSignatureRequest({
@@ -63,6 +68,25 @@ export function PetitionSignaturesCard({
     });
     await onRefetchPetition();
   }, [startSignatureRequest, petition]);
+
+  const handleDownloadSignedDoc = useCallback(
+    async (petitionSignatureRequestId: string) => {
+      try {
+        const _window = window.open(undefined, "_blank")!;
+
+        const { data } = await downloadSignedDoc({
+          variables: { petitionSignatureRequestId, preview: true },
+        });
+        const { url, result } = data!.signedPetitionDownloadLink;
+        if (result === "SUCCESS") {
+          _window.location.href = url!;
+        } else {
+          _window.close();
+        }
+      } catch {}
+    },
+    [downloadSignedDoc]
+  );
 
   return (
     <Card {...props}>
@@ -121,7 +145,8 @@ export function PetitionSignaturesCard({
                   />
                 </Button>
               ) : null}
-              {["CANCELLED", "COMPLETED"].includes(current.status) ? (
+              {["CANCELLED", "COMPLETED"].includes(current.status) &&
+              petition.signatureConfig ? (
                 <Button onClick={() => handleStartSignatureProcess()}>
                   <FormattedMessage
                     id="generic.restart"
@@ -130,8 +155,10 @@ export function PetitionSignaturesCard({
                 </Button>
               ) : null}
               {current.status === "COMPLETED" ? (
-                // TODO download signed doc
-                <Button colorScheme="purple">
+                <Button
+                  colorScheme="purple"
+                  onClick={() => handleDownloadSignedDoc(current.id)}
+                >
                   <FormattedMessage
                     id="generic.download"
                     defaultMessage="Download"
@@ -179,8 +206,10 @@ export function PetitionSignaturesCard({
                     />
                     <Spacer />
                     {signature.status === "COMPLETED" ? (
-                      // TODO download signed doc
-                      <Button size="xs">
+                      <Button
+                        size="xs"
+                        onClick={() => handleDownloadSignedDoc(signature.id)}
+                      >
                         <FormattedMessage
                           id="generic.download"
                           defaultMessage="Download"
@@ -345,6 +374,20 @@ PetitionSignaturesCard.mutations = [
       startSignatureRequest(petitionId: $petitionId) {
         id
         status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_signedPetitionDownloadLink(
+      $petitionSignatureRequestId: GID!
+      $preview: Boolean
+    ) {
+      signedPetitionDownloadLink(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+        preview: $preview
+      ) {
+        result
+        url
       }
     }
   `,

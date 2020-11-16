@@ -570,6 +570,18 @@ type Mutation {
   Sends a reminder for the specified petition accesses.
   """
   sendReminders(accessIds: [GID!]!, petitionId: GID!): Result!
+
+  """
+  Generates a download link for the signed PDF petition.
+  """
+  signedPetitionDownloadLink(
+    petitionSignatureRequestId: GID!
+
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
+  ): FileUploadReplyDownloadLinkResult!
   startSignatureRequest(petitionId: GID!): PetitionSignatureRequest!
 
   """

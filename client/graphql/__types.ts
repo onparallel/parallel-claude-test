@@ -247,6 +247,8 @@ export type Mutation = {
   sendPetitionClosedNotification: Petition;
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
+  /** Generates a download link for the signed PDF petition. */
+  signedPetitionDownloadLink: FileUploadReplyDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
   /** Submits all unpublished comments. */
   submitUnpublishedComments: Array<PetitionFieldComment>;
@@ -501,6 +503,11 @@ export type MutationsendPetitionClosedNotificationArgs = {
 export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+};
+
+export type MutationsignedPetitionDownloadLinkArgs = {
+  petitionSignatureRequestId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
 };
 
 export type MutationstartSignatureRequestArgs = {
@@ -2643,6 +2650,19 @@ export type PetitionSignaturesCard_startSignatureRequestMutation = {
     PetitionSignatureRequest,
     "id" | "status"
   >;
+};
+
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  signedPetitionDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
 export type RecipientViewContentsCard_PublicUserFragment = {
@@ -6381,6 +6401,53 @@ export function usePetitionSignaturesCard_startSignatureRequestMutation(
 }
 export type PetitionSignaturesCard_startSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_startSignatureRequestMutation
+>;
+export const PetitionSignaturesCard_signedPetitionDownloadLinkDocument = gql`
+  mutation PetitionSignaturesCard_signedPetitionDownloadLink(
+    $petitionSignatureRequestId: GID!
+    $preview: Boolean
+  ) {
+    signedPetitionDownloadLink(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+      preview: $preview
+    ) {
+      result
+      url
+    }
+  }
+`;
+
+/**
+ * __usePetitionSignaturesCard_signedPetitionDownloadLinkMutation__
+ *
+ * To run a mutation, you first call `usePetitionSignaturesCard_signedPetitionDownloadLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSignaturesCard_signedPetitionDownloadLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSignaturesCardSignedPetitionDownloadLinkMutation, { data, loading, error }] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation({
+ *   variables: {
+ *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
+ *      preview: // value for 'preview'
+ *   },
+ * });
+ */
+export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSignaturesCard_signedPetitionDownloadLinkMutation,
+    PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSignaturesCard_signedPetitionDownloadLinkMutation,
+    PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables
+  >(PetitionSignaturesCard_signedPetitionDownloadLinkDocument, baseOptions);
+}
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
 >;
 export const AdminDocument = gql`
   query Admin {
