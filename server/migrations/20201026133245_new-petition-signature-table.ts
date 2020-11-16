@@ -12,10 +12,14 @@ export async function up(knex: Knex): Promise<void> {
     })
       .notNullable()
       .defaultTo("ENQUEUED");
-    t.enum("cancel_reason", ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER"], {
-      useNative: true,
-      enumName: "petition_signature_cancel_reason",
-    }).nullable();
+    t.enum(
+      "cancel_reason",
+      ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
+      {
+        useNative: true,
+        enumName: "petition_signature_cancel_reason",
+      }
+    ).nullable();
     t.jsonb("cancel_data").nullable();
     t.jsonb("data");
     t.jsonb("event_logs").defaultTo("[]");

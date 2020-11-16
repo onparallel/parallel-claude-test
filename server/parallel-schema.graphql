@@ -1499,6 +1499,7 @@ type PetitionReopenedEvent implements PetitionEvent {
 enum PetitionSignatureCancelReason {
   CANCELLED_BY_USER
   DECLINED_BY_SIGNER
+  REQUEST_ERROR
 }
 
 type PetitionSignatureRequest implements Timestamps {

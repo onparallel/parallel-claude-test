@@ -59,7 +59,8 @@ export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
 
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
-  | "DECLINED_BY_SIGNER";
+  | "DECLINED_BY_SIGNER"
+  | "REQUEST_ERROR";
 
 export type PetitionSignatureStatus =
   | "ENQUEUED"
@@ -553,19 +554,18 @@ export interface PetitionSignatureRequest {
   updated_at: Date;
 }
 
-export interface CreatePetitionSignatureRequest {
-  petition_id: number;
-  external_id?: Maybe<string>;
-  signature_config: any;
-  status?: PetitionSignatureStatus;
-  cancel_reason?: Maybe<PetitionSignatureCancelReason>;
-  cancel_data?: Maybe<any>;
-  data?: Maybe<any>;
-  event_logs?: Maybe<any>;
-  file_upload_id?: Maybe<number>;
-  created_at?: Date;
-  updated_at?: Date;
-}
+export type CreatePetitionSignatureRequest = PartialProps<
+  Omit<PetitionSignatureRequest, "id">,
+  | "external_id"
+  | "status"
+  | "cancel_reason"
+  | "cancel_data"
+  | "data"
+  | "event_logs"
+  | "file_upload_id"
+  | "created_at"
+  | "updated_at"
+>;
 
 export interface PetitionUser {
   id: number;

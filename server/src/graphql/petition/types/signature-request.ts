@@ -7,7 +7,7 @@ export const PetitionSignatureRequestStatus = enumType({
 
 export const PetitionSignatureCancelReason = enumType({
   name: "PetitionSignatureCancelReason",
-  members: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER"],
+  members: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
 });
 
 export const PetitionSignatureRequest = objectType({
