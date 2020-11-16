@@ -94,7 +94,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   } = assertQuery(usePetitionComposeUserQuery());
   const {
     data: { petition },
-  } = assertQuery(usePetitionComposeQuery({ variables: { id: petitionId } }));
+  } = assertQuery(
+    usePetitionComposeQuery({
+      variables: {
+        id: petitionId,
+        hasPetitionSignature: me.hasPetitionSignature,
+      },
+    })
+  );
 
   const [petitionState, wrapper] = usePetitionState();
   const [{ activeFieldId, showSettings }, dispatch] = useReducer(
@@ -198,7 +205,13 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
-      return await updatePetition({ variables: { petitionId, data } });
+      return await updatePetition({
+        variables: {
+          petitionId,
+          data,
+          hasPetitionSignature: me.hasPetitionSignature,
+        },
+      });
     }),
     [petitionId]
   );
@@ -680,6 +693,7 @@ PetitionCompose.mutations = [
     mutation PetitionCompose_updatePetition(
       $petitionId: GID!
       $data: UpdatePetitionInput!
+      $hasPetitionSignature: Boolean!
     ) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_PetitionBase
@@ -857,32 +871,36 @@ PetitionCompose.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  await Promise.all([
-    fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
-      gql`
-        query PetitionCompose($id: GID!) {
-          petition(id: $id) {
-            ...PetitionCompose_PetitionBase
-          }
+  const {
+    data: { me },
+  } = await fetchQuery<PetitionComposeUserQuery>(
+    gql`
+      query PetitionComposeUser {
+        me {
+          ...PetitionCompose_User
         }
-        ${PetitionCompose.fragments.PetitionBase}
-      `,
-      {
-        variables: { id: query.petitionId as string },
-        ignoreCache: true,
       }
-    ),
-    fetchQuery<PetitionComposeUserQuery>(
-      gql`
-        query PetitionComposeUser {
-          me {
-            ...PetitionCompose_User
-          }
+      ${PetitionCompose.fragments.User}
+    `
+  );
+  await fetchQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
+    gql`
+      query PetitionCompose($id: GID!, $hasPetitionSignature: Boolean!) {
+        petition(id: $id) {
+          ...PetitionCompose_PetitionBase
         }
-        ${PetitionCompose.fragments.User}
-      `
-    ),
-  ]);
+      }
+      ${PetitionCompose.fragments.PetitionBase}
+    `,
+    {
+      variables: {
+        id: query.petitionId as string,
+        hasPetitionSignature: me.hasPetitionSignature,
+      },
+      ignoreCache: true,
+    }
+  );
+
   return {
     petitionId: query.petitionId as string,
   };

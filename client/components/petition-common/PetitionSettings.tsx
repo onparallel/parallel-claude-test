@@ -255,7 +255,7 @@ PetitionSettings.fragments = {
         signatureConfig {
           ...SignatureConfigDialog_SignatureConfig
         }
-        currentSignatureRequest {
+        currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status
         }

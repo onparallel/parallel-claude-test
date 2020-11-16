@@ -3098,6 +3098,7 @@ export type PetitionCompose_UserFragment = {
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   data: UpdatePetitionInput;
+  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type PetitionCompose_updatePetitionMutation = {
@@ -3297,8 +3298,15 @@ export type PetitionCompose_sendPetitionMutation = {
     };
 };
 
+export type PetitionComposeUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PetitionComposeUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & PetitionCompose_UserFragment;
+};
+
 export type PetitionComposeQueryVariables = Exact<{
   id: Scalars["GID"];
+  hasPetitionSignature: Scalars["Boolean"];
 }>;
 
 export type PetitionComposeQuery = { __typename?: "Query" } & {
@@ -3310,12 +3318,6 @@ export type PetitionComposeQuery = { __typename?: "Query" } & {
         __typename?: "PetitionTemplate";
       } & PetitionCompose_PetitionBase_PetitionTemplate_Fragment)
   >;
-};
-
-export type PetitionComposeUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type PetitionComposeUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & PetitionCompose_UserFragment;
 };
 
 export type PetitionQueryVariables = Exact<{
@@ -5252,7 +5254,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
       signatureConfig {
         ...SignatureConfigDialog_SignatureConfig
       }
-      currentSignatureRequest {
+      currentSignatureRequest @include(if: $hasPetitionSignature) {
         id
         status
       }
@@ -7313,6 +7315,7 @@ export const PetitionCompose_updatePetitionDocument = gql`
   mutation PetitionCompose_updatePetition(
     $petitionId: GID!
     $data: UpdatePetitionInput!
+    $hasPetitionSignature: Boolean!
   ) {
     updatePetition(petitionId: $petitionId, data: $data) {
       ...PetitionLayout_PetitionBase
@@ -7342,6 +7345,7 @@ export const PetitionCompose_updatePetitionDocument = gql`
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      data: // value for 'data'
+ *      hasPetitionSignature: // value for 'hasPetitionSignature'
  *   },
  * });
  */
@@ -7757,59 +7761,6 @@ export function usePetitionCompose_sendPetitionMutation(
 export type PetitionCompose_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_sendPetitionMutation
 >;
-export const PetitionComposeDocument = gql`
-  query PetitionCompose($id: GID!) {
-    petition(id: $id) {
-      ...PetitionCompose_PetitionBase
-    }
-  }
-  ${PetitionCompose_PetitionBaseFragmentDoc}
-`;
-
-/**
- * __usePetitionComposeQuery__
- *
- * To run a query within a React component, call `usePetitionComposeQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionComposeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionComposeQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function usePetitionComposeQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >
-) {
-  return Apollo.useQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
-    PetitionComposeDocument,
-    baseOptions
-  );
-}
-export function usePetitionComposeLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >
-) {
-  return Apollo.useLazyQuery<
-    PetitionComposeQuery,
-    PetitionComposeQueryVariables
-  >(PetitionComposeDocument, baseOptions);
-}
-export type PetitionComposeQueryHookResult = ReturnType<
-  typeof usePetitionComposeQuery
->;
-export type PetitionComposeLazyQueryHookResult = ReturnType<
-  typeof usePetitionComposeLazyQuery
->;
 export const PetitionComposeUserDocument = gql`
   query PetitionComposeUser {
     me {
@@ -7861,6 +7812,60 @@ export type PetitionComposeUserQueryHookResult = ReturnType<
 >;
 export type PetitionComposeUserLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeUserLazyQuery
+>;
+export const PetitionComposeDocument = gql`
+  query PetitionCompose($id: GID!, $hasPetitionSignature: Boolean!) {
+    petition(id: $id) {
+      ...PetitionCompose_PetitionBase
+    }
+  }
+  ${PetitionCompose_PetitionBaseFragmentDoc}
+`;
+
+/**
+ * __usePetitionComposeQuery__
+ *
+ * To run a query within a React component, call `usePetitionComposeQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionComposeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionComposeQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      hasPetitionSignature: // value for 'hasPetitionSignature'
+ *   },
+ * });
+ */
+export function usePetitionComposeQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionComposeQuery,
+    PetitionComposeQueryVariables
+  >
+) {
+  return Apollo.useQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
+    PetitionComposeDocument,
+    baseOptions
+  );
+}
+export function usePetitionComposeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionComposeQuery,
+    PetitionComposeQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    PetitionComposeQuery,
+    PetitionComposeQueryVariables
+  >(PetitionComposeDocument, baseOptions);
+}
+export type PetitionComposeQueryHookResult = ReturnType<
+  typeof usePetitionComposeQuery
+>;
+export type PetitionComposeLazyQueryHookResult = ReturnType<
+  typeof usePetitionComposeLazyQuery
 >;
 export const PetitionDocument = gql`
   query Petition($id: GID!) {
