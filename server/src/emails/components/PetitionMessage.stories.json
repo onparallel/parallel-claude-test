@@ -1,0 +1,126 @@
+{
+  "title": "Petition Message",
+  "stories": [
+    {
+      "name": "Petition Message",
+      "parameters": {
+        "server": {
+          "id": "PetitionMessage"
+        }
+      },
+      "args": {
+        "fullName": "Derek Lou",
+        "senderName": "Santi",
+        "senderEmail": "santi@parallel.so",
+        "subject": "Hola!",
+        "body": [
+          {
+            "children": [
+              { "text": "hola Derek, envimae los " },
+              { "text": "documentos " },
+              { "text": "siguientes ", "bold": true },
+              { "text": "super guays", "bold": true, "underline": true }
+            ]
+          },
+          {
+            "children": [{ "text": "hmmm" }]
+          },
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      { "text": "foto", "bold": true, "underline": true }
+                    ]
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [{ "text": "pasaporte", "italic": true }]
+                  },
+                  {
+                    "type": "bulleted-list",
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "type": "paragraph",
+                            "children": [
+                              {
+                                "text": "foto",
+                                "bold": true,
+                                "underline": true
+                              }
+                            ]
+                          }
+                        ],
+                        "type": "list-item"
+                      },
+                      {
+                        "children": [
+                          {
+                            "type": "paragraph",
+                            "children": [
+                              { "text": "pasaporte", "italic": true }
+                            ]
+                          }
+                        ],
+                        "type": "list-item"
+                      }
+                    ]
+                  }
+                ],
+                "type": "list-item"
+              }
+            ]
+          }
+        ],
+        "fields": [
+          { "position": 0, "id": 123, "title": "Title 1", "type": "HEADING" },
+          { "position": 1, "id": 1223, "title": "DNI", "type": "TEXT" },
+          { "position": 2, "id": 123, "title": "Title 2", "type": "HEADING" },
+          {
+            "position": 3,
+            "id": 235,
+            "title": "Escrituras",
+            "type": "FILE_UPLOAD"
+          },
+          {
+            "position": 4,
+            "id": 345,
+            "title": "Certificado de rentas del trabajo",
+            "type": "FILE_UPLOAD"
+          },
+          { "position": 5, "id": 1243, "title": "Title 3", "type": "HEADING" },
+          { "position": 6, "id": 32, "title": "Prueba", "type": "TEXT" },
+          { "position": 7, "id": 6905, "title": "", "type": "TEXT" }
+        ],
+        "keycode": "asdfghjkl",
+        "parallelUrl": "https://staging.parallel.so",
+        "assetsUrl": "https://static-staging.parallel.so",
+        "logoUrl": "http://localhost/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "fullName": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
+        "senderEmail": { "control": { "type": "text" } },
+        "subject": { "control": { "type": "text" } },
+        "body": { "control": { "type": "object" } },
+        "fields": { "control": { "type": "object" } },
+        "keycode": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

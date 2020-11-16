@@ -1,0 +1,55 @@
+diff --git a/node_modules/@storybook/server/dist/client/preview/render.js b/node_modules/@storybook/server/dist/client/preview/render.js
+index 1e07ede..ae514d3 100644
+--- a/node_modules/@storybook/server/dist/client/preview/render.js
++++ b/node_modules/@storybook/server/dist/client/preview/render.js
+@@ -76,14 +76,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
+ var rootElement = _global.document.getElementById('root');
+ 
+ var defaultFetchStoryHtml = /*#__PURE__*/function () {
+-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, path, params) {
++  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, path, params, storyContext) {
+     var fetchUrl, response;
+     return regeneratorRuntime.wrap(function _callee$(_context) {
+       while (1) {
+         switch (_context.prev = _context.next) {
+           case 0:
+             fetchUrl = new URL("".concat(url, "/").concat(path));
+-            fetchUrl.search = new URLSearchParams(params).toString();
++            fetchUrl.search = new URLSearchParams(Object.assign({}, storyContext.globals, params)).toString();
+             _context.next = 4;
+             return (0, _global.fetch)(fetchUrl);
+ 
+@@ -99,7 +99,7 @@ var defaultFetchStoryHtml = /*#__PURE__*/function () {
+     }, _callee);
+   }));
+ 
+-  return function defaultFetchStoryHtml(_x, _x2, _x3) {
++  return function defaultFetchStoryHtml(_x, _x2, _x3, _x4) {
+     return _ref.apply(this, arguments);
+   };
+ }();
+@@ -143,13 +143,13 @@ function renderMain(_x4) {
+ 
+ function _renderMain() {
+   _renderMain = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(_ref2) {
+-    var id, kind, name, showMain, showError, forceRender, parameters, storyFn, args, argTypes, storyArgs, _parameters$server, url, storyId, _parameters$server$fe, fetchStoryHtml, params, fetchId, fetchParams, element;
++    var id, kind, name, showMain, showError, forceRender, parameters, storyContext, storyFn, args, argTypes, storyArgs, _parameters$server, url, storyId, _parameters$server$fe, fetchStoryHtml, params, fetchId, fetchParams, element;
+ 
+     return regeneratorRuntime.wrap(function _callee2$(_context2) {
+       while (1) {
+         switch (_context2.prev = _context2.next) {
+           case 0:
+-            id = _ref2.id, kind = _ref2.kind, name = _ref2.name, showMain = _ref2.showMain, showError = _ref2.showError, forceRender = _ref2.forceRender, parameters = _ref2.parameters, storyFn = _ref2.storyFn, args = _ref2.args, argTypes = _ref2.argTypes;
++            id = _ref2.id, kind = _ref2.kind, name = _ref2.name, showMain = _ref2.showMain, showError = _ref2.showError, forceRender = _ref2.forceRender, parameters = _ref2.parameters, storyContext = _ref2.storyContext, storyFn = _ref2.storyFn, args = _ref2.args, argTypes = _ref2.argTypes;
+             // Some addons wrap the storyFn so we need to call it even though Server doesn't need the answer
+             storyFn();
+             storyArgs = buildStoryArgs(args, argTypes);
+@@ -157,7 +157,7 @@ function _renderMain() {
+             fetchId = storyId || id;
+             fetchParams = Object.assign({}, params, storyArgs);
+             _context2.next = 8;
+-            return fetchStoryHtml(url, fetchId, fetchParams);
++            return fetchStoryHtml(url, fetchId, fetchParams, storyContext);
+ 
+           case 8:
+             element = _context2.sent;

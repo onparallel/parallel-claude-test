@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { MjmlText } from "mjml-react";
 import { FormattedMessage } from "react-intl";
 
@@ -18,7 +18,7 @@ type GroupedField = {
   children: PetitionField[];
 };
 
-function groupByTitle(
+function groupByHeading(
   groups: GroupedField[],
   field: PetitionField
 ): GroupedField[] {
@@ -39,10 +39,10 @@ function groupByTitle(
 export function PetitionFieldList({ fields }: PetitionFieldListProps) {
   return (
     <MjmlText paddingTop={0} paddingLeft="50px" lineHeight="24px">
-      {fields.reduce(groupByTitle, []).map(({ heading, children }, groupId) => (
-        <ul key={`group_${groupId}`} style={{ margin: 0, padding: 0 }}>
-          <b>{heading?.title}</b>
-          <ul>
+      {fields.reduce(groupByHeading, []).map(({ heading, children }, index) => (
+        <Fragment key={index}>
+          <h3 style={{ margin: 0, fontSize: "1em" }}>{heading?.title}</h3>
+          <ul style={{ margin: 0 }}>
             {children.map(({ position, id, title }) => (
               <li
                 key={`children_${id}`}
@@ -62,7 +62,7 @@ export function PetitionFieldList({ fields }: PetitionFieldListProps) {
               </li>
             ))}
           </ul>
-        </ul>
+        </Fragment>
       ))}
     </MjmlText>
   );

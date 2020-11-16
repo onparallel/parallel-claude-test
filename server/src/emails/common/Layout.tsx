@@ -109,6 +109,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             />
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
+                alt="LinkedIn"
                 name="linkedin-noshare"
                 href="https://www.linkedin.com/company/parallel-so"
                 backgroundColor="#6059f7"
@@ -116,6 +117,7 @@ export const Layout: FC<LayoutProps> = function Layout({
                 {" "}
               </MjmlSocialElement>
               <MjmlSocialElement
+                alt="Twitter"
                 name="twitter-noshare"
                 href="https://twitter.com/Parallel_SO"
                 backgroundColor="#6059f7"

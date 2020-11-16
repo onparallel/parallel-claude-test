@@ -1,0 +1,14 @@
+declare module "ansi-to-html" {
+  interface ToHtmlOptions {
+    fg?: string;
+    bg?: string;
+    newline?: boolean;
+    escapeXML?: boolean;
+    stream?: boolean;
+    colors?: string[] | Record<number, string>;
+  }
+
+  export = class Convert {
+    toHtml(text: string, options?: ToHtmlOptions): string;
+  };
+}
