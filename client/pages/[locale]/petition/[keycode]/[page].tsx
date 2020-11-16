@@ -537,7 +537,7 @@ function ConfirmStartSignatureProcess({
                     ? `${intl
                         .formatMessage({
                           id: "generic.you",
-                          defaultMessage: "you",
+                          defaultMessage: "You",
                         })
                         .toLowerCase()}`
                     : `${signer?.fullName} (${signer?.email})`,

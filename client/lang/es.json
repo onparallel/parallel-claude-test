@@ -491,37 +491,37 @@
   },
   {
     "term": "component.petition-signatures-card.header",
-    "definition": "Firma digital de petitición",
+    "definition": "Firma digital de petición",
     "context": "Petition eSignature"
   },
   {
     "term": "component.petition-signatures-card.no-signature-configured",
-    "definition": "",
+    "definition": "No se ha configurado la firma para esta petición",
     "context": "No signature has been configured for this petition."
   },
   {
     "term": "component.petition-signatures-card.no-signature-configured-2",
-    "definition": "",
+    "definition": "Si lo deseas, puedes configurarla desde los ajustes de petición en la pestaña de <a>Edición</a>",
     "context": "If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
   },
   {
     "term": "component.petition-signatures-card.previous-signatures",
-    "definition": "",
+    "definition": "Firmas anteriores",
     "context": "Previous signatures"
   },
   {
     "term": "component.petition-signatures-card.signature-not-started",
-    "definition": "",
+    "definition": "El proceso de firma comenzará una vez los destinatarios hayan completado la petición.",
     "context": "The signature process will start when the recipients complete the petition."
   },
   {
     "term": "component.petition-signatures-card.signers",
-    "definition": "",
+    "definition": "Firmantes",
     "context": "Signers"
   },
   {
     "term": "component.petition-signatures-card.status",
-    "definition": "",
+    "definition": "Estado",
     "context": "Status"
   },
   {
@@ -905,6 +905,11 @@
     "context": "Continue"
   },
   {
+    "term": "generic.continue.eSignature",
+    "definition": "Continuar con la firma digital",
+    "context": "Continue with eSignature"
+  },
+  {
     "term": "generic.delete",
     "definition": "Eliminar",
     "context": "Delete"
@@ -926,7 +931,7 @@
   },
   {
     "term": "generic.download",
-    "definition": "",
+    "definition": "Descargar",
     "context": "Download"
   },
   {
@@ -1201,7 +1206,7 @@
   },
   {
     "term": "generic.restart",
-    "definition": "",
+    "definition": "Reiniciar",
     "context": "Restart"
   },
   {
@@ -1948,6 +1953,16 @@
     "term": "petition.field-type.text.description",
     "definition": "Obtén información escrita que no está almacenada en documentos u otros archivos.",
     "context": "Obtain written information that is not stored in documents or other files."
+  },
+  {
+    "term": "petition.finalize-start-signature.body",
+    "definition": "Esta petición requiere de firma digital para ser completada. Cuando hagas click en Continuar, enviaremos a {signers} un email con información sobre cómo completar el proceso",
+    "context": "This petition requires an eSignature in order to be completed. After you click on Continue, we will send {signers} an e-mail with information on how to complete the process."
+  },
+  {
+    "term": "petition.finalize-start-signature.header",
+    "definition": "Firmar petición",
+    "context": "Sign petition"
   },
   {
     "term": "petition.header.activity-tab",
@@ -3333,6 +3348,11 @@
     "term": "recipient-view.sender-email",
     "definition": "Correo electrónico del remitente",
     "context": "Sender email"
+  },
+  {
+    "term": "recipient-view.submit-and-sign-button-short",
+    "definition": "Finalizar y firmar",
+    "context": "Finalize and sign"
   },
   {
     "term": "recipient-view.submit-button-short",

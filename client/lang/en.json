@@ -905,6 +905,11 @@
     "context": "Continue"
   },
   {
+    "term": "generic.continue.eSignature",
+    "definition": "Continue with eSignature",
+    "context": "Continue with eSignature"
+  },
+  {
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete"
@@ -1948,6 +1953,16 @@
     "term": "petition.field-type.text.description",
     "definition": "Obtain written information that is not stored in documents or other files.",
     "context": "Obtain written information that is not stored in documents or other files."
+  },
+  {
+    "term": "petition.finalize-start-signature.body",
+    "definition": "This petition requires an eSignature in order to be completed. After you click on Continue, we will send {signers} an e-mail with information on how to complete the process.",
+    "context": "This petition requires an eSignature in order to be completed. After you click on Continue, we will send {signers} an e-mail with information on how to complete the process."
+  },
+  {
+    "term": "petition.finalize-start-signature.header",
+    "definition": "Sign petition",
+    "context": "Sign petition"
   },
   {
     "term": "petition.header.activity-tab",
@@ -3333,6 +3348,11 @@
     "term": "recipient-view.sender-email",
     "definition": "Sender email",
     "context": "Sender email"
+  },
+  {
+    "term": "recipient-view.submit-and-sign-button-short",
+    "definition": "Finalize and sign",
+    "context": "Finalize and sign"
   },
   {
     "term": "recipient-view.submit-button-short",
