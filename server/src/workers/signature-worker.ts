@@ -12,6 +12,7 @@ type PetitionSignatureConfig = {
   provider: string;
   timezone: string;
   contactIds: number[];
+  title: string;
 };
 
 /** starts a signature request on the petition */
@@ -37,12 +38,11 @@ async function startSignatureProcess(
   }
 
   const petitionGID = toGlobalId("Petition", signature.petition_id);
-  const fileName = `${petition.name ?? petitionGID}.pdf`;
+  const settings = petition.signature_config as PetitionSignatureConfig;
+  const fileName = `${settings.title}.pdf`;
   const tmpPdfPath = resolve(tmpdir(), fileName);
 
   try {
-    const settings = petition.signature_config as PetitionSignatureConfig;
-
     const signatureIntegration = await fetchOrgSignatureIntegration(
       petition.org_id,
       settings.provider,

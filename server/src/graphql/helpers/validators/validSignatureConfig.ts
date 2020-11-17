@@ -1,5 +1,6 @@
 import { core } from "@nexus/schema";
 import { fromGlobalIds } from "../../../util/globalId";
+import { isDefined } from "../../../util/remedaExtensions";
 import { isValidTimezone } from "../../../util/validators";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
@@ -16,7 +17,7 @@ export function validSignatureConfig<
   return (async (_, args, ctx, info) => {
     const signatureConfig = prop(args);
     if (signatureConfig) {
-      const { provider, contactIds, timezone } = signatureConfig;
+      const { provider, contactIds, timezone, title } = signatureConfig;
       const [hasFeatureFlag, contacts, integrations] = await Promise.all([
         ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, "PETITION_SIGNATURE"),
         ctx.contacts.loadContact(fromGlobalIds(contactIds, "Contact").ids),
@@ -54,6 +55,14 @@ export function validSignatureConfig<
           info,
           `${argName}.timezone`,
           `Value must be a valid timezone.`
+        );
+      }
+
+      if (!isDefined(title)) {
+        throw new ArgValidationError(
+          info,
+          `${argName}.title`,
+          "Value must be defined"
         );
       }
     }

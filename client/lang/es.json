@@ -585,6 +585,16 @@
     "context": "eSignature provider"
   },
   {
+    "term": "component.signature-config-dialog.title-help",
+    "definition": "Usaremos esto como el título del documento a firmar",
+    "context": "We will use this as the title of the signing document"
+  },
+  {
+    "term": "component.signature-config-dialog.title-label",
+    "definition": "Título del documento",
+    "context": "Title of the document"
+  },
+  {
     "term": "component.table.next-page-button",
     "definition": "Siguiente",
     "context": "Next"

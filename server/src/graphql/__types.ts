@@ -97,6 +97,7 @@ export interface NexusGenInputs {
     contactIds: string[]; // [ID!]!
     provider: string; // String!
     timezone: string; // String!
+    title: string; // String!
   };
   UpdateContactInput: {
     // input type
@@ -319,6 +320,7 @@ export interface NexusGenRootTypes {
     provider: string;
     contactIds: number[];
     timezone: string;
+    title: string;
   };
   SignatureStartedEvent: events.SignatureStartedEvent;
   SupportMethodResponse: {
@@ -919,6 +921,7 @@ export interface NexusGenFieldTypes {
     contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     provider: string; // String!
     timezone: string; // String!
+    title: string; // String!
   };
   SignatureStartedEvent: {
     // field return type

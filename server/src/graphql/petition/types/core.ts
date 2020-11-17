@@ -378,11 +378,15 @@ export const SignatureConfig = objectType({
     t.string("timezone", {
       description: "The timezone used to generate the document.",
     });
+    t.string("title", {
+      description: "Title of the signature document",
+    });
   },
   rootTyping: /* ts */ `{
     provider: string;
     contactIds: number[];
     timezone: string;
+    title: string;
   }`,
 });
 

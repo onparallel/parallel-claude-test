@@ -78,7 +78,7 @@ function PrintPetitionSignature({ token }: { token: string }) {
                 />
               )}
               <Heading justifyContent="center" display="flex">
-                {petition.name}
+                {signatureConfig.title}
               </Heading>
             </>
           ) : undefined}
@@ -140,7 +140,6 @@ PrintPetitionSignature.fragments = {
       fragment PrintPetitionSignature_PetitionSignatureRequest on PetitionSignatureRequest {
         petition {
           id
-          name
           fields {
             ...PrintPetitionSignature_PetitionField
           }
@@ -157,6 +156,7 @@ PrintPetitionSignature.fragments = {
           }
           provider
           timezone
+          title
         }
       }
       ${this.PetitionField}

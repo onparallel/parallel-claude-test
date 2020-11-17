@@ -89,8 +89,8 @@ export function PetitionSettings({
         await showConfirmConfigureOngoingSignature({});
       }
       const signatureConfig = await showSignatureConfigDialog({
+        petition,
         providers: user.organization.signatureIntegrations,
-        config: petition.signatureConfig ?? null,
         onSearchContacts: handleSearchContacts,
         onCreateContact: handleCreateContact,
       });
@@ -99,7 +99,8 @@ export function PetitionSettings({
         ongoingSignatureRequest &&
         (signatureConfig.provider !== petition.signatureConfig?.provider ||
           signatureConfig.contactIds.toString() !==
-            petition.signatureConfig?.contacts.map((c) => c?.id).toString())
+            petition.signatureConfig?.contacts.map((c) => c?.id).toString() ||
+          signatureConfig.title !== petition.signatureConfig?.title)
       ) {
         await showConfirmSignatureConfigChanged({});
         await cancelSignatureRequest({
@@ -252,16 +253,14 @@ PetitionSettings.fragments = {
       ... on Petition {
         status
         deadline
-        signatureConfig {
-          ...SignatureConfigDialog_SignatureConfig
-        }
+        ...SignatureConfigDialog_Petition
         currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status
         }
       }
     }
-    ${SignatureConfigDialog.fragments.SignatureConfig}
+    ${SignatureConfigDialog.fragments.Petition}
   `,
 };
 

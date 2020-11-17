@@ -317,6 +317,10 @@ export const SignatureConfigInput = inputObjectType({
       description: "The timezone used to generate the document.",
       required: true,
     });
+    t.string("title", {
+      description: "The title of the signing document",
+      required: true,
+    });
   },
 });
 
@@ -399,7 +403,7 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {
-        ...pick(signatureConfig, ["provider", "timezone"]),
+        ...pick(signatureConfig, ["provider", "timezone", "title"]),
         contactIds: fromGlobalIds(signatureConfig.contactIds, "Contact").ids,
       };
     }

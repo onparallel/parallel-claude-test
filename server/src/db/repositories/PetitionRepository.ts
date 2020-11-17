@@ -2402,6 +2402,7 @@ export class PetitionRepository extends BaseRepository {
       provider: string;
       contactIds: number[];
       timezone: string;
+      title: string;
     }
   ) {
     const [row] = await this.insert("petition_signature_request", {

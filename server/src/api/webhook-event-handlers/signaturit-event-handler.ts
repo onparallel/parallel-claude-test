@@ -144,7 +144,8 @@ async function documentCompleted(
     `${signatureId}/${documentId}`
   );
 
-  const filename = `${petition.name ?? petitionId}_signed.pdf`;
+  const config = petition.signature_config as any;
+  const filename = `${config.title}_signed.pdf`;
   const key = `${signatureId}/${documentId}/${filename}`;
   await ctx.aws.uploadFile(key, buffer, "application/pdf");
   const file = await ctx.files.createFileUpload(

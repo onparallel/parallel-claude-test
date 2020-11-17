@@ -1021,7 +1021,8 @@ export type PetitionReopenedEvent = PetitionEvent & {
 
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
-  | "DECLINED_BY_SIGNER";
+  | "DECLINED_BY_SIGNER"
+  | "REQUEST_ERROR";
 
 export type PetitionSignatureRequest = Timestamps & {
   __typename?: "PetitionSignatureRequest";
@@ -1444,6 +1445,8 @@ export type SignatureConfig = {
   provider: Scalars["String"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
+  /** Title of the signature document */
+  title: Scalars["String"];
 };
 
 /** The signature settings for the petition */
@@ -1454,6 +1457,8 @@ export type SignatureConfigInput = {
   provider: Scalars["String"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
+  /** The title of the signing document */
+  title: Scalars["String"];
 };
 
 export type SignatureStartedEvent = PetitionEvent & {
@@ -2283,18 +2288,13 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "status" | "deadline" | "id" | "locale"> & {
-    signatureConfig?: Maybe<
-      {
-        __typename?: "SignatureConfig";
-      } & SignatureConfigDialog_SignatureConfigFragment
-    >;
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
         "id" | "status"
       >
     >;
-  };
+  } & SignatureConfigDialog_PetitionFragment;
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
@@ -2435,11 +2435,18 @@ export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
   };
 };
 
-export type SignatureConfigDialog_SignatureConfigFragment = {
-  __typename?: "SignatureConfig";
-} & Pick<SignatureConfig, "provider" | "timezone"> & {
-    contacts: Array<
-      Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
+export type SignatureConfigDialog_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "name"> & {
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<
+        SignatureConfig,
+        "provider" | "timezone" | "title"
+      > & {
+          contacts: Array<
+            Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
+          >;
+        }
     >;
   };
 
@@ -4180,7 +4187,7 @@ export type PublicPetitionQuery = { __typename?: "Query" } & {
 export type PrintPetitionSignature_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
 } & {
-  petition: { __typename?: "Petition" } & Pick<Petition, "id" | "name"> & {
+  petition: { __typename?: "Petition" } & Pick<Petition, "id"> & {
       fields: Array<
         {
           __typename?: "PetitionField";
@@ -4193,7 +4200,7 @@ export type PrintPetitionSignature_PetitionSignatureRequestFragment = {
     };
   signatureConfig: { __typename?: "SignatureConfig" } & Pick<
     SignatureConfig,
-    "provider" | "timezone"
+    "provider" | "timezone" | "title"
   > & {
       contacts: Array<
         Maybe<
@@ -5234,13 +5241,17 @@ export const ContactSelect_ContactFragmentDoc = gql`
     email
   }
 `;
-export const SignatureConfigDialog_SignatureConfigFragmentDoc = gql`
-  fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
-    provider
-    contacts {
-      ...ContactSelect_Contact
+export const SignatureConfigDialog_PetitionFragmentDoc = gql`
+  fragment SignatureConfigDialog_Petition on Petition {
+    name
+    signatureConfig {
+      provider
+      contacts {
+        ...ContactSelect_Contact
+      }
+      timezone
+      title
     }
-    timezone
   }
   ${ContactSelect_ContactFragmentDoc}
 `;
@@ -5251,16 +5262,14 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     ... on Petition {
       status
       deadline
-      signatureConfig {
-        ...SignatureConfigDialog_SignatureConfig
-      }
+      ...SignatureConfigDialog_Petition
       currentSignatureRequest @include(if: $hasPetitionSignature) {
         id
         status
       }
     }
   }
-  ${SignatureConfigDialog_SignatureConfigFragmentDoc}
+  ${SignatureConfigDialog_PetitionFragmentDoc}
 `;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
@@ -5800,7 +5809,6 @@ export const PrintPetitionSignature_PetitionSignatureRequestFragmentDoc = gql`
   fragment PrintPetitionSignature_PetitionSignatureRequest on PetitionSignatureRequest {
     petition {
       id
-      name
       fields {
         ...PrintPetitionSignature_PetitionField
       }
@@ -5817,6 +5825,7 @@ export const PrintPetitionSignature_PetitionSignatureRequestFragmentDoc = gql`
       }
       provider
       timezone
+      title
     }
   }
   ${PrintPetitionSignature_PetitionFieldFragmentDoc}

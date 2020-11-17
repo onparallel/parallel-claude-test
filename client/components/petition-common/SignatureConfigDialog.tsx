@@ -1,5 +1,12 @@
 import { gql } from "@apollo/client";
-import { Button, FormControl, FormLabel, Select, Stack } from "@chakra-ui/core";
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  Stack,
+} from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -7,35 +14,39 @@ import {
 } from "@parallel/components/common/DialogOpenerProvider";
 import {
   SignatureConfigDialog_OrgIntegrationFragment,
-  SignatureConfigDialog_SignatureConfigFragment,
+  SignatureConfigDialog_PetitionFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
-import { Maybe } from "@parallel/utils/types";
-import { useRef, useState } from "react";
+
+import { useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
   ContactSelect,
   ContactSelectProps,
   ContactSelectSelection,
 } from "../common/ContactSelect";
+import { HelpPopover } from "../common/HelpPopover";
 
 export type SignatureConfigDialogProps = {
-  config: Maybe<SignatureConfigDialog_SignatureConfigFragment>;
+  petition: SignatureConfigDialog_PetitionFragment;
   providers: SignatureConfigDialog_OrgIntegrationFragment[];
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
 };
 
 export function SignatureConfigDialog({
-  config,
+  petition,
   providers,
   onSearchContacts,
   onCreateContact,
   ...props
 }: DialogProps<SignatureConfigDialogProps, SignatureConfigInput>) {
+  const [title, setTitle] = useState(
+    petition.signatureConfig?.title ?? petition.name ?? ""
+  );
   const [provider, setProvider] = useState(providers[0].provider);
   const [contacts, setContacts] = useState(
-    config?.contacts.map(
+    petition.signatureConfig?.contacts.map(
       (contact, index) =>
         (contact ?? {
           id: "" + index,
@@ -47,7 +58,10 @@ export function SignatureConfigDialog({
   );
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const contactsRef = useRef<any>();
-  const isInvalid = contacts.some((c) => c === null || c.isInvalid);
+  const isInvalid = useMemo(
+    () => contacts.some((c) => c === null || c.isInvalid) || !title,
+    [contacts, title]
+  );
   return (
     <ConfirmDialog
       initialFocusRef={contactsRef}
@@ -93,6 +107,21 @@ export function SignatureConfigDialog({
               onCreateContact={onCreateContact}
             />
           </FormControl>
+          <FormControl isInvalid={isInvalid}>
+            <FormLabel display="flex" alignItems="center">
+              <FormattedMessage
+                id="component.signature-config-dialog.title-label"
+                defaultMessage="Title of the document"
+              />
+              <HelpPopover marginLeft={2}>
+                <FormattedMessage
+                  id="component.signature-config-dialog.title-help"
+                  defaultMessage="We will use this as the title of the signing document"
+                />
+              </HelpPopover>
+            </FormLabel>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+          </FormControl>
         </Stack>
       }
       confirm={
@@ -104,6 +133,7 @@ export function SignatureConfigDialog({
               provider,
               contactIds: contacts.map((c) => c!.id),
               timezone,
+              title,
             })
           }
         >
@@ -116,13 +146,17 @@ export function SignatureConfigDialog({
 }
 
 SignatureConfigDialog.fragments = {
-  SignatureConfig: gql`
-    fragment SignatureConfigDialog_SignatureConfig on SignatureConfig {
-      provider
-      contacts {
-        ...ContactSelect_Contact
+  Petition: gql`
+    fragment SignatureConfigDialog_Petition on Petition {
+      name
+      signatureConfig {
+        provider
+        contacts {
+          ...ContactSelect_Contact
+        }
+        timezone
+        title
       }
-      timezone
     }
     ${ContactSelect.fragments.Contact}
   `,
