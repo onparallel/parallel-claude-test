@@ -107,14 +107,12 @@ async function startSignatureProcess(
       }),
     ]);
   } catch (error) {
-    ctx.logger.error(
-      `PetitionSignatureRequest:${signature.id} => ${JSON.stringify(error)}`
-    );
     await ctx.petitions.updatePetitionSignature(signature.id, {
       status: "CANCELLED",
       cancel_reason: "REQUEST_ERROR",
       cancel_data: error,
     });
+    throw error;
   } finally {
     try {
       await fs.unlink(tmpPdfPath);
