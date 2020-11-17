@@ -3,6 +3,8 @@ import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
 import { removeNotDefined } from "../../util/remedaExtensions";
+import sanitize from "sanitize-filename";
+import { random } from "../../util/token";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -145,14 +147,17 @@ async function documentCompleted(
   );
 
   const config = petition.signature_config as any;
-  const filename = `${config.title}_signed.pdf`;
-  const key = `${signatureId}/${documentId}/${filename}`;
-  await ctx.aws.uploadFile(key, buffer, "application/pdf");
+
+  const filename = sanitize(
+    `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
+  );
+  const path = random(16);
+  await ctx.aws.uploadFile(path, buffer, "application/pdf");
   const file = await ctx.files.createFileUpload(
     {
       content_type: "application/pdf",
       filename,
-      path: key,
+      path,
       size: Buffer.byteLength(buffer),
       upload_complete: true,
     },

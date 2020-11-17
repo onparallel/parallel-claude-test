@@ -7,6 +7,7 @@ import { createQueueWorker } from "./helpers/createQueueWorker";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { fullName } from "../util/fullName";
 import { Contact, OrgIntegration, Petition } from "../db/__types";
+import sanitize from "sanitize-filename";
 
 type PetitionSignatureConfig = {
   provider: string;
@@ -39,8 +40,7 @@ async function startSignatureProcess(
 
   const petitionGID = toGlobalId("Petition", signature.petition_id);
   const settings = petition.signature_config as PetitionSignatureConfig;
-  const fileName = `${settings.title}.pdf`;
-  const tmpPdfPath = resolve(tmpdir(), fileName);
+  const tmpPdfPath = resolve(tmpdir(), sanitize(`${settings.title}.pdf`));
 
   try {
     const signatureIntegration = await fetchOrgSignatureIntegration(
