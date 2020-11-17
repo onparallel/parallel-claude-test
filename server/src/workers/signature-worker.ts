@@ -110,7 +110,7 @@ async function startSignatureProcess(
     await ctx.petitions.updatePetitionSignature(signature.id, {
       status: "CANCELLED",
       cancel_reason: "REQUEST_ERROR",
-      cancel_data: error,
+      cancel_data: { error: error.toString?.() },
     });
     throw error;
   } finally {
