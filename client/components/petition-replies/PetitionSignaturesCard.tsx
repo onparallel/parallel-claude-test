@@ -38,7 +38,7 @@ export function PetitionSignaturesCard({
   ...props
 }: ExtendChakra<{
   petition: PetitionSignaturesCard_PetitionFragment;
-  onRefetchPetition: () => Promise<void>;
+  onRefetchPetition: () => void;
 }>) {
   const [current, ...older] = petition.signatureRequests!;
 
