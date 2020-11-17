@@ -1,6 +1,6 @@
 import { Text, Heading, Box } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
-import { PdfView_FieldFragment } from "@parallel/graphql/__types";
+import { PrintPetitionSignature_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { Card } from "../common/Card";
 
 const fieldStyles = {
@@ -10,7 +10,11 @@ const fieldStyles = {
   pageBreakInside: "avoid",
 };
 
-export function FieldWithReplies({ field }: { field: PdfView_FieldFragment }) {
+export function FieldWithReplies({
+  field,
+}: {
+  field: PrintPetitionSignature_PetitionFieldFragment;
+}) {
   switch (field.type) {
     case "HEADING":
       return <HeadingField field={field} sx={fieldStyles} />;
@@ -21,7 +25,9 @@ export function FieldWithReplies({ field }: { field: PdfView_FieldFragment }) {
   }
 }
 
-type TextFieldProps = ExtendChakra<{ field: PdfView_FieldFragment }>;
+type TextFieldProps = ExtendChakra<{
+  field: PrintPetitionSignature_PetitionFieldFragment;
+}>;
 function TextField({ field, ...props }: TextFieldProps) {
   return (
     <Card {...props} boxShadow="none" borderColor="gray.400">
@@ -36,7 +42,9 @@ function TextField({ field, ...props }: TextFieldProps) {
   );
 }
 
-type HeadingFieldProps = ExtendChakra<{ field: PdfView_FieldFragment }>;
+type HeadingFieldProps = ExtendChakra<{
+  field: PrintPetitionSignature_PetitionFieldFragment;
+}>;
 function HeadingField({ field, ...props }: HeadingFieldProps) {
   return (
     <Box {...props}>
