@@ -40,10 +40,13 @@ async function main() {
   execSync(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
 
   console.log("Installing dependencies...");
-  execSync(`yarn install --prefer-offline --frozen-lockfile`, {
-    cwd: buildDir,
-    encoding: "utf-8",
-  });
+  execSync(
+    `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install --prefer-offline --frozen-lockfile`,
+    {
+      cwd: buildDir,
+      encoding: "utf-8",
+    }
+  );
 
   console.log("Getting the secrets 🤫");
   execSync(
@@ -84,7 +87,7 @@ async function main() {
 
   console.log("Pruning devDependencies");
   execSync(
-    `yarn install \
+    `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install \
     --production \
     --ignore-scripts \
     --prefer-offline \
