@@ -8,15 +8,10 @@ aws s3 cp s3://parallel-builds/${BUILD_ID}.tar.gz ${BUILD_ID}.tar.gz --profile p
 tar -zxpf ${BUILD_ID}.tar.gz
 ln -s ${BUILD_ID} main
 
-# password for staging
-sudo echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
-sudo mv .htpasswd /etc/nginx/.htpasswd
-
 sed -i "s/^ENV=$/ENV=\"${ENV}\"/g" workers.sh
 sed -i "s/#ENV#/${ENV}/g" main/ops/prod/systemd/parallel-client.service
 sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx.conf
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
-sudo cp main/ops/prod/nginx.conf /etc/nginx/nginx.conf
 
 sudo systemctl daemon-reload
 sudo systemctl enable parallel-server.service

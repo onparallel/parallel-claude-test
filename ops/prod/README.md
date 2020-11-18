@@ -1,10 +1,16 @@
-## Summary
+## Server image
 
-The backend runs on the parallel-server AMI ami-0e66d197dc8662d25. This instace has the following installed:
+The server image is built by copying all files inside ops/prod/image in a vanilla Amazon Linux instance and running
 
-- Node.js v13.13.0 (latest when installed)
-- Yarn
-- Nginx 1.16.1 (latest when installed) with nginx_accept_language_module
+```
+sudo bash build.s
+```
+
+This script will install all the dependencies needed, including:
+
+- node.js
+- yarn
+- nginx with nginx_accept_language_module
 
 The different processes run on the systemd services defined on `ops/prod/systemd`.
 
