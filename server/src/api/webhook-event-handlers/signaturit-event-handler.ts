@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { SignatureEvents } from "signaturit-sdk";
 import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
-import { removeNotDefined } from "../../util/remedaExtensions";
 import sanitize from "sanitize-filename";
 import { random } from "../../util/token";
 
@@ -210,12 +209,6 @@ async function appendEventLogs(
 ): Promise<void> {
   await ctx.petitions.appendPetitionSignatureEventLogs(
     `SIGNATURIT/${data.document.signature.id}`,
-    [
-      removeNotDefined({
-        created_at: data.created_at,
-        type: data.type,
-        decline_reason: data.document.decline_reason,
-      }),
-    ]
+    [data]
   );
 }
