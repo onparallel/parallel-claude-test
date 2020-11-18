@@ -70,7 +70,7 @@ export class SignatureService {
 
   public generateAuthToken(payload: any) {
     return sign(payload, this.config.signature.jwtSecret, {
-      expiresIn: 5, // 5 seconds
+      expiresIn: 30,
       issuer: "signature-service",
       algorithm: "HS256",
     });
