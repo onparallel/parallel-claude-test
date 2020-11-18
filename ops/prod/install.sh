@@ -10,7 +10,7 @@ ln -s ${BUILD_ID} main
 
 sed -i "s/^ENV=$/ENV=\"${ENV}\"/g" workers.sh
 sed -i "s/#ENV#/${ENV}/g" main/ops/prod/systemd/parallel-client.service
-sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" main/ops/prod/nginx.conf
+sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" /etc/nginx/nginx.conf
 sudo cp main/ops/prod/systemd/* /lib/systemd/system
 
 sudo systemctl daemon-reload
