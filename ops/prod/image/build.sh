@@ -79,11 +79,12 @@ make install
 popd > /dev/null
 mv nginx.service /lib/systemd/system/nginx.service
 mv nginx.conf /etc/nginx/nginx.conf
+echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
+mv .htpasswd /etc/nginx/.htpasswd
 adduser --system --no-create-home --user-group --shell /sbin/nologin nginx
 mkdir -p /var/lib/nginx/tmp
 chown nginx /var/lib/nginx/tmp
 chgrp nginx /var/lib/nginx/tmp
-echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
 systemctl daemon-reload
 systemctl enable nginx.service 
 systemctl start nginx.service
