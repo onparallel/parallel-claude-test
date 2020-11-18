@@ -220,6 +220,46 @@
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition."
   },
   {
+    "term": "signature-cancelled.subject",
+    "definition": "Cancelled signature request containing \"{documentName}\"",
+    "context": "Cancelled signature request containing \"{documentName}\""
+  },
+  {
+    "term": "signature-cancelled.text",
+    "definition": "This is to let you know that {senderName} ({senderEmail}) has cancelled the signing process sent through {signatureProvider}.",
+    "context": "This is to let you know that {senderName} ({senderEmail}) has cancelled the signing process sent through {signatureProvider}."
+  },
+  {
+    "term": "signature-cancelled.text-2",
+    "definition": "Document cancelled: {documentName}.",
+    "context": "Document cancelled: {documentName}."
+  },
+  {
+    "term": "signature-completed.subject",
+    "definition": "Signed document containing \"{documentName}\"",
+    "context": "Signed document containing \"{documentName}\""
+  },
+  {
+    "term": "signature-completed.text",
+    "definition": "Please find attached a copy of the document sent by {senderName} ({senderEmail}) that you just signed through {signatureProvider}.",
+    "context": "Please find attached a copy of the document sent by {senderName} ({senderEmail}) that you just signed through {signatureProvider}."
+  },
+  {
+    "term": "signature-requested.external-link",
+    "definition": "To review and sign the document, click on the following link:",
+    "context": "To review and sign the document, click on the following link:"
+  },
+  {
+    "term": "signature-requested.subject",
+    "definition": "Signature request containing \"{documentName}\"",
+    "context": "Signature request containing \"{documentName}\""
+  },
+  {
+    "term": "signature-requested.text",
+    "definition": "{senderName} ({senderEmail}) has sent you a document requiring your signature.",
+    "context": "{senderName} ({senderEmail}) has sent you a document requiring your signature."
+  },
+  {
     "term": "template-sharing-notification.access-button",
     "definition": "Access the template here",
     "context": "Access the template here"

@@ -220,6 +220,46 @@
     "context": "Remember that {senderName} ({senderEmail}) sent you a petition."
   },
   {
+    "term": "signature-cancelled.subject",
+    "definition": "Solicitud de firma cancelada en \"{documentName}\"",
+    "context": "Cancelled signature request containing \"{documentName}\""
+  },
+  {
+    "term": "signature-cancelled.text",
+    "definition": "Te avisamos que {senderName} ({senderEmail}) ha cancelado el proceso de firma enviado a través de {signatureProvider}.",
+    "context": "This is to let you know that {senderName} ({senderEmail}) has cancelled the signing process sent through {signatureProvider}."
+  },
+  {
+    "term": "signature-cancelled.text-2",
+    "definition": "Documento cancelado: {documentName}",
+    "context": "Document cancelled: {documentName}."
+  },
+  {
+    "term": "signature-completed.subject",
+    "definition": "Documento \"{documentName}\" firmado",
+    "context": "Signed document containing \"{documentName}\""
+  },
+  {
+    "term": "signature-completed.text",
+    "definition": "Encontrarás adjunta una copia del documento enviado por {senderName} ({senderEmail}) que acabas de firmar a través de {signatureProvider}.",
+    "context": "Please find attached a copy of the document sent by {senderName} ({senderEmail}) that you just signed through {signatureProvider}."
+  },
+  {
+    "term": "signature-requested.external-link",
+    "definition": "Para revisar y firmar el documento, haz click en el siguiente enlace:",
+    "context": "To review and sign the document, click on the following link:"
+  },
+  {
+    "term": "signature-requested.subject",
+    "definition": "Solicitud de firma en \"{documentName}\"",
+    "context": "Signature request containing \"{documentName}\""
+  },
+  {
+    "term": "signature-requested.text",
+    "definition": "{senderName} ({senderEmail}) te ha enviado un documento que requiere tu firma.",
+    "context": "{senderName} ({senderEmail}) has sent you a document requiring your signature."
+  },
+  {
     "term": "template-sharing-notification.access-button",
     "definition": "Accede a la plantilla aquí",
     "context": "Access the template here"

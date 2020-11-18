@@ -1,12 +1,23 @@
 import { injectable, inject } from "inversify";
 import "reflect-metadata";
-import SignaturitSDK from "signaturit-sdk";
-import { SignatureIntegrationSettings } from "../db/repositories/IntegrationRepository";
-import { OrgIntegration } from "../db/__types";
+import SignaturitSDK, {
+  BrandingParams,
+  BrandingResponse,
+} from "signaturit-sdk";
+import {
+  IntegrationRepository,
+  SignatureIntegrationSettings,
+} from "../db/repositories/IntegrationRepository";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
 import { sign, verify } from "jsonwebtoken";
 import { removeNotDefined } from "../util/remedaExtensions";
+import { EventEmitter } from "events";
+import { buildEmail } from "../emails/buildEmail";
+import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmail";
+import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
+import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
+import { OrgIntegration } from "../db/__types";
 
 type SignerBox = {
   email?: string;
@@ -19,13 +30,20 @@ type SignerBox = {
 };
 
 export type SignatureOptions = {
+  locale: string;
+  templateData?: {
+    senderFirstName: string;
+    logoUrl: string;
+    logoAlt: string;
+    documentName: string;
+  };
   events_url?: string;
-  signing_mode?: "parallel" | "sequential";
+  signingMode?: "parallel" | "sequential";
   /**
    *  Each element on the array represents a page in the document.
    *  Inside each page, there's an array with the signers information.
    */
-  signature_box_positions?: Array<SignerBox[]>;
+  signatureBoxPositions?: Array<SignerBox[]>;
 };
 
 type SignatureResponse = {
@@ -38,12 +56,14 @@ type SignatureResponse = {
 
 export type Recipient = { email: string; name: string };
 
+type SignaturitIntegrationSettings = SignatureIntegrationSettings<"SIGNATURIT">;
+
 export interface ISignatureClient {
   startSignatureRequest: (
     petitionId: string,
     filePath: string,
     recipients: Recipient[],
-    options?: SignatureOptions
+    options: SignatureOptions
   ) => Promise<SignatureResponse>;
 
   cancelSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
@@ -53,14 +73,15 @@ export interface ISignatureClient {
 export const SIGNATURE = Symbol.for("SIGNATURE");
 @injectable()
 export class SignatureService {
-  constructor(@inject(CONFIG) private config: Config) {}
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(IntegrationRepository)
+    private integrationRepository: IntegrationRepository
+  ) {}
   public getClient(integration: OrgIntegration): ISignatureClient {
     switch (integration.provider.toUpperCase()) {
       case "SIGNATURIT":
-        return new SignaturItClient(
-          integration.settings as SignatureIntegrationSettings<"SIGNATURIT">,
-          this.config
-        );
+        return this.buildSignaturItClient(integration);
       default:
         throw new Error(
           `Couldn't resolve signature client: ${integration.provider}`
@@ -87,14 +108,40 @@ export class SignatureService {
       return false;
     }
   }
+
+  private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
+    const settings = integration.settings as SignaturitIntegrationSettings;
+    const client = new SignaturItClient(settings, this.config);
+    client.on(
+      "branding_updated",
+      ({ locale, brandingId }: { locale: string; brandingId: string }) => {
+        switch (locale) {
+          case "en":
+            settings.EN_BRANDING_ID = brandingId;
+            break;
+          case "es":
+            settings.ES_BRANDING_ID = brandingId;
+            break;
+          default:
+            break;
+        }
+        this.integrationRepository.updateOrgIntegrationSettings<"SIGNATURIT">(
+          integration.id,
+          settings
+        );
+      }
+    );
+    return client;
+  }
 }
 
-class SignaturItClient implements ISignatureClient {
+class SignaturItClient extends EventEmitter implements ISignatureClient {
   private sdk: SignaturitSDK;
   constructor(
-    private settings: SignatureIntegrationSettings<"SIGNATURIT">,
+    private settings: SignaturitIntegrationSettings,
     private config: Config
   ) {
+    super();
     const isProduction =
       process.env.NODE_ENV === "production" && process.env.ENV === "production";
     if (!this.settings.API_KEY) {
@@ -104,25 +151,37 @@ class SignaturItClient implements ISignatureClient {
     }
     this.sdk = new SignaturitSDK(this.settings.API_KEY, isProduction);
   }
+
   public async startSignatureRequest(
     petitionId: string,
     files: string,
     recipients: Recipient[],
-    opts?: SignatureOptions
+    opts: SignatureOptions
   ) {
+    const locale = opts?.locale ?? "en";
+    let brandingId =
+      locale === "en"
+        ? this.settings.EN_BRANDING_ID
+        : this.settings.ES_BRANDING_ID;
+
+    if (!brandingId) {
+      brandingId = (await this.createOrgBranding(opts)).id;
+      this.emit("branding_updated", { locale, brandingId });
+    }
+
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
     return await this.sdk.createSignature(
       files,
       recipients,
       removeNotDefined({
         delivery_type: "email",
-        signing_mode: opts?.signing_mode ?? "parallel",
-        branding_id: this.settings.BRANDING_ID,
+        signing_mode: opts?.signingMode ?? "parallel",
+        branding_id: brandingId,
         events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
         recipients: recipients.map((r) => ({
           email: r.email,
           name: r.name,
-          require_signature_in_coordinates: opts?.signature_box_positions?.map(
+          require_signature_in_coordinates: opts?.signatureBoxPositions?.map(
             (boxPosition) =>
               boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
           ),
@@ -143,5 +202,81 @@ class SignaturItClient implements ISignatureClient {
     return Buffer.from(
       await this.sdk.downloadSignedDocument(signatureId, documentId)
     );
+  }
+
+  private async createOrgBranding(
+    opts: SignatureOptions
+  ): Promise<BrandingResponse> {
+    return await this.sdk.createBranding({
+      layout_color: "#6059F7",
+      text_color: "#F6F6F6",
+      application_texts: {
+        open_sign_button:
+          opts.locale === "es" ? "Abrir documento" : "Open document",
+      },
+      templates: await this.buildSignaturItBrandingTemplates(opts),
+    });
+  }
+
+  private async buildSignaturItBrandingTemplates(
+    opts: SignatureOptions
+  ): Promise<BrandingParams["templates"]> {
+    const [
+      { html: signatureRequestedEmail },
+      { html: signatureCompletedEmail },
+      { html: signatureCancelledEmail },
+    ] = await Promise.all([
+      buildEmail(
+        SignatureRequestedEmail,
+        {
+          signButton: "{{sign_button}}",
+          signerName: "{{signer_name}}",
+          senderEmail: "{{sender_email}}",
+          documentName: opts.templateData?.documentName ?? "",
+          senderName: opts.templateData?.senderFirstName ?? "",
+          logoUrl: opts.templateData?.logoUrl ?? "",
+          logoAlt: opts.templateData?.logoAlt ?? "",
+          parallelUrl: this.config.misc.parallelUrl,
+          assetsUrl: this.config.misc.assetsUrl,
+        },
+        { locale: opts.locale, replaceSubject: true }
+      ),
+      buildEmail(
+        SignatureCompletedEmail,
+        {
+          signatureProvider: "Signaturit",
+          signerName: "{{signer_name}}",
+          senderEmail: "{{sender_email}}",
+          senderName: opts.templateData?.senderFirstName ?? "",
+          documentName: opts.templateData?.documentName ?? "",
+          logoUrl: opts.templateData?.logoUrl ?? "",
+          logoAlt: opts.templateData?.logoAlt ?? "",
+          parallelUrl: this.config.misc.parallelUrl,
+          assetsUrl: this.config.misc.assetsUrl,
+        },
+        { locale: opts.locale, replaceSubject: true }
+      ),
+      buildEmail(
+        SignatureCancelledEmail,
+        {
+          signatureProvider: "Signaturit",
+          signerName: "{{signer_name}}",
+          senderEmail: "{{sender_email}}",
+          senderName: opts.templateData?.senderFirstName ?? "",
+          documentName: opts.templateData?.documentName ?? "",
+          logoUrl: opts.templateData?.logoUrl ?? "",
+          logoAlt: opts.templateData?.logoAlt ?? "",
+          parallelUrl: this.config.misc.parallelUrl,
+          assetsUrl: this.config.misc.assetsUrl,
+        },
+        { locale: opts.locale, replaceSubject: true }
+      ),
+    ]);
+
+    return {
+      signatures_request: signatureRequestedEmail,
+      signatures_receipt: signatureCompletedEmail,
+      document_canceled: signatureCancelledEmail,
+    };
   }
 }

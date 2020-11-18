@@ -10,7 +10,8 @@ export type SignatureIntegrationSettings<
 > = {
   SIGNATURIT: {
     API_KEY: string;
-    BRANDING_ID?: string;
+    EN_BRANDING_ID?: string;
+    ES_BRANDING_ID?: string;
   };
 }[K];
 
@@ -25,4 +26,13 @@ export class IntegrationRepository extends BaseRepository {
     "org_id",
     (q) => q.where("is_enabled", true)
   );
+
+  async updateOrgIntegrationSettings<K extends SignatureIntegrationProviders>(
+    integrationId: number,
+    settings: SignatureIntegrationSettings<K>
+  ) {
+    return await this.from("org_integration")
+      .where("id", integrationId)
+      .update({ settings });
+  }
 }

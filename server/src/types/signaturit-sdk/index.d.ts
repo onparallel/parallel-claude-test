@@ -60,7 +60,7 @@ declare module "signaturit-sdk" {
     deleteSubscription: (subscriptionId: string) => Promise<any[]>;
   };
 
-  type BrandingParams = {
+  export type BrandingParams = {
     /** List with all the customizable texts for application widgets. */
     application_texts?: {
       /** Send button text. */
@@ -79,16 +79,49 @@ declare module "signaturit-sdk" {
     /** The color that will be used in the signature draw */
     signature_color?: "black" | "blue";
     /** Primary text color. ex: #FAAC58 */
-    text_color: string;
+    text_color?: string;
     /** Hide or show the CSV image and text that is stamped in the signed file. */
     show_csv?: boolean;
     /** Hide or show the Biometric Hash in the signed document and audit trail. */
     show_biometric_hash?: boolean;
     /** Hide or show the welcome page that appears before showing the document. */
     show_welcome_page?: boolean;
+    /** The template content for the emails sent to the user. */
+    templates?: {
+      /**
+       * This template is the one the user receives when you send him a document to sign.
+       * Note: In this template, sign_button magic word is required.
+       */
+      signatures_request?: string;
+      /** This template is the one the user receives with a copy of signed document. */
+      signatures_receipt?: string;
+      /** This template is the one the user receives when a document expires. */
+      request_expired?: string;
+      /** This template is the one the user receives as a reminder of a document pending to sign.
+       * Note: In this template, sign_button magic word is required.
+       */
+      pending_sign?: string;
+      /** This template is the one the user receives when requester cancels the signature. */
+      document_canceled?: string;
+      /** This template is the one the user receives when you send him a document through certified emails.
+       * Note: In this template, email_button magic word is required.
+       */
+      emails_request?: string;
+      /** This template is the one the user receives when a SMS code is sent to open an advanced signature document.
+       * Note: In this template, code magic word is required.
+       */
+      sms_verify?: string;
+      /** This template is the one the user receives when a SMS code is sent to sign a simple signature document.
+       * Note: In this template, code magic word is required.
+       */
+      sms_validate?: string;
+    };
   };
 
-  type BrandingResponse = { id: string; created_at: Date } & BrandingParams;
+  export type BrandingResponse = {
+    id: string;
+    created_at: Date;
+  } & BrandingParams;
 
   type PageCoordinates = {
     top: string | number;

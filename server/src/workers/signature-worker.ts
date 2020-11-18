@@ -8,6 +8,7 @@ import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxP
 import { fullName } from "../util/fullName";
 import { Contact, OrgIntegration, Petition } from "../db/__types";
 import sanitize from "sanitize-filename";
+import { random } from "../util/token";
 
 type PetitionSignatureConfig = {
   provider: string;
@@ -40,7 +41,12 @@ async function startSignatureProcess(
 
   const petitionGID = toGlobalId("Petition", signature.petition_id);
   const settings = petition.signature_config as PetitionSignatureConfig;
-  const tmpPdfPath = resolve(tmpdir(), sanitize(`${settings.title}.pdf`));
+  const tmpPdfPath = resolve(
+    tmpdir(),
+    "print",
+    random(16),
+    sanitize(`${settings.title}.pdf`)
+  );
 
   try {
     const signatureIntegration = await fetchOrgSignatureIntegration(
@@ -76,6 +82,8 @@ async function startSignatureProcess(
       recipients
     );
 
+    const templateData = await fetchTemplateData(petition, ctx);
+
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
     // send request to signature client
@@ -84,8 +92,10 @@ async function startSignatureProcess(
       tmpPdfPath,
       recipients,
       {
-        signing_mode: "parallel",
-        signature_box_positions: signatureBoxPositions,
+        locale: petition.locale as "en" | "es",
+        templateData,
+        signingMode: "parallel",
+        signatureBoxPositions,
       }
     );
 
@@ -242,4 +252,26 @@ async function fetchPetitionSignature(
   }
 
   return signature;
+}
+
+async function fetchTemplateData(petition: Petition, ctx: WorkerContext) {
+  const user = await ctx.petitions.loadPetitionOwners(petition.id);
+  if (!user) {
+    throw new Error(`Can't find OWNER of petition with id ${petition.id}`);
+  }
+
+  const org = await ctx.organizations.loadOrg(petition.org_id);
+  if (!org) {
+    throw new Error(`Org with id ${petition.org_id} not found`);
+  }
+
+  const logoUrl = await ctx.organizations.getOrgLogoUrl(petition.org_id);
+
+  const signatureConfig = petition.signature_config as PetitionSignatureConfig;
+  return {
+    senderFirstName: user.first_name ?? "",
+    logoUrl: logoUrl ?? `${ctx.config.misc.assetsUrl}/static/emails/logo.png`,
+    logoAlt: org.identifier,
+    documentName: signatureConfig.title,
+  };
 }
