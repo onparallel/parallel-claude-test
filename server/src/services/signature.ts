@@ -239,7 +239,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           parallelUrl: this.config.misc.parallelUrl,
           assetsUrl: this.config.misc.assetsUrl,
         },
-        { locale: opts.locale, replaceSubject: true }
+        { locale: opts.locale }
       ),
       buildEmail(
         SignatureCompletedEmail,
@@ -254,7 +254,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           parallelUrl: this.config.misc.parallelUrl,
           assetsUrl: this.config.misc.assetsUrl,
         },
-        { locale: opts.locale, replaceSubject: true }
+        { locale: opts.locale }
       ),
       buildEmail(
         SignatureCancelledEmail,
@@ -269,7 +269,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           parallelUrl: this.config.misc.parallelUrl,
           assetsUrl: this.config.misc.assetsUrl,
         },
-        { locale: opts.locale, replaceSubject: true }
+        { locale: opts.locale }
       ),
     ]);
 
