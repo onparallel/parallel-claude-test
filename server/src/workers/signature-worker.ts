@@ -1,14 +1,15 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import { resolve } from "path";
-import { WorkerContext } from "../context";
-import { toGlobalId } from "../util/globalId";
-import { createQueueWorker } from "./helpers/createQueueWorker";
-import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
-import { fullName } from "../util/fullName";
-import { Contact, OrgIntegration, Petition } from "../db/__types";
 import sanitize from "sanitize-filename";
+import { URLSearchParams } from "url";
+import { WorkerContext } from "../context";
+import { Contact, OrgIntegration, Petition } from "../db/__types";
+import { fullName } from "../util/fullName";
+import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
+import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
+import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type PetitionSignatureConfig = {
   provider: string;
@@ -61,21 +62,22 @@ async function startSignatureProcess(
       petitionSignatureRequestId: signature.id,
     });
 
-    // print and save pdf to disk
-    const printURL = `http://localhost:3000/${
-      petition.locale
-    }/print/petition-signature?token=${encodeURIComponent(token)}`;
-    const buffer = await ctx.printer.pdf(printURL, {
-      path: tmpPdfPath,
-      height: "297mm",
-      width: "210mm",
-      margin: {
-        top: "10mm",
-        bottom: "10mm",
-        left: "10mm",
-        right: "10mm",
-      },
-    });
+    const buffer = await ctx.printer.pdf(
+      `http://localhost:3000/${
+        petition.locale
+      }/print/petition-signature?${new URLSearchParams({ token })}`,
+      {
+        path: tmpPdfPath,
+        height: "297mm",
+        width: "210mm",
+        margin: {
+          top: "10mm",
+          bottom: "10mm",
+          left: "10mm",
+          right: "10mm",
+        },
+      }
+    );
 
     const signatureBoxPositions = await calculateSignatureBoxPositions(
       buffer,

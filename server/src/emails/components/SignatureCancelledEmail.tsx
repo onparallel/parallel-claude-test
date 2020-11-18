@@ -1,7 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import React from "react";
-import { FormattedMessage, IntlShape } from "react-intl";
+import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Closing } from "../common/Closing";
 
@@ -78,12 +78,21 @@ const email: Email<SignatureCompletedProps> = {
     signatureProvider,
     documentName,
   }: SignatureCompletedProps) {
+    const intl = useIntl();
     return (
       <Layout
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        title={intl.formatMessage(
+          {
+            id: "signature-cancelled.subject",
+            defaultMessage:
+              'Cancelled signature request containing "{documentName}"',
+          },
+          { documentName }
+        )}
       >
         <MjmlSection>
           <MjmlColumn>

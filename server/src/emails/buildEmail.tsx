@@ -5,7 +5,6 @@ import { IntlProvider, IntlShape, createIntl } from "react-intl";
 
 export interface EmailOptions {
   locale: string;
-  replaceSubject?: boolean;
 }
 
 export interface Email<T> {
@@ -18,10 +17,10 @@ export interface Email<T> {
 export async function buildEmail<T>(
   email: Email<T>,
   props: T,
-  { locale, replaceSubject }: EmailOptions
+  { locale }: EmailOptions
 ) {
   const messages = await import(`../../lang/compiled/${locale}.json`);
-  let { html } = render(
+  const { html } = render(
     <IntlProvider locale={locale} messages={messages}>
       {createElement(email.html, props)}
     </IntlProvider>,
@@ -36,9 +35,5 @@ export async function buildEmail<T>(
   const text = email.text(props, intl);
   const subject = email.subject(props, intl);
   const from = email.from(props, intl);
-
-  if (replaceSubject) {
-    html = html.replace(/<title>\s*<\/title>/, `<title>${subject}</title>`);
-  }
   return { html, text, subject, from };
 }

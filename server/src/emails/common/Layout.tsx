@@ -13,12 +13,14 @@ import {
   MjmlSocialElement,
   MjmlStyle,
   MjmlText,
+  MjmlTitle,
   MjmlWrapper,
 } from "mjml-react";
 import React, { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type LayoutProps = {
+  title?: string;
   parallelUrl: string;
   logoUrl: string;
   logoAlt: string;
@@ -26,6 +28,7 @@ export type LayoutProps = {
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
+  title,
   parallelUrl,
   logoUrl,
   logoAlt,
@@ -36,6 +39,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   return (
     <Mjml>
       <MjmlHead>
+        {title ? <MjmlTitle>{title}</MjmlTitle> : null}
         <MjmlAttributes>
           <MjmlAll fontSize="14px" />
           <MjmlClass
