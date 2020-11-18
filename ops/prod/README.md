@@ -1,9 +1,9 @@
 ## Server image
 
-The server image is built by copying all files inside ops/prod/image in a vanilla Amazon Linux instance and running
+The server image is built by copying all files inside `ops/prod/image` in a vanilla Amazon Linux instance and running
 
 ```
-sudo bash build.s
+sudo bash build.sh
 ```
 
 This script will install all the dependencies needed, including:
@@ -12,7 +12,13 @@ This script will install all the dependencies needed, including:
 - yarn
 - nginx with nginx_accept_language_module
 
-The different processes run on the systemd services defined on `ops/prod/systemd`.
+To create a new image, launch a new vanilla Amazon Linux and copy the files inside `ops/prod/image`.
+
+```
+scp ops/prod/image/* ec2-user@[INSTANCE_IP]:~
+ssh ec2-user@[INSTANCE_IP]
+sudo bash build.sh
+```
 
 ## Release
 
