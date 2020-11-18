@@ -56,7 +56,7 @@ async function startSignatureProcess(
     });
 
     // print and save pdf to disk
-    const printURL = `${ctx.config.misc.parallelUrl}/${
+    const printURL = `http://localhost:3000/${
       petition.locale
     }/print/petition-signature?token=${encodeURIComponent(token)}`;
     const buffer = await ctx.printer.pdf(printURL, {
@@ -110,7 +110,7 @@ async function startSignatureProcess(
     await ctx.petitions.updatePetitionSignature(signature.id, {
       status: "CANCELLED",
       cancel_reason: "REQUEST_ERROR",
-      cancel_data: { error: error.toString?.() },
+      cancel_data: { error: error.stack ?? JSON.stringify(error) },
     });
     throw error;
   } finally {
