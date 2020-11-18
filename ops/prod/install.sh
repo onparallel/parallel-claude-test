@@ -4,7 +4,7 @@ BUILD_ID="${COMMIT_SHA}-${ENV}"
 WORK_DIR=/home/ec2-user
 
 cd ${WORK_DIR}
-aws s3 cp s3://parallel-builds/${BUILD_ID}.tar.gz ${BUILD_ID}.tar.gz --profile parallel-deploy
+aws s3 cp s3://parallel-builds/${BUILD_ID}.tar.gz ${BUILD_ID}.tar.gz
 tar -zxpf ${BUILD_ID}.tar.gz
 ln -s ${BUILD_ID} main
 
