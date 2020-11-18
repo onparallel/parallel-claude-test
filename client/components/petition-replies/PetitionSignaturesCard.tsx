@@ -193,17 +193,19 @@ export function PetitionSignaturesCard({
                     <Text as="span" marginX={2}>
                       -
                     </Text>
-                    <FormattedList
-                      value={signature.signatureConfig.contacts.map(
-                        (contact, i) => [
-                          contact ? (
-                            <ContactLink contact={contact} key={i} />
-                          ) : (
-                            <DeletedContact key={i} />
-                          ),
-                        ]
-                      )}
-                    />
+                    <Text as="span">
+                      <FormattedList
+                        value={signature.signatureConfig.contacts.map(
+                          (contact, i) => [
+                            contact ? (
+                              <ContactLink contact={contact} key={i} />
+                            ) : (
+                              <DeletedContact key={i} />
+                            ),
+                          ]
+                        )}
+                      />
+                    </Text>
                     <Spacer />
                     {signature.status === "COMPLETED" ? (
                       <Button
