@@ -7,7 +7,7 @@ cd ${WORK_DIR}
 aws s3 cp s3://parallel-builds/${BUILD_ID}.tar.gz ${BUILD_ID}.tar.gz
 tar -zxpf ${BUILD_ID}.tar.gz
 ln -s ${BUILD_ID} main
-node node_modules/playwright/install.js
+node main/node_modules/playwright/install.js
 
 sed -i "s/#ENV#/${ENV}/g" workers.sh main/ops/prod/systemd/parallel-client.service main/ops/prod/systemd/parallel-server.service
 sudo sed -i "s/#COMMIT_SHA#/${COMMIT_SHA}/g" /etc/nginx/nginx.conf
