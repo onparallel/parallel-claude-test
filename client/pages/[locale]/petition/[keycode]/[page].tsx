@@ -528,15 +528,16 @@ function ConfirmStartSignatureProcess({
       body={
         <FormattedMessage
           id="petition.finalize-start-signature.body"
-          defaultMessage="This petition requires an eSignature in order to be completed. After you click on Continue, we will send {signers} an e-mail with information on how to complete the process."
+          defaultMessage="This petition requires an eSignature in order to be completed. After you click on Continue, {count, plural, =1{we will send you} other {we will send {signers}}} an e-mail with information on how to complete the process."
           values={{
+            count: signers.length,
             signers: (
               <FormattedList
                 value={signers.map((signer) => [
                   signer && signer.id === contactId
                     ? `${intl
                         .formatMessage({
-                          id: "generic.you",
+                          id: "generic.to-you",
                           defaultMessage: "You",
                         })
                         .toLowerCase()}`
