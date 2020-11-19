@@ -8,6 +8,8 @@ const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = require("child_process");
 const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
+const fs_1 = require("fs");
+const rimraf_1 = __importDefault(require("rimraf"));
 aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCredentials({
     profile: "parallel-deploy",
 });
@@ -41,6 +43,14 @@ async function main() {
         cwd: buildDir,
         encoding: "utf-8",
     });
+    // remove unused browsers to keep the artifact small
+    const contents = await fs_1.promises.readdir(`${buildDir}/node_modules/playwright/.local-browsers`, { withFileTypes: true });
+    for (const content of contents) {
+        if (content.isDirectory() &&
+            ["firefox-", "webkit-"].some((prefix) => content.name.startsWith(prefix))) {
+            rimraf_1.default.sync(`${buildDir}/node_modules/playwright/.local-browsers/${content.name}`);
+        }
+    }
     console.log("Getting the secrets 🤫");
     child_process_1.execSync("git clone --depth 1 git@github.com:parallel-so/secrets.git secrets", {
         cwd: WORK_DIR,

@@ -3,6 +3,8 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
+import { promises as fs } from "fs";
+import rimraf from "rimraf";
 
 AWS.config.credentials = new AWS.SharedIniFileCredentials({
   profile: "parallel-deploy",
@@ -49,6 +51,21 @@ async function main() {
       encoding: "utf-8",
     }
   );
+  // remove unused browsers to keep the artifact small
+  const contents = await fs.readdir(
+    `${buildDir}/node_modules/playwright/.local-browsers`,
+    { withFileTypes: true }
+  );
+  for (const content of contents) {
+    if (
+      content.isDirectory() &&
+      ["firefox-", "webkit-"].some((prefix) => content.name.startsWith(prefix))
+    ) {
+      rimraf.sync(
+        `${buildDir}/node_modules/playwright/.local-browsers/${content.name}`
+      );
+    }
+  }
 
   console.log("Getting the secrets 🤫");
   execSync(
