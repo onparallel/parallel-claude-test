@@ -35,7 +35,9 @@ async function main() {
     child_process_1.execSync(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
     child_process_1.execSync(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Installing dependencies...");
-    child_process_1.execSync(`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install --prefer-offline --frozen-lockfile`, {
+    child_process_1.execSync(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+     --prefer-offline \
+     --frozen-lockfile`, {
         cwd: buildDir,
         encoding: "utf-8",
     });
@@ -67,11 +69,11 @@ async function main() {
     console.log("Building the server");
     child_process_1.execSync(`yarn build`, { cwd: `${buildDir}/server`, encoding: "utf-8" });
     console.log("Pruning devDependencies");
-    child_process_1.execSync(`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install \
+    child_process_1.execSync(`PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
     --production \
     --ignore-scripts \
     --prefer-offline \
-     --frozen-lockfile`, { cwd: buildDir, encoding: "utf-8" });
+    --frozen-lockfile`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Zip and upload to S3");
     child_process_1.execSync(`tar -zcf ${buildId}.tar.gz ${buildId}`, {
         cwd: WORK_DIR,

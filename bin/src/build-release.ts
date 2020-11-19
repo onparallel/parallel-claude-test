@@ -41,7 +41,9 @@ async function main() {
 
   console.log("Installing dependencies...");
   execSync(
-    `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install --prefer-offline --frozen-lockfile`,
+    `PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
+     --prefer-offline \
+     --frozen-lockfile`,
     {
       cwd: buildDir,
       encoding: "utf-8",
@@ -87,11 +89,11 @@ async function main() {
 
   console.log("Pruning devDependencies");
   execSync(
-    `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install \
+    `PLAYWRIGHT_BROWSERS_PATH=0 yarn install \
     --production \
     --ignore-scripts \
     --prefer-offline \
-     --frozen-lockfile`,
+    --frozen-lockfile`,
     { cwd: buildDir, encoding: "utf-8" }
   );
 
