@@ -2613,24 +2613,31 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
 
 export type PetitionSignaturesCard_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> & {
+} & Pick<Petition, "id" | "status"> & {
     signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "provider">
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "provider"> & {
+          contacts: Array<
+            Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
+          >;
+        }
     >;
     signatureRequests?: Maybe<
       Array<
-        { __typename?: "PetitionSignatureRequest" } & Pick<
-          PetitionSignatureRequest,
-          "id" | "status"
-        > & {
-            signatureConfig: { __typename?: "SignatureConfig" } & {
-              contacts: Array<
-                Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
-              >;
-            };
-          }
+        {
+          __typename?: "PetitionSignatureRequest";
+        } & PetitionSignaturesCard_PetitionSignatureRequestFragment
       >
     >;
+  };
+
+export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
+  __typename?: "PetitionSignatureRequest";
+} & Pick<PetitionSignatureRequest, "id" | "status"> & {
+    signatureConfig: { __typename?: "SignatureConfig" } & {
+      contacts: Array<
+        Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
+      >;
+    };
   };
 
 export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables = Exact<{
@@ -5408,23 +5415,34 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${DownloadAllDialog_PetitionFieldFragmentDoc}
 `;
-export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
-  fragment PetitionSignaturesCard_Petition on Petition {
+export const PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc = gql`
+  fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
     id
+    status
     signatureConfig {
-      provider
-    }
-    signatureRequests {
-      id
-      status
-      signatureConfig {
-        contacts {
-          ...ContactLink_Contact
-        }
+      contacts {
+        ...ContactLink_Contact
       }
     }
   }
   ${ContactLink_ContactFragmentDoc}
+`;
+export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
+  fragment PetitionSignaturesCard_Petition on Petition {
+    id
+    status
+    signatureConfig {
+      provider
+      contacts {
+        ...ContactLink_Contact
+      }
+    }
+    signatureRequests {
+      ...PetitionSignaturesCard_PetitionSignatureRequest
+    }
+  }
+  ${ContactLink_ContactFragmentDoc}
+  ${PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc}
 `;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {

@@ -485,6 +485,11 @@
     "context": "Cancelled"
   },
   {
+    "term": "component.petition-sigatures-card.not-started",
+    "definition": "Not started",
+    "context": "Not started"
+  },
+  {
     "term": "component.petition-sigatures-card.sending",
     "definition": "Sending",
     "context": "Sending"
@@ -1258,6 +1263,11 @@
     "term": "generic.send",
     "definition": "Send",
     "context": "Send"
+  },
+  {
+    "term": "generic.start",
+    "definition": "Start",
+    "context": "Start"
   },
   {
     "term": "generic.submit",
