@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/core";
 import {
   BellIcon,
+  BellSettingsIcon,
   ChevronDownIcon,
   EmailIcon,
   SettingsIcon,
@@ -24,7 +25,6 @@ import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,
-  PetitionStatus,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
@@ -36,8 +36,6 @@ import { DeletedContact } from "../common/DeletedContact";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 import { Table, TableColumn } from "../common/Table";
-
-type PetitionAccessSelection = PetitionAccessTable_PetitionAccessFragment;
 
 export function PetitionAccessesTable({
   petition,
@@ -70,20 +68,25 @@ export function PetitionAccessesTable({
   const handleSendReminders = useCallback(async () => {
     onSendReminders(selection);
   }, [selection]);
-  const columns = usePetitionAccessesColumns({
-    petitionStatus: petition.status,
-    onSendMessage,
-    onSendReminders,
-    onReactivateAccess,
-    onDeactivateAccess,
-  });
-
   const handleConfigureReminders = useCallback(async () => {
     onConfigureReminders(selection);
   }, [selection]);
 
   const showActions =
     selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
+
+  const columns = usePetitionAccessesColumns();
+  const context = useMemo(
+    () => ({
+      petition,
+      onSendMessage,
+      onSendReminders,
+      onReactivateAccess,
+      onDeactivateAccess,
+      onConfigureReminders,
+    }),
+    []
+  );
 
   return (
     <Card {...props}>
@@ -154,7 +157,7 @@ export function PetitionAccessesTable({
         ) : null}
         <Button
           colorScheme="purple"
-          leftIcon={<UserPlusIcon />}
+          leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddPetitionAccess}
         >
           {intl.formatMessage({
@@ -165,6 +168,7 @@ export function PetitionAccessesTable({
       </Stack>
       <Table
         columns={columns}
+        context={context}
         rows={petition.accesses ?? []}
         rowKeyProp="id"
         isSelectable
@@ -175,19 +179,17 @@ export function PetitionAccessesTable({
   );
 }
 
-function usePetitionAccessesColumns({
-  petitionStatus,
-  onReactivateAccess,
-  onDeactivateAccess,
-  onSendMessage,
-  onSendReminders,
-}: {
-  petitionStatus: PetitionStatus;
-  onReactivateAccess: (accessId: string) => void;
-  onDeactivateAccess: (accessId: string) => void;
-  onSendMessage: (accessIds: string[]) => void;
-  onSendReminders: (accessIds: string[]) => void;
-}): TableColumn<PetitionAccessSelection>[] {
+function usePetitionAccessesColumns(): TableColumn<
+  PetitionAccessTable_PetitionAccessFragment,
+  {
+    petition: PetitionAccessTable_PetitionFragment;
+    onReactivateAccess: (accessId: string) => void;
+    onDeactivateAccess: (accessId: string) => void;
+    onSendMessage: (accessIds: string[]) => void;
+    onSendReminders: (accessIds: string[]) => void;
+    onConfigureReminders: (accessIds: string[]) => void;
+  }
+>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -288,46 +290,63 @@ function usePetitionAccessesColumns({
           paddingY: 1,
           width: "1px",
         },
-        CellContent: ({ row: { id, status, contact } }) => {
+        CellContent: ({ row: { id, status, contact }, context }) => {
+          const {
+            petition,
+            onSendMessage,
+            onSendReminders,
+            onConfigureReminders,
+            onDeactivateAccess,
+            onReactivateAccess,
+          } = context!;
           const intl = useIntl();
           return contact ? (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               {status === "ACTIVE" ? (
-                <IconButtonWithTooltip
-                  label={intl.formatMessage({
-                    id: "petition-accesses.send-message",
-                    defaultMessage: "Send message",
-                  })}
-                  onClick={() => onSendMessage([id])}
-                  placement="bottom"
-                  icon={<EmailIcon />}
-                  size="sm"
-                />
-              ) : null}
-              {status === "ACTIVE" ? (
-                <IconButtonWithTooltip
-                  isDisabled={petitionStatus !== "PENDING"}
-                  label={intl.formatMessage({
-                    id: "petition-accesses.send-reminder",
-                    defaultMessage: "Send reminder",
-                  })}
-                  onClick={() => onSendReminders([id])}
-                  placement="bottom"
-                  icon={<BellIcon />}
-                  size="sm"
-                />
-              ) : null}
-              {status === "ACTIVE" ? (
-                <IconButtonWithTooltip
-                  label={intl.formatMessage({
-                    id: "petition-accesses.deactivate-access",
-                    defaultMessage: "Remove access",
-                  })}
-                  onClick={() => onDeactivateAccess(id)}
-                  placement="bottom"
-                  icon={<UserXIcon />}
-                  size="sm"
-                />
+                <>
+                  <IconButtonWithTooltip
+                    label={intl.formatMessage({
+                      id: "petition-accesses.send-message",
+                      defaultMessage: "Send message",
+                    })}
+                    onClick={() => onSendMessage([id])}
+                    placement="bottom"
+                    icon={<EmailIcon fontSize="16px" />}
+                    size="sm"
+                  />
+                  <IconButtonWithTooltip
+                    isDisabled={petition.status !== "PENDING"}
+                    label={intl.formatMessage({
+                      id: "petition-accesses.send-reminder",
+                      defaultMessage: "Send reminder",
+                    })}
+                    onClick={() => onSendReminders([id])}
+                    placement="bottom"
+                    icon={<BellIcon fontSize="16px" />}
+                    size="sm"
+                  />
+                  <IconButtonWithTooltip
+                    isDisabled={petition.status !== "PENDING"}
+                    label={intl.formatMessage({
+                      id: "petition-accesses.reminder-settings",
+                      defaultMessage: "Reminder settings",
+                    })}
+                    onClick={() => onConfigureReminders([id])}
+                    placement="bottom"
+                    icon={<BellSettingsIcon fontSize="16px" />}
+                    size="sm"
+                  />
+                  <IconButtonWithTooltip
+                    label={intl.formatMessage({
+                      id: "petition-accesses.deactivate-access",
+                      defaultMessage: "Remove access",
+                    })}
+                    onClick={() => onDeactivateAccess(id)}
+                    placement="bottom"
+                    icon={<UserXIcon fontSize="16px" />}
+                    size="sm"
+                  />
+                </>
               ) : (
                 <IconButtonWithTooltip
                   label={intl.formatMessage({
@@ -336,7 +355,7 @@ function usePetitionAccessesColumns({
                   })}
                   onClick={() => onReactivateAccess(id)}
                   placement="left"
-                  icon={<UserCheckIcon />}
+                  icon={<UserCheckIcon fontSize="16px" />}
                   size="sm"
                 />
               )}
@@ -345,14 +364,7 @@ function usePetitionAccessesColumns({
         },
       },
     ],
-    [
-      intl.locale,
-      petitionStatus,
-      onReactivateAccess,
-      onDeactivateAccess,
-      onSendMessage,
-      onSendReminders,
-    ]
+    [intl.locale]
   );
 }
 
