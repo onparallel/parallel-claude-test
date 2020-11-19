@@ -1275,11 +1275,6 @@
     "context": "To {recipient}"
   },
   {
-    "term": "generic.to-you",
-    "definition": "A tí",
-    "context": "You"
-  },
-  {
     "term": "generic.today-at",
     "definition": "Hoy a las {time}",
     "context": "Today at {time}"
@@ -1970,9 +1965,14 @@
     "context": "Obtain written information that is not stored in documents or other files."
   },
   {
-    "term": "petition.finalize-start-signature.body",
-    "definition": "Esta petición requiere de firma digital para ser completada. Cuando hagas click en Continuar, {count, plural, =1{te enviaremos} other {enviaremos a {signers}}} un email con información sobre cómo completar el proceso.",
-    "context": "This petition requires an eSignature in order to be completed. After you click on Continue, {count, plural, =1{we will send you} other {we will send {signers}}} an e-mail with information on how to complete the process."
+    "term": "petition.finalize-start-signature.body-1",
+    "definition": "Esta petición requiere de firma digital para ser completada.",
+    "context": "This petition requires an eSignature in order to be completed."
+  },
+  {
+    "term": "petition.finalize-start-signature.body-2",
+    "definition": " Cuando hagas click en Continuar, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:",
+    "context": "After you click on Continue, we will send an e-mail with information on how to complete the process to the following people:"
   },
   {
     "term": "petition.finalize-start-signature.header",

@@ -7,8 +7,10 @@ import {
   Button,
   CloseButton,
   Flex,
+  ListItem,
   Stack,
   Text,
+  UnorderedList,
   useDisclosure,
   useToast,
 } from "@chakra-ui/core";
@@ -68,7 +70,7 @@ import axios, { CancelTokenSource } from "axios";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FormattedList, FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 import { countBy, omit, pick } from "remeda";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
@@ -518,7 +520,7 @@ function ConfirmStartSignatureProcess({
     <ConfirmDialog
       closeOnEsc={false}
       closeOnOverlayClick={false}
-      size="md"
+      size="lg"
       header={
         <FormattedMessage
           id="petition.finalize-start-signature.header"
@@ -526,27 +528,32 @@ function ConfirmStartSignatureProcess({
         />
       }
       body={
-        <FormattedMessage
-          id="petition.finalize-start-signature.body"
-          defaultMessage="This petition requires an eSignature in order to be completed. After you click on Continue, {count, plural, =1{we will send you} other {we will send {signers}}} an e-mail with information on how to complete the process."
-          values={{
-            count: signers.length,
-            signers: (
-              <FormattedList
-                value={signers.map((signer) => [
-                  signer && signer.id === contactId
-                    ? `${intl
-                        .formatMessage({
-                          id: "generic.to-you",
-                          defaultMessage: "You",
-                        })
-                        .toLowerCase()}`
-                    : `${signer?.fullName} (${signer?.email})`,
-                ])}
-              />
-            ),
-          }}
-        />
+        <>
+          <FormattedMessage
+            id="petition.finalize-start-signature.body-1"
+            defaultMessage="This petition requires an eSignature in order to be completed."
+          />
+          <Spacer marginTop={2} />
+          <FormattedMessage
+            id="petition.finalize-start-signature.body-2"
+            defaultMessage="After you click on Continue, we will send an e-mail with information on how to complete the process to the following people:"
+          />
+          <Spacer marginTop={4} />
+          <UnorderedList>
+            {signers.map((s, i) => {
+              return (
+                <ListItem key={i}>
+                  {s?.fullName} {`<${s?.email}> `}
+                  {s?.id === contactId &&
+                    `(${intl.formatMessage({
+                      id: "generic.you",
+                      defaultMessage: "You",
+                    })})`}
+                </ListItem>
+              );
+            })}
+          </UnorderedList>
+        </>
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>
