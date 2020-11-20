@@ -15,11 +15,11 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.from("feature_flag").where("name", "INTERNAL_COMMENTS").delete();
   await knex
     .from("feature_flag_override")
     .where("feature_flag_name", "INTERNAL_COMMENTS")
     .delete();
+  await knex.from("feature_flag").where("name", "INTERNAL_COMMENTS").delete();
 
   // drop foreign key to avoid errors on next queries
   await knex.schema.alterTable("feature_flag_override", (t) => {

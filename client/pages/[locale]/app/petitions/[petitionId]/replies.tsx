@@ -644,10 +644,11 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_User on User {
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-        hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
         ...PetitionLayout_User
+        ...PetitionRepliesFieldComments_User
       }
       ${PetitionLayout.fragments.User}
+      ${PetitionRepliesFieldComments.fragments.User}
     `;
   },
 };
@@ -894,7 +895,7 @@ function useCreatePetitionFieldComment() {
             fragmentName:
               "PetitionReplies_createPetitionFieldComment_PetitionField",
             id: variables.petitionFieldId,
-            variables,
+            variables: pick(variables, ["hasInternalComments"]),
           };
           const field = client.readFragment<
             PetitionReplies_createPetitionFieldComment_PetitionFieldFragment
@@ -934,7 +935,7 @@ function useUpdatePetitionFieldComment() {
               PetitionRepliesFieldComments.fragments.PetitionFieldComment,
             id: variables.petitionFieldCommentId,
             fragmentName: "PetitionRepliesFieldComments_PetitionFieldComment",
-            variables,
+            variables: pick(variables, ["hasInternalComments"]),
           });
           return {
             updatePetitionFieldComment: {

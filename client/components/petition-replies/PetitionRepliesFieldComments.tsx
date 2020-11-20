@@ -181,6 +181,7 @@ export function PetitionRepliesFieldComments({
             {user.hasInternalComments && (
               <Stack display="flex" alignItems="center" direction="row">
                 <Checkbox
+                  marginLeft={2}
                   colorScheme="purple"
                   isChecked={isInternalComment}
                   onChange={() => setInternalComment(!isInternalComment)}
@@ -288,7 +289,7 @@ function FieldComment({
       }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
-        <Box>
+        <Box paddingRight={2}>
           {author?.__typename === "User" && author?.id === userId ? (
             <Text as="strong" fontStyle="italic">
               <FormattedMessage id="generic.you" defaultMessage="You" />
@@ -304,51 +305,45 @@ function FieldComment({
           ) : author?.__typename === "User" ? (
             <Text as="strong">{author.fullName}</Text>
           ) : null}
-          {isInternal && (
-            <SmallPopover
-              content={
-                <Text fontSize="sm">
-                  <FormattedMessage
-                    id="petition-replies.internal-comment-popover"
-                    defaultMessage="This comment is only visible for people in your organization."
-                  />
-                </Text>
-              }
-            >
-              <Badge
-                colorScheme="gray"
-                variant="outline"
-                cursor="default"
-                marginLeft={2}
-              >
-                <FormattedMessage
-                  id="petition-replies.internal-comment.badge"
-                  defaultMessage="Internal"
-                />
-              </Badge>
-            </SmallPopover>
-          )}
-          {publishedAt ? (
-            <>
-              <DateTime
-                color="gray.500"
-                value={publishedAt}
-                format={FORMATS.LLL}
-                useRelativeTime
-                marginLeft={2}
-              />
-              {isEdited ? (
-                <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
-                  <FormattedMessage
-                    id="generic.edited-comment-indicator"
-                    defaultMessage="Edited"
-                  />
-                </Text>
-              ) : null}
-            </>
-          ) : null}
         </Box>
-        {publishedAt ? null : (
+        {isInternal && (
+          <SmallPopover
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="petition-replies.internal-comment-popover"
+                  defaultMessage="This comment is only visible for people in your organization."
+                />
+              </Text>
+            }
+          >
+            <Badge colorScheme="gray" variant="outline" cursor="default">
+              <FormattedMessage
+                id="petition-replies.internal-comment.badge"
+                defaultMessage="Internal"
+              />
+            </Badge>
+          </SmallPopover>
+        )}
+        {publishedAt ? (
+          <>
+            <DateTime
+              color="gray.500"
+              value={publishedAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+              marginLeft={2}
+            />
+            {isEdited ? (
+              <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
+                <FormattedMessage
+                  id="generic.edited-comment-indicator"
+                  defaultMessage="Edited"
+                />
+              </Text>
+            ) : null}
+          </>
+        ) : (
           <SmallPopover
             content={
               <Text fontSize="sm">
@@ -359,12 +354,7 @@ function FieldComment({
               </Text>
             }
           >
-            <Badge
-              colorScheme="yellow"
-              variant="outline"
-              cursor="default"
-              marginLeft={2}
-            >
+            <Badge colorScheme="yellow" variant="outline" cursor="default">
               <FormattedMessage
                 id="petition-replies.comment-pending.label"
                 defaultMessage="Pending"
@@ -443,6 +433,12 @@ function FieldComment({
 }
 
 PetitionRepliesFieldComments.fragments = {
+  User: gql`
+    fragment PetitionRepliesFieldComments_User on User {
+      id
+      hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
+    }
+  `,
   get PetitionField() {
     return gql`
       fragment PetitionRepliesFieldComments_PetitionField on PetitionField {

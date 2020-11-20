@@ -123,7 +123,7 @@ export function ifArgEquals<
   TArg extends Arg<TypeName, FieldName>
 >(
   argName: TArg,
-  expectedValue: any, // TODO try to get type
+  expectedValue: core.ArgsValue<TypeName, FieldName>[TArg],
   authorizer: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {

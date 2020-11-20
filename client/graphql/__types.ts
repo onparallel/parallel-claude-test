@@ -2579,6 +2579,10 @@ export type PetitionRepliesField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
 } & Pick<PetitionFieldReply, "id" | "content" | "status" | "createdAt">;
 
+export type PetitionRepliesFieldComments_UserFragment = {
+  __typename?: "User";
+} & Pick<User, "id"> & { hasInternalComments: User["hasFeatureFlag"] };
+
 export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "title" | "type"> & {
@@ -3454,8 +3458,8 @@ export type PetitionReplies_PetitionFieldFragment = {
 
 export type PetitionReplies_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
-  hasInternalComments: User["hasFeatureFlag"];
-} & PetitionLayout_UserFragment;
+} & PetitionLayout_UserFragment &
+  PetitionRepliesFieldComments_UserFragment;
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -5476,13 +5480,20 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   ${PetitionReplies_PetitionFieldFragmentDoc}
   ${PetitionSignaturesCard_PetitionFragmentDoc}
 `;
+export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
+  fragment PetitionRepliesFieldComments_User on User {
+    id
+    hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
+  }
+`;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
-    hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
     ...PetitionLayout_User
+    ...PetitionRepliesFieldComments_User
   }
   ${PetitionLayout_UserFragmentDoc}
+  ${PetitionRepliesFieldComments_UserFragmentDoc}
 `;
 export const PetitionReplies_createPetitionFieldComment_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_createPetitionFieldComment_PetitionField on PetitionField {
