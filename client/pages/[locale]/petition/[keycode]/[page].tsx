@@ -515,7 +515,6 @@ function ConfirmStartSignatureProcess({
   contactId,
   ...props
 }: DialogProps<ConfirmStartSignatureProcessProps>) {
-  const intl = useIntl();
   return (
     <ConfirmDialog
       closeOnEsc={false}
@@ -536,7 +535,14 @@ function ConfirmStartSignatureProcess({
           <Spacer marginTop={2} />
           <FormattedMessage
             id="petition.finalize-start-signature.body-2"
-            defaultMessage="After you click on Continue, we will send an e-mail with information on how to complete the process to the following people:"
+            defaultMessage="After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
+            values={{
+              i: (...chunks: any[]) => (
+                <Text as="span" fontStyle="italic">
+                  {chunks}
+                </Text>
+              ),
+            }}
           />
           <Spacer marginTop={4} />
           <UnorderedList>
@@ -544,11 +550,6 @@ function ConfirmStartSignatureProcess({
               return (
                 <ListItem key={i}>
                   {s?.fullName} {`<${s?.email}> `}
-                  {s?.id === contactId &&
-                    `(${intl.formatMessage({
-                      id: "generic.you",
-                      defaultMessage: "You",
-                    })})`}
                 </ListItem>
               );
             })}

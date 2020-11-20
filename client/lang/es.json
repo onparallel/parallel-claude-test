@@ -70,6 +70,16 @@
     "context": "Resend confirmation email"
   },
   {
+    "term": "component.confirm-restart-signature-request.description",
+    "definition": "Ya tienes una petición firmada. Si continúas, gastarás un crédito de firma adicional. Estás seguro que quieres continuar?",
+    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?"
+  },
+  {
+    "term": "component.confirm-restart-signature-request.header",
+    "definition": "Reiniciar proceso de firma digital",
+    "context": "Restart eSignature process"
+  },
+  {
     "term": "component.confirm-signature-config-changed.body",
     "definition": "Haz hecho cambios a la configuración de firma digital. Si continúas, el proceso será cancelado.",
     "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
@@ -1730,6 +1740,16 @@
     "context": "Editor"
   },
   {
+    "term": "petition-signature.file-not-submitted",
+    "definition": "Archivo no enviado.",
+    "context": "File not submitted"
+  },
+  {
+    "term": "petition-signature.file-submitted-successfully",
+    "definition": "Archivo enviado correctamente. (Pendiente de revisión)",
+    "context": "File submitted successfully (Pending review)"
+  },
+  {
     "term": "petition.activity-not-available",
     "definition": "Una vez envíes esta petición, podrás ver toda la actividad aquí",
     "context": "Once you send this petition, you will be able to see all the petition activity here."
@@ -2001,8 +2021,8 @@
   },
   {
     "term": "petition.finalize-start-signature.body-2",
-    "definition": " Cuando hagas click en Continuar, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:",
-    "context": "After you click on Continue, we will send an e-mail with information on how to complete the process to the following people:"
+    "definition": "Al hacer click en <i>Continuar con firma digital</i>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:",
+    "context": "After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
   },
   {
     "term": "petition.finalize-start-signature.header",

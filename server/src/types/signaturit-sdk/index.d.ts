@@ -134,7 +134,7 @@ declare module "signaturit-sdk" {
     name: string;
   };
 
-  type SignatureParams = {
+  export type SignatureParams = {
     /** Use a custom branding for the signature request */
     branding_id?: string;
     /** Url to redirect the user when finish the signature process. */
@@ -187,7 +187,7 @@ declare module "signaturit-sdk" {
     options?: any;
   };
 
-  type Document = {
+  export type Document = {
     id: string;
     created_at: Date;
     file: {

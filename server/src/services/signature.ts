@@ -3,6 +3,8 @@ import "reflect-metadata";
 import SignaturitSDK, {
   BrandingParams,
   BrandingResponse,
+  Document,
+  SignatureParams,
 } from "signaturit-sdk";
 import {
   IntegrationRepository,
@@ -173,7 +175,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     return await this.sdk.createSignature(
       files,
       recipients,
-      removeNotDefined({
+      removeNotDefined<SignatureParams>({
         delivery_type: "email",
         signing_mode: opts?.signingMode ?? "parallel",
         branding_id: brandingId,
@@ -208,6 +210,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     opts: SignatureOptions
   ): Promise<BrandingResponse> {
     return await this.sdk.createBranding({
+      show_welcome_page: false,
       layout_color: "#6059F7",
       text_color: "#F6F6F6",
       application_texts: {

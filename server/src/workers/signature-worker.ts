@@ -7,6 +7,7 @@ import { WorkerContext } from "../context";
 import { Contact, OrgIntegration, Petition } from "../db/__types";
 import { fullName } from "../util/fullName";
 import { toGlobalId } from "../util/globalId";
+import { removeKeys } from "../util/remedaExtensions";
 import { random } from "../util/token";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { createQueueWorker } from "./helpers/createQueueWorker";
@@ -104,6 +105,11 @@ async function startSignatureProcess(
     );
 
     const provider = signatureIntegration.provider.toUpperCase();
+
+    // remove events array from data before saving to DB
+    data.documents = data.documents.map((doc) =>
+      removeKeys(doc, ([key]) => key !== "events")
+    );
 
     await Promise.all([
       ctx.petitions.updatePetitionSignature(signature.id, {

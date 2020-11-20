@@ -70,6 +70,16 @@
     "context": "Resend confirmation email"
   },
   {
+    "term": "component.confirm-restart-signature-request.description",
+    "definition": "You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?",
+    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?"
+  },
+  {
+    "term": "component.confirm-restart-signature-request.header",
+    "definition": "Restart eSignature process",
+    "context": "Restart eSignature process"
+  },
+  {
     "term": "component.confirm-signature-config-changed.body",
     "definition": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled.",
     "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
@@ -1730,6 +1740,16 @@
     "context": "Editor"
   },
   {
+    "term": "petition-signature.file-not-submitted",
+    "definition": "File not submitted",
+    "context": "File not submitted"
+  },
+  {
+    "term": "petition-signature.file-submitted-successfully",
+    "definition": "File submitted successfully (Pending review)",
+    "context": "File submitted successfully (Pending review)"
+  },
+  {
     "term": "petition.activity-not-available",
     "definition": "Once you send this petition, you will be able to see all the petition activity here.",
     "context": "Once you send this petition, you will be able to see all the petition activity here."
@@ -2001,8 +2021,8 @@
   },
   {
     "term": "petition.finalize-start-signature.body-2",
-    "definition": "After you click on Continue, we will send an e-mail with information on how to complete the process to the following people:",
-    "context": "After you click on Continue, we will send an e-mail with information on how to complete the process to the following people:"
+    "definition": "After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:",
+    "context": "After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
   },
   {
     "term": "petition.finalize-start-signature.header",

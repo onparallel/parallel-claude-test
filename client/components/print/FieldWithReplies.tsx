@@ -1,6 +1,7 @@
 import { Text, Heading, Box } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PrintPetitionSignature_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
 
 const fieldStyles = {
@@ -20,6 +21,8 @@ export function FieldWithReplies({
       return <HeadingField field={field} sx={fieldStyles} />;
     case "TEXT":
       return <TextField field={field} sx={fieldStyles} />;
+    case "FILE_UPLOAD":
+      return <FileUploadField field={field} sx={fieldStyles} />;
     default:
       return null;
   }
@@ -53,5 +56,31 @@ function HeadingField({ field, ...props }: HeadingFieldProps) {
         {field.description}
       </Text>
     </Box>
+  );
+}
+
+type FileUploadFieldProps = ExtendChakra<{
+  field: PrintPetitionSignature_PetitionFieldFragment;
+}>;
+
+function FileUploadField({ field, ...props }: FileUploadFieldProps) {
+  return (
+    <Card {...props} boxShadow="none" borderColor="gray.400">
+      <Text style={{ fontWeight: "bold" }}>{field.title}</Text>
+      <Text marginLeft="2mm" fontStyle="italic">
+        {field.description}
+      </Text>
+      {field.replies.length > 0 ? (
+        <FormattedMessage
+          id="petition-signature.file-submitted-successfully"
+          defaultMessage="File submitted successfully (Pending review)"
+        />
+      ) : (
+        <FormattedMessage
+          id="petition-signature.file-not-submitted"
+          defaultMessage="File not submitted"
+        />
+      )}
+    </Card>
   );
 }

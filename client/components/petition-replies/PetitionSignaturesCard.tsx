@@ -32,6 +32,7 @@ import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { Link } from "../common/Link";
 import { Spacer } from "../common/Spacer";
+import { useConfirmRestartSignatureRequestDialog } from "./ConfirmRestartSignatureRequestDialog";
 
 export function PetitionSignaturesCard({
   petition,
@@ -70,6 +71,14 @@ export function PetitionSignaturesCard({
     await onRefetchPetition();
   }, [startSignatureRequest, petition]);
 
+  const confirmRestartSignature = useConfirmRestartSignatureRequestDialog();
+  const handleRestartSignatureProcess = useCallback(async () => {
+    try {
+      await confirmRestartSignature({});
+      await handleStartSignatureProcess();
+    } catch {}
+  }, [confirmRestartSignature, handleStartSignatureProcess]);
+
   const handleDownloadSignedDoc = useCallback(
     async (petitionSignatureRequestId: string) => {
       try {
@@ -105,7 +114,7 @@ export function PetitionSignaturesCard({
           <CurrentSignatureRequestRow
             signatureConfig={petition.signatureConfig}
             signatureRequest={current}
-            onStart={handleStartSignatureProcess}
+            onStart={handleRestartSignatureProcess}
             onCancel={handleCancelSignatureProcess}
             onDownload={handleDownloadSignedDoc}
           />
