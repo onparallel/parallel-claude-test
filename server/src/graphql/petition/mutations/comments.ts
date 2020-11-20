@@ -1,4 +1,4 @@
-import { mutationField, stringArg } from "@nexus/schema";
+import { booleanArg, mutationField, stringArg } from "@nexus/schema";
 import {
   and,
   authenticate,
@@ -40,6 +40,7 @@ export const createPetitionFieldComment = mutationField(
         required: false,
       }),
       content: stringArg({ required: true }),
+      isInternal: booleanArg({ required: false }),
     },
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.createPetitionFieldCommentFromUser(
@@ -48,6 +49,7 @@ export const createPetitionFieldComment = mutationField(
           petitionFieldId: args.petitionFieldId,
           petitionFieldReplyId: args.petitionFieldReplyId ?? null,
           content: args.content,
+          isInternal: args.isInternal ?? false,
         },
         ctx.user!
       );

@@ -679,6 +679,7 @@ export interface NexusGenFieldTypes {
     content: string; // String!
     id: NexusGenScalars["GID"]; // GID!
     isEdited: boolean; // Boolean!
+    isInternal: boolean; // Boolean!
     isUnread: boolean; // Boolean!
     publishedAt: NexusGenScalars["DateTime"] | null; // DateTime
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
@@ -1090,6 +1091,7 @@ export interface NexusGenArgTypes {
     createPetitionFieldComment: {
       // args
       content: string; // String!
+      isInternal?: boolean | null; // Boolean
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionFieldReplyId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!

@@ -76,5 +76,10 @@ export const PetitionFieldComment = objectType({
         return root.published_at ? root.updated_at > root.published_at : false;
       },
     });
+    t.boolean("isInternal", {
+      description:
+        "Whether the comment is internal (only visible to org users) or public (visible for users and accesses)",
+      resolve: (root) => root.is_internal,
+    });
   },
 });

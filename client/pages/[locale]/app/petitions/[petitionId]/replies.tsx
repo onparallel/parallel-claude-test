@@ -276,11 +276,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
-  async function handleAddComment(content: string) {
+  async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
       petitionId,
       petitionFieldId: activeFieldId!,
       content,
+      isInternal,
     });
   }
 
@@ -709,12 +710,14 @@ PetitionReplies.mutations = [
       $petitionFieldId: GID!
       $petitionFieldReplyId: GID
       $content: String!
+      $isInternal: Boolean
     ) {
       createPetitionFieldComment(
         petitionId: $petitionId
         petitionFieldId: $petitionFieldId
         petitionFieldReplyId: $petitionFieldReplyId
         content: $content
+        isInternal: $isInternal
       ) {
         ...PetitionRepliesFieldComments_PetitionFieldComment
       }

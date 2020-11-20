@@ -344,6 +344,7 @@ export type MutationcreatePetitionFieldArgs = {
 
 export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
+  isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -891,6 +892,8 @@ export type PetitionFieldComment = {
   id: Scalars["GID"];
   /** Whether the comment has been edited after being published. */
   isEdited: Scalars["Boolean"];
+  /** Whether the comment is internal (only visible to org users) or public (visible for users and accesses) */
+  isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
   /** Time when the comment was published. */
@@ -2599,7 +2602,7 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
 } & Pick<
   PetitionFieldComment,
-  "id" | "content" | "publishedAt" | "isUnread" | "isEdited"
+  "id" | "content" | "publishedAt" | "isUnread" | "isEdited" | "isInternal"
 > & {
     author?: Maybe<
       | ({ __typename?: "PetitionAccess" } & {
@@ -3517,6 +3520,7 @@ export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   content: Scalars["String"];
+  isInternal?: Maybe<Scalars["Boolean"]>;
 }>;
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
@@ -5364,6 +5368,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     publishedAt
     isUnread
     isEdited
+    isInternal
   }
   ${ContactLink_ContactFragmentDoc}
 `;
@@ -8107,12 +8112,14 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
     $petitionFieldId: GID!
     $petitionFieldReplyId: GID
     $content: String!
+    $isInternal: Boolean
   ) {
     createPetitionFieldComment(
       petitionId: $petitionId
       petitionFieldId: $petitionFieldId
       petitionFieldReplyId: $petitionFieldReplyId
       content: $content
+      isInternal: $isInternal
     ) {
       ...PetitionRepliesFieldComments_PetitionFieldComment
     }
@@ -8137,6 +8144,7 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
  *      petitionFieldId: // value for 'petitionFieldId'
  *      petitionFieldReplyId: // value for 'petitionFieldReplyId'
  *      content: // value for 'content'
+ *      isInternal: // value for 'isInternal'
  *   },
  * });
  */

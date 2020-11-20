@@ -457,6 +457,7 @@ export interface PetitionFieldComment {
   updated_by: Maybe<string>;
   deleted_at: Maybe<Date>;
   deleted_by: Maybe<string>;
+  is_internal: boolean;
 }
 
 export type CreatePetitionFieldComment = PartialProps<
@@ -471,6 +472,7 @@ export type CreatePetitionFieldComment = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "is_internal"
 >;
 
 export interface PetitionFieldReply {

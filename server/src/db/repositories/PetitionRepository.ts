@@ -1517,6 +1517,7 @@ export class PetitionRepository extends BaseRepository {
             }
           })
           .whereNull("deleted_at")
+          .where("is_internal", false)
           .select("*");
 
         const byId = groupBy(
@@ -1704,6 +1705,7 @@ export class PetitionRepository extends BaseRepository {
       petitionFieldId: number;
       petitionFieldReplyId: number | null;
       content: string;
+      isInternal: boolean;
     },
     user: User
   ) {
@@ -1713,6 +1715,8 @@ export class PetitionRepository extends BaseRepository {
       petition_field_reply_id: data.petitionFieldReplyId,
       content: data.content,
       user_id: user.id,
+      published_at: data.isInternal ? this.now() : null,
+      is_internal: data.isInternal,
       created_by: `User:${user.id}`,
     });
     return comment;

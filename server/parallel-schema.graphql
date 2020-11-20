@@ -321,6 +321,7 @@ type Mutation {
   """
   createPetitionFieldComment(
     content: String!
+    isInternal: Boolean
     petitionFieldId: GID!
     petitionFieldReplyId: GID
     petitionId: GID!
@@ -1232,6 +1233,11 @@ type PetitionFieldComment {
   Whether the comment has been edited after being published.
   """
   isEdited: Boolean!
+
+  """
+  Whether the comment is internal (only visible to org users) or public (visible for users and accesses)
+  """
+  isInternal: Boolean!
 
   """
   Whether the comment has been read or not.

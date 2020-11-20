@@ -1580,6 +1580,26 @@
     "context": "Type a new comment"
   },
   {
+    "term": "petition-replies.internal-comment-check.help",
+    "definition": "Al marcar este campo, el comentario será visible sólamente para personas dentro de tu organización.",
+    "context": "By checking this field, the comment will be visible only to users in your organization."
+  },
+  {
+    "term": "petition-replies.internal-comment-check.label",
+    "definition": "Comentario interno",
+    "context": "Internal comment"
+  },
+  {
+    "term": "petition-replies.internal-comment-popover",
+    "definition": "Este comentario es visible sólamente para personas dentro de tu organización.",
+    "context": "This comment is only visible for people in your organization."
+  },
+  {
+    "term": "petition-replies.internal-comment.badge",
+    "definition": "Interno",
+    "context": "Internal"
+  },
+  {
     "term": "petition-replies.notify-petition-reviewed.button",
     "definition": "Notificar que está correcto",
     "context": "Notify that it is correct"

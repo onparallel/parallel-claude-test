@@ -3,6 +3,7 @@ import {
   Badge,
   Box,
   Button,
+  Checkbox,
   Collapse,
   Flex,
   IconButton,
@@ -40,13 +41,14 @@ import { DateTime } from "../common/DateTime";
 import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
+import { HelpPopover } from "../common/HelpPopover";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
 export type PetitionRepliesFieldCommentsProps = {
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   userId: string;
-  onAddComment: (value: string) => void;
+  onAddComment: (value: string, internal?: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
   onClose: () => void;
@@ -63,12 +65,13 @@ export function PetitionRepliesFieldComments({
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
+  const [isInternalComment, setInternalComment] = useState(false);
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Scroll to bttom when a comment is added
+  // Scroll to bottom when a comment is added
   const previousCommentCount = usePreviousValue(field.comments.length);
   useEffect(() => {
     if (
@@ -82,7 +85,7 @@ export function PetitionRepliesFieldComments({
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && event.metaKey) {
       event.preventDefault();
-      onAddComment(draft);
+      onAddComment(draft, isInternalComment);
       setNativeValue(textareaRef.current!, "");
     }
   }
@@ -92,7 +95,7 @@ export function PetitionRepliesFieldComments({
   }
 
   function handleSubmitClick() {
-    onAddComment(draft.trim());
+    onAddComment(draft.trim(), isInternalComment);
     setNativeValue(textareaRef.current!, "");
   }
 
@@ -168,18 +171,39 @@ export function PetitionRepliesFieldComments({
           {...inputFocusBind}
         />
         <Collapse isOpen={isExpanded} paddingTop={2}>
-          <Stack direction="row" justifyContent="flex-end">
-            <Button size="sm" onClick={handleCancelClick}>
-              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-            </Button>
-            <Button
-              size="sm"
-              colorScheme="purple"
-              isDisabled={draft.trim().length === 0}
-              onClick={handleSubmitClick}
-            >
-              <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-            </Button>
+          <Stack direction="row" justifyContent="space-between">
+            <Stack display="flex" alignItems="center" direction="row">
+              <Checkbox
+                colorScheme="purple"
+                isChecked={isInternalComment}
+                onChange={() => setInternalComment(!isInternalComment)}
+              >
+                <FormattedMessage
+                  id="petition-replies.internal-comment-check.label"
+                  defaultMessage="Internal comment"
+                />
+              </Checkbox>
+              <HelpPopover marginLeft={2}>
+                <FormattedMessage
+                  id="petition-replies.internal-comment-check.help"
+                  defaultMessage="By checking this field, the comment will be visible only to users in your organization."
+                />
+              </HelpPopover>
+            </Stack>
+            <Stack direction="row">
+              <Button size="sm" onClick={handleCancelClick}>
+                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+              </Button>
+              <Button
+                marginLeft={2}
+                size="sm"
+                colorScheme="purple"
+                isDisabled={draft.trim().length === 0}
+                onClick={handleSubmitClick}
+              >
+                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
+              </Button>
+            </Stack>
           </Stack>
         </Collapse>
       </Box>
@@ -188,7 +212,15 @@ export function PetitionRepliesFieldComments({
 }
 
 function FieldComment({
-  comment: { id, author, publishedAt, isUnread, isEdited, content: _content },
+  comment: {
+    id,
+    author,
+    publishedAt,
+    isUnread,
+    isEdited,
+    content: _content,
+    isInternal,
+  },
   userId,
   onDelete,
   onEdit,
@@ -238,7 +270,13 @@ function FieldComment({
       paddingX={4}
       paddingY={2}
       backgroundColor={
-        !publishedAt ? "yellow.50" : isUnread ? "purple.50" : "white"
+        !publishedAt
+          ? "yellow.50"
+          : isUnread
+          ? "purple.50"
+          : isInternal
+          ? "gray.50"
+          : "white"
       }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
@@ -258,6 +296,30 @@ function FieldComment({
           ) : author?.__typename === "User" ? (
             <Text as="strong">{author.fullName}</Text>
           ) : null}
+          {isInternal && (
+            <SmallPopover
+              content={
+                <Text fontSize="sm">
+                  <FormattedMessage
+                    id="petition-replies.internal-comment-popover"
+                    defaultMessage="This comment is only visible for people in your organization."
+                  />
+                </Text>
+              }
+            >
+              <Badge
+                colorScheme="gray"
+                variant="outline"
+                cursor="default"
+                marginLeft={2}
+              >
+                <FormattedMessage
+                  id="petition-replies.internal-comment.badge"
+                  defaultMessage="Internal"
+                />
+              </Badge>
+            </SmallPopover>
+          )}
           {publishedAt ? (
             <>
               <DateTime
@@ -411,6 +473,7 @@ PetitionRepliesFieldComments.fragments = {
         publishedAt
         isUnread
         isEdited
+        isInternal
       }
       ${ContactLink.fragments.Contact}
     `;
