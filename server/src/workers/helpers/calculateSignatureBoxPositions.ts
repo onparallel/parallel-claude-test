@@ -49,9 +49,7 @@ export async function calculateSignatureBoxPositions(
   );
 
   if (countBy(positions, (pageSignature) => pageSignature.length > 0) === 0) {
-    throw new Error(
-      "couldn't find signature box positions on the signature pdf"
-    );
+    throw new Error("MALFORMED_PDF_ERROR");
   }
 
   return positions;

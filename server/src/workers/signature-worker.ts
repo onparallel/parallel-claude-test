@@ -42,6 +42,8 @@ async function startSignatureProcess(
 
   const petitionGID = toGlobalId("Petition", signature.petition_id);
   const settings = petition.signature_config as PetitionSignatureConfig;
+
+  let removeGeneratedPdf = true;
   const tmpPdfPath = resolve(
     tmpdir(),
     "print",
@@ -119,15 +121,25 @@ async function startSignatureProcess(
       }),
     ]);
   } catch (error) {
+    const cancelData = { error: error.stack ?? JSON.stringify(error) } as {
+      error: any;
+      file?: string;
+    };
+    if (error.message === "MALFORMED_PDF_ERROR") {
+      cancelData.file = tmpPdfPath;
+      removeGeneratedPdf = false;
+    }
     await ctx.petitions.updatePetitionSignature(signature.id, {
       status: "CANCELLED",
       cancel_reason: "REQUEST_ERROR",
-      cancel_data: { error: error.stack ?? JSON.stringify(error) },
+      cancel_data: cancelData,
     });
     throw error;
   } finally {
     try {
-      await fs.unlink(tmpPdfPath);
+      if (removeGeneratedPdf) {
+        await fs.unlink(tmpPdfPath);
+      }
     } catch {}
   }
 }
