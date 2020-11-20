@@ -116,3 +116,20 @@ export function ifArgDefined<
     return true;
   };
 }
+
+export function ifArgEquals<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName>
+>(
+  argName: TArg,
+  expectedValue: any, // TODO try to get type
+  authorizer: FieldAuthorizeResolver<TypeName, FieldName>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    if (args[argName] === expectedValue) {
+      return await authorizer(root, args, ctx, info);
+    }
+    return true;
+  };
+}

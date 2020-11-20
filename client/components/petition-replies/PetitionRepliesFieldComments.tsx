@@ -21,6 +21,7 @@ import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
   PetitionRepliesFieldComments_PetitionFieldFragment,
+  PetitionReplies_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
@@ -47,7 +48,7 @@ import { Spacer } from "../common/Spacer";
 
 export type PetitionRepliesFieldCommentsProps = {
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
-  userId: string;
+  user: PetitionReplies_UserFragment;
   onAddComment: (value: string, internal?: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
@@ -56,7 +57,7 @@ export type PetitionRepliesFieldCommentsProps = {
 
 export function PetitionRepliesFieldComments({
   field,
-  userId,
+  user,
   onAddComment,
   onDeleteComment,
   onUpdateComment,
@@ -130,7 +131,7 @@ export function PetitionRepliesFieldComments({
           <Fragment key={comment.id}>
             <FieldComment
               comment={comment}
-              userId={userId}
+              userId={user.id}
               onEdit={(content) => onUpdateComment(comment.id, content)}
               onDelete={() => onDeleteComment(comment.id)}
             />
@@ -171,25 +172,32 @@ export function PetitionRepliesFieldComments({
           {...inputFocusBind}
         />
         <Collapse isOpen={isExpanded} paddingTop={2}>
-          <Stack direction="row" justifyContent="space-between">
-            <Stack display="flex" alignItems="center" direction="row">
-              <Checkbox
-                colorScheme="purple"
-                isChecked={isInternalComment}
-                onChange={() => setInternalComment(!isInternalComment)}
-              >
-                <FormattedMessage
-                  id="petition-replies.internal-comment-check.label"
-                  defaultMessage="Internal comment"
-                />
-              </Checkbox>
-              <HelpPopover marginLeft={2}>
-                <FormattedMessage
-                  id="petition-replies.internal-comment-check.help"
-                  defaultMessage="By checking this field, the comment will be visible only to users in your organization."
-                />
-              </HelpPopover>
-            </Stack>
+          <Stack
+            direction="row"
+            justifyContent={
+              user.hasInternalComments ? "space-between" : "flex-end"
+            }
+          >
+            {user.hasInternalComments && (
+              <Stack display="flex" alignItems="center" direction="row">
+                <Checkbox
+                  colorScheme="purple"
+                  isChecked={isInternalComment}
+                  onChange={() => setInternalComment(!isInternalComment)}
+                >
+                  <FormattedMessage
+                    id="petition-replies.internal-comment-check.label"
+                    defaultMessage="Internal comment"
+                  />
+                </Checkbox>
+                <HelpPopover marginLeft={2}>
+                  <FormattedMessage
+                    id="petition-replies.internal-comment-check.help"
+                    defaultMessage="By checking this field, the comment will be visible only to users in your organization."
+                  />
+                </HelpPopover>
+              </Stack>
+            )}
             <Stack direction="row">
               <Button size="sm" onClick={handleCancelClick}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
@@ -473,7 +481,7 @@ PetitionRepliesFieldComments.fragments = {
         publishedAt
         isUnread
         isEdited
-        isInternal
+        isInternal @include(if: $hasInternalComments)
       }
       ${ContactLink.fragments.Contact}
     `;

@@ -93,6 +93,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       variables: {
         id: petitionId,
         hasPetitionSignature: me.hasPetitionSignature,
+        hasInternalComments: me.hasInternalComments,
       },
     })
   );
@@ -282,6 +283,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionFieldId: activeFieldId!,
       content,
       isInternal,
+      hasInternalComments: me.hasInternalComments,
     });
   }
 
@@ -295,6 +297,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
       content,
+      hasInternalComments: me.hasInternalComments,
     });
   }
 
@@ -523,7 +526,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 <PetitionRepliesFieldComments
                   key={activeFieldId!}
                   field={activeField!}
-                  userId={me.id}
+                  user={me}
                   onClose={() => setActiveFieldId(null)}
                   onAddComment={handleAddComment}
                   onUpdateComment={handleUpdateComment}
@@ -641,6 +644,7 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_User on User {
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+        hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
         ...PetitionLayout_User
       }
       ${PetitionLayout.fragments.User}
@@ -711,6 +715,7 @@ PetitionReplies.mutations = [
       $petitionFieldReplyId: GID
       $content: String!
       $isInternal: Boolean
+      $hasInternalComments: Boolean!
     ) {
       createPetitionFieldComment(
         petitionId: $petitionId
@@ -730,6 +735,7 @@ PetitionReplies.mutations = [
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
       $content: String!
+      $hasInternalComments: Boolean!
     ) {
       updatePetitionFieldComment(
         petitionId: $petitionId
@@ -888,6 +894,7 @@ function useCreatePetitionFieldComment() {
             fragmentName:
               "PetitionReplies_createPetitionFieldComment_PetitionField",
             id: variables.petitionFieldId,
+            variables,
           };
           const field = client.readFragment<
             PetitionReplies_createPetitionFieldComment_PetitionFieldFragment
@@ -927,6 +934,7 @@ function useUpdatePetitionFieldComment() {
               PetitionRepliesFieldComments.fragments.PetitionFieldComment,
             id: variables.petitionFieldCommentId,
             fragmentName: "PetitionRepliesFieldComments_PetitionFieldComment",
+            variables,
           });
           return {
             updatePetitionFieldComment: {
@@ -1073,7 +1081,11 @@ PetitionReplies.getInitialProps = async ({
   );
   await fetchQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
     gql`
-      query PetitionReplies($id: GID!, $hasPetitionSignature: Boolean!) {
+      query PetitionReplies(
+        $id: GID!
+        $hasPetitionSignature: Boolean!
+        $hasInternalComments: Boolean!
+      ) {
         petition(id: $id) {
           ...PetitionReplies_Petition
         }
@@ -1084,6 +1096,7 @@ PetitionReplies.getInitialProps = async ({
       variables: {
         id: query.petitionId as string,
         hasPetitionSignature: me.hasPetitionSignature,
+        hasInternalComments: me.hasInternalComments,
       },
     }
   );

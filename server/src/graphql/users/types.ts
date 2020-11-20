@@ -10,7 +10,7 @@ export const OrganizationRole = enumType({
 
 export const FeatureFlag = enumType({
   name: "FeatureFlag",
-  members: ["PETITION_SIGNATURE"],
+  members: ["PETITION_SIGNATURE", "INTERNAL_COMMENTS"],
   rootTyping: "db.FeatureFlagName",
 });
 

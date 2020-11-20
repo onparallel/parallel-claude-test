@@ -4,6 +4,7 @@ import {
   authenticate,
   chain,
   ifArgDefined,
+  ifArgEquals,
 } from "../../helpers/authorize";
 import { RESULT } from "../../helpers/result";
 import {
@@ -11,6 +12,7 @@ import {
   fieldsBelongsToPetition,
   repliesBelongsToPetition,
   userHasAccessToPetitions,
+  userHasFeatureFlag,
 } from "../authorizers";
 import { prop } from "remeda";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
@@ -30,7 +32,8 @@ export const createPetitionFieldComment = mutationField(
         ifArgDefined(
           "petitionFieldReplyId",
           repliesBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
-        )
+        ),
+        ifArgEquals("isInternal", true, userHasFeatureFlag("INTERNAL_COMMENTS"))
       )
     ),
     args: {

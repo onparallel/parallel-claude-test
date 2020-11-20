@@ -8,7 +8,7 @@ type Maybe<T> = T | null;
 type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
-export type FeatureFlagName = "PETITION_SIGNATURE";
+export type FeatureFlagName = "PETITION_SIGNATURE" | "INTERNAL_COMMENTS";
 
 export type IntegrationType = "SIGNATURE";
 

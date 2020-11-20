@@ -131,7 +131,7 @@ export type CreateTextReplyInput = {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
-export type FeatureFlag = "PETITION_SIGNATURE";
+export type FeatureFlag = "INTERNAL_COMMENTS" | "PETITION_SIGNATURE";
 
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
@@ -3454,6 +3454,7 @@ export type PetitionReplies_PetitionFieldFragment = {
 
 export type PetitionReplies_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
+  hasInternalComments: User["hasFeatureFlag"];
 } & PetitionLayout_UserFragment;
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
@@ -3521,6 +3522,7 @@ export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
+  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
@@ -3536,6 +3538,7 @@ export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<
   petitionFieldId: Scalars["GID"];
   petitionFieldCommentId: Scalars["GID"];
   content: Scalars["String"];
+  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PetitionReplies_updatePetitionFieldCommentMutation = {
@@ -3758,6 +3761,7 @@ export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
 export type PetitionRepliesQueryVariables = Exact<{
   id: Scalars["GID"];
   hasPetitionSignature: Scalars["Boolean"];
+  hasInternalComments: Scalars["Boolean"];
 }>;
 
 export type PetitionRepliesQuery = { __typename?: "Query" } & {
@@ -5368,7 +5372,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
     publishedAt
     isUnread
     isEdited
-    isInternal
+    isInternal @include(if: $hasInternalComments)
   }
   ${ContactLink_ContactFragmentDoc}
 `;
@@ -5475,6 +5479,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+    hasInternalComments: hasFeatureFlag(featureFlag: INTERNAL_COMMENTS)
     ...PetitionLayout_User
   }
   ${PetitionLayout_UserFragmentDoc}
@@ -8113,6 +8118,7 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
     $petitionFieldReplyId: GID
     $content: String!
     $isInternal: Boolean
+    $hasInternalComments: Boolean!
   ) {
     createPetitionFieldComment(
       petitionId: $petitionId
@@ -8145,6 +8151,7 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
  *      petitionFieldReplyId: // value for 'petitionFieldReplyId'
  *      content: // value for 'content'
  *      isInternal: // value for 'isInternal'
+ *      hasInternalComments: // value for 'hasInternalComments'
  *   },
  * });
  */
@@ -8168,6 +8175,7 @@ export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
     $petitionFieldId: GID!
     $petitionFieldCommentId: GID!
     $content: String!
+    $hasInternalComments: Boolean!
   ) {
     updatePetitionFieldComment(
       petitionId: $petitionId
@@ -8198,6 +8206,7 @@ export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
  *      petitionFieldId: // value for 'petitionFieldId'
  *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
  *      content: // value for 'content'
+ *      hasInternalComments: // value for 'hasInternalComments'
  *   },
  * });
  */
@@ -8559,7 +8568,11 @@ export type PetitionRepliesUserLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserLazyQuery
 >;
 export const PetitionRepliesDocument = gql`
-  query PetitionReplies($id: GID!, $hasPetitionSignature: Boolean!) {
+  query PetitionReplies(
+    $id: GID!
+    $hasPetitionSignature: Boolean!
+    $hasInternalComments: Boolean!
+  ) {
     petition(id: $id) {
       ...PetitionReplies_Petition
     }
@@ -8581,6 +8594,7 @@ export const PetitionRepliesDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      hasPetitionSignature: // value for 'hasPetitionSignature'
+ *      hasInternalComments: // value for 'hasInternalComments'
  *   },
  * });
  */

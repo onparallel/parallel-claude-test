@@ -314,11 +314,21 @@ export const PetitionField = objectType({
       list: [true],
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser({
-          userId: ctx.user!.id,
-          petitionId: root.petition_id,
-          petitionFieldId: root.id,
-        });
+        const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
+          ctx.user!.id,
+          "INTERNAL_COMMENTS"
+        );
+        const comments = await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser(
+          {
+            userId: ctx.user!.id,
+            petitionId: root.petition_id,
+            petitionFieldId: root.id,
+          }
+        );
+
+        return loadInternalComments
+          ? comments
+          : comments.filter((c) => !c.is_internal);
       },
     });
     t.int("position");
