@@ -12,8 +12,6 @@ import { closing, greeting } from "../common/texts";
 export type SignatureCompletedProps = {
   documentName: string | null;
   signerName: string | null;
-  senderEmail: string | null;
-  senderName: string;
   signatureProvider: string;
 } & LayoutProps;
 
@@ -35,12 +33,7 @@ const email: Email<SignatureCompletedProps> = {
     );
   },
   text(
-    {
-      senderName,
-      senderEmail,
-      signerName,
-      signatureProvider,
-    }: SignatureCompletedProps,
+    { signerName, signatureProvider }: SignatureCompletedProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -49,9 +42,9 @@ const email: Email<SignatureCompletedProps> = {
         {
           id: "signature-completed.text",
           defaultMessage:
-            "Please find attached a copy of the document sent by {senderName} ({senderEmail}) that you just signed through {signatureProvider}.",
+            "Please find attached a copy of the document you just signed through {signatureProvider}.",
         },
-        { senderName, senderEmail, signatureProvider }
+        { signatureProvider }
       )}
 
       ${closing({}, intl)}
@@ -59,8 +52,6 @@ const email: Email<SignatureCompletedProps> = {
   },
   html({
     signerName,
-    senderEmail,
-    senderName,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -89,10 +80,8 @@ const email: Email<SignatureCompletedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-completed.text"
-                defaultMessage="Please find attached a copy of the document sent by {senderName} ({senderEmail}) that you just signed through {signatureProvider}."
+                defaultMessage="Please find attached a copy of the document you just signed through {signatureProvider}."
                 values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
                   signatureProvider,
                 }}
               />
@@ -110,8 +99,6 @@ export default email;
 export const props: SignatureCompletedProps = {
   signatureProvider: "Signaturit",
   documentName: "Know Your Client (KYC)",
-  senderName: "Mariano",
-  senderEmail: "mariano@parallel.so",
   signerName: "Mariano",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",

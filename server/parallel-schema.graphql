@@ -442,7 +442,7 @@ type Mutation {
   presendPetitionClosedNotification(petitionId: GID!): Result!
 
   """
-  Marks a filled petition as ready for review.
+  Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.
   """
   publicCompletePetition(keycode: ID!): PublicPetition!
 

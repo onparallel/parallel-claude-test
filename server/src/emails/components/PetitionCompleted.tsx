@@ -14,6 +14,7 @@ import {
 import { closing, greeting, petitionFieldList } from "../common/texts";
 
 export type PetitionCompletedProps = {
+  isSigned: boolean;
   name: string | null;
   petitionId: string;
   petitionName: string | null;
@@ -39,6 +40,7 @@ const email: Email<PetitionCompletedProps> = {
   },
   text(
     {
+      isSigned,
       name,
       petitionId,
       petitionName,
@@ -53,9 +55,10 @@ const email: Email<PetitionCompletedProps> = {
       ${intl.formatMessage(
         {
           id: "petition-completed.text",
-          defaultMessage: "{recipient} completed the petition you sent to him.",
+          defaultMessage:
+            "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him.",
         },
-        { recipient: recipientNameOrEmail }
+        { recipient: recipientNameOrEmail, signed: isSigned }
       )}
 
       ${
@@ -86,6 +89,7 @@ const email: Email<PetitionCompletedProps> = {
     assetsUrl,
     logoUrl,
     logoAlt,
+    isSigned,
   }: PetitionCompletedProps) {
     const { locale } = useIntl();
     return (
@@ -101,9 +105,10 @@ const email: Email<PetitionCompletedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-completed.text"
-                defaultMessage="{recipient} completed the petition you sent to him."
+                defaultMessage="{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
                 values={{
                   recipient: <b>{recipientNameOrEmail}</b>,
+                  signed: isSigned,
                 }}
               />
             </MjmlText>
@@ -152,6 +157,7 @@ function AccessInfoButton({ href }: { href: string }) {
 }
 
 export const props: PetitionCompletedProps = {
+  isSigned: true,
   name: "Derek",
   petitionId: "1234567890",
   petitionName: "Declaración de la renta",

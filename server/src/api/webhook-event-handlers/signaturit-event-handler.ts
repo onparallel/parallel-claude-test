@@ -118,6 +118,17 @@ async function documentCompleted(
     petition.org_id
   );
 
+  const contact = await ctx.contacts.loadContactByEmail({
+    orgId: petition.org_id,
+    email: data.document.email,
+  });
+
+  if (!contact) {
+    throw new Error(
+      `Can't find contact on Org ${petition.org_id} with email ${data.document.email}`
+    );
+  }
+
   const signaturitIntegration = orgIntegration.find(
     (i) => i.type === "SIGNATURE" && i.provider === "SIGNATURIT"
   );
@@ -173,16 +184,20 @@ async function documentCompleted(
     }
   );
 
-  await appendEventLogs(petitionId, data, ctx);
-
-  await ctx.petitions.createEvent({
-    type: "SIGNATURE_COMPLETED",
-    petitionId,
-    data: {
-      petition_signature_request_id: signatureRequest.id,
-      file_upload_id: file.id,
-    },
-  });
+  await Promise.all([
+    ctx.emails.sendPetitionCompletedEmail(petition.id, {
+      contactId: contact.id,
+    }),
+    appendEventLogs(petitionId, data, ctx),
+    ctx.petitions.createEvent({
+      type: "SIGNATURE_COMPLETED",
+      petitionId,
+      data: {
+        petition_signature_request_id: signatureRequest.id,
+        file_upload_id: file.id,
+      },
+    }),
+  ]);
 }
 
 async function fetchPetitionSignature(

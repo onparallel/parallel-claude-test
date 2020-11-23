@@ -1,40 +1,60 @@
 import { pick } from "remeda";
 import { WorkerContext } from "../../context";
-import { EmailLog } from "../../db/__types";
+import { Contact, EmailLog, PetitionAccess } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/components/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { Maybe } from "../../util/types";
 
 export async function petitionCompleted(
-  payload: { petition_access_id: number },
+  payload: {
+    petition_id: number;
+    petition_access_id?: number;
+    signer_contact_id?: number;
+  },
   context: WorkerContext
 ) {
-  const access = await context.petitions.loadAccess(payload.petition_access_id);
-  if (!access) {
-    throw new Error(`Access not found for id ${payload.petition_access_id}`);
+  let access: Maybe<PetitionAccess> = null;
+  let contact: Maybe<Contact> = null;
+  if (!payload.petition_access_id && !payload.signer_contact_id) {
+    throw new Error(`Required param not found ${JSON.stringify(payload)}`);
   }
-  const [petition, permissions, contact, fields] = await Promise.all([
-    context.petitions.loadPetition(access.petition_id),
-    context.petitions.loadUserPermissions(access.petition_id),
-    context.contacts.loadContact(access.contact_id),
-    context.petitions.loadFieldsForPetition(access.petition_id),
-  ]);
-  if (!petition) {
+  if (payload.petition_access_id) {
+    // if payload.petition_access_id is set, the petition has been completed and doesn't require signature
+    access = await context.petitions.loadAccess(payload.petition_access_id);
+    if (!access) {
+      throw new Error(`Access not found for id ${payload.petition_access_id}`);
+    }
+    contact = await context.contacts.loadContact(access.contact_id);
+  } else if (payload.signer_contact_id) {
+    // if payload.signer_contact_id is set, the petition has been completed and signed by the contact
+    contact = await context.contacts.loadContact(payload.signer_contact_id);
+  }
+
+  if (!contact) {
     throw new Error(
-      `Petition not found for petition_access.petition_id ${access.petition_id}`
+      `Contact not found for contact_id ${
+        access?.contact_id ?? payload.signer_contact_id
+      }`
     );
+  }
+  const petitionId = payload.petition_id;
+  const [petition, permissions, fields] = await Promise.all([
+    context.petitions.loadPetition(petitionId),
+    context.petitions.loadUserPermissions(petitionId),
+    context.petitions.loadFieldsForPetition(petitionId),
+  ]);
+
+  if (!petition) {
+    throw new Error(`Petition not found for id ${petitionId}`);
   }
 
   if (!permissions || permissions.length === 0) {
     return;
   }
-  if (!contact) {
-    throw new Error(
-      `Contact not found for petition_access.contact_id ${access.contact_id}`
-    );
-  }
+
   const [org, logoUrl] = await Promise.all([
     context.organizations.loadOrg(petition!.org_id),
     context.organizations.getOrgLogoUrl(petition!.org_id),
@@ -51,8 +71,9 @@ export async function petitionCompleted(
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
+        isSigned: Boolean(payload.signer_contact_id ?? false),
         name: user!.first_name,
-        petitionId: toGlobalId("Petition", access.petition_id),
+        petitionId: toGlobalId("Petition", petitionId),
         petitionName: petition!.name,
         contactNameOrEmail:
           fullName(contact.first_name, contact.last_name) || contact.email,

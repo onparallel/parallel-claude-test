@@ -59,6 +59,7 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   PETITION_COMPLETED: {
     petition_id: number;
     access_id: number;
+    requiresSignature: boolean;
   };
   /** User logs in */
   USER_LOGGED_IN: { user_id: number; email: string; org_id: number };

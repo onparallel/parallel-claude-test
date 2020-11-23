@@ -179,7 +179,8 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
 });
 
 export const publicCompletePetition = mutationField("publicCompletePetition", {
-  description: "Marks a filled petition as ready for review.",
+  description:
+    "Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.",
   type: "PublicPetition",
   args: {
     keycode: idArg({ required: true }),
@@ -191,8 +192,12 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       ctx.access!.id
     );
 
-    const config = petition.signature_config as { contactIds: number[] };
-    if (config && config.contactIds.length > 0) {
+    const signatureConfig = petition.signature_config as {
+      contactIds: number[];
+    };
+    const requiresSignature =
+      signatureConfig && signatureConfig.contactIds.length > 0;
+    if (requiresSignature) {
       const signatureRequest = await ctx.petitions.createPetitionSignature(
         petition.id,
         petition.signature_config
@@ -204,13 +209,17 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
           payload: { petitionSignatureRequestId: signatureRequest.id },
         },
       });
+    } else {
+      await ctx.emails.sendPetitionCompletedEmail(petition.id, {
+        accessIds: ctx.access!.id,
+      });
     }
-    await ctx.emails.sendPetitionCompletedEmail(ctx.access!.id);
     ctx.analytics.trackEvent(
       "PETITION_COMPLETED",
       {
         access_id: ctx.access!.id,
         petition_id: petition.id,
+        requiresSignature,
       },
       toGlobalId("User", ctx.access!.granter_id)
     );

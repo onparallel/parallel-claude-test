@@ -20,7 +20,11 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
   resolve: async (_, { petitionId }, ctx) => {
-    const petition = await ctx.petitions.loadPetition(petitionId);
+    const petition = await ctx.petitions.updatePetition(
+      petitionId,
+      { status: "COMPLETED" },
+      ctx.user!
+    );
     if (!petition) {
       throw new Error(`Petition with id ${petitionId} not found`);
     }

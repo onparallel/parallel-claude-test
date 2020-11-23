@@ -181,8 +181,8 @@
   },
   {
     "term": "petition-completed.text",
-    "definition": "{recipient} ha completado la petición que le enviaste.",
-    "context": "{recipient} completed the petition you sent to him."
+    "definition": "{recipient} ha completado {signed, select, true{y firmado } other{}}la petición que le enviaste.",
+    "context": "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
   },
   {
     "term": "petition-reminder.subject",
@@ -226,13 +226,8 @@
   },
   {
     "term": "signature-cancelled.text",
-    "definition": "Te avisamos que {senderName} ({senderEmail}) ha cancelado el proceso de firma enviado a través de {signatureProvider}.",
-    "context": "This is to let you know that {senderName} ({senderEmail}) has cancelled the signing process sent through {signatureProvider}."
-  },
-  {
-    "term": "signature-cancelled.text-2",
-    "definition": "Documento cancelado: {documentName}",
-    "context": "Document cancelled: {documentName}."
+    "definition": "El proceso de firma enviado a través de {signatureProvider} ha sido cancelado por el remitente.",
+    "context": "The signing process sent through {signatureProvider} has been cancelled by the sender."
   },
   {
     "term": "signature-completed.subject",
@@ -241,13 +236,13 @@
   },
   {
     "term": "signature-completed.text",
-    "definition": "Encontrarás adjunta una copia del documento enviado por {senderName} ({senderEmail}) que acabas de firmar a través de {signatureProvider}.",
-    "context": "Please find attached a copy of the document sent by {senderName} ({senderEmail}) that you just signed through {signatureProvider}."
+    "definition": "Adjuntamos una copia del documento acabado de firmar a través de {signatureProvider}.",
+    "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
   },
   {
     "term": "signature-requested.external-link",
     "definition": "Para revisar y firmar el documento, haz click en el siguiente enlace:",
-    "context": "To review and sign the document, click on the following link:"
+    "context": "To review and sign it, click on the following link:"
   },
   {
     "term": "signature-requested.subject",
@@ -256,8 +251,8 @@
   },
   {
     "term": "signature-requested.text",
-    "definition": "{senderName} ({senderEmail}) te ha enviado un documento que requiere tu firma.",
-    "context": "{senderName} ({senderEmail}) has sent you a document requiring your signature."
+    "definition": "Ha recibido una petición para firmar un documento con el nombre de {documentName}.",
+    "context": "You have received a signature request to sign a document named {documentName}"
   },
   {
     "term": "template-sharing-notification.access-button",

@@ -234,9 +234,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signButton: "{{sign_button}}",
           signerName: "{{signer_name}}",
-          senderEmail: "{{sender_email}}",
-          documentName: opts.templateData?.documentName ?? "",
-          senderName: opts.templateData?.senderFirstName ?? "",
+          documentName: "{{filename}}",
           logoUrl: opts.templateData?.logoUrl ?? "",
           logoAlt: opts.templateData?.logoAlt ?? "",
           parallelUrl: this.config.misc.parallelUrl,
@@ -249,9 +247,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
-          senderEmail: "{{sender_email}}",
-          senderName: opts.templateData?.senderFirstName ?? "",
-          documentName: opts.templateData?.documentName ?? "",
+          documentName: "{{filename}}",
           logoUrl: opts.templateData?.logoUrl ?? "",
           logoAlt: opts.templateData?.logoAlt ?? "",
           parallelUrl: this.config.misc.parallelUrl,
@@ -264,9 +260,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
-          senderEmail: "{{sender_email}}",
-          senderName: opts.templateData?.senderFirstName ?? "",
-          documentName: opts.templateData?.documentName ?? "",
+          documentName: "{{filename}}",
           logoUrl: opts.templateData?.logoUrl ?? "",
           logoAlt: opts.templateData?.logoAlt ?? "",
           parallelUrl: this.config.misc.parallelUrl,

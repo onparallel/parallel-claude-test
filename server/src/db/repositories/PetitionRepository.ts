@@ -1203,8 +1203,10 @@ export class PetitionRepository extends BaseRepository {
 
         return updated;
       });
-      await this.createEvent_old(petitionId, "PETITION_COMPLETED", {
-        petition_access_id: accessId,
+      await this.createEvent({
+        petitionId,
+        type: "PETITION_COMPLETED",
+        data: { petition_access_id: accessId },
       });
       return petition;
     } else {

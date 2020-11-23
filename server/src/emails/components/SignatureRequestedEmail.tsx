@@ -12,8 +12,6 @@ import { closing, greeting } from "../common/texts";
 export type SignatureRequestedProps = {
   signerName: string | null;
   documentName: string | null;
-  senderName: string;
-  senderEmail: string;
   signButton: string;
 } & LayoutProps;
 
@@ -35,12 +33,7 @@ const email: Email<SignatureRequestedProps> = {
     );
   },
   text(
-    {
-      signerName: name,
-      senderEmail,
-      senderName,
-      signButton,
-    }: SignatureRequestedProps,
+    { signerName: name, documentName, signButton }: SignatureRequestedProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -49,15 +42,14 @@ const email: Email<SignatureRequestedProps> = {
         {
           id: "signature-requested.text",
           defaultMessage:
-            "{senderName} ({senderEmail}) has sent you a document requiring your signature.",
+            "You have received a signature request to sign a document named {documentName}",
         },
-        { senderName, senderEmail }
+        { documentName }
       )}
 
       ${intl.formatMessage({
         id: "signature-requested.external-link",
-        defaultMessage:
-          "To review and sign the document, click on the following link:",
+        defaultMessage: "To review and sign it, click on the following link:",
       })}
 
       ${signButton}
@@ -71,8 +63,6 @@ const email: Email<SignatureRequestedProps> = {
     parallelUrl,
     logoAlt,
     logoUrl,
-    senderEmail,
-    senderName,
     signButton,
     documentName,
   }: SignatureRequestedProps) {
@@ -97,10 +87,9 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"
-                defaultMessage="{senderName} ({senderEmail}) has sent you a document requiring your signature."
+                defaultMessage="You have received a signature request to sign a document named {documentName}"
                 values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
+                  documentName,
                 }}
               />
             </MjmlText>
@@ -108,7 +97,7 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.external-link"
-                defaultMessage="To review and sign the document, click on the following link:"
+                defaultMessage="To review and sign it, click on the following link:"
               />
             </MjmlText>
 
@@ -129,8 +118,6 @@ export default email;
 export const props: SignatureRequestedProps = {
   signerName: "Derek",
   documentName: "Know your Client (KYC)",
-  senderName: "Mariano",
-  senderEmail: "mariano@parallel.so",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
   logoUrl: "http://localhost/static/emails/logo.png",

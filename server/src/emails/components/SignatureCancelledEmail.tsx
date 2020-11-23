@@ -12,8 +12,6 @@ import { closing, greeting } from "../common/texts";
 export type SignatureCompletedProps = {
   documentName: string | null;
   signerName: string | null;
-  senderEmail: string | null;
-  senderName: string;
   signatureProvider: string;
 } & LayoutProps;
 
@@ -36,13 +34,7 @@ const email: Email<SignatureCompletedProps> = {
     );
   },
   text(
-    {
-      senderName,
-      senderEmail,
-      signerName,
-      signatureProvider,
-      documentName,
-    }: SignatureCompletedProps,
+    { signerName, signatureProvider, documentName }: SignatureCompletedProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -51,26 +43,17 @@ const email: Email<SignatureCompletedProps> = {
         {
           id: "signature-cancelled.text",
           defaultMessage:
-            "This is to let you know that {senderName} ({senderEmail}) has cancelled the signing process sent through {signatureProvider}.",
+            "The signing process sent through {signatureProvider} has been cancelled by the sender.",
         },
-        { senderName, senderEmail, signatureProvider }
+        { signatureProvider }
       )}
 
-      ${intl.formatMessage(
-        {
-          id: "signature-cancelled.text-2",
-          defaultMessage: "Document cancelled: {documentName}.",
-        },
-        { documentName }
-      )}
 
       ${closing({}, intl)}
     `;
   },
   html({
     signerName,
-    senderEmail,
-    senderName,
     assetsUrl,
     parallelUrl,
     logoAlt,
@@ -100,21 +83,9 @@ const email: Email<SignatureCompletedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled.text"
-                defaultMessage="This is to let you know that {senderName} ({senderEmail}) has cancelled the signing process sent through {signatureProvider}."
+                defaultMessage="The signing process sent through {signatureProvider} has been cancelled by the sender."
                 values={{
-                  senderName: <b>{senderName}</b>,
-                  senderEmail: <b>{senderEmail}</b>,
                   signatureProvider,
-                }}
-              />
-            </MjmlText>
-
-            <MjmlText>
-              <FormattedMessage
-                id="signature-cancelled.text-2"
-                defaultMessage="Document cancelled: {documentName}."
-                values={{
-                  documentName,
                 }}
               />
             </MjmlText>
@@ -131,8 +102,6 @@ export default email;
 export const props: SignatureCompletedProps = {
   signatureProvider: "Signaturit",
   documentName: "Know Your Client (KYC)",
-  senderName: "Mariano",
-  senderEmail: "mariano@parallel.so",
   signerName: "Mariano",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",

@@ -7,7 +7,16 @@ import { EmailPayload } from "../workers/email-sender";
 export interface IEmailsService {
   sendPetitionMessageEmail(messageIds: MaybeArray<number>): Promise<void>;
   sendPetitionReminderEmail(reminderIds: MaybeArray<number>): Promise<void>;
-  sendPetitionCompletedEmail(accessIds: MaybeArray<number>): Promise<void>;
+  sendPetitionCompletedEmail(
+    petitionId: number,
+    {
+      accessIds,
+      contactId,
+    }: {
+      accessIds?: MaybeArray<number>;
+      contactId?: number;
+    }
+  ): Promise<void>;
   sendPetitionCommentsContactNotificationEmail(
     petitionId: number,
     userId: number,
@@ -78,14 +87,28 @@ export class EmailsService implements IEmailsService {
     );
   }
 
-  async sendPetitionCompletedEmail(accessIds: MaybeArray<number>) {
-    return await this.enqueueEmail(
-      "petition-completed",
-      unMaybeArray(accessIds).map((accessId) => ({
-        id: this.buildQueueId("PetitionAccess", accessId),
-        petition_access_id: accessId,
-      }))
-    );
+  async sendPetitionCompletedEmail(
+    petitionId: number,
+    {
+      accessIds,
+      contactId,
+    }: {
+      accessIds?: MaybeArray<number>;
+      contactId?: number;
+    }
+  ) {
+    const payload = accessIds
+      ? unMaybeArray(accessIds).map((accessId) => ({
+          id: this.buildQueueId("PetitionAccess", accessId),
+          petition_id: petitionId,
+          petition_access_id: accessId,
+        }))
+      : {
+          id: this.buildQueueId("PetitionSigned", petitionId),
+          petition_id: petitionId,
+          signer_contact_id: contactId,
+        };
+    return await this.enqueueEmail("petition-completed", payload);
   }
 
   async sendPetitionCommentsContactNotificationEmail(
