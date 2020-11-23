@@ -23,14 +23,11 @@ const email: Email<SignatureCompletedProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ documentName }: SignatureCompletedProps, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "signature-completed.subject",
-        defaultMessage: 'Signed document containing "{documentName}"',
-      },
-      { documentName }
-    );
+  subject(_, intl: IntlShape) {
+    return intl.formatMessage({
+      id: "signature-completed.subject",
+      defaultMessage: "Signature completed on Petition",
+    });
   },
   text(
     { signerName, signatureProvider }: SignatureCompletedProps,
@@ -57,7 +54,6 @@ const email: Email<SignatureCompletedProps> = {
     logoAlt,
     logoUrl,
     signatureProvider,
-    documentName,
   }: SignatureCompletedProps) {
     const intl = useIntl();
     return (
@@ -66,13 +62,10 @@ const email: Email<SignatureCompletedProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        title={intl.formatMessage(
-          {
-            id: "signature-completed.subject",
-            defaultMessage: 'Signed document containing "{documentName}"',
-          },
-          { documentName }
-        )}
+        title={intl.formatMessage({
+          id: "signature-completed.subject",
+          defaultMessage: "Signature completed on Petition",
+        })}
       >
         <MjmlSection>
           <MjmlColumn>

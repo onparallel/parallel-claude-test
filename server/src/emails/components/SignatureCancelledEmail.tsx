@@ -23,15 +23,11 @@ const email: Email<SignatureCompletedProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ documentName }: SignatureCompletedProps, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "signature-cancelled.subject",
-        defaultMessage:
-          'Cancelled signature request containing "{documentName}"',
-      },
-      { documentName }
-    );
+  subject(_, intl: IntlShape) {
+    return intl.formatMessage({
+      id: "signature-cancelled.subject",
+      defaultMessage: "Cancelled signature request on Petition",
+    });
   },
   text(
     { signerName, signatureProvider, documentName }: SignatureCompletedProps,
@@ -59,7 +55,6 @@ const email: Email<SignatureCompletedProps> = {
     logoAlt,
     logoUrl,
     signatureProvider,
-    documentName,
   }: SignatureCompletedProps) {
     const intl = useIntl();
     return (
@@ -68,14 +63,10 @@ const email: Email<SignatureCompletedProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        title={intl.formatMessage(
-          {
-            id: "signature-cancelled.subject",
-            defaultMessage:
-              'Cancelled signature request containing "{documentName}"',
-          },
-          { documentName }
-        )}
+        title={intl.formatMessage({
+          id: "signature-cancelled.subject",
+          defaultMessage: "Cancelled signature request on Petition",
+        })}
       >
         <MjmlSection>
           <MjmlColumn>

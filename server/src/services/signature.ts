@@ -34,10 +34,8 @@ type SignerBox = {
 export type SignatureOptions = {
   locale: string;
   templateData?: {
-    senderFirstName: string;
     logoUrl: string;
     logoAlt: string;
-    documentName: string;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";

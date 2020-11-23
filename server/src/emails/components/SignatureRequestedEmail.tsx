@@ -23,14 +23,11 @@ const email: Email<SignatureRequestedProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ documentName }: SignatureRequestedProps, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "signature-requested.subject",
-        defaultMessage: 'Signature request containing "{documentName}"',
-      },
-      { documentName }
-    );
+  subject(_, intl: IntlShape) {
+    return intl.formatMessage({
+      id: "signature-requested.subject",
+      defaultMessage: "Signature request on Petition",
+    });
   },
   text(
     { signerName: name, documentName, signButton }: SignatureRequestedProps,
@@ -73,13 +70,10 @@ const email: Email<SignatureRequestedProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
-        title={intl.formatMessage(
-          {
-            id: "signature-requested.subject",
-            defaultMessage: 'Signature request containing "{documentName}"',
-          },
-          { documentName }
-        )}
+        title={intl.formatMessage({
+          id: "signature-requested.subject",
+          defaultMessage: "Signature request on Petition",
+        })}
       >
         <MjmlSection>
           <MjmlColumn>
