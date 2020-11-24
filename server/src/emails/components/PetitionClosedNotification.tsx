@@ -3,15 +3,14 @@ import outdent from "outdent";
 import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Email } from "../buildEmail";
-
 import { Disclaimer } from "../common/Disclaimer";
-import { Greeting } from "../common/Greeting";
+import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-
 import { RenderSlate } from "../common/RenderSlate";
-import { disclaimer, greeting, renderSlateText } from "../common/texts";
+import { disclaimer, greetingFormal, renderSlateText } from "../common/texts";
 
 export type PetitionClosedNotificationProps = {
+  contactFullName: string | null;
   senderName: string;
   senderEmail: string;
   body: any | null;
@@ -36,14 +35,14 @@ const email: Email<PetitionClosedNotificationProps> = {
       { senderName }
     );
   },
-  text({ senderName, senderEmail, body }, intl) {
+  text({ contactFullName, senderName, senderEmail, body }, intl) {
     return outdent`
-      ${greeting({ name: null }, intl)}
+      ${greetingFormal({ fullName: contactFullName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-closed-notification.text",
           defaultMessage:
-            "{senderName} ({senderEmail}) has confirmed receipt of the information.",
+            "{senderName} ({senderEmail}) has received and reviewed the information.",
         },
         { senderName, senderEmail }
       )}
@@ -55,6 +54,7 @@ const email: Email<PetitionClosedNotificationProps> = {
     `;
   },
   html({
+    contactFullName,
     senderName,
     senderEmail,
     body,
@@ -69,14 +69,15 @@ const email: Email<PetitionClosedNotificationProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        showGdprDisclaimer
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <Greeting name={null} />
+            <GreetingFormal fullName={contactFullName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-closed-notification.text"
-                defaultMessage="{senderName} ({senderEmail}) has confirmed receipt of the information."
+                defaultMessage="{senderName} ({senderEmail}) has received and reviewed the information."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
@@ -105,6 +106,7 @@ const email: Email<PetitionClosedNotificationProps> = {
 export default email;
 
 export const props: PetitionClosedNotificationProps = {
+  contactFullName: "Derek Lou",
   senderName: "Santi",
   senderEmail: "santi@parallel.so",
   body: [

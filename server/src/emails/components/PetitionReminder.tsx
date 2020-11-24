@@ -6,17 +6,17 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { Greeting } from "../common/Greeting";
+import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldList,
   PetitionFieldListProps,
 } from "../common/PetitionFieldList";
-import { disclaimer, greeting, petitionFieldList } from "../common/texts";
+import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
-  name: string | null;
+  fullName: string | null;
   senderName: string;
   senderEmail: string;
   fields: PetitionFieldListProps["fields"];
@@ -45,7 +45,7 @@ const email: Email<PetitionReminderProps> = {
   },
   text(
     {
-      name,
+      fullName,
       senderName,
       senderEmail,
       fields,
@@ -56,12 +56,12 @@ const email: Email<PetitionReminderProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greeting({ name }, intl)}
+      ${greetingFormal({ fullName }, intl)}
       ${intl.formatMessage(
         {
           id: "reminder.text",
           defaultMessage:
-            "Remember that {senderName} ({senderEmail}) sent you a petition.",
+            "We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending.",
         },
         { senderName, senderEmail }
       )}
@@ -75,13 +75,14 @@ const email: Email<PetitionReminderProps> = {
                     {
                       id: "generic.submit-text.with-deadline",
                       defaultMessage:
-                        "Please submit the following information before {deadline}:",
+                        "This is the information that has been requested to be submitted before {deadline}:",
                     },
                     { deadline: intl.formatDate(deadline, FORMATS.LLL) }
                   )
                 : intl.formatMessage({
                     id: "generic.submit-text.without-deadline",
-                    defaultMessage: "Please submit the following information:",
+                    defaultMessage:
+                      "This is the information that has been requested:",
                   })
             }
             ${petitionFieldList({ fields }, intl)}`
@@ -106,7 +107,7 @@ const email: Email<PetitionReminderProps> = {
     `;
   },
   html({
-    name,
+    fullName,
     senderName,
     senderEmail,
     fields,
@@ -124,14 +125,15 @@ const email: Email<PetitionReminderProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        showGdprDisclaimer
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <Greeting name={name} />
+            <GreetingFormal fullName={fullName} />
             <MjmlText>
               <FormattedMessage
                 id="reminder.text"
-                defaultMessage="Remember that {senderName} ({senderEmail}) sent you a petition."
+                defaultMessage="We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
@@ -153,7 +155,7 @@ const email: Email<PetitionReminderProps> = {
                   {deadline ? (
                     <FormattedMessage
                       id="generic.submit-text.with-deadline"
-                      defaultMessage="Please submit the following information before {deadline}:"
+                      defaultMessage="This is the information that has been requested to be submitted before {deadline}:"
                       values={{
                         deadline: (
                           <span style={{ textDecoration: "underline" }}>
@@ -165,7 +167,7 @@ const email: Email<PetitionReminderProps> = {
                   ) : (
                     <FormattedMessage
                       id="generic.submit-text.without-deadline"
-                      defaultMessage="Please submit the following information:"
+                      defaultMessage="This is the information that has been requested:"
                     />
                   )}
                 </MjmlText>
@@ -198,7 +200,7 @@ const email: Email<PetitionReminderProps> = {
 export default email;
 
 export const props: PetitionReminderProps = {
-  name: "Santi",
+  fullName: "Santi Albo",
   senderName: "Derek",
   senderEmail: "derek@parallel.so",
   deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),

@@ -6,7 +6,7 @@ import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
-import { Greeting } from "../common/Greeting";
+import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import {
   PetitionFieldList,
@@ -15,7 +15,7 @@ import {
 import { RenderSlate } from "../common/RenderSlate";
 import {
   disclaimer,
-  greeting,
+  greetingFormal,
   petitionFieldList,
   renderSlateText,
 } from "../common/texts";
@@ -23,6 +23,7 @@ import { FORMATS } from "../utils/dates";
 
 export type PetitionMessageProps = {
   name: string | null;
+  fullName: string | null;
   senderName: string;
   senderEmail: string;
   fields: PetitionFieldListProps["fields"];
@@ -48,6 +49,7 @@ const email: Email<PetitionMessageProps> = {
   text(
     {
       name,
+      fullName,
       senderName,
       senderEmail,
       fields,
@@ -59,11 +61,12 @@ const email: Email<PetitionMessageProps> = {
     intl
   ) {
     return outdent`
-      ${greeting({ name }, intl)}
+      ${greetingFormal({ fullName }, intl)}
       ${intl.formatMessage(
         {
           id: "new-petition.text",
-          defaultMessage: "{senderName} ({senderEmail}) sent you a petition:",
+          defaultMessage:
+            "{senderName} ({senderEmail}) has sent you the following petition:",
         },
         { senderName, senderEmail }
       )}
@@ -76,13 +79,14 @@ const email: Email<PetitionMessageProps> = {
               {
                 id: "generic.submit-text.with-deadline",
                 defaultMessage:
-                  "Please submit the following information before {deadline}:",
+                  "This is the information that has been requested to be submitted before {deadline}:",
               },
               { deadline: intl.formatDate(deadline, FORMATS.LLL) }
             )
           : intl.formatMessage({
               id: "generic.submit-text.without-deadline",
-              defaultMessage: "Please submit the following information:",
+              defaultMessage:
+                "This is the information that has been requested:",
             })
       }
       ${petitionFieldList({ fields }, intl)}
@@ -99,6 +103,7 @@ const email: Email<PetitionMessageProps> = {
   },
   html({
     name,
+    fullName,
     senderName,
     senderEmail,
     fields,
@@ -118,14 +123,15 @@ const email: Email<PetitionMessageProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        showGdprDisclaimer
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <Greeting name={name} />
+            <GreetingFormal fullName={fullName} />
             <MjmlText>
               <FormattedMessage
                 id="new-petition.text"
-                defaultMessage="{senderName} ({senderEmail}) sent you a petition:"
+                defaultMessage="{senderName} ({senderEmail}) has sent you the following petition:"
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
@@ -154,7 +160,7 @@ const email: Email<PetitionMessageProps> = {
               {deadline ? (
                 <FormattedMessage
                   id="generic.submit-text.with-deadline"
-                  defaultMessage="Please submit the following information before {deadline}:"
+                  defaultMessage="This is the information that has been requested to be submitted before {deadline}:"
                   values={{
                     deadline: (
                       <span style={{ textDecoration: "underline" }}>
@@ -166,7 +172,7 @@ const email: Email<PetitionMessageProps> = {
               ) : (
                 <FormattedMessage
                   id="generic.submit-text.without-deadline"
-                  defaultMessage="Please submit the following information:"
+                  defaultMessage="This is the information that has been requested:"
                 />
               )}
             </MjmlText>
@@ -187,6 +193,7 @@ export default email;
 
 export const props: PetitionMessageProps = {
   name: "Derek",
+  fullName: "Derek Lou",
   senderName: "Santi",
   senderEmail: "santi@parallel.so",
   subject: null,

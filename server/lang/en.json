@@ -45,6 +45,11 @@
     "context": "{senderName} (via Parallel)"
   },
   {
+    "term": "gdpr.processor-disclaimer",
+    "definition": "Under the provisions of Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016 regarding the protection of natural persons with regard to the processing of personal data and on the free movement of such data, you are informed that Parallel Solutions, SL has sent you this email in fulfillment of the order received for the provision of services regarding the management of information workflows. You can contact the data controller to exercise your rights.",
+    "context": "Under the provisions of Regulation (EU) 2016/679 of the European Parliament and of the Council of April 27, 2016 regarding the protection of natural persons with regard to the processing of personal data and on the free movement of such data, you are informed that Parallel Solutions, SL has sent you this email in fulfillment of the order received for the provision of services regarding the management of information workflows. You can contact the data controller to exercise your rights."
+  },
+  {
     "term": "generic.complete-information-button",
     "definition": "Complete the information here",
     "context": "Complete the information here"
@@ -56,13 +61,13 @@
   },
   {
     "term": "generic.submit-text.with-deadline",
-    "definition": "Please submit the following information before {deadline}:",
-    "context": "Please submit the following information before {deadline}:"
+    "definition": "This is the information that has been requested to be submitted before {deadline}:",
+    "context": "This is the information that has been requested to be submitted before {deadline}:"
   },
   {
     "term": "generic.submit-text.without-deadline",
-    "definition": "Please submit the following information:",
-    "context": "Please submit the following information:"
+    "definition": "This is the information that has been requested:",
+    "context": "This is the information that has been requested:"
   },
   {
     "term": "generic.untitled-field",
@@ -83,6 +88,11 @@
     "term": "greeting",
     "definition": "{name, select, null {Hi,} other {Hi {name},}}",
     "context": "{name, select, null {Hi,} other {Hi {name},}}"
+  },
+  {
+    "term": "greeting.formal",
+    "definition": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
+    "context": "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
   },
   {
     "term": "invitation.details",
@@ -111,8 +121,8 @@
   },
   {
     "term": "new-petition.text",
-    "definition": "{senderName} ({senderEmail}) sent you a petition:",
-    "context": "{senderName} ({senderEmail}) sent you a petition:"
+    "definition": "{senderName} ({senderEmail}) has sent you the following petition:",
+    "context": "{senderName} ({senderEmail}) has sent you the following petition:"
   },
   {
     "term": "petition-closed-notification.subject",
@@ -121,8 +131,8 @@
   },
   {
     "term": "petition-closed-notification.text",
-    "definition": "{senderName} ({senderEmail}) has confirmed receipt of the information.",
-    "context": "{senderName} ({senderEmail}) has confirmed receipt of the information."
+    "definition": "{senderName} ({senderEmail}) has received and reviewed the information.",
+    "context": "{senderName} ({senderEmail}) has received and reviewed the information."
   },
   {
     "term": "petition-comments-contact-notification.access-button",
@@ -136,8 +146,8 @@
   },
   {
     "term": "petition-comments-contact-notification.intro-text",
-    "definition": "{ name } commented on your petition:",
-    "context": "{ name } commented on your petition:"
+    "definition": "{ name } ({ email }) has included comments to the information. You can review them below:",
+    "context": "{ name } ({ email }) has included comments to the information. You can review them below:"
   },
   {
     "term": "petition-comments-contact-notification.subject",
@@ -216,8 +226,8 @@
   },
   {
     "term": "reminder.text",
-    "definition": "Remember that {senderName} ({senderEmail}) sent you a petition.",
-    "context": "Remember that {senderName} ({senderEmail}) sent you a petition."
+    "definition": "We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending.",
+    "context": "We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending."
   },
   {
     "term": "signature-cancelled.subject",

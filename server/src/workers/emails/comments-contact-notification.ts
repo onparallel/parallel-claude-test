@@ -70,7 +70,8 @@ export async function commentsContactNotification(
         PetitionCommentsContactNotification,
         {
           authorName: fullName(author.first_name, author.last_name),
-          contactName: contact.first_name,
+          authorEmail: author.email,
+          contactFullName: fullName(contact.first_name, contact.last_name),
           keycode: access.keycode,
           fields,
           assetsUrl: context.config.misc.assetsUrl,

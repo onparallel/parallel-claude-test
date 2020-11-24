@@ -18,6 +18,7 @@ import {
 } from "mjml-react";
 import React, { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { GdprDisclaimer } from "./GdprDisclaimer";
 
 export type LayoutProps = {
   title?: string;
@@ -25,6 +26,7 @@ export type LayoutProps = {
   logoUrl: string;
   logoAlt: string;
   assetsUrl: string;
+  showGdprDisclaimer?: boolean;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -34,6 +36,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   logoAlt,
   assetsUrl,
   children,
+  showGdprDisclaimer,
 }) {
   const { locale } = useIntl();
   return (
@@ -136,6 +139,11 @@ export const Layout: FC<LayoutProps> = function Layout({
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
+        {showGdprDisclaimer ? (
+          <MjmlSection>
+            <GdprDisclaimer />
+          </MjmlSection>
+        ) : null}
       </MjmlBody>
     </Mjml>
   );

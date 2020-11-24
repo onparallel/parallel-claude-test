@@ -13,3 +13,15 @@ export function Greeting({ name }: { name: string | null }) {
     </MjmlText>
   );
 }
+
+export function GreetingFormal({ fullName }: { fullName: string | null }) {
+  return (
+    <MjmlText>
+      <FormattedMessage
+        id="greeting.formal"
+        defaultMessage="{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}"
+        values={{ fullName }}
+      />
+    </MjmlText>
+  );
+}

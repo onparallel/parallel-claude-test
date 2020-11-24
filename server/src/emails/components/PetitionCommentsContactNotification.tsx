@@ -4,18 +4,18 @@ import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
-import { Closing } from "../common/Closing";
-import { Greeting } from "../common/Greeting";
+import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
 import {
-  PetitionFieldAndCommentsProps,
   PetitionFieldAndComments,
+  PetitionFieldAndCommentsProps,
 } from "../common/PetitionFieldAndCommentsList";
+import { closing, greetingFormal } from "../common/texts";
 
 export type PetitionCommentsContactNotificationProps = {
   authorName: string | null;
-  contactName: string | null;
+  authorEmail: string;
+  contactFullName: string | null;
   keycode: string;
   fields: PetitionFieldAndCommentsProps["fields"];
 } & LayoutProps;
@@ -39,20 +39,22 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
   text(
     {
       authorName,
-      contactName,
+      authorEmail,
+      contactFullName,
       keycode,
       parallelUrl,
     }: PetitionCommentsContactNotificationProps,
     intl: IntlShape
   ) {
     return outdent`
-      ${greeting({ name: contactName }, intl)}
+      ${greetingFormal({ fullName: contactFullName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-comments-contact-notification.intro-text",
-          defaultMessage: "{ name } commented on your petition:",
+          defaultMessage:
+            "{ name } ({ email }) has included comments to the information. You can review them below:",
         },
-        { name: authorName }
+        { name: authorName, email: authorEmail }
       )}
 
       ${intl.formatMessage({
@@ -66,8 +68,9 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     `;
   },
   html({
-    contactName,
     authorName,
+    authorEmail,
+    contactFullName,
     keycode,
     fields,
     parallelUrl,
@@ -82,16 +85,18 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        showGdprDisclaimer
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <Greeting name={contactName} />
+            <GreetingFormal fullName={contactFullName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-contact-notification.intro-text"
-                defaultMessage="{ name } commented on your petition:"
+                defaultMessage="{ name } ({ email }) has included comments to the information. You can review them below:"
                 values={{
                   name: <b>{authorName}</b>,
+                  email: <b>{authorEmail}</b>,
                 }}
               />
             </MjmlText>
@@ -107,7 +112,6 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
                 defaultMessage="See the comments here"
               />
             </Button>
-            <Closing />
           </MjmlColumn>
         </MjmlSection>
       </Layout>
@@ -118,8 +122,9 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
 export default email;
 
 export const props: PetitionCommentsContactNotificationProps = {
-  contactName: "Santi",
+  contactFullName: "Santi",
   authorName: "Derek",
+  authorEmail: "derek@parallel.so",
   keycode: "1234567890",
   parallelUrl: "http://localhost",
   fields: [

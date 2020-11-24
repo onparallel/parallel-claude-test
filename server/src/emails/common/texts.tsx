@@ -26,6 +26,20 @@ export function greeting({ name }: { name: string | null }, intl: IntlShape) {
   );
 }
 
+export function greetingFormal(
+  { fullName }: { fullName: string | null },
+  intl: IntlShape
+) {
+  return intl.formatMessage(
+    {
+      id: "greeting.formal",
+      defaultMessage:
+        "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
+    },
+    { fullName }
+  );
+}
+
 export function petitionFieldList(
   {
     fields,
