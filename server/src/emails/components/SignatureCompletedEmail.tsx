@@ -9,7 +9,7 @@ import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greeting } from "../common/texts";
 
-export type SignatureCompletedProps = {
+type SignatureCompletedProps = {
   documentName: string | null;
   signerName: string | null;
   signatureProvider: string;

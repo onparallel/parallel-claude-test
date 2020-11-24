@@ -9,14 +9,14 @@ import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, greeting } from "../common/texts";
 
-export type SignatureCompletedProps = {
+type SignatureCancelledProps = {
   documentName: string | null;
   signerName: string | null;
   signatureProvider: string;
 } & LayoutProps;
 
 /** Email sent to signers to let them know the signature process has been cancelled by the user. */
-const email: Email<SignatureCompletedProps> = {
+const email: Email<SignatureCancelledProps> = {
   from({}, intl) {
     return intl.formatMessage({
       id: "from.parallel-team",
@@ -30,7 +30,7 @@ const email: Email<SignatureCompletedProps> = {
     });
   },
   text(
-    { signerName, signatureProvider, documentName }: SignatureCompletedProps,
+    { signerName, signatureProvider, documentName }: SignatureCancelledProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -55,7 +55,7 @@ const email: Email<SignatureCompletedProps> = {
     logoAlt,
     logoUrl,
     signatureProvider,
-  }: SignatureCompletedProps) {
+  }: SignatureCancelledProps) {
     const intl = useIntl();
     return (
       <Layout
@@ -90,7 +90,7 @@ const email: Email<SignatureCompletedProps> = {
 
 export default email;
 
-export const props: SignatureCompletedProps = {
+export const props: SignatureCancelledProps = {
   signatureProvider: "Signaturit",
   documentName: "Know Your Client (KYC)",
   signerName: "Mariano",
