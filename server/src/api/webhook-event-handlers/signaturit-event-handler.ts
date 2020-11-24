@@ -4,7 +4,6 @@ import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
 import sanitize from "sanitize-filename";
 import { random } from "../../util/token";
-import { removeNotDefined } from "../../util/remedaExtensions";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -61,9 +60,6 @@ async function documentDeclined(
   data: SignaturItEventBody,
   ctx: ApiContext
 ) {
-  // when a document is declined, the signature request is automatically cancelled for all recipients
-  const externalId = `SIGNATURIT/${data.document.signature.id}`;
-
   const petition = await ctx.petitions.loadPetition(petitionId);
   if (!petition) {
     throw new Error(`Can't find petition with id ${petitionId}`);
@@ -74,14 +70,8 @@ async function documentDeclined(
     email: data.document.email,
   });
 
-  // remove events array from data before saving to DB
-  const cleanData = removeNotDefined<SignaturItEventBody>({
-    ...data,
-    document: { ...data.document, events: undefined },
-  });
-
   const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
-    externalId,
+    `SIGNATURIT/${data.document.signature.id}`,
     {
       status: "CANCELLED",
       cancel_reason: "DECLINED_BY_SIGNER",
@@ -89,7 +79,6 @@ async function documentDeclined(
         contact_id: contact?.id,
         decline_reason: data.document.decline_reason,
       },
-      data: cleanData,
     }
   );
 
@@ -181,19 +170,11 @@ async function documentCompleted(
     `OrgIntegration:${signaturitIntegration.id}`
   );
 
-  // remove events array from data before saving to DB
-  const cleanData = removeNotDefined<SignaturItEventBody>({
-    ...data,
-    document: { ...data.document, events: undefined },
-  });
-
-  const externalId = `SIGNATURIT/${signatureId}`;
   const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
-    externalId,
+    `SIGNATURIT/${signatureId}`,
     {
       status: "COMPLETED",
       file_upload_id: file.id,
-      data: cleanData,
     }
   );
 
