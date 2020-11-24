@@ -122,7 +122,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
 export default email;
 
 export const props: PetitionCommentsContactNotificationProps = {
-  contactFullName: "Santi",
+  contactFullName: "Santi Albo",
   authorName: "Derek",
   authorEmail: "derek@parallel.so",
   keycode: "1234567890",

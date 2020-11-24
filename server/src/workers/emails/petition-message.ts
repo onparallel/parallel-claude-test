@@ -56,7 +56,6 @@ export async function petitionMessage(
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
-      name: contact.first_name,
       fullName: fullName(contact.first_name, contact.last_name),
       senderName: fullName(sender.first_name, sender.last_name)!,
       senderEmail: sender.email,

@@ -22,7 +22,6 @@ import {
 import { FORMATS } from "../utils/dates";
 
 export type PetitionMessageProps = {
-  name: string | null;
   fullName: string | null;
   senderName: string;
   senderEmail: string;
@@ -48,7 +47,6 @@ const email: Email<PetitionMessageProps> = {
   },
   text(
     {
-      name,
       fullName,
       senderName,
       senderEmail,
@@ -102,7 +100,6 @@ const email: Email<PetitionMessageProps> = {
     `;
   },
   html({
-    name,
     fullName,
     senderName,
     senderEmail,
@@ -192,7 +189,6 @@ const email: Email<PetitionMessageProps> = {
 export default email;
 
 export const props: PetitionMessageProps = {
-  name: "Derek",
   fullName: "Derek Lou",
   senderName: "Santi",
   senderEmail: "santi@parallel.so",
