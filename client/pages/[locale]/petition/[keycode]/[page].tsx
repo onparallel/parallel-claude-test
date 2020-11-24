@@ -48,7 +48,7 @@ import {
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFragment,
   RecipientView_PublicPetitionFieldFragment,
-  RecipientView_PublicSignerFragment,
+  RecipientView_PublicContactFragment,
   RecipientView_updatePetitionFieldCommentMutationVariables,
   usePublicPetitionQuery,
   useRecipientView_createPetitionFieldCommentMutation,
@@ -506,7 +506,7 @@ function RecipientView({
 }
 
 type ConfirmStartSignatureProcessProps = {
-  signers: Maybe<RecipientView_PublicSignerFragment>[];
+  signers: Maybe<RecipientView_PublicContactFragment>[];
   contactId: string;
 };
 
@@ -580,21 +580,21 @@ RecipientView.fragments = {
           ...RecipientView_PublicPetitionField
         }
         signers {
-          ...RecipientView_PublicSigner
+          ...RecipientView_PublicContact
         }
         ...RecipientViewContentsCard_PublicPetition
         ...RecipientViewProgressFooter_PublicPetition
       }
 
       ${this.PublicPetitionField}
-      ${this.PublicSigner}
+      ${this.PublicContact}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
     `;
   },
-  get PublicSigner() {
+  get PublicContact() {
     return gql`
-      fragment RecipientView_PublicSigner on PublicContact {
+      fragment RecipientView_PublicContact on PublicContact {
         id
         fullName
         email

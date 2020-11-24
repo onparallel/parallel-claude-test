@@ -213,7 +213,7 @@ export type Mutation = {
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Checks if a PetitionClosedNotification was already sent or not */
   presendPetitionClosedNotification: Result;
-  /** Marks a filled petition as ready for review. */
+  /** Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user. */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: CreateFileUploadReply;
@@ -3956,13 +3956,13 @@ export type RecipientView_PublicPetitionFragment = {
     >;
     signers: Array<
       Maybe<
-        { __typename?: "PublicContact" } & RecipientView_PublicSignerFragment
+        { __typename?: "PublicContact" } & RecipientView_PublicContactFragment
       >
     >;
   } & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
 
-export type RecipientView_PublicSignerFragment = {
+export type RecipientView_PublicContactFragment = {
   __typename?: "PublicContact";
 } & Pick<PublicContact, "id" | "fullName" | "email">;
 
@@ -5706,8 +5706,8 @@ export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
   ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
 `;
-export const RecipientView_PublicSignerFragmentDoc = gql`
-  fragment RecipientView_PublicSigner on PublicContact {
+export const RecipientView_PublicContactFragmentDoc = gql`
+  fragment RecipientView_PublicContact on PublicContact {
     id
     fullName
     email
@@ -5743,13 +5743,13 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       ...RecipientView_PublicPetitionField
     }
     signers {
-      ...RecipientView_PublicSigner
+      ...RecipientView_PublicContact
     }
     ...RecipientViewContentsCard_PublicPetition
     ...RecipientViewProgressFooter_PublicPetition
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
-  ${RecipientView_PublicSignerFragmentDoc}
+  ${RecipientView_PublicContactFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 `;
