@@ -4,6 +4,7 @@ import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
 import sanitize from "sanitize-filename";
 import { random } from "../../util/token";
+import { removeNotDefined } from "../../util/remedaExtensions";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -73,6 +74,12 @@ async function documentDeclined(
     email: data.document.email,
   });
 
+  // remove events array from data before saving to DB
+  const cleanData = removeNotDefined<SignaturItEventBody>({
+    ...data,
+    document: { ...data.document, events: undefined },
+  });
+
   const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
     externalId,
     {
@@ -82,7 +89,7 @@ async function documentDeclined(
         contact_id: contact?.id,
         decline_reason: data.document.decline_reason,
       },
-      data,
+      data: cleanData,
     }
   );
 
@@ -174,13 +181,19 @@ async function documentCompleted(
     `OrgIntegration:${signaturitIntegration.id}`
   );
 
+  // remove events array from data before saving to DB
+  const cleanData = removeNotDefined<SignaturItEventBody>({
+    ...data,
+    document: { ...data.document, events: undefined },
+  });
+
   const externalId = `SIGNATURIT/${signatureId}`;
   const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
     externalId,
     {
       status: "COMPLETED",
       file_upload_id: file.id,
-      data,
+      data: cleanData,
     }
   );
 

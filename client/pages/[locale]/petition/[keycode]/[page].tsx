@@ -537,7 +537,7 @@ function ConfirmStartSignatureProcess({
             id="petition.finalize-start-signature.body-2"
             defaultMessage="After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
             values={{
-              i: (...chunks: any[]) => (
+              i: (chunks: any[]) => (
                 <Text as="span" fontStyle="italic">
                   {chunks}
                 </Text>
