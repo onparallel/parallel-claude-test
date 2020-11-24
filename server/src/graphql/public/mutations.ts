@@ -321,7 +321,7 @@ export const publicSubmitUnpublishedComments = mutationField(
     resolve: async (_, args, ctx) => {
       const {
         comments,
-        users,
+        userIds,
       } = await ctx.petitions.publishPetitionFieldCommentsForAccess(
         ctx.access!.petition_id,
         ctx.access!
@@ -329,7 +329,7 @@ export const publicSubmitUnpublishedComments = mutationField(
       await ctx.emails.sendPetitionCommentsUserNotificationEmail(
         ctx.access!.petition_id,
         ctx.access!.id,
-        users.map(prop("id")),
+        userIds,
         comments.map(prop("id")),
         false
       );

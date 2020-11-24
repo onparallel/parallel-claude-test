@@ -1924,17 +1924,11 @@ export class PetitionRepository extends BaseRepository {
         );
 
       // Create user notifications and events
-      const users = await this.from("petition_user", t)
-        .where({
-          petition_id: petitionId,
-          deleted_at: null,
-          is_subscribed: true,
-        })
-        .select<[{ id: number }]>("user_id as id");
+      const userIds = await this.loadSubscribedUserIdsOnPetition(petitionId);
 
       await this.insert(
         "petition_user_notification",
-        users.flatMap(({ id }) =>
+        userIds.flatMap((id) =>
           comments.map((comment) => ({
             type: "COMMENT_CREATED",
             petition_id: comment.petition_id,
@@ -1957,7 +1951,7 @@ export class PetitionRepository extends BaseRepository {
         })),
         t
       );
-      return { comments, users };
+      return { comments, userIds };
     });
   }
 
