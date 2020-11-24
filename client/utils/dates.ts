@@ -16,6 +16,17 @@ export const FORMATS = {
     year: "numeric",
   },
   /**
+   * E.g. 05/03/2020 14:16
+   */
+  "L+LT": {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  },
+  /**
    * E.g. March 5, 2020
    */
   LL: {

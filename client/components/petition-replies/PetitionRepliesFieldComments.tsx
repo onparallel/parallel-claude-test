@@ -335,7 +335,7 @@ function FieldComment({
             <DateTime
               color="gray.500"
               value={publishedAt}
-              format={FORMATS.LLL}
+              format={FORMATS["L+LT"]}
               useRelativeTime
             />
             {isEdited ? (
