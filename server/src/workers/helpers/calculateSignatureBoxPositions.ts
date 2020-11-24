@@ -73,7 +73,7 @@ export async function calculateSignatureBoxPositions(
           email: recipients[signerIndex].email,
           box: {
             top: (sb.box.y / page.Height) * 100,
-            left: (sb.box.x / metadata.formImage.Width) * 100,
+            left: Math.ceil((sb.box.x / pageWidth) * 100),
             height: 7, // 7% of page height
             width: 26, // 26% of page width
           },
