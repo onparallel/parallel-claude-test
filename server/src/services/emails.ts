@@ -16,9 +16,10 @@ export interface IEmailsService {
   ): Promise<void>;
   sendPetitionCommentsUserNotificationEmail(
     petitionId: number,
-    accessId: number,
+    authorId: number, // can be User (isInternal = true) or Contact (isInternal = false)
     userIds: number[],
-    commentIds: number[]
+    commentIds: number[],
+    isInternal: boolean
   ): Promise<void>;
   sendPetitionSharingNotificationEmail(
     userId: number,
@@ -107,9 +108,10 @@ export class EmailsService implements IEmailsService {
 
   async sendPetitionCommentsUserNotificationEmail(
     petitionId: number,
-    accessId: number,
+    authorId: number,
     userIds: number[],
-    commentIds: number[]
+    commentIds: number[],
+    isInternal: boolean
   ) {
     return await this.enqueueEmail("comments-user-notification", {
       id: this.buildQueueId("PetitionFieldCommentUser", [
@@ -117,7 +119,8 @@ export class EmailsService implements IEmailsService {
         ...userIds,
       ]),
       petition_id: petitionId,
-      petition_access_id: accessId,
+      petition_access_id: isInternal ? undefined : authorId,
+      author_user_id: isInternal ? authorId : undefined,
       user_ids: userIds,
       petition_field_comment_ids: commentIds,
     });

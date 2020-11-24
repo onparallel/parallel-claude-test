@@ -46,7 +46,7 @@ export const createPetitionFieldComment = mutationField(
       isInternal: booleanArg({ required: false }),
     },
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.createPetitionFieldCommentFromUser(
+      const comment = await ctx.petitions.createPetitionFieldCommentFromUser(
         {
           petitionId: args.petitionId,
           petitionFieldId: args.petitionFieldId,
@@ -56,6 +56,22 @@ export const createPetitionFieldComment = mutationField(
         },
         ctx.user!
       );
+      // on internal comment, send email to subscribed users as soon as the comment is created
+      if (args.isInternal) {
+        const userIds = (
+          await ctx.petitions.loadSubscribedUserIdsOnPetition(args.petitionId)
+        ).filter((id) => id !== ctx.user!.id);
+
+        await ctx.emails.sendPetitionCommentsUserNotificationEmail(
+          args.petitionId,
+          ctx.user!.id,
+          userIds,
+          [comment.id],
+          true
+        );
+      }
+
+      return comment;
     },
   }
 );

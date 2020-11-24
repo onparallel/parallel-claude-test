@@ -9,12 +9,13 @@ import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 
 /*
-  from contact to all subscribed users
+  from contact/user to all subscribed users
 */
 export async function commentsUserNotification(
   payload: {
     petition_id: number;
-    petition_access_id: number;
+    petition_access_id?: number; // if set, the comment comes from a Contact
+    author_user_id?: number; // if set, the comment comes from a User
     user_ids: number[];
     petition_field_comment_ids: number[];
   },
@@ -54,18 +55,44 @@ export async function commentsUserNotification(
 
   const emails: EmailLog[] = [];
 
-  const access = await context.petitions.loadAccess(payload.petition_access_id);
-  if (!access) {
+  let authorNameOrEmail;
+  if (payload.petition_access_id) {
+    // Comment author is a contact
+    const access = await context.petitions.loadAccess(
+      payload.petition_access_id
+    );
+    if (!access) {
+      throw new Error(
+        `PetitionAccess not found for petition_access_id ${payload.petition_access_id}`
+      );
+    }
+    const contact = await context.contacts.loadContact(access.contact_id);
+    if (!contact) {
+      throw new Error(
+        `Contact not found for petition_access.contact_id ${access.contact_id}`
+      );
+    }
+
+    authorNameOrEmail =
+      fullName(contact.first_name, contact.last_name) || contact.email;
+  } else if (payload.author_user_id) {
+    // comment author is an User
+    const user = await context.users.loadUser(payload.author_user_id);
+    if (!user) {
+      throw new Error(
+        `User not found for payload.author_user_id ${payload.author_user_id}`
+      );
+    }
+    authorNameOrEmail = fullName(user.first_name, user.last_name) || user.email;
+  } else {
     throw new Error(
-      `PetitionAccess not found for petition_access_id ${payload.petition_access_id}`
+      `Arguments petition_access_id and author_user_id can't be both undefined. Payload: ${JSON.stringify(
+        payload
+      )}`
     );
   }
-  const contact = await context.contacts.loadContact(access.contact_id);
-  if (!contact) {
-    throw new Error(
-      `Contact not found for petition_access.contact_id ${access.contact_id}`
-    );
-  }
+
+  // user_ids arg is already filtered on subscribed only users
   const users = (await context.users.loadUser(payload.user_ids)).filter(
     isDefined
   );
@@ -74,8 +101,7 @@ export async function commentsUserNotification(
       PetitionCommentsUserNotification,
       {
         userName: user.first_name,
-        authorNameOrEmail:
-          fullName(contact.first_name, contact.last_name) || contact.email,
+        authorNameOrEmail,
         petitionId: toGlobalId("Petition", petition.id),
         petitionName: petition.name,
         fields,

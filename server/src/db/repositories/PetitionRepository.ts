@@ -2487,4 +2487,16 @@ export class PetitionRepository extends BaseRepository {
 
     return count === new Set(ids).size;
   }
+
+  async loadSubscribedUserIdsOnPetition(petitionId: number): Promise<number[]> {
+    const subscribedUserIds = await this.from("petition_user")
+      .where({
+        petition_id: petitionId,
+        deleted_at: null,
+        is_subscribed: true,
+      })
+      .select<[{ id: number }]>("user_id as id");
+
+    return subscribedUserIds.map((u) => u.id);
+  }
 }

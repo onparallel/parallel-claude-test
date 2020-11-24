@@ -317,7 +317,12 @@ function FieldComment({
               </Text>
             }
           >
-            <Badge colorScheme="gray" variant="outline" cursor="default">
+            <Badge
+              colorScheme="gray"
+              variant="outline"
+              cursor="default"
+              marginRight={2}
+            >
               <FormattedMessage
                 id="petition-replies.internal-comment.badge"
                 defaultMessage="Internal"
@@ -332,7 +337,6 @@ function FieldComment({
               value={publishedAt}
               format={FORMATS.LLL}
               useRelativeTime
-              marginLeft={2}
             />
             {isEdited ? (
               <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">

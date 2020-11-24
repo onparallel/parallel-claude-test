@@ -330,7 +330,8 @@ export const publicSubmitUnpublishedComments = mutationField(
         ctx.access!.petition_id,
         ctx.access!.id,
         users.map(prop("id")),
-        comments.map(prop("id"))
+        comments.map(prop("id")),
+        false
       );
       return comments;
     },
