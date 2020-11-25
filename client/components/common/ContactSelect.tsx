@@ -8,13 +8,15 @@ import {
   UserReactSelectProps,
 } from "@parallel/utils/useReactSelectProps";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
+import useMergedRef from "@react-hook/merged-ref";
 import {
   forwardRef,
+  KeyboardEvent,
   memo,
   ReactNode,
   Ref,
-  useCallback,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -66,78 +68,112 @@ export const ContactSelect = Object.assign(
 
     const [isCreating, setIsCreating] = useState(false);
 
-    const [options, setOptions] = useState<ContactSelectSelection[]>([]);
+    const [options, setOptions] = useState<ContactSelectSelection[]>();
 
-    const loadOptions = useCallback(
-      async (search) => {
-        const exclude: string[] = [];
-        for (const recipient of value) {
-          if (!recipient.isInvalid) {
-            exclude.push(recipient.id);
-          }
-        }
-        const options = await onSearchContacts(search, exclude);
-        setOptions(options);
-        return options;
-      },
-      [onSearchContacts, setOptions, value, options]
-    );
-
-    const handleCreate = useCallback(
-      async (email: string) => {
-        setIsCreating(true);
-        try {
-          const contact = await onCreateContact({ defaultEmail: email });
-          onChange([
-            ...value.filter((v) => v.id !== email),
-            pick(contact, ["id", "email", "fullName"]),
-          ]);
-        } catch (error) {
-          if (
-            error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT"
-          ) {
-            errorToast();
-          }
-        }
-        setIsCreating(false);
-      },
-      [value, onCreateContact, onChange]
-    );
     const reactSelectProps = useContactSelectReactSelectProps(
       { ...props, isDisabled: props.isDisabled || isCreating },
       handleCreate
     );
+    const innerRef = useRef<any>();
 
-    const [previousValue, setPreviousValue] = useState("");
-    const handleInputChange = useCallback(
-      (newValue: string, meta: InputActionMeta) => {
-        if (
-          previousValue.trim() !== "" &&
-          ["input-blur", "menu-close"].includes(meta.action)
-        ) {
-          const option = options.find((o) => o.email === previousValue) || {
-            id: previousValue,
-            email: previousValue,
-            fullName: "",
-            isInvalid: true,
-          };
+    const [inputValue, setInputValue] = useState("");
 
-          onChange([...value, option]);
+    async function loadOptions(search: string) {
+      if (!search) {
+        setOptions(undefined);
+        return [];
+      }
+      const exclude: string[] = [];
+      for (const recipient of value) {
+        if (!recipient.isInvalid) {
+          exclude.push(recipient.id);
         }
-        setPreviousValue(newValue);
-      },
-      [value, previousValue]
-    );
+      }
+      const options = await onSearchContacts(search.trim(), exclude);
+      setOptions(options);
+      return options;
+    }
+
+    async function handleCreate(email: string) {
+      setIsCreating(true);
+      try {
+        const contact = await onCreateContact({ defaultEmail: email });
+        onChange([
+          ...value.filter((v) => v.id !== email),
+          pick(contact, ["id", "email", "fullName"]),
+        ]);
+        setIsCreating(false);
+        return true;
+      } catch (error) {
+        if (error?.graphQLErrors?.[0]?.extensions.code === "EXISTING_CONTACT") {
+          errorToast();
+        }
+      }
+      setIsCreating(false);
+      return false;
+    }
+
+    async function handleInputChange(_value: string, meta: InputActionMeta) {
+      switch (meta.action) {
+        case "input-change":
+          if (_value === "") {
+            setInputValue("");
+            setOptions(undefined);
+          } else {
+            setInputValue(_value);
+          }
+          break;
+        case "set-value":
+          setInputValue("");
+          setOptions(undefined);
+          break;
+        case "input-blur":
+          const cleaned = inputValue.trim();
+          if (EMAIL_REGEX.test(cleaned)) {
+            const option = options?.find((o) => o.email === cleaned);
+            if (option) {
+              onChange([...value, option]);
+              setInputValue("");
+              setOptions(undefined);
+            } else {
+              if (await handleCreate(cleaned)) {
+                setInputValue("");
+                setOptions(undefined);
+              }
+            }
+          }
+          break;
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      const select = innerRef.current!.select.select.select;
+      if (!select) {
+        return;
+      }
+      switch (event.key) {
+        case ",":
+        case ";":
+        case " ":
+          const { focusedOption } = select.state;
+          if (focusedOption && inputValue === focusedOption.email) {
+            event.preventDefault();
+            select.selectOption(focusedOption);
+          }
+      }
+    }
 
     return (
       <AsyncCreatableSelect<ContactSelectSelection>
-        ref={ref}
+        ref={useMergedRef(ref, innerRef)}
         value={value}
         isMulti
         onChange={(value) => onChange((value as any) ?? [])}
+        inputValue={inputValue}
+        onKeyDown={handleKeyDown}
         onInputChange={handleInputChange}
         onCreateOption={handleCreate}
         loadOptions={loadOptions}
+        defaultOptions={options}
         {...props}
         {...reactSelectProps}
       />
@@ -158,7 +194,7 @@ export const ContactSelect = Object.assign(
 
 function useContactSelectReactSelectProps(
   props: UserReactSelectProps,
-  handleCreateContact: (email: string) => Promise<void>
+  handleCreateContact: (email: string) => any
 ) {
   const reactSelectProps = useReactSelectProps<ContactSelectSelection>(props);
   return useMemo(
@@ -171,7 +207,7 @@ function useContactSelectReactSelectProps(
             const search = selectProps.inputValue;
             return (
               <Box textAlign="center" color="gray.400" padding={4}>
-                <UserPlusIcon boxSize="30px" />
+                <UserPlusIcon boxSize={8} />
                 {search ? (
                   <>
                     <Text as="div" marginTop={2}>
