@@ -559,7 +559,7 @@ const CommentsButton = forwardRef<
     ...props,
   } as const;
   return commentCount > 0 ? (
-    <Button rightIcon={<CommentIcon />} {...common}>
+    <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
       <RecipientViewCommentsBadge
         hasUnreadComments={hasUnreadComments}
         hasUnpublishedComments={hasUnpublishedComments}
