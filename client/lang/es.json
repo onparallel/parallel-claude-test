@@ -3291,7 +3291,7 @@
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
-    "definition": "{name} ha sido notificado para que proceda a su revisión.",
+    "definition": "Hemos notificado a {name} para que proceda a su revisión.",
     "context": "{name} will be notified for its revision."
   },
   {
@@ -3366,7 +3366,7 @@
   },
   {
     "term": "recipient-view.petition-completed-alert-1",
-    "definition": "Esta petición ha sido completada y {name} ha sido notificado para su revisión y validación.",
+    "definition": "Esta petición ha sido completada y hemos notificado a {name} para su revisión y validación.",
     "context": "This petition has been completed and {name} has been notified for its revision and validation."
   },
   {
