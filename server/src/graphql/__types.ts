@@ -521,6 +521,7 @@ export interface NexusGenFieldTypes {
     publicDeletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
@@ -1165,6 +1166,7 @@ export interface NexusGenFieldTypeNames {
     publicDeletePetitionFieldComment: "Result";
     publicDeletePetitionReply: "Result";
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
+    publicFileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicSendVerificationCode: "VerificationCodeRequest";
     publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
@@ -1881,6 +1883,12 @@ export interface NexusGenArgTypes {
     publicFileUploadReplyComplete: {
       // args
       keycode: string; // ID!
+      replyId: NexusGenScalars["GID"]; // GID!
+    };
+    publicFileUploadReplyDownloadLink: {
+      // args
+      keycode: string; // ID!
+      preview?: boolean | null; // Boolean
       replyId: NexusGenScalars["GID"]; // GID!
     };
     publicMarkPetitionFieldCommentsAsRead: {

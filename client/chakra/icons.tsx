@@ -1210,3 +1210,21 @@ export const FieldSelectIcon = createIcon({
     </g>
   ),
 });
+
+export const DownForwardArrowIcon = createIcon({
+  displayName: "DownForwardArrowIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M 15,19 22,12 15,5" />
+      <path d="M 2,12 H 22" />
+      <path d="M 2,12 V 5" />
+    </g>
+  ),
+});

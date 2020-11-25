@@ -512,6 +512,19 @@ type Mutation {
   ): PublicPetitionFieldReply!
 
   """
+  Generates a download link for a file reply on a public context.
+  """
+  publicFileUploadReplyDownloadLink(
+    keycode: ID!
+
+    """
+    If true will use content-disposition inline instead of attachment
+    """
+    preview: Boolean
+    replyId: GID!
+  ): FileUploadReplyDownloadLinkResult!
+
+  """
   Marks the specified comments as read.
   """
   publicMarkPetitionFieldCommentsAsRead(

@@ -960,6 +960,16 @@
     "context": "Clear"
   },
   {
+    "term": "generic.click-to-show-less",
+    "definition": "Haz click para ver menos",
+    "context": "Click to show less"
+  },
+  {
+    "term": "generic.click-to-show-more",
+    "definition": "Haz click para ver más",
+    "context": "Click to show more"
+  },
+  {
     "term": "generic.close",
     "definition": "Cerrar",
     "context": "Close"

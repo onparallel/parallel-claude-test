@@ -214,7 +214,7 @@ export const PublicPetitionFieldReply = objectType({
       resolve: async (root, _, ctx) => {
         switch (root.type) {
           case "TEXT": {
-            return {};
+            return root.content;
           }
           case "FILE_UPLOAD": {
             const file = await ctx.files.loadFileUpload(

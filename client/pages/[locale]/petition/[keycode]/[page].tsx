@@ -26,6 +26,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
@@ -68,6 +69,7 @@ import {
   useRecipientView_publicCreateTextReplyMutation,
   useRecipientView_publicDeletePetitionReplyMutation,
   useRecipientView_publicFileUploadReplyCompleteMutation,
+  useRecipientView_publicFileUploadReplyDownloadLinkMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
   useRecipientView_updatePetitionFieldCommentMutation,
 } from "@parallel/graphql/__types";
@@ -189,6 +191,38 @@ function RecipientView({
       }
     },
     [keycode, petition.id]
+  );
+
+  const [
+    downloadFileUploadReply,
+  ] = useRecipientView_publicFileUploadReplyDownloadLinkMutation();
+  const showFailure = useFailureGeneratingLinkDialog();
+  const handleDownloadReply = useCallback(
+    async (fieldId: string, replyId: string) => {
+      const reply = fields
+        .find((f) => f.id === fieldId)
+        ?.replies.find((r) => r.id === replyId);
+      if (reply) {
+        const _window = window.open(undefined, "_blank")!;
+        const { data } = await downloadFileUploadReply({
+          variables: {
+            keycode,
+            replyId: reply.id,
+            preview: false,
+          },
+        });
+        const { url, result } = data!.publicFileUploadReplyDownloadLink;
+        if (result === "SUCCESS") {
+          _window.location.href = url!;
+        } else {
+          _window.close();
+          try {
+            await showFailure({ filename: reply.content.filename });
+          } catch {}
+        }
+      }
+    },
+    [keycode, fields]
   );
 
   const [finalized, setFinalized] = useState(false);
@@ -497,6 +531,9 @@ function RecipientView({
                   onDeleteReply={(replyId) =>
                     handleDeleteReply(field.id, replyId)
                   }
+                  onDownloadReply={(replyId) =>
+                    handleDownloadReply(field.id, replyId)
+                  }
                 />
               ))}
             </Stack>
@@ -675,6 +712,22 @@ RecipientView.fragments = {
 };
 
 RecipientView.mutations = [
+  gql`
+    mutation RecipientView_publicFileUploadReplyDownloadLink(
+      $keycode: ID!
+      $replyId: GID!
+      $preview: Boolean
+    ) {
+      publicFileUploadReplyDownloadLink(
+        keycode: $keycode
+        replyId: $replyId
+        preview: $preview
+      ) {
+        result
+        url
+      }
+    }
+  `,
   gql`
     mutation RecipientView_publicDeletePetitionReply(
       $replyId: GID!

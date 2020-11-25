@@ -1,5 +1,6 @@
 import {
   arg,
+  booleanArg,
   idArg,
   inputObjectType,
   list,
@@ -591,6 +592,51 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
         args.petitionFieldCommentIds,
         ctx.access!.id
       );
+    },
+  }
+);
+
+export const publicFileUploadReplyDownloadLink = mutationField(
+  "publicFileUploadReplyDownloadLink",
+  {
+    description:
+      "Generates a download link for a file reply on a public context.",
+    type: "FileUploadReplyDownloadLinkResult",
+    authorize: fetchPetitionAccess("keycode"),
+    args: {
+      keycode: nonNull(idArg()),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      preview: booleanArg({
+        description:
+          "If true will use content-disposition inline instead of attachment",
+      }),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const reply = await ctx.petitions.loadFieldReply(args.replyId);
+        if (reply!.type !== "FILE_UPLOAD") {
+          throw new Error("Invalid field type");
+        }
+        const file = await ctx.files.loadFileUpload(
+          reply!.content["file_upload_id"]
+        );
+        if (file && !file.upload_complete) {
+          await ctx.aws.getFileMetadata(file!.path);
+          await ctx.files.markFileUploadComplete(file.id);
+        }
+        return {
+          result: RESULT.SUCCESS,
+          url: await ctx.aws.getSignedDownloadEndpoint(
+            file!.path,
+            file!.filename,
+            args.preview ? "inline" : "attachment"
+          ),
+        };
+      } catch {
+        return {
+          result: RESULT.FAILURE,
+        };
+      }
     },
   }
 );

@@ -21,6 +21,8 @@ import {
   CloseIcon,
   CommentIcon,
   DeleteIcon,
+  DownloadIcon,
+  DownForwardArrowIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
@@ -37,6 +39,7 @@ import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
+import { ExpandableText } from "../common/ExpandableText";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
@@ -61,6 +64,7 @@ export type PublicPetitionFieldProps = ExtendChakra<{
   onOpenCommentsClick: () => void;
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (payload: CreateReply) => void;
+  onDownloadReply: (replyId: string) => void;
 }>;
 
 export function RecipientViewPetitionField({
@@ -73,6 +77,7 @@ export function RecipientViewPetitionField({
   onOpenCommentsClick,
   onDeleteReply,
   onCreateReply,
+  onDownloadReply,
   ...props
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
@@ -196,37 +201,47 @@ export function RecipientViewPetitionField({
         <List as={Stack} marginTop={1} alignItems="flex-start">
           {field.replies.map((reply) => (
             <ListItem key={reply.id}>
-              <ReplyWrapper
-                status={reply.status}
-                progress={uploadProgress?.[reply.id]}
-                canDeleteReply={!field.validated}
-                onDeleteReply={() => onDeleteReply(reply.id)}
-              >
-                {isTextLikeType ? (
-                  <FormattedMessage
-                    id="recipient-view.text-reply"
-                    defaultMessage="Reply added on {date}"
-                    values={{
-                      date: (
-                        <DateTime
-                          value={reply.createdAt}
-                          format={FORMATS.LLL}
-                        />
-                      ),
-                    }}
-                  />
-                ) : field.type === "FILE_UPLOAD" ? (
-                  <>
-                    <Text as="span">{reply.content?.filename}</Text>
-                    <Text as="span" marginX={2}>
-                      -
-                    </Text>
-                    <Text as="span" fontSize="sm" color="gray.500">
-                      <FileSize value={reply.content?.size} />
-                    </Text>
-                  </>
-                ) : null}
-              </ReplyWrapper>
+              <>
+                <ReplyWrapper
+                  status={reply.status}
+                  progress={uploadProgress?.[reply.id]}
+                  canDeleteReply={!field.validated}
+                  onDeleteReply={() => onDeleteReply(reply.id)}
+                >
+                  {isTextLikeType ? (
+                    <FormattedMessage
+                      id="recipient-view.text-reply"
+                      defaultMessage="Reply added on {date}"
+                      values={{
+                        date: (
+                          <DateTime
+                            value={reply.createdAt}
+                            format={FORMATS.LLL}
+                          />
+                        ),
+                      }}
+                    />
+                  ) : field.type === "FILE_UPLOAD" ? (
+                    <>
+                      <Text as="span">{reply.content?.filename}</Text>
+                      <Text as="span" marginX={2}>
+                        -
+                      </Text>
+                      <Text as="span" fontSize="sm" color="gray.500">
+                        <FileSize value={reply.content?.size} />
+                      </Text>
+                    </>
+                  ) : null}
+                </ReplyWrapper>
+                {isTextLikeType && (
+                  <Flex marginTop={1}>
+                    <DownForwardArrowIcon marginRight={1} marginTop="2px" />
+                    <ExpandableText as="cite" fontSize="sm" noOfLines={3}>
+                      {reply.content.text}
+                    </ExpandableText>
+                  </Flex>
+                )}
+              </>
             </ListItem>
           ))}
         </List>
@@ -262,11 +277,15 @@ function ReplyWrapper({
   children,
   canDeleteReply,
   onDeleteReply,
+  canDownloadReply,
+  onDownloadFileReply,
 }: {
   status: PetitionFieldReplyStatus;
   progress?: number;
   canDeleteReply: boolean;
   onDeleteReply: () => void;
+  canDownloadReply: boolean;
+  onDownloadFileReply: () => void;
   children: ReactNode;
 }) {
   const intl = useIntl();
@@ -336,6 +355,20 @@ function ReplyWrapper({
           ) : null}
         </Flex>
       </Tooltip>
+      {canDownloadReply && (
+        <IconButtonWithTooltip
+          size="xs"
+          variant="ghost"
+          placement="bottom"
+          icon={<DownloadIcon />}
+          label={intl.formatMessage({
+            id: "petition-replies.petition-field-reply.file-download",
+            defaultMessage: "Download file",
+          })}
+          onClick={onDownloadFileReply}
+          marginLeft={1}
+        />
+      )}
       {status !== "APPROVED" && canDeleteReply ? (
         <IconButtonWithTooltip
           onClick={onDeleteReply}

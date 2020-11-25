@@ -238,6 +238,8 @@ export type Mutation = {
   publicDeletePetitionReply: Result;
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
+  /** Generates a download link for a file reply on a public context. */
+  publicFileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   publicSendVerificationCode: VerificationCodeRequest;
@@ -474,6 +476,12 @@ export type MutationpublicDeletePetitionReplyArgs = {
 
 export type MutationpublicFileUploadReplyCompleteArgs = {
   keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+};
+
+export type MutationpublicFileUploadReplyDownloadLinkArgs = {
+  keycode: Scalars["ID"];
+  preview?: Maybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
 };
 
@@ -3998,6 +4006,20 @@ export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
 } & RecipientViewSenderCard_PublicUserFragment &
   RecipientViewContentsCard_PublicUserFragment;
+
+export type RecipientView_publicFileUploadReplyDownloadLinkMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type RecipientView_publicFileUploadReplyDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  publicFileUploadReplyDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
 
 export type RecipientView_publicDeletePetitionReplyMutationVariables = Exact<{
   replyId: Scalars["GID"];
@@ -9418,6 +9440,56 @@ export function useCurrentUserLazyQuery(
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
 export type CurrentUserLazyQueryHookResult = ReturnType<
   typeof useCurrentUserLazyQuery
+>;
+export const RecipientView_publicFileUploadReplyDownloadLinkDocument = gql`
+  mutation RecipientView_publicFileUploadReplyDownloadLink(
+    $keycode: ID!
+    $replyId: GID!
+    $preview: Boolean
+  ) {
+    publicFileUploadReplyDownloadLink(
+      keycode: $keycode
+      replyId: $replyId
+      preview: $preview
+    ) {
+      result
+      url
+    }
+  }
+`;
+
+/**
+ * __useRecipientView_publicFileUploadReplyDownloadLinkMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_publicFileUploadReplyDownloadLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicFileUploadReplyDownloadLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewPublicFileUploadReplyDownloadLinkMutation, { data, loading, error }] = useRecipientView_publicFileUploadReplyDownloadLinkMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      replyId: // value for 'replyId'
+ *      preview: // value for 'preview'
+ *   },
+ * });
+ */
+export function useRecipientView_publicFileUploadReplyDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientView_publicFileUploadReplyDownloadLinkMutation,
+    RecipientView_publicFileUploadReplyDownloadLinkMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    RecipientView_publicFileUploadReplyDownloadLinkMutation,
+    RecipientView_publicFileUploadReplyDownloadLinkMutationVariables
+  >(RecipientView_publicFileUploadReplyDownloadLinkDocument, baseOptions);
+}
+export type RecipientView_publicFileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof useRecipientView_publicFileUploadReplyDownloadLinkMutation
 >;
 export const RecipientView_publicDeletePetitionReplyDocument = gql`
   mutation RecipientView_publicDeletePetitionReply(
