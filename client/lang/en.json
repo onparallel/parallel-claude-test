@@ -940,11 +940,6 @@
     "context": "Continue"
   },
   {
-    "term": "generic.continue.eSignature",
-    "definition": "Continue with eSignature",
-    "context": "Continue with eSignature"
-  },
-  {
     "term": "generic.delete",
     "definition": "Delete",
     "context": "Delete"
@@ -1928,6 +1923,11 @@
     "term": "petition.contents",
     "definition": "Contents",
     "context": "Contents"
+  },
+  {
+    "term": "petition.continue-with-signature",
+    "definition": "Continue with eSignature",
+    "context": "Continue with eSignature"
   },
   {
     "term": "petition.deadline-label",

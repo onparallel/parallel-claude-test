@@ -570,7 +570,7 @@ function ConfirmStartSignatureProcess({
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="generic.continue.eSignature"
+            id="petition.continue-with-signature"
             defaultMessage="Continue with eSignature"
           />
         </Button>
