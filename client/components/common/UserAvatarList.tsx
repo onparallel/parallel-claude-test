@@ -28,9 +28,10 @@ export function UserAvatarList({
 }>) {
   const styles = useMultiStyleConfig("Avatar", { size });
   const max = 3;
-  const slice = users.length > max ? users.slice(0, max) : [...users];
+  const slice = users.length === max + 1 ? [...users] : users.slice(0, max);
   slice.reverse();
-  const excess = users.length > max ? users.length - max : null;
+  const excess =
+    users.length > slice.length ? users.length - slice.length : null;
 
   return (
     <Flex
