@@ -44,7 +44,7 @@ export function RecipientViewHelpModal(props: ModalProps) {
           <ModalBody paddingY={6}>
             <Text fontSize="lg" fontWeight="bold">
               <FormattedMessage
-                id="recipient-view.first-time.into"
+                id="recipient-view.first-time.intro"
                 defaultMessage="Is this the first time you use Parallel?"
               />
             </Text>

@@ -208,10 +208,9 @@ function RecipientView({
             description: intl.formatMessage(
               {
                 id: "recipient-view.completed-petition.toast-description",
-                defaultMessage:
-                  "You have completed this petition and {name} will be notified",
+                defaultMessage: "{name} will be notified for its revision.",
               },
-              { name: granter.firstName }
+              { name: granter.fullName }
             ),
             status: "success",
             isClosable: true,
@@ -346,7 +345,7 @@ function RecipientView({
               <Flex
                 maxWidth="container.lg"
                 alignItems="center"
-                justifyContent="center"
+                justifyContent="flex-start"
                 marginX="auto"
                 width="100%"
                 paddingLeft={4}
@@ -355,16 +354,32 @@ function RecipientView({
                 <AlertIcon />
                 <AlertDescription>
                   {petition.status === "COMPLETED" ? (
-                    <FormattedMessage
-                      id="recipient-view.petition-completed-alert"
-                      defaultMessage="This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
-                    />
+                    <>
+                      <Text>
+                        <FormattedMessage
+                          id="recipient-view.petition-completed-alert-1"
+                          defaultMessage="This petition has been completed and {name} has been notified for its revision and validation."
+                          values={{
+                            name: <b>{granter.fullName}</b>,
+                          }}
+                        />
+                      </Text>
+                      <Text>
+                        <FormattedMessage
+                          id="recipient-view.petition-completed-alert-2"
+                          defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                          values={{
+                            b: (chunks: any[]) => <b>{chunks}</b>,
+                          }}
+                        />
+                      </Text>
+                    </>
                   ) : (
                     <FormattedMessage
                       id="recipient-view.petition-closed-alert"
                       defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
                       values={{
-                        name: granter.firstName,
+                        name: <b>{granter.fullName}</b>,
                       }}
                     />
                   )}
@@ -494,7 +509,7 @@ function RecipientView({
           onClose={() => setSelectedFieldId(null)}
           field={selectedField}
           contactId={contact.id}
-          granterName={granter.firstName}
+          granterName={granter.fullName}
           onAddComment={handleAddComment}
           onDeleteComment={handleDeleteComment}
           onUpdateComment={handleUpdateComment}
@@ -535,13 +550,9 @@ function ConfirmStartSignatureProcess({
           <Spacer marginTop={2} />
           <FormattedMessage
             id="petition.finalize-start-signature.body-2"
-            defaultMessage="After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
+            defaultMessage="After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:"
             values={{
-              i: (chunks: any[]) => (
-                <Text as="span" fontStyle="italic">
-                  {chunks}
-                </Text>
-              ),
+              b: (chunks: any[]) => <b>{chunks}</b>,
             }}
           />
           <Spacer marginTop={4} />

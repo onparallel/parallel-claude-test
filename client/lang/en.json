@@ -2021,8 +2021,8 @@
   },
   {
     "term": "petition.finalize-start-signature.body-2",
-    "definition": "After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:",
-    "context": "After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
+    "definition": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:",
+    "context": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:"
   },
   {
     "term": "petition.finalize-start-signature.header",
@@ -3291,8 +3291,8 @@
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
-    "definition": "You have completed this petition and {name} will be notified",
-    "context": "You have completed this petition and {name} will be notified"
+    "definition": "{name} will be notified for its revision.",
+    "context": "{name} will be notified for its revision."
   },
   {
     "term": "recipient-view.completed-petition.toast-title",
@@ -3316,8 +3316,8 @@
   },
   {
     "term": "recipient-view.field-comments.placeholder",
-    "definition": "Type a new comment",
-    "context": "Type a new comment"
+    "definition": "Ask here your questions and doubts",
+    "context": "Ask here your questions and doubts"
   },
   {
     "term": "recipient-view.files-uploaded",
@@ -3340,7 +3340,7 @@
     "context": "You can add any comments and questions you'd like. Submit them at once whenever you decide."
   },
   {
-    "term": "recipient-view.first-time.into",
+    "term": "recipient-view.first-time.intro",
     "definition": "Is this the first time you use Parallel?",
     "context": "Is this the first time you use Parallel?"
   },
@@ -3365,9 +3365,14 @@
     "context": "This petition has been closed. If you need to make any changes, please reach out to {name}."
   },
   {
-    "term": "recipient-view.petition-completed-alert",
-    "definition": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again.",
-    "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
+    "term": "recipient-view.petition-completed-alert-1",
+    "definition": "This petition has been completed and {name} has been notified for its revision and validation.",
+    "context": "This petition has been completed and {name} has been notified for its revision and validation."
+  },
+  {
+    "term": "recipient-view.petition-completed-alert-2",
+    "definition": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again.",
+    "context": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
   },
   {
     "term": "recipient-view.powered-by",

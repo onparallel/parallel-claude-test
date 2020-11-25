@@ -189,7 +189,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
               rows={1}
               placeholder={intl.formatMessage({
                 id: "recipient-view.field-comments.placeholder",
-                defaultMessage: "Type a new comment",
+                defaultMessage: "Ask here your questions and doubts",
               })}
               value={draft}
               onKeyDown={handleKeyDown as any}
@@ -284,11 +284,7 @@ function FieldComment({
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
-          {comment.author?.id === contactId ? (
-            <Text fontStyle="italic">
-              <FormattedMessage id="generic.you" defaultMessage="You" />
-            </Text>
-          ) : comment.author?.__typename === "PublicContact" ? (
+          {comment.author?.__typename === "PublicContact" ? (
             comment.author.fullName
           ) : comment.author?.__typename === "PublicUser" ? (
             comment.author.fullName

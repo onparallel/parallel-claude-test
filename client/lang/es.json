@@ -2021,8 +2021,8 @@
   },
   {
     "term": "petition.finalize-start-signature.body-2",
-    "definition": "Al hacer click en <i>Continuar con firma digital</i>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:",
-    "context": "After you click on <i>Continue with eSignature</i>, we will send an e-mail with information on how to complete the process to the following people:"
+    "definition": "Al hacer click en <b>Continuar con firma digital</b>, enviaremos un email con información sobre cómo completar el proceso a las siguientes personas:",
+    "context": "After you click on <b>Continue with eSignature</b>, we will send an e-mail with information on how to complete the process to the following people:"
   },
   {
     "term": "petition.finalize-start-signature.header",
@@ -3291,8 +3291,8 @@
   },
   {
     "term": "recipient-view.completed-petition.toast-description",
-    "definition": "Has completado esta petición y {name} será notificado",
-    "context": "You have completed this petition and {name} will be notified"
+    "definition": "{name} ha sido notificado para que proceda a su revisión.",
+    "context": "{name} will be notified for its revision."
   },
   {
     "term": "recipient-view.completed-petition.toast-title",
@@ -3306,18 +3306,18 @@
   },
   {
     "term": "recipient-view.field-comments.cta",
-    "definition": "¿Alguna duda? Pregunta por aquí",
+    "definition": "¿Alguna duda? Pregunte por aquí",
     "context": "Have any questions? Ask here"
   },
   {
     "term": "recipient-view.field-comments.cta-with-name",
-    "definition": "¿Alguna duda? Pregunta por aquí a {name}",
+    "definition": "¿Alguna duda? Pregunte por aquí a {name}",
     "context": "Have any questions? Ask {name} here"
   },
   {
     "term": "recipient-view.field-comments.placeholder",
-    "definition": "Escribe un comentario",
-    "context": "Type a new comment"
+    "definition": "Escriba aquí sus dudas y preguntas",
+    "context": "Ask here your questions and doubts"
   },
   {
     "term": "recipient-view.files-uploaded",
@@ -3326,22 +3326,22 @@
   },
   {
     "term": "recipient-view.first-time.claim-1",
-    "definition": "La información se irá guardando a medida que vayas completando la petición.",
+    "definition": "La información se irá guardando a medida que vaya completando la petición.",
     "context": "The information will be saved automatically as you add it."
   },
   {
     "term": "recipient-view.first-time.claim-2",
-    "definition": "Puedes volver las veces que quieras a través del enlace que has recibido en tu email.",
+    "definition": "Puede consultar la petición siempre que sea necesario a través del enlace indicado en el correo electrónico.",
     "context": "You can come back as many times as you'd like using the link you received in your email."
   },
   {
     "term": "recipient-view.first-time.claim-3",
-    "definition": "Anota las preguntas y comentarios que tengas. Cuando tú decidas, podrás enviarlas todas a la vez.",
+    "definition": "Si tiene alguna duda o comentario sobre alguna de las preguntas puede anotarlos en cada una de ellas y enviarlos todos a la vez.",
     "context": "You can add any comments and questions you'd like. Submit them at once whenever you decide."
   },
   {
-    "term": "recipient-view.first-time.into",
-    "definition": "¿Es la primera vez que usas Parallel?",
+    "term": "recipient-view.first-time.intro",
+    "definition": "¿Es la primera vez que usa Parallel?",
     "context": "Is this the first time you use Parallel?"
   },
   {
@@ -3365,9 +3365,14 @@
     "context": "This petition has been closed. If you need to make any changes, please reach out to {name}."
   },
   {
-    "term": "recipient-view.petition-completed-alert",
-    "definition": "Esta petición ha sido completada. Si deseas realizar cambios, no te olvides de hacer click de nuevo en el botón de finalizar.",
-    "context": "This petition has been completed. If you want to make any changes don't forget to hit the submit button again."
+    "term": "recipient-view.petition-completed-alert-1",
+    "definition": "Esta petición ha sido completada y {name} ha sido notificado para su revisión y validación.",
+    "context": "This petition has been completed and {name} has been notified for its revision and validation."
+  },
+  {
+    "term": "recipient-view.petition-completed-alert-2",
+    "definition": "Puede realizar cambios si así lo desea, pero no olvide hacer click de nuevo en el botón de <b>Finalizar</b>.",
+    "context": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
   },
   {
     "term": "recipient-view.powered-by",
@@ -3431,7 +3436,7 @@
   },
   {
     "term": "recipient-view.submit-unpublished-comments-text",
-    "definition": "Tienes comentarios pendientes. Envíalos todos de una vez y notifica a {sender} en un solo email.",
+    "definition": "Tiene comentarios pendientes. Envíelos todos de una vez y notificaremos a {sender} en un solo email.",
     "context": "You have some pending comments. Submit them at once to notify {sender} in a single email."
   },
   {
