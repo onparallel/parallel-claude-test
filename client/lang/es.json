@@ -71,8 +71,8 @@
   },
   {
     "term": "component.confirm-restart-signature-request.description",
-    "definition": "Ya tienes una petición firmada. Si continúas, gastarás un crédito de firma adicional. Estás seguro que quieres continuar?",
-    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?"
+    "definition": "Ya tienes una petición firmada. Si continúas, gastarás un crédito de firma adicional.",
+    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit."
   },
   {
     "term": "component.confirm-restart-signature-request.header",
@@ -920,6 +920,11 @@
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
   },
   {
+    "term": "generic.confirm-continue",
+    "definition": "¿Estás seguro que quieres continuar?",
+    "context": "Are you sure you want to continue?"
+  },
+  {
     "term": "generic.confirm-delete-button",
     "definition": "Si, eliminar",
     "context": "Yes, delete"
@@ -1745,9 +1750,9 @@
     "context": "File not submitted"
   },
   {
-    "term": "petition-signature.file-submitted-successfully",
-    "definition": "Archivo enviado correctamente. (Pendiente de revisión)",
-    "context": "File submitted successfully (Pending review)"
+    "term": "petition-signature.file-submitted.pending-review",
+    "definition": "{filename} - {size} (Pendiente de revisión)",
+    "context": "{filename} - {size} (Pending review)"
   },
   {
     "term": "petition.activity-not-available",
@@ -2131,8 +2136,8 @@
   },
   {
     "term": "petition.print-pdf.signatures-disclaimer",
-    "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de la persona jurídica identificada.",
-    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified."
+    "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
+    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
   },
   {
     "term": "petition.reminder-sent.toast-description",

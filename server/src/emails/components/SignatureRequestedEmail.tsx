@@ -26,7 +26,7 @@ const email: Email<SignatureRequestedProps> = {
   subject(_, intl: IntlShape) {
     return intl.formatMessage({
       id: "signature-requested.subject",
-      defaultMessage: "Signature request on Petition",
+      defaultMessage: "Signature requested",
     });
   },
   text(
@@ -72,7 +72,7 @@ const email: Email<SignatureRequestedProps> = {
         logoAlt={logoAlt}
         title={intl.formatMessage({
           id: "signature-requested.subject",
-          defaultMessage: "Signature request on Petition",
+          defaultMessage: "Signature requested",
         })}
       >
         <MjmlSection>

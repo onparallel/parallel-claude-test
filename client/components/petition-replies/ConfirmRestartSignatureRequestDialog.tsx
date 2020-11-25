@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/core";
+import { Button, Stack, Text } from "@chakra-ui/core";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -17,10 +17,20 @@ function ConfirmRestartSignatureRequestDialog(props: DialogProps) {
         />
       }
       body={
-        <FormattedMessage
-          id="component.confirm-restart-signature-request.description"
-          defaultMessage="You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?"
-        />
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="component.confirm-restart-signature-request.description"
+              defaultMessage="You already have a signed petition. If you continue you will spend an additional eSignature credit."
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="generic.confirm-continue"
+              defaultMessage="Are you sure you want to continue?"
+            />
+          </Text>
+        </Stack>
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>

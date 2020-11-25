@@ -71,8 +71,8 @@
   },
   {
     "term": "component.confirm-restart-signature-request.description",
-    "definition": "You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?",
-    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit. Are you sure you want to continue?"
+    "definition": "You already have a signed petition. If you continue you will spend an additional eSignature credit.",
+    "context": "You already have a signed petition. If you continue you will spend an additional eSignature credit."
   },
   {
     "term": "component.confirm-restart-signature-request.header",
@@ -920,6 +920,11 @@
     "context": "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}"
   },
   {
+    "term": "generic.confirm-continue",
+    "definition": "Are you sure you want to continue?",
+    "context": "Are you sure you want to continue?"
+  },
+  {
     "term": "generic.confirm-delete-button",
     "definition": "Yes, delete",
     "context": "Yes, delete"
@@ -1745,9 +1750,9 @@
     "context": "File not submitted"
   },
   {
-    "term": "petition-signature.file-submitted-successfully",
-    "definition": "File submitted successfully (Pending review)",
-    "context": "File submitted successfully (Pending review)"
+    "term": "petition-signature.file-submitted.pending-review",
+    "definition": "{filename} - {size} (Pending review)",
+    "context": "{filename} - {size} (Pending review)"
   },
   {
     "term": "petition.activity-not-available",
@@ -2131,8 +2136,8 @@
   },
   {
     "term": "petition.print-pdf.signatures-disclaimer",
-    "definition": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified.",
-    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified."
+    "definition": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information.",
+    "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
   },
   {
     "term": "petition.reminder-sent.toast-description",

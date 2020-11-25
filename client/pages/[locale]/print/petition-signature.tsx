@@ -128,7 +128,7 @@ function SignatureDisclaimer(props: ExtendChakra) {
     <Text {...props}>
       <FormattedMessage
         id="petition.print-pdf.signatures-disclaimer"
-        defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current information of the legal entity identified."
+        defaultMessage="I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
       />
     </Text>
   );

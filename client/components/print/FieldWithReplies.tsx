@@ -3,6 +3,7 @@ import { ExtendChakra } from "@parallel/chakra/utils";
 import { PrintPetitionSignature_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
+import { FileSize } from "../common/FileSize";
 
 const fieldStyles = {
   borderRadius: "md",
@@ -70,12 +71,27 @@ function FileUploadField({ field, ...props }: FileUploadFieldProps) {
       <Text marginLeft="2mm" fontStyle="italic">
         {field.description}
       </Text>
-      {field.replies.length > 0 ? (
-        <FormattedMessage
-          id="petition-signature.file-submitted-successfully"
-          defaultMessage="File submitted successfully (Pending review)"
-        />
-      ) : (
+
+      {field.replies.map((r) => (
+        <>
+          <FormattedMessage
+            key={r.id}
+            id="petition-signature.file-submitted.pending-review"
+            defaultMessage="{filename} - {size} (Pending review)"
+            values={{
+              filename: r.content.filename,
+              size: (
+                <Text as="span" fontStyle="italic">
+                  <FileSize value={r.content.size} />
+                </Text>
+              ),
+            }}
+          />
+          <br />
+        </>
+      ))}
+
+      {field.replies.length === 0 && (
         <FormattedMessage
           id="petition-signature.file-not-submitted"
           defaultMessage="File not submitted"

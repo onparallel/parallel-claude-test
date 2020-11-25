@@ -1255,6 +1255,7 @@ export class PetitionRepository extends BaseRepository {
             "updated_at",
             "template_public",
             "from_template_id",
+            "signature_config",
             ...(data?.is_template
               ? (["reminders_active", "reminders_config"] as const)
               : (["template_description"] as const)),

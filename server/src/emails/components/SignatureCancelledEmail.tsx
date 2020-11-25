@@ -26,7 +26,7 @@ const email: Email<SignatureCancelledProps> = {
   subject(_, intl: IntlShape) {
     return intl.formatMessage({
       id: "signature-cancelled.subject",
-      defaultMessage: "Cancelled signature request on Petition",
+      defaultMessage: "Cancelled signature request",
     });
   },
   text(
@@ -65,7 +65,7 @@ const email: Email<SignatureCancelledProps> = {
         logoAlt={logoAlt}
         title={intl.formatMessage({
           id: "signature-cancelled.subject",
-          defaultMessage: "Cancelled signature request on Petition",
+          defaultMessage: "Cancelled signature request",
         })}
       >
         <MjmlSection>

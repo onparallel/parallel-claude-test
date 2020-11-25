@@ -231,8 +231,8 @@
   },
   {
     "term": "signature-cancelled.subject",
-    "definition": "Cancelled signature request on Petition",
-    "context": "Cancelled signature request on Petition"
+    "definition": "Cancelled signature request",
+    "context": "Cancelled signature request"
   },
   {
     "term": "signature-cancelled.text",
@@ -241,8 +241,8 @@
   },
   {
     "term": "signature-completed.subject",
-    "definition": "Signature completed on Petition",
-    "context": "Signature completed on Petition"
+    "definition": "Signature request completed",
+    "context": "Signature request completed"
   },
   {
     "term": "signature-completed.text",
@@ -256,8 +256,8 @@
   },
   {
     "term": "signature-requested.subject",
-    "definition": "Signature request on Petition",
-    "context": "Signature request on Petition"
+    "definition": "Signature requested",
+    "context": "Signature requested"
   },
   {
     "term": "signature-requested.text",
