@@ -610,6 +610,11 @@
     "context": "Title of the document"
   },
   {
+    "term": "component.signature-config-dialog.title-placeholder",
+    "definition": "Enter a title...",
+    "context": "Enter a title..."
+  },
+  {
     "term": "component.table.next-page-button",
     "definition": "Next",
     "context": "Next"
@@ -2248,6 +2253,11 @@
     "term": "petition.shared-delete-error",
     "definition": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
     "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+  },
+  {
+    "term": "petition.signature-config-dialog.contacts-placeholder",
+    "definition": "Search contacts...",
+    "context": "Search contacts..."
   },
   {
     "term": "petition.status.error",

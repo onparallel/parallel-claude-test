@@ -19,7 +19,7 @@ import {
 } from "@parallel/graphql/__types";
 
 import { useMemo, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
   ContactSelect,
   ContactSelectProps,
@@ -62,6 +62,8 @@ export function SignatureConfigDialog({
     () => contacts.some((c) => c === null || c.isInvalid) || !title,
     [contacts, title]
   );
+
+  const intl = useIntl();
   return (
     <ConfirmDialog
       initialFocusRef={contactsRef}
@@ -100,6 +102,10 @@ export function SignatureConfigDialog({
               />
             </FormLabel>
             <ContactSelect
+              placeholder={intl.formatMessage({
+                id: "petition.signature-config-dialog.contacts-placeholder",
+                defaultMessage: "Search contacts...",
+              })}
               ref={contactsRef}
               value={contacts}
               onChange={setContacts}
@@ -120,7 +126,14 @@ export function SignatureConfigDialog({
                 />
               </HelpPopover>
             </FormLabel>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={intl.formatMessage({
+                id: "component.signature-config-dialog.title-placeholder",
+                defaultMessage: "Enter a title...",
+              })}
+            />
           </FormControl>
         </Stack>
       }
