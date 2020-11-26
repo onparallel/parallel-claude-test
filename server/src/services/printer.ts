@@ -25,7 +25,7 @@ export class Printer implements IPrinter {
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
-    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.goto(url, { waitUntil: "networkidle" });
     const buffer = await page.pdf({
       printBackground: true,
       displayHeaderFooter: false,
