@@ -239,6 +239,8 @@ export type Mutation = {
   removePetitionUserPermission: Array<Petition>;
   /** Reopens the petition */
   reopenPetition: Petition;
+  /** Removes the Signaturit Branding Ids of selected organization. */
+  resetSignaturitOrganizationBranding: SupportMethodResponse;
   /** Sends a petition message to the speicified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -476,6 +478,10 @@ export type MutationremovePetitionUserPermissionArgs = {
 
 export type MutationreopenPetitionArgs = {
   petitionId: Scalars["GID"];
+};
+
+export type MutationresetSignaturitOrganizationBrandingArgs = {
+  orgId: Scalars["Int"];
 };
 
 export type MutationsendMessagesArgs = {

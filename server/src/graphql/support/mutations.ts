@@ -179,6 +179,37 @@ export const createUser = mutationField("createUser", {
   },
 });
 
+export const resetSignaturitOrganizationBranding = mutationField(
+  "resetSignaturitOrganizationBranding",
+  {
+    description:
+      "Removes the Signaturit Branding Ids of selected organization.",
+    type: "SupportMethodResponse",
+    args: {
+      orgId: arg({ type: "Int", required: true }),
+    },
+    authorize: supportMethodAccess(),
+    resolve: async (_, { orgId }, ctx) => {
+      try {
+        const org = await ctx.organizations.loadOrg(orgId);
+        if (!org) {
+          return {
+            result: RESULT.FAILURE,
+            message: `Can't find organization with id ${orgId}`,
+          };
+        }
+        await ctx.integrations.removeSignaturitBrandingIds(orgId);
+        return {
+          result: RESULT.SUCCESS,
+          message: `Brandings resetted successfully`,
+        };
+      } catch (e) {
+        return { result: RESULT.FAILURE, message: e.message };
+      }
+    },
+  }
+);
+
 // export const uploadOrgLogo = mutationField("uploadOrganizationLogo", {
 //   description: "Uploads a logo for an organization.",
 //   type: "SupportMethodResponse",

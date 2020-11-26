@@ -252,6 +252,33 @@ export const supportMethods: {
     },
     queryType: "query",
   },
+  {
+    field: {
+      name: "resetSignaturitOrganizationBranding",
+      description:
+        "Removes the Signaturit Branding Ids of selected organization.",
+      args: [
+        {
+          name: "orgId",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
 ] as any;
 
 export const schemaTypes: IntrospectionType[] = [

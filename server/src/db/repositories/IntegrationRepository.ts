@@ -35,4 +35,14 @@ export class IntegrationRepository extends BaseRepository {
       .where("id", integrationId)
       .update({ settings });
   }
+
+  async removeSignaturitBrandingIds(orgId: number) {
+    await this.knex.raw(
+      /* sql */ `
+      update org_integration 
+      set settings = settings - 'ES_BRANDING_ID' - 'EN_BRANDING_ID'
+      where org_id = ? and provider = 'SIGNATURIT'`,
+      [orgId]
+    );
+  }
 }

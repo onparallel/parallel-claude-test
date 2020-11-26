@@ -522,6 +522,7 @@ export interface NexusGenFieldTypes {
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
+    resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
@@ -1223,6 +1224,10 @@ export interface NexusGenArgTypes {
     reopenPetition: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    resetSignaturitOrganizationBranding: {
+      // args
+      orgId: number; // Int!
     };
     sendMessages: {
       // args

@@ -537,6 +537,11 @@ type Mutation {
   reopenPetition(petitionId: GID!): Petition!
 
   """
+  Removes the Signaturit Branding Ids of selected organization.
+  """
+  resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
+
+  """
   Sends a petition message to the speicified contacts.
   """
   sendMessages(
