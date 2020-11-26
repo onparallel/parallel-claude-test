@@ -67,7 +67,7 @@ function PrintPetitionSignature({ token }: { token: string }) {
                   margin="5mm auto"
                   src={orgLogo}
                   alt={orgName}
-                  width="50%"
+                  width="40%"
                 />
               ) : (
                 <Logo
