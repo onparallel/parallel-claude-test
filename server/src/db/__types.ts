@@ -288,7 +288,7 @@ export type CreateOrganization = PartialProps<
 
 export interface OrgIntegration {
   id: number;
-  org_id: Maybe<number>;
+  org_id: number;
   type: IntegrationType;
   provider: string;
   settings: Maybe<any>;
@@ -297,7 +297,7 @@ export interface OrgIntegration {
 
 export type CreateOrgIntegration = PartialProps<
   Omit<OrgIntegration, "id">,
-  "org_id" | "settings" | "is_enabled"
+  "settings" | "is_enabled"
 >;
 
 export interface Petition {
