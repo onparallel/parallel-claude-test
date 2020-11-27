@@ -32,7 +32,7 @@ export function SelectTypeFieldOptionsTextarea({
       ref={ref}
       placeholder={intl.formatMessage({
         id: "petition-field.select.options-placeholder",
-        defaultMessage: "Add two or more options...",
+        defaultMessage: "- Option 1\n- Option 2",
       })}
       _placeholder={{
         color: showError && options.length < 2 ? "red.500" : "placeholder",

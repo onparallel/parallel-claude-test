@@ -1541,8 +1541,8 @@
   },
   {
     "term": "petition-field.select.options-placeholder",
-    "definition": "Agrega dos o más opciones...",
-    "context": "Add two or more options..."
+    "definition": "- Opción 1\n- Opción 2",
+    "context": "- Option 1 - Option 2"
   },
   {
     "term": "petition-replies.close-petition-without-notify.button",
