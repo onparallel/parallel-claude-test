@@ -103,6 +103,13 @@ export function createApolloClient(
             },
           },
         },
+        PublicPetitionField: {
+          fields: {
+            replies: {
+              merge: mergeArraysBy(["id"]),
+            },
+          },
+        },
       },
     }).restore(initialState ?? {}),
     typeDefs,

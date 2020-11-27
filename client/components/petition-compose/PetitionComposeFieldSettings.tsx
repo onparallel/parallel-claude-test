@@ -164,6 +164,8 @@ export function PetitionComposeFieldSettings({
           <FileUploadSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "TEXT" ? (
           <TextSettings field={field} onFieldEdit={onFieldEdit} />
+        ) : field.type === "SELECT" ? (
+          <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} />
         ) : null}
       </Stack>
     </Card>
@@ -272,39 +274,40 @@ function TextSettings({
           }
         />
       </SettingsRow>
-      <SettingsRow
-        label={
-          <FormattedMessage
-            id="field-settings.text-placeholder-label"
-            defaultMessage="Placeholder"
-          />
-        }
-        description={
-          <>
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="field-settings.text-placeholder-description"
-                defaultMessage="The placeholder is the subtle descriptive text that shows when the input field is empty."
-              />
-            </Text>
-            <Image
-              height="55px"
-              marginTop={2}
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/placeholder.gif`}
-              role="presentation"
-            />
-          </>
-        }
-        controlId="text-placeholder"
-      >
-        <Input
-          id="text-placeholder"
-          value={placeholder}
-          marginLeft={2}
-          size="sm"
-          onChange={handlePlaceholderChange}
-        />
-      </SettingsRow>
+      <SettingsRowPlaceholder
+        placeholder={placeholder}
+        onChange={handlePlaceholderChange}
+      />
+    </Stack>
+  );
+}
+
+function SelectOptionSettings({
+  field,
+  onFieldEdit: onFieldEdit,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
+  const options = field.options as FieldOptions["SELECT"];
+  const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
+  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
+  const handlePlaceholderChange = function (
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    const value = event.target.value;
+    setPlaceholder(value);
+    debouncedOnUpdate(field.id, {
+      options: {
+        ...field.options,
+        placeholder: value || null,
+      },
+    });
+  };
+
+  return (
+    <Stack spacing={4}>
+      <SettingsRowPlaceholder
+        placeholder={placeholder}
+        onChange={handlePlaceholderChange}
+      />
     </Stack>
   );
 }
@@ -335,6 +338,51 @@ function SettingsRow({
       <Spacer minWidth={4} />
       {children}
     </FormControl>
+  );
+}
+
+type SettingsRowPlaceholderProps = {
+  placeholder: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+};
+function SettingsRowPlaceholder({
+  placeholder,
+  onChange,
+}: SettingsRowPlaceholderProps) {
+  return (
+    <SettingsRow
+      label={
+        <FormattedMessage
+          id="field-settings.text-placeholder-label"
+          defaultMessage="Placeholder"
+        />
+      }
+      description={
+        <>
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="field-settings.text-placeholder-description"
+              defaultMessage="The placeholder is the subtle descriptive text that shows when the input field is empty."
+            />
+          </Text>
+          <Image
+            height="55px"
+            marginTop={2}
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/placeholder.gif`}
+            role="presentation"
+          />
+        </>
+      }
+      controlId="text-placeholder"
+    >
+      <Input
+        id="text-placeholder"
+        value={placeholder}
+        marginLeft={2}
+        size="sm"
+        onChange={onChange}
+      />
+    </SettingsRow>
   );
 }
 

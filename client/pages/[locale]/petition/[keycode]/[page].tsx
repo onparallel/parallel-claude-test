@@ -61,6 +61,9 @@ import {
   useRecipientView_publicFileUploadReplyCompleteMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
   useRecipientView_updatePetitionFieldCommentMutation,
+  useRecipientView_publicCreateSelectReplyMutation,
+  RecipientView_createSelectReply_FieldFragment,
+  RecipientView_createSelectReply_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { resolveUrl } from "@parallel/utils/next";
@@ -104,6 +107,7 @@ function RecipientView({
   const deletePetitionReply = useDeletePetitionReply();
   const createTextReply = useCreateTextReply();
   const createFileUploadReply = useCreateFileUploadReply();
+  const createSelectReply = useCreateSelectReply();
   const [
     fileUploadReplyComplete,
   ] = useRecipientView_publicFileUploadReplyCompleteMutation();
@@ -173,6 +177,13 @@ function RecipientView({
           await createTextReply(keycode, petition.id, fieldId, {
             text: payload.content,
           });
+          break;
+        case "SELECT":
+          await createSelectReply(keycode, petition.id, fieldId, {
+            text: payload.content,
+          });
+          break;
+        default:
           break;
       }
     },
@@ -680,6 +691,22 @@ RecipientView.mutations = [
     ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
   `,
   gql`
+    mutation RecipientView_publicCreateSelectReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $data: CreateTextReplyInput!
+    ) {
+      publicCreateSelectReply(
+        keycode: $keycode
+        fieldId: $fieldId
+        data: $data
+      ) {
+        ...RecipientViewPetitionField_PublicPetitionFieldReply
+      }
+    }
+    ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
     mutation RecipientView_publicFileUploadReplyComplete(
       $keycode: ID!
       $replyId: GID!
@@ -888,6 +915,63 @@ function useCreateTextReply() {
     });
   },
   []);
+}
+
+function useCreateSelectReply() {
+  const [mutate] = useRecipientView_publicCreateSelectReplyMutation();
+  return useCallback(async function (
+    keycode: string,
+    petitionId: string,
+    fieldId: string,
+    data: CreateTextReplyInput // reusing TEXT input object
+  ) {
+    return await mutate({
+      variables: { keycode, fieldId, data },
+      update(client, { data }) {
+        const fieldFragment = gql`
+          fragment RecipientView_createSelectReply_Field on PublicPetitionField {
+            replies {
+              id
+            }
+          }
+        `;
+        const reply = data!.publicCreateSelectReply;
+        const cachedField = client.readFragment<
+          RecipientView_createSelectReply_FieldFragment
+        >({ id: fieldId, fragment: fieldFragment });
+        client.writeFragment<RecipientView_createSelectReply_FieldFragment>({
+          id: fieldId,
+          fragment: fieldFragment,
+          data: {
+            __typename: "PublicPetitionField",
+            replies: [
+              ...cachedField!.replies,
+              pick(reply, ["id", "__typename"]),
+            ],
+          },
+        });
+        const petitionFragment = gql`
+          fragment RecipientView_createSelectReply_PublicPetition on PublicPetition {
+            status
+          }
+        `;
+        const cachedPetition = client.readFragment<
+          RecipientView_createSelectReply_PublicPetitionFragment
+        >({ id: petitionId, fragment: petitionFragment });
+        if (cachedPetition?.status === "COMPLETED") {
+          client.writeFragment<
+            RecipientView_createSelectReply_PublicPetitionFragment
+          >({
+            id: petitionId,
+            fragment: petitionFragment,
+            data: {
+              status: "PENDING",
+            },
+          });
+        }
+      },
+    });
+  }, []);
 }
 
 function useCreateFileUploadReply() {

@@ -21,6 +21,7 @@ export function FieldWithReplies({
     case "HEADING":
       return <HeadingField field={field} sx={fieldStyles} />;
     case "TEXT":
+    case "SELECT":
       return <TextField field={field} sx={fieldStyles} />;
     case "FILE_UPLOAD":
       return <FileUploadField field={field} sx={fieldStyles} />;
@@ -42,6 +43,14 @@ function TextField({ field, ...props }: TextFieldProps) {
       {field.replies.map((reply, replyNumber) => (
         <Text key={replyNumber}>{reply.content.text}</Text>
       ))}
+      {field.replies.length === 0 && (
+        <Text fontStyle="italic">
+          <FormattedMessage
+            id="petition-signature.no-reply-submitted"
+            defaultMessage="No replies have been submitted."
+          />
+        </Text>
+      )}
     </Card>
   );
 }

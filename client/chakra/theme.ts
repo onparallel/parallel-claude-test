@@ -37,6 +37,7 @@ export const theme = extendTheme({
       FILE_UPLOAD: base.colors.teal[400],
       TEXT: base.colors.yellow[400],
       HEADING: base.colors.blue[400],
+      SELECT: base.colors.red[400],
     },
   },
   textStyles: {

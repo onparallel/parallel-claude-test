@@ -512,6 +512,7 @@ export interface NexusGenFieldTypes {
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
+    publicCreateSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicDeletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
@@ -1172,6 +1173,12 @@ export interface NexusGenArgTypes {
       content: string; // String!
       keycode: string; // ID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    publicCreateSelectReply: {
+      // args
+      data: NexusGenInputs["CreateTextReplyInput"]; // CreateTextReplyInput!
+      fieldId: NexusGenScalars["GID"]; // GID!
+      keycode: string; // ID!
     };
     publicCreateTextReply: {
       // args

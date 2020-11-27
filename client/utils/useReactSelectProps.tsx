@@ -206,6 +206,10 @@ export function useReactSelectProps<
           display: "flex",
           alignItems: "center",
         }),
+        menu: (styles) => ({
+          ...styles,
+          zIndex: 1000,
+        }),
         menuList: (styles) => ({
           ...styles,
           padding: "0.5rem 0",

@@ -1,3 +1,5 @@
+import { Maybe } from "./types";
+
 export type FileUploadAccepts = "PDF" | "IMAGE" | "VIDEO" | "DOCUMENT";
 
 export type FieldOptions = {
@@ -5,10 +7,14 @@ export type FieldOptions = {
     hasPageBreak: boolean;
   };
   FILE_UPLOAD: {
-    accepts: FileUploadAccepts[] | null;
+    accepts: Maybe<FileUploadAccepts[]>;
   };
   TEXT: {
     multiline: boolean;
-    placeholder: string | null;
+    placeholder: Maybe<string>;
+  };
+  SELECT: {
+    values: string[];
+    placeholder: Maybe<string>;
   };
 };

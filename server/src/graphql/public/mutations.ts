@@ -1,4 +1,5 @@
 import {
+  arg,
   idArg,
   inputObjectType,
   mutationField,
@@ -177,6 +178,37 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
     return reply;
   },
 });
+
+export const publicCreateSelectReply = mutationField(
+  "publicCreateSelectReply",
+  {
+    description: "Creates a reply to a select field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: idArg({ required: true }),
+      fieldId: globalIdArg("PetitionField", { required: true }),
+      // use the same input data as Text replies
+      data: arg({ type: "CreateTextReplyInput", required: true }),
+    },
+    authorize: chain(
+      fetchPetitionAccess("keycode"),
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", "SELECT")
+    ),
+    resolve: async (_, args, ctx) => {
+      const reply = await ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          petition_access_id: ctx.access!.id,
+          type: "SELECT",
+          content: { text: args.data.text },
+        },
+        ctx.contact!
+      );
+      return reply;
+    },
+  }
+);
 
 export const publicCompletePetition = mutationField("publicCompletePetition", {
   description:

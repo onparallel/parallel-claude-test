@@ -465,6 +465,15 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
+  Creates a reply to a select field.
+  """
+  publicCreateSelectReply(
+    data: CreateTextReplyInput!
+    fieldId: GID!
+    keycode: ID!
+  ): PublicPetitionFieldReply!
+
+  """
   Creates a reply to a text field.
   """
   publicCreateTextReply(
@@ -1334,6 +1343,11 @@ enum PetitionFieldType {
   A heading field.
   """
   HEADING
+
+  """
+  A select field.
+  """
+  SELECT
 
   """
   A text field.

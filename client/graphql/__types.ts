@@ -219,6 +219,8 @@ export type Mutation = {
   publicCreateFileUploadReply: CreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
+  /** Creates a reply to a select field. */
+  publicCreateSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a text field. */
   publicCreateTextReply: PublicPetitionFieldReply;
   /** Delete a petition field comment. */
@@ -426,6 +428,12 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
+};
+
+export type MutationpublicCreateSelectReplyArgs = {
+  data: CreateTextReplyInput;
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
 };
 
 export type MutationpublicCreateTextReplyArgs = {
@@ -942,6 +950,8 @@ export type PetitionFieldType =
   | "FILE_UPLOAD"
   /** A heading field. */
   | "HEADING"
+  /** A select field. */
+  | "SELECT"
   /** A text field. */
   | "TEXT";
 
@@ -2511,7 +2521,8 @@ export type PetitionComposeField_PetitionFieldFragment = {
   | "multiple"
   | "isFixed"
   | "isDescriptionShown"
->;
+> &
+  SelectTypeFieldOptionsTextarea_PetitionFieldFragment;
 
 export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
@@ -2541,6 +2552,10 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
 } & Pick<PetitionTemplate, "id" | "emailSubject" | "emailBody" | "description">;
+
+export type SelectTypeFieldOptionsTextarea_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "options">;
 
 export type DownloadAllDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -4027,6 +4042,20 @@ export type RecipientView_publicCreateFileUploadReplyMutation = {
     };
 };
 
+export type RecipientView_publicCreateSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  data: CreateTextReplyInput;
+}>;
+
+export type RecipientView_publicCreateSelectReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionField_PublicPetitionFieldReplyFragment;
+};
+
 export type RecipientView_publicFileUploadReplyCompleteMutationVariables = Exact<{
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
@@ -4150,6 +4179,21 @@ export type RecipientView_createTextReply_FieldFragment = {
 };
 
 export type RecipientView_createTextReply_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type RecipientView_createSelectReply_FieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type RecipientView_createSelectReply_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status">;
 
@@ -4474,6 +4518,12 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
     updatedAt
   }
 `;
+export const SelectTypeFieldOptionsTextarea_PetitionFieldFragmentDoc = gql`
+  fragment SelectTypeFieldOptionsTextarea_PetitionField on PetitionField {
+    id
+    options
+  }
+`;
 export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeField_PetitionField on PetitionField {
     id
@@ -4484,7 +4534,9 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     multiple
     isFixed
     isDescriptionShown @client
+    ...SelectTypeFieldOptionsTextarea_PetitionField
   }
+  ${SelectTypeFieldOptionsTextarea_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
@@ -5806,6 +5858,18 @@ export const RecipientView_createTextReply_FieldFragmentDoc = gql`
 `;
 export const RecipientView_createTextReply_PublicPetitionFragmentDoc = gql`
   fragment RecipientView_createTextReply_PublicPetition on PublicPetition {
+    status
+  }
+`;
+export const RecipientView_createSelectReply_FieldFragmentDoc = gql`
+  fragment RecipientView_createSelectReply_Field on PublicPetitionField {
+    replies {
+      id
+    }
+  }
+`;
+export const RecipientView_createSelectReply_PublicPetitionFragmentDoc = gql`
+  fragment RecipientView_createSelectReply_PublicPetition on PublicPetition {
     status
   }
 `;
@@ -9368,6 +9432,52 @@ export function useRecipientView_publicCreateFileUploadReplyMutation(
 }
 export type RecipientView_publicCreateFileUploadReplyMutationHookResult = ReturnType<
   typeof useRecipientView_publicCreateFileUploadReplyMutation
+>;
+export const RecipientView_publicCreateSelectReplyDocument = gql`
+  mutation RecipientView_publicCreateSelectReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $data: CreateTextReplyInput!
+  ) {
+    publicCreateSelectReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
+      ...RecipientViewPetitionField_PublicPetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionField_PublicPetitionFieldReplyFragmentDoc}
+`;
+
+/**
+ * __useRecipientView_publicCreateSelectReplyMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_publicCreateSelectReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_publicCreateSelectReplyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewPublicCreateSelectReplyMutation, { data, loading, error }] = useRecipientView_publicCreateSelectReplyMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      fieldId: // value for 'fieldId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useRecipientView_publicCreateSelectReplyMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientView_publicCreateSelectReplyMutation,
+    RecipientView_publicCreateSelectReplyMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    RecipientView_publicCreateSelectReplyMutation,
+    RecipientView_publicCreateSelectReplyMutationVariables
+  >(RecipientView_publicCreateSelectReplyDocument, baseOptions);
+}
+export type RecipientView_publicCreateSelectReplyMutationHookResult = ReturnType<
+  typeof useRecipientView_publicCreateSelectReplyMutation
 >;
 export const RecipientView_publicFileUploadReplyCompleteDocument = gql`
   mutation RecipientView_publicFileUploadReplyComplete(

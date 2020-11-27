@@ -40,6 +40,7 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { AddFieldPopover } from "./AddFieldPopover";
+import { SelectTypeFieldOptionsTextarea } from "./SelectTypeFieldOptionsTextarea";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
@@ -50,6 +51,7 @@ export type PetitionComposeFieldProps = {
   showError: boolean;
   titleFieldProps: InputProps;
   descriptionFieldProps: TextareaProps;
+  selectOptionsFieldProps: TextareaProps;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onAddField: (type: PetitionFieldType, position: number) => void;
@@ -75,6 +77,7 @@ export const PetitionComposeField = Object.assign(
       showError,
       titleFieldProps,
       descriptionFieldProps,
+      selectOptionsFieldProps,
       onMove,
       onFocus,
       onAddField,
@@ -250,7 +253,7 @@ export const PetitionComposeField = Object.assign(
                         id: "petition.field-title-file-upload-placeholder",
                         defaultMessage: "Describe the file(s) that you need...",
                       })
-                    : field.type === "TEXT"
+                    : field.type === "TEXT" || field.type === "SELECT"
                     ? intl.formatMessage({
                         id: "petition.field-title-text-placeholder",
                         defaultMessage:
@@ -323,7 +326,15 @@ export const PetitionComposeField = Object.assign(
                   {...descriptionFieldProps}
                 />
               ) : (
-                <Box height="26px" />
+                field.type !== "SELECT" && <Box height="26px" />
+              )}
+              {field.type === "SELECT" && (
+                <SelectTypeFieldOptionsTextarea
+                  field={field}
+                  onFieldEdit={onFieldEdit}
+                  showError={showError}
+                  {...selectOptionsFieldProps}
+                />
               )}
             </Box>
             <Stack
@@ -408,7 +419,9 @@ export const PetitionComposeField = Object.assign(
           multiple
           isFixed
           isDescriptionShown @client
+          ...SelectTypeFieldOptionsTextarea_PetitionField
         }
+        ${SelectTypeFieldOptionsTextarea.fragments.PetitionField}
       `,
     },
   }

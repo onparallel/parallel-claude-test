@@ -98,6 +98,15 @@ export const PetitionComposeFieldList = Object.assign(
       });
     }, []);
 
+    const focusSelectOptions = useCallback((fieldId: string) => {
+      setTimeout(() => {
+        const options = document.querySelector<HTMLElement>(
+          `#field-select-options-${fieldId}`
+        );
+        options?.focus();
+      });
+    }, []);
+
     // Memoize field callbacks
     const fieldProps = useMemoFactory(
       (
@@ -112,6 +121,7 @@ export const PetitionComposeFieldList = Object.assign(
         | "onFieldEdit"
         | "titleFieldProps"
         | "descriptionFieldProps"
+        | "selectOptionsFieldProps"
       > => ({
         onClick: () => onSelectField(fieldId),
         onFocus: () => onSelectField(fieldId),
@@ -136,12 +146,16 @@ export const PetitionComposeFieldList = Object.assign(
               index < fields.length - 1 ? fields[index + 1].id : null;
             switch (event.key) {
               case "ArrowDown":
-                if (nextId) {
+                if (fields[index].type === "SELECT") {
+                  focusSelectOptions(fields[index].id);
+                } else if (nextId) {
                   focusTitle(nextId);
                 }
                 break;
               case "ArrowUp":
-                if (prevId) {
+                if (fields[index - 1]?.type === "SELECT") {
+                  focusSelectOptions(fields[index - 1].id);
+                } else if (prevId) {
                   focusTitle(prevId);
                 }
                 break;
@@ -179,6 +193,38 @@ export const PetitionComposeFieldList = Object.assign(
               case "ArrowUp":
                 if (currentLine === 0) {
                   focusTitle(fieldId);
+                }
+                break;
+            }
+          },
+        },
+        selectOptionsFieldProps: {
+          onKeyDown: (event) => {
+            const index = fields.findIndex((f) => f.id === fieldId);
+            const prevId = index > 0 ? fields[index - 1].id : null;
+            const nextId =
+              index < fields.length - 1 ? fields[index + 1].id : null;
+            const stringOptionsLength =
+              fields[index].options?.values.join("\n").length ?? 0;
+
+            switch (event.key) {
+              case "ArrowDown":
+                if (
+                  nextId &&
+                  // only focus title if cursor is at the end of the options string
+                  event.currentTarget.selectionStart === stringOptionsLength
+                ) {
+                  focusTitle(nextId);
+                }
+                break;
+              case "ArrowUp":
+                // only focus title if cursor is at the beginning of the options string
+                if (event.currentTarget.selectionStart === 0) {
+                  if (fields[index].type === "SELECT") {
+                    focusTitle(fields[index].id);
+                  } else if (prevId) {
+                    focusTitle(prevId);
+                  }
                 }
                 break;
             }

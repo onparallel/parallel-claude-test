@@ -401,6 +401,34 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         return;
       }
     }
+
+    const selectFieldWithoutOptions = petition.fields.find(
+      (f) =>
+        f.type === "SELECT" &&
+        (!f.options?.values ||
+          !Array.isArray(f.options.values) ||
+          f.options.values.length < 2)
+    );
+    if (selectFieldWithoutOptions) {
+      try {
+        setShowErrors(true);
+        const node = document.querySelector(
+          `#field-${selectFieldWithoutOptions.id}`
+        );
+        await scrollIntoView(node!, { block: "center", behavior: "smooth" });
+        await showErrorDialog({
+          message: (
+            <FormattedMessage
+              id="petition.no-select-fields-without-options-error"
+              defaultMessage="Please add two or more options to all Dropdown fields."
+            />
+          ),
+        });
+      } finally {
+        return;
+      }
+    }
+
     try {
       const {
         recipientIds,

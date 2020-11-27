@@ -39,6 +39,22 @@ const SCHEMAS = {
       },
     },
   },
+  SELECT: {
+    type: "object",
+    required: ["values"],
+    additionalProperties: false,
+    properties: {
+      values: {
+        type: ["array", "null"],
+        items: {
+          type: "string",
+        },
+      },
+      placeholder: {
+        type: ["string", "null"],
+      },
+    },
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -79,6 +95,16 @@ export function defaultFieldOptions(
           accepts: null,
         },
       };
+    case "SELECT": {
+      return {
+        optional: false,
+        multiple: false,
+        options: {
+          values: [],
+          placeholder: null,
+        },
+      };
+    }
     default:
       return {};
   }

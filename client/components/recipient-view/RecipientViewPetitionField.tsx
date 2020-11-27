@@ -15,6 +15,7 @@ import {
   Textarea,
   Tooltip,
 } from "@chakra-ui/core";
+import Select from "react-select";
 import {
   CheckIcon,
   CloseIcon,
@@ -30,7 +31,7 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
-import { forwardRef, ReactNode, useCallback } from "react";
+import { forwardRef, ReactNode, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -39,10 +40,15 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
+import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
 
-export type CreateReply = CreateReplyText | CreateReplyFileUpload;
+export type CreateReply =
+  | CreateReplyText
+  | CreateReplyFileUpload
+  | CreateReplySelect;
 
 type CreateReplyText = { type: "TEXT"; content: string };
+type CreateReplySelect = { type: "SELECT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
 export type PublicPetitionFieldProps = ExtendChakra<{
@@ -95,7 +101,6 @@ export function RecipientViewPetitionField({
   ) : (
     <Card
       padding={4}
-      overflow="hidden"
       {...(isInvalid
         ? {
             border: "2px solid",
@@ -168,7 +173,7 @@ export function RecipientViewPetitionField({
         ) : null}
       </Box>
       <Text fontSize="sm" color="gray.500">
-        {field.type === "TEXT" ? (
+        {field.type === "TEXT" || field.type === "SELECT" ? (
           <FormattedMessage
             id="recipient-view.replies-submitted"
             defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
@@ -192,7 +197,7 @@ export function RecipientViewPetitionField({
                 canDeleteReply={!field.validated}
                 onDeleteReply={() => onDeleteReply(reply.id)}
               >
-                {field.type === "TEXT" ? (
+                {field.type === "TEXT" || field.type === "SELECT" ? (
                   <FormattedMessage
                     id="recipient-view.text-reply"
                     defaultMessage="Reply added on {date}"
@@ -232,6 +237,12 @@ export function RecipientViewPetitionField({
           <FileUploadReplyForm
             canReply={canReply}
             field={field}
+            onCreateReply={onCreateReply}
+          />
+        ) : field.type === "SELECT" ? (
+          <OptionSelectReplyForm
+            field={field}
+            canReply={canReply}
             onCreateReply={onCreateReply}
           />
         ) : null}
@@ -529,6 +540,83 @@ function FileUploadReplyForm({
           />
         )}
       </Box>
+    </Flex>
+  );
+}
+
+function OptionSelectReplyForm({
+  field,
+  canReply,
+  onCreateReply,
+  ...props
+}: ExtendChakra<{
+  canReply: boolean;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
+  onCreateReply: (payload: CreateReplySelect) => void;
+}>) {
+  const intl = useIntl();
+
+  const { values, placeholder } = field.options as FieldOptions["SELECT"];
+  const [selection, setSelection] = useState<string | null>();
+  const [showError, setShowError] = useState(false);
+  const disabled = !field.multiple && field.replies.length > 0;
+
+  const reactSelectProps = useReactSelectProps({
+    id: `field-select-option-${field.id}`,
+    isDisabled: disabled || !canReply,
+    isInvalid: showError,
+  });
+
+  return (
+    <Flex
+      as="form"
+      flexDirection={{ base: "column", sm: "row" }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (selection) {
+          onCreateReply({ type: "SELECT", content: selection });
+          setTimeout(() => setSelection(null));
+        } else {
+          setShowError(true);
+        }
+      }}
+      {...props}
+    >
+      <FormControl flex="1" isInvalid={showError} isDisabled={disabled}>
+        <Select
+          value={selection ? { value: selection, label: selection } : null}
+          options={values.map((value) => ({ value, label: value }))}
+          onChange={({ value }: any) => {
+            setSelection(value as any);
+            setShowError(false);
+          }}
+          placeholder={
+            placeholder ??
+            intl.formatMessage({
+              id: "generic.select-an-option",
+              defaultMessage: "Select an option...",
+            })
+          }
+          {...reactSelectProps}
+        />
+        {showError && (
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.forms.required-field-error"
+              defaultMessage="A value is required"
+            />
+          </FormErrorMessage>
+        )}
+      </FormControl>
+      <Button
+        type="submit"
+        variant="outline"
+        isDisabled={disabled || !canReply}
+        marginTop={{ base: 2, sm: 0 }}
+        marginLeft={{ base: 0, sm: 4 }}
+      >
+        <FormattedMessage id="generic.save" defaultMessage="Save" />
+      </Button>
     </Flex>
   );
 }

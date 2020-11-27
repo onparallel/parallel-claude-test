@@ -222,6 +222,7 @@ export const PetitionFieldType = enumType({
     { name: "FILE_UPLOAD", description: "A file upload field." },
     { name: "TEXT", description: "A text field." },
     { name: "HEADING", description: "A heading field." },
+    { name: "SELECT", description: "A select field." },
   ],
 });
 
@@ -514,7 +515,8 @@ export const PetitionFieldReply = objectType({
       description: "The content of the reply.",
       resolve: async (root, _, ctx) => {
         switch (root.type) {
-          case "TEXT": {
+          case "TEXT":
+          case "SELECT": {
             return root.content;
           }
           case "FILE_UPLOAD": {

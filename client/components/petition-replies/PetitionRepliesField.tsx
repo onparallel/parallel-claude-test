@@ -236,7 +236,7 @@ export function PetitionRepliesField({
               reply={reply}
               onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
               actions={
-                field.type === "TEXT" ? (
+                field.type === "TEXT" || field.type === "SELECT" ? (
                   <CopyToClipboardButton size="xs" text={reply.content.text} />
                 ) : field.type === "FILE_UPLOAD" ? (
                   <Stack spacing={1}>
@@ -269,7 +269,7 @@ export function PetitionRepliesField({
                 ) : null
               }
             >
-              {field.type === "TEXT" ? (
+              {field.type === "TEXT" || field.type === "SELECT" ? (
                 <BreakLines text={reply.content.text} />
               ) : field.type === "FILE_UPLOAD" ? (
                 <Box>
