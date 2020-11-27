@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { usePetitionFieldTypeLabels } from "@parallel/utils/usePetitionFieldTypeLabels";
+import { useIntl } from "react-intl";
 
 export type PetitionFieldTypeIndicatorProps = ExtendChakra<{
   type: PetitionFieldType;
@@ -15,8 +16,9 @@ export function PetitionFieldTypeIndicator({
   relativeIndex,
   ...props
 }: PetitionFieldTypeIndicatorProps) {
+  const intl = useIntl();
   const labels = usePetitionFieldTypeLabels();
-  const label = useMemo(() => labels[type], [type]);
+  const label = useMemo(() => labels[type], [type, intl.locale]);
 
   return (
     <Tooltip label={label}>
