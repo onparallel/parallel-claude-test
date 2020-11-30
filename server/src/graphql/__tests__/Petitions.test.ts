@@ -463,6 +463,10 @@ describe("GraphQL/Petitions", () => {
             type: "FILE_UPLOAD",
             isFixed: false,
           },
+          {
+            type: "SELECT",
+            isFixed: false,
+          },
         ],
         __typename: "Petition",
       });
@@ -513,6 +517,10 @@ describe("GraphQL/Petitions", () => {
           },
           {
             type: "FILE_UPLOAD",
+            isFixed: false,
+          },
+          {
+            type: "SELECT",
             isFixed: false,
           },
         ],
