@@ -2522,7 +2522,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   | "isFixed"
   | "isDescriptionShown"
 > &
-  SelectTypeFieldOptionsTextarea_PetitionFieldFragment;
+  SelectTypeFieldOptions_PetitionFieldFragment;
 
 export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
@@ -2553,7 +2553,7 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
 } & Pick<PetitionTemplate, "id" | "emailSubject" | "emailBody" | "description">;
 
-export type SelectTypeFieldOptionsTextarea_PetitionFieldFragment = {
+export type SelectTypeFieldOptions_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "options">;
 
@@ -4518,8 +4518,8 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
     updatedAt
   }
 `;
-export const SelectTypeFieldOptionsTextarea_PetitionFieldFragmentDoc = gql`
-  fragment SelectTypeFieldOptionsTextarea_PetitionField on PetitionField {
+export const SelectTypeFieldOptions_PetitionFieldFragmentDoc = gql`
+  fragment SelectTypeFieldOptions_PetitionField on PetitionField {
     id
     options
   }
@@ -4534,9 +4534,9 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     multiple
     isFixed
     isDescriptionShown @client
-    ...SelectTypeFieldOptionsTextarea_PetitionField
+    ...SelectTypeFieldOptions_PetitionField
   }
-  ${SelectTypeFieldOptionsTextarea_PetitionFieldFragmentDoc}
+  ${SelectTypeFieldOptions_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {

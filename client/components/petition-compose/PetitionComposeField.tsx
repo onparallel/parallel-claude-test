@@ -40,7 +40,7 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { AddFieldPopover } from "./AddFieldPopover";
-import { SelectTypeFieldOptionsTextarea } from "./SelectTypeFieldOptionsTextarea";
+import { SelectTypeFieldOptions } from "./SelectTypeFieldOptions";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
@@ -323,12 +323,14 @@ export const PetitionComposeField = Object.assign(
                 />
               ) : null}
               {field.type === "SELECT" ? (
-                <SelectTypeFieldOptionsTextarea
-                  field={field}
-                  onFieldEdit={onFieldEdit}
-                  showError={showError}
-                  {...selectOptionsFieldProps}
-                />
+                <Box marginTop={1}>
+                  <SelectTypeFieldOptions
+                    field={field}
+                    onFieldEdit={onFieldEdit}
+                    showError={showError}
+                    {...selectOptionsFieldProps}
+                  />
+                </Box>
               ) : null}
             </Box>
             <Stack
@@ -413,9 +415,9 @@ export const PetitionComposeField = Object.assign(
           multiple
           isFixed
           isDescriptionShown @client
-          ...SelectTypeFieldOptionsTextarea_PetitionField
+          ...SelectTypeFieldOptions_PetitionField
         }
-        ${SelectTypeFieldOptionsTextarea.fragments.PetitionField}
+        ${SelectTypeFieldOptions.fragments.PetitionField}
       `,
     },
   }
