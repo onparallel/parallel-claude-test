@@ -562,7 +562,7 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      const { petition } = await this.createPetitionFieldAtPosition(
+      await this.createPetitionFieldAtPosition(
         row.id,
         {
           type: "FILE_UPLOAD",
@@ -575,11 +575,26 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      await this.createEvent_old(
+      const { petition } = await this.createPetitionFieldAtPosition(
         row.id,
-        "PETITION_CREATED",
         {
-          user_id: user.id,
+          type: "SELECT",
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+          ...defaultFieldOptions("SELECT"),
+        },
+        3,
+        user,
+        t
+      );
+
+      await this.createEvent(
+        {
+          petitionId: row.id,
+          type: "PETITION_CREATED",
+          data: {
+            user_id: user.id,
+          },
         },
         t
       );
