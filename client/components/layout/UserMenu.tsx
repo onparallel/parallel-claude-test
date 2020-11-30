@@ -33,7 +33,6 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
 
   async function handleLogoutClick() {
     await postJson("/api/auth/logout");
-    localStorage.removeItem("token");
     await apollo.clearStore();
     router.push(`/${router.query.locale}/login`);
   }

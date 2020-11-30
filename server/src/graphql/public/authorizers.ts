@@ -1,9 +1,49 @@
-import { PetitionFieldType } from "../../db/__types";
-import { MaybeArray } from "../../util/types";
-import { Arg } from "../helpers/authorize";
-import { PublicPetitionNotAvailableError } from "../helpers/errors";
-import { unMaybeArray } from "../../util/arrays";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { parse as parseCookie } from "cookie";
+import { IncomingMessage } from "http";
+import { PetitionFieldType } from "../../db/__types";
+import { unMaybeArray } from "../../util/arrays";
+import { toGlobalId } from "../../util/globalId";
+import { MaybeArray } from "../../util/types";
+import { Arg, chain } from "../helpers/authorize";
+import {
+  PublicPetitionNotAvailableError,
+  WhitelistedError,
+} from "../helpers/errors";
+
+export function authenticatePublicAccess<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, string>
+>(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
+    const contactId = ctx.contact!.id;
+    const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
+    if (
+      cookieValue &&
+      (await ctx.contacts.verifyContact(contactId, cookieValue))
+    ) {
+      return true;
+    } else {
+      throw new WhitelistedError(
+        "Contact is not verified",
+        "CONTACT_NOT_VERIFIED"
+      );
+    }
+  });
+}
+
+export function getContactAuthCookieValue(
+  req: IncomingMessage,
+  contactId: number
+): string | undefined {
+  const cookies = parseCookie(req.headers["cookie"] ?? "");
+  const cookieName = `parallel_contact_auth_${toGlobalId(
+    "Contact",
+    contactId
+  )}`;
+  return cookies[cookieName];
+}
 
 export function fetchPetitionAccess<
   TypeName extends string,

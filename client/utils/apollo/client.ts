@@ -1,16 +1,30 @@
 import {
   ApolloClient,
+  createHttpLink,
   FieldMergeFunction,
+  from,
   InMemoryCache,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
-import { createUploadLink } from "apollo-upload-client";
-import { indexBy } from "remeda";
+import { IncomingMessage } from "http";
+import { filter, indexBy, map, pipe } from "remeda";
 import typeDefs from "./client-schema.graphql";
+import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 
 export interface CreateApolloClientOptions {
-  getToken: () => string;
+  req?: IncomingMessage;
+}
+
+function filterCookies(cookies: string) {
+  return pipe(
+    cookies,
+    parseCookie,
+    Object.entries,
+    filter(([key]) => key.startsWith("parallel_")),
+    map(([key, value]) => serializeCookie(key, value)),
+    (values) => values.join("; ")
+  );
 }
 
 export function mergeArraysBy(path: string[]): FieldMergeFunction {
@@ -43,7 +57,7 @@ export function mergeArraysBy(path: string[]): FieldMergeFunction {
 let _cached: ApolloClient<any>;
 export function createApolloClient(
   initialState: any,
-  { getToken }: CreateApolloClientOptions
+  { req }: CreateApolloClientOptions
 ) {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections
@@ -51,22 +65,23 @@ export function createApolloClient(
     return _cached;
   }
 
-  const uploadLink = createUploadLink({
+  const httpLink = createHttpLink({
     uri: process.browser ? "/graphql" : "http://localhost:4000/graphql",
   });
 
-  const authLink = setContext((_, { headers }) => {
-    const token = getToken();
+  const authLink = setContext((_, { headers, ...re }) => {
     return {
       headers: {
         ...headers,
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(process.browser
+          ? {}
+          : { cookie: filterCookies(req!.headers["cookie"]!) }),
       },
     };
   });
 
   const client = new ApolloClient({
-    link: authLink.concat(uploadLink as any),
+    link: from([authLink, httpLink]),
     ssrMode: !process.browser,
     cache: new InMemoryCache({
       dataIdFromObject: (o) => o.id as string,

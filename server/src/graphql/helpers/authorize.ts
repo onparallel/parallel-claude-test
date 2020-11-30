@@ -4,6 +4,7 @@ import { AuthenticationError } from "apollo-server-express";
 import { every, everySeries } from "async";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
+import { getTokenFromRequest } from "../../util/getTokenFromRequest";
 import { isDefined } from "../../util/remedaExtensions";
 import { KeysOfType, MaybeArray } from "../../util/types";
 
@@ -12,11 +13,10 @@ export function authenticate<
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
-    const authorization = ctx.req.header("Authorization");
-    if (!authorization || !authorization.startsWith("Bearer ")) {
-      throw new AuthenticationError("Invalid Authorization header");
+    const token = getTokenFromRequest(ctx.req);
+    if (!token) {
+      throw new AuthenticationError("Invalid session");
     }
-    const token = authorization.replace("Bearer ", "");
     const cognitoId = await ctx.auth.validateSession(token);
     if (!cognitoId) {
       throw new AuthenticationError("Invalid session");

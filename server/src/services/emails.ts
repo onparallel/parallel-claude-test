@@ -183,4 +183,11 @@ export class EmailsService implements IEmailsService {
       email_log_id: emailLogId,
     });
   }
+
+  async sendContactAuthenticationRequestEmail(requestId: number) {
+    return await this.enqueueEmail("contact-authentication-request", {
+      id: this.buildQueueId("ContactAuthenticationRequest", requestId),
+      contact_authentication_request_id: requestId,
+    });
+  }
 }

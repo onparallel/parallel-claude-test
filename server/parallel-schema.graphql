@@ -442,6 +442,11 @@ type Mutation {
   Checks if a PetitionClosedNotification was already sent or not
   """
   presendPetitionClosedNotification(petitionId: GID!): Result!
+  publicCheckVerificationCode(
+    code: String!
+    keycode: ID!
+    token: ID!
+  ): VerificationCodeCheck!
 
   """
   Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.
@@ -513,6 +518,7 @@ type Mutation {
     keycode: ID!
     petitionFieldCommentIds: [GID!]!
   ): [PublicPetitionFieldComment!]!
+  publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 
   """
   Submits all unpublished comments.
@@ -693,6 +699,12 @@ type Mutation {
     validateRepliesWith: PetitionFieldReplyStatus
     value: Boolean!
   ): PetitionAndPartialFields!
+  verifyPublicAccess(
+    ip: String
+    keycode: ID!
+    token: ID!
+    userAgent: String
+  ): PublicAccessVerification!
 }
 
 enum OnboardingKey {
@@ -1766,6 +1778,15 @@ type PetitionWithFieldAndReplies {
   replies: [PetitionFieldReply!]!
 }
 
+type PublicAccessVerification {
+  cookieName: String
+  cookieValue: String
+  email: String
+  isAllowed: Boolean!
+  orgLogoUrl: String
+  orgName: String
+}
+
 """
 A public view of a contact
 """
@@ -2480,4 +2501,15 @@ type UserPermissionRemovedEvent implements PetitionEvent {
   id: GID!
   permissionUser: User
   user: User
+}
+
+type VerificationCodeCheck {
+  remainingAttempts: Int
+  result: Result!
+}
+
+type VerificationCodeRequest {
+  expiresAt: DateTime!
+  remainingAttempts: Int!
+  token: ID!
 }

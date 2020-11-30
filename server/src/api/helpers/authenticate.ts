@@ -1,14 +1,13 @@
 import { Handler } from "express";
-import { parse as parseCookie } from "cookie";
+import { getTokenFromRequest } from "../../util/getTokenFromRequest";
 
 export function authenticate(): Handler {
   return async (req, res, next) => {
     try {
       const ctx = req.context;
-      const cookies = parseCookie(req.headers.cookie ?? "");
-      const token = cookies["parallel_session"];
+      const token = getTokenFromRequest(req);
       if (!token) {
-        throw new Error("Missing cookie");
+        throw new Error("Not auhtorized");
       }
       const cognitoId = await ctx.auth.validateSession(token);
       if (!cognitoId) {

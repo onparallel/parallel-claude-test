@@ -82,6 +82,8 @@ export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
 export interface TableTypes {
   contact: Contact;
+  contact_authentication: ContactAuthentication;
+  contact_authentication_request: ContactAuthenticationRequest;
   email_event: EmailEvent;
   email_log: EmailLog;
   feature_flag: FeatureFlag;
@@ -106,6 +108,8 @@ export interface TableTypes {
 
 export interface TableCreateTypes {
   contact: CreateContact;
+  contact_authentication: CreateContactAuthentication;
+  contact_authentication_request: CreateContactAuthenticationRequest;
   email_event: CreateEmailEvent;
   email_log: CreateEmailLog;
   feature_flag: CreateFeatureFlag;
@@ -130,6 +134,8 @@ export interface TableCreateTypes {
 
 export interface TablePrimaryKeys {
   contact: "id";
+  contact_authentication: "id";
+  contact_authentication_request: "id";
   email_event: "id";
   email_log: "id";
   feature_flag: "id";
@@ -176,6 +182,35 @@ export type CreateContact = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+>;
+
+export interface ContactAuthentication {
+  id: number;
+  contact_id: number;
+  cookie_value_hash: string;
+  access_log: any;
+}
+
+export type CreateContactAuthentication = PartialProps<
+  Omit<ContactAuthentication, "id">,
+  "access_log"
+>;
+
+export interface ContactAuthenticationRequest {
+  id: number;
+  petition_access_id: number;
+  token_hash: string;
+  code: string;
+  remaining_attempts: number;
+  email_log_id: Maybe<number>;
+  ip: Maybe<string>;
+  user_agent: Maybe<string>;
+  expires_at: Date;
+}
+
+export type CreateContactAuthenticationRequest = PartialProps<
+  Omit<ContactAuthenticationRequest, "id">,
+  "email_log_id" | "ip" | "user_agent"
 >;
 
 export interface EmailEvent {

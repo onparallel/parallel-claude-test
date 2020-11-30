@@ -221,6 +221,7 @@ export type Mutation = {
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Checks if a PetitionClosedNotification was already sent or not */
   presendPetitionClosedNotification: Result;
+  publicCheckVerificationCode: VerificationCodeCheck;
   /** Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user. */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
@@ -239,6 +240,7 @@ export type Mutation = {
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
+  publicSendVerificationCode: VerificationCodeRequest;
   /** Submits all unpublished comments. */
   publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
   /** Update a petition field comment. */
@@ -288,6 +290,7 @@ export type Mutation = {
   updateUser: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
+  verifyPublicAccess: PublicAccessVerification;
 };
 
 export type MutationaddPetitionUserPermissionArgs = {
@@ -424,6 +427,12 @@ export type MutationpresendPetitionClosedNotificationArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationpublicCheckVerificationCodeArgs = {
+  code: Scalars["String"];
+  keycode: Scalars["ID"];
+  token: Scalars["ID"];
+};
+
 export type MutationpublicCompletePetitionArgs = {
   keycode: Scalars["ID"];
 };
@@ -471,6 +480,10 @@ export type MutationpublicFileUploadReplyCompleteArgs = {
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
+};
+
+export type MutationpublicSendVerificationCodeArgs = {
+  keycode: Scalars["ID"];
 };
 
 export type MutationpublicSubmitUnpublishedCommentsArgs = {
@@ -610,6 +623,13 @@ export type MutationvalidatePetitionFieldsArgs = {
   petitionId: Scalars["GID"];
   validateRepliesWith?: Maybe<PetitionFieldReplyStatus>;
   value: Scalars["Boolean"];
+};
+
+export type MutationverifyPublicAccessArgs = {
+  ip?: Maybe<Scalars["String"]>;
+  keycode: Scalars["ID"];
+  token: Scalars["ID"];
+  userAgent?: Maybe<Scalars["String"]>;
 };
 
 export type OnboardingKey =
@@ -1185,6 +1205,16 @@ export type PetitionWithFieldAndReplies = {
   replies: Array<PetitionFieldReply>;
 };
 
+export type PublicAccessVerification = {
+  __typename?: "PublicAccessVerification";
+  cookieName?: Maybe<Scalars["String"]>;
+  cookieValue?: Maybe<Scalars["String"]>;
+  email?: Maybe<Scalars["String"]>;
+  isAllowed: Scalars["Boolean"];
+  orgLogoUrl?: Maybe<Scalars["String"]>;
+  orgName?: Maybe<Scalars["String"]>;
+};
+
 /** A public view of a contact */
 export type PublicContact = {
   __typename?: "PublicContact";
@@ -1638,6 +1668,19 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
   id: Scalars["GID"];
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
+};
+
+export type VerificationCodeCheck = {
+  __typename?: "VerificationCodeCheck";
+  remainingAttempts?: Maybe<Scalars["Int"]>;
+  result: Result;
+};
+
+export type VerificationCodeRequest = {
+  __typename?: "VerificationCodeRequest";
+  expiresAt: Scalars["DateTime"];
+  remainingAttempts: Scalars["Int"];
+  token: Scalars["ID"];
 };
 
 export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
@@ -3904,6 +3947,18 @@ export type Login_UserFragment = { __typename?: "User" } & Pick<
   "id" | "fullName" | "email"
 >;
 
+export type RecipientView_PublicPetitionAccessFragment = {
+  __typename?: "PublicPetitionAccess";
+} & {
+  petition?: Maybe<
+    { __typename?: "PublicPetition" } & RecipientView_PublicPetitionFragment
+  >;
+  granter?: Maybe<
+    { __typename?: "PublicUser" } & RecipientView_PublicUserFragment
+  >;
+  contact?: Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>;
+};
+
 export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<
@@ -4183,17 +4238,56 @@ export type PublicPetitionQueryVariables = Exact<{
 
 export type PublicPetitionQuery = { __typename?: "Query" } & {
   access?: Maybe<
-    { __typename?: "PublicPetitionAccess" } & {
-      petition?: Maybe<
-        { __typename?: "PublicPetition" } & RecipientView_PublicPetitionFragment
-      >;
-      granter?: Maybe<
-        { __typename?: "PublicUser" } & RecipientView_PublicUserFragment
-      >;
-      contact?: Maybe<
-        { __typename?: "PublicContact" } & Pick<PublicContact, "id">
-      >;
-    }
+    {
+      __typename?: "PublicPetitionAccess";
+    } & RecipientView_PublicPetitionAccessFragment
+  >;
+};
+
+export type RecipientView_verifyPublicAccessMutationVariables = Exact<{
+  token: Scalars["ID"];
+  keycode: Scalars["ID"];
+  ip?: Maybe<Scalars["String"]>;
+  userAgent?: Maybe<Scalars["String"]>;
+}>;
+
+export type RecipientView_verifyPublicAccessMutation = {
+  __typename?: "Mutation";
+} & {
+  verifyPublicAccess: { __typename?: "PublicAccessVerification" } & Pick<
+    PublicAccessVerification,
+    | "isAllowed"
+    | "cookieName"
+    | "cookieValue"
+    | "email"
+    | "orgName"
+    | "orgLogoUrl"
+  >;
+};
+
+export type publicSendVerificationCodeMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type publicSendVerificationCodeMutation = { __typename?: "Mutation" } & {
+  publicSendVerificationCode: { __typename?: "VerificationCodeRequest" } & Pick<
+    VerificationCodeRequest,
+    "token" | "remainingAttempts" | "expiresAt"
+  >;
+};
+
+export type publicCheckVerificationCodeMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  token: Scalars["ID"];
+  code: Scalars["String"];
+}>;
+
+export type publicCheckVerificationCodeMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCheckVerificationCode: { __typename?: "VerificationCodeCheck" } & Pick<
+    VerificationCodeCheck,
+    "result" | "remainingAttempts"
   >;
 };
 
@@ -5807,6 +5901,21 @@ export const RecipientView_PublicUserFragmentDoc = gql`
   }
   ${RecipientViewSenderCard_PublicUserFragmentDoc}
   ${RecipientViewContentsCard_PublicUserFragmentDoc}
+`;
+export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
+  fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
+    petition {
+      ...RecipientView_PublicPetition
+    }
+    granter {
+      ...RecipientView_PublicUser
+    }
+    contact {
+      id
+    }
+  }
+  ${RecipientView_PublicPetitionFragmentDoc}
+  ${RecipientView_PublicUserFragmentDoc}
 `;
 export const RecipientView_deletePetitionReply_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientView_deletePetitionReply_PublicPetitionField on PublicPetitionField {
@@ -9820,19 +9929,10 @@ export type RecipientView_markPetitionFieldCommentsAsReadMutationHookResult = Re
 export const PublicPetitionDocument = gql`
   query PublicPetition($keycode: ID!) {
     access(keycode: $keycode) {
-      petition {
-        ...RecipientView_PublicPetition
-      }
-      granter {
-        ...RecipientView_PublicUser
-      }
-      contact {
-        id
-      }
+      ...RecipientView_PublicPetitionAccess
     }
   }
-  ${RecipientView_PublicPetitionFragmentDoc}
-  ${RecipientView_PublicUserFragmentDoc}
+  ${RecipientView_PublicPetitionAccessFragmentDoc}
 `;
 
 /**
@@ -9878,6 +9978,150 @@ export type PublicPetitionQueryHookResult = ReturnType<
 >;
 export type PublicPetitionLazyQueryHookResult = ReturnType<
   typeof usePublicPetitionLazyQuery
+>;
+export const RecipientView_verifyPublicAccessDocument = gql`
+  mutation RecipientView_verifyPublicAccess(
+    $token: ID!
+    $keycode: ID!
+    $ip: String
+    $userAgent: String
+  ) {
+    verifyPublicAccess(
+      token: $token
+      keycode: $keycode
+      ip: $ip
+      userAgent: $userAgent
+    ) {
+      isAllowed
+      cookieName
+      cookieValue
+      email
+      orgName
+      orgLogoUrl
+    }
+  }
+`;
+
+/**
+ * __useRecipientView_verifyPublicAccessMutation__
+ *
+ * To run a mutation, you first call `useRecipientView_verifyPublicAccessMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientView_verifyPublicAccessMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewVerifyPublicAccessMutation, { data, loading, error }] = useRecipientView_verifyPublicAccessMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      keycode: // value for 'keycode'
+ *      ip: // value for 'ip'
+ *      userAgent: // value for 'userAgent'
+ *   },
+ * });
+ */
+export function useRecipientView_verifyPublicAccessMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientView_verifyPublicAccessMutation,
+    RecipientView_verifyPublicAccessMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    RecipientView_verifyPublicAccessMutation,
+    RecipientView_verifyPublicAccessMutationVariables
+  >(RecipientView_verifyPublicAccessDocument, baseOptions);
+}
+export type RecipientView_verifyPublicAccessMutationHookResult = ReturnType<
+  typeof useRecipientView_verifyPublicAccessMutation
+>;
+export const publicSendVerificationCodeDocument = gql`
+  mutation publicSendVerificationCode($keycode: ID!) {
+    publicSendVerificationCode(keycode: $keycode) {
+      token
+      remainingAttempts
+      expiresAt
+    }
+  }
+`;
+
+/**
+ * __usepublicSendVerificationCodeMutation__
+ *
+ * To run a mutation, you first call `usepublicSendVerificationCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usepublicSendVerificationCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [publicSendVerificationCodeMutation, { data, loading, error }] = usepublicSendVerificationCodeMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *   },
+ * });
+ */
+export function usepublicSendVerificationCodeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    publicSendVerificationCodeMutation,
+    publicSendVerificationCodeMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    publicSendVerificationCodeMutation,
+    publicSendVerificationCodeMutationVariables
+  >(publicSendVerificationCodeDocument, baseOptions);
+}
+export type publicSendVerificationCodeMutationHookResult = ReturnType<
+  typeof usepublicSendVerificationCodeMutation
+>;
+export const publicCheckVerificationCodeDocument = gql`
+  mutation publicCheckVerificationCode(
+    $keycode: ID!
+    $token: ID!
+    $code: String!
+  ) {
+    publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
+      result
+      remainingAttempts
+    }
+  }
+`;
+
+/**
+ * __usepublicCheckVerificationCodeMutation__
+ *
+ * To run a mutation, you first call `usepublicCheckVerificationCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usepublicCheckVerificationCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [publicCheckVerificationCodeMutation, { data, loading, error }] = usepublicCheckVerificationCodeMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      token: // value for 'token'
+ *      code: // value for 'code'
+ *   },
+ * });
+ */
+export function usepublicCheckVerificationCodeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    publicCheckVerificationCodeMutation,
+    publicCheckVerificationCodeMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    publicCheckVerificationCodeMutation,
+    publicCheckVerificationCodeMutationVariables
+  >(publicCheckVerificationCodeDocument, baseOptions);
+}
+export type publicCheckVerificationCodeMutationHookResult = ReturnType<
+  typeof usepublicCheckVerificationCodeMutation
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {

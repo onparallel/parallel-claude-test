@@ -14,6 +14,12 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/core";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import {
+  DialogProps,
+  useDialog,
+  withDialogs,
+} from "@parallel/components/common/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   RedirectError,
@@ -41,14 +47,16 @@ import {
   RecipientView_createFileUploadReply_PublicPetitionFragment,
   RecipientView_createPetitionFieldCommentMutationVariables,
   RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment,
+  RecipientView_createSelectReply_FieldFragment,
+  RecipientView_createSelectReply_PublicPetitionFragment,
   RecipientView_createTextReply_FieldFragment,
   RecipientView_createTextReply_PublicPetitionFragment,
   RecipientView_deletePetitionFieldCommentMutationVariables,
   RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFragment,
-  RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicContactFragment,
+  RecipientView_PublicPetitionFieldFragment,
   RecipientView_updatePetitionFieldCommentMutationVariables,
   usePublicPetitionQuery,
   useRecipientView_createPetitionFieldCommentMutation,
@@ -56,19 +64,18 @@ import {
   useRecipientView_markPetitionFieldCommentsAsReadMutation,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_publicCreateFileUploadReplyMutation,
+  useRecipientView_publicCreateSelectReplyMutation,
   useRecipientView_publicCreateTextReplyMutation,
   useRecipientView_publicDeletePetitionReplyMutation,
   useRecipientView_publicFileUploadReplyCompleteMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
   useRecipientView_updatePetitionFieldCommentMutation,
-  useRecipientView_publicCreateSelectReplyMutation,
-  RecipientView_createSelectReply_FieldFragment,
-  RecipientView_createSelectReply_PublicPetitionFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
+import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import axios, { CancelTokenSource } from "axios";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -76,13 +83,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 import { countBy, omit, pick } from "remeda";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/DialogProvider";
-import { compose } from "@parallel/utils/compose";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -597,6 +597,23 @@ function ConfirmStartSignatureProcess({
 }
 
 RecipientView.fragments = {
+  get PublicPetitionAccess() {
+    return gql`
+      fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
+        petition {
+          ...RecipientView_PublicPetition
+        }
+        granter {
+          ...RecipientView_PublicUser
+        }
+        contact {
+          id
+        }
+      }
+      ${this.PublicPetition}
+      ${this.PublicUser}
+    `;
+  },
   get PublicPetition() {
     return gql`
       fragment RecipientView_PublicPetition on PublicPetition {
@@ -1196,8 +1213,10 @@ function useHelpModal() {
 }
 
 RecipientView.getInitialProps = async ({
+  req,
   query,
   pathname,
+  apollo,
   fetchQuery,
 }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
@@ -1213,23 +1232,12 @@ RecipientView.getInitialProps = async ({
     gql`
       query PublicPetition($keycode: ID!) {
         access(keycode: $keycode) {
-          petition {
-            ...RecipientView_PublicPetition
-          }
-          granter {
-            ...RecipientView_PublicUser
-          }
-          contact {
-            id
-          }
+          ...RecipientView_PublicPetitionAccess
         }
       }
-      ${RecipientView.fragments.PublicPetition}
-      ${RecipientView.fragments.PublicUser}
+      ${RecipientView.fragments.PublicPetitionAccess}
     `,
-    {
-      variables: { keycode },
-    }
+    { variables: { keycode } }
   );
   if (!result.data?.access?.petition) {
     throw new Error();

@@ -133,7 +133,7 @@ export class Auth implements IAuth {
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
-    res.status(201).send({ token });
+    res.status(201).send({});
   }
 
   private async deleteSession(token: string) {

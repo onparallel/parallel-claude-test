@@ -1,12 +1,12 @@
 import { idArg, nonNull, nullable, queryField } from "@nexus/schema";
-import { fetchPetitionAccess } from "./authorizers";
+import { authenticatePublicAccess } from "./authorizers";
 
 export const accessQuery = queryField("access", {
   type: nullable("PublicPetitionAccess"),
   args: {
     keycode: nonNull(idArg()),
   },
-  authorize: fetchPetitionAccess("keycode"),
+  authorize: authenticatePublicAccess("keycode"),
   resolve: async (root, args, ctx) => {
     await ctx.petitions.createEvent_old(
       ctx.access!.petition_id,

@@ -29,7 +29,7 @@ import {
   ifArgDefined,
   or,
 } from "../../helpers/authorize";
-import { dateTimeArg } from "../../helpers/date";
+import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
@@ -755,7 +755,7 @@ export const sendPetition = mutationField("sendPetition", {
     contactIds: nonNull(list(nonNull(globalIdArg("Contact")))),
     subject: nonNull(stringArg()),
     body: nonNull(jsonArg()),
-    scheduledAt: dateTimeArg({}),
+    scheduledAt: datetimeArg(),
     remindersConfig: arg({ type: "RemindersConfigInput" }),
   },
   validateArgs: validateAnd(
@@ -860,7 +860,7 @@ export const sendMessages = mutationField("sendMessages", {
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
     subject: nonNull(stringArg()),
     body: nonNull(jsonArg()),
-    scheduledAt: dateTimeArg({}),
+    scheduledAt: datetimeArg(),
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.accessIds, "accessIds"),

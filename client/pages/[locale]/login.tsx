@@ -47,12 +47,11 @@ function Login() {
   async function onLoginSubmit({ email, password }: LoginFormData) {
     setIsSubmitting(true);
     try {
-      const res = await postJson<{ token: string }>("/api/auth/login", {
+      await postJson<{ token: string }>("/api/auth/login", {
         email,
         password,
       });
       await client.clearStore();
-      localStorage.setItem("token", res!.token);
       router.push(`/${router.query.locale}/app/petitions`);
     } catch (error) {
       if (error.error === "NewPasswordRequired") {
@@ -82,12 +81,11 @@ function Login() {
     setIsSubmitting(true);
     try {
       const { email, password } = passwordChange;
-      const res = await postJson<{ token: string }>("/api/auth/new-password", {
+      await postJson<{ token: string }>("/api/auth/new-password", {
         email,
         password,
         newPassword,
       });
-      localStorage.setItem("token", res!.token);
       router.push(`/${router.query.locale}/app/petitions`);
     } catch (error) {}
     setIsSubmitting(false);

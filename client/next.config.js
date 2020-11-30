@@ -57,11 +57,6 @@ const config = {
         destination: "/:locale/app/petitions",
         permanent: false,
       },
-      {
-        source: "/:locale/petition/:keycode",
-        destination: "/:locale/petition/:keycode/1",
-        permanent: false,
-      },
     ];
   },
   async headers() {

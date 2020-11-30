@@ -15,15 +15,194 @@ import { WhitelistedError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import {
   commentsBelongsToAccess,
-  fetchPetitionAccess,
+  authenticatePublicAccess,
   fieldBelongsToAccess,
   fieldHasType,
   replyBelongsToAccess,
+  fetchPetitionAccess,
+  getContactAuthCookieValue,
 } from "./authorizers";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userIsCommentAuthor } from "../petition/mutations/authorizers";
 import { toGlobalId } from "../../util/globalId";
+import { getClientIp } from "request-ip";
+import { stallFor } from "../../util/stallFor";
+
+function anonymizePart(part: string) {
+  return part.length > 2
+    ? part[0] + "*".repeat(part.length - 2) + part[part.length - 1]
+    : part[0] + "*".repeat(part.length - 1);
+}
+
+function anonymizeEmail(email: string) {
+  const [, local, domain] = email.match(/^(.+)@(.+)$/)!;
+  const match = domain.match(/(^[^\.]*)\.(.*)$/);
+  const _domain = match
+    ? anonymizePart(match[1]) + "." + match[2]
+    : anonymizePart(domain);
+  return anonymizePart(local) + "@" + _domain;
+}
+
+export const verifyPublicAccess = mutationField("verifyPublicAccess", {
+  type: objectType({
+    name: "PublicAccessVerification",
+    definition(t) {
+      t.boolean("isAllowed");
+      t.nullable.string("cookieName");
+      t.nullable.string("cookieValue");
+      t.nullable.string("email");
+      t.nullable.string("orgLogoUrl");
+      t.nullable.string("orgName");
+    },
+  }),
+  authorize: fetchPetitionAccess("keycode"),
+  args: {
+    token: nonNull(idArg()),
+    keycode: nonNull(idArg()),
+    ip: stringArg(),
+    userAgent: stringArg(),
+  },
+  resolve: async (_, args, ctx) => {
+    const logEntry = {
+      ip: args.ip ?? null,
+      userAgent: args.userAgent ?? null,
+    };
+    const contactId = ctx.contact!.id;
+    if (await ctx.contacts.hasContactAuthentication(contactId)) {
+      const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
+      const authenticationId = cookieValue
+        ? await ctx.contacts.verifyContact(contactId, cookieValue)
+        : null;
+      if (authenticationId) {
+        // await ctx.petitions.createEvent({
+        //   petitionId: ctx.access!.petition_id,
+        //   type: "ACCESS_OPENED",
+        //   data: { petition_access_id: ctx.access!.id },
+        // });
+        await ctx.contacts.addContactAuthenticationLogAccessEntry(
+          authenticationId,
+          logEntry
+        );
+        return { isAllowed: true };
+      } else {
+        const org = await ctx.organizations.loadOrg(ctx.contact!.org_id);
+        return {
+          isAllowed: false,
+          email: anonymizeEmail(ctx.contact!.email),
+          orgName: org!.name,
+          orgLogoUrl: await ctx.organizations.getOrgLogoUrl(org!.id),
+        };
+      }
+    } else {
+      // await ctx.petitions.createEvent({
+      //   petitionId: ctx.access!.petition_id,
+      //   type: "ACCESS_OPENED",
+      //   data: { petition_access_id: ctx.access!.id },
+      // });
+      const {
+        cookieValue,
+        contactAuthentication,
+      } = await ctx.contacts.createContactAuthentication(contactId);
+      await ctx.contacts.addContactAuthenticationLogAccessEntry(
+        contactAuthentication.id,
+        logEntry
+      );
+      return {
+        isAllowed: true,
+        cookieName: `parallel_contact_auth_${toGlobalId("Contact", contactId)}`,
+        cookieValue,
+      };
+    }
+  },
+});
+
+export const publicSendVerificationCode = mutationField(
+  "publicSendVerificationCode",
+  {
+    type: objectType({
+      name: "VerificationCodeRequest",
+      definition(t) {
+        t.id("token");
+        t.datetime("expiresAt");
+        t.int("remainingAttempts");
+      },
+    }),
+    authorize: fetchPetitionAccess("keycode"),
+    args: {
+      keycode: nonNull(idArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      return await stallFor(async function () {
+        const {
+          token,
+          request,
+        } = await ctx.contacts.createContactAuthenticationRequest({
+          petition_access_id: ctx.access!.id,
+          user_agent: ctx.req!.headers["user-agent"] ?? null,
+          ip: getClientIp(ctx.req),
+        });
+        await ctx.emails.sendContactAuthenticationRequestEmail(request.id);
+        return {
+          token,
+          expiresAt: request.expires_at,
+          remainingAttempts: request.remaining_attempts,
+        };
+      }, 2000);
+    },
+  }
+);
+
+export const publicCheckVerificationCode = mutationField(
+  "publicCheckVerificationCode",
+  {
+    type: objectType({
+      name: "VerificationCodeCheck",
+      definition(t) {
+        t.field("result", { type: "Result" });
+        t.nullable.int("remainingAttempts");
+      },
+    }),
+    authorize: fetchPetitionAccess("keycode"),
+    args: {
+      keycode: nonNull(idArg()),
+      token: nonNull(idArg()),
+      code: nonNull(stringArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      return await stallFor(async function () {
+        try {
+          const result = await ctx.contacts.verifyContactAuthenticationRequest(
+            ctx.access!.id,
+            args.token,
+            args.code
+          );
+          if (result.success) {
+            ctx.req.res?.cookie(
+              `parallel_contact_auth_${toGlobalId("Contact", ctx.contact!.id)}`,
+              await ctx.contacts.createContactAuthentication(ctx.contact!.id),
+              {
+                path: "/",
+                httpOnly: true,
+                sameSite: "strict",
+                secure: process.env.NODE_ENV === "production",
+              }
+            );
+          }
+          return {
+            result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
+            remainingAttempts: result.remainingAttempts,
+          };
+        } catch (e) {
+          throw new WhitelistedError(
+            "INVALID_TOKEN",
+            "The token is no longer valid"
+          );
+        }
+      }, 2000);
+    },
+  }
+);
 
 export const publicDeletePetitionReply = mutationField(
   "publicDeletePetitionReply",
@@ -31,7 +210,7 @@ export const publicDeletePetitionReply = mutationField(
     description: "Deletes a reply to a petition field.",
     type: "Result",
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       replyBelongsToAccess("replyId")
     ),
     args: {
@@ -71,7 +250,7 @@ export const publicFileUploadReplyComplete = mutationField(
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
     },
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       replyBelongsToAccess("replyId")
     ),
     resolve: async (_, args, ctx) => {
@@ -118,7 +297,7 @@ export const publicCreateFileUploadReply = mutationField(
       ),
     },
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD")
     ),
@@ -167,7 +346,7 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
     ),
   },
   authorize: chain(
-    fetchPetitionAccess("keycode"),
+    authenticatePublicAccess("keycode"),
     fieldBelongsToAccess("fieldId"),
     fieldHasType("fieldId", "TEXT")
   ),
@@ -223,7 +402,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   args: {
     keycode: nonNull(idArg()),
   },
-  authorize: fetchPetitionAccess("keycode"),
+  authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
     const petition = await ctx.petitions.completePetition(
       ctx.access!.petition_id,
@@ -271,7 +450,7 @@ export const publicCreatePetitionFieldComment = mutationField(
     description: "Create a petition field comment.",
     type: "PublicPetitionFieldComment",
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       fieldBelongsToAccess("petitionFieldId")
     ),
     args: {
@@ -307,7 +486,7 @@ export const publicDeletePetitionFieldComment = mutationField(
     description: "Delete a petition field comment.",
     type: "Result",
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       and(
         fieldBelongsToAccess("petitionFieldId"),
         commentsBelongsToAccess("petitionFieldCommentId")
@@ -336,7 +515,7 @@ export const publicUpdatePetitionFieldComment = mutationField(
     description: "Update a petition field comment.",
     type: "PublicPetitionFieldComment",
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       and(
         fieldBelongsToAccess("petitionFieldId"),
         commentsBelongsToAccess("petitionFieldCommentId"),
@@ -364,7 +543,7 @@ export const publicSubmitUnpublishedComments = mutationField(
   {
     description: "Submits all unpublished comments.",
     type: list(nonNull("PublicPetitionFieldComment")),
-    authorize: chain(fetchPetitionAccess("keycode")),
+    authorize: authenticatePublicAccess("keycode"),
     args: {
       keycode: nonNull(idArg()),
     },
@@ -394,7 +573,7 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
     description: "Marks the specified comments as read.",
     type: list(nonNull("PublicPetitionFieldComment")),
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       commentsBelongsToAccess("petitionFieldCommentIds")
     ),
     args: {

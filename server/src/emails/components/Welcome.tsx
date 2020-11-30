@@ -1,7 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import React from "react";
-import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
@@ -22,7 +22,7 @@ const email: Email<WelcomeProps> = {
   subject({}, intl) {
     return "";
   },
-  text({ verificationUrl, parallelUrl }: WelcomeProps, intl: IntlShape) {
+  text({ verificationUrl, parallelUrl }, intl) {
     return outdent`
       ${intl.formatMessage({
         id: "welcome.greeting",
@@ -38,13 +38,7 @@ const email: Email<WelcomeProps> = {
       ${closing({}, intl)}
     `;
   },
-  html({
-    verificationUrl,
-    parallelUrl,
-    assetsUrl,
-    logoUrl,
-    logoAlt,
-  }: WelcomeProps) {
+  html({ verificationUrl, parallelUrl, assetsUrl, logoUrl, logoAlt }) {
     const { locale } = useIntl();
     return (
       <Layout

@@ -304,6 +304,15 @@ export interface NexusGenObjects {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
   };
+  PublicAccessVerification: {
+    // root type
+    cookieName?: string | null; // String
+    cookieValue?: string | null; // String
+    email?: string | null; // String
+    isAllowed: boolean; // Boolean!
+    orgLogoUrl?: string | null; // String
+    orgName?: string | null; // String
+  };
   PublicContact: db.Contact;
   PublicOrganization: db.Organization;
   PublicPetition: db.Petition;
@@ -351,6 +360,17 @@ export interface NexusGenObjects {
   UserPermissionAddedEvent: events.UserPermissionAddedEvent;
   UserPermissionEditedEvent: events.UserPermissionEditedEvent;
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
+  VerificationCodeCheck: {
+    // root type
+    remainingAttempts?: number | null; // Int
+    result: NexusGenEnums["Result"]; // Result!
+  };
+  VerificationCodeRequest: {
+    // root type
+    expiresAt: NexusGenScalars["DateTime"]; // DateTime!
+    remainingAttempts: number; // Int!
+    token: string; // ID!
+  };
 }
 
 export interface NexusGenInterfaces {
@@ -492,6 +512,7 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     presendPetitionClosedNotification: NexusGenEnums["Result"]; // Result!
+    publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
@@ -501,6 +522,7 @@ export interface NexusGenFieldTypes {
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -526,6 +548,7 @@ export interface NexusGenFieldTypes {
     updatePetitionUserSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updateUser: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
+    verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
   OrgIntegration: {
     // field return type
@@ -771,6 +794,15 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
   };
+  PublicAccessVerification: {
+    // field return type
+    cookieName: string | null; // String
+    cookieValue: string | null; // String
+    email: string | null; // String
+    isAllowed: boolean; // Boolean!
+    orgLogoUrl: string | null; // String
+    orgName: string | null; // String
+  };
   PublicContact: {
     // field return type
     email: string; // String!
@@ -969,6 +1001,17 @@ export interface NexusGenFieldTypes {
     permissionUser: NexusGenRootTypes["User"] | null; // User
     user: NexusGenRootTypes["User"] | null; // User
   };
+  VerificationCodeCheck: {
+    // field return type
+    remainingAttempts: number | null; // Int
+    result: NexusGenEnums["Result"]; // Result!
+  };
+  VerificationCodeRequest: {
+    // field return type
+    expiresAt: NexusGenScalars["DateTime"]; // DateTime!
+    remainingAttempts: number; // Int!
+    token: string; // ID!
+  };
   CreatedAt: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1113,6 +1156,7 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
     markPetitionFieldCommentsAsRead: "PetitionFieldComment";
     presendPetitionClosedNotification: "Result";
+    publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
     publicCreateFileUploadReply: "CreateFileUploadReply";
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
@@ -1122,6 +1166,7 @@ export interface NexusGenFieldTypeNames {
     publicDeletePetitionReply: "Result";
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
+    publicSendVerificationCode: "VerificationCodeRequest";
     publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     reactivateAccesses: "PetitionAccess";
@@ -1147,6 +1192,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionUserSubscription: "Petition";
     updateUser: "User";
     validatePetitionFields: "PetitionAndPartialFields";
+    verifyPublicAccess: "PublicAccessVerification";
   };
   OrgIntegration: {
     // field return type name
@@ -1390,6 +1436,15 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     replies: "PetitionFieldReply";
   };
+  PublicAccessVerification: {
+    // field return type name
+    cookieName: "String";
+    cookieValue: "String";
+    email: "String";
+    isAllowed: "Boolean";
+    orgLogoUrl: "String";
+    orgName: "String";
+  };
   PublicContact: {
     // field return type name
     email: "String";
@@ -1586,6 +1641,17 @@ export interface NexusGenFieldTypeNames {
     permissionUser: "User";
     user: "User";
   };
+  VerificationCodeCheck: {
+    // field return type name
+    remainingAttempts: "Int";
+    result: "Result";
+  };
+  VerificationCodeRequest: {
+    // field return type name
+    expiresAt: "DateTime";
+    remainingAttempts: "Int";
+    token: "ID";
+  };
   CreatedAt: {
     // field return type name
     createdAt: "DateTime";
@@ -1767,6 +1833,12 @@ export interface NexusGenArgTypes {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    publicCheckVerificationCode: {
+      // args
+      code: string; // String!
+      keycode: string; // ID!
+      token: string; // ID!
+    };
     publicCompletePetition: {
       // args
       keycode: string; // ID!
@@ -1815,6 +1887,10 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    publicSendVerificationCode: {
+      // args
+      keycode: string; // ID!
     };
     publicSubmitUnpublishedComments: {
       // args
@@ -1954,6 +2030,13 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       validateRepliesWith?: NexusGenEnums["PetitionFieldReplyStatus"] | null; // PetitionFieldReplyStatus
       value: boolean; // Boolean!
+    };
+    verifyPublicAccess: {
+      // args
+      ip?: string | null; // String
+      keycode: string; // ID!
+      token: string; // ID!
+      userAgent?: string | null; // String
     };
   };
   Organization: {

@@ -8,6 +8,7 @@ import { petitionClosedNotification } from "./emails/petition-closed-notificatio
 import { petitionSharingNotification } from "./emails/petition-sharing-notification";
 import { petitionMessageBounced } from "./emails/petition-message-bounced";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -18,6 +19,7 @@ const builders = {
   "petition-sharing-notification": petitionSharingNotification,
   "petition-closed-notification": petitionClosedNotification,
   "petition-message-bounced": petitionMessageBounced,
+  "contact-authentication-request": contactAuthenticationRequest,
 };
 
 export type EmailType = keyof typeof builders;

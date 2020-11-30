@@ -8,8 +8,8 @@ export const DateTime = asNexusMethod(
   "Date"
 );
 
-export function dateTimeArg(
-  opts: Omit<core.NexusArgConfig<"DateTime">, "type">
+export function datetimeArg(
+  opts?: Omit<core.NexusArgConfig<"DateTime">, "type">
 ) {
   return arg({ ...opts, type: "DateTime" });
 }
