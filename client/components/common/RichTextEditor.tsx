@@ -43,20 +43,32 @@ import {
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
 
-function TextComponent({ element, attributes, styles, ...props }: any) {
-  return createElement(Text, { ...props, ...attributes });
+function RenderComponent({
+  element,
+  leaf,
+  attributes,
+  htmlAttributes,
+  styles,
+  ...props
+}: any) {
+  return createElement(Text, {
+    ...props,
+    ...attributes,
+    ...htmlAttributes,
+    sx: styles?.root,
+  });
 }
 
 export const options = {
   p: {
-    component: TextComponent,
+    component: RenderComponent,
     type: "paragraph",
     rootProps: {
       as: "p",
     },
   },
   bold: {
-    component: TextComponent,
+    component: RenderComponent,
     type: MARK_BOLD,
     hotkey: "mod+b",
     rootProps: {
@@ -64,7 +76,7 @@ export const options = {
     },
   },
   italic: {
-    component: TextComponent,
+    component: RenderComponent,
     type: MARK_ITALIC,
     hotkey: "mod+i",
     rootProps: {
@@ -72,7 +84,7 @@ export const options = {
     },
   },
   underline: {
-    component: TextComponent,
+    component: RenderComponent,
     type: MARK_UNDERLINE,
     hotkey: "mod+u",
     rootProps: {
@@ -80,23 +92,21 @@ export const options = {
     },
   },
   ul: {
-    component: TextComponent,
+    component: RenderComponent,
     type: "bulleted-list",
     rootProps: {
       as: "ul",
-      paddingLeft: 6,
     },
   },
   ol: {
-    component: TextComponent,
+    component: RenderComponent,
     type: "numbered-list",
     rootProps: {
       as: "ol",
-      paddingLeft: 6,
     },
   },
   li: {
-    component: TextComponent,
+    component: RenderComponent,
     type: "list-item",
     rootProps: {
       as: "li",
@@ -185,7 +195,6 @@ export function RichTextEditor({
       } as CSSProperties),
     []
   );
-
   return (
     <Box
       {...pick(formControl, [

@@ -85,6 +85,9 @@ export function createApolloClient(
             userPermissions: {
               merge: mergeArraysBy(["user", "id"]),
             },
+            emailBody: {
+              merge: false,
+            },
             signatureConfig: {
               merge: true,
             },

@@ -32,6 +32,8 @@ export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
         );
       },
       rootProps: {},
+      hotkey: undefined as any,
+      defaultType: undefined as any,
     }),
     deserialize: {
       element: getNodeDeserializer({
