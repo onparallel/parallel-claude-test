@@ -80,6 +80,8 @@ export class OrganizationRepository extends BaseRepository {
           "kantox",
           "osborneclarke",
           "themillandpartners",
+          "targetglobal",
+          "adplegal",
         ].includes(org.identifier)
           ? `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`
           : null
