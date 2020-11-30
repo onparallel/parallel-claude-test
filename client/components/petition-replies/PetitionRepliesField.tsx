@@ -76,6 +76,7 @@ export function PetitionRepliesField({
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
+  const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
   return field.type === "HEADING" ? (
     <Stack
       spacing={1}
@@ -236,7 +237,7 @@ export function PetitionRepliesField({
               reply={reply}
               onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
               actions={
-                field.type === "TEXT" || field.type === "SELECT" ? (
+                isTextLikeType ? (
                   <CopyToClipboardButton size="xs" text={reply.content.text} />
                 ) : field.type === "FILE_UPLOAD" ? (
                   <Stack spacing={1}>
@@ -269,7 +270,7 @@ export function PetitionRepliesField({
                 ) : null
               }
             >
-              {field.type === "TEXT" || field.type === "SELECT" ? (
+              {isTextLikeType ? (
                 <BreakLines text={reply.content.text} />
               ) : field.type === "FILE_UPLOAD" ? (
                 <Box>

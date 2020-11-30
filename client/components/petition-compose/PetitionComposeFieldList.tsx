@@ -17,7 +17,7 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { KeyboardEvent, memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy, pick } from "remeda";
 
@@ -173,7 +173,7 @@ export const PetitionComposeFieldList = Object.assign(
           },
         },
         descriptionFieldProps: {
-          onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => {
+          onKeyDown: (event) => {
             const textarea = event.target as HTMLTextAreaElement;
             const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
             const beforeCursor = textarea.value.substr(

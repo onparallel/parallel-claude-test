@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { usePetitionFieldTypeLabels } from "@parallel/utils/usePetitionFieldTypeLabels";
+import { usePetitionFieldTypeLabel } from "@parallel/utils/usePetitionFieldTypeLabel";
 import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -91,10 +91,7 @@ function PetitionFieldTypeText({
   type,
   ...props
 }: { type: PetitionFieldType } & ExtendChakra<TextProps>) {
-  const intl = useIntl();
-  const labels = usePetitionFieldTypeLabels();
-  const label = useMemo(() => labels[type], [type, intl.locale]);
-
+  const label = usePetitionFieldTypeLabel(type);
   return <Text {...props}>{label}</Text>;
 }
 
@@ -202,43 +199,59 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
           <Heading as="h2" size="sm" marginBottom={2}>
             <PetitionFieldTypeText as={"span" as any} type={activeType} />
           </Heading>
-          <Box id={`field-description-${activeType}`}>
+          <Box fontSize="sm" id={`field-description-${activeType}`}>
             {activeType === "HEADING" ? (
               <Stack>
-                <Text fontSize="sm">
+                <Text>
                   <FormattedMessage
-                    id="petition.field-type.heading.description"
+                    id="petition.field-type.heading.description-1"
                     defaultMessage="Organize your petitions in sections or pages with a heading."
                   />
                 </Text>
-                <Text fontSize="sm">
+                <Text>
                   <FormattedMessage
-                    id="petition.field-type.heading.information-only"
+                    id="petition.field-type.heading.description-2"
                     defaultMessage="Sections are for information purposes only and do not collect information."
                   />
                 </Text>
               </Stack>
             ) : activeType === "TEXT" ? (
-              <Text fontSize="sm">
+              <Text>
                 <FormattedMessage
                   id="petition.field-type.text.description"
                   defaultMessage="Obtain written information that is not stored in documents or other files."
                 />
               </Text>
             ) : activeType === "FILE_UPLOAD" ? (
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="petition.field-type.file-upload.description"
-                  defaultMessage="Collect documents or other files in an organized way."
-                />
-              </Text>
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="petition.field-type.file-upload.description-1"
+                    defaultMessage="Collect documents or other files in an organized way."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition.field-type.file-upload.description-2"
+                    defaultMessage="Using this option will allow the recipient to upload a file very easily."
+                  />
+                </Text>
+              </Stack>
             ) : activeType === "SELECT" ? (
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="petition.field-type.select.description"
-                  defaultMessage="Collect text replies through a drop-down menu of options."
-                />
-              </Text>
+              <Stack>
+                <Text>
+                  <FormattedMessage
+                    id="petition.field-type.select.description-1"
+                    defaultMessage="Collect text replies through a drop-down menu of options."
+                  />
+                </Text>
+                <Text>
+                  <FormattedMessage
+                    id="petition.field-type.select.description-2"
+                    defaultMessage="Using this option will allow the recipient to select from a predefined list of possible answers."
+                  />
+                </Text>
+              </Stack>
             ) : null}
           </Box>
         </Box>

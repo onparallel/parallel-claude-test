@@ -1985,6 +1985,11 @@
     "context": "Describe the file(s) that you need..."
   },
   {
+    "term": "petition.field-title-generic-placeholder",
+    "definition": "Ask for the information that you need...",
+    "context": "Ask for the information that you need..."
+  },
+  {
     "term": "petition.field-title-heading-placeholder",
     "definition": "Enter an introductory title for this section...",
     "context": "Enter an introductory title for this section..."
@@ -1995,24 +2000,19 @@
     "context": "Field title"
   },
   {
-    "term": "petition.field-title-placeholder",
-    "definition": "Enter a field title",
-    "context": "Enter a field title"
-  },
-  {
-    "term": "petition.field-title-text-placeholder",
-    "definition": "Ask for the information that you need...",
-    "context": "Ask for the information that you need..."
-  },
-  {
     "term": "petition.field-type.file-upload",
     "definition": "Documents and files",
     "context": "Documents and files"
   },
   {
-    "term": "petition.field-type.file-upload.description",
+    "term": "petition.field-type.file-upload.description-1",
     "definition": "Collect documents or other files in an organized way.",
     "context": "Collect documents or other files in an organized way."
+  },
+  {
+    "term": "petition.field-type.file-upload.description-2",
+    "definition": "Using this option will allow the recipient to upload a file very easily.",
+    "context": "Using this option will allow the recipient to upload a file very easily."
   },
   {
     "term": "petition.field-type.heading",
@@ -2020,12 +2020,12 @@
     "context": "Section"
   },
   {
-    "term": "petition.field-type.heading.description",
+    "term": "petition.field-type.heading.description-1",
     "definition": "Organize your petitions in sections or pages with a heading.",
     "context": "Organize your petitions in sections or pages with a heading."
   },
   {
-    "term": "petition.field-type.heading.information-only",
+    "term": "petition.field-type.heading.description-2",
     "definition": "Sections are for information purposes only and do not collect information.",
     "context": "Sections are for information purposes only and do not collect information."
   },
@@ -2035,9 +2035,14 @@
     "context": "Dropdown"
   },
   {
-    "term": "petition.field-type.select.description",
+    "term": "petition.field-type.select.description-1",
     "definition": "Collect text replies through a drop-down menu of options.",
     "context": "Collect text replies through a drop-down menu of options."
+  },
+  {
+    "term": "petition.field-type.select.description-2",
+    "definition": "Using this option will allow the recipient to select from a predefined list of possible answers.",
+    "context": "Using this option will allow the recipient to select from a predefined list of possible answers."
   },
   {
     "term": "petition.field-type.text",

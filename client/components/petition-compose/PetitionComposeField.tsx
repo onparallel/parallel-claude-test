@@ -143,6 +143,7 @@ export const PetitionComposeField = Object.assign(
             flexDirection="row"
             opacity={isDragging ? 0 : 1}
             position="relative"
+            minHeight="102px"
             backgroundColor={isActive ? "purple.50" : "white"}
             sx={{
               "[draggable]": {
@@ -253,15 +254,10 @@ export const PetitionComposeField = Object.assign(
                         id: "petition.field-title-file-upload-placeholder",
                         defaultMessage: "Describe the file(s) that you need...",
                       })
-                    : field.type === "TEXT" || field.type === "SELECT"
-                    ? intl.formatMessage({
-                        id: "petition.field-title-text-placeholder",
+                    : intl.formatMessage({
+                        id: "petition.field-title-generic-placeholder",
                         defaultMessage:
                           "Ask for the information that you need...",
-                      })
-                    : intl.formatMessage({
-                        id: "petition.field-title-placeholder",
-                        defaultMessage: "Enter a field title",
                       })
                 }
                 value={title ?? ""}
@@ -271,9 +267,9 @@ export const PetitionComposeField = Object.assign(
                 paddingX={2}
                 height={6}
                 marginBottom={1}
-                _placeholder={{
-                  color: showError && !title ? "red.500" : "placeholder",
-                }}
+                _placeholder={
+                  showError && !title ? { color: "red.500" } : undefined
+                }
                 _focus={{
                   boxShadow: "none",
                 }}
@@ -325,17 +321,15 @@ export const PetitionComposeField = Object.assign(
                   }}
                   {...descriptionFieldProps}
                 />
-              ) : (
-                field.type !== "SELECT" && <Box height="26px" />
-              )}
-              {field.type === "SELECT" && (
+              ) : null}
+              {field.type === "SELECT" ? (
                 <SelectTypeFieldOptionsTextarea
                   field={field}
                   onFieldEdit={onFieldEdit}
                   showError={showError}
                   {...selectOptionsFieldProps}
                 />
-              )}
+              ) : null}
             </Box>
             <Stack
               className="field-actions"

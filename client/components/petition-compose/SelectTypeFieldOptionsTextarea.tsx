@@ -37,9 +37,9 @@ export function SelectTypeFieldOptionsTextarea({
         },
         { br: () => `\n` }
       )}
-      _placeholder={{
-        color: showError && options.length < 2 ? "red.500" : "placeholder",
-      }}
+      _placeholder={
+        showError && options.length ? { color: "red.500" } : undefined
+      }
       fontSize="sm"
       color={showError && options.length < 2 ? "red.500" : "none"}
       background="transparent"

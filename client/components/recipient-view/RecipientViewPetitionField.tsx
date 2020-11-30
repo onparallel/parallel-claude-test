@@ -74,6 +74,7 @@ export function RecipientViewPetitionField({
   ...props
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
+  const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
 
   return field.type === "HEADING" ? (
     <Stack spacing={1} {...props} paddingX={2} paddingY={2}>
@@ -173,7 +174,7 @@ export function RecipientViewPetitionField({
         ) : null}
       </Box>
       <Text fontSize="sm" color="gray.500">
-        {field.type === "TEXT" || field.type === "SELECT" ? (
+        {isTextLikeType ? (
           <FormattedMessage
             id="recipient-view.replies-submitted"
             defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
@@ -197,7 +198,7 @@ export function RecipientViewPetitionField({
                 canDeleteReply={!field.validated}
                 onDeleteReply={() => onDeleteReply(reply.id)}
               >
-                {field.type === "TEXT" || field.type === "SELECT" ? (
+                {isTextLikeType ? (
                   <FormattedMessage
                     id="recipient-view.text-reply"
                     defaultMessage="Reply added on {date}"
@@ -561,13 +562,26 @@ function OptionSelectReplyForm({
   const [showError, setShowError] = useState(false);
   const disabled = !field.multiple && field.replies.length > 0;
 
-  const reactSelectProps = useReactSelectProps({
+  const _reactSelectProps = useReactSelectProps({
     id: `field-select-option-${field.id}`,
     isDisabled: disabled || !canReply,
     isInvalid: showError,
   });
 
-  // TODO filter options based on the submitted replies to avoid selecting the same option twice (wait until we have public replies)
+  const reactSelectProps = useMemo(
+    () => ({
+      ..._reactSelectProps,
+      styles: {
+        ..._reactSelectProps.styles,
+        menu: (styles) => ({
+          ...styles,
+          zIndex: 1000,
+        }),
+      },
+    }),
+    [_reactSelectProps]
+  );
+
   const availableOptions = useMemo(() => {
     return values.map((value) => ({ value, label: value }));
   }, []);

@@ -1,10 +1,8 @@
 import { Button, Text, Tooltip } from "@chakra-ui/core";
-import { PetitionFieldType } from "@parallel/graphql/__types";
-import { useMemo } from "react";
-import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 import { ExtendChakra } from "@parallel/chakra/utils";
-import { usePetitionFieldTypeLabels } from "@parallel/utils/usePetitionFieldTypeLabels";
-import { useIntl } from "react-intl";
+import { PetitionFieldType } from "@parallel/graphql/__types";
+import { usePetitionFieldTypeLabel } from "@parallel/utils/usePetitionFieldTypeLabel";
+import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
 export type PetitionFieldTypeIndicatorProps = ExtendChakra<{
   type: PetitionFieldType;
@@ -16,9 +14,7 @@ export function PetitionFieldTypeIndicator({
   relativeIndex,
   ...props
 }: PetitionFieldTypeIndicatorProps) {
-  const intl = useIntl();
-  const labels = usePetitionFieldTypeLabels();
-  const label = useMemo(() => labels[type], [type, intl.locale]);
+  const label = usePetitionFieldTypeLabel(type);
 
   return (
     <Tooltip label={label}>

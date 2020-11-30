@@ -1985,6 +1985,11 @@
     "context": "Describe the file(s) that you need..."
   },
   {
+    "term": "petition.field-title-generic-placeholder",
+    "definition": "Pregunta lo que necesites...",
+    "context": "Ask for the information that you need..."
+  },
+  {
     "term": "petition.field-title-heading-placeholder",
     "definition": "Escribe un título introductorio para esta sección...",
     "context": "Enter an introductory title for this section..."
@@ -1995,24 +2000,19 @@
     "context": "Field title"
   },
   {
-    "term": "petition.field-title-placeholder",
-    "definition": "Introduce un título para el campo",
-    "context": "Enter a field title"
-  },
-  {
-    "term": "petition.field-title-text-placeholder",
-    "definition": "Pregunta lo que necesites...",
-    "context": "Ask for the information that you need..."
-  },
-  {
     "term": "petition.field-type.file-upload",
     "definition": "Documentos y archivos",
     "context": "Documents and files"
   },
   {
-    "term": "petition.field-type.file-upload.description",
-    "definition": "Recopila documentos u otros archivos de una manera organizada.",
+    "term": "petition.field-type.file-upload.description-1",
+    "definition": "Recopila documentos u otra información de manera organizada.",
     "context": "Collect documents or other files in an organized way."
+  },
+  {
+    "term": "petition.field-type.file-upload.description-2",
+    "definition": "Usando esta opción permitirás al destinatario subir archivos de forma fácil.",
+    "context": "Using this option will allow the recipient to upload a file very easily."
   },
   {
     "term": "petition.field-type.heading",
@@ -2020,12 +2020,12 @@
     "context": "Section"
   },
   {
-    "term": "petition.field-type.heading.description",
-    "definition": "Organiza tus peticiones en secciones o páginas con encabezados.",
+    "term": "petition.field-type.heading.description-1",
+    "definition": "Obtén respuestas de texto a través de un menú desplegable de opciones.",
     "context": "Organize your petitions in sections or pages with a heading."
   },
   {
-    "term": "petition.field-type.heading.information-only",
+    "term": "petition.field-type.heading.description-2",
     "definition": "Las secciones únicamente son informativas y no permiten obtener información.",
     "context": "Sections are for information purposes only and do not collect information."
   },
@@ -2035,9 +2035,14 @@
     "context": "Dropdown"
   },
   {
-    "term": "petition.field-type.select.description",
-    "definition": "Obtén respuestas de texto a través de un menú desplegable de opciones.",
+    "term": "petition.field-type.select.description-1",
+    "definition": "Recopila respuestas mediante un menú desplegable con opciones.",
     "context": "Collect text replies through a drop-down menu of options."
+  },
+  {
+    "term": "petition.field-type.select.description-2",
+    "definition": "Usando esta opción permitirás al destinatario escoger de una lista de posibles respuestas predefinidas.",
+    "context": "Using this option will allow the recipient to select from a predefined list of possible answers."
   },
   {
     "term": "petition.field-type.text",
