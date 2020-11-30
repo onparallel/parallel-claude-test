@@ -1192,8 +1192,8 @@ export const SignatureIcon = createIcon({
   ),
 });
 
-export const DropdownIcon = createIcon({
-  displayName: "DropdownIcon",
+export const FieldSelectIcon = createIcon({
+  displayName: "FieldSelectIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

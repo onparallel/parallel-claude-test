@@ -3,7 +3,7 @@ import {
   FieldFileUploadIcon,
   FieldTextIcon,
   FieldHeadingIcon,
-  DropdownIcon,
+  FieldSelectIcon,
 } from "@parallel/chakra/icons";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
@@ -20,7 +20,7 @@ export const PetitionFieldTypeIcon = forwardRef<
     FILE_UPLOAD: FieldFileUploadIcon,
     TEXT: FieldTextIcon,
     HEADING: FieldHeadingIcon,
-    SELECT: DropdownIcon,
+    SELECT: FieldSelectIcon,
   }[type];
   return <Icon as={icon} {...props} ref={ref} />;
 });
