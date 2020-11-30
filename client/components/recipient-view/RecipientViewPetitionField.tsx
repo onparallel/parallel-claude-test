@@ -31,7 +31,7 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/FieldOptions";
-import { forwardRef, ReactNode, useCallback, useState } from "react";
+import { forwardRef, ReactNode, useCallback, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -567,25 +567,26 @@ function OptionSelectReplyForm({
     isInvalid: showError,
   });
 
+  // TODO filter options based on the submitted replies to avoid selecting the same option twice (wait until we have public replies)
+  const availableOptions = useMemo(() => {
+    return values.map((value) => ({ value, label: value }));
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    if (selection) {
+      onCreateReply({ type: "SELECT", content: selection });
+      setTimeout(() => setSelection(null));
+    } else {
+      setShowError(true);
+    }
+  }, [selection]);
+
   return (
-    <Flex
-      as="form"
-      flexDirection={{ base: "column", sm: "row" }}
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (selection) {
-          onCreateReply({ type: "SELECT", content: selection });
-          setTimeout(() => setSelection(null));
-        } else {
-          setShowError(true);
-        }
-      }}
-      {...props}
-    >
+    <Flex flexDirection={{ base: "column", sm: "row" }} {...props}>
       <FormControl flex="1" isInvalid={showError} isDisabled={disabled}>
         <Select
           value={selection ? { value: selection, label: selection } : null}
-          options={values.map((value) => ({ value, label: value }))}
+          options={availableOptions}
           onChange={({ value }: any) => {
             setSelection(value as any);
             setShowError(false);
@@ -614,6 +615,7 @@ function OptionSelectReplyForm({
         isDisabled={disabled || !canReply}
         marginTop={{ base: 2, sm: 0 }}
         marginLeft={{ base: 0, sm: 4 }}
+        onClick={handleSubmit}
       >
         <FormattedMessage id="generic.save" defaultMessage="Save" />
       </Button>
