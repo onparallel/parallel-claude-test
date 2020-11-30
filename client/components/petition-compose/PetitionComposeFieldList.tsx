@@ -17,9 +17,17 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { memo, useCallback, useRef, useState } from "react";
+import {
+  createRef,
+  memo,
+  RefObject,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage } from "react-intl";
 import { indexBy, pick } from "remeda";
+import { SelectTypeFieldOptionsRef } from "./SelectTypeFieldOptions";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
@@ -98,14 +106,10 @@ export const PetitionComposeFieldList = Object.assign(
       });
     }, []);
 
-    const focusSelectOptions = useCallback((fieldId: string) => {
-      setTimeout(() => {
-        const options = document.querySelector<HTMLElement>(
-          `#field-select-options-${fieldId}`
-        );
-        options?.focus();
-      });
-    }, []);
+    const selectOptionsFieldRefs = useRef<
+      Record<string, RefObject<SelectTypeFieldOptionsRef>>
+    >({});
+    console.log(selectOptionsFieldRefs);
 
     // Memoize field callbacks
     const fieldProps = useMemoFactory(
@@ -147,14 +151,18 @@ export const PetitionComposeFieldList = Object.assign(
             switch (event.key) {
               case "ArrowDown":
                 if (fields[index].type === "SELECT") {
-                  focusSelectOptions(fields[index].id);
+                  selectOptionsFieldRefs.current[fieldId].current?.focus(
+                    "START"
+                  );
+                  event.preventDefault();
                 } else if (nextId) {
                   focusTitle(nextId);
                 }
                 break;
               case "ArrowUp":
-                if (fields[index - 1]?.type === "SELECT") {
-                  focusSelectOptions(fields[index - 1].id);
+                if (prevId && fields[index - 1]?.type === "SELECT") {
+                  selectOptionsFieldRefs.current[prevId].current?.focus("END");
+                  event.preventDefault();
                 } else if (prevId) {
                   focusTitle(prevId);
                 }
@@ -199,36 +207,9 @@ export const PetitionComposeFieldList = Object.assign(
           },
         },
         selectOptionsFieldProps: {
-          onKeyDown: (event) => {
-            const index = fields.findIndex((f) => f.id === fieldId);
-            const prevId = index > 0 ? fields[index - 1].id : null;
-            const nextId =
-              index < fields.length - 1 ? fields[index + 1].id : null;
-            const stringOptionsLength =
-              fields[index].options?.values.join("\n").length ?? 0;
-
-            switch (event.key) {
-              case "ArrowDown":
-                if (
-                  nextId &&
-                  // only focus title if cursor is at the end of the options string
-                  event.currentTarget.selectionStart === stringOptionsLength
-                ) {
-                  focusTitle(nextId);
-                }
-                break;
-              case "ArrowUp":
-                // only focus title if cursor is at the beginning of the options string
-                if (event.currentTarget.selectionStart === 0) {
-                  if (fields[index].type === "SELECT") {
-                    focusTitle(fields[index].id);
-                  } else if (prevId) {
-                    focusTitle(prevId);
-                  }
-                }
-                break;
-            }
-          },
+          ref:
+            selectOptionsFieldRefs.current![fieldId] ??
+            (selectOptionsFieldRefs.current![fieldId] = createRef()),
         },
       }),
       [
@@ -237,7 +218,7 @@ export const PetitionComposeFieldList = Object.assign(
         onFieldSettingsClick,
         onDeleteField,
         onFieldEdit,
-        fields.map((f) => f.id).join(","),
+        fields.map((f) => `${f.id}:${f.type}`).join(","),
       ]
     );
 

@@ -5,19 +5,20 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { pipe } from "@udecode/slate-plugins";
-import { useMemo, useState } from "react";
+import { forwardRef, PropsWithRef, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { createEditor, Node } from "slate";
+import { createEditor, Editor, Node, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import {
   Editable,
+  ReactEditor,
   RenderElementProps,
   RenderLeafProps,
   Slate,
   withReact,
 } from "slate-react";
 
-type SelectTypeFieldOptionsProps = {
+export type SelectTypeFieldOptionsProps = {
   field: SelectTypeFieldOptions_PetitionFieldFragment;
   showError: boolean;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
@@ -59,48 +60,81 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
   );
 }
 
-export function SelectTypeFieldOptions({
-  field,
-  showError,
-  onFieldEdit,
-}: SelectTypeFieldOptionsProps) {
-  const editor = useMemo(
-    () => pipe(createEditor(), withHistory, withReact),
-    []
-  );
-  const [value, onChange] = useState<Node[]>(
-    ((field.options?.values?.length
-      ? field.options?.values
-      : [""]) as string[]).map((option) => ({
-      children: [{ text: option }],
-    }))
-  );
-  return (
-    <Slate editor={editor} value={value} onChange={onChange as any}>
-      <Box maxHeight="200px" overflow="auto" fontSize="sm">
-        <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          onBlur={() => {
-            onFieldEdit({
-              options: {
-                values: value
-                  .map((n) => (n.children as any)[0].text.trim())
-                  .filter((option) => option !== ""),
-              },
-            });
-          }}
-        />
-      </Box>
-    </Slate>
-  );
-}
-
-SelectTypeFieldOptions.fragments = {
-  PetitionField: gql`
-    fragment SelectTypeFieldOptions_PetitionField on PetitionField {
-      id
-      options
-    }
-  `,
+export type SelectTypeFieldOptionsRef = {
+  focus: (position: "START" | "END") => void;
 };
+
+export const SelectTypeFieldOptions = Object.assign(
+  forwardRef<SelectTypeFieldOptionsRef, SelectTypeFieldOptionsProps>(
+    function SelectTypeFieldOptions({ field, showError, onFieldEdit }, ref) {
+      const editor = useMemo(
+        () => pipe(createEditor(), withHistory, withReact),
+        []
+      );
+      const [value, onChange] = useState<Node[]>(
+        ((field.options?.values?.length
+          ? field.options?.values
+          : [""]) as string[]).map((option) => ({
+          children: [{ text: option }],
+        }))
+      );
+      const _ref = useMemo(
+        () =>
+          ({
+            focus: (position) => {
+              ReactEditor.focus(editor);
+              Transforms.select(
+                editor,
+                position === "START"
+                  ? Editor.start(editor, [])
+                  : Editor.end(editor, [])
+              );
+            },
+          } as SelectTypeFieldOptionsRef),
+        [editor]
+      );
+      if (typeof ref === "function") {
+        ref(_ref);
+      } else if (ref) {
+        ref.current = _ref;
+      }
+      return (
+        <Slate
+          editor={editor}
+          value={value}
+          onChange={(value: Node[]) => {
+            console.log(editor.selection);
+            onChange(value);
+          }}
+        >
+          <Box maxHeight="200px" overflow="auto" fontSize="sm">
+            <Editable
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              onBlur={() => {
+                onFieldEdit({
+                  options: {
+                    values: value
+                      .map((n) => (n.children as any)[0].text.trim())
+                      .filter((option) => option !== ""),
+                  },
+                });
+              }}
+            />
+          </Box>
+        </Slate>
+      );
+    }
+  ),
+
+  {
+    fragments: {
+      PetitionField: gql`
+        fragment SelectTypeFieldOptions_PetitionField on PetitionField {
+          id
+          options
+        }
+      `,
+    },
+  }
+);

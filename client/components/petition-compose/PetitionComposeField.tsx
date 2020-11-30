@@ -28,6 +28,7 @@ import {
   forwardRef,
   memo,
   MouseEvent,
+  Ref,
   useEffect,
   useRef,
   useState,
@@ -40,7 +41,11 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { AddFieldPopover } from "./AddFieldPopover";
-import { SelectTypeFieldOptions } from "./SelectTypeFieldOptions";
+import {
+  SelectTypeFieldOptions,
+  SelectTypeFieldOptionsProps,
+  SelectTypeFieldOptionsRef,
+} from "./SelectTypeFieldOptions";
 
 export type PetitionComposeFieldProps = {
   field: PetitionComposeField_PetitionFieldFragment;
@@ -51,7 +56,9 @@ export type PetitionComposeFieldProps = {
   showError: boolean;
   titleFieldProps: InputProps;
   descriptionFieldProps: TextareaProps;
-  selectOptionsFieldProps: TextareaProps;
+  selectOptionsFieldProps: Partial<SelectTypeFieldOptionsProps> & {
+    ref: Ref<SelectTypeFieldOptionsRef>;
+  };
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onAddField: (type: PetitionFieldType, position: number) => void;
