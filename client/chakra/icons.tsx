@@ -1191,3 +1191,22 @@ export const SignatureIcon = createIcon({
     </g>
   ),
 });
+
+export const DropdownIcon = createIcon({
+  displayName: "DropdownIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M 22,19 H 2 V 5 c 6.6666667,0 13.333333,0 20,0 v 14" />
+      <path d="m 5,16 3,-8 3,8" />
+      <path d="m 6,14 h 4" />
+      <path d="m 13,11 3,3 3,-3" />
+    </g>
+  ),
+});
