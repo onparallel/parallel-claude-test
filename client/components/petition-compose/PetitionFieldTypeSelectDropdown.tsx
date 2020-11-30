@@ -20,7 +20,7 @@ import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeLabels } from "@parallel/utils/usePetitionFieldTypeLabels";
 import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
@@ -91,8 +91,9 @@ function PetitionFieldTypeText({
   type,
   ...props
 }: { type: PetitionFieldType } & ExtendChakra<TextProps>) {
+  const intl = useIntl();
   const labels = usePetitionFieldTypeLabels();
-  const label = useMemo(() => labels[type], [type]);
+  const label = useMemo(() => labels[type], [type, intl.locale]);
 
   return <Text {...props}>{label}</Text>;
 }
