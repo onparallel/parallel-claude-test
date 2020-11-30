@@ -1541,8 +1541,8 @@
   },
   {
     "term": "petition-field.select.options-placeholder",
-    "definition": "- Opción 1\n- Opción 2",
-    "context": "- Option 1 - Option 2"
+    "definition": "- Opción 1<br></br>- Opción 2",
+    "context": "- Option 1<br></br>- Option 2"
   },
   {
     "term": "petition-replies.close-petition-without-notify.button",

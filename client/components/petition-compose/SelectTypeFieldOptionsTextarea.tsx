@@ -30,10 +30,13 @@ export function SelectTypeFieldOptionsTextarea({
     <GrowingTextarea
       id={`field-select-options-${field.id}`}
       ref={ref}
-      placeholder={intl.formatMessage({
-        id: "petition-field.select.options-placeholder",
-        defaultMessage: "- Option 1\n- Option 2",
-      })}
+      placeholder={intl.formatMessage(
+        {
+          id: "petition-field.select.options-placeholder",
+          defaultMessage: "- Option 1<br></br>- Option 2",
+        },
+        { br: () => `\n` }
+      )}
       _placeholder={{
         color: showError && options.length < 2 ? "red.500" : "placeholder",
       }}
