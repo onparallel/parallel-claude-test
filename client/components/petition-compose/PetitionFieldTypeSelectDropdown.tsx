@@ -19,8 +19,8 @@ import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { usePetitionFieldTypeLabel } from "@parallel/utils/usePetitionFieldTypeLabel";
 import useMergedRef from "@react-hook/merged-ref";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { FormattedMessage } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
