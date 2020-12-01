@@ -905,6 +905,11 @@
     "context": "Saved"
   },
   {
+    "term": "generic.choice",
+    "definition": "Choice",
+    "context": "Choice"
+  },
+  {
     "term": "generic.clear",
     "definition": "Clear",
     "context": "Clear"
@@ -1538,11 +1543,6 @@
     "term": "petition-compose.settings",
     "definition": "Settings",
     "context": "Settings"
-  },
-  {
-    "term": "petition-field.select.options-placeholder",
-    "definition": "- Option 1<br></br>- Option 2",
-    "context": "- Option 1<br></br>- Option 2"
   },
   {
     "term": "petition-replies.close-petition-without-notify.button",

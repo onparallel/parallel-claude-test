@@ -905,6 +905,11 @@
     "context": "Saved"
   },
   {
+    "term": "generic.choice",
+    "definition": "Opción",
+    "context": "Choice"
+  },
+  {
     "term": "generic.clear",
     "definition": "Vaciar",
     "context": "Clear"
@@ -1540,11 +1545,6 @@
     "context": "Settings"
   },
   {
-    "term": "petition-field.select.options-placeholder",
-    "definition": "- Opción 1<br></br>- Opción 2",
-    "context": "- Option 1<br></br>- Option 2"
-  },
-  {
     "term": "petition-replies.close-petition-without-notify.button",
     "definition": "Cerrar petición sin notificar",
     "context": "Close petition without notification"
@@ -2021,7 +2021,7 @@
   },
   {
     "term": "petition.field-type.heading.description-1",
-    "definition": "Obtén respuestas de texto a través de un menú desplegable de opciones.",
+    "definition": "Organiza tus peticiones en secciones o páginas con encabezado.",
     "context": "Organize your petitions in sections or pages with a heading."
   },
   {
