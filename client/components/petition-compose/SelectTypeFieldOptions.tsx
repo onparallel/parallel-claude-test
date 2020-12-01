@@ -5,7 +5,7 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { pipe } from "@udecode/slate-plugins";
-import { forwardRef, PropsWithRef, useMemo, useState } from "react";
+import { forwardRef, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { createEditor, Editor, Node, Transforms } from "slate";
 import { withHistory } from "slate-history";
@@ -17,12 +17,13 @@ import {
   Slate,
   withReact,
 } from "slate-react";
+import { EditableProps } from "slate-react/dist/components/editable";
 
 export type SelectTypeFieldOptionsProps = {
   field: SelectTypeFieldOptions_PetitionFieldFragment;
   showError: boolean;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
-};
+} & EditableProps;
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
   const isEmpty = !element.children[0].text;
@@ -62,11 +63,15 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
 
 export type SelectTypeFieldOptionsRef = {
   focus: (position: "START" | "END") => void;
+  editor: Editor;
 };
 
 export const SelectTypeFieldOptions = Object.assign(
   forwardRef<SelectTypeFieldOptionsRef, SelectTypeFieldOptionsProps>(
-    function SelectTypeFieldOptions({ field, showError, onFieldEdit }, ref) {
+    function SelectTypeFieldOptions(
+      { field, showError, onFieldEdit, ...props },
+      ref
+    ) {
       const editor = useMemo(
         () => pipe(createEditor(), withHistory, withReact),
         []
@@ -90,6 +95,7 @@ export const SelectTypeFieldOptions = Object.assign(
                   : Editor.end(editor, [])
               );
             },
+            editor,
           } as SelectTypeFieldOptionsRef),
         [editor]
       );
@@ -103,7 +109,6 @@ export const SelectTypeFieldOptions = Object.assign(
           editor={editor}
           value={value}
           onChange={(value: Node[]) => {
-            console.log(editor.selection);
             onChange(value);
           }}
         >
@@ -120,6 +125,7 @@ export const SelectTypeFieldOptions = Object.assign(
                   },
                 });
               }}
+              {...props}
             />
           </Box>
         </Slate>

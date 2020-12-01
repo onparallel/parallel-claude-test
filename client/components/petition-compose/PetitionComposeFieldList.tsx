@@ -109,12 +109,11 @@ export const PetitionComposeFieldList = Object.assign(
     const selectOptionsFieldRefs = useRef<
       Record<string, RefObject<SelectTypeFieldOptionsRef>>
     >({});
-    console.log(selectOptionsFieldRefs);
 
     // Memoize field callbacks
     const fieldProps = useMemoFactory(
       (
-        fieldId
+        fieldId: string
       ): Pick<
         PetitionComposeFieldProps,
         | "onClick"
@@ -210,6 +209,48 @@ export const PetitionComposeFieldList = Object.assign(
           ref:
             selectOptionsFieldRefs.current![fieldId] ??
             (selectOptionsFieldRefs.current![fieldId] = createRef()),
+          onKeyDown: (event) => {
+            const index = fields.findIndex((f) => f.id === fieldId);
+            const prevId = index > 0 ? fields[index - 1].id : null;
+            const nextId =
+              index < fields.length - 1 ? fields[index + 1].id : null;
+
+            const { editor } = selectOptionsFieldRefs.current![
+              fieldId
+            ].current!;
+
+            const anchor = editor.selection?.anchor;
+            if (!anchor) {
+              return;
+            }
+
+            const lastLineInEditor = (editor.children[
+              editor.children.length - 1
+            ].children as any[])[0].text as string;
+
+            const cursorIsAtStart = anchor.path[0] === 0 && anchor.offset === 0;
+
+            const cursorIsAtEnd =
+              anchor.path[0] === editor.children.length - 1 &&
+              anchor.offset === lastLineInEditor.length;
+
+            switch (event.key) {
+              case "ArrowDown":
+                if (nextId && cursorIsAtEnd) {
+                  focusTitle(nextId);
+                }
+                break;
+              case "ArrowUp":
+                if (cursorIsAtStart) {
+                  if (fields[index].type === "SELECT") {
+                    focusTitle(fields[index].id);
+                  } else if (prevId) {
+                    focusTitle(prevId);
+                  }
+                }
+                break;
+            }
+          },
         },
       }),
       [
