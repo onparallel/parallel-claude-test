@@ -213,7 +213,8 @@ export const PublicPetitionFieldReply = objectType({
       description: "The public content of the reply",
       resolve: async (root, _, ctx) => {
         switch (root.type) {
-          case "TEXT": {
+          case "TEXT":
+          case "SELECT": {
             return root.content;
           }
           case "FILE_UPLOAD": {

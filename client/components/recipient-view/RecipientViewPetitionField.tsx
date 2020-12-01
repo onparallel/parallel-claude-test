@@ -207,6 +207,8 @@ export function RecipientViewPetitionField({
                   progress={uploadProgress?.[reply.id]}
                   canDeleteReply={!field.validated}
                   onDeleteReply={() => onDeleteReply(reply.id)}
+                  canDownloadReply={field.type === "FILE_UPLOAD"}
+                  onDownloadFileReply={() => onDownloadReply(reply.id)}
                 >
                   {isTextLikeType ? (
                     <FormattedMessage
@@ -236,7 +238,12 @@ export function RecipientViewPetitionField({
                 {isTextLikeType && (
                   <Flex marginTop={1}>
                     <DownForwardArrowIcon marginRight={1} marginTop="2px" />
-                    <ExpandableText as="cite" fontSize="sm" noOfLines={3}>
+                    <ExpandableText
+                      paddingRight={1}
+                      as="cite"
+                      fontSize="sm"
+                      noOfLines={3}
+                    >
                       {reply.content.text}
                     </ExpandableText>
                   </Flex>
@@ -642,6 +649,11 @@ function OptionSelectReplyForm({
           onChange={({ value }: any) => {
             setSelection(value as any);
             setShowError(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit();
+            }
           }}
           placeholder={
             placeholder ??

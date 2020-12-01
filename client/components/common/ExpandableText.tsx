@@ -44,6 +44,7 @@ export function ExpandableText({
         onClick={handleSwitchExpand}
       >
         <Text
+          wordBreak="break-word"
           display="-webkit-box"
           noOfLines={isExpanded ? undefined : noOfLines}
           ref={textRef}
