@@ -2528,9 +2528,8 @@ export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
 } & {
   fields: Array<
-    {
-      __typename?: "PetitionField";
-    } & PetitionComposeField_PetitionFieldFragment
+    { __typename?: "PetitionField" } & Pick<PetitionField, "isFixed"> &
+      PetitionComposeField_PetitionFieldFragment
   >;
 };
 
@@ -4541,6 +4540,7 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
     fields {
+      isFixed
       ...PetitionComposeField_PetitionField
     }
   }

@@ -62,9 +62,15 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
 }
 
 export type SelectTypeFieldOptionsRef = {
-  focus: (position: "START" | "END") => void;
+  focus: (position?: "START" | "END") => void;
   editor: Editor;
 };
+
+function valuesToSlateNodes(values: string[]) {
+  return (values.length ? values : [""]).map((option) => ({
+    children: [{ text: option }],
+  }));
+}
 
 export const SelectTypeFieldOptions = Object.assign(
   forwardRef<SelectTypeFieldOptionsRef, SelectTypeFieldOptionsProps>(
@@ -77,23 +83,21 @@ export const SelectTypeFieldOptions = Object.assign(
         []
       );
       const [value, onChange] = useState<Node[]>(
-        ((field.options?.values?.length
-          ? field.options?.values
-          : [""]) as string[]).map((option) => ({
-          children: [{ text: option }],
-        }))
+        valuesToSlateNodes(field.options?.values ?? [])
       );
       const _ref = useMemo(
         () =>
           ({
             focus: (position) => {
               ReactEditor.focus(editor);
-              Transforms.select(
-                editor,
-                position === "START"
-                  ? Editor.start(editor, [])
-                  : Editor.end(editor, [])
-              );
+              if (position) {
+                Transforms.select(
+                  editor,
+                  position === "START"
+                    ? Editor.start(editor, [])
+                    : Editor.end(editor, [])
+                );
+              }
             },
             editor,
           } as SelectTypeFieldOptionsRef),
@@ -105,25 +109,17 @@ export const SelectTypeFieldOptions = Object.assign(
         ref.current = _ref;
       }
       return (
-        <Slate
-          editor={editor}
-          value={value}
-          onChange={(value: Node[]) => {
-            onChange(value);
-          }}
-        >
+        <Slate editor={editor} value={value} onChange={onChange}>
           <Box maxHeight="200px" overflow="auto" fontSize="sm">
             <Editable
               renderElement={renderElement}
               renderLeaf={renderLeaf}
               onBlur={() => {
-                onFieldEdit({
-                  options: {
-                    values: value
-                      .map((n) => (n.children as any)[0].text.trim())
-                      .filter((option) => option !== ""),
-                  },
-                });
+                const values = value
+                  .map((n) => (n.children as any)[0].text.trim())
+                  .filter((option) => option !== "");
+                onFieldEdit({ options: { values } });
+                onChange(valuesToSlateNodes(values));
               }}
               {...props}
             />

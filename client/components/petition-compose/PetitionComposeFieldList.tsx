@@ -1,5 +1,12 @@
 import { gql } from "@apollo/client";
-import { Button, Flex } from "@chakra-ui/core";
+import {
+  Box,
+  Button,
+  ButtonProps,
+  Flex,
+  IconButton,
+  Tooltip,
+} from "@chakra-ui/core";
 import { AddIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
@@ -7,6 +14,7 @@ import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldP
 import {
   PetitionComposeField,
   PetitionComposeFieldProps,
+  PetitionComposeFieldRef,
 } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
   PetitionComposeField_PetitionFieldFragment,
@@ -19,15 +27,15 @@ import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import {
   createRef,
+  forwardRef,
   memo,
   RefObject,
   useCallback,
   useRef,
   useState,
 } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick } from "remeda";
-import { SelectTypeFieldOptionsRef } from "./SelectTypeFieldOptions";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
@@ -73,8 +81,6 @@ export const PetitionComposeFieldList = Object.assign(
     const [{ fieldsById, fieldIds }, setState] = useState(reset(fields));
     useEffectSkipFirst(() => setState(reset(fields)), [fields]);
 
-    const addFieldRef = useRef<HTMLButtonElement>(null);
-
     const handleFieldMove = useCallback(
       async function (
         dragIndex: number,
@@ -97,17 +103,8 @@ export const PetitionComposeFieldList = Object.assign(
       [onUpdateFieldPositions]
     );
 
-    const focusTitle = useCallback((fieldId: string) => {
-      setTimeout(() => {
-        const title = document.querySelector<HTMLElement>(
-          `#field-title-${fieldId}`
-        );
-        title?.focus();
-      });
-    }, []);
-
-    const selectOptionsFieldRefs = useRef<
-      Record<string, RefObject<SelectTypeFieldOptionsRef>>
+    const fieldRefs = useRef<
+      Record<string, RefObject<PetitionComposeFieldRef>>
     >({});
 
     // Memoize field callbacks
@@ -122,9 +119,9 @@ export const PetitionComposeFieldList = Object.assign(
         | "onSettingsClick"
         | "onDeleteClick"
         | "onFieldEdit"
-        | "titleFieldProps"
-        | "descriptionFieldProps"
-        | "selectOptionsFieldProps"
+        | "onFocusPrevField"
+        | "onFocusNextField"
+        | "onAddField"
       > => ({
         onClick: () => onSelectField(fieldId),
         onFocus: () => onSelectField(fieldId),
@@ -141,116 +138,33 @@ export const PetitionComposeFieldList = Object.assign(
           onDeleteField(fieldId);
         },
         onFieldEdit: (data) => onFieldEdit(fieldId, data),
-        titleFieldProps: {
-          onKeyDown: (event) => {
-            const index = fields.findIndex((f) => f.id === fieldId);
-            const prevId = index > 0 ? fields[index - 1].id : null;
-            const nextId =
-              index < fields.length - 1 ? fields[index + 1].id : null;
-            switch (event.key) {
-              case "ArrowDown":
-                if (fields[index].type === "SELECT") {
-                  selectOptionsFieldRefs.current[fieldId].current?.focus(
-                    "START"
-                  );
-                  event.preventDefault();
-                } else if (nextId) {
-                  focusTitle(nextId);
-                }
-                break;
-              case "ArrowUp":
-                if (prevId && fields[index - 1]?.type === "SELECT") {
-                  selectOptionsFieldRefs.current[prevId].current?.focus("END");
-                  event.preventDefault();
-                } else if (prevId) {
-                  focusTitle(prevId);
-                }
-                break;
-            }
-          },
-          onKeyUp: (event) => {
-            switch (event.key) {
-              case "Enter":
-                const addFieldButton = document.querySelector<
-                  HTMLButtonElement
-                >(".add-field-after");
-                (addFieldButton ?? addFieldRef.current!).click();
-                break;
-            }
-          },
+        onFocusPrevField: () => {
+          const index = fields.findIndex((f) => f.id === fieldId);
+          if (index > 0) {
+            const prevId = fields[index - 1].id;
+            fieldRefs.current![prevId].current!.focusFromNext();
+          }
         },
-        descriptionFieldProps: {
-          onKeyDown: (event) => {
-            const textarea = event.target as HTMLTextAreaElement;
-            const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-            const beforeCursor = textarea.value.substr(
-              0,
-              textarea.selectionStart
-            );
-            const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-            const index = fields.findIndex((f) => f.id === fieldId);
-            const nextId =
-              index < fields.length - 1 ? fields[index + 1].id : null;
-            switch (event.key) {
-              case "ArrowDown":
-                if (nextId && currentLine === totalLines - 1) {
-                  focusTitle(nextId);
-                }
-                break;
-              case "ArrowUp":
-                if (currentLine === 0) {
-                  focusTitle(fieldId);
-                }
-                break;
-            }
-          },
+        onFocusNextField: () => {
+          const index = fields.findIndex((f) => f.id === fieldId);
+          if (index < fields.length - 1) {
+            const nextId = fields[index + 1].id;
+            fieldRefs.current![nextId].current!.focusFromPrevious();
+          }
         },
-        selectOptionsFieldProps: {
-          ref:
-            selectOptionsFieldRefs.current![fieldId] ??
-            (selectOptionsFieldRefs.current![fieldId] = createRef()),
-          onKeyDown: (event) => {
-            const index = fields.findIndex((f) => f.id === fieldId);
-            const prevId = index > 0 ? fields[index - 1].id : null;
-            const nextId =
-              index < fields.length - 1 ? fields[index + 1].id : null;
-
-            const { editor } = selectOptionsFieldRefs.current![
-              fieldId
-            ].current!;
-
-            const anchor = editor.selection?.anchor;
-            if (!anchor) {
-              return;
-            }
-
-            const lastLineInEditor = (editor.children[
-              editor.children.length - 1
-            ].children as any[])[0].text as string;
-
-            const cursorIsAtStart = anchor.path[0] === 0 && anchor.offset === 0;
-
-            const cursorIsAtEnd =
-              anchor.path[0] === editor.children.length - 1 &&
-              anchor.offset === lastLineInEditor.length;
-
-            switch (event.key) {
-              case "ArrowDown":
-                if (nextId && cursorIsAtEnd) {
-                  focusTitle(nextId);
-                }
-                break;
-              case "ArrowUp":
-                if (cursorIsAtStart) {
-                  if (fields[index].type === "SELECT") {
-                    focusTitle(fields[index].id);
-                  } else if (prevId) {
-                    focusTitle(prevId);
-                  }
-                }
-                break;
-            }
-          },
+        onAddField: () => {
+          const index = fields.findIndex((f) => f.id === fieldId);
+          if (index === fields.length - 1) {
+            document
+              .querySelector<HTMLButtonElement>(".add-field-outer-button")!
+              .click();
+          } else {
+            document
+              .querySelector<HTMLButtonElement>(
+                `#field-${fieldId} .add-field-after-button`
+              )!
+              .click();
+          }
         },
       }),
       [
@@ -270,26 +184,54 @@ export const PetitionComposeFieldList = Object.assign(
     return (
       <>
         <Card id="petition-fields" overflow="hidden" {...props}>
-          {fieldIds.map((fieldId, index) => (
-            <PetitionComposeField
-              id={`field-${fieldId}`}
-              onMove={handleFieldMove}
-              key={fieldId}
-              field={fieldsById[fieldId]}
-              fieldRelativeIndex={fieldIndexValues[index]}
-              index={index}
-              isActive={active === fieldId}
-              isLast={index === fieldIds.length - 1}
-              showError={showErrors}
-              onAddField={onAddField}
-              {...fieldProps(fieldId)}
-            />
-          ))}
+          {fieldIds.map((fieldId, index) => {
+            const field = fieldsById[fieldId];
+            const isActive = active === fieldId;
+            const isLast = index === fieldIds.length - 1;
+            return (
+              <Box key={fieldId} id={`field-${fieldId}`} position="relative">
+                {isActive && !field.isFixed ? (
+                  <AddFieldButton
+                    position="absolute"
+                    top="-1px"
+                    left="50%"
+                    transform="translate(-50%, -50%)"
+                    zIndex="1"
+                    onSelectFieldType={(type) => onAddField(type, index)}
+                  />
+                ) : null}
+                <PetitionComposeField
+                  ref={
+                    fieldRefs.current[fieldId] ??
+                    (fieldRefs.current[fieldId] = createRef())
+                  }
+                  onMove={handleFieldMove}
+                  field={field}
+                  fieldRelativeIndex={fieldIndexValues[index]}
+                  index={index}
+                  isActive={isActive}
+                  showError={showErrors}
+                  {...fieldProps(fieldId)}
+                />
+                {isActive && !isLast ? (
+                  <AddFieldButton
+                    className="add-field-after-button"
+                    position="absolute"
+                    bottom={0}
+                    left="50%"
+                    transform="translate(-50%, 50%)"
+                    zIndex="1"
+                    onSelectFieldType={(type) => onAddField(type, index + 1)}
+                  />
+                ) : null}
+              </Box>
+            );
+          })}
         </Card>
         <Flex marginTop={4} justifyContent="center">
           <AddFieldPopover
             as={Button}
-            ref={addFieldRef}
+            className="add-field-outer-button"
             leftIcon={<AddIcon />}
             onSelectFieldType={onAddField}
           >
@@ -307,6 +249,7 @@ export const PetitionComposeFieldList = Object.assign(
       petition: gql`
         fragment PetitionComposeFieldList_Petition on Petition {
           fields {
+            isFixed
             ...PetitionComposeField_PetitionField
           }
         }
@@ -315,3 +258,44 @@ export const PetitionComposeFieldList = Object.assign(
     },
   }
 );
+
+const AddFieldButton = forwardRef<
+  HTMLButtonElement,
+  ButtonProps & {
+    onSelectFieldType: (type: PetitionFieldType) => void;
+  }
+>(function AddFieldButton(props, ref) {
+  const intl = useIntl();
+  return (
+    <Tooltip
+      label={intl.formatMessage({
+        id: "petition.add-field-button",
+        defaultMessage: "Add field",
+      })}
+    >
+      <AddFieldPopover
+        ref={ref as any}
+        as={IconButton}
+        label={intl.formatMessage({
+          id: "petition.add-field-button",
+          defaultMessage: "Add field",
+        })}
+        icon={<AddIcon />}
+        size="xs"
+        variant="outline"
+        rounded="full"
+        backgroundColor="white"
+        borderColor="gray.200"
+        color="gray.500"
+        _hover={{
+          borderColor: "gray.300",
+          color: "gray.800",
+        }}
+        _active={{
+          backgroundColor: "gray.50",
+        }}
+        {...props}
+      />
+    </Tooltip>
+  );
+});
