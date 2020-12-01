@@ -569,16 +569,17 @@ function OptionSelectReplyForm({
   });
 
   const reactSelectProps = useMemo(
-    () => ({
-      ..._reactSelectProps,
-      styles: {
-        ..._reactSelectProps.styles,
-        menu: (styles) => ({
-          ...styles,
-          zIndex: 1000,
-        }),
-      },
-    }),
+    () =>
+      ({
+        ..._reactSelectProps,
+        styles: {
+          ..._reactSelectProps.styles,
+          menu: (styles) => ({
+            ...styles,
+            zIndex: 1000,
+          }),
+        },
+      } as typeof _reactSelectProps),
     [_reactSelectProps]
   );
 
