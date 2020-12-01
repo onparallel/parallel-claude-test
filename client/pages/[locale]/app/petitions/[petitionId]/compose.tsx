@@ -557,10 +557,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         alignWith={showSettings ? activeFieldElement : null}
         flyout={
           <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
-            {showSettings ? (
+            {showSettings && activeField ? (
               <PetitionComposeFieldSettings
-                key={activeField!.id}
-                field={activeField!}
+                key={activeField.id}
+                field={activeField}
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
                 onIsDescriptionShownChange={handleIsDescriptionShownChange}
