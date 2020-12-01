@@ -18,7 +18,7 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { useMemo } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function PrintPetitionSignature({ token }: { token: string }) {
   const { data } = assertQuery(
@@ -46,10 +46,17 @@ function PrintPetitionSignature({ token }: { token: string }) {
   }
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
+  const intl = useIntl();
   const pages = useMemo(() => {
     const fields = fieldIndexValues.map((indexValue, i) => ({
       ...petition.fields[i],
-      title: `${indexValue} - ${petition.fields[i].title}`,
+      title: `${indexValue} - ${
+        petition.fields[i].title ??
+        intl.formatMessage({
+          id: "generic.untitled-field",
+          defaultMessage: "Untitled field",
+        })
+      }`,
     }));
     return groupFieldsByPages<PrintPetitionSignature_PetitionFieldFragment>(
       fields
