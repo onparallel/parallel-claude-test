@@ -133,7 +133,7 @@ export const PetitionComposeField = Object.assign(
                 }
               },
             } as PetitionComposeFieldRef),
-          []
+          [field]
         );
         if (typeof ref === "function") {
           ref(_ref);
@@ -376,7 +376,11 @@ export const PetitionComposeField = Object.assign(
                       switch (event.key) {
                         case "ArrowDown":
                           if (currentLine === totalLines - 1) {
-                            onFocusNextField();
+                            if (field.type === "SELECT") {
+                              selectFieldOptionsRef.current!.focus("START");
+                            } else {
+                              onFocusNextField();
+                            }
                           }
                           break;
                         case "ArrowUp":
