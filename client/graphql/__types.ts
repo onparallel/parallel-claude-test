@@ -697,6 +697,8 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Whether user is subscribed to email notifications on this petition */
+  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -795,6 +797,8 @@ export type PetitionBase = {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Whether user is subscribed to email notifications on this petition */
+  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1093,6 +1097,8 @@ export type PetitionTemplate = PetitionBase & {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
+  /** Whether user is subscribed to email notifications on this petition */
+  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1518,6 +1524,7 @@ export type UpdatePetitionInput = {
   description?: Maybe<Scalars["String"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
+  isSubscribed?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -2306,7 +2313,7 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "deadline" | "id" | "locale"> & {
+} & Pick<Petition, "status" | "deadline" | "id" | "locale" | "isSubscribed"> & {
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
@@ -2317,7 +2324,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale">;
+} & Pick<PetitionTemplate, "id" | "locale" | "isSubscribed">;
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -5336,6 +5343,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
     locale
+    isSubscribed
     ... on Petition {
       status
       deadline

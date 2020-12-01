@@ -113,6 +113,17 @@ export const PetitionBase = interfaceType({
       description: "Time when the resource was last updated.",
       resolve: (o) => o.updated_at,
     });
+    t.boolean("isSubscribed", {
+      description:
+        "Whether user is subscribed to email notifications on this petition",
+      resolve: async (root, _, ctx) => {
+        const userPermission = (
+          await ctx.petitions.loadUserPermissions(root.id)
+        ).find((p) => p.user_id === ctx.user!.id);
+
+        return userPermission ? userPermission.is_subscribed : false;
+      },
+    });
   },
   rootTyping: "db.Petition",
 });

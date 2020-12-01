@@ -465,6 +465,16 @@
     "context": "Language of the petition"
   },
   {
+    "term": "component.petition-settings.petition-follow-notifications",
+    "definition": "Email notifications",
+    "context": "Email notifications"
+  },
+  {
+    "term": "component.petition-settings.petition-follow-notifications.description",
+    "definition": "By enabling notifications you will receive emails related to the progress of the petition.",
+    "context": "By enabling notifications you will receive emails related to the progress of the petition."
+  },
+  {
     "term": "component.petition-settings.petition-signature-configure",
     "definition": "Configure eSignature",
     "context": "Configure eSignature"

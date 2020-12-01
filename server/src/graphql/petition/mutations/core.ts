@@ -347,6 +347,7 @@ export const updatePetition = mutationField("updatePetition", {
           nullable: true,
         });
         t.string("description", { nullable: true });
+        t.boolean("isSubscribed", { nullable: true });
       },
     }).asArg({ required: true }),
   },
@@ -375,6 +376,7 @@ export const updatePetition = mutationField("updatePetition", {
       remindersConfig,
       signatureConfig,
       description,
+      isSubscribed,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -409,6 +411,15 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (description !== undefined) {
       data.template_description = description?.trim() || null;
+    }
+    if (isSubscribed !== undefined) {
+      await ctx.petitions.updatePetitionUser(
+        args.petitionId,
+        {
+          is_subscribed: isSubscribed ?? false,
+        },
+        ctx.user!
+      );
     }
     return await ctx.petitions.updatePetition(args.petitionId, data, ctx.user!);
   },

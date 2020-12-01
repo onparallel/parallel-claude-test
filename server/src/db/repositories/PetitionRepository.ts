@@ -2118,6 +2118,7 @@ export class PetitionRepository extends BaseRepository {
       userIds.map((userId) => ({
         petition_id: petitionId,
         user_id: userId,
+        is_subscribed: true,
         permission_type: permissionType,
         created_by: `User:${user.id}`,
         updated_by: `User:${user.id}`,
@@ -2510,5 +2511,28 @@ export class PetitionRepository extends BaseRepository {
       .select<[{ id: number }]>("user_id as id");
 
     return subscribedUserIds.map((u) => u.id);
+  }
+
+  async updatePetitionUser(
+    petitionId: number,
+    data: Partial<CreatePetitionUser>,
+    user: User
+  ) {
+    const [row] = await this.from("petition_user")
+      .where({
+        petition_id: petitionId,
+        user_id: user.id,
+        deleted_at: null,
+      })
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        },
+        "*"
+      );
+
+    return row;
   }
 }
