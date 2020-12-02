@@ -2,10 +2,17 @@ import { Text } from "@chakra-ui/core";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { NextPageContext } from "next";
 import { FormattedMessage } from "react-intl";
+import * as Sentry from "@sentry/node";
+import { UnwrapPromise } from "@parallel/utils/types";
 
 export default function CustomError({
+  err,
   errorCode,
-}: ReturnType<typeof CustomError.getInitialProps>) {
+  hasGetInitialPropsRun,
+}: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>) {
+  if (!hasGetInitialPropsRun && err) {
+    Sentry.captureException(err);
+  }
   return errorCode === "PUBLIC_PETITION_NOT_AVAILABLE" ? (
     <ErrorPage
       header={
@@ -60,8 +67,14 @@ export default function CustomError({
   );
 }
 
-CustomError.getInitialProps = function ({ res, err }: NextPageContext) {
+CustomError.getInitialProps = async ({ res, err, asPath }: NextPageContext) => {
   const errorCode =
     (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
-  return { errorCode };
+
+  Sentry.captureException(
+    err ?? `_error.js getInitialProps missing data at path: ${asPath}`
+  );
+
+  await Sentry.flush(2000);
+  return { errorCode, err, hasGetInitialPropsRun: true };
 };

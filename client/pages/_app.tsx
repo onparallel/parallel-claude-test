@@ -11,8 +11,11 @@ import { AppProps } from "next/app";
 import { useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { init as initSentry } from "../utils/sentry";
 
 type MyAppProps = AppProps & I18nProps;
+
+initSentry();
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
