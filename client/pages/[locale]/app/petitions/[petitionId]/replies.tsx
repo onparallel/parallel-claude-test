@@ -1,10 +1,26 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
+import {
+  Box,
+  Button,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Portal,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/core";
 import {
   DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
+  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
@@ -15,6 +31,7 @@ import {
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { ResponsiveButton } from "@parallel/components/common/ResponsiveButton";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   withApolloData,
@@ -23,6 +40,7 @@ import {
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { PetitionSharingModal } from "@parallel/components/petition-common/PetitionSharingModal";
 import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
@@ -442,160 +460,192 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     ]
   );
 
+  const {
+    isOpen: isSharePetitionOpen,
+    onOpen: onOpenSharePetition,
+    onClose: onCloseSharePetition,
+  } = useDisclosure();
+
   return (
-    <PetitionLayout
-      key={petition.id}
-      user={me}
-      petition={petition}
-      onUpdatePetition={handleOnUpdatePetition}
-      section="replies"
-      scrollBody={false}
-      state={state}
-      display="flex"
-      flexDirection="column"
-      minHeight={0}
-      overflow="visible"
-    >
-      <Stack
-        direction="row"
-        paddingX={4}
-        paddingY={2}
-        backgroundColor={pendingComments ? "yellow.50" : "white"}
-      >
-        <IconButtonWithTooltip
-          onClick={() => refetch()}
-          icon={<RepeatIcon />}
-          placement="bottom"
-          variant="outline"
-          label={intl.formatMessage({
-            id: "generic.reload-data",
-            defaultMessage: "Reload",
-          })}
-        />
-        <ClosePetitionButton
-          hidden={petition.status === "CLOSED"}
-          onClosePetition={handleClosePetition}
-        />
-        <Button
-          hidden={petition.status !== "CLOSED"}
-          colorScheme="blue"
-          leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
-          onClick={() => handleConfirmPetitionCompleted()}
-        >
-          <FormattedMessage
-            id="petition-replies.notify-petition-reviewed.button"
-            defaultMessage="Notify that it is correct"
-          />
-        </Button>
-        {showDownloadAll ? (
-          <Button
-            colorScheme="purple"
-            leftIcon={<DownloadIcon fontSize="lg" display="block" />}
-            onClick={handleDownloadAllClick}
-            id="download-all"
-          >
-            <FormattedMessage
-              id="petition-replies.download-all"
-              defaultMessage="Download replies"
-            />
-          </Button>
-        ) : null}
-        <Spacer />
-        {pendingComments ? (
-          <Button
-            colorScheme="yellow"
-            isDisabled={isSubmitting}
-            onClick={handleSubmitUnpublished}
-          >
-            <FormattedMessage
-              id="petition-replies.submit-comments"
-              defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-              values={{ commentCount: pendingComments }}
-            />
-          </Button>
-        ) : null}
-      </Stack>
-      <Divider />
-      <Box flex="1" overflow="auto">
-        <PaneWithFlyout
-          isFlyoutActive={Boolean(activeFieldId)}
-          alignWith={activeFieldElement}
-          flyout={
-            <Box padding={4} paddingLeft={{ md: 0 }}>
-              {activeFieldId ? (
-                <PetitionRepliesFieldComments
-                  key={activeFieldId!}
-                  field={activeField!}
-                  user={me}
-                  onClose={() => setActiveFieldId(null)}
-                  onAddComment={handleAddComment}
-                  onUpdateComment={handleUpdateComment}
-                  onDeleteComment={handleDeleteComment}
-                />
-              ) : (
-                <Card
-                  display="flex"
-                  flexDirection="column"
-                  maxHeight={`calc(100vh - 153px)`}
-                >
-                  <CardHeader>
-                    <Text as="span" display="flex" alignItems="center">
-                      <ListIcon fontSize="18px" marginRight={2} />
-                      <FormattedMessage
-                        id="petition.contents"
-                        defaultMessage="Contents"
-                      />
-                    </Text>
-                  </CardHeader>
-                  <Box overflow="auto">
-                    <PetitionFieldsIndex
-                      fields={petition.fields}
-                      onFieldClick={handleIndexFieldClick}
-                    />
-                  </Box>
-                </Card>
-              )}
-            </Box>
-          }
-        >
-          <Box padding={4}>
-            <Stack flex="2" spacing={4} id="petition-replies">
-              {petition.fields.map((field, index) => (
-                <PetitionRepliesField
-                  id={`field-${field.id}`}
-                  key={field.id}
-                  field={field}
-                  fieldRelativeIndex={fieldIndexValues[index]}
-                  index={index}
-                  onValidateToggle={() =>
-                    handleValidateToggle([field.id], !field.validated)
-                  }
-                  onAction={handleAction}
-                  isActive={activeFieldId === field.id}
-                  commentCount={index}
-                  newCommentCount={index > 1 ? index - 1 : 0}
-                  onToggleComments={() =>
-                    setActiveFieldId(
-                      activeFieldId === field.id ? null : field.id
-                    )
-                  }
-                  onUpdateReplyStatus={(replyId, status) =>
-                    handleUpdateRepliesStatus(field.id, [replyId], status)
-                  }
-                />
-              ))}
-            </Stack>
-            {me.hasPetitionSignature ? (
-              <PetitionSignaturesCard
-                petition={petition}
-                marginTop={8}
-                onRefetchPetition={refetch}
+    <>
+      <PetitionLayout
+        key={petition.id}
+        user={me}
+        petition={petition}
+        onUpdatePetition={handleOnUpdatePetition}
+        section="replies"
+        scrollBody={false}
+        state={state}
+        display="flex"
+        flexDirection="column"
+        minHeight={0}
+        overflow="visible"
+        mainActions={[
+          {
+            node: <WatchNotificationsMenu key="action-watch" />,
+          },
+          {
+            node: (
+              <ResponsiveButton
+                key="action-share"
+                icon={<UserArrowIcon fontSize="18px" />}
+                label={intl.formatMessage({
+                  id: "generic.share",
+                  defaultMessage: "Share",
+                })}
+                onClick={onOpenSharePetition}
               />
-            ) : null}
-          </Box>
-        </PaneWithFlyout>
-      </Box>
-    </PetitionLayout>
+            ),
+          },
+        ]}
+      >
+        <Stack
+          direction="row"
+          paddingX={4}
+          paddingY={2}
+          backgroundColor={pendingComments ? "yellow.50" : "white"}
+        >
+          <IconButtonWithTooltip
+            onClick={() => refetch()}
+            icon={<RepeatIcon />}
+            placement="bottom"
+            variant="outline"
+            label={intl.formatMessage({
+              id: "generic.reload-data",
+              defaultMessage: "Reload",
+            })}
+          />
+          <ClosePetitionButton
+            hidden={petition.status === "CLOSED"}
+            onClosePetition={handleClosePetition}
+          />
+          <Button
+            hidden={petition.status !== "CLOSED"}
+            colorScheme="blue"
+            leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
+            onClick={() => handleConfirmPetitionCompleted()}
+          >
+            <FormattedMessage
+              id="petition-replies.notify-petition-reviewed.button"
+              defaultMessage="Notify that it is correct"
+            />
+          </Button>
+          {showDownloadAll ? (
+            <Button
+              colorScheme="purple"
+              leftIcon={<DownloadIcon fontSize="lg" display="block" />}
+              onClick={handleDownloadAllClick}
+              id="download-all"
+            >
+              <FormattedMessage
+                id="petition-replies.download-all"
+                defaultMessage="Download replies"
+              />
+            </Button>
+          ) : null}
+          <Spacer />
+          {pendingComments ? (
+            <Button
+              colorScheme="yellow"
+              isDisabled={isSubmitting}
+              onClick={handleSubmitUnpublished}
+            >
+              <FormattedMessage
+                id="petition-replies.submit-comments"
+                defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
+                values={{ commentCount: pendingComments }}
+              />
+            </Button>
+          ) : null}
+        </Stack>
+        <Divider />
+        <Box flex="1" overflow="auto">
+          <PaneWithFlyout
+            isFlyoutActive={Boolean(activeFieldId)}
+            alignWith={activeFieldElement}
+            flyout={
+              <Box padding={4} paddingLeft={{ md: 0 }}>
+                {activeFieldId ? (
+                  <PetitionRepliesFieldComments
+                    key={activeFieldId!}
+                    field={activeField!}
+                    user={me}
+                    onClose={() => setActiveFieldId(null)}
+                    onAddComment={handleAddComment}
+                    onUpdateComment={handleUpdateComment}
+                    onDeleteComment={handleDeleteComment}
+                  />
+                ) : (
+                  <Card
+                    display="flex"
+                    flexDirection="column"
+                    maxHeight={`calc(100vh - 153px)`}
+                  >
+                    <CardHeader>
+                      <Text as="span" display="flex" alignItems="center">
+                        <ListIcon fontSize="18px" marginRight={2} />
+                        <FormattedMessage
+                          id="petition.contents"
+                          defaultMessage="Contents"
+                        />
+                      </Text>
+                    </CardHeader>
+                    <Box overflow="auto">
+                      <PetitionFieldsIndex
+                        fields={petition.fields}
+                        onFieldClick={handleIndexFieldClick}
+                      />
+                    </Box>
+                  </Card>
+                )}
+              </Box>
+            }
+          >
+            <Box padding={4}>
+              <Stack flex="2" spacing={4} id="petition-replies">
+                {petition.fields.map((field, index) => (
+                  <PetitionRepliesField
+                    id={`field-${field.id}`}
+                    key={field.id}
+                    field={field}
+                    fieldRelativeIndex={fieldIndexValues[index]}
+                    index={index}
+                    onValidateToggle={() =>
+                      handleValidateToggle([field.id], !field.validated)
+                    }
+                    onAction={handleAction}
+                    isActive={activeFieldId === field.id}
+                    commentCount={index}
+                    newCommentCount={index > 1 ? index - 1 : 0}
+                    onToggleComments={() =>
+                      setActiveFieldId(
+                        activeFieldId === field.id ? null : field.id
+                      )
+                    }
+                    onUpdateReplyStatus={(replyId, status) =>
+                      handleUpdateRepliesStatus(field.id, [replyId], status)
+                    }
+                  />
+                ))}
+              </Stack>
+              {me.hasPetitionSignature ? (
+                <PetitionSignaturesCard
+                  petition={petition}
+                  marginTop={8}
+                  onRefetchPetition={refetch}
+                />
+              ) : null}
+            </Box>
+          </PaneWithFlyout>
+        </Box>
+      </PetitionLayout>
+      <PetitionSharingModal
+        petitionId={petition.id}
+        userId={me.id}
+        isOpen={isSharePetitionOpen}
+        onClose={onCloseSharePetition}
+      />
+    </>
   );
 }
 
@@ -841,6 +891,89 @@ PetitionReplies.mutations = [
     }
   `,
 ];
+
+function WatchNotificationsMenu() {
+  const intl = useIntl();
+  const [following, setFollowing] = useState(true);
+
+  const followingLabel = intl.formatMessage({
+    id: "generic.following",
+    defaultMessage: "Following",
+  });
+  const ignoringLabel = intl.formatMessage({
+    id: "generic.ignoring",
+    defaultMessage: "Ignoring",
+  });
+
+  const followLabel = useMemo(
+    () => (following ? followingLabel : ignoringLabel),
+    [following]
+  );
+
+  const FollowIcon = useMemo(() => (following ? EyeIcon : EyeOffIcon), [
+    following,
+  ]);
+
+  return (
+    <Box>
+      <Menu>
+        <MenuButton as={Button} aria-label={followLabel}>
+          {followLabel}
+          <FollowIcon marginLeft={2} />
+        </MenuButton>
+
+        <Portal>
+          <MenuList>
+            <MenuOptionGroup
+              title="Notifications"
+              defaultValue={following ? "follow" : "unfollow"}
+              type="radio"
+            >
+              <MenuItemOption
+                alignItems="baseline"
+                value="follow"
+                onClick={() => setFollowing(true)}
+              >
+                <Stack fontWeight="bold">
+                  <FormattedMessage
+                    id="generic.follow"
+                    defaultMessage="Follow"
+                  />
+
+                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
+                    <FormattedMessage
+                      id="generic.all-notifications-explainer"
+                      defaultMessage="Be notified of all activity on this petition."
+                    />
+                  </Text>
+                </Stack>
+              </MenuItemOption>
+              <MenuItemOption
+                alignItems="baseline"
+                value="unfollow"
+                onClick={() => setFollowing(false)}
+              >
+                <Stack fontWeight="bold">
+                  <FormattedMessage
+                    id="generic.ignore"
+                    defaultMessage="Ignore"
+                  />
+
+                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
+                    <FormattedMessage
+                      id="generic.all-notifications-explainer"
+                      defaultMessage="Never be notified of the activity on this petition."
+                    />
+                  </Text>
+                </Stack>
+              </MenuItemOption>
+            </MenuOptionGroup>
+          </MenuList>
+        </Portal>
+      </Menu>
+    </Box>
+  );
+}
 
 function useDownloadReplyFile() {
   const [mutate] = usePetitionReplies_fileUploadReplyDownloadLinkMutation();

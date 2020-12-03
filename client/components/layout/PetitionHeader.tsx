@@ -16,7 +16,6 @@ import {
   useDisclosure,
 } from "@chakra-ui/core";
 import {
-  ArrowForwardIcon,
   CopyIcon,
   DeleteIcon,
   EditIcon,
@@ -54,6 +53,7 @@ export type PetitionHeaderProps = ExtendChakra<{
   onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
+  mainActions?: ReactNode[];
 }>;
 
 export function PetitionHeader({
@@ -64,6 +64,7 @@ export function PetitionHeader({
   onSuggestEventRefetch,
   section: current,
   state,
+  mainActions,
   ...props
 }: PetitionHeaderProps) {
   const intl = useIntl();
@@ -252,28 +253,7 @@ export function PetitionHeader({
           </Flex>
           <Spacer minWidth={4} />
           <Stack direction="row">
-            {petition.status === "DRAFT" ? (
-              <Box>
-                <IconButton
-                  display={{ base: "flex", md: "none" }}
-                  colorScheme="purple"
-                  icon={<ArrowForwardIcon fontSize="18px" />}
-                  onClick={onNextClick}
-                  aria-label={intl.formatMessage({
-                    id: "generic.next",
-                    defaultMessage: "Next",
-                  })}
-                />
-                <Button
-                  display={{ base: "none", md: "flex" }}
-                  colorScheme="purple"
-                  rightIcon={<ArrowForwardIcon fontSize="18px" />}
-                  onClick={onNextClick}
-                >
-                  <FormattedMessage id="generic.next" defaultMessage="Next" />
-                </Button>
-              </Box>
-            ) : null}
+            {mainActions ?? null}
             <Box>
               <Menu id="petition-more-options-menu">
                 <Tooltip

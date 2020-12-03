@@ -189,10 +189,6 @@ export function PetitionSettings({
           />
         </FormControl>
       ) : null}
-      <EmailNotificationsSetting
-        isSubscribed={petition.isSubscribed}
-        onChange={(isSubscribed) => onUpdatePetition({ isSubscribed })}
-      />
       {petition.__typename === "Petition" &&
       (petition.signatureConfig || hasSignature) ? (
         <Box>
@@ -238,38 +234,6 @@ export function PetitionSettings({
   );
 }
 
-function EmailNotificationsSetting({
-  isSubscribed,
-  onChange,
-}: {
-  isSubscribed: boolean;
-  onChange: (isSubscribed: boolean) => void;
-}) {
-  return (
-    <Flex alignItems="center">
-      <FormControl as={Stack} direction="row">
-        <FormLabel margin={0} display="flex" alignItems="center">
-          <FormattedMessage
-            id="component.petition-settings.petition-follow-notifications"
-            defaultMessage="Email notifications"
-          />
-          <HelpPopover marginLeft={2}>
-            <FormattedMessage
-              id="component.petition-settings.petition-follow-notifications.description"
-              defaultMessage="By enabling notifications you will receive emails related to the progress of the petition."
-            />
-          </HelpPopover>
-        </FormLabel>
-        <Spacer />
-        <Switch
-          isChecked={isSubscribed}
-          onClick={() => onChange(!isSubscribed)}
-        />
-      </FormControl>
-    </Flex>
-  );
-}
-
 PetitionSettings.fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
@@ -286,7 +250,6 @@ PetitionSettings.fragments = {
     fragment PetitionSettings_PetitionBase on PetitionBase {
       id
       locale
-      isSubscribed
       ... on Petition {
         status
         deadline

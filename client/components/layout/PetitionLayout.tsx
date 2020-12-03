@@ -11,7 +11,7 @@ import {
   PetitionLayout_UserFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
@@ -24,6 +24,7 @@ export type PetitionLayoutProps = ExtendChakra<{
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
   scrollBody: boolean;
+  mainActions?: { show?: boolean; node: ReactNode }[];
 }>;
 
 export function PetitionLayout({
@@ -32,9 +33,9 @@ export function PetitionLayout({
   scrollBody,
   state,
   section,
-  onNextClick,
   onUpdatePetition,
   onSuggestEventRefetch,
+  mainActions,
   children,
   ...props
 }: PetitionLayoutProps) {
@@ -62,6 +63,11 @@ export function PetitionLayout({
           }),
     [section, intl.locale]
   );
+
+  const actions = useMemo(
+    () => mainActions?.filter((a) => a.show !== false).map((a) => a.node),
+    [mainActions]
+  );
   return (
     <AppLayout
       title={`${
@@ -82,11 +88,11 @@ export function PetitionLayout({
         <PetitionHeader
           petition={petition}
           user={user}
-          onNextClick={onNextClick}
           onUpdatePetition={onUpdatePetition}
           onSuggestEventRefetch={onSuggestEventRefetch}
           section={section!}
           state={state}
+          mainActions={actions}
         />
       ) : petition.__typename === "PetitionTemplate" ? (
         <PetitionTemplateHeader

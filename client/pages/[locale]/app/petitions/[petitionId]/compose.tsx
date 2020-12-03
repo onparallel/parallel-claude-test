@@ -9,11 +9,16 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/core";
-import { ListIcon, SettingsIcon } from "@parallel/chakra/icons";
+import {
+  ArrowForwardIcon,
+  ListIcon,
+  SettingsIcon,
+} from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { ResponsiveButton } from "@parallel/components/common/ResponsiveButton";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -541,16 +546,34 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     minHeight: 0,
   } as const;
 
+  const isPetitionDraft =
+    petition?.__typename === "Petition" && petition.status === "DRAFT";
+
   return (
     <PetitionLayout
       key={petition!.id}
       user={me}
       petition={petition!}
       onUpdatePetition={handleUpdatePetition}
-      onNextClick={handleNextClick}
       section="compose"
       scrollBody
       state={petitionState}
+      mainActions={[
+        {
+          show: isPetitionDraft,
+          node: (
+            <ResponsiveButton
+              key="action-next"
+              icon={<ArrowForwardIcon fontSize="18px" />}
+              label={intl.formatMessage({
+                id: "generic.next",
+                defaultMessage: "Next",
+              })}
+              onClick={handleNextClick}
+            />
+          ),
+        },
+      ]}
     >
       <PaneWithFlyout
         isFlyoutActive={showSettings}
@@ -683,6 +706,9 @@ PetitionCompose.fragments = {
         ...PetitionSettings_PetitionBase
         fields {
           ...PetitionCompose_PetitionField
+        }
+        ... on Petition {
+          status
         }
       }
       ${PetitionLayout.fragments.PetitionBase}
