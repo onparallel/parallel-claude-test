@@ -472,21 +472,17 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         flexDirection="column"
         minHeight={0}
         overflow="visible"
-        mainActions={[
-          {
-            node: (
-              <ResponsiveButton
-                key="action-share"
-                icon={<UserArrowIcon fontSize="18px" />}
-                label={intl.formatMessage({
-                  id: "generic.share",
-                  defaultMessage: "Share",
-                })}
-                onClick={onOpenSharePetition}
-              />
-            ),
-          },
-        ]}
+        headerActions={
+          <ResponsiveButton
+            key="action-share"
+            icon={<UserArrowIcon fontSize="18px" />}
+            label={intl.formatMessage({
+              id: "generic.share",
+              defaultMessage: "Share",
+            })}
+            onClick={onOpenSharePetition}
+          />
+        }
       >
         <Stack
           direction="row"

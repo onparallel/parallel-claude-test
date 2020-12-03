@@ -546,9 +546,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     minHeight: 0,
   } as const;
 
-  const isPetitionDraft =
-    petition?.__typename === "Petition" && petition.status === "DRAFT";
-
   return (
     <PetitionLayout
       key={petition!.id}
@@ -558,22 +555,19 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       section="compose"
       scrollBody
       state={petitionState}
-      mainActions={[
-        {
-          show: isPetitionDraft,
-          node: (
-            <ResponsiveButton
-              key="action-next"
-              icon={<ArrowForwardIcon fontSize="18px" />}
-              label={intl.formatMessage({
-                id: "generic.next",
-                defaultMessage: "Next",
-              })}
-              onClick={handleNextClick}
-            />
-          ),
-        },
-      ]}
+      headerActions={
+        petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
+          <ResponsiveButton
+            key="action-next"
+            icon={<ArrowForwardIcon fontSize="18px" />}
+            label={intl.formatMessage({
+              id: "generic.next",
+              defaultMessage: "Next",
+            })}
+            onClick={handleNextClick}
+          />
+        ) : null
+      }
     >
       <PaneWithFlyout
         isFlyoutActive={showSettings}

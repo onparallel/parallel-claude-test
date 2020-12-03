@@ -64,7 +64,7 @@ export type PetitionHeaderProps = ExtendChakra<{
   onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
-  mainActions?: ReactNode[];
+  actions?: ReactNode;
 }>;
 
 export function PetitionHeader({
@@ -75,7 +75,7 @@ export function PetitionHeader({
   onSuggestEventRefetch,
   section: current,
   state,
-  mainActions,
+  actions,
   ...props
 }: PetitionHeaderProps) {
   const intl = useIntl();
@@ -264,7 +264,7 @@ export function PetitionHeader({
           </Flex>
           <Spacer minWidth={4} />
           <Stack direction="row">
-            {mainActions ?? null}
+            {actions ?? null}
             <Box>
               <Menu id="petition-more-options-menu">
                 <Tooltip

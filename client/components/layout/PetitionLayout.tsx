@@ -24,7 +24,7 @@ export type PetitionLayoutProps = ExtendChakra<{
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
   scrollBody: boolean;
-  mainActions?: { show?: boolean; node: ReactNode }[];
+  headerActions?: ReactNode;
 }>;
 
 export function PetitionLayout({
@@ -35,7 +35,7 @@ export function PetitionLayout({
   section,
   onUpdatePetition,
   onSuggestEventRefetch,
-  mainActions,
+  headerActions,
   children,
   ...props
 }: PetitionLayoutProps) {
@@ -64,10 +64,6 @@ export function PetitionLayout({
     [section, intl.locale]
   );
 
-  const actions = useMemo(
-    () => mainActions?.filter((a) => a.show !== false).map((a) => a.node),
-    [mainActions]
-  );
   return (
     <AppLayout
       title={`${
@@ -92,7 +88,7 @@ export function PetitionLayout({
           onSuggestEventRefetch={onSuggestEventRefetch}
           section={section!}
           state={state}
-          mainActions={actions}
+          actions={headerActions}
         />
       ) : petition.__typename === "PetitionTemplate" ? (
         <PetitionTemplateHeader
