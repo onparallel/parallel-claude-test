@@ -1,5 +1,10 @@
 import { gql } from "@apollo/client";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   Flex,
@@ -8,7 +13,10 @@ import {
   MenuButton,
   MenuDivider,
   MenuItem,
+  MenuItemOption,
+  MenuItemOptionProps,
   MenuList,
+  MenuOptionGroup,
   Portal,
   Stack,
   Text,
@@ -19,6 +27,7 @@ import {
   CopyIcon,
   DeleteIcon,
   EditIcon,
+  EyeIcon,
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -28,7 +37,9 @@ import {
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
   usePetitionHeader_reopenPetitionMutation,
+  usePetitionHeader_updateUserPermissionMutation,
 } from "@parallel/graphql/__types";
+
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -274,7 +285,7 @@ export function PetitionHeader({
                   />
                 </Tooltip>
                 <Portal>
-                  <MenuList>
+                  <MenuList width="min-content">
                     <MenuItem onClick={onOpenSharePetition}>
                       <UserArrowIcon marginRight={2} />
                       <FormattedMessage
@@ -306,6 +317,8 @@ export function PetitionHeader({
                         defaultMessage="Reopen petition"
                       />
                     </MenuItem>
+                    <MenuDivider />
+                    <NotificationsAccordion petition={petition} user={user} />
                     <MenuDivider />
                     <MenuItem color="red.500" onClick={handleDeleteClick}>
                       <DeleteIcon marginRight={2} />
@@ -362,6 +375,113 @@ export function PetitionHeader({
     </>
   );
 }
+type NotificationsAccordionProps = {
+  petition: PetitionHeader_PetitionFragment;
+  user: PetitionHeader_UserFragment;
+};
+function NotificationsAccordion({
+  petition,
+  user,
+}: NotificationsAccordionProps) {
+  const isSubscribed =
+    petition.userPermissions.find((up) => up.user.id === user.id)
+      ?.isSubscribed ?? false;
+
+  const [
+    updateUserPermissions,
+  ] = usePetitionHeader_updateUserPermissionMutation();
+
+  const handleClickOption = useCallback(
+    async (isSubscribed: boolean) => {
+      await updateUserPermissions({
+        variables: {
+          petitionId: petition.id,
+          userId: user.id,
+          isSubscribed,
+        },
+      });
+    },
+    [petition, user]
+  );
+
+  const menuItemOptionProps: MenuItemOptionProps = {
+    alignItems: "baseline",
+    padding: "0.5rem 1rem 0.5rem 1rem",
+    sx: {
+      ":hover": {
+        backgroundColor: "gray.100",
+      },
+    },
+  };
+
+  return (
+    <Accordion allowToggle border="transparent">
+      <AccordionItem>
+        <AccordionButton>
+          <Flex flex="1" alignItems="center">
+            <EyeIcon marginRight={2} />
+            <FormattedMessage
+              id="generic.notifications"
+              defaultMessage="Notifications"
+            />
+          </Flex>
+          <AccordionIcon />
+        </AccordionButton>
+        <AccordionPanel padding={0}>
+          <MenuOptionGroup
+            type="radio"
+            value={isSubscribed ? "follow" : "ignore"}
+          >
+            <MenuItemOption value="follow" {...menuItemOptionProps}>
+              <Box
+                flex="1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickOption(true);
+                }}
+              >
+                <Stack fontWeight="bold">
+                  <FormattedMessage
+                    id="generic.subscribed"
+                    defaultMessage="Subscribed"
+                  />
+                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
+                    <FormattedMessage
+                      id="generic.all-notifications-explainer"
+                      defaultMessage="I want to be notified of all activity on this petition."
+                    />
+                  </Text>
+                </Stack>
+              </Box>
+            </MenuItemOption>
+            <MenuItemOption value="ignore" {...menuItemOptionProps}>
+              <Box
+                flex="1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickOption(false);
+                }}
+              >
+                <Stack fontWeight="bold">
+                  <FormattedMessage
+                    id="generic.unsubscribed"
+                    defaultMessage="Unsubscribed"
+                  />
+                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
+                    <FormattedMessage
+                      id="generic.no-notifications-explainer"
+                      defaultMessage="I don't want to be notified about the activity on this petition."
+                    />
+                  </Text>
+                </Stack>
+              </Box>
+            </MenuItemOption>
+          </MenuOptionGroup>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
+  );
+}
 
 const PetitionHeaderTab = forwardRef(function (
   {
@@ -409,6 +529,12 @@ PetitionHeader.fragments = {
       locale
       deadline
       status
+      userPermissions {
+        isSubscribed
+        user {
+          id
+        }
+      }
       ...HeaderNameEditable_PetitionBase
     }
     ${HeaderNameEditable.fragments.PetitionBase}
@@ -427,6 +553,27 @@ PetitionHeader.mutations = [
         id
         status
         updatedAt
+      }
+    }
+  `,
+  gql`
+    mutation PetitionHeader_updateUserPermission(
+      $petitionId: GID!
+      $userId: GID!
+      $isSubscribed: Boolean
+    ) {
+      updatePetitionUserPermission(
+        petitionIds: [$petitionId]
+        userIds: [$userId]
+        data: { isSubscribed: $isSubscribed }
+      ) {
+        id
+        userPermissions {
+          isSubscribed
+          user {
+            id
+          }
+        }
       }
     }
   `,

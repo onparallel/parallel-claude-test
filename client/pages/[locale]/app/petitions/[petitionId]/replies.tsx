@@ -2,12 +2,6 @@ import { gql, useApolloClient } from "@apollo/client";
 import {
   Box,
   Button,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  MenuOptionGroup,
-  Portal,
   Stack,
   Text,
   useDisclosure,
@@ -15,8 +9,6 @@ import {
 } from "@chakra-ui/core";
 import {
   DownloadIcon,
-  EyeIcon,
-  EyeOffIcon,
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
@@ -482,9 +474,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         overflow="visible"
         mainActions={[
           {
-            node: <WatchNotificationsMenu key="action-watch" />,
-          },
-          {
             node: (
               <ResponsiveButton
                 key="action-share"
@@ -891,89 +880,6 @@ PetitionReplies.mutations = [
     }
   `,
 ];
-
-function WatchNotificationsMenu() {
-  const intl = useIntl();
-  const [following, setFollowing] = useState(true);
-
-  const followingLabel = intl.formatMessage({
-    id: "generic.following",
-    defaultMessage: "Following",
-  });
-  const ignoringLabel = intl.formatMessage({
-    id: "generic.ignoring",
-    defaultMessage: "Ignoring",
-  });
-
-  const followLabel = useMemo(
-    () => (following ? followingLabel : ignoringLabel),
-    [following]
-  );
-
-  const FollowIcon = useMemo(() => (following ? EyeIcon : EyeOffIcon), [
-    following,
-  ]);
-
-  return (
-    <Box>
-      <Menu>
-        <MenuButton as={Button} aria-label={followLabel}>
-          {followLabel}
-          <FollowIcon marginLeft={2} />
-        </MenuButton>
-
-        <Portal>
-          <MenuList>
-            <MenuOptionGroup
-              title="Notifications"
-              defaultValue={following ? "follow" : "unfollow"}
-              type="radio"
-            >
-              <MenuItemOption
-                alignItems="baseline"
-                value="follow"
-                onClick={() => setFollowing(true)}
-              >
-                <Stack fontWeight="bold">
-                  <FormattedMessage
-                    id="generic.follow"
-                    defaultMessage="Follow"
-                  />
-
-                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
-                    <FormattedMessage
-                      id="generic.all-notifications-explainer"
-                      defaultMessage="Be notified of all activity on this petition."
-                    />
-                  </Text>
-                </Stack>
-              </MenuItemOption>
-              <MenuItemOption
-                alignItems="baseline"
-                value="unfollow"
-                onClick={() => setFollowing(false)}
-              >
-                <Stack fontWeight="bold">
-                  <FormattedMessage
-                    id="generic.ignore"
-                    defaultMessage="Ignore"
-                  />
-
-                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
-                    <FormattedMessage
-                      id="generic.all-notifications-explainer"
-                      defaultMessage="Never be notified of the activity on this petition."
-                    />
-                  </Text>
-                </Stack>
-              </MenuItemOption>
-            </MenuOptionGroup>
-          </MenuList>
-        </Portal>
-      </Menu>
-    </Box>
-  );
-}
 
 function useDownloadReplyFile() {
   const [mutate] = usePetitionReplies_fileUploadReplyDownloadLinkMutation();

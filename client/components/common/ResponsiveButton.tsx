@@ -1,25 +1,24 @@
-import { Box, Button } from "@chakra-ui/core";
+import { Box, Button, BoxProps } from "@chakra-ui/core";
 import { ReactElement } from "react";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
 type ResponsiveButtonProps = {
-  key: string;
   icon: ReactElement;
   label: string;
   colorScheme?: string;
   iconOnly?: boolean;
   onClick: (...args: any[]) => void;
-};
+} & BoxProps;
 export function ResponsiveButton({
-  key,
   icon,
   label,
   iconOnly,
   colorScheme,
   onClick,
+  ...props
 }: ResponsiveButtonProps) {
   return (
-    <Box key={key}>
+    <Box {...props}>
       <IconButtonWithTooltip
         display={iconOnly ? "flex" : { base: "flex", md: "none" }}
         colorScheme={colorScheme ?? "purple"}

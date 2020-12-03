@@ -13,7 +13,7 @@ import { validateAnd } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { WhitelistedError } from "../../helpers/errors";
+import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
 import { CreatePetitionUser } from "../../../db/__types";
 import { isDefined } from "../../../util/remedaExtensions";
 
@@ -133,10 +133,9 @@ export const updatePetitionUserPermission = mutationField(
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.userIds, "userIds"),
-      userIdNotIncludedInArray((args) => args.userIds, "userIds")
+      notEmptyArray((args) => args.userIds, "userIds")
     ),
-    resolve: async (_, args, ctx) => {
+    resolve: async (_, args, ctx, info) => {
       try {
         const data: Partial<CreatePetitionUser> = {};
 
@@ -146,6 +145,13 @@ export const updatePetitionUserPermission = mutationField(
 
         if (isDefined(args.data.permissionType)) {
           data.permission_type = args.data.permissionType;
+          if (args.userIds.includes(ctx.user!.id)) {
+            throw new ArgValidationError(
+              info,
+              "userIds",
+              `Invalid value on array.`
+            );
+          }
         }
         return await ctx.petitions.updatePetitionUserPermissions(
           args.petitionIds,

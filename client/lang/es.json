@@ -465,16 +465,6 @@
     "context": "Language of the petition"
   },
   {
-    "term": "component.petition-settings.petition-follow-notifications",
-    "definition": "Notificaciones por email",
-    "context": "Email notifications"
-  },
-  {
-    "term": "component.petition-settings.petition-follow-notifications.description",
-    "definition": "Al activar las notificaciones recibirás emails relacionados con el progreso de la petición.",
-    "context": "By enabling notifications you will receive emails related to the progress of the petition."
-  },
-  {
     "term": "component.petition-settings.petition-signature-configure",
     "definition": "Ajustes de firma digital",
     "context": "Configure eSignature"
@@ -885,6 +875,11 @@
     "context": "All languages"
   },
   {
+    "term": "generic.all-notifications-explainer",
+    "definition": "Quiero recibir notificaciones de toda la actividad en esta petición.",
+    "context": "I want to be notified of all activity on this petition."
+  },
+  {
     "term": "generic.by",
     "definition": "por {name}",
     "context": "by {name}"
@@ -1195,9 +1190,19 @@
     "context": "No description"
   },
   {
+    "term": "generic.no-notifications-explainer",
+    "definition": "No quiero recibir notificaciones sobre la actividad en esta petición.",
+    "context": "I don't want to be notified about the activity on this petition."
+  },
+  {
     "term": "generic.not-specified",
     "definition": "Sin especificar",
     "context": "Not specified"
+  },
+  {
+    "term": "generic.notifications",
+    "definition": "Notificaciones",
+    "context": "Notifications"
   },
   {
     "term": "generic.optional-field",
@@ -1300,6 +1305,11 @@
     "context": "Send"
   },
   {
+    "term": "generic.share",
+    "definition": "Compartir",
+    "context": "Share"
+  },
+  {
     "term": "generic.start",
     "definition": "Iniciar",
     "context": "Start"
@@ -1308,6 +1318,11 @@
     "term": "generic.submit",
     "definition": "Enviar",
     "context": "Submit"
+  },
+  {
+    "term": "generic.subscribed",
+    "definition": "Suscrito",
+    "context": "Subscribed"
   },
   {
     "term": "generic.template",
@@ -1338,6 +1353,11 @@
     "term": "generic.unexpected-error-happened",
     "definition": "Ocurrió un error inesperado. Por favor, refresca esta ventana y, si vuelve a ocurrir, contacta con soporte para que te podamos ayudar.",
     "context": "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help."
+  },
+  {
+    "term": "generic.unsubscribed",
+    "definition": "Desuscrito",
+    "context": "Unsubscribed"
   },
   {
     "term": "generic.untitled-field",
