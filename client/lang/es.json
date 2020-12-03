@@ -320,6 +320,11 @@
     "context": "Delete petition"
   },
   {
+    "term": "component.petition-header.not-subscribed-description",
+    "definition": "No recibir notificaciones sobre esta petición.",
+    "context": "Don't get notifications about this petition."
+  },
+  {
     "term": "component.petition-header.reopen-button",
     "definition": "Reabrir petición",
     "context": "Reopen petition"
@@ -333,6 +338,11 @@
     "term": "component.petition-header.share-label",
     "definition": "Compartir petición",
     "context": "Share petition"
+  },
+  {
+    "term": "component.petition-header.subscribed-description",
+    "definition": "Recibir notificaciones sobre actividad en esta petición.",
+    "context": "Get email notifications about activity in this petition."
   },
   {
     "term": "component.petition-list-filter.all",
@@ -583,6 +593,21 @@
     "term": "component.send-button.schedule",
     "definition": "Programar envío",
     "context": "Schedule send"
+  },
+  {
+    "term": "component.share-button.petition-not-shared",
+    "definition": "Esta petición no se ha compartido todavía.",
+    "context": "This petition has not been shared yet."
+  },
+  {
+    "term": "component.share-button.shared-with",
+    "definition": "Compartida con:",
+    "context": "Shared with:"
+  },
+  {
+    "term": "component.share-button.template-not-shared",
+    "definition": "Esta plantilla no se ha compartido todavía.",
+    "context": "This template has not been shared yet."
   },
   {
     "term": "component.signature-config-dialog.contacts-label",
@@ -873,11 +898,6 @@
     "term": "generic.all-languages",
     "definition": "Todos los idiomas",
     "context": "All languages"
-  },
-  {
-    "term": "generic.all-notifications-explainer",
-    "definition": "Quiero recibir notificaciones de toda la actividad en esta petición.",
-    "context": "I want to be notified of all activity on this petition."
   },
   {
     "term": "generic.by",
@@ -1190,11 +1210,6 @@
     "context": "No description"
   },
   {
-    "term": "generic.no-notifications-explainer",
-    "definition": "No quiero recibir notificaciones sobre la actividad en esta petición.",
-    "context": "I don't want to be notified about the activity on this petition."
-  },
-  {
     "term": "generic.not-specified",
     "definition": "Sin especificar",
     "context": "Not specified"
@@ -1321,7 +1336,7 @@
   },
   {
     "term": "generic.subscribed",
-    "definition": "Suscrito",
+    "definition": "Subscrito",
     "context": "Subscribed"
   },
   {
@@ -1356,7 +1371,7 @@
   },
   {
     "term": "generic.unsubscribed",
-    "definition": "Desuscrito",
+    "definition": "No subscrito",
     "context": "Unsubscribed"
   },
   {

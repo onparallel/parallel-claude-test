@@ -1639,6 +1639,30 @@ export type PetitionStatusCellContent_PetitionFragment = {
     >;
   };
 
+export type ShareButton_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & {
+  userPermissions: Array<
+    { __typename?: "PetitionUserPermission" } & {
+      user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+    }
+  >;
+};
+
+export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & {
+  userPermissions: Array<
+    { __typename?: "PetitionUserPermission" } & {
+      user: { __typename?: "User" } & Pick<User, "id" | "fullName">;
+    }
+  >;
+};
+
+export type ShareButton_PetitionBaseFragment =
+  | ShareButton_PetitionBase_Petition_Fragment
+  | ShareButton_PetitionBase_PetitionTemplate_Fragment;
+
 export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "fullName"
@@ -1723,13 +1747,13 @@ export type PetitionHeader_reopenPetitionMutation = {
   >;
 };
 
-export type PetitionHeader_updateUserPermissionMutationVariables = Exact<{
+export type PetitionHeader_updatePetitionUserPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   userId: Scalars["GID"];
   isSubscribed?: Maybe<Scalars["Boolean"]>;
 }>;
 
-export type PetitionHeader_updateUserPermissionMutation = {
+export type PetitionHeader_updatePetitionUserPermissionMutation = {
   __typename?: "Mutation";
 } & {
   updatePetitionUserPermission: Array<
@@ -3498,6 +3522,7 @@ export type PetitionReplies_PetitionFragment = {
       >
     >;
   } & PetitionLayout_PetitionBase_Petition_Fragment &
+  ShareButton_PetitionBase_Petition_Fragment &
   PetitionSignaturesCard_PetitionFragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
@@ -5527,6 +5552,16 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${DownloadAllDialog_PetitionFieldFragmentDoc}
 `;
+export const ShareButton_PetitionBaseFragmentDoc = gql`
+  fragment ShareButton_PetitionBase on PetitionBase {
+    userPermissions {
+      user {
+        id
+        fullName
+      }
+    }
+  }
+`;
 export const PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc = gql`
   fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
     id
@@ -5569,6 +5604,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
     fields {
       ...PetitionReplies_PetitionField
     }
+    ...ShareButton_PetitionBase
     currentSignatureRequest @include(if: $hasPetitionSignature) {
       id
       status
@@ -5577,6 +5613,7 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
+  ${ShareButton_PetitionBaseFragmentDoc}
   ${PetitionSignaturesCard_PetitionFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
@@ -6122,8 +6159,8 @@ export function usePetitionHeader_reopenPetitionMutation(
 export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
   typeof usePetitionHeader_reopenPetitionMutation
 >;
-export const PetitionHeader_updateUserPermissionDocument = gql`
-  mutation PetitionHeader_updateUserPermission(
+export const PetitionHeader_updatePetitionUserPermissionDocument = gql`
+  mutation PetitionHeader_updatePetitionUserPermission(
     $petitionId: GID!
     $userId: GID!
     $isSubscribed: Boolean
@@ -6145,17 +6182,17 @@ export const PetitionHeader_updateUserPermissionDocument = gql`
 `;
 
 /**
- * __usePetitionHeader_updateUserPermissionMutation__
+ * __usePetitionHeader_updatePetitionUserPermissionMutation__
  *
- * To run a mutation, you first call `usePetitionHeader_updateUserPermissionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionHeader_updateUserPermissionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `usePetitionHeader_updatePetitionUserPermissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionHeader_updatePetitionUserPermissionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [petitionHeaderUpdateUserPermissionMutation, { data, loading, error }] = usePetitionHeader_updateUserPermissionMutation({
+ * const [petitionHeaderUpdatePetitionUserPermissionMutation, { data, loading, error }] = usePetitionHeader_updatePetitionUserPermissionMutation({
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      userId: // value for 'userId'
@@ -6163,19 +6200,19 @@ export const PetitionHeader_updateUserPermissionDocument = gql`
  *   },
  * });
  */
-export function usePetitionHeader_updateUserPermissionMutation(
+export function usePetitionHeader_updatePetitionUserPermissionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionHeader_updateUserPermissionMutation,
-    PetitionHeader_updateUserPermissionMutationVariables
+    PetitionHeader_updatePetitionUserPermissionMutation,
+    PetitionHeader_updatePetitionUserPermissionMutationVariables
   >
 ) {
   return Apollo.useMutation<
-    PetitionHeader_updateUserPermissionMutation,
-    PetitionHeader_updateUserPermissionMutationVariables
-  >(PetitionHeader_updateUserPermissionDocument, baseOptions);
+    PetitionHeader_updatePetitionUserPermissionMutation,
+    PetitionHeader_updatePetitionUserPermissionMutationVariables
+  >(PetitionHeader_updatePetitionUserPermissionDocument, baseOptions);
 }
-export type PetitionHeader_updateUserPermissionMutationHookResult = ReturnType<
-  typeof usePetitionHeader_updateUserPermissionMutation
+export type PetitionHeader_updatePetitionUserPermissionMutationHookResult = ReturnType<
+  typeof usePetitionHeader_updatePetitionUserPermissionMutation
 >;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest(

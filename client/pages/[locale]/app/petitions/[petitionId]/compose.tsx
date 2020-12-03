@@ -1,6 +1,7 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
   Box,
+  Button,
   Tab,
   TabList,
   TabPanel,
@@ -16,9 +17,9 @@ import {
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { ResponsiveButton } from "@parallel/components/common/ResponsiveButton";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -557,15 +558,26 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       state={petitionState}
       headerActions={
         petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
-          <ResponsiveButton
-            key="action-next"
-            icon={<ArrowForwardIcon fontSize="18px" />}
-            label={intl.formatMessage({
-              id: "generic.next",
-              defaultMessage: "Next",
-            })}
-            onClick={handleNextClick}
-          />
+          <>
+            <IconButtonWithTooltip
+              display={{ base: "flex", md: "none" }}
+              colorScheme="purple"
+              icon={<ArrowForwardIcon fontSize="18px" />}
+              label={intl.formatMessage({
+                id: "generic.next",
+                defaultMessage: "Next",
+              })}
+              onClick={handleNextClick}
+            />
+            <Button
+              display={{ base: "none", md: "flex" }}
+              colorScheme={"purple"}
+              rightIcon={<ArrowForwardIcon fontSize="18px" />}
+              onClick={handleNextClick}
+            >
+              <FormattedMessage id="generic.next" defaultMessage="Next" />
+            </Button>
+          </>
         ) : null
       }
     >

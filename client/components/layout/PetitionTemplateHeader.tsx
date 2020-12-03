@@ -163,17 +163,18 @@ export function PetitionTemplateHeader({
               defaultMessage="Use this template"
             />
           </Button>
-          <Menu id="petition-more-options-menu">
+          <Menu>
             <Tooltip
               placement="left"
               label={intl.formatMessage({
                 id: "generic.more-options",
                 defaultMessage: "More options...",
               })}
+              whiteSpace="nowrap"
             >
               <MenuButton
                 as={IconButton}
-                variant="ghost"
+                variant="outline"
                 icon={<MoreVerticalIcon />}
                 marginLeft={4}
                 aria-label={intl.formatMessage({

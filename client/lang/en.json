@@ -320,6 +320,11 @@
     "context": "Delete petition"
   },
   {
+    "term": "component.petition-header.not-subscribed-description",
+    "definition": "Don't get notifications about this petition.",
+    "context": "Don't get notifications about this petition."
+  },
+  {
     "term": "component.petition-header.reopen-button",
     "definition": "Reopen petition",
     "context": "Reopen petition"
@@ -333,6 +338,11 @@
     "term": "component.petition-header.share-label",
     "definition": "Share petition",
     "context": "Share petition"
+  },
+  {
+    "term": "component.petition-header.subscribed-description",
+    "definition": "Get email notifications about activity in this petition.",
+    "context": "Get email notifications about activity in this petition."
   },
   {
     "term": "component.petition-list-filter.all",
@@ -583,6 +593,21 @@
     "term": "component.send-button.schedule",
     "definition": "Schedule send",
     "context": "Schedule send"
+  },
+  {
+    "term": "component.share-button.petition-not-shared",
+    "definition": "This petition has not been shared yet.",
+    "context": "This petition has not been shared yet."
+  },
+  {
+    "term": "component.share-button.shared-with",
+    "definition": "Shared with:",
+    "context": "Shared with:"
+  },
+  {
+    "term": "component.share-button.template-not-shared",
+    "definition": "This template has not been shared yet.",
+    "context": "This template has not been shared yet."
   },
   {
     "term": "component.signature-config-dialog.contacts-label",
@@ -873,11 +898,6 @@
     "term": "generic.all-languages",
     "definition": "All languages",
     "context": "All languages"
-  },
-  {
-    "term": "generic.all-notifications-explainer",
-    "definition": "I want to be notified of all activity on this petition.",
-    "context": "I want to be notified of all activity on this petition."
   },
   {
     "term": "generic.by",
@@ -1188,11 +1208,6 @@
     "term": "generic.no-description",
     "definition": "No description",
     "context": "No description"
-  },
-  {
-    "term": "generic.no-notifications-explainer",
-    "definition": "I don't want to be notified about the activity on this petition.",
-    "context": "I don't want to be notified about the activity on this petition."
   },
   {
     "term": "generic.not-specified",

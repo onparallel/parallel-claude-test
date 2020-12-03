@@ -12,7 +12,6 @@ import {
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
-  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
@@ -23,7 +22,7 @@ import {
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { ResponsiveButton } from "@parallel/components/common/ResponsiveButton";
+import { ShareButton } from "@parallel/components/common/ShareButton";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   withApolloData,
@@ -473,15 +472,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         minHeight={0}
         overflow="visible"
         headerActions={
-          <ResponsiveButton
-            key="action-share"
-            icon={<UserArrowIcon fontSize="18px" />}
-            label={intl.formatMessage({
-              id: "generic.share",
-              defaultMessage: "Share",
-            })}
-            onClick={onOpenSharePetition}
-          />
+          <Box display={{ base: "none", lg: "block" }}>
+            <ShareButton
+              petition={petition}
+              userId={me.id}
+              onClick={onOpenSharePetition}
+            />
+          </Box>
         }
       >
         <Stack
@@ -649,6 +646,7 @@ PetitionReplies.fragments = {
         fields {
           ...PetitionReplies_PetitionField
         }
+        ...ShareButton_PetitionBase
         currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status
@@ -657,6 +655,7 @@ PetitionReplies.fragments = {
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
+      ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
     `;
   },

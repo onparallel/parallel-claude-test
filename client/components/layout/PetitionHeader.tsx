@@ -1,10 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Box,
   Button,
   Flex,
@@ -14,7 +9,6 @@ import {
   MenuDivider,
   MenuItem,
   MenuItemOption,
-  MenuItemOptionProps,
   MenuList,
   MenuOptionGroup,
   Portal,
@@ -27,7 +21,6 @@ import {
   CopyIcon,
   DeleteIcon,
   EditIcon,
-  EyeIcon,
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -37,9 +30,8 @@ import {
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
   usePetitionHeader_reopenPetitionMutation,
-  usePetitionHeader_updateUserPermissionMutation,
+  usePetitionHeader_updatePetitionUserPermissionMutation,
 } from "@parallel/graphql/__types";
-
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -59,7 +51,6 @@ import { HeaderNameEditable } from "./HeaderNameEditable";
 export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
-  onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
@@ -70,7 +61,6 @@ export type PetitionHeaderProps = ExtendChakra<{
 export function PetitionHeader({
   petition,
   user,
-  onNextClick,
   onUpdatePetition,
   onSuggestEventRefetch,
   section: current,
@@ -125,6 +115,27 @@ export function PetitionHeader({
       } catch {}
     },
     [petition.id, createPetition, goToPetition]
+  );
+
+  const isSubscribed =
+    petition.userPermissions.find((up) => up.user.id === user.id)
+      ?.isSubscribed ?? false;
+
+  const [
+    updatePetitionUserPermissions,
+  ] = usePetitionHeader_updatePetitionUserPermissionMutation();
+
+  const handleUpdateUserPermission = useCallback(
+    async (isSubscribed: boolean) => {
+      await updatePetitionUserPermissions({
+        variables: {
+          petitionId: petition.id,
+          userId: user.id,
+          isSubscribed,
+        },
+      });
+    },
+    [petition.id, user.id]
   );
 
   const {
@@ -197,6 +208,7 @@ export function PetitionHeader({
     onCloseSharePetition();
     onSuggestEventRefetch?.();
   }, [onCloseSharePetition, onSuggestEventRefetch]);
+
   return (
     <>
       <Box
@@ -266,17 +278,18 @@ export function PetitionHeader({
           <Stack direction="row">
             {actions ?? null}
             <Box>
-              <Menu id="petition-more-options-menu">
+              <Menu>
                 <Tooltip
-                  placement="left"
+                  placement="bottom"
                   label={intl.formatMessage({
                     id: "generic.more-options",
                     defaultMessage: "More options...",
                   })}
+                  whiteSpace="nowrap"
                 >
                   <MenuButton
                     as={IconButton}
-                    variant="ghost"
+                    variant="outline"
                     icon={<MoreVerticalIcon />}
                     aria-label={intl.formatMessage({
                       id: "generic.more-options",
@@ -285,7 +298,7 @@ export function PetitionHeader({
                   />
                 </Tooltip>
                 <Portal>
-                  <MenuList width="min-content">
+                  <MenuList width="min-content" minWidth="16rem">
                     <MenuItem onClick={onOpenSharePetition}>
                       <UserArrowIcon marginRight={2} />
                       <FormattedMessage
@@ -318,7 +331,50 @@ export function PetitionHeader({
                       />
                     </MenuItem>
                     <MenuDivider />
-                    <NotificationsAccordion petition={petition} user={user} />
+                    <MenuOptionGroup
+                      type="radio"
+                      title={intl.formatMessage({
+                        id: "generic.notifications",
+                        defaultMessage: "Notifications",
+                      })}
+                      onChange={(value) => {
+                        handleUpdateUserPermission(value === "FOLLOW");
+                      }}
+                      value={isSubscribed ? "FOLLOW" : "IGNORE"}
+                    >
+                      <MenuItemOption value="FOLLOW">
+                        <Box flex="1">
+                          <Text fontWeight="bold">
+                            <FormattedMessage
+                              id="generic.subscribed"
+                              defaultMessage="Subscribed"
+                            />
+                          </Text>
+                          <Text fontSize="sm" color="gray.500">
+                            <FormattedMessage
+                              id="component.petition-header.subscribed-description"
+                              defaultMessage="Get email notifications about activity in this petition."
+                            />
+                          </Text>
+                        </Box>
+                      </MenuItemOption>
+                      <MenuItemOption value="IGNORE">
+                        <Box flex="1">
+                          <Text fontWeight="bold">
+                            <FormattedMessage
+                              id="generic.unsubscribed"
+                              defaultMessage="Unsubscribed"
+                            />
+                          </Text>
+                          <Text fontSize="sm" color="gray.500">
+                            <FormattedMessage
+                              id="component.petition-header.not-subscribed-description"
+                              defaultMessage="Don't get notifications about this petition."
+                            />
+                          </Text>
+                        </Box>
+                      </MenuItemOption>
+                    </MenuOptionGroup>
                     <MenuDivider />
                     <MenuItem color="red.500" onClick={handleDeleteClick}>
                       <DeleteIcon marginRight={2} />
@@ -373,113 +429,6 @@ export function PetitionHeader({
         onClose={handleCloseSharingModal}
       />
     </>
-  );
-}
-type NotificationsAccordionProps = {
-  petition: PetitionHeader_PetitionFragment;
-  user: PetitionHeader_UserFragment;
-};
-function NotificationsAccordion({
-  petition,
-  user,
-}: NotificationsAccordionProps) {
-  const isSubscribed =
-    petition.userPermissions.find((up) => up.user.id === user.id)
-      ?.isSubscribed ?? false;
-
-  const [
-    updateUserPermissions,
-  ] = usePetitionHeader_updateUserPermissionMutation();
-
-  const handleClickOption = useCallback(
-    async (isSubscribed: boolean) => {
-      await updateUserPermissions({
-        variables: {
-          petitionId: petition.id,
-          userId: user.id,
-          isSubscribed,
-        },
-      });
-    },
-    [petition, user]
-  );
-
-  const menuItemOptionProps: MenuItemOptionProps = {
-    alignItems: "baseline",
-    padding: "0.5rem 1rem 0.5rem 1rem",
-    sx: {
-      ":hover": {
-        backgroundColor: "gray.100",
-      },
-    },
-  };
-
-  return (
-    <Accordion allowToggle border="transparent">
-      <AccordionItem>
-        <AccordionButton>
-          <Flex flex="1" alignItems="center">
-            <EyeIcon marginRight={2} />
-            <FormattedMessage
-              id="generic.notifications"
-              defaultMessage="Notifications"
-            />
-          </Flex>
-          <AccordionIcon />
-        </AccordionButton>
-        <AccordionPanel padding={0}>
-          <MenuOptionGroup
-            type="radio"
-            value={isSubscribed ? "follow" : "ignore"}
-          >
-            <MenuItemOption value="follow" {...menuItemOptionProps}>
-              <Box
-                flex="1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClickOption(true);
-                }}
-              >
-                <Stack fontWeight="bold">
-                  <FormattedMessage
-                    id="generic.subscribed"
-                    defaultMessage="Subscribed"
-                  />
-                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
-                    <FormattedMessage
-                      id="generic.all-notifications-explainer"
-                      defaultMessage="I want to be notified of all activity on this petition."
-                    />
-                  </Text>
-                </Stack>
-              </Box>
-            </MenuItemOption>
-            <MenuItemOption value="ignore" {...menuItemOptionProps}>
-              <Box
-                flex="1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClickOption(false);
-                }}
-              >
-                <Stack fontWeight="bold">
-                  <FormattedMessage
-                    id="generic.unsubscribed"
-                    defaultMessage="Unsubscribed"
-                  />
-                  <Text fontSize="sm" fontWeight="normal" color="gray.500">
-                    <FormattedMessage
-                      id="generic.no-notifications-explainer"
-                      defaultMessage="I don't want to be notified about the activity on this petition."
-                    />
-                  </Text>
-                </Stack>
-              </Box>
-            </MenuItemOption>
-          </MenuOptionGroup>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
   );
 }
 
@@ -557,7 +506,7 @@ PetitionHeader.mutations = [
     }
   `,
   gql`
-    mutation PetitionHeader_updateUserPermission(
+    mutation PetitionHeader_updatePetitionUserPermission(
       $petitionId: GID!
       $userId: GID!
       $isSubscribed: Boolean

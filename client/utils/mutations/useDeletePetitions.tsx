@@ -65,7 +65,7 @@ export function useDeletePetitions() {
           error?.graphQLErrors?.[0]?.extensions.code ===
           "DELETE_SHARED_PETITION_ERROR"
         ) {
-          return await showErrorDialog({
+          await showErrorDialog({
             message: intl.formatMessage(
               {
                 id: "petition.shared-delete-error",
@@ -76,6 +76,7 @@ export function useDeletePetitions() {
             ),
           });
         }
+        throw error;
       }
     },
     [intl.locale]
