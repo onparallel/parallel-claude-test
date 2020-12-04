@@ -445,10 +445,12 @@ PetitionActivity.fragments = {
       ...PetitionLayout_PetitionBase
       ...PetitionAccessTable_Petition
       ...PetitionActivityTimeline_Petition
+      ...ShareButton_PetitionBase
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
     ${PetitionActivityTimeline.fragments.Petition}
+    ${ShareButton.fragments.PetitionBase}
   `,
   User: gql`
     fragment PetitionActivity_User on User {

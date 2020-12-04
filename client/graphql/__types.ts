@@ -3018,7 +3018,8 @@ export type PetitionActivity_PetitionFragment = {
 } & Pick<Petition, "id"> &
   PetitionLayout_PetitionBase_Petition_Fragment &
   PetitionAccessTable_PetitionFragment &
-  PetitionActivityTimeline_PetitionFragment;
+  PetitionActivityTimeline_PetitionFragment &
+  ShareButton_PetitionBase_Petition_Fragment;
 
 export type PetitionActivity_UserFragment = {
   __typename?: "User";
@@ -5276,16 +5277,28 @@ export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   }
   ${PetitionActivityTimeline_PetitionEventFragmentDoc}
 `;
+export const ShareButton_PetitionBaseFragmentDoc = gql`
+  fragment ShareButton_PetitionBase on PetitionBase {
+    userPermissions {
+      user {
+        id
+        fullName
+      }
+    }
+  }
+`;
 export const PetitionActivity_PetitionFragmentDoc = gql`
   fragment PetitionActivity_Petition on Petition {
     id
     ...PetitionLayout_PetitionBase
     ...PetitionAccessTable_Petition
     ...PetitionActivityTimeline_Petition
+    ...ShareButton_PetitionBase
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionAccessTable_PetitionFragmentDoc}
   ${PetitionActivityTimeline_PetitionFragmentDoc}
+  ${ShareButton_PetitionBaseFragmentDoc}
 `;
 export const PetitionHeader_UserFragmentDoc = gql`
   fragment PetitionHeader_User on User {
@@ -5551,16 +5564,6 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${DownloadAllDialog_PetitionFieldFragmentDoc}
-`;
-export const ShareButton_PetitionBaseFragmentDoc = gql`
-  fragment ShareButton_PetitionBase on PetitionBase {
-    userPermissions {
-      user {
-        id
-        fullName
-      }
-    }
-  }
 `;
 export const PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc = gql`
   fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
