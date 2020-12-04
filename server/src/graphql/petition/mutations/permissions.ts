@@ -119,9 +119,10 @@ export const editPetitionUserPermission = mutationField(
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.userIds, "userIds")
+      notEmptyArray((args) => args.userIds, "userIds"),
+      userIdNotIncludedInArray((args) => args.userIds, "userIds")
     ),
-    resolve: async (_, args, ctx, info) => {
+    resolve: async (_, args, ctx) => {
       try {
         return await ctx.petitions.editPetitionUserPermissions(
           args.petitionIds,
@@ -171,6 +172,30 @@ export const removePetitionUserPermission = mutationField(
         args.userIds,
         ctx.user!
       );
+    },
+  }
+);
+
+export const updatePetitionUserSubscription = mutationField(
+  "updatePetitionUserSubscription",
+  {
+    description: "Updates the subscription flag on a PetitionUser",
+    type: "Petition",
+    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+    args: {
+      petitionId: globalIdArg("Petition", { required: true }),
+      isSubscribed: booleanArg({ required: true }),
+    },
+    resolve: async (_, { petitionId, isSubscribed }, ctx) => {
+      await ctx.petitions.updatePetitionUser(
+        petitionId,
+        {
+          is_subscribed: isSubscribed,
+        },
+        ctx.user!
+      );
+
+      return (await ctx.petitions.loadPetition(petitionId))!;
     },
   }
 );

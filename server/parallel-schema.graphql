@@ -670,6 +670,14 @@ type Mutation {
   ): PetitionWithFieldAndReplies!
 
   """
+  Updates the subscription flag on a PetitionUser
+  """
+  updatePetitionUserSubscription(
+    isSubscribed: Boolean!
+    petitionId: GID!
+  ): Petition!
+
+  """
   Updates the user with the provided data.
   """
   updateUser(data: UpdateUserInput!, id: GID!): User!
@@ -889,11 +897,6 @@ type Petition implements PetitionBase {
   id: GID!
 
   """
-  Whether user is subscribed to email notifications on this petition
-  """
-  isSubscribed: Boolean!
-
-  """
   The locale of the petition.
   """
   locale: PetitionLocale!
@@ -1076,11 +1079,6 @@ interface PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
-
-  """
-  Whether user is subscribed to email notifications on this petition
-  """
-  isSubscribed: Boolean!
 
   """
   The locale of the petition.
@@ -1637,11 +1635,6 @@ type PetitionTemplate implements PetitionBase {
   Whether the template is publicly available or not
   """
   isPublic: Boolean!
-
-  """
-  Whether user is subscribed to email notifications on this petition
-  """
-  isSubscribed: Boolean!
 
   """
   The locale of the petition.
@@ -2343,7 +2336,6 @@ input UpdatePetitionInput {
   description: String
   emailBody: JSON
   emailSubject: String
-  isSubscribed: Boolean
   locale: PetitionLocale
   name: String
   remindersConfig: RemindersConfigInput

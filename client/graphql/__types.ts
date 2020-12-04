@@ -274,6 +274,8 @@ export type Mutation = {
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
+  /** Updates the subscription flag on a PetitionUser */
+  updatePetitionUserSubscription: Petition;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
@@ -585,6 +587,11 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   status: PetitionFieldReplyStatus;
 };
 
+export type MutationupdatePetitionUserSubscriptionArgs = {
+  isSubscribed: Scalars["Boolean"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationupdateUserArgs = {
   data: UpdateUserInput;
   id: Scalars["GID"];
@@ -697,8 +704,6 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
-  /** Whether user is subscribed to email notifications on this petition */
-  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -797,8 +802,6 @@ export type PetitionBase = {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
-  /** Whether user is subscribed to email notifications on this petition */
-  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1097,8 +1100,6 @@ export type PetitionTemplate = PetitionBase & {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
-  /** Whether user is subscribed to email notifications on this petition */
-  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1524,7 +1525,6 @@ export type UpdatePetitionInput = {
   description?: Maybe<Scalars["String"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
-  isSubscribed?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -1749,25 +1749,25 @@ export type PetitionHeader_reopenPetitionMutation = {
   >;
 };
 
-export type PetitionHeader_updatePetitionUserPermissionMutationVariables = Exact<{
+export type PetitionHeader_updatePetitionUserSubscriptionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  userId: Scalars["GID"];
-  isSubscribed?: Maybe<Scalars["Boolean"]>;
+  isSubscribed: Scalars["Boolean"];
 }>;
 
-export type PetitionHeader_updatePetitionUserPermissionMutation = {
+export type PetitionHeader_updatePetitionUserSubscriptionMutation = {
   __typename?: "Mutation";
 } & {
-  updatePetitionUserPermission: Array<
-    { __typename?: "Petition" } & Pick<Petition, "id"> & {
-        userPermissions: Array<
-          { __typename?: "PetitionUserPermission" } & Pick<
-            PetitionUserPermission,
-            "isSubscribed"
-          > & { user: { __typename?: "User" } & Pick<User, "id"> }
-        >;
-      }
-  >;
+  updatePetitionUserSubscription: { __typename?: "Petition" } & Pick<
+    Petition,
+    "id"
+  > & {
+      userPermissions: Array<
+        { __typename?: "PetitionUserPermission" } & Pick<
+          PetitionUserPermission,
+          "isSubscribed"
+        > & { user: { __typename?: "User" } & Pick<User, "id"> }
+      >;
+    };
 };
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
@@ -2364,7 +2364,7 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "deadline" | "id" | "locale" | "isSubscribed"> & {
+} & Pick<Petition, "status" | "deadline" | "id" | "locale"> & {
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
@@ -2375,7 +2375,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale" | "isSubscribed">;
+} & Pick<PetitionTemplate, "id" | "locale">;
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -3162,7 +3162,7 @@ export type onFieldEdit_PetitionFieldFragment = {
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> & {
+} & Pick<Petition, "status" | "id"> & {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
@@ -5414,7 +5414,6 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
     locale
-    isSubscribed
     ... on Petition {
       status
       deadline
@@ -5436,6 +5435,9 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     ...PetitionSettings_PetitionBase
     fields {
       ...PetitionCompose_PetitionField
+    }
+    ... on Petition {
+      status
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
@@ -6162,16 +6164,14 @@ export function usePetitionHeader_reopenPetitionMutation(
 export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
   typeof usePetitionHeader_reopenPetitionMutation
 >;
-export const PetitionHeader_updatePetitionUserPermissionDocument = gql`
-  mutation PetitionHeader_updatePetitionUserPermission(
+export const PetitionHeader_updatePetitionUserSubscriptionDocument = gql`
+  mutation PetitionHeader_updatePetitionUserSubscription(
     $petitionId: GID!
-    $userId: GID!
-    $isSubscribed: Boolean
+    $isSubscribed: Boolean!
   ) {
-    updatePetitionUserPermission(
-      petitionIds: [$petitionId]
-      userIds: [$userId]
-      data: { isSubscribed: $isSubscribed }
+    updatePetitionUserSubscription(
+      petitionId: $petitionId
+      isSubscribed: $isSubscribed
     ) {
       id
       userPermissions {
@@ -6185,37 +6185,36 @@ export const PetitionHeader_updatePetitionUserPermissionDocument = gql`
 `;
 
 /**
- * __usePetitionHeader_updatePetitionUserPermissionMutation__
+ * __usePetitionHeader_updatePetitionUserSubscriptionMutation__
  *
- * To run a mutation, you first call `usePetitionHeader_updatePetitionUserPermissionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionHeader_updatePetitionUserPermissionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `usePetitionHeader_updatePetitionUserSubscriptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionHeader_updatePetitionUserSubscriptionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [petitionHeaderUpdatePetitionUserPermissionMutation, { data, loading, error }] = usePetitionHeader_updatePetitionUserPermissionMutation({
+ * const [petitionHeaderUpdatePetitionUserSubscriptionMutation, { data, loading, error }] = usePetitionHeader_updatePetitionUserSubscriptionMutation({
  *   variables: {
  *      petitionId: // value for 'petitionId'
- *      userId: // value for 'userId'
  *      isSubscribed: // value for 'isSubscribed'
  *   },
  * });
  */
-export function usePetitionHeader_updatePetitionUserPermissionMutation(
+export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionHeader_updatePetitionUserPermissionMutation,
-    PetitionHeader_updatePetitionUserPermissionMutationVariables
+    PetitionHeader_updatePetitionUserSubscriptionMutation,
+    PetitionHeader_updatePetitionUserSubscriptionMutationVariables
   >
 ) {
   return Apollo.useMutation<
-    PetitionHeader_updatePetitionUserPermissionMutation,
-    PetitionHeader_updatePetitionUserPermissionMutationVariables
-  >(PetitionHeader_updatePetitionUserPermissionDocument, baseOptions);
+    PetitionHeader_updatePetitionUserSubscriptionMutation,
+    PetitionHeader_updatePetitionUserSubscriptionMutationVariables
+  >(PetitionHeader_updatePetitionUserSubscriptionDocument, baseOptions);
 }
-export type PetitionHeader_updatePetitionUserPermissionMutationHookResult = ReturnType<
-  typeof usePetitionHeader_updatePetitionUserPermissionMutation
+export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult = ReturnType<
+  typeof usePetitionHeader_updatePetitionUserSubscriptionMutation
 >;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest(
