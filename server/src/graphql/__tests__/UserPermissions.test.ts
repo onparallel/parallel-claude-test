@@ -450,7 +450,7 @@ describe("GraphQL/User Permissions", () => {
     });
   });
 
-  describe("updatePetitionUserPermission", () => {
+  describe("editPetitionUserPermission", () => {
     beforeEach(async (done) => {
       await mocks.knex.raw(/* sql */ `
       INSERT INTO petition_user(petition_id, user_id, permission_type)
@@ -474,10 +474,10 @@ describe("GraphQL/User Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionUserPermissionType!
           ) {
-            updatePetitionUserPermission(
+            editPetitionUserPermission(
               petitionIds: $petitionIds
               userIds: $userIds
-              data: { permissionType: $type }
+              permissionType: $type
             ) {
               id
               userPermissions {
@@ -500,7 +500,7 @@ describe("GraphQL/User Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.updatePetitionUserPermission).toEqual([
+      expect(data!.editPetitionUserPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           userPermissions: [
@@ -529,10 +529,10 @@ describe("GraphQL/User Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionUserPermissionType!
           ) {
-            updatePetitionUserPermission(
+            editPetitionUserPermission(
               petitionIds: $petitionIds
               userIds: $userIds
-              data: { permissionType: $type }
+              permissionType: $type
             ) {
               id
               userPermissions {
@@ -566,10 +566,10 @@ describe("GraphQL/User Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionUserPermissionType!
           ) {
-            updatePetitionUserPermission(
+            editPetitionUserPermission(
               petitionIds: $petitionIds
               userIds: $userIds
-              data: { permissionType: $type }
+              permissionType: $type
             ) {
               id
               userPermissions {
@@ -600,10 +600,10 @@ describe("GraphQL/User Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionUserPermissionType!
           ) {
-            updatePetitionUserPermission(
+            editPetitionUserPermission(
               petitionIds: $petitionIds
               userIds: $userIds
-              data: { permissionType: $type }
+              permissionType: $type
             ) {
               id
               userPermissions {
@@ -634,10 +634,10 @@ describe("GraphQL/User Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionUserPermissionType!
           ) {
-            updatePetitionUserPermission(
+            editPetitionUserPermission(
               petitionIds: $petitionIds
               userIds: $userIds
-              data: { permissionType: $type }
+              permissionType: $type
             ) {
               id
               userPermissions {
@@ -668,10 +668,10 @@ describe("GraphQL/User Permissions", () => {
             $userIds: [GID!]!
             $type: PetitionUserPermissionType!
           ) {
-            updatePetitionUserPermission(
+            editPetitionUserPermission(
               petitionIds: $petitionIds
               userIds: $userIds
-              data: { permissionType: $type }
+              permissionType: $type
             ) {
               id
               userPermissions {

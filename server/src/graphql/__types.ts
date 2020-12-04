@@ -118,15 +118,11 @@ export interface NexusGenInputs {
     description?: string | null; // String
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
+    isSubscribed?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
     signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
-  };
-  UpdatePetitionUserPermissionInput: {
-    // input type
-    isSubscribed?: boolean | null; // Boolean
-    permissionType?: NexusGenEnums["PetitionUserPermissionType"] | null; // PetitionUserPermissionType
   };
   UpdateUserInput: {
     // input type
@@ -372,7 +368,6 @@ export interface NexusGenAllTypes extends NexusGenRootTypes {
   UpdateContactInput: NexusGenInputs["UpdateContactInput"];
   UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
   UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
-  UpdatePetitionUserPermissionInput: NexusGenInputs["UpdatePetitionUserPermissionInput"];
   UpdateUserInput: NexusGenInputs["UpdateUserInput"];
   ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
   EntityType: NexusGenEnums["EntityType"];
@@ -511,6 +506,7 @@ export interface NexusGenFieldTypes {
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     presendPetitionClosedNotification: NexusGenEnums["Result"]; // Result!
@@ -545,7 +541,6 @@ export interface NexusGenFieldTypes {
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
-    updatePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     updateUser: NexusGenRootTypes["User"]; // User!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
   };
@@ -588,6 +583,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isSubscribed: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -757,6 +753,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
     isPublic: boolean; // Boolean!
+    isSubscribed: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -997,6 +994,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     id: NexusGenScalars["GID"]; // GID!
+    isSubscribed: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -1142,6 +1140,12 @@ export interface NexusGenArgTypes {
       // args
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    editPetitionUserPermission: {
+      // args
+      permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
+      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     fileUploadReplyDownloadLink: {
       // args
@@ -1328,12 +1332,6 @@ export interface NexusGenArgTypes {
       petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
-    };
-    updatePetitionUserPermission: {
-      // args
-      data: NexusGenInputs["UpdatePetitionUserPermissionInput"]; // UpdatePetitionUserPermissionInput!
-      petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     updateUser: {
       // args
@@ -1551,7 +1549,6 @@ export type NexusGenInputNames =
   | "UpdateContactInput"
   | "UpdatePetitionFieldInput"
   | "UpdatePetitionInput"
-  | "UpdatePetitionUserPermissionInput"
   | "UpdateUserInput";
 
 export type NexusGenEnumNames =

@@ -2163,10 +2163,10 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async updatePetitionUserPermissions(
+  async editPetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
-    data: Partial<CreatePetitionUser>,
+    newPermission: PetitionUserPermissionType,
     user: User
   ) {
     return this.withTransaction(async (t) => {
@@ -2176,9 +2176,9 @@ export class PetitionRepository extends BaseRepository {
         .whereNull("deleted_at")
         .update(
           {
-            ...data,
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
+            permission_type: newPermission,
           },
           "*"
         );
@@ -2187,21 +2187,18 @@ export class PetitionRepository extends BaseRepository {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
 
-      // create event only if permission type (Read/Write/Owner) was updated
-      if (data.permission_type) {
-        await this.createEvent(
-          updatedPermissions.map((p) => ({
-            petitionId: p.petition_id,
-            type: "USER_PERMISSION_EDITED",
-            data: {
-              user_id: user.id,
-              permission_type: p.permission_type,
-              permission_user_id: p.user_id,
-            },
-          })),
-          t
-        );
-      }
+      await this.createEvent(
+        updatedPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "USER_PERMISSION_EDITED",
+          data: {
+            user_id: user.id,
+            permission_type: p.permission_type,
+            permission_user_id: p.user_id,
+          },
+        })),
+        t
+      );
 
       return await this.from("petition", t)
         .whereNull("deleted_at")
@@ -2514,5 +2511,28 @@ export class PetitionRepository extends BaseRepository {
       .select<[{ id: number }]>("user_id as id");
 
     return subscribedUserIds.map((u) => u.id);
+  }
+
+  async updatePetitionUser(
+    petitionId: number,
+    data: Partial<CreatePetitionUser>,
+    user: User
+  ) {
+    const [row] = await this.from("petition_user")
+      .where({
+        petition_id: petitionId,
+        user_id: user.id,
+        deleted_at: null,
+      })
+      .update(
+        {
+          ...data,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        },
+        "*"
+      );
+
+    return row;
   }
 }

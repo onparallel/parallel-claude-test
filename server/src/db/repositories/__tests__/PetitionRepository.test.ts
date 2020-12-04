@@ -643,7 +643,7 @@ describe("repositories/PetitionRepository", () => {
       });
     });
 
-    describe("updatePetitionUserPermissions", () => {
+    describe("editPetitionUserPermissions", () => {
       let petitionId: number, userId: number;
       beforeEach(async () => {
         await mocks.clearSharedPetitions();
@@ -659,10 +659,10 @@ describe("repositories/PetitionRepository", () => {
 
       test("should update permissions for users with shared petitions", async () => {
         const permissions = await petitions.loadUserPermissions(petitionId);
-        await petitions.updatePetitionUserPermissions(
+        await petitions.editPetitionUserPermissions(
           [petitionId],
           [userId],
-          { permission_type: "WRITE" },
+          "WRITE",
           users[0]
         );
         const newPermissions = await petitions.loadUserPermissions(petitionId);
@@ -686,10 +686,10 @@ describe("repositories/PetitionRepository", () => {
         // this test should assert 1 time on the catch block
         expect.assertions(1);
         try {
-          await petitions.updatePetitionUserPermissions(
+          await petitions.editPetitionUserPermissions(
             [petitionId],
             [userId],
-            { permission_type: "OWNER" },
+            "OWNER",
             users[0]
           );
         } catch (e) {
@@ -699,10 +699,10 @@ describe("repositories/PetitionRepository", () => {
 
       test("should not edit for user without permissions", async () => {
         const permissions = await petitions.loadUserPermissions(petitionId);
-        await petitions.updatePetitionUserPermissions(
+        await petitions.editPetitionUserPermissions(
           [petitionId],
           [users[3].id],
-          { permission_type: "READ" },
+          "READ",
           users[0]
         );
         const newPermissions = await petitions.loadUserPermissions(petitionId, {

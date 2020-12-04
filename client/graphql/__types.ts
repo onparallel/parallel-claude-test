@@ -205,6 +205,8 @@ export type Mutation = {
   deletePetitionFieldComment: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** Edits permissions on given petitions and users */
+  editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Marks the specified comments as read. */
@@ -272,8 +274,6 @@ export type Mutation = {
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
-  /** Updates permissions on given petitions and users */
-  updatePetitionUserPermission: Array<Petition>;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
@@ -391,6 +391,12 @@ export type MutationdeletePetitionFieldCommentArgs = {
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationeditPetitionUserPermissionArgs = {
+  permissionType: PetitionUserPermissionType;
+  petitionIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
@@ -579,12 +585,6 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   status: PetitionFieldReplyStatus;
 };
 
-export type MutationupdatePetitionUserPermissionArgs = {
-  data: UpdatePetitionUserPermissionInput;
-  petitionIds: Array<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
-};
-
 export type MutationupdateUserArgs = {
   data: UpdateUserInput;
   id: Scalars["GID"];
@@ -697,6 +697,8 @@ export type Petition = PetitionBase & {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Whether user is subscribed to email notifications on this petition */
+  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -795,6 +797,8 @@ export type PetitionBase = {
   fields: Array<PetitionField>;
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /** Whether user is subscribed to email notifications on this petition */
+  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1093,6 +1097,8 @@ export type PetitionTemplate = PetitionBase & {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
+  /** Whether user is subscribed to email notifications on this petition */
+  isSubscribed: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1518,15 +1524,11 @@ export type UpdatePetitionInput = {
   description?: Maybe<Scalars["String"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
+  isSubscribed?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
   signatureConfig?: Maybe<SignatureConfigInput>;
-};
-
-export type UpdatePetitionUserPermissionInput = {
-  isSubscribed?: Maybe<Scalars["Boolean"]>;
-  permissionType?: Maybe<PetitionUserPermissionType>;
 };
 
 export type UpdateUserInput = {
@@ -2362,7 +2364,7 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "deadline" | "id" | "locale"> & {
+} & Pick<Petition, "status" | "deadline" | "id" | "locale" | "isSubscribed"> & {
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
@@ -2373,7 +2375,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale">;
+} & Pick<PetitionTemplate, "id" | "locale" | "isSubscribed">;
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -3160,7 +3162,7 @@ export type onFieldEdit_PetitionFieldFragment = {
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "id"> & {
+} & Pick<Petition, "id"> & {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
     >;
@@ -5412,6 +5414,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
     locale
+    isSubscribed
     ... on Petition {
       status
       deadline
@@ -5433,9 +5436,6 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     ...PetitionSettings_PetitionBase
     fields {
       ...PetitionCompose_PetitionField
-    }
-    ... on Petition {
-      status
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}

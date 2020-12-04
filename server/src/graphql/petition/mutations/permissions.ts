@@ -1,10 +1,4 @@
-import {
-  mutationField,
-  arg,
-  booleanArg,
-  stringArg,
-  inputObjectType,
-} from "@nexus/schema";
+import { mutationField, arg, booleanArg, stringArg } from "@nexus/schema";
 import { chain, and, authenticate } from "../../helpers/authorize";
 import { userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
@@ -13,9 +7,7 @@ import { validateAnd } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
-import { CreatePetitionUser } from "../../../db/__types";
-import { isDefined } from "../../../util/remedaExtensions";
+import { WhitelistedError } from "../../helpers/errors";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -104,10 +96,10 @@ export const addPetitionUserPermission = mutationField(
   }
 );
 
-export const updatePetitionUserPermission = mutationField(
-  "updatePetitionUserPermission",
+export const editPetitionUserPermission = mutationField(
+  "editPetitionUserPermission",
   {
-    description: "Updates permissions on given petitions and users",
+    description: "Edits permissions on given petitions and users",
     type: "Petition",
     list: [true],
     authorize: chain(
@@ -120,16 +112,10 @@ export const updatePetitionUserPermission = mutationField(
     args: {
       petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
       userIds: globalIdArg("User", { required: true, list: [true] }),
-      data: inputObjectType({
-        name: "UpdatePetitionUserPermissionInput",
-        definition(t) {
-          t.field("permissionType", {
-            type: "PetitionUserPermissionType",
-            nullable: true,
-          });
-          t.boolean("isSubscribed", { nullable: true });
-        },
-      }).asArg({ required: true }),
+      permissionType: arg({
+        type: "PetitionUserPermissionType",
+        required: true,
+      }),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
@@ -137,26 +123,10 @@ export const updatePetitionUserPermission = mutationField(
     ),
     resolve: async (_, args, ctx, info) => {
       try {
-        const data: Partial<CreatePetitionUser> = {};
-
-        if (isDefined(args.data.isSubscribed)) {
-          data.is_subscribed = args.data.isSubscribed;
-        }
-
-        if (isDefined(args.data.permissionType)) {
-          data.permission_type = args.data.permissionType;
-          if (args.userIds.includes(ctx.user!.id)) {
-            throw new ArgValidationError(
-              info,
-              "userIds",
-              `Invalid value on array.`
-            );
-          }
-        }
-        return await ctx.petitions.updatePetitionUserPermissions(
+        return await ctx.petitions.editPetitionUserPermissions(
           args.petitionIds,
           args.userIds,
-          data,
+          args.permissionType,
           ctx.user!
         );
       } catch (e) {
