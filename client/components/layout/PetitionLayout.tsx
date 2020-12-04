@@ -20,7 +20,6 @@ export type PetitionLayoutProps = ExtendChakra<{
   user: PetitionLayout_UserFragment;
   onNextClick?: () => void;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
   scrollBody: boolean;
@@ -34,7 +33,6 @@ export function PetitionLayout({
   state,
   section,
   onUpdatePetition,
-  onSuggestEventRefetch,
   headerActions,
   children,
   ...props
@@ -85,7 +83,6 @@ export function PetitionLayout({
           petition={petition}
           user={user}
           onUpdatePetition={onUpdatePetition}
-          onSuggestEventRefetch={onSuggestEventRefetch}
           section={section!}
           state={state}
           actions={headerActions}

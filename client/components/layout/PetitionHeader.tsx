@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
   Button,
@@ -25,6 +26,7 @@ import {
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
+  PetitionActivityDocument,
   PetitionHeader_PetitionFragment,
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
@@ -51,7 +53,6 @@ export type PetitionHeaderProps = ExtendChakra<{
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
-  onSuggestEventRefetch?: () => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
   actions?: ReactNode;
@@ -61,7 +62,6 @@ export function PetitionHeader({
   petition,
   user,
   onUpdatePetition,
-  onSuggestEventRefetch,
   section: current,
   state,
   actions,
@@ -180,8 +180,8 @@ export function PetitionHeader({
         variables: {
           petitionId: petition.id,
         },
+        refetchQueries: [getOperationName(PetitionActivityDocument)!],
       });
-      onSuggestEventRefetch?.();
     } catch {}
   }, [petition.id]);
 

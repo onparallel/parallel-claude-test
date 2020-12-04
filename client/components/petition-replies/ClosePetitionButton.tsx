@@ -58,7 +58,7 @@ export function ClosePetitionButton({
               <CheckIcon marginRight={2} />
               <FormattedMessage
                 id="petition-replies.close-petition-without-notify.button"
-                defaultMessage="Close petition without notification"
+                defaultMessage="Close petition without notifying"
               />
             </MenuItem>
           </MenuList>

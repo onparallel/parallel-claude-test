@@ -1591,8 +1591,8 @@
   },
   {
     "term": "petition-replies.close-petition-without-notify.button",
-    "definition": "Close petition without notification",
-    "context": "Close petition without notification"
+    "definition": "Close petition without notifying",
+    "context": "Close petition without notifying"
   },
   {
     "term": "petition-replies.close-petition.button",

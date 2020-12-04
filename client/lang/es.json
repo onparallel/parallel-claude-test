@@ -1592,7 +1592,7 @@
   {
     "term": "petition-replies.close-petition-without-notify.button",
     "definition": "Cerrar petición sin notificar",
-    "context": "Close petition without notification"
+    "context": "Close petition without notifying"
   },
   {
     "term": "petition-replies.close-petition.button",
