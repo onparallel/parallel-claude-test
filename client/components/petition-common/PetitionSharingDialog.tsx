@@ -147,6 +147,7 @@ export function PetitionSharingDialog({
     <ConfirmDialog
       size="xl"
       initialFocusRef={usersRef as any}
+      hasCloseButton
       {...props}
       content={{ as: "form", onSubmit: handleAddUserPermissions }}
       header={

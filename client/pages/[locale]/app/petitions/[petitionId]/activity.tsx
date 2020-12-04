@@ -386,10 +386,12 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
-    await showPetitionSharingDialog({
-      userId: me.id,
-      petitionId: petition.id,
-    });
+    try {
+      await showPetitionSharingDialog({
+        userId: me.id,
+        petitionId: petition.id,
+      });
+    } catch {}
   };
 
   return (

@@ -447,10 +447,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
-    await showPetitionSharingDialog({
-      userId: me.id,
-      petitionId: petition.id,
-    });
+    try {
+      await showPetitionSharingDialog({
+        userId: me.id,
+        petitionId: petition.id,
+      });
+    } catch {}
   };
 
   return (

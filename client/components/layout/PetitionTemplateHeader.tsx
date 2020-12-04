@@ -84,10 +84,12 @@ export function PetitionTemplateHeader({
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
-    await showPetitionSharingDialog({
-      userId: user.id,
-      petitionId: petition.id,
-    });
+    try {
+      await showPetitionSharingDialog({
+        userId: user.id,
+        petitionId: petition.id,
+      });
+    } catch {}
   };
 
   return (
