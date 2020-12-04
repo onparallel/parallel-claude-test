@@ -5,7 +5,8 @@ import { DateTime } from "@parallel/components/common/DateTime";
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+  withDialogs,
+} from "@parallel/components/common/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import {
@@ -428,5 +429,6 @@ export default compose(
       },
     ],
   }),
+  withDialogs,
   withApolloData
 )(Contacts);

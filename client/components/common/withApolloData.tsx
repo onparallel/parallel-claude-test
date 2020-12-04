@@ -10,7 +10,6 @@ import { parse as parseCookie } from "cookie";
 import { NextComponentType } from "next";
 import { NextPageContext } from "next/dist/next-server/lib/utils";
 import Router from "next/router";
-import React from "react";
 
 export type WithApolloDataContext = NextPageContext & {
   apollo: ApolloClient<any>;
@@ -23,9 +22,10 @@ export type WithApolloDataContext = NextPageContext & {
   ): Promise<ApolloQueryResult<T>>;
 };
 
-export type WithDataProps<P> = {
-  serverState: any;
-  componentProps: P;
+export const SERVER_STATE = "__SERVER_STATE__";
+
+export type WithServerState<P> = P & {
+  [SERVER_STATE]: any;
 };
 
 export function redirect(context: NextPageContext, location: string) {
@@ -39,12 +39,12 @@ export function redirect(context: NextPageContext, location: string) {
 export function withApolloData<P = {}>(
   // eslint-disable-next-line @typescript-eslint/naming-convention
   Component: NextComponentType<WithApolloDataContext, P, P>
-): NextComponentType<NextPageContext, WithDataProps<P>, WithDataProps<P>> {
-  const WithData: NextComponentType<
+): NextComponentType<NextPageContext, WithServerState<P>, WithServerState<P>> {
+  const WithApolloData: NextComponentType<
     NextPageContext,
-    WithDataProps<P>,
-    WithDataProps<P>
-  > = function ({ componentProps, serverState }) {
+    WithServerState<P>,
+    WithServerState<P>
+  > = function ({ [SERVER_STATE]: serverState, ...props }) {
     const client = createApolloClient(serverState, {
       getToken() {
         // On the server won't be necessary because all necessary queries were
@@ -54,12 +54,12 @@ export function withApolloData<P = {}>(
     });
     return (
       <ApolloProvider client={client}>
-        <Component {...componentProps} />
+        <Component {...(props as any)} />
       </ApolloProvider>
     );
   };
   const { getInitialProps, displayName, ...rest } = Component;
-  return Object.assign(WithData, rest, {
+  return Object.assign(WithApolloData, rest, {
     displayName: `WithApolloData(${displayName ?? Component.name})`,
     getInitialProps: async (context: NextPageContext) => {
       const apollo = createApolloClient(
@@ -120,18 +120,18 @@ export function withApolloData<P = {}>(
 
         if (process.browser) {
           return {
-            componentProps,
-            serverState: {},
+            ...componentProps,
+            [SERVER_STATE]: {},
           };
         } else {
           // if getInitialProps made a redirect, the response is finished.
-          if (context.res?.finished) {
+          if (context.res?.writableEnded) {
             return null as any;
           }
           return {
+            ...componentProps,
             // get the cache from the Apollo store
-            serverState: apollo.cache.extract(),
-            componentProps,
+            [SERVER_STATE]: apollo.cache.extract(),
           };
         }
       } catch (error) {

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Flex, Text } from "@chakra-ui/core";
 import { ContactLink } from "@parallel/components/common/ContactLink";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { TablePage } from "@parallel/components/common/TablePage";
 import {
@@ -408,5 +409,6 @@ export default compose(
       },
     ],
   }),
+  withDialogs,
   withApolloData
 )(Petitions);

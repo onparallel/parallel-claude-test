@@ -3,7 +3,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+} from "@parallel/components/common/DialogProvider";
 import { DownloadAllDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { gql } from "@apollo/client";
 import escapeStringRegexp from "escape-string-regexp";

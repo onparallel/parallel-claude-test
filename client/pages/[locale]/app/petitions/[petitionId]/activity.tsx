@@ -43,6 +43,9 @@ import { differenceInMinutes } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { ShareButton } from "@parallel/components/common/ShareButton";
+import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 
 type PetitionActivityProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -381,6 +384,14 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     return result;
   }, [petition.events.items]);
 
+  const showPetitionSharingDialog = usePetitionSharingDialog();
+  const handlePetitionSharingClick = async function () {
+    await showPetitionSharingDialog({
+      userId: me.id,
+      petitionId: petition.id,
+    });
+  };
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -391,6 +402,15 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       section="activity"
       scrollBody
       state={state}
+      headerActions={
+        <Box display={{ base: "none", lg: "block" }}>
+          <ShareButton
+            petition={petition}
+            userId={me.id}
+            onClick={handlePetitionSharingClick}
+          />
+        </Box>
+      }
     >
       <Box minWidth="container.lg">
         <PetitionAccessesTable
@@ -684,5 +704,6 @@ export default compose(
       },
     ],
   }),
+  withDialogs,
   withApolloData
 )(PetitionActivity);

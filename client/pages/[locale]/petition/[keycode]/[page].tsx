@@ -80,7 +80,9 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+  withDialogs,
+} from "@parallel/components/common/DialogProvider";
+import { compose } from "@parallel/utils/compose";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -1235,4 +1237,4 @@ RecipientView.getInitialProps = async ({
   return { keycode, currentPage: page, pageCount };
 };
 
-export default withApolloData(RecipientView);
+export default compose(withDialogs, withApolloData)(RecipientView);

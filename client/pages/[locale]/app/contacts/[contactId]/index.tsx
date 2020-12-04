@@ -13,6 +13,7 @@ import {
 import { EditIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
@@ -546,5 +547,6 @@ export default compose(
       },
     ],
   }),
+  withDialogs,
   withApolloData
 )(Contact);

@@ -28,7 +28,7 @@ import {
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+} from "@parallel/components/common/DialogProvider";
 import {
   TemplateDetailsDialog_PetitionTemplateFragment,
   useTemplateDetailsDialogPetitionQuery,

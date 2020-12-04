@@ -1,3 +1,4 @@
+import { NextComponentType } from "next";
 import {
   cloneElement,
   ComponentType,
@@ -40,7 +41,7 @@ export function useDialog<TProps = {}, TResult = void>(
   );
 }
 
-export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
+function DialogOpenerProvider({ children }: { children?: ReactNode }) {
   const [stack, setStack] = useState<ReactElement[]>([]);
   const opener = useCallback<DialogOpener>(function (createDialog) {
     return new Promise((resolve, reject) => {
@@ -63,4 +64,19 @@ export function DialogOpenerProvider({ children }: { children?: ReactNode }) {
       {stack.map((dialog, index) => cloneElement(dialog, { key: index }))}
     </DialogOpenerContext.Provider>
   );
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export function withDialogs<P>(Component: ComponentType<P>): ComponentType<P> {
+  const WithDialogs: NextComponentType = function ({ ...props }) {
+    return (
+      <DialogOpenerProvider>
+        <Component {...(props as any)} />
+      </DialogOpenerProvider>
+    );
+  };
+  const { displayName, ...rest } = Component;
+  return Object.assign(WithDialogs, rest, {
+    displayName: `WithDialogs(${displayName ?? Component.name})`,
+  });
 }

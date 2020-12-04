@@ -156,7 +156,6 @@ export function PetitionAccessesTable({
           </Menu>
         ) : null}
         <Button
-          colorScheme="purple"
           leftIcon={<UserPlusIcon fontSize="18px" />}
           onClick={onAddPetitionAccess}
         >

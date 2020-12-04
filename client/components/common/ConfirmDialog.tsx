@@ -2,6 +2,7 @@ import {
   Button,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -11,8 +12,8 @@ import {
 } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { ReactNode, RefObject, useRef } from "react";
-import { FormattedMessage } from "react-intl";
-import { DialogProps } from "./DialogOpenerProvider";
+import { FormattedMessage, useIntl } from "react-intl";
+import { DialogProps } from "./DialogProvider";
 
 export type ConfirmDialogProps<TResult> = {
   header: ReactNode;
@@ -21,6 +22,7 @@ export type ConfirmDialogProps<TResult> = {
   cancel?: ReactNode;
   initialFocusRef?: RefObject<any>;
   content?: ExtendChakra;
+  hasCloseButton?: boolean;
 } & DialogProps<{}, TResult> &
   Omit<ModalProps, "children" | "isOpen" | "initialFocusRef" | "onClose">;
 
@@ -33,8 +35,10 @@ export function ConfirmDialog<TResult = void>({
   onResolve,
   onReject,
   content,
+  hasCloseButton,
   ...props
 }: ConfirmDialogProps<TResult>) {
+  const intl = useIntl();
   const cancelRef = useRef<HTMLButtonElement>(null);
   return (
     <Modal
@@ -45,6 +49,14 @@ export function ConfirmDialog<TResult = void>({
     >
       <ModalOverlay>
         <ModalContent borderRadius="md" {...content}>
+          {hasCloseButton ? (
+            <ModalCloseButton
+              aria-label={intl.formatMessage({
+                id: "generic.close",
+                defaultMessage: "Close",
+              })}
+            />
+          ) : null}
           <ModalHeader>{header}</ModalHeader>
           <ModalBody>{body}</ModalBody>
           <ModalFooter as={Stack} direction="row">

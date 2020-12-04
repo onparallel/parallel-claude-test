@@ -9,6 +9,7 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/core";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -22,6 +23,7 @@ import {
   useAccountQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -173,4 +175,4 @@ Account.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   `);
 };
 
-export default withApolloData(Account);
+export default compose(withDialogs, withApolloData)(Account);

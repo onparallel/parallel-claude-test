@@ -1,6 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/core";
 import { theme } from "@parallel/chakra/theme";
-import { DialogOpenerProvider } from "@parallel/components/common/DialogOpenerProvider";
 import {
   I18nProps,
   I18nProvider,
@@ -40,9 +39,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
       <I18nProvider {...props}>
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
           <DndProvider backend={HTML5Backend}>
-            <DialogOpenerProvider>
-              <Component {...pageProps} />
-            </DialogOpenerProvider>
+            <Component {...pageProps} />
           </DndProvider>
         </ChakraProvider>
       </I18nProvider>

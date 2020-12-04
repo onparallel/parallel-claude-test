@@ -9,6 +9,7 @@ import {
   Stack,
   useToast,
 } from "@chakra-ui/core";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import {
   withApolloData,
@@ -23,6 +24,7 @@ import {
   useSecurityQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -214,4 +216,4 @@ Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   `);
 };
 
-export default withApolloData(Security);
+export default compose(withDialogs, withApolloData)(Security);

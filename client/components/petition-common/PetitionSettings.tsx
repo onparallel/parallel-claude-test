@@ -30,7 +30,7 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
-import { DialogProps, useDialog } from "../common/DialogOpenerProvider";
+import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";

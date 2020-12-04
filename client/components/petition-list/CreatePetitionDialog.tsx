@@ -14,7 +14,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+} from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import useMergedRef from "@react-hook/merged-ref";

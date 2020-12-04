@@ -16,6 +16,7 @@ import {
   SettingsIcon,
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Link } from "@parallel/components/common/Link";
@@ -1088,5 +1089,6 @@ export default compose(
       },
     ],
   }),
+  withDialogs,
   withApolloData
 )(PetitionCompose);

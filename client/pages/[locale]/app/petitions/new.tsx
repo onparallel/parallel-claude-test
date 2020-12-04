@@ -16,6 +16,7 @@ import { AddIcon, ChevronDownIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { BreakLines } from "@parallel/components/common/BreakLines";
 import { Card } from "@parallel/components/common/Card";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
@@ -767,4 +768,4 @@ NewPetition.getInitialProps = async ({
   ]);
 };
 
-export default compose(withApolloData)(NewPetition);
+export default compose(withDialogs, withApolloData)(NewPetition);

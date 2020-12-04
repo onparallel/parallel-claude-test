@@ -2,7 +2,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+} from "@parallel/components/common/DialogProvider";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";

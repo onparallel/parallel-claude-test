@@ -3,7 +3,7 @@ import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
-} from "@parallel/components/common/DialogOpenerProvider";
+} from "@parallel/components/common/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
 export type FailureGeneratingLinkDialogProps = {
