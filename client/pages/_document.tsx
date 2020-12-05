@@ -54,6 +54,7 @@ class MyDocument extends Document<MyDocumentProps> {
       <Html lang={locale}>
         <Head>
           <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
+          <link href="https://polyfill.io" rel="preconnect" />
           <link
             rel="preload"
             href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
@@ -62,7 +63,7 @@ class MyDocument extends Document<MyDocumentProps> {
           />
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,500,600|Playfair+Display&display=swap"
+            href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/fonts.css?v=${process.env.BUILD_ID}`}
           />
           <script
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
