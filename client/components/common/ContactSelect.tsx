@@ -247,34 +247,19 @@ function useContactSelectReactSelectProps(
               data: ContactSelectSelection;
               children: ReactNode;
             }) => {
-              const { fullName, email, isInvalid, isDeleted } = data;
-              const intl = useIntl();
+              const { fullName, email, isDeleted } = data;
               return (
-                <Tooltip
-                  label={intl.formatMessage({
-                    id: "component.contact-select.click-to-create",
-                    defaultMessage: "Click to create contact",
-                  })}
-                >
-                  <Box
-                    onClick={() => {
-                      if (isInvalid) handleCreateContact(data.email);
-                    }}
-                    style={{ cursor: isInvalid ? "pointer" : "default" }}
-                  >
-                    <components.MultiValueLabel {...props}>
-                      <Text as="span" marginLeft={1}>
-                        {isDeleted ? (
-                          <DeletedContact color="red.600" />
-                        ) : fullName ? (
-                          `${fullName} <${email}>`
-                        ) : (
-                          email
-                        )}
-                      </Text>
-                    </components.MultiValueLabel>
-                  </Box>
-                </Tooltip>
+                <components.MultiValueLabel {...props}>
+                  <Text as="span" marginLeft={1}>
+                    {isDeleted ? (
+                      <DeletedContact color="red.600" />
+                    ) : fullName ? (
+                      `${fullName} <${email}>`
+                    ) : (
+                      email
+                    )}
+                  </Text>
+                </components.MultiValueLabel>
               );
             }
           ),
