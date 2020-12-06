@@ -21,7 +21,12 @@ export const PublicShowcase = forwardRef<PublicShowcaseProps, "div">(
         {...props}
       >
         <Flex flex="1" justifyContent="center">
-          <Image src={imageUrl} height={imageSize} role="presentation" />
+          <Image
+            src={imageUrl}
+            loading="lazy"
+            height={imageSize}
+            role="presentation"
+          />
         </Flex>
         <Box flex="1" justifyContent="center">
           {children}

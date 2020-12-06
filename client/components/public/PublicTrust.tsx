@@ -23,6 +23,7 @@ export function PublicTrust(props: BoxProps) {
           <Image
             alt="Cuatrecasas Acelera"
             width="250px"
+            loading="lazy"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/cuatrecasas-acelera.png`}
           />
         </NormalLink>

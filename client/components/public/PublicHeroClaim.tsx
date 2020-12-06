@@ -100,7 +100,12 @@ function Feature({
       margin={4}
     >
       <Flex justifyContent="center" alignItems="bottom" height="180px">
-        <Image src={imageUrl} maxWidth="80%" role="presentation" />
+        <Image
+          src={imageUrl}
+          loading="lazy"
+          maxWidth="80%"
+          role="presentation"
+        />
       </Flex>
       <Heading as="h4" size="sm" marginY={4}>
         {header}

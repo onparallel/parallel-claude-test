@@ -52,6 +52,7 @@ export function PublicPress({ ...props }: BoxProps) {
               src={item.image}
               width="200px"
               margin="auto"
+              loading="lazy"
               alt={item.name}
             />
           </Flex>

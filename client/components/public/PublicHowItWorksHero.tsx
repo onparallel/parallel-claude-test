@@ -225,6 +225,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
                       />
                       <img
                         ref={imageRef as any}
+                        loading="lazy"
                         src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png?v=${process.env.BUILD_ID}`}
                         alt={`${steps[index].alt}`}
                       />
