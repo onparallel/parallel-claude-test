@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text, Tooltip } from "@chakra-ui/core";
+import { Box, Text } from "@chakra-ui/core";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
@@ -19,7 +19,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import {
   components,
   InputActionMeta,
