@@ -148,6 +148,9 @@ const config = {
                 ],
                 referrerPolicy: "same-origin",
                 frameGuard: "sameorigin",
+                xssProtection: "sanitize",
+                nosniff: "nosniff",
+                noopen: "noopen",
               })
             : [],
       },
