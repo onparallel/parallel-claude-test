@@ -49,7 +49,10 @@ async function main() {
         instance.Tags?.find((t) => t.Key === "Name")!.Value
       }`
     );
-    execSync(`ssh ${ipAddress} /home/ec2-user/workers.sh stop`);
+    execSync(`ssh \
+      -o "UserKnownHostsFile=/dev/null" \
+      -o StrictHostKeyChecking=no \
+      ${ipAddress} /home/ec2-user/workers.sh stop`);
     console.log(
       chalk`Workers stopped on ${
         instance.Tags?.find((t) => t.Key === "Name")!.Value
@@ -91,7 +94,10 @@ async function main() {
         instance.Tags?.find((t) => t.Key === "Name")!.Value
       }`
     );
-    execSync(`ssh ${ipAddress} /home/ec2-user/workers.sh start`);
+    execSync(`ssh \
+      -o "UserKnownHostsFile=/dev/null" \
+      -o StrictHostKeyChecking=no \
+      ${ipAddress} /home/ec2-user/workers.sh start`);
     console.log(
       chalk`Workers started on ${
         instance.Tags?.find((t) => t.Key === "Name")!.Value

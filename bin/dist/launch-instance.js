@@ -128,7 +128,11 @@ async function main() {
         .promise();
     await wait_1.waitFor(async () => {
         try {
-            child_process_1.execSync(`ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no ec2-user@${ipAddress} true >/dev/null 2>&1`);
+            child_process_1.execSync(`ssh \
+            -o ConnectTimeout=1 \
+            -o "UserKnownHostsFile=/dev/null" \
+            -o StrictHostKeyChecking=no \
+            ec2-user@${ipAddress} true >/dev/null 2>&1`);
             return true;
         }
         catch {
@@ -136,8 +140,13 @@ async function main() {
         }
     }, chalk_1.default `SSH not available. Waiting 5 more seconds...`, 5000);
     console.log("Uploading install script to the new instance.");
-    child_process_1.execSync(`scp -o StrictHostKeyChecking=no \
-      ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`);
-    child_process_1.execSync(`ssh ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
+    child_process_1.execSync(`scp \
+    -o "UserKnownHostsFile=/dev/null" \
+    -o "StrictHostKeyChecking=no" \
+    ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`);
+    child_process_1.execSync(`ssh
+    -o "UserKnownHostsFile=/dev/null" \
+    -o StrictHostKeyChecking=no \
+    ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
 }
 run_1.run(main);

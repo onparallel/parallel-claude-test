@@ -135,7 +135,11 @@ async function main() {
     async () => {
       try {
         execSync(
-          `ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no ec2-user@${ipAddress} true >/dev/null 2>&1`
+          `ssh \
+            -o ConnectTimeout=1 \
+            -o "UserKnownHostsFile=/dev/null" \
+            -o StrictHostKeyChecking=no \
+            ec2-user@${ipAddress} true >/dev/null 2>&1`
         );
         return true;
       } catch {
@@ -147,11 +151,14 @@ async function main() {
   );
 
   console.log("Uploading install script to the new instance.");
-  execSync(
-    `scp -o StrictHostKeyChecking=no \
-      ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`
-  );
-  execSync(`ssh ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
+  execSync(`scp \
+    -o "UserKnownHostsFile=/dev/null" \
+    -o "StrictHostKeyChecking=no" \
+    ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`);
+  execSync(`ssh
+    -o "UserKnownHostsFile=/dev/null" \
+    -o StrictHostKeyChecking=no \
+    ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
 }
 
 run(main);

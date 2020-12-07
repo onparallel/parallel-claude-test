@@ -43,7 +43,10 @@ async function main() {
     for (const instance of result3.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
         console.log(chalk_1.default `Stopping workers on ${(_a = instance.Tags) === null || _a === void 0 ? void 0 : _a.find((t) => t.Key === "Name").Value}`);
-        child_process_1.execSync(`ssh ${ipAddress} /home/ec2-user/workers.sh stop`);
+        child_process_1.execSync(`ssh \
+      -o "UserKnownHostsFile=/dev/null" \
+      -o StrictHostKeyChecking=no \
+      ${ipAddress} /home/ec2-user/workers.sh stop`);
         console.log(chalk_1.default `Workers stopped on ${(_b = instance.Tags) === null || _b === void 0 ? void 0 : _b.find((t) => t.Key === "Name").Value}`);
     }
     console.log("Getting new target group.");
@@ -73,7 +76,10 @@ async function main() {
     for (const instance of result6.Reservations.flatMap((r) => r.Instances)) {
         const ipAddress = instance.PrivateIpAddress;
         console.log(chalk_1.default `Starting workers on ${(_c = instance.Tags) === null || _c === void 0 ? void 0 : _c.find((t) => t.Key === "Name").Value}`);
-        child_process_1.execSync(`ssh ${ipAddress} /home/ec2-user/workers.sh start`);
+        child_process_1.execSync(`ssh \
+      -o "UserKnownHostsFile=/dev/null" \
+      -o StrictHostKeyChecking=no \
+      ${ipAddress} /home/ec2-user/workers.sh start`);
         console.log(chalk_1.default `Workers started on ${(_d = instance.Tags) === null || _d === void 0 ? void 0 : _d.find((t) => t.Key === "Name").Value}`);
     }
 }
