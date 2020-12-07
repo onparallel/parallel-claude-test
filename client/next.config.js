@@ -137,6 +137,12 @@ const config = {
                       // Hubspot
                       "app.hubspot.com",
                     ],
+                    fontSrc: [
+                      "'self'",
+                      "*.parallel.so",
+                      // Hubspot
+                      "fonts.googleapis.com",
+                    ],
                   },
                 },
                 forceHTTPSRedirect: [

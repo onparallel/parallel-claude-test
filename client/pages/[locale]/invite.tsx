@@ -7,6 +7,7 @@ import languages from "@parallel/lang/languages.json";
 import { useHubspotForm } from "@parallel/utils/useHubspotForm";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
+import ReactGA from "react-ga";
 
 function Invite() {
   const intl = useIntl();
@@ -16,9 +17,10 @@ function Invite() {
       ? {
           target: "#form-container",
           onFormSubmit: function () {
-            gtag("event", "HS-invite-submit", {
-              event_category: "HS-form-submit",
-              event_label: "new-invite",
+            ReactGA.event({
+              action: "HS-invite-submit",
+              category: "HS-form-submit",
+              label: "new-invite",
             });
           },
           ...({
