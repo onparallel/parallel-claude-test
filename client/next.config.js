@@ -18,9 +18,7 @@ const config = {
     config.plugins.push(
       new DefinePlugin({
         "process.env.BUILD_ID": JSON.stringify(options.buildId),
-        "process.env.NEXT_IS_SERVER": JSON.stringify(
-          options.isServer.toString()
-        ),
+        "process.env.NEXT_IS_SERVER": JSON.stringify(options.isServer),
       })
     );
 
