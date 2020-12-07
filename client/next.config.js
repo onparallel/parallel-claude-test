@@ -100,6 +100,7 @@ const config = {
                       "js.hsadspixel.net",
                       "js.hs-analytics.net",
                       "js.hs-banner.com",
+                      "js.hsforms.net",
                       "js.usemessages.com",
                       "static.hsappstatic.net",
                     ],
