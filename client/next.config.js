@@ -89,6 +89,8 @@ const config = {
                       "www.googletagmanager.com",
                       "www.google-analytics.com",
                       "googleads.g.doubleclick.net",
+                      "www.google.com",
+                      "www.googleadservices.com",
                       // Hotjar
                       "*.hotjar.com",
                       // Hubspot
@@ -145,6 +147,7 @@ const config = {
                   { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true },
                 ],
                 referrerPolicy: "same-origin",
+                frameGuard: "sameorigin",
               })
             : [],
       },
