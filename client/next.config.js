@@ -94,6 +94,7 @@ const config = {
                       "js.hs-analytics.net",
                       "js.hs-banner.com",
                       "js.hsforms.net",
+                      "forms.hsforms.com",
                       "js.usemessages.com",
                       "static.hsappstatic.net",
                     ],
@@ -109,6 +110,7 @@ const config = {
                       "api.hubapi.com",
                       "forms.hubspot.com",
                       "forms.hsforms.com",
+                      "hubspot-forms-static-embed.s3.amazonaws.com",
                     ],
                     styleSrc: [
                       "'self'",
