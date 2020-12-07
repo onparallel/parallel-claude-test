@@ -176,4 +176,11 @@ export class EmailsService implements IEmailsService {
       message: emailBody,
     });
   }
+
+  async sendPetitionMessageBouncedEmail(emailLogId: number) {
+    return await this.enqueueEmail("petition-message-bounced", {
+      id: this.buildQueueId("PetitionMessageBounced", emailLogId),
+      email_log_id: emailLogId,
+    });
+  }
 }

@@ -195,6 +195,26 @@
     "context": "{recipient} completed {signed, select, true{and signed } other{}}the petition you sent to him."
   },
   {
+    "term": "petition-message-bounced.access-click-link",
+    "definition": "Sigue el enlace siguiente para acceder a la petición.",
+    "context": "Follow the link below to access the petition."
+  },
+  {
+    "term": "petition-message-bounced.intro-text",
+    "definition": "No pudimos entregar el mensaje que acabas de enviar a {contactFullName} ({contactEmail}):",
+    "context": "We couldn't deliver the message you just sent to {contactFullName} ({contactEmail}):"
+  },
+  {
+    "term": "petition-message-bounced.intro-text-2",
+    "definition": "Por favor, verifica que el email {contactEmail} es válido e inténtalo nuevamente.",
+    "context": "Please, verify that the email {contactEmail} is correct and try again."
+  },
+  {
+    "term": "petition-message-bounced.subject",
+    "definition": "No pudimos entregar tu mensaje",
+    "context": "We couldn't deliver your message"
+  },
+  {
     "term": "petition-reminder.subject",
     "definition": "Le recordamos que {senderName} le envió una petición, de la que queda información pendiente de completar.",
     "context": "Remember that {senderName} sent you a petition"

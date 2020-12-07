@@ -6,6 +6,7 @@ import { petitionMessage } from "./emails/petition-message";
 import { petitionReminder } from "./emails/petition-reminder";
 import { petitionClosedNotification } from "./emails/petition-closed-notification";
 import { petitionSharingNotification } from "./emails/petition-sharing-notification";
+import { petitionMessageBounced } from "./emails/petition-message-bounced";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
 const builders = {
@@ -16,6 +17,7 @@ const builders = {
   "petition-reminder": petitionReminder,
   "petition-sharing-notification": petitionSharingNotification,
   "petition-closed-notification": petitionClosedNotification,
+  "petition-message-bounced": petitionMessageBounced,
 };
 
 export type EmailType = keyof typeof builders;

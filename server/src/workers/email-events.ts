@@ -27,6 +27,10 @@ createQueueWorker(
       event,
       payload: JSON.stringify((payload as any)[event]),
     });
+
+    if (event === "bounce") {
+      await context.emails.sendPetitionMessageBouncedEmail(emailLogId);
+    }
   },
   {
     parser: (message) => {
