@@ -54,10 +54,6 @@ class MyDocument extends Document<MyDocumentProps> {
             as="script"
             crossOrigin="anonymous"
           />
-          <link
-            rel="stylesheet"
-            href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/fonts/fonts.css?v=${process.env.BUILD_ID}`}
-          />
           <script
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
               [

@@ -2,7 +2,6 @@ import { mode, Styles } from "@chakra-ui/theme-tools";
 
 export const styles: Styles = {
   global: (props: any) => ({
-    // copy these until rc.4
     body: {
       fontFamily: "body",
       color: mode("gray.800", "whiteAlpha.900")(props),
