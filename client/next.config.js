@@ -126,6 +126,7 @@ const config = {
                       "'self'",
                       "*.parallel.so",
                       // Google analytics
+                      "www.google-analytics.com",
                       "www.googletagmanager.com",
                       "www.google.com",
                       "www.google.es",
