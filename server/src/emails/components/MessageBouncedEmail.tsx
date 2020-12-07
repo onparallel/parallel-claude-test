@@ -93,8 +93,16 @@ const email: Email<MessageBouncedEmailProps> = {
         logoAlt={logoAlt}
       >
         <MjmlSection backgroundColor="#6059f7" borderRadius="4px">
-          <MjmlText align="center" color="white" fontWeight={600}>
-            ACTION REQUIRED
+          <MjmlText
+            align="center"
+            color="white"
+            fontWeight={600}
+            textTransform="uppercase"
+          >
+            <FormattedMessage
+              id="generic.action-required"
+              defaultMessage="Action required"
+            />
           </MjmlText>
         </MjmlSection>
 
