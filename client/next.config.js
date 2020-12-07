@@ -26,7 +26,7 @@ const config = {
       config.plugins.push(
         new SentryWebpackPlugin({
           authToken: process.env.SENTRY_AUTH_TOKEN,
-          org: "parallel-so",
+          org: "parallel-org",
           project: "parallel",
           include: ".next",
           ignore: ["node_modules"],
