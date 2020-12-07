@@ -97,6 +97,7 @@ const config = {
                       "*.hsforms.com",
                       "js.usemessages.com",
                       "static.hsappstatic.net",
+                      "www.gstatic.com", // (recaptcha)
                     ],
                     connectSrc: [
                       "'self'",
@@ -139,6 +140,7 @@ const config = {
                       // Hubspot
                       "app.hubspot.com",
                       "forms.hsforms.com",
+                      "www.google.com",
                     ],
                     fontSrc: [
                       "'self'",
