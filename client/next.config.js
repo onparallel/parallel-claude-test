@@ -84,36 +84,59 @@ const config = {
                     scriptSrc: [
                       "'self'",
                       "*.parallel.so",
-                      "https://polyfill.io",
+                      "polyfill.io",
                       // Google analytics
-                      "https://www.googletagmanager.com",
-                      "https://www.google-analytics.com",
-                      "https://googleads.g.doubleclick.net",
+                      "www.googletagmanager.com",
+                      "www.google-analytics.com",
+                      "googleads.g.doubleclick.net",
                       // Hotjar
-                      "https://script.hotjar.com",
+                      "*.hotjar.com",
                       // Hubspot
-                      "https://js.hs-scripts.com",
-                      "https://js.hscollectedforms.net",
-                      "https://js.hsleadflows.net",
-                      "https://js.hsadspixel.net",
-                      "https://js.hs-analytics.net",
-                      "https://js.hs-banner.com",
-                      "https://js.usemessages.com",
-                      "https://static.hsappstatic.net",
+                      "js.hs-scripts.com",
+                      "js.hscollectedforms.net",
+                      "js.hsleadflows.net",
+                      "js.hsadspixel.net",
+                      "js.hs-analytics.net",
+                      "js.hs-banner.com",
+                      "js.usemessages.com",
+                      "static.hsappstatic.net",
+                    ],
+                    connectSrc: [
+                      "'self'",
+                      "*.parallel.so",
+                      // Google analytics
+                      "www.google-analytics.com",
+                      // Hotjar
+                      "*.hotjar.com",
+                      // Hubspot
+                      "api.hubspot.com",
+                      "api.hubapi.com",
+                      "forms.hubspot.com",
+                      "forms.hsforms.com",
                     ],
                     styleSrc: [
                       "'self'",
                       "'unsafe-inline'",
                       "*.parallel.so",
-                      "https://static.hsappstatic.net",
+                      "static.hsappstatic.net",
                     ],
                     imgSrc: [
                       "'self'",
                       "*.parallel.so",
-                      "https://www.googletagmanager.com",
-                      "https://track.hubspot.com",
-                      "https://www.google.com",
-                      "https://www.google.es",
+                      // Google analytics
+                      "www.googletagmanager.com",
+                      "www.google.com",
+                      "www.google.es",
+                      // Hubspot
+                      "track.hubspot.com",
+                    ],
+                    frameSrc: [
+                      "'self'",
+                      "*.parallel.so",
+                      // Hotjar
+                      "vars.hotjar.com",
+                      // Hubspot
+                      "app.hubspot.com",
                     ],
                   },
                 },
