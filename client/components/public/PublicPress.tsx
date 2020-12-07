@@ -47,7 +47,7 @@ export function PublicPress({ ...props }: BoxProps) {
         gridGap={4}
       >
         {items.map((item, index) => (
-          <Flex key={index} minHeight="100px" backgroundColor={"red"}>
+          <Flex key={index} minHeight="100px">
             <Image
               src={item.image}
               width="200px"
