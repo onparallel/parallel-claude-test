@@ -93,8 +93,8 @@ const config = {
                       "js.hsadspixel.net",
                       "js.hs-analytics.net",
                       "js.hs-banner.com",
-                      "js.hsforms.net",
-                      "forms.hsforms.com",
+                      "*.hsforms.net",
+                      "*.hsforms.com",
                       "js.usemessages.com",
                       "static.hsappstatic.net",
                     ],
@@ -106,10 +106,9 @@ const config = {
                       // Hotjar
                       "*.hotjar.com",
                       // Hubspot
-                      "api.hubspot.com",
-                      "api.hubapi.com",
-                      "forms.hubspot.com",
-                      "forms.hsforms.com",
+                      "*.hubspot.com",
+                      "*.hubapi.com",
+                      "*.hsforms.com",
                       "hubspot-forms-static-embed.s3.amazonaws.com",
                     ],
                     styleSrc: [
@@ -129,8 +128,8 @@ const config = {
                       "www.google.com",
                       "www.google.es",
                       // Hubspot
-                      "track.hubspot.com",
-                      "forms.hubspot.com",
+                      "*.hubspot.com",
+                      "*.hsforms.com",
                     ],
                     frameSrc: [
                       "'self'",
