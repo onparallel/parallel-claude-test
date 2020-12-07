@@ -29,7 +29,12 @@ export function PublicTrust(props: BoxProps) {
         }}
         gridGap={4}
       >
-        <NormalLink href="https://acelera.cuatrecasas.com/" isExternal>
+        <NormalLink
+          href="https://acelera.cuatrecasas.com"
+          isExternal
+          display="flex"
+          justifyContent="center"
+        >
           <Image
             alt="Cuatrecasas Acelera"
             width="250px"
@@ -37,7 +42,12 @@ export function PublicTrust(props: BoxProps) {
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/cuatrecasas-acelera.png`}
           />
         </NormalLink>
-        <NormalLink href="https://www.enisa.es/" isExternal>
+        <NormalLink
+          href="https://www.enisa.es/"
+          isExternal
+          display="flex"
+          justifyContent="center"
+        >
           <Image
             alt="Enisa"
             width="120px"
