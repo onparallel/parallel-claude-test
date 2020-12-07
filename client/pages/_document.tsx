@@ -1,6 +1,5 @@
 import { I18nProps } from "@parallel/components/common/I18nProvider";
 import languages from "@parallel/lang/languages.json";
-import { logger } from "@parallel/utils/logger";
 import { promises as fs } from "fs";
 import Document, {
   DocumentContext,
@@ -31,19 +30,13 @@ class MyDocument extends Document<MyDocumentProps> {
     const { renderPage } = ctx;
     const locale = getLocale(ctx);
     const messages = await loadMessages(locale);
-    ctx.renderPage = () => {
-      try {
-        return renderPage({
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          enhanceApp: (App) => (props) => (
-            <App {...props} {...{ locale, messages }} />
-          ),
-        });
-      } catch (error) {
-        logger.error(error.stack, { error });
-        throw error;
-      }
-    };
+    ctx.renderPage = () =>
+      renderPage({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        enhanceApp: (App) => (props) => (
+          <App {...props} {...{ locale, messages }} />
+        ),
+      });
     const initialProps = await Document.getInitialProps(ctx);
     return { ...initialProps, locale };
   }

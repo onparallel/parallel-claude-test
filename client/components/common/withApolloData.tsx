@@ -150,15 +150,6 @@ export function withApolloData<P = {}>(
           ) {
             console.error(error?.graphQLErrors?.[0]?.extensions);
           }
-          if (!process.browser) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const logger = require("@parallel/utils/logger").logger;
-            if (!["PUBLIC_PETITION_NOT_AVAILABLE"].includes(code))
-              // Errors that are OK
-              logger.error(error.message, {
-                error,
-              });
-          }
           throw error;
         }
       }

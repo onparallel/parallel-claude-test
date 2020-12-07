@@ -70,9 +70,7 @@
     "slate-react": "^0.59.0",
     "smooth-scroll-into-view-if-needed": "^1.1.29",
     "styled-components": "^5.2.0",
-    "vanilla-text-mask": "^5.1.1",
-    "winston": "^3.3.3",
-    "winston-cloudwatch": "^2.3.2"
+    "vanilla-text-mask": "^5.1.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.18.0",
