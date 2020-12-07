@@ -405,7 +405,10 @@ export const PetitionComposeField = Object.assign(
                         if (editor.selection && isSelectionExpanded(editor)) {
                           return;
                         }
-                        const anchor = editor.selection!.anchor;
+                        const anchor = editor.selection?.anchor;
+                        if (!anchor) {
+                          return;
+                        }
 
                         switch (event.key) {
                           case "ArrowDown":
