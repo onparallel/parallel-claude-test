@@ -155,7 +155,7 @@ async function main() {
     -o "UserKnownHostsFile=/dev/null" \
     -o "StrictHostKeyChecking=no" \
     ${OPS_DIR}/{install.sh,workers.sh} ${ipAddress}:/home/ec2-user/`);
-  execSync(`ssh
+  execSync(`ssh \
     -o "UserKnownHostsFile=/dev/null" \
     -o StrictHostKeyChecking=no \
     ${ipAddress} /home/ec2-user/install.sh ${commit} ${env}`);
