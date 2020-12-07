@@ -1,14 +1,13 @@
-import { memo, useEffect } from "react";
-import Head from "next/head";
 import Router from "next/router";
+import { memo, useEffect } from "react";
+import ReactGA from "react-ga";
 
 export const GoogleAnalytics = memo(() => {
-  const gtagId = "UA-153451031-1";
-
   useEffect(() => {
+    ReactGA.initialize("UA-153451031-1");
     function handler() {
       setTimeout(() => {
-        gtag("event", "page_view", { page_location: window.location.href });
+        ReactGA.pageview(window.location.href + window.location.search);
       }, 0);
     }
     Router.events.on("routeChangeComplete", handler);
@@ -17,22 +16,5 @@ export const GoogleAnalytics = memo(() => {
       Router.events.off("routeChangeComplete", handler);
     };
   }, []);
-  return (
-    <Head>
-      <script
-        async
-        src={`https://www.googletagmanager.com/gtag/js?id=${gtagId}`}
-      />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: /* js */ `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${gtagId}', { 'send_page_view': false });
-          `.replace(/\s*\n\s*/g, ""),
-        }}
-      />
-    </Head>
-  );
+  return null;
 });

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { DefinePlugin } = require("webpack");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const { createSecureHeaders } = require("next-secure-headers");
 
 const config = {
   env: {
@@ -56,11 +57,6 @@ const config = {
     };
     return config;
   },
-  exportPathMap: async function () {
-    return {
-      "/": { page: "/" },
-    };
-  },
   async redirects() {
     return [
       {
@@ -72,6 +68,62 @@ const config = {
         source: "/:locale/petition/:keycode",
         destination: "/:locale/petition/:keycode/1",
         permanent: false,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers:
+          process.env.NODE_ENV === "production"
+            ? createSecureHeaders({
+                contentSecurityPolicy: {
+                  directives: {
+                    defaultSrc: ["'self'", "*.parallel.so"],
+                    scriptSrc: [
+                      "'self'",
+                      "*.parallel.so",
+                      "https://polyfill.io",
+                      // Google analytics
+                      "https://www.googletagmanager.com",
+                      "https://www.google-analytics.com",
+                      "https://googleads.g.doubleclick.net",
+                      // Hotjar
+                      "https://script.hotjar.com",
+                      // Hubspot
+                      "https://js.hs-scripts.com",
+                      "https://js.hscollectedforms.net",
+                      "https://js.hsleadflows.net",
+                      "https://js.hsadspixel.net",
+                      "https://js.hs-analytics.net",
+                      "https://js.hs-banner.com",
+                      "https://js.usemessages.com",
+                      "https://static.hsappstatic.net",
+                    ],
+                    styleSrc: [
+                      "'self'",
+                      "'unsafe-inline'",
+                      "*.parallel.so",
+                      "https://static.hsappstatic.net",
+                    ],
+                    imgSrc: [
+                      "'self'",
+                      "*.parallel.so",
+                      "https://www.googletagmanager.com",
+                      "https://track.hubspot.com",
+                      "https://www.google.com",
+                      "https://www.google.es",
+                    ],
+                  },
+                },
+                forceHTTPSRedirect: [
+                  true,
+                  { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true },
+                ],
+                referrerPolicy: "same-origin",
+              })
+            : {},
       },
     ];
   },
