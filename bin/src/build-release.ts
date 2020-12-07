@@ -92,12 +92,14 @@ async function main() {
     `aws s3 sync \
       ${buildDir}/client/.next/static \
       s3://parallel-static-${env}/_next/static \
+      --cache-control max-age=2592000 \
       --profile parallel-deploy`
   );
   execSync(
     `aws s3 sync \
       ${buildDir}/client/public \
       s3://parallel-static-${env} \
+      --cache-control max-age=2592000 \
       --profile parallel-deploy`
   );
 
