@@ -19,7 +19,6 @@ const config = {
     config.plugins.push(
       new DefinePlugin({
         "process.env.BUILD_ID": JSON.stringify(options.buildId),
-        "process.env.NEXT_IS_SERVER": JSON.stringify(options.isServer),
       })
     );
 
@@ -41,16 +40,10 @@ const config = {
     config.entry = async () => {
       const entries = await originalEntry();
       const main = entries["main.js"];
-      for (const { src, dev, isServer } of [
-        { src: "./build/why-did-you-render.js", dev: true, isServer: false },
-      ]) {
-        if (
-          (dev === undefined || dev === options.dev) &&
-          (isServer === undefined || isServer === options.isServer)
-        ) {
-          if (main && !main.includes(src)) {
-            main.unshift(src);
-          }
+      if (options.dev && !options.isServer) {
+        const script = "./build/why-did-you-render.js";
+        if (main && !main.includes(script)) {
+          main.unshift(script);
         }
       }
       return entries;
