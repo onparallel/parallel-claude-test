@@ -123,7 +123,7 @@ const config = {
                 ],
                 referrerPolicy: "same-origin",
               })
-            : {},
+            : [],
       },
     ];
   },
