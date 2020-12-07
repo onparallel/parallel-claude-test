@@ -117,6 +117,8 @@ const config = {
                       "'unsafe-inline'",
                       "*.parallel.so",
                       "static.hsappstatic.net",
+                      // Hubspot
+                      "fonts.googleapis.com",
                     ],
                     imgSrc: [
                       "'self'",
@@ -128,6 +130,7 @@ const config = {
                       "www.google.es",
                       // Hubspot
                       "track.hubspot.com",
+                      "forms.hubspot.com",
                     ],
                     frameSrc: [
                       "'self'",
@@ -136,12 +139,13 @@ const config = {
                       "vars.hotjar.com",
                       // Hubspot
                       "app.hubspot.com",
+                      "forms.hsforms.com",
                     ],
                     fontSrc: [
                       "'self'",
                       "*.parallel.so",
                       // Hubspot
-                      "fonts.googleapis.com",
+                      "fonts.gstatic.com",
                     ],
                   },
                 },
