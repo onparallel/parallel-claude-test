@@ -5,12 +5,21 @@ import { FormattedMessage } from "react-intl";
 import * as Sentry from "@sentry/node";
 import { UnwrapPromise } from "@parallel/utils/types";
 
+const SENTRY_WHITELISTED_ERRORS = [
+  "PUBLIC_PETITION_NOT_AVAILABLE",
+  "FORBIDDEN",
+];
+
 export default function CustomError({
   err,
   errorCode,
   hasGetInitialPropsRun,
 }: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>) {
-  if (!hasGetInitialPropsRun && err) {
+  if (
+    !hasGetInitialPropsRun &&
+    err &&
+    !SENTRY_WHITELISTED_ERRORS.includes(errorCode)
+  ) {
     Sentry.captureException(err);
   }
   return errorCode === "PUBLIC_PETITION_NOT_AVAILABLE" ? (
@@ -71,10 +80,12 @@ CustomError.getInitialProps = async ({ res, err, asPath }: NextPageContext) => {
   const errorCode =
     (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
 
-  Sentry.captureException(
-    err ?? `_error.js getInitialProps missing data at path: ${asPath}`
-  );
+  if (!err || (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode))) {
+    Sentry.captureException(
+      err ?? `_error.js getInitialProps missing data at path: ${asPath}`
+    );
+    await Sentry.flush(2000);
+  }
 
-  await Sentry.flush(2000);
   return { errorCode, err, hasGetInitialPropsRun: true };
 };
