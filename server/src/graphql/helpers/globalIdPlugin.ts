@@ -94,7 +94,7 @@ export function globalIdPlugin() {
         // decode any GID args
         const _args = mapValues(args ?? {}, (argValue, argName) => {
           const argConfig = config.args[argName].config;
-          if (argConfig.type === "GID" && isDefined(argValue)) {
+          if (argConfig?.type === "GID" && isDefined(argValue)) {
             const isList = argConfig.list;
             const prefixName = argConfig[PREFIX_NAME] ?? config.type;
             return isList
