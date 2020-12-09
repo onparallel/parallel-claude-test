@@ -2,6 +2,7 @@ import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, User } from "../../db/__types";
 import { userCognitoId } from "./mocks";
+import faker from "faker";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
 import Knex from "knex";
@@ -13,13 +14,6 @@ describe("GraphQL/Contacts", () => {
   let organization: Organization;
   let userContacts: Contact[];
   let mocks: Mocks;
-  const emails = [
-    "santi@parallel.so",
-    "derek@gmail.com",
-    "alex@parallel.so",
-    "mariano@parallel.so",
-    "email.search@parallel.so",
-  ];
 
   beforeAll(async (done) => {
     testClient = await initServer();
@@ -44,7 +38,10 @@ describe("GraphQL/Contacts", () => {
       organization.id,
       5,
       (n) => ({
-        email: emails[n],
+        email:
+          n === 4
+            ? "email.search@parallel.so"
+            : faker.internet.email().toLowerCase(),
       })
     );
     done();
@@ -128,7 +125,7 @@ describe("GraphQL/Contacts", () => {
     });
 
     const orderedContacts = userContacts.sort((a, b) =>
-      a.email > b.email ? -1 : 1
+      b.email.localeCompare(a.email, "en-us", { ignorePunctuation: true })
     );
 
     expect(errors).toBeUndefined();
@@ -155,7 +152,9 @@ describe("GraphQL/Contacts", () => {
     });
 
     const orderedContacts = userContacts.sort((a, b) =>
-      (a.first_name || "") < (b.first_name || "") ? -1 : 1
+      a.first_name!.localeCompare(b.first_name!, "en-us", {
+        ignorePunctuation: true,
+      })
     );
 
     expect(errors).toBeUndefined();
