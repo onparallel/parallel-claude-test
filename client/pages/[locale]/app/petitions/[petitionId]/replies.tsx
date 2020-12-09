@@ -921,18 +921,21 @@ function useCreatePetitionFieldComment() {
             id: variables.petitionFieldId,
             variables: pick(variables, ["hasInternalComments"]),
           };
-          const field = client.readFragment<
-            PetitionReplies_createPetitionFieldComment_PetitionFieldFragment
-          >(options);
-          client.writeFragment<
-            PetitionReplies_createPetitionFieldComment_PetitionFieldFragment
-          >({
-            ...options,
-            data: {
-              ...field,
-              comments: [...field!.comments, data!.createPetitionFieldComment],
-            },
-          });
+          const field = client.readFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
+            options
+          );
+          client.writeFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
+            {
+              ...options,
+              data: {
+                ...field,
+                comments: [
+                  ...field!.comments,
+                  data!.createPetitionFieldComment,
+                ],
+              },
+            }
+          );
         },
       });
     },
@@ -952,15 +955,15 @@ function useUpdatePetitionFieldComment() {
       await updatePetitionFieldComment({
         variables,
         optimisticResponse: () => {
-          const comment = apollo.readFragment<
-            PetitionRepliesFieldComments_PetitionFieldCommentFragment
-          >({
-            fragment:
-              PetitionRepliesFieldComments.fragments.PetitionFieldComment,
-            id: variables.petitionFieldCommentId,
-            fragmentName: "PetitionRepliesFieldComments_PetitionFieldComment",
-            variables: pick(variables, ["hasInternalComments"]),
-          });
+          const comment = apollo.readFragment<PetitionRepliesFieldComments_PetitionFieldCommentFragment>(
+            {
+              fragment:
+                PetitionRepliesFieldComments.fragments.PetitionFieldComment,
+              id: variables.petitionFieldCommentId,
+              fragmentName: "PetitionRepliesFieldComments_PetitionFieldComment",
+              variables: pick(variables, ["hasInternalComments"]),
+            }
+          );
           return {
             updatePetitionFieldComment: {
               ...comment!,
@@ -998,20 +1001,20 @@ function useDeletePetitionFieldComment() {
             `,
             id: variables.petitionFieldId,
           };
-          const field = client.readFragment<
-            PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment
-          >(options);
-          client.writeFragment<
-            PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment
-          >({
-            ...options,
-            data: {
-              ...field,
-              comments: field!.comments.filter(
-                (c) => c.id !== variables.petitionFieldCommentId
-              ),
-            },
-          });
+          const field = client.readFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
+            options
+          );
+          client.writeFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
+            {
+              ...options,
+              data: {
+                ...field,
+                comments: field!.comments.filter(
+                  (c) => c.id !== variables.petitionFieldCommentId
+                ),
+              },
+            }
+          );
         },
       });
     },

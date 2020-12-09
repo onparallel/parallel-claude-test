@@ -44,9 +44,13 @@ function Security() {
   const sections = useSettingsSections();
 
   const [updatePassword] = useUpdatePassword();
-  const { handleSubmit, register, errors, getValues, setError } = useForm<
-    PasswordChangeFormData
-  >();
+  const {
+    handleSubmit,
+    register,
+    errors,
+    getValues,
+    setError,
+  } = useForm<PasswordChangeFormData>();
 
   async function onChangePassword({
     password,

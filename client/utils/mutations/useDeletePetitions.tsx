@@ -41,12 +41,12 @@ export function useDeletePetitions() {
     async (petitionIds: string[]) => {
       try {
         // petition name should always be on cache at this point
-        const cachedPetition = cache.readFragment<
-          ConfirmDeletePetitionsDialog_PetitionBaseFragment
-        >({
-          fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
-          id: petitionIds[0],
-        });
+        const cachedPetition = cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>(
+          {
+            fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
+            id: petitionIds[0],
+          }
+        );
 
         await confirmDelete({
           petitionIds,

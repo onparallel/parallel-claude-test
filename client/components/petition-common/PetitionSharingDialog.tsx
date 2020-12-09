@@ -77,9 +77,12 @@ export function PetitionSharingDialog({
     (up) => up.permissionType === "OWNER" && up.user.id === userId
   );
 
-  const { handleSubmit, register, control, watch } = useForm<
-    PetitionSharingDialogData
-  >({
+  const {
+    handleSubmit,
+    register,
+    control,
+    watch,
+  } = useForm<PetitionSharingDialogData>({
     mode: "onChange",
     defaultValues: {
       users: [],

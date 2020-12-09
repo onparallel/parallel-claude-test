@@ -134,23 +134,26 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             description
           }
         `;
-        const { isDescriptionShown, description } = client.cache.readFragment<
-          updateIsDescriptionShown_PetitionFieldFragment
-        >({
-          fragment,
-          id: fieldId,
-        })!;
-        client.cache.writeFragment<
-          updateIsDescriptionShown_PetitionFieldFragment
-        >({
-          fragment,
-          id: fieldId,
-          data: {
-            __typename: "PetitionField",
-            isDescriptionShown: !isDescriptionShown,
-            description,
-          },
-        });
+        const {
+          isDescriptionShown,
+          description,
+        } = client.cache.readFragment<updateIsDescriptionShown_PetitionFieldFragment>(
+          {
+            fragment,
+            id: fieldId,
+          }
+        )!;
+        client.cache.writeFragment<updateIsDescriptionShown_PetitionFieldFragment>(
+          {
+            fragment,
+            id: fieldId,
+            data: {
+              __typename: "PetitionField",
+              isDescriptionShown: !isDescriptionShown,
+              description,
+            },
+          }
+        );
         if (isDescriptionShown && !!description) {
           await updatePetitionField({
             variables: {
@@ -286,18 +289,18 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleFieldEdit = useCallback(
     wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
-      const field = client.cache.readFragment<
-        onFieldEdit_PetitionFieldFragment
-      >({
-        fragment: gql`
-          fragment onFieldEdit_PetitionField on PetitionField {
-            ...PetitionCompose_PetitionField
-          }
-          ${PetitionCompose.fragments.PetitionField}
-        `,
-        fragmentName: "onFieldEdit_PetitionField",
-        id: fieldId,
-      })!;
+      const field = client.cache.readFragment<onFieldEdit_PetitionFieldFragment>(
+        {
+          fragment: gql`
+            fragment onFieldEdit_PetitionField on PetitionField {
+              ...PetitionCompose_PetitionField
+            }
+            ${PetitionCompose.fragments.PetitionField}
+          `,
+          fragmentName: "onFieldEdit_PetitionField",
+          id: fieldId,
+        }
+      )!;
       await updatePetitionField({
         variables: { petitionId, fieldId, data },
         optimisticResponse: {

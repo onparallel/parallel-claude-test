@@ -168,7 +168,7 @@ const config = {
 
 const plugins = [
   require("@next/bundle-analyzer")({
-    enabled: process.env.ANALYZE === "true",
+    enabled: Boolean(process.env.ANALYZE),
   }),
   require("next-plugin-graphql"),
   // source maps in last place, so it wraps every other plugin

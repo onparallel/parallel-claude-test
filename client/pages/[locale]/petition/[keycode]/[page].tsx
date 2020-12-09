@@ -821,38 +821,40 @@ function useDeletePetitionReply() {
               }
             }
           `;
-          const cachedField = client.readFragment<
-            RecipientView_deletePetitionReply_PublicPetitionFieldFragment
-          >({ id: fieldId, fragment: fieldFragment });
-          client.writeFragment<
-            RecipientView_deletePetitionReply_PublicPetitionFieldFragment
-          >({
-            id: fieldId,
-            fragment: fieldFragment,
-            data: {
-              ...cachedField,
-              replies: cachedField!.replies.filter(({ id }) => id !== replyId),
-            },
-          });
+          const cachedField = client.readFragment<RecipientView_deletePetitionReply_PublicPetitionFieldFragment>(
+            { id: fieldId, fragment: fieldFragment }
+          );
+          client.writeFragment<RecipientView_deletePetitionReply_PublicPetitionFieldFragment>(
+            {
+              id: fieldId,
+              fragment: fieldFragment,
+              data: {
+                ...cachedField,
+                replies: cachedField!.replies.filter(
+                  ({ id }) => id !== replyId
+                ),
+              },
+            }
+          );
           const petitionFragment = gql`
             fragment RecipientView_deletePetitionReply_PublicPetition on PublicPetition {
               status
             }
           `;
-          const cachedPetition = client.readFragment<
-            RecipientView_deletePetitionReply_PublicPetitionFragment
-          >({ id: petitionId, fragment: petitionFragment });
+          const cachedPetition = client.readFragment<RecipientView_deletePetitionReply_PublicPetitionFragment>(
+            { id: petitionId, fragment: petitionFragment }
+          );
           if (cachedPetition?.status === "COMPLETED") {
-            client.writeFragment<
-              RecipientView_deletePetitionReply_PublicPetitionFragment
-            >({
-              id: petitionId,
-              fragment: petitionFragment,
-              data: {
-                ...cachedPetition,
-                status: "PENDING",
-              },
-            });
+            client.writeFragment<RecipientView_deletePetitionReply_PublicPetitionFragment>(
+              {
+                id: petitionId,
+                fragment: petitionFragment,
+                data: {
+                  ...cachedPetition,
+                  status: "PENDING",
+                },
+              }
+            );
           }
         },
       });
@@ -880,9 +882,9 @@ function useCreateTextReply() {
           }
         `;
         const reply = data!.publicCreateTextReply;
-        const cachedField = client.readFragment<
-          RecipientView_createTextReply_FieldFragment
-        >({ id: fieldId, fragment: fieldFragment });
+        const cachedField = client.readFragment<RecipientView_createTextReply_FieldFragment>(
+          { id: fieldId, fragment: fieldFragment }
+        );
         client.writeFragment<RecipientView_createTextReply_FieldFragment>({
           id: fieldId,
           fragment: fieldFragment,
@@ -899,19 +901,19 @@ function useCreateTextReply() {
             status
           }
         `;
-        const cachedPetition = client.readFragment<
-          RecipientView_createTextReply_PublicPetitionFragment
-        >({ id: petitionId, fragment: petitionFragment });
+        const cachedPetition = client.readFragment<RecipientView_createTextReply_PublicPetitionFragment>(
+          { id: petitionId, fragment: petitionFragment }
+        );
         if (cachedPetition?.status === "COMPLETED") {
-          client.writeFragment<
-            RecipientView_createTextReply_PublicPetitionFragment
-          >({
-            id: petitionId,
-            fragment: petitionFragment,
-            data: {
-              status: "PENDING",
-            },
-          });
+          client.writeFragment<RecipientView_createTextReply_PublicPetitionFragment>(
+            {
+              id: petitionId,
+              fragment: petitionFragment,
+              data: {
+                status: "PENDING",
+              },
+            }
+          );
         }
       },
     });
@@ -938,9 +940,9 @@ function useCreateSelectReply() {
           }
         `;
         const reply = data!.publicCreateSelectReply;
-        const cachedField = client.readFragment<
-          RecipientView_createSelectReply_FieldFragment
-        >({ id: fieldId, fragment: fieldFragment });
+        const cachedField = client.readFragment<RecipientView_createSelectReply_FieldFragment>(
+          { id: fieldId, fragment: fieldFragment }
+        );
         client.writeFragment<RecipientView_createSelectReply_FieldFragment>({
           id: fieldId,
           fragment: fieldFragment,
@@ -957,19 +959,19 @@ function useCreateSelectReply() {
             status
           }
         `;
-        const cachedPetition = client.readFragment<
-          RecipientView_createSelectReply_PublicPetitionFragment
-        >({ id: petitionId, fragment: petitionFragment });
+        const cachedPetition = client.readFragment<RecipientView_createSelectReply_PublicPetitionFragment>(
+          { id: petitionId, fragment: petitionFragment }
+        );
         if (cachedPetition?.status === "COMPLETED") {
-          client.writeFragment<
-            RecipientView_createSelectReply_PublicPetitionFragment
-          >({
-            id: petitionId,
-            fragment: petitionFragment,
-            data: {
-              status: "PENDING",
-            },
-          });
+          client.writeFragment<RecipientView_createSelectReply_PublicPetitionFragment>(
+            {
+              id: petitionId,
+              fragment: petitionFragment,
+              data: {
+                status: "PENDING",
+              },
+            }
+          );
         }
       },
     });
@@ -996,40 +998,40 @@ function useCreateFileUploadReply() {
             }
           `;
           const { reply } = data!.publicCreateFileUploadReply;
-          const cachedField = client.readFragment<
-            RecipientView_createFileUploadReply_FieldFragment
-          >({ id: fieldId, fragment: fieldFragment });
-          client.writeFragment<
-            RecipientView_createFileUploadReply_FieldFragment
-          >({
-            id: fieldId,
-            fragment: fieldFragment,
-            data: {
-              __typename: "PublicPetitionField",
-              replies: [
-                ...cachedField!.replies,
-                pick(reply, ["id", "__typename"]),
-              ],
-            },
-          });
+          const cachedField = client.readFragment<RecipientView_createFileUploadReply_FieldFragment>(
+            { id: fieldId, fragment: fieldFragment }
+          );
+          client.writeFragment<RecipientView_createFileUploadReply_FieldFragment>(
+            {
+              id: fieldId,
+              fragment: fieldFragment,
+              data: {
+                __typename: "PublicPetitionField",
+                replies: [
+                  ...cachedField!.replies,
+                  pick(reply, ["id", "__typename"]),
+                ],
+              },
+            }
+          );
           const petitionFragment = gql`
             fragment RecipientView_createFileUploadReply_PublicPetition on PublicPetition {
               status
             }
           `;
-          const cachedPetition = client.readFragment<
-            RecipientView_createFileUploadReply_PublicPetitionFragment
-          >({ id: petitionId, fragment: petitionFragment });
+          const cachedPetition = client.readFragment<RecipientView_createFileUploadReply_PublicPetitionFragment>(
+            { id: petitionId, fragment: petitionFragment }
+          );
           if (cachedPetition?.status === "COMPLETED") {
-            client.writeFragment<
-              RecipientView_createFileUploadReply_PublicPetitionFragment
-            >({
-              id: petitionId,
-              fragment: petitionFragment,
-              data: {
-                status: "PENDING",
-              },
-            });
+            client.writeFragment<RecipientView_createFileUploadReply_PublicPetitionFragment>(
+              {
+                id: petitionId,
+                fragment: petitionFragment,
+                data: {
+                  status: "PENDING",
+                },
+              }
+            );
           }
         },
       });
@@ -1066,21 +1068,21 @@ function useCreatePetitionFieldComment() {
               "RecipientView_createPetitionFieldComment_PublicPetitionField",
             id: variables.petitionFieldId,
           };
-          const field = client.readFragment<
-            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
-          >(options);
-          client.writeFragment<
-            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
-          >({
-            ...options,
-            data: {
-              ...field,
-              comments: [
-                ...field!.comments,
-                data!.publicCreatePetitionFieldComment,
-              ],
-            },
-          });
+          const field = client.readFragment<RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment>(
+            options
+          );
+          client.writeFragment<RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment>(
+            {
+              ...options,
+              data: {
+                ...field,
+                comments: [
+                  ...field!.comments,
+                  data!.publicCreatePetitionFieldComment,
+                ],
+              },
+            }
+          );
         },
       });
     },
@@ -1100,14 +1102,14 @@ function useUpdatePetitionFieldComment() {
       await updatePetitionFieldComment({
         variables,
         optimisticResponse: () => {
-          const comment = apollo.readFragment<
-            RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
-          >({
-            fragment:
-              RecipientViewPetitionFieldCommentsDialog.fragments
-                .PublicPetitionFieldComment,
-            id: variables.petitionFieldCommentId,
-          });
+          const comment = apollo.readFragment<RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment>(
+            {
+              fragment:
+                RecipientViewPetitionFieldCommentsDialog.fragments
+                  .PublicPetitionFieldComment,
+              id: variables.petitionFieldCommentId,
+            }
+          );
           return {
             publicUpdatePetitionFieldComment: {
               ...comment!,
@@ -1145,20 +1147,20 @@ function useDeletePetitionFieldComment() {
             `,
             id: variables.petitionFieldId,
           };
-          const field = client.readFragment<
-            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
-          >(options);
-          client.writeFragment<
-            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
-          >({
-            ...options,
-            data: {
-              ...field,
-              comments: field!.comments.filter(
-                (c) => c.id !== variables.petitionFieldCommentId
-              ),
-            },
-          });
+          const field = client.readFragment<RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment>(
+            options
+          );
+          client.writeFragment<RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment>(
+            {
+              ...options,
+              data: {
+                ...field,
+                comments: field!.comments.filter(
+                  (c) => c.id !== variables.petitionFieldCommentId
+                ),
+              },
+            }
+          );
         },
       });
     },
