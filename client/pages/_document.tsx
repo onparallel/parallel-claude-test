@@ -45,7 +45,7 @@ class MyDocument extends Document<MyDocumentProps> {
     const { locale } = this.props;
     return (
       <Html lang={locale}>
-        <Head crossOrigin="anonymous">
+        <Head>
           <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
           <link href="https://polyfill.io" rel="preconnect" />
           <link
@@ -79,7 +79,7 @@ class MyDocument extends Document<MyDocumentProps> {
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
             crossOrigin="anonymous"
           />
-          <NextScript crossOrigin="anonymous" />
+          <NextScript />
         </body>
       </Html>
     );
