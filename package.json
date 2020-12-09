@@ -8,7 +8,7 @@
     "e2e"
   ],
   "scripts": {
-    "lint": "eslint '*/**/*.{js,ts,tsx,json}'",
+    "lint": "eslint --config .eslintrc.js .",
     "update-deps": "ncu -u && ncu -u --packageFile bin/package.json && ncu -u --packageFile client/package.json && ncu -u --packageFile server/package.json  && ncu -u --packageFile e2e/package.json"
   },
   "devDependencies": {
