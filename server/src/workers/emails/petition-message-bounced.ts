@@ -13,9 +13,8 @@ export async function petitionMessageBounced(
     payload.email_log_id
   );
   if (!message) {
-    throw new Error(
-      `Petition message not found for email_log_id ${payload.email_log_id}`
-    );
+    // if the bounce doesn't come from a PetitionMessage, ignore it
+    return;
   }
   const [petition, sender, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
@@ -58,6 +57,7 @@ export async function petitionMessageBounced(
     {
       senderName: fullName(sender.first_name, sender.last_name)!,
       petitionId: toGlobalId("Petition", petition.id),
+      petitionName: petition.name,
       body: message.email_body ? JSON.parse(message.email_body) : [],
       contactEmail: contact.email,
       contactFullName: fullName(contact.first_name, contact.last_name)!,

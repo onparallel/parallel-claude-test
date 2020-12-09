@@ -27,6 +27,7 @@ export type LayoutProps = {
   logoAlt: string;
   assetsUrl: string;
   showGdprDisclaimer?: boolean;
+  contentHeading?: Element | null;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -37,6 +38,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   assetsUrl,
   children,
   showGdprDisclaimer,
+  contentHeading,
 }) {
   const { locale } = useIntl();
   return (
@@ -76,6 +78,7 @@ export const Layout: FC<LayoutProps> = function Layout({
 
         {/* Content */}
         <MjmlWrapper padding="1px" backgroundColor="#A0AEC0" borderRadius="4px">
+          {contentHeading}
           <MjmlWrapper padding="0" backgroundColor="#ffffff" borderRadius="3px">
             {children}
           </MjmlWrapper>

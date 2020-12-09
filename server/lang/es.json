@@ -206,8 +206,8 @@
   },
   {
     "term": "petition-message-bounced.intro-text",
-    "definition": "No pudimos entregar el mensaje que acabas de enviar a {contactFullName} ({contactEmail}):",
-    "context": "We couldn't deliver the message you just sent to {contactFullName} ({contactEmail}):"
+    "definition": "No hemos podido entregar la petición {petitionName} que enviaste a {contactFullName} ({contactEmail}):",
+    "context": "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):"
   },
   {
     "term": "petition-message-bounced.intro-text-2",

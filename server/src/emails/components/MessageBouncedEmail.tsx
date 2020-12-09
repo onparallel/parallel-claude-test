@@ -1,4 +1,4 @@
-import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
+import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
 import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
@@ -15,6 +15,7 @@ export type MessageBouncedEmailProps = {
   contactEmail: string;
   contactFullName: string | null;
   petitionId: string;
+  petitionName: string | null;
   body: any | null;
 } & LayoutProps;
 
@@ -37,20 +38,37 @@ const email: Email<MessageBouncedEmailProps> = {
       contactEmail,
       contactFullName,
       petitionId,
+      petitionName,
       parallelUrl,
       body,
     }: MessageBouncedEmailProps,
     intl: IntlShape
   ) {
     return outdent`
+      ${intl
+        .formatMessage({
+          id: "generic.action-required",
+          defaultMessage: "Action required",
+        })
+        .toUpperCase()}
+
       ${greeting({ name: senderName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-message-bounced.intro-text",
           defaultMessage:
-            "We couldn't deliver the message you just sent to {contactFullName} ({contactEmail}):",
+            "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):",
         },
-        { contactFullName, contactEmail }
+        {
+          contactFullName,
+          contactEmail,
+          petitionName:
+            petitionName ??
+            intl.formatMessage({
+              id: "generic.untitled-petition",
+              defaultMessage: "Untitled petition",
+            }),
+        }
       )}
 
       ${renderSlateText(body)}
@@ -79,41 +97,56 @@ const email: Email<MessageBouncedEmailProps> = {
     contactEmail,
     contactFullName,
     petitionId,
+    petitionName,
     parallelUrl,
     assetsUrl,
     logoUrl,
     logoAlt,
   }: MessageBouncedEmailProps) {
-    const { locale } = useIntl();
+    const intl = useIntl();
     return (
       <Layout
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
         logoAlt={logoAlt}
+        contentHeading={
+          <MjmlWrapper backgroundColor="#6059f7" borderRadius="3px">
+            <MjmlText
+              align="center"
+              color="white"
+              fontWeight={600}
+              textTransform="uppercase"
+            >
+              <FormattedMessage
+                id="generic.action-required"
+                defaultMessage="Action required"
+              />
+            </MjmlText>
+          </MjmlWrapper>
+        }
       >
-        <MjmlSection backgroundColor="#6059f7" borderRadius="4px">
-          <MjmlText
-            align="center"
-            color="white"
-            fontWeight={600}
-            textTransform="uppercase"
-          >
-            <FormattedMessage
-              id="generic.action-required"
-              defaultMessage="Action required"
-            />
-          </MjmlText>
-        </MjmlSection>
-
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
             <Greeting name={senderName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-message-bounced.intro-text"
-                defaultMessage="We couldn't deliver the message you just sent to {contactFullName} ({contactEmail}):"
-                values={{ contactFullName, contactEmail }}
+                defaultMessage="We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):"
+                values={{
+                  contactFullName,
+                  contactEmail,
+                  petitionName: petitionName ? (
+                    <b>{petitionName}</b>
+                  ) : (
+                    <i>
+                      {intl.formatMessage({
+                        id: "generic.untitled-petition",
+                        defaultMessage: "Untitled petition",
+                      })}
+                    </i>
+                  ),
+                }}
               />
             </MjmlText>
           </MjmlColumn>
@@ -144,7 +177,7 @@ const email: Email<MessageBouncedEmailProps> = {
         <MjmlSection paddingTop="0px">
           <MjmlColumn>
             <Button
-              href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/activity`}
+              href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity`}
             >
               <FormattedMessage
                 id="petition-sharing-notification.access-button"
@@ -166,9 +199,10 @@ export const props: MessageBouncedEmailProps = {
   contactEmail: "mariano@parallels.so",
   contactFullName: "Mariano Rodriguez",
   petitionId: "1234567890",
+  petitionName: "Know your Client",
   parallelUrl: "http://localhost",
   assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
+  logoUrl: "https://static-staging.parallel.so/static/emails/logo.png",
   logoAlt: "Parallel",
   body: [{ children: [{ text: "Completame los siguientes datos porfa" }] }],
 };
