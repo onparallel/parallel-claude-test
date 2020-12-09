@@ -431,7 +431,7 @@ const PetitionHeaderTab = forwardRef(function (
   );
   if (isDisabled) {
     return (
-      <SmallPopover placement="right" content={popoverContent ?? null}>
+      <SmallPopover placement="bottom" content={popoverContent ?? null}>
         {link}
       </SmallPopover>
     );

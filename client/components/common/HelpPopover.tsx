@@ -1,5 +1,4 @@
-import { forwardRef, Placement } from "@chakra-ui/core";
-import { HTMLChakraProps } from "@chakra-ui/system";
+import { forwardRef, IconProps, Placement } from "@chakra-ui/core";
 import { QuestionIcon } from "@parallel/chakra/icons";
 import { ReactNode } from "react";
 import { SmallPopover } from "../common/SmallPopover";
@@ -7,7 +6,7 @@ import { SmallPopover } from "../common/SmallPopover";
 export type HelpPopoverProps = {
   children: ReactNode;
   placement?: Placement;
-} & HTMLChakraProps<"svg">;
+} & IconProps;
 
 export const HelpPopover = forwardRef<HelpPopoverProps, "svg">(function (
   { children, placement = "bottom", ...props },

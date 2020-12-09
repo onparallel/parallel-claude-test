@@ -16,7 +16,6 @@
     "@apollo/react-common": "^3.1.4",
     "@apollo/react-ssr": "^4.0.0",
     "@chakra-ui/core": "1.0.0-rc.5",
-    "@chakra-ui/system": "1.0.0-rc.5",
     "@chakra-ui/theme": "1.0.0-rc.5",
     "@chakra-ui/theme-tools": "1.0.0-rc.5",
     "@formatjs/intl-utils": "^3.8.4",
