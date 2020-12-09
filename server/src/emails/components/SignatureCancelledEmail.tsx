@@ -3,11 +3,9 @@ import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { Closing } from "../common/Closing";
-
-import { Greeting } from "../common/Greeting";
+import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greeting } from "../common/texts";
+import { closing, greetingFormal } from "../common/texts";
 
 type SignatureCancelledProps = {
   documentName: string | null;
@@ -34,7 +32,7 @@ const email: Email<SignatureCancelledProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greeting({ name: signerName }, intl)}
+      ${greetingFormal({ fullName: signerName }, intl)}
       ${intl.formatMessage(
         {
           id: "signature-cancelled.text",
@@ -70,7 +68,7 @@ const email: Email<SignatureCancelledProps> = {
       >
         <MjmlSection>
           <MjmlColumn>
-            <Greeting name={signerName} />
+            <GreetingFormal fullName={signerName} />
             <MjmlText>
               <FormattedMessage
                 id="signature-cancelled.text"
@@ -80,7 +78,6 @@ const email: Email<SignatureCancelledProps> = {
                 }}
               />
             </MjmlText>
-            <Closing />
           </MjmlColumn>
         </MjmlSection>
       </Layout>
