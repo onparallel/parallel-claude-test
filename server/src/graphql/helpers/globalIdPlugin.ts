@@ -1,5 +1,11 @@
 import { core, dynamicOutputMethod, plugin } from "@nexus/schema";
-import { GraphQLResolveInfo } from "graphql";
+import {
+  GraphQLInputType,
+  GraphQLResolveInfo,
+  isListType,
+  isNonNullType,
+  isScalarType,
+} from "graphql";
 import { mapValues, omit } from "remeda";
 import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
@@ -78,6 +84,36 @@ export function globalIdArg(
 
 const PREFIX_NAME = Symbol.for("PREFIX_NAME");
 
+function isMaybeGlobalIdType(type: GraphQLInputType): boolean {
+  if (isScalarType(type)) {
+    return type.name === "GID";
+  } else if (isNonNullType(type)) {
+    return isMaybeGlobalIdType(type.ofType);
+  }
+  return false;
+}
+
+function isMaybeListOfMaybeGlobalIdType(type: GraphQLInputType): boolean {
+  if (isListType(type)) {
+    return isMaybeGlobalIdType(type.ofType);
+  } else if (isNonNullType(type)) {
+    return isMaybeListOfMaybeGlobalIdType(type.ofType);
+  }
+  return false;
+}
+
+function getPrefixName(arg: core.AllNexusArgsDefs): string {
+  if (arg instanceof core.NexusNonNullDef) {
+    return getPrefixName(arg.ofNexusType);
+  } else if (arg instanceof core.NexusListDef) {
+    return getPrefixName(arg.ofNexusType);
+  } else if (arg instanceof core.NexusArgDef && arg.name === "GID") {
+    return (arg.value as any)[PREFIX_NAME] as string;
+  } else {
+    throw new Error("Missing prefixName on globalIdArg options");
+  }
+}
+
 export function globalIdPlugin() {
   // Define the plugin with the appropriate configuration.
   return plugin({
@@ -88,18 +124,24 @@ export function globalIdPlugin() {
         bindings: ["GlobalIdConfigSpread"],
       }),
     ],
-    onCreateFieldResolver({ fieldConfig, schemaExtension, ...a }) {
+    onCreateFieldResolver({ fieldConfig }) {
       const config = fieldConfig.extensions?.nexus?.config;
       return async function (root, args, ctx, info, next) {
         // decode any GID args
         const _args = mapValues(args ?? {}, (argValue, argName) => {
-          const argConfig = config.args[argName].config;
-          if (argConfig?.type === "GID" && isDefined(argValue)) {
-            const isList = argConfig.list;
-            const prefixName = argConfig[PREFIX_NAME] ?? config.type;
-            return isList
-              ? fromGlobalIds(argValue as string[], prefixName).ids
-              : fromGlobalId(argValue as string, prefixName).id;
+          const type = fieldConfig.args![argName as string].type;
+          const argConfig = config.args[argName] as core.AllNexusArgsDefs;
+          if (isMaybeGlobalIdType(type)) {
+            return isDefined(argValue)
+              ? fromGlobalId(argValue as string, getPrefixName(argConfig)).id
+              : argValue;
+          } else if (isMaybeListOfMaybeGlobalIdType(type)) {
+            return isDefined(argValue)
+              ? fromGlobalIds(
+                  argValue as (string | null)[],
+                  getPrefixName(argConfig)
+                ).ids
+              : argValue;
           }
           return argValue;
         });
