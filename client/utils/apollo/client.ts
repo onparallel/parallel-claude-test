@@ -70,12 +70,7 @@ export function createApolloClient(
     ssrMode: !process.browser,
     cache: new InMemoryCache({
       dataIdFromObject: (o) => o.id as string,
-      possibleTypes: Object.fromEntries(
-        fragmentMatcher.__schema.types.map(({ name, possibleTypes }) => [
-          name,
-          possibleTypes.map((t) => t.name),
-        ])
-      ),
+      possibleTypes: fragmentMatcher.possibleTypes,
       typePolicies: {
         Petition: {
           fields: {

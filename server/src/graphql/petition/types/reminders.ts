@@ -32,9 +32,8 @@ export const PetitionReminder = objectType({
         return (await ctx.petitions.loadAccess(root.petition_access_id))!;
       },
     });
-    t.field("sender", {
+    t.nullable.field("sender", {
       type: "User",
-      nullable: true,
       description: "The sender of this petition message.",
       resolve: async (root, _, ctx) => {
         return root.sender_id

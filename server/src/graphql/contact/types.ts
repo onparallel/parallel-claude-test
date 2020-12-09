@@ -12,19 +12,16 @@ export const Contact = objectType({
     t.string("email", {
       description: "The email of the contact.",
     });
-    t.string("firstName", {
+    t.nullable.string("firstName", {
       description: "The first name of the contact.",
-      nullable: true,
       resolve: (o) => o.first_name,
     });
-    t.string("lastName", {
+    t.nullable.string("lastName", {
       description: "The last name of the contact.",
-      nullable: true,
       resolve: (o) => o.last_name,
     });
-    t.string("fullName", {
+    t.nullable.string("fullName", {
       description: "The full name of the contact.",
-      nullable: true,
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
     t.paginationField("accesses", {

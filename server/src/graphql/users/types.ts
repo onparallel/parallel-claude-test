@@ -1,4 +1,4 @@
-import { arg, enumType, objectType } from "@nexus/schema";
+import { arg, enumType, nonNull, objectType } from "@nexus/schema";
 import { rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
 
@@ -37,19 +37,16 @@ export const User = objectType({
     t.string("email", {
       description: "The email of the user.",
     });
-    t.string("firstName", {
+    t.nullable.string("firstName", {
       description: "The first name of the user.",
-      nullable: true,
       resolve: (o) => o.first_name,
     });
-    t.string("lastName", {
+    t.nullable.string("lastName", {
       description: "The last name of the user.",
-      nullable: true,
       resolve: (o) => o.last_name,
     });
-    t.string("fullName", {
+    t.nullable.string("fullName", {
       description: "The full name of the user.",
-      nullable: true,
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
     t.field("organization", {
@@ -66,10 +63,7 @@ export const User = objectType({
     t.boolean("hasFeatureFlag", {
       authorize: rootIsContextUser(),
       args: {
-        featureFlag: arg({
-          type: "FeatureFlag",
-          nullable: false,
-        }),
+        featureFlag: nonNull(arg({ type: "FeatureFlag" })),
       },
       resolve: async (root, { featureFlag }, ctx) => {
         return ctx.featureFlags.userHasFeatureFlag(root.id, featureFlag);

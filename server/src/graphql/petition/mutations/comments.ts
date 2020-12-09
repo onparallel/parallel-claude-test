@@ -1,4 +1,10 @@
-import { booleanArg, mutationField, stringArg } from "@nexus/schema";
+import {
+  booleanArg,
+  list,
+  mutationField,
+  nonNull,
+  stringArg,
+} from "@nexus/schema";
 import {
   and,
   authenticate,
@@ -37,13 +43,11 @@ export const createPetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldReplyId: globalIdArg("PetitionFieldReply", {
-        required: false,
-      }),
-      content: stringArg({ required: true }),
-      isInternal: booleanArg({ required: false }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      petitionFieldReplyId: globalIdArg("PetitionFieldReply"),
+      content: nonNull(stringArg()),
+      isInternal: booleanArg(),
     },
     resolve: async (_, args, ctx) => {
       const comment = await ctx.petitions.createPetitionFieldCommentFromUser(
@@ -90,11 +94,9 @@ export const deletePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
-        required: true,
-      }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
     },
     resolve: async (_, args, ctx) => {
       await ctx.petitions.deletePetitionFieldCommentFromUser(
@@ -123,12 +125,10 @@ export const updatePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
-        required: true,
-      }),
-      content: stringArg({ required: true }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
+      content: nonNull(stringArg()),
     },
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.updatePetitionFieldCommentFromUser(
@@ -144,11 +144,10 @@ export const submitUnpublishedComments = mutationField(
   "submitUnpublishedComments",
   {
     description: "Submits all unpublished comments.",
-    type: "PetitionFieldComment",
-    list: [true],
+    type: list(nonNull("PetitionFieldComment")),
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
+      petitionId: nonNull(globalIdArg("Petition")),
     },
     resolve: async (_, args, ctx) => {
       const {
@@ -173,8 +172,7 @@ export const markPetitionFieldCommentsAsRead = mutationField(
   "markPetitionFieldCommentsAsRead",
   {
     description: "Marks the specified comments as read.",
-    type: "PetitionFieldComment",
-    list: [true],
+    type: list(nonNull("PetitionFieldComment")),
     authorize: chain(
       authenticate(),
       and(
@@ -183,11 +181,10 @@ export const markPetitionFieldCommentsAsRead = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      petitionFieldCommentIds: globalIdArg("PetitionFieldComment", {
-        required: true,
-        list: [true],
-      }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldCommentIds: nonNull(
+        list(nonNull(globalIdArg("PetitionFieldComment")))
+      ),
     },
     validateArgs: notEmptyArray(
       prop("petitionFieldCommentIds"),

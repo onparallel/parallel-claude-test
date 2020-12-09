@@ -1,8 +1,8 @@
 import { Arg } from "../../helpers/authorize";
-import { FieldAuthorizeResolver } from "@nexus/schema";
 import { unMaybeArray } from "../../../util/arrays";
 import { MaybeArray } from "../../../util/types";
 import { isDefined } from "../../../util/remedaExtensions";
+import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 
 export function userHasAccessToUsers<
   TypeName extends string,
@@ -11,7 +11,7 @@ export function userHasAccessToUsers<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const userIds = unMaybeArray(args[argName]);
+      const userIds = unMaybeArray(args[argName] as MaybeArray<number>);
       if (userIds.length === 0) {
         return true;
       }
@@ -31,7 +31,7 @@ export function userIsCommentAuthor<
 >(argNameCommentId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const comment = await ctx.petitions.loadPetitionFieldComment(
-      args[argNameCommentId] as number
+      (args[argNameCommentId] as unknown) as number
     );
     return (comment && comment.user_id === ctx.user!.id) ?? false;
   };

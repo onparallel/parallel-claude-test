@@ -59,9 +59,9 @@ export class Cognito {
     verificationCode: string,
     newPasword: string
   ) {
-    return await new Promise<any>((resolve, reject) =>
+    return await new Promise<void>((resolve, reject) =>
       this.getUser(email).confirmPassword(verificationCode, newPasword, {
-        onSuccess: resolve,
+        onSuccess: () => resolve(),
         onFailure: reject,
       })
     );

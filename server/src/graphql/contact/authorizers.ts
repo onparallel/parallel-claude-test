@@ -1,4 +1,4 @@
-import { FieldAuthorizeResolver } from "@nexus/schema";
+import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
@@ -12,7 +12,7 @@ export function userHasAccessToContacts<
     try {
       return ctx.contacts.userHasAccessToContacts(
         ctx.user!,
-        unMaybeArray(args[argName])
+        unMaybeArray(args[argName] as MaybeArray<number>)
       );
     } catch {}
     return false;

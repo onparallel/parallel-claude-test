@@ -1,4 +1,11 @@
-import { mutationField, arg, booleanArg, stringArg } from "@nexus/schema";
+import {
+  mutationField,
+  arg,
+  booleanArg,
+  stringArg,
+  nonNull,
+  list,
+} from "@nexus/schema";
 import { chain, and, authenticate } from "../../helpers/authorize";
 import { userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
@@ -13,8 +20,7 @@ export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
   {
     description: "Transfers petition ownership to a given user",
-    type: "Petition",
-    list: [true],
+    type: list(nonNull("Petition")),
     authorize: chain(
       authenticate(),
       and(
@@ -23,8 +29,8 @@ export const transferPetitionOwnership = mutationField(
       )
     ),
     args: {
-      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
-      userId: globalIdArg("User", { required: true }),
+      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+      userId: nonNull(globalIdArg("User")),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds")
@@ -43,8 +49,7 @@ export const addPetitionUserPermission = mutationField(
   "addPetitionUserPermission",
   {
     description: "Adds permissions on given petitions and users",
-    type: "Petition",
-    list: [true],
+    type: list(nonNull("Petition")),
     authorize: chain(
       authenticate(),
       and(
@@ -53,20 +58,14 @@ export const addPetitionUserPermission = mutationField(
       )
     ),
     args: {
-      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
-      userIds: globalIdArg("User", { required: true, list: [true] }),
-      permissionType: arg({
-        type: "PetitionUserPermissionTypeRW",
-        required: true,
-      }),
+      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+      userIds: nonNull(list(nonNull(globalIdArg("User")))),
+      permissionType: nonNull(arg({ type: "PetitionUserPermissionTypeRW" })),
       notify: booleanArg({
         description: "Wether to notify the user via email or not.",
-        required: false,
         default: false,
       }),
-      message: stringArg({
-        required: false,
-      }),
+      message: stringArg(),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
@@ -100,8 +99,7 @@ export const editPetitionUserPermission = mutationField(
   "editPetitionUserPermission",
   {
     description: "Edits permissions on given petitions and users",
-    type: "Petition",
-    list: [true],
+    type: list(nonNull("Petition")),
     authorize: chain(
       authenticate(),
       and(
@@ -110,12 +108,9 @@ export const editPetitionUserPermission = mutationField(
       )
     ),
     args: {
-      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
-      userIds: globalIdArg("User", { required: true, list: [true] }),
-      permissionType: arg({
-        type: "PetitionUserPermissionType",
-        required: true,
-      }),
+      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+      userIds: nonNull(list(nonNull(globalIdArg("User")))),
+      permissionType: nonNull(arg({ type: "PetitionUserPermissionType" })),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
@@ -148,8 +143,7 @@ export const removePetitionUserPermission = mutationField(
   "removePetitionUserPermission",
   {
     description: "Removes permissions on given petitions and users",
-    type: "Petition",
-    list: [true],
+    type: list(nonNull("Petition")),
     authorize: chain(
       authenticate(),
       and(
@@ -158,8 +152,8 @@ export const removePetitionUserPermission = mutationField(
       )
     ),
     args: {
-      petitionIds: globalIdArg("Petition", { required: true, list: [true] }),
-      userIds: globalIdArg("User", { required: true, list: [true] }),
+      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+      userIds: nonNull(list(nonNull(globalIdArg("User")))),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
@@ -183,8 +177,8 @@ export const updatePetitionUserSubscription = mutationField(
     type: "Petition",
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      isSubscribed: booleanArg({ required: true }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      isSubscribed: nonNull(booleanArg()),
     },
     resolve: async (_, { petitionId, isSubscribed }, ctx) => {
       await ctx.petitions.updatePetitionUser(

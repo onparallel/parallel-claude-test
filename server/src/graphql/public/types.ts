@@ -6,23 +6,20 @@ export const PublicPetitionAccess = objectType({
   rootTyping: "db.PetitionAccess",
   description: "A public view of a petition access",
   definition(t) {
-    t.field("petition", {
+    t.nullable.field("petition", {
       type: "PublicPetition",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetition(root.petition_id);
       },
     });
-    t.field("granter", {
+    t.nullable.field("granter", {
       type: "PublicUser",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.granter_id);
       },
     });
-    t.field("contact", {
+    t.nullable.field("contact", {
       type: "PublicContact",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadContact(root.contact_id);
       },
@@ -40,9 +37,8 @@ export const PublicPetition = objectType({
       description: "The ID of the petition.",
       prefixName: "Petition",
     });
-    t.datetime("deadline", {
+    t.nullable.datetime("deadline", {
       description: "The deadline of the petition.",
-      nullable: true,
     });
     t.field("locale", {
       type: "PetitionLocale",
@@ -53,18 +49,15 @@ export const PublicPetition = objectType({
       description: "The status of the petition.",
       resolve: (o) => o.status!,
     });
-    t.field("fields", {
+    t.list.nonNull.field("fields", {
       type: "PublicPetitionField",
-      list: [true],
       description: "The field definition of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
-    t.field("signers", {
+    t.list.nullable.field("signers", {
       type: "PublicContact",
-      list: [false],
-      nullable: false,
       description: "The signers of the petition",
       resolve: async (root, _, ctx) => {
         if (!root.signature_config || !root.signature_config.contactIds) {
@@ -91,17 +84,14 @@ export const PublicPetitionField = objectType({
       type: "PetitionFieldType",
       description: "The type of the petition field.",
     });
-    t.string("title", {
-      nullable: true,
+    t.nullable.string("title", {
       description: "The title of the petition field.",
     });
-    t.string("description", {
-      nullable: true,
+    t.nullable.string("description", {
       description: "The description of the petition field.",
     });
-    t.jsonObject("options", {
+    t.nullable.jsonObject("options", {
       description: "The options of the petition.",
-      nullable: true,
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -117,17 +107,15 @@ export const PublicPetitionField = objectType({
       description: "Determines if the field accepts replies",
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
-    t.field("replies", {
+    t.list.nonNull.field("replies", {
       type: "PublicPetitionFieldReply",
-      list: [true],
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadRepliesForField(root.id);
       },
     });
-    t.field("comments", {
+    t.list.nonNull.field("comments", {
       type: "PublicPetitionFieldComment",
-      list: [true],
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionFieldCommentsForFieldAndAccess({
@@ -152,19 +140,16 @@ export const PublicUser = objectType({
     t.string("email", {
       description: "The email of the user.",
     });
-    t.string("firstName", {
+    t.nullable.string("firstName", {
       description: "The first name of the user.",
-      nullable: true,
       resolve: (o) => o.first_name,
     });
-    t.string("lastName", {
+    t.nullable.string("lastName", {
       description: "The last name of the user.",
-      nullable: true,
       resolve: (o) => o.last_name,
     });
-    t.string("fullName", {
+    t.nullable.string("fullName", {
       description: "The full name of the user.",
-      nullable: true,
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
     t.field("organization", {
@@ -192,9 +177,8 @@ export const PublicOrganization = objectType({
     t.string("identifier", {
       description: "The identifier of the organization.",
     });
-    t.string("logoUrl", {
+    t.nullable.string("logoUrl", {
       description: "The logo of the organization.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.organizations.getOrgLogoUrl(root.id);
       },
@@ -254,19 +238,16 @@ export const PublicContact = objectType({
     t.string("email", {
       description: "The email of the user.",
     });
-    t.string("firstName", {
+    t.nullable.string("firstName", {
       description: "The first name of the user.",
-      nullable: true,
       resolve: (o) => o.first_name,
     });
-    t.string("lastName", {
+    t.nullable.string("lastName", {
       description: "The last name of the user.",
-      nullable: true,
       resolve: (o) => o.last_name,
     });
-    t.string("fullName", {
+    t.nullable.string("fullName", {
       description: "The full name of the user.",
-      nullable: true,
       resolve: (o) => fullName(o.first_name, o.last_name),
     });
   },
@@ -276,14 +257,12 @@ export const PublicUserOrContact = unionType({
   name: "PublicUserOrContact",
   definition(t) {
     t.members("PublicUser", "PublicContact");
-    t.resolveType((o) => {
-      if (["User", "Contact"].includes(o.__type)) {
-        return `Public${o.__type}` as core.AbstractResolveReturn<
-          "PublicUserOrContact"
-        >;
-      }
-      throw new Error("Missing __type on PublicUserOrContact");
-    });
+  },
+  resolveType: (o) => {
+    if (["User", "Contact"].includes(o.__type)) {
+      return `Public${o.__type}` as core.AbstractResolveReturn<"PublicUserOrContact">;
+    }
+    throw new Error("Missing __type on PublicUserOrContact");
   },
   rootTyping: /* ts */ `
     | ({__type: "Contact"} & NexusGenRootTypes["Contact"])
@@ -300,10 +279,9 @@ export const PublicPetitionFieldComment = objectType({
       description: "The ID of the petition field comment.",
       prefixName: "PetitionFieldComment",
     });
-    t.field("author", {
+    t.nullable.field("author", {
       type: "PublicUserOrContact",
       description: "The author of the comment.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         if (root.user_id !== null) {
           const user = await ctx.users.loadUser(root.user_id);
@@ -322,19 +300,17 @@ export const PublicPetitionFieldComment = objectType({
     t.string("content", {
       description: "The content of the comment.",
     });
-    t.field("reply", {
+    t.nullable.field("reply", {
       description: "The reply the comment is refering to.",
       type: "PublicPetitionFieldReply",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return root.petition_field_reply_id !== null
           ? await ctx.petitions.loadFieldReply(root.petition_field_reply_id)
           : null;
       },
     });
-    t.datetime("publishedAt", {
+    t.nullable.datetime("publishedAt", {
       description: "Time when the comment was published.",
-      nullable: true,
       resolve: (o) => o.published_at,
     });
     t.boolean("isUnread", {

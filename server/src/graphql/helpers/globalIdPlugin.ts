@@ -137,7 +137,6 @@ export function globalIdPlugin() {
           },
         })
       );
-      return { types: [] };
     },
   });
 }

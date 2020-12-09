@@ -134,7 +134,7 @@ export const supportMethods: {
         },
         {
           name: "password",
-          description: "Temporary of the user",
+          description: "Temporary password of the user",
           type: {
             kind: "NON_NULL",
             name: null,

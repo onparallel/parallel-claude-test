@@ -7,56 +7,56 @@ export const PetitionEvent = interfaceType({
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });
-    t.resolveType((p) => {
-      switch (p.type) {
-        case "PETITION_CREATED":
-          return "PetitionCreatedEvent";
-        case "PETITION_COMPLETED":
-          return "PetitionCompletedEvent";
-        case "ACCESS_ACTIVATED":
-          return "AccessActivatedEvent";
-        case "ACCESS_DEACTIVATED":
-          return "AccessDeactivatedEvent";
-        case "ACCESS_OPENED":
-          return "AccessOpenedEvent";
-        case "MESSAGE_SCHEDULED":
-          return "MessageScheduledEvent";
-        case "MESSAGE_CANCELLED":
-          return "MessageCancelledEvent";
-        case "MESSAGE_SENT":
-          return "MessageSentEvent";
-        case "REMINDER_SENT":
-          return "ReminderSentEvent";
-        case "REPLY_CREATED":
-          return "ReplyCreatedEvent";
-        case "REPLY_DELETED":
-          return "ReplyDeletedEvent";
-        case "COMMENT_PUBLISHED":
-          return "CommentPublishedEvent";
-        case "COMMENT_DELETED":
-          return "CommentDeletedEvent";
-        case "USER_PERMISSION_ADDED":
-          return "UserPermissionAddedEvent";
-        case "USER_PERMISSION_REMOVED":
-          return "UserPermissionRemovedEvent";
-        case "USER_PERMISSION_EDITED":
-          return "UserPermissionEditedEvent";
-        case "OWNERSHIP_TRANSFERRED":
-          return "OwnershipTransferredEvent";
-        case "PETITION_CLOSED":
-          return "PetitionClosedEvent";
-        case "PETITION_CLOSED_NOTIFIED":
-          return "PetitionClosedNotifiedEvent";
-        case "PETITION_REOPENED":
-          return "PetitionReopenedEvent";
-        case "SIGNATURE_STARTED":
-          return "SignatureStartedEvent";
-        case "SIGNATURE_COMPLETED":
-          return "SignatureCompletedEvent";
-        case "SIGNATURE_CANCELLED":
-          return "SignatureCancelledEvent";
-      }
-    });
+  },
+  resolveType: (p) => {
+    switch (p.type) {
+      case "PETITION_CREATED":
+        return "PetitionCreatedEvent";
+      case "PETITION_COMPLETED":
+        return "PetitionCompletedEvent";
+      case "ACCESS_ACTIVATED":
+        return "AccessActivatedEvent";
+      case "ACCESS_DEACTIVATED":
+        return "AccessDeactivatedEvent";
+      case "ACCESS_OPENED":
+        return "AccessOpenedEvent";
+      case "MESSAGE_SCHEDULED":
+        return "MessageScheduledEvent";
+      case "MESSAGE_CANCELLED":
+        return "MessageCancelledEvent";
+      case "MESSAGE_SENT":
+        return "MessageSentEvent";
+      case "REMINDER_SENT":
+        return "ReminderSentEvent";
+      case "REPLY_CREATED":
+        return "ReplyCreatedEvent";
+      case "REPLY_DELETED":
+        return "ReplyDeletedEvent";
+      case "COMMENT_PUBLISHED":
+        return "CommentPublishedEvent";
+      case "COMMENT_DELETED":
+        return "CommentDeletedEvent";
+      case "USER_PERMISSION_ADDED":
+        return "UserPermissionAddedEvent";
+      case "USER_PERMISSION_REMOVED":
+        return "UserPermissionRemovedEvent";
+      case "USER_PERMISSION_EDITED":
+        return "UserPermissionEditedEvent";
+      case "OWNERSHIP_TRANSFERRED":
+        return "OwnershipTransferredEvent";
+      case "PETITION_CLOSED":
+        return "PetitionClosedEvent";
+      case "PETITION_CLOSED_NOTIFIED":
+        return "PetitionClosedNotifiedEvent";
+      case "PETITION_REOPENED":
+        return "PetitionReopenedEvent";
+      case "SIGNATURE_STARTED":
+        return "SignatureStartedEvent";
+      case "SIGNATURE_COMPLETED":
+        return "SignatureCompletedEvent";
+      case "SIGNATURE_CANCELLED":
+        return "SignatureCancelledEvent";
+    }
   },
   rootTyping: "events.PetitionEvent",
 });
@@ -78,9 +78,8 @@ function createPetitionEvent<TypeName extends string>(
 export const PetitionCreatedEvent = createPetitionEvent(
   "PetitionCreatedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
@@ -109,9 +108,8 @@ export const AccessActivatedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
@@ -128,9 +126,8 @@ export const AccessDeactivatedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
@@ -175,9 +172,8 @@ export const MessagesCancelledEvent = createPetitionEvent(
         ))!;
       },
     });
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
@@ -217,16 +213,14 @@ export const ReplyCreatedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadField(root.data.petition_field_id);
       },
     });
-    t.field("reply", {
+    t.nullable.field("reply", {
       type: "PetitionFieldReply",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldReply(
           root.data.petition_field_reply_id
@@ -245,9 +239,8 @@ export const ReplyDeletedEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadField(root.data.petition_field_id);
       },
@@ -258,16 +251,14 @@ export const ReplyDeletedEvent = createPetitionEvent(
 export const CommentPublishedEvent = createPetitionEvent(
   "CommentPublishedEvent",
   (t) => {
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadField(root.data.petition_field_id);
       },
     });
-    t.field("comment", {
+    t.nullable.field("comment", {
       type: "PetitionFieldComment",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionFieldComment(
           root.data.petition_field_comment_id
@@ -280,16 +271,14 @@ export const CommentPublishedEvent = createPetitionEvent(
 export const CommentDeletedEvent = createPetitionEvent(
   "CommentDeletedEvent",
   (t) => {
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadField(root.data.petition_field_id);
       },
     });
-    t.field("deletedBy", {
+    t.nullable.field("deletedBy", {
       type: "UserOrPetitionAccess",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         if (root.data.user_id !== undefined) {
           const user = await ctx.users.loadUser(root.data.user_id);
@@ -309,9 +298,8 @@ export const CommentDeletedEvent = createPetitionEvent(
 export const UserPermissionAddedEvent = createPetitionEvent(
   "UserPermissionAddedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
@@ -322,9 +310,8 @@ export const UserPermissionAddedEvent = createPetitionEvent(
         return root.data.permission_type;
       },
     });
-    t.field("permissionUser", {
+    t.nullable.field("permissionUser", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.permission_user_id);
       },
@@ -335,16 +322,14 @@ export const UserPermissionAddedEvent = createPetitionEvent(
 export const UserPermissionRemovedEvent = createPetitionEvent(
   "UserPermissionRemovedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
     });
-    t.field("permissionUser", {
+    t.nullable.field("permissionUser", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.permission_user_id);
       },
@@ -355,9 +340,8 @@ export const UserPermissionRemovedEvent = createPetitionEvent(
 export const UserPermissionEditedEvent = createPetitionEvent(
   "UserPermissionEditedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
@@ -368,9 +352,8 @@ export const UserPermissionEditedEvent = createPetitionEvent(
         return root.data.permission_type;
       },
     });
-    t.field("permissionUser", {
+    t.nullable.field("permissionUser", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.permission_user_id);
       },
@@ -381,16 +364,14 @@ export const UserPermissionEditedEvent = createPetitionEvent(
 export const OwnershipTransferredEvent = createPetitionEvent(
   "OwnershipTransferredEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.user_id);
       },
     });
-    t.field("owner", {
+    t.nullable.field("owner", {
       type: "User",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.owner_id);
       },
@@ -404,9 +385,8 @@ export const OwnershipTransferredEvent = createPetitionEvent(
 export const PetitionClosedEvent = createPetitionEvent(
   "PetitionClosedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
       },
@@ -420,9 +400,8 @@ export const PetitionClosedEvent = createPetitionEvent(
 export const PetitionClosedNotifiedEvent = createPetitionEvent(
   "PetitionClosedNotifiedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
       },
@@ -442,9 +421,8 @@ export const PetitionClosedNotifiedEvent = createPetitionEvent(
 export const PetitionReopenedEvent = createPetitionEvent(
   "PetitionReopenedEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async ({ data }, _, ctx) => {
         return await ctx.users.loadUser(data.user_id);
       },
@@ -474,9 +452,8 @@ export const SignatureCompletedEvent = createPetitionEvent(
 export const SignatureCancelledEvent = createPetitionEvent(
   "SignatureCancelledEvent",
   (t) => {
-    t.field("user", {
+    t.nullable.field("user", {
       type: "User",
-      nullable: true,
       resolve: async ({ data }, _, ctx) => {
         const cancellerId = data.cancel_data?.canceller_id;
         if (data.cancel_reason === "CANCELLED_BY_USER" && cancellerId) {
@@ -485,9 +462,8 @@ export const SignatureCancelledEvent = createPetitionEvent(
         return null;
       },
     });
-    t.field("contact", {
+    t.nullable.field("contact", {
       type: "Contact",
-      nullable: true,
       resolve: async ({ data }, _, ctx) => {
         const cancellerId = data.cancel_data?.canceller_id;
         if (data.cancel_reason === "DECLINED_BY_SIGNER" && cancellerId) {
@@ -496,9 +472,8 @@ export const SignatureCancelledEvent = createPetitionEvent(
         return null;
       },
     });
-    t.field("cancellerReason", {
+    t.nullable.field("cancellerReason", {
       type: "String",
-      nullable: true,
       resolve: ({ data }) => {
         return data.cancel_data?.canceller_reason ?? null;
       },

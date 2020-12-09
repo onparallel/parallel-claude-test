@@ -11,8 +11,8 @@ export const Timestamps = interfaceType({
       description: "Time when the resource was last updated.",
       resolve: (o) => o.updated_at,
     });
-    t.resolveType(() => null);
   },
+  resolveType: () => null,
   rootTyping: `{
     created_at: Date;
     updated_at: Date;
@@ -26,8 +26,8 @@ export const CreatedAt = interfaceType({
       description: "Time when the resource was created.",
       resolve: (o) => o.created_at,
     });
-    t.resolveType(() => null);
   },
+  resolveType: () => null,
   rootTyping: `{
     created_at: Date;
   }`,

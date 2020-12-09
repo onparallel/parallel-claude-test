@@ -9,11 +9,11 @@ export const JSONObject = asNexusMethod(
 export const JSON = asNexusMethod(GraphQLJSON, "json", "any");
 
 export function jsonObjectArg(
-  opts: Omit<core.NexusArgConfig<"JSONObject">, "type">
+  opts?: Omit<core.NexusArgConfig<"JSONObject">, "type">
 ) {
   return arg({ ...opts, type: "JSONObject" });
 }
 
-export function jsonArg(opts: Omit<core.NexusArgConfig<"JSON">, "type">) {
+export function jsonArg(opts?: Omit<core.NexusArgConfig<"JSON">, "type">) {
   return arg({ ...opts, type: "JSON" });
 }

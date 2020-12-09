@@ -4,12 +4,12 @@ export const UserOrPetitionAccess = unionType({
   name: "UserOrPetitionAccess",
   definition(t) {
     t.members("User", "PetitionAccess");
-    t.resolveType((o) => {
-      if (["User", "PetitionAccess"].includes(o.__type)) {
-        return o.__type;
-      }
-      throw new Error("Missing __type on UserOrPetitionAccess");
-    });
+  },
+  resolveType: (o) => {
+    if (["User", "PetitionAccess"].includes(o.__type)) {
+      return o.__type;
+    }
+    throw new Error("Missing __type on UserOrPetitionAccess");
   },
   rootTyping: /* ts */ `
     | ({__type: "User"} & NexusGenRootTypes["User"])
@@ -24,10 +24,9 @@ export const PetitionFieldComment = objectType({
     t.globalId("id", {
       description: "The ID of the petition field comment.",
     });
-    t.field("author", {
+    t.nullable.field("author", {
       type: "UserOrPetitionAccess",
       description: "The author of the comment.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         if (root.user_id !== null) {
           const user = await ctx.users.loadUser(root.user_id);
@@ -44,19 +43,17 @@ export const PetitionFieldComment = objectType({
     t.string("content", {
       description: "The content of the comment.",
     });
-    t.field("reply", {
+    t.nullable.field("reply", {
       description: "The reply the comment is refering to.",
       type: "PetitionFieldReply",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return root.petition_field_reply_id !== null
           ? await ctx.petitions.loadFieldReply(root.petition_field_reply_id)
           : null;
       },
     });
-    t.datetime("publishedAt", {
+    t.nullable.datetime("publishedAt", {
       description: "Time when the comment was published.",
-      nullable: true,
       resolve: (o) => o.published_at,
     });
     t.boolean("isUnread", {

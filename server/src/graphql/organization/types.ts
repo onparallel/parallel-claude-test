@@ -1,4 +1,4 @@
-import { arg, enumType, objectType } from "@nexus/schema";
+import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
 import { titleize } from "../../util/strings";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { belongsToOrg } from "./authorizers";
@@ -52,8 +52,7 @@ export const Organization = objectType({
       description: "The unique text identifier of the organization.",
       authorize: belongsToOrg(),
     });
-    t.string("logoUrl", {
-      nullable: true,
+    t.nullable.string("logoUrl", {
       description: "URL of the organization logo",
       resolve: async (root, _, ctx) => {
         return await ctx.organizations.getOrgLogoUrl(root.id);
@@ -70,10 +69,7 @@ export const Organization = objectType({
       searchable: true,
       authorize: belongsToOrg(),
       additionalArgs: {
-        exclude: globalIdArg("User", {
-          list: [true],
-          required: false,
-        }),
+        exclude: list(nonNull(globalIdArg("User"))),
       },
       resolve: async (root, { offset, limit, search, exclude }, ctx) => {
         return await ctx.organizations.loadOrgUsers(root.id, {
@@ -84,9 +80,8 @@ export const Organization = objectType({
         });
       },
     });
-    t.field("integrations", {
+    t.list.nonNull.field("integrations", {
       type: "OrgIntegration",
-      list: [true],
       args: {
         type: arg({
           type: "IntegrationType",

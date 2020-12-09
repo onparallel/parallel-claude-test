@@ -1,4 +1,4 @@
-import { booleanArg, mutationField } from "@nexus/schema";
+import { booleanArg, mutationField, nonNull } from "@nexus/schema";
 import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";
@@ -13,7 +13,7 @@ import {
 export const startSignatureRequest = mutationField("startSignatureRequest", {
   type: "PetitionSignatureRequest",
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
@@ -65,7 +65,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
 export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   type: "PetitionSignatureRequest",
   args: {
-    petitionSignatureRequestId: globalIdArg({ required: true }),
+    petitionSignatureRequestId: nonNull(globalIdArg()),
   },
   authorize: authenticateAnd(
     userHasFeatureFlag("PETITION_SIGNATURE"),
@@ -146,9 +146,9 @@ export const signedPetitionDownloadLink = mutationField(
       ])
     ),
     args: {
-      petitionSignatureRequestId: globalIdArg("PetitionSignatureRequest", {
-        required: true,
-      }),
+      petitionSignatureRequestId: nonNull(
+        globalIdArg("PetitionSignatureRequest")
+      ),
       preview: booleanArg({
         description:
           "If true will use content-disposition inline instead of attachment",

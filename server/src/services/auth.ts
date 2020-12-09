@@ -170,7 +170,11 @@ export class Auth implements IAuth {
             exp: expiresAt,
             "cognito:username": cognitoId,
             email,
-          } = jwtDecode(idToken);
+          } = jwtDecode<{
+            exp: number;
+            "cognito:username": string;
+            email: string;
+          }>(idToken);
           if (Date.now() > expiresAt * 1000) {
             const refreshToken = await this.redis.get(
               `session:${token}:refreshToken`

@@ -4,6 +4,10 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -2682,9 +2686,12 @@ export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
 
 export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
-} & Pick<
-  PetitionFieldComment,
-  "id" | "content" | "publishedAt" | "isUnread" | "isEdited" | "isInternal"
+} & MakeOptional<
+  Pick<
+    PetitionFieldComment,
+    "id" | "content" | "publishedAt" | "isUnread" | "isEdited" | "isInternal"
+  >,
+  "isInternal"
 > & {
     author?: Maybe<
       | ({ __typename?: "PetitionAccess" } & {
@@ -6433,7 +6440,7 @@ export const PetitionSharingModal_PetitionUserPermissionsDocument = gql`
  * });
  */
 export function usePetitionSharingModal_PetitionUserPermissionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PetitionSharingModal_PetitionUserPermissionsQuery,
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
   >
@@ -6493,7 +6500,7 @@ export const PetitionSharingModal_searchUsersDocument = gql`
  * });
  */
 export function usePetitionSharingModal_searchUsersQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PetitionSharingModal_searchUsersQuery,
     PetitionSharingModal_searchUsersQueryVariables
   >
@@ -6546,7 +6553,7 @@ export const useTemplateDetailsDialogPetitionDocument = gql`
  * });
  */
 export function useuseTemplateDetailsDialogPetitionQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     useTemplateDetailsDialogPetitionQuery,
     useTemplateDetailsDialogPetitionQueryVariables
   >
@@ -6917,7 +6924,7 @@ export const ContactDocument = gql`
  * });
  */
 export function useContactQuery(
-  baseOptions?: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
   return Apollo.useQuery<ContactQuery, ContactQueryVariables>(
     ContactDocument,
@@ -7005,7 +7012,7 @@ export const ContactsDocument = gql`
  * });
  */
 export function useContactsQuery(
-  baseOptions?: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>
 ) {
   return Apollo.useQuery<ContactsQuery, ContactsQueryVariables>(
     ContactsDocument,
@@ -7485,7 +7492,7 @@ export const PetitionActivityDocument = gql`
  * });
  */
 export function usePetitionActivityQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PetitionActivityQuery,
     PetitionActivityQueryVariables
   >
@@ -8093,7 +8100,7 @@ export const PetitionComposeDocument = gql`
  * });
  */
 export function usePetitionComposeQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PetitionComposeQuery,
     PetitionComposeQueryVariables
   >
@@ -8148,7 +8155,7 @@ export const PetitionDocument = gql`
  * });
  */
 export function usePetitionQuery(
-  baseOptions?: Apollo.QueryHookOptions<PetitionQuery, PetitionQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<PetitionQuery, PetitionQueryVariables>
 ) {
   return Apollo.useQuery<PetitionQuery, PetitionQueryVariables>(
     PetitionDocument,
@@ -8815,7 +8822,7 @@ export const PetitionRepliesDocument = gql`
  * });
  */
 export function usePetitionRepliesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PetitionRepliesQuery,
     PetitionRepliesQueryVariables
   >
@@ -8941,7 +8948,7 @@ export const PetitionsDocument = gql`
  * });
  */
 export function usePetitionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
 ) {
   return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
     PetitionsDocument,
@@ -9005,7 +9012,7 @@ export const NewPetitionPublicTemplatesDocument = gql`
  * });
  */
 export function useNewPetitionPublicTemplatesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     NewPetitionPublicTemplatesQuery,
     NewPetitionPublicTemplatesQueryVariables
   >
@@ -9079,7 +9086,7 @@ export const NewPetitionTemplatesDocument = gql`
  * });
  */
 export function useNewPetitionTemplatesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     NewPetitionTemplatesQuery,
     NewPetitionTemplatesQueryVariables
   >
@@ -9970,7 +9977,7 @@ export const PublicPetitionDocument = gql`
  * });
  */
 export function usePublicPetitionQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PublicPetitionQuery,
     PublicPetitionQueryVariables
   >
@@ -10023,7 +10030,7 @@ export const PdfViewPetitionDocument = gql`
  * });
  */
 export function usePdfViewPetitionQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     PdfViewPetitionQuery,
     PdfViewPetitionQueryVariables
   >

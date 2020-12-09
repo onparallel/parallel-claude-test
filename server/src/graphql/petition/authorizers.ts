@@ -1,8 +1,8 @@
-import { FieldAuthorizeResolver } from "@nexus/schema";
 import { Arg } from "../helpers/authorize";
 import { unMaybeArray } from "../../util/arrays";
 import { FeatureFlagName, PetitionUserPermissionType } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
+import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 
 export function userHasAccessToPetitions<
   TypeName extends string,
@@ -14,7 +14,7 @@ export function userHasAccessToPetitions<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionIds = unMaybeArray(args[argName]);
+      const petitionIds = unMaybeArray(args[argName] as MaybeArray<number>);
       if (petitionIds.length === 0) {
         return true;
       }
@@ -38,7 +38,9 @@ export function userHasAccessToSignatureRequest<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const signatureRequestIds = unMaybeArray(args[argName]);
+      const signatureRequestIds = unMaybeArray(
+        args[argName] as MaybeArray<number>
+      );
       if (signatureRequestIds.length === 0) {
         return true;
       }
@@ -75,7 +77,7 @@ export function fieldIsNotFixed<
   return async (_, args, ctx) => {
     try {
       const field = await ctx.petitions.loadField(
-        args[argNameFieldId] as number
+        (args[argNameFieldId] as unknown) as number
       );
       return !field!.is_fixed;
     } catch {}
@@ -95,8 +97,8 @@ export function fieldsBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.fieldsBelongToPetition(
-        args[argNamePetitionId],
-        unMaybeArray(args[argNameFieldIds])
+        (args[argNamePetitionId] as unknown) as number,
+        unMaybeArray(args[argNameFieldIds] as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -115,8 +117,8 @@ export function repliesBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToPetition(
-        args[argNamePetitionId],
-        unMaybeArray(args[argNameReplyIds])
+        (args[argNamePetitionId] as unknown) as number,
+        unMaybeArray(args[argNameReplyIds] as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -135,8 +137,8 @@ export function repliesBelongsToField<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToField(
-        args[argNameFieldId],
-        unMaybeArray(args[argNameReplyIds])
+        (args[argNameFieldId] as unknown) as number,
+        unMaybeArray(args[argNameReplyIds] as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -155,8 +157,8 @@ export function accessesBelongToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accesessBelongToPetition(
-        args[argNamePetitionId],
-        unMaybeArray(args[argNameAccessIds])
+        (args[argNamePetitionId] as unknown) as number,
+        unMaybeArray(args[argNameAccessIds] as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -175,8 +177,8 @@ export function messageBelongToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.messagesBelongToPetition(
-        args[argNamePetitionId],
-        [args[argNameMessageId]]
+        (args[argNamePetitionId] as unknown) as number,
+        [(args[argNameMessageId] as unknown) as number]
       );
     } catch {}
     return false;
@@ -195,8 +197,8 @@ export function commentsBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.commentsBelongToPetition(
-        args[argNamePetitionId],
-        unMaybeArray(args[argNameCommentIds])
+        (args[argNamePetitionId] as unknown) as number,
+        unMaybeArray(args[argNameCommentIds] as MaybeArray<number>)
       );
     } catch {}
     return false;
@@ -211,7 +213,7 @@ export function accessesBelongToValidContacts<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToValidContacts(
-        unMaybeArray(args[argNameAccessIds])
+        unMaybeArray(args[argNameAccessIds] as MaybeArray<number>)
       );
     } catch {}
     return false;

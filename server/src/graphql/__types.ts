@@ -3,8 +3,8 @@
  * Do not make changes to this file directly
  */
 
-import * as ctx from "../context";
-import * as db from "../db/__types";
+import * as ctx from "./../context";
+import * as db from "./../db/__types";
 import * as events from "./backing/events";
 import { GlobalIdConfigSpread } from "./helpers/globalIdPlugin";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
@@ -13,36 +13,48 @@ import { core } from "@nexus/schema";
 import { PaginationFieldConfig } from "./helpers/paginationPlugin";
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
+    /**
+     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+     */
     datetime<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.ScalarInputFieldConfig<
-        core.GetGen3<"inputTypes", TypeName, FieldName>
-      >
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "DateTime";
+    /**
+     * The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+     */
     jsonObject<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.ScalarInputFieldConfig<
-        core.GetGen3<"inputTypes", TypeName, FieldName>
-      >
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "JSONObject";
+    /**
+     * The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+     */
     json<FieldName extends string>(
       fieldName: FieldName,
-      opts?: core.ScalarInputFieldConfig<
-        core.GetGen3<"inputTypes", TypeName, FieldName>
-      >
+      opts?: core.CommonInputFieldConfig<TypeName, FieldName>
     ): void; // "JSON";
   }
 }
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
+    /**
+     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+     */
     datetime<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "DateTime";
+    /**
+     * The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+     */
     jsonObject<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
     ): void; // "JSONObject";
+    /**
+     * The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+     */
     json<FieldName extends string>(
       fieldName: FieldName,
       ...opts: core.ScalarOutSpread<TypeName, FieldName>
@@ -198,7 +210,7 @@ export interface NexusGenScalars {
   Upload: any;
 }
 
-export interface NexusGenRootTypes {
+export interface NexusGenObjects {
   AccessActivatedEvent: events.AccessActivatedEvent;
   AccessDeactivatedEvent: events.AccessDeactivatedEvent;
   AccessOpenedEvent: events.AccessOpenedEvent;
@@ -337,6 +349,9 @@ export interface NexusGenRootTypes {
   UserPermissionAddedEvent: events.UserPermissionAddedEvent;
   UserPermissionEditedEvent: events.UserPermissionEditedEvent;
   UserPermissionRemovedEvent: events.UserPermissionRemovedEvent;
+}
+
+export interface NexusGenInterfaces {
   CreatedAt: {
     created_at: Date;
   };
@@ -350,6 +365,9 @@ export interface NexusGenRootTypes {
     created_at: Date;
     updated_at: Date;
   };
+}
+
+export interface NexusGenUnions {
   PublicUserOrContact:
     | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
     | ({ __type: "User" } & NexusGenRootTypes["User"]);
@@ -358,50 +376,13 @@ export interface NexusGenRootTypes {
     | ({ __type: "PetitionAccess" } & NexusGenRootTypes["PetitionAccess"]);
 }
 
-export interface NexusGenAllTypes extends NexusGenRootTypes {
-  CreateContactInput: NexusGenInputs["CreateContactInput"];
-  CreateFileUploadReplyInput: NexusGenInputs["CreateFileUploadReplyInput"];
-  CreateTextReplyInput: NexusGenInputs["CreateTextReplyInput"];
-  RemindersConfigInput: NexusGenInputs["RemindersConfigInput"];
-  SignatureConfigInput: NexusGenInputs["SignatureConfigInput"];
-  UpdateContactInput: NexusGenInputs["UpdateContactInput"];
-  UpdatePetitionFieldInput: NexusGenInputs["UpdatePetitionFieldInput"];
-  UpdatePetitionInput: NexusGenInputs["UpdatePetitionInput"];
-  UpdateUserInput: NexusGenInputs["UpdateUserInput"];
-  ChangePasswordResult: NexusGenEnums["ChangePasswordResult"];
-  EntityType: NexusGenEnums["EntityType"];
-  FeatureFlag: NexusGenEnums["FeatureFlag"];
-  IntegrationType: NexusGenEnums["IntegrationType"];
-  OnboardingKey: NexusGenEnums["OnboardingKey"];
-  OnboardingStatus: NexusGenEnums["OnboardingStatus"];
-  OrganizationRole: NexusGenEnums["OrganizationRole"];
-  OrganizationStatus: NexusGenEnums["OrganizationStatus"];
-  PetitionAccessStatus: NexusGenEnums["PetitionAccessStatus"];
-  PetitionBaseType: NexusGenEnums["PetitionBaseType"];
-  PetitionFieldReplyStatus: NexusGenEnums["PetitionFieldReplyStatus"];
-  PetitionFieldType: NexusGenEnums["PetitionFieldType"];
-  PetitionLocale: NexusGenEnums["PetitionLocale"];
-  PetitionMessageStatus: NexusGenEnums["PetitionMessageStatus"];
-  PetitionReminderType: NexusGenEnums["PetitionReminderType"];
-  PetitionSignatureCancelReason: NexusGenEnums["PetitionSignatureCancelReason"];
-  PetitionSignatureRequestStatus: NexusGenEnums["PetitionSignatureRequestStatus"];
-  PetitionStatus: NexusGenEnums["PetitionStatus"];
-  PetitionUserPermissionType: NexusGenEnums["PetitionUserPermissionType"];
-  PetitionUserPermissionTypeRW: NexusGenEnums["PetitionUserPermissionTypeRW"];
-  QueryContacts_OrderBy: NexusGenEnums["QueryContacts_OrderBy"];
-  QueryPetitions_OrderBy: NexusGenEnums["QueryPetitions_OrderBy"];
-  Result: NexusGenEnums["Result"];
-  String: NexusGenScalars["String"];
-  Int: NexusGenScalars["Int"];
-  Float: NexusGenScalars["Float"];
-  Boolean: NexusGenScalars["Boolean"];
-  ID: NexusGenScalars["ID"];
-  DateTime: NexusGenScalars["DateTime"];
-  GID: NexusGenScalars["GID"];
-  JSON: NexusGenScalars["JSON"];
-  JSONObject: NexusGenScalars["JSONObject"];
-  Upload: NexusGenScalars["Upload"];
-}
+export type NexusGenRootTypes = NexusGenInterfaces &
+  NexusGenObjects &
+  NexusGenUnions;
+
+export type NexusGenAllTypes = NexusGenRootTypes &
+  NexusGenScalars &
+  NexusGenEnums;
 
 export interface NexusGenFieldTypes {
   AccessActivatedEvent: {
@@ -1016,6 +997,615 @@ export interface NexusGenFieldTypes {
   };
 }
 
+export interface NexusGenFieldTypeNames {
+  AccessActivatedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  AccessDeactivatedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  AccessOpenedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  CommentDeletedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    deletedBy: "UserOrPetitionAccess";
+    field: "PetitionField";
+    id: "GID";
+  };
+  CommentPublishedEvent: {
+    // field return type name
+    comment: "PetitionFieldComment";
+    createdAt: "DateTime";
+    field: "PetitionField";
+    id: "GID";
+  };
+  Contact: {
+    // field return type name
+    accesses: "PetitionAccessPagination";
+    createdAt: "DateTime";
+    email: "String";
+    firstName: "String";
+    fullName: "String";
+    id: "GID";
+    lastName: "String";
+    updatedAt: "DateTime";
+  };
+  ContactPagination: {
+    // field return type name
+    items: "Contact";
+    totalCount: "Int";
+  };
+  CreateFileUploadReply: {
+    // field return type name
+    endpoint: "String";
+    reply: "PublicPetitionFieldReply";
+  };
+  FileUploadReplyDownloadLinkResult: {
+    // field return type name
+    result: "Result";
+    url: "String";
+  };
+  MessageCancelledEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    message: "PetitionMessage";
+    user: "User";
+  };
+  MessageScheduledEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    message: "PetitionMessage";
+  };
+  MessageSentEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    message: "PetitionMessage";
+  };
+  Mutation: {
+    // field return type name
+    addPetitionUserPermission: "Petition";
+    assignPetitionToUser: "SupportMethodResponse";
+    cancelScheduledMessage: "PetitionMessage";
+    cancelSignatureRequest: "PetitionSignatureRequest";
+    changePassword: "ChangePasswordResult";
+    changePetitionFieldType: "PetitionBaseAndField";
+    clonePetitionField: "PetitionBaseAndField";
+    clonePetitions: "PetitionBase";
+    createContact: "Contact";
+    createOrganization: "SupportMethodResponse";
+    createPetition: "PetitionBase";
+    createPetitionField: "PetitionBaseAndField";
+    createPetitionFieldComment: "PetitionFieldComment";
+    createUser: "SupportMethodResponse";
+    deactivateAccesses: "PetitionAccess";
+    deleteContacts: "Result";
+    deletePetition: "SupportMethodResponse";
+    deletePetitionField: "PetitionBase";
+    deletePetitionFieldComment: "Result";
+    deletePetitions: "Result";
+    editPetitionUserPermission: "Petition";
+    fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
+    markPetitionFieldCommentsAsRead: "PetitionFieldComment";
+    presendPetitionClosedNotification: "Result";
+    publicCompletePetition: "PublicPetition";
+    publicCreateFileUploadReply: "CreateFileUploadReply";
+    publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
+    publicCreateSelectReply: "PublicPetitionFieldReply";
+    publicCreateTextReply: "PublicPetitionFieldReply";
+    publicDeletePetitionFieldComment: "Result";
+    publicDeletePetitionReply: "Result";
+    publicFileUploadReplyComplete: "PublicPetitionFieldReply";
+    publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
+    publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
+    publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
+    reactivateAccesses: "PetitionAccess";
+    removePetitionUserPermission: "Petition";
+    reopenPetition: "Petition";
+    resetSignaturitOrganizationBranding: "SupportMethodResponse";
+    sendMessages: "Result";
+    sendPetition: "SendPetitionResult";
+    sendPetitionClosedNotification: "Petition";
+    sendReminders: "Result";
+    signedPetitionDownloadLink: "FileUploadReplyDownloadLinkResult";
+    startSignatureRequest: "PetitionSignatureRequest";
+    submitUnpublishedComments: "PetitionFieldComment";
+    switchAutomaticReminders: "PetitionAccess";
+    transferPetitionOwnership: "Petition";
+    updateContact: "Contact";
+    updateFieldPositions: "PetitionBase";
+    updateOnboardingStatus: "User";
+    updatePetition: "PetitionBase";
+    updatePetitionField: "PetitionBaseAndField";
+    updatePetitionFieldComment: "PetitionFieldComment";
+    updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
+    updatePetitionUserSubscription: "Petition";
+    updateUser: "User";
+    validatePetitionFields: "PetitionAndPartialFields";
+  };
+  OrgIntegration: {
+    // field return type name
+    name: "String";
+    provider: "String";
+    type: "IntegrationType";
+  };
+  Organization: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    identifier: "String";
+    integrations: "OrgIntegration";
+    logoUrl: "String";
+    name: "String";
+    status: "OrganizationStatus";
+    updatedAt: "DateTime";
+    users: "UserPagination";
+  };
+  OwnershipTransferredEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    owner: "User";
+    user: "User";
+  };
+  Petition: {
+    // field return type name
+    accesses: "PetitionAccess";
+    createdAt: "DateTime";
+    currentSignatureRequest: "PetitionSignatureRequest";
+    deadline: "DateTime";
+    emailBody: "JSON";
+    emailSubject: "String";
+    events: "PetitionEventPagination";
+    fieldCount: "Int";
+    fields: "PetitionField";
+    id: "GID";
+    locale: "PetitionLocale";
+    name: "String";
+    organization: "Organization";
+    owner: "User";
+    progress: "PetitionProgress";
+    remindersConfig: "RemindersConfig";
+    signatureConfig: "SignatureConfig";
+    signatureRequests: "PetitionSignatureRequest";
+    status: "PetitionStatus";
+    updatedAt: "DateTime";
+    userPermissions: "PetitionUserPermission";
+  };
+  PetitionAccess: {
+    // field return type name
+    contact: "Contact";
+    createdAt: "DateTime";
+    granter: "User";
+    id: "GID";
+    nextReminderAt: "DateTime";
+    petition: "Petition";
+    reminderCount: "Int";
+    remindersActive: "Boolean";
+    remindersConfig: "RemindersConfig";
+    remindersLeft: "Int";
+    status: "PetitionAccessStatus";
+    updatedAt: "DateTime";
+  };
+  PetitionAccessPagination: {
+    // field return type name
+    items: "PetitionAccess";
+    totalCount: "Int";
+  };
+  PetitionAndField: {
+    // field return type name
+    field: "PetitionField";
+    petition: "Petition";
+  };
+  PetitionAndPartialFields: {
+    // field return type name
+    fields: "PetitionField";
+    petition: "Petition";
+  };
+  PetitionBasePagination: {
+    // field return type name
+    items: "PetitionBase";
+    totalCount: "Int";
+  };
+  PetitionClosedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  PetitionClosedNotifiedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  PetitionCompletedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  PetitionCreatedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  PetitionEventPagination: {
+    // field return type name
+    items: "PetitionEvent";
+    totalCount: "Int";
+  };
+  PetitionField: {
+    // field return type name
+    comments: "PetitionFieldComment";
+    description: "String";
+    id: "GID";
+    isFixed: "Boolean";
+    isReadOnly: "Boolean";
+    multiple: "Boolean";
+    optional: "Boolean";
+    options: "JSONObject";
+    position: "Int";
+    replies: "PetitionFieldReply";
+    title: "String";
+    type: "PetitionFieldType";
+    validated: "Boolean";
+  };
+  PetitionFieldComment: {
+    // field return type name
+    author: "UserOrPetitionAccess";
+    content: "String";
+    id: "GID";
+    isEdited: "Boolean";
+    isInternal: "Boolean";
+    isUnread: "Boolean";
+    publishedAt: "DateTime";
+    reply: "PetitionFieldReply";
+  };
+  PetitionFieldReply: {
+    // field return type name
+    access: "PetitionAccess";
+    content: "JSONObject";
+    createdAt: "DateTime";
+    field: "PetitionField";
+    id: "GID";
+    status: "PetitionFieldReplyStatus";
+    updatedAt: "DateTime";
+  };
+  PetitionMessage: {
+    // field return type name
+    access: "PetitionAccess";
+    bouncedAt: "DateTime";
+    createdAt: "DateTime";
+    deliveredAt: "DateTime";
+    emailBody: "JSON";
+    emailSubject: "JSON";
+    id: "GID";
+    openedAt: "DateTime";
+    scheduledAt: "DateTime";
+    sender: "User";
+    sentAt: "DateTime";
+    status: "PetitionMessageStatus";
+  };
+  PetitionProgress: {
+    // field return type name
+    optional: "Int";
+    replied: "Int";
+    total: "Int";
+    validated: "Int";
+  };
+  PetitionReminder: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    sender: "User";
+    type: "PetitionReminderType";
+  };
+  PetitionReopenedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  PetitionSignatureRequest: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    petition: "Petition";
+    signatureConfig: "SignatureConfig";
+    status: "PetitionSignatureRequestStatus";
+    updatedAt: "DateTime";
+  };
+  PetitionTemplate: {
+    // field return type name
+    createdAt: "DateTime";
+    description: "String";
+    emailBody: "JSON";
+    emailSubject: "String";
+    fieldCount: "Int";
+    fields: "PetitionField";
+    id: "GID";
+    isPublic: "Boolean";
+    locale: "PetitionLocale";
+    name: "String";
+    organization: "Organization";
+    owner: "User";
+    updatedAt: "DateTime";
+    userPermissions: "PetitionUserPermission";
+  };
+  PetitionTemplateAndField: {
+    // field return type name
+    field: "PetitionField";
+    petition: "PetitionTemplate";
+  };
+  PetitionTemplatePagination: {
+    // field return type name
+    items: "PetitionTemplate";
+    totalCount: "Int";
+  };
+  PetitionUserPermission: {
+    // field return type name
+    createdAt: "DateTime";
+    isSubscribed: "Boolean";
+    permissionType: "PetitionUserPermissionType";
+    petition: "Petition";
+    updatedAt: "DateTime";
+    user: "User";
+  };
+  PetitionWithFieldAndReplies: {
+    // field return type name
+    field: "PetitionField";
+    petition: "Petition";
+    replies: "PetitionFieldReply";
+  };
+  PublicContact: {
+    // field return type name
+    email: "String";
+    firstName: "String";
+    fullName: "String";
+    id: "GID";
+    lastName: "String";
+  };
+  PublicOrganization: {
+    // field return type name
+    id: "GID";
+    identifier: "String";
+    logoUrl: "String";
+    name: "String";
+  };
+  PublicPetition: {
+    // field return type name
+    createdAt: "DateTime";
+    deadline: "DateTime";
+    fields: "PublicPetitionField";
+    id: "GID";
+    locale: "PetitionLocale";
+    signers: "PublicContact";
+    status: "PetitionStatus";
+    updatedAt: "DateTime";
+  };
+  PublicPetitionAccess: {
+    // field return type name
+    contact: "PublicContact";
+    granter: "PublicUser";
+    petition: "PublicPetition";
+  };
+  PublicPetitionField: {
+    // field return type name
+    comments: "PublicPetitionFieldComment";
+    description: "String";
+    id: "GID";
+    isReadOnly: "Boolean";
+    multiple: "Boolean";
+    optional: "Boolean";
+    options: "JSONObject";
+    replies: "PublicPetitionFieldReply";
+    title: "String";
+    type: "PetitionFieldType";
+    validated: "Boolean";
+  };
+  PublicPetitionFieldComment: {
+    // field return type name
+    author: "PublicUserOrContact";
+    content: "String";
+    id: "GID";
+    isUnread: "Boolean";
+    publishedAt: "DateTime";
+    reply: "PublicPetitionFieldReply";
+  };
+  PublicPetitionFieldReply: {
+    // field return type name
+    content: "JSONObject";
+    createdAt: "DateTime";
+    id: "GID";
+    status: "PetitionFieldReplyStatus";
+    updatedAt: "DateTime";
+  };
+  PublicUser: {
+    // field return type name
+    email: "String";
+    firstName: "String";
+    fullName: "String";
+    id: "GID";
+    lastName: "String";
+    organization: "PublicOrganization";
+  };
+  Query: {
+    // field return type name
+    access: "PublicPetitionAccess";
+    contact: "Contact";
+    contacts: "ContactPagination";
+    globalIdDecode: "SupportMethodResponse";
+    globalIdEncode: "SupportMethodResponse";
+    me: "User";
+    organization: "Organization";
+    petition: "PetitionBase";
+    petitions: "PetitionBasePagination";
+    petitionSignatureRequestToken: "PetitionSignatureRequest";
+    publicTemplates: "PetitionTemplatePagination";
+  };
+  ReminderSentEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    reminder: "PetitionReminder";
+  };
+  RemindersConfig: {
+    // field return type name
+    offset: "Int";
+    time: "String";
+    timezone: "String";
+    weekdaysOnly: "Boolean";
+  };
+  ReplyCreatedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    field: "PetitionField";
+    id: "GID";
+    reply: "PetitionFieldReply";
+  };
+  ReplyDeletedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    field: "PetitionField";
+    id: "GID";
+  };
+  SendPetitionResult: {
+    // field return type name
+    accesses: "PetitionAccess";
+    petition: "Petition";
+    result: "Result";
+  };
+  SignatureCancelledEvent: {
+    // field return type name
+    cancellerReason: "String";
+    cancelType: "PetitionSignatureCancelReason";
+    contact: "Contact";
+    createdAt: "DateTime";
+    id: "GID";
+    user: "User";
+  };
+  SignatureCompletedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  SignatureConfig: {
+    // field return type name
+    contacts: "Contact";
+    provider: "String";
+    timezone: "String";
+    title: "String";
+  };
+  SignatureStartedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  SupportMethodResponse: {
+    // field return type name
+    message: "String";
+    result: "Result";
+  };
+  User: {
+    // field return type name
+    createdAt: "DateTime";
+    email: "String";
+    firstName: "String";
+    fullName: "String";
+    hasFeatureFlag: "Boolean";
+    id: "GID";
+    isSuperAdmin: "Boolean";
+    lastName: "String";
+    onboardingStatus: "JSONObject";
+    organization: "Organization";
+    role: "OrganizationRole";
+    updatedAt: "DateTime";
+  };
+  UserPagination: {
+    // field return type name
+    items: "User";
+    totalCount: "Int";
+  };
+  UserPermissionAddedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    permissionType: "PetitionUserPermissionType";
+    permissionUser: "User";
+    user: "User";
+  };
+  UserPermissionEditedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    permissionType: "PetitionUserPermissionType";
+    permissionUser: "User";
+    user: "User";
+  };
+  UserPermissionRemovedEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    permissionUser: "User";
+    user: "User";
+  };
+  CreatedAt: {
+    // field return type name
+    createdAt: "DateTime";
+  };
+  PetitionBase: {
+    // field return type name
+    createdAt: "DateTime";
+    emailBody: "JSON";
+    emailSubject: "String";
+    fieldCount: "Int";
+    fields: "PetitionField";
+    id: "GID";
+    locale: "PetitionLocale";
+    name: "String";
+    organization: "Organization";
+    owner: "User";
+    updatedAt: "DateTime";
+    userPermissions: "PetitionUserPermission";
+  };
+  PetitionBaseAndField: {
+    // field return type name
+    field: "PetitionField";
+    petition: "PetitionBase";
+  };
+  PetitionEvent: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  Timestamps: {
+    // field return type name
+    createdAt: "DateTime";
+    updatedAt: "DateTime";
+  };
+}
+
 export interface NexusGenArgTypes {
   Contact: {
     accesses: {
@@ -1083,7 +1673,7 @@ export interface NexusGenArgTypes {
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       name?: string | null; // String
       petitionId?: NexusGenScalars["GID"] | null; // GID
-      type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
+      type: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
     createPetitionField: {
       // args
@@ -1432,7 +2022,7 @@ export interface NexusGenArgTypes {
   };
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
+export interface NexusGenAbstractTypeMembers {
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
   CreatedAt: "PetitionMessage" | "PetitionReminder";
@@ -1474,130 +2064,77 @@ export interface NexusGenAbstractResolveReturnTypes {
     | "User";
 }
 
-export interface NexusGenInheritedFields {}
+export interface NexusGenTypeInterfaces {
+  AccessActivatedEvent: "PetitionEvent";
+  AccessDeactivatedEvent: "PetitionEvent";
+  AccessOpenedEvent: "PetitionEvent";
+  CommentDeletedEvent: "PetitionEvent";
+  CommentPublishedEvent: "PetitionEvent";
+  Contact: "Timestamps";
+  MessageCancelledEvent: "PetitionEvent";
+  MessageScheduledEvent: "PetitionEvent";
+  MessageSentEvent: "PetitionEvent";
+  Organization: "Timestamps";
+  OwnershipTransferredEvent: "PetitionEvent";
+  Petition: "PetitionBase";
+  PetitionAccess: "Timestamps";
+  PetitionAndField: "PetitionBaseAndField";
+  PetitionClosedEvent: "PetitionEvent";
+  PetitionClosedNotifiedEvent: "PetitionEvent";
+  PetitionCompletedEvent: "PetitionEvent";
+  PetitionCreatedEvent: "PetitionEvent";
+  PetitionFieldReply: "Timestamps";
+  PetitionMessage: "CreatedAt";
+  PetitionReminder: "CreatedAt";
+  PetitionReopenedEvent: "PetitionEvent";
+  PetitionSignatureRequest: "Timestamps";
+  PetitionTemplate: "PetitionBase";
+  PetitionTemplateAndField: "PetitionBaseAndField";
+  PetitionUserPermission: "Timestamps";
+  PublicPetition: "Timestamps";
+  PublicPetitionFieldReply: "Timestamps";
+  ReminderSentEvent: "PetitionEvent";
+  ReplyCreatedEvent: "PetitionEvent";
+  ReplyDeletedEvent: "PetitionEvent";
+  SignatureCancelledEvent: "PetitionEvent";
+  SignatureCompletedEvent: "PetitionEvent";
+  SignatureStartedEvent: "PetitionEvent";
+  User: "Timestamps";
+  UserPermissionAddedEvent: "PetitionEvent";
+  UserPermissionEditedEvent: "PetitionEvent";
+  UserPermissionRemovedEvent: "PetitionEvent";
+}
 
-export type NexusGenObjectNames =
-  | "AccessActivatedEvent"
-  | "AccessDeactivatedEvent"
-  | "AccessOpenedEvent"
-  | "CommentDeletedEvent"
-  | "CommentPublishedEvent"
-  | "Contact"
-  | "ContactPagination"
-  | "CreateFileUploadReply"
-  | "FileUploadReplyDownloadLinkResult"
-  | "MessageCancelledEvent"
-  | "MessageScheduledEvent"
-  | "MessageSentEvent"
-  | "Mutation"
-  | "OrgIntegration"
-  | "Organization"
-  | "OwnershipTransferredEvent"
-  | "Petition"
-  | "PetitionAccess"
-  | "PetitionAccessPagination"
-  | "PetitionAndField"
-  | "PetitionAndPartialFields"
-  | "PetitionBasePagination"
-  | "PetitionClosedEvent"
-  | "PetitionClosedNotifiedEvent"
-  | "PetitionCompletedEvent"
-  | "PetitionCreatedEvent"
-  | "PetitionEventPagination"
-  | "PetitionField"
-  | "PetitionFieldComment"
-  | "PetitionFieldReply"
-  | "PetitionMessage"
-  | "PetitionProgress"
-  | "PetitionReminder"
-  | "PetitionReopenedEvent"
-  | "PetitionSignatureRequest"
-  | "PetitionTemplate"
-  | "PetitionTemplateAndField"
-  | "PetitionTemplatePagination"
-  | "PetitionUserPermission"
-  | "PetitionWithFieldAndReplies"
-  | "PublicContact"
-  | "PublicOrganization"
-  | "PublicPetition"
-  | "PublicPetitionAccess"
-  | "PublicPetitionField"
-  | "PublicPetitionFieldComment"
-  | "PublicPetitionFieldReply"
-  | "PublicUser"
-  | "Query"
-  | "ReminderSentEvent"
-  | "RemindersConfig"
-  | "ReplyCreatedEvent"
-  | "ReplyDeletedEvent"
-  | "SendPetitionResult"
-  | "SignatureCancelledEvent"
-  | "SignatureCompletedEvent"
-  | "SignatureConfig"
-  | "SignatureStartedEvent"
-  | "SupportMethodResponse"
-  | "User"
-  | "UserPagination"
-  | "UserPermissionAddedEvent"
-  | "UserPermissionEditedEvent"
-  | "UserPermissionRemovedEvent";
+export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames =
-  | "CreateContactInput"
-  | "CreateFileUploadReplyInput"
-  | "CreateTextReplyInput"
-  | "RemindersConfigInput"
-  | "SignatureConfigInput"
-  | "UpdateContactInput"
-  | "UpdatePetitionFieldInput"
-  | "UpdatePetitionInput"
-  | "UpdateUserInput";
+export type NexusGenInputNames = keyof NexusGenInputs;
 
-export type NexusGenEnumNames =
-  | "ChangePasswordResult"
-  | "EntityType"
-  | "FeatureFlag"
-  | "IntegrationType"
-  | "OnboardingKey"
-  | "OnboardingStatus"
-  | "OrganizationRole"
-  | "OrganizationStatus"
-  | "PetitionAccessStatus"
-  | "PetitionBaseType"
-  | "PetitionFieldReplyStatus"
-  | "PetitionFieldType"
-  | "PetitionLocale"
-  | "PetitionMessageStatus"
-  | "PetitionReminderType"
-  | "PetitionSignatureCancelReason"
-  | "PetitionSignatureRequestStatus"
-  | "PetitionStatus"
-  | "PetitionUserPermissionType"
-  | "PetitionUserPermissionTypeRW"
-  | "QueryContacts_OrderBy"
-  | "QueryPetitions_OrderBy"
-  | "Result";
+export type NexusGenEnumNames = keyof NexusGenEnums;
 
-export type NexusGenInterfaceNames =
+export type NexusGenInterfaceNames = keyof NexusGenInterfaces;
+
+export type NexusGenScalarNames = keyof NexusGenScalars;
+
+export type NexusGenUnionNames = keyof NexusGenUnions;
+
+export type NexusGenObjectsUsingAbstractStrategyIsTypeOf = never;
+
+export type NexusGenAbstractsUsingStrategyResolveType =
   | "CreatedAt"
   | "PetitionBase"
   | "PetitionBaseAndField"
   | "PetitionEvent"
-  | "Timestamps";
+  | "PublicUserOrContact"
+  | "Timestamps"
+  | "UserOrPetitionAccess";
 
-export type NexusGenScalarNames =
-  | "Boolean"
-  | "DateTime"
-  | "Float"
-  | "GID"
-  | "ID"
-  | "Int"
-  | "JSON"
-  | "JSONObject"
-  | "String"
-  | "Upload";
-
-export type NexusGenUnionNames = "PublicUserOrContact" | "UserOrPetitionAccess";
+export type NexusGenFeaturesConfig = {
+  abstractTypeStrategies: {
+    isTypeOf: false;
+    resolveType: true;
+    __typename: false;
+  };
+};
 
 export interface NexusGenTypes {
   context: ctx.ApiContext;
@@ -1605,8 +2142,9 @@ export interface NexusGenTypes {
   rootTypes: NexusGenRootTypes;
   argTypes: NexusGenArgTypes;
   fieldTypes: NexusGenFieldTypes;
+  fieldTypeNames: NexusGenFieldTypeNames;
   allTypes: NexusGenAllTypes;
-  inheritedFields: NexusGenInheritedFields;
+  typeInterfaces: NexusGenTypeInterfaces;
   objectNames: NexusGenObjectNames;
   inputNames: NexusGenInputNames;
   enumNames: NexusGenEnumNames;
@@ -1627,7 +2165,10 @@ export interface NexusGenTypes {
     | NexusGenTypes["allInputTypes"]
     | NexusGenTypes["allOutputTypes"];
   abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
-  abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
+  abstractTypeMembers: NexusGenAbstractTypeMembers;
+  objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;
+  abstractsUsingStrategyResolveType: NexusGenAbstractsUsingStrategyResolveType;
+  features: NexusGenFeaturesConfig;
 }
 
 declare global {
@@ -1650,6 +2191,74 @@ declare global {
      * prevent the resolve method from executing.
      */
     validateArgs?: FieldValidateArgsResolver<TypeName, FieldName>;
+
+    /**
+     * Whether the type can be null
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    nullable?: boolean;
+    /**
+     * Whether the type is list of values, or just a single value.
+     * If list is true, we assume the type is a list. If list is an array,
+     * we'll assume that it's a list with the depth. The boolean indicates whether
+     * the type is required (non-null), where true = nonNull, false = nullable.
+     * @see declarativeWrappingPlugin
+     */
+    list?: true | boolean[];
+    /**
+     * Whether the type should be non null, `required: true` = `nullable: false`
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    required?: boolean;
+  }
+  interface NexusGenPluginInputFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {
+    /**
+     * Whether the type can be null
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    nullable?: boolean;
+    /**
+     * Whether the type is list of values, or just a single value.
+     * If list is true, we assume the type is a list. If list is an array,
+     * we'll assume that it's a list with the depth. The boolean indicates whether
+     * the type is required (non-null), where true = nonNull, false = nullable.
+     * @see declarativeWrappingPlugin
+     */
+    list?: true | boolean[];
+    /**
+     * Whether the type should be non null, `required: true` = `nullable: false`
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    required?: boolean;
   }
   interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginArgConfig {
+    /**
+     * Whether the type can be null
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    nullable?: boolean;
+    /**
+     * Whether the type is list of values, or just a single value.
+     * If list is true, we assume the type is a list. If list is an array,
+     * we'll assume that it's a list with the depth. The boolean indicates whether
+     * the type is required (non-null), where true = nonNull, false = nullable.
+     * @see declarativeWrappingPlugin
+     */
+    list?: true | boolean[];
+    /**
+     * Whether the type should be non null, `required: true` = `nullable: false`
+     * @default (depends on whether nullability is configured in type or schema)
+     * @see declarativeWrappingPlugin
+     */
+    required?: boolean;
+  }
 }

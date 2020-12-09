@@ -14,7 +14,7 @@ import { NormalLink } from "./Link";
 export type UserSelectSelection = UserSelect_UserFragment;
 
 export type UserSelectProps = Omit<
-  AsyncSelectProps<UserSelectSelection>,
+  AsyncSelectProps<UserSelectSelection, true>,
   "value" | "onChange"
 > & {
   value?: UserSelectSelection[];
@@ -25,7 +25,7 @@ export type UserSelectProps = Omit<
   ) => Promise<UserSelectSelection[]>;
 } & UserReactSelectProps;
 
-export type UserSelectInstance = AsyncSelect<UserSelectSelection>;
+export type UserSelectInstance = AsyncSelect<UserSelectSelection, true>;
 
 export const UserSelect = Object.assign(
   forwardRef(function (
@@ -46,7 +46,7 @@ export const UserSelect = Object.assign(
     const reactSelectProps = useUserSelectReactSelectProps(props);
 
     return (
-      <AsyncSelect<UserSelectSelection>
+      <AsyncSelect<UserSelectSelection, true>
         ref={ref}
         value={value}
         onChange={(value) => onChange?.((value as any) ?? [])}
@@ -143,7 +143,7 @@ function useUserSelectReactSelectProps(props: UserReactSelectProps) {
             children,
             data,
             ...props
-          }: Omit<OptionProps<UserSelectSelection>, "data"> & {
+          }: Omit<OptionProps<UserSelectSelection, true>, "data"> & {
             data: UserSelectSelection;
           }) => {
             return (
@@ -171,7 +171,7 @@ function useUserSelectReactSelectProps(props: UserReactSelectProps) {
           }
         },
         getOptionValue: (option) => option.id,
-      } as Partial<AsyncSelectProps<UserSelectSelection>>),
+      } as Partial<AsyncSelectProps<UserSelectSelection, true>>),
     [reactSelectProps]
   );
 }

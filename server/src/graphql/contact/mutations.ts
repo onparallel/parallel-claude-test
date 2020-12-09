@@ -1,4 +1,4 @@
-import { inputObjectType, mutationField } from "@nexus/schema";
+import { inputObjectType, list, mutationField, nonNull } from "@nexus/schema";
 import { CreateContact } from "../../db/__types";
 import { authenticate, chain } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
@@ -12,14 +12,16 @@ export const createContact = mutationField("createContact", {
   type: "Contact",
   authorize: authenticate(),
   args: {
-    data: inputObjectType({
-      name: "CreateContactInput",
-      definition(t) {
-        t.string("email", { required: true });
-        t.string("firstName", { nullable: true });
-        t.string("lastName", { nullable: true });
-      },
-    }).asArg({ required: true }),
+    data: nonNull(
+      inputObjectType({
+        name: "CreateContactInput",
+        definition(t) {
+          t.nonNull.string("email");
+          t.string("firstName");
+          t.string("lastName");
+        },
+      }).asArg()
+    ),
   },
   validateArgs: validEmail((args) => args.data.email, "data.email"),
   resolve: async (_, args, ctx) => {
@@ -51,14 +53,16 @@ export const updateContact = mutationField("updateContact", {
   type: "Contact",
   authorize: chain(authenticate(), userHasAccessToContacts("id")),
   args: {
-    id: globalIdArg("Contact", { required: true }),
-    data: inputObjectType({
-      name: "UpdateContactInput",
-      definition(t) {
-        t.string("firstName", { nullable: true });
-        t.string("lastName", { nullable: true });
-      },
-    }).asArg({ required: true }),
+    id: nonNull(globalIdArg("Contact")),
+    data: nonNull(
+      inputObjectType({
+        name: "UpdateContactInput",
+        definition(t) {
+          t.nullable.string("firstName");
+          t.nullable.string("lastName");
+        },
+      }).asArg()
+    ),
   },
   validateArgs: notEmptyObject((arg) => arg.data, "data"),
   resolve: async (_, args, ctx) => {
@@ -79,7 +83,7 @@ export const deleteContacts = mutationField("deleteContacts", {
   type: "Result",
   authorize: chain(authenticate(), userHasAccessToContacts("ids")),
   args: {
-    ids: globalIdArg("Contact", { required: true, list: [true] }),
+    ids: nonNull(list(nonNull(globalIdArg("Contact")))),
   },
   resolve: async (_, args, ctx) => {
     throw new WhitelistedError(

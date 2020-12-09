@@ -1,4 +1,5 @@
-import { core, FieldAuthorizeResolver } from "@nexus/schema";
+import { core } from "@nexus/schema";
+import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { AuthenticationError } from "apollo-server-express";
 import { every, everySeries } from "async";
 import { ApiContext } from "../../context";
@@ -51,7 +52,7 @@ export function argIsContextUserId<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      return ctx.user!.id === args[argName];
+      return ctx.user!.id === ((args[argName] as unknown) as number);
     } catch {}
     return false;
   };

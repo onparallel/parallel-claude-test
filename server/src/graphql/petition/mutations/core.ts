@@ -3,7 +3,10 @@ import {
   booleanArg,
   inputObjectType,
   intArg,
+  list,
   mutationField,
+  nonNull,
+  nullable,
   objectType,
   stringArg,
 } from "@nexus/schema";
@@ -73,16 +76,14 @@ export const createPetition = mutationField("createPetition", {
   ),
   args: {
     name: stringArg(),
-    locale: arg({ type: "PetitionLocale", required: true }),
+    locale: nonNull(arg({ type: "PetitionLocale" })),
     petitionId: globalIdArg("Petition", {
       description: "GID of petition to base from",
-      required: false,
     }),
     type: arg({
       type: "PetitionBaseType",
       description: "Type of petition to create",
       default: "PETITION",
-      required: false,
     }),
   },
   resolve: async (_, { name, locale, petitionId, type }, ctx) => {
@@ -149,8 +150,7 @@ export const createPetition = mutationField("createPetition", {
 
 export const clonePetitions = mutationField("clonePetitions", {
   description: "Clone petition.",
-  type: "PetitionBase",
-  list: [true],
+  type: list(nonNull("PetitionBase")),
   authorize: chain(
     authenticate(),
     or(
@@ -159,10 +159,7 @@ export const clonePetitions = mutationField("clonePetitions", {
     )
   ),
   args: {
-    petitionIds: globalIdArg("Petition", {
-      list: [true],
-      required: true,
-    }),
+    petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
   },
   validateArgs: notEmptyArray((args) => args.petitionIds, "petitionIds"),
   resolve: async (_, args, ctx) => {
@@ -204,8 +201,8 @@ export const deletePetitions = mutationField("deletePetitions", {
   type: "Result",
   authorize: chain(authenticate(), userHasAccessToPetitions("ids")),
   args: {
-    ids: globalIdArg("Petition", { required: true, list: [true] }),
-    force: booleanArg({ default: false, required: false }),
+    ids: nonNull(list(nonNull(globalIdArg("Petition")))),
+    force: booleanArg({ default: false }),
   },
   validateArgs: notEmptyArray((args) => args.ids, "ids"),
   resolve: async (_, args, ctx) => {
@@ -250,11 +247,8 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   type: "PetitionBase",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    fieldIds: globalIdArg("PetitionField", {
-      required: true,
-      list: [true],
-    }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
   },
   resolve: async (_, args, ctx) => {
     try {
@@ -280,21 +274,17 @@ export const RemindersConfigInput = inputObjectType({
   name: "RemindersConfigInput",
   description: "The reminders settings for the petition",
   definition(t) {
-    t.int("offset", {
+    t.nonNull.int("offset", {
       description: "The amount of days between reminders.",
-      required: true,
     });
-    t.string("time", {
+    t.nonNull.string("time", {
       description: "The time at which the reminder should be sent.",
-      required: true,
     });
-    t.string("timezone", {
+    t.nonNull.string("timezone", {
       description: "The timezone the time is referring to.",
-      required: true,
     });
-    t.boolean("weekdaysOnly", {
+    t.nonNull.boolean("weekdaysOnly", {
       description: "Whether to send reminders only from monday to friday.",
-      required: true,
     });
   },
 });
@@ -303,23 +293,17 @@ export const SignatureConfigInput = inputObjectType({
   name: "SignatureConfigInput",
   description: "The signature settings for the petition",
   definition(t) {
-    t.string("provider", {
+    t.nonNull.string("provider", {
       description: "The selected provider for the signature.",
-      required: true,
     });
-    t.field("contactIds", {
-      type: "ID",
-      list: [true],
+    t.nonNull.list.nonNull.id("contactIds", {
       description: "The contacts that need to sign the generated document.",
-      required: true,
     });
-    t.string("timezone", {
+    t.nonNull.string("timezone", {
       description: "The timezone used to generate the document.",
-      required: true,
     });
-    t.string("title", {
+    t.nonNull.string("title", {
       description: "The title of the signing document",
-      required: true,
     });
   },
 });
@@ -329,26 +313,26 @@ export const updatePetition = mutationField("updatePetition", {
   type: "PetitionBase",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    data: inputObjectType({
-      name: "UpdatePetitionInput",
-      definition(t) {
-        t.string("name", { nullable: true });
-        t.field("locale", { type: "PetitionLocale", nullable: true });
-        t.datetime("deadline", { nullable: true });
-        t.string("emailSubject", { nullable: true });
-        t.json("emailBody", { nullable: true });
-        t.field("remindersConfig", {
-          type: "RemindersConfigInput",
-          nullable: true,
-        });
-        t.field("signatureConfig", {
-          type: "SignatureConfigInput",
-          nullable: true,
-        });
-        t.string("description", { nullable: true });
-      },
-    }).asArg({ required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    data: nonNull(
+      inputObjectType({
+        name: "UpdatePetitionInput",
+        definition(t) {
+          t.nullable.string("name");
+          t.nullable.field("locale", { type: "PetitionLocale" });
+          t.nullable.datetime("deadline");
+          t.nullable.string("emailSubject");
+          t.nullable.json("emailBody");
+          t.nullable.field("remindersConfig", {
+            type: "RemindersConfigInput",
+          });
+          t.nullable.field("signatureConfig", {
+            type: "SignatureConfigInput",
+          });
+          t.nullable.string("description");
+        },
+      }).asArg()
+    ),
   },
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
@@ -420,9 +404,9 @@ export const createPetitionField = mutationField("createPetitionField", {
   type: "PetitionBaseAndField",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    type: arg({ type: "PetitionFieldType", required: true }),
-    position: intArg({ required: false }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    type: nonNull(arg({ type: "PetitionFieldType" })),
+    position: intArg(),
   },
   validateArgs: inRange((args) => args.position, "position", 0),
   resolve: async (_, args, ctx) => {
@@ -449,8 +433,8 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    fieldId: globalIdArg("PetitionField", { required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.clonePetitionField(
@@ -473,9 +457,9 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    fieldId: globalIdArg("PetitionField", { required: true }),
-    force: booleanArg({ default: false, required: false }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    force: booleanArg({ default: false }),
   },
   resolve: async (_, args, ctx) => {
     const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
@@ -505,18 +489,20 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    fieldId: globalIdArg("PetitionField", { required: true }),
-    data: inputObjectType({
-      name: "UpdatePetitionFieldInput",
-      definition(t) {
-        t.string("title", { nullable: true });
-        t.string("description", { nullable: true });
-        t.field("options", { type: "JSONObject", nullable: true });
-        t.boolean("optional", { nullable: true });
-        t.boolean("multiple", { nullable: true });
-      },
-    }).asArg({ required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    data: nonNull(
+      inputObjectType({
+        name: "UpdatePetitionFieldInput",
+        definition(t) {
+          t.nullable.string("title");
+          t.nullable.string("description");
+          t.nullable.field("options", { type: "JSONObject" });
+          t.nullable.boolean("optional");
+          t.nullable.boolean("multiple");
+        },
+      }).asArg()
+    ),
   },
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
@@ -566,13 +552,10 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    fieldIds: globalIdArg("PetitionField", { required: true, list: [true] }),
-    value: booleanArg({ required: true }),
-    validateRepliesWith: arg({
-      type: "PetitionFieldReplyStatus",
-      required: false,
-    }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
+    value: nonNull(booleanArg()),
+    validateRepliesWith: arg({ type: "PetitionFieldReplyStatus" }),
   },
   validateArgs: notEmptyArray((args) => args.fieldIds, "fieldIds"),
   resolve: async (_, args, ctx) => {
@@ -633,7 +616,7 @@ export const updatePetitionFieldRepliesStatus = mutationField(
       definition(t) {
         t.field("petition", { type: "Petition" });
         t.field("field", { type: "PetitionField" });
-        t.field("replies", { type: "PetitionFieldReply", list: [true] });
+        t.list.nonNull.field("replies", { type: "PetitionFieldReply" });
       },
     }),
     authorize: chain(
@@ -645,13 +628,12 @@ export const updatePetitionFieldRepliesStatus = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldReplyIds: globalIdArg("PetitionFieldReply", {
-        required: true,
-        list: [true],
-      }),
-      status: arg({ type: "PetitionFieldReplyStatus", required: true }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      petitionFieldReplyIds: nonNull(
+        list(nonNull(globalIdArg("PetitionFieldReply")))
+      ),
+      status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
     },
     validateArgs: notEmptyArray(
       (args) => args.petitionFieldReplyIds,
@@ -708,8 +690,8 @@ export const fileUploadReplyDownloadLink = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      replyId: globalIdArg("PetitionFieldReply", { required: true }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
       preview: booleanArg({
         description:
           "If true will use content-disposition inline instead of attachment",
@@ -752,20 +734,16 @@ export const sendPetition = mutationField("sendPetition", {
     name: "SendPetitionResult",
     definition(t) {
       t.field("result", { type: "Result" });
-      t.field("petition", { type: "Petition", nullable: true });
-      t.field("accesses", {
-        type: "PetitionAccess",
-        list: [true],
-        nullable: true,
-      });
+      t.nullable.field("petition", { type: "Petition" });
+      t.nullable.list.nonNull.field("accesses", { type: "PetitionAccess" });
     },
   }),
   authorize: chain(authenticate(), and(userHasAccessToPetitions("petitionId"))),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    contactIds: globalIdArg("Contact", { list: [true], required: true }),
-    subject: stringArg({ required: true }),
-    body: jsonArg({ required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    contactIds: nonNull(list(nonNull(globalIdArg("Contact")))),
+    subject: nonNull(stringArg()),
+    body: nonNull(jsonArg()),
     scheduledAt: dateTimeArg({}),
     remindersConfig: arg({ type: "RemindersConfigInput" }),
   },
@@ -867,10 +845,10 @@ export const sendMessages = mutationField("sendMessages", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
-    subject: stringArg({ required: true }),
-    body: jsonArg({ required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
+    subject: nonNull(stringArg()),
+    body: nonNull(jsonArg()),
     scheduledAt: dateTimeArg({}),
   },
   validateArgs: validateAnd(
@@ -916,8 +894,8 @@ export const sendReminders = mutationField("sendReminders", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   resolve: async (_, args, ctx, info) => {
     const [petition, accesses] = await Promise.all([
@@ -969,8 +947,7 @@ export const switchAutomaticReminders = mutationField(
   {
     description:
       "Switches automatic reminders for the specified petition accesses.",
-    type: "PetitionAccess",
-    list: [true],
+    type: list(nonNull("PetitionAccess")),
     authorize: chain(
       authenticate(),
       and(
@@ -979,13 +956,10 @@ export const switchAutomaticReminders = mutationField(
       )
     ),
     args: {
-      start: booleanArg({ required: true }),
-      petitionId: globalIdArg("Petition", { required: true }),
-      accessIds: globalIdArg("PetitionAccess", {
-        list: [true],
-        required: true,
-      }),
-      remindersConfig: arg({ type: "RemindersConfigInput", required: false }),
+      start: nonNull(booleanArg()),
+      petitionId: nonNull(globalIdArg("Petition")),
+      accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
+      remindersConfig: arg({ type: "RemindersConfigInput" }),
     },
     validateArgs: validateOr(
       validBooleanValue((args) => args.start, "start", false),
@@ -1022,8 +996,7 @@ export const switchAutomaticReminders = mutationField(
 
 export const deactivateAccesses = mutationField("deactivateAccesses", {
   description: "Deactivates the specified active petition accesses.",
-  type: "PetitionAccess",
-  list: [true],
+  type: list(nonNull("PetitionAccess")),
   authorize: chain(
     authenticate(),
     and(
@@ -1032,8 +1005,8 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.deactivateAccesses(
@@ -1046,8 +1019,7 @@ export const deactivateAccesses = mutationField("deactivateAccesses", {
 
 export const reactivateAccesses = mutationField("reactivateAccesses", {
   description: "Reactivates the specified inactive petition accesses.",
-  type: "PetitionAccess",
-  list: [true],
+  type: list(nonNull("PetitionAccess")),
   authorize: chain(
     authenticate(),
     and(
@@ -1057,8 +1029,8 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    accessIds: globalIdArg("PetitionAccess", { list: [true], required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   resolve: async (_, args, ctx, info) => {
     return await ctx.petitions.reactivateAccesses(
@@ -1071,8 +1043,7 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
 
 export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
   description: "Cancels a scheduled petition message.",
-  type: "PetitionMessage",
-  nullable: true,
+  type: nullable("PetitionMessage"),
   authorize: chain(
     authenticate(),
     and(
@@ -1081,8 +1052,8 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
     )
   ),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
-    messageId: globalIdArg("PetitionMessage", { required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
+    messageId: nonNull(globalIdArg("PetitionMessage")),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.cancelScheduledMessage(
@@ -1106,13 +1077,10 @@ export const changePetitionFieldType = mutationField(
       )
     ),
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      fieldId: globalIdArg("PetitionField", { required: true }),
-      type: arg({
-        type: "PetitionFieldType",
-        required: true,
-      }),
-      force: booleanArg({ default: false, required: false }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      type: nonNull(arg({ type: "PetitionFieldType" })),
+      force: booleanArg({ default: false }),
     },
     resolve: async (_, args, ctx) => {
       const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
@@ -1152,7 +1120,7 @@ export const presendPetitionClosedNotification = mutationField(
       "Checks if a PetitionClosedNotification was already sent or not",
     type: "Result",
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
+      petitionId: nonNull(globalIdArg("Petition")),
     },
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     resolve: async (_, args, ctx) => {
@@ -1178,9 +1146,9 @@ export const sendPetitionClosedNotification = mutationField(
       "Sends an email to all contacts of the petition confirming the replies are ok",
     type: "Petition",
     args: {
-      petitionId: globalIdArg("Petition", { required: true }),
-      emailBody: jsonArg({ required: true }),
-      force: booleanArg({ default: false, required: false }),
+      petitionId: nonNull(globalIdArg("Petition")),
+      emailBody: nonNull(jsonArg()),
+      force: booleanArg({ default: false }),
     },
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
@@ -1230,7 +1198,7 @@ export const reopenPetition = mutationField("reopenPetition", {
   type: "Petition",
   authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
   args: {
-    petitionId: globalIdArg("Petition", { required: true }),
+    petitionId: nonNull(globalIdArg("Petition")),
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {

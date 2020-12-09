@@ -1,4 +1,11 @@
-import { arg, idArg, intArg, mutationField, stringArg } from "@nexus/schema";
+import {
+  arg,
+  idArg,
+  intArg,
+  mutationField,
+  nonNull,
+  stringArg,
+} from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { RESULT } from "../helpers/result";
 import { validEmail } from "../helpers/validators/validEmail";
@@ -9,14 +16,8 @@ export const assignPetitionToUser = mutationField("assignPetitionToUser", {
     "Clones the petition and assigns the given user as owner and creator.",
   type: "SupportMethodResponse",
   args: {
-    petitionId: idArg({
-      required: true,
-      description: "Global ID of the petition",
-    }),
-    userId: intArg({
-      required: true,
-      description: "ID of the user",
-    }),
+    petitionId: nonNull(idArg({ description: "Global ID of the petition" })),
+    userId: nonNull(intArg({ description: "ID of the user" })),
   },
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
@@ -46,10 +47,7 @@ export const deletePetition = mutationField("deletePetition", {
   description: "Soft-deletes any given petition on the database.",
   type: "SupportMethodResponse",
   args: {
-    petitionId: idArg({
-      required: true,
-      description: "Global ID of the petition",
-    }),
+    petitionId: nonNull(idArg({ description: "Global ID of the petition" })),
   },
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
@@ -78,15 +76,11 @@ export const createOrganization = mutationField("createOrganization", {
   description: "Creates a new organization.",
   type: "SupportMethodResponse",
   args: {
-    name: stringArg({
-      required: true,
-      description: "Name of the organization",
-    }),
-    identifier: stringArg({
-      required: true,
-      description: "Identifier of the organization",
-    }),
-    status: arg({ type: "OrganizationStatus", required: true }),
+    name: nonNull(stringArg({ description: "Name of the organization" })),
+    identifier: nonNull(
+      stringArg({ description: "Identifier of the organization" })
+    ),
+    status: nonNull(arg({ type: "OrganizationStatus" })),
   },
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
@@ -118,31 +112,16 @@ export const createUser = mutationField("createUser", {
   description: "Creates a new user in the specified organization.",
   type: "SupportMethodResponse",
   args: {
-    email: stringArg({
-      required: true,
-      description: "Email of the user",
-    }),
-    password: stringArg({
-      required: true,
-      description: "Temporary of the user",
-    }),
-    firstName: stringArg({
-      required: true,
-      description: "First name of the user",
-    }),
-    lastName: stringArg({
-      required: true,
-      description: "Last name of the user",
-    }),
-    role: arg({
-      type: "OrganizationRole",
-      required: true,
-      description: "Role of the user",
-    }),
-    organizationId: intArg({
-      required: true,
-      description: "ID of the organization",
-    }),
+    email: nonNull(stringArg({ description: "Email of the user" })),
+    password: nonNull(
+      stringArg({ description: "Temporary password of the user" })
+    ),
+    firstName: nonNull(stringArg({ description: "First name of the user" })),
+    lastName: nonNull(stringArg({ description: "Last name of the user" })),
+    role: nonNull(
+      arg({ type: "OrganizationRole", description: "Role of the user" })
+    ),
+    organizationId: nonNull(intArg({ description: "ID of the organization" })),
   },
   validateArgs: validEmail((args) => args.email, "email"),
   authorize: supportMethodAccess(),
@@ -186,7 +165,7 @@ export const resetSignaturitOrganizationBranding = mutationField(
       "Removes the Signaturit Branding Ids of selected organization.",
     type: "SupportMethodResponse",
     args: {
-      orgId: arg({ type: "Int", required: true }),
+      orgId: nonNull(intArg()),
     },
     authorize: supportMethodAccess(),
     resolve: async (_, { orgId }, ctx) => {
@@ -214,8 +193,8 @@ export const resetSignaturitOrganizationBranding = mutationField(
 //   description: "Uploads a logo for an organization.",
 //   type: "SupportMethodResponse",
 //   args: {
-//     orgId: arg({ type: "Int", required: true }),
-//     logo: arg({ type: "Upload", required: true }),
+//     orgId: nonNull(intArg()),
+//     logo: nonNull(arg({ type: "Upload" })),
 //   },
 //   validateArgs: fileIsImage((args) => args.logo, "logo"),
 //   authorize: supportMethodAccess(),

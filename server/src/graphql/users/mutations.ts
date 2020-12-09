@@ -4,6 +4,7 @@ import {
   mutationField,
   stringArg,
   arg,
+  nonNull,
 } from "@nexus/schema";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import { argIsContextUserId, authenticate, chain } from "../helpers/authorize";
@@ -16,14 +17,16 @@ export const updateUser = mutationField("updateUser", {
   description: "Updates the user with the provided data.",
   authorize: chain(authenticate(), argIsContextUserId("id")),
   args: {
-    id: globalIdArg("User", { required: true }),
-    data: inputObjectType({
-      name: "UpdateUserInput",
-      definition(t) {
-        t.string("firstName");
-        t.string("lastName");
-      },
-    }).asArg({ required: true }),
+    id: nonNull(globalIdArg("User")),
+    data: nonNull(
+      inputObjectType({
+        name: "UpdateUserInput",
+        definition(t) {
+          t.string("firstName");
+          t.string("lastName");
+        },
+      }).asArg()
+    ),
   },
   validateArgs: validateAnd(
     maxLength((args) => args.data.firstName, "data.firstName", 255),
@@ -50,8 +53,8 @@ export const changePassword = mutationField("changePassword", {
   }),
   authorize: authenticate(),
   args: {
-    password: stringArg({ required: true }),
-    newPassword: stringArg({ required: true }),
+    password: nonNull(stringArg()),
+    newPassword: nonNull(stringArg()),
   },
   resolve: async (o, { password, newPassword }, ctx) => {
     try {
@@ -91,8 +94,8 @@ export const updateOnboardingStatus = mutationField("updateOnboardingStatus", {
   type: "User",
   authorize: authenticate(),
   args: {
-    key: arg({ type: "OnboardingKey", required: true }),
-    status: arg({ type: "OnboardingStatus", required: true }),
+    key: nonNull(arg({ type: "OnboardingKey" })),
+    status: nonNull(arg({ type: "OnboardingStatus" })),
   },
   resolve: async (o, { key, status }, ctx) => {
     return ctx.users.updateUserOnboardingStatus(key, status, ctx.user!);

@@ -1,9 +1,9 @@
-import { FieldAuthorizeResolver } from "@nexus/schema";
 import { PetitionFieldType } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 import { PublicPetitionNotAvailableError } from "../helpers/errors";
 import { unMaybeArray } from "../../util/arrays";
+import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 
 export function fetchPetitionAccess<
   TypeName extends string,
@@ -11,7 +11,7 @@ export function fetchPetitionAccess<
   TArg extends Arg<TypeName, FieldName, string>
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const keycode = args[argKeycode] as string;
+    const keycode = (args[argKeycode] as unknown) as string;
     const access = await ctx.petitions.loadAccessByKeycode(keycode);
     if (!access) {
       throw new PublicPetitionNotAvailableError(
@@ -54,7 +54,9 @@ export function fieldHasType<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const field = await ctx.petitions.loadField(args[argFieldId] as number);
+      const field = await ctx.petitions.loadField(
+        (args[argFieldId] as unknown) as number
+      );
       return Array.isArray(fieldType)
         ? fieldType.includes(field!.type)
         : fieldType === field!.type;
@@ -72,7 +74,7 @@ export function fieldBelongsToAccess<
     try {
       return await ctx.petitions.fieldsBelongToPetition(
         ctx.access!.petition_id,
-        [args[argFieldId]]
+        [(args[argFieldId] as unknown) as number]
       );
     } catch {}
     return false;
@@ -88,7 +90,7 @@ export function replyBelongsToAccess<
     try {
       return await ctx.petitions.repliesBelongsToPetition(
         ctx.access!.petition_id,
-        [args[argReplyId]]
+        [(args[argReplyId] as unknown) as number]
       );
     } catch {}
     return false;
@@ -104,7 +106,7 @@ export function commentsBelongsToAccess<
     try {
       return await ctx.petitions.commentsBelongToPetition(
         ctx.access!.petition_id,
-        unMaybeArray(args[argCommentId])
+        unMaybeArray(args[argCommentId] as MaybeArray<number>)
       );
     } catch {}
     return false;

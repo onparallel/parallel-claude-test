@@ -47,14 +47,12 @@ export const PetitionProgress = objectType({
 export const PetitionBase = interfaceType({
   name: "PetitionBase",
   definition(t) {
-    t.resolveType((p) => (p.is_template ? "PetitionTemplate" : "Petition"));
     t.globalId("id", {
       prefixName: "Petition",
       description: "The ID of the petition or template.",
     });
-    t.string("name", {
+    t.nullable.string("name", {
       description: "The name of the petition.",
-      nullable: true,
     });
     t.field("organization", {
       type: "Organization",
@@ -72,18 +70,16 @@ export const PetitionBase = interfaceType({
         return (await ctx.petitions.loadPetitionOwners(root.id))!;
       },
     });
-    t.field("userPermissions", {
+    t.list.nonNull.field("userPermissions", {
       type: "PetitionUserPermission",
-      list: [true],
       description: "The permissions linked to the petition",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadUserPermissions(root.id);
       },
     });
-    t.field("fields", {
+    t.list.nonNull.field("fields", {
       type: "PetitionField",
       description: "The definition of the petition fields.",
-      list: [true],
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadFieldsForPetition(root.id);
       },
@@ -94,14 +90,12 @@ export const PetitionBase = interfaceType({
         return await ctx.petitions.loadFieldCountForPetition(root.id);
       },
     });
-    t.string("emailSubject", {
+    t.nullable.string("emailSubject", {
       description: "The subject of the petition.",
-      nullable: true,
       resolve: (o) => o.email_subject,
     });
-    t.json("emailBody", {
+    t.nullable.json("emailBody", {
       description: "The body of the petition.",
-      nullable: true,
       resolve: (o) => safeJsonParse(o.email_body),
     });
     // Until nexus allows interfaces to extend other interfaces
@@ -114,6 +108,7 @@ export const PetitionBase = interfaceType({
       resolve: (o) => o.updated_at,
     });
   },
+  resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   rootTyping: "db.Petition",
 });
 
@@ -122,9 +117,8 @@ export const Petition = objectType({
   description: "A petition",
   definition(t) {
     t.implements("PetitionBase");
-    t.datetime("deadline", {
+    t.nullable.datetime("deadline", {
       description: "The deadline of the petition.",
-      nullable: true,
       resolve: (o) => o.deadline,
     });
     t.field("status", {
@@ -139,33 +133,29 @@ export const Petition = objectType({
         return await ctx.petitions.loadStatusForPetition(root.id);
       },
     });
-    t.field("accesses", {
+    t.list.nonNull.field("accesses", {
       type: "PetitionAccess",
       description: "The accesses for this petition",
-      list: [true],
       resolve: async (root, _, ctx) => {
         return ctx.petitions.loadAccessesForPetition(root.id);
       },
     });
-    t.field("remindersConfig", {
+    t.nullable.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminders configuration for the petition.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return root.reminders_config;
       },
     });
-    t.field("signatureConfig", {
+    t.nullable.field("signatureConfig", {
       type: "SignatureConfig",
       description: "The signature configuration for the petition.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return root.signature_config;
       },
     });
-    t.field("currentSignatureRequest", {
+    t.nullable.field("currentSignatureRequest", {
       type: "PetitionSignatureRequest",
-      nullable: true,
       description: "The current signature request.",
       authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
       resolve: async (root, _, ctx) => {
@@ -174,10 +164,8 @@ export const Petition = objectType({
         );
       },
     });
-    t.field("signatureRequests", {
+    t.nullable.list.nonNull.field("signatureRequests", {
       type: "PetitionSignatureRequest",
-      list: [true],
-      nullable: true,
       description: "The list of signature requests.",
       authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
       resolve: async (root, _, ctx) => {
@@ -206,9 +194,8 @@ export const PetitionTemplate = objectType({
       description: "Whether the template is publicly available or not",
       resolve: (o) => o.template_public,
     });
-    t.string("description", {
+    t.nullable.string("description", {
       description: "Description of the template.",
-      nullable: true,
       resolve: (o) => o.template_description,
     });
   },
@@ -229,12 +216,11 @@ export const PetitionFieldType = enumType({
 export const PetitionBaseAndField = interfaceType({
   name: "PetitionBaseAndField",
   definition(t) {
-    t.resolveType((o) =>
-      o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField"
-    );
     t.field("petition", { type: "PetitionBase" });
     t.field("field", { type: "PetitionField" });
   },
+  resolveType: (o) =>
+    o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField",
   rootTyping: `{
     petition: db.Petition;
     field: db.PetitionField;
@@ -271,17 +257,14 @@ export const PetitionField = objectType({
       type: "PetitionFieldType",
       description: "The type of the petition field.",
     });
-    t.string("title", {
-      nullable: true,
+    t.nullable.string("title", {
       description: "The title of the petition field.",
     });
-    t.string("description", {
-      nullable: true,
+    t.nullable.string("description", {
       description: "The description of the petition field.",
     });
-    t.jsonObject("options", {
+    t.nullable.jsonObject("options", {
       description: "The options of the petition.",
-      nullable: true,
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -302,17 +285,15 @@ export const PetitionField = objectType({
       description:
         "Determines if the content of this field has been validated.",
     });
-    t.field("replies", {
+    t.list.nonNull.field("replies", {
       type: "PetitionFieldReply",
-      list: [true],
       description: "The replies to the petition field",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadRepliesForField(root.id);
       },
     });
-    t.field("comments", {
+    t.list.nonNull.field("comments", {
       type: "PetitionFieldComment",
-      list: [true],
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
         const loadInternalComments = await ctx.featureFlags.userHasFeatureFlag(
@@ -342,7 +323,7 @@ export const PetitionAndUpdatedFields = objectType({
   description: "The petition and a subset of some of its fields.",
   definition(t) {
     t.field("petition", { type: "Petition" });
-    t.field("fields", { type: "PetitionField", list: [true] });
+    t.list.nonNull.field("fields", { type: "PetitionField" });
   },
 });
 
@@ -378,9 +359,8 @@ export const SignatureConfig = objectType({
     t.string("provider", {
       description: "The selected provider for the signature.",
     });
-    t.field("contacts", {
+    t.list.nullable.field("contacts", {
       type: "Contact",
-      list: [false],
       description: "The contacts that need to sign the generated document.",
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadContact(root.contactIds);
@@ -424,26 +404,23 @@ export const PetitionAccess = objectType({
     t.globalId("id", {
       description: "The ID of the petition access.",
     });
-    t.field("petition", {
+    t.nullable.field("petition", {
       type: "Petition",
       description: "The petition for this message access.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetition(root.petition_id);
       },
     });
-    t.field("granter", {
+    t.nullable.field("granter", {
       type: "User",
       description: "The user who granted the access.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return (await ctx.users.loadUser(root.granter_id))!;
       },
     });
-    t.field("contact", {
+    t.nullable.field("contact", {
       type: "Contact",
       description: "The contact of this access.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadContact(root.contact_id);
       },
@@ -452,9 +429,8 @@ export const PetitionAccess = objectType({
       type: "PetitionAccessStatus",
       description: "The status of the petition access",
     });
-    t.datetime("nextReminderAt", {
+    t.nullable.datetime("nextReminderAt", {
       description: "When the next reminder will be sent.",
-      nullable: true,
       resolve: (o) =>
         o.status === "ACTIVE" && o.reminders_active ? o.next_reminder_at : null,
     });
@@ -468,10 +444,9 @@ export const PetitionAccess = objectType({
         return await ctx.petitions.loadReminderCountForAccess(root.id);
       },
     });
-    t.field("remindersConfig", {
+    t.nullable.field("remindersConfig", {
       type: "RemindersConfig",
       description: "The reminder settings of the petition.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return root.reminders_config;
       },
@@ -543,10 +518,9 @@ export const PetitionFieldReply = objectType({
         return (await ctx.petitions.loadAccess(root.petition_access_id))!;
       },
     });
-    t.field("field", {
+    t.nullable.field("field", {
       type: "PetitionField",
       description: "The petition field for this reply.",
-      nullable: true,
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadField(root.petition_field_id);
       },
@@ -558,6 +532,6 @@ export const FileUploadReplyDownloadLinkResult = objectType({
   name: "FileUploadReplyDownloadLinkResult",
   definition(t) {
     t.field("result", { type: "Result" });
-    t.string("url", { nullable: true });
+    t.nullable.string("url");
   },
 });

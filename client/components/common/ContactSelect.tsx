@@ -38,7 +38,7 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
 };
 
 export type ContactSelectProps = Omit<
-  AsyncCreatableSelectProps<ContactSelectSelection>,
+  AsyncCreatableSelectProps<ContactSelectSelection, true>,
   "value" | "onChange"
 > & {
   placeholder?: string;
@@ -62,7 +62,7 @@ export const ContactSelect = Object.assign(
       onChange,
       ...props
     }: ContactSelectProps,
-    ref: Ref<AsyncCreatableSelect<ContactSelectSelection>>
+    ref: Ref<AsyncCreatableSelect<ContactSelectSelection, true>>
   ) {
     const errorToast = useExistingContactToast();
 
@@ -163,7 +163,7 @@ export const ContactSelect = Object.assign(
     }
 
     return (
-      <AsyncCreatableSelect<ContactSelectSelection>
+      <AsyncCreatableSelect<ContactSelectSelection, true>
         ref={useMergedRef(ref, innerRef)}
         value={value}
         isMulti
@@ -267,7 +267,7 @@ function useContactSelectReactSelectProps(
             children,
             data,
             ...props
-          }: Omit<OptionProps<ContactSelectSelection>, "data"> & {
+          }: Omit<OptionProps<ContactSelectSelection, true>, "data"> & {
             data: ContactSelectSelection;
           }) => {
             if ((data as any).__isNew__) {
@@ -326,7 +326,7 @@ function useContactSelectReactSelectProps(
             />
           );
         },
-      } as Partial<AsyncCreatableSelectProps<ContactSelectSelection>>),
+      } as Partial<AsyncCreatableSelectProps<ContactSelectSelection, true>>),
     [reactSelectProps, handleCreateContact]
   );
 }

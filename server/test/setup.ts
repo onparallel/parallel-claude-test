@@ -16,7 +16,7 @@ export default async function () {
 }
 
 function waitUntilReady(process: ChildProcessWithoutNullStreams) {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     process.stdout.on("data", (data: Buffer) => {
       const text = data.toString();
       if (text.includes("database system is ready to accept connections")) {

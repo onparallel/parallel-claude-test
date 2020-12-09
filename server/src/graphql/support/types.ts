@@ -13,7 +13,7 @@ export const SupportMethodResponse = objectType({
   description: "Return type for all support methods",
   definition(t) {
     t.field("result", { type: "Result" });
-    t.string("message", { nullable: true });
+    t.nullable.string("message");
   },
 });
 

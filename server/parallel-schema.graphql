@@ -353,7 +353,7 @@ type Mutation {
     organizationId: Int!
 
     """
-    Temporary of the user
+    Temporary password of the user
     """
     password: String!
 

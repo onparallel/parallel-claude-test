@@ -4,6 +4,9 @@ import {
   dynamicOutputMethod,
   enumType,
   intArg,
+  list,
+  nonNull,
+  nullable,
   objectType,
   plugin,
   stringArg,
@@ -77,14 +80,16 @@ export type PaginationFieldConfig<
 } & NexusGenPluginFieldConfig<TypeName, FieldName>;
 
 const PaginationArgs = {
-  offset: intArg({
-    nullable: true,
-    description: "Number of elements to skip from the list.",
-  }),
-  limit: intArg({
-    nullable: true,
-    description: "Number of elements to take from the list.",
-  }),
+  offset: nullable(
+    intArg({
+      description: "Number of elements to skip from the list.",
+    })
+  ),
+  limit: nullable(
+    intArg({
+      description: "Number of elements to take from the list.",
+    })
+  ),
 };
 
 export function paginationPlugin() {
@@ -102,7 +107,7 @@ export function paginationPlugin() {
       }),
     ],
     // Defines the field added to the definition block:
-    // t.paginationField('users', {
+    // t.paginationField("users", {
     //   type: "User"
     // })
     onInstall(b) {
@@ -142,13 +147,11 @@ export function paginationPlugin() {
                 objectType({
                   name: paginationName as any,
                   definition(t2) {
-                    t2.field("items", {
+                    t2.nonNull.list.nonNull.field("items", {
                       type: targetType,
                       description: "The requested slice of items.",
-                      list: [true],
                     });
-                    t2.int("totalCount", {
-                      nullable: false,
+                    t2.nonNull.int("totalCount", {
                       description: "The total count of items in the list.",
                     });
                     if (fieldConfig.extendPagination instanceof Function) {
@@ -187,12 +190,16 @@ export function paginationPlugin() {
                   : {}),
                 ...(fieldConfig.sortableBy
                   ? {
-                      sortBy: arg({
-                        description: "Sorting to use on the collection",
-                        required: false,
-                        type: sortByName as any,
-                        list: [true],
-                      }),
+                      sortBy: nullable(
+                        list(
+                          nonNull(
+                            arg({
+                              description: "Sorting to use on the collection",
+                              type: sortByName as any,
+                            })
+                          )
+                        )
+                      ),
                     }
                   : {}),
                 ...(fieldConfig.additionalArgs ?? {}),
@@ -206,8 +213,6 @@ export function paginationPlugin() {
           },
         })
       );
-
-      return { types: [] };
     },
   });
 }

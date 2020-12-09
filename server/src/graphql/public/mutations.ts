@@ -2,7 +2,9 @@ import {
   arg,
   idArg,
   inputObjectType,
+  list,
   mutationField,
+  nonNull,
   objectType,
   stringArg,
 } from "@nexus/schema";
@@ -33,8 +35,8 @@ export const publicDeletePetitionReply = mutationField(
       replyBelongsToAccess("replyId")
     ),
     args: {
-      replyId: globalIdArg("PetitionFieldReply", { required: true }),
-      keycode: idArg({ required: true }),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      keycode: nonNull(idArg()),
     },
     resolve: async (_, args, ctx) => {
       const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -65,8 +67,8 @@ export const publicFileUploadReplyComplete = mutationField(
     description: "Notifies the backend that the upload is complete.",
     type: "PublicPetitionFieldReply",
     args: {
-      keycode: idArg({ required: true }),
-      replyId: globalIdArg("PetitionFieldReply", { required: true }),
+      keycode: nonNull(idArg()),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
     },
     authorize: chain(
       fetchPetitionAccess("keycode"),
@@ -102,16 +104,18 @@ export const publicCreateFileUploadReply = mutationField(
       },
     }),
     args: {
-      keycode: idArg({ required: true }),
-      fieldId: globalIdArg("PetitionField", { required: true }),
-      data: inputObjectType({
-        name: "CreateFileUploadReplyInput",
-        definition(t) {
-          t.string("filename", { required: true });
-          t.int("size", { required: true });
-          t.string("contentType", { required: true });
-        },
-      }).asArg({ required: true }),
+      keycode: nonNull(idArg()),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      data: nonNull(
+        inputObjectType({
+          name: "CreateFileUploadReplyInput",
+          definition(t) {
+            t.nonNull.string("filename");
+            t.nonNull.int("size");
+            t.nonNull.string("contentType");
+          },
+        }).asArg()
+      ),
     },
     authorize: chain(
       fetchPetitionAccess("keycode"),
@@ -151,14 +155,16 @@ export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   description: "Creates a reply to a text field.",
   type: "PublicPetitionFieldReply",
   args: {
-    keycode: idArg({ required: true }),
-    fieldId: globalIdArg("PetitionField", { required: true }),
-    data: inputObjectType({
-      name: "CreateTextReplyInput",
-      definition(t) {
-        t.string("text", { required: true });
-      },
-    }).asArg({ required: true }),
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    data: nonNull(
+      inputObjectType({
+        name: "CreateTextReplyInput",
+        definition(t) {
+          t.nonNull.string("text");
+        },
+      }).asArg()
+    ),
   },
   authorize: chain(
     fetchPetitionAccess("keycode"),
@@ -185,10 +191,10 @@ export const publicCreateSelectReply = mutationField(
     description: "Creates a reply to a select field.",
     type: "PublicPetitionFieldReply",
     args: {
-      keycode: idArg({ required: true }),
-      fieldId: globalIdArg("PetitionField", { required: true }),
+      keycode: nonNull(idArg()),
+      fieldId: nonNull(globalIdArg("PetitionField")),
       // use the same input data as Text replies
-      data: arg({ type: "CreateTextReplyInput", required: true }),
+      data: nonNull(arg({ type: "CreateTextReplyInput" })),
     },
     authorize: chain(
       fetchPetitionAccess("keycode"),
@@ -215,7 +221,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
     "Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.",
   type: "PublicPetition",
   args: {
-    keycode: idArg({ required: true }),
+    keycode: nonNull(idArg()),
   },
   authorize: fetchPetitionAccess("keycode"),
   resolve: async (_, args, ctx) => {
@@ -269,9 +275,9 @@ export const publicCreatePetitionFieldComment = mutationField(
       fieldBelongsToAccess("petitionFieldId")
     ),
     args: {
-      keycode: idArg({ required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      content: stringArg({ required: true }),
+      keycode: nonNull(idArg()),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      content: nonNull(stringArg()),
     },
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.createPetitionFieldCommentFromAccess(
@@ -300,11 +306,9 @@ export const publicDeletePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      keycode: idArg({ required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
-        required: true,
-      }),
+      keycode: nonNull(idArg()),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
     },
     resolve: async (_, args, ctx) => {
       await ctx.petitions.deletePetitionFieldCommentFromAccess(
@@ -332,12 +336,10 @@ export const publicUpdatePetitionFieldComment = mutationField(
       )
     ),
     args: {
-      keycode: idArg({ required: true }),
-      petitionFieldId: globalIdArg("PetitionField", { required: true }),
-      petitionFieldCommentId: globalIdArg("PetitionFieldComment", {
-        required: true,
-      }),
-      content: stringArg({ required: true }),
+      keycode: nonNull(idArg()),
+      petitionFieldId: nonNull(globalIdArg("PetitionField")),
+      petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
+      content: nonNull(stringArg()),
     },
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.updatePetitionFieldCommentFromContact(
@@ -353,11 +355,10 @@ export const publicSubmitUnpublishedComments = mutationField(
   "publicSubmitUnpublishedComments",
   {
     description: "Submits all unpublished comments.",
-    type: "PublicPetitionFieldComment",
-    list: [true],
+    type: list(nonNull("PublicPetitionFieldComment")),
     authorize: chain(fetchPetitionAccess("keycode")),
     args: {
-      keycode: idArg({ required: true }),
+      keycode: nonNull(idArg()),
     },
     resolve: async (_, args, ctx) => {
       const {
@@ -383,18 +384,16 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
   "publicMarkPetitionFieldCommentsAsRead",
   {
     description: "Marks the specified comments as read.",
-    type: "PublicPetitionFieldComment",
-    list: [true],
+    type: list(nonNull("PublicPetitionFieldComment")),
     authorize: chain(
       fetchPetitionAccess("keycode"),
       commentsBelongsToAccess("petitionFieldCommentIds")
     ),
     args: {
-      keycode: idArg({ required: true }),
-      petitionFieldCommentIds: globalIdArg("PetitionFieldComment", {
-        required: true,
-        list: [true],
-      }),
+      keycode: nonNull(idArg()),
+      petitionFieldCommentIds: nonNull(
+        list(nonNull(globalIdArg("PetitionFieldComment")))
+      ),
     },
     validateArgs: notEmptyArray(
       prop("petitionFieldCommentIds"),

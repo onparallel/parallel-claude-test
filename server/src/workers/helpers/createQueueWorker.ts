@@ -82,7 +82,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
           logger.error(error.stack);
         });
         consumer.on("processing_error", (error, message) => {
-          logger.error(error.stack, { payload: message.Body });
+          logger.error(error.stack ?? "", { payload: message.Body });
         });
         process.on("SIGINT", function () {
           logger.info(`Received SIGINT. Shutting down queue worker`);

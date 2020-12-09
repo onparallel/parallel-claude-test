@@ -1,4 +1,4 @@
-import { queryField } from "@nexus/schema";
+import { list, nonNull, queryField } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { userHasAccessToContacts } from "./authorizers";
@@ -10,10 +10,7 @@ export const contactQueries = queryField((t) => {
     authorize: authenticate(),
     searchable: true,
     additionalArgs: {
-      exclude: globalIdArg("Contact", {
-        list: [true],
-        required: false,
-      }),
+      exclude: list(nonNull(globalIdArg("Contact"))),
     },
     sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt"],
     resolve: async (_, { offset, limit, search, sortBy, exclude }, ctx) => {
@@ -51,13 +48,12 @@ export const contactQueries = queryField((t) => {
     },
   });
 
-  t.field("contact", {
+  t.nullable.field("contact", {
     type: "Contact",
     args: {
-      id: globalIdArg({ required: true }),
+      id: nonNull(globalIdArg()),
     },
     authorize: chain(authenticate(), userHasAccessToContacts("id")),
-    nullable: true,
     resolve: async (root, args, ctx) => {
       return await ctx.contacts.loadContact(args.id);
     },

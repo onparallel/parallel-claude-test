@@ -152,9 +152,8 @@ function ObjectInput({
 }: SupportMethodArgumentInputProps) {
   const { inputFields } = findNamedTypeRef(
     arg.type.kind === "NON_NULL"
-      ? (arg.type.ofType as IntrospectionNamedTypeRef<
-          IntrospectionInputObjectType
-        >)
+      ? (arg.type
+          .ofType as IntrospectionNamedTypeRef<IntrospectionInputObjectType>)
       : (arg.type as IntrospectionNamedTypeRef<IntrospectionInputObjectType>),
     schemaTypes
   );
