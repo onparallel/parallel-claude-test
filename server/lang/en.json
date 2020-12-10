@@ -315,6 +315,36 @@
     "context": "{ownerName} ({ownerEmail}) has shared the following template with you."
   },
   {
+    "term": "verification-code-request.code-label",
+    "definition": "Verification code:",
+    "context": "Verification code:"
+  },
+  {
+    "term": "verification-code-request.device",
+    "definition": "{browserName} on {osName}",
+    "context": "{browserName} on {osName}"
+  },
+  {
+    "term": "verification-code-request.device-label",
+    "definition": "Device:",
+    "context": "Device:"
+  },
+  {
+    "term": "verification-code-request.expiry",
+    "definition": "This verification code will expire in 10 minutes, so make sure you use as soon as possible.",
+    "context": "This verification code will expire in 10 minutes, so make sure you use as soon as possible."
+  },
+  {
+    "term": "verification-code-request.instructions",
+    "definition": "Please use the following verification code on the unrecognized device.",
+    "context": "Please use the following verification code on the unrecognized device."
+  },
+  {
+    "term": "verification-code-request.subject",
+    "definition": "Verify your device",
+    "context": "Verify your device"
+  },
+  {
     "term": "welcome.click-to-verify",
     "definition": "Please click the link below to verify your email address.",
     "context": "Please click the link below to verify your email address."

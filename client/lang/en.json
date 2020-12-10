@@ -3440,6 +3440,16 @@
     "context": "Contents"
   },
   {
+    "term": "recipient-view.expired-code-description",
+    "definition": "The code has expired. Please try again.",
+    "context": "The code has expired. Please try again."
+  },
+  {
+    "term": "recipient-view.expired-code-title",
+    "definition": "Expired code",
+    "context": "Expired code"
+  },
+  {
     "term": "recipient-view.field-comments.cta",
     "definition": "Have any questions? Ask here",
     "context": "Have any questions? Ask here"
@@ -3530,6 +3540,11 @@
     "context": "This reply has been rejected"
   },
   {
+    "term": "recipient-view.remaining-attempts",
+    "definition": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}",
+    "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+  },
+  {
     "term": "recipient-view.remove-reply-label",
     "definition": "Remove reply",
     "context": "Remove reply"
@@ -3543,6 +3558,11 @@
     "term": "recipient-view.security-link",
     "definition": "About security",
     "context": "About security"
+  },
+  {
+    "term": "recipient-view.send-code",
+    "definition": "Send verification code",
+    "context": "Send verification code"
   },
   {
     "term": "recipient-view.sender",
@@ -3593,6 +3613,21 @@
     "term": "recipient-view.unread-comments",
     "definition": "There's unread comments",
     "context": "There's unread comments"
+  },
+  {
+    "term": "recipient-view.verify-1",
+    "definition": "It looks like you are trying to access this page from a new device.",
+    "context": "It looks like you are trying to access this page from a new device."
+  },
+  {
+    "term": "recipient-view.verify-2",
+    "definition": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}.",
+    "context": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
+  },
+  {
+    "term": "recipient-view.verify-button",
+    "definition": "Verify code",
+    "context": "Verify code"
   },
   {
     "term": "settings.account",

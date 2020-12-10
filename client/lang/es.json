@@ -3440,6 +3440,16 @@
     "context": "Contents"
   },
   {
+    "term": "recipient-view.expired-code-description",
+    "definition": "El código ha caducado. Por favor, vuelva a intentarlo.",
+    "context": "The code has expired. Please try again."
+  },
+  {
+    "term": "recipient-view.expired-code-title",
+    "definition": "Código caducado",
+    "context": "Expired code"
+  },
+  {
     "term": "recipient-view.field-comments.cta",
     "definition": "¿Alguna duda? Pregunte por aquí",
     "context": "Have any questions? Ask here"
@@ -3530,6 +3540,11 @@
     "context": "This reply has been rejected"
   },
   {
+    "term": "recipient-view.remaining-attempts",
+    "definition": "Tiene {attempts, plural, =1{un intento más} other{# intentos más}}",
+    "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+  },
+  {
     "term": "recipient-view.remove-reply-label",
     "definition": "Eliminar respuesta",
     "context": "Remove reply"
@@ -3543,6 +3558,11 @@
     "term": "recipient-view.security-link",
     "definition": "Seguridad",
     "context": "About security"
+  },
+  {
+    "term": "recipient-view.send-code",
+    "definition": "Enviar código de verificación",
+    "context": "Send verification code"
   },
   {
     "term": "recipient-view.sender",
@@ -3593,6 +3613,21 @@
     "term": "recipient-view.unread-comments",
     "definition": "Hay comentarios por leer",
     "context": "There's unread comments"
+  },
+  {
+    "term": "recipient-view.verify-1",
+    "definition": "Parece que está intentando acceder a esta página desde un dispositivo nuevo.",
+    "context": "It looks like you are trying to access this page from a new device."
+  },
+  {
+    "term": "recipient-view.verify-2",
+    "definition": "Para asegurar la privacidad de sus datos, necesitamos que verifique su identidad mediante el código que le llegará a su correo electrónico {email}.",
+    "context": "To ensure the privacy of your data, we need to verify your identity with a code you will receive on your email {email}."
+  },
+  {
+    "term": "recipient-view.verify-button",
+    "definition": "Verificar código",
+    "context": "Verify code"
   },
   {
     "term": "settings.account",

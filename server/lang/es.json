@@ -315,6 +315,36 @@
     "context": "{ownerName} ({ownerEmail}) has shared the following template with you."
   },
   {
+    "term": "verification-code-request.code-label",
+    "definition": "Código de verificación:",
+    "context": "Verification code:"
+  },
+  {
+    "term": "verification-code-request.device",
+    "definition": "{browserName} en {osName}",
+    "context": "{browserName} on {osName}"
+  },
+  {
+    "term": "verification-code-request.device-label",
+    "definition": "Dispositivo:",
+    "context": "Device:"
+  },
+  {
+    "term": "verification-code-request.expiry",
+    "definition": "Este código de verificación caducará en 10 minutos, intente utilizarlo lo antes posible.",
+    "context": "This verification code will expire in 10 minutes, so make sure you use as soon as possible."
+  },
+  {
+    "term": "verification-code-request.instructions",
+    "definition": "Por favor, use el siguiente código de verificación en el dispositivo nuevo.",
+    "context": "Please use the following verification code on the unrecognized device."
+  },
+  {
+    "term": "verification-code-request.subject",
+    "definition": "Verifique su dispositivo",
+    "context": "Verify your device"
+  },
+  {
     "term": "welcome.click-to-verify",
     "definition": "Por favor, haz click en el siguiente enlace para verificar tu dirección de correo.",
     "context": "Please click the link below to verify your email address."
