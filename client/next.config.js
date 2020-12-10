@@ -107,6 +107,7 @@ const config = {
                       "www.google-analytics.com",
                       // Hotjar
                       "*.hotjar.com",
+                      "*.hotjar.io",
                       // Hubspot
                       "*.hubspot.com",
                       "*.hubapi.com",
