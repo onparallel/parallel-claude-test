@@ -7,7 +7,7 @@ export function authenticate(): Handler {
       const ctx = req.context;
       const token = getTokenFromRequest(req);
       if (!token) {
-        throw new Error("Not auhtorized");
+        throw new Error("Not authorized");
       }
       const cognitoId = await ctx.auth.validateSession(token);
       if (!cognitoId) {

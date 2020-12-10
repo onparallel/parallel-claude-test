@@ -30,7 +30,7 @@ export function authenticate<
   };
 }
 
-export function checkClienServerToken<
+export function checkClientServerToken<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, string>

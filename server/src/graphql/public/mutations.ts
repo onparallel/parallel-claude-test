@@ -11,7 +11,7 @@ import {
 } from "@nexus/schema";
 import { prop } from "remeda";
 import { random } from "../../util/token";
-import { and, chain, checkClienServerToken } from "../helpers/authorize";
+import { and, chain, checkClientServerToken } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import {
@@ -58,7 +58,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
     },
   }),
   authorize: chain(
-    checkClienServerToken("token"),
+    checkClientServerToken("token"),
     fetchPetitionAccess("keycode")
   ),
   args: {
