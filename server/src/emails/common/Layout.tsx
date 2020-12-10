@@ -79,7 +79,11 @@ export const Layout: FC<LayoutProps> = function Layout({
         {/* Content */}
         <MjmlWrapper padding="1px" backgroundColor="#A0AEC0" borderRadius="4px">
           {contentHeading}
-          <MjmlWrapper padding="0" backgroundColor="#ffffff" borderRadius="3px">
+          <MjmlWrapper
+            padding="0"
+            backgroundColor="#ffffff"
+            borderRadius={contentHeading ? "0 0 3px 3px" : "3px"}
+          >
             {children}
           </MjmlWrapper>
         </MjmlWrapper>

@@ -111,7 +111,7 @@ const email: Email<MessageBouncedEmailProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         contentHeading={
-          <MjmlWrapper backgroundColor="#6059f7" borderRadius="3px">
+          <MjmlWrapper backgroundColor="#6059f7" borderRadius="3px 3px 0 0">
             <MjmlText
               align="center"
               color="white"
