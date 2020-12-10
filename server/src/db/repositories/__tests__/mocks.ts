@@ -133,14 +133,15 @@ export class Mocks {
     return await this.knex<PetitionField>("petition_field")
       .insert(
         range(0, amount).map<CreatePetitionField>((index) => {
-          const type = randomPetitionFieldType();
+          const data = builder?.(index) ?? {};
+          const type = data.type ?? randomPetitionFieldType();
           return {
             petition_id: petitionId,
             position: index,
             title: faker.random.words(),
             type: type,
             options: randomPetitionFieldOptions(type),
-            ...builder?.(index),
+            ...data,
           };
         })
       )

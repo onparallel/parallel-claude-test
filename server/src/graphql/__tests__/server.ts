@@ -1,23 +1,23 @@
 import { ApolloServer } from "apollo-server-express";
-import { schema } from "./../../schema";
+import { createTestClient } from "apollo-server-testing";
+import { serialize as serializeCookie } from "cookie";
+import Knex from "knex";
+import { createContainer } from "../../container";
 import { ApiContext } from "../../context";
+import { KNEX } from "../../db/knex";
+import { ANALYTICS, IAnalyticsService } from "../../services/analytics";
 import { AUTH, IAuth } from "../../services/auth";
+import { EMAILS, IEmailsService } from "../../services/emails";
+import { IRedis, REDIS } from "../../services/redis";
+import { deleteAllData } from "../../util/knexUtils";
+import { UnwrapPromise } from "../../util/types";
+import { schema } from "./../../schema";
 import {
   MockAnalyticsService,
   MockAuth,
   MockEmailsService,
   MockRedis,
 } from "./mocks";
-import { createTestClient } from "apollo-server-testing";
-import { KNEX } from "../../db/knex";
-import Knex from "knex";
-import { createContainer } from "../../container";
-import { ANALYTICS, IAnalyticsService } from "../../services/analytics";
-import { IRedis, REDIS } from "../../services/redis";
-import { deleteAllData } from "../../util/knexUtils";
-import { EMAILS, IEmailsService } from "../../services/emails";
-import { UnwrapPromise } from "../../util/types";
-import { serialize as serializeCookie } from "cookie";
 
 export type TestClient = UnwrapPromise<ReturnType<typeof initServer>>;
 
@@ -31,19 +31,18 @@ export const initServer = async () => {
     .to(MockEmailsService)
     .inSingletonScope();
 
+  const stack: any[] = [];
   const server = new ApolloServer({
     schema,
     context: () => {
       const context = container.get<ApiContext>(ApiContext);
-      context.req = {
-        headers: {
-          cookie: serializeCookie("parallel_session", "XXXXX"),
-          "user-agent": "tests",
-        },
-        connection: {
-          remoteAddress: "127.0.0.1",
-        },
-      } as any;
+      context.req = stack.length
+        ? stack.pop()
+        : ({
+            headers: {
+              cookie: serializeCookie("parallel_session", "XXXXX"),
+            },
+          } as any);
       return context;
     },
   });
@@ -56,8 +55,11 @@ export const initServer = async () => {
   return {
     query,
     mutate,
+    setNextReq(req: any) {
+      stack.push(req);
+    },
     container,
-    stop: async () => {
+    async stop() {
       await knex.destroy();
       await server.stop();
     },
