@@ -17,6 +17,7 @@ import { IRedis, REDIS } from "../../services/redis";
 import { deleteAllData } from "../../util/knexUtils";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { UnwrapPromise } from "../../util/types";
+import { serialize as serializeCookie } from "cookie";
 
 export type TestClient = UnwrapPromise<ReturnType<typeof initServer>>;
 
@@ -35,11 +36,12 @@ export const initServer = async () => {
     context: () => {
       const context = container.get<ApiContext>(ApiContext);
       context.req = {
-        header: (name: string) => {
-          if (name === "Authorization") {
-            return "Bearer xxxxxxx";
-          }
-          return "";
+        headers: {
+          cookie: serializeCookie("parallel_session", "XXXXX"),
+          "user-agent": "tests",
+        },
+        connection: {
+          remoteAddress: "127.0.0.1",
         },
       } as any;
       return context;
