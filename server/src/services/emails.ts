@@ -41,6 +41,8 @@ export interface IEmailsService {
     petitionAccessIds: MaybeArray<number>,
     emailBody: any
   ): Promise<void>;
+  sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
+  sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
 }
 export const EMAILS = Symbol.for("EMAILS");
 

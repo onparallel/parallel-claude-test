@@ -47,4 +47,6 @@ export class MockEmailsService implements IEmailsService {
   async sendPetitionCommentsUserNotificationEmail() {}
   async sendPetitionSharingNotificationEmail() {}
   async sendPetitionClosedEmail() {}
+  async sendPetitionMessageBouncedEmail() {}
+  async sendContactAuthenticationRequestEmail() {}
 }

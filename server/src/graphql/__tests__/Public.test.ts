@@ -15,6 +15,7 @@ import Knex from "knex";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
 import { serialize as serializeCookie } from "cookie";
+import { EMAILS, IEmailsService } from "../../services/emails";
 
 describe("GraphQL/Public", () => {
   let testClient: TestClient;
@@ -75,9 +76,6 @@ describe("GraphQL/Public", () => {
           isAllowed
           cookieName
           cookieValue
-          email
-          orgName
-          orgLogoUrl
         }
       }
     `;
@@ -131,5 +129,107 @@ describe("GraphQL/Public", () => {
     expect(res3.errors).toBeUndefined();
     expect(res3.data!.verifyPublicAccess.isAllowed).toBe(true);
     expect(res3.data!.verifyPublicAccess.cookieValue).toBeNull();
+  });
+
+  it("sends a verification code", async () => {
+    // assume already existing contact authentication from previous test
+    expect(
+      await contactRepository.hasContactAuthentication(access.contact_id)
+    ).toBe(true);
+
+    const emailSpy = jest.spyOn(
+      testClient.container.get<IEmailsService>(EMAILS),
+      "sendContactAuthenticationRequestEmail"
+    );
+
+    const res1 = await testClient.mutate({
+      mutation: gql`
+        mutation($keycode: ID!) {
+          publicSendVerificationCode(keycode: $keycode) {
+            token
+            remainingAttempts
+            expiresAt
+          }
+        }
+      `,
+      variables: { keycode: access.keycode },
+    });
+
+    expect(emailSpy).toHaveBeenCalledTimes(1);
+
+    // get generated code
+    const requestId = emailSpy.mock.calls[emailSpy.mock.calls.length - 1][0];
+    const [{ code }] = await knex
+      .from("contact_authentication_request")
+      .where("id", requestId);
+
+    const req = {
+      headers: {},
+      res: {
+        cookie() {},
+      },
+    };
+
+    const cookieSpy = jest.spyOn(req.res, "cookie");
+    testClient.setNextReq(req);
+
+    const res2 = await testClient.mutate({
+      mutation: gql`
+        mutation($keycode: ID!, $token: ID!, $code: String!) {
+          publicCheckVerificationCode(
+            keycode: $keycode
+            token: $token
+            code: $code
+          ) {
+            result
+            remainingAttempts
+          }
+        }
+      `,
+      variables: {
+        keycode: access.keycode,
+        token: res1.data.publicSendVerificationCode.token,
+        code,
+      },
+    });
+
+    expect(res2.errors).toBeUndefined();
+    expect(res2.data!.publicCheckVerificationCode.result).toBe("SUCCESS");
+    expect(cookieSpy).toHaveBeenCalled();
+
+    const [cookieName, cookieValue] = cookieSpy.mock.calls[
+      cookieSpy.mock.calls.length - 1
+    ] as any;
+
+    // verify cookie is valid
+    testClient.setNextReq({
+      headers: {
+        cookie: serializeCookie(cookieName, cookieValue),
+      },
+    });
+
+    const res3 = await testClient.mutate({
+      mutation: gql`
+        mutation($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
+          verifyPublicAccess(
+            token: $token
+            keycode: $keycode
+            ip: $ip
+            userAgent: $userAgent
+          ) {
+            isAllowed
+          }
+        }
+      `,
+      variables: {
+        token: "test",
+        keycode: access.keycode,
+        ip: "127.0.0.42",
+        userAgent: "WAT",
+      },
+    });
+
+    expect(res3.errors).toBeUndefined();
+    expect(res3.data!.verifyPublicAccess.isAllowed).toBe(true);
   });
 });
