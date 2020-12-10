@@ -149,30 +149,29 @@ function RecipientView({
               }
             );
             const { endpoint, reply } = data!.publicCreateFileUploadReply;
-            try {
-              const source = axios.CancelToken.source();
-              setUploadTokens((tokens) => ({ ...tokens, [reply.id]: source }));
-              await axios.put(endpoint, file, {
-                cancelToken: source.token,
-                onUploadProgress({ loaded, total }) {
-                  const progress: number = loaded / total;
-                  setUploadProgress((curr) => ({
-                    ...curr,
-                    [fieldId]: { ...curr[fieldId], [reply.id]: progress },
-                  }));
-                },
-                headers: {
-                  "Content-Type": file.type,
-                },
-              });
-              await fileUploadReplyComplete({
-                variables: { keycode, replyId: reply.id },
-              });
-              setUploadProgress((curr) => ({
-                ...curr,
-                [fieldId]: omit(curr[fieldId] ?? {}, [reply.id]),
-              }));
-            } catch {}
+
+            const source = axios.CancelToken.source();
+            setUploadTokens((tokens) => ({ ...tokens, [reply.id]: source }));
+            await axios.put(endpoint, file, {
+              cancelToken: source.token,
+              onUploadProgress({ loaded, total }) {
+                const progress: number = loaded / total;
+                setUploadProgress((curr) => ({
+                  ...curr,
+                  [fieldId]: { ...curr[fieldId], [reply.id]: progress },
+                }));
+              },
+              headers: {
+                "Content-Type": file.type,
+              },
+            });
+            await fileUploadReplyComplete({
+              variables: { keycode, replyId: reply.id },
+            });
+            setUploadProgress((curr) => ({
+              ...curr,
+              [fieldId]: omit(curr[fieldId] ?? {}, [reply.id]),
+            }));
           }
           break;
         case "TEXT":
