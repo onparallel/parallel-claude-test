@@ -102,6 +102,7 @@ const config = {
                     connectSrc: [
                       "'self'",
                       "*.parallel.so",
+                      "parallel-file-uploads-production.s3-accelerate.amazonaws.com",
                       // Google analytics
                       "www.google-analytics.com",
                       // Hotjar
