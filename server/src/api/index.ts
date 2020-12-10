@@ -18,7 +18,7 @@ export function api(container: Container) {
         stream: {
           write: (message: string) => logger.info(message),
         },
-      })
+      }) as any
     )
     .use(
       "/auth",
