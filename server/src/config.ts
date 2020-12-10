@@ -76,6 +76,7 @@ export function buildConfig() {
       assetsUrl: process.env.ASSETS_URL!,
       parallelUrl: process.env.PARALLEL_URL!,
       emailFrom: process.env.EMAIL_FROM!,
+      clientServerToken: process.env.CLIENT_SERVER_TOKEN!,
     }),
   });
 }

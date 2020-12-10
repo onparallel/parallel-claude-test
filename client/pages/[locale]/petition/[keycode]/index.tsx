@@ -9,18 +9,20 @@ import {
   Image,
   PinInput,
   PinInputField,
+  ScaleFade,
   Stack,
   Text,
   useToast,
 } from "@chakra-ui/core";
+import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { withApolloData } from "@parallel/components/common/withApolloData";
 import {
   RecipientView_verifyPublicAccessMutation,
   RecipientView_verifyPublicAccessMutationVariables,
-  usepublicSendVerificationCodeMutation,
   usepublicCheckVerificationCodeMutation,
+  usepublicSendVerificationCodeMutation,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { resolveUrl } from "@parallel/utils/next";
@@ -48,7 +50,8 @@ type RecipientViewVerifyState =
       token: string;
       expiresAt: string;
       remainingAttempts: number;
-    };
+    }
+  | { step: "VERIFIED" };
 
 function RecipientViewVerify({
   email,
@@ -109,7 +112,7 @@ function RecipientViewVerify({
 
   async function handleSubmitCode(event: FormEvent) {
     event.preventDefault();
-    if (state.step === "REQUEST") {
+    if (state.step === "REQUEST" || state.step === "VERIFIED") {
       return;
     }
     if (isPast(new Date(state.expiresAt))) {
@@ -125,6 +128,7 @@ function RecipientViewVerify({
         }
         const { result, remainingAttempts } = data.publicCheckVerificationCode;
         if (result === "SUCCESS") {
+          setState({ step: "VERIFIED" });
           router.replace(resolveUrl(`${router.pathname}/1`, router.query));
         } else {
           setState({
@@ -261,6 +265,21 @@ function RecipientViewVerify({
                     />
                   </Button>
                 </Flex>
+              ) : state.step === "VERIFIED" ? (
+                <Center height="96px">
+                  <ScaleFade timeout={500} initialScale={0} in={true}>
+                    {(style) => (
+                      <Center
+                        backgroundColor="green.500"
+                        borderRadius="full"
+                        boxSize="96px"
+                        {...(style as any)}
+                      >
+                        <CheckIcon color="white" boxSize="64px" />
+                      </Center>
+                    )}
+                  </ScaleFade>
+                </Center>
               ) : null}
             </Stack>
           </Card>
@@ -306,7 +325,7 @@ export async function getServerSideProps({
     `,
     variables: {
       keycode: keycode as string,
-      token: process.env.SERVER_TOKEN,
+      token: process.env.CLIENT_SERVER_TOKEN!,
       ip: getClientIp(req),
       userAgent: req.headers["user-agent"] ?? null,
     },

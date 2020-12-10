@@ -33,6 +33,7 @@ export function redirect(context: NextPageContext, location: string) {
   } else {
     context.res!.writeHead(302, { Location: location }).end();
   }
+  return null;
 }
 
 export function withApolloData<P = {}>(
@@ -123,14 +124,17 @@ export function withApolloData<P = {}>(
             }
             const code = error?.graphQLErrors?.[0]?.extensions?.code;
             if (code === "UNAUTHENTICATED") {
-              redirect(context, `/${query.locale}/login`);
+              return redirect(context, `/${query.locale}/login`);
             } else if (code === "FORBIDDEN") {
-              redirect(context, `/${query.locale}/app`);
+              return redirect(context, `/${query.locale}/app`);
             } else if (
               code === "CONTACT_NOT_VERIFIED" &&
               context.pathname.startsWith("/[locale]/petition/[keycode]")
             ) {
-              redirect(context, `/${query.locale}/petition/${query.keycode}`);
+              return redirect(
+                context,
+                `/${query.locale}/petition/${query.keycode}`
+              );
             } else {
               if (
                 process.env.NODE_ENV === "development" &&

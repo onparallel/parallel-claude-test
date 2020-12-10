@@ -18,7 +18,7 @@ export interface CreateApolloClientOptions {
 
 function filterCookies(cookies: string) {
   return pipe(
-    cookies,
+    cookies ?? "",
     parseCookie,
     Object.entries,
     filter(([key]) => key.startsWith("parallel_")),

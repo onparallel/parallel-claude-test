@@ -11,7 +11,7 @@ import {
 } from "@nexus/schema";
 import { prop } from "remeda";
 import { random } from "../../util/token";
-import { and, chain } from "../helpers/authorize";
+import { and, chain, checkClienServerToken } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import {
@@ -57,7 +57,10 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("orgName");
     },
   }),
-  authorize: fetchPetitionAccess("keycode"),
+  authorize: chain(
+    checkClienServerToken("token"),
+    fetchPetitionAccess("keycode")
+  ),
   args: {
     token: nonNull(idArg()),
     keycode: nonNull(idArg()),
@@ -178,10 +181,21 @@ export const publicCheckVerificationCode = mutationField(
             args.token,
             args.code
           );
+          const {
+            contactAuthentication,
+            cookieValue,
+          } = await ctx.contacts.createContactAuthentication(ctx.contact!.id);
+          await ctx.contacts.addContactAuthenticationLogAccessEntry(
+            contactAuthentication.id,
+            {
+              ip: getClientIp(ctx.req),
+              userAgent: ctx.req.headers["user-agent"] ?? null,
+            }
+          );
           if (result.success) {
             ctx.req.res?.cookie(
               `parallel_contact_auth_${toGlobalId("Contact", ctx.contact!.id)}`,
-              await ctx.contacts.createContactAuthentication(ctx.contact!.id),
+              cookieValue,
               {
                 path: "/",
                 httpOnly: true,

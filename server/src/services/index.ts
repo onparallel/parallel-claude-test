@@ -9,6 +9,7 @@ import { EMAILS, EmailsService, IEmailsService } from "./emails";
 import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
 import { Printer, IPrinter, PRINTER } from "./printer";
 import { SIGNATURE, SignatureService } from "./signature";
+import { SECURITY, SecurityService } from "./security";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<Logger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -21,4 +22,5 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<Smtp>(Smtp).toSelf().inSingletonScope();
   bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
   bind<SignatureService>(SIGNATURE).to(SignatureService);
+  bind<SecurityService>(SECURITY).to(SecurityService);
 });

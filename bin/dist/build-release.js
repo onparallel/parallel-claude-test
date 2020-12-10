@@ -10,6 +10,7 @@ const yargs_1 = __importDefault(require("yargs"));
 const run_1 = require("./utils/run");
 const fs_1 = require("fs");
 const rimraf_1 = __importDefault(require("rimraf"));
+const token_1 = require("./utils/token");
 aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCredentials({
     profile: "parallel-deploy",
 });
@@ -63,6 +64,12 @@ async function main() {
         });
     }
     child_process_1.execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
+    // Generate tokens
+    const CLIENT_SERVER_TOKEN = token_1.token(32);
+    const SIGNATURE_SERVICE_JWT_SECRET = token_1.token(32);
+    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, { cwd: WORK_DIR, encoding: "utf-8" });
+    child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
+    child_process_1.execSync(`echo "SIGNATURE_SERVICE_JWT_SECRET=${SIGNATURE_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
     console.log("Building the client");
     child_process_1.execSync(`yarn build`, {
         cwd: `${buildDir}/client`,

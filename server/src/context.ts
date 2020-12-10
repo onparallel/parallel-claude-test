@@ -20,6 +20,7 @@ import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { SIGNATURE, SignatureService } from "./services/signature";
+import { SECURITY, SecurityService } from "./services/security";
 
 @injectable()
 export class ApiContext {
@@ -33,6 +34,7 @@ export class ApiContext {
     @inject(AUTH) public readonly auth: Auth,
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
+    @inject(SECURITY) public readonly security: SecurityService,
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PRINTER) public readonly printer: Printer,
 

@@ -5,6 +5,7 @@ import yargs from "yargs";
 import { run } from "./utils/run";
 import { promises as fs } from "fs";
 import rimraf from "rimraf";
+import { token } from "./utils/token";
 
 AWS.config.credentials = new AWS.SharedIniFileCredentials({
   profile: "parallel-deploy",
@@ -82,6 +83,21 @@ async function main() {
     });
   }
   execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
+  // Generate tokens
+  const CLIENT_SERVER_TOKEN = token(32);
+  const SIGNATURE_SERVICE_JWT_SECRET = token(32);
+  execSync(
+    `echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`,
+    { cwd: WORK_DIR, encoding: "utf-8" }
+  );
+  execSync(
+    `echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`,
+    { cwd: WORK_DIR, encoding: "utf-8" }
+  );
+  execSync(
+    `echo "SIGNATURE_SERVICE_JWT_SECRET=${SIGNATURE_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`,
+    { cwd: WORK_DIR, encoding: "utf-8" }
+  );
 
   console.log("Building the client");
   execSync(`yarn build`, {

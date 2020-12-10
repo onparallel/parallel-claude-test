@@ -30,6 +30,18 @@ export function authenticate<
   };
 }
 
+export function checkClienServerToken<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, string>
+>(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx) => {
+    return ctx.security.checkClientServerToken(
+      (args[tokenArg] as unknown) as string
+    );
+  };
+}
+
 export function authenticateAnd<
   TypeName extends string,
   FieldName extends string
