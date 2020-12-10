@@ -325,7 +325,7 @@ export async function getServerSideProps({
     `,
     variables: {
       keycode: keycode as string,
-      token: process.env.CLIENT_SERVER_TOKEN!,
+      token: process.env.CLIENT_SERVER_TOKEN,
       ip: getClientIp(req),
       userAgent: req.headers["user-agent"] ?? null,
     },
