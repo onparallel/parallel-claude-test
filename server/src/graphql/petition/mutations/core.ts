@@ -506,7 +506,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   },
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
-    maxLength((args) => args.data.title, "data.title", 255)
+    maxLength((args) => args.data.title, "data.title", 500)
   ),
   resolve: async (_, args, ctx, info) => {
     const { title, description, optional, multiple, options } = args.data;

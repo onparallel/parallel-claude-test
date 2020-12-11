@@ -1162,7 +1162,7 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("sends error when field title is too long", async () => {
+    it("sends error when field title is longer than 500 chars", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation(
@@ -1184,12 +1184,10 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
-          data: {
-            title:
-              "Cupiditate omnis doloremque ut excepturi dolor accusantium qui qui cum. Blanditiis sit nemo ut voluptatem laudantium est voluptas et dolor. Voluptatem explicabo voluptas aut aspernatur molestias et. Iste aut iure modi optio omnis similique voluptates id. Omnis natus ab",
-          },
+          data: { title: "x".repeat(501) },
         },
       });
+
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });

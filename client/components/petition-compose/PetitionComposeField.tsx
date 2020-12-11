@@ -285,7 +285,7 @@ export const PetitionComposeField = Object.assign(
                   }
                   value={title ?? ""}
                   width="100%"
-                  maxLength={100}
+                  maxLength={500}
                   border="none"
                   paddingX={2}
                   height={6}
