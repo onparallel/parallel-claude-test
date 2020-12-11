@@ -79,11 +79,11 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         ? await ctx.contacts.verifyContact(contactId, cookieValue)
         : null;
       if (authenticationId) {
-        // await ctx.petitions.createEvent({
-        //   petitionId: ctx.access!.petition_id,
-        //   type: "ACCESS_OPENED",
-        //   data: { petition_access_id: ctx.access!.id },
-        // });
+        await ctx.petitions.createEvent({
+          petitionId: ctx.access!.petition_id,
+          type: "ACCESS_OPENED",
+          data: { petition_access_id: ctx.access!.id },
+        });
         await ctx.contacts.addContactAuthenticationLogAccessEntry(
           authenticationId,
           logEntry
@@ -99,11 +99,11 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         };
       }
     } else {
-      // await ctx.petitions.createEvent({
-      //   petitionId: ctx.access!.petition_id,
-      //   type: "ACCESS_OPENED",
-      //   data: { petition_access_id: ctx.access!.id },
-      // });
+      await ctx.petitions.createEvent({
+        petitionId: ctx.access!.petition_id,
+        type: "ACCESS_OPENED",
+        data: { petition_access_id: ctx.access!.id },
+      });
       const {
         cookieValue,
         contactAuthentication,
@@ -201,6 +201,7 @@ export const publicCheckVerificationCode = mutationField(
                 httpOnly: true,
                 sameSite: "strict",
                 secure: process.env.NODE_ENV === "production",
+                maxAge: 60 * 60 * 24 * 365 * 10,
               }
             );
           }
