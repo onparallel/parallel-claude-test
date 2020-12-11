@@ -31,7 +31,7 @@ import { isPast } from "date-fns";
 import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { getClientIp } from "request-ip";
@@ -92,6 +92,7 @@ function RecipientViewVerify({
   }
 
   const [code, setCode] = useState("");
+  const firstInputRef = useRef<HTMLInputElement>();
 
   function codeExpired() {
     toast({
@@ -128,9 +129,12 @@ function RecipientViewVerify({
         }
         const { result, remainingAttempts } = data.publicCheckVerificationCode;
         if (result === "SUCCESS") {
+          setCode("");
           setState({ step: "VERIFIED" });
           router.replace(resolveUrl(`${router.pathname}/1`, router.query));
         } else {
+          setCode("");
+          firstInputRef.current!.focus();
           setState({
             ...state,
             remainingAttempts: remainingAttempts!,
@@ -235,7 +239,7 @@ function RecipientViewVerify({
                       onChange={setCode}
                       isInvalid={state.isInvalid}
                     >
-                      <PinInputField />
+                      <PinInputField ref={firstInputRef} />
                       <PinInputField />
                       <PinInputField />
                       <PinInputField />
