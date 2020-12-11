@@ -50,7 +50,7 @@ export const downloads = Router()
       next(error);
     }
   })
-  .get("/petition/:petitionId/pdf", async (req, res) => {
+  .get("/petition/:petitionId/pdf", async (req, res, next) => {
     try {
       const ctx = req.context;
       const user = ctx.user!;
@@ -111,11 +111,18 @@ export const downloads = Router()
       );
 
       await ctx.petitions.deletePetitionSignature(signatureRequest.id);
-
-      res.set("Content-Type", "application/pdf");
-      res.send(buffer).end();
-    } catch {
-      res.status(500).end();
+      res
+        .header(
+          "content-disposition",
+          contentDisposition(sanitize(`${petition.name}.pdf`), {
+            type: "inline",
+          })
+        )
+        .header("content-type", "application/pdf")
+        .send(buffer)
+        .end();
+    } catch (error) {
+      next(error);
     }
   });
 
