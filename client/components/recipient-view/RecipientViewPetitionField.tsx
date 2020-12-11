@@ -244,7 +244,7 @@ export function RecipientViewPetitionField({
                       fontSize="sm"
                       noOfLines={3}
                     >
-                      {reply.content.text}
+                      <BreakLines text={reply.content.text} />
                     </ExpandableText>
                   </Flex>
                 )}
