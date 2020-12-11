@@ -90,13 +90,3 @@ const email: Email<SignatureCompletedProps> = {
 };
 
 export default email;
-
-export const props: SignatureCompletedProps = {
-  signatureProvider: "Signaturit",
-  documentName: "Know Your Client (KYC)",
-  signerName: "Mariano",
-  parallelUrl: "http://localhost",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

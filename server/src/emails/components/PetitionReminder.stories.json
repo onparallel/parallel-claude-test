@@ -1,0 +1,47 @@
+{
+  "title": "Petition Reminder",
+  "stories": [
+    {
+      "name": "Petition Reminder",
+      "parameters": {
+        "server": {
+          "id": "PetitionReminder"
+        }
+      },
+      "args": {
+        "fullName": "Santi Albo",
+        "senderName": "Derek",
+        "senderEmail": "derek@parallel.so",
+        "deadline": "2022-12-11T17:29:24.601Z",
+        "fields": [
+          { "position": 0, "id": 236, "title": "Sección 1", "type": "HEADING" },
+          { "position": 1, "id": 235, "title": "Escrituras", "type": "TEXT" },
+          {
+            "position": 2,
+            "id": 345,
+            "title": "Certificado de rentas del trabajo",
+            "type": "TEXT"
+          },
+          { "position": 4, "id": 6905, "title": "Nombre", "type": "TEXT" }
+        ],
+        "keycode": "asdfghjkl",
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "fullName": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
+        "senderEmail": { "control": { "type": "text" } },
+        "fields": { "control": { "type": "object" } },
+        "deadline": { "control": { "type": "date" } },
+        "keycode": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

@@ -103,7 +103,7 @@ app.get("/:email", async (req, res, next) => {
     res.status(500).send(/* html */ `
       <html>
       <body>
-        <pre style="background-color: #333; color: #fff">${convert.toHtml(
+        <pre style="background-color: #333; color: #fff; max-width: 100vw; white-space: pre-wrap;">${convert.toHtml(
           escapeHTML(error.toString()),
           { bg: "#333", fg: "#fff" }
         )}</pre> 

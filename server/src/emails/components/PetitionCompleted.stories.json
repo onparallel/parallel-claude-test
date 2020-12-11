@@ -1,0 +1,56 @@
+{
+  "title": "Petition Completed",
+  "stories": [
+    {
+      "name": "Petition Completed",
+      "parameters": {
+        "server": {
+          "id": "PetitionCompleted"
+        }
+      },
+      "args": {
+        "name": "Derek",
+        "contactNameOrEmail": "Santi Albo",
+        "petitionName": "Declaración de la renta",
+        "petitionId": "1234567890",
+        "isSigned": true,
+        "fields": [
+          { "position": 0, "id": 123, "title": "Seccion 1", "type": "HEADING" },
+
+          { "position": 1, "id": 1234, "title": "DNI", "type": "TEXT" },
+          { "position": 2, "id": 235, "title": "Escrituras", "type": "TEXT" },
+          {
+            "position": 3,
+            "id": 2355,
+            "title": "Seccion 2",
+            "type": "HEADING"
+          },
+          {
+            "position": 4,
+            "id": 345,
+            "title": "Certificado de rentas del trabajo",
+            "type": "TEXT"
+          },
+          { "position": 5, "id": 32, "title": "Prueba", "type": "TEXT" },
+          { "position": 6, "id": 6905, "title": "Prueba 2", "type": "TEXT" }
+        ],
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "name": { "control": { "type": "text" } },
+        "contactNameOrEmail": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" } },
+        "petitionId": { "control": { "type": "text" } },
+        "isSigned": { "control": { "type": "boolean" } },
+        "fields": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

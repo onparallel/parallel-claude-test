@@ -1,0 +1,33 @@
+{
+  "title": "Signature Requested Email",
+  "stories": [
+    {
+      "name": "Signature Requested Email",
+      "parameters": {
+        "server": {
+          "id": "SignatureRequestedEmail"
+        }
+      },
+      "args": {
+        "signatureProvider": "Signaturit",
+        "signerName": "{{signer_name}}",
+        "documentName": "{{filename}}",
+        "signButton": "{{sign_button}}",
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "signatureProvider": { "control": { "type": "text" } },
+        "signerName": { "control": { "type": "text" } },
+        "documentName": { "control": { "type": "text" } },
+        "signButton": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

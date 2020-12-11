@@ -155,30 +155,3 @@ function AccessInfoButton({ href }: { href: string }) {
     </Button>
   );
 }
-
-export const props: PetitionCompletedProps = {
-  isSigned: true,
-  name: "Derek",
-  petitionId: "1234567890",
-  petitionName: "Declaración de la renta",
-  contactNameOrEmail: "Santi Albo",
-  fields: [
-    { position: 0, id: 123, title: "Seccion 1", type: "HEADING" },
-
-    { position: 1, id: 1234, title: "DNI", type: "TEXT" },
-    { position: 2, id: 235, title: "Escrituras", type: "TEXT" },
-    { position: 3, id: 2355, title: "Seccion 2", type: "HEADING" },
-    {
-      position: 4,
-      id: 345,
-      title: "Certificado de rentas del trabajo",
-      type: "TEXT",
-    },
-    { position: 5, id: 32, title: "Prueba", type: "TEXT" },
-    { position: 6, id: 6905, title: null, type: "TEXT" },
-  ],
-  parallelUrl: "http://localhost",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

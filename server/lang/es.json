@@ -262,7 +262,7 @@
   {
     "term": "reminder.text",
     "definition": "Le recordamos que {senderName} ({senderEmail}) le envió una petición de la que queda información pendiente de completar.",
-    "context": "We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending."
+    "context": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
   },
   {
     "term": "signature-cancelled.subject",

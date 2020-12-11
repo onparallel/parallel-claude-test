@@ -1,0 +1,39 @@
+{
+  "title": "Message Bounced Email",
+  "stories": [
+    {
+      "name": "Message Bounced Email",
+      "parameters": {
+        "server": {
+          "id": "MessageBouncedEmail"
+        }
+      },
+      "args": {
+        "senderName": "Santi",
+        "contactEmail": "mariano@parallels.so",
+        "contactFullName": "Mariano Rodriguez",
+        "petitionId": "1234567890",
+        "petitionName": "Know your Client",
+        "body": [
+          { "children": [{ "text": "Completame los siguientes datos porfa" }] }
+        ],
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "senderName": { "control": { "type": "text" } },
+        "contactEmail": { "control": { "type": "text" } },
+        "contactFullName": { "control": { "type": "text" } },
+        "petitionId": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" } },
+        "body": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

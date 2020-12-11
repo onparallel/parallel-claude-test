@@ -91,13 +91,3 @@ const email: Email<SignatureCancelledProps> = {
 };
 
 export default email;
-
-export const props: SignatureCancelledProps = {
-  signatureProvider: "Signaturit",
-  documentName: "Know Your Client (KYC)",
-  signerName: "Mariano",
-  parallelUrl: "http://localhost",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

@@ -109,13 +109,3 @@ const email: Email<SignatureRequestedProps> = {
 };
 
 export default email;
-
-export const props: SignatureRequestedProps = {
-  signerName: "Derek",
-  documentName: "Know your Client (KYC)",
-  parallelUrl: "http://localhost",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-  signButton: "Open document",
-};

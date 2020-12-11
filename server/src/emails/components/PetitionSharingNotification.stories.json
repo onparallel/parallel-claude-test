@@ -1,0 +1,37 @@
+{
+  "title": "Petition Sharing Notification",
+  "stories": [
+    {
+      "name": "Petition Sharing Notification",
+      "parameters": {
+        "server": {
+          "id": "PetitionSharingNotification"
+        }
+      },
+      "args": {
+        "name": "Derek",
+        "ownerName": "Santi Albo",
+        "ownerEmail": "santi@parallel.so",
+        "petitionName": "Declaración de la renta",
+        "petitionId": "1234567890",
+        "message": "hola tio aqui la tienes\\npara que veas",
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "name": { "control": { "type": "text" } },
+        "ownerName": { "control": { "type": "text" } },
+        "ownerEmail": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" } },
+        "petitionId": { "control": { "type": "text" } },
+        "message": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

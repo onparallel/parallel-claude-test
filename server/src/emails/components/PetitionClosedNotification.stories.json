@@ -1,0 +1,52 @@
+{
+  "title": "Petition Closed Notification",
+  "stories": [
+    {
+      "name": "Petition Closed Notification",
+      "parameters": {
+        "server": {
+          "id": "PetitionClosedNotification"
+        }
+      },
+      "args": {
+        "contactFullName": "Derek Lou",
+        "senderName": "Santi",
+        "senderEmail": "santi@parallel.so",
+        "body": [
+          { "children": [{ "text": "Hola," }] },
+          { "children": [{ "text": "" }] },
+          {
+            "children": [
+              { "text": "Ya hemos revisado toda la información. " },
+              { "text": "Te confirmamos que está todo correcto." }
+            ]
+          },
+          { "children": [{ "text": "" }] },
+          {
+            "children": [
+              {
+                "text": " Vamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber."
+              }
+            ]
+          },
+          { "children": [{ "text": "" }] },
+          { "children": [{ "text": "Un saludo." }] }
+        ],
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "contactFullName": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
+        "senderEmail": { "control": { "type": "text" } },
+        "body": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

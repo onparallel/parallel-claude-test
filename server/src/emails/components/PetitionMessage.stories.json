@@ -103,9 +103,9 @@
           { "position": 7, "id": 6905, "title": "", "type": "TEXT" }
         ],
         "keycode": "asdfghjkl",
-        "parallelUrl": "https://staging.parallel.so",
-        "assetsUrl": "https://static-staging.parallel.so",
-        "logoUrl": "http://localhost/static/emails/logo.png",
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

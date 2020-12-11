@@ -261,8 +261,8 @@
   },
   {
     "term": "reminder.text",
-    "definition": "We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending.",
-    "context": "We remind you that {senderName} ({senderEmail}) has sent you a petition and some information is still pending."
+    "definition": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted.",
+    "context": "We remind you that {senderName} ({senderEmail}) sent you a petition and some of the requested information has not yet been submitted."
   },
   {
     "term": "signature-cancelled.subject",

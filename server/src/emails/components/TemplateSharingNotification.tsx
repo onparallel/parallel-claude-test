@@ -164,16 +164,3 @@ const email: Email<TemplateSharingNotificationProps> = {
 };
 
 export default email;
-
-export const props: TemplateSharingNotificationProps = {
-  name: "Derek",
-  petitionId: "1234567890",
-  petitionName: "Declaración de la renta",
-  ownerName: "Santi Albo",
-  ownerEmail: "santi@parallel.so",
-  message: "hola tio aqui la tienes\npara que veas",
-  parallelUrl: "http://localhost",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

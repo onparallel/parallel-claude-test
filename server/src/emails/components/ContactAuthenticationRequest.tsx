@@ -134,14 +134,3 @@ const email: Email<ContactAuthenticationRequest> = {
 };
 
 export default email;
-
-export const props: ContactAuthenticationRequest = {
-  assetsUrl: "http://localhost",
-  parallelUrl: "http://localhost",
-  fullName: "Santi Albo",
-  code: "123456",
-  browserName: "Safari",
-  osName: "iOS",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

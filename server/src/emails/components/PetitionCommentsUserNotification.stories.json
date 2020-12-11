@@ -1,0 +1,62 @@
+{
+  "title": "Petition Comments User Notification",
+  "stories": [
+    {
+      "name": "Petition Comments User Notification",
+      "parameters": {
+        "server": {
+          "id": "PetitionCommentsUserNotification"
+        }
+      },
+      "args": {
+        "userName": "Santi",
+        "authorNameOrEmail": "Derek",
+        "petitionName": "Declaración de la renta",
+        "petitionId": "1234567890",
+        "fields": [
+          {
+            "id": 1,
+            "title": "Nominas",
+            "position": 2,
+            "comments": [
+              {
+                "id": 1,
+                "content": "De dónde saco esto tio?\\nNo lo encuentro por ningun lado"
+              },
+              {
+                "id": 2,
+                "content": "Ni caso, ya lo encontré"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "title": "Dividendos",
+            "position": 4,
+            "comments": [
+              {
+                "id": 3,
+                "content": "Ya sale en el borrador"
+              }
+            ]
+          }
+        ],
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "userName": { "control": { "type": "text" } },
+        "authorNameOrEmail": { "control": { "type": "text" } },
+        "petitionName": { "control": { "type": "text" } },
+        "petitionId": { "control": { "type": "text" } },
+        "fields": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

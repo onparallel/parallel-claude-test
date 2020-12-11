@@ -104,38 +104,3 @@ const email: Email<PetitionClosedNotificationProps> = {
   },
 };
 export default email;
-
-export const props: PetitionClosedNotificationProps = {
-  contactFullName: "Derek Lou",
-  senderName: "Santi",
-  senderEmail: "santi@parallel.so",
-  body: [
-    { children: [{ text: "Hola," }] },
-    { children: [{ text: "" }] },
-    {
-      children: [
-        {
-          text: "Ya hemos revisado toda la información. ",
-        },
-        {
-          text: "Te confirmamos que está todo correcto.",
-        },
-      ],
-    },
-    { children: [{ text: "" }] },
-    {
-      children: [
-        {
-          text:
-            " Vamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.",
-        },
-      ],
-    },
-    { children: [{ text: "" }] },
-    { children: [{ text: "Un saludo." }] },
-  ],
-  parallelUrl: "https://staging.parallel.so",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "http://localhost/static/emails/logo.png",
-  logoAlt: "Parallel",
-};

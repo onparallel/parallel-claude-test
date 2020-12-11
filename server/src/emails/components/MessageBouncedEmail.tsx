@@ -193,16 +193,3 @@ const email: Email<MessageBouncedEmailProps> = {
 };
 
 export default email;
-
-export const props: MessageBouncedEmailProps = {
-  senderName: "Santi",
-  contactEmail: "mariano@parallels.so",
-  contactFullName: "Mariano Rodriguez",
-  petitionId: "1234567890",
-  petitionName: "Know your Client",
-  parallelUrl: "http://localhost",
-  assetsUrl: "https://static-staging.parallel.so",
-  logoUrl: "https://static-staging.parallel.so/static/emails/logo.png",
-  logoAlt: "Parallel",
-  body: [{ children: [{ text: "Completame los siguientes datos porfa" }] }],
-};
