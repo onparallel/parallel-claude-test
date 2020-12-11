@@ -3,6 +3,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import { Router } from "express";
 import { indexBy, zip } from "remeda";
 import sanitize from "sanitize-filename";
+import { URLSearchParams } from "url";
 import { ApiContext } from "../context";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
 import { fromGlobalId } from "../util/globalId";
@@ -47,6 +48,74 @@ export const downloads = Router()
       zipFile.pipe(res);
     } catch (error) {
       next(error);
+    }
+  })
+  .get("/petition/:petitionId/pdf", async (req, res) => {
+    try {
+      const ctx = req.context;
+      const user = ctx.user!;
+      const { id: petitionId } = fromGlobalId(
+        req.params.petitionId,
+        "Petition"
+      );
+
+      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [
+        petitionId,
+      ]);
+      if (!hasAccess) {
+        throw new Error("No access");
+      }
+
+      const hasFeatureFlag = await ctx.featureFlags.userHasFeatureFlag(
+        user.id,
+        "PETITION_PDF_EXPORT"
+      );
+      if (!hasFeatureFlag) {
+        throw new Error("FORBIDDEN");
+      }
+
+      const petition = await ctx.petitions.loadPetition(petitionId);
+      if (!petition) {
+        throw new Error(`Petition with id ${petitionId} not found`);
+      }
+
+      // create a temporal signature request to be able to print the PDF
+      const signatureRequest = await ctx.petitions.createPetitionSignature(
+        petitionId,
+        {
+          provider: "NONE",
+          timezone: "NONE",
+          contactIds: [],
+          title: petition.name ?? "",
+        }
+      );
+
+      const token = ctx.signature.generateAuthToken({
+        petitionSignatureRequestId: signatureRequest.id,
+      });
+
+      const buffer = await ctx.printer.pdf(
+        `http://localhost:3000/${
+          petition.locale
+        }/print/petition-signature?${new URLSearchParams({ token })}`,
+        {
+          height: "297mm",
+          width: "210mm",
+          margin: {
+            top: "10mm",
+            bottom: "10mm",
+            left: "10mm",
+            right: "10mm",
+          },
+        }
+      );
+
+      await ctx.petitions.deletePetitionSignature(signatureRequest.id);
+
+      res.set("Content-Type", "application/pdf");
+      res.send(buffer).end();
+    } catch {
+      res.status(500).end();
     }
   });
 

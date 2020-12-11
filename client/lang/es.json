@@ -105,11 +105,6 @@
     "context": "Delete selected"
   },
   {
-    "term": "component.contact-select.click-to-create",
-    "definition": "Haz click para crear el contacto",
-    "context": "Click to create contact"
-  },
-  {
     "term": "component.contact-select.create-new-contact",
     "definition": "Crear nuevo contacto para: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>"
@@ -318,6 +313,11 @@
     "term": "component.petition-header.delete-label",
     "definition": "Eliminar petición",
     "context": "Delete petition"
+  },
+  {
+    "term": "component.petition-header.export-pdf",
+    "definition": "Exportar a PDF",
+    "context": "Export to PDF"
   },
   {
     "term": "component.petition-header.not-subscribed-description",

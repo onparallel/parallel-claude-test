@@ -135,7 +135,10 @@ export type CreateTextReplyInput = {
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
-export type FeatureFlag = "INTERNAL_COMMENTS" | "PETITION_SIGNATURE";
+export type FeatureFlag =
+  | "INTERNAL_COMMENTS"
+  | "PETITION_PDF_EXPORT"
+  | "PETITION_SIGNATURE";
 
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
@@ -1738,7 +1741,7 @@ export type PetitionHeader_PetitionFragment = {
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id"
->;
+> & { hasPdfExport: User["hasFeatureFlag"] };
 
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -5312,6 +5315,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
 export const PetitionHeader_UserFragmentDoc = gql`
   fragment PetitionHeader_User on User {
     id
+    hasPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
   }
 `;
 export const PetitionLayout_UserFragmentDoc = gql`

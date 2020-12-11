@@ -2435,6 +2435,12 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  async deletePetitionSignature(petitionSignatureRequestId: number) {
+    return await this.from("petition_signature_request")
+      .where("id", petitionSignatureRequestId)
+      .delete();
+  }
+
   async updatePetitionSignature(
     petitionSignatureId: number,
     data: Partial<PetitionSignatureRequest>

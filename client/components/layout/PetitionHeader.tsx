@@ -20,6 +20,7 @@ import {
 import {
   CopyIcon,
   DeleteIcon,
+  DownloadIcon,
   EditIcon,
   MoreVerticalIcon,
   UserArrowIcon,
@@ -186,6 +187,10 @@ export function PetitionHeader({
     } catch {}
   }, [petition.id]);
 
+  const handleExportPetitionPDF = async () => {
+    window.open(`/api/downloads/petition/${petition.id}/pdf`, "_blank");
+  };
+
   return (
     <Box
       backgroundColor="white"
@@ -306,6 +311,15 @@ export function PetitionHeader({
                       defaultMessage="Reopen petition"
                     />
                   </MenuItem>
+                  {user.hasPdfExport ? (
+                    <MenuItem onClick={handleExportPetitionPDF}>
+                      <DownloadIcon marginRight={2} />
+                      <FormattedMessage
+                        id="component.petition-header.export-pdf"
+                        defaultMessage="Export to PDF"
+                      />
+                    </MenuItem>
+                  ) : null}
                   <MenuDivider />
                   <MenuOptionGroup
                     type="radio"
@@ -460,6 +474,7 @@ PetitionHeader.fragments = {
   User: gql`
     fragment PetitionHeader_User on User {
       id
+      hasPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     }
   `,
 };

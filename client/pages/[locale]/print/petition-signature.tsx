@@ -39,12 +39,6 @@ function PrintPetitionSignature({ token }: { token: string }) {
     throw new Error("petition signature request must have defined settings");
   }
 
-  if (!contacts || contacts.length === 0) {
-    throw new Error(
-      "petition signature request must contain valid contactIds in its settings"
-    );
-  }
-
   const fieldIndexValues = useFieldIndexValues(petition.fields);
   const intl = useIntl();
   const pages = useMemo(() => {

@@ -153,6 +153,7 @@ enum EntityType {
 
 enum FeatureFlag {
   INTERNAL_COMMENTS
+  PETITION_PDF_EXPORT
   PETITION_SIGNATURE
 }
 
