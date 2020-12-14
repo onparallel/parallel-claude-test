@@ -3444,87 +3444,6 @@ export type PetitionQuery = { __typename?: "Query" } & {
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id"> & {
-    events: { __typename?: "PetitionEventPagination" } & {
-      items: Array<
-        | ({ __typename: "AccessActivatedEvent" } & Pick<
-            AccessActivatedEvent,
-            "id"
-          >)
-        | ({ __typename: "AccessDeactivatedEvent" } & Pick<
-            AccessDeactivatedEvent,
-            "id"
-          >)
-        | ({ __typename: "AccessOpenedEvent" } & Pick<AccessOpenedEvent, "id">)
-        | ({ __typename: "CommentDeletedEvent" } & Pick<
-            CommentDeletedEvent,
-            "id"
-          >)
-        | ({ __typename: "CommentPublishedEvent" } & Pick<
-            CommentPublishedEvent,
-            "id"
-          >)
-        | ({ __typename: "MessageCancelledEvent" } & Pick<
-            MessageCancelledEvent,
-            "id"
-          >)
-        | ({ __typename: "MessageScheduledEvent" } & Pick<
-            MessageScheduledEvent,
-            "id"
-          >)
-        | ({ __typename: "MessageSentEvent" } & Pick<MessageSentEvent, "id">)
-        | ({ __typename: "OwnershipTransferredEvent" } & Pick<
-            OwnershipTransferredEvent,
-            "id"
-          >)
-        | ({ __typename: "PetitionClosedEvent" } & Pick<
-            PetitionClosedEvent,
-            "id"
-          >)
-        | ({ __typename: "PetitionClosedNotifiedEvent" } & Pick<
-            PetitionClosedNotifiedEvent,
-            "id"
-          >)
-        | ({ __typename: "PetitionCompletedEvent" } & Pick<
-            PetitionCompletedEvent,
-            "id"
-          >)
-        | ({ __typename: "PetitionCreatedEvent" } & Pick<
-            PetitionCreatedEvent,
-            "id"
-          >)
-        | ({ __typename: "PetitionReopenedEvent" } & Pick<
-            PetitionReopenedEvent,
-            "id"
-          >)
-        | ({ __typename: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id">)
-        | ({ __typename: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id">)
-        | ({ __typename: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id">)
-        | ({ __typename: "SignatureCancelledEvent" } & Pick<
-            SignatureCancelledEvent,
-            "id"
-          >)
-        | ({ __typename: "SignatureCompletedEvent" } & Pick<
-            SignatureCompletedEvent,
-            "id"
-          >)
-        | ({ __typename: "SignatureStartedEvent" } & Pick<
-            SignatureStartedEvent,
-            "id"
-          >)
-        | ({ __typename: "UserPermissionAddedEvent" } & Pick<
-            UserPermissionAddedEvent,
-            "id"
-          >)
-        | ({ __typename: "UserPermissionEditedEvent" } & Pick<
-            UserPermissionEditedEvent,
-            "id"
-          >)
-        | ({ __typename: "UserPermissionRemovedEvent" } & Pick<
-            UserPermissionRemovedEvent,
-            "id"
-          >)
-      >;
-    };
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
@@ -3723,101 +3642,7 @@ export type PetitionReplies_sendPetitionClosedNotificationMutation = {
   sendPetitionClosedNotification: { __typename?: "Petition" } & Pick<
     Petition,
     "id"
-  > & {
-      events: { __typename?: "PetitionEventPagination" } & {
-        items: Array<
-          | ({ __typename: "AccessActivatedEvent" } & Pick<
-              AccessActivatedEvent,
-              "id"
-            >)
-          | ({ __typename: "AccessDeactivatedEvent" } & Pick<
-              AccessDeactivatedEvent,
-              "id"
-            >)
-          | ({ __typename: "AccessOpenedEvent" } & Pick<
-              AccessOpenedEvent,
-              "id"
-            >)
-          | ({ __typename: "CommentDeletedEvent" } & Pick<
-              CommentDeletedEvent,
-              "id"
-            >)
-          | ({ __typename: "CommentPublishedEvent" } & Pick<
-              CommentPublishedEvent,
-              "id"
-            >)
-          | ({ __typename: "MessageCancelledEvent" } & Pick<
-              MessageCancelledEvent,
-              "id"
-            >)
-          | ({ __typename: "MessageScheduledEvent" } & Pick<
-              MessageScheduledEvent,
-              "id"
-            >)
-          | ({ __typename: "MessageSentEvent" } & Pick<MessageSentEvent, "id">)
-          | ({ __typename: "OwnershipTransferredEvent" } & Pick<
-              OwnershipTransferredEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionClosedEvent" } & Pick<
-              PetitionClosedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionClosedNotifiedEvent" } & Pick<
-              PetitionClosedNotifiedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionCompletedEvent" } & Pick<
-              PetitionCompletedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionCreatedEvent" } & Pick<
-              PetitionCreatedEvent,
-              "id"
-            >)
-          | ({ __typename: "PetitionReopenedEvent" } & Pick<
-              PetitionReopenedEvent,
-              "id"
-            >)
-          | ({ __typename: "ReminderSentEvent" } & Pick<
-              ReminderSentEvent,
-              "id"
-            >)
-          | ({ __typename: "ReplyCreatedEvent" } & Pick<
-              ReplyCreatedEvent,
-              "id"
-            >)
-          | ({ __typename: "ReplyDeletedEvent" } & Pick<
-              ReplyDeletedEvent,
-              "id"
-            >)
-          | ({ __typename: "SignatureCancelledEvent" } & Pick<
-              SignatureCancelledEvent,
-              "id"
-            >)
-          | ({ __typename: "SignatureCompletedEvent" } & Pick<
-              SignatureCompletedEvent,
-              "id"
-            >)
-          | ({ __typename: "SignatureStartedEvent" } & Pick<
-              SignatureStartedEvent,
-              "id"
-            >)
-          | ({ __typename: "UserPermissionAddedEvent" } & Pick<
-              UserPermissionAddedEvent,
-              "id"
-            >)
-          | ({ __typename: "UserPermissionEditedEvent" } & Pick<
-              UserPermissionEditedEvent,
-              "id"
-            >)
-          | ({ __typename: "UserPermissionRemovedEvent" } & Pick<
-              UserPermissionRemovedEvent,
-              "id"
-            >)
-        >;
-      };
-    };
+  >;
 };
 
 export type PetitionReplies_presendPetitionClosedNotificationMutationVariables = Exact<{
@@ -5611,12 +5436,6 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
     ...PetitionLayout_PetitionBase
-    events(limit: 1000) {
-      items {
-        id
-        __typename
-      }
-    }
     fields {
       ...PetitionReplies_PetitionField
     }
@@ -8660,12 +8479,6 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
       force: $force
     ) {
       id
-      events(limit: 1000) {
-        items {
-          id
-          __typename
-        }
-      }
     }
   }
 `;

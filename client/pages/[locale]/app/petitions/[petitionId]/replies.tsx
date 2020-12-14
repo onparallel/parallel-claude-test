@@ -628,12 +628,6 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_Petition on Petition {
         id
         ...PetitionLayout_PetitionBase
-        events(limit: 1000) {
-          items {
-            id
-            __typename
-          }
-        }
         fields {
           ...PetitionReplies_PetitionField
         }
@@ -849,12 +843,6 @@ PetitionReplies.mutations = [
         force: $force
       ) {
         id
-        events(limit: 1000) {
-          items {
-            id
-            __typename
-          }
-        }
       }
     }
   `,
