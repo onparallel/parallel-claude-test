@@ -136,6 +136,7 @@ export interface NexusGenInputs {
     name?: string | null; // String
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
     signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
+    skipForwardSecurity?: boolean | null; // Boolean
   };
   UpdateUserInput: {
     // input type
@@ -600,6 +601,7 @@ export interface NexusGenFieldTypes {
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][] | null; // [PetitionSignatureRequest!]
+    skipForwardSecurity: boolean; // Boolean!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
@@ -767,6 +769,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
+    skipForwardSecurity: boolean; // Boolean!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
@@ -1031,6 +1034,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
+    skipForwardSecurity: boolean; // Boolean!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
@@ -1243,6 +1247,7 @@ export interface NexusGenFieldTypeNames {
     remindersConfig: "RemindersConfig";
     signatureConfig: "SignatureConfig";
     signatureRequests: "PetitionSignatureRequest";
+    skipForwardSecurity: "Boolean";
     status: "PetitionStatus";
     updatedAt: "DateTime";
     userPermissions: "PetitionUserPermission";
@@ -1410,6 +1415,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     organization: "Organization";
     owner: "User";
+    skipForwardSecurity: "Boolean";
     updatedAt: "DateTime";
     userPermissions: "PetitionUserPermission";
   };
@@ -1672,6 +1678,7 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     organization: "Organization";
     owner: "User";
+    skipForwardSecurity: "Boolean";
     updatedAt: "DateTime";
     userPermissions: "PetitionUserPermission";
   };

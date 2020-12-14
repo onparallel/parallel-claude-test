@@ -139,7 +139,8 @@ export type FeatureFlag =
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
-  | "PETITION_SIGNATURE";
+  | "PETITION_SIGNATURE"
+  | "SKIP_FORWARD_SECURITY";
 
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
@@ -761,6 +762,8 @@ export type Petition = PetitionBase & {
   signatureConfig?: Maybe<SignatureConfig>;
   /** The list of signature requests. */
   signatureRequests?: Maybe<Array<PetitionSignatureRequest>>;
+  /** Whether to skip the forward security check on the recipient view. */
+  skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
   status: PetitionStatus;
   /** Time when the resource was last updated. */
@@ -858,6 +861,8 @@ export type PetitionBase = {
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  /** Whether to skip the forward security check on the recipient view. */
+  skipForwardSecurity: Scalars["Boolean"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1163,6 +1168,8 @@ export type PetitionTemplate = PetitionBase & {
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  /** Whether to skip the forward security check on the recipient view. */
+  skipForwardSecurity: Scalars["Boolean"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1605,6 +1612,7 @@ export type UpdatePetitionInput = {
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
   signatureConfig?: Maybe<SignatureConfigInput>;
+  skipForwardSecurity?: Maybe<Scalars["Boolean"]>;
 };
 
 export type UpdateUserInput = {
@@ -2441,6 +2449,7 @@ export type PetitionFieldsIndex_PetitionFieldFragment = {
 
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
+  hasSkipForwardSecurity: User["hasFeatureFlag"];
   hasHideRecipientViewContents: User["hasFeatureFlag"];
 } & {
   organization: { __typename?: "Organization" } & {
@@ -2461,6 +2470,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   | "id"
   | "locale"
   | "hasCommentsEnabled"
+  | "skipForwardSecurity"
   | "isRecipientViewContentsHidden"
 > & {
     currentSignatureRequest?: Maybe<
@@ -2475,7 +2485,11 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
 } & Pick<
   PetitionTemplate,
-  "id" | "locale" | "hasCommentsEnabled" | "isRecipientViewContentsHidden"
+  | "id"
+  | "locale"
+  | "hasCommentsEnabled"
+  | "skipForwardSecurity"
+  | "isRecipientViewContentsHidden"
 >;
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -5417,6 +5431,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     id
     locale
     hasCommentsEnabled
+    skipForwardSecurity
     isRecipientViewContentsHidden
     ... on Petition {
       status
@@ -5459,6 +5474,7 @@ export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+    hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
     hasHideRecipientViewContents: hasFeatureFlag(
       featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
     )

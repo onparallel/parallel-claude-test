@@ -90,6 +90,16 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-skip-forward-security.confirm",
+    "definition": "Disable Forward Security",
+    "context": "Disable Forward Security"
+  },
+  {
+    "term": "component.confirm-skip-forward-security.header",
+    "definition": "Disable Forward Security",
+    "context": "Disable Forward Security"
+  },
+  {
     "term": "component.contact-list-header.actions-button",
     "definition": "Actions",
     "context": "Actions"
@@ -465,6 +475,11 @@
     "context": "This date is used to inform the recipients of the deadline for which you need to have the information."
   },
   {
+    "term": "component.petition-settings.forward-security-description",
+    "definition": "Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake.",
+    "context": "Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
+  },
+  {
     "term": "component.petition-settings.hide-recipient-view-contents",
     "definition": "Hide recipient view contents",
     "context": "Hide recipient view contents"
@@ -508,6 +523,16 @@
     "term": "component.petition-settings.petition-signature-enable",
     "definition": "Enable eSignature",
     "context": "Enable eSignature"
+  },
+  {
+    "term": "component.petition-settings.skip-forward-security",
+    "definition": "Disable Forward Security",
+    "context": "Disable Forward Security"
+  },
+  {
+    "term": "component.petition-settings.skip-forward-security-warning",
+    "definition": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far.",
+    "context": "If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
   },
   {
     "term": "component.petition-settings.template-locale-label",

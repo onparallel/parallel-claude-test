@@ -18,6 +18,7 @@ export const FeatureFlag = enumType({
       name: "HIDE_RECIPIENT_VIEW_CONTENTS",
       deprecation: "Don't use this",
     },
+    "SKIP_FORWARD_SECURITY",
   ],
   rootTyping: "db.FeatureFlagName",
 });

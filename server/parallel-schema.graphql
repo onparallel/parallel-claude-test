@@ -156,6 +156,7 @@ enum FeatureFlag {
   INTERNAL_COMMENTS
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
+  SKIP_FORWARD_SECURITY
 }
 
 type FileUploadReplyDownloadLinkResult {
@@ -966,6 +967,11 @@ type Petition implements PetitionBase {
   signatureRequests: [PetitionSignatureRequest!]
 
   """
+  Whether to skip the forward security check on the recipient view.
+  """
+  skipForwardSecurity: Boolean!
+
+  """
   The status of the petition.
   """
   status: PetitionStatus!
@@ -1138,6 +1144,11 @@ interface PetitionBase {
   name: String
   organization: Organization!
   owner: User!
+
+  """
+  Whether to skip the forward security check on the recipient view.
+  """
+  skipForwardSecurity: Boolean!
 
   """
   Time when the resource was last updated.
@@ -1704,6 +1715,11 @@ type PetitionTemplate implements PetitionBase {
   name: String
   organization: Organization!
   owner: User!
+
+  """
+  Whether to skip the forward security check on the recipient view.
+  """
+  skipForwardSecurity: Boolean!
 
   """
   Time when the resource was last updated.
@@ -2418,6 +2434,7 @@ input UpdatePetitionInput {
   name: String
   remindersConfig: RemindersConfigInput
   signatureConfig: SignatureConfigInput
+  skipForwardSecurity: Boolean
 }
 
 input UpdateUserInput {

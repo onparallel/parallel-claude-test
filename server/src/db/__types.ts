@@ -12,7 +12,8 @@ export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
-  | "HIDE_RECIPIENT_VIEW_CONTENTS";
+  | "HIDE_RECIPIENT_VIEW_CONTENTS"
+  | "SKIP_FORWARD_SECURITY";
 
 export type IntegrationType = "SIGNATURE";
 
@@ -364,6 +365,7 @@ export interface Petition {
   signature_config: Maybe<any>;
   comments_enabled: boolean;
   hide_recipient_view_contents: boolean;
+  skip_forward_security: boolean;
 }
 
 export type CreatePetition = PartialProps<
@@ -389,6 +391,7 @@ export type CreatePetition = PartialProps<
   | "signature_config"
   | "comments_enabled"
   | "hide_recipient_view_contents"
+  | "skip_forward_security"
 >;
 
 export interface PetitionAccess {

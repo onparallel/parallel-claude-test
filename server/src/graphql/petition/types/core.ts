@@ -102,6 +102,11 @@ export const PetitionBase = interfaceType({
       description: "Whether comments are enabled or not.",
       resolve: (o) => o.comments_enabled,
     });
+    t.boolean("skipForwardSecurity", {
+      description:
+        "Whether to skip the forward security check on the recipient view.",
+      resolve: (o) => o.skip_forward_security,
+    });
     t.boolean("isRecipientViewContentsHidden", {
       description: "Whether the contents card is hidden in the recipient view.",
       deprecation: "Don't use this",

@@ -17,6 +17,12 @@ export function authenticatePublicAccess<
   TArg extends Arg<TypeName, FieldName, string>
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
+    const petition = (await ctx.petitions.loadPetition(
+      ctx.access!.petition_id
+    ))!;
+    if (petition.skip_forward_security) {
+      return true;
+    }
     const contactId = ctx.contact!.id;
     const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
     if (

@@ -27,7 +27,7 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { ChangeEvent } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -66,14 +66,10 @@ export function PetitionSettings({
   const showSignatureConfigDialog = useSignatureConfigDialog();
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
+
   const showConfirmConfigureOngoingSignature = useDialog(
     ConfirmConfigureOngoingSignature
   );
-
-  const showConfirmDisableOngoingSignature = useDialog(
-    ConfirmDisableOngoingSignature
-  );
-
   const showConfirmSignatureConfigChanged = useDialog(
     ConfirmSignatureConfigChanged
   );
@@ -113,8 +109,11 @@ export function PetitionSettings({
     } catch {}
   }
 
-  async function handleSignatureChange(event: ChangeEvent<HTMLInputElement>) {
-    if (event.target.checked) {
+  const showConfirmDisableOngoingSignature = useDialog(
+    ConfirmDisableOngoingSignature
+  );
+  async function handleSignatureChange(value: boolean) {
+    if (value) {
       await handleConfigureSignatureClick();
     } else {
       try {
@@ -129,6 +128,16 @@ export function PetitionSettings({
         onUpdatePetition({ signatureConfig: null });
       } catch {}
     }
+  }
+
+  const showConfirmSkipForwardSecurity = useDialog(ConfirmSkipForwardSecurity);
+  async function handleSkipForwardSecurityChange(value: boolean) {
+    try {
+      if (value) {
+        await showConfirmSkipForwardSecurity({});
+      }
+      await onUpdatePetition({ skipForwardSecurity: value });
+    } catch {}
   }
 
   return (
@@ -189,50 +198,44 @@ export function PetitionSettings({
           />
         </FormControl>
       ) : null}
-      <FormControl as={Stack} direction="row">
-        <FormLabel margin={0} display="flex" alignItems="center">
+      <SwitchSetting
+        title={
           <FormattedMessage
             id="component.petition-settings.petition-comments-enable"
             defaultMessage="Enable comments"
           />
-          <HelpPopover marginLeft={2}>
-            <FormattedMessage
-              id="component.petition-settings.petition-comments-description"
-              defaultMessage="By enabling comments, recipients of the petition will be able to ask you questions within the recipient view."
-            />
-          </HelpPopover>
-        </FormLabel>
-        <Spacer />
-        <Switch
-          onChange={async (e) =>
-            await onUpdatePetition({ hasCommentsEnabled: e.target.checked })
-          }
-          isChecked={Boolean(petition.hasCommentsEnabled)}
-        />
-      </FormControl>
+        }
+        help={
+          <FormattedMessage
+            id="component.petition-settings.petition-comments-description"
+            defaultMessage="By enabling comments, recipients of the petition will be able to ask you questions within the recipient view."
+          />
+        }
+        isChecked={petition.hasCommentsEnabled}
+        onChange={async (value) =>
+          await onUpdatePetition({ hasCommentsEnabled: value })
+        }
+      />
       {petition.__typename === "Petition" &&
       (petition.signatureConfig || hasSignature) ? (
         <Box>
-          <FormControl as={Stack} direction="row">
-            <FormLabel margin={0} display="flex" alignItems="center">
+          <SwitchSetting
+            title={
               <FormattedMessage
                 id="component.petition-settings.petition-signature-enable"
                 defaultMessage="Enable eSignature"
               />
-              <HelpPopover marginLeft={2}>
-                <FormattedMessage
-                  id="component.petition-settings.petition-signature-description"
-                  defaultMessage="By enabling eSignature, once the petition is completed by the recipient, Parallel will generate a PDF document with all the replies and send it to the selected eSignature provider to start the signature process."
-                />
-              </HelpPopover>
-            </FormLabel>
-            <Spacer />
-            <Switch
-              onChange={handleSignatureChange}
-              isChecked={Boolean(petition.signatureConfig)}
-              isDisabled={!hasSignature}
-            />
-          </FormControl>
+            }
+            help={
+              <FormattedMessage
+                id="component.petition-settings.petition-signature-description"
+                defaultMessage="By enabling eSignature, once the petition is completed by the recipient, Parallel will generate a PDF document with all the replies and send it to the selected eSignature provider to start the signature process."
+              />
+            }
+            onChange={handleSignatureChange}
+            isChecked={Boolean(petition.signatureConfig)}
+            isDisabled={!hasSignature}
+          />
           <Collapse isOpen={Boolean(petition.signatureConfig)}>
             <Flex justifyContent="center" marginTop={2}>
               <Button
@@ -251,31 +254,43 @@ export function PetitionSettings({
           </Collapse>
         </Box>
       ) : null}
-      {petition.__typename === "Petition" &&
-      user.hasHideRecipientViewContents ? (
-        <FormControl as={Stack} direction="row">
-          <FormLabel margin={0} display="flex" alignItems="center">
+      {user.hasSkipForwardSecurity ? (
+        <SwitchSetting
+          title={
+            <FormattedMessage
+              id="component.petition-settings.skip-forward-security"
+              defaultMessage="Disable Forward Security"
+            />
+          }
+          help={
+            <FormattedMessage
+              id="component.petition-settings.forward-security-description"
+              defaultMessage="Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
+            />
+          }
+          isChecked={petition.skipForwardSecurity}
+          onChange={handleSkipForwardSecurityChange}
+        />
+      ) : null}
+      {user.hasHideRecipientViewContents ? (
+        <SwitchSetting
+          title={
             <FormattedMessage
               id="component.petition-settings.hide-recipient-view-contents"
               defaultMessage="Hide recipient view contents"
             />
-            <HelpPopover marginLeft={2}>
-              <FormattedMessage
-                id="component.petition-settings.hide-recipient-view-contents-description"
-                defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
-              />
-            </HelpPopover>
-          </FormLabel>
-          <Spacer />
-          <Switch
-            onChange={async (e) =>
-              await onUpdatePetition({
-                isRecipientViewContentsHidden: e.target.checked,
-              })
-            }
-            isChecked={Boolean(petition.isRecipientViewContentsHidden)}
-          />
-        </FormControl>
+          }
+          help={
+            <FormattedMessage
+              id="component.petition-settings.hide-recipient-view-contents-description"
+              defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
+            />
+          }
+          isChecked={petition.isRecipientViewContentsHidden}
+          onChange={async (value) =>
+            await onUpdatePetition({ isRecipientViewContentsHidden: value })
+          }
+        />
       ) : null}
     </Stack>
   );
@@ -285,6 +300,7 @@ PetitionSettings.fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+      hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
       hasHideRecipientViewContents: hasFeatureFlag(
         featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
       )
@@ -301,6 +317,7 @@ PetitionSettings.fragments = {
       id
       locale
       hasCommentsEnabled
+      skipForwardSecurity
       isRecipientViewContentsHidden
       ... on Petition {
         status
@@ -330,6 +347,35 @@ PetitionSettings.mutations = [
     }
   `,
 ];
+
+function SwitchSetting({
+  title,
+  help,
+  isChecked,
+  isDisabled,
+  onChange,
+}: {
+  title: ReactNode;
+  help: ReactNode;
+  isChecked: boolean;
+  isDisabled?: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <FormControl as={Stack} direction="row">
+      <FormLabel margin={0} display="flex" alignItems="center">
+        {title}
+        <HelpPopover marginLeft={2}>{help}</HelpPopover>
+      </FormLabel>
+      <Spacer />
+      <Switch
+        isChecked={isChecked}
+        isDisabled={isDisabled}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+    </FormControl>
+  );
+}
 
 function DeadlineInput({
   value,
@@ -424,6 +470,44 @@ function ConfirmDisableOngoingSignature(props: DialogProps<{}, void>) {
           <FormattedMessage
             id="component.confirm-disable-ongoing-signature.confirm"
             defaultMessage="Disable eSignature"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+function ConfirmSkipForwardSecurity(props: DialogProps<{}, void>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-skip-forward-security.header"
+          defaultMessage="Disable Forward Security"
+        />
+      }
+      body={
+        <Stack>
+          <Text>
+            <FormattedMessage
+              id="component.petition-settings.forward-security-description"
+              defaultMessage="Forward security is a security measure that protects the privacy of the data uploaded by the recipient in case they share their personal link by mistake."
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="component.petition-settings.skip-forward-security-warning"
+              defaultMessage="If you disable Forward Security recipients will be able to share their links and other people might be able to access the data submitted so far."
+            />
+          </Text>
+        </Stack>
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-skip-forward-security.confirm"
+            defaultMessage="Disable Forward Security"
           />
         </Button>
       }

@@ -68,6 +68,17 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
     userAgent: stringArg(),
   },
   resolve: async (_, args, ctx) => {
+    const petition = (await ctx.petitions.loadPetition(
+      ctx.access!.petition_id
+    ))!;
+    if (petition.skip_forward_security) {
+      await ctx.petitions.createEvent({
+        petitionId: ctx.access!.petition_id,
+        type: "ACCESS_OPENED",
+        data: { petition_access_id: ctx.access!.id },
+      });
+      return { isAllowed: true };
+    }
     const logEntry = {
       ip: args.ip ?? null,
       userAgent: args.userAgent ?? null,
