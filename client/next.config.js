@@ -22,7 +22,10 @@ const config = {
       })
     );
 
-    if (process.env.NODE_ENV === "production" && !process.env.SKIP_SENTRY) {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.SENTRY_AUTH_TOKEN
+    ) {
       config.plugins.push(
         new SentryWebpackPlugin({
           authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -98,6 +101,7 @@ const config = {
                       "'self'",
                       "*.parallel.so",
                       "parallel-file-uploads-production.s3-accelerate.amazonaws.com",
+                      "*.sentry.io",
                       // Google analytics
                       "www.google-analytics.com",
                       // Hotjar
