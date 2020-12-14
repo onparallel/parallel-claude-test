@@ -10,6 +10,7 @@ export type SignatureIntegrationSettings<
 > = {
   SIGNATURIT: {
     API_KEY: string;
+    ENVIRONMENT?: "production" | "sandbox";
     EN_BRANDING_ID?: string;
     ES_BRANDING_ID?: string;
   };

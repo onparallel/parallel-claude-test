@@ -142,15 +142,16 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     private config: Config
   ) {
     super();
-    // const isProduction =
-    //   process.env.NODE_ENV === "production" && process.env.ENV === "production";
-    const isProduction = false;
     if (!this.settings.API_KEY) {
       throw new Error(
         "Signaturit API KEY not found on org_integration settings"
       );
     }
-    this.sdk = new SignaturitSDK(this.settings.API_KEY, isProduction);
+
+    this.sdk = new SignaturitSDK(
+      this.settings.API_KEY,
+      settings.ENVIRONMENT === "production"
+    );
   }
 
   public async startSignatureRequest(
