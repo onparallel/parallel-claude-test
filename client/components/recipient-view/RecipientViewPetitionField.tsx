@@ -56,6 +56,7 @@ export type PublicPetitionFieldProps = ExtendChakra<{
   contactId: string;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   isInvalid: boolean;
+  hasCommentsEnabled: boolean;
   uploadProgress?: { [replyId: string]: number };
   onOpenCommentsClick: () => void;
   onDeleteReply: (replyId: string) => void;
@@ -67,6 +68,7 @@ export function RecipientViewPetitionField({
   contactId,
   field,
   isInvalid,
+  hasCommentsEnabled,
   uploadProgress,
   onOpenCommentsClick,
   onDeleteReply,
@@ -154,12 +156,14 @@ export function RecipientViewPetitionField({
             )}
           </Heading>
         </Box>
-        <CommentsButton
-          commentCount={field.comments.length}
-          hasUnreadComments={field.comments.some((c) => c.isUnread)}
-          hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
-          onClick={onOpenCommentsClick}
-        />
+        {hasCommentsEnabled ? (
+          <CommentsButton
+            commentCount={field.comments.length}
+            hasUnreadComments={field.comments.some((c) => c.isUnread)}
+            hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
+            onClick={onOpenCommentsClick}
+          />
+        ) : null}
       </Flex>
       <Box>
         {field.description ? (

@@ -461,6 +461,7 @@ function RecipientView({
               <RecipientViewSenderCard sender={granter} />
               <RecipientViewContentsCard
                 currentPage={currentPage}
+                hasCommentsEnabled={petition.hasCommentsEnabled}
                 sender={granter}
                 petition={petition}
                 display={{ base: "none", [breakpoint]: "flex" }}
@@ -484,6 +485,7 @@ function RecipientView({
                   isInvalid={
                     finalized && field.replies.length === 0 && !field.optional
                   }
+                  hasCommentsEnabled={petition.hasCommentsEnabled}
                   uploadProgress={uploadProgress[field.id]}
                   contactId={contact.id}
                   onOpenCommentsClick={() => setSelectedFieldId(field.id)}
@@ -599,6 +601,7 @@ RecipientView.fragments = {
         id
         status
         deadline
+        hasCommentsEnabled
         fields {
           ...RecipientView_PublicPetitionField
         }

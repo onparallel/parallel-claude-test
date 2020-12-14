@@ -49,6 +49,10 @@ export const PublicPetition = objectType({
       description: "The status of the petition.",
       resolve: (o) => o.status!,
     });
+    t.boolean("hasCommentsEnabled", {
+      description: "Whether comments are enabled or not.",
+      resolve: (o) => o.comments_enabled,
+    });
     t.list.nonNull.field("fields", {
       type: "PublicPetitionField",
       description: "The field definition of the petition.",

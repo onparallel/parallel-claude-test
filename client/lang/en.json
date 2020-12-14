@@ -475,6 +475,16 @@
     "context": "Language of the petition"
   },
   {
+    "term": "component.petition-settings.petition-comments-description",
+    "definition": "By enabling comments, recipients of the petition will be able to ask you questions within the recipient view.",
+    "context": "By enabling comments, recipients of the petition will be able to ask you questions within the recipient view."
+  },
+  {
+    "term": "component.petition-settings.petition-comments-enable",
+    "definition": "Enable comments",
+    "context": "Enable comments"
+  },
+  {
     "term": "component.petition-settings.petition-signature-configure",
     "definition": "Configure eSignature",
     "context": "Configure eSignature"
@@ -1643,6 +1653,16 @@
     "term": "petition-replies.download-all",
     "definition": "Download replies",
     "context": "Download replies"
+  },
+  {
+    "term": "petition-replies.field-comments.disabled-comments-1",
+    "definition": "Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab.",
+    "context": "Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
+  },
+  {
+    "term": "petition-replies.field-comments.disabled-comments-2",
+    "definition": "Only internal comments will be displayed here.",
+    "context": "Only internal comments will be displayed here."
   },
   {
     "term": "petition-replies.field-comments.placeholder",

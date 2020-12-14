@@ -548,6 +548,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               {activeFieldId ? (
                 <PetitionRepliesFieldComments
                   key={activeFieldId!}
+                  petitionId={petition.id}
+                  hasCommentsEnabled={petition.hasCommentsEnabled}
                   field={activeField!}
                   user={me}
                   onClose={() => setActiveFieldId(null)}
@@ -627,6 +629,7 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_Petition on Petition {
         id
+        hasCommentsEnabled
         ...PetitionLayout_PetitionBase
         fields {
           ...PetitionReplies_PetitionField

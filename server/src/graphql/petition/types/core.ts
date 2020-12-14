@@ -98,6 +98,10 @@ export const PetitionBase = interfaceType({
       description: "The body of the petition.",
       resolve: (o) => safeJsonParse(o.email_body),
     });
+    t.boolean("hasCommentsEnabled", {
+      description: "Whether comments are enabled or not.",
+      resolve: (o) => o.comments_enabled,
+    });
     // Until nexus allows interfaces to extend other interfaces
     t.datetime("createdAt", {
       description: "Time when the resource was created.",

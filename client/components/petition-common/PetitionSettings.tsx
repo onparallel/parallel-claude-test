@@ -131,6 +131,12 @@ export function PetitionSettings({
     }
   }
 
+  async function handleHasCommentsEnabledChange(
+    event: ChangeEvent<HTMLInputElement>
+  ) {
+    await onUpdatePetition({ hasCommentsEnabled: event.target.checked });
+  }
+
   return (
     <Stack padding={4} spacing={4}>
       <FormControl id="petition-locale">
@@ -189,6 +195,25 @@ export function PetitionSettings({
           />
         </FormControl>
       ) : null}
+      <FormControl as={Stack} direction="row">
+        <FormLabel margin={0} display="flex" alignItems="center">
+          <FormattedMessage
+            id="component.petition-settings.petition-comments-enable"
+            defaultMessage="Enable comments"
+          />
+          <HelpPopover marginLeft={2}>
+            <FormattedMessage
+              id="component.petition-settings.petition-comments-description"
+              defaultMessage="By enabling comments, recipients of the petition will be able to ask you questions within the recipient view."
+            />
+          </HelpPopover>
+        </FormLabel>
+        <Spacer />
+        <Switch
+          onChange={handleHasCommentsEnabledChange}
+          isChecked={Boolean(petition.hasCommentsEnabled)}
+        />
+      </FormControl>
       {petition.__typename === "Petition" &&
       (petition.signatureConfig || hasSignature) ? (
         <Box>
@@ -250,10 +275,11 @@ PetitionSettings.fragments = {
     fragment PetitionSettings_PetitionBase on PetitionBase {
       id
       locale
+      hasCommentsEnabled
       ... on Petition {
         status
         deadline
-        ...SignatureConfigDialog_Petition
+        ...SignatureConfigDialog_Petition @include(if: $hasPetitionSignature)
         currentSignatureRequest @include(if: $hasPetitionSignature) {
           id
           status

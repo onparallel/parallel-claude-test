@@ -326,6 +326,7 @@ export interface Petition {
   template_public: boolean;
   from_template_id: Maybe<number>;
   signature_config: Maybe<any>;
+  comments_enabled: boolean;
 }
 
 export type CreatePetition = PartialProps<
@@ -349,6 +350,7 @@ export type CreatePetition = PartialProps<
   | "template_public"
   | "from_template_id"
   | "signature_config"
+  | "comments_enabled"
 >;
 
 export interface PetitionAccess {

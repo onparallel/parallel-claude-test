@@ -24,6 +24,7 @@ import { prop } from "remeda";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { userIsCommentAuthor } from "./authorizers";
+import { WhitelistedError } from "../../helpers/errors";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -50,6 +51,13 @@ export const createPetitionFieldComment = mutationField(
       isInternal: booleanArg(),
     },
     resolve: async (_, args, ctx) => {
+      const petition = (await ctx.petitions.loadPetition(args.petitionId))!;
+      if (!petition.comments_enabled && !args.isInternal) {
+        throw new WhitelistedError(
+          "Comments are not enabled for this petition",
+          "COMMENTS_NOT_ENABLED"
+        );
+      }
       const comment = await ctx.petitions.createPetitionFieldCommentFromUser(
         {
           petitionId: args.petitionId,

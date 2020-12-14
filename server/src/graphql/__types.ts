@@ -130,6 +130,7 @@ export interface NexusGenInputs {
     description?: string | null; // String
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
+    hasCommentsEnabled?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
@@ -563,6 +564,7 @@ export interface NexusGenFieldTypes {
     events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
@@ -731,6 +733,7 @@ export interface NexusGenFieldTypes {
     emailSubject: string | null; // String
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isPublic: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
@@ -785,6 +788,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
+    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
@@ -972,6 +976,7 @@ export interface NexusGenFieldTypes {
     emailSubject: string | null; // String
     fieldCount: number; // Int!
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
@@ -1174,6 +1179,7 @@ export interface NexusGenFieldTypeNames {
     events: "PetitionEventPagination";
     fieldCount: "Int";
     fields: "PetitionField";
+    hasCommentsEnabled: "Boolean";
     id: "GID";
     locale: "PetitionLocale";
     name: "String";
@@ -1342,6 +1348,7 @@ export interface NexusGenFieldTypeNames {
     emailSubject: "String";
     fieldCount: "Int";
     fields: "PetitionField";
+    hasCommentsEnabled: "Boolean";
     id: "GID";
     isPublic: "Boolean";
     locale: "PetitionLocale";
@@ -1396,6 +1403,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     deadline: "DateTime";
     fields: "PublicPetitionField";
+    hasCommentsEnabled: "Boolean";
     id: "GID";
     locale: "PetitionLocale";
     signers: "PublicContact";
@@ -1581,6 +1589,7 @@ export interface NexusGenFieldTypeNames {
     emailSubject: "String";
     fieldCount: "Int";
     fields: "PetitionField";
+    hasCommentsEnabled: "Boolean";
     id: "GID";
     locale: "PetitionLocale";
     name: "String";

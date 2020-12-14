@@ -16,7 +16,11 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/core";
-import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
+import {
+  AlertCircleIcon,
+  CommentIcon,
+  MoreVerticalIcon,
+} from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
@@ -43,12 +47,15 @@ import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpPopover } from "../common/HelpPopover";
+import { Link } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
 export type PetitionRepliesFieldCommentsProps = {
+  petitionId: string;
   field: PetitionRepliesFieldComments_PetitionFieldFragment;
   user: PetitionReplies_UserFragment;
+  hasCommentsEnabled: boolean;
   onAddComment: (value: string, internal?: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
@@ -56,8 +63,10 @@ export type PetitionRepliesFieldCommentsProps = {
 };
 
 export function PetitionRepliesFieldComments({
+  petitionId,
   field,
   user,
+  hasCommentsEnabled,
   onAddComment,
   onDeleteComment,
   onUpdateComment,
@@ -66,7 +75,9 @@ export function PetitionRepliesFieldComments({
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
-  const [isInternalComment, setInternalComment] = useState(false);
+  const [isInternalComment, setInternalComment] = useState(
+    hasCommentsEnabled ? false : true
+  );
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLDivElement>(null);
@@ -145,9 +156,35 @@ export function PetitionRepliesFieldComments({
             paddingY={8}
             justifyContent="center"
             alignItems="center"
-            color="gray.200"
           >
-            <CommentIcon boxSize="64px" />
+            {hasCommentsEnabled ? (
+              <CommentIcon boxSize="64px" color="gray.200" />
+            ) : (
+              <Stack alignItems="center" textAlign="center">
+                <AlertCircleIcon boxSize="64px" color="gray.200" />
+                <Text color="gray.400">
+                  <FormattedMessage
+                    id="petition-replies.field-comments.disabled-comments-1"
+                    defaultMessage="Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
+                    values={{
+                      a: (chunks: any[]) => (
+                        <Link href={`/app/petitions/${petitionId}/compose`}>
+                          {chunks}
+                        </Link>
+                      ),
+                    }}
+                  />
+                </Text>
+                {user.hasInternalComments ? (
+                  <Text color="gray.400">
+                    <FormattedMessage
+                      id="petition-replies.field-comments.disabled-comments-2"
+                      defaultMessage="Only internal comments will be displayed here."
+                    />
+                  </Text>
+                ) : null}
+              </Stack>
+            )}
           </Flex>
         ) : null}
       </Box>
@@ -166,6 +203,7 @@ export function PetitionRepliesFieldComments({
             id: "petition-replies.field-comments.placeholder",
             defaultMessage: "Type a new comment",
           })}
+          isDisabled={!hasCommentsEnabled && !user.hasInternalComments}
           value={draft}
           onKeyDown={handleKeyDown as any}
           onChange={handleDraftChange as any}
@@ -184,6 +222,7 @@ export function PetitionRepliesFieldComments({
                   marginLeft={2}
                   colorScheme="purple"
                   isChecked={isInternalComment}
+                  isDisabled={hasCommentsEnabled ? false : true}
                   onChange={() => setInternalComment(!isInternalComment)}
                 >
                   <FormattedMessage

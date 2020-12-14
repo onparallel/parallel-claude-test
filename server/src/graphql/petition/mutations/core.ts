@@ -20,6 +20,7 @@ import {
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import { fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import {
   and,
@@ -326,6 +327,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.field("remindersConfig", {
             type: "RemindersConfigInput",
           });
+          t.nullable.boolean("hasCommentsEnabled");
           t.nullable.field("signatureConfig", {
             type: "SignatureConfigInput",
           });
@@ -357,6 +359,7 @@ export const updatePetition = mutationField("updatePetition", {
       emailSubject,
       emailBody,
       remindersConfig,
+      hasCommentsEnabled,
       signatureConfig,
       description,
     } = args.data;
@@ -364,7 +367,7 @@ export const updatePetition = mutationField("updatePetition", {
     if (name !== undefined) {
       data.name = name?.trim() || null;
     }
-    if (locale !== undefined && locale !== null) {
+    if (isDefined(locale)) {
       data.locale = locale;
     }
     if (deadline !== undefined) {
@@ -374,7 +377,7 @@ export const updatePetition = mutationField("updatePetition", {
       data.email_subject = emailSubject?.trim() || null;
     }
     if (emailBody !== undefined) {
-      data.email_body = emailBody === null ? null : JSON.stringify(emailBody);
+      data.email_body = emailBody && JSON.stringify(emailBody);
     }
     if (remindersConfig !== undefined) {
       if (remindersConfig === null) {
@@ -384,6 +387,9 @@ export const updatePetition = mutationField("updatePetition", {
         data.reminders_config = remindersConfig;
         data.reminders_active = true;
       }
+    }
+    if (isDefined(hasCommentsEnabled)) {
+      data.comments_enabled = hasCommentsEnabled;
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {

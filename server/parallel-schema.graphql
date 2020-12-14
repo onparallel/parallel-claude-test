@@ -893,6 +893,11 @@ type Petition implements PetitionBase {
   fields: [PetitionField!]!
 
   """
+  Whether comments are enabled or not.
+  """
+  hasCommentsEnabled: Boolean!
+
+  """
   The ID of the petition or template.
   """
   id: GID!
@@ -1075,6 +1080,11 @@ interface PetitionBase {
   The definition of the petition fields.
   """
   fields: [PetitionField!]!
+
+  """
+  Whether comments are enabled or not.
+  """
+  hasCommentsEnabled: Boolean!
 
   """
   The ID of the petition or template.
@@ -1628,6 +1638,11 @@ type PetitionTemplate implements PetitionBase {
   fields: [PetitionField!]!
 
   """
+  Whether comments are enabled or not.
+  """
+  hasCommentsEnabled: Boolean!
+
+  """
   The ID of the petition or template.
   """
   id: GID!
@@ -1808,6 +1823,11 @@ type PublicPetition implements Timestamps {
   The field definition of the petition.
   """
   fields: [PublicPetitionField!]!
+
+  """
+  Whether comments are enabled or not.
+  """
+  hasCommentsEnabled: Boolean!
 
   """
   The ID of the petition.
@@ -2337,6 +2357,7 @@ input UpdatePetitionInput {
   description: String
   emailBody: JSON
   emailSubject: String
+  hasCommentsEnabled: Boolean
   locale: PetitionLocale
   name: String
   remindersConfig: RemindersConfigInput

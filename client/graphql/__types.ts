@@ -709,6 +709,8 @@ export type Petition = PetitionBase & {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** Whether comments are enabled or not. */
+  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   /** The locale of the petition. */
@@ -807,6 +809,8 @@ export type PetitionBase = {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** Whether comments are enabled or not. */
+  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   /** The locale of the petition. */
@@ -1103,6 +1107,8 @@ export type PetitionTemplate = PetitionBase & {
   fieldCount: Scalars["Int"];
   /** The definition of the petition fields. */
   fields: Array<PetitionField>;
+  /** Whether comments are enabled or not. */
+  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
@@ -1200,6 +1206,8 @@ export type PublicPetition = Timestamps & {
   deadline?: Maybe<Scalars["DateTime"]>;
   /** The field definition of the petition. */
   fields: Array<PublicPetitionField>;
+  /** Whether comments are enabled or not. */
+  hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
   /** The locale of the petition. */
@@ -1532,6 +1540,7 @@ export type UpdatePetitionInput = {
   description?: Maybe<Scalars["String"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
+  hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -2371,7 +2380,10 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "deadline" | "id" | "locale"> & {
+} & Pick<
+  Petition,
+  "status" | "deadline" | "id" | "locale" | "hasCommentsEnabled"
+> & {
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
         PetitionSignatureRequest,
@@ -2382,7 +2394,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale">;
+} & Pick<PetitionTemplate, "id" | "locale" | "hasCommentsEnabled">;
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -3443,7 +3455,7 @@ export type PetitionQuery = { __typename?: "Query" } & {
 
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> & {
+} & Pick<Petition, "id" | "hasCommentsEnabled"> & {
     fields: Array<
       { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
     >;
@@ -3863,7 +3875,10 @@ export type Login_UserFragment = { __typename?: "User" } & Pick<
 
 export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-} & Pick<PublicPetition, "id" | "status" | "deadline"> & {
+} & Pick<
+  PublicPetition,
+  "id" | "status" | "deadline" | "hasCommentsEnabled"
+> & {
     fields: Array<
       {
         __typename?: "PublicPetitionField";
@@ -5250,10 +5265,11 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
   fragment PetitionSettings_PetitionBase on PetitionBase {
     id
     locale
+    hasCommentsEnabled
     ... on Petition {
       status
       deadline
-      ...SignatureConfigDialog_Petition
+      ...SignatureConfigDialog_Petition @include(if: $hasPetitionSignature)
       currentSignatureRequest @include(if: $hasPetitionSignature) {
         id
         status
@@ -5435,6 +5451,7 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
     id
+    hasCommentsEnabled
     ...PetitionLayout_PetitionBase
     fields {
       ...PetitionReplies_PetitionField
@@ -5710,6 +5727,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     id
     status
     deadline
+    hasCommentsEnabled
     fields {
       ...RecipientView_PublicPetitionField
     }

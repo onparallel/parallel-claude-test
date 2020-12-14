@@ -475,18 +475,28 @@
     "context": "Language of the petition"
   },
   {
+    "term": "component.petition-settings.petition-comments-description",
+    "definition": "Al habilitar comentarios, los destinatarios de la petición podrán realizarte preguntas desde la misma vista de destinatario.",
+    "context": "By enabling comments, recipients of the petition will be able to ask you questions within the recipient view."
+  },
+  {
+    "term": "component.petition-settings.petition-comments-enable",
+    "definition": "Habilitar comentarios",
+    "context": "Enable comments"
+  },
+  {
     "term": "component.petition-settings.petition-signature-configure",
     "definition": "Ajustes de firma digital",
     "context": "Configure eSignature"
   },
   {
     "term": "component.petition-settings.petition-signature-description",
-    "definition": "Al activar la firma digital, y una vez la petición ha sido rellenada, Parallel generará un PDF con todas las respuestas y lo enviará al proveedor seleccionado para iniciar el proceso de firma.",
+    "definition": "Al habilitar la firma digital, y una vez la petición ha sido rellenada, Parallel generará un PDF con todas las respuestas y lo enviará al proveedor seleccionado para iniciar el proceso de firma.",
     "context": "By enabling eSignature, once the petition is completed by the recipient, Parallel will generate a PDF document with all the replies and send it to the selected eSignature provider to start the signature process."
   },
   {
     "term": "component.petition-settings.petition-signature-enable",
-    "definition": "Activar firma digital",
+    "definition": "Habilitar firma digital",
     "context": "Enable eSignature"
   },
   {
@@ -526,7 +536,7 @@
   },
   {
     "term": "component.petition-signatures-card.no-signature-configured-2",
-    "definition": "Si lo deseas, puedes configurarla desde los ajustes de petición en la pestaña de <a>Edición</a>",
+    "definition": "Si lo deseas, puedes configurarla desde los ajustes de petición en la pestaña de <a>Edición</a>.",
     "context": "If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
   },
   {
@@ -1643,6 +1653,16 @@
     "term": "petition-replies.download-all",
     "definition": "Descargar respuestas",
     "context": "Download replies"
+  },
+  {
+    "term": "petition-replies.field-comments.disabled-comments-1",
+    "definition": "Los comentarios están deshabilitados. Habilitalos desde los ajustes de petición en la pestaña de <a>Edición</a>.",
+    "context": "Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
+  },
+  {
+    "term": "petition-replies.field-comments.disabled-comments-2",
+    "definition": "Solo se mostrarán comentarios internos aquí.",
+    "context": "Only internal comments will be displayed here."
   },
   {
     "term": "petition-replies.field-comments.placeholder",

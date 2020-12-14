@@ -280,9 +280,17 @@ export const publicCreatePetitionFieldComment = mutationField(
       content: nonNull(stringArg()),
     },
     resolve: async (_, args, ctx) => {
+      const petitionId = ctx.access!.petition_id;
+      const petition = (await ctx.petitions.loadPetition(petitionId))!;
+      if (!petition.comments_enabled) {
+        throw new WhitelistedError(
+          "Comments are not enabled for this petition",
+          "COMMENTS_NOT_ENABLED"
+        );
+      }
       return await ctx.petitions.createPetitionFieldCommentFromAccess(
         {
-          petitionId: ctx.access!.petition_id,
+          petitionId: petitionId,
           petitionFieldId: args.petitionFieldId,
           petitionFieldReplyId: null,
           content: args.content,

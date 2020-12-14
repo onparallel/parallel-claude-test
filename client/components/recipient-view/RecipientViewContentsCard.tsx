@@ -15,11 +15,13 @@ import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
 
 export function RecipientViewContentsCard({
   currentPage,
+  hasCommentsEnabled,
   sender,
   petition,
   ...props
 }: ExtendChakra<{
   currentPage: number;
+  hasCommentsEnabled: boolean;
   sender: RecipientViewContentsCard_PublicUserFragment;
   petition: RecipientViewContentsCard_PublicPetitionFragment;
 }>) {
@@ -52,7 +54,7 @@ export function RecipientViewContentsCard({
                 fontWeight="bold"
                 isTruncated
               >
-                {index + 1 !== currentPage ? (
+                {hasCommentsEnabled && index + 1 !== currentPage ? (
                   <RecipientViewCommentsBadge
                     {...badge}
                     position="absolute"
@@ -101,13 +103,15 @@ export function RecipientViewContentsCard({
                       paddingLeft={4}
                       fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                     >
-                      <RecipientViewCommentsBadge
-                        {...badge}
-                        position="absolute"
-                        left="0"
-                        top="50%"
-                        transform="translate(0, -50%)"
-                      />
+                      {hasCommentsEnabled ? (
+                        <RecipientViewCommentsBadge
+                          {...badge}
+                          position="absolute"
+                          left="0"
+                          top="50%"
+                          transform="translate(0, -50%)"
+                        />
+                      ) : null}
                       <NakedLink
                         href={`/petition/${query.keycode}/${index + 1}#field-${
                           field.id
