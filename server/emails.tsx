@@ -28,6 +28,8 @@ async function parseArgs(req: Request) {
     switch (type) {
       case "object":
         return JSON.parse(req.query[key as string] as string);
+      case "boolean":
+        return req.query[key as string] === "true";
       case "date":
         return new Date(req.query[key as string] as string);
       default:

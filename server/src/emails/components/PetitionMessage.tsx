@@ -25,6 +25,7 @@ export type PetitionMessageProps = {
   fullName: string | null;
   senderName: string;
   senderEmail: string;
+  showFields: boolean;
   fields: PetitionFieldListProps["fields"];
   subject: string | null;
   body: any | null;
@@ -50,6 +51,7 @@ const email: Email<PetitionMessageProps> = {
       fullName,
       senderName,
       senderEmail,
+      showFields,
       fields,
       body,
       deadline,
@@ -72,23 +74,28 @@ const email: Email<PetitionMessageProps> = {
       ${renderSlateText(body)}
 
       ${
-        deadline
-          ? intl.formatMessage(
-              {
-                id: "generic.submit-text.with-deadline",
-                defaultMessage:
-                  "This is the information that has been requested to be submitted before {deadline}:",
-              },
-              { deadline: intl.formatDate(deadline, FORMATS.LLL) }
-            )
-          : intl.formatMessage({
-              id: "generic.submit-text.without-deadline",
-              defaultMessage:
-                "This is the information that has been requested:",
-            })
+        showFields
+          ? outdent`
+              ${
+                deadline
+                  ? intl.formatMessage(
+                      {
+                        id: "generic.submit-text.with-deadline",
+                        defaultMessage:
+                          "This is the information that has been requested to be submitted before {deadline}:",
+                      },
+                      { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+                    )
+                  : intl.formatMessage({
+                      id: "generic.submit-text.without-deadline",
+                      defaultMessage:
+                        "This is the information that has been requested:",
+                    })
+              }
+              ${petitionFieldList({ fields }, intl)}
+            `
+          : ""
       }
-      ${petitionFieldList({ fields }, intl)}
-
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
         defaultMessage:
@@ -103,6 +110,7 @@ const email: Email<PetitionMessageProps> = {
     fullName,
     senderName,
     senderEmail,
+    showFields,
     fields,
     body,
     deadline,
@@ -148,33 +156,37 @@ const email: Email<PetitionMessageProps> = {
         </MjmlSection>
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
-            {fields.length > 10 && (
-              <CompleteInfoButton
-                href={`${parallelUrl}/${locale}/petition/${keycode}`}
-              />
-            )}
-            <MjmlText>
-              {deadline ? (
-                <FormattedMessage
-                  id="generic.submit-text.with-deadline"
-                  defaultMessage="This is the information that has been requested to be submitted before {deadline}:"
-                  values={{
-                    deadline: (
-                      <span style={{ textDecoration: "underline" }}>
-                        <DateTime value={deadline} format={FORMATS.LLL} />
-                      </span>
-                    ),
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  id="generic.submit-text.without-deadline"
-                  defaultMessage="This is the information that has been requested:"
-                />
-              )}
-            </MjmlText>
-            <PetitionFieldList fields={fields} />
-            <MjmlSpacer height="10px" />
+            {showFields ? (
+              <>
+                {fields.length > 10 && (
+                  <CompleteInfoButton
+                    href={`${parallelUrl}/${locale}/petition/${keycode}`}
+                  />
+                )}
+                <MjmlText>
+                  {deadline ? (
+                    <FormattedMessage
+                      id="generic.submit-text.with-deadline"
+                      defaultMessage="This is the information that has been requested to be submitted before {deadline}:"
+                      values={{
+                        deadline: (
+                          <span style={{ textDecoration: "underline" }}>
+                            <DateTime value={deadline} format={FORMATS.LLL} />
+                          </span>
+                        ),
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="generic.submit-text.without-deadline"
+                      defaultMessage="This is the information that has been requested:"
+                    />
+                  )}
+                </MjmlText>
+                <PetitionFieldList fields={fields} />
+                <MjmlSpacer height="10px" />
+              </>
+            ) : null}
             <CompleteInfoButton
               href={`${parallelUrl}/${locale}/petition/${keycode}`}
             />

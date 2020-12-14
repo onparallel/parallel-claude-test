@@ -61,6 +61,7 @@ export async function petitionMessage(
       senderEmail: sender.email,
       subject: message.email_subject,
       body: message.email_body ? JSON.parse(message.email_body) : [],
+      showFields: !petition.hide_recipient_view_contents,
       fields: fields.map(pick(["id", "title", "position", "type"])),
       deadline: petition.deadline,
       keycode: access.keycode,

@@ -82,6 +82,7 @@
             ]
           }
         ],
+        "showFields": true,
         "fields": [
           { "position": 0, "id": 123, "title": "Title 1", "type": "HEADING" },
           { "position": 1, "id": 1223, "title": "DNI", "type": "TEXT" },
@@ -114,6 +115,7 @@
         "senderEmail": { "control": { "type": "text" } },
         "subject": { "control": { "type": "text" } },
         "body": { "control": { "type": "object" } },
+        "showFields": { "control": { "type": "boolean" } },
         "fields": { "control": { "type": "object" } },
         "keycode": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },
