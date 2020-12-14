@@ -5,7 +5,7 @@ import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { closing, greetingFormal } from "../common/texts";
+import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
 
 type SignatureRequestedProps = {
   signerName: string | null;
@@ -50,6 +50,8 @@ const email: Email<SignatureRequestedProps> = {
       ${signButton}
 
       ${closing({}, intl)}
+
+      ${gdprDisclaimer(intl)}
     `;
   },
   html({
@@ -64,6 +66,7 @@ const email: Email<SignatureRequestedProps> = {
     const intl = useIntl();
     return (
       <Layout
+        showGdprDisclaimer
         assetsUrl={assetsUrl}
         parallelUrl={parallelUrl}
         logoUrl={logoUrl}
