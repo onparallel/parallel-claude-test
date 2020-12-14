@@ -92,7 +92,7 @@ function RecipientViewVerify({
   }
 
   const [code, setCode] = useState("");
-  const firstInputRef = useRef<HTMLInputElement>();
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   function codeExpired() {
     toast({
