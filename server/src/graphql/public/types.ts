@@ -53,6 +53,11 @@ export const PublicPetition = objectType({
       description: "Whether comments are enabled or not.",
       resolve: (o) => o.comments_enabled,
     });
+    t.boolean("isRecipientViewContentsHidden", {
+      description: "Whether the contents card is hidden in the recipient view.",
+      deprecation: "Don't use this",
+      resolve: (o) => o.hide_recipient_view_contents,
+    });
     t.list.nonNull.field("fields", {
       type: "PublicPetitionField",
       description: "The field definition of the petition.",

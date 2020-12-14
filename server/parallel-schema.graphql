@@ -152,6 +152,7 @@ enum EntityType {
 }
 
 enum FeatureFlag {
+  HIDE_RECIPIENT_VIEW_CONTENTS @deprecated(reason: "Don't use this")
   INTERNAL_COMMENTS
   PETITION_PDF_EXPORT
   PETITION_SIGNATURE
@@ -903,6 +904,11 @@ type Petition implements PetitionBase {
   id: GID!
 
   """
+  Whether the contents card is hidden in the recipient view.
+  """
+  isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
+
+  """
   The locale of the petition.
   """
   locale: PetitionLocale!
@@ -1090,6 +1096,11 @@ interface PetitionBase {
   The ID of the petition or template.
   """
   id: GID!
+
+  """
+  Whether the contents card is hidden in the recipient view.
+  """
+  isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
 
   """
   The locale of the petition.
@@ -1653,6 +1664,11 @@ type PetitionTemplate implements PetitionBase {
   isPublic: Boolean!
 
   """
+  Whether the contents card is hidden in the recipient view.
+  """
+  isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
+
+  """
   The locale of the petition.
   """
   locale: PetitionLocale!
@@ -1833,6 +1849,11 @@ type PublicPetition implements Timestamps {
   The ID of the petition.
   """
   id: GID!
+
+  """
+  Whether the contents card is hidden in the recipient view.
+  """
+  isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
 
   """
   The locale of the petition.
@@ -2358,6 +2379,7 @@ input UpdatePetitionInput {
   emailBody: JSON
   emailSubject: String
   hasCommentsEnabled: Boolean
+  isRecipientViewContentsHidden: Boolean
   locale: PetitionLocale
   name: String
   remindersConfig: RemindersConfigInput

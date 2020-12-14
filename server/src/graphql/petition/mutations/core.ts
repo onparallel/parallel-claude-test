@@ -328,6 +328,7 @@ export const updatePetition = mutationField("updatePetition", {
             type: "RemindersConfigInput",
           });
           t.nullable.boolean("hasCommentsEnabled");
+          t.nullable.boolean("isRecipientViewContentsHidden");
           t.nullable.field("signatureConfig", {
             type: "SignatureConfigInput",
           });
@@ -360,6 +361,7 @@ export const updatePetition = mutationField("updatePetition", {
       emailBody,
       remindersConfig,
       hasCommentsEnabled,
+      isRecipientViewContentsHidden,
       signatureConfig,
       description,
     } = args.data;
@@ -390,6 +392,9 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (isDefined(hasCommentsEnabled)) {
       data.comments_enabled = hasCommentsEnabled;
+    }
+    if (isDefined(isRecipientViewContentsHidden)) {
+      data.hide_recipient_view_contents = isRecipientViewContentsHidden;
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {

@@ -131,6 +131,7 @@ export interface NexusGenInputs {
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
     hasCommentsEnabled?: boolean | null; // Boolean
+    isRecipientViewContentsHidden?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
     remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
@@ -566,6 +567,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -736,6 +738,7 @@ export interface NexusGenFieldTypes {
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isPublic: boolean; // Boolean!
+    isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -790,6 +793,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PublicPetitionField"][]; // [PublicPetitionField!]!
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
@@ -978,6 +982,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -1181,6 +1186,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     hasCommentsEnabled: "Boolean";
     id: "GID";
+    isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     name: "String";
     organization: "Organization";
@@ -1351,6 +1357,7 @@ export interface NexusGenFieldTypeNames {
     hasCommentsEnabled: "Boolean";
     id: "GID";
     isPublic: "Boolean";
+    isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     name: "String";
     organization: "Organization";
@@ -1405,6 +1412,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PublicPetitionField";
     hasCommentsEnabled: "Boolean";
     id: "GID";
+    isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     signers: "PublicContact";
     status: "PetitionStatus";
@@ -1591,6 +1599,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     hasCommentsEnabled: "Boolean";
     id: "GID";
+    isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     name: "String";
     organization: "Organization";

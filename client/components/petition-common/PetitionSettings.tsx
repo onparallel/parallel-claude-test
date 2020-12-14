@@ -131,12 +131,6 @@ export function PetitionSettings({
     }
   }
 
-  async function handleHasCommentsEnabledChange(
-    event: ChangeEvent<HTMLInputElement>
-  ) {
-    await onUpdatePetition({ hasCommentsEnabled: event.target.checked });
-  }
-
   return (
     <Stack padding={4} spacing={4}>
       <FormControl id="petition-locale">
@@ -210,7 +204,9 @@ export function PetitionSettings({
         </FormLabel>
         <Spacer />
         <Switch
-          onChange={handleHasCommentsEnabledChange}
+          onChange={async (e) =>
+            await onUpdatePetition({ hasCommentsEnabled: e.target.checked })
+          }
           isChecked={Boolean(petition.hasCommentsEnabled)}
         />
       </FormControl>
@@ -255,6 +251,32 @@ export function PetitionSettings({
           </Collapse>
         </Box>
       ) : null}
+      {petition.__typename === "Petition" &&
+      user.hasHideRecipientViewContents ? (
+        <FormControl as={Stack} direction="row">
+          <FormLabel margin={0} display="flex" alignItems="center">
+            <FormattedMessage
+              id="component.petition-settings.hide-recipient-view-contents"
+              defaultMessage="Hide recipient view contents"
+            />
+            <HelpPopover marginLeft={2}>
+              <FormattedMessage
+                id="component.petition-settings.hide-recipient-view-contents-description"
+                defaultMessage="By enabling this, the contents card in the recipient view will be hidden."
+              />
+            </HelpPopover>
+          </FormLabel>
+          <Spacer />
+          <Switch
+            onChange={async (e) =>
+              await onUpdatePetition({
+                isRecipientViewContentsHidden: e.target.checked,
+              })
+            }
+            isChecked={Boolean(petition.isRecipientViewContentsHidden)}
+          />
+        </FormControl>
+      ) : null}
     </Stack>
   );
 }
@@ -263,6 +285,9 @@ PetitionSettings.fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+      hasHideRecipientViewContents: hasFeatureFlag(
+        featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
+      )
       organization {
         signatureIntegrations: integrations(type: SIGNATURE) {
           ...SignatureConfigDialog_OrgIntegration
@@ -276,6 +301,7 @@ PetitionSettings.fragments = {
       id
       locale
       hasCommentsEnabled
+      isRecipientViewContentsHidden
       ... on Petition {
         status
         deadline

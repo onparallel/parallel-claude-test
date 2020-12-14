@@ -136,6 +136,7 @@ export type CreateTextReplyInput = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
+  | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
   | "PETITION_SIGNATURE";
@@ -713,6 +714,11 @@ export type Petition = PetitionBase & {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -813,6 +819,11 @@ export type PetitionBase = {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1113,6 +1124,11 @@ export type PetitionTemplate = PetitionBase & {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The name of the petition. */
@@ -1210,6 +1226,11 @@ export type PublicPetition = Timestamps & {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition. */
   id: Scalars["GID"];
+  /**
+   * Whether the contents card is hidden in the recipient view.
+   * @deprecated Don't use this
+   */
+  isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The signers of the petition */
@@ -1541,6 +1562,7 @@ export type UpdatePetitionInput = {
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
   hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
+  isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -2368,6 +2390,7 @@ export type PetitionFieldsIndex_PetitionFieldFragment = {
 
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
+  hasHideRecipientViewContents: User["hasFeatureFlag"];
 } & {
   organization: { __typename?: "Organization" } & {
     signatureIntegrations: Array<
@@ -2382,7 +2405,12 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<
   Petition,
-  "status" | "deadline" | "id" | "locale" | "hasCommentsEnabled"
+  | "status"
+  | "deadline"
+  | "id"
+  | "locale"
+  | "hasCommentsEnabled"
+  | "isRecipientViewContentsHidden"
 > & {
     currentSignatureRequest?: Maybe<
       { __typename?: "PetitionSignatureRequest" } & Pick<
@@ -2394,7 +2422,10 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale" | "hasCommentsEnabled">;
+} & Pick<
+  PetitionTemplate,
+  "id" | "locale" | "hasCommentsEnabled" | "isRecipientViewContentsHidden"
+>;
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -3877,7 +3908,11 @@ export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<
   PublicPetition,
-  "id" | "status" | "deadline" | "hasCommentsEnabled"
+  | "id"
+  | "status"
+  | "deadline"
+  | "hasCommentsEnabled"
+  | "isRecipientViewContentsHidden"
 > & {
     fields: Array<
       {
@@ -5266,6 +5301,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     id
     locale
     hasCommentsEnabled
+    isRecipientViewContentsHidden
     ... on Petition {
       status
       deadline
@@ -5307,6 +5343,9 @@ export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
 export const PetitionSettings_UserFragmentDoc = gql`
   fragment PetitionSettings_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+    hasHideRecipientViewContents: hasFeatureFlag(
+      featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
+    )
     organization {
       signatureIntegrations: integrations(type: SIGNATURE) {
         ...SignatureConfigDialog_OrgIntegration
@@ -5728,6 +5767,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     status
     deadline
     hasCommentsEnabled
+    isRecipientViewContentsHidden
     fields {
       ...RecipientView_PublicPetitionField
     }

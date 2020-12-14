@@ -102,6 +102,11 @@ export const PetitionBase = interfaceType({
       description: "Whether comments are enabled or not.",
       resolve: (o) => o.comments_enabled,
     });
+    t.boolean("isRecipientViewContentsHidden", {
+      description: "Whether the contents card is hidden in the recipient view.",
+      deprecation: "Don't use this",
+      resolve: (o) => o.hide_recipient_view_contents,
+    });
     // Until nexus allows interfaces to extend other interfaces
     t.datetime("createdAt", {
       description: "Time when the resource was created.",

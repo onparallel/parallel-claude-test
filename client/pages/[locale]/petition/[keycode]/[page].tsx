@@ -459,14 +459,16 @@ function RecipientView({
               top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
             >
               <RecipientViewSenderCard sender={granter} />
-              <RecipientViewContentsCard
-                currentPage={currentPage}
-                hasCommentsEnabled={petition.hasCommentsEnabled}
-                sender={granter}
-                petition={petition}
-                display={{ base: "none", [breakpoint]: "flex" }}
-              />
-              <Button variant="ghost" onClick={handleOpenHelp}>
+              {petition.isRecipientViewContentsHidden ? null : (
+                <RecipientViewContentsCard
+                  currentPage={currentPage}
+                  hasCommentsEnabled={petition.hasCommentsEnabled}
+                  sender={granter}
+                  petition={petition}
+                  display={{ base: "none", [breakpoint]: "flex" }}
+                />
+              )}
+              <Button variant="outline" onClick={handleOpenHelp}>
                 <FormattedMessage
                   id="recipient-view.need-help"
                   defaultMessage="Help"
@@ -602,6 +604,7 @@ RecipientView.fragments = {
         status
         deadline
         hasCommentsEnabled
+        isRecipientViewContentsHidden
         fields {
           ...RecipientView_PublicPetitionField
         }

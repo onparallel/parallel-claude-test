@@ -11,7 +11,8 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
 export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "INTERNAL_COMMENTS"
-  | "PETITION_PDF_EXPORT";
+  | "PETITION_PDF_EXPORT"
+  | "HIDE_RECIPIENT_VIEW_CONTENTS";
 
 export type IntegrationType = "SIGNATURE";
 
@@ -327,6 +328,7 @@ export interface Petition {
   from_template_id: Maybe<number>;
   signature_config: Maybe<any>;
   comments_enabled: boolean;
+  hide_recipient_view_contents: boolean;
 }
 
 export type CreatePetition = PartialProps<
@@ -351,6 +353,7 @@ export type CreatePetition = PartialProps<
   | "from_template_id"
   | "signature_config"
   | "comments_enabled"
+  | "hide_recipient_view_contents"
 >;
 
 export interface PetitionAccess {
