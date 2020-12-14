@@ -146,8 +146,8 @@
   },
   {
     "term": "petition-closed-notification.text",
-    "definition": "{senderName} ({senderEmail}) ha recibido y revisado la información.",
-    "context": "{senderName} ({senderEmail}) has received and reviewed the information."
+    "definition": "{senderName} ({senderEmail}) ha recibido la información.",
+    "context": "{senderName} ({senderEmail}) has received the information."
   },
   {
     "term": "petition-comments-contact-notification.access-button",

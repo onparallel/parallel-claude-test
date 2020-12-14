@@ -42,7 +42,7 @@ const email: Email<PetitionClosedNotificationProps> = {
         {
           id: "petition-closed-notification.text",
           defaultMessage:
-            "{senderName} ({senderEmail}) has received and reviewed the information.",
+            "{senderName} ({senderEmail}) has received the information.",
         },
         { senderName, senderEmail }
       )}
@@ -77,7 +77,7 @@ const email: Email<PetitionClosedNotificationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-closed-notification.text"
-                defaultMessage="{senderName} ({senderEmail}) has received and reviewed the information."
+                defaultMessage="{senderName} ({senderEmail}) has received the information."
                 values={{
                   senderName: <b>{senderName}</b>,
                   senderEmail: <b>{senderEmail}</b>,
