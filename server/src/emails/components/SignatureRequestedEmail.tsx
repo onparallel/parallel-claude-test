@@ -3,6 +3,7 @@ import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
+import { ClosingFormal } from "../common/Closing Formal";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
@@ -99,6 +100,7 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText align="center" fontSize="16px">
               {`${signButton}`}
             </MjmlText>
+            <ClosingFormal />
           </MjmlColumn>
         </MjmlSection>
       </Layout>

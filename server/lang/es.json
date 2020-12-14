@@ -1,5 +1,15 @@
 [
   {
+    "term": "closing.formal.regards",
+    "definition": "Reciba un cordial saludo.",
+    "context": "Best regards."
+  },
+  {
+    "term": "closing.formal.thank-you",
+    "definition": "Muchas gracias.",
+    "context": "Thank you very much."
+  },
+  {
     "term": "closing.sender",
     "definition": "El equipo de Parallel",
     "context": "The Parallel team"
