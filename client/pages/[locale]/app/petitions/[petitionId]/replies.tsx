@@ -382,6 +382,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       });
       toast(petitionClosedNotificationToast);
     } catch (error) {
+      if (error.reason === "CANCEL") {
+        throw error;
+      }
       if (
         error?.graphQLErrors?.[0]?.extensions.code ===
         "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
@@ -407,7 +410,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             },
           });
           toast(petitionClosedNotificationToast);
-        } catch {}
+        } catch (error) {
+          if (error.reason === "CANCEL") {
+            throw error;
+          }
+        }
       }
     }
   }, [petition, intl.locale]);
@@ -446,14 +453,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           ? await closePetitionDialog({})
           : "APPROVE";
 
+        if (sendNotification) {
+          await handleConfirmPetitionCompleted();
+        }
+
         await handleValidateToggle(
           petition.fields.map((f) => f.id),
           true,
           option === "APPROVE" ? "APPROVED" : "REJECTED"
         );
-        if (sendNotification) {
-          await handleConfirmPetitionCompleted();
-        }
       } catch {}
     },
     [
