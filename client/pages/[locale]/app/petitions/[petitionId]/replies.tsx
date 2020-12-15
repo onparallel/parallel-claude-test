@@ -363,12 +363,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       await presendPetitionClosedNotification({
         variables: { petitionId: petition.id },
       });
+      const { body, attachPetition } = await confirmPetitionDialog({
+        locale: petition.locale,
+      });
       await sendPetitionClosedNotification({
         variables: {
           petitionId: petition.id,
-          emailBody: await confirmPetitionDialog({
-            locale: petition.locale,
-          }),
+          emailBody: body,
+          attachPetition,
         },
       });
       toast(petitionClosedNotificationToast);
@@ -379,12 +381,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       ) {
         try {
           await petitionAlreadyNotifiedDialog({});
+          const { body, attachPetition } = await confirmPetitionDialog({
+            locale: petition.locale,
+          });
           await sendPetitionClosedNotification({
             variables: {
               petitionId: petition.id,
-              emailBody: await confirmPetitionDialog({
-                locale: petition.locale,
-              }),
+              emailBody: body,
+              attachPetition,
               force: true,
             },
           });
@@ -838,11 +842,13 @@ PetitionReplies.mutations = [
     mutation PetitionReplies_sendPetitionClosedNotification(
       $petitionId: GID!
       $emailBody: JSON!
+      $attachPetition: Boolean!
       $force: Boolean
     ) {
       sendPetitionClosedNotification(
         petitionId: $petitionId
         emailBody: $emailBody
+        attachPetition: $attachPetition
         force: $force
       ) {
         id

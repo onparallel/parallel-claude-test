@@ -1955,6 +1955,7 @@ export interface NexusGenArgTypes {
     };
     sendPetitionClosedNotification: {
       // args
+      attachPetition: boolean; // Boolean!
       emailBody: NexusGenScalars["JSON"]; // JSON!
       force?: boolean | null; // Boolean
       petitionId: NexusGenScalars["GID"]; // GID!

@@ -11,6 +11,7 @@ export async function petitionClosedNotification(
     petition_id: number;
     petition_access_ids: number[];
     message: any;
+    attach_petition: boolean;
   },
   context: WorkerContext
 ) {

@@ -1,4 +1,4 @@
-import { Button, Center, Stack, Text } from "@chakra-ui/core";
+import { Button, Center, Checkbox, Flex, Stack, Text } from "@chakra-ui/core";
 import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -10,6 +10,7 @@ import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import outdent from "outdent";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { HelpPopover } from "../common/HelpPopover";
 import {
   RichTextEditor,
   RichTextEditorContent,
@@ -39,7 +40,10 @@ const messages: Record<PetitionLocale, string> = {
 export function ConfirmPetitionCompletedDialog({
   locale,
   ...props
-}: DialogProps<{ locale: PetitionLocale }, RichTextEditorContent>) {
+}: DialogProps<
+  { locale: PetitionLocale },
+  { body: RichTextEditorContent; attachPetition: boolean }
+>) {
   const intl = useIntl();
   const message = Object.keys(messages).includes(locale)
     ? messages[locale]
@@ -49,6 +53,8 @@ export function ConfirmPetitionCompletedDialog({
   );
 
   const isInvalidBody = isEmptyContent(body);
+
+  const [attachPetition, setAttachPetition] = useState(true);
 
   return (
     <ConfirmDialog
@@ -89,13 +95,33 @@ export function ConfirmPetitionCompletedDialog({
               defaultMessage: "Write a message to include in the email",
             })}
           />
+          <Checkbox
+            colorScheme="purple"
+            onChange={(e) => setAttachPetition(e.target.checked)}
+            isChecked={attachPetition}
+          >
+            <Flex alignItems="center">
+              <Text fontSize="md" as="span">
+                <FormattedMessage
+                  id="petition-replies.confirm-reviewed.attach-petition"
+                  defaultMessage="Attach petition to email"
+                />
+              </Text>
+              <HelpPopover marginLeft={2}>
+                <FormattedMessage
+                  id="petition-replies.confirm-reviewed.attach-petition.help"
+                  defaultMessage="By checking this box, a PDF with the petition replies will be attached to the email."
+                />
+              </HelpPopover>
+            </Flex>
+          </Checkbox>
         </Stack>
       }
       confirm={
         <Button
           leftIcon={<PaperPlaneIcon />}
           colorScheme="purple"
-          onClick={() => props.onResolve(body)}
+          onClick={() => props.onResolve({ body, attachPetition })}
           disabled={isInvalidBody}
         >
           <FormattedMessage id="generic.send" defaultMessage="Send" />
