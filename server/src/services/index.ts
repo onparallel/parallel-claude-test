@@ -1,4 +1,4 @@
-import { ContainerModule, interfaces } from "inversify";
+import { ContainerModule } from "inversify";
 import { AUTH, Auth, IAuth } from "./auth";
 import { Aws } from "./aws";
 import { Cognito } from "./cognito";
