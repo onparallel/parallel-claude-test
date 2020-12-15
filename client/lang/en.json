@@ -1685,11 +1685,6 @@
     "context": "Attach a PDF export with the submitted replies"
   },
   {
-    "term": "petition-replies.confirm-reviewed.pdf-export-title",
-    "definition": "Attachment name",
-    "context": "Attachment name"
-  },
-  {
     "term": "petition-replies.confirm-reviewed.dialog-disclaimer",
     "definition": "We will only notify recipients with active access.",
     "context": "We will only notify recipients with active access."
@@ -1703,6 +1698,11 @@
     "term": "petition-replies.confirm-reviewed.dialog-subheading",
     "definition": "If everything is correct, notify the recipient for peace of mind.",
     "context": "If everything is correct, notify the recipient for peace of mind."
+  },
+  {
+    "term": "petition-replies.confirm-reviewed.pdf-export-title",
+    "definition": "PDF export title",
+    "context": "PDF export title"
   },
   {
     "term": "petition-replies.download-all",

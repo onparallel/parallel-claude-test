@@ -542,10 +542,10 @@ export type MutationsendPetitionArgs = {
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
-  pdfExportTitle?: Maybe<Scalars["String"]>;
   attachPdfExport: Scalars["Boolean"];
   emailBody: Scalars["JSON"];
   force?: Maybe<Scalars["Boolean"]>;
+  pdfExportTitle?: Maybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
 };
 
