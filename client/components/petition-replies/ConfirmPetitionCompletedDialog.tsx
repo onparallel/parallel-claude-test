@@ -22,6 +22,7 @@ import { Maybe } from "@parallel/utils/types";
 import outdent from "outdent";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { HelpPopover } from "../common/HelpPopover";
 import {
   RichTextEditor,
   RichTextEditorContent,
@@ -134,11 +135,17 @@ export function ConfirmPetitionCompletedDialog({
             <Collapse isOpen={attachPdfExport}>
               <Box paddingTop={1}>
                 <FormControl>
-                  <FormLabel>
+                  <FormLabel display="flex" alignItems="center">
                     <FormattedMessage
                       id="petition-replies.confirm-reviewed.pdf-export-title"
                       defaultMessage="PDF export title"
                     />
+                    <HelpPopover marginLeft={2} placement="auto">
+                      <FormattedMessage
+                        id="petition-replies.confirm-reviewed.pdf-export-title.help"
+                        defaultMessage="This will be the name of the attached PDF file."
+                      />
+                    </HelpPopover>
                   </FormLabel>
                   <Input
                     ref={pdfExportTitleRef}

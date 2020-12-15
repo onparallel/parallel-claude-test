@@ -1705,6 +1705,11 @@
     "context": "PDF export title"
   },
   {
+    "term": "petition-replies.confirm-reviewed.pdf-export-title.help",
+    "definition": "This will be the name of the attached PDF file.",
+    "context": "This will be the name of the attached PDF file."
+  },
+  {
     "term": "petition-replies.download-all",
     "definition": "Download replies",
     "context": "Download replies"
