@@ -1,21 +1,28 @@
 import { gql } from "@apollo/client";
-import { Divider, Flex, FlexProps, Image, Text } from "@chakra-ui/core";
+import {
+  Box,
+  Center,
+  Divider,
+  Flex,
+  Heading,
+  Image,
+  Stack,
+  Text,
+} from "@chakra-ui/core";
 import {
   CheckIcon,
   LinkedInSimpleIcon,
   TwitterIcon,
 } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
-import { Link } from "@parallel/components/common/Link";
+import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { useThanks_PetitionLogoQuery } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -23,20 +30,13 @@ function ThanksForSigning() {
   const router = useRouter();
   const intl = useIntl();
 
-  let logoUrl = null;
-  if (router.query.o) {
-    try {
-      const { data } = assertQuery(
-        useThanks_PetitionLogoQuery({
-          variables: {
-            id: router.query.o as string,
-          },
-        })
-      );
-
-      logoUrl = data.publicOrgLogoUrl;
-    } catch {}
-  }
+  const { data } = useThanks_PetitionLogoQuery({
+    variables: {
+      id: router.query.o as string,
+    },
+    skip: !router.query.o,
+  });
+  const logoUrl = data?.publicOrgLogoUrl;
 
   return (
     <PublicLayout
@@ -47,97 +47,88 @@ function ThanksForSigning() {
         defaultMessage: "Thanks",
       })}
     >
-      <Flex
-        minHeight="100vh"
-        width="90%"
-        margin="auto"
-        verticalAlign="middle"
-        display="flex"
-        alignItems="center"
-        flexDirection="column"
-        justifyContent="center"
-      >
-        {logoUrl ? (
-          <Image src={logoUrl} width="200px" />
-        ) : (
-          <Logo width="200px" />
-        )}
-        <Card padding={5} marginTop={5}>
-          <Flex
-            margin="auto"
-            borderRadius="100%"
-            background="purple.500"
-            padding={2}
-            width={8}
-            height={8}
-          >
-            <CheckIcon color="white" />
-          </Flex>
-
-          <Flex
-            fontWeight="bold"
-            justifyContent="center"
-            fontSize="lg"
-            margin="10px auto 10px auto"
-          >
-            <FormattedMessage
-              id="petition.signature-successful.title"
-              defaultMessage="Document signed successfully"
-            />
-          </Flex>
-
-          <Flex justifyContent="center">
-            <FormattedMessage
-              id="petition.signature-successful.subtitle"
-              defaultMessage="We have sent a signed copy of the document to your email."
-            />
-          </Flex>
-        </Card>
-
-        <ThanksFooter
-          marginTop={5}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-        />
+      <Flex flex="1" paddingX={4} justifyContent="center">
+        <Stack
+          spacing={8}
+          minHeight="100vh"
+          alignItems="stretch"
+          maxWidth="container.xs"
+          paddingY={8}
+          justifyContent="center"
+        >
+          <Center>
+            {logoUrl ? (
+              <Image src={logoUrl} width="200px" />
+            ) : (
+              <Logo width="200px" />
+            )}
+          </Center>
+          <Card paddingY={8} paddingX={4} textAlign="center">
+            <Stack spacing={4}>
+              <Center
+                margin="auto"
+                borderRadius="full"
+                background="purple.500"
+                boxSize={8}
+              >
+                <CheckIcon color="white" role="presentation" />
+              </Center>
+              <Heading size="md">
+                <FormattedMessage
+                  id="petition.signature-successful.title"
+                  defaultMessage="Document signed successfully"
+                />
+              </Heading>
+              <Text>
+                <FormattedMessage
+                  id="petition.signature-successful.subtitle"
+                  defaultMessage="We have sent a signed copy of the document to your email."
+                />
+              </Text>
+            </Stack>
+          </Card>
+          <ThanksFooter />
+        </Stack>
       </Flex>
     </PublicLayout>
   );
 }
 
-function ThanksFooter(props: FlexProps) {
+function ThanksFooter() {
   return (
-    <Flex {...props}>
+    <Flex flexDirection="column" alignItems="center">
       <Divider borderColor="#A0AEC0" />
-      <Text color="#2D3748" align="center" marginTop={5}>
+      <Text align="center" marginTop={5}>
         <FormattedMessage
           id="footer.slogan"
           defaultMessage="Work better with"
         />
       </Text>
-      <Logo width="120px" marginTop={1} />
-      <Flex marginTop={2}>
-        <Flex
-          as="a"
+      <NakedLink href="/">
+        <Box as="a">
+          <Logo width="120px" marginTop={1} />
+        </Box>
+      </NakedLink>
+      <Stack direction="row" marginTop={2}>
+        <NormalLink
           href="https://www.linkedin.com/company/parallel-so"
-          target="_blank"
-          background="purple.500"
-          borderRadius={5}
-          margin={1}
+          aria-label="LinkedIn"
+          isExternal
         >
-          <LinkedInSimpleIcon color="white" margin={1} />
-        </Flex>
-        <Flex
-          as="a"
+          <Center boxSize="24px" backgroundColor="purple.500" borderRadius="md">
+            <LinkedInSimpleIcon color="white" role="presentation" />
+          </Center>
+        </NormalLink>
+        <NormalLink
           href="https://twitter.com/Parallel_SO"
-          target="_blank"
-          background="purple.500"
-          borderRadius={5}
-          margin={1}
+          aria-label="Twitter"
+          isExternal
         >
-          <TwitterIcon color="white" margin={1} />
-        </Flex>
-      </Flex>
+          <Center boxSize="24px" backgroundColor="purple.500" borderRadius="md">
+            <TwitterIcon color="white" role="presentation" />
+          </Center>
+        </NormalLink>
+      </Stack>
       <Text align="center" fontSize="12px" marginTop={2}>
         {`Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`}
       </Text>
