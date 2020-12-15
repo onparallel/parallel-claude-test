@@ -11,7 +11,7 @@ export async function downloadImageBase64(url: string) {
       )}`
     );
   }
-  return await fetch(url)
-    .then((r) => r.buffer())
-    .then((buffer) => buffer.toString("base64"));
+  const response = await fetch(url);
+  const buffer = await response.buffer();
+  return buffer.toString("base64");
 }
