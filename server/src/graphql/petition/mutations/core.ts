@@ -723,12 +723,12 @@ export const fileUploadReplyDownloadLink = mutationField(
           reply!.content["file_upload_id"]
         );
         if (file && !file.upload_complete) {
-          await ctx.aws.getFileMetadata(file!.path);
+          await ctx.aws.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id);
         }
         return {
           result: RESULT.SUCCESS,
-          url: await ctx.aws.getSignedDownloadEndpoint(
+          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
             args.preview ? "inline" : "attachment"

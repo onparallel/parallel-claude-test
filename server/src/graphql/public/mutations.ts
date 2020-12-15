@@ -258,7 +258,7 @@ export const publicDeletePetitionReply = mutationField(
         );
         await Promise.all([
           ctx.files.deleteFileUpload(file!.id, ctx.contact!),
-          ctx.aws.deleteFile(file!.path),
+          ctx.aws.fileUploads.deleteFile(file!.path),
         ]);
       }
       await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.contact!);
@@ -289,7 +289,7 @@ export const publicFileUploadReplyComplete = mutationField(
         reply.content["file_upload_id"]
       );
       // Try to get metadata
-      await ctx.aws.getFileMetadata(file!.path);
+      await ctx.aws.fileUploads.getFileMetadata(file!.path);
       await ctx.files.markFileUploadComplete(file!.id);
       return reply;
     },
@@ -341,7 +341,7 @@ export const publicCreateFileUploadReply = mutationField(
         `Contact:${ctx.contact!.id}`
       );
       const [endpoint, reply] = await Promise.all([
-        ctx.aws.getSignedUploadEndpoint(key, contentType),
+        ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType),
         ctx.petitions.createPetitionFieldReply(
           {
             petition_field_id: args.fieldId,
@@ -647,12 +647,12 @@ export const publicFileUploadReplyDownloadLink = mutationField(
           reply!.content["file_upload_id"]
         );
         if (file && !file.upload_complete) {
-          await ctx.aws.getFileMetadata(file!.path);
+          await ctx.aws.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id);
         }
         return {
           result: RESULT.SUCCESS,
-          url: await ctx.aws.getSignedDownloadEndpoint(
+          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
             args.preview ? "inline" : "attachment"

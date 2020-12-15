@@ -158,7 +158,7 @@ async function documentCompleted(
     `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
   );
   const path = random(16);
-  await ctx.aws.uploadFile(path, buffer, "application/pdf");
+  await ctx.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
   const file = await ctx.files.createFileUpload(
     {
       content_type: "application/pdf",

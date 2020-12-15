@@ -26,7 +26,7 @@ export function buildConfig() {
       region: process.env._AWS_REGION!,
     }),
     s3: Object.freeze({
-      uploadsBucketName: process.env.S3_UPLOADS_BUCKET_NAME!,
+      fileUploadsBucketName: process.env.S3_FILE_UPLOADS_BUCKET_NAME!,
     }),
     smtp: Object.freeze({
       host: process.env.SMTP_HOST!,

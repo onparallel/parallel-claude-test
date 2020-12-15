@@ -1,52 +1,45 @@
-import { inject, injectable } from "inversify";
+import { inject, injectable, interfaces } from "inversify";
 import { Config, CONFIG } from "../config";
 import AWS from "aws-sdk";
-import contentDisposition from "content-disposition";
 import { chunk } from "remeda";
 import { LOGGER, Logger } from "./logger";
 import { createHash } from "crypto";
+import { Memoize } from "typescript-memoize";
+import { Storage, STORAGE_FACTORY } from "./storage";
 
 @injectable()
 export class Aws {
-  private _s3?: AWS.S3;
-  public get s3() {
-    if (!this._s3) {
-      this._s3 = new AWS.S3({
-        signatureVersion: "v4",
-        region: this.config.aws.region,
-        useAccelerateEndpoint: true,
-      });
-    }
-    return this._s3;
+  @Memoize() public get s3() {
+    return new AWS.S3({
+      signatureVersion: "v4",
+      region: this.config.aws.region,
+      useAccelerateEndpoint: true,
+    });
   }
 
-  private _sqs?: AWS.SQS;
-  public get sqs() {
-    if (!this._sqs) {
-      this._sqs = new AWS.SQS();
-    }
-    return this._sqs;
+  @Memoize() public get sqs() {
+    return new AWS.SQS();
   }
 
-  private _logs?: AWS.CloudWatchLogs;
-  public get logs() {
-    if (!this._logs) {
-      this._logs = new AWS.CloudWatchLogs();
-    }
-    return this._logs;
+  @Memoize() public get logs() {
+    return new AWS.CloudWatchLogs();
   }
 
-  private _cognitoIdP?: AWS.CognitoIdentityServiceProvider;
-  public get cognitoIdP() {
-    if (!this._cognitoIdP) {
-      this._cognitoIdP = new AWS.CognitoIdentityServiceProvider();
-    }
-    return this._cognitoIdP;
+  @Memoize() public get cognitoIdP() {
+    return new AWS.CognitoIdentityServiceProvider();
+  }
+
+  @Memoize() public get fileUploads() {
+    return this.storageFactory(
+      this.s3,
+      this.config.s3.fileUploadsBucketName
+    ) as Storage;
   }
 
   constructor(
     @inject(CONFIG) private config: Config,
-    @inject(LOGGER) private logger: Logger
+    @inject(LOGGER) private logger: Logger,
+    @inject(STORAGE_FACTORY) private storageFactory: interfaces.Factory<Storage>
   ) {
     AWS.config.update({
       ...config.aws,
@@ -97,71 +90,9 @@ export class Aws {
     }
   }
 
-  async getSignedUploadEndpoint(key: string, contentType: string) {
-    return await this.s3.getSignedUrlPromise("putObject", {
-      Bucket: this.config.s3.uploadsBucketName,
-      Key: key,
-      ContentType: contentType,
-      Expires: 60 * 30,
-    });
-  }
-
-  async getFileMetadata(key: string) {
-    return this.s3
-      .headObject({
-        Bucket: this.config.s3.uploadsBucketName,
-        Key: key,
-      })
-      .promise();
-  }
-
-  async deleteFile(key: string) {
-    this.s3
-      .deleteObject({
-        Bucket: this.config.s3.uploadsBucketName,
-        Key: key,
-      })
-      .promise();
-  }
-
-  async getSignedDownloadEndpoint(
-    key: string,
-    filename: string,
-    cdType: "attachment" | "inline"
-  ) {
-    return await this.s3.getSignedUrlPromise("getObject", {
-      Bucket: this.config.s3.uploadsBucketName,
-      Key: key,
-      Expires: 60 * 30,
-      ResponseContentDisposition: contentDisposition(filename, {
-        type: cdType,
-      }),
-    });
-  }
-
-  downloadFile(key: string) {
-    return this.s3
-      .getObject({
-        Bucket: this.config.s3.uploadsBucketName,
-        Key: key,
-      })
-      .createReadStream();
-  }
-
-  async uploadFile(key: string, buffer: Buffer, contentType: string) {
-    return this.s3
-      .upload(
-        {
-          Bucket: this.config.s3.uploadsBucketName,
-          Key: key,
-          ContentType: contentType,
-          Body: buffer,
-        },
-        {}
-      )
-      .promise();
-  }
-
+  /**
+   * Creates a user in Cognito and returns the cognito Id
+   */
   async createCognitoUser(email: string, password: string) {
     const res = await this.cognitoIdP
       .adminCreateUser({
@@ -181,7 +112,6 @@ export class Aws {
         ],
       })
       .promise();
-    // return cognito id
     return res.User!.Username;
   }
 }

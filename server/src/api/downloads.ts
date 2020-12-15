@@ -205,7 +205,7 @@ async function* getPetitionFiles(
           seen.add(filename);
           yield {
             filename,
-            stream: ctx.aws.downloadFile(file.path),
+            stream: ctx.aws.fileUploads.downloadFile(file.path),
           } as ZipFileInput;
         }
       }
@@ -255,7 +255,7 @@ async function* getPetitionFiles(
     if (signedPetition) {
       yield {
         filename: signedPetition.filename,
-        stream: ctx.aws.downloadFile(signedPetition.path),
+        stream: ctx.aws.fileUploads.downloadFile(signedPetition.path),
       };
     }
   }

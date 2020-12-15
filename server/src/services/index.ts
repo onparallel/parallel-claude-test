@@ -1,4 +1,4 @@
-import { ContainerModule } from "inversify";
+import { ContainerModule, interfaces } from "inversify";
 import { AUTH, Auth, IAuth } from "./auth";
 import { Aws } from "./aws";
 import { Cognito } from "./cognito";
@@ -10,6 +10,7 @@ import { ANALYTICS, AnalyticsService, IAnalyticsService } from "./analytics";
 import { Printer, IPrinter, PRINTER } from "./printer";
 import { SIGNATURE, SignatureService } from "./signature";
 import { SECURITY, SecurityService } from "./security";
+import { Storage, StorageFactory, STORAGE_FACTORY } from "./storage";
 
 export const servicesModule = new ContainerModule((bind) => {
   bind<Logger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
@@ -23,4 +24,7 @@ export const servicesModule = new ContainerModule((bind) => {
   bind<IPrinter>(PRINTER).to(Printer).inSingletonScope();
   bind<SignatureService>(SIGNATURE).to(SignatureService);
   bind<SecurityService>(SECURITY).to(SecurityService);
+  bind<StorageFactory>(STORAGE_FACTORY).toFactory(() => {
+    return ((...args) => new Storage(...args)) as StorageFactory;
+  });
 });

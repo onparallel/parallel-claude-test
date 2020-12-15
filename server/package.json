@@ -80,6 +80,7 @@
     "signaturit-sdk": "^1.2.0",
     "sqs-consumer": "^5.5.0",
     "timezone-support": "^2.0.2",
+    "typescript-memoize": "^1.0.0-alpha.4",
     "ua-parser-js": "^0.7.22",
     "uuid": "^8.3.1",
     "winston": "^3.3.3",
