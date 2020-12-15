@@ -1390,6 +1390,7 @@ export type Query = {
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   petitionSignatureRequestToken?: Maybe<PetitionSignatureRequest>;
+  publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
 };
@@ -1439,6 +1440,10 @@ export type QuerypetitionsArgs = {
 
 export type QuerypetitionSignatureRequestTokenArgs = {
   token: Scalars["String"];
+};
+
+export type QuerypublicOrgLogoUrlArgs = {
+  id: Scalars["GID"];
 };
 
 export type QuerypublicTemplatesArgs = {
@@ -4385,6 +4390,15 @@ export type PdfViewPetitionQuery = { __typename?: "Query" } & {
     } & PrintPetitionSignature_PetitionSignatureRequestFragment
   >;
 };
+
+export type Thanks_PetitionLogoQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type Thanks_PetitionLogoQuery = { __typename?: "Query" } & Pick<
+  Query,
+  "publicOrgLogoUrl"
+>;
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]>;
@@ -10273,6 +10287,56 @@ export type PdfViewPetitionQueryHookResult = ReturnType<
 >;
 export type PdfViewPetitionLazyQueryHookResult = ReturnType<
   typeof usePdfViewPetitionLazyQuery
+>;
+export const Thanks_PetitionLogoDocument = gql`
+  query Thanks_PetitionLogo($id: GID!) {
+    publicOrgLogoUrl(id: $id)
+  }
+`;
+
+/**
+ * __useThanks_PetitionLogoQuery__
+ *
+ * To run a query within a React component, call `useThanks_PetitionLogoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useThanks_PetitionLogoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useThanks_PetitionLogoQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useThanks_PetitionLogoQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    Thanks_PetitionLogoQuery,
+    Thanks_PetitionLogoQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    Thanks_PetitionLogoQuery,
+    Thanks_PetitionLogoQueryVariables
+  >(Thanks_PetitionLogoDocument, baseOptions);
+}
+export function useThanks_PetitionLogoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    Thanks_PetitionLogoQuery,
+    Thanks_PetitionLogoQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    Thanks_PetitionLogoQuery,
+    Thanks_PetitionLogoQueryVariables
+  >(Thanks_PetitionLogoDocument, baseOptions);
+}
+export type Thanks_PetitionLogoQueryHookResult = ReturnType<
+  typeof useThanks_PetitionLogoQuery
+>;
+export type Thanks_PetitionLogoLazyQueryHookResult = ReturnType<
+  typeof useThanks_PetitionLogoLazyQuery
 >;
 export const useClonePetitions_clonePetitionsDocument = gql`
   mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {

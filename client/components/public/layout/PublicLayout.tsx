@@ -14,12 +14,16 @@ export interface PublicLayoutProps {
   title: string;
   description?: string;
   children?: ReactNode;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 
 export function PublicLayout({
   title,
   description,
   children,
+  hideFooter,
+  hideHeader,
 }: PublicLayoutProps) {
   const { query, pathname } = useRouter();
   const intl = useIntl();
@@ -65,17 +69,19 @@ export function PublicLayout({
         ))}
       </Head>
       <Flex direction="column" minHeight="100vh">
-        <PublicHeader position="fixed" zIndex={2} isThin={headerIsThin} />
+        {hideHeader ? null : (
+          <PublicHeader position="fixed" zIndex={2} isThin={headerIsThin} />
+        )}
         <Flex
           as="main"
-          marginTop={headerIsThin ? 16 : 20}
+          marginTop={hideHeader ? 0 : headerIsThin ? 16 : 20}
           flex="1"
           direction="column"
           zIndex={1}
         >
           {children}
         </Flex>
-        <PublicFooter marginTop={8} />
+        {hideFooter ? null : <PublicFooter marginTop={8} />}
         <CookieConsent />
       </Flex>
     </>

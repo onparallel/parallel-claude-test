@@ -935,6 +935,11 @@
     "context": "Placeholder"
   },
   {
+    "term": "footer.slogan",
+    "definition": "Trabaja mejor con",
+    "context": "Work better with"
+  },
+  {
     "term": "generic.actions-button",
     "definition": "Acciones",
     "context": "Actions"
@@ -1400,6 +1405,11 @@
     "context": "Template"
   },
   {
+    "term": "generic.thanks",
+    "definition": "Gracias",
+    "context": "Thanks"
+  },
+  {
     "term": "generic.to",
     "definition": "Para {recipient}",
     "context": "To {recipient}"
@@ -1453,6 +1463,16 @@
     "term": "header.user-menu-button",
     "definition": "Menú de usuario",
     "context": "User menu"
+  },
+  {
+    "term": "layout.privacy-link",
+    "definition": "Privacidad",
+    "context": "Privacy"
+  },
+  {
+    "term": "layout.terms-and-conditions-link",
+    "definition": "Términos y condiciones",
+    "context": "Terms and conditions"
   },
   {
     "term": "navbar.campaigns-link",
@@ -2418,6 +2438,16 @@
     "term": "petition.signature-config-dialog.contacts-placeholder",
     "definition": "Buscar contactos...",
     "context": "Search contacts..."
+  },
+  {
+    "term": "petition.signature-successful.subtitle",
+    "definition": "Hemos enviado una copia firmada del documento a tu email.",
+    "context": "We have sent a signed copy of the document to your email."
+  },
+  {
+    "term": "petition.signature-successful.title",
+    "definition": "Documento firmado correctamente",
+    "context": "Document signed successfully"
   },
   {
     "term": "petition.status.error",

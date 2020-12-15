@@ -2187,6 +2187,7 @@ type Query {
     """
     token: String!
   ): PetitionSignatureRequest
+  publicOrgLogoUrl(id: GID!): String
 
   """
   The publicly available templates

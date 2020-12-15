@@ -20,6 +20,8 @@ import SignatureRequestedEmail from "../emails/components/SignatureRequestedEmai
 import SignatureCompletedEmail from "../emails/components/SignatureCompletedEmail";
 import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmail";
 import { OrgIntegration } from "../db/__types";
+import { downloadImageBase64 } from "../util/images";
+import { toGlobalId } from "../util/globalId";
 
 type SignerBox = {
   email?: string;
@@ -111,7 +113,11 @@ export class SignatureService {
 
   private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
     const settings = integration.settings as SignaturitIntegrationSettings;
-    const client = new SignaturItClient(settings, this.config);
+    const client = new SignaturItClient(
+      settings,
+      this.config,
+      integration.org_id
+    );
     client.on(
       "branding_updated",
       ({ locale, brandingId }: { locale: string; brandingId: string }) => {
@@ -139,7 +145,8 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   private sdk: SignaturitSDK;
   constructor(
     private settings: SignaturitIntegrationSettings,
-    private config: Config
+    private config: Config,
+    private orgId: number
   ) {
     super();
     if (!this.settings.API_KEY) {
@@ -172,6 +179,9 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     }
 
     const baseEventsUrl = await getBaseWebhookUrl(this.config.misc.parallelUrl);
+
+    const orgGID = toGlobalId("Organization", this.orgId);
+
     return await this.sdk.createSignature(
       files,
       recipients,
@@ -180,6 +190,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
         signing_mode: opts?.signingMode ?? "parallel",
         branding_id: brandingId,
         events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
+        callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks-for-signing?o=${orgGID}`,
         recipients: recipients.map((r) => ({
           email: r.email,
           name: r.name,
@@ -213,6 +224,9 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
       show_welcome_page: false,
       layout_color: "#6059F7",
       text_color: "#F6F6F6",
+      logo: opts.templateData?.logoUrl
+        ? await downloadImageBase64(opts.templateData?.logoUrl)
+        : undefined,
       application_texts: {
         open_sign_button:
           opts.locale === "es" ? "Abrir documento" : "Open document",

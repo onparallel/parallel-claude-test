@@ -935,6 +935,11 @@
     "context": "Placeholder"
   },
   {
+    "term": "footer.slogan",
+    "definition": "Work better with",
+    "context": "Work better with"
+  },
+  {
     "term": "generic.actions-button",
     "definition": "Actions",
     "context": "Actions"
@@ -1400,6 +1405,11 @@
     "context": "Template"
   },
   {
+    "term": "generic.thanks",
+    "definition": "Thanks",
+    "context": "Thanks"
+  },
+  {
     "term": "generic.to",
     "definition": "To {recipient}",
     "context": "To {recipient}"
@@ -1453,6 +1463,16 @@
     "term": "header.user-menu-button",
     "definition": "User menu",
     "context": "User menu"
+  },
+  {
+    "term": "layout.privacy-link",
+    "definition": "Privacy",
+    "context": "Privacy"
+  },
+  {
+    "term": "layout.terms-and-conditions-link",
+    "definition": "Terms and conditions",
+    "context": "Terms and conditions"
   },
   {
     "term": "navbar.campaigns-link",
@@ -2418,6 +2438,16 @@
     "term": "petition.signature-config-dialog.contacts-placeholder",
     "definition": "Search contacts...",
     "context": "Search contacts..."
+  },
+  {
+    "term": "petition.signature-successful.subtitle",
+    "definition": "We have sent a signed copy of the document to your email.",
+    "context": "We have sent a signed copy of the document to your email."
+  },
+  {
+    "term": "petition.signature-successful.title",
+    "definition": "Document signed successfully",
+    "context": "Document signed successfully"
   },
   {
     "term": "petition.status.error",

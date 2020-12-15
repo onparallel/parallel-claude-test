@@ -895,6 +895,7 @@ export interface NexusGenFieldTypes {
     petitionSignatureRequestToken:
       | NexusGenRootTypes["PetitionSignatureRequest"]
       | null; // PetitionSignatureRequest
+    publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
   };
   ReminderSentEvent: {
@@ -1539,6 +1540,7 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     petitions: "PetitionBasePagination";
     petitionSignatureRequestToken: "PetitionSignatureRequest";
+    publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
   };
   ReminderSentEvent: {
@@ -2123,6 +2125,10 @@ export interface NexusGenArgTypes {
     petitionSignatureRequestToken: {
       // args
       token: string; // String!
+    };
+    publicOrgLogoUrl: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     publicTemplates: {
       // args
