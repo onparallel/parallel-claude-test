@@ -311,7 +311,7 @@ export function PetitionHeader({
                       defaultMessage="Reopen petition"
                     />
                   </MenuItem>
-                  {user.hasPdfExport ? (
+                  {user.hasPetitionPdfExport ? (
                     <MenuItem onClick={handleExportPetitionPDF}>
                       <DownloadIcon marginRight={2} />
                       <FormattedMessage
@@ -474,7 +474,7 @@ PetitionHeader.fragments = {
   User: gql`
     fragment PetitionHeader_User on User {
       id
-      hasPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+      hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     }
   `,
 };

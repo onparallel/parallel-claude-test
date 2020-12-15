@@ -370,6 +370,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       } = await confirmPetitionCompletedDialog({
         locale: petition.locale,
         petitionName: petition.name ?? null,
+        hasPetitionPdfExport: me.hasPetitionPdfExport,
       });
       await sendPetitionClosedNotification({
         variables: {
@@ -394,6 +395,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           } = await confirmPetitionCompletedDialog({
             locale: petition.locale,
             petitionName: petition.name ?? null,
+            hasPetitionPdfExport: me.hasPetitionPdfExport,
           });
           await sendPetitionClosedNotification({
             variables: {
@@ -682,6 +684,7 @@ PetitionReplies.fragments = {
     return gql`
       fragment PetitionReplies_User on User {
         hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+        hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
         ...PetitionLayout_User
         ...PetitionRepliesFieldComments_User
       }

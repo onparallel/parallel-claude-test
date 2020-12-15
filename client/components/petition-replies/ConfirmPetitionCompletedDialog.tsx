@@ -52,9 +52,14 @@ const messages: Record<PetitionLocale, string> = {
 export function ConfirmPetitionCompletedDialog({
   locale,
   petitionName,
+  hasPetitionPdfExport,
   ...props
 }: DialogProps<
-  { locale: PetitionLocale; petitionName: Maybe<string> },
+  {
+    locale: PetitionLocale;
+    petitionName: Maybe<string>;
+    hasPetitionPdfExport: boolean;
+  },
   {
     body: RichTextEditorContent;
     attachPdfExport: boolean;
@@ -114,48 +119,50 @@ export function ConfirmPetitionCompletedDialog({
               defaultMessage: "Write a message to include in the email",
             })}
           />
-          <Box>
-            <Checkbox
-              colorScheme="purple"
-              onChange={(e) => {
-                setAttachPdfExport(e.target.checked);
-                if (e.target.checked) {
-                  setTimeout(() => {
-                    pdfExportTitleRef.current!.select();
-                  });
-                }
-              }}
-              isChecked={attachPdfExport}
-            >
-              <FormattedMessage
-                id="petition-replies.confirm-reviewed.attach-pdf-export"
-                defaultMessage="Attach a PDF export with the submitted replies"
-              />
-            </Checkbox>
-            <Collapse isOpen={attachPdfExport}>
-              <Box paddingTop={1}>
-                <FormControl>
-                  <FormLabel display="flex" alignItems="center">
-                    <FormattedMessage
-                      id="petition-replies.confirm-reviewed.pdf-export-title"
-                      defaultMessage="PDF export title"
-                    />
-                    <HelpPopover marginLeft={2} placement="auto">
+          {hasPetitionPdfExport ? (
+            <Box>
+              <Checkbox
+                colorScheme="purple"
+                onChange={(e) => {
+                  setAttachPdfExport(e.target.checked);
+                  if (e.target.checked) {
+                    setTimeout(() => {
+                      pdfExportTitleRef.current!.select();
+                    });
+                  }
+                }}
+                isChecked={attachPdfExport}
+              >
+                <FormattedMessage
+                  id="petition-replies.confirm-reviewed.attach-pdf-export"
+                  defaultMessage="Attach a PDF export with the submitted replies"
+                />
+              </Checkbox>
+              <Collapse isOpen={attachPdfExport}>
+                <Box paddingTop={1}>
+                  <FormControl>
+                    <FormLabel display="flex" alignItems="center">
                       <FormattedMessage
-                        id="petition-replies.confirm-reviewed.pdf-export-title.help"
-                        defaultMessage="This will be the name of the attached PDF file."
+                        id="petition-replies.confirm-reviewed.pdf-export-title"
+                        defaultMessage="PDF export title"
                       />
-                    </HelpPopover>
-                  </FormLabel>
-                  <Input
-                    ref={pdfExportTitleRef}
-                    value={pdfExportTitle}
-                    onChange={(e) => setPdfExportTitle(e.target.value)}
-                  />
-                </FormControl>
-              </Box>
-            </Collapse>
-          </Box>
+                      <HelpPopover marginLeft={2} placement="auto">
+                        <FormattedMessage
+                          id="petition-replies.confirm-reviewed.pdf-export-title.help"
+                          defaultMessage="This will be the name of the attached PDF file."
+                        />
+                      </HelpPopover>
+                    </FormLabel>
+                    <Input
+                      ref={pdfExportTitleRef}
+                      value={pdfExportTitle}
+                      onChange={(e) => setPdfExportTitle(e.target.value)}
+                    />
+                  </FormControl>
+                </Box>
+              </Collapse>
+            </Box>
+          ) : null}
         </Stack>
       }
       confirm={

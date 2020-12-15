@@ -1838,7 +1838,7 @@ export type PetitionHeader_PetitionFragment = {
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id"
-> & { hasPdfExport: User["hasFeatureFlag"] };
+> & { hasPetitionPdfExport: User["hasFeatureFlag"] };
 
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -3582,6 +3582,7 @@ export type PetitionReplies_PetitionFieldFragment = {
 
 export type PetitionReplies_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
+  hasPetitionPdfExport: User["hasFeatureFlag"];
 } & PetitionLayout_UserFragment &
   PetitionRepliesFieldComments_UserFragment;
 
@@ -5338,7 +5339,7 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
 export const PetitionHeader_UserFragmentDoc = gql`
   fragment PetitionHeader_User on User {
     id
-    hasPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
+    hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
   }
 `;
 export const PetitionLayout_UserFragmentDoc = gql`
@@ -5666,6 +5667,7 @@ export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
+    hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
     ...PetitionLayout_User
     ...PetitionRepliesFieldComments_User
   }
