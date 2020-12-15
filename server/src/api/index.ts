@@ -19,13 +19,13 @@ export function api(container: Container) {
     })
     .use(
       morgan("short", {
-        stream: { write: (message: string) => logger.info(message) },
+        stream: { write: (message: string) => logger.error(message) },
         skip: (req, res) => res.statusCode < 500,
       }) as any
     )
     .use(
       morgan("short", {
-        stream: { write: (message: string) => logger.error(message) },
+        stream: { write: (message: string) => logger.info(message) },
         skip: (req, res) => res.statusCode >= 500,
       }) as any
     )
