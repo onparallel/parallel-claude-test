@@ -42,6 +42,9 @@ createQueueWorker(
     const emails = await builder(payload.payload as any, context);
     for (const email of unMaybeArray(emails)) {
       if (email) {
+        const attachments = await context.emailLogs.getEmailAttachments(
+          email.id
+        );
         const result = await context.smtp.sendEmail({
           from: email.from,
           to: email.to,
@@ -55,6 +58,11 @@ createQueueWorker(
                 email.track_opens ? "tracking" : "noTracking"
               ],
           },
+          attachments: attachments.map((attachment) => ({
+            filename: attachment.filename,
+            contentType: attachment.content_type,
+            content: context.aws.temporaryFiles.downloadFile(attachment.path),
+          })),
         });
         await context.emailLogs.updateWithResponse(email.id, {
           response: JSON.stringify(result),

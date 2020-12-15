@@ -337,7 +337,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
 
-  const confirmPetitionDialog = useConfirmPetitionCompletedDialog();
+  const confirmPetitionCompletedDialog = useConfirmPetitionCompletedDialog();
   const [
     sendPetitionClosedNotification,
   ] = usePetitionReplies_sendPetitionClosedNotificationMutation();
@@ -363,14 +363,20 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       await presendPetitionClosedNotification({
         variables: { petitionId: petition.id },
       });
-      const { body, attachPetition } = await confirmPetitionDialog({
+      const {
+        body,
+        attachPdfExport,
+        pdfExportTitle,
+      } = await confirmPetitionCompletedDialog({
         locale: petition.locale,
+        petitionName: petition.name ?? null,
       });
       await sendPetitionClosedNotification({
         variables: {
           petitionId: petition.id,
           emailBody: body,
-          attachPetition,
+          attachPdfExport,
+          pdfExportTitle,
         },
       });
       toast(petitionClosedNotificationToast);
@@ -381,14 +387,20 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       ) {
         try {
           await petitionAlreadyNotifiedDialog({});
-          const { body, attachPetition } = await confirmPetitionDialog({
+          const {
+            body,
+            attachPdfExport,
+            pdfExportTitle,
+          } = await confirmPetitionCompletedDialog({
             locale: petition.locale,
+            petitionName: petition.name ?? null,
           });
           await sendPetitionClosedNotification({
             variables: {
               petitionId: petition.id,
               emailBody: body,
-              attachPetition,
+              attachPdfExport,
+              pdfExportTitle,
               force: true,
             },
           });
@@ -842,13 +854,15 @@ PetitionReplies.mutations = [
     mutation PetitionReplies_sendPetitionClosedNotification(
       $petitionId: GID!
       $emailBody: JSON!
-      $attachPetition: Boolean!
+      $attachPdfExport: Boolean!
+      $pdfExportTitle: String
       $force: Boolean
     ) {
       sendPetitionClosedNotification(
         petitionId: $petitionId
         emailBody: $emailBody
-        attachPetition: $attachPetition
+        attachPdfExport: $attachPdfExport
+        pdfExportTitle: $pdfExportTitle
         force: $force
       ) {
         id

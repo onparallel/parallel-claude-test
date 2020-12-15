@@ -40,7 +40,8 @@ export interface IEmailsService {
     userId: number,
     petitionAccessIds: MaybeArray<number>,
     emailBody: any,
-    attachPetition: boolean
+    attachPdfExport: boolean,
+    pdfExportTitle: Maybe<string>
   ): Promise<void>;
   sendPetitionMessageBouncedEmail(emailLogId: number): Promise<void>;
   sendContactAuthenticationRequestEmail(requestId: number): Promise<void>;
@@ -170,7 +171,8 @@ export class EmailsService implements IEmailsService {
     userId: number,
     petitionAccessIds: MaybeArray<number>,
     emailBody: any,
-    attachPetition: boolean
+    attachPdfExport: boolean,
+    pdfExportTitle: Maybe<string>
   ) {
     return await this.enqueueEmail("petition-closed-notification", {
       id: this.buildQueueId("PetitionClosedNotification", petitionAccessIds),
@@ -178,7 +180,8 @@ export class EmailsService implements IEmailsService {
       petition_id: petitionId,
       user_id: userId,
       message: emailBody,
-      attach_petition: attachPetition,
+      attach_pdf_export: attachPdfExport,
+      pdf_export_title: pdfExportTitle,
     });
   }
 

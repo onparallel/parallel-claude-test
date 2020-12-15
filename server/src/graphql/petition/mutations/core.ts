@@ -1164,7 +1164,8 @@ export const sendPetitionClosedNotification = mutationField(
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       emailBody: nonNull(jsonArg()),
-      attachPetition: nonNull(booleanArg()),
+      attachPdfExport: nonNull(booleanArg()),
+      pdfExportTitle: stringArg(),
       force: booleanArg({ default: false }),
     },
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
@@ -1191,7 +1192,8 @@ export const sendPetitionClosedNotification = mutationField(
         ctx.user!.id,
         activeAccesses.map((a) => a.id),
         args.emailBody,
-        args.attachPetition
+        args.attachPdfExport,
+        args.pdfExportTitle ?? null
       );
 
       await Promise.all(

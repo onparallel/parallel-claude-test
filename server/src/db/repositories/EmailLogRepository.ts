@@ -1,8 +1,15 @@
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import { unMaybeArray } from "../../util/arrays";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateEmailEvent, CreateEmailLog, EmailLog } from "../__types";
+import {
+  CreateEmailEvent,
+  CreateEmailLog,
+  EmailLog,
+  TemporaryFile,
+} from "../__types";
 
 @injectable()
 export class EmailLogRepository extends BaseRepository {
@@ -15,6 +22,31 @@ export class EmailLogRepository extends BaseRepository {
   async createEmail(data: CreateEmailLog) {
     const rows = await this.insert("email_log", data).returning("*");
     return rows[0];
+  }
+
+  async addEmailAttachments(
+    emailLogId: number,
+    temporaryFileIds: MaybeArray<number>
+  ) {
+    await this.insert(
+      "email_attachment",
+      unMaybeArray(temporaryFileIds).map((temporaryFileId) => ({
+        email_log_id: emailLogId,
+        temporary_file_id: temporaryFileId,
+      }))
+    );
+  }
+
+  async getEmailAttachments(emailLogId: number) {
+    const { rows } = await this.knex.raw<{ rows: TemporaryFile[] }>(
+      /* sql */ `
+        select tf.* from temporary_file as tf
+        join email_attachment as ea on ea.temporary_file_id = tf.id
+        where ea.email_log_id = ?
+      `,
+      [emailLogId]
+    );
+    return rows;
   }
 
   async updateWithResponse(id: number, data: Partial<EmailLog>) {

@@ -85,6 +85,7 @@ export interface TableTypes {
   contact: Contact;
   contact_authentication: ContactAuthentication;
   contact_authentication_request: ContactAuthenticationRequest;
+  email_attachment: EmailAttachment;
   email_event: EmailEvent;
   email_log: EmailLog;
   feature_flag: FeatureFlag;
@@ -104,6 +105,7 @@ export interface TableTypes {
   petition_signature_request: PetitionSignatureRequest;
   petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
+  temporary_file: TemporaryFile;
   user: User;
 }
 
@@ -111,6 +113,7 @@ export interface TableCreateTypes {
   contact: CreateContact;
   contact_authentication: CreateContactAuthentication;
   contact_authentication_request: CreateContactAuthenticationRequest;
+  email_attachment: CreateEmailAttachment;
   email_event: CreateEmailEvent;
   email_log: CreateEmailLog;
   feature_flag: CreateFeatureFlag;
@@ -130,6 +133,7 @@ export interface TableCreateTypes {
   petition_signature_request: CreatePetitionSignatureRequest;
   petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
+  temporary_file: CreateTemporaryFile;
   user: CreateUser;
 }
 
@@ -137,6 +141,7 @@ export interface TablePrimaryKeys {
   contact: "id";
   contact_authentication: "id";
   contact_authentication_request: "id";
+  email_attachment: "id";
   email_event: "id";
   email_log: "id";
   feature_flag: "id";
@@ -156,6 +161,7 @@ export interface TablePrimaryKeys {
   petition_signature_request: "id";
   petition_user: "id";
   petition_user_notification: "id";
+  temporary_file: "id";
   user: "id";
 }
 
@@ -213,6 +219,14 @@ export type CreateContactAuthenticationRequest = PartialProps<
   Omit<ContactAuthenticationRequest, "id">,
   "email_log_id" | "ip" | "user_agent"
 >;
+
+export interface EmailAttachment {
+  id: number;
+  email_log_id: number;
+  temporary_file_id: number;
+}
+
+export type CreateEmailAttachment = PartialProps<Omit<EmailAttachment, "id">>;
 
 export interface EmailEvent {
   id: number;
@@ -654,6 +668,21 @@ export interface PetitionUserNotification {
 export type CreatePetitionUserNotification = PartialProps<
   Omit<PetitionUserNotification, "id">,
   "data" | "is_read" | "created_at"
+>;
+
+export interface TemporaryFile {
+  id: number;
+  path: string;
+  filename: string;
+  size: number;
+  content_type: string;
+  created_at: Date;
+  created_by: Maybe<string>;
+}
+
+export type CreateTemporaryFile = PartialProps<
+  Omit<TemporaryFile, "id">,
+  "created_at" | "created_by"
 >;
 
 export interface User {

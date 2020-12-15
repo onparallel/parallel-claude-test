@@ -2,10 +2,10 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateFileUpload, Contact } from "../__types";
+import { CreateFileUpload, Contact, CreateTemporaryFile } from "../__types";
 
 @injectable()
-export class FileUploadRepository extends BaseRepository {
+export class FileRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
     super(knex);
   }
@@ -39,5 +39,15 @@ export class FileUploadRepository extends BaseRepository {
         "*"
       )
       .where("id", id);
+  }
+
+  readonly loadTemporaryFile = this.buildLoadById("temporary_file", "id");
+
+  async createTemporaryFile(data: CreateTemporaryFile, createdBy: string) {
+    const rows = await this.insert("temporary_file", {
+      ...data,
+      created_by: createdBy,
+    }).returning("*");
+    return rows[0];
   }
 }

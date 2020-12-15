@@ -1,4 +1,15 @@
-import { Button, Center, Checkbox, Flex, Stack, Text } from "@chakra-ui/core";
+import {
+  Box,
+  Button,
+  Center,
+  Checkbox,
+  Collapse,
+  FormControl,
+  FormLabel,
+  Input,
+  Stack,
+  Text,
+} from "@chakra-ui/core";
 import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -7,10 +18,10 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
+import { Maybe } from "@parallel/utils/types";
 import outdent from "outdent";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { HelpPopover } from "../common/HelpPopover";
 import {
   RichTextEditor,
   RichTextEditorContent,
@@ -39,10 +50,15 @@ const messages: Record<PetitionLocale, string> = {
 
 export function ConfirmPetitionCompletedDialog({
   locale,
+  petitionName,
   ...props
 }: DialogProps<
-  { locale: PetitionLocale },
-  { body: RichTextEditorContent; attachPetition: boolean }
+  { locale: PetitionLocale; petitionName: Maybe<string> },
+  {
+    body: RichTextEditorContent;
+    attachPdfExport: boolean;
+    pdfExportTitle: Maybe<string>;
+  }
 >) {
   const intl = useIntl();
   const message = Object.keys(messages).includes(locale)
@@ -54,7 +70,9 @@ export function ConfirmPetitionCompletedDialog({
 
   const isInvalidBody = isEmptyContent(body);
 
-  const [attachPetition, setAttachPetition] = useState(true);
+  const [attachPdfExport, setAttachPdfExport] = useState(false);
+  const pdfExportTitleRef = useRef<HTMLInputElement>(null);
+  const [pdfExportTitle, setPdfExportTitle] = useState(petitionName ?? "");
 
   return (
     <ConfirmDialog
@@ -95,33 +113,55 @@ export function ConfirmPetitionCompletedDialog({
               defaultMessage: "Write a message to include in the email",
             })}
           />
-          <Checkbox
-            colorScheme="purple"
-            onChange={(e) => setAttachPetition(e.target.checked)}
-            isChecked={attachPetition}
-          >
-            <Flex alignItems="center">
-              <Text fontSize="md" as="span">
-                <FormattedMessage
-                  id="petition-replies.confirm-reviewed.attach-petition"
-                  defaultMessage="Attach petition to email"
-                />
-              </Text>
-              <HelpPopover marginLeft={2}>
-                <FormattedMessage
-                  id="petition-replies.confirm-reviewed.attach-petition.help"
-                  defaultMessage="By checking this box, a PDF with the petition replies will be attached to the email."
-                />
-              </HelpPopover>
-            </Flex>
-          </Checkbox>
+          <Box>
+            <Checkbox
+              colorScheme="purple"
+              onChange={(e) => {
+                setAttachPdfExport(e.target.checked);
+                if (e.target.checked) {
+                  setTimeout(() => {
+                    pdfExportTitleRef.current!.select();
+                  });
+                }
+              }}
+              isChecked={attachPdfExport}
+            >
+              <FormattedMessage
+                id="petition-replies.confirm-reviewed.attach-pdf-export"
+                defaultMessage="Attach a PDF export with the submitted replies"
+              />
+            </Checkbox>
+            <Collapse isOpen={attachPdfExport}>
+              <Box paddingTop={1}>
+                <FormControl>
+                  <FormLabel>
+                    <FormattedMessage
+                      id="petition-replies.confirm-reviewed.pdf-export-title"
+                      defaultMessage="PDF export title"
+                    />
+                  </FormLabel>
+                  <Input
+                    ref={pdfExportTitleRef}
+                    value={pdfExportTitle}
+                    onChange={(e) => setPdfExportTitle(e.target.value)}
+                  />
+                </FormControl>
+              </Box>
+            </Collapse>
+          </Box>
         </Stack>
       }
       confirm={
         <Button
           leftIcon={<PaperPlaneIcon />}
           colorScheme="purple"
-          onClick={() => props.onResolve({ body, attachPetition })}
+          onClick={() =>
+            props.onResolve({
+              body,
+              attachPdfExport,
+              pdfExportTitle: attachPdfExport ? pdfExportTitle : null,
+            })
+          }
           disabled={isInvalidBody}
         >
           <FormattedMessage id="generic.send" defaultMessage="Send" />

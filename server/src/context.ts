@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "./config";
 import { ContactRepository } from "./db/repositories/ContactRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
-import { FileUploadRepository } from "./db/repositories/FileUploadRepository";
+import { FileRepository } from "./db/repositories/FileRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
@@ -44,7 +44,7 @@ export class ApiContext {
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
     public readonly featureFlags: FeatureFlagRepository,
-    public readonly files: FileUploadRepository,
+    public readonly files: FileRepository,
     public readonly integrations: IntegrationRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
@@ -67,7 +67,7 @@ export class WorkerContext {
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,
-    public readonly files: FileUploadRepository,
+    public readonly files: FileRepository,
     public readonly integrations: IntegrationRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,

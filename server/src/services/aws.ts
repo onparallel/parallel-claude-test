@@ -36,6 +36,13 @@ export class Aws {
     ) as Storage;
   }
 
+  @Memoize() public get temporaryFiles() {
+    return this.storageFactory(
+      this.s3,
+      this.config.s3.temporaryFilesBucketName
+    ) as Storage;
+  }
+
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(LOGGER) private logger: Logger,

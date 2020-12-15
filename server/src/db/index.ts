@@ -4,7 +4,7 @@ import { createKnex, KNEX } from "./knex";
 import { ContactRepository } from "./repositories/ContactRepository";
 import { EmailLogRepository } from "./repositories/EmailLogRepository";
 import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
-import { FileUploadRepository } from "./repositories/FileUploadRepository";
+import { FileRepository } from "./repositories/FileRepository";
 import { IntegrationRepository } from "./repositories/IntegrationRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
@@ -18,7 +18,7 @@ export const dbModule = new ContainerModule((bind) => {
   bind<ContactRepository>(ContactRepository).toSelf();
   bind<EmailLogRepository>(EmailLogRepository).toSelf();
   bind<FeatureFlagRepository>(FeatureFlagRepository).toSelf();
-  bind<FileUploadRepository>(FileUploadRepository).toSelf();
+  bind<FileRepository>(FileRepository).toSelf();
   bind<IntegrationRepository>(IntegrationRepository).toSelf();
   bind<OrganizationRepository>(OrganizationRepository).toSelf();
   bind<PetitionRepository>(PetitionRepository).toSelf();

@@ -1680,14 +1680,14 @@
     "context": "Pending"
   },
   {
-    "term": "petition-replies.confirm-reviewed.attach-petition",
-    "definition": "Adjuntar petición al email",
-    "context": "Attach petition to email"
+    "term": "petition-replies.confirm-reviewed.attach-pdf-export",
+    "definition": "Adjuntar un archivo PDF con las respuestas recibidas",
+    "context": "Attach a PDF export with the submitted replies"
   },
   {
-    "term": "petition-replies.confirm-reviewed.attach-petition.help",
-    "definition": "Al marcar esta casilla, se adjuntará al email un PDF con las respuestas de la petición.",
-    "context": "By checking this box, a PDF with the petition replies will be attached to the email."
+    "term": "petition-replies.confirm-reviewed.pdf-export-title",
+    "definition": "Título del PDF adjunto",
+    "context": "Attachment name"
   },
   {
     "term": "petition-replies.confirm-reviewed.dialog-disclaimer",

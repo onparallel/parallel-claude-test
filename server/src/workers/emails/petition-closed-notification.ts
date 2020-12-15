@@ -4,6 +4,9 @@ import PetitionClosedNotification from "../../emails/components/PetitionClosedNo
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { EmailLog } from "../../db/__types";
+import { URLSearchParams } from "url";
+import { random } from "../../util/token";
+import sanitize from "sanitize-filename";
 
 export async function petitionClosedNotification(
   payload: {
@@ -11,7 +14,8 @@ export async function petitionClosedNotification(
     petition_id: number;
     petition_access_ids: number[];
     message: any;
-    attach_petition: boolean;
+    attach_pdf_export: boolean;
+    pdf_export_title: string | null;
   },
   context: WorkerContext
 ) {
@@ -65,6 +69,59 @@ export async function petitionClosedNotification(
       track_opens: true,
       created_from: `PetitionClosedNotification:${accessId}`,
     });
+
+    if (payload.attach_pdf_export) {
+      // create a temporal signature request to be able to print the PDF
+      const signatureRequest = await context.petitions.createPetitionSignature(
+        access!.petition_id,
+        {
+          provider: "NONE",
+          timezone: "NONE",
+          contactIds: [],
+          title: payload.pdf_export_title ?? "",
+        }
+      );
+
+      const token = context.signature.generateAuthToken({
+        petitionSignatureRequestId: signatureRequest.id,
+      });
+
+      const buffer = await context.printer.pdf(
+        `http://localhost:3000/${
+          petition.locale
+        }/print/petition-signature?${new URLSearchParams({ token })}`,
+        {
+          height: "297mm",
+          width: "210mm",
+          margin: {
+            top: "10mm",
+            bottom: "10mm",
+            left: "10mm",
+            right: "10mm",
+          },
+        }
+      );
+
+      const path = random(16);
+      await context.aws.temporaryFiles.uploadFile(
+        path,
+        "application/pdf",
+        buffer
+      );
+      const attachment = await context.files.createTemporaryFile(
+        {
+          path,
+          content_type: "application/pdf",
+          filename: sanitize(`${payload.pdf_export_title ?? "_"}.pdf`),
+          size: buffer.byteLength,
+        },
+        `User:${sender.id}`
+      );
+
+      await context.emailLogs.addEmailAttachments(email.id, attachment.id);
+
+      await context.petitions.deletePetitionSignature(signatureRequest.id);
+    }
 
     emails.push(email);
   }

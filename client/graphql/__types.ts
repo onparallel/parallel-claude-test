@@ -542,7 +542,8 @@ export type MutationsendPetitionArgs = {
 };
 
 export type MutationsendPetitionClosedNotificationArgs = {
-  attachPetition: Scalars["Boolean"];
+  pdfExportTitle?: Maybe<Scalars["String"]>;
+  attachPdfExport: Scalars["Boolean"];
   emailBody: Scalars["JSON"];
   force?: Maybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
@@ -3742,7 +3743,8 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
 export type PetitionReplies_sendPetitionClosedNotificationMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   emailBody: Scalars["JSON"];
-  attachPetition: Scalars["Boolean"];
+  attachPdfExport: Scalars["Boolean"];
+  pdfExportTitle?: Maybe<Scalars["String"]>;
   force?: Maybe<Scalars["Boolean"]>;
 }>;
 
@@ -8678,13 +8680,15 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
   mutation PetitionReplies_sendPetitionClosedNotification(
     $petitionId: GID!
     $emailBody: JSON!
-    $attachPetition: Boolean!
+    $attachPdfExport: Boolean!
+    $pdfExportTitle: String
     $force: Boolean
   ) {
     sendPetitionClosedNotification(
       petitionId: $petitionId
       emailBody: $emailBody
-      attachPetition: $attachPetition
+      attachPdfExport: $attachPdfExport
+      pdfExportTitle: $pdfExportTitle
       force: $force
     ) {
       id
@@ -8707,7 +8711,8 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      emailBody: // value for 'emailBody'
- *      attachPetition: // value for 'attachPetition'
+ *      attachPdfExport: // value for 'attachPdfExport'
+ *      pdfExportTitle: // value for 'pdfExportTitle'
  *      force: // value for 'force'
  *   },
  * });
