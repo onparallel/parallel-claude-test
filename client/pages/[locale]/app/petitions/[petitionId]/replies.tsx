@@ -382,7 +382,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       });
       toast(petitionClosedNotificationToast);
     } catch (error) {
-      if (error.reason === "CANCEL") {
+      if (["CANCEL", "CLOSE"].includes(error.reason)) {
         throw error;
       }
       if (
@@ -411,7 +411,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           });
           toast(petitionClosedNotificationToast);
         } catch (error) {
-          if (error.reason === "CANCEL") {
+          if (["CANCEL", "CLOSE"].includes(error.reason)) {
             throw error;
           }
         }
