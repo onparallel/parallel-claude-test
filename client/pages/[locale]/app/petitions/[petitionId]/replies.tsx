@@ -529,7 +529,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           hidden={petition.status !== "CLOSED"}
           colorScheme="blue"
           leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
-          onClick={() => handleConfirmPetitionCompleted()}
+          onClick={async () => {
+            try {
+              await handleConfirmPetitionCompleted();
+            } catch {}
+          }}
         >
           <FormattedMessage
             id="petition-replies.notify-petition-reviewed.button"
