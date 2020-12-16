@@ -7,6 +7,7 @@ import { UnwrapPromise } from "@parallel/utils/types";
 
 const SENTRY_WHITELISTED_ERRORS = [
   "PUBLIC_PETITION_NOT_AVAILABLE",
+  "CONTACT_NOT_VERIFIED",
   "FORBIDDEN",
 ];
 
