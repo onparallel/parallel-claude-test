@@ -64,6 +64,7 @@ export class WorkerContext {
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     @inject(PRINTER) public readonly printer: Printer,
     @inject(SIGNATURE) public readonly signature: SignatureService,
+    @inject(SECURITY) public readonly security: SecurityService,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

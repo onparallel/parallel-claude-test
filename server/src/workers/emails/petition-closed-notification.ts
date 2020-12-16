@@ -71,19 +71,8 @@ export async function petitionClosedNotification(
     });
 
     if (payload.attach_pdf_export) {
-      // create a temporal signature request to be able to print the PDF
-      const signatureRequest = await context.petitions.createPetitionSignature(
-        access!.petition_id,
-        {
-          provider: "NONE",
-          timezone: "NONE",
-          contactIds: [],
-          title: payload.pdf_export_title ?? "",
-        }
-      );
-
-      const token = context.signature.generateAuthToken({
-        petitionSignatureRequestId: signatureRequest.id,
+      const token = context.security.generateAuthToken({
+        petitionId: petition.id,
       });
 
       const buffer = await context.printer.pdf(
@@ -119,8 +108,6 @@ export async function petitionClosedNotification(
       );
 
       await context.emailLogs.addEmailAttachments(email.id, attachment.id);
-
-      await context.petitions.deletePetitionSignature(signatureRequest.id);
     }
 
     emails.push(email);

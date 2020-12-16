@@ -44,8 +44,8 @@ export function buildConfig() {
     analytics: Object.freeze({
       writeKey: process.env.ANALYTICS_SEGMENT_WRITE_KEY, // can be undefined
     }),
-    signature: Object.freeze({
-      jwtSecret: process.env.SIGNATURE_SERVICE_JWT_SECRET!,
+    security: Object.freeze({
+      jwtSecret: process.env.SECURITY_SERVICE_JWT_SECRET!,
     }),
     queueWorkers: Object.freeze({
       "email-sender": Object.freeze({

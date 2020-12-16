@@ -12,7 +12,6 @@ import {
 } from "../db/repositories/IntegrationRepository";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
-import { sign, verify } from "jsonwebtoken";
 import { removeNotDefined } from "../util/remedaExtensions";
 import { EventEmitter } from "events";
 import { buildEmail } from "../emails/buildEmail";
@@ -88,26 +87,6 @@ export class SignatureService {
         throw new Error(
           `Couldn't resolve signature client: ${integration.provider}`
         );
-    }
-  }
-
-  public generateAuthToken(payload: any) {
-    return sign(payload, this.config.signature.jwtSecret, {
-      expiresIn: 30,
-      issuer: "signature-service",
-      algorithm: "HS256",
-    });
-  }
-
-  public verifyAuthToken(token: string) {
-    try {
-      verify(token, this.config.signature.jwtSecret, {
-        algorithms: ["HS256"],
-        issuer: "signature-service",
-      });
-      return true;
-    } catch {
-      return false;
     }
   }
 

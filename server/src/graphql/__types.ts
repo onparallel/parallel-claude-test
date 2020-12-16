@@ -259,6 +259,11 @@ export interface NexusGenObjects {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
+  PetitionAuthToken: {
+    // root type
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    tokenPayload: NexusGenScalars["JSONObject"]; // JSONObject!
+  };
   PetitionBasePagination: {
     // root type
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
@@ -636,6 +641,11 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
+  PetitionAuthToken: {
+    // field return type
+    petition: NexusGenRootTypes["Petition"]; // Petition!
+    tokenPayload: NexusGenScalars["JSONObject"]; // JSONObject!
+  };
   PetitionBasePagination: {
     // field return type
     items: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
@@ -891,10 +901,8 @@ export interface NexusGenFieldTypes {
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
+    petitionAuthToken: NexusGenRootTypes["PetitionAuthToken"]; // PetitionAuthToken!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
-    petitionSignatureRequestToken:
-      | NexusGenRootTypes["PetitionSignatureRequest"]
-      | null; // PetitionSignatureRequest
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
   };
@@ -1283,6 +1291,11 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     petition: "Petition";
   };
+  PetitionAuthToken: {
+    // field return type name
+    petition: "Petition";
+    tokenPayload: "JSONObject";
+  };
   PetitionBasePagination: {
     // field return type name
     items: "PetitionBase";
@@ -1538,8 +1551,8 @@ export interface NexusGenFieldTypeNames {
     me: "User";
     organization: "Organization";
     petition: "PetitionBase";
+    petitionAuthToken: "PetitionAuthToken";
     petitions: "PetitionBasePagination";
-    petitionSignatureRequestToken: "PetitionSignatureRequest";
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
   };
@@ -2072,6 +2085,10 @@ export interface NexusGenArgTypes {
     };
   };
   Petition: {
+    currentSignatureRequest: {
+      // args
+      token?: string | null; // String
+    };
     events: {
       // args
       limit?: number | null; // Int
@@ -2112,6 +2129,10 @@ export interface NexusGenArgTypes {
       // args
       id: NexusGenScalars["GID"]; // GID!
     };
+    petitionAuthToken: {
+      // args
+      token: string; // String!
+    };
     petitions: {
       // args
       limit?: number | null; // Int
@@ -2121,10 +2142,6 @@ export interface NexusGenArgTypes {
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
-    };
-    petitionSignatureRequestToken: {
-      // args
-      token: string; // String!
     };
     publicOrgLogoUrl: {
       // args

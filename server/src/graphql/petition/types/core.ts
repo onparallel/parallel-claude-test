@@ -1,5 +1,12 @@
-import { enumType, objectType, interfaceType } from "@nexus/schema";
+import {
+  enumType,
+  objectType,
+  interfaceType,
+  nullable,
+  stringArg,
+} from "@nexus/schema";
 import { safeJsonParse } from "../../../util/safeJsonParse";
+import { or } from "../../helpers/authorize";
 import { userHasFeatureFlag } from "../authorizers";
 
 export const PetitionLocale = enumType({
@@ -171,7 +178,14 @@ export const Petition = objectType({
     t.nullable.field("currentSignatureRequest", {
       type: "PetitionSignatureRequest",
       description: "The current signature request.",
-      authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
+      args: {
+        token: nullable(stringArg()),
+      },
+      authorize: or(
+        userHasFeatureFlag("PETITION_SIGNATURE"),
+        (_, { token }, ctx) =>
+          token ? ctx.security.verifyAuthToken(token) : false
+      ),
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
           root.id

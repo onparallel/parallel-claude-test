@@ -11,7 +11,7 @@ import { PdfPage } from "@parallel/components/print/PdfPage";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
 import {
   PdfViewPetitionQuery,
-  PrintPetitionSignature_PetitionFieldFragment,
+  PrintPetition_PetitionFieldFragment,
   usePdfViewPetitionQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
@@ -20,23 +20,22 @@ import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function PrintPetitionSignature({ token }: { token: string }) {
+function PrintPetition({ token }: { token: string }) {
   const { data } = assertQuery(
     usePdfViewPetitionQuery({
       variables: { token },
     })
   );
 
-  const { petition, signatureConfig } = data.petitionSignatureRequestToken!;
+  const { petition, tokenPayload } = data.petitionAuthToken!;
   const { name: orgName, logoUrl: orgLogo } = petition.organization;
+
+  const signatureConfig = petition.currentSignatureRequest?.signatureConfig;
   const contacts = signatureConfig?.contacts;
+  const { showSignatureBoxes } = tokenPayload;
 
   if (!petition) {
-    throw new Error(`petition for signature request not found`);
-  }
-
-  if (!signatureConfig || Object.keys(signatureConfig).length === 0) {
-    throw new Error("petition signature request must have defined settings");
+    throw new Error(`petition with id ${tokenPayload.petitionId} not found`);
   }
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
@@ -52,9 +51,7 @@ function PrintPetitionSignature({ token }: { token: string }) {
         })
       }`,
     }));
-    return groupFieldsByPages<PrintPetitionSignature_PetitionFieldFragment>(
-      fields
-    );
+    return groupFieldsByPages<PrintPetition_PetitionFieldFragment>(fields);
   }, [petition.fields]);
 
   return (
@@ -79,45 +76,49 @@ function PrintPetitionSignature({ token }: { token: string }) {
                 />
               )}
               <Heading justifyContent="center" display="flex">
-                {signatureConfig.title}
+                {signatureConfig?.title ?? petition.name}
               </Heading>
             </>
           ) : undefined}
           {fields.map((field, fieldNum) => (
             <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
           ))}
-          {pageNum === pages.length - 1 && contacts && contacts.length > 0 && (
-            <>
-              <Box sx={{ pageBreakInside: "avoid" }}>
-                <SignatureDisclaimer
-                  textAlign="center"
-                  margin="15mm 4mm 5mm 4mm"
-                  fontStyle="italic"
-                />
-                <Flex
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gridAutoRows: "minmax(150px, auto)",
-                    alignItems: "center",
-                    justifyItems: "center",
-                    width: "100%",
-                  }}
-                >
-                  {contacts?.map(
-                    (signer, index) =>
-                      signer && (
-                        <SignatureBox
-                          key={signer.id}
-                          signer={{ ...signer!, key: index }}
-                          timezone={signatureConfig["timezone"]}
-                        />
-                      )
-                  )}
-                </Flex>
-              </Box>
-            </>
-          )}
+          {signatureConfig &&
+            showSignatureBoxes &&
+            pageNum === pages.length - 1 &&
+            contacts &&
+            contacts.length > 0 && (
+              <>
+                <Box sx={{ pageBreakInside: "avoid" }}>
+                  <SignatureDisclaimer
+                    textAlign="center"
+                    margin="15mm 4mm 5mm 4mm"
+                    fontStyle="italic"
+                  />
+                  <Flex
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)",
+                      gridAutoRows: "minmax(150px, auto)",
+                      alignItems: "center",
+                      justifyItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    {contacts?.map(
+                      (signer, index) =>
+                        signer && (
+                          <SignatureBox
+                            key={signer.id}
+                            signer={{ ...signer!, key: index }}
+                            timezone={signatureConfig["timezone"]}
+                          />
+                        )
+                    )}
+                  </Flex>
+                </Box>
+              </>
+            )}
         </PdfPage>
       ))}
     </>
@@ -135,29 +136,33 @@ function SignatureDisclaimer(props: ExtendChakra) {
   );
 }
 
-PrintPetitionSignature.fragments = {
-  get PetitionSignatureRequest() {
+PrintPetition.fragments = {
+  get PetitionAuthToken() {
     return gql`
-      fragment PrintPetitionSignature_PetitionSignatureRequest on PetitionSignatureRequest {
+      fragment PrintPetition_PetitionAuthToken on PetitionAuthToken {
+        tokenPayload
         petition {
           id
+          name
           fields {
-            ...PrintPetitionSignature_PetitionField
+            ...PrintPetition_PetitionField
           }
           organization {
             name
             logoUrl
           }
-        }
-        signatureConfig {
-          contacts {
-            id
-            fullName
-            email
+          currentSignatureRequest(token: $token) {
+            signatureConfig {
+              contacts {
+                id
+                fullName
+                email
+              }
+              provider
+              timezone
+              title
+            }
           }
-          provider
-          timezone
-          title
         }
       }
       ${this.PetitionField}
@@ -165,7 +170,7 @@ PrintPetitionSignature.fragments = {
   },
   get PetitionField() {
     return gql`
-      fragment PrintPetitionSignature_PetitionField on PetitionField {
+      fragment PrintPetition_PetitionField on PetitionField {
         id
         type
         title
@@ -181,7 +186,7 @@ PrintPetitionSignature.fragments = {
   },
 };
 
-PrintPetitionSignature.getInitialProps = async ({
+PrintPetition.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
@@ -189,11 +194,11 @@ PrintPetitionSignature.getInitialProps = async ({
   await fetchQuery<PdfViewPetitionQuery>(
     gql`
       query PdfViewPetition($token: String!) {
-        petitionSignatureRequestToken(token: $token) {
-          ...PrintPetitionSignature_PetitionSignatureRequest
+        petitionAuthToken(token: $token) {
+          ...PrintPetition_PetitionAuthToken
         }
       }
-      ${PrintPetitionSignature.fragments.PetitionSignatureRequest}
+      ${PrintPetition.fragments.PetitionAuthToken}
     `,
     {
       variables: { token },
@@ -202,4 +207,4 @@ PrintPetitionSignature.getInitialProps = async ({
   return { token };
 };
 
-export default withApolloData(PrintPetitionSignature);
+export default withApolloData(PrintPetition);

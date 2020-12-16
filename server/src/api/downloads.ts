@@ -79,19 +79,8 @@ export const downloads = Router()
         throw new Error(`Petition with id ${petitionId} not found`);
       }
 
-      // create a temporal signature request to be able to print the PDF
-      const signatureRequest = await ctx.petitions.createPetitionSignature(
+      const token = ctx.security.generateAuthToken({
         petitionId,
-        {
-          provider: "NONE",
-          timezone: "NONE",
-          contactIds: [],
-          title: petition.name ?? "",
-        }
-      );
-
-      const token = ctx.signature.generateAuthToken({
-        petitionSignatureRequestId: signatureRequest.id,
       });
 
       const buffer = await ctx.printer.pdf(
@@ -110,7 +99,6 @@ export const downloads = Router()
         }
       );
 
-      await ctx.petitions.deletePetitionSignature(signatureRequest.id);
       res
         .header(
           "content-disposition",
