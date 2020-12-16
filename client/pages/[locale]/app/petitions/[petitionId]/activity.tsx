@@ -1,5 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, List, ListItem, Text, useToast } from "@chakra-ui/core";
+import {
+  Box,
+  Stack,
+  ListItem,
+  Text,
+  UnorderedList,
+  useToast,
+} from "@chakra-ui/core";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import {
   withApolloData,
@@ -611,13 +618,13 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-activity.main"
+            id="tour.petition-activity.page-title"
             defaultMessage="Activity"
           />
         ),
         content: (
           <FormattedMessage
-            id="tour.petition-activity.items"
+            id="tour.petition-activity.page-content"
             defaultMessage="Here you can view and manage your petitions' access, messages, follow-ups, and event history."
           />
         ),
@@ -627,28 +634,22 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-activity.access-and-reminders"
+            id="tour.petition-activity.access-and-reminders-title"
             defaultMessage="Access and reminders"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petition-activity.you-can"
+                id="tour.petition-activity.access-and-reminders-content-1"
                 defaultMessage="In this section, you will be able to:"
               />
             </Text>
-            <List
-              listStyleType="disc"
-              listStylePosition="outside"
-              paddingLeft={5}
-              marginTop={4}
-              spacing={3}
-            >
+            <Stack as={UnorderedList} paddingLeft={5}>
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-activity.track"
+                  id="tour.petition-activity.access-and-reminders-content-2"
                   defaultMessage="Manage who can <b>access</b> this petition."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
@@ -657,7 +658,7 @@ export default compose(
               </ListItem>
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-activity.send-message"
+                  id="tour.petition-activity.access-and-reminders-content-3"
                   defaultMessage="Send an automatic or custom <b>reminder message</b> to your recipients."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
@@ -666,15 +667,15 @@ export default compose(
               </ListItem>
               <ListItem>
                 <FormattedMessage
-                  id="tour.petition-activity.change-reminder"
+                  id="tour.petition-activity.access-and-reminders-content-4"
                   defaultMessage="Change <b>reminders settings</b>."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}
                 />
               </ListItem>
-            </List>
-          </>
+            </Stack>
+          </Stack>
         ),
         placement: "right",
         target: "#petition-accesses",
@@ -682,25 +683,25 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-activity.monitor-requests"
+            id="tour.petition-activity.events-title"
             defaultMessage="Monitor your requests"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petition-activity.open"
+                id="tour.petition-activity.events-content-1"
                 defaultMessage="Are you wondering if your recipients read the emails or opened the recipient replies page?"
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petition-activity.overview"
+                id="tour.petition-activity.events-content-2"
                 defaultMessage="Have a better overview of what is happening around your petition with the activity timeline."
               />
             </Text>
-          </>
+          </Stack>
         ),
         placement: "top-end",
         target: "#petition-activity-timeline",

@@ -153,7 +153,10 @@ export const AppLayoutNavbar = Object.assign(
           </Flex>
         )}
         <Flex justifyContent="center" alignItems="center">
-          <Menu placement={isMobile ? "top-start" : "right"}>
+          <Menu
+            id="create-petition"
+            placement={isMobile ? "top-start" : "right"}
+          >
             <Tooltip
               label={intl.formatMessage({
                 id: "navbar.create-new-petition",
@@ -163,7 +166,6 @@ export const AppLayoutNavbar = Object.assign(
             >
               <MenuButton
                 as={IconButton}
-                id="new-petition-button"
                 colorScheme="purple"
                 icon={<AddIcon />}
                 size="lg"

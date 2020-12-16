@@ -1225,7 +1225,7 @@
     "context": "Verification code"
   },
   {
-    "term": "generic.go-back-button",
+    "term": "generic.go-back",
     "definition": "Go back",
     "context": "Go back"
   },
@@ -1383,6 +1383,11 @@
     "term": "generic.share",
     "definition": "Share",
     "context": "Share"
+  },
+  {
+    "term": "generic.skip",
+    "definition": "Skip",
+    "context": "Skip"
   },
   {
     "term": "generic.start",
@@ -3965,47 +3970,42 @@
     "context": "We started an eSignature process on the petition {timeAgo}"
   },
   {
-    "term": "tour.back",
-    "definition": "Back",
-    "context": "Back"
-  },
-  {
-    "term": "tour.contact-details.essential",
+    "term": "tour.contact-details.personal-information-content-1",
     "definition": "All the essential information of your contact will be displayed here: email, first name, and last name.",
     "context": "All the essential information of your contact will be displayed here: email, first name, and last name."
   },
   {
-    "term": "tour.contact-details.info",
-    "definition": "You can find all the information regarding a contact stored in Parallel on this page.",
-    "context": "You can find all the information regarding a contact stored in Parallel on this page."
-  },
-  {
-    "term": "tour.contact-details.name",
+    "term": "tour.contact-details.personal-information-content-2",
     "definition": "Parallel will use the first name shown here for any messages you send to your contact. Make sure it is correct.",
     "context": "Parallel will use the first name shown here for any messages you send to your contact. Make sure it is correct."
   },
   {
-    "term": "tour.contact-details.page",
-    "definition": "Contact details",
-    "context": "Contact details"
-  },
-  {
-    "term": "tour.contact-details.personal-information",
+    "term": "tour.contact-details.personal-information-title",
     "definition": "Personal information",
     "context": "Personal information"
   },
   {
-    "term": "tour.contact-details.petitions",
-    "definition": "Petitions sent to your contact",
-    "context": "Petitions sent to your contact"
-  },
-  {
-    "term": "tour.contact-details.petitions-list",
+    "term": "tour.contact-details.petitions-content",
     "definition": "Here is a list of all the petitions you sent to your contact to help you find them faster.",
     "context": "Here is a list of all the petitions you sent to your contact to help you find them faster."
   },
   {
-    "term": "tour.contacts.add-contact",
+    "term": "tour.contact-details.petitions-title",
+    "definition": "Petitions sent to your contact",
+    "context": "Petitions sent to your contact"
+  },
+  {
+    "term": "tour.contacts-details.page-content",
+    "definition": "You can find all the information regarding a contact stored in Parallel on this page.",
+    "context": "You can find all the information regarding a contact stored in Parallel on this page."
+  },
+  {
+    "term": "tour.contacts-details.page-title",
+    "definition": "Contact details",
+    "context": "Contact details"
+  },
+  {
+    "term": "tour.contacts.add-contact-content",
     "definition": "Here you can create a contact before sending any petition to her.",
     "context": "Here you can create a contact before sending any petition to her."
   },
@@ -4015,12 +4015,12 @@
     "context": "Add contact"
   },
   {
-    "term": "tour.contacts.list",
+    "term": "tour.contacts.page-content",
     "definition": "Here you can find a list with every contact that you have sent a petition to or that you have created from this page.",
     "context": "Here you can find a list with every contact that you have sent a petition to or that you have created from this page."
   },
   {
-    "term": "tour.contacts.page",
+    "term": "tour.contacts.page-title",
     "definition": "Contacts",
     "context": "Contacts"
   },
@@ -4030,218 +4030,198 @@
     "context": "Ok. Let me try it!"
   },
   {
-    "term": "tour.next",
-    "definition": "Next",
-    "context": "Next"
-  },
-  {
-    "term": "tour.petition-activity.access-and-reminders",
-    "definition": "Access and reminders",
-    "context": "Access and reminders"
-  },
-  {
-    "term": "tour.petition-activity.change-reminder",
-    "definition": "Change <b>reminders settings</b>.",
-    "context": "Change <b>reminders settings</b>."
-  },
-  {
-    "term": "tour.petition-activity.items",
-    "definition": "Here you can view and manage your petitions' access, messages, follow-ups, and event history.",
-    "context": "Here you can view and manage your petitions' access, messages, follow-ups, and event history."
-  },
-  {
-    "term": "tour.petition-activity.main",
-    "definition": "Activity",
-    "context": "Activity"
-  },
-  {
-    "term": "tour.petition-activity.monitor-requests",
-    "definition": "Monitor your requests",
-    "context": "Monitor your requests"
-  },
-  {
-    "term": "tour.petition-activity.open",
-    "definition": "Are you wondering if your recipients read the emails or opened the recipient replies page?",
-    "context": "Are you wondering if your recipients read the emails or opened the recipient replies page?"
-  },
-  {
-    "term": "tour.petition-activity.overview",
-    "definition": "Have a better overview of what is happening around your petition with the activity timeline.",
-    "context": "Have a better overview of what is happening around your petition with the activity timeline."
-  },
-  {
-    "term": "tour.petition-activity.send-message",
-    "definition": "Send an automatic or custom <b>reminder message</b> to your recipients.",
-    "context": "Send an automatic or custom <b>reminder message</b> to your recipients."
-  },
-  {
-    "term": "tour.petition-activity.track",
-    "definition": "Manage who can <b>access</b> this petition.",
-    "context": "Manage who can <b>access</b> this petition."
-  },
-  {
-    "term": "tour.petition-activity.you-can",
+    "term": "tour.petition-activity.access-and-reminders-content-1",
     "definition": "In this section, you will be able to:",
     "context": "In this section, you will be able to:"
   },
   {
-    "term": "tour.petition-compose.add-petition-fields",
-    "definition": "Here you can add the recipients, your first message, and configure your automatic reminders.",
-    "context": "Here you can add the recipients, your first message, and configure your automatic reminders."
+    "term": "tour.petition-activity.access-and-reminders-content-2",
+    "definition": "Manage who can <b>access</b> this petition.",
+    "context": "Manage who can <b>access</b> this petition."
   },
   {
-    "term": "tour.petition-compose.add-petition-fields-title",
-    "definition": "Message and automatic reminders",
-    "context": "Message and automatic reminders"
+    "term": "tour.petition-activity.access-and-reminders-content-3",
+    "definition": "Send an automatic or custom <b>reminder message</b> to your recipients.",
+    "context": "Send an automatic or custom <b>reminder message</b> to your recipients."
   },
   {
-    "term": "tour.petition-compose.create-petition",
-    "definition": "Let's fill out your first petition",
-    "context": "Let's fill out your first petition"
+    "term": "tour.petition-activity.access-and-reminders-content-4",
+    "definition": "Change <b>reminders settings</b>.",
+    "context": "Change <b>reminders settings</b>."
   },
   {
-    "term": "tour.petition-compose.field-types",
+    "term": "tour.petition-activity.access-and-reminders-title",
+    "definition": "Access and reminders",
+    "context": "Access and reminders"
+  },
+  {
+    "term": "tour.petition-activity.events-content-1",
+    "definition": "Are you wondering if your recipients read the emails or opened the recipient replies page?",
+    "context": "Are you wondering if your recipients read the emails or opened the recipient replies page?"
+  },
+  {
+    "term": "tour.petition-activity.events-content-2",
+    "definition": "Have a better overview of what is happening around your petition with the activity timeline.",
+    "context": "Have a better overview of what is happening around your petition with the activity timeline."
+  },
+  {
+    "term": "tour.petition-activity.events-title",
+    "definition": "Monitor your requests",
+    "context": "Monitor your requests"
+  },
+  {
+    "term": "tour.petition-activity.page-content",
+    "definition": "Here you can view and manage your petitions' access, messages, follow-ups, and event history.",
+    "context": "Here you can view and manage your petitions' access, messages, follow-ups, and event history."
+  },
+  {
+    "term": "tour.petition-activity.page-title",
+    "definition": "Activity",
+    "context": "Activity"
+  },
+  {
+    "term": "tour.petition-compose.fields-content",
     "definition": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies).",
     "context": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies)."
   },
   {
-    "term": "tour.petition-compose.petition-advanced-settings",
-    "definition": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them.",
-    "context": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them."
-  },
-  {
-    "term": "tour.petition-compose.petition-advanced-settings-title",
-    "definition": "Need more customization?",
-    "context": "Need more customization?"
-  },
-  {
-    "term": "tour.petition-compose.petition-reminders",
-    "definition": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders.",
-    "context": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders."
-  },
-  {
-    "term": "tour.petition-compose.petition-reminders-title",
-    "definition": "We will handle this, but tell us a little bit more.",
-    "context": "We will handle this, but tell us a little bit more."
-  },
-  {
-    "term": "tour.petition-compose.select-multiple-recipients",
-    "definition": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested.",
-    "context": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested."
-  },
-  {
-    "term": "tour.petition-compose.select-recipients-title",
-    "definition": "Select your recipients",
-    "context": "Select your recipients"
-  },
-  {
-    "term": "tour.petition-compose.set-petition",
+    "term": "tour.petition-compose.initial-content-1",
     "definition": "On this page, you can set up the information that you need from your recipients.",
     "context": "On this page, you can set up the information that you need from your recipients."
   },
   {
-    "term": "tour.petition-compose.show-around",
+    "term": "tour.petition-compose.initial-content-2",
     "definition": "Let us show you step by step!",
     "context": "Let us show you step by step!"
   },
   {
-    "term": "tour.petition-replies.all-items-on-page",
-    "definition": "On this page, you can see all the items that you requested to the recipients.",
-    "context": "On this page, you can see all the items that you requested to the recipients."
+    "term": "tour.petition-compose.initial-title",
+    "definition": "Let's fill out your first petition",
+    "context": "Let's fill out your first petition"
   },
   {
-    "term": "tour.petition-replies.completed-items",
-    "definition": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons.",
-    "context": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
+    "term": "tour.petition-compose.next-content",
+    "definition": "Once you have added all the fields that you need, click <b>{next}</b> to customize the email message.",
+    "context": "Once you have added all the fields that you need, click <b>{next}</b> to customize the email message."
   },
   {
-    "term": "tour.petition-replies.control",
-    "definition": "Here you can control and verify the information that your recipients have submitted.",
-    "context": "Here you can control and verify the information that your recipients have submitted."
+    "term": "tour.petition-compose.next-title",
+    "definition": "Send the petition",
+    "context": "Send the petition"
   },
   {
-    "term": "tour.petition-replies.conversations",
-    "definition": "Conversations",
-    "context": "Conversations"
+    "term": "tour.petition-compose.petition-settings-content-1",
+    "definition": "Here you will be able to change settings like:",
+    "context": "Here you will be able to change settings like:"
   },
   {
-    "term": "tour.petition-replies.conversations.keep",
-    "definition": "Avoid back and forth emails, and keep track of the conversations around documents or information here.",
-    "context": "Avoid back and forth emails, and keep track of the conversations around documents or information here."
+    "term": "tour.petition-compose.petition-settings-content-2",
+    "definition": "The <b>language</b> of the recipient view and the message we will send to them.",
+    "context": "The <b>language</b> of the recipient view and the message we will send to them."
   },
   {
-    "term": "tour.petition-replies.conversations.send",
-    "definition": "Take your time to include your comments and send them when they are ready.",
-    "context": "Take your time to include your comments and send them when they are ready."
+    "term": "tour.petition-compose.petition-settings-content-3",
+    "definition": "The <b>deadline</b> that you want to inform the recipients.",
+    "context": "The <b>deadline</b> that you want to inform the recipients."
   },
   {
-    "term": "tour.petition-replies.conversations.unclear",
+    "term": "tour.petition-compose.petition-settings-title",
+    "definition": "Need more customization?",
+    "context": "Need more customization?"
+  },
+  {
+    "term": "tour.petition-replies.conversations-content-1",
     "definition": "Is there anything not clear? Is the submitted document incorrect?",
     "context": "Is there anything not clear? Is the submitted document incorrect?"
   },
   {
-    "term": "tour.petition-replies.download",
-    "definition": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses.",
-    "context": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
+    "term": "tour.petition-replies.conversations-content-2",
+    "definition": "Avoid back and forth emails, and keep track of the conversations around documents or information here.",
+    "context": "Avoid back and forth emails, and keep track of the conversations around documents or information here."
   },
   {
-    "term": "tour.petition-replies.download.organize",
-    "definition": "Organize your downloads",
-    "context": "Organize your downloads"
+    "term": "tour.petition-replies.conversations-content-3",
+    "definition": "Take your time to include your comments and send them when they are ready.",
+    "context": "Take your time to include your comments and send them when they are ready."
   },
   {
-    "term": "tour.petition-replies.download.save-time",
+    "term": "tour.petition-replies.conversations-title",
+    "definition": "Conversations",
+    "context": "Conversations"
+  },
+  {
+    "term": "tour.petition-replies.download-content-1",
     "definition": "Save time downloading and renaming all the files from here.",
     "context": "Save time downloading and renaming all the files from here."
   },
   {
-    "term": "tour.petition-replies.download.variables",
+    "term": "tour.petition-replies.download-content-2",
     "definition": "Try using <b>variables</b> to set how you want your filenames to appear.",
     "context": "Try using <b>variables</b> to set how you want your filenames to appear."
   },
   {
-    "term": "tour.petition-replies.review-items",
-    "definition": "Replies",
-    "context": "Replies"
+    "term": "tour.petition-replies.download-title",
+    "definition": "Organize your downloads",
+    "context": "Organize your downloads"
   },
   {
-    "term": "tour.petition-replies.your-information",
+    "term": "tour.petition-replies.page-content",
+    "definition": "On this page, you can see all the items that you requested to the recipients.",
+    "context": "On this page, you can see all the items that you requested to the recipients."
+  },
+  {
+    "term": "tour.petition-replies.page-title",
     "definition": "Here you have your information on the requests",
     "context": "Here you have your information on the requests"
   },
   {
-    "term": "tour.petitions-list.create-petition",
-    "definition": "Let's start by creating a petition!",
-    "context": "Let's start by creating a petition!"
+    "term": "tour.petition-replies.review-items-content-1",
+    "definition": "Here you can control and verify the information that your recipients have submitted.",
+    "context": "Here you can control and verify the information that your recipients have submitted."
   },
   {
-    "term": "tour.petitions-list.show-around",
-    "definition": "If this is your first time here, let us show you around!",
-    "context": "If this is your first time here, let us show you around!"
+    "term": "tour.petition-replies.review-items-content-2",
+    "definition": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons.",
+    "context": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
   },
   {
-    "term": "tour.petitions-list.we-collect",
-    "definition": "We are here to help you collect and organize the documents and information you need, keeping everything under control.",
-    "context": "We are here to help you collect and organize the documents and information you need, keeping everything under control."
+    "term": "tour.petition-replies.review-items-content-3",
+    "definition": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses.",
+    "context": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
   },
   {
-    "term": "tour.petitions-list.we-notify",
-    "definition": "We will let you know when the recipients complete everything.",
-    "context": "We will let you know when the recipients complete everything."
+    "term": "tour.petition-replies.review-items-title",
+    "definition": "Replies",
+    "context": "Replies"
   },
   {
-    "term": "tour.petitions-list.welcome",
-    "definition": "Welcome to Parallel!",
-    "context": "Welcome to Parallel!"
-  },
-  {
-    "term": "tour.petitions-list.you-focus",
+    "term": "tour.petitions-list.create-petition-content-1",
     "definition": "We want you to focus on what matters, so let us collect the information for you.",
     "context": "We want you to focus on what matters, so let us collect the information for you."
   },
   {
-    "term": "tour.skip",
-    "definition": "Skip",
-    "context": "Skip"
+    "term": "tour.petitions-list.create-petition-content-2",
+    "definition": "We will let you know when the recipients complete everything.",
+    "context": "We will let you know when the recipients complete everything."
+  },
+  {
+    "term": "tour.petitions-list.create-petition-title",
+    "definition": "Let's start by creating a petition!",
+    "context": "Let's start by creating a petition!"
+  },
+  {
+    "term": "tour.petitions-list.welcome-content-1",
+    "definition": "We are here to help you collect and organize the documents and information you need, keeping everything under control.",
+    "context": "We are here to help you collect and organize the documents and information you need, keeping everything under control."
+  },
+  {
+    "term": "tour.petitions-list.welcome-content-2",
+    "definition": "If this is your first time here, let us show you around!",
+    "context": "If this is your first time here, let us show you around!"
+  },
+  {
+    "term": "tour.petitions-list.welcome-title",
+    "definition": "Welcome to Parallel!",
+    "context": "Welcome to Parallel!"
   }
 ]

@@ -4,6 +4,7 @@ import {
   Button,
   ChakraProvider,
   CloseButton,
+  Heading,
   Stack,
 } from "@chakra-ui/core";
 import { theme } from "@parallel/chakra/theme";
@@ -25,6 +26,7 @@ import ReactJoyride, {
   Step,
   TooltipRenderProps,
 } from "react-joyride";
+import { Card } from "./Card";
 import { Spacer } from "./Spacer";
 
 export type Onboarding = {
@@ -76,20 +78,19 @@ const TourStep = ({
   const bodyId = `step-body-${useId()}`;
   return (
     <ChakraProvider theme={theme}>
-      <Box
+      <Card
         id="pw-onboarding-dialog"
-        as="section"
         position="relative"
-        background="white"
-        width="380px"
+        width="container.2xs"
+        border="none"
         maxWidth="100%"
-        borderRadius="md"
-        boxShadow="0 7px 14px 0 rgba(0,0,0, 0.1), 0 3px 6px 0 rgba(0, 0, 0, .07)"
+        paddingY={4}
+        paddingX={6}
         aria-labelledby={headerId}
         aria-describedby={bodyId}
         {...tooltipProps}
       >
-        {!step.hideCloseButton && (
+        {step.hideCloseButton === false && (
           <CloseButton
             position="absolute"
             top={2}
@@ -99,22 +100,12 @@ const TourStep = ({
           />
         )}
         {step.title && (
-          <Box
-            as="header"
-            id={headerId}
-            paddingLeft={6}
-            paddingRight={12}
-            paddingY={4}
-            fontSize="xl"
-            fontWeight="semibold"
-          >
-            {step.title}
+          <Box as="header" id={headerId} paddingRight={4} marginBottom={4}>
+            <Heading size="md">{step.title}</Heading>
           </Box>
         )}
-        <Box paddingX={6} paddingY={2} id={bodyId}>
-          {step.content}
-        </Box>
-        <Stack as="footer" paddingX={6} paddingY={4} direction="row">
+        <Box id={bodyId}>{step.content}</Box>
+        <Stack as="footer" direction="row" marginTop={4}>
           {skipProps && !isLastStep && (
             <Button {...skipProps} variant="outline">
               {step.locale!.skip}
@@ -136,7 +127,7 @@ const TourStep = ({
             </Button>
           )}
         </Stack>
-      </Box>
+      </Card>
     </ChakraProvider>
   );
 };
@@ -157,15 +148,15 @@ export function OnboardingTour({ status, onUpdateTour }: OnboardingTourProps) {
           defaultMessage: "Ok. Let me try it!",
         }),
         next: intl.formatMessage({
-          id: "tour.next",
+          id: "generic.next",
           defaultMessage: "Next",
         }),
         back: intl.formatMessage({
-          id: "tour.back",
-          defaultMessage: "Back",
+          id: "generic.go-back",
+          defaultMessage: "Go back",
         }),
         skip: intl.formatMessage({
-          id: "tour.skip",
+          id: "generic.skip",
           defaultMessage: "Skip",
         }),
         close: intl.formatMessage({
@@ -204,12 +195,16 @@ export function OnboardingTour({ status, onUpdateTour }: OnboardingTourProps) {
         continuous={true}
         scrollToFirstStep={true}
         showSkipButton={true}
-        spotlightClicks={true}
+        spotlightClicks={false}
         locale={locale}
         callback={handleCallback}
         // floater is adding some weird css filter which is making the tooltip look blurry sometimes
         floaterProps={{
           styles: {
+            arrow: {
+              length: 12,
+              spread: 20,
+            },
             floater: {
               filter: "none",
             },

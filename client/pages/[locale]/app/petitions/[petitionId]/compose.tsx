@@ -1,13 +1,15 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
   Box,
-  Button,
+  ListItem,
+  Stack,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
   Text,
+  UnorderedList,
   useToast,
 } from "@chakra-ui/core";
 import {
@@ -18,9 +20,9 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -562,26 +564,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       state={petitionState}
       headerActions={
         petition?.__typename === "Petition" && petition.status === "DRAFT" ? (
-          <>
-            <IconButtonWithTooltip
-              display={{ base: "flex", md: "none" }}
-              colorScheme="purple"
-              icon={<ArrowForwardIcon fontSize="18px" />}
-              label={intl.formatMessage({
-                id: "generic.next",
-                defaultMessage: "Next",
-              })}
-              onClick={handleNextClick}
-            />
-            <Button
-              display={{ base: "none", md: "flex" }}
-              colorScheme={"purple"}
-              rightIcon={<ArrowForwardIcon fontSize="18px" />}
-              onClick={handleNextClick}
-            >
-              <FormattedMessage id="generic.next" defaultMessage="Next" />
-            </Button>
-          </>
+          <ResponsiveButtonIcon
+            id="petition-next"
+            colorScheme="purple"
+            icon={<ArrowForwardIcon fontSize="18px" />}
+            label={intl.formatMessage({
+              id: "generic.next",
+              defaultMessage: "Next",
+            })}
+            onClick={handleNextClick}
+          />
         ) : null
       }
     >
@@ -614,7 +606,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                         defaultMessage="Contents"
                       />
                     </Tab>
-                    <Tab padding={4} lineHeight={5} fontWeight="bold">
+                    <Tab
+                      className="petition-settings"
+                      padding={4}
+                      lineHeight={5}
+                      fontWeight="bold"
+                    >
                       <SettingsIcon fontSize="16px" marginRight={2} />
                       <FormattedMessage
                         id="petition-compose.settings"
@@ -977,7 +974,7 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-compose.create-petition"
+            id="tour.petition-compose.initial-title"
             defaultMessage="Let's fill out your first petition"
           />
         ),
@@ -985,13 +982,13 @@ export default compose(
           <>
             <Text>
               <FormattedMessage
-                id="tour.petition-compose.set-petition"
+                id="tour.petition-compose.initial-content-1"
                 defaultMessage="On this page, you can set up the information that you need from your recipients."
               />
             </Text>
             <Text marginTop={4}>
               <FormattedMessage
-                id="tour.petition-compose.show-around"
+                id="tour.petition-compose.initial-content-2"
                 defaultMessage="Let us show you step by step!"
               />
             </Text>
@@ -999,12 +996,13 @@ export default compose(
         ),
         placement: "center",
         target: "#__next",
+        disableScrolling: true,
       },
       {
         content: (
-          <Text marginTop={4}>
+          <Text>
             <FormattedMessage
-              id="tour.petition-compose.field-types"
+              id="tour.petition-compose.fields-content"
               defaultMessage="Here you can add what you need from your recipients and choose the type of information it is (files or written replies)."
             />
           </Text>
@@ -1015,80 +1013,66 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-compose.add-petition-fields-title"
-            defaultMessage="Message and automatic reminders"
+            id="tour.petition-compose.next-title"
+            defaultMessage="Send the petition"
           />
         ),
         content: (
           <Text>
             <FormattedMessage
-              id="tour.petition-compose.add-petition-fields"
-              defaultMessage="Here you can add the recipients, your first message, and configure your automatic reminders."
-            />
-          </Text>
-        ),
-        placement: "right-start",
-        target: "#petition-message-compose",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-compose.select-recipients-title"
-            defaultMessage="Select your recipients"
-          />
-        ),
-        content: (
-          <Text>
-            <FormattedMessage
-              id="tour.petition-compose.select-multiple-recipients"
-              defaultMessage="If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested."
+              id="tour.petition-compose.next-content"
+              defaultMessage="Once you have added all the fields that you need, click <b>{next}</b> to customize the email message."
               values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+                b: (chunks: any[]) => <strong>{chunks}</strong>,
+                next: (
+                  <FormattedMessage id="generic.next" defaultMessage="Next" />
+                ),
               }}
             />
           </Text>
         ),
-        placement: "right-start",
-        target: "#petition-select-recipients",
+        placement: "bottom-end",
+        target: "#petition-next",
       },
       {
         title: (
           <FormattedMessage
-            id="tour.petition-compose.petition-reminders-title"
-            defaultMessage="We will handle this, but tell us a little bit more."
-          />
-        ),
-        content: (
-          <Text>
-            <FormattedMessage
-              id="tour.petition-compose.petition-reminders"
-              defaultMessage="We know that every situation and every client is different, so please help us understand better when it is best to send the reminders."
-            />
-          </Text>
-        ),
-        placement: "top",
-        target: "#petition-reminders",
-      },
-      {
-        title: (
-          <FormattedMessage
-            id="tour.petition-compose.petition-advanced-settings-title"
+            id="tour.petition-compose.petition-settings-title"
             defaultMessage="Need more customization?"
           />
         ),
         content: (
-          <Text>
-            <FormattedMessage
-              id="tour.petition-compose.petition-advanced-settings"
-              defaultMessage="Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
-            />
-          </Text>
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="tour.petition-compose.petition-settings-content-1"
+                defaultMessage="Here you will be able to change settings like:"
+              />
+            </Text>
+            <Stack as={UnorderedList} paddingLeft={5}>
+              <ListItem>
+                <FormattedMessage
+                  id="tour.petition-compose.petition-settings-content-2"
+                  defaultMessage="The <b>language</b> of the recipient view and the message we will send to them."
+                  values={{
+                    b: (chunks: any[]) => <strong>{chunks}</strong>,
+                  }}
+                />
+              </ListItem>
+              <ListItem>
+                <FormattedMessage
+                  id="tour.petition-compose.petition-settings-content-3"
+                  defaultMessage="The <b>deadline</b> that you want to inform the recipients."
+                  values={{
+                    b: (chunks: any[]) => <strong>{chunks}</strong>,
+                  }}
+                />
+              </ListItem>
+            </Stack>
+          </Stack>
         ),
-        placement: "top",
-        target: "#petition-advanced-settings",
+        placement: "left",
+        target: ".petition-settings",
       },
     ],
   }),

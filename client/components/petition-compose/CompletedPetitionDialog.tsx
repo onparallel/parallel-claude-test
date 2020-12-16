@@ -44,10 +44,7 @@ export function CompletedPetitionDialog({ ...props }: DialogProps) {
             router.back();
           }}
         >
-          <FormattedMessage
-            id="generic.go-back-button"
-            defaultMessage="Go back"
-          />
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
       }
       {...props}

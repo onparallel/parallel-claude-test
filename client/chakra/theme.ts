@@ -12,6 +12,7 @@ export const theme = extendTheme({
   sizes: {
     container: {
       xs: "480px",
+      "2xs": "380px",
     },
   },
   fontSizes: {

@@ -222,10 +222,7 @@ export function AddPetitionAccessDialog({
       }
       cancel={
         <Button onClick={() => props.onReject({ reason: "CANCEL" })}>
-          <FormattedMessage
-            id="generic.go-back-button"
-            defaultMessage="Go back"
-          />
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
         </Button>
       }
       {...props}

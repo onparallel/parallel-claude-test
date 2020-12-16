@@ -400,11 +400,14 @@ export default compose(
     steps: [
       {
         title: (
-          <FormattedMessage id="tour.contacts.page" defaultMessage="Contacts" />
+          <FormattedMessage
+            id="tour.contacts.page-title"
+            defaultMessage="Contacts"
+          />
         ),
         content: (
           <FormattedMessage
-            id="tour.contacts.list"
+            id="tour.contacts.page-content"
             defaultMessage="Here you can find a list with every contact that you have sent a petition to or that you have created from this page."
           />
         ),
@@ -420,11 +423,11 @@ export default compose(
         ),
         content: (
           <FormattedMessage
-            id="tour.contacts.add-contact"
+            id="tour.contacts.add-contact-content"
             defaultMessage="Here you can create a contact before sending any petition to her."
           />
         ),
-        placement: "left",
+        placement: "bottom-right",
         target: "#pw-new-contact",
       },
     ],

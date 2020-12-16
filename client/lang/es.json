@@ -1225,7 +1225,7 @@
     "context": "Verification code"
   },
   {
-    "term": "generic.go-back-button",
+    "term": "generic.go-back",
     "definition": "Volver atrás",
     "context": "Go back"
   },
@@ -1383,6 +1383,11 @@
     "term": "generic.share",
     "definition": "Compartir",
     "context": "Share"
+  },
+  {
+    "term": "generic.skip",
+    "definition": "Omitir",
+    "context": "Skip"
   },
   {
     "term": "generic.start",
@@ -3965,47 +3970,42 @@
     "context": "We started an eSignature process on the petition {timeAgo}"
   },
   {
-    "term": "tour.back",
-    "definition": "Atrás",
-    "context": "Back"
-  },
-  {
-    "term": "tour.contact-details.essential",
+    "term": "tour.contact-details.personal-information-content-1",
     "definition": "Toda la información esencial de tu contacto se muestra aquí: correo, nombre, y apellidos.",
     "context": "All the essential information of your contact will be displayed here: email, first name, and last name."
   },
   {
-    "term": "tour.contact-details.info",
-    "definition": "Puedes encontrar toda la información guardada en Parallel sobre un contacto en esta página.",
-    "context": "You can find all the information regarding a contact stored in Parallel on this page."
-  },
-  {
-    "term": "tour.contact-details.name",
+    "term": "tour.contact-details.personal-information-content-2",
     "definition": "Parallel usa el nombre mostrado aquí para cualquier mensaje que envíes a tu contacto. Asegúrate de que es correcto.",
     "context": "Parallel will use the first name shown here for any messages you send to your contact. Make sure it is correct."
   },
   {
-    "term": "tour.contact-details.page",
-    "definition": "Detalles del contacto",
-    "context": "Contact details"
-  },
-  {
-    "term": "tour.contact-details.personal-information",
+    "term": "tour.contact-details.personal-information-title",
     "definition": "Información personal",
     "context": "Personal information"
   },
   {
-    "term": "tour.contact-details.petitions",
-    "definition": "Peticiones enviadas a tu contacto",
-    "context": "Petitions sent to your contact"
-  },
-  {
-    "term": "tour.contact-details.petitions-list",
+    "term": "tour.contact-details.petitions-content",
     "definition": "Aquí encontrarás un listado con todas las peticiones que has enviado a tu contacto para ayudarte a encontrarlos más rápidamente.",
     "context": "Here is a list of all the petitions you sent to your contact to help you find them faster."
   },
   {
-    "term": "tour.contacts.add-contact",
+    "term": "tour.contact-details.petitions-title",
+    "definition": "Peticiones enviadas a tu contacto",
+    "context": "Petitions sent to your contact"
+  },
+  {
+    "term": "tour.contacts-details.page-content",
+    "definition": "Puedes encontrar toda la información guardada en Parallel sobre un contacto en esta página.",
+    "context": "You can find all the information regarding a contact stored in Parallel on this page."
+  },
+  {
+    "term": "tour.contacts-details.page-title",
+    "definition": "Detalles del contacto",
+    "context": "Contact details"
+  },
+  {
+    "term": "tour.contacts.add-contact-content",
     "definition": "Aquí puedes crear un contacto antes de enviarle cualquier petición.",
     "context": "Here you can create a contact before sending any petition to her."
   },
@@ -4015,12 +4015,12 @@
     "context": "Add contact"
   },
   {
-    "term": "tour.contacts.list",
+    "term": "tour.contacts.page-content",
     "definition": "Aquí encontrarás un listado con cada contacto al que hayas enviado una petición o hayas creado desde esta misma página.",
     "context": "Here you can find a list with every contact that you have sent a petition to or that you have created from this page."
   },
   {
-    "term": "tour.contacts.page",
+    "term": "tour.contacts.page-title",
     "definition": "Contactos",
     "context": "Contacts"
   },
@@ -4030,218 +4030,198 @@
     "context": "Ok. Let me try it!"
   },
   {
-    "term": "tour.next",
-    "definition": "Siguiente",
-    "context": "Next"
-  },
-  {
-    "term": "tour.petition-activity.access-and-reminders",
-    "definition": "Acceso y recordatorios",
-    "context": "Access and reminders"
-  },
-  {
-    "term": "tour.petition-activity.change-reminder",
-    "definition": "Cambiar la <b>configuración de los recordatorios</b>.",
-    "context": "Change <b>reminders settings</b>."
-  },
-  {
-    "term": "tour.petition-activity.items",
-    "definition": "Aquí puedes ver y gestionar el acceso, los mensajes, los recordatorios y la historia de los eventos de tus peticiones.",
-    "context": "Here you can view and manage your petitions' access, messages, follow-ups, and event history."
-  },
-  {
-    "term": "tour.petition-activity.main",
-    "definition": "Actividad",
-    "context": "Activity"
-  },
-  {
-    "term": "tour.petition-activity.monitor-requests",
-    "definition": "Monitoriza tus peticiones",
-    "context": "Monitor your requests"
-  },
-  {
-    "term": "tour.petition-activity.open",
-    "definition": "¿Te gustaría saber si tus destinatarios han leído o abierto su página de respuestas?",
-    "context": "Are you wondering if your recipients read the emails or opened the recipient replies page?"
-  },
-  {
-    "term": "tour.petition-activity.overview",
-    "definition": "Consigue una mejor vista de lo que está ocurriendo con tu petición con la línea temporal de actividades.",
-    "context": "Have a better overview of what is happening around your petition with the activity timeline."
-  },
-  {
-    "term": "tour.petition-activity.send-message",
-    "definition": "Envíar un <b>mensaje de seguimiento</b> a los destinatarios.",
-    "context": "Send an automatic or custom <b>reminder message</b> to your recipients."
-  },
-  {
-    "term": "tour.petition-activity.track",
-    "definition": "Gestionar quién tiene <b>acceso</b> a esta petición.",
-    "context": "Manage who can <b>access</b> this petition."
-  },
-  {
-    "term": "tour.petition-activity.you-can",
+    "term": "tour.petition-activity.access-and-reminders-content-1",
     "definition": "En esta sección podrás:",
     "context": "In this section, you will be able to:"
   },
   {
-    "term": "tour.petition-compose.add-petition-fields",
-    "definition": "Aquí puedes añadir los destinatarios, tu primer mensaje, y configurar los recordatorios automáticos.",
-    "context": "Here you can add the recipients, your first message, and configure your automatic reminders."
+    "term": "tour.petition-activity.access-and-reminders-content-2",
+    "definition": "Gestionar quién tiene <b>acceso</b> a esta petición.",
+    "context": "Manage who can <b>access</b> this petition."
   },
   {
-    "term": "tour.petition-compose.add-petition-fields-title",
-    "definition": "Mensaje y recordatorios automáticos",
-    "context": "Message and automatic reminders"
+    "term": "tour.petition-activity.access-and-reminders-content-3",
+    "definition": "Envíar un <b>mensaje de seguimiento</b> a los destinatarios.",
+    "context": "Send an automatic or custom <b>reminder message</b> to your recipients."
   },
   {
-    "term": "tour.petition-compose.create-petition",
-    "definition": "Completemos tu primera petición",
-    "context": "Let's fill out your first petition"
+    "term": "tour.petition-activity.access-and-reminders-content-4",
+    "definition": "Cambiar la <b>configuración de los recordatorios</b>.",
+    "context": "Change <b>reminders settings</b>."
   },
   {
-    "term": "tour.petition-compose.field-types",
+    "term": "tour.petition-activity.access-and-reminders-title",
+    "definition": "Acceso y recordatorios",
+    "context": "Access and reminders"
+  },
+  {
+    "term": "tour.petition-activity.events-content-1",
+    "definition": "¿Te gustaría saber si tus destinatarios han leído o abierto su página de respuestas?",
+    "context": "Are you wondering if your recipients read the emails or opened the recipient replies page?"
+  },
+  {
+    "term": "tour.petition-activity.events-content-2",
+    "definition": "Consigue una mejor vista de lo que está ocurriendo con tu petición con la línea temporal de actividades.",
+    "context": "Have a better overview of what is happening around your petition with the activity timeline."
+  },
+  {
+    "term": "tour.petition-activity.events-title",
+    "definition": "Monitoriza tus peticiones",
+    "context": "Monitor your requests"
+  },
+  {
+    "term": "tour.petition-activity.page-content",
+    "definition": "Aquí puedes ver y gestionar el acceso, los mensajes, los recordatorios y la historia de los eventos de tus peticiones.",
+    "context": "Here you can view and manage your petitions' access, messages, follow-ups, and event history."
+  },
+  {
+    "term": "tour.petition-activity.page-title",
+    "definition": "Actividad",
+    "context": "Activity"
+  },
+  {
+    "term": "tour.petition-compose.fields-content",
     "definition": "Aquí puedes añadir lo que necesites de tus destinatarios y escoger el tipo de información (archivos o respuestas escritas).",
     "context": "Here you can add what you need from your recipients and choose the type of information it is (files or written replies)."
   },
   {
-    "term": "tour.petition-compose.petition-advanced-settings",
-    "definition": "Escoge aquí el <b>idioma</b> de la página de subida de información y los mensajes automáticos que enviaremos a tus destinatarios, así como la <b>fecha límite</b> que quieras que les informemos.",
-    "context": "Choose here the <b>language</b> from the upload page and the automatic messages that we will send to your recipients, and the <b>deadline</b> you want us to inform them."
-  },
-  {
-    "term": "tour.petition-compose.petition-advanced-settings-title",
-    "definition": "¿Necesitas más personalización?",
-    "context": "Need more customization?"
-  },
-  {
-    "term": "tour.petition-compose.petition-reminders",
-    "definition": "Sabemos que cada situación y cada cliente es diferente. Por eso, ayúdanos por favor a entender mejor cuándo es el mejor momento para enviar los recordatorios.",
-    "context": "We know that every situation and every client is different, so please help us understand better when it is best to send the reminders."
-  },
-  {
-    "term": "tour.petition-compose.petition-reminders-title",
-    "definition": "Nos encargaremos de esto, pero cuéntanos un poco más.",
-    "context": "We will handle this, but tell us a little bit more."
-  },
-  {
-    "term": "tour.petition-compose.select-multiple-recipients",
-    "definition": "Si seleccionas <b>múltiples destinatarios</b>, cualquiera de ellos podrá contestar a cualquier elemento que hayas pedido.",
-    "context": "If you select <b>multiple recipients</b>, any of them will be able to reply to any of the items you requested."
-  },
-  {
-    "term": "tour.petition-compose.select-recipients-title",
-    "definition": "Escoge tus destinatarios",
-    "context": "Select your recipients"
-  },
-  {
-    "term": "tour.petition-compose.set-petition",
+    "term": "tour.petition-compose.initial-content-1",
     "definition": "En esta página podrás configurar la información que necesitas de tus destinatarios.",
     "context": "On this page, you can set up the information that you need from your recipients."
   },
   {
-    "term": "tour.petition-compose.show-around",
+    "term": "tour.petition-compose.initial-content-2",
     "definition": "¡Déjanos enseñarte paso a paso!",
     "context": "Let us show you step by step!"
   },
   {
-    "term": "tour.petition-replies.all-items-on-page",
-    "definition": "En esta página puedes ver todos los elementos que has pedido a los destinatarios.",
-    "context": "On this page, you can see all the items that you requested to the recipients."
+    "term": "tour.petition-compose.initial-title",
+    "definition": "Completemos tu primera petición",
+    "context": "Let's fill out your first petition"
   },
   {
-    "term": "tour.petition-replies.completed-items",
-    "definition": "Controla los documentos y las respuestas que ya has revisado utilizando los <b>botones de aprobar y rechazar</b>.",
-    "context": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
+    "term": "tour.petition-compose.next-content",
+    "definition": "Una vez has añadido todos los campos que necesitas, haz click en <b>{next}</b> para personalizar el correo electrónico.",
+    "context": "Once you have added all the fields that you need, click <b>{next}</b> to customize the email message."
   },
   {
-    "term": "tour.petition-replies.control",
-    "definition": "Aquí puedes controlar y verificar la información que te han enviado tus destinatarios.",
-    "context": "Here you can control and verify the information that your recipients have submitted."
+    "term": "tour.petition-compose.next-title",
+    "definition": "Enviar la petición",
+    "context": "Send the petition"
   },
   {
-    "term": "tour.petition-replies.conversations",
-    "definition": "Conversaciones",
-    "context": "Conversations"
+    "term": "tour.petition-compose.petition-settings-content-1",
+    "definition": "Aquí podrás cambiar ajustes de la petición como:",
+    "context": "Here you will be able to change settings like:"
   },
   {
-    "term": "tour.petition-replies.conversations.keep",
-    "definition": "Evita correos de un lado a otro, mantén el hilo de las conversaciones alrededor de los documentos o la información aquí.",
-    "context": "Avoid back and forth emails, and keep track of the conversations around documents or information here."
+    "term": "tour.petition-compose.petition-settings-content-2",
+    "definition": "El <b>idioma</b> de la vista de destinatario y los mensajes que se le enviarán.",
+    "context": "The <b>language</b> of the recipient view and the message we will send to them."
   },
   {
-    "term": "tour.petition-replies.conversations.send",
-    "definition": "Tómate tu tiempo para incluir tus comentarios y envíales cuando estén listos.",
-    "context": "Take your time to include your comments and send them when they are ready."
+    "term": "tour.petition-compose.petition-settings-content-3",
+    "definition": "La <b>fecha límite</b> de la que quieres informar a los destinatarios.",
+    "context": "The <b>deadline</b> that you want to inform the recipients."
   },
   {
-    "term": "tour.petition-replies.conversations.unclear",
+    "term": "tour.petition-compose.petition-settings-title",
+    "definition": "¿Necesitas más personalización?",
+    "context": "Need more customization?"
+  },
+  {
+    "term": "tour.petition-replies.conversations-content-1",
     "definition": "¿Hay algo que no está claro? ¿El documento subido es incorrecto?",
     "context": "Is there anything not clear? Is the submitted document incorrect?"
   },
   {
-    "term": "tour.petition-replies.download",
-    "definition": "Si la información es correcta y la necesitas, puedes <b>descargar</b> los archivos, o <b>copiar los textos</b> de las contestaciones.",
-    "context": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
+    "term": "tour.petition-replies.conversations-content-2",
+    "definition": "Evita correos de un lado a otro, mantén el hilo de las conversaciones alrededor de los documentos o la información aquí.",
+    "context": "Avoid back and forth emails, and keep track of the conversations around documents or information here."
   },
   {
-    "term": "tour.petition-replies.download.organize",
-    "definition": "Organiza tus descargas",
-    "context": "Organize your downloads"
+    "term": "tour.petition-replies.conversations-content-3",
+    "definition": "Tómate tu tiempo para incluir tus comentarios y envíales cuando estén listos.",
+    "context": "Take your time to include your comments and send them when they are ready."
   },
   {
-    "term": "tour.petition-replies.download.save-time",
+    "term": "tour.petition-replies.conversations-title",
+    "definition": "Conversaciones",
+    "context": "Conversations"
+  },
+  {
+    "term": "tour.petition-replies.download-content-1",
     "definition": "Ahorra tiempo descargando y renombrando todos los archivos desde aquí",
     "context": "Save time downloading and renaming all the files from here."
   },
   {
-    "term": "tour.petition-replies.download.variables",
+    "term": "tour.petition-replies.download-content-2",
     "definition": "Prueba a usar <b>parámetros</b> para indicar cómo quieres que aparezcan los nombres de tus archivos.",
     "context": "Try using <b>variables</b> to set how you want your filenames to appear."
   },
   {
-    "term": "tour.petition-replies.review-items",
-    "definition": "Respuestas",
-    "context": "Replies"
+    "term": "tour.petition-replies.download-title",
+    "definition": "Organiza tus descargas",
+    "context": "Organize your downloads"
   },
   {
-    "term": "tour.petition-replies.your-information",
+    "term": "tour.petition-replies.page-content",
+    "definition": "En esta página puedes ver todos los elementos que has pedido a los destinatarios.",
+    "context": "On this page, you can see all the items that you requested to the recipients."
+  },
+  {
+    "term": "tour.petition-replies.page-title",
     "definition": "Aquí tienes la información acerca de las peticiones",
     "context": "Here you have your information on the requests"
   },
   {
-    "term": "tour.petitions-list.create-petition",
-    "definition": "¡Empecemos creando una petición!",
-    "context": "Let's start by creating a petition!"
+    "term": "tour.petition-replies.review-items-content-1",
+    "definition": "Aquí puedes controlar y verificar la información que te han enviado tus destinatarios.",
+    "context": "Here you can control and verify the information that your recipients have submitted."
   },
   {
-    "term": "tour.petitions-list.show-around",
-    "definition": "Si esta es tu primera vez aquí, déjanos mostrarte cómo funciona.",
-    "context": "If this is your first time here, let us show you around!"
+    "term": "tour.petition-replies.review-items-content-2",
+    "definition": "Controla los documentos y las respuestas que ya has revisado utilizando los <b>botones de aprobar y rechazar</b>.",
+    "context": "Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
   },
   {
-    "term": "tour.petitions-list.we-collect",
-    "definition": "Estamos aquí para ayudarte a obtener y ordenar los documentos e información que necesitas, para que tengas todo bajo control.",
-    "context": "We are here to help you collect and organize the documents and information you need, keeping everything under control."
+    "term": "tour.petition-replies.review-items-content-3",
+    "definition": "Si la información es correcta y la necesitas, puedes <b>descargar</b> los archivos, o <b>copiar los textos</b> de las contestaciones.",
+    "context": "If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
   },
   {
-    "term": "tour.petitions-list.we-notify",
-    "definition": "Te lo haremos saber cuando tus destinatarios hayan completado todo.",
-    "context": "We will let you know when the recipients complete everything."
+    "term": "tour.petition-replies.review-items-title",
+    "definition": "Respuestas",
+    "context": "Replies"
   },
   {
-    "term": "tour.petitions-list.welcome",
-    "definition": "¡Bienvenidos a Parallel!",
-    "context": "Welcome to Parallel!"
-  },
-  {
-    "term": "tour.petitions-list.you-focus",
+    "term": "tour.petitions-list.create-petition-content-1",
     "definition": "Queremos que te centres en aquello que es importante. Déjanos que recopilemos la información por ti.",
     "context": "We want you to focus on what matters, so let us collect the information for you."
   },
   {
-    "term": "tour.skip",
-    "definition": "Saltar",
-    "context": "Skip"
+    "term": "tour.petitions-list.create-petition-content-2",
+    "definition": "Te lo haremos saber cuando tus destinatarios hayan completado todo.",
+    "context": "We will let you know when the recipients complete everything."
+  },
+  {
+    "term": "tour.petitions-list.create-petition-title",
+    "definition": "¡Empecemos creando una petición!",
+    "context": "Let's start by creating a petition!"
+  },
+  {
+    "term": "tour.petitions-list.welcome-content-1",
+    "definition": "Estamos aquí para ayudarte a obtener y ordenar los documentos e información que necesitas, para que tengas todo bajo control.",
+    "context": "We are here to help you collect and organize the documents and information you need, keeping everything under control."
+  },
+  {
+    "term": "tour.petitions-list.welcome-content-2",
+    "definition": "Si esta es tu primera vez aquí, déjanos mostrarte cómo funciona.",
+    "context": "If this is your first time here, let us show you around!"
+  },
+  {
+    "term": "tour.petitions-list.welcome-title",
+    "definition": "¡Bienvenidos a Parallel!",
+    "context": "Welcome to Parallel!"
   }
 ]

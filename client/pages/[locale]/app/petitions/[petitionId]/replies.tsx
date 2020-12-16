@@ -1167,13 +1167,13 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-replies.your-information"
+            id="tour.petition-replies.page-title"
             defaultMessage="Here you have your information on the requests"
           />
         ),
         content: (
           <FormattedMessage
-            id="tour.petition-replies.all-items-on-page"
+            id="tour.petition-replies.page-content"
             defaultMessage="On this page, you can see all the items that you requested to the recipients."
           />
         ),
@@ -1183,37 +1183,37 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-replies.review-items"
+            id="tour.petition-replies.review-items-title"
             defaultMessage="Replies"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petition-replies.control"
+                id="tour.petition-replies.review-items-content-1"
                 defaultMessage="Here you can control and verify the information that your recipients have submitted."
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petition-replies.completed-items"
+                id="tour.petition-replies.review-items-content-2"
                 defaultMessage="Keep track of the documents and replies you review by using the <b>approve and reject</b> buttons."
                 values={{
                   b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 }}
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petition-replies.download"
+                id="tour.petition-replies.review-items-content-3"
                 defaultMessage="If the information is correct and you need them, you can <b>download</b> the files, or <b>copy the text</b> responses."
                 values={{
                   b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 }}
               />
             </Text>
-          </>
+          </Stack>
         ),
         placement: "right-start",
         target: "#petition-replies",
@@ -1221,31 +1221,31 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-replies.conversations"
+            id="tour.petition-replies.conversations-title"
             defaultMessage="Conversations"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petition-replies.conversations.unclear"
+                id="tour.petition-replies.conversations-content-1"
                 defaultMessage="Is there anything not clear? Is the submitted document incorrect?"
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petition-replies.conversations.keep"
+                id="tour.petition-replies.conversations-content-2"
                 defaultMessage="Avoid back and forth emails, and keep track of the conversations around documents or information here."
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petition-replies.conversations.send"
+                id="tour.petition-replies.conversations-content-3"
                 defaultMessage="Take your time to include your comments and send them when they are ready."
               />
             </Text>
-          </>
+          </Stack>
         ),
         placement: "right-start",
         target: "#comment-0",
@@ -1253,30 +1253,30 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petition-replies.download.organize"
+            id="tour.petition-replies.download-title"
             defaultMessage="Organize your downloads"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petition-replies.download.save-time"
+                id="tour.petition-replies.download-content-1"
                 defaultMessage="Save time downloading and renaming all the files from here."
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petition-replies.download.variables"
+                id="tour.petition-replies.download-content-2"
                 defaultMessage="Try using <b>variables</b> to set how you want your filenames to appear."
                 values={{
                   b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 }}
               />
             </Text>
-          </>
+          </Stack>
         ),
-        placement: "left-start",
+        placement: "bottom-right",
         target: "#download-all",
       },
     ],

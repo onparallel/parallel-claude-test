@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/core";
+import { Box, Flex, Stack, Text } from "@chakra-ui/core";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -359,25 +359,25 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petitions-list.welcome"
+            id="tour.petitions-list.welcome-title"
             defaultMessage="Welcome to Parallel!"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petitions-list.we-collect"
+                id="tour.petitions-list.welcome-content-1"
                 defaultMessage="We are here to help you collect and organize the documents and information you need, keeping everything under control."
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petitions-list.show-around"
+                id="tour.petitions-list.welcome-content-2"
                 defaultMessage="If this is your first time here, let us show you around!"
               />
             </Text>
-          </>
+          </Stack>
         ),
         placement: "center",
         target: "#__next",
@@ -385,27 +385,28 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.petitions-list.create-petition"
+            id="tour.petitions-list.create-petition-title"
             defaultMessage="Let's start by creating a petition!"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.petitions-list.you-focus"
+                id="tour.petitions-list.create-petition-content-1"
                 defaultMessage="We want you to focus on what matters, so let us collect the information for you."
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.petitions-list.we-notify"
+                id="tour.petitions-list.create-petition-content-2"
                 defaultMessage="We will let you know when the recipients complete everything."
               />
             </Text>
-          </>
+          </Stack>
         ),
-        target: "#new-petition-button",
+        placement: "right-start",
+        target: "#menu-button-create-petition",
       },
     ],
   }),

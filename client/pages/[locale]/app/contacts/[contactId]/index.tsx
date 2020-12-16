@@ -490,13 +490,13 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.contact-details.page"
+            id="tour.contacts-details.page-title"
             defaultMessage="Contact details"
           />
         ),
         content: (
           <FormattedMessage
-            id="tour.contact-details.info"
+            id="tour.contacts-details.page-content"
             defaultMessage="You can find all the information regarding a contact stored in Parallel on this page."
           />
         ),
@@ -506,25 +506,25 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.contact-details.personal-information"
+            id="tour.contact-details.personal-information-title"
             defaultMessage="Personal information"
           />
         ),
         content: (
-          <>
+          <Stack>
             <Text>
               <FormattedMessage
-                id="tour.contact-details.essential"
+                id="tour.contact-details.personal-information-content-1"
                 defaultMessage="All the essential information of your contact will be displayed here: email, first name, and last name."
               />
             </Text>
-            <Text marginTop={4}>
+            <Text>
               <FormattedMessage
-                id="tour.contact-details.name"
+                id="tour.contact-details.personal-information-content-2"
                 defaultMessage="Parallel will use the first name shown here for any messages you send to your contact. Make sure it is correct."
               />
             </Text>
-          </>
+          </Stack>
         ),
         placement: "right",
         target: "#contact-details",
@@ -532,13 +532,13 @@ export default compose(
       {
         title: (
           <FormattedMessage
-            id="tour.contact-details.petitions"
+            id="tour.contact-details.petitions-title"
             defaultMessage="Petitions sent to your contact"
           />
         ),
         content: (
           <FormattedMessage
-            id="tour.contact-details.petitions-list"
+            id="tour.contact-details.petitions-content"
             defaultMessage="Here is a list of all the petitions you sent to your contact to help you find them faster."
           />
         ),

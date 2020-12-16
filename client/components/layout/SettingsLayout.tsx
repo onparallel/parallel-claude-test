@@ -94,7 +94,7 @@ export function SettingsLayout({
                     icon={<ArrowBackIcon />}
                     variant="ghost"
                     aria-label={intl.formatMessage({
-                      id: "generic.go-back-button",
+                      id: "generic.go-back",
                       defaultMessage: "Go back",
                     })}
                     marginRight={2}
