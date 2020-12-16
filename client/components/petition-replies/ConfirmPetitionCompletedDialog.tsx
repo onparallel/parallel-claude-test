@@ -30,22 +30,22 @@ import {
 
 const messages: Record<PetitionLocale, string> = {
   en: outdent`
-    Hi,
+    Dear Sir/Madam,
 
-    We have reviewed all the information and we can confirm that everything is correct.
+    We have reviewed all the information that we requested, and we can confirm that everything is correct.
 
-    We will get to work and if we have any questions or need any more information we will let you know.
+    Let us know if you have any questions or comments.
     
-    Best regards,
+    Best regards.
   `,
   es: outdent`
-    Hola,
+    Apreciado Sr/Sra,
+
+    Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
     
-    Ya hemos revisado toda la información y podemos confirmar que está todo correcto.
+    Quedamos a su entera disposición para aclarar o comentar cualquier aspecto que considere oportuno.
     
-    Vamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.
-    
-    Saludos,
+    Reciba un cordial saludo.
   `,
 };
 
