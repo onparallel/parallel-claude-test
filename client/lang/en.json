@@ -4006,8 +4006,8 @@
   },
   {
     "term": "tour.contacts.add-contact-content",
-    "definition": "Here you can create a contact before sending any petition to her.",
-    "context": "Here you can create a contact before sending any petition to her."
+    "definition": "Here you can create a contact before sending any petition to them.",
+    "context": "Here you can create a contact before sending any petition to them."
   },
   {
     "term": "tour.contacts.add-contact-title",

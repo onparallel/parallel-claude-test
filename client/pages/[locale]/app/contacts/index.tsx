@@ -424,10 +424,10 @@ export default compose(
         content: (
           <FormattedMessage
             id="tour.contacts.add-contact-content"
-            defaultMessage="Here you can create a contact before sending any petition to her."
+            defaultMessage="Here you can create a contact before sending any petition to them."
           />
         ),
-        placement: "bottom-right",
+        placement: "bottom-end",
         target: "#pw-new-contact",
       },
     ],

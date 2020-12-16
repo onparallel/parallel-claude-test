@@ -1276,7 +1276,7 @@ export default compose(
             </Text>
           </Stack>
         ),
-        placement: "bottom-right",
+        placement: "bottom-end",
         target: "#download-all",
       },
     ],

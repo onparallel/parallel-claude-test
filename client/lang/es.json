@@ -4007,7 +4007,7 @@
   {
     "term": "tour.contacts.add-contact-content",
     "definition": "Aquí puedes crear un contacto antes de enviarle cualquier petición.",
-    "context": "Here you can create a contact before sending any petition to her."
+    "context": "Here you can create a contact before sending any petition to them."
   },
   {
     "term": "tour.contacts.add-contact-title",
@@ -4151,7 +4151,7 @@
   },
   {
     "term": "tour.petition-replies.download-content-1",
-    "definition": "Ahorra tiempo descargando y renombrando todos los archivos desde aquí",
+    "definition": "Ahorra tiempo descargando y renombrando todos los archivos desde aquí.",
     "context": "Save time downloading and renaming all the files from here."
   },
   {
