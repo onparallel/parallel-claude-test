@@ -2,6 +2,6 @@
   "presets": ["next/babel"],
   "plugins": [
     "./build/clean-react-intl-plugin/index.js",
-    ["babel-plugin-emotion"]
+    ["@emotion"]
   ]
 }

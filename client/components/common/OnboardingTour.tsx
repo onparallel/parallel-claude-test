@@ -211,7 +211,7 @@ export function OnboardingTour({ status, onUpdateTour }: OnboardingTourProps) {
         floaterProps={{
           styles: {
             floater: {
-              filter: null,
+              filter: "none",
             },
           },
         }}
