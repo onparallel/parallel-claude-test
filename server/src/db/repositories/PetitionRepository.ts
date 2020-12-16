@@ -342,12 +342,14 @@ export class PetitionRepository extends BaseRepository {
         updated_by: `User:${user.id}`,
       }))
     );
-    await this.createEvent_old(
-      petitionId,
-      "ACCESS_ACTIVATED",
-      rows.map((a) => ({
-        petition_access_id: a.id,
-        user_id: user.id,
+    await this.createEvent(
+      rows.map((access) => ({
+        type: "ACCESS_ACTIVATED",
+        petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: user.id,
+        },
       }))
     );
     return rows;
@@ -379,13 +381,13 @@ export class PetitionRepository extends BaseRepository {
         created_by: `User:${user.id}`,
       }))
     );
-
-    await this.createEvent_old(
-      petitionId,
-      scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
-      rows.map((m) => ({
-        petition_access_id: m.petition_access_id,
-        petition_message_id: m.id,
+    await this.createEvent(
+      rows.map((message) => ({
+        type: scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
+        petitionId,
+        data: {
+          petition_message_id: message.id,
+        },
       }))
     );
 
@@ -405,9 +407,13 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    await this.createEvent_old(petitionId, "MESSAGE_CANCELLED", {
-      petition_message_id: messageId,
-      user_id: user.id,
+    await this.createEvent({
+      type: "MESSAGE_CANCELLED",
+      petitionId,
+      data: {
+        petition_message_id: messageId,
+        user_id: user.id,
+      },
     });
     return row ?? null;
   }
@@ -441,21 +447,25 @@ export class PetitionRepository extends BaseRepository {
           "*"
         ),
     ]);
-    await this.createEvent_old(
-      petitionId,
-      "ACCESS_DEACTIVATED",
+    await this.createEvent(
       accesses.map((access) => ({
-        petition_access_id: access.id,
-        user_id: user.id,
+        type: "ACCESS_DEACTIVATED",
+        petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: user.id,
+        },
       }))
     );
     if (messages.length > 0) {
-      await this.createEvent_old(
-        petitionId,
-        "MESSAGE_CANCELLED",
+      await this.createEvent(
         messages.map((message) => ({
-          petition_message_id: message.id,
-          user_id: user.id,
+          type: "MESSAGE_CANCELLED",
+          petitionId,
+          data: {
+            petition_message_id: message.id,
+            user_id: user.id,
+          },
         }))
       );
     }
@@ -478,12 +488,14 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    await this.createEvent_old(
-      petitionId,
-      "ACCESS_ACTIVATED",
+    await this.createEvent(
       accesses.map((access) => ({
-        petition_access_id: access.id,
-        user_id: user.id,
+        type: "ACCESS_ACTIVATED",
+        petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: user.id,
+        },
       }))
     );
     return accesses;
@@ -685,12 +697,14 @@ export class PetitionRepository extends BaseRepository {
       for (const [, _accesses] of Object.entries(
         groupBy(accesses, (a) => a.petition_id)
       )) {
-        await this.createEvent_old(
-          _accesses[0].petition_id,
-          "ACCESS_DEACTIVATED",
+        await this.createEvent(
           _accesses.map((access) => ({
-            petition_access_id: access.id,
-            user_id: user.id,
+            type: "ACCESS_DEACTIVATED",
+            petitionId: _accesses[0].petition_id,
+            data: {
+              petition_access_id: access.id,
+              user_id: user.id,
+            },
           })),
           t
         );
@@ -698,12 +712,14 @@ export class PetitionRepository extends BaseRepository {
       for (const [, _messages] of Object.entries(
         groupBy(messages, (m) => m.petition_id)
       )) {
-        await this.createEvent_old(
-          _messages[0].petition_id,
-          "MESSAGE_CANCELLED",
+        await this.createEvent(
           _messages.map((message) => ({
-            petition_message_id: message.id,
-            user_id: user.id,
+            type: "MESSAGE_CANCELLED",
+            petitionId: _messages[0].petition_id,
+            data: {
+              petition_message_id: message.id,
+              user_id: user.id,
+            },
           })),
           t
         );
@@ -1137,10 +1153,14 @@ export class PetitionRepository extends BaseRepository {
         })
         .where({ id: field?.petition_id, status: "COMPLETED" }),
     ]);
-    await this.createEvent_old(field.petition_id, "REPLY_CREATED", {
-      petition_access_id: reply.petition_access_id,
-      petition_field_id: reply.petition_field_id,
-      petition_field_reply_id: reply.id,
+    await this.createEvent({
+      type: "REPLY_CREATED",
+      petitionId: field.petition_id,
+      data: {
+        petition_access_id: reply.petition_access_id,
+        petition_field_id: reply.petition_field_id,
+        petition_field_reply_id: reply.id,
+      },
     });
     return reply;
   }
@@ -1171,10 +1191,14 @@ export class PetitionRepository extends BaseRepository {
           updated_by: `Contact:${contact.id}`,
         })
         .where({ id: field.petition_id, status: "COMPLETED" }),
-      this.createEvent_old(field!.petition_id, "REPLY_DELETED", {
-        petition_access_id: reply.petition_access_id,
-        petition_field_id: reply.petition_field_id,
-        petition_field_reply_id: reply.id,
+      this.createEvent({
+        type: "REPLY_DELETED",
+        petitionId: field!.petition_id,
+        data: {
+          petition_access_id: reply.petition_access_id,
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+        },
       }),
     ]);
   }
@@ -1356,11 +1380,13 @@ export class PetitionRepository extends BaseRepository {
         });
       return await this.insert("petition_reminder", data, t).returning("*");
     });
-    await this.createEvent_old(
-      petitionId,
-      "REMINDER_SENT",
+    await this.createEvent(
       reminders.map((reminder) => ({
-        petition_reminder_id: reminder.id,
+        type: "REMINDER_SENT",
+        petitionId,
+        data: {
+          petition_reminder_id: reminder.id,
+        },
       }))
     );
     return reminders;
@@ -1439,26 +1465,6 @@ export class PetitionRepository extends BaseRepository {
     }
 
     return true;
-  }
-
-  /**
-   * @deprecated Use `createEvent`
-   */
-  async createEvent_old<TType extends PetitionEventType>(
-    petitionId: number,
-    type: TType,
-    payload: MaybeArray<PetitionEventPayload<TType>>,
-    t?: Transaction<any, any>
-  ) {
-    return await this.insert(
-      "petition_event",
-      (Array.isArray(payload) ? payload : [payload]).map((data) => ({
-        petition_id: petitionId,
-        type,
-        data,
-      })),
-      t
-    );
   }
 
   async createEvent<TType extends PetitionEventType>(
@@ -1778,10 +1784,14 @@ export class PetitionRepository extends BaseRepository {
         `User:${user.id}`
       ),
       comment?.published_at
-        ? this.createEvent_old(petitionId, "COMMENT_DELETED", {
-            petition_field_id: petitionFieldId,
-            petition_field_comment_id: petitionFieldCommentId,
-            user_id: user.id,
+        ? this.createEvent({
+            type: "COMMENT_DELETED",
+            petitionId,
+            data: {
+              petition_field_id: petitionFieldId,
+              petition_field_comment_id: petitionFieldCommentId,
+              user_id: user.id,
+            },
           })
         : null,
     ]);
@@ -1800,10 +1810,14 @@ export class PetitionRepository extends BaseRepository {
         `PetitionAccess:${access.id}`
       ),
       comment?.published_at
-        ? this.createEvent_old(petitionId, "COMMENT_DELETED", {
-            petition_field_id: petitionFieldId,
-            petition_field_comment_id: petitionFieldCommentId,
-            petition_access_id: access.id,
+        ? this.createEvent({
+            type: "COMMENT_DELETED",
+            petitionId,
+            data: {
+              petition_field_id: petitionFieldId,
+              petition_field_comment_id: petitionFieldCommentId,
+              petition_access_id: access.id,
+            },
           })
         : null,
     ]);
@@ -1916,12 +1930,14 @@ export class PetitionRepository extends BaseRepository {
         )
     );
 
-    await this.createEvent_old(
-      petitionId,
-      "COMMENT_PUBLISHED",
+    await this.createEvent(
       comments.map((comment) => ({
-        petition_field_id: comment.petition_field_id,
-        petition_field_comment_id: comment.id,
+        type: "COMMENT_PUBLISHED",
+        petitionId,
+        data: {
+          petition_field_id: comment.petition_field_id,
+          petition_field_comment_id: comment.id,
+        },
       }))
     );
     return { comments, accesses };
@@ -1965,12 +1981,14 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      await this.createEvent_old(
-        petitionId,
-        "COMMENT_PUBLISHED",
+      await this.createEvent(
         comments.map((comment) => ({
-          petition_field_id: comment.petition_field_id,
-          petition_field_comment_id: comment.id,
+          type: "COMMENT_PUBLISHED",
+          petitionId,
+          data: {
+            petition_field_id: comment.petition_field_id,
+            petition_field_comment_id: comment.id,
+          },
         })),
         t
       );
