@@ -8,10 +8,6 @@ import { ArgValidationError } from "../helpers/errors";
 import { GraphQLResolveInfo } from "graphql";
 import { Maybe } from "../../util/types";
 import { toGlobalId } from "../../util/globalId";
-import { core } from "@nexus/schema";
-import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
-import { decode } from "jsonwebtoken";
-import { isDefined } from "../../util/remedaExtensions";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -74,38 +70,4 @@ export function validateArgumentIsSet(
       `Argument ${argumentsKey} is required.`
     );
   }
-}
-
-export function validateAuthToken<
-  TypeName extends string,
-  FieldName extends string
->(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>
-  ) => string | null | undefined,
-  argName: string
-) {
-  return (async (_, args, ctx, info) => {
-    const token = prop(args)!;
-
-    // check that auth token payload contains a valid petitionId
-    const payload: any = decode(token);
-    if (!isDefined(payload.petitionId)) {
-      throw new ArgValidationError(
-        info,
-        argName,
-        "auth token payload must have a 'petitionId' key"
-      );
-    }
-
-    const { petitionId } = payload;
-    const petition = await ctx.petitions.loadPetition(petitionId);
-    if (!petition) {
-      throw new ArgValidationError(
-        info,
-        "token.payload.petitionId",
-        `Can't find a petition with id ${petitionId}`
-      );
-    }
-  }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

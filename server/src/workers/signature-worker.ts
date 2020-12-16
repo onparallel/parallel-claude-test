@@ -63,13 +63,13 @@ async function startSignatureProcess(
 
     const token = ctx.security.generateAuthToken({
       petitionId: petition.id,
-      showSignatureBoxes: true,
+      petitionSignatureRequestId: signature.id,
     });
 
     const buffer = await ctx.printer.pdf(
       `http://localhost:3000/${
         petition.locale
-      }/print/petition-signature?${new URLSearchParams({ token })}`,
+      }/print/petition-pdf?${new URLSearchParams({ token })}`,
       {
         path: tmpPdfPath,
         height: "297mm",

@@ -879,7 +879,7 @@ type Petition implements PetitionBase {
   """
   The current signature request.
   """
-  currentSignatureRequest(token: String): PetitionSignatureRequest
+  currentSignatureRequest: PetitionSignatureRequest
 
   """
   The deadline of the petition.
@@ -1092,11 +1092,6 @@ The petition and a subset of some of its fields.
 type PetitionAndPartialFields {
   fields: [PetitionField!]!
   petition: Petition!
-}
-
-type PetitionAuthToken {
-  petition: Petition!
-  tokenPayload: JSONObject!
 }
 
 interface PetitionBase {
@@ -2158,7 +2153,7 @@ type Query {
   me: User!
   organization(id: GID!): Organization
   petition(id: GID!): PetitionBase
-  petitionAuthToken(token: String!): PetitionAuthToken!
+  petitionAuthToken(token: String!): Petition
 
   """
   The petitions of the user
@@ -2187,6 +2182,7 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
+  petitionSignatureRequestAuthToken(token: String!): PetitionSignatureRequest
   publicOrgLogoUrl(id: GID!): String
 
   """

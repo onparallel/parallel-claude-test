@@ -78,7 +78,7 @@ export async function petitionClosedNotification(
       const buffer = await context.printer.pdf(
         `http://localhost:3000/${
           petition.locale
-        }/print/petition-signature?${new URLSearchParams({ token })}`,
+        }/print/petition-pdf?${new URLSearchParams({ token })}`,
         {
           height: "297mm",
           width: "210mm",

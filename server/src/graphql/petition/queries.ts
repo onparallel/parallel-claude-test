@@ -5,7 +5,6 @@ import {
   stringArg,
   nonNull,
   nullable,
-  objectType,
 } from "@nexus/schema";
 import { authenticate, chain, or } from "../helpers/authorize";
 import {
@@ -102,23 +101,34 @@ export const publicTemplatesQuery = queryField((t) => {
 });
 
 export const petitionAuthToken = queryField("petitionAuthToken", {
-  type: objectType({
-    name: "PetitionAuthToken",
-    definition(t) {
-      t.nonNull.field("petition", { type: "Petition" });
-      t.nonNull.jsonObject("tokenPayload");
-    },
-  }),
+  type: nullable("Petition"),
   args: {
     token: nonNull(stringArg()),
   },
   authorize: (_, { token }, ctx) => ctx.security.verifyAuthToken(token),
-  validateArgs: validateAuthToken((args) => args.token, "token"),
   resolve: async (_, { token }, ctx) => {
     const payload: any = decode(token);
-    return {
-      petition: (await ctx.petitions.loadPetition(payload.petitionId))!,
-      tokenPayload: payload,
-    };
+    return payload.petitionId
+      ? await ctx.petitions.loadPetition(payload.petitionId)
+      : null;
   },
 });
+
+export const petitionSignatureRequestToken = queryField(
+  "petitionSignatureRequestAuthToken",
+  {
+    type: nullable("PetitionSignatureRequest"),
+    args: {
+      token: nonNull(stringArg()),
+    },
+    authorize: (_, { token }, ctx) => ctx.security.verifyAuthToken(token),
+    resolve: async (_, { token }, ctx) => {
+      const payload: any = decode(token);
+      return payload.petitionSignatureRequestId
+        ? await ctx.petitions.loadPetitionSignatureById(
+            payload.petitionSignatureRequestId
+          )
+        : null;
+    },
+  }
+);

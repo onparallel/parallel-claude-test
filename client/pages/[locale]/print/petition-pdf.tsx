@@ -11,7 +11,7 @@ import { PdfPage } from "@parallel/components/print/PdfPage";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
 import {
   PdfViewPetitionQuery,
-  PrintPetition_PetitionFieldFragment,
+  PetitionPdf_PetitionFieldFragment,
   usePdfViewPetitionQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
@@ -20,23 +20,24 @@ import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function PrintPetition({ token }: { token: string }) {
+function PetitionPdf({ token }: { token: string }) {
   const { data } = assertQuery(
     usePdfViewPetitionQuery({
       variables: { token },
     })
   );
 
-  const { petition, tokenPayload } = data.petitionAuthToken!;
-  const { name: orgName, logoUrl: orgLogo } = petition.organization;
-
-  const signatureConfig = petition.currentSignatureRequest?.signatureConfig;
-  const contacts = signatureConfig?.contacts;
-  const { showSignatureBoxes } = tokenPayload;
+  const petition = data.petitionAuthToken;
+  const petitionSignatureRequest = data.petitionSignatureRequestAuthToken;
 
   if (!petition) {
-    throw new Error(`petition with id ${tokenPayload.petitionId} not found`);
+    throw new Error(`petition not found on auth token ${token}`);
   }
+
+  const { name: orgName, logoUrl: orgLogo } = petition.organization;
+
+  const signatureConfig = petitionSignatureRequest?.signatureConfig;
+  const contacts = signatureConfig?.contacts;
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
   const intl = useIntl();
@@ -51,7 +52,7 @@ function PrintPetition({ token }: { token: string }) {
         })
       }`,
     }));
-    return groupFieldsByPages<PrintPetition_PetitionFieldFragment>(fields);
+    return groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(fields);
   }, [petition.fields]);
 
   return (
@@ -84,7 +85,6 @@ function PrintPetition({ token }: { token: string }) {
             <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
           ))}
           {signatureConfig &&
-            showSignatureBoxes &&
             pageNum === pages.length - 1 &&
             contacts &&
             contacts.length > 0 && (
@@ -136,33 +136,18 @@ function SignatureDisclaimer(props: ExtendChakra) {
   );
 }
 
-PrintPetition.fragments = {
-  get PetitionAuthToken() {
+PetitionPdf.fragments = {
+  get Petition() {
     return gql`
-      fragment PrintPetition_PetitionAuthToken on PetitionAuthToken {
-        tokenPayload
-        petition {
-          id
+      fragment PetitionPdf_Petition on Petition {
+        id
+        name
+        fields {
+          ...PetitionPdf_PetitionField
+        }
+        organization {
           name
-          fields {
-            ...PrintPetition_PetitionField
-          }
-          organization {
-            name
-            logoUrl
-          }
-          currentSignatureRequest(token: $token) {
-            signatureConfig {
-              contacts {
-                id
-                fullName
-                email
-              }
-              provider
-              timezone
-              title
-            }
-          }
+          logoUrl
         }
       }
       ${this.PetitionField}
@@ -170,7 +155,7 @@ PrintPetition.fragments = {
   },
   get PetitionField() {
     return gql`
-      fragment PrintPetition_PetitionField on PetitionField {
+      fragment PetitionPdf_PetitionField on PetitionField {
         id
         type
         title
@@ -184,9 +169,24 @@ PrintPetition.fragments = {
       }
     `;
   },
+  get PetitionSignatureRequest() {
+    return gql`
+      fragment PetitionPdf_PetitionSignatureRequest on PetitionSignatureRequest {
+        signatureConfig {
+          contacts {
+            id
+            fullName
+            email
+          }
+          timezone
+          title
+        }
+      }
+    `;
+  },
 };
 
-PrintPetition.getInitialProps = async ({
+PetitionPdf.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
@@ -195,10 +195,14 @@ PrintPetition.getInitialProps = async ({
     gql`
       query PdfViewPetition($token: String!) {
         petitionAuthToken(token: $token) {
-          ...PrintPetition_PetitionAuthToken
+          ...PetitionPdf_Petition
+        }
+        petitionSignatureRequestAuthToken(token: $token) {
+          ...PetitionPdf_PetitionSignatureRequest
         }
       }
-      ${PrintPetition.fragments.PetitionAuthToken}
+      ${PetitionPdf.fragments.Petition}
+      ${PetitionPdf.fragments.PetitionSignatureRequest}
     `,
     {
       variables: { token },
@@ -207,4 +211,4 @@ PrintPetition.getInitialProps = async ({
   return { token };
 };
 
-export default withApolloData(PrintPetition);
+export default withApolloData(PetitionPdf);
