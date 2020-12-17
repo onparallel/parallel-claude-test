@@ -19,7 +19,7 @@ import {
   defaultFieldOptions,
   validateFieldOptions,
 } from "../helpers/fieldOptions";
-import { escapeLike } from "../helpers/utils";
+import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   Contact,
@@ -167,10 +167,7 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     opts: {
       search?: string | null;
-      sortBy?: {
-        column: keyof Petition | "last_used_at";
-        order?: "asc" | "desc";
-      }[];
+      sortBy?: SortBy<keyof Petition | "last_used_at">[];
       status?: PetitionStatus | null;
       type?: PetitionType;
       locale?: "en" | "es" | null;
@@ -227,9 +224,7 @@ export class PetitionRepository extends BaseRepository {
               "petition.id"
             ).orderByRaw(
               opts
-                .sortBy!.map(
-                  ({ column, order }) => `${column} ${order} NULLS LAST`
-                )
+                .sortBy!.map((s) => `${s.column} ${s.order} NULLS LAST`)
                 .join(", ")
             );
           } else if (opts.sortBy?.length) {

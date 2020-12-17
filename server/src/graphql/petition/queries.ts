@@ -13,6 +13,7 @@ import {
 } from "./authorizers";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { decode } from "jsonwebtoken";
+import { parseSortBy } from "../helpers/paginationPlugin";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -52,11 +53,8 @@ export const petitionsQuery = queryField((t) => {
         locale,
         type: type || "PETITION",
         sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
-          const [field, order] = value.split("_");
-          return {
-            column: columnMap[field as keyof typeof columnMap],
-            order: order.toLowerCase() as "asc" | "desc",
-          };
+          const [field, order] = parseSortBy(value);
+          return { column: columnMap[field], order };
         }),
         limit,
       });

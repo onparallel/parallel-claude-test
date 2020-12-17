@@ -16,6 +16,18 @@ import { omit } from "remeda";
 import { KeysOfType } from "../../util/types";
 import { ArgValidationError } from "./errors";
 
+export function parseSortBy<T extends string>(
+  key: T
+): T extends `${infer U}_${"ASC" | "DESC"}` ? [U, "asc" | "desc"] : never {
+  if (key.endsWith("_ASC")) {
+    return [key.slice(0, -4), "asc"] as any;
+  } else if (key.endsWith("_DESC")) {
+    return [key.slice(0, -5), "desc"] as any;
+  } else {
+    throw new Error("This shouldn't happen as GraphQL validates the arguments");
+  }
+}
+
 export type PaginationPluginConfig = {};
 
 type ObjectOrInterfaceNames =

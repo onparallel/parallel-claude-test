@@ -10,7 +10,7 @@ import { keyBuilder } from "../../util/keyBuilder";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike } from "../helpers/utils";
+import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   Contact,
@@ -86,10 +86,7 @@ export class ContactRepository extends BaseRepository {
     user: User,
     opts: {
       search?: string | null;
-      sortBy?: {
-        column: keyof Contact | QueryBuilder;
-        order?: "asc" | "desc";
-      }[];
+      sortBy?: SortBy<keyof Contact>[];
       excludeIds?: number[] | null;
     } & PageOpts
   ) {
@@ -113,8 +110,11 @@ export class ContactRepository extends BaseRepository {
           if (excludeIds) {
             q.whereNotIn("id", excludeIds);
           }
-          q.orderBy(opts.sortBy ?? ["id"]);
+          if (opts.sortBy?.length) {
+            q.orderBy(opts.sortBy);
+          }
         })
+        .orderBy("id")
         .select("*"),
       opts
     );
