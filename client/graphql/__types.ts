@@ -671,6 +671,8 @@ export type Organization = Timestamps & {
   status: OrganizationStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+  /** The total number of users */
+  userCount: Scalars["Int"];
   /** The users in the organization. */
   users: UserPagination;
 };
@@ -686,6 +688,14 @@ export type OrganizationusersArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+};
+
+export type OrganizationPagination = {
+  __typename?: "OrganizationPagination";
+  /** The requested slice of items. */
+  items: Array<Organization>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 };
 
 /** The roles of a user within an organization. */
@@ -1386,6 +1396,8 @@ export type Query = {
   globalIdEncode: SupportMethodResponse;
   me: User;
   organization?: Maybe<Organization>;
+  /** The organizations registered in Parallel. */
+  organizations: OrganizationPagination;
   petition?: Maybe<PetitionBase>;
   petitionAuthToken?: Maybe<Petition>;
   /** The petitions of the user */
@@ -1422,6 +1434,14 @@ export type QueryglobalIdEncodeArgs = {
 
 export type QueryorganizationArgs = {
   id: Scalars["GID"];
+};
+
+export type QueryorganizationsArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
+  status?: Maybe<OrganizationStatus>;
 };
 
 export type QuerypetitionArgs = {
@@ -1465,6 +1485,13 @@ export type QueryContacts_OrderBy =
   | "fullName_DESC"
   | "lastName_ASC"
   | "lastName_DESC";
+
+/** Order to use on Query.organizations */
+export type QueryOrganizations_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
 
 /** Order to use on Query.petitions */
 export type QueryPetitions_OrderBy =
@@ -3021,14 +3048,56 @@ export type AdminQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & Admin_UserFragment;
 };
 
-export type SupportMethods_UserFragment = {
+export type AdminOrganizations_OrganizationFragment = {
+  __typename?: "Organization";
+} & Pick<
+  Organization,
+  "id" | "name" | "identifier" | "status" | "userCount" | "createdAt"
+>;
+
+export type AdminOrganizations_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
 
-export type SupportMethodsUserQueryVariables = Exact<{ [key: string]: never }>;
+export type AdminOrganizationsQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
+  status?: Maybe<OrganizationStatus>;
+}>;
 
-export type SupportMethodsUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & SupportMethods_UserFragment;
+export type AdminOrganizationsQuery = { __typename?: "Query" } & {
+  organizations: { __typename?: "OrganizationPagination" } & Pick<
+    OrganizationPagination,
+    "totalCount"
+  > & {
+      items: Array<
+        {
+          __typename?: "Organization";
+        } & AdminOrganizations_OrganizationFragment
+      >;
+    };
+};
+
+export type AdminOrganizationsUserQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type AdminOrganizationsUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & AdminOrganizations_UserFragment;
+};
+
+export type AdminSupportMethods_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment;
+
+export type AdminSupportMethodsUserQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type AdminSupportMethodsUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & AdminSupportMethods_UserFragment;
 };
 
 export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
@@ -4640,8 +4709,24 @@ export const Admin_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
-export const SupportMethods_UserFragmentDoc = gql`
-  fragment SupportMethods_User on User {
+export const AdminOrganizations_OrganizationFragmentDoc = gql`
+  fragment AdminOrganizations_Organization on Organization {
+    id
+    name
+    identifier
+    status
+    userCount
+    createdAt
+  }
+`;
+export const AdminOrganizations_UserFragmentDoc = gql`
+  fragment AdminOrganizations_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+export const AdminSupportMethods_UserFragmentDoc = gql`
+  fragment AdminSupportMethods_User on User {
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
@@ -6793,57 +6878,181 @@ export function useAdminLazyQuery(
 }
 export type AdminQueryHookResult = ReturnType<typeof useAdminQuery>;
 export type AdminLazyQueryHookResult = ReturnType<typeof useAdminLazyQuery>;
-export const SupportMethodsUserDocument = gql`
-  query SupportMethodsUser {
-    me {
-      ...SupportMethods_User
+export const AdminOrganizationsDocument = gql`
+  query AdminOrganizations(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryOrganizations_OrderBy!]
+    $status: OrganizationStatus
+  ) {
+    organizations(
+      offset: $offset
+      limit: $limit
+      search: $search
+      sortBy: $sortBy
+      status: $status
+    ) {
+      totalCount
+      items {
+        ...AdminOrganizations_Organization
+      }
     }
   }
-  ${SupportMethods_UserFragmentDoc}
+  ${AdminOrganizations_OrganizationFragmentDoc}
 `;
 
 /**
- * __useSupportMethodsUserQuery__
+ * __useAdminOrganizationsQuery__
  *
- * To run a query within a React component, call `useSupportMethodsUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useSupportMethodsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useAdminOrganizationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminOrganizationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useSupportMethodsUserQuery({
+ * const { data, loading, error } = useAdminOrganizationsQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *      sortBy: // value for 'sortBy'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useAdminOrganizationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AdminOrganizationsQuery,
+    AdminOrganizationsQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    AdminOrganizationsQuery,
+    AdminOrganizationsQueryVariables
+  >(AdminOrganizationsDocument, baseOptions);
+}
+export function useAdminOrganizationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AdminOrganizationsQuery,
+    AdminOrganizationsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    AdminOrganizationsQuery,
+    AdminOrganizationsQueryVariables
+  >(AdminOrganizationsDocument, baseOptions);
+}
+export type AdminOrganizationsQueryHookResult = ReturnType<
+  typeof useAdminOrganizationsQuery
+>;
+export type AdminOrganizationsLazyQueryHookResult = ReturnType<
+  typeof useAdminOrganizationsLazyQuery
+>;
+export const AdminOrganizationsUserDocument = gql`
+  query AdminOrganizationsUser {
+    me {
+      ...AdminOrganizations_User
+    }
+  }
+  ${AdminOrganizations_UserFragmentDoc}
+`;
+
+/**
+ * __useAdminOrganizationsUserQuery__
+ *
+ * To run a query within a React component, call `useAdminOrganizationsUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminOrganizationsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminOrganizationsUserQuery({
  *   variables: {
  *   },
  * });
  */
-export function useSupportMethodsUserQuery(
+export function useAdminOrganizationsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    SupportMethodsUserQuery,
-    SupportMethodsUserQueryVariables
+    AdminOrganizationsUserQuery,
+    AdminOrganizationsUserQueryVariables
   >
 ) {
   return Apollo.useQuery<
-    SupportMethodsUserQuery,
-    SupportMethodsUserQueryVariables
-  >(SupportMethodsUserDocument, baseOptions);
+    AdminOrganizationsUserQuery,
+    AdminOrganizationsUserQueryVariables
+  >(AdminOrganizationsUserDocument, baseOptions);
 }
-export function useSupportMethodsUserLazyQuery(
+export function useAdminOrganizationsUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    SupportMethodsUserQuery,
-    SupportMethodsUserQueryVariables
+    AdminOrganizationsUserQuery,
+    AdminOrganizationsUserQueryVariables
   >
 ) {
   return Apollo.useLazyQuery<
-    SupportMethodsUserQuery,
-    SupportMethodsUserQueryVariables
-  >(SupportMethodsUserDocument, baseOptions);
+    AdminOrganizationsUserQuery,
+    AdminOrganizationsUserQueryVariables
+  >(AdminOrganizationsUserDocument, baseOptions);
 }
-export type SupportMethodsUserQueryHookResult = ReturnType<
-  typeof useSupportMethodsUserQuery
+export type AdminOrganizationsUserQueryHookResult = ReturnType<
+  typeof useAdminOrganizationsUserQuery
 >;
-export type SupportMethodsUserLazyQueryHookResult = ReturnType<
-  typeof useSupportMethodsUserLazyQuery
+export type AdminOrganizationsUserLazyQueryHookResult = ReturnType<
+  typeof useAdminOrganizationsUserLazyQuery
+>;
+export const AdminSupportMethodsUserDocument = gql`
+  query AdminSupportMethodsUser {
+    me {
+      ...AdminSupportMethods_User
+    }
+  }
+  ${AdminSupportMethods_UserFragmentDoc}
+`;
+
+/**
+ * __useAdminSupportMethodsUserQuery__
+ *
+ * To run a query within a React component, call `useAdminSupportMethodsUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdminSupportMethodsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdminSupportMethodsUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAdminSupportMethodsUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    AdminSupportMethodsUserQuery,
+    AdminSupportMethodsUserQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    AdminSupportMethodsUserQuery,
+    AdminSupportMethodsUserQueryVariables
+  >(AdminSupportMethodsUserDocument, baseOptions);
+}
+export function useAdminSupportMethodsUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AdminSupportMethodsUserQuery,
+    AdminSupportMethodsUserQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    AdminSupportMethodsUserQuery,
+    AdminSupportMethodsUserQueryVariables
+  >(AdminSupportMethodsUserDocument, baseOptions);
+}
+export type AdminSupportMethodsUserQueryHookResult = ReturnType<
+  typeof useAdminSupportMethodsUserQuery
+>;
+export type AdminSupportMethodsUserLazyQueryHookResult = ReturnType<
+  typeof useAdminSupportMethodsUserLazyQuery
 >;
 export const Contact_updateContactDocument = gql`
   mutation Contact_updateContact($id: GID!, $data: UpdateContactInput!) {

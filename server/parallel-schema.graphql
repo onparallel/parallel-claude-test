@@ -783,6 +783,11 @@ type Organization implements Timestamps {
   updatedAt: DateTime!
 
   """
+  The total number of users
+  """
+  userCount: Int!
+
+  """
   The users in the organization.
   """
   users(
@@ -803,6 +808,18 @@ type Organization implements Timestamps {
     """
     search: String
   ): UserPagination!
+}
+
+type OrganizationPagination {
+  """
+  The requested slice of items.
+  """
+  items: [Organization!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 """
@@ -2152,6 +2169,36 @@ type Query {
   ): SupportMethodResponse!
   me: User!
   organization(id: GID!): Organization
+
+  """
+  The organizations registered in Parallel.
+  """
+  organizations(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryOrganizations_OrderBy!]
+
+    """
+    Optional status to filter for.
+    """
+    status: OrganizationStatus
+  ): OrganizationPagination!
   petition(id: GID!): PetitionBase
   petitionAuthToken(token: String!): Petition
 
@@ -2220,6 +2267,16 @@ enum QueryContacts_OrderBy {
   fullName_DESC
   lastName_ASC
   lastName_DESC
+}
+
+"""
+Order to use on Query.organizations
+"""
+enum QueryOrganizations_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  name_ASC
+  name_DESC
 }
 
 """

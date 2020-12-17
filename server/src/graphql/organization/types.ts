@@ -1,7 +1,7 @@
 import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
 import { titleize } from "../../util/strings";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { belongsToOrg } from "./authorizers";
+import { isOwnOrgOrSuperAdmin } from "./authorizers";
 
 export const OrganizationStatus = enumType({
   name: "OrganizationStatus",
@@ -50,7 +50,7 @@ export const Organization = objectType({
     });
     t.string("identifier", {
       description: "The unique text identifier of the organization.",
-      authorize: belongsToOrg(),
+      authorize: isOwnOrgOrSuperAdmin(),
     });
     t.nullable.string("logoUrl", {
       description: "URL of the organization logo",
@@ -61,25 +61,31 @@ export const Organization = objectType({
     t.field("status", {
       type: "OrganizationStatus",
       description: "The status of the organization.",
-      authorize: belongsToOrg(),
+      authorize: isOwnOrgOrSuperAdmin(),
     });
-    t.paginationField("users", {
-      type: "User",
-      description: "The users in the organization.",
-      searchable: true,
-      authorize: belongsToOrg(),
-      additionalArgs: {
-        exclude: list(nonNull(globalIdArg("User"))),
-      },
-      resolve: async (root, { offset, limit, search, exclude }, ctx) => {
-        return await ctx.organizations.loadOrgUsers(root.id, {
-          offset,
-          limit,
-          search,
-          excludeIds: exclude,
-        });
-      },
-    });
+    t.int("userCount", {
+      description: "The total number of users",
+      authorize: isOwnOrgOrSuperAdmin(),
+      resolve: async (root, _, ctx) =>
+        await ctx.organizations.loadUserCount(root.id),
+    }),
+      t.paginationField("users", {
+        type: "User",
+        description: "The users in the organization.",
+        searchable: true,
+        authorize: isOwnOrgOrSuperAdmin(),
+        additionalArgs: {
+          exclude: list(nonNull(globalIdArg("User"))),
+        },
+        resolve: async (root, { offset, limit, search, exclude }, ctx) => {
+          return await ctx.organizations.loadOrgUsers(root.id, {
+            offset,
+            limit,
+            search,
+            excludeIds: exclude,
+          });
+        },
+      });
     t.list.nonNull.field("integrations", {
       type: "OrgIntegration",
       args: {
@@ -88,6 +94,7 @@ export const Organization = objectType({
           description: "Filter by integration type.",
         }),
       },
+      authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, { type }, ctx) => {
         const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
           root.id

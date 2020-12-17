@@ -180,7 +180,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           key: "createdAt",
           isSortable: true,
           header: intl.formatMessage({
-            id: "petitions.header.created-at",
+            id: "generic.created-at",
             defaultMessage: "Created at",
           }),
           cellProps: { width: "1%" },

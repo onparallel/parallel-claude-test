@@ -265,7 +265,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
         key: "createdAt",
         isSortable: true,
         header: intl.formatMessage({
-          id: "contacts.header.created-at",
+          id: "generic.created-at",
           defaultMessage: "Created at",
         }),
         CellContent: ({ row: { createdAt } }) => (

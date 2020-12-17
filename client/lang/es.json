@@ -1,5 +1,10 @@
 [
   {
+    "term": "admin.organizations",
+    "definition": "Organizaciones",
+    "context": "Organizations"
+  },
+  {
     "term": "admin.support-methods",
     "definition": "Métodos de soporte",
     "context": "Support methods"
@@ -785,11 +790,6 @@
     "context": "Enter the contact details"
   },
   {
-    "term": "contacts.header.created-at",
-    "definition": "Fecha de creación",
-    "context": "Created at"
-  },
-  {
     "term": "contacts.header.email",
     "definition": "Correo electrónico",
     "context": "Email"
@@ -1028,6 +1028,11 @@
     "term": "generic.continue",
     "definition": "Continuar",
     "context": "Continue"
+  },
+  {
+    "term": "generic.created-at",
+    "definition": "Fecha de creación",
+    "context": "Created at"
   },
   {
     "term": "generic.delete",
@@ -1595,6 +1600,26 @@
     "context": "New petition"
   },
   {
+    "term": "organizations.header.identifier",
+    "definition": "Identificador",
+    "context": "Identifier"
+  },
+  {
+    "term": "organizations.header.organization-name",
+    "definition": "Nombre de la organización",
+    "context": "Organization name"
+  },
+  {
+    "term": "organizations.header.status",
+    "definition": "Estado",
+    "context": "Status"
+  },
+  {
+    "term": "organizations.header.user-count",
+    "definition": "Usuarios",
+    "context": "Users"
+  },
+  {
     "term": "petition-access.header",
     "definition": "Control de acceso",
     "context": "Petition access control"
@@ -1618,11 +1643,6 @@
     "term": "petition-accesses.contact-header",
     "definition": "Contacto",
     "context": "Contact"
-  },
-  {
-    "term": "petition-accesses.created-at-header",
-    "definition": "Fecha de creación",
-    "context": "Created at"
   },
   {
     "term": "petition-accesses.deactivate-access",
@@ -2473,11 +2493,6 @@
     "term": "petitions.confirm-delete.header",
     "definition": "Eliminar peticiones",
     "context": "Delete petitions"
-  },
-  {
-    "term": "petitions.header.created-at",
-    "definition": "Fecha de creación",
-    "context": "Created at"
   },
   {
     "term": "petitions.header.description",

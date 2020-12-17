@@ -146,3 +146,19 @@ export function ifArgEquals<
     return true;
   };
 }
+
+export function userIsSuperAdmin<
+  TypeName extends string,
+  FieldName extends string
+>(): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const user = ctx.user!;
+      const org = await ctx.organizations.loadOrg(user.org_id);
+      return (
+        org!.identifier === "parallel" && user.organization_role === "ADMIN"
+      );
+    } catch {}
+    return false;
+  };
+}

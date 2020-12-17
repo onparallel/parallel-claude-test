@@ -275,7 +275,7 @@ function usePetitionAccessesColumns(): TableColumn<
       {
         key: "createdAt",
         header: intl.formatMessage({
-          id: "petition-accesses.created-at-header",
+          id: "generic.created-at",
           defaultMessage: "Created at",
         }),
         CellContent: ({ row: { createdAt } }) => (

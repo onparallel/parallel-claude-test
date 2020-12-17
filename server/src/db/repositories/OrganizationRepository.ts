@@ -5,9 +5,14 @@ import { Config, CONFIG } from "../../config";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import { escapeLike } from "../helpers/utils";
+import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
-import { CreateOrganization, User } from "../__types";
+import {
+  CreateOrganization,
+  Organization,
+  OrganizationStatus,
+  User,
+} from "../__types";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
@@ -54,6 +59,10 @@ export class OrganizationRepository extends BaseRepository {
     );
   }
 
+  readonly loadUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
+    q.whereNull("deleted_at")
+  );
+
   readonly getOrgLogoUrl = fromDataLoader(
     new DataLoader<number, Maybe<string>>(async (orgIds) => {
       const orgs = await this.loadOrg(orgIds);
@@ -96,5 +105,33 @@ export class OrganizationRepository extends BaseRepository {
       updated_by: `User:${user.id}`,
     });
     return org;
+  }
+
+  async loadOrganizations(
+    opts: {
+      search?: string | null;
+      sortBy?: SortBy<keyof Organization>[];
+      status?: OrganizationStatus | null;
+    } & PageOpts
+  ) {
+    return await this.loadPageAndCount(
+      this.from("organization")
+        .whereNull("deleted_at")
+        .mmodify((q) => {
+          const { search, status, sortBy } = opts;
+          if (search) {
+            q.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
+          }
+          if (status) {
+            q.where("status", status);
+          }
+          if (sortBy) {
+            q.orderBy(sortBy);
+          }
+        })
+        .orderBy("id")
+        .select("*"),
+      opts
+    );
   }
 }

@@ -13,8 +13,8 @@ import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdmin
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
-  SupportMethodsUserQuery,
-  useSupportMethodsUserQuery,
+  AdminSupportMethodsUserQuery,
+  useAdminSupportMethodsUserQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -24,21 +24,24 @@ import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-type SupportMethodsProps = Exclude<
-  UnwrapPromise<ReturnType<typeof SupportMethods.getInitialProps>>,
+type AdminSupportMethodsProps = Exclude<
+  UnwrapPromise<ReturnType<typeof AdminSupportMethods.getInitialProps>>,
   undefined
 >;
 
-function SupportMethods({ supportMethods, schemaTypes }: SupportMethodsProps) {
+function AdminSupportMethods({
+  supportMethods,
+  schemaTypes,
+}: AdminSupportMethodsProps) {
   const intl = useIntl();
   const {
     data: { me },
-  } = assertQuery(useSupportMethodsUserQuery());
+  } = assertQuery(useAdminSupportMethodsUserQuery());
   const sections = useAdminSections();
 
   const [search, setSearch] = useState("");
 
-  const filteredSupportMethods = useMemo(() => {
+  const filteredAdminSupportMethods = useMemo(() => {
     return supportMethods.filter(({ field }) => {
       return (
         unCamelCase(field.name).toLowerCase().includes(search.toLowerCase()) ||
@@ -78,7 +81,7 @@ function SupportMethods({ supportMethods, schemaTypes }: SupportMethodsProps) {
           />
         </Box>
         <Stack>
-          {filteredSupportMethods.map((method) => (
+          {filteredAdminSupportMethods.map((method) => (
             <Card
               key={method.field.name}
               display="flex"
@@ -126,10 +129,10 @@ function SupportMethods({ supportMethods, schemaTypes }: SupportMethodsProps) {
   );
 }
 
-SupportMethods.fragments = {
+AdminSupportMethods.fragments = {
   get User() {
     return gql`
-      fragment SupportMethods_User on User {
+      fragment AdminSupportMethods_User on User {
         ...AppLayout_User
       }
       ${AppLayout.fragments.User}
@@ -137,17 +140,17 @@ SupportMethods.fragments = {
   },
 };
 
-SupportMethods.getInitialProps = async ({
+AdminSupportMethods.getInitialProps = async ({
   fetchQuery,
 }: WithApolloDataContext) => {
   await Promise.all([
-    fetchQuery<SupportMethodsUserQuery>(gql`
-      query SupportMethodsUser {
+    fetchQuery<AdminSupportMethodsUserQuery>(gql`
+      query AdminSupportMethodsUser {
         me {
-          ...SupportMethods_User
+          ...AdminSupportMethods_User
         }
       }
-      ${SupportMethods.fragments.User}
+      ${AdminSupportMethods.fragments.User}
     `),
   ]);
   const { supportMethods, schemaTypes } = await import(
@@ -160,4 +163,4 @@ export default compose(
   withSuperAdminAccess,
   withDialogs,
   withApolloData
-)(SupportMethods);
+)(AdminSupportMethods);

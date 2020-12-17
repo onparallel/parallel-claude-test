@@ -7,6 +7,13 @@ export function useAdminSections() {
     () => [
       {
         title: intl.formatMessage({
+          id: "admin.organizations",
+          defaultMessage: "Organizations",
+        }),
+        path: "/app/admin/organizations",
+      },
+      {
+        title: intl.formatMessage({
           id: "admin.support-methods",
           defaultMessage: "Support methods",
         }),

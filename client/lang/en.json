@@ -1,5 +1,10 @@
 [
   {
+    "term": "admin.organizations",
+    "definition": "Organizations",
+    "context": "Organizations"
+  },
+  {
     "term": "admin.support-methods",
     "definition": "Support methods",
     "context": "Support methods"
@@ -785,11 +790,6 @@
     "context": "Enter the contact details"
   },
   {
-    "term": "contacts.header.created-at",
-    "definition": "Created at",
-    "context": "Created at"
-  },
-  {
     "term": "contacts.header.email",
     "definition": "Email",
     "context": "Email"
@@ -1028,6 +1028,11 @@
     "term": "generic.continue",
     "definition": "Continue",
     "context": "Continue"
+  },
+  {
+    "term": "generic.created-at",
+    "definition": "Created at",
+    "context": "Created at"
   },
   {
     "term": "generic.delete",
@@ -1595,6 +1600,26 @@
     "context": "New petition"
   },
   {
+    "term": "organizations.header.identifier",
+    "definition": "Identifier",
+    "context": "Identifier"
+  },
+  {
+    "term": "organizations.header.organization-name",
+    "definition": "Organization name",
+    "context": "Organization name"
+  },
+  {
+    "term": "organizations.header.status",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
+    "term": "organizations.header.user-count",
+    "definition": "Users",
+    "context": "Users"
+  },
+  {
     "term": "petition-access.header",
     "definition": "Petition access control",
     "context": "Petition access control"
@@ -1618,11 +1643,6 @@
     "term": "petition-accesses.contact-header",
     "definition": "Contact",
     "context": "Contact"
-  },
-  {
-    "term": "petition-accesses.created-at-header",
-    "definition": "Created at",
-    "context": "Created at"
   },
   {
     "term": "petition-accesses.deactivate-access",
@@ -2473,11 +2493,6 @@
     "term": "petitions.confirm-delete.header",
     "definition": "Delete petitions",
     "context": "Delete petitions"
-  },
-  {
-    "term": "petitions.header.created-at",
-    "definition": "Created at",
-    "context": "Created at"
   },
   {
     "term": "petitions.header.description",

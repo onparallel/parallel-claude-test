@@ -190,6 +190,11 @@ export interface NexusGenEnums {
     | "fullName_DESC"
     | "lastName_ASC"
     | "lastName_DESC";
+  QueryOrganizations_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
+    | "name_ASC"
+    | "name_DESC";
   QueryPetitions_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -241,6 +246,11 @@ export interface NexusGenObjects {
   Mutation: {};
   OrgIntegration: db.OrgIntegration;
   Organization: db.Organization;
+  OrganizationPagination: {
+    // root type
+    items: NexusGenRootTypes["Organization"][]; // [Organization!]!
+    totalCount: number; // Int!
+  };
   OwnershipTransferredEvent: events.OwnershipTransferredEvent;
   Petition: db.Petition;
   PetitionAccess: db.PetitionAccess;
@@ -568,7 +578,13 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+    userCount: number; // Int!
     users: NexusGenRootTypes["UserPagination"]; // UserPagination!
+  };
+  OrganizationPagination: {
+    // field return type
+    items: NexusGenRootTypes["Organization"][]; // [Organization!]!
+    totalCount: number; // Int!
   };
   OwnershipTransferredEvent: {
     // field return type
@@ -890,6 +906,7 @@ export interface NexusGenFieldTypes {
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
+    organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
@@ -1215,7 +1232,13 @@ export interface NexusGenFieldTypeNames {
     name: "String";
     status: "OrganizationStatus";
     updatedAt: "DateTime";
+    userCount: "Int";
     users: "UserPagination";
+  };
+  OrganizationPagination: {
+    // field return type name
+    items: "Organization";
+    totalCount: "Int";
   };
   OwnershipTransferredEvent: {
     // field return type name
@@ -1535,6 +1558,7 @@ export interface NexusGenFieldTypeNames {
     globalIdEncode: "SupportMethodResponse";
     me: "User";
     organization: "Organization";
+    organizations: "OrganizationPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
     petitions: "PetitionBasePagination";
@@ -2105,6 +2129,14 @@ export interface NexusGenArgTypes {
     organization: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    organizations: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+      sortBy?: NexusGenEnums["QueryOrganizations_OrderBy"][] | null; // [QueryOrganizations_OrderBy!]
+      status?: NexusGenEnums["OrganizationStatus"] | null; // OrganizationStatus
     };
     petition: {
       // args
