@@ -33,7 +33,8 @@ export const createContact = mutationField("createContact", {
           first_name: firstName || null,
           last_name: lastName || null,
         },
-        ctx.user!
+        ctx.user!,
+        `User:${ctx.user!.id}`
       );
     } catch (error) {
       if (error?.constraint === "contact__org_id__email") {

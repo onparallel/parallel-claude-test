@@ -46,7 +46,8 @@ export type PetitionEventType =
   | "PETITION_REOPENED"
   | "SIGNATURE_STARTED"
   | "SIGNATURE_COMPLETED"
-  | "SIGNATURE_CANCELLED";
+  | "SIGNATURE_CANCELLED"
+  | "ACCESS_DELEGATED";
 
 export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
 

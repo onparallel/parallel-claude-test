@@ -20,6 +20,8 @@ export const PetitionEvent = interfaceType({
         return "AccessDeactivatedEvent";
       case "ACCESS_OPENED":
         return "AccessOpenedEvent";
+      case "ACCESS_DELEGATED":
+        return "AccessDelegatedEvent";
       case "MESSAGE_SCHEDULED":
         return "MessageScheduledEvent";
       case "MESSAGE_CANCELLED":
@@ -142,6 +144,24 @@ export const AccessOpenedEvent = createPetitionEvent(
       type: "PetitionAccess",
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
+);
+
+export const AccessDelegatedEvent = createPetitionEvent(
+  "AccessDelegatedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.nullable.field("contact", {
+      type: "Contact",
+      resolve: async (root, _, ctx) => {
+        return await ctx.contacts.loadContact(root.data.contact_id);
       },
     });
   }

@@ -97,7 +97,7 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(fieldIds).size;
   }
 
-  async accesessBelongToPetition(petitionId: number, accessIds: number[]) {
+  async accessesBelongToPetition(petitionId: number, accessIds: number[]) {
     const [{ count }] = await this.from("petition_access")
       .where({
         petition_id: petitionId,
@@ -348,6 +348,25 @@ export class PetitionRepository extends BaseRepository {
       }))
     );
     return rows;
+  }
+
+  async createAccessFromRecipient(
+    petitionId: number,
+    granterId: number,
+    contactId: number,
+    recipient: Contact
+  ) {
+    const [access] = await this.insert("petition_access", {
+      petition_id: petitionId,
+      granter_id: granterId,
+      contact_id: contactId,
+      keycode: random(16),
+      status: "ACTIVE",
+      created_by: `Contact:${recipient.id}`,
+      updated_by: `Contact:${recipient.id}`,
+    }).returning("*");
+
+    return access;
   }
 
   readonly loadMessage = this.buildLoadById("petition_message", "id");

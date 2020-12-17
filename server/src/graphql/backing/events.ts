@@ -9,6 +9,10 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   ACCESS_ACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_DEACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_OPENED: { petition_access_id: number };
+  ACCESS_DELEGATED: {
+    petition_access_id: number;
+    contact_id: number;
+  };
   MESSAGE_SCHEDULED: { petition_message_id: number };
   MESSAGE_CANCELLED: { petition_message_id: number; user_id: number };
   MESSAGE_SENT: { petition_message_id: number };
@@ -90,6 +94,7 @@ export type PetitionCompletedEvent = GenericPetitionEvent<"PETITION_COMPLETED">;
 export type AccessActivatedEvent = GenericPetitionEvent<"ACCESS_ACTIVATED">;
 export type AccessDeactivatedEvent = GenericPetitionEvent<"ACCESS_DEACTIVATED">;
 export type AccessOpenedEvent = GenericPetitionEvent<"ACCESS_OPENED">;
+export type AccessDelegatedEvent = GenericPetitionEvent<"ACCESS_DELEGATED">;
 export type MessageScheduledEvent = GenericPetitionEvent<"MESSAGE_SCHEDULED">;
 export type MessageCancelledEvent = GenericPetitionEvent<"MESSAGE_CANCELLED">;
 export type MessageSentEvent = GenericPetitionEvent<"MESSAGE_SENT">;
@@ -116,6 +121,7 @@ export type PetitionEvent =
   | AccessActivatedEvent
   | AccessDeactivatedEvent
   | AccessOpenedEvent
+  | AccessDelegatedEvent
   | MessageScheduledEvent
   | MessageCancelledEvent
   | MessageSentEvent

@@ -37,6 +37,7 @@ import {
 } from "@parallel/components/recipient-view/RecipientViewPetitionField";
 import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
+import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
   CreateFileUploadReplyInput,
@@ -493,6 +494,11 @@ function RecipientView({
               top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
             >
               <RecipientViewSenderCard sender={granter} />
+              <RecipientViewContactCard
+                contact={contact}
+                keycode={keycode}
+                organizationName={granter.organization.name}
+              />
               {petition.isRecipientViewContentsHidden ? null : (
                 <RecipientViewContentsCard
                   currentPage={currentPage}
@@ -644,11 +650,12 @@ RecipientView.fragments = {
           ...RecipientView_PublicUser
         }
         contact {
-          id
+          ...RecipientViewContactCard_PublicContact
         }
       }
       ${this.PublicPetition}
       ${this.PublicUser}
+      ${RecipientViewContactCard.fragments.PublicContact}
     `;
   },
   get PublicPetition() {

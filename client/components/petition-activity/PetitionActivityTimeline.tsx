@@ -25,6 +25,7 @@ import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopen
 import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
 import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
 import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
+import { TimelineAccessDelegatedEvent } from "./timeline/TimelineAccessDelegatedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -111,6 +112,8 @@ export function PetitionActivityTimeline({
               <TimelineSignatureCompletedEvent event={event} />
             ) : event.__typename === "SignatureCancelledEvent" ? (
               <TimelineSignatureCancelledEvent event={event} userId={userId} />
+            ) : event.__typename === "AccessDelegatedEvent" ? (
+              <TimelineAccessDelegatedEvent event={event} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -204,6 +207,9 @@ PetitionActivityTimeline.fragments = {
       ... on SignatureCancelledEvent {
         ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
       }
+      ... on AccessDelegatedEvent {
+        ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -228,5 +234,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelineSignatureStartedEvent.fragments.SignatureStartedEvent}
     ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}
     ${TimelineSignatureCancelledEvent.fragments.SignatureCancelledEvent}
+    ${TimelineAccessDelegatedEvent.fragments.AccessDelegatedEvent}
   `,
 };

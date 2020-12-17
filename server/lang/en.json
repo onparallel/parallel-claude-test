@@ -1,5 +1,15 @@
 [
   {
+    "term": "access-delegated-email.subject",
+    "definition": "You have a message from {senderName}",
+    "context": "You have a message from {senderName}"
+  },
+  {
+    "term": "access-delegated.text",
+    "definition": "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):",
+    "context": "{senderName} ({senderEmail}) has asked you to complete the information requested by {petitionOwnerFullName} ({petitionOwnerEmail}):"
+  },
+  {
     "term": "closing.formal.regards",
     "definition": "Best regards.",
     "context": "Best regards."

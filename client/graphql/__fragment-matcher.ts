@@ -11,6 +11,7 @@ const result: PossibleTypesResultData = {
     PetitionEvent: [
       "AccessActivatedEvent",
       "AccessDeactivatedEvent",
+      "AccessDelegatedEvent",
       "AccessOpenedEvent",
       "CommentDeletedEvent",
       "CommentPublishedEvent",

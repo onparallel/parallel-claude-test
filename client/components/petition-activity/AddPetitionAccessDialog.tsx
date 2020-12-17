@@ -200,6 +200,7 @@ export function AddPetitionAccessDialog({
           ) : null}
           <Box marginTop={2}>
             <MessageEmailEditor
+              showSubject={true}
               showErrors={showErrors}
               subject={subject}
               body={body}

@@ -1,0 +1,63 @@
+{
+  "title": "Access Delegated Email",
+  "stories": [
+    {
+      "name": "Access Delegated Email",
+      "parameters": {
+        "server": {
+          "id": "AccessDelegatedEmail"
+        }
+      },
+      "args": {
+        "fullName": "Derek Lou",
+        "senderName": "Santi",
+        "senderEmail": "santi@parallel.so",
+        "petitionOwnerFullName": "Mariano Rodriguez",
+        "petitionOwnerEmail": "mariano@parallel.so",
+        "body": [
+          {
+            "children": [
+              { "text": "hola Derek, ayudame a completar esto porfa" }
+            ]
+          }
+        ],
+        "deadline": "2022-12-11T17:29:24.601Z",
+        "fields": [
+          { "position": 1, "id": 1223, "title": "DNI", "type": "TEXT" },
+          {
+            "position": 2,
+            "id": 235,
+            "title": "Escrituras",
+            "type": "FILE_UPLOAD"
+          },
+          {
+            "position": 3,
+            "id": 345,
+            "title": "Certificado de rentas del trabajo",
+            "type": "FILE_UPLOAD"
+          }
+        ],
+        "keycode": "asdfghjkl",
+        "parallelUrl": "https://staging.parallel.so",
+        "assetsUrl": "https://static-staging.parallel.so",
+        "logoUrl": "http://localhost/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "fullName": { "control": { "type": "text" } },
+        "senderName": { "control": { "type": "text" } },
+        "senderEmail": { "control": { "type": "text" } },
+        "petitionOwnerFullName": { "control": { "type": "text" } },
+        "petitionOwnerEmail": { "control": { "type": "text" } },
+        "body": { "control": { "type": "object" } },
+        "deadline": { "control": { "type": "date" } },
+        "fields": { "control": { "type": "object" } },
+        "keycode": { "control": { "type": "text" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

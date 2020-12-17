@@ -851,7 +851,7 @@ export const sendPetition = mutationField("sendPetition", {
 });
 
 export const sendMessages = mutationField("sendMessages", {
-  description: "Sends a petition message to the speicified contacts.",
+  description: "Sends a petition message to the specified contacts.",
   type: "Result",
   authorize: chain(
     authenticate(),

@@ -42,6 +42,14 @@ export type AccessDeactivatedEvent = PetitionEvent & {
   user?: Maybe<User>;
 };
 
+export type AccessDelegatedEvent = PetitionEvent & {
+  __typename?: "AccessDelegatedEvent";
+  access: PetitionAccess;
+  contact?: Maybe<Contact>;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+};
+
 export type AccessOpenedEvent = PetitionEvent & {
   __typename?: "AccessOpenedEvent";
   access: PetitionAccess;
@@ -233,6 +241,8 @@ export type Mutation = {
   publicCreateSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a text field. */
   publicCreateTextReply: PublicPetitionFieldReply;
+  /** Lets a recipient delegate access to the petition to another contact in the same organization */
+  publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
   publicDeletePetitionFieldComment: Result;
   /** Deletes a reply to a petition field. */
@@ -256,7 +266,7 @@ export type Mutation = {
   reopenPetition: Petition;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
-  /** Sends a petition message to the speicified contacts. */
+  /** Sends a petition message to the specified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
   sendPetition: SendPetitionResult;
@@ -462,6 +472,14 @@ export type MutationpublicCreateTextReplyArgs = {
   data: CreateTextReplyInput;
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
+};
+
+export type MutationpublicDelegateAccessToContactArgs = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  keycode: Scalars["ID"];
+  lastName: Scalars["String"];
+  messageBody: Scalars["JSON"];
 };
 
 export type MutationpublicDeletePetitionFieldCommentArgs = {
@@ -2032,6 +2050,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "AccessDeactivatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment)
       | ({
+          __typename?: "AccessDelegatedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment)
+      | ({
           __typename?: "AccessOpenedEvent";
         } & PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment)
       | ({
@@ -2107,6 +2128,11 @@ export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragme
   __typename?: "AccessDeactivatedEvent";
 } & Pick<AccessDeactivatedEvent, "id"> &
   TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment = {
+  __typename?: "AccessDelegatedEvent";
+} & Pick<AccessDelegatedEvent, "id"> &
+  TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = {
   __typename?: "AccessOpenedEvent";
@@ -2217,6 +2243,7 @@ export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fr
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment
@@ -2261,6 +2288,15 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
 } & Pick<AccessDeactivatedEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
+
+export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
+  __typename?: "AccessDelegatedEvent";
+} & Pick<AccessDelegatedEvent, "createdAt"> & {
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     access: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
@@ -2939,6 +2975,28 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
+
+export type RecipientViewContactCard_PublicContactFragment = {
+  __typename?: "PublicContact";
+} & Pick<PublicContact, "id" | "fullName" | "firstName" | "email">;
+
+export type RecipientViewContactCard_publicDelegateAccessToContactMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  messageBody: Scalars["JSON"];
+}>;
+
+export type RecipientViewContactCard_publicDelegateAccessToContactMutation = {
+  __typename?: "Mutation";
+} & {
+  publicDelegateAccessToContact: { __typename?: "PublicPetitionAccess" } & {
+    petition?: Maybe<
+      { __typename?: "PublicPetition" } & Pick<PublicPetition, "id">
+    >;
+  };
 };
 
 export type RecipientViewContentsCard_PublicUserFragment = {
@@ -4123,7 +4181,11 @@ export type RecipientView_PublicPetitionAccessFragment = {
   granter?: Maybe<
     { __typename?: "PublicUser" } & RecipientView_PublicUserFragment
   >;
-  contact?: Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>;
+  contact?: Maybe<
+    {
+      __typename?: "PublicContact";
+    } & RecipientViewContactCard_PublicContactFragment
+  >;
 };
 
 export type RecipientView_PublicPetitionFragment = {
@@ -5361,6 +5423,20 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
   ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
+  fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
+    contact {
+      ...ContactLink_Contact
+    }
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -5436,6 +5512,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on SignatureCancelledEvent {
       ...TimelineSignatureCancelledEvent_SignatureCancelledEvent
     }
+    ... on AccessDelegatedEvent {
+      ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -5460,6 +5539,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineSignatureStartedEvent_SignatureStartedEventFragmentDoc}
   ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
   ${TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc}
+  ${TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -6118,6 +6198,14 @@ export const RecipientView_PublicUserFragmentDoc = gql`
   ${RecipientViewSenderCard_PublicUserFragmentDoc}
   ${RecipientViewContentsCard_PublicUserFragmentDoc}
 `;
+export const RecipientViewContactCard_PublicContactFragmentDoc = gql`
+  fragment RecipientViewContactCard_PublicContact on PublicContact {
+    id
+    fullName
+    firstName
+    email
+  }
+`;
 export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientView_PublicPetitionAccess on PublicPetitionAccess {
     petition {
@@ -6127,11 +6215,12 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
       ...RecipientView_PublicUser
     }
     contact {
-      id
+      ...RecipientViewContactCard_PublicContact
     }
   }
   ${RecipientView_PublicPetitionFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
+  ${RecipientViewContactCard_PublicContactFragmentDoc}
 `;
 export const RecipientView_deletePetitionReply_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientView_deletePetitionReply_PublicPetitionField on PublicPetitionField {
@@ -6964,6 +7053,66 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
 }
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
+>;
+export const RecipientViewContactCard_publicDelegateAccessToContactDocument = gql`
+  mutation RecipientViewContactCard_publicDelegateAccessToContact(
+    $keycode: ID!
+    $email: String!
+    $firstName: String!
+    $lastName: String!
+    $messageBody: JSON!
+  ) {
+    publicDelegateAccessToContact(
+      keycode: $keycode
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      messageBody: $messageBody
+    ) {
+      petition {
+        id
+      }
+    }
+  }
+`;
+
+/**
+ * __useRecipientViewContactCard_publicDelegateAccessToContactMutation__
+ *
+ * To run a mutation, you first call `useRecipientViewContactCard_publicDelegateAccessToContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientViewContactCard_publicDelegateAccessToContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewContactCardPublicDelegateAccessToContactMutation, { data, loading, error }] = useRecipientViewContactCard_publicDelegateAccessToContactMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      email: // value for 'email'
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      messageBody: // value for 'messageBody'
+ *   },
+ * });
+ */
+export function useRecipientViewContactCard_publicDelegateAccessToContactMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientViewContactCard_publicDelegateAccessToContactMutation,
+    RecipientViewContactCard_publicDelegateAccessToContactMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    RecipientViewContactCard_publicDelegateAccessToContactMutation,
+    RecipientViewContactCard_publicDelegateAccessToContactMutationVariables
+  >(
+    RecipientViewContactCard_publicDelegateAccessToContactDocument,
+    baseOptions
+  );
+}
+export type RecipientViewContactCard_publicDelegateAccessToContactMutationHookResult = ReturnType<
+  typeof useRecipientViewContactCard_publicDelegateAccessToContactMutation
 >;
 export const AdminDocument = gql`
   query Admin {

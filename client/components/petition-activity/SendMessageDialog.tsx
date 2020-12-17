@@ -61,6 +61,7 @@ export function SendMessageDialogDialog({
       body={
         <MessageEmailEditor
           showErrors={showErrors}
+          showSubject={true}
           subjectRef={subjectRef}
           subject={subject}
           body={body}

@@ -156,7 +156,7 @@ export function accessesBelongToPetition<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.accesessBelongToPetition(
+      return await ctx.petitions.accessesBelongToPetition(
         (args[argNamePetitionId] as unknown) as number,
         unMaybeArray(args[argNameAccessIds] as MaybeArray<number>)
       );

@@ -139,12 +139,16 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async createContact(data: Omit<CreateContact, "org_id">, user: User) {
+  async createContact(
+    data: Omit<CreateContact, "org_id">,
+    userOrContact: User | Contact,
+    createdBy: string
+  ) {
     const [row] = await this.insert("contact", {
       ...data,
-      org_id: user.org_id,
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
+      org_id: userOrContact.org_id,
+      created_by: createdBy,
+      updated_by: createdBy,
     });
     return row;
   }

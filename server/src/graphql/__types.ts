@@ -232,6 +232,7 @@ export interface NexusGenScalars {
 export interface NexusGenObjects {
   AccessActivatedEvent: events.AccessActivatedEvent;
   AccessDeactivatedEvent: events.AccessDeactivatedEvent;
+  AccessDelegatedEvent: events.AccessDelegatedEvent;
   AccessOpenedEvent: events.AccessOpenedEvent;
   CommentDeletedEvent: events.CommentDeletedEvent;
   CommentPublishedEvent: events.CommentPublishedEvent;
@@ -443,6 +444,13 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
   };
+  AccessDelegatedEvent: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    contact: NexusGenRootTypes["Contact"] | null; // Contact
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+  };
   AccessOpenedEvent: {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
@@ -540,6 +548,7 @@ export interface NexusGenFieldTypes {
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicCreateSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+    publicDelegateAccessToContact: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicDeletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -1099,6 +1108,13 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     user: "User";
   };
+  AccessDelegatedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    contact: "Contact";
+    createdAt: "DateTime";
+    id: "GID";
+  };
   AccessOpenedEvent: {
     // field return type name
     access: "PetitionAccess";
@@ -1196,6 +1212,7 @@ export interface NexusGenFieldTypeNames {
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
     publicCreateSelectReply: "PublicPetitionFieldReply";
     publicCreateTextReply: "PublicPetitionFieldReply";
+    publicDelegateAccessToContact: "PublicPetitionAccess";
     publicDeletePetitionFieldComment: "Result";
     publicDeletePetitionReply: "Result";
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
@@ -1915,6 +1932,14 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
     };
+    publicDelegateAccessToContact: {
+      // args
+      email: string; // String!
+      firstName: string; // String!
+      keycode: string; // ID!
+      lastName: string; // String!
+      messageBody: NexusGenScalars["JSON"]; // JSON!
+    };
     publicDeletePetitionFieldComment: {
       // args
       keycode: string; // ID!
@@ -2201,6 +2226,7 @@ export interface NexusGenAbstractTypeMembers {
   PetitionEvent:
     | "AccessActivatedEvent"
     | "AccessDeactivatedEvent"
+    | "AccessDelegatedEvent"
     | "AccessOpenedEvent"
     | "CommentDeletedEvent"
     | "CommentPublishedEvent"
@@ -2237,6 +2263,7 @@ export interface NexusGenAbstractTypeMembers {
 export interface NexusGenTypeInterfaces {
   AccessActivatedEvent: "PetitionEvent";
   AccessDeactivatedEvent: "PetitionEvent";
+  AccessDelegatedEvent: "PetitionEvent";
   AccessOpenedEvent: "PetitionEvent";
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";

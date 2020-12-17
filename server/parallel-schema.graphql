@@ -15,6 +15,13 @@ type AccessDeactivatedEvent implements PetitionEvent {
   user: User
 }
 
+type AccessDelegatedEvent implements PetitionEvent {
+  access: PetitionAccess!
+  contact: Contact
+  createdAt: DateTime!
+  id: GID!
+}
+
 type AccessOpenedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
@@ -491,6 +498,17 @@ type Mutation {
   ): PublicPetitionFieldReply!
 
   """
+  Lets a recipient delegate access to the petition to another contact in the same organization
+  """
+  publicDelegateAccessToContact(
+    email: String!
+    firstName: String!
+    keycode: ID!
+    lastName: String!
+    messageBody: JSON!
+  ): PublicPetitionAccess!
+
+  """
   Delete a petition field comment.
   """
   publicDeletePetitionFieldComment(
@@ -573,7 +591,7 @@ type Mutation {
   resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
 
   """
-  Sends a petition message to the speicified contacts.
+  Sends a petition message to the specified contacts.
   """
   sendMessages(
     accessIds: [GID!]!

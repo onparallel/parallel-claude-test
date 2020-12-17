@@ -1150,6 +1150,16 @@
     "context": "First name"
   },
   {
+    "term": "generic.forms.invalid-contact-first-name-error",
+    "definition": "Please, enter the contact first name",
+    "context": "Please, enter the contact first name"
+  },
+  {
+    "term": "generic.forms.invalid-contact-last-name-error",
+    "definition": "Please, enter the contact last name",
+    "context": "Please, enter the contact last name"
+  },
+  {
     "term": "generic.forms.invalid-email-error",
     "definition": "Please, enter a valid email",
     "context": "Please, enter a valid email"
@@ -1168,6 +1178,11 @@
     "term": "generic.forms.last-name-label",
     "definition": "Last name",
     "context": "Last name"
+  },
+  {
+    "term": "generic.forms.message-label",
+    "definition": "Message",
+    "context": "Message"
   },
   {
     "term": "generic.forms.new-password-label",
@@ -3560,9 +3575,44 @@
     "context": "Petition completed!"
   },
   {
+    "term": "recipient-view.contact",
+    "definition": "Contact",
+    "context": "Contact"
+  },
+  {
+    "term": "recipient-view.contact-email",
+    "definition": "Contact email",
+    "context": "Contact email"
+  },
+  {
+    "term": "recipient-view.contact.to",
+    "definition": "To:",
+    "context": "To:"
+  },
+  {
     "term": "recipient-view.contents-header",
     "definition": "Contents",
     "context": "Contents"
+  },
+  {
+    "term": "recipient-view.delegate-access",
+    "definition": "Delegate access",
+    "context": "Delegate access"
+  },
+  {
+    "term": "recipient-view.delegate-access-dialog.subtitle-1",
+    "definition": "Please fill out the contact details of the person you want to delegate your access.",
+    "context": "Please fill out the contact details of the person you want to delegate your access."
+  },
+  {
+    "term": "recipient-view.delegate-access-dialog.subtitle-2",
+    "definition": "We will send them an email with instructions on how to proceed.",
+    "context": "We will send them an email with instructions on how to proceed."
+  },
+  {
+    "term": "recipient-view.delegate-access.help",
+    "definition": "Use this option to request someone else to complete the information for you.",
+    "context": "Use this option to request someone else to complete the information for you."
   },
   {
     "term": "recipient-view.expired-code-description",
@@ -3643,6 +3693,16 @@
     "term": "recipient-view.petition-completed-alert-2",
     "definition": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again.",
     "context": "If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+  },
+  {
+    "term": "recipient-view.petition-delegated.toast-body",
+    "definition": "We have sent an email to {email} with instructions to access this petition.",
+    "context": "We have sent an email to {email} with instructions to access this petition."
+  },
+  {
+    "term": "recipient-view.petition-delegated.toast-header",
+    "definition": "Access delegated",
+    "context": "Access delegated"
   },
   {
     "term": "recipient-view.powered-by",
@@ -3883,6 +3943,11 @@
     "term": "timeline.access-deactivated-description",
     "definition": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} removed access to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.access-delegated-description",
+    "definition": "{contact} has delegated the petition to {newContact} {timeAgo}",
+    "context": "{contact} has delegated the petition to {newContact} {timeAgo}"
   },
   {
     "term": "timeline.access-opened-description",

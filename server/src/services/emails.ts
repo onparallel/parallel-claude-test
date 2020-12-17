@@ -198,4 +198,22 @@ export class EmailsService implements IEmailsService {
       contact_authentication_request_id: requestId,
     });
   }
+
+  async sendAccessDelegatedEmail(
+    petitionId: number,
+    originalAccessId: number,
+    newAccessId: number,
+    messageBody: any
+  ) {
+    return await this.enqueueEmail("petition-access-delegated", {
+      id: this.buildQueueId("PetitionAccessDelegated", [
+        originalAccessId,
+        newAccessId,
+      ]),
+      petition_id: petitionId,
+      original_access_id: originalAccessId,
+      new_access_id: newAccessId,
+      message_body: messageBody,
+    });
+  }
 }

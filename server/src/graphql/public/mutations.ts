@@ -29,6 +29,8 @@ import { userIsCommentAuthor } from "../petition/mutations/authorizers";
 import { toGlobalId } from "../../util/globalId";
 import { getClientIp } from "request-ip";
 import { stallFor } from "../../util/stallFor";
+import { jsonArg } from "../helpers/json";
+import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -662,6 +664,98 @@ export const publicFileUploadReplyDownloadLink = mutationField(
         return {
           result: RESULT.FAILURE,
         };
+      }
+    },
+  }
+);
+
+export const publicDelegateAccessToContact = mutationField(
+  "publicDelegateAccessToContact",
+  {
+    description:
+      "Lets a recipient delegate access to the petition to another contact in the same organization",
+    type: nonNull("PublicPetitionAccess"),
+    args: {
+      keycode: nonNull(idArg()),
+      email: nonNull(stringArg()),
+      firstName: nonNull(stringArg()),
+      lastName: nonNull(stringArg()),
+      messageBody: nonNull(jsonArg()),
+    },
+    authorize: fetchPetitionAccess("keycode"),
+    validateArgs: validRichTextContent(
+      (args) => args.messageBody,
+      "messageBody"
+    ),
+    resolve: async (_, args, ctx) => {
+      const access = ctx.access!;
+      const recipient = ctx.contact!;
+      const petitionId = access.petition_id;
+
+      let contactToDelegate = await ctx.contacts.loadContactByEmail({
+        email: args.email,
+        orgId: recipient.org_id,
+      });
+
+      if (!contactToDelegate) {
+        contactToDelegate = await ctx.contacts.createContact(
+          {
+            email: args.email,
+            first_name: args.firstName,
+            last_name: args.lastName,
+          },
+          recipient,
+          `Contact:${recipient.id}`
+        );
+      }
+      try {
+        const newAccess = await ctx.petitions.createAccessFromRecipient(
+          petitionId,
+          access.granter_id,
+          contactToDelegate.id,
+          recipient
+        );
+
+        await Promise.all([
+          ctx.emails.sendAccessDelegatedEmail(
+            petitionId,
+            access.id,
+            newAccess.id,
+            args.messageBody
+          ),
+          ctx.petitions.createEvent({
+            type: "ACCESS_DELEGATED",
+            petitionId,
+            data: {
+              contact_id: recipient.id,
+              petition_access_id: newAccess.id,
+            },
+          }),
+        ]);
+
+        return newAccess;
+      } catch (error) {
+        // if the access already exists, just send the email
+        if (error.constraint === "petition_access__petition_id_contact_id") {
+          const petitionAccesses = await ctx.petitions.loadAccessesForPetition(
+            petitionId
+          );
+
+          const contactAccess = petitionAccesses.find(
+            (a) => a.contact_id === contactToDelegate!.id
+          )!;
+
+          await ctx.emails.sendAccessDelegatedEmail(
+            petitionId,
+            access.id,
+            contactAccess.id,
+            args.messageBody
+          );
+
+          return contactAccess;
+        } else {
+          throw error;
+        }
       }
     },
   }
