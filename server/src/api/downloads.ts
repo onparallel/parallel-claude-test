@@ -80,7 +80,7 @@ export const downloads = Router()
       }
 
       const token = ctx.security.generateAuthToken({
-        petitionId,
+        petition: { id: petitionId },
       });
 
       const buffer = await ctx.printer.pdf(

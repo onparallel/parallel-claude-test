@@ -8,6 +8,10 @@ import { ArgValidationError } from "../helpers/errors";
 import { GraphQLResolveInfo } from "graphql";
 import { Maybe } from "../../util/types";
 import { toGlobalId } from "../../util/globalId";
+import { ArgsValue } from "@nexus/schema/dist/core";
+import { FieldValidateArgsResolver } from "../helpers/validateArgsPlugin";
+import { decode } from "jsonwebtoken";
+import { isDefined } from "../../util/remedaExtensions";
 
 export function validatePetitionStatus(
   petition: Maybe<Petition>,
@@ -70,4 +74,34 @@ export function validateArgumentIsSet(
       `Argument ${argumentsKey} is required.`
     );
   }
+}
+
+/**
+ * checks that auth token payload contains the required keys
+ */
+export function validateAuthTokenPayload<
+  TypeName extends string,
+  FieldName extends string
+>(
+  prop: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
+  requiredKey: string,
+  argName: string
+) {
+  return (async (_, args, ctx, info) => {
+    const token = prop(args)!;
+    const payload: any = decode(token);
+
+    const keys = requiredKey.split(".");
+    let data = payload;
+    keys.forEach((key) => {
+      data = data[key];
+      if (!isDefined(data)) {
+        throw new ArgValidationError(
+          info,
+          argName,
+          `token payload must have a '${requiredKey}' key`
+        );
+      }
+    });
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

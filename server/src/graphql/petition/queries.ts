@@ -14,7 +14,8 @@ import {
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { decode } from "jsonwebtoken";
 import { parseSortBy } from "../helpers/paginationPlugin";
-import { validateAuthToken } from "./validations";
+import { validateAuthTokenPayload } from "./validations";
+import { omit } from "remeda";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -106,11 +107,18 @@ export const petitionAuthToken = queryField("petitionAuthToken", {
     token: nonNull(stringArg()),
   },
   authorize: (_, { token }, ctx) => ctx.security.verifyAuthToken(token),
+  validateArgs: validateAuthTokenPayload(
+    (args) => args.token,
+    "petition.id",
+    "token"
+  ),
   resolve: async (_, { token }, ctx) => {
     const payload: any = decode(token);
-    return payload.petitionId
-      ? await ctx.petitions.loadPetition(payload.petitionId)
-      : null;
+    const petition = await ctx.petitions.loadPetition(payload.petition.id);
+
+    // merge any optional payload data before returning the petition
+    const payloadPetitionData = omit(payload.petition, ["id"]);
+    return petition ? Object.assign(petition, payloadPetitionData) : null;
   },
 });
 
@@ -124,9 +132,9 @@ export const petitionSignatureRequestToken = queryField(
     authorize: (_, { token }, ctx) => ctx.security.verifyAuthToken(token),
     resolve: async (_, { token }, ctx) => {
       const payload: any = decode(token);
-      return payload.petitionSignatureRequestId
+      return payload.petitionSignatureRequest?.id
         ? await ctx.petitions.loadPetitionSignatureById(
-            payload.petitionSignatureRequestId
+            payload.petitionSignatureRequest.id
           )
         : null;
     },

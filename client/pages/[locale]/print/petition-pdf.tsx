@@ -84,41 +84,36 @@ function PetitionPdf({ token }: { token: string }) {
           {fields.map((field, fieldNum) => (
             <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
           ))}
-          {signatureConfig &&
-            pageNum === pages.length - 1 &&
-            contacts &&
-            contacts.length > 0 && (
-              <>
-                <Box sx={{ pageBreakInside: "avoid" }}>
-                  <SignatureDisclaimer
-                    textAlign="center"
-                    margin="15mm 4mm 5mm 4mm"
-                    fontStyle="italic"
-                  />
-                  <Flex
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
-                      gridAutoRows: "minmax(150px, auto)",
-                      alignItems: "center",
-                      justifyItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    {contacts?.map(
-                      (signer, index) =>
-                        signer && (
-                          <SignatureBox
-                            key={signer.id}
-                            signer={{ ...signer!, key: index }}
-                            timezone={signatureConfig["timezone"]}
-                          />
-                        )
-                    )}
-                  </Flex>
-                </Box>
-              </>
-            )}
+          {pageNum === pages.length - 1 && (contacts ?? []).length > 0 && (
+            <Box sx={{ pageBreakInside: "avoid" }}>
+              <SignatureDisclaimer
+                textAlign="center"
+                margin="15mm 4mm 5mm 4mm"
+                fontStyle="italic"
+              />
+              <Flex
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gridAutoRows: "minmax(150px, auto)",
+                  alignItems: "center",
+                  justifyItems: "center",
+                  width: "100%",
+                }}
+              >
+                {contacts?.map(
+                  (signer, index) =>
+                    signer && (
+                      <SignatureBox
+                        key={signer.id}
+                        signer={{ ...signer!, key: index }}
+                        timezone={signatureConfig!.timezone}
+                      />
+                    )
+                )}
+              </Flex>
+            </Box>
+          )}
         </PdfPage>
       ))}
     </>

@@ -62,8 +62,8 @@ async function startSignatureProcess(
     const recipients = await fetchSignatureRecipients(settings.contactIds, ctx);
 
     const token = ctx.security.generateAuthToken({
-      petitionId: petition.id,
-      petitionSignatureRequestId: signature.id,
+      petition: { id: petition.id },
+      petitionSignatureRequest: { id: signature.id },
     });
 
     const buffer = await ctx.printer.pdf(

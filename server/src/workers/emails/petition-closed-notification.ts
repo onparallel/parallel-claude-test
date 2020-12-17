@@ -72,7 +72,10 @@ export async function petitionClosedNotification(
 
     if (payload.attach_pdf_export) {
       const token = context.security.generateAuthToken({
-        petitionId: petition.id,
+        petition: {
+          id: petition.id,
+          name: payload.pdf_export_title,
+        },
       });
 
       const buffer = await context.printer.pdf(
