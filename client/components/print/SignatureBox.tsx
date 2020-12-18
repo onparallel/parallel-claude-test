@@ -1,14 +1,13 @@
-import { Box, Text } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Text } from "@chakra-ui/react";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedDate } from "react-intl";
 import { Card } from "../common/Card";
 
-type SignatureBoxProps = ExtendChakra<{
+interface SignatureBoxProps extends BoxProps {
   signer: { email: string; fullName?: Maybe<string>; key: number };
   timezone?: string;
-}>;
+}
 
 export function SignatureBox({ signer, timezone }: SignatureBoxProps) {
   return (

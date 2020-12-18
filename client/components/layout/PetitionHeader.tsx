@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
+  BoxProps,
   Button,
   Center,
   Flex,
@@ -26,7 +27,7 @@ import {
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef, ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionActivityDocument,
   PetitionHeader_PetitionFragment,
@@ -51,14 +52,14 @@ import { usePetitionSharingDialog } from "../petition-common/PetitionSharingDial
 import { useConfirmReopenPetitionDialog } from "../petition-replies/ConfirmReopenPetitionDialog";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
-export type PetitionHeaderProps = ExtendChakra<{
+export interface PetitionHeaderProps extends BoxProps {
   petition: PetitionHeader_PetitionFragment;
   user: PetitionHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   section: "compose" | "replies" | "activity";
   state: "SAVED" | "SAVING" | "ERROR";
   actions?: ReactNode;
-}>;
+}
 
 export function PetitionHeader({
   petition,

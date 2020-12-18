@@ -15,7 +15,6 @@ import {
   SignatureIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionSignatureRequestStatus,
   PetitionSignaturesCard_PetitionFragment,
@@ -26,7 +25,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
-import { Card, CardHeader } from "../common/Card";
+import { Card, CardHeader, CardProps } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
@@ -34,14 +33,16 @@ import { Link } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 import { useConfirmRestartSignatureRequestDialog } from "./ConfirmRestartSignatureRequestDialog";
 
+export interface PetitionSignaturesCardProps extends CardProps {
+  petition: PetitionSignaturesCard_PetitionFragment;
+  onRefetchPetition: () => void;
+}
+
 export function PetitionSignaturesCard({
   petition,
   onRefetchPetition,
   ...props
-}: ExtendChakra<{
-  petition: PetitionSignaturesCard_PetitionFragment;
-  onRefetchPetition: () => void;
-}>) {
+}: PetitionSignaturesCardProps) {
   const [current, ...older] = petition.signatureRequests!;
 
   const [

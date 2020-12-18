@@ -1,9 +1,8 @@
-import { Box, Flex } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Flex } from "@chakra-ui/react";
 
-export type PublicContainerProps = ExtendChakra & {
-  wrapper?: ExtendChakra;
-};
+export interface PublicContainerProps extends BoxProps {
+  wrapper?: BoxProps;
+}
 
 export function PublicContainer({
   wrapper,

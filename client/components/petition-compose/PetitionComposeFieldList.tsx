@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef, ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import {
@@ -51,7 +51,7 @@ function reset(fields: FieldSelection[]): () => FieldsState {
   });
 }
 
-export type PetitionComposeFieldListProps = ExtendChakra<{
+export interface PetitionComposeFieldListProps extends BoxProps {
   active: Maybe<string>;
   fields: FieldSelection[];
   showErrors: boolean;
@@ -62,7 +62,7 @@ export type PetitionComposeFieldListProps = ExtendChakra<{
   onSelectField: (fieldId: string) => void;
   onAddField: (type: PetitionFieldType, position?: number) => void;
   onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
-}>;
+}
 
 export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({

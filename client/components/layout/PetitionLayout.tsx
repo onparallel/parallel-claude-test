@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps } from "@chakra-ui/react";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   PetitionHeader,
@@ -15,7 +14,7 @@ import { ReactNode, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { PetitionTemplateHeader } from "./PetitionTemplateHeader";
 
-export type PetitionLayoutProps = ExtendChakra<{
+export interface PetitionLayoutProps extends BoxProps {
   petition: PetitionLayout_PetitionBaseFragment;
   user: PetitionLayout_UserFragment;
   onNextClick?: () => void;
@@ -24,7 +23,7 @@ export type PetitionLayoutProps = ExtendChakra<{
   state: "SAVED" | "SAVING" | "ERROR";
   scrollBody: boolean;
   headerActions?: ReactNode;
-}>;
+}
 
 export function PetitionLayout({
   user,

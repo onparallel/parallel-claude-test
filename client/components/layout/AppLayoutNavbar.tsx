@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  BoxProps,
   Flex,
   IconButton,
   List,
@@ -23,7 +24,6 @@ import {
   PaperPlanesIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -38,11 +38,11 @@ import { Spacer } from "../common/Spacer";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
 
-export type AppLayoutNavbarProps = ExtendChakra<{
+export interface AppLayoutNavbarProps extends BoxProps {
   isMobile?: boolean;
   user: AppLayoutNavbar_UserFragment;
   onOnboardingClick: () => void;
-}>;
+}
 
 export const AppLayoutNavbar = Object.assign(
   memo(function AppLayoutNavbar({

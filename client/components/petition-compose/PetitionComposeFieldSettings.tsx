@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Box,
   FormControl,
+  FormControlProps,
   FormLabel,
   Image,
   Input,
@@ -9,7 +10,6 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -312,18 +312,20 @@ function SelectOptionSettings({
   );
 }
 
+interface SettingsRowProps extends Omit<FormControlProps, "label"> {
+  label: ReactNode;
+  controlId: string;
+  children: ReactNode;
+  description: ReactNode;
+}
+
 function SettingsRow({
   label,
   controlId,
   description,
   children,
   ...props
-}: ExtendChakra<{
-  label: ReactNode;
-  controlId: string;
-  children: ReactNode;
-  description: ReactNode;
-}>) {
+}: SettingsRowProps) {
   return (
     <FormControl display="flex" alignItems="center" id={controlId} {...props}>
       <FormLabel

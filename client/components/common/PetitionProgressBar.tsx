@@ -1,5 +1,6 @@
 import {
   Box,
+  BoxProps,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -11,11 +12,14 @@ import {
   useTheme,
 } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FormattedMessage } from "react-intl";
 import { ProgressIndicator, ProgressTrack } from "./Progress";
+
+interface PetitionProgressBarProps extends PetitionProgress, BoxProps {
+  status: PetitionStatus;
+}
 
 export function PetitionProgressBar({
   status,
@@ -24,7 +28,7 @@ export function PetitionProgressBar({
   optional,
   total,
   ...props
-}: ExtendChakra<PetitionProgress & { status: PetitionStatus }>) {
+}: PetitionProgressBarProps) {
   const theme = useTheme();
   return (
     <Popover trigger="hover" placement="left">

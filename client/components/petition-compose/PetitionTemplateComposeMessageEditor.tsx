@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, Stack } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Heading, Stack } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
 import {
@@ -13,10 +12,10 @@ import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 
-export type PetitionTemplateComposeMessageEditorProps = ExtendChakra<{
+export interface PetitionTemplateComposeMessageEditorProps extends BoxProps {
   petition: PetitionTemplateComposeMessageEditor_PetitionFragment;
   onUpdatePetition: (data: UpdatePetitionInput) => void;
-}>;
+}
 
 export function PetitionTemplateComposeMessageEditor({
   petition,

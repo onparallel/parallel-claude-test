@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { BoxProps, Flex } from "@chakra-ui/react";
 import {
   AppLayout_UserFragment,
   OnboardingKey,
@@ -15,10 +14,10 @@ import {
 } from "../common/OnboardingTour";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
-export type AppLayoutProps = ExtendChakra<{
+export interface AppLayoutProps extends BoxProps {
   title: string;
   user: AppLayout_UserFragment;
-}>;
+}
 
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   /* Onboarding tour callbacks */

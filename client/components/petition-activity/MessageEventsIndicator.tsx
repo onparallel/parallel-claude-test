@@ -1,14 +1,13 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/react";
+import { Box, BoxProps } from "@chakra-ui/react";
 import { CheckIcon, CheckShortIcon } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { MessageEventsIndicator_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIntl } from "react-intl";
 
-export type MessageEventsIndicatorProps = ExtendChakra<{
+export interface MessageEventsIndicatorProps extends BoxProps {
   message: MessageEventsIndicator_PetitionMessageFragment;
-}>;
+}
 
 function rountToNearestSecond(value: Date | string | number) {
   const date = new Date(value);

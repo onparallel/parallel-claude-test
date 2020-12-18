@@ -1,5 +1,4 @@
-import { Box, Heading, Stack, Textarea } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Heading, Stack, Textarea } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { UpdatePetitionInput } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
@@ -7,10 +6,10 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type PetitionTemplateDescriptionEditProps = ExtendChakra<{
+export interface PetitionTemplateDescriptionEditProps extends BoxProps {
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   description?: Maybe<string>;
-}>;
+}
 
 export function PetitionTemplateDescriptionEdit({
   onUpdatePetition,

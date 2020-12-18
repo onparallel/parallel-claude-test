@@ -1,5 +1,6 @@
 import {
   Box,
+  BoxProps,
   Stack,
   Text,
   useFormControl,
@@ -11,7 +12,6 @@ import {
   ListIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   AutoformatRule,
   BoldPlugin,
@@ -206,7 +206,7 @@ export function RichTextEditor({
       {...inputStyles}
     >
       <Slate editor={editor} value={value} onChange={onChange as any}>
-        <Toolbar disabled={formControl.disabled || formControl.readOnly} />
+        <Toolbar isDisabled={formControl.disabled || formControl.readOnly} />
         <Box maxHeight="360px" overflow="auto">
           <EditablePlugins
             readOnly={formControl.disabled || formControl.readOnly}
@@ -220,10 +220,11 @@ export function RichTextEditor({
   );
 }
 
-const Toolbar = memo(function _Toolbar({
-  disabled,
-  ...props
-}: ExtendChakra<{ disabled?: boolean }>) {
+interface ToolbarProps extends BoxProps {
+  isDisabled?: boolean;
+}
+
+const Toolbar = memo(function _Toolbar({ isDisabled, ...props }: ToolbarProps) {
   const intl = useIntl();
   return (
     <Stack
@@ -236,7 +237,7 @@ const Toolbar = memo(function _Toolbar({
       <MarkButton
         type="bold"
         icon={<BoldIcon />}
-        isDisabled={disabled}
+        isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.bold",
           defaultMessage: "Bold",
@@ -245,7 +246,7 @@ const Toolbar = memo(function _Toolbar({
       <MarkButton
         type="italic"
         icon={<ItalicIcon />}
-        isDisabled={disabled}
+        isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.italic",
           defaultMessage: "Italic",
@@ -254,7 +255,7 @@ const Toolbar = memo(function _Toolbar({
       <MarkButton
         type="underline"
         icon={<UnderlineIcon />}
-        isDisabled={disabled}
+        isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.underline",
           defaultMessage: "Underline",
@@ -263,7 +264,7 @@ const Toolbar = memo(function _Toolbar({
       <ListButton
         type="bulleted-list"
         icon={<ListIcon />}
-        isDisabled={disabled}
+        isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.list",
           defaultMessage: "Bullet list",

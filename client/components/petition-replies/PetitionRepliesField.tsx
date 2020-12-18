@@ -21,7 +21,7 @@ import {
   DownloadIcon,
   EyeIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef, ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
@@ -46,7 +46,7 @@ export type PetitionRepliesFieldAction = {
   reply: PetitionRepliesField_PetitionFieldReplyFragment;
 };
 
-export type PetitionRepliesFieldProps = ExtendChakra<{
+export interface PetitionRepliesFieldProps extends BoxProps {
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldRelativeIndex: number | string;
   index: number;
@@ -60,7 +60,7 @@ export type PetitionRepliesFieldProps = ExtendChakra<{
     status: PetitionFieldReplyStatus
   ) => void;
   onValidateToggle: () => void;
-}>;
+}
 
 export function PetitionRepliesField({
   field,

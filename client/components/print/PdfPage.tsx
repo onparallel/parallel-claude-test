@@ -1,12 +1,11 @@
-import { Flex } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { BoxProps, Flex } from "@chakra-ui/react";
 import { ReactNode } from "react";
 
-type PdfPageProps = ExtendChakra<{
+interface PdfPageProps extends BoxProps {
   children?: ReactNode;
   heading?: ReactNode;
   footer?: ReactNode;
-}>;
+}
 
 export function PdfPage({ children, heading, footer, ...props }: PdfPageProps) {
   return (

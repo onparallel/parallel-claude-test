@@ -22,7 +22,6 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   PetitionAccessTable_PetitionFragment,

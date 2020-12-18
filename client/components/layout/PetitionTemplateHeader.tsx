@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Badge,
   Box,
+  BoxProps,
   Button,
   Flex,
   IconButton,
@@ -19,7 +20,6 @@ import {
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionTemplateHeader_PetitionTemplateFragment,
   PetitionTemplateHeader_UserFragment,
@@ -36,12 +36,12 @@ import { Spacer } from "../common/Spacer";
 import { usePetitionSharingDialog } from "../petition-common/PetitionSharingDialog";
 import { HeaderNameEditable } from "./HeaderNameEditable";
 
-export type PetitionTemplateHeaderProps = ExtendChakra<{
+export interface PetitionTemplateHeaderProps extends BoxProps {
   petition: PetitionTemplateHeader_PetitionTemplateFragment;
   user: PetitionTemplateHeader_UserFragment;
   onUpdatePetition: (value: UpdatePetitionInput) => void;
   state: "SAVED" | "SAVING" | "ERROR";
-}>;
+}
 
 export function PetitionTemplateHeader({
   petition,

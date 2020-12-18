@@ -1,12 +1,11 @@
-import { Box, Tooltip } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Tooltip } from "@chakra-ui/react";
 import { useIntl } from "react-intl";
 
-export type RecipientViewCommentsBadgeProps = ExtendChakra<{
+export interface RecipientViewCommentsBadgeProps extends BoxProps {
   hasUnreadComments?: boolean;
   hasUnpublishedComments?: boolean;
   isReversedPurple?: boolean;
-}>;
+}
 
 export function RecipientViewCommentsBadge({
   hasUnreadComments,

@@ -1,5 +1,4 @@
-import { Text, Heading, Box } from "@chakra-ui/react";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Text, Heading, Box, BoxProps } from "@chakra-ui/react";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
@@ -30,9 +29,9 @@ export function FieldWithReplies({
   }
 }
 
-type TextFieldProps = ExtendChakra<{
+interface TextFieldProps extends BoxProps {
   field: PetitionPdf_PetitionFieldFragment;
-}>;
+}
 function TextField({ field, ...props }: TextFieldProps) {
   return (
     <Card {...props} boxShadow="none" borderColor="gray.400">
@@ -55,9 +54,9 @@ function TextField({ field, ...props }: TextFieldProps) {
   );
 }
 
-type HeadingFieldProps = ExtendChakra<{
+interface HeadingFieldProps extends BoxProps {
   field: PetitionPdf_PetitionFieldFragment;
-}>;
+}
 function HeadingField({ field, ...props }: HeadingFieldProps) {
   return (
     <Box {...props}>
@@ -69,9 +68,9 @@ function HeadingField({ field, ...props }: HeadingFieldProps) {
   );
 }
 
-type FileUploadFieldProps = ExtendChakra<{
+interface FileUploadFieldProps extends BoxProps {
   field: PetitionPdf_PetitionFieldFragment;
-}>;
+}
 
 function FileUploadField({ field, ...props }: FileUploadFieldProps) {
   return (
