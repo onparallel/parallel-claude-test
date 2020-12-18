@@ -1,6 +1,6 @@
 import { Text, Heading, Box } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
-import { PrintPetitionSignature_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
 import { FileSize } from "../common/FileSize";
@@ -15,7 +15,7 @@ const fieldStyles = {
 export function FieldWithReplies({
   field,
 }: {
-  field: PrintPetitionSignature_PetitionFieldFragment;
+  field: PetitionPdf_PetitionFieldFragment;
 }) {
   switch (field.type) {
     case "HEADING":
@@ -31,7 +31,7 @@ export function FieldWithReplies({
 }
 
 type TextFieldProps = ExtendChakra<{
-  field: PrintPetitionSignature_PetitionFieldFragment;
+  field: PetitionPdf_PetitionFieldFragment;
 }>;
 function TextField({ field, ...props }: TextFieldProps) {
   return (
@@ -56,7 +56,7 @@ function TextField({ field, ...props }: TextFieldProps) {
 }
 
 type HeadingFieldProps = ExtendChakra<{
-  field: PrintPetitionSignature_PetitionFieldFragment;
+  field: PetitionPdf_PetitionFieldFragment;
 }>;
 function HeadingField({ field, ...props }: HeadingFieldProps) {
   return (
@@ -70,7 +70,7 @@ function HeadingField({ field, ...props }: HeadingFieldProps) {
 }
 
 type FileUploadFieldProps = ExtendChakra<{
-  field: PrintPetitionSignature_PetitionFieldFragment;
+  field: PetitionPdf_PetitionFieldFragment;
 }>;
 
 function FileUploadField({ field, ...props }: FileUploadFieldProps) {
