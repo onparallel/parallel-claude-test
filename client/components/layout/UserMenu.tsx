@@ -12,7 +12,12 @@ import {
   Portal,
   UsePopperProps,
 } from "@chakra-ui/react";
-import { KeyIcon, LogOutIcon, UserIcon } from "@parallel/chakra/icons";
+import {
+  BusinessIcon,
+  KeyIcon,
+  LogOutIcon,
+  UserIcon,
+} from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -61,6 +66,17 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
               <FormattedMessage id="settings.title" defaultMessage="Settings" />
             </MenuItem>
           </NakedLink>
+          {user.role === "ADMIN" ? (
+            <NakedLink href="/app/organization">
+              <MenuItem as="a">
+                <BusinessIcon marginRight={2} />
+                <FormattedMessage
+                  id="organization.title"
+                  defaultMessage="Organization"
+                />
+              </MenuItem>
+            </NakedLink>
+          ) : null}
           {user.isSuperAdmin ? (
             <NakedLink href="/app/admin">
               <MenuItem as="a">
@@ -106,6 +122,7 @@ UserMenu.fragments = {
     fragment UserMenu_User on User {
       fullName
       isSuperAdmin
+      role
     }
   `,
 };

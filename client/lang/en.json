@@ -1245,6 +1245,11 @@
     "context": "I understand"
   },
   {
+    "term": "generic.last-active-at",
+    "definition": "Last active at",
+    "context": "Last active at"
+  },
+  {
     "term": "generic.load-more",
     "definition": "Load more",
     "context": "Load more"
@@ -1598,6 +1603,36 @@
     "term": "new-petition.title",
     "definition": "New petition",
     "context": "New petition"
+  },
+  {
+    "term": "organization-users.header.user-email",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
+    "term": "organization-users.header.user-firstname",
+    "definition": "First name",
+    "context": "First name"
+  },
+  {
+    "term": "organization-users.header.user-lastname",
+    "definition": "Last name",
+    "context": "Last name"
+  },
+  {
+    "term": "organization-users.header.user-role",
+    "definition": "Role",
+    "context": "Role"
+  },
+  {
+    "term": "organization.title",
+    "definition": "Organization",
+    "context": "Organization"
+  },
+  {
+    "term": "organization.users.title",
+    "definition": "Users",
+    "context": "Users"
   },
   {
     "term": "organizations.header.identifier",

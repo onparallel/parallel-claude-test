@@ -1400,6 +1400,8 @@ export type Query = {
   organization?: Maybe<Organization>;
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
+  /** The users of an organization */
+  organizationUsers: UserPagination;
   petition?: Maybe<PetitionBase>;
   petitionAuthToken?: Maybe<Petition>;
   /** The petitions of the user */
@@ -1444,6 +1446,13 @@ export type QueryorganizationsArgs = {
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
   status?: Maybe<OrganizationStatus>;
+};
+
+export type QueryorganizationUsersArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryOrganizationUsers_OrderBy>>;
 };
 
 export type QuerypetitionArgs = {
@@ -1494,6 +1503,17 @@ export type QueryOrganizations_OrderBy =
   | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
+
+/** Order to use on Query.organizationUsers */
+export type QueryOrganizationUsers_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "firstName_ASC"
+  | "firstName_DESC"
+  | "lastName_ASC"
+  | "lastName_DESC";
 
 /** Order to use on Query.petitions */
 export type QueryPetitions_OrderBy =
@@ -1671,6 +1691,7 @@ export type User = Timestamps & {
   /** The ID of the user. */
   id: Scalars["GID"];
   isSuperAdmin: Scalars["Boolean"];
+  lastActiveAt?: Maybe<Scalars["DateTime"]>;
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
   /** The onboarding status for the different views of the app. */
@@ -1937,7 +1958,7 @@ export type SettingsLayout_UserFragment = {
 
 export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "fullName" | "isSuperAdmin"
+  "fullName" | "isSuperAdmin" | "role"
 >;
 
 export type AddPetitionAccessDialog_PetitionFragment = {
@@ -3209,6 +3230,49 @@ export type ContactsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contacts_UserFragment;
+};
+
+export type OrganizationSettingsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type OrganizationSettingsQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
+};
+
+export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "firstName"
+  | "lastName"
+  | "email"
+  | "role"
+  | "createdAt"
+  | "lastActiveAt"
+>;
+
+export type OrganizationUsersQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryOrganizationUsers_OrderBy>>;
+}>;
+
+export type OrganizationUsersQuery = { __typename?: "Query" } & {
+  organizationUsers: { __typename?: "UserPagination" } & Pick<
+    UserPagination,
+    "totalCount"
+  > & {
+      items: Array<{ __typename?: "User" } & OrganizationUsers_UserFragment>;
+    };
+};
+
+export type OrganizationUsersUserQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type OrganizationUsersUserQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & AppLayout_UserFragment;
 };
 
 export type PetitionActivity_PetitionFragment = {
@@ -4591,6 +4655,7 @@ export const UserMenu_UserFragmentDoc = gql`
   fragment UserMenu_User on User {
     fullName
     isSuperAdmin
+    role
   }
 `;
 export const AppLayoutNavbar_UserFragmentDoc = gql`
@@ -4839,6 +4904,17 @@ export const Contacts_UserFragmentDoc = gql`
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
+`;
+export const OrganizationUsers_UserFragmentDoc = gql`
+  fragment OrganizationUsers_User on User {
+    id
+    firstName
+    lastName
+    email
+    role
+    createdAt
+    lastActiveAt
+  }
 `;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
@@ -7336,6 +7412,180 @@ export type ContactsUserQueryHookResult = ReturnType<
 >;
 export type ContactsUserLazyQueryHookResult = ReturnType<
   typeof useContactsUserLazyQuery
+>;
+export const OrganizationSettingsDocument = gql`
+  query OrganizationSettings {
+    me {
+      id
+      ...AppLayout_User
+    }
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+
+/**
+ * __useOrganizationSettingsQuery__
+ *
+ * To run a query within a React component, call `useOrganizationSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrganizationSettingsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOrganizationSettingsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OrganizationSettingsQuery,
+    OrganizationSettingsQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    OrganizationSettingsQuery,
+    OrganizationSettingsQueryVariables
+  >(OrganizationSettingsDocument, baseOptions);
+}
+export function useOrganizationSettingsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OrganizationSettingsQuery,
+    OrganizationSettingsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    OrganizationSettingsQuery,
+    OrganizationSettingsQueryVariables
+  >(OrganizationSettingsDocument, baseOptions);
+}
+export type OrganizationSettingsQueryHookResult = ReturnType<
+  typeof useOrganizationSettingsQuery
+>;
+export type OrganizationSettingsLazyQueryHookResult = ReturnType<
+  typeof useOrganizationSettingsLazyQuery
+>;
+export const OrganizationUsersDocument = gql`
+  query OrganizationUsers(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryOrganizationUsers_OrderBy!]
+  ) {
+    organizationUsers(
+      offset: $offset
+      limit: $limit
+      search: $search
+      sortBy: $sortBy
+    ) {
+      totalCount
+      items {
+        ...OrganizationUsers_User
+      }
+    }
+  }
+  ${OrganizationUsers_UserFragmentDoc}
+`;
+
+/**
+ * __useOrganizationUsersQuery__
+ *
+ * To run a query within a React component, call `useOrganizationUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrganizationUsersQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *      sortBy: // value for 'sortBy'
+ *   },
+ * });
+ */
+export function useOrganizationUsersQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    OrganizationUsersQuery,
+    OrganizationUsersQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    OrganizationUsersQuery,
+    OrganizationUsersQueryVariables
+  >(OrganizationUsersDocument, baseOptions);
+}
+export function useOrganizationUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OrganizationUsersQuery,
+    OrganizationUsersQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    OrganizationUsersQuery,
+    OrganizationUsersQueryVariables
+  >(OrganizationUsersDocument, baseOptions);
+}
+export type OrganizationUsersQueryHookResult = ReturnType<
+  typeof useOrganizationUsersQuery
+>;
+export type OrganizationUsersLazyQueryHookResult = ReturnType<
+  typeof useOrganizationUsersLazyQuery
+>;
+export const OrganizationUsersUserDocument = gql`
+  query OrganizationUsersUser {
+    me {
+      ...AppLayout_User
+    }
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
+
+/**
+ * __useOrganizationUsersUserQuery__
+ *
+ * To run a query within a React component, call `useOrganizationUsersUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationUsersUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrganizationUsersUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOrganizationUsersUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OrganizationUsersUserQuery,
+    OrganizationUsersUserQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    OrganizationUsersUserQuery,
+    OrganizationUsersUserQueryVariables
+  >(OrganizationUsersUserDocument, baseOptions);
+}
+export function useOrganizationUsersUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OrganizationUsersUserQuery,
+    OrganizationUsersUserQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    OrganizationUsersUserQuery,
+    OrganizationUsersUserQueryVariables
+  >(OrganizationUsersUserDocument, baseOptions);
+}
+export type OrganizationUsersUserQueryHookResult = ReturnType<
+  typeof useOrganizationUsersUserQuery
+>;
+export type OrganizationUsersUserLazyQueryHookResult = ReturnType<
+  typeof useOrganizationUsersUserLazyQuery
 >;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition(

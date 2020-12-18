@@ -2202,6 +2202,31 @@ type Query {
     """
     status: OrganizationStatus
   ): OrganizationPagination!
+
+  """
+  The users of an organization
+  """
+  organizationUsers(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryOrganizationUsers_OrderBy!]
+  ): UserPagination!
   petition(id: GID!): PetitionBase
   petitionAuthToken(token: String!): Petition
 
@@ -2280,6 +2305,20 @@ enum QueryOrganizations_OrderBy {
   createdAt_DESC
   name_ASC
   name_DESC
+}
+
+"""
+Order to use on Query.organizationUsers
+"""
+enum QueryOrganizationUsers_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  email_ASC
+  email_DESC
+  firstName_ASC
+  firstName_DESC
+  lastName_ASC
+  lastName_DESC
 }
 
 """
@@ -2535,6 +2574,7 @@ type User implements Timestamps {
   """
   id: GID!
   isSuperAdmin: Boolean!
+  lastActiveAt: DateTime
 
   """
   The last name of the user.

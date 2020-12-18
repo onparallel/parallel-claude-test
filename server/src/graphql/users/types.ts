@@ -1,5 +1,5 @@
 import { arg, enumType, nonNull, objectType } from "@nexus/schema";
-import { rootIsContextUser } from "./authorizers";
+import { contextUserIsOrgAdmin, rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
 
 export const OrganizationRole = enumType({
@@ -77,6 +77,10 @@ export const User = objectType({
       resolve: async (root, { featureFlag }, ctx) => {
         return ctx.featureFlags.userHasFeatureFlag(root.id, featureFlag);
       },
+    });
+    t.nullable.datetime("lastActiveAt", {
+      authorize: contextUserIsOrgAdmin(),
+      resolve: (o) => o.last_active_at,
     });
   },
 });

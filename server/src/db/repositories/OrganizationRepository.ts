@@ -32,13 +32,14 @@ export class OrganizationRepository extends BaseRepository {
     opts: {
       search?: string | null;
       excludeIds?: number[] | null;
+      sortBy?: SortBy<keyof User>[];
     } & PageOpts
   ) {
     return await this.loadPageAndCount(
       this.from("user")
         .where({ org_id: orgId, deleted_at: null })
         .mmodify((q) => {
-          const { search, excludeIds } = opts;
+          const { search, excludeIds, sortBy } = opts;
           if (search) {
             q.andWhere((q2) => {
               q2.whereIlike(
@@ -51,9 +52,11 @@ export class OrganizationRepository extends BaseRepository {
           if (excludeIds) {
             q.whereNotIn("id", excludeIds);
           }
-
-          q.orderBy("id");
+          if (sortBy) {
+            q.orderBy(sortBy);
+          }
         })
+        .orderBy("id")
         .select("*"),
       opts
     );

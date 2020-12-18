@@ -190,6 +190,15 @@ export interface NexusGenEnums {
     | "fullName_DESC"
     | "lastName_ASC"
     | "lastName_DESC";
+  QueryOrganizationUsers_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
+    | "email_ASC"
+    | "email_DESC"
+    | "firstName_ASC"
+    | "firstName_DESC"
+    | "lastName_ASC"
+    | "lastName_DESC";
   QueryOrganizations_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -908,6 +917,7 @@ export interface NexusGenFieldTypes {
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
+    organizationUsers: NexusGenRootTypes["UserPagination"]; // UserPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
@@ -988,6 +998,7 @@ export interface NexusGenFieldTypes {
     hasFeatureFlag: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isSuperAdmin: boolean; // Boolean!
+    lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastName: string | null; // String
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
@@ -1561,6 +1572,7 @@ export interface NexusGenFieldTypeNames {
     me: "User";
     organization: "Organization";
     organizations: "OrganizationPagination";
+    organizationUsers: "UserPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
     petitions: "PetitionBasePagination";
@@ -1641,6 +1653,7 @@ export interface NexusGenFieldTypeNames {
     hasFeatureFlag: "Boolean";
     id: "GID";
     isSuperAdmin: "Boolean";
+    lastActiveAt: "DateTime";
     lastName: "String";
     onboardingStatus: "JSONObject";
     organization: "Organization";
@@ -2139,6 +2152,13 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryOrganizations_OrderBy"][] | null; // [QueryOrganizations_OrderBy!]
       status?: NexusGenEnums["OrganizationStatus"] | null; // OrganizationStatus
+    };
+    organizationUsers: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+      sortBy?: NexusGenEnums["QueryOrganizationUsers_OrderBy"][] | null; // [QueryOrganizationUsers_OrderBy!]
     };
     petition: {
       // args
