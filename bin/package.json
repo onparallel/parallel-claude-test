@@ -14,12 +14,12 @@
     "full-release": "node dist/full-release.js"
   },
   "dependencies": {
-    "@formatjs/cli": "^2.13.15",
-    "aws-sdk": "^2.811.0",
+    "@formatjs/cli": "^2.13.16",
+    "aws-sdk": "^2.813.0",
     "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
-    "intl-messageformat-parser": "^6.0.18",
-    "outdent": "^0.7.1",
+    "intl-messageformat-parser": "^6.1.0",
+    "outdent": "^0.8.0",
     "remeda": "^0.0.27",
     "rimraf": "^3.0.2",
     "yargs": "^16.2.0"
