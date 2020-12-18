@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { usePetitionFieldTypeLabel } from "@parallel/utils/usePetitionFieldTypeLabel";
+import { usePetitionFieldTypeColor, usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
 import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -59,10 +59,11 @@ const PetitionFieldTypeLabel = forwardRef<
   HTMLDivElement,
   { type: PetitionFieldType } & BoxProps
 >(function PetitionFieldTypeLabel({ type, ...props }, ref) {
+  const color = usePetitionFieldTypeColor(type);
   return (
     <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
       <Box
-        backgroundColor={`field.${type}`}
+        backgroundColor={color}
         color="white"
         borderRadius="md"
         padding={1}

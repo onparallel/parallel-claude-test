@@ -1,6 +1,5 @@
-import { default as base } from "@chakra-ui/theme";
-import { styles } from "./styles";
 import { extendTheme } from "@chakra-ui/core";
+import { styles } from "./styles";
 
 export const theme = extendTheme({
   styles,
@@ -33,12 +32,6 @@ export const theme = extendTheme({
       700: "#433ead",
       800: "#332f80",
       900: "#282666",
-    },
-    field: {
-      FILE_UPLOAD: base.colors.teal[400],
-      TEXT: base.colors.yellow[400],
-      HEADING: base.colors.blue[400],
-      SELECT: base.colors.pink[400],
     },
   },
   textStyles: {

@@ -15,14 +15,13 @@ import {
   Textarea,
   Tooltip,
 } from "@chakra-ui/core";
-import Select from "react-select";
 import {
   CheckIcon,
   CloseIcon,
   CommentIcon,
   DeleteIcon,
-  DownloadIcon,
   DownForwardArrowIcon,
+  DownloadIcon,
 } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
@@ -32,18 +31,19 @@ import {
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
-import { FieldOptions } from "@parallel/utils/FieldOptions";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
 import { forwardRef, ReactNode, useCallback, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import Select from "react-select";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { ExpandableText } from "../common/ExpandableText";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
-import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
 
 export type CreateReply =
   | CreateReplyText
