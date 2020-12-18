@@ -58,7 +58,7 @@ export const UserAvatarList = Object.assign(
               </Flex>
             </PopoverTrigger>
             <Portal>
-              <PopoverContent width="200px" maxWidth="200px">
+              <PopoverContent width="200px">
                 <PopoverArrow />
                 <PopoverBody
                   paddingX={0}

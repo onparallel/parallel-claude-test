@@ -2,6 +2,7 @@ import {
   Box,
   Popover,
   PopoverArrow,
+  PopoverBody,
   PopoverContent,
   PopoverProps,
   PopoverTrigger,
@@ -20,7 +21,6 @@ export function SmallPopover({
   children: ReactNode;
 } & Pick<PopoverProps, "placement">) {
   const [isOpen, setIsOpen] = useState(false);
-  const theme = useTheme();
   const popoverId = `popover-${useId()}`;
   return (
     <Popover
@@ -36,11 +36,11 @@ export function SmallPopover({
         })}
       </PopoverTrigger>
       <Portal>
-        <PopoverContent zIndex={theme.zIndices.popover} maxWidth={240}>
+        <PopoverContent width="240px">
           <PopoverArrow />
-          <Box paddingY={2} paddingX={3} id={popoverId}>
+          <PopoverBody paddingY={2} paddingX={3} id={popoverId}>
             {content}
-          </Box>
+          </PopoverBody>
         </PopoverContent>
       </Portal>
     </Popover>

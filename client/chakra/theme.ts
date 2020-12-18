@@ -1,4 +1,10 @@
-import { extendTheme, Menu, Popover, Tooltip } from "@chakra-ui/react";
+import {
+  extendTheme,
+  Menu,
+  Popover,
+  Tooltip,
+  theme as base,
+} from "@chakra-ui/react";
 import { styles } from "./styles";
 
 export const theme = extendTheme({
@@ -90,6 +96,21 @@ export const theme = extendTheme({
         },
         _active: {
           color: "purple.800",
+        },
+      },
+    },
+    Popover: {
+      parts: ["popper"],
+      baseStyle: {
+        // Workaround until this is fixed https://github.com/chakra-ui/chakra-ui/issues/2481
+        popper: (props: any) => {
+          const baseStylePopper = base.components.Popover.baseStyle(props)[
+            "popper"
+          ];
+          return {
+            ...baseStylePopper,
+            maxW: props.width ?? baseStylePopper.maxW,
+          };
         },
       },
     },
