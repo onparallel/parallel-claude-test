@@ -19,6 +19,7 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { decode } from "jsonwebtoken";
 
 function PetitionPdf({ token }: { token: string }) {
   const { data } = assertQuery(
@@ -27,16 +28,19 @@ function PetitionPdf({ token }: { token: string }) {
     })
   );
 
+  const tokenPayload: any = decode(token);
+
   const petition = data.petitionAuthToken;
-  const petitionSignatureRequest = data.petitionSignatureRequestAuthToken;
 
   if (!petition) {
     throw new Error(`petition not found on auth token ${token}`);
   }
 
-  const { name: orgName, logoUrl: orgLogo } = petition.organization;
+  const {
+    organization: { name: orgName, logoUrl: orgLogo },
+    signatureConfig,
+  } = petition;
 
-  const signatureConfig = petitionSignatureRequest?.signatureConfig;
   const contacts = signatureConfig?.contacts;
 
   const fieldIndexValues = useFieldIndexValues(petition.fields);
@@ -77,43 +81,45 @@ function PetitionPdf({ token }: { token: string }) {
                 />
               )}
               <Heading justifyContent="center" display="flex">
-                {signatureConfig?.title ?? petition.name}
+                {tokenPayload.documentTitle ?? petition.name}
               </Heading>
             </>
           ) : undefined}
           {fields.map((field, fieldNum) => (
             <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
           ))}
-          {pageNum === pages.length - 1 && (contacts ?? []).length > 0 && (
-            <Box sx={{ pageBreakInside: "avoid" }}>
-              <SignatureDisclaimer
-                textAlign="center"
-                margin="15mm 4mm 5mm 4mm"
-                fontStyle="italic"
-              />
-              <Flex
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gridAutoRows: "minmax(150px, auto)",
-                  alignItems: "center",
-                  justifyItems: "center",
-                  width: "100%",
-                }}
-              >
-                {contacts?.map(
-                  (signer, index) =>
-                    signer && (
-                      <SignatureBox
-                        key={signer.id}
-                        signer={{ ...signer!, key: index }}
-                        timezone={signatureConfig!.timezone}
-                      />
-                    )
-                )}
-              </Flex>
-            </Box>
-          )}
+          {tokenPayload.showSignatureBoxes &&
+            pageNum === pages.length - 1 &&
+            (contacts ?? []).length > 0 && (
+              <Box sx={{ pageBreakInside: "avoid" }}>
+                <SignatureDisclaimer
+                  textAlign="center"
+                  margin="15mm 4mm 5mm 4mm"
+                  fontStyle="italic"
+                />
+                <Flex
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gridAutoRows: "minmax(150px, auto)",
+                    alignItems: "center",
+                    justifyItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {contacts?.map(
+                    (signer, index) =>
+                      signer && (
+                        <SignatureBox
+                          key={signer.id}
+                          signer={{ ...signer!, key: index }}
+                          timezone={signatureConfig!.timezone}
+                        />
+                      )
+                  )}
+                </Flex>
+              </Box>
+            )}
         </PdfPage>
       ))}
     </>
@@ -144,6 +150,14 @@ PetitionPdf.fragments = {
           name
           logoUrl
         }
+        signatureConfig {
+          contacts {
+            id
+            fullName
+            email
+          }
+          timezone
+        }
       }
       ${this.PetitionField}
     `;
@@ -164,21 +178,6 @@ PetitionPdf.fragments = {
       }
     `;
   },
-  get PetitionSignatureRequest() {
-    return gql`
-      fragment PetitionPdf_PetitionSignatureRequest on PetitionSignatureRequest {
-        signatureConfig {
-          contacts {
-            id
-            fullName
-            email
-          }
-          timezone
-          title
-        }
-      }
-    `;
-  },
 };
 
 PetitionPdf.getInitialProps = async ({
@@ -192,12 +191,8 @@ PetitionPdf.getInitialProps = async ({
         petitionAuthToken(token: $token) {
           ...PetitionPdf_Petition
         }
-        petitionSignatureRequestAuthToken(token: $token) {
-          ...PetitionPdf_PetitionSignatureRequest
-        }
       }
       ${PetitionPdf.fragments.Petition}
-      ${PetitionPdf.fragments.PetitionSignatureRequest}
     `,
     {
       variables: { token },

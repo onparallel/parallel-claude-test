@@ -893,9 +893,6 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
-    petitionSignatureRequestAuthToken:
-      | NexusGenRootTypes["PetitionSignatureRequest"]
-      | null; // PetitionSignatureRequest
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
   };
@@ -1541,7 +1538,6 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
     petitions: "PetitionBasePagination";
-    petitionSignatureRequestAuthToken: "PetitionSignatureRequest";
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
   };
@@ -2127,10 +2123,6 @@ export interface NexusGenArgTypes {
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
-    };
-    petitionSignatureRequestAuthToken: {
-      // args
-      token: string; // String!
     };
     publicOrgLogoUrl: {
       // args

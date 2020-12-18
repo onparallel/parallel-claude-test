@@ -3,7 +3,7 @@ import { map } from "async";
 import DataLoader from "dataloader";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { inject, injectable } from "inversify";
-import jwtDecode from "jwt-decode";
+import { decode } from "jsonwebtoken";
 import { ApiContext } from "../context";
 import { fromDataLoader } from "../util/fromDataLoader";
 import { toGlobalId } from "../util/globalId";
@@ -170,11 +170,11 @@ export class Auth implements IAuth {
             exp: expiresAt,
             "cognito:username": cognitoId,
             email,
-          } = jwtDecode<{
+          } = decode(idToken) as {
             exp: number;
             "cognito:username": string;
             email: string;
-          }>(idToken);
+          };
           if (Date.now() > expiresAt * 1000) {
             const refreshToken = await this.redis.get(
               `session:${token}:refreshToken`

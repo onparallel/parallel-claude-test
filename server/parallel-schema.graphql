@@ -2182,7 +2182,6 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
-  petitionSignatureRequestAuthToken(token: String!): PetitionSignatureRequest
   publicOrgLogoUrl(id: GID!): String
 
   """

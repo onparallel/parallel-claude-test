@@ -96,11 +96,7 @@ export function validateAuthTokenPayload<
     keys.forEach((key) => {
       data = data[key];
       if (!isDefined(data)) {
-        throw new ArgValidationError(
-          info,
-          argName,
-          `token payload must have a '${requiredKey}' key`
-        );
+        throw new ArgValidationError(info, argName, "Invalid token");
       }
     });
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

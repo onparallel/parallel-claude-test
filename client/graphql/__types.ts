@@ -1390,7 +1390,6 @@ export type Query = {
   petitionAuthToken?: Maybe<Petition>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  petitionSignatureRequestAuthToken?: Maybe<PetitionSignatureRequest>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1441,10 +1440,6 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
-};
-
-export type QuerypetitionSignatureRequestAuthTokenArgs = {
-  token: Scalars["String"];
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
@@ -4353,6 +4348,18 @@ export type PetitionPdf_PetitionFragment = { __typename?: "Petition" } & Pick<
       Organization,
       "name" | "logoUrl"
     >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "timezone"> & {
+          contacts: Array<
+            Maybe<
+              { __typename?: "Contact" } & Pick<
+                Contact,
+                "id" | "fullName" | "email"
+              >
+            >
+          >;
+        }
+    >;
   };
 
 export type PetitionPdf_PetitionFieldFragment = {
@@ -4369,24 +4376,6 @@ export type PetitionPdf_PetitionFieldFragment = {
     >;
   };
 
-export type PetitionPdf_PetitionSignatureRequestFragment = {
-  __typename?: "PetitionSignatureRequest";
-} & {
-  signatureConfig: { __typename?: "SignatureConfig" } & Pick<
-    SignatureConfig,
-    "timezone" | "title"
-  > & {
-      contacts: Array<
-        Maybe<
-          { __typename?: "Contact" } & Pick<
-            Contact,
-            "id" | "fullName" | "email"
-          >
-        >
-      >;
-    };
-};
-
 export type PdfViewPetitionQueryVariables = Exact<{
   token: Scalars["String"];
 }>;
@@ -4394,11 +4383,6 @@ export type PdfViewPetitionQueryVariables = Exact<{
 export type PdfViewPetitionQuery = { __typename?: "Query" } & {
   petitionAuthToken?: Maybe<
     { __typename?: "Petition" } & PetitionPdf_PetitionFragment
-  >;
-  petitionSignatureRequestAuthToken?: Maybe<
-    {
-      __typename?: "PetitionSignatureRequest";
-    } & PetitionPdf_PetitionSignatureRequestFragment
   >;
 };
 
@@ -6073,11 +6057,6 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
       name
       logoUrl
     }
-  }
-  ${PetitionPdf_PetitionFieldFragmentDoc}
-`;
-export const PetitionPdf_PetitionSignatureRequestFragmentDoc = gql`
-  fragment PetitionPdf_PetitionSignatureRequest on PetitionSignatureRequest {
     signatureConfig {
       contacts {
         id
@@ -6085,9 +6064,9 @@ export const PetitionPdf_PetitionSignatureRequestFragmentDoc = gql`
         email
       }
       timezone
-      title
     }
   }
+  ${PetitionPdf_PetitionFieldFragmentDoc}
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
@@ -10254,12 +10233,8 @@ export const PdfViewPetitionDocument = gql`
     petitionAuthToken(token: $token) {
       ...PetitionPdf_Petition
     }
-    petitionSignatureRequestAuthToken(token: $token) {
-      ...PetitionPdf_PetitionSignatureRequest
-    }
   }
   ${PetitionPdf_PetitionFragmentDoc}
-  ${PetitionPdf_PetitionSignatureRequestFragmentDoc}
 `;
 
 /**

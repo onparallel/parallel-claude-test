@@ -66,10 +66,10 @@ async function main() {
     child_process_1.execSync("rm -rf secrets", { cwd: WORK_DIR, encoding: "utf-8" });
     // Generate tokens
     const CLIENT_SERVER_TOKEN = token_1.token(32);
-    const SIGNATURE_SERVICE_JWT_SECRET = token_1.token(32);
+    const SECURITY_SERVICE_JWT_SECRET = token_1.token(32);
     child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, { cwd: WORK_DIR, encoding: "utf-8" });
     child_process_1.execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
-    child_process_1.execSync(`echo "SIGNATURE_SERVICE_JWT_SECRET=${SIGNATURE_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
+    child_process_1.execSync(`echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`, { cwd: WORK_DIR, encoding: "utf-8" });
     console.log("Building the client");
     child_process_1.execSync(`yarn build`, {
         cwd: `${buildDir}/client`,
