@@ -1,5 +1,4 @@
 import {
-  Box,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -7,7 +6,6 @@ import {
   PopoverProps,
   PopoverTrigger,
   Portal,
-  useTheme,
 } from "@chakra-ui/react";
 import { useId } from "@reach/auto-id";
 import { cloneElement, ReactNode, useState } from "react";
