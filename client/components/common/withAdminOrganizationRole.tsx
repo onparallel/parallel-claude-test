@@ -21,7 +21,7 @@ export function withAdminOrganizationRole<P = {}>(
     getInitialProps: async (context: WithApolloDataContext) => {
       if (!context.apollo) {
         throw new Error(
-          `Please, place "withSuperAdminAccess" before "withApolloData" in the "compose" argument list.`
+          `Please, place "withAdminOrganizationRole" before "withApolloData" in the "compose" argument list.`
         );
       }
       const {
