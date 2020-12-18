@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  redirect,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
@@ -42,8 +43,9 @@ function OrganizationSettings() {
 
 OrganizationSettings.getInitialProps = async ({
   fetchQuery,
+  ...context
 }: WithApolloDataContext) => {
-  await fetchQuery<OrganizationSettingsQuery>(gql`
+  const { data } = await fetchQuery<OrganizationSettingsQuery>(gql`
     query OrganizationSettings {
       me {
         id
@@ -52,6 +54,10 @@ OrganizationSettings.getInitialProps = async ({
     }
     ${AppLayout.fragments.User}
   `);
+
+  if (data.me.role !== "ADMIN") {
+    return redirect(context, `/${context.query.locale}/app`);
+  }
 };
 
 export default withApolloData(OrganizationSettings);
