@@ -7,6 +7,7 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import {
+  redirect,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
@@ -14,17 +15,12 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   OrganizationUsersQuery,
-  OrganizationUsersUserQuery,
   OrganizationUsers_UserFragment,
-  QueryOrganizationUsers_OrderBy,
-  useOrganizationUsersUserQuery,
   useOrganizationUsersQuery,
   OrganizationRole,
+  OrganizationUsers_OrderBy,
 } from "@parallel/graphql/__types";
-import {
-  assertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/assertQuery";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
@@ -58,9 +54,6 @@ function OrganizationUsers() {
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me },
-  } = assertQuery(useOrganizationUsersUserQuery());
-  const {
-    data: { organizationUsers },
     loading,
     refetch,
   } = useAssertQueryOrPreviousData(
@@ -70,11 +63,14 @@ function OrganizationUsers() {
         limit: PAGE_SIZE,
         search: state.search,
         sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as QueryOrganizationUsers_OrderBy,
+          `${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy,
         ],
       },
     })
   );
+
+  const userList = me.organization.users;
+
   const sections = useOrganizationSections();
 
   const columns = useOrganizationUsersColumns();
@@ -125,13 +121,13 @@ function OrganizationUsers() {
       <Box flex="1" padding={4}>
         <TablePage
           columns={columns}
-          rows={organizationUsers.items}
+          rows={userList.items}
           rowKeyProp={"id"}
           isHighlightable
           loading={loading}
           page={state.page}
           pageSize={PAGE_SIZE}
-          totalCount={organizationUsers.totalCount}
+          totalCount={userList.totalCount}
           sort={state.sort}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
@@ -272,53 +268,53 @@ OrganizationUsers.fragments = {
 };
 
 OrganizationUsers.getInitialProps = async ({
-  query,
   fetchQuery,
+  ...context
 }: WithApolloDataContext) => {
-  const { page, search, sort } = parseQuery(query, QUERY_STATE);
-  await Promise.all([
-    fetchQuery<OrganizationUsersQuery>(
-      gql`
-        query OrganizationUsers(
-          $offset: Int!
-          $limit: Int!
-          $search: String
-          $sortBy: [QueryOrganizationUsers_OrderBy!]
-        ) {
-          organizationUsers(
-            offset: $offset
-            limit: $limit
-            search: $search
-            sortBy: $sortBy
-          ) {
-            totalCount
-            items {
-              ...OrganizationUsers_User
+  const { page, search, sort } = parseQuery(context.query, QUERY_STATE);
+  const { data } = await fetchQuery<OrganizationUsersQuery>(
+    gql`
+      query OrganizationUsers(
+        $offset: Int!
+        $limit: Int!
+        $search: String
+        $sortBy: [OrganizationUsers_OrderBy!]
+      ) {
+        me {
+          ...AppLayout_User
+          organization {
+            users(
+              offset: $offset
+              limit: $limit
+              search: $search
+              sortBy: $sortBy
+            ) {
+              totalCount
+              items {
+                ...OrganizationUsers_User
+              }
             }
           }
         }
-        ${OrganizationUsers.fragments.User}
-      `,
-      {
-        variables: {
-          offset: PAGE_SIZE * (page - 1),
-          limit: PAGE_SIZE,
-          search,
-          sortBy: [
-            `${sort.field}_${sort.direction}` as QueryOrganizationUsers_OrderBy,
-          ],
-        },
-      }
-    ),
-    fetchQuery<OrganizationUsersUserQuery>(gql`
-      query OrganizationUsersUser {
-        me {
-          ...AppLayout_User
-        }
       }
       ${AppLayout.fragments.User}
-    `),
-  ]);
+      ${OrganizationUsers.fragments.User}
+    `,
+    {
+      variables: {
+        offset: PAGE_SIZE * (page - 1),
+        limit: PAGE_SIZE,
+        search,
+        sortBy: [
+          `${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy,
+        ],
+      },
+    }
+  );
+
+  if (data.me.role !== "ADMIN") {
+    return redirect(context, `/${context.query.locale}/app`);
+  }
 };
 
 export default withApolloData(OrganizationUsers);

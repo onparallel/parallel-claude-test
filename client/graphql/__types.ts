@@ -690,6 +690,7 @@ export type OrganizationusersArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<OrganizationUsers_OrderBy>>;
 };
 
 export type OrganizationPagination = {
@@ -713,6 +714,17 @@ export type OrganizationStatus =
   | "DEMO"
   /** Used for development or testing purposes */
   | "DEV";
+
+/** Order to use on Organization.users */
+export type OrganizationUsers_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "email_ASC"
+  | "email_DESC"
+  | "firstName_ASC"
+  | "firstName_DESC"
+  | "lastName_ASC"
+  | "lastName_DESC";
 
 export type OrgIntegration = {
   __typename?: "OrgIntegration";
@@ -1400,8 +1412,6 @@ export type Query = {
   organization?: Maybe<Organization>;
   /** The organizations registered in Parallel. */
   organizations: OrganizationPagination;
-  /** The users of an organization */
-  organizationUsers: UserPagination;
   petition?: Maybe<PetitionBase>;
   petitionAuthToken?: Maybe<Petition>;
   /** The petitions of the user */
@@ -1446,13 +1456,6 @@ export type QueryorganizationsArgs = {
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
   status?: Maybe<OrganizationStatus>;
-};
-
-export type QueryorganizationUsersArgs = {
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryOrganizationUsers_OrderBy>>;
 };
 
 export type QuerypetitionArgs = {
@@ -1503,17 +1506,6 @@ export type QueryOrganizations_OrderBy =
   | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
-
-/** Order to use on Query.organizationUsers */
-export type QueryOrganizationUsers_OrderBy =
-  | "createdAt_ASC"
-  | "createdAt_DESC"
-  | "email_ASC"
-  | "email_DESC"
-  | "firstName_ASC"
-  | "firstName_DESC"
-  | "lastName_ASC"
-  | "lastName_DESC";
 
 /** Order to use on Query.petitions */
 export type QueryPetitions_OrderBy =
@@ -3255,24 +3247,22 @@ export type OrganizationUsersQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryOrganizationUsers_OrderBy>>;
+  sortBy?: Maybe<Array<OrganizationUsers_OrderBy>>;
 }>;
 
 export type OrganizationUsersQuery = { __typename?: "Query" } & {
-  organizationUsers: { __typename?: "UserPagination" } & Pick<
-    UserPagination,
-    "totalCount"
-  > & {
-      items: Array<{ __typename?: "User" } & OrganizationUsers_UserFragment>;
+  me: { __typename?: "User" } & {
+    organization: { __typename?: "Organization" } & {
+      users: { __typename?: "UserPagination" } & Pick<
+        UserPagination,
+        "totalCount"
+      > & {
+          items: Array<
+            { __typename?: "User" } & OrganizationUsers_UserFragment
+          >;
+        };
     };
-};
-
-export type OrganizationUsersUserQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type OrganizationUsersUserQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & AppLayout_UserFragment;
+  } & AppLayout_UserFragment;
 };
 
 export type PetitionActivity_PetitionFragment = {
@@ -7471,20 +7461,26 @@ export const OrganizationUsersDocument = gql`
     $offset: Int!
     $limit: Int!
     $search: String
-    $sortBy: [QueryOrganizationUsers_OrderBy!]
+    $sortBy: [OrganizationUsers_OrderBy!]
   ) {
-    organizationUsers(
-      offset: $offset
-      limit: $limit
-      search: $search
-      sortBy: $sortBy
-    ) {
-      totalCount
-      items {
-        ...OrganizationUsers_User
+    me {
+      ...AppLayout_User
+      organization {
+        users(
+          offset: $offset
+          limit: $limit
+          search: $search
+          sortBy: $sortBy
+        ) {
+          totalCount
+          items {
+            ...OrganizationUsers_User
+          }
+        }
       }
     }
   }
+  ${AppLayout_UserFragmentDoc}
   ${OrganizationUsers_UserFragmentDoc}
 `;
 
@@ -7534,58 +7530,6 @@ export type OrganizationUsersQueryHookResult = ReturnType<
 >;
 export type OrganizationUsersLazyQueryHookResult = ReturnType<
   typeof useOrganizationUsersLazyQuery
->;
-export const OrganizationUsersUserDocument = gql`
-  query OrganizationUsersUser {
-    me {
-      ...AppLayout_User
-    }
-  }
-  ${AppLayout_UserFragmentDoc}
-`;
-
-/**
- * __useOrganizationUsersUserQuery__
- *
- * To run a query within a React component, call `useOrganizationUsersUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationUsersUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationUsersUserQuery({
- *   variables: {
- *   },
- * });
- */
-export function useOrganizationUsersUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    OrganizationUsersUserQuery,
-    OrganizationUsersUserQueryVariables
-  >
-) {
-  return Apollo.useQuery<
-    OrganizationUsersUserQuery,
-    OrganizationUsersUserQueryVariables
-  >(OrganizationUsersUserDocument, baseOptions);
-}
-export function useOrganizationUsersUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    OrganizationUsersUserQuery,
-    OrganizationUsersUserQueryVariables
-  >
-) {
-  return Apollo.useLazyQuery<
-    OrganizationUsersUserQuery,
-    OrganizationUsersUserQueryVariables
-  >(OrganizationUsersUserDocument, baseOptions);
-}
-export type OrganizationUsersUserQueryHookResult = ReturnType<
-  typeof useOrganizationUsersUserQuery
->;
-export type OrganizationUsersUserLazyQueryHookResult = ReturnType<
-  typeof useOrganizationUsersUserLazyQuery
 >;
 export const PetitionActivity_updatePetitionDocument = gql`
   mutation PetitionActivity_updatePetition(

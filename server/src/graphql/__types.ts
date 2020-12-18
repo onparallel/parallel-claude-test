@@ -163,6 +163,15 @@ export interface NexusGenEnums {
   OnboardingStatus: "FINISHED" | "SKIPPED";
   OrganizationRole: "ADMIN" | "NORMAL";
   OrganizationStatus: db.OrganizationStatus;
+  OrganizationUsers_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
+    | "email_ASC"
+    | "email_DESC"
+    | "firstName_ASC"
+    | "firstName_DESC"
+    | "lastName_ASC"
+    | "lastName_DESC";
   PetitionAccessStatus: db.PetitionAccessStatus;
   PetitionBaseType: "PETITION" | "TEMPLATE";
   PetitionFieldReplyStatus: db.PetitionFieldReplyStatus;
@@ -188,15 +197,6 @@ export interface NexusGenEnums {
     | "firstName_DESC"
     | "fullName_ASC"
     | "fullName_DESC"
-    | "lastName_ASC"
-    | "lastName_DESC";
-  QueryOrganizationUsers_OrderBy:
-    | "createdAt_ASC"
-    | "createdAt_DESC"
-    | "email_ASC"
-    | "email_DESC"
-    | "firstName_ASC"
-    | "firstName_DESC"
     | "lastName_ASC"
     | "lastName_DESC";
   QueryOrganizations_OrderBy:
@@ -917,7 +917,6 @@ export interface NexusGenFieldTypes {
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
-    organizationUsers: NexusGenRootTypes["UserPagination"]; // UserPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
@@ -1572,7 +1571,6 @@ export interface NexusGenFieldTypeNames {
     me: "User";
     organization: "Organization";
     organizations: "OrganizationPagination";
-    organizationUsers: "UserPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
     petitions: "PetitionBasePagination";
@@ -2106,6 +2104,7 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+      sortBy?: NexusGenEnums["OrganizationUsers_OrderBy"][] | null; // [OrganizationUsers_OrderBy!]
     };
   };
   Petition: {
@@ -2152,13 +2151,6 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryOrganizations_OrderBy"][] | null; // [QueryOrganizations_OrderBy!]
       status?: NexusGenEnums["OrganizationStatus"] | null; // OrganizationStatus
-    };
-    organizationUsers: {
-      // args
-      limit?: number | null; // Int
-      offset?: number | null; // Int
-      search?: string | null; // String
-      sortBy?: NexusGenEnums["QueryOrganizationUsers_OrderBy"][] | null; // [QueryOrganizationUsers_OrderBy!]
     };
     petition: {
       // args

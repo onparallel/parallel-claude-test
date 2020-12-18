@@ -2,6 +2,7 @@ import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
 import { titleize } from "../../util/strings";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { parseSortBy } from "../helpers/paginationPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
 
 export const OrganizationStatus = enumType({
@@ -79,16 +80,31 @@ export const Organization = objectType({
         type: "User",
         description: "The users in the organization.",
         searchable: true,
+        sortableBy: ["firstName", "lastName", "email", "createdAt"],
         authorize: isOwnOrgOrSuperAdmin(),
         additionalArgs: {
           exclude: list(nonNull(globalIdArg("User"))),
         },
-        resolve: async (root, { offset, limit, search, exclude }, ctx) => {
+        resolve: async (
+          root,
+          { offset, limit, search, sortBy, exclude },
+          ctx
+        ) => {
+          const columnMap = {
+            firstName: "first_name",
+            lastName: "last_name",
+            email: "email",
+            createdAt: "created_at",
+          } as const;
           return await ctx.organizations.loadOrgUsers(root.id, {
             offset,
             limit,
             search,
             excludeIds: exclude,
+            sortBy: (sortBy || ["createdAt_ASC"]).map((value) => {
+              const [field, order] = parseSortBy(value);
+              return { column: columnMap[field], order };
+            }),
           });
         },
       });
