@@ -1,26 +1,27 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Stack } from "@chakra-ui/core";
+import { Badge, Box, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
-  redirect,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
+  OrganizationRole,
   OrganizationUsersQuery,
+  OrganizationUsers_OrderBy,
   OrganizationUsers_UserFragment,
   useOrganizationUsersQuery,
-  OrganizationRole,
-  OrganizationUsers_OrderBy,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
@@ -272,7 +273,7 @@ OrganizationUsers.getInitialProps = async ({
   ...context
 }: WithApolloDataContext) => {
   const { page, search, sort } = parseQuery(context.query, QUERY_STATE);
-  const { data } = await fetchQuery<OrganizationUsersQuery>(
+  await fetchQuery<OrganizationUsersQuery>(
     gql`
       query OrganizationUsers(
         $offset: Int!
@@ -311,10 +312,9 @@ OrganizationUsers.getInitialProps = async ({
       },
     }
   );
-
-  if (data.me.role !== "ADMIN") {
-    return redirect(context, `/${context.query.locale}/app`);
-  }
 };
 
-export default withApolloData(OrganizationUsers);
+export default compose(
+  withAdminOrganizationRole,
+  withApolloData
+)(OrganizationUsers);

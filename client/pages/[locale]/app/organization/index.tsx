@@ -1,16 +1,17 @@
 import { gql } from "@apollo/client";
+import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
-  redirect,
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
-  useOrganizationSettingsQuery,
   OrganizationSettingsQuery,
+  useOrganizationSettingsQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -45,7 +46,7 @@ OrganizationSettings.getInitialProps = async ({
   fetchQuery,
   ...context
 }: WithApolloDataContext) => {
-  const { data } = await fetchQuery<OrganizationSettingsQuery>(gql`
+  await fetchQuery<OrganizationSettingsQuery>(gql`
     query OrganizationSettings {
       me {
         id
@@ -54,10 +55,9 @@ OrganizationSettings.getInitialProps = async ({
     }
     ${AppLayout.fragments.User}
   `);
-
-  if (data.me.role !== "ADMIN") {
-    return redirect(context, `/${context.query.locale}/app`);
-  }
 };
 
-export default withApolloData(OrganizationSettings);
+export default compose(
+  withAdminOrganizationRole,
+  withApolloData
+)(OrganizationSettings);
