@@ -656,6 +656,8 @@ export type OnboardingStatus = "FINISHED" | "SKIPPED";
 /** An organization in the system. */
 export type Organization = Timestamps & {
   __typename?: "Organization";
+  /** @deprecated Temporal solution for support methods, don't use */
+  _id: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The ID of the organization. */
@@ -3052,7 +3054,7 @@ export type AdminOrganizations_OrganizationFragment = {
   __typename?: "Organization";
 } & Pick<
   Organization,
-  "id" | "name" | "identifier" | "status" | "userCount" | "createdAt"
+  "id" | "_id" | "name" | "identifier" | "status" | "userCount" | "createdAt"
 >;
 
 export type AdminOrganizations_UserFragment = {
@@ -4712,6 +4714,7 @@ export const Admin_UserFragmentDoc = gql`
 export const AdminOrganizations_OrganizationFragmentDoc = gql`
   fragment AdminOrganizations_Organization on Organization {
     id
+    _id
     name
     identifier
     status

@@ -741,6 +741,9 @@ enum OnboardingStatus {
 An organization in the system.
 """
 type Organization implements Timestamps {
+  _id: Int!
+    @deprecated(reason: "Temporal solution for support methods, don't use")
+
   """
   Time when the resource was created.
   """

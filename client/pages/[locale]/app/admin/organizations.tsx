@@ -170,6 +170,11 @@ function useOrganizationColumns() {
   return useMemo<TableColumn<OrganizationSelection>[]>(
     () => [
       {
+        key: "id",
+        header: "ID",
+        CellContent: ({ row }) => <>{row._id}</>,
+      },
+      {
         key: "name",
         isSortable: true,
         header: intl.formatMessage({
@@ -252,6 +257,7 @@ AdminOrganizations.fragments = {
     return gql`
       fragment AdminOrganizations_Organization on Organization {
         id
+        _id
         name
         identifier
         status

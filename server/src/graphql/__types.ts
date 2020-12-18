@@ -570,6 +570,7 @@ export interface NexusGenFieldTypes {
   };
   Organization: {
     // field return type
+    _id: number; // Int!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     identifier: string; // String!
@@ -1224,6 +1225,7 @@ export interface NexusGenFieldTypeNames {
   };
   Organization: {
     // field return type name
+    _id: "Int";
     createdAt: "DateTime";
     id: "GID";
     identifier: "String";

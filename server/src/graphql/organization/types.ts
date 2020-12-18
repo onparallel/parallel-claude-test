@@ -1,5 +1,6 @@
 import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
 import { titleize } from "../../util/strings";
+import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { isOwnOrgOrSuperAdmin } from "./authorizers";
 
@@ -42,6 +43,11 @@ export const Organization = objectType({
   description: "An organization in the system.",
   definition(t) {
     t.implements("Timestamps");
+    t.int("_id", {
+      deprecation: "Temporal solution for support methods, don't use",
+      authorize: userIsSuperAdmin(),
+      resolve: ({ id }) => id,
+    });
     t.globalId("id", {
       description: "The ID of the organization.",
     });
