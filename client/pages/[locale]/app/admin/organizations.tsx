@@ -170,7 +170,7 @@ function useOrganizationColumns() {
   return useMemo<TableColumn<OrganizationSelection>[]>(
     () => [
       {
-        key: "id",
+        key: "_id",
         header: "ID",
         CellContent: ({ row }) => <>{row._id}</>,
       },
