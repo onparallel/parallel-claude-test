@@ -1,4 +1,4 @@
-import { keyframes } from "@chakra-ui/core";
+import { keyframes } from "@chakra-ui/react";
 import { getColor } from "@chakra-ui/theme-tools";
 import { Theme } from "@parallel/chakra/theme";
 

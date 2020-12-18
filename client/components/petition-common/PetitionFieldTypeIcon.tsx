@@ -1,19 +1,19 @@
-import { Icon, IconProps } from "@chakra-ui/core";
+import { Icon, IconProps } from "@chakra-ui/react";
 import {
   FieldFileUploadIcon,
-  FieldTextIcon,
   FieldHeadingIcon,
   FieldSelectIcon,
+  FieldTextIcon,
 } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { forwardRef } from "react";
 
-export type PetitionFieldTypeIconProps = IconProps & {
+export interface PetitionFieldTypeIconProps extends IconProps {
   type: PetitionFieldType;
-};
+}
 
-export const PetitionFieldTypeIcon = forwardRef<
-  SVGSVGElement,
+export const PetitionFieldTypeIcon = chakraForwardRef<
+  "svg",
   PetitionFieldTypeIconProps
 >(function PetitionFieldTypeIcon({ type, ...props }, ref) {
   const icon = {

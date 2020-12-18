@@ -1,4 +1,4 @@
-import { useTheme } from "@chakra-ui/core";
+import { useTheme } from "@chakra-ui/react";
 import { useEffect } from "react";
 
 export function useOnMediaQueryChange(

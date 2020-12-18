@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/core";
+import { Box, Flex, Heading, IconButton, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { SettingsLayout_UserFragment } from "@parallel/graphql/__types";
 import { useOnMediaQueryChange } from "@parallel/utils/useOnMediaQueryChange";

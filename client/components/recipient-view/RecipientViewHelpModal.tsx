@@ -13,7 +13,7 @@ import {
   ModalProps,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -21,7 +21,7 @@ import { NormalLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 
-export function RecipientViewHelpModal(props: ModalProps) {
+export function RecipientViewHelpModal(props: Omit<ModalProps, "children">) {
   const intl = useIntl();
   const router = useRouter();
   const supportUrl = ({

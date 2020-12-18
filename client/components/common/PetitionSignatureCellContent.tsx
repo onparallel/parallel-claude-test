@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Tooltip } from "@chakra-ui/core";
+import { Box, Tooltip } from "@chakra-ui/react";
 import { AlertCircleIcon, SignatureIcon } from "@parallel/chakra/icons";
 import {
   PetitionSignatureCellContent_PetitionFragment,

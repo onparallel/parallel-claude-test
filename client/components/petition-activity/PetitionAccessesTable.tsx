@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  BoxProps,
   Button,
   Flex,
   Heading,
@@ -10,7 +11,7 @@ import {
   Portal,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   BellIcon,
   BellSettingsIcon,
@@ -37,6 +38,16 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 import { Table, TableColumn } from "../common/Table";
 
+export interface PetitionAccessesTable extends BoxProps {
+  petition: PetitionAccessTable_PetitionFragment;
+  onAddPetitionAccess: () => void;
+  onSendMessage: (accessIds: string[]) => void;
+  onSendReminders: (accessIds: string[]) => void;
+  onReactivateAccess: (accessId: string) => void;
+  onDeactivateAccess: (accessId: string) => void;
+  onConfigureReminders: (accessIds: string[]) => void;
+}
+
 export function PetitionAccessesTable({
   petition,
   onAddPetitionAccess,
@@ -46,15 +57,7 @@ export function PetitionAccessesTable({
   onDeactivateAccess,
   onConfigureReminders,
   ...props
-}: ExtendChakra<{
-  petition: PetitionAccessTable_PetitionFragment;
-  onAddPetitionAccess: () => void;
-  onSendMessage: (accessIds: string[]) => void;
-  onSendReminders: (accessIds: string[]) => void;
-  onReactivateAccess: (accessId: string) => void;
-  onDeactivateAccess: (accessId: string) => void;
-  onConfigureReminders: (accessIds: string[]) => void;
-}>) {
+}: PetitionAccessesTable) {
   const intl = useIntl();
   const [selection, setSelection] = useState<string[]>([]);
   const selected = useMemo(

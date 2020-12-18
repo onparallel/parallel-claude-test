@@ -1,4 +1,4 @@
-import { Text } from "@chakra-ui/core";
+import { Text } from "@chakra-ui/react";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";
 import { NextPageContext } from "next";
 import { FormattedMessage } from "react-intl";

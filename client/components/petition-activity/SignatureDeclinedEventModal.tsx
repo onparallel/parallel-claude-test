@@ -8,7 +8,7 @@ import {
   ModalProps,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ContactLink_ContactFragment, Maybe } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 import { ContactLink } from "../common/ContactLink";

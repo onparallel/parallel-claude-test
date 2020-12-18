@@ -1,12 +1,13 @@
-import { Box, Flex, forwardRef, Image, Stack } from "@chakra-ui/core";
+import { Box, Flex, Image, Stack } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 
-export type PublicShowcaseProps = {
+export interface PublicShowcaseProps {
   isReversed?: boolean;
   imageUrl: string;
   imageSize?: string;
-};
+}
 
-export const PublicShowcase = forwardRef<PublicShowcaseProps, "div">(
+export const PublicShowcase = chakraForwardRef<"div", PublicShowcaseProps>(
   function PublicShowcase(
     { isReversed, imageUrl, imageSize = "250px", children, ...props },
     ref

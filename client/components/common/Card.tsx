@@ -1,15 +1,26 @@
-import { Box, CloseButton, Flex, Heading, HeadingProps } from "@chakra-ui/core";
-import { forwardRef, ReactNode } from "react";
+import {
+  Box,
+  CloseButton,
+  Flex,
+  Heading,
+  HeadingProps,
+  HTMLChakraProps,
+} from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
+import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Divider } from "./Divider";
 
-export const Card: typeof Box = forwardRef(function Card(
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CardProps extends HTMLChakraProps<"section"> {}
+
+export const Card = chakraForwardRef<"section", {}>(function Card(
   { children, ...props },
   ref
 ) {
   return (
     <Box
-      ref={ref}
+      ref={ref as any}
       as="section"
       border="1px solid"
       borderColor="gray.200"

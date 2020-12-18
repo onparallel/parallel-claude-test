@@ -5,7 +5,7 @@ import {
   NumberInputField,
   Select,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { unCamelCase } from "@parallel/utils/strings";
 import {
   IntrospectionEnumType,

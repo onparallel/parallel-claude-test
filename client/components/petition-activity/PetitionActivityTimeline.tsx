@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps } from "@chakra-ui/core";
+import { Box, BoxProps } from "@chakra-ui/react";
 import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphql/__types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";

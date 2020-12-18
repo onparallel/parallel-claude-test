@@ -9,7 +9,7 @@ import {
   Input,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
@@ -138,7 +138,7 @@ export function ConfirmPetitionCompletedDialog({
                   defaultMessage="Attach a PDF export with the submitted replies"
                 />
               </Checkbox>
-              <Collapse isOpen={attachPdfExport}>
+              <Collapse in={attachPdfExport}>
                 <Box paddingTop={1}>
                   <FormControl>
                     <FormLabel display="flex" alignItems="center">

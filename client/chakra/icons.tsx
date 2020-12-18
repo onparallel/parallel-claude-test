@@ -1,4 +1,4 @@
-import { createIcon } from "@chakra-ui/core";
+import { createIcon } from "@chakra-ui/react";
 
 export const TwitterIcon = createIcon({
   displayName: "TwitterIcon",

@@ -1,4 +1,4 @@
-import { Box, Button, Flex } from "@chakra-ui/core";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   addDays,

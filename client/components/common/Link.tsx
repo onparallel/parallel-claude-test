@@ -1,20 +1,22 @@
 import {
   Link as ChakraLink,
   LinkProps as ChakraLinkProps,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, forwardRef, Ref } from "react";
+import { ReactNode } from "react";
 
-export type LinkProps = Pick<NextLinkProps, "href"> &
-  Omit<ChakraLinkProps, "href"> & {
-    next?: Omit<NextLinkProps, "href">;
-    children?: ReactNode;
-  };
+export interface LinkProps
+  extends Pick<NextLinkProps, "href">,
+    Omit<ChakraLinkProps, "href"> {
+  next?: Omit<NextLinkProps, "href">;
+  children?: ReactNode;
+}
 
-export const Link = forwardRef(function Link(
-  { next, children, href, ...props }: LinkProps,
-  ref: Ref<HTMLAnchorElement>
+export const Link = chakraForwardRef<"a", LinkProps>(function Link(
+  { next, children, href, ...props },
+  ref
 ) {
   const { query } = useRouter();
   return (

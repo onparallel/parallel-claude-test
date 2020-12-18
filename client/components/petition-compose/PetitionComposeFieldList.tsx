@@ -1,14 +1,15 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  BoxProps,
   Button,
   ButtonProps,
   Flex,
   IconButton,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef, ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { AddFieldPopover } from "@parallel/components/petition-compose/AddFieldPopover";
 import {
@@ -27,7 +28,6 @@ import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import {
   createRef,
-  forwardRef,
   memo,
   RefObject,
   useCallback,
@@ -112,7 +112,7 @@ export const PetitionComposeFieldList = Object.assign(
       (
         fieldId: string
       ): Pick<
-        PetitionComposeFieldProps,
+        PetitionComposeFieldProps & BoxProps,
         | "onClick"
         | "onFocus"
         | "onCloneClick"
@@ -259,43 +259,44 @@ export const PetitionComposeFieldList = Object.assign(
   }
 );
 
-const AddFieldButton = forwardRef<
-  HTMLButtonElement,
-  ButtonProps & {
-    onSelectFieldType: (type: PetitionFieldType) => void;
-  }
->(function AddFieldButton(props, ref) {
-  const intl = useIntl();
-  return (
-    <Tooltip
-      label={intl.formatMessage({
-        id: "petition.add-field-button",
-        defaultMessage: "Add field",
-      })}
-    >
-      <AddFieldPopover
-        ref={ref as any}
-        as={IconButton}
+interface AddFieldButtonProps extends ButtonProps {
+  onSelectFieldType: (type: PetitionFieldType) => void;
+}
+
+const AddFieldButton = chakraForwardRef<"button", AddFieldButtonProps>(
+  function AddFieldButton(props, ref) {
+    const intl = useIntl();
+    return (
+      <Tooltip
         label={intl.formatMessage({
           id: "petition.add-field-button",
           defaultMessage: "Add field",
         })}
-        icon={<AddIcon />}
-        size="xs"
-        variant="outline"
-        rounded="full"
-        backgroundColor="white"
-        borderColor="gray.200"
-        color="gray.500"
-        _hover={{
-          borderColor: "gray.300",
-          color: "gray.800",
-        }}
-        _active={{
-          backgroundColor: "gray.50",
-        }}
-        {...props}
-      />
-    </Tooltip>
-  );
-});
+      >
+        <AddFieldPopover
+          ref={ref as any}
+          as={IconButton}
+          label={intl.formatMessage({
+            id: "petition.add-field-button",
+            defaultMessage: "Add field",
+          })}
+          icon={<AddIcon />}
+          size="xs"
+          variant="outline"
+          rounded="full"
+          backgroundColor="white"
+          borderColor="gray.200"
+          color="gray.500"
+          _hover={{
+            borderColor: "gray.300",
+            color: "gray.800",
+          }}
+          _active={{
+            backgroundColor: "gray.50",
+          }}
+          {...props}
+        />
+      </Tooltip>
+    );
+  }
+);

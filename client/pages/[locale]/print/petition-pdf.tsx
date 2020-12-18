@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, Image, Text } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   withApolloData,
@@ -17,9 +16,9 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
+import { decode } from "jsonwebtoken";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { decode } from "jsonwebtoken";
 
 function PetitionPdf({ token }: { token: string }) {
   const { data } = assertQuery(
@@ -126,7 +125,7 @@ function PetitionPdf({ token }: { token: string }) {
   );
 }
 
-function SignatureDisclaimer(props: ExtendChakra) {
+function SignatureDisclaimer(props: BoxProps) {
   return (
     <Text {...props}>
       <FormattedMessage

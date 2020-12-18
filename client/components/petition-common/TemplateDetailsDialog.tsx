@@ -18,7 +18,7 @@ import {
   Stack,
   Text,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ChevronDownIcon,
   CopyIcon,

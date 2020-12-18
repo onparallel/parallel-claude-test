@@ -1,4 +1,4 @@
-import { Box, BoxProps, Button, ButtonProps } from "@chakra-ui/core";
+import { Box, BoxProps, Button, ButtonProps } from "@chakra-ui/react";
 import { useIntl } from "react-intl";
 
 export type BurgerButtonProps = Omit<ButtonProps, "children"> & {

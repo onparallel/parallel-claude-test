@@ -11,7 +11,7 @@ import {
   MenuOptionGroup,
   Portal,
   UsePopperProps,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { KeyIcon, LogOutIcon, UserIcon } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
 import { postJson } from "@parallel/utils/rest";

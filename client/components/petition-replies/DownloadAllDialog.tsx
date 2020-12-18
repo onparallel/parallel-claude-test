@@ -1,11 +1,12 @@
-import { Box, Button, Radio, RadioGroup, Text } from "@chakra-ui/core";
+import { gql } from "@apollo/client";
+import { Box, Button, Radio, RadioGroup, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import { DownloadAllDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { gql } from "@apollo/client";
+import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import escapeStringRegexp from "escape-string-regexp";
 import { useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -14,7 +15,6 @@ import {
   PlaceholderInput,
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 
 export type DownloadAllDialogProps = {
   fields: DownloadAllDialog_PetitionFieldFragment[];

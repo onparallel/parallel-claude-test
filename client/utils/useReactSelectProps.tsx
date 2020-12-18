@@ -4,7 +4,7 @@ import {
   Text,
   useFormControl,
   useTheme,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { memo, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";

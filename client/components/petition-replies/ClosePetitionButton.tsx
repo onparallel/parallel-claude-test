@@ -7,7 +7,7 @@ import {
   MenuList,
   Portal,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { CheckIcon, ChevronDownIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
 import { SplitButton, SplitButtonProps } from "../common/SplitButton";

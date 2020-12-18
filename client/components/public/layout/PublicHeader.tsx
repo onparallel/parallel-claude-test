@@ -10,7 +10,7 @@ import {
   Stack,
   StackProps,
   useDisclosure,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { NakedLink } from "@parallel/components/common/Link";

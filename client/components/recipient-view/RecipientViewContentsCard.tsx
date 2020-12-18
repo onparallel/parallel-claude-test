@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, List, ListItem, Stack, Text } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, Heading, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import {
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
@@ -9,9 +8,16 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
-import { Card } from "../common/Card";
+import { Card, CardProps } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
+
+interface RecipientViewContentsCardProps extends CardProps {
+  currentPage: number;
+  hasCommentsEnabled: boolean;
+  sender: RecipientViewContentsCard_PublicUserFragment;
+  petition: RecipientViewContentsCard_PublicPetitionFragment;
+}
 
 export function RecipientViewContentsCard({
   currentPage,
@@ -19,12 +25,7 @@ export function RecipientViewContentsCard({
   sender,
   petition,
   ...props
-}: ExtendChakra<{
-  currentPage: number;
-  hasCommentsEnabled: boolean;
-  sender: RecipientViewContentsCard_PublicUserFragment;
-  petition: RecipientViewContentsCard_PublicPetitionFragment;
-}>) {
+}: RecipientViewContentsCardProps) {
   const { query } = useRouter();
   const { pages, fields } = getPagesAndFields(petition.fields, currentPage);
   return (

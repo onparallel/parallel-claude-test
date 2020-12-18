@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { ContactLink_ContactFragment } from "@parallel/graphql/__types";
 import { Link, LinkProps } from "./Link";
-import { Tooltip } from "@chakra-ui/core";
+import { Tooltip } from "@chakra-ui/react";
 
 export function ContactLink({
   contact: { id, email, fullName },

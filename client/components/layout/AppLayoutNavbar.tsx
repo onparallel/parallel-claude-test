@@ -13,7 +13,7 @@ import {
   Portal,
   Stack,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   AddIcon,
   FileNewIcon,

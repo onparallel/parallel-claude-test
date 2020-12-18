@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/core";
+import { Box, Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
@@ -14,7 +14,6 @@ import {
   KeyboardEvent,
   memo,
   ReactNode,
-  Ref,
   useMemo,
   useRef,
   useState,
@@ -37,10 +36,12 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
   isDeleted?: boolean;
 };
 
-export type ContactSelectProps = Omit<
-  AsyncCreatableSelectProps<ContactSelectSelection, true>,
-  "value" | "onChange"
-> & {
+export interface ContactSelectProps
+  extends UserReactSelectProps,
+    Omit<
+      AsyncCreatableSelectProps<ContactSelectSelection, true>,
+      "value" | "onChange"
+    > {
   placeholder?: string;
   value: ContactSelectSelection[];
   onChange: (recipients: ContactSelectSelection[]) => void;
@@ -51,18 +52,15 @@ export type ContactSelectProps = Omit<
     search: string,
     exclude: string[]
   ) => Promise<ContactSelectSelection[]>;
-} & UserReactSelectProps;
+}
 
 export const ContactSelect = Object.assign(
-  forwardRef(function (
-    {
-      value,
-      onSearchContacts,
-      onCreateContact,
-      onChange,
-      ...props
-    }: ContactSelectProps,
-    ref: Ref<AsyncCreatableSelect<ContactSelectSelection, true>>
+  forwardRef<
+    AsyncCreatableSelect<ContactSelectSelection, true>,
+    ContactSelectProps
+  >(function (
+    { value, onSearchContacts, onCreateContact, onChange, ...props },
+    ref
   ) {
     const errorToast = useExistingContactToast();
 

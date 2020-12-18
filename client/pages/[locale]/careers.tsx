@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Stack, Text } from "@chakra-ui/core";
+import { Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";

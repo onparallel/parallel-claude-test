@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Avatar,
   Box,
+  BoxProps,
   Button,
   Collapse,
   Flex,
@@ -11,9 +12,8 @@ import {
   Stack,
   Text,
   useDisclosure,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { AddIcon, ChevronDownIcon } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { BreakLines } from "@parallel/components/common/BreakLines";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -290,6 +290,7 @@ function NewPetition() {
                 lg: "repeat(3, 1fr)",
               }}
               gap={4}
+              padding={4}
             >
               <EmptyPetitionCard
                 id="empty-petition-card"
@@ -303,7 +304,7 @@ function NewPetition() {
                 />
               ))}
             </Grid>
-            <Stack direction="row" justifyContent="flex-end" marginTop={4}>
+            <Stack direction="row" justifyContent="flex-end">
               <Button
                 variant="ghost"
                 colorScheme="purple"
@@ -331,13 +332,14 @@ function NewPetition() {
           </>
         )}
       </NewPetitionSection>
-      <NewPetitionSection header={"Parallel"} paddingBottom={2}>
+      <NewPetitionSection header={"Parallel"} marginTop={4} paddingBottom={2}>
         <Grid
           templateColumns={{
             md: "repeat(2, 1fr)",
             lg: "repeat(3, 1fr)",
           }}
           gap={4}
+          padding={4}
         >
           {publicTemplates.map(
             (template: NewPetition_PetitionTemplateFragment) => (
@@ -349,7 +351,7 @@ function NewPetition() {
             )
           )}
         </Grid>
-        <Stack direction="row" justifyContent="flex-end" marginTop={4}>
+        <Stack direction="row" justifyContent="flex-end">
           <Button
             variant="ghost"
             size="sm"
@@ -368,7 +370,7 @@ function NewPetition() {
   );
 }
 
-function NewPetitionContainer({ children, ...props }: ExtendChakra) {
+function NewPetitionContainer({ children, ...props }: BoxProps) {
   return (
     <Box {...props}>
       <Box
@@ -386,6 +388,14 @@ function NewPetitionContainer({ children, ...props }: ExtendChakra) {
   );
 }
 
+interface NewPetitionHeader extends BoxProps {
+  inputRef: Ref<HTMLInputElement>;
+  search: string;
+  locale: Maybe<PetitionLocale>;
+  onSearchChange: (search: string) => void;
+  onLocaleChange: (locale: Maybe<PetitionLocale>) => void;
+}
+
 function NewPetitionHeader({
   inputRef,
   search,
@@ -393,13 +403,7 @@ function NewPetitionHeader({
   onSearchChange,
   onLocaleChange,
   ...props
-}: ExtendChakra<{
-  inputRef: Ref<HTMLInputElement>;
-  search: string;
-  locale: Maybe<PetitionLocale>;
-  onSearchChange: (search: string) => void;
-  onLocaleChange: (locale: Maybe<PetitionLocale>) => void;
-}>) {
+}: NewPetitionHeader) {
   const intl = useIntl();
   const suggestions = useMemo(
     () => [
@@ -515,14 +519,13 @@ const NewPetitionSection = memo(function NewPetitionSection({
   header,
   children,
   ...props
-}: ExtendChakra<{
+}: {
   header: ReactNode;
-  children: ReactNode;
-}>) {
+} & BoxProps) {
   const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
   return (
     <NewPetitionContainer {...props}>
-      <Flex marginBottom={4}>
+      <Flex>
         <Flex
           as="button"
           outline="none"
@@ -539,19 +542,23 @@ const NewPetitionSection = memo(function NewPetitionSection({
           </Heading>
         </Flex>
       </Flex>
-      <Collapse isOpen={isOpen}>{children}</Collapse>
+      <Collapse in={isOpen}>
+        <Box>{children}</Box>
+      </Collapse>
     </NewPetitionContainer>
   );
 });
+
+interface TemplateCardProps extends BoxProps {
+  template: NewPetition_PetitionTemplateFragment;
+  onPress: () => void;
+}
 
 const TemplateCard = memo(function TemplateCard({
   template,
   onPress,
   ...props
-}: ExtendChakra<{
-  template: NewPetition_PetitionTemplateFragment;
-  onPress: () => void;
-}>) {
+}: TemplateCardProps) {
   const intl = useIntl();
   const buttonProps = useRoleButton(onPress, [onPress]);
 
@@ -612,10 +619,14 @@ const TemplateCard = memo(function TemplateCard({
   );
 });
 
+interface EmptyPetitionCardProps extends BoxProps {
+  onPress: () => void;
+}
+
 const EmptyPetitionCard = memo(function EmptyPetitionCard({
   onPress,
   ...props
-}: ExtendChakra<{ onPress: () => void }>) {
+}: EmptyPetitionCardProps) {
   const buttonProps = useRoleButton(onPress, [onPress]);
   return (
     <Card

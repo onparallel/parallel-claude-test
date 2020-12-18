@@ -11,7 +11,7 @@ import {
   Text,
   UnorderedList,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ArrowForwardIcon,
   ListIcon,

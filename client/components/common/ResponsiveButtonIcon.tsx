@@ -1,12 +1,12 @@
 import {
-  chakra,
   Button,
-  forwardRef,
+  chakra,
   IconButtonProps,
-  Tooltip,
   Placement,
+  Tooltip,
   useBreakpointValue,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { cloneElement, isValidElement } from "react";
 
 export interface ResponsiveButtonIconProps
@@ -16,9 +16,9 @@ export interface ResponsiveButtonIconProps
   placement?: Placement;
 }
 
-export const ResponsiveButtonIcon = forwardRef<
-  ResponsiveButtonIconProps,
-  "button"
+export const ResponsiveButtonIcon = chakraForwardRef<
+  "button",
+  ResponsiveButtonIconProps
 >(function (
   {
     label,

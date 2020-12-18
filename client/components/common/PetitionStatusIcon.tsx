@@ -1,54 +1,63 @@
-import { Center, Tooltip } from "@chakra-ui/core";
+import { Tooltip } from "@chakra-ui/react";
 import {
   CheckIcon,
   DoubleCheckIcon,
   EditIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionStatus } from "@parallel/graphql/__types";
-import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-export function PetitionStatusIcon({
-  status,
-  ...props
-}: ExtendChakra<{
+interface PetitionStatusIconProps {
   status: PetitionStatus;
-}>) {
-  const intl = useIntl();
-  const { label, icon } = useMemo(
-    () => ({
-      label: {
-        DRAFT: intl.formatMessage({
-          id: "generic.petition-status.draft",
-          defaultMessage: "Draft",
-        }),
-        PENDING: intl.formatMessage({
-          id: "generic.petition-status.pending",
-          defaultMessage: "Pending",
-        }),
-        COMPLETED: intl.formatMessage({
-          id: "generic.petition-status.completed",
-          defaultMessage: "Completed",
-        }),
-        CLOSED: intl.formatMessage({
-          id: "generic.petition-status.closed",
-          defaultMessage: "Closed",
-        }),
-      }[status],
-      icon: {
-        DRAFT: <EditIcon boxSize="18px" color="gray.500" />,
-        PENDING: <TimeIcon boxSize="18px" color="yellow.600" />,
-        COMPLETED: <CheckIcon boxSize="18px" color="green.500" />,
-        CLOSED: <DoubleCheckIcon boxSize="24px" color="green.500" />,
-      }[status],
-    }),
-    [status, intl.locale]
-  );
-  return (
-    <Center boxSize="24px" {...props}>
-      <Tooltip label={label}>{icon}</Tooltip>
-    </Center>
-  );
 }
+
+export const PetitionStatusIcon = chakraForwardRef<
+  "svg",
+  PetitionStatusIconProps
+>(function PetitionStatusIcon({ status, ...props }, ref) {
+  const intl = useIntl();
+  return (
+    <Tooltip
+      label={
+        status === "DRAFT"
+          ? intl.formatMessage({
+              id: "generic.petition-status.draft",
+              defaultMessage: "Draft",
+            })
+          : status === "PENDING"
+          ? intl.formatMessage({
+              id: "generic.petition-status.pending",
+              defaultMessage: "Pending",
+            })
+          : status === "COMPLETED"
+          ? intl.formatMessage({
+              id: "generic.petition-status.completed",
+              defaultMessage: "Completed",
+            })
+          : status === "CLOSED"
+          ? intl.formatMessage({
+              id: "generic.petition-status.closed",
+              defaultMessage: "Closed",
+            })
+          : null
+      }
+    >
+      {status === "DRAFT" ? (
+        <EditIcon ref={ref} boxSize="18px" color="gray.500" {...props} />
+      ) : status === "PENDING" ? (
+        <TimeIcon ref={ref} boxSize="18px" color="yellow.600" {...props} />
+      ) : status === "COMPLETED" ? (
+        <CheckIcon ref={ref} boxSize="18px" color="green.500" {...props} />
+      ) : status === "CLOSED" ? (
+        <DoubleCheckIcon
+          ref={ref}
+          boxSize="24px"
+          color="green.500"
+          {...props}
+        />
+      ) : null}
+    </Tooltip>
+  );
+});

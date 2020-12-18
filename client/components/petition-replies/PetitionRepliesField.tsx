@@ -13,7 +13,7 @@ import {
   Text,
   Theme,
   VisuallyHidden,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   CheckIcon,
   CloseIcon,
@@ -21,7 +21,7 @@ import {
   DownloadIcon,
   EyeIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef, ExtendChakra } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
@@ -30,7 +30,7 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { forwardRef, ReactNode } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -387,83 +387,87 @@ function PetitionRepliesFieldReply({
   );
 }
 
-const CommentsButton = forwardRef<
-  HTMLButtonElement,
-  {
-    commentCount: number;
-    hasUnreadComments: boolean;
-    hasUnpublishedComments: boolean;
-    isActive: boolean;
-  } & ButtonProps
->(function CommentsButton(
-  {
-    commentCount,
-    hasUnreadComments,
-    hasUnpublishedComments,
-    isActive,
-    ...props
-  },
-  ref
-) {
-  const intl = useIntl();
-  const common = {
-    "aria-pressed": isActive,
-    size: "sm",
-    variant: isActive ? "solid" : "ghost",
-    colorScheme: isActive ? "purple" : "gray",
-    ...props,
-  } as const;
-  return commentCount > 0 ? (
-    <Button
-      flexDirection="row-reverse"
-      fontWeight="normal"
-      alignItems="center"
-      {...common}
-      ref={ref}
-    >
-      <Stack
-        display="inline-flex"
-        direction="row-reverse"
-        alignItems="flex-end"
+interface CommentsButtonProps extends ButtonProps {
+  commentCount: number;
+  hasUnreadComments: boolean;
+  hasUnpublishedComments: boolean;
+  isActive: boolean;
+}
+
+const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
+  function CommentsButton(
+    {
+      commentCount,
+      hasUnreadComments,
+      hasUnpublishedComments,
+      isActive,
+      ...props
+    },
+    ref
+  ) {
+    const intl = useIntl();
+    const common = {
+      "aria-pressed": isActive,
+      size: "sm",
+      variant: isActive ? "solid" : "ghost",
+      colorScheme: isActive ? "purple" : "gray",
+      ...props,
+    } as const;
+    return commentCount > 0 ? (
+      <Button
+        flexDirection="row-reverse"
+        fontWeight="normal"
+        alignItems="center"
+        {...common}
+        ref={ref}
       >
-        <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
-        <Text
-          as="span"
-          aria-label={intl.formatMessage(
-            {
-              id: "generic.comments-button-label",
-              defaultMessage:
-                "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-            },
-            { commentCount }
-          )}
+        <Stack
+          display="inline-flex"
+          direction="row-reverse"
+          alignItems="flex-end"
         >
-          {intl.formatNumber(commentCount)}
-        </Text>
-      </Stack>
-      <RecipientViewCommentsBadge
-        hasUnpublishedComments={hasUnpublishedComments}
-        hasUnreadComments={hasUnreadComments}
-        isReversedPurple={isActive}
-        marginRight={2}
+          <CommentIcon
+            fontSize="md"
+            color={isActive ? "inherit" : "gray.700"}
+          />
+          <Text
+            as="span"
+            aria-label={intl.formatMessage(
+              {
+                id: "generic.comments-button-label",
+                defaultMessage:
+                  "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+              },
+              { commentCount }
+            )}
+          >
+            {intl.formatNumber(commentCount)}
+          </Text>
+        </Stack>
+        <RecipientViewCommentsBadge
+          hasUnpublishedComments={hasUnpublishedComments}
+          hasUnreadComments={hasUnreadComments}
+          isReversedPurple={isActive}
+          marginRight={2}
+        />
+      </Button>
+    ) : (
+      <IconButton
+        icon={<CommentIcon />}
+        {...common}
+        aria-label={intl.formatMessage(
+          {
+            id: "generic.comments-button-label",
+            defaultMessage:
+              "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+          },
+          { commentCount }
+        )}
+        ref={ref}
       />
-    </Button>
-  ) : (
-    <IconButton
-      icon={<CommentIcon />}
-      {...common}
-      aria-label={intl.formatMessage(
-        {
-          id: "generic.comments-button-label",
-          defaultMessage:
-            "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-        },
-        { commentCount }
-      )}
-      ref={ref}
-    />
-  );
-});
+    );
+  }
+);
 
 PetitionRepliesField.fragments = {
   PetitionField: gql`

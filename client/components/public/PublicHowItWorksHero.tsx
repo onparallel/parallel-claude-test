@@ -8,11 +8,11 @@ import {
   Heading,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { ReactNode, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Card } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { PublicContainer } from "./layout/PublicContainer";
@@ -124,7 +124,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
     },
   ];
 
-  const imageRef = useRef<HTMLImageElement>();
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleChangeStep = (index: number) => {
     // change index when image is loaded on the browser to avoid flashing
@@ -187,53 +187,48 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           alignItems="center"
         >
           <Box flex="1" maxWidth="720px">
-            <SwitchTransition mode="out-in">
-              <CSSTransition
-                key={index}
-                timeout={{ enter: 300, exit: 200 }}
-                addEndListener={(node, done) => {
-                  node.addEventListener("transitionend", done, false);
-                }}
-                classNames="fade"
-              >
-                <AspectRatio
-                  ratio={2520 / 1606}
-                  onClick={() => handleChangeStep((index + 1) % steps.length)}
-                  willChange="opacity"
-                  sx={{
-                    "&.fade": {
-                      "&-enter": { opacity: 0 },
-                      "&-enter-active": {
-                        opacity: 1,
-                        transition: "opacity 300ms cubic-bezier(0,0,.2,1)",
-                      },
-                      "&-exit": {
-                        opacity: 1,
-                      },
-                      "&-exit-active": {
-                        opacity: 0,
-                        transition: "opacity 200ms cubic-bezier(.4,0,1,1)",
-                      },
+            <motion.div
+              key={index}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <AspectRatio
+                ratio={2520 / 1606}
+                onClick={() => handleChangeStep((index + 1) % steps.length)}
+                willChange="opacity"
+                sx={{
+                  "&.fade": {
+                    "&-enter": { opacity: 0 },
+                    "&-enter-active": {
+                      opacity: 1,
+                      transition: "opacity 300ms cubic-bezier(0,0,.2,1)",
                     },
-                  }}
-                >
-                  <Card overflow="hidden" role="button">
-                    <picture>
-                      <source
-                        srcSet={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.webp?v=${process.env.BUILD_ID}`}
-                        type="image/webp"
-                      />
-                      <img
-                        ref={imageRef as any}
-                        loading="lazy"
-                        src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png?v=${process.env.BUILD_ID}`}
-                        alt={`${steps[index].alt}`}
-                      />
-                    </picture>
-                  </Card>
-                </AspectRatio>
-              </CSSTransition>
-            </SwitchTransition>
+                    "&-exit": {
+                      opacity: 1,
+                    },
+                    "&-exit-active": {
+                      opacity: 0,
+                      transition: "opacity 200ms cubic-bezier(.4,0,1,1)",
+                    },
+                  },
+                }}
+              >
+                <Card overflow="hidden" role="button">
+                  <picture>
+                    <source
+                      srcSet={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.webp?v=${process.env.BUILD_ID}`}
+                      type="image/webp"
+                    />
+                    <img
+                      ref={imageRef}
+                      loading="lazy"
+                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${steps[index].image}_${query.locale}.png?v=${process.env.BUILD_ID}`}
+                      alt={`${steps[index].alt}`}
+                    />
+                  </picture>
+                </Card>
+              </AspectRatio>
+            </motion.div>
           </Box>
         </Flex>
       </Stack>

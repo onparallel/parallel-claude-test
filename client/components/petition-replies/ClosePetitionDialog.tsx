@@ -7,7 +7,7 @@ import {
   Stack,
   Text,
   useTheme,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import {
   DialogProps,

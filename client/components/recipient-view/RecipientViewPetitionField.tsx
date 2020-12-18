@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  BoxProps,
   Button,
   ButtonProps,
   Flex,
@@ -14,7 +15,7 @@ import {
   Text,
   Textarea,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   CheckIcon,
   CloseIcon,
@@ -23,7 +24,7 @@ import {
   DownForwardArrowIcon,
   DownloadIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import {
   PetitionFieldReplyStatus,
@@ -33,7 +34,7 @@ import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
-import { forwardRef, ReactNode, useCallback, useMemo, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -54,7 +55,7 @@ type CreateReplyText = { type: "TEXT"; content: string };
 type CreateReplySelect = { type: "SELECT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
-export type PublicPetitionFieldProps = ExtendChakra<{
+export interface PublicPetitionFieldProps extends BoxProps {
   canReply: boolean;
   contactId: string;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
@@ -65,7 +66,7 @@ export type PublicPetitionFieldProps = ExtendChakra<{
   onDeleteReply: (replyId: string) => void;
   onCreateReply: (payload: CreateReply) => void;
   onDownloadReply: (replyId: string) => void;
-}>;
+}
 
 export function RecipientViewPetitionField({
   canReply,
@@ -84,7 +85,7 @@ export function RecipientViewPetitionField({
   const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
 
   return field.type === "HEADING" ? (
-    <Stack spacing={1} {...props} paddingX={2} paddingY={2}>
+    <Stack spacing={1} paddingX={2} paddingY={2} {...props}>
       {field.title ? (
         <Heading size="md">{field.title}</Heading>
       ) : (
@@ -394,16 +395,18 @@ function ReplyWrapper({
   );
 }
 
+interface TextReplyFormProps extends BoxProps {
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
+  canReply: boolean;
+  onCreateReply: (payload: CreateReplyText) => void;
+}
+
 function TextReplyForm({
   field,
   canReply,
   onCreateReply,
   ...props
-}: ExtendChakra<{
-  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
-  canReply: boolean;
-  onCreateReply: (payload: CreateReplyText) => void;
-}>) {
+}: TextReplyFormProps) {
   const { placeholder, multiline } = field.options as FieldOptions["TEXT"];
   const { handleSubmit, register, reset, errors } = useForm<{
     content: string;
@@ -463,16 +466,18 @@ function TextReplyForm({
   );
 }
 
+interface FileUploadReplyFormProps extends BoxProps {
+  canReply: boolean;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
+  onCreateReply: (payload: CreateReplyFileUpload) => void;
+}
+
 function FileUploadReplyForm({
   field,
   canReply,
   onCreateReply,
   ...props
-}: ExtendChakra<{
-  canReply: boolean;
-  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
-  onCreateReply: (payload: CreateReplyFileUpload) => void;
-}>) {
+}: FileUploadReplyFormProps) {
   const { accepts } = field.options as FieldOptions["FILE_UPLOAD"];
   const accept = accepts
     ? accepts.flatMap((type) => {
@@ -589,16 +594,18 @@ function FileUploadReplyForm({
   );
 }
 
+interface OptionSelectReplyFormProps extends BoxProps {
+  canReply: boolean;
+  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
+  onCreateReply: (payload: CreateReplySelect) => void;
+}
+
 function OptionSelectReplyForm({
   field,
   canReply,
   onCreateReply,
   ...props
-}: ExtendChakra<{
-  canReply: boolean;
-  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
-  onCreateReply: (payload: CreateReplySelect) => void;
-}>) {
+}: OptionSelectReplyFormProps) {
   const intl = useIntl();
 
   const { values, placeholder } = field.options as FieldOptions["SELECT"];
@@ -687,49 +694,50 @@ function OptionSelectReplyForm({
   );
 }
 
-const CommentsButton = forwardRef<
-  HTMLButtonElement,
-  {
-    commentCount: number;
-    hasUnreadComments: boolean;
-    hasUnpublishedComments: boolean;
-  } & ButtonProps
->(function CommentsButton(
-  { commentCount, hasUnreadComments, hasUnpublishedComments, ...props },
-  ref
-) {
-  const intl = useIntl();
-  const common = {
-    size: "sm",
-    fontWeight: "normal",
-    "aria-label": intl.formatMessage(
-      {
-        id: "generic.comments-button-label",
-        defaultMessage:
-          "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-      },
-      { commentCount }
-    ),
-    ...props,
-  } as const;
-  return commentCount > 0 ? (
-    <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
-      <RecipientViewCommentsBadge
-        hasUnreadComments={hasUnreadComments}
-        hasUnpublishedComments={hasUnpublishedComments}
-        marginRight={2}
-      />
-      {intl.formatNumber(commentCount)}
-    </Button>
-  ) : (
-    <Button {...common}>
-      <FormattedMessage
-        id="recipient-view.questions-button"
-        defaultMessage="Questions?"
-      />
-    </Button>
-  );
-});
+interface CommentsButtonProps extends ButtonProps {
+  commentCount: number;
+  hasUnreadComments: boolean;
+  hasUnpublishedComments: boolean;
+}
+
+const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
+  function CommentsButton(
+    { commentCount, hasUnreadComments, hasUnpublishedComments, ...props },
+    ref
+  ) {
+    const intl = useIntl();
+    const common = {
+      size: "sm",
+      fontWeight: "normal",
+      "aria-label": intl.formatMessage(
+        {
+          id: "generic.comments-button-label",
+          defaultMessage:
+            "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+        },
+        { commentCount }
+      ),
+      ...props,
+    } as const;
+    return commentCount > 0 ? (
+      <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
+        <RecipientViewCommentsBadge
+          hasUnreadComments={hasUnreadComments}
+          hasUnpublishedComments={hasUnpublishedComments}
+          marginRight={2}
+        />
+        {intl.formatNumber(commentCount)}
+      </Button>
+    ) : (
+      <Button {...common}>
+        <FormattedMessage
+          id="recipient-view.questions-button"
+          defaultMessage="Questions?"
+        />
+      </Button>
+    );
+  }
+);
 
 RecipientViewPetitionField.fragments = {
   get PublicPetitionField() {

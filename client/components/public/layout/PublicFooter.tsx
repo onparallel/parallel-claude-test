@@ -8,7 +8,7 @@ import {
   ListItem,
   Select,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { LinkedInIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { resolveUrl } from "@parallel/utils/next";

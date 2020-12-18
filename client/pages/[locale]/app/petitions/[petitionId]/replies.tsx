@@ -1,5 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/core";
+import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import {
   DownloadIcon,
   ListIcon,

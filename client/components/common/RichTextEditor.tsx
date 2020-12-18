@@ -4,7 +4,7 @@ import {
   Text,
   useFormControl,
   useMultiStyleConfig,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   BoldIcon,
   ItalicIcon,

@@ -13,7 +13,7 @@ import {
   Stack,
   Text,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
@@ -271,17 +271,14 @@ function RecipientViewVerify({
                 </Flex>
               ) : state.step === "VERIFIED" ? (
                 <Center height="96px">
-                  <ScaleFade timeout={500} initialScale={0} in={true}>
-                    {(style) => (
-                      <Center
-                        backgroundColor="green.500"
-                        borderRadius="full"
-                        boxSize="96px"
-                        {...(style as any)}
-                      >
-                        <CheckIcon color="white" boxSize="64px" />
-                      </Center>
-                    )}
+                  <ScaleFade initialScale={0} in={true}>
+                    <Center
+                      backgroundColor="green.500"
+                      borderRadius="full"
+                      boxSize="96px"
+                    >
+                      <CheckIcon color="white" boxSize="64px" />
+                    </Center>
                   </ScaleFade>
                 </Center>
               ) : null}

@@ -7,7 +7,7 @@ import {
   Image,
   Text,
   useTheme,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { ClaimsList } from "@parallel/components/public/ClaimsList";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";

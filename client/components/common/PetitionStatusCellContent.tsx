@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Stack } from "@chakra-ui/core";
+import { Center, Stack } from "@chakra-ui/react";
 import { PetitionStatusCellContent_PetitionFragment } from "@parallel/graphql/__types";
 import { omit } from "remeda";
 import { PetitionProgressBar } from "./PetitionProgressBar";
@@ -18,7 +18,9 @@ export function PetitionStatusCellContent({
         flex="1"
         minWidth="80px"
       />
-      <PetitionStatusIcon status={status} />
+      <Center width={6}>
+        <PetitionStatusIcon status={status} />
+      </Center>
     </Stack>
   );
 }

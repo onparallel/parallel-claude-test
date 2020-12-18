@@ -3,7 +3,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useId } from "@reach/auto-id";
 import { Ref } from "react";

@@ -8,7 +8,7 @@ import {
   Image,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   CheckIcon,
   LinkedInSimpleIcon,

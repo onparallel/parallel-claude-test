@@ -1,4 +1,4 @@
-import { Box, Flex, Heading } from "@chakra-ui/core";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 

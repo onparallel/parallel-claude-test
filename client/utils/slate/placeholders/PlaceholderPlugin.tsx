@@ -1,5 +1,4 @@
-import { Box } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box } from "@chakra-ui/react";
 import {
   getNodeDeserializer,
   getRenderElement,
@@ -53,12 +52,12 @@ const PlaceholderToken = function ({
   label,
   attributes,
   children,
-}: ExtendChakra<{
+}: {
   value: string;
   label: string;
   attributes: any;
   children: ReactNode;
-}>) {
+}) {
   const selected = useSelected();
   const focused = useFocused();
   return (
@@ -71,7 +70,7 @@ const PlaceholderToken = function ({
       display="inline-block"
       backgroundColor="purple.500"
       color="white"
-      borderRadius="md"
+      borderRadius="sm"
       fontSize="xs"
       boxShadow={selected && focused ? "outline" : "none"}
       textTransform="uppercase"

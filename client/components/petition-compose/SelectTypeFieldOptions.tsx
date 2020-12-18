@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Text } from "@chakra-ui/core";
+import { Box, Text } from "@chakra-ui/react";
 import {
   SelectTypeFieldOptions_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -19,11 +19,11 @@ import {
 } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 
-export type SelectTypeFieldOptionsProps = {
+export interface SelectTypeFieldOptionsProps extends EditableProps {
   field: SelectTypeFieldOptions_PetitionFieldFragment;
   showError: boolean;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
-} & EditableProps;
+}
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
   const isEmpty = !element.children[0].text;

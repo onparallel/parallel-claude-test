@@ -1,5 +1,5 @@
-import { Button, Text, Tooltip } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Button, Text, Tooltip } from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import {
   usePetitionFieldTypeColor,
@@ -7,22 +7,25 @@ import {
 } from "@parallel/utils/petitionFields";
 import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
-export type PetitionFieldTypeIndicatorProps = ExtendChakra<{
+export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;
   relativeIndex: number | string;
-}>;
+}
 
-export function PetitionFieldTypeIndicator({
-  type,
-  relativeIndex,
-  ...props
-}: PetitionFieldTypeIndicatorProps) {
+export const PetitionFieldTypeIndicator = chakraForwardRef<
+  "button",
+  PetitionFieldTypeIndicatorProps
+>(function PetitionFieldTypeIndicator(
+  { type, relativeIndex, ...props }: PetitionFieldTypeIndicatorProps,
+  ref
+) {
   const label = usePetitionFieldTypeLabel(type);
   const color = usePetitionFieldTypeColor(type);
 
   return (
     <Tooltip label={label}>
       <Button
+        ref={ref}
         size="2xs"
         aria-label={label}
         backgroundColor={color}
@@ -44,4 +47,4 @@ export function PetitionFieldTypeIndicator({
       </Button>
     </Tooltip>
   );
-}
+});

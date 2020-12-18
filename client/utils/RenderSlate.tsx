@@ -1,8 +1,7 @@
+import { Box, BoxProps, Text, TextProps } from "@chakra-ui/react";
 import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
-import { Element, Text as Leaf } from "slate";
 import { memo } from "react";
-import { Box, Text, TextProps } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Element, Text as Leaf } from "slate";
 
 function render(node: Element | Leaf, index?: number) {
   if (Array.isArray(node.children)) {
@@ -59,11 +58,13 @@ function paragraphIsEmpty(node: Element) {
   return node.children.length === 1 && node.children[0]?.text === "";
 }
 
+interface RenderSlate extends BoxProps {
+  value: RichTextEditorContent;
+}
+
 export const RenderSlate = memo(function RenderSlate({
   value,
   ...props
-}: ExtendChakra<{
-  value: RichTextEditorContent;
-}>) {
+}: RenderSlate) {
   return <Box {...props}>{value?.map(render)}</Box>;
 });

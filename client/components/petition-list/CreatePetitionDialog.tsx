@@ -9,7 +9,7 @@ import {
   Select,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -158,7 +158,7 @@ export function CreatePetitionDialog({
                 />
               </Text>
             </Checkbox>
-            <Collapse isOpen={addDeadline}>
+            <Collapse in={addDeadline}>
               <Box marginTop={4}>
                 <DateTimePicker
                   value={deadline}

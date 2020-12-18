@@ -3,6 +3,7 @@ import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
   Button,
+  Center,
   Flex,
   IconButton,
   Menu,
@@ -16,7 +17,7 @@ import {
   Stack,
   Text,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   CopyIcon,
   DeleteIcon,
@@ -25,7 +26,7 @@ import {
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { chakraForwardRef, ExtendChakra } from "@parallel/chakra/utils";
 import {
   PetitionActivityDocument,
   PetitionHeader_PetitionFragment,
@@ -39,7 +40,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import { useRouter } from "next/router";
-import { forwardRef, ReactNode, Ref, useCallback, useMemo } from "react";
+import { ReactNode, Ref, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { LocaleBadge } from "../common/LocaleBadge";
@@ -202,7 +203,9 @@ export function PetitionHeader({
     >
       <Flex height={16} alignItems="center" paddingX={4}>
         <Flex alignItems="center">
-          <PetitionStatusIcon marginRight={1} status={petition.status} />
+          <Center width={6} marginRight={1}>
+            <PetitionStatusIcon status={petition.status} />
+          </Center>
           <LocaleBadge locale={petition.locale} marginLeft={1} />
           <HeaderNameEditable
             petition={petition}
@@ -415,19 +418,16 @@ export function PetitionHeader({
   );
 }
 
-const PetitionHeaderTab = forwardRef(function (
+const PetitionHeaderTab = chakraForwardRef<
+  "a",
   {
-    isActive,
-    isDisabled,
-    children,
-    popoverContent,
-    ...props
-  }: ExtendChakra<{
     isActive?: boolean;
     isDisabled?: boolean;
     popoverContent?: ReactNode;
     children: ReactNode;
-  }>,
+  }
+>(function (
+  { isActive, isDisabled, children, popoverContent, ...props },
   ref: Ref<any>
 ) {
   const link = (
@@ -438,7 +438,7 @@ const PetitionHeaderTab = forwardRef(function (
       isDisabled={isDisabled}
       variant={isActive ? "solid" : "ghost"}
       {...(isActive ? { "aria-current": "page" } : {})}
-      {...props}
+      {...(props as any)}
     >
       {children}
     </Button>

@@ -1,4 +1,4 @@
-import { Button, Text } from "@chakra-ui/core";
+import { Button, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import Cookie from "js-cookie";

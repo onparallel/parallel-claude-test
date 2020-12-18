@@ -1,11 +1,11 @@
 import {
   Box,
-  BoxProps,
   Portal,
   Tooltip,
   useMultiStyleConfig,
   usePopper,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   Placeholder,
   PlaceholderPlugin,
@@ -15,18 +15,18 @@ import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placehold
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
+import {
+  useSingleLine,
+  withSingleLine,
+} from "@parallel/utils/slate/withSingleLine";
 import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import { forwardRef, MouseEvent, useCallback, useMemo, useEffect } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, withReact } from "slate-react";
-import {
-  useSingleLine,
-  withSingleLine,
-} from "@parallel/utils/slate/withSingleLine";
 import { Card } from "./Card";
 
 export type PlaceholderInputProps = {
@@ -34,15 +34,16 @@ export type PlaceholderInputProps = {
   value: string;
   isDisabled?: boolean;
   onChange: (value: string) => void;
-} & Omit<BoxProps, "onChange">;
+};
 
 export type PlaceholderInputRef = {
   focus: () => void;
 };
 
-export const PlaceholderInput = forwardRef<
-  PlaceholderInputRef,
-  PlaceholderInputProps
+export const PlaceholderInput = chakraForwardRef<
+  "div",
+  PlaceholderInputProps,
+  PlaceholderInputRef
 >(({ placeholders, value, isDisabled, onChange, ...props }, ref) => {
   const intl = useIntl();
   const editor = useMemo(
@@ -127,24 +128,22 @@ export const PlaceholderInput = forwardRef<
     ReactEditor.focus(editor);
   }
 
-  const { popper, reference } = usePopper({
-    forceUpdate: isOpen,
+  const { getPopperProps, getReferenceProps, forceUpdate, state } = usePopper({
     placement: "bottom",
     gutter: 2,
   });
 
   useEffect(() => {
     if (isOpen) {
-      popper.ref.current!.style.width = `${
-        reference.ref.current!.offsetWidth
-      }px`;
+      const { popper, reference } = state!.elements;
+      popper.style.width = `${(reference as HTMLDivElement).offsetWidth}px`;
     }
-  }, [isOpen]);
+    forceUpdate?.();
+  }, [isOpen, forceUpdate]);
 
   return (
     <>
       <Box
-        ref={reference.ref as any}
         role="combobox"
         aria-owns={placeholderMenuId}
         aria-haspopup="listbox"
@@ -152,8 +151,7 @@ export const PlaceholderInput = forwardRef<
         aria-disabled={isDisabled}
         display="flex"
         alignItems="center"
-        {...inputStyles}
-        {...props}
+        {...getReferenceProps({ ...props, ...inputStyles })}
       >
         <Slate editor={editor} value={slateValue} onChange={handleChange}>
           <EditablePlugins
@@ -216,21 +214,20 @@ export const PlaceholderInput = forwardRef<
           itemIdPrefix={itemIdPrefix}
           values={values}
           selectedIndex={selectedIndex}
-          ref={popper.ref}
-          hidden={!isOpen}
-          style={popper.style as any}
+          visibility={isOpen ? "visible" : "hidden"}
           onAddPlaceholder={(placeholder) =>
             onAddPlaceholder(editor, placeholder)
           }
           onHighlightOption={onHighlightOption}
+          {...(getPopperProps() as any)}
         />
       </Portal>
     </>
   );
 });
 
-const PlaceholderMenu = forwardRef<
-  HTMLDivElement,
+const PlaceholderMenu = chakraForwardRef<
+  "div",
   {
     menuId: string;
     itemIdPrefix: string;
@@ -238,7 +235,7 @@ const PlaceholderMenu = forwardRef<
     selectedIndex: number;
     onAddPlaceholder: (placeholder: Placeholder) => void;
     onHighlightOption: (index: number) => void;
-  } & BoxProps
+  }
 >(function PlaceholderMenu(
   {
     menuId,
@@ -253,6 +250,7 @@ const PlaceholderMenu = forwardRef<
 ) {
   return (
     <Card
+      as="div"
       ref={ref}
       id={menuId}
       role="listbox"

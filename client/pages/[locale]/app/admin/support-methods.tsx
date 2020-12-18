@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/core";
+import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@parallel/chakra/icons";
 import { SupportMethodModal } from "@parallel/components/admin-support/SupportMethodModal";
 import { Card } from "@parallel/components/common/Card";

@@ -9,8 +9,9 @@ import {
   InputProps,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -41,14 +42,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { UnwrapPromise } from "@parallel/utils/types";
-import {
-  forwardRef,
-  ReactNode,
-  Ref,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -419,35 +413,34 @@ Contact.mutations = [
   `,
 ];
 
-const ToggleInput = forwardRef(function ToggleInput(
-  {
-    isEditing,
-    children,
-    ...props
-  }: { isEditing: boolean; children: ReactNode } & InputProps,
-  ref: Ref<HTMLInputElement>
-) {
-  return isEditing ? (
-    <Input ref={ref} {...props} />
-  ) : children === null ? (
-    <Text paddingLeft={4} height="40px" lineHeight="40px" textStyle="hint">
-      <FormattedMessage
-        id="generic.not-specified"
-        defaultMessage="Not specified"
-      />
-    </Text>
-  ) : (
-    <Box
-      height="40px"
-      display="flex"
-      borderLeft="1px solid transparent"
-      paddingLeft={4}
-      alignItems="center"
-    >
-      {children}
-    </Box>
-  );
-});
+interface ToggleInputProps extends InputProps {
+  isEditing: boolean;
+}
+
+const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(
+  function ToggleInput({ isEditing, children, ...props }, ref) {
+    return isEditing ? (
+      <Input ref={ref} {...props} />
+    ) : children === null ? (
+      <Text paddingLeft={4} height="40px" lineHeight="40px" textStyle="hint">
+        <FormattedMessage
+          id="generic.not-specified"
+          defaultMessage="Not specified"
+        />
+      </Text>
+    ) : (
+      <Box
+        height="40px"
+        display="flex"
+        borderLeft="1px solid transparent"
+        paddingLeft={4}
+        alignItems="center"
+      >
+        {children}
+      </Box>
+    );
+  }
+);
 
 Contact.getInitialProps = async ({
   query,

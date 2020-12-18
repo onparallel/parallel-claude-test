@@ -1,4 +1,4 @@
-import { BoxProps, Flex, Grid, Image, Text } from "@chakra-ui/core";
+import { BoxProps, Flex, Grid, Image, Text } from "@chakra-ui/react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 

@@ -1,17 +1,17 @@
 import {
   Box,
+  BoxProps,
   IconButton,
   IconButtonProps,
   List,
   ListItem,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ArrowBackIcon,
   ArrowForwardIcon,
   MoreIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { useRouter } from "next/router";
 import { useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
@@ -19,10 +19,10 @@ import { range } from "remeda";
 import { NakedLink } from "../common/Link";
 import { Spacer } from "../common/Spacer";
 
-export type RecipientViewPaginationProps = ExtendChakra<{
+export interface RecipientViewPaginationProps extends BoxProps {
   currentPage: number;
   pageCount: number;
-}>;
+}
 
 export function RecipientViewPagination({
   currentPage,

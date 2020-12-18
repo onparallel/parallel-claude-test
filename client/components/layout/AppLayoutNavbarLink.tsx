@@ -1,4 +1,4 @@
-import { Box, Text, Tooltip } from "@chakra-ui/core";
+import { Box, Text, Tooltip } from "@chakra-ui/react";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "../common/Link";

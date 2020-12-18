@@ -6,7 +6,7 @@ import {
   Text,
   UnorderedList,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import {
   withApolloData,

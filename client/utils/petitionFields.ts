@@ -1,4 +1,4 @@
-import { useTheme } from "@chakra-ui/core";
+import { useTheme } from "@chakra-ui/react";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";

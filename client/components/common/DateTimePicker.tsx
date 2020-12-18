@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Input } from "@chakra-ui/core";
+import { Box, Button, Flex, Input } from "@chakra-ui/react";
 import { FORMATS } from "@parallel/utils/dates";
 import { useTimeInput } from "@parallel/utils/useTimeInput";
 import { format, isEqual, isToday, isTomorrow, parse } from "date-fns";

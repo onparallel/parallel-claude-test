@@ -1,4 +1,7 @@
-import { Sorting, SortingDirection } from "@parallel/components/common/Table";
+import {
+  TableSorting,
+  TableSortingDirection,
+} from "@parallel/components/common/Table";
 import { useRouter } from "next/router";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
@@ -70,7 +73,7 @@ export function enums<T extends string>(values: T[]) {
 }
 
 export function sorting<T extends string>(fields: readonly T[]) {
-  return new QueryItem<Sorting<T>>(
+  return new QueryItem<TableSorting<T>>(
     (value) => {
       if (value) {
         const [field, direction] = (value as string).split("_");
@@ -80,7 +83,7 @@ export function sorting<T extends string>(fields: readonly T[]) {
         ) {
           return {
             field: field as T,
-            direction: direction as SortingDirection,
+            direction: direction as TableSortingDirection,
           };
         }
       }

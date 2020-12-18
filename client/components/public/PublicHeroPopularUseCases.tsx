@@ -1,4 +1,4 @@
-import { Button, Flex, Grid, Heading, Text } from "@chakra-ui/core";
+import { Button, Flex, Grid, Heading, Text } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { NakedLink } from "@parallel/components/common/Link";
 import { ReactNode } from "react";

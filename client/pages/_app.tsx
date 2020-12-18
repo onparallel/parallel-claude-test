@@ -1,5 +1,4 @@
-import { ChakraProvider, Global } from "@chakra-ui/core";
-import { fonts } from "@parallel/chakra/fonts";
+import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import {
   I18nProps,
@@ -42,7 +41,6 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
       ) : null}
       <I18nProvider {...props}>
         <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
-          <Global styles={fonts} />
           <DndProvider backend={HTML5Backend}>
             <Component {...pageProps} />
           </DndProvider>

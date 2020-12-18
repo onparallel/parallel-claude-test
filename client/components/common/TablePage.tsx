@@ -1,4 +1,5 @@
-import { Box, Button, Flex, Spinner, Stack } from "@chakra-ui/core";
+import { Box, Button, Flex, Spinner, Stack } from "@chakra-ui/react";
+import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -8,27 +9,25 @@ import {
 } from "@parallel/components/common/Table";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
-import { ExtendChakra } from "@parallel/chakra/utils";
 
-export type TableCardProps<T, TContext = unknown> = ExtendChakra<
-  TableProps<T, TContext> & {
-    loading: boolean;
-    header?: ReactNode;
-    body?: ReactNode;
-    totalCount: number;
-    page: number;
-    pageSize: number;
-    onPageChange?: (page: number) => void;
-  }
->;
+export type TableCardProps<T, TContext = unknown> = TableProps<T, TContext> & {
+  loading: boolean;
+  header?: ReactNode;
+  body?: ReactNode;
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  onPageChange?: (page: number) => void;
+};
 
 export function TablePage<T, TContext = unknown>({
   columns,
   rows,
   context,
   rowKeyProp,
-  isSelectable: selectable,
-  isHighlightable: highlightable,
+  isExpandable,
+  isSelectable,
+  isHighlightable,
   sort,
   onSelectionChange,
   onRowClick,
@@ -40,10 +39,10 @@ export function TablePage<T, TContext = unknown>({
   page,
   pageSize,
   onPageChange,
+  color,
   ...props
-}: TableCardProps<T, TContext>) {
+}: WithChakraProps<"section", TableCardProps<T, TContext>>) {
   const colors = useTableColors();
-
   return (
     <Card display="flex" flexDirection="column" {...props}>
       {header ? (
@@ -78,8 +77,9 @@ export function TablePage<T, TContext = unknown>({
             rows={rows}
             context={context}
             rowKeyProp={rowKeyProp}
-            isSelectable={selectable}
-            isHighlightable={highlightable}
+            isExpandable={isExpandable}
+            isSelectable={isSelectable}
+            isHighlightable={isHighlightable}
             sort={sort}
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}

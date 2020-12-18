@@ -1,5 +1,5 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Button } from "@chakra-ui/core";
+import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,

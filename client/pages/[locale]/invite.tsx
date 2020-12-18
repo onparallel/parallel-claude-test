@@ -1,4 +1,4 @@
-import { Box, Stack, Heading, Image, Text } from "@chakra-ui/core";
+import { Box, Stack, Heading, Image, Text } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { Link } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";

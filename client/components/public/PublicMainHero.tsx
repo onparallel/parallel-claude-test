@@ -1,4 +1,4 @@
-import { Box, BoxProps, Button, Flex, Heading, Stack } from "@chakra-ui/core";
+import { Box, BoxProps, Button, Flex, Heading, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";

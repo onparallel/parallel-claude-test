@@ -6,7 +6,7 @@ import {
   CloseButton,
   Heading,
   Stack,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { OnboardingKey, OnboardingStatus } from "@parallel/graphql/__types";
 import { NoSSR } from "@parallel/utils/NoSSR";

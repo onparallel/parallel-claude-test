@@ -1,18 +1,19 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Grid, Text } from "@chakra-ui/core";
+import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { BusinessIcon, EmailIcon, UserIcon } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
-import { Card } from "@parallel/components/common/Card";
+import { Card, CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import { RecipientViewSenderCard_PublicUserFragment } from "@parallel/graphql/__types";
 import { useIntl } from "react-intl";
 
+interface RecipientViewSenderCardProps extends CardProps {
+  sender: RecipientViewSenderCard_PublicUserFragment;
+}
+
 export function RecipientViewSenderCard({
   sender,
   ...props
-}: ExtendChakra<{
-  sender: RecipientViewSenderCard_PublicUserFragment;
-}>) {
+}: RecipientViewSenderCardProps) {
   const intl = useIntl();
 
   return (

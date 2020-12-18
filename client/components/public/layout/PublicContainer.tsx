@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/core";
+import { Box, Flex } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 
 export type PublicContainerProps = ExtendChakra & {

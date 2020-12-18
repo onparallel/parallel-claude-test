@@ -5,7 +5,7 @@ import {
   FormLabel,
   Input,
   Stack,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,

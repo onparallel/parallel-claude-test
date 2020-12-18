@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Stack } from "@chakra-ui/core";
+import { Badge, Box, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";

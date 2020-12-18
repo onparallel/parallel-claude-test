@@ -1,4 +1,4 @@
-import { Button, Text } from "@chakra-ui/core";
+import { Button, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,

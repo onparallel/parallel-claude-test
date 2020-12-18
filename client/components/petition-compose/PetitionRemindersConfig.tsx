@@ -10,7 +10,7 @@ import {
   NumberInputField,
   NumberInputStepper,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { RemindersConfig } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";

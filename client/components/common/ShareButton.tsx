@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, ButtonProps, Text } from "@chakra-ui/core";
+import { Button, ButtonProps, Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";

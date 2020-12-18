@@ -8,7 +8,7 @@ import {
   Heading,
   Input,
   Stack,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import {
   withApolloData,

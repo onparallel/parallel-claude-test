@@ -9,7 +9,7 @@ import {
   Stack,
   Text,
   useTheme,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";

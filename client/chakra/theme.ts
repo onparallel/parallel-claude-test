@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/core";
+import { extendTheme, Menu, Popover, Tooltip } from "@chakra-ui/react";
 import { styles } from "./styles";
 
 export const theme = extendTheme({
@@ -99,12 +99,20 @@ export const theme = extendTheme({
         colorScheme: "green",
       },
     },
-    Tooltip: {
-      defaultProps: {
-        openDelay: 300,
-      },
-    },
   },
 });
 
 export type Theme = typeof theme;
+
+Tooltip.defaultProps = {
+  openDelay: 250,
+} as any;
+
+Menu.defaultProps = {
+  isLazy: true,
+} as any;
+
+Popover.defaultProps = {
+  openDelay: 250,
+  isLazy: true,
+} as any;

@@ -3,7 +3,7 @@ import {
   IconButtonProps,
   Tooltip,
   TooltipProps,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ClipboardIcon } from "@parallel/chakra/icons";
 import copy from "clipboard-copy";
 import { memo, MouseEvent, useState } from "react";

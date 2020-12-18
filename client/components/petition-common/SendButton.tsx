@@ -7,7 +7,7 @@ import {
   MenuList,
   Portal,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ChevronDownIcon,
   PaperPlaneIcon,

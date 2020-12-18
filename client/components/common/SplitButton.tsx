@@ -1,4 +1,4 @@
-import { ButtonProps, Flex, BoxProps } from "@chakra-ui/core";
+import { ButtonProps, Flex, BoxProps } from "@chakra-ui/react";
 import { Children, cloneElement, ReactElement } from "react";
 import { Divider, DividerProps } from "./Divider";
 import { MaybeArray } from "@parallel/utils/types";

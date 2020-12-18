@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/core";
+import { Box } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {

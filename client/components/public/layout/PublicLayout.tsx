@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/core";
+import { Flex } from "@chakra-ui/react";
 import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
 import { useWindowScroll } from "beautiful-react-hooks";

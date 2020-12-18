@@ -5,15 +5,16 @@ import {
   InputLeftElement,
   InputProps,
   InputRightElement,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { SearchIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import useMergedRef from "@react-hook/merged-ref";
-import { forwardRef, useRef } from "react";
+import { useRef } from "react";
 import { useIntl } from "react-intl";
 
-export const SearchInput = forwardRef<HTMLInputElement, InputProps>(
+export const SearchInput = chakraForwardRef<"input", InputProps>(
   function SearchInput(props, ref) {
     const inputRef = useRef<HTMLInputElement>(null);
     const mergedRef = useMergedRef(ref, inputRef);

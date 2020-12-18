@@ -1,11 +1,10 @@
-import { Box, Flex } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, Flex } from "@chakra-ui/react";
 
-export type ProgressIndicatorProps = ExtendChakra<{
+export interface ProgressIndicatorProps extends BoxProps {
   min: number;
   max: number;
   value: number;
-}>;
+}
 
 export function ProgressIndicator({
   min,
@@ -25,12 +24,12 @@ const progressbarSizes = {
   sm: "0.5rem",
 };
 
-export type ProgressTrackProps = Omit<ExtendChakra, "size"> & {
+export interface ProgressTrackProps extends Omit<BoxProps, "size"> {
   size: keyof typeof progressbarSizes;
   min: number;
   max: number;
   value: number;
-};
+}
 
 export function ProgressTrack({
   size,

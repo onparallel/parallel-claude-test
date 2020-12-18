@@ -7,7 +7,7 @@ import {
   MenuList,
   Portal,
   Stack,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ChevronDownIcon,
   DeleteIcon,

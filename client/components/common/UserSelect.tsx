@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { Image, Stack, Text } from "@chakra-ui/core";
+import { Image, Stack, Text } from "@chakra-ui/react";
 import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import {
   useReactSelectProps,
   UserReactSelectProps,
 } from "@parallel/utils/useReactSelectProps";
-import { forwardRef, memo, ReactNode, Ref, useCallback, useMemo } from "react";
+import { forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { components, OptionProps } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
@@ -13,24 +13,26 @@ import { NormalLink } from "./Link";
 
 export type UserSelectSelection = UserSelect_UserFragment;
 
-export type UserSelectProps = Omit<
-  AsyncSelectProps<UserSelectSelection, true>,
-  "value" | "onChange"
-> & {
+export interface UserSelectProps
+  extends Omit<
+      AsyncSelectProps<UserSelectSelection, true>,
+      "value" | "onChange"
+    >,
+    UserReactSelectProps {
   value?: UserSelectSelection[];
   onChange?: (users: UserSelectSelection[]) => void;
   onSearchUsers: (
     search: string,
     exclude: string[]
   ) => Promise<UserSelectSelection[]>;
-} & UserReactSelectProps;
+}
 
 export type UserSelectInstance = AsyncSelect<UserSelectSelection, true>;
 
 export const UserSelect = Object.assign(
-  forwardRef(function (
-    { value, onSearchUsers, onChange, ...props }: UserSelectProps,
-    ref: Ref<UserSelectInstance>
+  forwardRef<UserSelectInstance, UserSelectProps>(function (
+    { value, onSearchUsers, onChange, ...props },
+    ref
   ) {
     const loadOptions = useCallback(
       async (search) => {

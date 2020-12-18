@@ -14,7 +14,7 @@ import {
   Stack,
   Switch,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
 import {
   PetitionSettings_PetitionBaseFragment,
@@ -236,7 +236,7 @@ export function PetitionSettings({
             isChecked={Boolean(petition.signatureConfig)}
             isDisabled={!hasSignature}
           />
-          <Collapse isOpen={Boolean(petition.signatureConfig)}>
+          <Collapse in={Boolean(petition.signatureConfig)}>
             <Flex justifyContent="center" marginTop={2}>
               <Button
                 leftIcon={<SignatureIcon fontSize="18px" />}

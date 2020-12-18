@@ -1,4 +1,4 @@
-import { Box, Tooltip } from "@chakra-ui/core";
+import { Box, Tooltip } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { useIntl } from "react-intl";
 

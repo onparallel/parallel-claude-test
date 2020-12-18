@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex } from "@chakra-ui/core";
+import { Flex } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import {
   AppLayout_UserFragment,
@@ -94,6 +94,14 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         onUpdateTour={handleUpdateTour}
         status={user.onboardingStatus as any}
       />
+      <style jsx global>
+        {`
+          body {
+            max-height: 100vh;
+            overflow: hidden;
+          }
+        `}
+      </style>
     </>
   );
 }

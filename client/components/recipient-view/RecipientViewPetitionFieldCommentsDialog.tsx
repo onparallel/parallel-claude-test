@@ -22,7 +22,7 @@ import {
   Stack,
   Text,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import {
   Maybe,
@@ -50,6 +50,16 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 
+interface RecipientViewPetitionFieldCommentsDialogProps
+  extends Omit<ModalProps, "children"> {
+  granterName?: Maybe<string>;
+  contactId: string;
+  field: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
+  onAddComment: (content: string) => void;
+  onDeleteComment: (commentId: string) => void;
+  onUpdateComment: (commentId: string, content: string) => void;
+}
+
 export function RecipientViewPetitionFieldCommentsDialog({
   granterName,
   contactId,
@@ -58,14 +68,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   onDeleteComment,
   onUpdateComment,
   ...props
-}: {
-  granterName?: Maybe<string>;
-  contactId: string;
-  field: RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
-  onAddComment: (content: string) => void;
-  onDeleteComment: (commentId: string) => void;
-  onUpdateComment: (commentId: string, content: string) => void;
-} & ModalProps) {
+}: RecipientViewPetitionFieldCommentsDialogProps) {
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
@@ -196,8 +199,8 @@ export function RecipientViewPetitionFieldCommentsDialog({
               onChange={handleDraftChange as any}
               {...inputFocusBind}
             />
-            <Collapse isOpen={isExpanded} paddingTop={2}>
-              <Stack direction="row" justifyContent="flex-end">
+            <Collapse in={isExpanded}>
+              <Stack direction="row" justifyContent="flex-end" paddingTop={2}>
                 <Button size="sm" onClick={handleCancelClick}>
                   <FormattedMessage
                     id="generic.cancel"

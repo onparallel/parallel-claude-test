@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/core";
+import { Box, Flex } from "@chakra-ui/react";
 import { Maybe } from "@parallel/utils/types";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";

@@ -15,7 +15,7 @@ import {
   Stack,
   Text,
   Tooltip,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   AlertCircleIcon,
   CommentIcon,
@@ -209,8 +209,9 @@ export function PetitionRepliesFieldComments({
           onChange={handleDraftChange as any}
           {...inputFocusBind}
         />
-        <Collapse isOpen={isExpanded} paddingTop={2}>
+        <Collapse in={isExpanded}>
           <Stack
+            paddingTop={2}
             direction="row"
             justifyContent={
               user.hasInternalComments ? "space-between" : "flex-end"

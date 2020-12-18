@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box } from "@chakra-ui/core";
+import { Box } from "@chakra-ui/react";
 import { CheckIcon, CheckShortIcon } from "@parallel/chakra/icons";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { MessageEventsIndicator_PetitionMessageFragment } from "@parallel/graphql/__types";

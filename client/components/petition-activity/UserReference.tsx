@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/core";
+import { Text } from "@chakra-ui/react";
 import { UserReference_UserFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage } from "react-intl";

@@ -1,4 +1,4 @@
-import { Box, Text, TextProps, Tooltip } from "@chakra-ui/core";
+import { Box, Text, TextProps, Tooltip } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 

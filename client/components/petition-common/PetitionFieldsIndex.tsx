@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Stack, Text } from "@chakra-ui/core";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { PetitionFieldsIndex_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";

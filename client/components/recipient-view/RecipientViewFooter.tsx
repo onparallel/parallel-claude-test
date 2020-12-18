@@ -1,11 +1,18 @@
-import { Box, Flex, List, ListItem, Stack, Text } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import {
+  Box,
+  BoxProps,
+  Flex,
+  List,
+  ListItem,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 
-export type RecipientViewFooterProps = ExtendChakra<{}>;
+export type RecipientViewFooterProps = BoxProps;
 
 export function RecipientViewFooter(props: RecipientViewFooterProps) {
   const router = useRouter();

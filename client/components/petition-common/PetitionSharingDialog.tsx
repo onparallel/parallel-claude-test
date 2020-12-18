@@ -18,7 +18,7 @@ import {
   Stack,
   Text,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ChevronDownIcon,
   DeleteIcon,
@@ -231,7 +231,7 @@ export function PetitionSharingDialog({
                   defaultMessage="Notify users"
                 />
               </Checkbox>
-              <Collapse isOpen={notify}>
+              <Collapse in={notify}>
                 <GrowingTextarea
                   name="message"
                   ref={useMergedRef(messageRef, register)}

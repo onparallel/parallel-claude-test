@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Text } from "@chakra-ui/core";
+import { Text } from "@chakra-ui/react";
 import { ShinyIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelinePetitionCreatedEvent_PetitionCreatedEventFragment } from "@parallel/graphql/__types";

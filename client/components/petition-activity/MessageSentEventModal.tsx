@@ -9,7 +9,7 @@ import {
   ModalProps,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { MessageSentEventModal_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { RenderSlate } from "@parallel/utils/RenderSlate";
 import { FormattedMessage, useIntl } from "react-intl";

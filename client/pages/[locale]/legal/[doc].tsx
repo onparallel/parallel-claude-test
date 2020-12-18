@@ -1,4 +1,4 @@
-import { Box, Heading, Text } from "@chakra-ui/core";
+import { Box, Heading, Text } from "@chakra-ui/react";
 import { NormalLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";

@@ -1,4 +1,4 @@
-import { List, ListItem, Text } from "@chakra-ui/core";
+import { List, ListItem, Text } from "@chakra-ui/react";
 import { useSetLocale } from "@parallel/components/common/I18nProvider";
 import { NormalLink } from "@parallel/components/common/Link";
 import { ErrorPage } from "@parallel/components/public/ErrorPage";

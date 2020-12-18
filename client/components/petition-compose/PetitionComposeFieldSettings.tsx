@@ -8,7 +8,7 @@ import {
   Stack,
   Switch,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";

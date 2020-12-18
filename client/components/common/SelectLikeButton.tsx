@@ -4,12 +4,12 @@ import {
   omitThemingProps,
   SelectProps,
   useMultiStyleConfig,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
-import { forwardRef } from "react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { omit, pick } from "remeda";
 
-export const SelectLikeButton = forwardRef<HTMLDivElement, SelectProps>(
+export const SelectLikeButton = chakraForwardRef<"div", SelectProps>(
   function PetitionFieldTypeSelectButton({ children, ...props }, ref) {
     const styles = useMultiStyleConfig("Select", props);
 
@@ -33,7 +33,7 @@ export const SelectLikeButton = forwardRef<HTMLDivElement, SelectProps>(
           display="flex"
           alignItems="center"
           aria-haspopup="listbox"
-          sx={styles.field}
+          sx={omit(styles.field, ["paddingBottom"]) as any}
           {...otherProps}
         >
           {children}

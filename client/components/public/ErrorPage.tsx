@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Image } from "@chakra-ui/core";
+import { Box, Flex, Heading, Image } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import NextLink from "next/link";

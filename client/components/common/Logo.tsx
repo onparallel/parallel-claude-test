@@ -1,9 +1,8 @@
-import { Box, VisuallyHidden } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, BoxProps, VisuallyHidden } from "@chakra-ui/react";
 
-export type LogoProps = ExtendChakra<{
+export interface LogoProps extends BoxProps {
   hideText?: boolean;
-}>;
+}
 
 export function Logo({ hideText, ...rest }: LogoProps) {
   return (

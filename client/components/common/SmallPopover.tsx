@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
   Portal,
   useTheme,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { useId } from "@reach/auto-id";
 import { cloneElement, ReactNode, useState } from "react";
 
@@ -18,7 +18,7 @@ export function SmallPopover({
 }: {
   content: ReactNode;
   children: ReactNode;
-} & Pick<PopoverProps, "placement" | "openDelay">) {
+} & Pick<PopoverProps, "placement">) {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
   const popoverId = `popover-${useId()}`;

@@ -1,4 +1,4 @@
-import { Heading, Stack, Text } from "@chakra-ui/core";
+import { Heading, Stack, Text } from "@chakra-ui/react";
 import { ClaimsList } from "@parallel/components/public/ClaimsList";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";

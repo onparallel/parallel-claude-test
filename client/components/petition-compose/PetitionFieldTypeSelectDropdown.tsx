@@ -1,7 +1,5 @@
 import {
   Box,
-  BoxProps,
-  Flex,
   Heading,
   Menu,
   MenuButton,
@@ -14,26 +12,27 @@ import {
   Text,
   TextProps,
   useMenuContext,
-} from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+} from "@chakra-ui/react";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
 import {
   usePetitionFieldTypeColor,
   usePetitionFieldTypeLabel,
 } from "@parallel/utils/petitionFields";
 import useMergedRef from "@react-hook/merged-ref";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
-export type PetitionFieldTypeSelectProps = {
+export interface PetitionFieldTypeSelectProps
+  extends Omit<SelectProps, "onChange"> {
   type: PetitionFieldType;
   onChange: (type: PetitionFieldType) => void;
-} & Omit<SelectProps, "onChange">;
+}
 
-export const PetitionFieldTypeSelect = forwardRef<
-  HTMLDivElement,
+export const PetitionFieldTypeSelect = chakraForwardRef<
+  "div",
   PetitionFieldTypeSelectProps
 >(function PetitionFieldTypeSelect({ type, onChange, ...props }, ref) {
   return (
@@ -58,9 +57,13 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "HEADING",
 ];
 
-const PetitionFieldTypeLabel = forwardRef<
-  HTMLDivElement,
-  { type: PetitionFieldType } & BoxProps
+interface PetitionFieldTypeLabelProps {
+  type: PetitionFieldType;
+}
+
+const PetitionFieldTypeLabel = chakraForwardRef<
+  "div",
+  PetitionFieldTypeLabelProps
 >(function PetitionFieldTypeLabel({ type, ...props }, ref) {
   const color = usePetitionFieldTypeColor(type);
   return (
@@ -91,22 +94,29 @@ const PetitionFieldTypeLabel = forwardRef<
   );
 });
 
-function PetitionFieldTypeText({
-  type,
-  ...props
-}: { type: PetitionFieldType } & ExtendChakra<TextProps>) {
-  const label = usePetitionFieldTypeLabel(type);
-  return <Text {...props}>{label}</Text>;
+interface PetitionFieldTypeTextProps extends TextProps {
+  type: PetitionFieldType;
 }
 
-export type PetitionFieldTypeSelectDropdownProps = MenuListProps & {
+const PetitionFieldTypeText = chakraForwardRef<"p", PetitionFieldTypeTextProps>(
+  function PetitionFieldTypeText({ type, ...props }, ref) {
+    const label = usePetitionFieldTypeLabel(type);
+    return (
+      <Text ref={ref} {...props}>
+        {label}
+      </Text>
+    );
+  }
+);
+
+export interface PetitionFieldTypeSelectDropdownProps extends MenuListProps {
   showHeader?: boolean;
   showDescription?: boolean;
   onSelectFieldType: (type: PetitionFieldType) => void;
-};
+}
 
-export const PetitionFieldTypeSelectDropdown = forwardRef<
-  HTMLDivElement,
+export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
+  "div",
   PetitionFieldTypeSelectDropdownProps
 >(function PetitionFieldTypeSelectDropdown(
   { onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
@@ -123,27 +133,27 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
       menu: "menuitem",
       listbox: "option",
     } as Record<string, string>)[role];
-    for (const item of Array.from(menu.children)) {
+    for (const item of Array.from(menu.querySelectorAll("[role='menuitem']"))) {
       item.setAttribute("role", itemRole);
     }
   }, []);
 
-  const { isOpen, popper, reference } = useMenuContext();
+  const { isOpen, menuRef, buttonRef, forceUpdate } = useMenuContext();
 
   useEffect(() => {
     if (isOpen) {
-      popper.ref.current!.style.width = `${
-        reference.ref.current!.offsetWidth
-      }px`;
+      menuRef.current!.style.width = `${buttonRef.current!.offsetWidth}px`;
     }
-  }, [isOpen]);
+    forceUpdate?.();
+  }, [isOpen, forceUpdate]);
 
   const fieldListWidth = 230;
   const descriptionWidth = 270;
 
   return (
     <MenuList
-      as={Flex}
+      ref={useMergedRef(ref, ownRef)}
+      display="flex"
       paddingY={0}
       minWidth={{
         base: `${fieldListWidth}px`,
@@ -153,9 +163,8 @@ export const PetitionFieldTypeSelectDropdown = forwardRef<
       }}
       overflow="hidden"
       {...props}
-      ref={useMergedRef(ref, ownRef)}
     >
-      <Box flex="1" minWidth={`${fieldListWidth}px`}>
+      <Box flex="1">
         <Box
           display={{ base: "none", sm: showHeader ? "block" : "none" }}
           paddingX={4}

@@ -1,18 +1,17 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/core";
-import { ExtendChakra } from "@parallel/chakra/utils";
+import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
-import { Card } from "../common/Card";
+import { Card, CardProps } from "../common/Card";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
 
-export type RecipientViewProgressFooterProps = ExtendChakra<{
+export interface RecipientViewProgressFooterProps extends CardProps {
   petition: RecipientViewProgressFooter_PublicPetitionFragment;
   onFinalize: () => void;
-}>;
+}
 
 export function RecipientViewProgressFooter({
   petition,

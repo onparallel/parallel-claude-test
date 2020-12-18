@@ -7,7 +7,7 @@ import {
   MenuOptionGroup,
   Portal,
   MenuDivider,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
 import { PetitionStatus, PetitionBaseType } from "@parallel/graphql/__types";
 import { useCallback } from "react";

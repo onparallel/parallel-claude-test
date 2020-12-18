@@ -4,15 +4,15 @@ import {
   Checkbox,
   Collapse,
   Flex,
+  HTMLChakraProps,
   IconButton,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import {
   ArrowUpDownIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   ChevronUpIcon,
 } from "@parallel/chakra/icons";
-import { ExtendChakra } from "@parallel/chakra/utils";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import {
   ComponentType,
@@ -25,42 +25,45 @@ import {
 } from "react";
 import { useIntl } from "react-intl";
 
-export type SortingDirection = "ASC" | "DESC";
+export type TableSortingDirection = "ASC" | "DESC";
 
-export type Sorting<T extends string> = {
+export interface TableSorting<T extends string> {
   field: T;
-  direction: SortingDirection;
-};
+  direction: TableSortingDirection;
+}
 
-function toggleSortingDirection(direction: SortingDirection): SortingDirection {
+function toggleSortingDirection(
+  direction: TableSortingDirection
+): TableSortingDirection {
   return direction === "ASC" ? "DESC" : "ASC";
 }
 
-export type TableProps<TRow, TContext = unknown> = ExtendChakra<{
+export interface TableProps<TRow, TContext = unknown>
+  extends HTMLChakraProps<"table"> {
   columns: TableColumn<TRow, TContext>[];
   rows: TRow[];
   context?: TContext;
   rowKeyProp: keyof TRow;
-  sort?: Sorting<any>;
+  sort?: TableSorting<any>;
   isSelectable?: boolean;
   isExpandable?: boolean;
   isHighlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
   onRowClick?: (row: TRow, event: MouseEvent) => void;
-  onSortChange?: (sort: Sorting<any>) => void;
-}>;
+  onSortChange?: (sort: TableSorting<any>) => void;
+}
 
-export type TableHeaderProps<TRow, TContext = unknown> = {
+export interface TableHeaderProps<TRow, TContext = unknown> {
   column: TableColumn<TRow, TContext>;
   context?: TContext;
-  sort: Sorting<any> | undefined;
+  sort: TableSorting<any> | undefined;
   allSelected: boolean;
   anySelected: boolean;
   onSortByClick?: (value: string, event: MouseEvent) => void;
   onToggleAll: (event?: any) => void;
-};
+}
 
-export type TableCellProps<TRow, TContext = unknown> = {
+export interface TableCellProps<TRow, TContext = unknown> {
   row: TRow;
   context?: TContext;
   rowKey: string;
@@ -69,9 +72,9 @@ export type TableCellProps<TRow, TContext = unknown> = {
   isExpanded?: boolean;
   onToggleSelection?: (event: any) => void;
   onToggleExpand?: (expanded: boolean) => void;
-};
+}
 
-export type TableColumn<TRow, TContext = unknown> = {
+export interface TableColumn<TRow, TContext = unknown> {
   key: string;
   align?: BoxProps["textAlign"];
   context?: TContext;
@@ -79,8 +82,8 @@ export type TableColumn<TRow, TContext = unknown> = {
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow, TContext>>;
   CellContent: ComponentType<TableCellProps<TRow, TContext>>;
-  cellProps?: ExtendChakra;
-};
+  cellProps?: HTMLChakraProps<"td">;
+}
 
 function _Table<TRow, TContext = unknown>({
   columns,
@@ -396,7 +399,7 @@ function _Row<TRow, TContext = unknown>({
       {isExpandable ? (
         <Box as="tr" borderBottom="1px solid" borderBottomColor={colors.border}>
           <Box as="td" padding={0} colSpan={columns.length}>
-            <Collapse isOpen={isExpanded}>
+            <Collapse in={isExpanded}>
               <Box borderTop="1px solid" borderTopColor={colors.border} />
             </Collapse>
           </Box>

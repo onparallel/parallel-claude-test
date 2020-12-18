@@ -10,7 +10,7 @@ import {
   ModalOverlay,
   Stack,
   Text,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { Maybe, SupportMethodResponse } from "@parallel/graphql/__types";
 import { unCamelCase } from "@parallel/utils/strings";
 import {

@@ -1,4 +1,4 @@
-import { Text, Heading, Box } from "@chakra-ui/core";
+import { Text, Heading, Box } from "@chakra-ui/react";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";

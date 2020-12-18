@@ -8,7 +8,7 @@ import {
   Heading,
   Stack,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import {

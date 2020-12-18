@@ -1,4 +1,4 @@
-import { BoxProps, Grid, Heading, Image } from "@chakra-ui/core";
+import { BoxProps, Grid, Heading, Image } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import { NormalLink } from "../common/Link";

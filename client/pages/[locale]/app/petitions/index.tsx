@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Stack, Text } from "@chakra-ui/core";
+import { Box, Flex, Stack, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";

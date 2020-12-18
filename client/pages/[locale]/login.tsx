@@ -10,7 +10,7 @@ import {
   Input,
   Text,
   useToast,
-} from "@chakra-ui/core";
+} from "@chakra-ui/react";
 import { Link, NormalLink } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import {
