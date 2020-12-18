@@ -17,7 +17,10 @@ import {
 } from "@chakra-ui/core";
 import { ExtendChakra } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
-import { usePetitionFieldTypeColor, usePetitionFieldTypeLabel } from "@parallel/utils/petitionFields";
+import {
+  usePetitionFieldTypeColor,
+  usePetitionFieldTypeLabel,
+} from "@parallel/utils/petitionFields";
 import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
