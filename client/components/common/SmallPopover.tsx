@@ -34,11 +34,9 @@ export function SmallPopover({
         })}
       </PopoverTrigger>
       <Portal>
-        <PopoverContent width="240px">
+        <PopoverContent>
+          <PopoverBody id={popoverId}>{content}</PopoverBody>
           <PopoverArrow />
-          <PopoverBody paddingY={2} paddingX={3} id={popoverId}>
-            {content}
-          </PopoverBody>
         </PopoverContent>
       </Portal>
     </Popover>

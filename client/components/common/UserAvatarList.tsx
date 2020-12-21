@@ -58,7 +58,7 @@ export const UserAvatarList = Object.assign(
               </Flex>
             </PopoverTrigger>
             <Portal>
-              <PopoverContent width="200px">
+              <PopoverContent>
                 <PopoverArrow />
                 <PopoverBody
                   paddingX={0}
@@ -96,7 +96,7 @@ export const UserAvatarList = Object.assign(
                 ":hover > *": {
                   transform: "translateY(-0.25rem)",
                   borderColor: "purple.500",
-                  zIndex: 2,
+                  zIndex: 1,
                 },
               }}
             >
@@ -106,7 +106,6 @@ export const UserAvatarList = Object.assign(
                 borderRadius="full"
                 transition="transform 150ms ease"
                 position="relative"
-                zIndex={1}
               >
                 <Avatar size="xs" name={fullName ?? undefined} />
               </Box>

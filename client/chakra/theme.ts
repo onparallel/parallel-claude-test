@@ -17,7 +17,10 @@ export const theme = extendTheme({
   sizes: {
     container: {
       xs: "480px",
-      "2xs": "380px",
+      "2xs": "420px",
+      "3xs": "360px",
+      "4xs": "300px",
+      "5xs": "240px",
     },
   },
   fontSizes: {
@@ -100,18 +103,17 @@ export const theme = extendTheme({
       },
     },
     Popover: {
-      parts: ["popper"],
-      baseStyle: {
+      baseStyle: (props) => {
         // Workaround until this is fixed https://github.com/chakra-ui/chakra-ui/issues/2481
-        popper: (props: any) => {
-          const baseStylePopper = base.components.Popover.baseStyle(props)[
-            "popper"
-          ];
-          return {
-            ...baseStylePopper,
-            maxW: props.width ?? baseStylePopper.maxW,
-          };
-        },
+        const _baseStyle = base.components.Popover.baseStyle(props);
+        const baseStyle = {
+          ..._baseStyle,
+          popper: {
+            ..._baseStyle.popper,
+            maxW: "container.5xs",
+          },
+        };
+        return baseStyle;
       },
     },
     Switch: {
@@ -126,7 +128,10 @@ export const theme = extendTheme({
 export type Theme = typeof theme;
 
 Tooltip.defaultProps = {
+  hasArrow: true,
   openDelay: 250,
+  closeDelay: 150,
+  arrowSize: 8,
 } as any;
 
 Menu.defaultProps = {

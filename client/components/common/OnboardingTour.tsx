@@ -81,7 +81,11 @@ const TourStep = ({
       <Card
         id="pw-onboarding-dialog"
         position="relative"
-        width="container.2xs"
+        width={
+          step.target === "#__next" && step.placement === "center"
+            ? "container.2xs"
+            : "container.3xs"
+        }
         border="none"
         maxWidth="100%"
         paddingY={4}
@@ -91,13 +95,7 @@ const TourStep = ({
         {...tooltipProps}
       >
         {step.hideCloseButton === false && (
-          <CloseButton
-            position="absolute"
-            top={2}
-            right={3}
-            zIndex={1}
-            {...closeProps}
-          />
+          <CloseButton position="absolute" top={2} right={3} {...closeProps} />
         )}
         {step.title && (
           <Box as="header" id={headerId} paddingRight={4} marginBottom={4}>

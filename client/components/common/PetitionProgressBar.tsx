@@ -23,7 +23,7 @@ export function PetitionProgressBar({
       placement="left"
       content={
         status === "DRAFT" ? (
-          <Box textAlign="center" margin={2} fontSize="sm">
+          <Box textAlign="center" fontSize="sm">
             <Text fontStyle="italic">
               <FormattedMessage
                 id="component.petition-progress-bar.not-sent"
@@ -32,7 +32,7 @@ export function PetitionProgressBar({
             </Text>
           </Box>
         ) : total === 0 ? (
-          <Box textAlign="center" margin={2} fontSize="sm">
+          <Box textAlign="center" fontSize="sm">
             <QuestionIcon boxSize="24px" color="gray.300" />
             <Text fontStyle="italic" marginTop={2}>
               <FormattedMessage
@@ -42,7 +42,7 @@ export function PetitionProgressBar({
             </Text>
           </Box>
         ) : replied + validated === 0 ? (
-          <Box textAlign="center" margin={2} fontSize="sm">
+          <Box textAlign="center" fontSize="sm">
             <QuestionIcon boxSize="24px" color="gray.300" />
             <Text marginTop={2}>
               <FormattedMessage
@@ -52,7 +52,7 @@ export function PetitionProgressBar({
             </Text>
           </Box>
         ) : total === validated ? (
-          <Box textAlign="center" margin={2} fontSize="sm">
+          <Box textAlign="center" fontSize="sm">
             <CheckIcon boxSize="24px" color="green.500" />
             <Text marginTop={2}>
               <FormattedMessage
