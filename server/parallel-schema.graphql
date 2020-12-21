@@ -16,10 +16,10 @@ type AccessDeactivatedEvent implements PetitionEvent {
 }
 
 type AccessDelegatedEvent implements PetitionEvent {
-  access: PetitionAccess!
   contact: Contact
   createdAt: DateTime!
   id: GID!
+  newAccess: PetitionAccess!
 }
 
 type AccessOpenedEvent implements PetitionEvent {

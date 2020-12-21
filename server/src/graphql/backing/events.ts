@@ -10,8 +10,8 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   ACCESS_DEACTIVATED: { petition_access_id: number; user_id: number };
   ACCESS_OPENED: { petition_access_id: number };
   ACCESS_DELEGATED: {
-    petition_access_id: number;
-    contact_id: number;
+    new_petition_access_id: number; // new petition access created by the contact
+    contact_id: number; // contact that delegated the access
   };
   MESSAGE_SCHEDULED: { petition_message_id: number };
   MESSAGE_CANCELLED: { petition_message_id: number; user_id: number };

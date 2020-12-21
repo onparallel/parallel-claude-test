@@ -152,10 +152,12 @@ export const AccessOpenedEvent = createPetitionEvent(
 export const AccessDelegatedEvent = createPetitionEvent(
   "AccessDelegatedEvent",
   (t) => {
-    t.field("access", {
+    t.field("newAccess", {
       type: "PetitionAccess",
       resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+        return (await ctx.petitions.loadAccess(
+          root.data.new_petition_access_id
+        ))!;
       },
     });
     t.nullable.field("contact", {

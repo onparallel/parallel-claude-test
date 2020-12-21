@@ -16,7 +16,6 @@ import {
 export function MessageEmailEditor({
   showErrors,
   subjectRef,
-  showSubject,
   subject,
   body,
   onSubjectChange,
@@ -25,7 +24,6 @@ export function MessageEmailEditor({
   showErrors: boolean;
   subjectRef?: Ref<HTMLInputElement>;
   subject: string;
-  showSubject: boolean;
   body: RichTextEditorContent;
   onSubjectChange: (value: string) => void;
   onBodyChange: (value: RichTextEditorContent) => void;
@@ -34,34 +32,32 @@ export function MessageEmailEditor({
   const subjectId = `subject-${useId()}`;
   return (
     <>
-      {showSubject ? (
-        <FormControl id={subjectId} isInvalid={showErrors && !subject}>
-          <FormLabel paddingBottom={0}>
-            <FormattedMessage
-              id="component.message-email-editor.subject-label"
-              defaultMessage="Subject"
-            />
-          </FormLabel>
-          <Input
-            type="text"
-            ref={subjectRef}
-            value={subject}
-            maxLength={255}
-            onChange={(event) => onSubjectChange(event.target.value)}
-            onBlur={() => onSubjectChange(subject.trim())}
-            placeholder={intl.formatMessage({
-              id: "component.message-email-editor.subject-placeholder",
-              defaultMessage: "Enter the subject of the email",
-            })}
+      <FormControl id={subjectId} isInvalid={showErrors && !subject}>
+        <FormLabel paddingBottom={0}>
+          <FormattedMessage
+            id="component.message-email-editor.subject-label"
+            defaultMessage="Subject"
           />
-          <FormErrorMessage>
-            <FormattedMessage
-              id="component.message-email-editor.subject-required-error"
-              defaultMessage="A subject helps the recipient understand the context of your petition"
-            />
-          </FormErrorMessage>
-        </FormControl>
-      ) : null}
+        </FormLabel>
+        <Input
+          type="text"
+          ref={subjectRef}
+          value={subject}
+          maxLength={255}
+          onChange={(event) => onSubjectChange(event.target.value)}
+          onBlur={() => onSubjectChange(subject.trim())}
+          placeholder={intl.formatMessage({
+            id: "component.message-email-editor.subject-placeholder",
+            defaultMessage: "Enter the subject of the email",
+          })}
+        />
+        <FormErrorMessage>
+          <FormattedMessage
+            id="component.message-email-editor.subject-required-error"
+            defaultMessage="A subject helps the recipient understand the context of your petition"
+          />
+        </FormErrorMessage>
+      </FormControl>
       <FormControl isInvalid={showErrors && isEmptyContent(body)} marginTop={4}>
         <RichTextEditor
           value={body}

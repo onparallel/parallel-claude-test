@@ -34,8 +34,8 @@ export function TimelineAccessDelegatedEvent({
           ) : (
             <DeletedContact />
           ),
-          newContact: event.access.contact ? (
-            <ContactLink contact={event.access.contact} />
+          newContact: event.newAccess.contact ? (
+            <ContactLink contact={event.newAccess.contact} />
           ) : (
             <DeletedContact />
           ),
@@ -58,7 +58,7 @@ TimelineAccessDelegatedEvent.fragments = {
       contact {
         ...ContactLink_Contact
       }
-      access {
+      newAccess {
         contact {
           ...ContactLink_Contact
         }

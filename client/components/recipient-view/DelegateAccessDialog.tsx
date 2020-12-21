@@ -14,13 +14,13 @@ import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import { FormattedMessage, useIntl } from "react-intl";
-import { noop } from "remeda";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
-import { RichTextEditorContent } from "../common/RichTextEditor";
-import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
+import {
+  RichTextEditor,
+  RichTextEditorContent,
+} from "../common/RichTextEditor";
 import outdent from "outdent";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { useForm } from "react-hook-form";
@@ -237,21 +237,28 @@ function DelegateAccessDialog({
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl id="message">
+          <FormControl id="message" isInvalid={messageBodyError}>
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.message-label"
                 defaultMessage="Message"
               />
             </FormLabel>
-            <MessageEmailEditor
-              showSubject={false}
-              showErrors={messageBodyError}
-              body={messageBody}
-              onBodyChange={setMessageBody}
-              subject=""
-              onSubjectChange={noop}
+            <RichTextEditor
+              value={messageBody}
+              onChange={setMessageBody}
+              placeholder={intl.formatMessage({
+                id: "component.message-email-editor.body-placeholder",
+                defaultMessage: "Write a message to include in the email",
+              })}
             />
+
+            <FormErrorMessage>
+              <FormattedMessage
+                id="component.message-email-editor.body-required-error"
+                defaultMessage="Customizing the initial message improves the response time of the recipients"
+              />
+            </FormErrorMessage>
           </FormControl>
         </Stack>
       }

@@ -1,7 +1,7 @@
 [
   {
     "term": "access-delegated-email.subject",
-    "definition": "Tienes un mensaje de {senderName}",
+    "definition": "Tiene un mensaje de {senderName}",
     "context": "You have a message from {senderName}"
   },
   {
