@@ -407,6 +407,7 @@ function TextReplyForm({
   onCreateReply,
   ...props
 }: TextReplyFormProps) {
+  const intl = useIntl();
   const { placeholder, multiline } = field.options as FieldOptions["TEXT"];
   const { handleSubmit, register, reset, errors } = useForm<{
     content: string;
@@ -431,7 +432,13 @@ function TextReplyForm({
               required: true,
               validate: (val) => val.trim().length > 0,
             })}
-            placeholder={placeholder ?? ""}
+            placeholder={
+              placeholder ??
+              intl.formatMessage({
+                id: "recipient-view.text-placeholder",
+                defaultMessage: "Enter your answer",
+              })
+            }
           />
         ) : (
           <Input
@@ -441,7 +448,13 @@ function TextReplyForm({
               required: true,
               validate: (val) => val.trim().length > 0,
             })}
-            placeholder={placeholder ?? ""}
+            placeholder={
+              placeholder ??
+              intl.formatMessage({
+                id: "recipient-view.text-placeholder",
+                defaultMessage: "Enter your answer",
+              })
+            }
           />
         )}
         {errors.content && (
@@ -665,8 +678,8 @@ function OptionSelectReplyForm({
           placeholder={
             placeholder ??
             intl.formatMessage({
-              id: "generic.select-an-option",
-              defaultMessage: "Select an option...",
+              id: "recipient-view.select-placeholder",
+              defaultMessage: "Select an option",
             })
           }
           {...reactSelectProps}

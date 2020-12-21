@@ -1385,11 +1385,6 @@
     "context": "Saving..."
   },
   {
-    "term": "generic.select-an-option",
-    "definition": "Seleccione una opción...",
-    "context": "Select an option..."
-  },
-  {
     "term": "generic.send",
     "definition": "Enviar",
     "context": "Send"
@@ -3690,6 +3685,11 @@
     "context": "About security"
   },
   {
+    "term": "recipient-view.select-placeholder",
+    "definition": "Seleccione una opción",
+    "context": "Select an option"
+  },
+  {
     "term": "recipient-view.send-code",
     "definition": "Enviar código de verificación",
     "context": "Send verification code"
@@ -3723,6 +3723,11 @@
     "term": "recipient-view.submit-unpublished-comments-text",
     "definition": "Tiene comentarios pendientes. Envíelos todos de una vez y notificaremos a {sender} en un solo email.",
     "context": "You have some pending comments. Submit them at once to notify {sender} in a single email."
+  },
+  {
+    "term": "recipient-view.text-placeholder",
+    "definition": "Su respuesta",
+    "context": "Enter your answer"
   },
   {
     "term": "recipient-view.text-reply",
