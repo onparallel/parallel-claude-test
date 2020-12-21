@@ -723,6 +723,8 @@ export type OrganizationUsers_OrderBy =
   | "email_DESC"
   | "firstName_ASC"
   | "firstName_DESC"
+  | "lastActiveAt_ASC"
+  | "lastActiveAt_DESC"
   | "lastName_ASC"
   | "lastName_DESC";
 
@@ -3260,16 +3262,16 @@ export type OrganizationUsersQueryVariables = Exact<{
 
 export type OrganizationUsersQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & {
-    organization: { __typename?: "Organization" } & {
-      users: { __typename?: "UserPagination" } & Pick<
-        UserPagination,
-        "totalCount"
-      > & {
-          items: Array<
-            { __typename?: "User" } & OrganizationUsers_UserFragment
-          >;
-        };
-    };
+    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+        users: { __typename?: "UserPagination" } & Pick<
+          UserPagination,
+          "totalCount"
+        > & {
+            items: Array<
+              { __typename?: "User" } & OrganizationUsers_UserFragment
+            >;
+          };
+      };
   } & AppLayout_UserFragment;
 };
 
@@ -7525,6 +7527,7 @@ export const OrganizationUsersDocument = gql`
     me {
       ...AppLayout_User
       organization {
+        id
         users(
           offset: $offset
           limit: $limit

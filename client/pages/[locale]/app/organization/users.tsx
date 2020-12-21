@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Stack } from "@chakra-ui/react";
+import { Badge, Box, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -37,7 +37,13 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 const PAGE_SIZE = 10;
 
-const SORTING = ["firstName", "lastName", "email", "createdAt"] as const;
+const SORTING = [
+  "firstName",
+  "lastName",
+  "email",
+  "createdAt",
+  "lastActiveAt",
+] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -218,6 +224,7 @@ function useOrganizationUsersColumns() {
           id: "generic.last-active-at",
           defaultMessage: "Last active at",
         }),
+        isSortable: true,
         CellContent: ({ row }) =>
           row.lastActiveAt ? (
             <DateTime
@@ -226,7 +233,14 @@ function useOrganizationUsersColumns() {
               useRelativeTime
               whiteSpace="nowrap"
             />
-          ) : null,
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage
+                id="generic.never-active"
+                defaultMessage="Never active"
+              />
+            </Text>
+          ),
       },
       {
         key: "createdAt",
@@ -284,6 +298,7 @@ OrganizationUsers.getInitialProps = async ({
         me {
           ...AppLayout_User
           organization {
+            id
             users(
               offset: $offset
               limit: $limit

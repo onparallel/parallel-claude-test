@@ -1260,6 +1260,11 @@
     "context": "More options..."
   },
   {
+    "term": "generic.never-active",
+    "definition": "Nunca activo",
+    "context": "Never active"
+  },
+  {
     "term": "generic.next",
     "definition": "Siguiente",
     "context": "Next"

@@ -53,7 +53,19 @@ export class OrganizationRepository extends BaseRepository {
             q.whereNotIn("id", excludeIds);
           }
           if (sortBy) {
-            q.orderBy(sortBy);
+            q.orderByRaw(
+              sortBy
+                .map((s) => {
+                  // nullable columns
+                  if (["last_active_at"].includes(s.column)) {
+                    const nulls = s.order === "asc" ? "FIRST" : "LAST";
+                    return `${s.column} ${s.order} NULLS ${nulls}`;
+                  } else {
+                    return `${s.column} ${s.order}`;
+                  }
+                })
+                .join(", ")
+            );
           }
         })
         .orderBy("id")

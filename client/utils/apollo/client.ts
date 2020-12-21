@@ -120,6 +120,11 @@ export function createApolloClient(
             },
           },
         },
+        Organization: {
+          fields: {
+            users: { merge: false },
+          },
+        },
       },
     }).restore(initialState ?? {}),
     typeDefs,

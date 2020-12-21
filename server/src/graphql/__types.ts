@@ -170,6 +170,8 @@ export interface NexusGenEnums {
     | "email_DESC"
     | "firstName_ASC"
     | "firstName_DESC"
+    | "lastActiveAt_ASC"
+    | "lastActiveAt_DESC"
     | "lastName_ASC"
     | "lastName_DESC";
   PetitionAccessStatus: db.PetitionAccessStatus;

@@ -75,39 +75,46 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, _, ctx) =>
         await ctx.organizations.loadUserCount(root.id),
-    }),
-      t.paginationField("users", {
-        type: "User",
-        description: "The users in the organization.",
-        searchable: true,
-        sortableBy: ["firstName", "lastName", "email", "createdAt"],
-        authorize: isOwnOrgOrSuperAdmin(),
-        additionalArgs: {
-          exclude: list(nonNull(globalIdArg("User"))),
-        },
-        resolve: async (
-          root,
-          { offset, limit, search, sortBy, exclude },
-          ctx
-        ) => {
-          const columnMap = {
-            firstName: "first_name",
-            lastName: "last_name",
-            email: "email",
-            createdAt: "created_at",
-          } as const;
-          return await ctx.organizations.loadOrgUsers(root.id, {
-            offset,
-            limit,
-            search,
-            excludeIds: exclude,
-            sortBy: (sortBy || ["createdAt_ASC"]).map((value) => {
-              const [field, order] = parseSortBy(value);
-              return { column: columnMap[field], order };
-            }),
-          });
-        },
-      });
+    });
+    t.paginationField("users", {
+      type: "User",
+      description: "The users in the organization.",
+      searchable: true,
+      sortableBy: [
+        "firstName",
+        "lastName",
+        "email",
+        "createdAt",
+        "lastActiveAt",
+      ],
+      authorize: isOwnOrgOrSuperAdmin(),
+      additionalArgs: {
+        exclude: list(nonNull(globalIdArg("User"))),
+      },
+      resolve: async (
+        root,
+        { offset, limit, search, sortBy, exclude },
+        ctx
+      ) => {
+        const columnMap = {
+          firstName: "first_name",
+          lastName: "last_name",
+          email: "email",
+          createdAt: "created_at",
+          lastActiveAt: "last_active_at",
+        } as const;
+        return await ctx.organizations.loadOrgUsers(root.id, {
+          offset,
+          limit,
+          search,
+          excludeIds: exclude,
+          sortBy: (sortBy || ["createdAt_ASC"]).map((value) => {
+            const [field, order] = parseSortBy(value);
+            return { column: columnMap[field], order };
+          }),
+        });
+      },
+    });
     t.list.nonNull.field("integrations", {
       type: "OrgIntegration",
       args: {
