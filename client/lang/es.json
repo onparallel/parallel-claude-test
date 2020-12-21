@@ -2291,7 +2291,7 @@
   },
   {
     "term": "petition.header.last-saved-on",
-    "definition": "Guardado por última vez el: {date}",
+    "definition": "Último guardado: {date}",
     "context": "Last saved on: {date}"
   },
   {

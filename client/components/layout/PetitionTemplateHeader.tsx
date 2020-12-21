@@ -101,10 +101,10 @@ export function PetitionTemplateHeader({
       {...props}
     >
       <Flex height={16} alignItems="center" paddingX={4}>
-        <Badge colorScheme="purple" marginRight={1}>
+        <Badge colorScheme="purple">
           <FormattedMessage id="generic.template" defaultMessage="Template" />
         </Badge>
-        <LocaleBadge locale={petition.locale} marginLeft={1} />
+        <LocaleBadge locale={petition.locale} marginLeft={2} />
         <HeaderNameEditable
           petition={petition}
           state={state}
@@ -112,6 +112,7 @@ export function PetitionTemplateHeader({
           maxWidth={{
             base: `calc(100vw - ${
               71 /* 'template' badge width */ +
+              8 /* locale badge margin left */ +
               24 /* locale badge width */ +
               16 /* petition name padding l+r */ +
               16 /* heading padding left */ +
@@ -122,6 +123,7 @@ export function PetitionTemplateHeader({
             }px)`,
             sm: `calc(100vw - ${
               96 /* left navbar width */ +
+              8 /* locale badge margin left */ +
               71 /* 'template' badge width */ +
               24 /* locale badge width */ +
               16 /* petition name padding l+r */ +

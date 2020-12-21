@@ -59,6 +59,7 @@ export const HeaderNameEditable = Object.assign(
                   id: "component.header-name-editable.change-name",
                   defaultMessage: "Change name",
                 })}
+                offset={[0, -1]}
               >
                 <EditablePreview
                   color={name ? undefined : "gray.400"}
@@ -94,6 +95,7 @@ export const HeaderNameEditable = Object.assign(
                     }
                   )}
                   isDisabled={state !== "SAVED"}
+                  offset={[0, 6]}
                 >
                   <Text
                     color={

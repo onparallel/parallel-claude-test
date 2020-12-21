@@ -204,10 +204,10 @@ export function PetitionHeader({
     >
       <Flex height={16} alignItems="center" paddingX={4}>
         <Flex alignItems="center">
-          <Center width={6} marginRight={1}>
+          <Center boxSize={6}>
             <PetitionStatusIcon status={petition.status} />
           </Center>
-          <LocaleBadge locale={petition.locale} marginLeft={1} />
+          <LocaleBadge locale={petition.locale} marginLeft={2} />
           <HeaderNameEditable
             petition={petition}
             state={state}
@@ -216,8 +216,7 @@ export function PetitionHeader({
               base: `calc(100vw - ${
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
-                4 /* petition status icon margin right */ +
-                4 /* locale badge margin left */ +
+                8 /* locale badge margin left */ +
                 24 /* locale badge width */ +
                 16 /* petition name padding l+r */ +
                 (petition.status === "DRAFT" ? 40 + 8 : 0) +
@@ -227,8 +226,7 @@ export function PetitionHeader({
                 96 /* left navbar width */ +
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
-                4 /* petition status icon margin right */ +
-                4 /* locale badge margin left */ +
+                8 /* locale badge margin left */ +
                 24 /* locale badge width */ +
                 16 /* petition name padding l+r */ +
                 (petition.status === "DRAFT" ? 40 + 8 : 0) +
@@ -240,8 +238,7 @@ export function PetitionHeader({
               }px)/2 - ${
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
-                4 /* petition status icon margin right */ +
-                4 /* locale badge margin left */ +
+                8 /* locale badge margin left */ +
                 24 /* locale badge width */
               }px)`,
             }}
