@@ -3,7 +3,6 @@ import express, { Request } from "express";
 import { createServer } from "livereload";
 import { render } from "mjml-react";
 import path from "path";
-import React from "react";
 import { createIntl, IntlProvider } from "react-intl";
 import { mapValues } from "remeda";
 import Convert from "ansi-to-html";

@@ -1,5 +1,5 @@
 import { MjmlText } from "mjml-react";
-import React, { CSSProperties, Fragment } from "react";
+import { CSSProperties, Fragment } from "react";
 
 function render(node: any, index?: number) {
   if (Array.isArray(node.children)) {

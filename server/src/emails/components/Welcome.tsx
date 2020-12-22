@@ -1,6 +1,5 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";

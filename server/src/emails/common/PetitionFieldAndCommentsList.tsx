@@ -1,5 +1,4 @@
 import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
-import React from "react";
 import { FormattedMessage } from "react-intl";
 import { BreakLines } from "./BreakLines";
 import { Maybe } from "../../util/types";

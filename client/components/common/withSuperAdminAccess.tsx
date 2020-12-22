@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { WithSuperAdminAccessQuery } from "@parallel/graphql/__types";
 import { NextComponentType } from "next";
-import React from "react";
 import { WithApolloDataContext } from "./withApolloData";
 
 export function withSuperAdminAccess<P = {}>(

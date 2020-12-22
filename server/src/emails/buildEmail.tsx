@@ -1,4 +1,3 @@
-import React from "react";
 import { render } from "mjml-react";
 import { ComponentType, createElement } from "react";
 import { IntlProvider, IntlShape, createIntl } from "react-intl";

@@ -72,13 +72,7 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { countBy } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";

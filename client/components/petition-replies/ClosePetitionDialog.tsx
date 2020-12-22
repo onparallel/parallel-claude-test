@@ -13,7 +13,7 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import React, { useState } from "react";
+import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 
