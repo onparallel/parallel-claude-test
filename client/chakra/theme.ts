@@ -5,6 +5,7 @@ import {
   Tooltip,
   theme as base,
 } from "@chakra-ui/react";
+import { mode } from "@chakra-ui/theme-tools";
 import { styles } from "./styles";
 
 export const theme = extendTheme({
@@ -61,6 +62,25 @@ export const theme = extendTheme({
           borderRadius: "sm",
         },
       },
+      variants: {
+        link: (props) => {
+          return {
+            fontWeight: "normal",
+            borderRadius: "sm",
+            padding: 0,
+            height: "auto",
+            lineHeight: "normal",
+            color: mode(`purple.600`, `purple.200`)(props),
+            _hover: {
+              color: mode(`purple.800`, `purple.200`)(props),
+              textDecoration: "none",
+            },
+            _active: {
+              color: mode(`purple.800`, `purple.500`)(props),
+            },
+          };
+        },
+      },
     },
     Checkbox: {
       sizes: {
@@ -91,14 +111,19 @@ export const theme = extendTheme({
     },
     Link: {
       baseStyle: {
+        transition: `all 0.15s ease-out`,
+        borderRadius: "sm",
         cursor: "pointer",
         color: "purple.600",
         _hover: {
-          color: "purple.700",
+          color: "purple.800",
           textDecoration: "none",
         },
         _active: {
           color: "purple.800",
+        },
+        _focus: {
+          boxShadow: "outline",
         },
       },
     },

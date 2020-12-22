@@ -475,8 +475,6 @@ function NewPetitionHeader({
               variant="link"
               marginX={2}
               size="sm"
-              colorScheme="purple"
-              fontWeight="normal"
               onClick={handleAddSuggestion(suggestion)}
             >
               {suggestion}

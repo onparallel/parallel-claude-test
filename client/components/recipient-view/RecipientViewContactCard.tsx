@@ -103,15 +103,7 @@ export function RecipientViewContactCard({
       </Box>
 
       <Flex alignItems="center" marginTop={2}>
-        <Button
-          variant="link"
-          fontWeight="normal"
-          color="purple.500"
-          _hover={{
-            color: "purple.700",
-          }}
-          onClick={() => handleDelegateAccess()}
-        >
+        <Button variant="link" onClick={handleDelegateAccess}>
           <FormattedMessage
             id="recipient-view.delegate-access"
             defaultMessage="Delegate access"
