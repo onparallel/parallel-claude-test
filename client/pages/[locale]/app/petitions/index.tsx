@@ -174,7 +174,12 @@ function Petitions() {
     );
   }, []);
 
-  const columns = usePetitionsTableColumns(state.type);
+  const columns = usePetitionsTableColumns(
+    petitions.items.length > 0 && petitions.items[0].__typename === "Petition"
+      ? "PETITION"
+      : "TEMPLATE"
+  );
+
   const context = useMemo(() => ({ user: me! }), [me]);
 
   return (
