@@ -175,9 +175,11 @@ function Petitions() {
   }, []);
 
   const columns = usePetitionsTableColumns(
-    petitions.items.length > 0 && petitions.items[0].__typename === "Petition"
-      ? "PETITION"
-      : "TEMPLATE"
+    petitions.items.length > 0
+      ? petitions.items[0].__typename === "Petition"
+        ? "PETITION"
+        : "TEMPLATE"
+      : state.type
   );
 
   const context = useMemo(() => ({ user: me! }), [me]);
