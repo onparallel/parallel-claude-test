@@ -6,6 +6,7 @@ import {
   PetitionTemplateComposeMessageEditor_PetitionFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { emptyContent } from "@parallel/utils/slate/emptyContent";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useState } from "react";
@@ -24,7 +25,7 @@ export function PetitionTemplateComposeMessageEditor({
 }: PetitionTemplateComposeMessageEditorProps) {
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorContent>(
-    petition.emailBody ?? [{ children: [{ text: "" }] }]
+    petition.emailBody ?? emptyContent()
   );
 
   const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [

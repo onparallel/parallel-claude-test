@@ -3,6 +3,7 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
+import { emptyContent } from "@parallel/utils/slate/emptyContent";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -22,9 +23,7 @@ export function SendMessageDialogDialog({
 }: DialogProps<{}, SendMessageDialogDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
   const [subject, setSubject] = useState("");
-  const [body, setBody] = useState<RichTextEditorContent>([
-    { children: [{ text: "" }] },
-  ]);
+  const [body, setBody] = useState<RichTextEditorContent>(emptyContent());
   const isValid = Boolean(subject && !isEmptyContent(body));
   const subjectRef = useRef<HTMLInputElement>(null);
   const showScheduleMessageDialog = useScheduleMessageDialog();

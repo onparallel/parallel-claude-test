@@ -73,6 +73,7 @@ export function AskContactDetailsDialog({
                 emailRef,
                 register({ required: true, pattern: EMAIL_REGEX })
               )}
+              type="email"
               name="email"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",

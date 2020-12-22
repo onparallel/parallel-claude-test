@@ -10,10 +10,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
+import { PetitionLocale } from "@parallel/graphql/__types";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
+import { plainTextToContent } from "@parallel/utils/slate/plainTextToContent";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
-import { useRef, useState } from "react";
+import outdent from "outdent";
+import { useRef } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -21,9 +25,6 @@ import {
   RichTextEditor,
   RichTextEditorContent,
 } from "../common/RichTextEditor";
-import outdent from "outdent";
-import { PetitionLocale } from "@parallel/graphql/__types";
-import { useForm } from "react-hook-form";
 
 type DelegateAccessDialogData = {
   email: string;
@@ -70,43 +71,26 @@ function DelegateAccessDialog({
   const intl = useIntl();
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const { handleSubmit, register, errors } = useForm<DelegateAccessDialogData>({
+  const {
+    control,
+    handleSubmit,
+    register,
+    errors,
+  } = useForm<DelegateAccessDialogData>({
     mode: "onChange",
     defaultValues: {
       email: "",
       firstName: "",
       lastName: "",
-      messageBody: [{ children: [{ text: "" }] }],
+      messageBody: plainTextToContent(
+        (messages[intl.locale as PetitionLocale] ?? messages["en"])(
+          organizationName,
+          contactName
+        )
+      ),
     },
     shouldFocusError: true,
   });
-
-  const messageBuilder = Object.keys(messages).includes(intl.locale)
-    ? messages[intl.locale as keyof typeof messages]
-    : messages["en"];
-  const message = messageBuilder(organizationName, contactName);
-
-  const [messageBody, setMessageBody] = useState<RichTextEditorContent>(
-    message.split("\n").map((text) => ({ children: [{ text }] }))
-  );
-
-  const [messageBodyError, setMessageBodyError] = useState(false);
-
-  const handleSubmitDelegateAccessForm = handleSubmit(
-    (data) => {
-      const isEmptyMessage = isEmptyContent(messageBody);
-      setMessageBodyError(isEmptyMessage);
-      if (!isEmptyMessage) {
-        props.onResolve({
-          ...data,
-          messageBody,
-        });
-      }
-    },
-    () => {
-      setMessageBodyError(isEmptyContent(messageBody));
-    }
-  );
 
   return (
     <ConfirmDialog
@@ -116,46 +100,42 @@ function DelegateAccessDialog({
       {...props}
       content={{
         as: "form",
-        onSubmit: handleSubmitDelegateAccessForm,
+        onSubmit: handleSubmit<DelegateAccessDialogData>(props.onResolve),
       }}
       header={
-        <>
-          <Stack direction="row">
-            <Circle
-              role="presentation"
-              size="32px"
-              backgroundColor="purple.500"
-              color="white"
-            >
-              <UserArrowIcon />
-            </Circle>
-            <Text as="div" flex="1">
-              <FormattedMessage
-                id="recipient-view.delegate-access"
-                defaultMessage="Delegate access"
-              />
-            </Text>
-          </Stack>
-          <Box
-            fontSize="sm"
-            fontWeight="normal"
-            marginTop={2}
-            fontStyle="italic"
+        <Stack direction="row">
+          <Circle
+            role="presentation"
+            size="32px"
+            backgroundColor="purple.500"
+            color="white"
           >
+            <UserArrowIcon />
+          </Circle>
+          <Text as="div" flex="1">
             <FormattedMessage
-              id="recipient-view.delegate-access-dialog.subtitle-1"
-              defaultMessage="Please fill out the contact details of the person you want to delegate your access."
+              id="recipient-view.delegate-access"
+              defaultMessage="Delegate access"
             />
-            <br />
-            <FormattedMessage
-              id="recipient-view.delegate-access-dialog.subtitle-2"
-              defaultMessage="We will send them an email with instructions on how to proceed."
-            />
-          </Box>
-        </>
+          </Text>
+        </Stack>
       }
       body={
         <Stack>
+          <Box fontSize="sm" fontStyle="italic">
+            <Text>
+              <FormattedMessage
+                id="recipient-view.delegate-access-dialog.subtitle-1"
+                defaultMessage="Please fill out the contact details of the person you want to delegate your access."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="recipient-view.delegate-access-dialog.subtitle-2"
+                defaultMessage="We will send them an email with instructions on how to proceed."
+              />
+            </Text>
+          </Box>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
             <FormLabel>
               <FormattedMessage
@@ -168,6 +148,7 @@ function DelegateAccessDialog({
                 emailRef,
                 register({ required: true, pattern: EMAIL_REGEX })
               )}
+              type="email"
               name="email"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",
@@ -183,7 +164,6 @@ function DelegateAccessDialog({
               </FormErrorMessage>
             )}
           </FormControl>
-
           <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
             <FormLabel>
               <FormattedMessage
@@ -209,7 +189,7 @@ function DelegateAccessDialog({
               />
             </FormLabel>
             <Input name="lastName" ref={register({ required: true })} />
-            {errors.email && (
+            {errors.lastName && (
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.forms.invalid-contact-last-name-error"
@@ -218,22 +198,30 @@ function DelegateAccessDialog({
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl id="message" isInvalid={messageBodyError}>
+          <FormControl id="message" isInvalid={!!errors.messageBody}>
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.message-label"
                 defaultMessage="Message"
               />
             </FormLabel>
-            <RichTextEditor
-              value={messageBody}
-              onChange={setMessageBody}
-              placeholder={intl.formatMessage({
-                id: "component.message-email-editor.body-placeholder",
-                defaultMessage: "Write a message to include in the email",
-              })}
+            <Controller
+              name="messageBody"
+              control={control}
+              rules={{
+                validate: { required: (value) => !isEmptyContent(value) },
+              }}
+              render={({ value, onChange }) => (
+                <RichTextEditor
+                  value={value}
+                  onChange={onChange}
+                  placeholder={intl.formatMessage({
+                    id: "component.message-email-editor.body-placeholder",
+                    defaultMessage: "Write a message to include in the email",
+                  })}
+                />
+              )}
             />
-
             <FormErrorMessage>
               <FormattedMessage
                 id="component.message-email-editor.body-required-error"

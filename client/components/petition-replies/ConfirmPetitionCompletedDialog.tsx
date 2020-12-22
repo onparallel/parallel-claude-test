@@ -18,6 +18,7 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
+import { plainTextToContent } from "@parallel/utils/slate/plainTextToContent";
 import { Maybe } from "@parallel/utils/types";
 import outdent from "outdent";
 import { useRef, useState } from "react";
@@ -67,11 +68,8 @@ export function ConfirmPetitionCompletedDialog({
   }
 >) {
   const intl = useIntl();
-  const message = Object.keys(messages).includes(locale)
-    ? messages[locale]
-    : messages["en"];
   const [body, setBody] = useState<RichTextEditorContent>(
-    message.split("\n").map((text) => ({ children: [{ text }] }))
+    plainTextToContent(messages[locale] ?? messages["en"])
   );
 
   const isInvalidBody = isEmptyContent(body);

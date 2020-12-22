@@ -17,6 +17,7 @@ import {
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { emptyContent } from "@parallel/utils/slate/emptyContent";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -65,7 +66,7 @@ export function AddPetitionAccessDialog({
   const [recipients, setRecipients] = useState<ContactSelectSelection[]>([]);
   const [subject, setSubject] = useState(defaultSubject ?? "");
   const [body, setBody] = useState<RichTextEditorContent>(
-    defaultBody ?? [{ children: [{ text: "" }] }]
+    defaultBody ?? emptyContent()
   );
   const [remindersConfig, setRemindersConfig] = useState<
     Maybe<RemindersConfig>
