@@ -100,8 +100,7 @@ const config = {
                     connectSrc: [
                       "'self'",
                       "*.parallel.so",
-                      "parallel-file-uploads-production.s3-accelerate.amazonaws.com",
-                      "parallel-file-uploads-staging.s3-accelerate.amazonaws.com",
+                      `parallel-file-uploads-${process.env.ENV}.s3-accelerate.amazonaws.com`,
                       "*.sentry.io",
                       // Google analytics
                       "www.google-analytics.com",
