@@ -405,9 +405,8 @@ export const publicCreateSelectReply = mutationField(
       data: nonNull(arg({ type: "CreateTextReplyInput" })),
     },
     authorize: chain(
-      fetchPetitionAccess("keycode"),
-      fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", "SELECT")
+      authenticatePublicAccess("keycode"),
+      and(fieldBelongsToAccess("fieldId"), fieldHasType("fieldId", "SELECT"))
     ),
     resolve: async (_, args, ctx) => {
       const reply = await ctx.petitions.createPetitionFieldReply(
@@ -630,7 +629,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     description:
       "Generates a download link for a file reply on a public context.",
     type: "FileUploadReplyDownloadLinkResult",
-    authorize: fetchPetitionAccess("keycode"),
+    authorize: authenticatePublicAccess("keycode"),
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
@@ -682,7 +681,7 @@ export const publicDelegateAccessToContact = mutationField(
       lastName: nonNull(stringArg()),
       messageBody: nonNull(jsonArg()),
     },
-    authorize: fetchPetitionAccess("keycode"),
+    authorize: authenticatePublicAccess("keycode"),
     validateArgs: validRichTextContent(
       (args) => args.messageBody,
       "messageBody"

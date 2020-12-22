@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Grid, Text, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, Text, useToast } from "@chakra-ui/react";
 import { EmailIcon, UserIcon } from "@parallel/chakra/icons";
 import { Card, CardProps } from "@parallel/components/common/Card";
 import {
@@ -103,9 +103,9 @@ export function RecipientViewContactCard({
       </Box>
 
       <Flex alignItems="center" marginTop={2}>
-        <Text
-          maxWidth="fit-content"
-          cursor="pointer"
+        <Button
+          variant="link"
+          fontWeight="normal"
           color="purple.500"
           _hover={{
             color: "purple.700",
@@ -116,7 +116,7 @@ export function RecipientViewContactCard({
             id="recipient-view.delegate-access"
             defaultMessage="Delegate access"
           />
-        </Text>
+        </Button>
         <HelpPopover marginLeft={2}>
           <FormattedMessage
             id="recipient-view.delegate-access.help"

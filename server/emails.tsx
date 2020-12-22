@@ -9,7 +9,7 @@ import Convert from "ansi-to-html";
 import escapeHTML from "escape-html";
 
 const app = express();
-app.use(cors<Request>());
+app.use(cors());
 
 const LR_SCRIPT = `<script src="http://localhost:35729/livereload.js?snipver=1"></script>`;
 
