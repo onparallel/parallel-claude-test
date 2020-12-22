@@ -13,7 +13,7 @@ import { UserArrowIcon } from "@parallel/chakra/icons";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -34,22 +34,18 @@ type DelegateAccessDialogData = {
 
 const messages: Record<
   PetitionLocale,
-  (
-    delegatedContactName: string,
-    organization: string,
-    contactName: string
-  ) => string
+  (organization: string, contactName: string) => string
 > = {
-  en: (delegatedContactName, organization, contactName) => outdent`
-    Hello ${delegatedContactName},
+  en: (organization, contactName) => outdent`
+    Hello,
 
     I have been asked for this information from ${organization} through Parallel. Could you please help me complete it?
 
     Thanks,
     ${contactName}.
   `,
-  es: (delegatedContactName, organization, contactName) => outdent`
-    Hola ${delegatedContactName},
+  es: (organization, contactName) => outdent`
+    Hola,
 
     Me han pedido esta información de ${organization} a través de Parallel. ¿Podrías ayudarme por favor a completarla?
     
@@ -74,12 +70,7 @@ function DelegateAccessDialog({
   const intl = useIntl();
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const {
-    handleSubmit,
-    register,
-    errors,
-    watch,
-  } = useForm<DelegateAccessDialogData>({
+  const { handleSubmit, register, errors } = useForm<DelegateAccessDialogData>({
     mode: "onChange",
     defaultValues: {
       email: "",
@@ -90,24 +81,14 @@ function DelegateAccessDialog({
     shouldFocusError: true,
   });
 
-  const watchFirstName = watch("firstName");
-
-  const message = useMemo(() => {
-    const messageBuilder = Object.keys(messages).includes(intl.locale)
-      ? messages[intl.locale as keyof typeof messages]
-      : messages["en"];
-    return messageBuilder(watchFirstName, organizationName, contactName);
-  }, [watchFirstName]);
+  const messageBuilder = Object.keys(messages).includes(intl.locale)
+    ? messages[intl.locale as keyof typeof messages]
+    : messages["en"];
+  const message = messageBuilder(organizationName, contactName);
 
   const [messageBody, setMessageBody] = useState<RichTextEditorContent>(
     message.split("\n").map((text) => ({ children: [{ text }] }))
   );
-
-  useEffect(() => {
-    setMessageBody(
-      message.split("\n").map((text) => ({ children: [{ text }] }))
-    );
-  }, [message]);
 
   const [messageBodyError, setMessageBodyError] = useState(false);
 
