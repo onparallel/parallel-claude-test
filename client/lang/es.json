@@ -3601,7 +3601,7 @@
   },
   {
     "term": "recipient-view.delegate-access-dialog.subtitle-1",
-    "definition": "Por favor, rellene los datos de contacto de la persona a la que quiere delegar su acceso.",
+    "definition": "Por favor, rellene los datos de la persona a la que quiere delegar su acceso.",
     "context": "Please fill out the contact details of the person you want to delegate your access."
   },
   {
