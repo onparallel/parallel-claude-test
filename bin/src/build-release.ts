@@ -131,6 +131,7 @@ async function main() {
     --frozen-lockfile`,
     { cwd: buildDir, encoding: "utf-8" }
   );
+  execSync(`yarn patch-package`, { cwd: buildDir, encoding: "utf-8" });
 
   console.log("Zip and upload to S3");
   execSync(`tar -zcf ${buildId}.tar.gz ${buildId}`, {

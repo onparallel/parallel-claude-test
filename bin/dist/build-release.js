@@ -93,6 +93,7 @@ async function main() {
     --ignore-scripts \
     --prefer-offline \
     --frozen-lockfile`, { cwd: buildDir, encoding: "utf-8" });
+    child_process_1.execSync(`yarn patch-package`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Zip and upload to S3");
     child_process_1.execSync(`tar -zcf ${buildId}.tar.gz ${buildId}`, {
         cwd: WORK_DIR,
