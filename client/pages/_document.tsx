@@ -29,6 +29,10 @@ class MyDocument extends Document<MyDocumentProps> {
   static async getInitialProps(ctx: DocumentContext) {
     const { renderPage } = ctx;
     const locale = getLocale(ctx);
+    if (locale === null) {
+      ctx.res!.writeHead(302, { Location: "/" }).end();
+      return {} as any;
+    }
     const messages = await loadMessages(locale);
     ctx.renderPage = () =>
       renderPage({
@@ -88,7 +92,11 @@ class MyDocument extends Document<MyDocumentProps> {
 
 function getLocale(context: DocumentContext) {
   if (context.query.locale) {
-    return context.query.locale as string;
+    const locale = context.query.locale as string;
+    if (locale && languages.some((l) => l.locale === locale)) {
+      return locale;
+    }
+    return null;
   } else {
     if (context.req?.url) {
       const match = context.req?.url.match(/^\/([a-z-]*)\//i);
@@ -97,8 +105,8 @@ function getLocale(context: DocumentContext) {
         return locale;
       }
     }
+    return "en";
   }
-  return "en";
 }
 
 export default MyDocument;
