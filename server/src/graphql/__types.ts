@@ -446,10 +446,10 @@ export interface NexusGenFieldTypes {
   };
   AccessDelegatedEvent: {
     // field return type
-    contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     newAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    originalAccess: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
   };
   AccessOpenedEvent: {
     // field return type
@@ -1110,10 +1110,10 @@ export interface NexusGenFieldTypeNames {
   };
   AccessDelegatedEvent: {
     // field return type name
-    contact: "Contact";
     createdAt: "DateTime";
     id: "GID";
     newAccess: "PetitionAccess";
+    originalAccess: "PetitionAccess";
   };
   AccessOpenedEvent: {
     // field return type name

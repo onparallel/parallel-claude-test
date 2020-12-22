@@ -44,10 +44,10 @@ export type AccessDeactivatedEvent = PetitionEvent & {
 
 export type AccessDelegatedEvent = PetitionEvent & {
   __typename?: "AccessDelegatedEvent";
-  contact?: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   newAccess: PetitionAccess;
+  originalAccess: PetitionAccess;
 };
 
 export type AccessOpenedEvent = PetitionEvent & {
@@ -2296,7 +2296,9 @@ export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
 export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
   __typename?: "AccessDelegatedEvent";
 } & Pick<AccessDelegatedEvent, "createdAt"> & {
-    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    originalAccess: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
     newAccess: { __typename?: "PetitionAccess" } & {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
@@ -5425,8 +5427,10 @@ export const TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc 
 `;
 export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
-    contact {
-      ...ContactLink_Contact
+    originalAccess {
+      contact {
+        ...ContactLink_Contact
+      }
     }
     newAccess {
       contact {

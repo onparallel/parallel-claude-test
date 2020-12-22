@@ -29,8 +29,8 @@ export function TimelineAccessDelegatedEvent({
         id="timeline.access-delegated-description"
         defaultMessage="{contact} has delegated the petition to {newContact} {timeAgo}"
         values={{
-          contact: event.contact ? (
-            <ContactLink contact={event.contact} />
+          contact: event.originalAccess.contact ? (
+            <ContactLink contact={event.originalAccess.contact} />
           ) : (
             <DeletedContact />
           ),
@@ -55,8 +55,10 @@ export function TimelineAccessDelegatedEvent({
 TimelineAccessDelegatedEvent.fragments = {
   AccessDelegatedEvent: gql`
     fragment TimelineAccessDelegatedEvent_AccessDelegatedEvent on AccessDelegatedEvent {
-      contact {
-        ...ContactLink_Contact
+      originalAccess {
+        contact {
+          ...ContactLink_Contact
+        }
       }
       newAccess {
         contact {

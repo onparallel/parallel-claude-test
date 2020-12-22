@@ -160,10 +160,10 @@ export const AccessDelegatedEvent = createPetitionEvent(
         ))!;
       },
     });
-    t.nullable.field("contact", {
-      type: "Contact",
+    t.field("originalAccess", {
+      type: "PetitionAccess",
       resolve: async (root, _, ctx) => {
-        return await ctx.contacts.loadContact(root.data.contact_id);
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
   }

@@ -727,7 +727,7 @@ export const publicDelegateAccessToContact = mutationField(
             type: "ACCESS_DELEGATED",
             petitionId,
             data: {
-              contact_id: recipient.id,
+              petition_access_id: access.id,
               new_petition_access_id: newAccess.id,
             },
           }),
