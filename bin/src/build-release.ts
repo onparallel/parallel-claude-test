@@ -100,7 +100,7 @@ async function main() {
   );
 
   console.log("Building the client");
-  execSync(`yarn build`, {
+  execSync(`ENV=${env} yarn build`, {
     cwd: `${buildDir}/client`,
     encoding: "utf-8",
   });
