@@ -100,13 +100,17 @@ export class Aws {
   /**
    * Creates a user in Cognito and returns the cognito Id
    */
-  async createCognitoUser(email: string, password: string) {
+  async createCognitoUser(
+    email: string,
+    password?: string,
+    sendEmail?: boolean
+  ) {
     const res = await this.cognitoIdP
       .adminCreateUser({
         UserPoolId: this.config.cognito.defaultPoolId,
         Username: email,
         TemporaryPassword: password,
-        MessageAction: "SUPPRESS",
+        MessageAction: sendEmail ? undefined : "SUPPRESS",
         UserAttributes: [
           {
             Name: "email",

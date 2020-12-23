@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Stack, Text } from "@chakra-ui/react";
-import { RepeatIcon } from "@parallel/chakra/icons";
-import { DateTime } from "@parallel/components/common/DateTime";
+import { Box, Button, Stack, useToast } from "@chakra-ui/react";
+import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { SearchInput } from "@parallel/components/common/SearchInput";
-import { TableColumn } from "@parallel/components/common/Table";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
@@ -13,16 +13,15 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { useCreateUserDialog } from "@parallel/components/organization/CreateUserDialog";
 import {
-  OrganizationRole,
   OrganizationUsersQuery,
   OrganizationUsers_OrderBy,
-  OrganizationUsers_UserFragment,
   useOrganizationUsersQuery,
+  useOrganizationUsers_createOrganizationUserMutation,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
-import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
   parseQuery,
@@ -32,7 +31,8 @@ import {
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { useOrganizationUsersTableColumns } from "@parallel/utils/useOrganizationUsersTableColumns";
+import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const PAGE_SIZE = 10;
@@ -54,10 +54,9 @@ const QUERY_STATE = {
   }),
 };
 
-type UserSelection = OrganizationUsers_UserFragment;
-
 function OrganizationUsers() {
   const intl = useIntl();
+  const toast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me },
@@ -80,7 +79,7 @@ function OrganizationUsers() {
 
   const sections = useOrganizationSections();
 
-  const columns = useOrganizationUsersColumns();
+  const columns = useOrganizationUsersTableColumns();
   const [search, setSearch] = useState(state.search);
 
   const debouncedOnSearchChange = useDebouncedCallback(
@@ -102,6 +101,39 @@ function OrganizationUsers() {
     },
     [debouncedOnSearchChange]
   );
+
+  const [
+    createOrganizationUser,
+  ] = useOrganizationUsers_createOrganizationUserMutation();
+  const showCreateUserDialog = useCreateUserDialog();
+  const handleCreateUser = async () => {
+    try {
+      const { email, firstName, lastName, role } = await showCreateUserDialog(
+        {}
+      );
+      await createOrganizationUser({
+        variables: {
+          email,
+          firstName,
+          lastName,
+          role,
+        },
+        update() {
+          refetch();
+        },
+      });
+      toast({
+        title: intl.formatMessage({
+          id: "generic.success",
+          defaultMessage: "Success",
+        }),
+        description: "User created successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch {}
+  };
 
   return (
     <SettingsLayout
@@ -156,113 +188,22 @@ function OrganizationUsers() {
                   defaultMessage: "Reload",
                 })}
               />
+              <Spacer />
+              <Button
+                colorScheme="purple"
+                leftIcon={<UserPlusIcon fontSize="18px" />}
+                onClick={handleCreateUser}
+              >
+                {intl.formatMessage({
+                  id: "organization.create-user-button",
+                  defaultMessage: "Create user",
+                })}
+              </Button>
             </Stack>
           }
         />
       </Box>
     </SettingsLayout>
-  );
-}
-
-function useOrganizationUsersColumns() {
-  const intl = useIntl();
-  return useMemo<TableColumn<UserSelection>[]>(
-    () => [
-      {
-        key: "firstName",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "organization-users.header.user-firstname",
-          defaultMessage: "First name",
-        }),
-        CellContent: ({ row }) => <>{row.firstName}</>,
-      },
-      {
-        key: "lastName",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "organization-users.header.user-lastname",
-          defaultMessage: "Last name",
-        }),
-        CellContent: ({ row }) => <>{row.lastName}</>,
-      },
-      {
-        key: "email",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "organization-users.header.user-email",
-          defaultMessage: "Email",
-        }),
-        CellContent: ({ row }) => <>{row.email}</>,
-      },
-      {
-        key: "role",
-        header: intl.formatMessage({
-          id: "organization-users.header.user-role",
-          defaultMessage: "Role",
-        }),
-        cellProps: {
-          width: "1px",
-          textAlign: "center",
-        },
-        CellContent: ({ row }) => (
-          <Badge
-            colorScheme={
-              ({
-                ADMIN: "green",
-                NORMAL: "gray",
-              } as Record<OrganizationRole, string>)[row.role]
-            }
-          >
-            {row.role}
-          </Badge>
-        ),
-      },
-      {
-        key: "lastActiveAt",
-        header: intl.formatMessage({
-          id: "generic.last-active-at",
-          defaultMessage: "Last active at",
-        }),
-        isSortable: true,
-        CellContent: ({ row }) =>
-          row.lastActiveAt ? (
-            <DateTime
-              value={row.lastActiveAt}
-              format={FORMATS.LLL}
-              useRelativeTime
-              whiteSpace="nowrap"
-            />
-          ) : (
-            <Text textStyle="hint">
-              <FormattedMessage
-                id="generic.never-active"
-                defaultMessage="Never active"
-              />
-            </Text>
-          ),
-      },
-      {
-        key: "createdAt",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "generic.created-at",
-          defaultMessage: "Created at",
-        }),
-        cellProps: {
-          width: "1px",
-        },
-        CellContent: ({ row }) => (
-          <DateTime
-            value={row.createdAt}
-            format={FORMATS.LLL}
-            useRelativeTime
-            whiteSpace="nowrap"
-          />
-        ),
-      },
-    ],
-    [intl.locale]
   );
 }
 
@@ -281,6 +222,27 @@ OrganizationUsers.fragments = {
     `;
   },
 };
+
+OrganizationUsers.mutations = [
+  gql`
+    mutation OrganizationUsers_createOrganizationUser(
+      $firstName: String!
+      $lastName: String!
+      $email: String!
+      $role: OrganizationRole!
+    ) {
+      createOrganizationUser(
+        email: $email
+        firstName: $firstName
+        lastName: $lastName
+        role: $role
+      ) {
+        ...OrganizationUsers_User
+      }
+    }
+    ${OrganizationUsers.fragments.User}
+  `,
+];
 
 OrganizationUsers.getInitialProps = async ({
   fetchQuery,
@@ -331,5 +293,6 @@ OrganizationUsers.getInitialProps = async ({
 
 export default compose(
   withAdminOrganizationRole,
+  withDialogs,
   withApolloData
 )(OrganizationUsers);

@@ -7,10 +7,17 @@ import {
   nonNull,
 } from "@nexus/schema";
 import { removeNotDefined } from "../../util/remedaExtensions";
-import { argIsContextUserId, authenticate, chain } from "../helpers/authorize";
+import {
+  argIsContextUserId,
+  authenticate,
+  authenticateAnd,
+  chain,
+} from "../helpers/authorize";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { contextUserIsAdmin } from "./authorizers";
+import { validEmail } from "../helpers/validators/validEmail";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -34,7 +41,7 @@ export const updateUser = mutationField("updateUser", {
   ),
   resolve: async (_, args, ctx) => {
     const { firstName, lastName } = args.data;
-    return await ctx.users.updateUserById(
+    const [user] = await ctx.users.updateUserById(
       args.id,
       removeNotDefined({
         first_name: firstName,
@@ -42,6 +49,7 @@ export const updateUser = mutationField("updateUser", {
       }),
       ctx.user!
     );
+    return user;
   },
 });
 
@@ -99,5 +107,37 @@ export const updateOnboardingStatus = mutationField("updateOnboardingStatus", {
   },
   resolve: async (o, { key, status }, ctx) => {
     return ctx.users.updateUserOnboardingStatus(key, status, ctx.user!);
+  },
+});
+
+export const createOrganizationUser = mutationField("createOrganizationUser", {
+  description:
+    "Creates a new user in the same organization as the context user",
+  type: "User",
+  authorize: authenticateAnd(contextUserIsAdmin()),
+  args: {
+    email: nonNull(stringArg()),
+    firstName: nonNull(stringArg()),
+    lastName: nonNull(stringArg()),
+    role: nonNull(arg({ type: "OrganizationRole" })),
+  },
+  validateArgs: validEmail((args) => args.email, "email"),
+  resolve: async (_, args, ctx) => {
+    const cognitoId = await ctx.aws.createCognitoUser(
+      args.email,
+      undefined,
+      true
+    );
+    return await ctx.users.createUser(
+      {
+        cognito_id: cognitoId!,
+        org_id: ctx.user!.org_id,
+        organization_role: args.role,
+        email: args.email,
+        first_name: args.firstName,
+        last_name: args.lastName,
+      },
+      ctx.user!
+    );
   },
 });

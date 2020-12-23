@@ -6,6 +6,8 @@ import { CreateUser, User } from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import DataLoader from "dataloader";
 import { indexBy } from "remeda";
+import { MaybeArray } from "../../util/types";
+import { unMaybeArray } from "../../util/arrays";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -29,16 +31,24 @@ export class UserRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async updateUserById(id: number, data: Partial<CreateUser>, user: User) {
-    const rows = await this.from("user")
+  readonly loadUserByEmail = this.buildLoadBy("user", "email", (q) =>
+    q.whereNull("deleted_at")
+  );
+
+  async updateUserById(
+    id: MaybeArray<number>,
+    data: Partial<CreateUser>,
+    user: User
+  ) {
+    const ids = unMaybeArray(id);
+    return await this.from("user")
       .update({
         ...data,
         updated_at: this.now(),
         updated_by: `User:${user.id}`,
       })
-      .where({ id })
+      .whereIn("id", ids)
       .returning("*");
-    return rows[0];
   }
 
   async updateUserOnboardingStatus(

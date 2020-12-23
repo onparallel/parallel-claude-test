@@ -524,6 +524,7 @@ export interface NexusGenFieldTypes {
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -918,6 +919,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
+    emailIsRegistered: boolean; // Boolean!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     me: NexusGenRootTypes["User"]; // User!
@@ -1187,6 +1189,7 @@ export interface NexusGenFieldTypeNames {
     clonePetitions: "PetitionBase";
     createContact: "Contact";
     createOrganization: "SupportMethodResponse";
+    createOrganizationUser: "User";
     createPetition: "PetitionBase";
     createPetitionField: "PetitionBaseAndField";
     createPetitionFieldComment: "PetitionFieldComment";
@@ -1579,6 +1582,7 @@ export interface NexusGenFieldTypeNames {
     access: "PublicPetitionAccess";
     contact: "Contact";
     contacts: "ContactPagination";
+    emailIsRegistered: "Boolean";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
     me: "User";
@@ -1810,6 +1814,13 @@ export interface NexusGenArgTypes {
       identifier: string; // String!
       name: string; // String!
       status: NexusGenEnums["OrganizationStatus"]; // OrganizationStatus!
+    };
+    createOrganizationUser: {
+      // args
+      email: string; // String!
+      firstName: string; // String!
+      lastName: string; // String!
+      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     };
     createPetition: {
       // args
@@ -2145,6 +2156,10 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryContacts_OrderBy"][] | null; // [QueryContacts_OrderBy!]
+    };
+    emailIsRegistered: {
+      // args
+      email: string; // String!
     };
     globalIdDecode: {
       // args

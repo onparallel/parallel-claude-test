@@ -198,6 +198,8 @@ export type Mutation = {
   createContact: Contact;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
+  /** Creates a new user in the same organization as the context user */
+  createOrganizationUser: User;
   /** Create petition. */
   createPetition: PetitionBase;
   /** Creates a petition field */
@@ -351,6 +353,13 @@ export type MutationcreateOrganizationArgs = {
   identifier: Scalars["String"];
   name: Scalars["String"];
   status: OrganizationStatus;
+};
+
+export type MutationcreateOrganizationUserArgs = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  role: OrganizationRole;
 };
 
 export type MutationcreatePetitionArgs = {
@@ -1412,6 +1421,8 @@ export type Query = {
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
+  /** Checks if the provided email is registered as a user on Parallel */
+  emailIsRegistered: Scalars["Boolean"];
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
@@ -1443,6 +1454,10 @@ export type QuerycontactsArgs = {
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
+};
+
+export type QueryemailIsRegisteredArgs = {
+  email: Scalars["String"];
 };
 
 export type QueryglobalIdDecodeArgs = {
@@ -1968,6 +1983,14 @@ export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   User,
   "fullName" | "isSuperAdmin" | "role"
 >;
+
+export type CreateUserDialog_emailIsRegisteredQueryVariables = Exact<{
+  email: Scalars["String"];
+}>;
+
+export type CreateUserDialog_emailIsRegisteredQuery = {
+  __typename?: "Query";
+} & Pick<Query, "emailIsRegistered">;
 
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
@@ -3300,6 +3323,21 @@ export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
   | "createdAt"
   | "lastActiveAt"
 >;
+
+export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  email: Scalars["String"];
+  role: OrganizationRole;
+}>;
+
+export type OrganizationUsers_createOrganizationUserMutation = {
+  __typename?: "Mutation";
+} & {
+  createOrganizationUser: {
+    __typename?: "User";
+  } & OrganizationUsers_UserFragment;
+};
 
 export type OrganizationUsersQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -6517,6 +6555,56 @@ export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
 export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult = ReturnType<
   typeof usePetitionHeader_updatePetitionUserSubscriptionMutation
 >;
+export const CreateUserDialog_emailIsRegisteredDocument = gql`
+  query CreateUserDialog_emailIsRegistered($email: String!) {
+    emailIsRegistered(email: $email)
+  }
+`;
+
+/**
+ * __useCreateUserDialog_emailIsRegisteredQuery__
+ *
+ * To run a query within a React component, call `useCreateUserDialog_emailIsRegisteredQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserDialog_emailIsRegisteredQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCreateUserDialog_emailIsRegisteredQuery({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useCreateUserDialog_emailIsRegisteredQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    CreateUserDialog_emailIsRegisteredQuery,
+    CreateUserDialog_emailIsRegisteredQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    CreateUserDialog_emailIsRegisteredQuery,
+    CreateUserDialog_emailIsRegisteredQueryVariables
+  >(CreateUserDialog_emailIsRegisteredDocument, baseOptions);
+}
+export function useCreateUserDialog_emailIsRegisteredLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CreateUserDialog_emailIsRegisteredQuery,
+    CreateUserDialog_emailIsRegisteredQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    CreateUserDialog_emailIsRegisteredQuery,
+    CreateUserDialog_emailIsRegisteredQueryVariables
+  >(CreateUserDialog_emailIsRegisteredDocument, baseOptions);
+}
+export type CreateUserDialog_emailIsRegisteredQueryHookResult = ReturnType<
+  typeof useCreateUserDialog_emailIsRegisteredQuery
+>;
+export type CreateUserDialog_emailIsRegisteredLazyQueryHookResult = ReturnType<
+  typeof useCreateUserDialog_emailIsRegisteredLazyQuery
+>;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest(
     $petitionSignatureRequestId: GID!
@@ -7616,6 +7704,59 @@ export type OrganizationSettingsQueryHookResult = ReturnType<
 >;
 export type OrganizationSettingsLazyQueryHookResult = ReturnType<
   typeof useOrganizationSettingsLazyQuery
+>;
+export const OrganizationUsers_createOrganizationUserDocument = gql`
+  mutation OrganizationUsers_createOrganizationUser(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $role: OrganizationRole!
+  ) {
+    createOrganizationUser(
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      role: $role
+    ) {
+      ...OrganizationUsers_User
+    }
+  }
+  ${OrganizationUsers_UserFragmentDoc}
+`;
+
+/**
+ * __useOrganizationUsers_createOrganizationUserMutation__
+ *
+ * To run a mutation, you first call `useOrganizationUsers_createOrganizationUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationUsers_createOrganizationUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [organizationUsersCreateOrganizationUserMutation, { data, loading, error }] = useOrganizationUsers_createOrganizationUserMutation({
+ *   variables: {
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      email: // value for 'email'
+ *      role: // value for 'role'
+ *   },
+ * });
+ */
+export function useOrganizationUsers_createOrganizationUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OrganizationUsers_createOrganizationUserMutation,
+    OrganizationUsers_createOrganizationUserMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    OrganizationUsers_createOrganizationUserMutation,
+    OrganizationUsers_createOrganizationUserMutationVariables
+  >(OrganizationUsers_createOrganizationUserDocument, baseOptions);
+}
+export type OrganizationUsers_createOrganizationUserMutationHookResult = ReturnType<
+  typeof useOrganizationUsers_createOrganizationUserMutation
 >;
 export const OrganizationUsersDocument = gql`
   query OrganizationUsers(

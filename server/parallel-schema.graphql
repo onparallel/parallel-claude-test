@@ -297,6 +297,16 @@ type Mutation {
   ): SupportMethodResponse!
 
   """
+  Creates a new user in the same organization as the context user
+  """
+  createOrganizationUser(
+    email: String!
+    firstName: String!
+    lastName: String!
+    role: OrganizationRole!
+  ): User!
+
+  """
   Create petition.
   """
   createPetition(
@@ -2175,6 +2185,11 @@ type Query {
     """
     sortBy: [QueryContacts_OrderBy!]
   ): ContactPagination!
+
+  """
+  Checks if the provided email is registered as a user on Parallel
+  """
+  emailIsRegistered(email: String!): Boolean!
 
   """
   Decodes the given Global ID into an entity in the database.

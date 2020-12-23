@@ -7,3 +7,12 @@ export function rootIsContextUser<
     return ctx.user!.id === root.id;
   };
 }
+
+export function contextUserIsAdmin<
+  TypeName extends string,
+  FieldName extends string
+>(): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (root, _, ctx) => {
+    return ctx.user!.organization_role === "ADMIN";
+  };
+}
