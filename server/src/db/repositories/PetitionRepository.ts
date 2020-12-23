@@ -1165,7 +1165,7 @@ export class PetitionRepository extends BaseRepository {
           updated_at: this.now(),
           updated_by: `Contact:${contact.id}`,
         })
-        .where({ id: field?.petition_id, status: "COMPLETED" }),
+        .where({ id: field.petition_id, status: "COMPLETED" }),
     ]);
     await this.createEvent({
       type: "REPLY_CREATED",

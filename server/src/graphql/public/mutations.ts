@@ -10,27 +10,28 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { prop } from "remeda";
+import { getClientIp } from "request-ip";
+import { toGlobalId } from "../../util/globalId";
+import { stallFor } from "../../util/stallFor";
 import { random } from "../../util/token";
+import { Maybe } from "../../util/types";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
+import { ArgValidationError, WhitelistedError } from "../helpers/errors";
+import { globalIdArg } from "../helpers/globalIdPlugin";
+import { jsonArg } from "../helpers/json";
 import { RESULT } from "../helpers/result";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+import { userIsCommentAuthor } from "../petition/mutations/authorizers";
 import {
-  commentsBelongsToAccess,
   authenticatePublicAccess,
+  commentsBelongsToAccess,
+  fetchPetitionAccess,
   fieldBelongsToAccess,
   fieldHasType,
-  replyBelongsToAccess,
-  fetchPetitionAccess,
   getContactAuthCookieValue,
+  replyBelongsToAccess,
 } from "./authorizers";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
-import { globalIdArg } from "../helpers/globalIdPlugin";
-import { userIsCommentAuthor } from "../petition/mutations/authorizers";
-import { toGlobalId } from "../../util/globalId";
-import { getClientIp } from "request-ip";
-import { stallFor } from "../../util/stallFor";
-import { jsonArg } from "../helpers/json";
-import { validRichTextContent } from "../helpers/validators/validRichTextContent";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -243,8 +244,8 @@ export const publicDeletePetitionReply = mutationField(
       replyBelongsToAccess("replyId")
     ),
     args: {
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
       keycode: nonNull(idArg()),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
     },
     resolve: async (_, args, ctx) => {
       const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
@@ -362,6 +363,7 @@ export const publicCreateFileUploadReply = mutationField(
 export const publicCreateTextReply = mutationField("publicCreateTextReply", {
   description: "Creates a reply to a text field.",
   type: "PublicPetitionFieldReply",
+  deprecation: "Delete after a few releases",
   args: {
     keycode: nonNull(idArg()),
     fieldId: nonNull(globalIdArg("PetitionField")),
@@ -398,6 +400,7 @@ export const publicCreateSelectReply = mutationField(
   {
     description: "Creates a reply to a select field.",
     type: "PublicPetitionFieldReply",
+    deprecation: "Delete after a few releases",
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
@@ -419,6 +422,45 @@ export const publicCreateSelectReply = mutationField(
         ctx.contact!
       );
       return reply;
+    },
+  }
+);
+
+export const publicCreateSimpleReply = mutationField(
+  "publicCreateSimpleReply",
+  {
+    description: "Creates a reply to a text or select field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: nonNull(idArg()),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      reply: nonNull(stringArg()),
+    },
+    authorize: chain(
+      fetchPetitionAccess("keycode"),
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["TEXT", "SELECT"])
+    ),
+    validateArgs: async (_, args, ctx, info) => {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      if (field.type === "SELECT") {
+        const options = field.options.values as Maybe<string[]>;
+        if (!options?.includes(args.reply)) {
+          throw new ArgValidationError(info, "reply", "Invalid option");
+        }
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      return await ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          petition_access_id: ctx.access!.id,
+          type: field.type,
+          content: { text: args.reply },
+        },
+        ctx.contact!
+      );
     },
   }
 );

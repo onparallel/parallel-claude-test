@@ -487,6 +487,16 @@ type Mutation {
     fieldId: GID!
     keycode: ID!
   ): PublicPetitionFieldReply!
+    @deprecated(reason: "Delete after a few releases")
+
+  """
+  Creates a reply to a text or select field.
+  """
+  publicCreateSimpleReply(
+    fieldId: GID!
+    keycode: ID!
+    reply: String!
+  ): PublicPetitionFieldReply!
 
   """
   Creates a reply to a text field.
@@ -496,6 +506,7 @@ type Mutation {
     fieldId: GID!
     keycode: ID!
   ): PublicPetitionFieldReply!
+    @deprecated(reason: "Delete after a few releases")
 
   """
   Lets a recipient delegate access to the petition to another contact in the same organization

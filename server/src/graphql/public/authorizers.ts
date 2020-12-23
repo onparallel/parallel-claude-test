@@ -100,12 +100,9 @@ export function fieldHasType<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const field = await ctx.petitions.loadField(
-        (args[argFieldId] as unknown) as number
-      );
-      return Array.isArray(fieldType)
-        ? fieldType.includes(field!.type)
-        : fieldType === field!.type;
+      const fieldId = (args[argFieldId] as unknown) as number;
+      const field = (await ctx.petitions.loadField(fieldId))!;
+      return unMaybeArray(fieldType).includes(field.type);
     } catch {}
     return false;
   };

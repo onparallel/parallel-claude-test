@@ -27,6 +27,7 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
+import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
@@ -37,11 +38,9 @@ import {
 } from "@parallel/components/recipient-view/RecipientViewPetitionField";
 import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
-import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
   CreateFileUploadReplyInput,
-  CreateTextReplyInput,
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
   RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
@@ -49,10 +48,8 @@ import {
   RecipientView_createFileUploadReply_PublicPetitionFragment,
   RecipientView_createPetitionFieldCommentMutationVariables,
   RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment,
-  RecipientView_createSelectReply_FieldFragment,
-  RecipientView_createSelectReply_PublicPetitionFragment,
-  RecipientView_createTextReply_FieldFragment,
-  RecipientView_createTextReply_PublicPetitionFragment,
+  RecipientView_createSimpleReply_FieldFragment,
+  RecipientView_createSimpleReply_PublicPetitionFragment,
   RecipientView_deletePetitionFieldCommentMutationVariables,
   RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment,
   RecipientView_deletePetitionReply_PublicPetitionFieldFragment,
@@ -66,8 +63,7 @@ import {
   useRecipientView_markPetitionFieldCommentsAsReadMutation,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_publicCreateFileUploadReplyMutation,
-  useRecipientView_publicCreateSelectReplyMutation,
-  useRecipientView_publicCreateTextReplyMutation,
+  useRecipientView_publicCreateSimpleReplyMutation,
   useRecipientView_publicDeletePetitionReplyMutation,
   useRecipientView_publicFileUploadReplyCompleteMutation,
   useRecipientView_publicFileUploadReplyDownloadLinkMutation,
@@ -110,9 +106,8 @@ function RecipientView({
 
   const [showAlert, setShowAlert] = useState(true);
   const deletePetitionReply = useDeletePetitionReply();
-  const createTextReply = useCreateTextReply();
+  const createSimpleReply = useCreateSimpleReply();
   const createFileUploadReply = useCreateFileUploadReply();
-  const createSelectReply = useCreateSelectReply();
   const [
     fileUploadReplyComplete,
   ] = useRecipientView_publicFileUploadReplyCompleteMutation();
@@ -178,14 +173,13 @@ function RecipientView({
           }
           break;
         case "TEXT":
-          await createTextReply(keycode, petition.id, fieldId, {
-            text: payload.content,
-          });
-          break;
         case "SELECT":
-          await createSelectReply(keycode, petition.id, fieldId, {
-            text: payload.content,
-          });
+          await createSimpleReply(
+            keycode,
+            petition.id,
+            fieldId,
+            payload.content
+          );
           break;
         default:
           break;
@@ -744,12 +738,16 @@ RecipientView.mutations = [
     }
   `,
   gql`
-    mutation RecipientView_publicCreateTextReply(
+    mutation RecipientView_publicCreateSimpleReply(
       $keycode: ID!
       $fieldId: GID!
-      $data: CreateTextReplyInput!
+      $reply: String!
     ) {
-      publicCreateTextReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
+      publicCreateSimpleReply(
+        keycode: $keycode
+        fieldId: $fieldId
+        reply: $reply
+      ) {
         ...RecipientViewPetitionField_PublicPetitionFieldReply
       }
     }
@@ -770,22 +768,6 @@ RecipientView.mutations = [
         reply {
           ...RecipientViewPetitionField_PublicPetitionFieldReply
         }
-      }
-    }
-    ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
-  `,
-  gql`
-    mutation RecipientView_publicCreateSelectReply(
-      $keycode: ID!
-      $fieldId: GID!
-      $data: CreateTextReplyInput!
-    ) {
-      publicCreateSelectReply(
-        keycode: $keycode
-        fieldId: $fieldId
-        data: $data
-      ) {
-        ...RecipientViewPetitionField_PublicPetitionFieldReply
       }
     }
     ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
@@ -945,29 +927,29 @@ function useDeletePetitionReply() {
   );
 }
 
-function useCreateTextReply() {
-  const [mutate] = useRecipientView_publicCreateTextReplyMutation();
+function useCreateSimpleReply() {
+  const [mutate] = useRecipientView_publicCreateSimpleReplyMutation();
   return useCallback(async function (
     keycode: string,
     petitionId: string,
     fieldId: string,
-    data: CreateTextReplyInput
+    reply: string
   ) {
     return await mutate({
-      variables: { keycode, fieldId, data },
+      variables: { keycode, fieldId, reply },
       update(client, { data }) {
         const fieldFragment = gql`
-          fragment RecipientView_createTextReply_Field on PublicPetitionField {
+          fragment RecipientView_createSimpleReply_Field on PublicPetitionField {
             replies {
               id
             }
           }
         `;
-        const reply = data!.publicCreateTextReply;
-        const cachedField = client.readFragment<RecipientView_createTextReply_FieldFragment>(
+        const reply = data!.publicCreateSimpleReply;
+        const cachedField = client.readFragment<RecipientView_createSimpleReply_FieldFragment>(
           { id: fieldId, fragment: fieldFragment }
         );
-        client.writeFragment<RecipientView_createTextReply_FieldFragment>({
+        client.writeFragment<RecipientView_createSimpleReply_FieldFragment>({
           id: fieldId,
           fragment: fieldFragment,
           data: {
@@ -979,15 +961,15 @@ function useCreateTextReply() {
           },
         });
         const petitionFragment = gql`
-          fragment RecipientView_createTextReply_PublicPetition on PublicPetition {
+          fragment RecipientView_createSimpleReply_PublicPetition on PublicPetition {
             status
           }
         `;
-        const cachedPetition = client.readFragment<RecipientView_createTextReply_PublicPetitionFragment>(
+        const cachedPetition = client.readFragment<RecipientView_createSimpleReply_PublicPetitionFragment>(
           { id: petitionId, fragment: petitionFragment }
         );
         if (cachedPetition?.status === "COMPLETED") {
-          client.writeFragment<RecipientView_createTextReply_PublicPetitionFragment>(
+          client.writeFragment<RecipientView_createSimpleReply_PublicPetitionFragment>(
             {
               id: petitionId,
               fragment: petitionFragment,
@@ -1001,63 +983,6 @@ function useCreateTextReply() {
     });
   },
   []);
-}
-
-function useCreateSelectReply() {
-  const [mutate] = useRecipientView_publicCreateSelectReplyMutation();
-  return useCallback(async function (
-    keycode: string,
-    petitionId: string,
-    fieldId: string,
-    data: CreateTextReplyInput // reusing TEXT input object
-  ) {
-    return await mutate({
-      variables: { keycode, fieldId, data },
-      update(client, { data }) {
-        const fieldFragment = gql`
-          fragment RecipientView_createSelectReply_Field on PublicPetitionField {
-            replies {
-              id
-            }
-          }
-        `;
-        const reply = data!.publicCreateSelectReply;
-        const cachedField = client.readFragment<RecipientView_createSelectReply_FieldFragment>(
-          { id: fieldId, fragment: fieldFragment }
-        );
-        client.writeFragment<RecipientView_createSelectReply_FieldFragment>({
-          id: fieldId,
-          fragment: fieldFragment,
-          data: {
-            __typename: "PublicPetitionField",
-            replies: [
-              ...cachedField!.replies,
-              pick(reply, ["id", "__typename"]),
-            ],
-          },
-        });
-        const petitionFragment = gql`
-          fragment RecipientView_createSelectReply_PublicPetition on PublicPetition {
-            status
-          }
-        `;
-        const cachedPetition = client.readFragment<RecipientView_createSelectReply_PublicPetitionFragment>(
-          { id: petitionId, fragment: petitionFragment }
-        );
-        if (cachedPetition?.status === "COMPLETED") {
-          client.writeFragment<RecipientView_createSelectReply_PublicPetitionFragment>(
-            {
-              id: petitionId,
-              fragment: petitionFragment,
-              data: {
-                status: "PENDING",
-              },
-            }
-          );
-        }
-      },
-    });
-  }, []);
 }
 
 function useCreateFileUploadReply() {
