@@ -231,6 +231,7 @@ export const deletePetitions = mutationField("deletePetitions", {
       // delete all permissions to the petitions
       const ownedPetitionIds = await ctx.petitions.deleteUserPermissions(
         args.ids,
+        ctx.user!.id,
         ctx.user!,
         t
       );

@@ -635,7 +635,8 @@ export class PetitionRepository extends BaseRepository {
 
   async deleteUserPermissions(
     petitionIds: number[],
-    user: User,
+    userId: number,
+    deletedBy: User,
     t?: Transaction
   ) {
     return await this.withTransaction(async (t) => {
@@ -643,11 +644,11 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("petition_id", petitionIds)
         .where({
           deleted_at: null,
-          user_id: user.id,
+          user_id: userId,
         })
         .update({
           deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
+          deleted_by: `User:${deletedBy.id}`,
         })
         .returning("*");
 
@@ -2285,20 +2286,26 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async transferOwnership(petitionIds: number[], userId: number, user: User) {
+  async transferOwnership(
+    petitionIds: number[],
+    fromUserId: number,
+    toUserId: number,
+    updatedBy: User,
+    t?: Transaction
+  ) {
     return this.withTransaction(async (t) => {
       // removes user ownership to avoid constraint failure
       await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .where({
-          user_id: user.id,
+          user_id: fromUserId,
           deleted_at: null,
           permission_type: "OWNER",
         })
         .update({
           permission_type: "WRITE",
           updated_at: this.now(),
-          updated_by: `User:${user.id}`,
+          updated_by: `User:${updatedBy.id}`,
         });
 
       for (const petitionId of petitionIds) {
@@ -2306,9 +2313,9 @@ export class PetitionRepository extends BaseRepository {
       }
 
       const insertBatch: CreatePetitionUser[] = petitionIds.map((pid) => ({
-        created_by: `User:${user.id}`,
+        created_by: `User:${updatedBy.id}`,
         permission_type: "OWNER",
-        user_id: userId,
+        user_id: toUserId,
         petition_id: pid,
       }));
 
@@ -2325,7 +2332,7 @@ export class PetitionRepository extends BaseRepository {
         [
           this.from("petition_user").insert(insertBatch),
           "OWNER",
-          `User:${user.id}`,
+          `User:${updatedBy.id}`,
           this.now(),
         ]
       );
@@ -2335,7 +2342,7 @@ export class PetitionRepository extends BaseRepository {
           petitionId: p.petition_id,
           type: "OWNERSHIP_TRANSFERRED",
           data: {
-            user_id: user.id,
+            user_id: updatedBy.id,
             owner_id: p.user_id,
           },
         })),
@@ -2346,7 +2353,7 @@ export class PetitionRepository extends BaseRepository {
         .whereNull("deleted_at")
         .whereIn("id", petitionIds)
         .returning("*");
-    });
+    }, t);
   }
 
   async arePublicTemplates(templateIds: MaybeArray<number>): Promise<boolean> {

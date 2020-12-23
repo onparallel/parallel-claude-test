@@ -832,7 +832,12 @@ describe("repositories/PetitionRepository", () => {
         const permissions = await petitions.loadUserPermissions(petitionId);
         expect(permissions).toHaveLength(1);
 
-        await petitions.transferOwnership([petitionId], users[2].id, users[0]);
+        await petitions.transferOwnership(
+          [petitionId],
+          users[0].id,
+          users[2].id,
+          users[0]
+        );
         const newPermissions = await petitions.loadUserPermissions(petitionId);
         expect(newPermissions).toHaveLength(2);
         newPermissions.sort((a, b) => (a.permission_type === "OWNER" ? -1 : 1));
@@ -860,7 +865,12 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.transferOwnership([petitionId], userId, users[0]);
+        await petitions.transferOwnership(
+          [petitionId],
+          users[0].id,
+          userId,
+          users[0]
+        );
         const newPermissions = await petitions.loadUserPermissions(petitionId);
         expect(newPermissions).toHaveLength(2);
         newPermissions.sort((a, b) => a.id - b.id);

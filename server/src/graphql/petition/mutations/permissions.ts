@@ -38,6 +38,7 @@ export const transferPetitionOwnership = mutationField(
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.transferOwnership(
         args.petitionIds,
+        ctx.user!.id,
         args.userId,
         ctx.user!
       );
