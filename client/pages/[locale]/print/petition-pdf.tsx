@@ -16,7 +16,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
-import { decode } from "jsonwebtoken";
+import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -27,7 +27,10 @@ function PetitionPdf({ token }: { token: string }) {
     })
   );
 
-  const tokenPayload: any = decode(token);
+  const tokenPayload = jwtDecode<{
+    documentTitle?: string;
+    showSignatureBoxes?: boolean;
+  }>(token);
 
   const petition = data.petitionAuthToken;
 
