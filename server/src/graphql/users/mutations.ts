@@ -18,6 +18,7 @@ import { maxLength } from "../helpers/validators/maxLength";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { contextUserIsAdmin } from "./authorizers";
 import { validEmail } from "../helpers/validators/validEmail";
+import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -121,7 +122,10 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     lastName: nonNull(stringArg()),
     role: nonNull(arg({ type: "OrganizationRole" })),
   },
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    emailIsAvailable((args) => args.email, "email")
+  ),
   resolve: async (_, args, ctx) => {
     const cognitoId = await ctx.aws.createCognitoUser(
       args.email,

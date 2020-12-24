@@ -108,17 +108,10 @@ function OrganizationUsers() {
   const showCreateUserDialog = useCreateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const { email, firstName, lastName, role } = await showCreateUserDialog(
-        {}
-      );
+      const newUser = await showCreateUserDialog({});
       await createOrganizationUser({
-        variables: {
-          email,
-          firstName,
-          lastName,
-          role,
-        },
-        update() {
+        variables: newUser,
+        update: () => {
           refetch();
         },
       });

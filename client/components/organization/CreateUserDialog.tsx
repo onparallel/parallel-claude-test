@@ -9,7 +9,6 @@ import {
   InputGroup,
   InputRightElement,
   Select,
-  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -21,13 +20,13 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import {
   OrganizationRole,
-  CreateUserDialog_emailIsRegisteredQuery,
-  CreateUserDialog_emailIsRegisteredQueryVariables,
+  CreateUserDialog_emailIsAvailableQuery,
+  CreateUserDialog_emailIsAvailableQueryVariables,
 } from "@parallel/graphql/__types";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -55,53 +54,50 @@ export function CreateUserDialog({
     },
   });
 
+  const email = watch("email");
   const emailRef = useRef<HTMLInputElement>(null);
 
   const apollo = useApolloClient();
-  const debouncedEmailIsRegistered = useDebouncedAsync(
+  const debouncedEmailIsAvailable = useDebouncedAsync(
     async (email: string) => {
       const { data } = await apollo.query<
-        CreateUserDialog_emailIsRegisteredQuery,
-        CreateUserDialog_emailIsRegisteredQueryVariables
+        CreateUserDialog_emailIsAvailableQuery,
+        CreateUserDialog_emailIsAvailableQueryVariables
       >({
         query: gql`
-          query CreateUserDialog_emailIsRegistered($email: String!) {
-            emailIsRegistered(email: $email)
+          query CreateUserDialog_emailIsAvailable($email: String!) {
+            emailIsAvailable(email: $email)
           }
         `,
         variables: { email },
         fetchPolicy: "no-cache",
       });
-      return data.emailIsRegistered;
+      return data.emailIsAvailable;
     },
     300,
     []
   );
 
-  const [emailCheck, setEmailCheck] = useState({
-    searching: false,
-    isRegistered: false,
-  });
-  const email = watch("email");
-  useEffect(() => {
-    if (email.match(EMAIL_REGEX)) {
-      setEmailCheck({ searching: true, isRegistered: false });
-      debouncedEmailIsRegistered(email).then((isRegistered) => {
-        setEmailCheck({ searching: false, isRegistered });
-      });
+  const emailIsAvailable = async (value: string) => {
+    try {
+      return await debouncedEmailIsAvailable(value);
+    } catch (e) {
+      /**
+       * "debounced" error means the search was cancelled because user is typing
+       * in that case, return true to give positive feedback.
+       * This can also result in a false positive, closing the dialog
+       * (user submits twice in less than the debounce timeout)
+       */
+      return e === "debounced";
     }
-  }, [email]);
+  };
 
   return (
     <ConfirmDialog
       hasCloseButton
       content={{
         as: "form",
-        onSubmit: handleSubmit((data) => {
-          if (!emailCheck.isRegistered) {
-            props.onResolve(data);
-          }
-        }),
+        onSubmit: handleSubmit((data) => props.onResolve(data)),
       }}
       initialFocusRef={emailRef}
       header={
@@ -112,10 +108,7 @@ export function CreateUserDialog({
       }
       body={
         <Stack>
-          <FormControl
-            id="create-user-email"
-            isInvalid={!!errors.email || emailCheck.isRegistered}
-          >
+          <FormControl id="create-user-email" isInvalid={!!errors.email}>
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.email-label"
@@ -126,7 +119,11 @@ export function CreateUserDialog({
               <Input
                 ref={useMergedRef(
                   emailRef,
-                  register({ required: true, pattern: EMAIL_REGEX })
+                  register({
+                    required: true,
+                    pattern: EMAIL_REGEX,
+                    validate: { emailIsAvailable },
+                  })
                 )}
                 name="email"
                 placeholder={intl.formatMessage({
@@ -134,26 +131,19 @@ export function CreateUserDialog({
                   defaultMessage: "name@example.com",
                 })}
               />
-              <InputRightElement>
-                {email.match(EMAIL_REGEX) && (
+              {email?.match(EMAIL_REGEX) ? (
+                <InputRightElement>
                   <Center>
-                    {emailCheck.searching ? (
-                      <Spinner
-                        size="sm"
-                        thickness="3px"
-                        speed="1s"
-                        color="green.500"
-                      />
-                    ) : emailCheck.isRegistered ? (
-                      <CloseIcon color="red.500" />
+                    {errors.email?.type === "emailIsAvailable" ? (
+                      <CloseIcon color="red.500" fontSize="sm" />
                     ) : (
                       <CheckIcon color="green.500" />
                     )}
                   </Center>
-                )}
-              </InputRightElement>
+                </InputRightElement>
+              ) : null}
             </InputGroup>
-            {emailCheck.isRegistered ? (
+            {errors.email?.type === "emailIsAvailable" ? (
               <Text color="red.500" fontSize="sm" marginTop={2}>
                 <FormattedMessage
                   id="generic.forms.email-already-registered-error"

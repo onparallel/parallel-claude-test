@@ -919,7 +919,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
-    emailIsRegistered: boolean; // Boolean!
+    emailIsAvailable: boolean; // Boolean!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     me: NexusGenRootTypes["User"]; // User!
@@ -1582,7 +1582,7 @@ export interface NexusGenFieldTypeNames {
     access: "PublicPetitionAccess";
     contact: "Contact";
     contacts: "ContactPagination";
-    emailIsRegistered: "Boolean";
+    emailIsAvailable: "Boolean";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
     me: "User";
@@ -2157,7 +2157,7 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryContacts_OrderBy"][] | null; // [QueryContacts_OrderBy!]
     };
-    emailIsRegistered: {
+    emailIsAvailable: {
       // args
       email: string; // String!
     };

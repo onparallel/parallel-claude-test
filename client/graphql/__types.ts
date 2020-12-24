@@ -1421,8 +1421,8 @@ export type Query = {
   contact?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
-  /** Checks if the provided email is registered as a user on Parallel */
-  emailIsRegistered: Scalars["Boolean"];
+  /** Checks if the provided email is available to be registered as a user on Parallel */
+  emailIsAvailable: Scalars["Boolean"];
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
@@ -1456,7 +1456,7 @@ export type QuerycontactsArgs = {
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
 };
 
-export type QueryemailIsRegisteredArgs = {
+export type QueryemailIsAvailableArgs = {
   email: Scalars["String"];
 };
 
@@ -1984,13 +1984,13 @@ export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
   "fullName" | "isSuperAdmin" | "role"
 >;
 
-export type CreateUserDialog_emailIsRegisteredQueryVariables = Exact<{
+export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
 }>;
 
-export type CreateUserDialog_emailIsRegisteredQuery = {
+export type CreateUserDialog_emailIsAvailableQuery = {
   __typename?: "Query";
-} & Pick<Query, "emailIsRegistered">;
+} & Pick<Query, "emailIsAvailable">;
 
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
@@ -6555,55 +6555,55 @@ export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
 export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult = ReturnType<
   typeof usePetitionHeader_updatePetitionUserSubscriptionMutation
 >;
-export const CreateUserDialog_emailIsRegisteredDocument = gql`
-  query CreateUserDialog_emailIsRegistered($email: String!) {
-    emailIsRegistered(email: $email)
+export const CreateUserDialog_emailIsAvailableDocument = gql`
+  query CreateUserDialog_emailIsAvailable($email: String!) {
+    emailIsAvailable(email: $email)
   }
 `;
 
 /**
- * __useCreateUserDialog_emailIsRegisteredQuery__
+ * __useCreateUserDialog_emailIsAvailableQuery__
  *
- * To run a query within a React component, call `useCreateUserDialog_emailIsRegisteredQuery` and pass it any options that fit your needs.
- * When your component renders, `useCreateUserDialog_emailIsRegisteredQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useCreateUserDialog_emailIsAvailableQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserDialog_emailIsAvailableQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useCreateUserDialog_emailIsRegisteredQuery({
+ * const { data, loading, error } = useCreateUserDialog_emailIsAvailableQuery({
  *   variables: {
  *      email: // value for 'email'
  *   },
  * });
  */
-export function useCreateUserDialog_emailIsRegisteredQuery(
+export function useCreateUserDialog_emailIsAvailableQuery(
   baseOptions: Apollo.QueryHookOptions<
-    CreateUserDialog_emailIsRegisteredQuery,
-    CreateUserDialog_emailIsRegisteredQueryVariables
+    CreateUserDialog_emailIsAvailableQuery,
+    CreateUserDialog_emailIsAvailableQueryVariables
   >
 ) {
   return Apollo.useQuery<
-    CreateUserDialog_emailIsRegisteredQuery,
-    CreateUserDialog_emailIsRegisteredQueryVariables
-  >(CreateUserDialog_emailIsRegisteredDocument, baseOptions);
+    CreateUserDialog_emailIsAvailableQuery,
+    CreateUserDialog_emailIsAvailableQueryVariables
+  >(CreateUserDialog_emailIsAvailableDocument, baseOptions);
 }
-export function useCreateUserDialog_emailIsRegisteredLazyQuery(
+export function useCreateUserDialog_emailIsAvailableLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    CreateUserDialog_emailIsRegisteredQuery,
-    CreateUserDialog_emailIsRegisteredQueryVariables
+    CreateUserDialog_emailIsAvailableQuery,
+    CreateUserDialog_emailIsAvailableQueryVariables
   >
 ) {
   return Apollo.useLazyQuery<
-    CreateUserDialog_emailIsRegisteredQuery,
-    CreateUserDialog_emailIsRegisteredQueryVariables
-  >(CreateUserDialog_emailIsRegisteredDocument, baseOptions);
+    CreateUserDialog_emailIsAvailableQuery,
+    CreateUserDialog_emailIsAvailableQueryVariables
+  >(CreateUserDialog_emailIsAvailableDocument, baseOptions);
 }
-export type CreateUserDialog_emailIsRegisteredQueryHookResult = ReturnType<
-  typeof useCreateUserDialog_emailIsRegisteredQuery
+export type CreateUserDialog_emailIsAvailableQueryHookResult = ReturnType<
+  typeof useCreateUserDialog_emailIsAvailableQuery
 >;
-export type CreateUserDialog_emailIsRegisteredLazyQueryHookResult = ReturnType<
-  typeof useCreateUserDialog_emailIsRegisteredLazyQuery
+export type CreateUserDialog_emailIsAvailableLazyQueryHookResult = ReturnType<
+  typeof useCreateUserDialog_emailIsAvailableLazyQuery
 >;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest(

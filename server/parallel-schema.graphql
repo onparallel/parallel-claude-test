@@ -2187,9 +2187,9 @@ type Query {
   ): ContactPagination!
 
   """
-  Checks if the provided email is registered as a user on Parallel
+  Checks if the provided email is available to be registered as a user on Parallel
   """
-  emailIsRegistered(email: String!): Boolean!
+  emailIsAvailable(email: String!): Boolean!
 
   """
   Decodes the given Global ID into an entity in the database.
