@@ -96,14 +96,55 @@ export function PublicHeader(props: BoxProps) {
 function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
-      <NakedLink href="/security">
-        <Button as="a" variant="ghost">
-          <FormattedMessage
-            id="public.security-link"
-            defaultMessage="Security"
-          />
-        </Button>
-      </NakedLink>
+      <Menu placement="bottom">
+        <MenuButton as={Button} variant="ghost">
+          <FormattedMessage id="public.product-link" defaultMessage="Product" />
+        </MenuButton>
+        <Portal>
+          <MenuList>
+            <NakedLink href="/product/request">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.request-link"
+                  defaultMessage="Request"
+                />
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/product/follow">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.follow-link"
+                  defaultMessage="Follow"
+                />
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/product/review">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.review-link"
+                  defaultMessage="Review"
+                />
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/product/collaborate">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.collaborate-link"
+                  defaultMessage="Collaborate"
+                />
+              </MenuItem>
+            </NakedLink>
+            <NakedLink href="/security">
+              <MenuItem as="a">
+                <FormattedMessage
+                  id="public.security-link"
+                  defaultMessage="Security"
+                />
+              </MenuItem>
+            </NakedLink>
+          </MenuList>
+        </Portal>
+      </Menu>
       <Menu placement="bottom">
         <MenuButton as={Button} variant="ghost">
           <FormattedMessage
@@ -153,11 +194,11 @@ function PublicHeaderMenu(props: StackProps) {
           <FormattedMessage id="public.login-button" defaultMessage="Login" />
         </Button>
       </NakedLink>
-      <NakedLink href="/invite">
+      <NakedLink href="/book-demo">
         <Button as="a" colorScheme="purple">
           <FormattedMessage
-            id="public.invite-button"
-            defaultMessage="Request an invite"
+            id="public.book-demo-button"
+            defaultMessage="Book a demo"
           />
         </Button>
       </NakedLink>

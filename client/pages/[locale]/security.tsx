@@ -42,8 +42,8 @@ function Security() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer paddingY={16} maxWidth="container.md">
-        <Stack spacing={{ base: 4, sm: 8, md: 12 }}>
+      <PublicContainer paddingY={16} maxWidth="container.lg">
+        <Stack spacing={{ base: 16, sm: 24, md: 32 }}>
           <PublicShowcase
             imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_safe.svg`}
             imageSize="150px"

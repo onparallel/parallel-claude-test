@@ -3220,6 +3220,11 @@
     "context": "Speed up processes"
   },
   {
+    "term": "public.collaborate-link",
+    "definition": "Colabora",
+    "context": "Collaborate"
+  },
+  {
     "term": "public.contact-link",
     "definition": "Contacta",
     "context": "Contact"
@@ -3228,6 +3233,11 @@
     "term": "public.cookies.title",
     "definition": "Política de cookies",
     "context": "Cookie policy"
+  },
+  {
+    "term": "public.follow-link",
+    "definition": "Sigue",
+    "context": "Follow"
   },
   {
     "term": "public.footer.company",
@@ -3693,6 +3703,236 @@
     "term": "public.privacy.title",
     "definition": "Política de privacidad",
     "context": "Privacy policy"
+  },
+  {
+    "term": "public.product-link",
+    "definition": "Producto",
+    "context": "Product"
+  },
+  {
+    "term": "public.product.collaborate.centralize",
+    "definition": "Centraliza la revisión y la comunicación interna",
+    "context": "Centralize the revision and internal communication"
+  },
+  {
+    "term": "public.product.collaborate.client-communication",
+    "definition": "Permite que todo tu equipo esté al tanto de las comunicaciones con el cliente.",
+    "context": "Allow your team to stay up to date with the communications with your client."
+  },
+  {
+    "term": "public.product.collaborate.flexible",
+    "definition": "Con una herramienta flexible como Parallel podrás adaptar cada caso como sea necesario antes de iniciar los procesos.",
+    "context": "With a flexible tool such as Parallel, you can adapt every case as needed before launching a process."
+  },
+  {
+    "term": "public.product.collaborate.hero-title",
+    "definition": "Un entorno colaborativo para escalar tus procesos",
+    "context": "A collaborative environment to scale your processes"
+  },
+  {
+    "term": "public.product.collaborate.meta-description",
+    "definition": "Parallel fomenta y hace que la colaboración alrededor de los procesos y flujos de trabajo documentales sean posibles.",
+    "context": "Parallel fosters and makes collaboration possible around document workflows and processes."
+  },
+  {
+    "term": "public.product.collaborate.share",
+    "definition": "Comparte plantillas para estandarizar tus procesos",
+    "context": "Share templates to standardize workflows"
+  },
+  {
+    "term": "public.product.collaborate.share-petition",
+    "definition": "Comparte la petición con tu equipo para que podáis trabajar en ella en cualquier momento.",
+    "context": "Share a petition with your team to work together on it at any time."
+  },
+  {
+    "term": "public.product.collaborate.team",
+    "definition": "Incluye a tu equipo en los procesos en marcha",
+    "context": "Include your team to the ongoing processes"
+  },
+  {
+    "term": "public.product.collaborate.title",
+    "definition": "Colaboración alrededor de flujos de trabajo documentales con Parallel",
+    "context": "Collaboration around document workflows with Parallel"
+  },
+  {
+    "term": "public.product.collaborate.transform",
+    "definition": "Convierte los procesos repetitivos y tediosos en algo simple y fácil de gestionar.",
+    "context": "Transform repetitive and tedious processes into something simple and easy to manage."
+  },
+  {
+    "term": "public.product.collaborate.unify",
+    "definition": "Unifica la comunicación con los flujos de trabajo y aumenta la productividad.",
+    "context": "Unify communication with workflows and improve your team's productivity."
+  },
+  {
+    "term": "public.product.collaborate.work-effectively",
+    "definition": "Ayúdales a trabajar de forma más efectiva revisando y comentando la documentación recibida.",
+    "context": "Help them work more effectively, allowing them to review and sharing their thought around the information received."
+  },
+  {
+    "term": "public.product.follow",
+    "definition": "Seguimiento de tus procesos simplificados",
+    "context": "Follow-ups made easy"
+  },
+  {
+    "term": "public.product.follow.control",
+    "definition": "Controla y sigue tus peticiones de una manera sencilla y visual",
+    "context": "Control and follow your petitions in a simple and visual way"
+  },
+  {
+    "term": "public.product.follow.conversations",
+    "definition": "Parallel te ayuda a centralizar y contextualizar todas las conversaciones alrededor de la información que pides.",
+    "context": "Parallel centralizes and contextualizes all conversations around the information that you request."
+  },
+  {
+    "term": "public.product.follow.email-threads",
+    "definition": "Evita cadenas de correo donde se cruzan preguntas que dificultan el hilo de la conversación.",
+    "context": "Avoid endless email threads that difficult the conversation around questions and answers."
+  },
+  {
+    "term": "public.product.follow.hero-title",
+    "definition": "Hacer seguimiento de tus peticiones nunca había sido tan fácil",
+    "context": "Following-up on your requests has never been so easy"
+  },
+  {
+    "term": "public.product.follow.interface",
+    "definition": "La interfaz de Parallel te ayuda a tener toda la información ordenada para que esté todo bajo control. Podrás saber cómo están tus procesos de un vistazo.",
+    "context": "Parallel's interface helps you keep all the information under control and organized. You will know the status of your processes at a glance."
+  },
+  {
+    "term": "public.product.follow.meta-description",
+    "definition": "Parallel te proporciona una manera sencilla de hacer seguimiento de la información que solicitas para que puedas centrarte en las tareas importantes.",
+    "context": "Parallel gives you a simple way to follow-up with your information requests so that you can focus on important tasks."
+  },
+  {
+    "term": "public.product.follow.missing",
+    "definition": "Recuérdale a tu receptor únicamente la información que le falta por completar y olvídate de repasar los listados y hacerlo manualmente.",
+    "context": "Remind your recipients of the missing information and avoid checking, again and again, your checklists manually."
+  },
+  {
+    "term": "public.product.follow.reminders",
+    "definition": "Programa recordatorios inteligentes",
+    "context": "Set up intelligent reminders"
+  },
+  {
+    "term": "public.product.follow.space",
+    "definition": "Parallel te proporciona un lugar donde controlarlo todo y hacer seguimiento con tus destinatarios de una manera sencilla.",
+    "context": "Parallel gives you a space to have everything under control and to follow-up with your recipients in a simple way."
+  },
+  {
+    "term": "public.product.follow.stress",
+    "definition": "Simplifica la conversación, reduciendo el estrés de los correos",
+    "context": "Reduce the stress of the emails and simplify the conversation"
+  },
+  {
+    "term": "public.product.request",
+    "definition": "Pedir información de forma profesional y sencilla",
+    "context": "Simple and professional information request"
+  },
+  {
+    "term": "public.product.request.create",
+    "definition": "Desde cero, o a partir de una plantilla para estandarizar tus procesos, podrás preparar el listado de información para tus clientes o terceros.",
+    "context": "From scratch or a template, you can prepare a list of information for your clients or third parties."
+  },
+  {
+    "term": "public.product.request.create-templates",
+    "definition": "Crea plantillas para tus procesos habituales y úsalas tantas veces como necesites.",
+    "context": "Create templates for your daily processes and use them as many times as you need."
+  },
+  {
+    "term": "public.product.request.customize",
+    "definition": "Personaliza con tu marca",
+    "context": "Customize with your branding"
+  },
+  {
+    "term": "public.product.request.hero-title",
+    "definition": "Pedir información puede ser eficiente y profesional",
+    "context": "Make your information requests efficient and professional"
+  },
+  {
+    "term": "public.product.request.include-branding",
+    "definition": "Incluye en tus comunicaciones y formularios tu imagen corporativa y transmite profesionalidad a tus clientes.",
+    "context": "Include in your communications and forms your corporate branding and show your clients your professionalism."
+  },
+  {
+    "term": "public.product.request.list",
+    "definition": "Lista fácilmente la información",
+    "context": "List the information quickly"
+  },
+  {
+    "term": "public.product.request.meta-description",
+    "definition": "Pide documentos e información de forma profesional y eficiente.",
+    "context": "Request professionally and efficiently documents and information."
+  },
+  {
+    "term": "public.product.request.templates",
+    "definition": "Utiliza plantillas para ahorrar tiempo",
+    "context": "Use templates to save time"
+  },
+  {
+    "term": "public.product.request.we-help-you",
+    "definition": "Te ayudamos a gestionar eficientemente la documentación que necesitas.",
+    "context": "We help you manage efficiently the documents you need."
+  },
+  {
+    "term": "public.product.review.activity-log",
+    "definition": "Controla mejor los tiempos con un registro de actividades",
+    "context": "Control better the timings with an activity log"
+  },
+  {
+    "term": "public.product.review.approve",
+    "definition": "Aprueba o rechaza los documentos o las respuestas",
+    "context": "Approve or reject the documents or the answers"
+  },
+  {
+    "term": "public.product.review.hero-title",
+    "definition": "Controla la información recibida sin esfuerzo, y con un orden como nunca habías visto",
+    "context": "Control the information received effortlessly and with an order never seen before"
+  },
+  {
+    "term": "public.product.review.improve-services",
+    "definition": "Controla cuándo se realizaron las distintas actividades para poder prestar un mejor servicio.",
+    "context": "Control when things were delivered or done to improve the rendering of your services."
+  },
+  {
+    "term": "public.product.review.meta-description",
+    "definition": "Parallel simplifica el proceso de revisión de información a la vez que te da control y orden sobre tus flujos de documentos.",
+    "context": "Parallel simplifies the information review process while giving you control and order over your document workflows."
+  },
+  {
+    "term": "public.product.review.obtain-control",
+    "definition": "Obtén el control sobre aquello que ya has revisado para evitar duplicidades, y mantén a tu cliente informado cuando hayas finalizado de revisar la petición.",
+    "context": "Obtain control over what you have already reviewed to avoid double work, and keep your client informed after checking the information."
+  },
+  {
+    "term": "public.product.review.organize-rename",
+    "definition": "Descarga todos los documentos organizados y elige cómo necesitas renombrarlos de forma masiva para que puedas trabajar con ellos fácilmente.",
+    "context": "Get all your documents organized and choose how you need to rename them in bulk so that you can store or work with them efficiently."
+  },
+  {
+    "term": "public.product.review.rename",
+    "definition": "Olvídate de renombrar archivos uno a uno de forma manual",
+    "context": "Forget about renaming files one by one manually"
+  },
+  {
+    "term": "public.product.review.simplify",
+    "definition": "Simplifica los procesos de revisión en tus flujos de trabajo y prepara los expedientes en pocos pasos.",
+    "context": "Simplify the review processes in your workflows and prepare the files in a few steps."
+  },
+  {
+    "term": "public.product.review.title",
+    "definition": "Obtén control y orden con Parallel",
+    "context": "Get control and order with Parallel"
+  },
+  {
+    "term": "public.request-link",
+    "definition": "Pide",
+    "context": "Request"
+  },
+  {
+    "term": "public.review-link",
+    "definition": "Revisa",
+    "context": "Review"
   },
   {
     "term": "public.security-link",

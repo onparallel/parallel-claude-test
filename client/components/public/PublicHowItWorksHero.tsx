@@ -21,6 +21,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
   const { query } = useRouter();
   const intl = useIntl();
   const [index, setIndex] = useState(0);
+  const breakpoint = "lg";
   const steps = [
     {
       header: (
@@ -233,11 +234,16 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
         </Flex>
       </Stack>
       <Flex marginTop={16} justifyContent="center">
-        <NakedLink href="/invite">
-          <Button as="a" colorScheme="purple">
+        <NakedLink href="/book-demo">
+          <Button
+            as="a"
+            colorScheme="purple"
+            marginBottom={{ base: 2, [breakpoint]: 0 }}
+            marginRight={{ base: 0, [breakpoint]: 2 }}
+          >
             <FormattedMessage
-              id="public.invite-button"
-              defaultMessage="Request an invite"
+              id="public.book-demo-button"
+              defaultMessage="Book a demo"
             />
           </Button>
         </NakedLink>

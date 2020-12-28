@@ -44,7 +44,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             marginTop={8}
             flexDirection={{ base: "column", [breakpoint]: "row" }}
           >
-            <NakedLink href="/invite">
+            <NakedLink href="/book-demo">
               <Button
                 as="a"
                 colorScheme="purple"
@@ -52,16 +52,16 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 marginRight={{ base: 0, [breakpoint]: 2 }}
               >
                 <FormattedMessage
-                  id="public.invite-button"
-                  defaultMessage="Request an invite"
+                  id="public.book-demo-button"
+                  defaultMessage="Book a demo"
                 />
               </Button>
             </NakedLink>
-            <NakedLink href="/book-demo">
+            <NakedLink href="/invite">
               <Button as="a" variant="outline">
                 <FormattedMessage
-                  id="public.book-demo-button"
-                  defaultMessage="Book a demo"
+                  id="public.invite-button"
+                  defaultMessage="Request an invite"
                 />
               </Button>
             </NakedLink>
