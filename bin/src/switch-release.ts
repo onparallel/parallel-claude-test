@@ -104,7 +104,7 @@ async function main() {
       console.log(JSON.stringify(result, null, "  "));
       return (
         result.TargetHealthDescriptions?.every(
-          (t) => t.TargetHealth?.State === "healty"
+          (t) => t.TargetHealth?.State === "healthy"
         ) ?? false
       );
     },

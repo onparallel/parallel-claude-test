@@ -81,7 +81,7 @@ async function main() {
         })
             .promise();
         console.log(JSON.stringify(result, null, "  "));
-        return ((_b = (_a = result.TargetHealthDescriptions) === null || _a === void 0 ? void 0 : _a.every((t) => { var _a; return ((_a = t.TargetHealth) === null || _a === void 0 ? void 0 : _a.State) === "healty"; })) !== null && _b !== void 0 ? _b : false);
+        return ((_b = (_a = result.TargetHealthDescriptions) === null || _a === void 0 ? void 0 : _a.every((t) => { var _a; return ((_a = t.TargetHealth) === null || _a === void 0 ? void 0 : _a.State) === "healthy"; })) !== null && _b !== void 0 ? _b : false);
     }, "Target not healthy. Waiting 5 more seconds...", 5000);
     console.log("Create invalidation for static files");
     const result = await cloudfront.listDistributions().promise();
