@@ -69,14 +69,9 @@ async function main() {
     .describeTargetGroups({ Names: [targetGroupName] })
     .promise();
   const targetGroupArn = result4.TargetGroups![0].TargetGroupArn!;
-  const result5 = await elbv2
-    .describeListeners({ LoadBalancerArn: loadBalancerArn })
-    .promise();
-  const listenerArn = result5.Listeners!.find((l) => l.Protocol === "HTTPS")!
-    .ListenerArn!;
 
-  const result6 = await getTargetGroupInstances(targetGroupArn);
-  for (const instance of result6.Reservations!.flatMap((r) => r.Instances!)) {
+  const result5 = await getTargetGroupInstances(targetGroupArn);
+  for (const instance of result5.Reservations!.flatMap((r) => r.Instances!)) {
     const ipAddress = instance.PrivateIpAddress!;
     console.log(
       chalk`Starting services on ${
@@ -101,7 +96,6 @@ async function main() {
           TargetGroupArn: targetGroupArn,
         })
         .promise();
-      console.log(JSON.stringify(result, null, "  "));
       return (
         result.TargetHealthDescriptions?.every(
           (t) => t.TargetHealth?.State === "healthy"
@@ -133,6 +127,11 @@ async function main() {
   console.log(
     chalk`Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`
   );
+  const result6 = await elbv2
+    .describeListeners({ LoadBalancerArn: loadBalancerArn })
+    .promise();
+  const listenerArn = result6.Listeners!.find((l) => l.Protocol === "HTTPS")!
+    .ListenerArn!;
   await elbv2
     .modifyListener({
       ListenerArn: listenerArn,
