@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { injectable } from "inversify";
-import Knex, { Transaction, QueryBuilder } from "knex";
+import Knex, { Transaction, QueryBuilder, RawBinding } from "knex";
 import { groupBy, indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray, UnwrapPromise } from "../../util/types";
@@ -39,6 +39,19 @@ export class BaseRepository {
     return transaction
       ? transaction<TableTypes[TName]>(tableName)
       : this.knex<TableTypes[TName]>(tableName);
+  }
+
+  protected async raw<TResult>(
+    sql: string,
+    bindings?: readonly RawBinding[],
+    transaction?: Transaction
+  ): Promise<TResult[]> {
+    let raw = this.knex.raw<{ rows: TResult[] }>(sql, bindings ?? []);
+    if (transaction) {
+      raw = raw.transacting(transaction);
+    }
+    const { rows } = await raw;
+    return rows;
   }
 
   protected insert<TName extends TableNames>(

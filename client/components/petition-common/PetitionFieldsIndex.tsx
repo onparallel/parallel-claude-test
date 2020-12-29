@@ -26,7 +26,7 @@ export function PetitionFieldsIndex({
         <Fragment key={field.id}>
           {index > 0 &&
           field.type === "HEADING" &&
-          field.options?.hasPageBreak ? (
+          field.options.hasPageBreak ? (
             <Divider
               role="separator"
               position="relative"

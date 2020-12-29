@@ -556,6 +556,7 @@ export interface NexusGenFieldTypes {
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
+    publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -718,7 +719,7 @@ export interface NexusGenFieldTypes {
     isReadOnly: boolean; // Boolean!
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
-    options: NexusGenScalars["JSONObject"] | null; // JSONObject
+    options: NexusGenScalars["JSONObject"]; // JSONObject!
     position: number; // Int!
     replies: NexusGenRootTypes["PetitionFieldReply"][]; // [PetitionFieldReply!]!
     title: string | null; // String
@@ -887,7 +888,7 @@ export interface NexusGenFieldTypes {
     isReadOnly: boolean; // Boolean!
     multiple: boolean; // Boolean!
     optional: boolean; // Boolean!
-    options: NexusGenScalars["JSONObject"] | null; // JSONObject
+    options: NexusGenScalars["JSONObject"]; // JSONObject!
     replies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
@@ -1224,6 +1225,7 @@ export interface NexusGenFieldTypeNames {
     publicSendVerificationCode: "VerificationCodeRequest";
     publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
+    publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
     removePetitionUserPermission: "Petition";
     reopenPetition: "Petition";
@@ -1989,6 +1991,12 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    publicUpdateSimpleReply: {
+      // args
+      keycode: string; // ID!
+      reply: string; // String!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     reactivateAccesses: {
       // args

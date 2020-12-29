@@ -83,7 +83,7 @@ export const SelectTypeFieldOptions = Object.assign(
         []
       );
       const [value, onChange] = useState<Node[]>(
-        valuesToSlateNodes(field.options?.values ?? [])
+        valuesToSlateNodes(field.options.values ?? [])
       );
       const _ref = useMemo(
         () =>

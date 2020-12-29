@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { DataProxy, gql, useApolloClient } from "@apollo/client";
 import {
   Box,
   BoxProps,
@@ -16,35 +16,31 @@ import {
   Textarea,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  CheckIcon,
-  CloseIcon,
-  CommentIcon,
-  DeleteIcon,
-  DownForwardArrowIcon,
-  DownloadIcon,
-} from "@parallel/chakra/icons";
+import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import {
-  PetitionFieldReplyStatus,
   RecipientViewPetitionField_PublicPetitionFieldFragment,
+  RecipientViewPetitionField_updateFieldReplies_PublicPetitionFieldFragment,
+  RecipientViewPetitionField_updateReplyContent_PublicPetitionFieldReplyFragment,
+  useRecipientViewPetitionField_publicCreateFileUploadReplyMutation,
+  useRecipientViewPetitionField_publicCreateSimpleReplyMutation,
+  useRecipientViewPetitionField_publicDeletePetitionReplyMutation,
+  useRecipientViewPetitionField_publicFileUploadReplyCompleteMutation,
 } from "@parallel/graphql/__types";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { generateCssStripe } from "@parallel/utils/css";
-import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
-import { ReactNode, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
+import { pick } from "remeda";
 import { BreakLines } from "../common/BreakLines";
-import { DateTime } from "../common/DateTime";
-import { ExpandableText } from "../common/ExpandableText";
-import { FileSize } from "../common/FileSize";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
+import { RecipientViewPetitionFieldReply } from "./RecipientViewPetitionFieldReply";
 
 export type CreateReply =
   | CreateReplyText
@@ -56,32 +52,134 @@ type CreateReplySelect = { type: "SELECT"; content: string };
 type CreateReplyFileUpload = { type: "FILE_UPLOAD"; content: File[] };
 
 export interface PublicPetitionFieldProps extends BoxProps {
+  keycode: string;
   canReply: boolean;
   contactId: string;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   isInvalid: boolean;
   hasCommentsEnabled: boolean;
-  uploadProgress?: { [replyId: string]: number };
   onOpenCommentsClick: () => void;
-  onDeleteReply: (replyId: string) => void;
-  onCreateReply: (payload: CreateReply) => void;
-  onDownloadReply: (replyId: string) => void;
 }
 
 export function RecipientViewPetitionField({
+  keycode,
   canReply,
   contactId,
   field,
   isInvalid,
   hasCommentsEnabled,
-  uploadProgress,
   onOpenCommentsClick,
-  onDeleteReply,
-  onCreateReply,
-  onDownloadReply,
   ...props
 }: PublicPetitionFieldProps) {
   const intl = useIntl();
+
+  const uploads = useRef<Record<string, XMLHttpRequest>>({});
+
+  const [
+    deletePetitionReply,
+  ] = useRecipientViewPetitionField_publicDeletePetitionReplyMutation({
+    optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
+  });
+  async function handleRemove(replyId: string) {
+    if (uploads.current[replyId]) {
+      uploads.current[replyId].abort();
+      delete uploads.current[replyId];
+    }
+    return await deletePetitionReply({
+      variables: { replyId, keycode },
+      update(cache) {
+        updateFieldReplies(cache, field.id, (replies) =>
+          replies.filter(({ id }) => id !== replyId)
+        );
+        // TODO: update petition status COMPLETED -> PENDING
+      },
+    });
+  }
+
+  const [
+    createSimpleReply,
+  ] = useRecipientViewPetitionField_publicCreateSimpleReplyMutation();
+  const [
+    createFileUploadReply,
+  ] = useRecipientViewPetitionField_publicCreateFileUploadReplyMutation();
+  const apollo = useApolloClient();
+  const [
+    fileUploadReplyComplete,
+  ] = useRecipientViewPetitionField_publicFileUploadReplyCompleteMutation();
+  async function handleCreateReply(payload: CreateReply) {
+    switch (payload.type) {
+      case "FILE_UPLOAD":
+        for (const file of payload.content) {
+          const { data } = await createFileUploadReply({
+            variables: {
+              keycode,
+              fieldId: field.id,
+              data: {
+                filename: file.name,
+                size: file.size,
+                contentType: file.type,
+              },
+            },
+            update(cache, { data }) {
+              const reply = data!.publicCreateFileUploadReply.reply;
+              updateFieldReplies(cache, field.id, (replies) => [
+                ...replies,
+                pick(reply, ["id", "__typename"]),
+              ]);
+              updateReplyContent(cache, reply.id, (content) => ({
+                ...content,
+                progress: 0,
+              }));
+              // TODO: update petition status COMPLETED -> PENDING
+            },
+          });
+          const { reply, endpoint } = data!.publicCreateFileUploadReply;
+
+          const form = new FormData();
+          form.append("file", file);
+
+          const request = new XMLHttpRequest();
+          request.open("PUT", endpoint);
+          request.setRequestHeader("Content-Type", file.type);
+          uploads.current[reply.id] = request;
+
+          request.upload.addEventListener("progress", (e) =>
+            updateReplyContent(apollo, reply.id, (content) => ({
+              ...content,
+              progress: e.loaded / e.total,
+            }))
+          );
+          request.addEventListener("load", async () => {
+            delete uploads.current[reply.id];
+            await fileUploadReplyComplete({
+              variables: { keycode, replyId: reply.id },
+            });
+          });
+          request.send(form);
+        }
+        break;
+      case "TEXT":
+      case "SELECT":
+        await createSimpleReply({
+          variables: {
+            keycode,
+            fieldId: field.id,
+            reply: payload.content,
+          },
+          update(cache, { data }) {
+            updateFieldReplies(cache, field.id, (replies) => [
+              ...replies,
+              pick(data!.publicCreateSimpleReply, ["id", "__typename"]),
+            ]);
+            // TODO: update petition status COMPLETED -> PENDING
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
   const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
 
   return field.type === "HEADING" ? (
@@ -199,57 +297,15 @@ export function RecipientViewPetitionField({
         ) : null}
       </Text>
       {field.replies.length ? (
-        <List as={Stack} marginTop={1} alignItems="flex-start">
+        <List as={Stack} marginTop={1}>
           {field.replies.map((reply) => (
             <ListItem key={reply.id}>
-              <>
-                <ReplyWrapper
-                  status={reply.status}
-                  progress={uploadProgress?.[reply.id]}
-                  canDeleteReply={!field.validated}
-                  onDeleteReply={() => onDeleteReply(reply.id)}
-                  canDownloadReply={field.type === "FILE_UPLOAD"}
-                  onDownloadFileReply={() => onDownloadReply(reply.id)}
-                >
-                  {isTextLikeType ? (
-                    <FormattedMessage
-                      id="recipient-view.text-reply"
-                      defaultMessage="Reply added on {date}"
-                      values={{
-                        date: (
-                          <DateTime
-                            value={reply.createdAt}
-                            format={FORMATS.LLL}
-                          />
-                        ),
-                      }}
-                    />
-                  ) : field.type === "FILE_UPLOAD" ? (
-                    <>
-                      <Text as="span">{reply.content?.filename}</Text>
-                      <Text as="span" marginX={2}>
-                        -
-                      </Text>
-                      <Text as="span" fontSize="sm" color="gray.500">
-                        <FileSize value={reply.content?.size} />
-                      </Text>
-                    </>
-                  ) : null}
-                </ReplyWrapper>
-                {isTextLikeType && (
-                  <Flex marginTop={1}>
-                    <DownForwardArrowIcon marginRight={1} marginTop="2px" />
-                    <ExpandableText
-                      paddingRight={1}
-                      as="cite"
-                      fontSize="sm"
-                      noOfLines={3}
-                    >
-                      <BreakLines text={reply.content.text} />
-                    </ExpandableText>
-                  </Flex>
-                )}
-              </>
+              <RecipientViewPetitionFieldReply
+                keycode={keycode}
+                field={field}
+                reply={reply}
+                onRemove={() => handleRemove(reply.id)}
+              />
             </ListItem>
           ))}
         </List>
@@ -259,19 +315,19 @@ export function RecipientViewPetitionField({
           <TextReplyForm
             canReply={canReply}
             field={field}
-            onCreateReply={onCreateReply}
+            onCreateReply={handleCreateReply}
           />
         ) : field.type === "FILE_UPLOAD" ? (
           <FileUploadReplyForm
             canReply={canReply}
             field={field}
-            onCreateReply={onCreateReply}
+            onCreateReply={handleCreateReply}
           />
         ) : field.type === "SELECT" ? (
           <OptionSelectReplyForm
             field={field}
             canReply={canReply}
-            onCreateReply={onCreateReply}
+            onCreateReply={handleCreateReply}
           />
         ) : null}
       </Box>
@@ -279,121 +335,7 @@ export function RecipientViewPetitionField({
   );
 }
 
-function ReplyWrapper({
-  status,
-  progress,
-  children,
-  canDeleteReply,
-  onDeleteReply,
-  canDownloadReply,
-  onDownloadFileReply,
-}: {
-  status: PetitionFieldReplyStatus;
-  progress?: number;
-  canDeleteReply: boolean;
-  onDeleteReply: () => void;
-  canDownloadReply: boolean;
-  onDownloadFileReply: () => void;
-  children: ReactNode;
-}) {
-  const intl = useIntl();
-  const label =
-    status === "APPROVED"
-      ? intl.formatMessage({
-          id: "recipient-view.approved-reply",
-          defaultMessage: "This reply has been approved",
-        })
-      : intl.formatMessage({
-          id: "recipient-view.rejected-reply",
-          defaultMessage: "This reply has been rejected",
-        });
-  return (
-    <Flex alignItems="center">
-      <Tooltip
-        isDisabled={status === "PENDING"}
-        placement="right"
-        label={label}
-      >
-        <Flex
-          alignItems="center"
-          fontSize="sm"
-          backgroundColor={
-            status === "APPROVED"
-              ? "green.100"
-              : status === "REJECTED"
-              ? "red.100"
-              : "gray.100"
-          }
-          paddingX={2}
-          borderRadius="sm"
-          position="relative"
-          {...(progress !== undefined
-            ? {
-                "aria-valuemax": 100,
-                "aria-valuemin": 0,
-                "aria-valuenow": Math.round(progress * 100),
-                role: "progressbar",
-              }
-            : {})}
-        >
-          <Box
-            display={progress !== undefined ? "block" : "none"}
-            position="absolute"
-            left={0}
-            top={0}
-            height="100%"
-            borderRadius="sm"
-            transition="width 100ms ease"
-            willChange="width"
-            width={`${Math.round((progress ?? 0) * 100)}%`}
-            sx={generateCssStripe({ color: "gray.200", isAnimated: true })}
-          />
-          <Box
-            position="relative"
-            lineHeight="24px"
-            minHeight="24px"
-            zIndex={1}
-          >
-            {children}
-          </Box>
-          {status === "APPROVED" ? (
-            <CheckIcon color="green.500" marginLeft={2} />
-          ) : status === "REJECTED" ? (
-            <CloseIcon color="red.500" boxSize="12px" marginLeft={2} />
-          ) : null}
-        </Flex>
-      </Tooltip>
-      {canDownloadReply && (
-        <IconButtonWithTooltip
-          size="xs"
-          variant="ghost"
-          placement="bottom"
-          icon={<DownloadIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.file-download",
-            defaultMessage: "Download file",
-          })}
-          onClick={onDownloadFileReply}
-          marginLeft={1}
-        />
-      )}
-      {status !== "APPROVED" && canDeleteReply ? (
-        <IconButtonWithTooltip
-          onClick={onDeleteReply}
-          variant="ghost"
-          icon={<DeleteIcon />}
-          size="xs"
-          placement="bottom"
-          label={intl.formatMessage({
-            id: "recipient-view.remove-reply-label",
-            defaultMessage: "Remove reply",
-          })}
-          marginLeft={1}
-        />
-      ) : null}
-    </Flex>
-  );
-}
+function CommonRecipientViewPetitionField() {}
 
 interface TextReplyFormProps extends BoxProps {
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
@@ -752,6 +694,51 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
   }
 );
 
+function updateFieldReplies(
+  proxy: DataProxy,
+  fieldId: string,
+  updateFn: (
+    cached: RecipientViewPetitionField_updateFieldReplies_PublicPetitionFieldFragment["replies"]
+  ) => RecipientViewPetitionField_updateFieldReplies_PublicPetitionFieldFragment["replies"]
+) {
+  updateFragment<
+    RecipientViewPetitionField_updateFieldReplies_PublicPetitionFieldFragment
+  >(proxy, {
+    id: fieldId,
+    fragment: gql`
+      fragment RecipientViewPetitionField_updateFieldReplies_PublicPetitionField on PublicPetitionField {
+        replies {
+          id
+        }
+      }
+    `,
+    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
+  });
+}
+
+function updateReplyContent(
+  proxy: DataProxy,
+  replyId: string,
+  updateFn: (
+    cached: RecipientViewPetitionField_updateReplyContent_PublicPetitionFieldReplyFragment["content"]
+  ) => RecipientViewPetitionField_updateReplyContent_PublicPetitionFieldReplyFragment["content"]
+) {
+  updateFragment<
+    RecipientViewPetitionField_updateReplyContent_PublicPetitionFieldReplyFragment
+  >(proxy, {
+    fragment: gql`
+      fragment RecipientViewPetitionField_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
+        content
+      }
+    `,
+    id: replyId,
+    data: (cached) => ({
+      ...cached,
+      content: updateFn(cached!.content),
+    }),
+  });
+}
+
 RecipientViewPetitionField.fragments = {
   get PublicPetitionField() {
     return gql`
@@ -772,18 +759,75 @@ RecipientViewPetitionField.fragments = {
           isUnread
           publishedAt
         }
+        ...RecipientViewPetitionFieldReply_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
+      ${RecipientViewPetitionFieldReply.fragments.PublicPetitionField}
     `;
   },
   get PublicPetitionFieldReply() {
     return gql`
       fragment RecipientViewPetitionField_PublicPetitionFieldReply on PublicPetitionFieldReply {
-        id
-        status
-        content
-        createdAt
+        ...RecipientViewPetitionFieldReply_PublicPetitionFieldReply
       }
+      ${RecipientViewPetitionFieldReply.fragments.PublicPetitionFieldReply}
     `;
   },
 };
+
+RecipientViewPetitionField.mutations = [
+  gql`
+    mutation RecipientViewPetitionField_publicCreateSimpleReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $reply: String!
+    ) {
+      publicCreateSimpleReply(
+        keycode: $keycode
+        fieldId: $fieldId
+        reply: $reply
+      ) {
+        ...RecipientViewPetitionField_PublicPetitionFieldReply
+      }
+    }
+    ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicCreateFileUploadReply(
+      $keycode: ID!
+      $fieldId: GID!
+      $data: CreateFileUploadReplyInput!
+    ) {
+      publicCreateFileUploadReply(
+        keycode: $keycode
+        fieldId: $fieldId
+        data: $data
+      ) {
+        endpoint
+        reply {
+          ...RecipientViewPetitionField_PublicPetitionFieldReply
+        }
+      }
+    }
+    ${RecipientViewPetitionField.fragments.PublicPetitionFieldReply}
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicFileUploadReplyComplete(
+      $keycode: ID!
+      $replyId: GID!
+    ) {
+      publicFileUploadReplyComplete(keycode: $keycode, replyId: $replyId) {
+        id
+        content
+      }
+    }
+  `,
+  gql`
+    mutation RecipientViewPetitionField_publicDeletePetitionReply(
+      $replyId: GID!
+      $keycode: ID!
+    ) {
+      publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
+    }
+  `,
+];

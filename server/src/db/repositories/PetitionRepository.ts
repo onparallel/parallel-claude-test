@@ -68,6 +68,25 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at")
   );
 
+  readonly loadFieldForReply = fromDataLoader(
+    new DataLoader<number, PetitionField | null>(async (ids) => {
+      const fields = await this.raw<PetitionField & { _pfr_id: number }>(
+        /* sql */ `
+      select pf.*, pfr.id as _pfr_id from petition_field_reply pfr
+      join petition_field pf on pfr.petition_field_id = pf.id
+      where pfr.id in (${ids.map(() => "?").join(", ")})
+        and pf.deleted_at is null
+        and pfr.deleted_at is null
+    `,
+        [...ids]
+      );
+      const byPfrId = indexBy(fields, (f) => f._pfr_id);
+      return ids.map((id) =>
+        byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null
+      );
+    })
+  );
+
   async userHasAccessToPetitions(
     userId: number,
     petitionIds: number[],
@@ -1177,6 +1196,37 @@ export class PetitionRepository extends BaseRepository {
         petition_field_reply_id: reply.id,
       },
     });
+    return reply;
+  }
+
+  async updatePetitionFieldReply(
+    replyId: number,
+    data: Partial<PetitionFieldReply>,
+    contact: Contact
+  ) {
+    const field = await this.loadFieldForReply(replyId);
+    if (!field) {
+      throw new Error("Petition field not found");
+    }
+    const [[reply]] = await Promise.all([
+      this.from("petition_field_reply")
+        .where("id", replyId)
+        .update(
+          {
+            ...data,
+            updated_at: this.now(),
+            updated_by: `Contact:${contact.id}`,
+          },
+          "*"
+        ),
+      this.from("petition")
+        .update({
+          status: "PENDING",
+          updated_at: this.now(),
+          updated_by: `Contact:${contact.id}`,
+        })
+        .where({ id: field.petition_id, status: "COMPLETED" }),
+    ]);
     return reply;
   }
 

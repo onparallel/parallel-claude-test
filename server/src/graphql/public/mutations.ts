@@ -398,6 +398,39 @@ export const publicCreateSimpleReply = mutationField(
   }
 );
 
+export const publicUpdateSimpleReply = mutationField(
+  "publicUpdateSimpleReply",
+  {
+    description: "Updates a reply to a text or select field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: nonNull(idArg()),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      reply: nonNull(stringArg()),
+    },
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      replyBelongsToAccess("replyId")
+    ),
+    validateArgs: async (_, args, ctx, info) => {
+      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+      if (field.type === "SELECT") {
+        const options = field.options.values as Maybe<string[]>;
+        if (!options?.includes(args.reply)) {
+          throw new ArgValidationError(info, "reply", "Invalid option");
+        }
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      return await ctx.petitions.updatePetitionFieldReply(
+        args.replyId,
+        { content: { text: args.reply } },
+        ctx.contact!
+      );
+    },
+  }
+);
+
 export const publicCompletePetition = mutationField("publicCompletePetition", {
   description:
     "Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.",

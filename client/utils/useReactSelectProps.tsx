@@ -169,6 +169,7 @@ export function useReactSelectProps<
         control: (styles, { isDisabled, isFocused, theme }: any) => {
           return {
             ...styles,
+            alignItems: "stretch",
             borderColor: isDisabled
               ? colors.gray[100]
               : isInvalid

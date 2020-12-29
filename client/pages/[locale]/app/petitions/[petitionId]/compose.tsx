@@ -411,7 +411,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const selectFieldWithoutOptions = petition.fields.find(
       (f) =>
         f.type === "SELECT" &&
-        (!f.options?.values ||
+        (!f.options.values ||
           !Array.isArray(f.options.values) ||
           f.options.values.length < 2)
     );

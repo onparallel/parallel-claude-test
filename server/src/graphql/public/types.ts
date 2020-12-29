@@ -1,4 +1,5 @@
 import { core, objectType, unionType } from "@nexus/schema";
+import { extension } from "mime-types";
 import { fullName } from "../../util/fullName";
 
 export const PublicPetitionAccess = objectType({
@@ -99,8 +100,8 @@ export const PublicPetitionField = objectType({
     t.nullable.string("description", {
       description: "The description of the petition field.",
     });
-    t.nullable.jsonObject("options", {
-      description: "The options of the petition.",
+    t.jsonObject("options", {
+      description: "The options of the petition field.",
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -225,6 +226,8 @@ export const PublicPetitionFieldReply = objectType({
               ? {
                   filename: file.filename,
                   size: file.size,
+                  contentType: file.content_type,
+                  extension: extension(file.content_type),
                 }
               : {};
           }
@@ -270,7 +273,9 @@ export const PublicUserOrContact = unionType({
   },
   resolveType: (o) => {
     if (["User", "Contact"].includes(o.__type)) {
-      return `Public${o.__type}` as core.AbstractResolveReturn<"PublicUserOrContact">;
+      return `Public${o.__type}` as core.AbstractResolveReturn<
+        "PublicUserOrContact"
+      >;
     }
     throw new Error("Missing __type on PublicUserOrContact");
   },

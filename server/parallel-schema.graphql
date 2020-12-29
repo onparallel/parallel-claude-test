@@ -565,6 +565,15 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
+  Updates a reply to a text or select field.
+  """
+  publicUpdateSimpleReply(
+    keycode: ID!
+    reply: String!
+    replyId: GID!
+  ): PublicPetitionFieldReply!
+
+  """
   Reactivates the specified inactive petition accesses.
   """
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
@@ -1336,9 +1345,9 @@ type PetitionField {
   optional: Boolean!
 
   """
-  The options of the petition.
+  The options of the petition field.
   """
-  options: JSONObject
+  options: JSONObject!
   position: Int!
 
   """
@@ -2041,9 +2050,9 @@ type PublicPetitionField {
   optional: Boolean!
 
   """
-  The options of the petition.
+  The options of the petition field.
   """
-  options: JSONObject
+  options: JSONObject!
 
   """
   The replies to the petition field

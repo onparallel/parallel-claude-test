@@ -1,4 +1,5 @@
 import { enumType, objectType, interfaceType } from "@nexus/schema";
+import { extension } from "mime-types";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { userHasFeatureFlag } from "../authorizers";
 
@@ -277,8 +278,8 @@ export const PetitionField = objectType({
     t.nullable.string("description", {
       description: "The description of the petition field.",
     });
-    t.nullable.jsonObject("options", {
-      description: "The options of the petition.",
+    t.jsonObject("options", {
+      description: "The options of the petition field.",
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -517,6 +518,7 @@ export const PetitionFieldReply = objectType({
                   filename: file.filename,
                   size: file.size,
                   contentType: file.content_type,
+                  extension: extension(file.content_type),
                 }
               : {};
           }
