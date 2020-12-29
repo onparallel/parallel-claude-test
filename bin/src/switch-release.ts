@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 import yargs from "yargs";
 import { run } from "./utils/run";
+import { waitFor } from "./utils/wait";
 
 AWS.config.credentials = new AWS.SharedIniFileCredentials({
   profile: "parallel-deploy",
@@ -11,6 +12,7 @@ AWS.config.region = "eu-central-1";
 
 const ec2 = new AWS.EC2();
 const elbv2 = new AWS.ELBv2();
+const cloudfront = new AWS.CloudFront();
 
 async function main() {
   const { commit: _commit, env } = yargs
@@ -27,6 +29,7 @@ async function main() {
     }).argv;
 
   const commit = _commit.slice(0, 7);
+  const buildId = `${commit}-${env}`;
 
   // Shutdown workers in current build
   console.log("Getting current target group.");
@@ -71,6 +74,62 @@ async function main() {
     .promise();
   const listenerArn = result5.Listeners!.find((l) => l.Protocol === "HTTPS")!
     .ListenerArn!;
+
+  const result6 = await getTargetGroupInstances(targetGroupArn);
+  for (const instance of result6.Reservations!.flatMap((r) => r.Instances!)) {
+    const ipAddress = instance.PrivateIpAddress!;
+    console.log(
+      chalk`Starting services on ${
+        instance.Tags?.find((t) => t.Key === "Name")!.Value
+      }`
+    );
+    execSync(`ssh \
+      -o "UserKnownHostsFile=/dev/null" \
+      -o StrictHostKeyChecking=no \
+      ${ipAddress} /home/ec2-user/workers.sh start`);
+    console.log(
+      chalk`Workers started on ${
+        instance.Tags?.find((t) => t.Key === "Name")!.Value
+      }`
+    );
+  }
+
+  waitFor(
+    async () => {
+      const result = await elbv2
+        .describeTargetHealth({
+          TargetGroupArn: targetGroupArn,
+        })
+        .promise();
+      console.log(JSON.stringify(result, null, "  "));
+      return (
+        result.TargetHealthDescriptions?.every(
+          (t) => t.TargetHealth?.State === "healty"
+        ) ?? false
+      );
+    },
+    "Target not healthy. Waiting 5 more seconds...",
+    5000
+  );
+
+  console.log("Create invalidation for static files");
+  const result = await cloudfront.listDistributions().promise();
+  const distributionId = result.DistributionList!.Items!.find(
+    (i) => i.Origins.Items[0].Id === `S3-parallel-static-${env}`
+  )!.Id;
+  await cloudfront
+    .createInvalidation({
+      DistributionId: distributionId,
+      InvalidationBatch: {
+        CallerReference: buildId,
+        Paths: {
+          Quantity: 1,
+          Items: ["/*"],
+        },
+      },
+    })
+    .promise();
+
   console.log(
     chalk`Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`
   );
@@ -85,25 +144,6 @@ async function main() {
       ],
     })
     .promise();
-
-  const result6 = await getTargetGroupInstances(targetGroupArn);
-  for (const instance of result6.Reservations!.flatMap((r) => r.Instances!)) {
-    const ipAddress = instance.PrivateIpAddress!;
-    console.log(
-      chalk`Starting workers on ${
-        instance.Tags?.find((t) => t.Key === "Name")!.Value
-      }`
-    );
-    execSync(`ssh \
-      -o "UserKnownHostsFile=/dev/null" \
-      -o StrictHostKeyChecking=no \
-      ${ipAddress} /home/ec2-user/workers.sh start`);
-    console.log(
-      chalk`Workers started on ${
-        instance.Tags?.find((t) => t.Key === "Name")!.Value
-      }`
-    );
-  }
 }
 
 run(main);

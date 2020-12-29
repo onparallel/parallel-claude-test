@@ -16,7 +16,6 @@ aws_sdk_1.default.config.credentials = new aws_sdk_1.default.SharedIniFileCreden
 });
 aws_sdk_1.default.config.region = "eu-central-1";
 const WORK_DIR = "/home/ec2-user";
-const cloudfront = new aws_sdk_1.default.CloudFront();
 async function main() {
     const { commit: _commit, env } = yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
@@ -101,20 +100,5 @@ async function main() {
     });
     child_process_1.execSync(`rm -rf ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
     child_process_1.execSync(`aws s3 mv ${buildId}.tar.gz s3://parallel-builds/${buildId}.tar.gz --profile parallel-deploy`, { cwd: WORK_DIR, encoding: "utf-8" });
-    console.log("Create invalidation for static files");
-    const result = await cloudfront.listDistributions().promise();
-    const distributionId = result.DistributionList.Items.find((i) => i.Origins.Items[0].Id === `S3-parallel-static-${env}`).Id;
-    await cloudfront
-        .createInvalidation({
-        DistributionId: distributionId,
-        InvalidationBatch: {
-            CallerReference: buildId,
-            Paths: {
-                Quantity: 1,
-                Items: ["/*"],
-            },
-        },
-    })
-        .promise();
 }
 run_1.run(main);
