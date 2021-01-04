@@ -213,7 +213,7 @@ export const publicCheckVerificationCode = mutationField(
               {
                 path: "/",
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 secure: process.env.NODE_ENV === "production",
                 maxAge: 60 * 60 * 24 * 365 * 10,
               }
