@@ -31,7 +31,7 @@ import { RecipientViewContentsCard } from "@parallel/components/recipient-view/R
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
-import { RecipientViewPetitionField } from "@parallel/components/recipient-view/RecipientViewPetitionField";
+import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
@@ -682,21 +682,21 @@ function useCreatePetitionFieldComment() {
               "RecipientView_createPetitionFieldComment_PublicPetitionField",
             id: variables.petitionFieldId,
           };
-          const field = client.readFragment<RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment>(
-            options
-          );
-          client.writeFragment<RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment>(
-            {
-              ...options,
-              data: {
-                ...field,
-                comments: [
-                  ...field!.comments,
-                  data!.publicCreatePetitionFieldComment,
-                ],
-              },
-            }
-          );
+          const field = client.readFragment<
+            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
+          >(options);
+          client.writeFragment<
+            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
+          >({
+            ...options,
+            data: {
+              ...field,
+              comments: [
+                ...field!.comments,
+                data!.publicCreatePetitionFieldComment,
+              ],
+            },
+          });
         },
       });
     },
@@ -716,14 +716,14 @@ function useUpdatePetitionFieldComment() {
       await updatePetitionFieldComment({
         variables,
         optimisticResponse: () => {
-          const comment = apollo.readFragment<RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment>(
-            {
-              fragment:
-                RecipientViewPetitionFieldCommentsDialog.fragments
-                  .PublicPetitionFieldComment,
-              id: variables.petitionFieldCommentId,
-            }
-          );
+          const comment = apollo.readFragment<
+            RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
+          >({
+            fragment:
+              RecipientViewPetitionFieldCommentsDialog.fragments
+                .PublicPetitionFieldComment,
+            id: variables.petitionFieldCommentId,
+          });
           return {
             publicUpdatePetitionFieldComment: {
               ...comment!,
@@ -761,20 +761,20 @@ function useDeletePetitionFieldComment() {
             `,
             id: variables.petitionFieldId,
           };
-          const field = client.readFragment<RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment>(
-            options
-          );
-          client.writeFragment<RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment>(
-            {
-              ...options,
-              data: {
-                ...field,
-                comments: field!.comments.filter(
-                  (c) => c.id !== variables.petitionFieldCommentId
-                ),
-              },
-            }
-          );
+          const field = client.readFragment<
+            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
+          >(options);
+          client.writeFragment<
+            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
+          >({
+            ...options,
+            data: {
+              ...field,
+              comments: field!.comments.filter(
+                (c) => c.id !== variables.petitionFieldCommentId
+              ),
+            },
+          });
         },
       });
     },
