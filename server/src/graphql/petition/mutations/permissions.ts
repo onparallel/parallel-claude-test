@@ -19,7 +19,8 @@ import { WhitelistedError } from "../../helpers/errors";
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
   {
-    description: "Transfers petition ownership to a given user",
+    description:
+      "Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.",
     type: list(nonNull("Petition")),
     authorize: chain(
       authenticate(),
@@ -36,12 +37,36 @@ export const transferPetitionOwnership = mutationField(
       notEmptyArray((args) => args.petitionIds, "petitionIds")
     ),
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.transferOwnership(
-        args.petitionIds,
-        ctx.user!.id,
-        args.userId,
-        ctx.user!
-      );
+      return await ctx.petitions.withTransaction(async (t) => {
+        await ctx.petitions.updatePetitionOwner(
+          args.petitionIds,
+          args.userId,
+          ctx.user!,
+          t
+        );
+
+        const { petitions } = await ctx.petitions.addPetitionUserPermissions(
+          args.petitionIds,
+          [ctx.user!.id],
+          "WRITE",
+          ctx.user!,
+          t
+        );
+
+        await ctx.petitions.createEvent(
+          args.petitionIds.map((petitionId) => ({
+            petitionId,
+            type: "OWNERSHIP_TRANSFERRED",
+            data: {
+              user_id: ctx.user!.id,
+              owner_id: args.userId,
+            },
+          })),
+          t
+        );
+
+        return petitions;
+      });
     },
   }
 );
@@ -75,15 +100,36 @@ export const addPetitionUserPermission = mutationField(
       maxLength((args) => args.message, "message", 1000)
     ),
     resolve: async (_, args, ctx) => {
-      const {
-        petitions,
-        newPermissions,
-      } = await ctx.petitions.addPetitionUserPermissions(
-        args.petitionIds,
-        args.userIds,
-        args.permissionType,
-        ctx.user!
+      const { petitions, newPermissions } = await ctx.petitions.withTransaction(
+        async (t) => {
+          const {
+            petitions,
+            newPermissions,
+          } = await ctx.petitions.addPetitionUserPermissions(
+            args.petitionIds,
+            args.userIds,
+            args.permissionType,
+            ctx.user!,
+            t
+          );
+
+          await ctx.petitions.createEvent(
+            newPermissions.map((p) => ({
+              petitionId: p.petition_id,
+              type: "USER_PERMISSION_ADDED",
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.permission_type,
+                permission_user_id: p.user_id,
+              },
+            })),
+            t
+          );
+
+          return { petitions, newPermissions };
+        }
       );
+
       if (args.notify) {
         ctx.emails.sendPetitionSharingNotificationEmail(
           ctx.user!.id,

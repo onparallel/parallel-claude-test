@@ -210,6 +210,7 @@ export interface NexusGenEnums {
     | "name_ASC"
     | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
+  UserStatus: db.UserStatus;
 }
 
 export interface NexusGenScalars {
@@ -575,6 +576,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionUserSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updateUser: NexusGenRootTypes["User"]; // User!
+    updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
@@ -1010,6 +1012,7 @@ export interface NexusGenFieldTypes {
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+    status: NexusGenEnums["UserStatus"]; // UserStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserPagination: {
@@ -1240,6 +1243,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionUserSubscription: "Petition";
     updateUser: "User";
+    updateUserStatus: "User";
     validatePetitionFields: "PetitionAndPartialFields";
     verifyPublicAccess: "PublicAccessVerification";
   };
@@ -1673,6 +1677,7 @@ export interface NexusGenFieldTypeNames {
     onboardingStatus: "JSONObject";
     organization: "Organization";
     role: "OrganizationRole";
+    status: "UserStatus";
     updatedAt: "DateTime";
   };
   UserPagination: {
@@ -2103,6 +2108,12 @@ export interface NexusGenArgTypes {
       // args
       data: NexusGenInputs["UpdateUserInput"]; // UpdateUserInput!
       id: NexusGenScalars["GID"]; // GID!
+    };
+    updateUserStatus: {
+      // args
+      status: NexusGenEnums["UserStatus"]; // UserStatus!
+      transferToUserId?: NexusGenScalars["GID"] | null; // GID
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     validatePetitionFields: {
       // args

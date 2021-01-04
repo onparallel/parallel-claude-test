@@ -82,6 +82,8 @@ export type PetitionUserPermissionType = "OWNER" | "WRITE" | "READ";
 
 export type UserOrganizationRole = "NORMAL" | "ADMIN";
 
+export type UserStatus = "ACTIVE" | "INACTIVE";
+
 export interface TableTypes {
   contact: Contact;
   contact_authentication: ContactAuthentication;
@@ -702,6 +704,7 @@ export interface User {
   deleted_by: Maybe<string>;
   last_active_at: Maybe<Date>;
   onboarding_status: any;
+  status: UserStatus;
 }
 
 export type CreateUser = PartialProps<
@@ -717,4 +720,5 @@ export type CreateUser = PartialProps<
   | "deleted_by"
   | "last_active_at"
   | "onboarding_status"
+  | "status"
 >;

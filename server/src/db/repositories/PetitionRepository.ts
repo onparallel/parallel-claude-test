@@ -2128,6 +2128,16 @@ export class PetitionRepository extends BaseRepository {
           .join(" ")} end, "created_at"`)
   );
 
+  readonly loadUserPermissionsByUserId = this.buildLoadMultipleBy(
+    "petition_user",
+    "user_id",
+    (q) =>
+      q.whereNull("deleted_at").orderByRaw(/* sql */ outdent`
+        case "permission_type" ${["OWNER", "WRITE", "READ"]
+          .map((v, i) => `when '${v}' then ${i}`)
+          .join(" ")} end, "created_at"`)
+  );
+
   readonly loadPetitionOwners = fromDataLoader(
     new DataLoader<number, User | null>(async (ids) => {
       const rows = await this.from("petition_user")
@@ -2150,7 +2160,8 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     userIds: number[],
     permissionType: PetitionUserPermissionType,
-    user: User
+    user: User,
+    t?: Transaction
   ) {
     const batch: CreatePetitionUser[] = petitionIds.flatMap((petitionId) =>
       userIds.map((userId) => ({
@@ -2175,19 +2186,6 @@ export class PetitionRepository extends BaseRepository {
         [this.from("petition_user").insert(batch)]
       );
 
-      await this.createEvent(
-        newPermissions.map((p) => ({
-          petitionId: p.petition_id,
-          type: "USER_PERMISSION_ADDED",
-          data: {
-            user_id: user.id,
-            permission_type: p.permission_type,
-            permission_user_id: p.user_id,
-          },
-        })),
-        t
-      );
-
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
@@ -2198,7 +2196,7 @@ export class PetitionRepository extends BaseRepository {
         .returning("*");
 
       return { petitions, newPermissions };
-    });
+    }, t);
   }
 
   async editPetitionUserPermissions(
@@ -2286,73 +2284,48 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  async transferOwnership(
+  /**
+   * sets new OWNER of petitions to @param toUserId.
+   * Original owner loses its access to the petitions.
+   */
+  async updatePetitionOwner(
     petitionIds: number[],
-    fromUserId: number,
-    toUserId: number,
+    newOwnerId: number,
     updatedBy: User,
     t?: Transaction
   ) {
-    return this.withTransaction(async (t) => {
-      // removes user ownership to avoid constraint failure
+    return await this.withTransaction(async (t) => {
+      // first, remove possible READ or WRITE access to newOwnerId, as it will now be OWNER.
       await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
+        .whereIn("permission_type", ["READ", "WRITE"])
         .where({
-          user_id: fromUserId,
+          user_id: newOwnerId,
+          deleted_at: null,
+        })
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${updatedBy}`,
+        });
+
+      const permissions = await this.from("petition_user", t)
+        .whereIn("petition_id", petitionIds)
+        .where({
           deleted_at: null,
           permission_type: "OWNER",
         })
         .update({
-          permission_type: "WRITE",
+          user_id: newOwnerId,
           updated_at: this.now(),
           updated_by: `User:${updatedBy.id}`,
-        });
+        })
+        .returning("*");
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
 
-      const insertBatch: CreatePetitionUser[] = petitionIds.map((pid) => ({
-        created_by: `User:${updatedBy.id}`,
-        permission_type: "OWNER",
-        user_id: toUserId,
-        petition_id: pid,
-      }));
-
-      const { rows: newPermissions } = await t.raw<{ rows: PetitionUser[] }>(
-        /* sql */ `
-        ? ON CONFLICT (user_id, petition_id) WHERE deleted_at IS NULL
-          DO UPDATE SET
-          permission_type = ?,
-          updated_by = ?,
-          updated_at = ?,
-          deleted_by = null,
-          deleted_at = null
-        RETURNING *;`,
-        [
-          this.from("petition_user").insert(insertBatch),
-          "OWNER",
-          `User:${updatedBy.id}`,
-          this.now(),
-        ]
-      );
-
-      await this.createEvent(
-        newPermissions.map((p) => ({
-          petitionId: p.petition_id,
-          type: "OWNERSHIP_TRANSFERRED",
-          data: {
-            user_id: updatedBy.id,
-            owner_id: p.user_id,
-          },
-        })),
-        t
-      );
-
-      return await this.from("petition", t)
-        .whereNull("deleted_at")
-        .whereIn("id", petitionIds)
-        .returning("*");
+      return permissions;
     }, t);
   }
 

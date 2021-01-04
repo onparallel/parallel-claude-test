@@ -23,6 +23,12 @@ export const FeatureFlag = enumType({
   rootTyping: "db.FeatureFlagName",
 });
 
+export const UserStatus = enumType({
+  name: "UserStatus",
+  members: ["ACTIVE", "INACTIVE"],
+  rootTyping: "db.UserStatus",
+});
+
 export const User = objectType({
   name: "User",
   description: "A user in the system.",
@@ -80,6 +86,10 @@ export const User = objectType({
     });
     t.nullable.datetime("lastActiveAt", {
       resolve: (o) => o.last_active_at,
+    });
+    t.field("status", {
+      type: "UserStatus",
+      resolve: (o) => o.status,
     });
   },
 });

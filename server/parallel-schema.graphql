@@ -722,6 +722,15 @@ type Mutation {
   updateUser(data: UpdateUserInput!, id: GID!): User!
 
   """
+  Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.
+  """
+  updateUserStatus(
+    status: UserStatus!
+    transferToUserId: GID
+    userIds: [GID!]!
+  ): [User!]!
+
+  """
   Updates the validation of a field and sets the petition as closed if all fields are validated.
   """
   validatePetitionFields(
@@ -2589,6 +2598,7 @@ type User implements Timestamps {
   onboardingStatus: JSONObject!
   organization: Organization!
   role: OrganizationRole!
+  status: UserStatus!
 
   """
   Time when the resource was last updated.
@@ -2631,6 +2641,11 @@ type UserPermissionRemovedEvent implements PetitionEvent {
   id: GID!
   permissionUser: User
   user: User
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
 }
 
 type VerificationCodeCheck {

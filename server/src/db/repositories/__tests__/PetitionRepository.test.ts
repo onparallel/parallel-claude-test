@@ -822,35 +822,27 @@ describe("repositories/PetitionRepository", () => {
       });
     });
 
-    describe("transferOwnership", () => {
+    describe("updatePetitionOwner", () => {
       beforeEach(async () => {
         await mocks.clearSharedPetitions();
       });
 
       test("should transfer ownership to a user without access to the petition", async () => {
         const petitionId = user0Petitions[1].id;
-        const permissions = await petitions.loadUserPermissions(petitionId);
-        expect(permissions).toHaveLength(1);
 
-        await petitions.transferOwnership(
+        await petitions.updatePetitionOwner(
           [petitionId],
-          users[0].id,
           users[2].id,
           users[0]
         );
         const newPermissions = await petitions.loadUserPermissions(petitionId);
-        expect(newPermissions).toHaveLength(2);
-        newPermissions.sort((a, b) => (a.permission_type === "OWNER" ? -1 : 1));
+        expect(newPermissions).toHaveLength(1);
+
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
             permission_type: "OWNER",
             user_id: users[2].id,
-          },
-          {
-            petition_id: petitionId,
-            permission_type: "WRITE",
-            user_id: users[0].id,
           },
         ]);
       });
@@ -865,21 +857,10 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.transferOwnership(
-          [petitionId],
-          users[0].id,
-          userId,
-          users[0]
-        );
+        await petitions.updatePetitionOwner([petitionId], userId, users[0]);
         const newPermissions = await petitions.loadUserPermissions(petitionId);
-        expect(newPermissions).toHaveLength(2);
-        newPermissions.sort((a, b) => a.id - b.id);
+        expect(newPermissions).toHaveLength(1);
         expect(newPermissions).toMatchObject([
-          {
-            petition_id: petitionId,
-            permission_type: "WRITE",
-            user_id: users[0].id,
-          },
           {
             petition_id: petitionId,
             permission_type: "OWNER",

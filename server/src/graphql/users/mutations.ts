@@ -5,8 +5,9 @@ import {
   stringArg,
   arg,
   nonNull,
+  list,
 } from "@nexus/schema";
-import { removeNotDefined } from "../../util/remedaExtensions";
+import { isDefined, removeNotDefined } from "../../util/remedaExtensions";
 import {
   argIsContextUserId,
   authenticate,
@@ -19,6 +20,10 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { contextUserIsAdmin } from "./authorizers";
 import { validEmail } from "../helpers/validators/validEmail";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
+import { userHasAccessToUsers } from "../petition/mutations/authorizers";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
+import { ArgValidationError } from "../helpers/errors";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -143,5 +148,108 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
       },
       ctx.user!
     );
+  },
+});
+
+export const UpdateUserStatus = mutationField("updateUserStatus", {
+  description:
+    "Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.",
+  type: list("User"),
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    userHasAccessToUsers("userIds")
+  ),
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.userIds, "userIds"),
+    userIdNotIncludedInArray((args) => args.userIds, "userIds")
+  ),
+  args: {
+    userIds: nonNull(list(nonNull(globalIdArg("User")))),
+    status: nonNull(arg({ type: "UserStatus" })),
+    transferToUserId: globalIdArg("User"),
+  },
+  resolve: async (_, { userIds, status, transferToUserId }, ctx, info) => {
+    // if status is INACTIVE, check that transferToUserId is defined
+    // and refers to an active user in the same org as the context user
+    if (status === "INACTIVE") {
+      if (!isDefined(transferToUserId)) {
+        throw new ArgValidationError(
+          info,
+          "transferToUserId",
+          "Value must be defined"
+        );
+      }
+
+      const userToTransfer = await ctx.users.loadUser(transferToUserId);
+
+      if (
+        !userToTransfer ||
+        userToTransfer.status !== "ACTIVE" ||
+        userToTransfer.org_id !== ctx.user!.org_id
+      ) {
+        throw new ArgValidationError(
+          info,
+          "transferToUserId",
+          "User to transfer must exist and have ACTIVE status"
+        );
+      }
+
+      const permissionsGroupedByUser = await ctx.petitions.loadUserPermissionsByUserId(
+        userIds
+      );
+
+      return await ctx.petitions.withTransaction(async (t) => {
+        await Promise.all(
+          permissionsGroupedByUser.map(async (userPermissions) => {
+            const notOwnedPermissions = userPermissions.filter(
+              (p) => p.permission_type !== "OWNER"
+            );
+            // delete permissions with type !== OWNER
+            if (notOwnedPermissions.length > 0) {
+              await ctx.petitions.deleteUserPermissions(
+                notOwnedPermissions.map((p) => p.petition_id),
+                notOwnedPermissions[0].user_id,
+                ctx.user!,
+                t
+              );
+            }
+
+            const ownedPermissions = userPermissions.filter(
+              (p) => p.permission_type === "OWNER"
+            );
+
+            // transfer OWNER permissions to new user
+            if (ownedPermissions.length > 0) {
+              await ctx.petitions.createEvent(
+                ownedPermissions.map((p) => ({
+                  petitionId: p.petition_id,
+                  type: "OWNERSHIP_TRANSFERRED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    owner_id: transferToUserId,
+                  },
+                })),
+                t
+              );
+              return await ctx.petitions.updatePetitionOwner(
+                ownedPermissions.map((p) => p.petition_id),
+                transferToUserId,
+                ctx.user!,
+                t
+              );
+            }
+          })
+        );
+
+        return await ctx.users.updateUserById(
+          userIds,
+          { status },
+          ctx.user!,
+          t
+        );
+      });
+    } else {
+      return await ctx.users.updateUserById(userIds, { status }, ctx.user!);
+    }
   },
 });
