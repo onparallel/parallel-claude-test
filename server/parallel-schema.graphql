@@ -142,10 +142,6 @@ input CreateFileUploadReplyInput {
   size: Int!
 }
 
-input CreateTextReplyInput {
-  text: String!
-}
-
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -480,16 +476,6 @@ type Mutation {
   ): PublicPetitionFieldComment!
 
   """
-  Creates a reply to a select field.
-  """
-  publicCreateSelectReply(
-    data: CreateTextReplyInput!
-    fieldId: GID!
-    keycode: ID!
-  ): PublicPetitionFieldReply!
-    @deprecated(reason: "Delete after a few releases")
-
-  """
   Creates a reply to a text or select field.
   """
   publicCreateSimpleReply(
@@ -497,16 +483,6 @@ type Mutation {
     keycode: ID!
     reply: String!
   ): PublicPetitionFieldReply!
-
-  """
-  Creates a reply to a text field.
-  """
-  publicCreateTextReply(
-    data: CreateTextReplyInput!
-    fieldId: GID!
-    keycode: ID!
-  ): PublicPetitionFieldReply!
-    @deprecated(reason: "Delete after a few releases")
 
   """
   Lets a recipient delegate access to the petition to another contact in the same organization

@@ -93,10 +93,6 @@ export interface NexusGenInputs {
     filename: string; // String!
     size: number; // Int!
   };
-  CreateTextReplyInput: {
-    // input type
-    text: string; // String!
-  };
   RemindersConfigInput: {
     // input type
     offset: number; // Int!
@@ -546,9 +542,7 @@ export interface NexusGenFieldTypes {
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
-    publicCreateSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
-    publicCreateTextReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicDelegateAccessToContact: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicDeletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
     publicDeletePetitionReply: NexusGenEnums["Result"]; // Result!
@@ -1211,9 +1205,7 @@ export interface NexusGenFieldTypeNames {
     publicCompletePetition: "PublicPetition";
     publicCreateFileUploadReply: "CreateFileUploadReply";
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
-    publicCreateSelectReply: "PublicPetitionFieldReply";
     publicCreateSimpleReply: "PublicPetitionFieldReply";
-    publicCreateTextReply: "PublicPetitionFieldReply";
     publicDelegateAccessToContact: "PublicPetitionAccess";
     publicDeletePetitionFieldComment: "Result";
     publicDeletePetitionReply: "Result";
@@ -1922,23 +1914,11 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
-    publicCreateSelectReply: {
-      // args
-      data: NexusGenInputs["CreateTextReplyInput"]; // CreateTextReplyInput!
-      fieldId: NexusGenScalars["GID"]; // GID!
-      keycode: string; // ID!
-    };
     publicCreateSimpleReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
       reply: string; // String!
-    };
-    publicCreateTextReply: {
-      // args
-      data: NexusGenInputs["CreateTextReplyInput"]; // CreateTextReplyInput!
-      fieldId: NexusGenScalars["GID"]; // GID!
-      keycode: string; // ID!
     };
     publicDelegateAccessToContact: {
       // args

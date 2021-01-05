@@ -137,10 +137,6 @@ export type CreateFileUploadReplyInput = {
   size: Scalars["Int"];
 };
 
-export type CreateTextReplyInput = {
-  text: Scalars["String"];
-};
-
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
@@ -237,18 +233,8 @@ export type Mutation = {
   publicCreateFileUploadReply: CreateFileUploadReply;
   /** Create a petition field comment. */
   publicCreatePetitionFieldComment: PublicPetitionFieldComment;
-  /**
-   * Creates a reply to a select field.
-   * @deprecated Delete after a few releases
-   */
-  publicCreateSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a text or select field. */
   publicCreateSimpleReply: PublicPetitionFieldReply;
-  /**
-   * Creates a reply to a text field.
-   * @deprecated Delete after a few releases
-   */
-  publicCreateTextReply: PublicPetitionFieldReply;
   /** Lets a recipient delegate access to the petition to another contact in the same organization */
   publicDelegateAccessToContact: PublicPetitionAccess;
   /** Delete a petition field comment. */
@@ -470,22 +456,10 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
   petitionFieldId: Scalars["GID"];
 };
 
-export type MutationpublicCreateSelectReplyArgs = {
-  data: CreateTextReplyInput;
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
-};
-
 export type MutationpublicCreateSimpleReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   reply: Scalars["String"];
-};
-
-export type MutationpublicCreateTextReplyArgs = {
-  data: CreateTextReplyInput;
-  fieldId: Scalars["GID"];
-  keycode: Scalars["ID"];
 };
 
 export type MutationpublicDelegateAccessToContactArgs = {
@@ -10169,7 +10143,7 @@ export const RecipientView_publicCreateSimpleReplyDocument = gql`
       keycode: $keycode
       fieldId: $fieldId
       reply: $reply
-  ) {
+    ) {
       ...RecipientViewPetitionField_PublicPetitionFieldReply
     }
   }
