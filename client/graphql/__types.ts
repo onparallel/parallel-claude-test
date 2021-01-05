@@ -277,7 +277,7 @@ export type Mutation = {
   submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
-  /** Transfers petition ownership to a given user */
+  /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<Petition>;
   /** Updates a contact. */
   updateContact: Contact;
@@ -297,6 +297,8 @@ export type Mutation = {
   updatePetitionUserSubscription: Petition;
   /** Updates the user with the provided data. */
   updateUser: User;
+  /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
+  updateUserStatus: Array<User>;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
@@ -644,6 +646,12 @@ export type MutationupdateUserArgs = {
   id: Scalars["GID"];
 };
 
+export type MutationupdateUserStatusArgs = {
+  status: UserStatus;
+  transferToUserId?: Maybe<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
+};
+
 export type MutationvalidatePetitionFieldsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -702,6 +710,7 @@ export type OrganizationintegrationsArgs = {
 /** An organization in the system. */
 export type OrganizationusersArgs = {
   exclude?: Maybe<Array<Scalars["GID"]>>;
+  includeInactive?: Maybe<Scalars["Boolean"]>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
@@ -758,6 +767,7 @@ export type OwnershipTransferredEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   owner?: Maybe<User>;
+  previousOwner?: Maybe<User>;
   user?: Maybe<User>;
 };
 
@@ -1713,6 +1723,7 @@ export type User = Timestamps & {
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   role: OrganizationRole;
+  status: UserStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -1757,6 +1768,8 @@ export type UserPermissionRemovedEvent = PetitionEvent & {
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
 };
+
+export type UserStatus = "ACTIVE" | "INACTIVE";
 
 export type VerificationCodeCheck = {
   __typename?: "VerificationCodeCheck";
@@ -2283,7 +2296,7 @@ export type PetitionFieldReference_PetitionFieldFragment = {
 
 export type UserReference_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "id" | "fullName"
+  "id" | "fullName" | "status"
 >;
 
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
@@ -2420,6 +2433,7 @@ export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment 
 } & Pick<OwnershipTransferredEvent, "createdAt"> & {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    previousOwner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
 export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
@@ -2718,21 +2732,6 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
         __typename?: "PetitionTemplate";
       } & PetitionSharingModal_Petition_PetitionTemplate_Fragment)
   >;
-};
-
-export type PetitionSharingModal_searchUsersQueryVariables = Exact<{
-  search: Scalars["String"];
-  exclude: Array<Scalars["GID"]>;
-}>;
-
-export type PetitionSharingModal_searchUsersQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & {
-    organization: { __typename?: "Organization" } & {
-      users: { __typename?: "UserPagination" } & {
-        items: Array<{ __typename?: "User" } & UserSelect_UserFragment>;
-      };
-    };
-  };
 };
 
 export type SignatureConfigDialog_PetitionFragment = {
@@ -3322,6 +3321,7 @@ export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
   | "role"
   | "createdAt"
   | "lastActiveAt"
+  | "status"
 >;
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
@@ -3337,6 +3337,20 @@ export type OrganizationUsers_createOrganizationUserMutation = {
   createOrganizationUser: {
     __typename?: "User";
   } & OrganizationUsers_UserFragment;
+};
+
+export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
+  userIds: Array<Scalars["GID"]>;
+  newStatus: UserStatus;
+  transferToUserId?: Maybe<Scalars["GID"]>;
+}>;
+
+export type OrganizationUsers_updateUserStatusMutation = {
+  __typename?: "Mutation";
+} & {
+  updateUserStatus: Array<
+    { __typename?: "User" } & Pick<User, "id" | "status">
+  >;
 };
 
 export type OrganizationUsersQueryVariables = Exact<{
@@ -4707,6 +4721,23 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   };
 };
 
+export type SearchUsersQueryVariables = Exact<{
+  search: Scalars["String"];
+  exclude: Array<Scalars["GID"]>;
+}>;
+
+export type SearchUsersQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & {
+    organization: { __typename?: "Organization" } & {
+      users: { __typename?: "UserPagination" } & {
+        items: Array<
+          { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">
+        >;
+      };
+    };
+  };
+};
+
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
@@ -4975,6 +5006,7 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     role
     createdAt
     lastActiveAt
+    status
   }
 `;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
@@ -5068,6 +5100,7 @@ export const UserReference_UserFragmentDoc = gql`
   fragment UserReference_User on User {
     id
     fullName
+    status
   }
 `;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
@@ -5358,6 +5391,9 @@ export const TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment
       ...UserReference_User
     }
     owner {
+      ...UserReference_User
+    }
+    previousOwner {
       ...UserReference_User
     }
     createdAt
@@ -6849,66 +6885,6 @@ export type PetitionSharingModal_PetitionUserPermissionsQueryHookResult = Return
 export type PetitionSharingModal_PetitionUserPermissionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionUserPermissionsLazyQuery
 >;
-export const PetitionSharingModal_searchUsersDocument = gql`
-  query PetitionSharingModal_searchUsers($search: String!, $exclude: [GID!]!) {
-    me {
-      organization {
-        users(search: $search, limit: 10, exclude: $exclude) {
-          items {
-            ...UserSelect_User
-          }
-        }
-      }
-    }
-  }
-  ${UserSelect_UserFragmentDoc}
-`;
-
-/**
- * __usePetitionSharingModal_searchUsersQuery__
- *
- * To run a query within a React component, call `usePetitionSharingModal_searchUsersQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionSharingModal_searchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionSharingModal_searchUsersQuery({
- *   variables: {
- *      search: // value for 'search'
- *      exclude: // value for 'exclude'
- *   },
- * });
- */
-export function usePetitionSharingModal_searchUsersQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    PetitionSharingModal_searchUsersQuery,
-    PetitionSharingModal_searchUsersQueryVariables
-  >
-) {
-  return Apollo.useQuery<
-    PetitionSharingModal_searchUsersQuery,
-    PetitionSharingModal_searchUsersQueryVariables
-  >(PetitionSharingModal_searchUsersDocument, baseOptions);
-}
-export function usePetitionSharingModal_searchUsersLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionSharingModal_searchUsersQuery,
-    PetitionSharingModal_searchUsersQueryVariables
-  >
-) {
-  return Apollo.useLazyQuery<
-    PetitionSharingModal_searchUsersQuery,
-    PetitionSharingModal_searchUsersQueryVariables
-  >(PetitionSharingModal_searchUsersDocument, baseOptions);
-}
-export type PetitionSharingModal_searchUsersQueryHookResult = ReturnType<
-  typeof usePetitionSharingModal_searchUsersQuery
->;
-export type PetitionSharingModal_searchUsersLazyQueryHookResult = ReturnType<
-  typeof usePetitionSharingModal_searchUsersLazyQuery
->;
 export const useTemplateDetailsDialogPetitionDocument = gql`
   query useTemplateDetailsDialogPetition($templateId: GID!) {
     petition(id: $templateId) {
@@ -7758,6 +7734,56 @@ export function useOrganizationUsers_createOrganizationUserMutation(
 export type OrganizationUsers_createOrganizationUserMutationHookResult = ReturnType<
   typeof useOrganizationUsers_createOrganizationUserMutation
 >;
+export const OrganizationUsers_updateUserStatusDocument = gql`
+  mutation OrganizationUsers_updateUserStatus(
+    $userIds: [GID!]!
+    $newStatus: UserStatus!
+    $transferToUserId: GID
+  ) {
+    updateUserStatus(
+      userIds: $userIds
+      status: $newStatus
+      transferToUserId: $transferToUserId
+    ) {
+      id
+      status
+    }
+  }
+`;
+
+/**
+ * __useOrganizationUsers_updateUserStatusMutation__
+ *
+ * To run a mutation, you first call `useOrganizationUsers_updateUserStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationUsers_updateUserStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [organizationUsersUpdateUserStatusMutation, { data, loading, error }] = useOrganizationUsers_updateUserStatusMutation({
+ *   variables: {
+ *      userIds: // value for 'userIds'
+ *      newStatus: // value for 'newStatus'
+ *      transferToUserId: // value for 'transferToUserId'
+ *   },
+ * });
+ */
+export function useOrganizationUsers_updateUserStatusMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OrganizationUsers_updateUserStatusMutation,
+    OrganizationUsers_updateUserStatusMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    OrganizationUsers_updateUserStatusMutation,
+    OrganizationUsers_updateUserStatusMutationVariables
+  >(OrganizationUsers_updateUserStatusDocument, baseOptions);
+}
+export type OrganizationUsers_updateUserStatusMutationHookResult = ReturnType<
+  typeof useOrganizationUsers_updateUserStatusMutation
+>;
 export const OrganizationUsersDocument = gql`
   query OrganizationUsers(
     $offset: Int!
@@ -7774,6 +7800,7 @@ export const OrganizationUsersDocument = gql`
           limit: $limit
           search: $search
           sortBy: $sortBy
+          includeInactive: true
         ) {
           totalCount
           items {
@@ -11224,4 +11251,63 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 >;
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
+>;
+export const SearchUsersDocument = gql`
+  query SearchUsers($search: String!, $exclude: [GID!]!) {
+    me {
+      organization {
+        users(search: $search, limit: 10, exclude: $exclude) {
+          items {
+            id
+            fullName
+            email
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useSearchUsersQuery__
+ *
+ * To run a query within a React component, call `useSearchUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchUsersQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      exclude: // value for 'exclude'
+ *   },
+ * });
+ */
+export function useSearchUsersQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    SearchUsersQuery,
+    SearchUsersQueryVariables
+  >
+) {
+  return Apollo.useQuery<SearchUsersQuery, SearchUsersQueryVariables>(
+    SearchUsersDocument,
+    baseOptions
+  );
+}
+export function useSearchUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SearchUsersQuery,
+    SearchUsersQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<SearchUsersQuery, SearchUsersQueryVariables>(
+    SearchUsersDocument,
+    baseOptions
+  );
+}
+export type SearchUsersQueryHookResult = ReturnType<typeof useSearchUsersQuery>;
+export type SearchUsersLazyQueryHookResult = ReturnType<
+  typeof useSearchUsersLazyQuery
 >;

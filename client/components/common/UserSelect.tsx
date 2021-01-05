@@ -13,66 +13,84 @@ import { NormalLink } from "./Link";
 
 export type UserSelectSelection = UserSelect_UserFragment;
 
-export interface UserSelectProps
-  extends Omit<
-      AsyncSelectProps<UserSelectSelection, true>,
-      "value" | "onChange"
-    >,
+export type UserSelectInstance<IsMulti extends boolean> = AsyncSelect<
+  UserSelectSelection,
+  IsMulti
+>;
+
+type AsyncUserSelectProps<IsMulti extends boolean> = AsyncSelectProps<
+  UserSelectSelection,
+  IsMulti
+>;
+
+interface UserSelectProps<IsMulti extends boolean>
+  extends Omit<AsyncUserSelectProps<IsMulti>, "value" | "onChange">,
     UserReactSelectProps {
-  value?: UserSelectSelection[];
-  onChange?: (users: UserSelectSelection[]) => void;
+  value?: IsMulti extends true ? UserSelectSelection[] : UserSelectSelection;
+  onChange?: IsMulti extends true
+    ? (users: UserSelectSelection[]) => void
+    : (user: UserSelectSelection) => void;
+
   onSearchUsers: (
     search: string,
     exclude: string[]
   ) => Promise<UserSelectSelection[]>;
 }
 
-export type UserSelectInstance = AsyncSelect<UserSelectSelection, true>;
+const fragments = {
+  User: gql`
+    fragment UserSelect_User on User {
+      id
+      fullName
+      email
+    }
+  `,
+};
 
-export const UserSelect = Object.assign(
-  forwardRef<UserSelectInstance, UserSelectProps>(function (
-    { value, onSearchUsers, onChange, ...props },
-    ref
-  ) {
-    const loadOptions = useCallback(
-      async (search) => {
-        const exclude = [];
-        for (const user of value ?? []) {
-          exclude.push(user.id);
-        }
-        return await onSearchUsers(search, exclude);
-      },
-      [onSearchUsers, value]
-    );
+function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
+  return forwardRef<UserSelectInstance<IsMulti>, UserSelectProps<IsMulti>>(
+    function ({ value, onSearchUsers, onChange, ...props }, ref) {
+      const loadOptions = useCallback(
+        async (search) => {
+          const exclude = [];
+          if (isMulti) {
+            for (const user of (value ?? []) as UserSelectSelection[]) {
+              exclude.push(user.id);
+            }
+          } else if (value) {
+            exclude.push((value as UserSelectSelection).id);
+          }
+          return await onSearchUsers(search, exclude);
+        },
+        [onSearchUsers, value]
+      );
 
-    const reactSelectProps = useUserSelectReactSelectProps(props);
+      const reactSelectProps = useUserSelectReactSelectProps<IsMulti>(props);
 
-    return (
-      <AsyncSelect<UserSelectSelection, true>
-        ref={ref}
-        value={value}
-        onChange={(value) => onChange?.((value as any) ?? [])}
-        isMulti
-        loadOptions={loadOptions}
-        {...props}
-        {...reactSelectProps}
-      />
-    );
-  }),
-  {
-    fragments: {
-      User: gql`
-        fragment UserSelect_User on User {
-          id
-          fullName
-          email
-        }
-      `,
-    },
-  }
-);
+      return (
+        <AsyncSelect<UserSelectSelection, IsMulti>
+          ref={ref}
+          value={value}
+          onChange={(value) =>
+            onChange?.((value ?? (isMulti ? [] : null)) as any)
+          }
+          isMulti={isMulti}
+          loadOptions={loadOptions}
+          {...props}
+          {...reactSelectProps}
+        />
+      );
+    }
+  );
+}
 
-function useUserSelectReactSelectProps(props: UserReactSelectProps) {
+export const UserMultiSelect = Object.assign(userSelect(true), { fragments });
+
+export const UserSingleSelect = Object.assign(userSelect(false), { fragments });
+
+function useUserSelectReactSelectProps<IsMulti extends boolean>(
+  props: UserReactSelectProps
+) {
   const reactSelectProps = useReactSelectProps<UserSelectSelection>(props);
   return useMemo(
     () =>
@@ -122,6 +140,16 @@ function useUserSelectReactSelectProps(props: UserReactSelectProps) {
               </Stack>
             );
           }),
+          SingleValue: memo(({ children, ...props }) => {
+            const { fullName, email } = props.data;
+            return (
+              <components.SingleValue {...props}>
+                <Text as="span">
+                  {fullName ? `${fullName} <${email}>` : email}
+                </Text>
+              </components.SingleValue>
+            );
+          }),
           MultiValueLabel: memo(
             ({
               data,
@@ -145,7 +173,7 @@ function useUserSelectReactSelectProps(props: UserReactSelectProps) {
             children,
             data,
             ...props
-          }: Omit<OptionProps<UserSelectSelection, true>, "data"> & {
+          }: Omit<OptionProps<UserSelectSelection, IsMulti>, "data"> & {
             data: UserSelectSelection;
           }) => {
             return (
@@ -173,7 +201,7 @@ function useUserSelectReactSelectProps(props: UserReactSelectProps) {
           }
         },
         getOptionValue: (option) => option.id,
-      } as Partial<AsyncSelectProps<UserSelectSelection, true>>),
+      } as Partial<AsyncUserSelectProps<IsMulti>>),
     [reactSelectProps]
   );
 }

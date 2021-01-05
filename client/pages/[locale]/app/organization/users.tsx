@@ -1,11 +1,10 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Stack, useToast } from "@chakra-ui/react";
-import { RepeatIcon, UserPlusIcon } from "@parallel/chakra/icons";
+import { Badge, Box, Text, useToast } from "@chakra-ui/react";
+import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { SearchInput } from "@parallel/components/common/SearchInput";
-import { Spacer } from "@parallel/components/common/Spacer";
+import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
+import { UserSelectSelection } from "@parallel/components/common/UserSelect";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
@@ -13,15 +12,23 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { useConfirmActivateUsersDialog } from "@parallel/components/organization/ConfirmActivateUsersDialog";
+import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/ConfirmDeactivateUserDialog";
 import { useCreateUserDialog } from "@parallel/components/organization/CreateUserDialog";
+import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
 import {
+  OrganizationRole,
   OrganizationUsersQuery,
   OrganizationUsers_OrderBy,
+  OrganizationUsers_UserFragment,
   useOrganizationUsersQuery,
   useOrganizationUsers_createOrganizationUserMutation,
+  useOrganizationUsers_updateUserStatusMutation,
+  UserStatus,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
   parseQuery,
@@ -29,10 +36,10 @@ import {
   string,
   useQueryState,
 } from "@parallel/utils/queryState";
+import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { useOrganizationUsersTableColumns } from "@parallel/utils/useOrganizationUsersTableColumns";
-import { ChangeEvent, useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const PAGE_SIZE = 10;
@@ -75,12 +82,14 @@ function OrganizationUsers() {
     })
   );
 
+  const [selected, setSelected] = useState<string[]>([]);
+  const [search, setSearch] = useState(state.search);
+
   const userList = me.organization.users;
 
   const sections = useOrganizationSections();
 
   const columns = useOrganizationUsersTableColumns();
-  const [search, setSearch] = useState(state.search);
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -94,8 +103,7 @@ function OrganizationUsers() {
     [setQueryState]
   );
   const handleSearchChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
+    (value: string | null) => {
       setSearch(value);
       debouncedOnSearchChange(value || null);
     },
@@ -117,10 +125,57 @@ function OrganizationUsers() {
       });
       toast({
         title: intl.formatMessage({
+          id: "organization.user-created-success.toast-title",
+          defaultMessage: "User created successfully.",
+        }),
+        description: intl.formatMessage(
+          {
+            id: "organization.user-created-success.toast-description",
+            defaultMessage:
+              "We have sent an email to {email} with instructions to register in Parallel.",
+          },
+          { email: newUser.email }
+        ),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch {}
+  };
+
+  const showConfirmActivateUserDialog = useConfirmActivateUsersDialog();
+  const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
+  const [updateUserStatus] = useOrganizationUsers_updateUserStatusMutation();
+  const handleUpdateUserStatus = async (
+    userIds: string[],
+    newStatus: UserStatus
+  ) => {
+    try {
+      let transferToUser: Maybe<UserSelectSelection> = null;
+      if (newStatus === "ACTIVE") {
+        await showConfirmActivateUserDialog({ count: userIds.length });
+      } else if (newStatus === "INACTIVE") {
+        transferToUser = await showConfirmDeactivateUserDialog({
+          selected: userIds,
+          me,
+        });
+      }
+      await updateUserStatus({
+        variables: {
+          newStatus,
+          userIds,
+          transferToUserId: transferToUser?.id,
+        },
+      });
+      toast({
+        title: intl.formatMessage({
           id: "generic.success",
           defaultMessage: "Success",
         }),
-        description: "User created successfully.",
+        description: intl.formatMessage({
+          id: "organization.user-updated-success.toast-title",
+          defaultMessage: "User updated successfully.",
+        }),
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -152,51 +207,168 @@ function OrganizationUsers() {
     >
       <Box flex="1" padding={4}>
         <TablePage
+          isSelectable
+          isHighlightable
           columns={columns}
           rows={userList.items}
-          rowKeyProp={"id"}
-          isHighlightable
+          rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={PAGE_SIZE}
           totalCount={userList.totalCount}
           sort={state.sort}
+          onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
-            <Stack direction="row" padding={2}>
-              <Box flex="0 1 400px">
-                <SearchInput
-                  value={search ?? ""}
-                  onChange={handleSearchChange}
-                />
-              </Box>
-              <IconButtonWithTooltip
-                onClick={() => refetch()}
-                icon={<RepeatIcon />}
-                placement="bottom"
-                variant="outline"
-                label={intl.formatMessage({
-                  id: "generic.reload-data",
-                  defaultMessage: "Reload",
-                })}
-              />
-              <Spacer />
-              <Button
-                colorScheme="purple"
-                leftIcon={<UserPlusIcon fontSize="18px" />}
-                onClick={handleCreateUser}
-              >
-                {intl.formatMessage({
-                  id: "organization.create-user-button",
-                  defaultMessage: "Create user",
-                })}
-              </Button>
-            </Stack>
+            <OrganizationUsersListTableHeader
+              me={me}
+              search={search}
+              selected={selected}
+              onCreateUser={handleCreateUser}
+              onReload={() => refetch()}
+              onSearchChange={handleSearchChange}
+              onUpdateUserStatus={handleUpdateUserStatus}
+            />
           }
         />
       </Box>
     </SettingsLayout>
+  );
+}
+
+function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserFragment>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "firstName",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "organization-users.header.user-firstname",
+          defaultMessage: "First name",
+        }),
+        CellContent: ({ row }) => <>{row.firstName}</>,
+      },
+      {
+        key: "lastName",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "organization-users.header.user-lastname",
+          defaultMessage: "Last name",
+        }),
+        CellContent: ({ row }) => <>{row.lastName}</>,
+      },
+      {
+        key: "email",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "organization-users.header.user-email",
+          defaultMessage: "Email",
+        }),
+        CellContent: ({ row }) => <>{row.email}</>,
+      },
+      {
+        key: "role",
+        header: intl.formatMessage({
+          id: "organization-users.header.user-role",
+          defaultMessage: "Role",
+        }),
+        cellProps: {
+          width: "1px",
+          textAlign: "center",
+        },
+        CellContent: ({ row }) => (
+          <Badge
+            aria-label={row.role}
+            colorScheme={
+              ({
+                ADMIN: "green",
+                NORMAL: "gray",
+              } as Record<OrganizationRole, string>)[row.role]
+            }
+          >
+            {row.role}
+          </Badge>
+        ),
+      },
+      {
+        key: "status",
+        header: intl.formatMessage({
+          id: "organization-users.header.user-status",
+          defaultMessage: "Status",
+        }),
+        cellProps: {
+          width: "1px",
+          textAlign: "center",
+        },
+        CellContent: ({ row }) => {
+          const label =
+            row.status === "ACTIVE"
+              ? intl.formatMessage({
+                  id: "organization-users.header.user-active",
+                  defaultMessage: "Active",
+                })
+              : intl.formatMessage({
+                  id: "organization-users.header.user-inactive",
+                  defaultMessage: "Inactive",
+                });
+
+          return (
+            <Badge
+              aria-label={label}
+              colorScheme={row.status === "ACTIVE" ? "gray" : "red"}
+            >
+              {label}
+            </Badge>
+          );
+        },
+      },
+      {
+        key: "lastActiveAt",
+        header: intl.formatMessage({
+          id: "generic.last-active-at",
+          defaultMessage: "Last active at",
+        }),
+        isSortable: true,
+        CellContent: ({ row }) =>
+          row.lastActiveAt ? (
+            <DateTime
+              value={row.lastActiveAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+              whiteSpace="nowrap"
+            />
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage
+                id="generic.never-active"
+                defaultMessage="Never active"
+              />
+            </Text>
+          ),
+      },
+      {
+        key: "createdAt",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "generic.created-at",
+          defaultMessage: "Created at",
+        }),
+        cellProps: {
+          width: "1px",
+        },
+        CellContent: ({ row }) => (
+          <DateTime
+            value={row.createdAt}
+            format={FORMATS.LLL}
+            useRelativeTime
+            whiteSpace="nowrap"
+          />
+        ),
+      },
+    ],
+    [intl.locale]
   );
 }
 
@@ -211,6 +383,7 @@ OrganizationUsers.fragments = {
         role
         createdAt
         lastActiveAt
+        status
       }
     `;
   },
@@ -234,6 +407,22 @@ OrganizationUsers.mutations = [
       }
     }
     ${OrganizationUsers.fragments.User}
+  `,
+  gql`
+    mutation OrganizationUsers_updateUserStatus(
+      $userIds: [GID!]!
+      $newStatus: UserStatus!
+      $transferToUserId: GID
+    ) {
+      updateUserStatus(
+        userIds: $userIds
+        status: $newStatus
+        transferToUserId: $transferToUserId
+      ) {
+        id
+        status
+      }
+    }
   `,
 ];
 
@@ -259,6 +448,7 @@ OrganizationUsers.getInitialProps = async ({
               limit: $limit
               search: $search
               sortBy: $sortBy
+              includeInactive: true
             ) {
               totalCount
               items {

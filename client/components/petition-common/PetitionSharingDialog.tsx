@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
   Avatar,
@@ -26,14 +26,13 @@ import {
 } from "@parallel/chakra/icons";
 import {
   PetitionActivityDocument,
-  PetitionSharingModal_searchUsersQuery,
-  PetitionSharingModal_searchUsersQueryVariables,
   PetitionSharingModal_UserFragment,
   usePetitionSharingModal_addPetitionUserPermissionMutation,
   usePetitionSharingModal_PetitionUserPermissionsQuery,
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import useMergedRef from "@react-hook/merged-ref";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -42,7 +41,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import {
-  UserSelect,
+  UserMultiSelect,
   UserSelectInstance,
   UserSelectSelection,
 } from "../common/UserSelect";
@@ -92,7 +91,7 @@ export function PetitionSharingDialog({
   });
   const [hasUsers, setHasUsers] = useState(false);
 
-  const usersRef = useRef<UserSelectInstance>(null);
+  const usersRef = useRef<UserSelectInstance<true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
 
   const _handleSearchUsers = useSearchUsers();
@@ -181,7 +180,7 @@ export function PetitionSharingDialog({
                   control={control}
                   rules={{ minLength: 1 }}
                   render={({ onChange, onBlur, value }) => (
-                    <UserSelect
+                    <UserMultiSelect
                       ref={usersRef}
                       value={value}
                       onKeyDown={(e: KeyboardEvent) => {
@@ -379,7 +378,7 @@ PetitionSharingDialog.fragments = {
         fullName
         ...UserSelect_User
       }
-      ${UserSelect.fragments.User}
+      ${UserMultiSelect.fragments.User}
     `;
   },
 };
@@ -442,37 +441,6 @@ PetitionSharingDialog.queries = [
     ${PetitionSharingDialog.fragments.Petition}
   `,
 ];
-
-function useSearchUsers() {
-  const client = useApolloClient();
-  return useCallback(async (search: string, exclude: string[]) => {
-    const { data } = await client.query<
-      PetitionSharingModal_searchUsersQuery,
-      PetitionSharingModal_searchUsersQueryVariables
-    >({
-      query: gql`
-        query PetitionSharingModal_searchUsers(
-          $search: String!
-          $exclude: [GID!]!
-        ) {
-          me {
-            organization {
-              users(search: $search, limit: 10, exclude: $exclude) {
-                items {
-                  ...UserSelect_User
-                }
-              }
-            }
-          }
-        }
-        ${UserSelect.fragments.User}
-      `,
-      variables: { search, exclude },
-      fetchPolicy: "no-cache",
-    });
-    return data!.me.organization.users.items;
-  }, []);
-}
 
 function useRemoveUserPermission() {
   const confirmRemoveUserPermission = useDialog(
